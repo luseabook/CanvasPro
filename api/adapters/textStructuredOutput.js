@@ -14,7 +14,7 @@ export function normalizeTextStructuredOutput(strict) {
   return {
     name: normalizeSchemaName(strict['name']),
     schema: schema,
-    strict: strict['strict'] !== ![],
+    strict: strict['strict'] !== false,
     fallback: strict['fallback'] === 'prompt' ? 'prompt' : 'none',
   };
 }

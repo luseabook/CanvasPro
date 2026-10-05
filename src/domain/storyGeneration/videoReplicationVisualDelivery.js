@@ -16,8 +16,8 @@ export function projectReplicationObservedShots(
       )
       ['filter']((options) => {
         const target = options['id'] + ':' + options['startSec'] + ':' + options['endSec'];
-        if (result['has'](target) || options['endSec'] <= key || options['startSec'] >= index) return ![];
-        return (result['add'](target), !![]);
+        if (result['has'](target) || options['endSec'] <= key || options['startSec'] >= index) return false;
+        return (result['add'](target), true);
       })
       ['sort']((source, next) => source['startSec'] - next['startSec']);
   if (!map['length'] || map['some']((current) => !String(current['visual'] || '')['trim']()))

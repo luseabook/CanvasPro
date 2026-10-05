@@ -2,9 +2,9 @@ import { normalizeStoryboard3DViewportSettings } from './viewportControlSystem.j
 export const STORYBOARD_3D_TRANSFORM_STORAGE_KEY = 'aiCanvas.storyboard3d.transform.v1';
 const DEFAULT_TRANSFORM_SETTINGS = Object['freeze']({
   transformSpace: 'world',
-  groundLock: ![],
-  uniformScale: ![],
-  snapEnabled: ![],
+  groundLock: false,
+  uniformScale: false,
+  snapEnabled: false,
 });
 export function loadStoryboard3DTransformSettings(value = globalThis['localStorage']) {
   try {

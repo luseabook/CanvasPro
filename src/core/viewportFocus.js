@@ -38,7 +38,7 @@ function _normalizeViewportRect(key, index, result, data) {
 export function getBrowserViewportRect({
   windowObject: windowObject = undefined,
   containerEl: containerEl = null,
-  containerCoordinates: containerCoordinates = ![],
+  containerCoordinates: containerCoordinates = false,
 } = {}) {
   const _getWindowObject2 = _getWindowObject(windowObject);
   if (containerCoordinates && containerEl && typeof containerEl['getBoundingClientRect'] === 'function') {
@@ -115,7 +115,7 @@ export function createViewportFocusController({
   animateViewport: animateViewport,
   cancelAnimation: cancelAnimation,
   containerEl: containerEl = null,
-  containerCoordinates: containerCoordinates = ![],
+  containerCoordinates: containerCoordinates = false,
   windowObject: windowObject = undefined,
   minZoom: minZoom = CANVAS_ZOOM_LIMITS['fitMin'],
   maxZoom: maxZoom = CANVAS_ZOOM_LIMITS['fitMax'],
@@ -182,22 +182,22 @@ export function createViewportFocusController({
   }
   function reapplyTrackedFocusNow() {
     value2 = null;
-    if (!args) return ![];
+    if (!args) return false;
     const enabled2 = run3(args);
-    if (!enabled2) return (clearTrackedFocus(), ![]);
+    if (!enabled2) return (clearTrackedFocus(), false);
     const { target: target3, viewport: viewport2 } = enabled2;
     if (
       viewport2['x'] === target3['x'] &&
       viewport2['y'] === target3['y'] &&
       viewport2['zoom'] === target3['zoom']
     )
-      return !![];
+      return true;
     return (
       cancelAnimation?.(),
       handler4(target3['x'], target3['y'], target3['zoom']),
       handler5(),
       handler6(),
-      !![]
+      true
     );
   }
   function run4() {
@@ -208,7 +208,7 @@ export function createViewportFocusController({
   }
   function run5(args2) {
     const enabled3 = run3(args2);
-    if (!enabled3) return (clearTrackedFocus(), ![]);
+    if (!enabled3) return (clearTrackedFocus(), false);
     args = { ...args2 };
     const { viewport: viewport3, target: target4 } = enabled3;
     return (
@@ -221,7 +221,7 @@ export function createViewportFocusController({
         target4['zoom'],
         args2['durationMs'],
       ),
-      !![]
+      true
     );
   }
   function focusNode(scope, padding = 120, durationMs = 1500, options2 = null) {
@@ -234,7 +234,7 @@ export function createViewportFocusController({
     });
   }
   function focusNodes(list, padding2 = 80, durationMs2 = 800, options3 = null) {
-    if (!Array['isArray'](list) || list['length'] === 0) return (clearTrackedFocus(), ![]);
+    if (!Array['isArray'](list) || list['length'] === 0) return (clearTrackedFocus(), false);
     return run5({
       type: 'nodes-fit',
       nodeIds: [...list],

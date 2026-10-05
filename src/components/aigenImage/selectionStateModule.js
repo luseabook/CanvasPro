@@ -1,20 +1,20 @@
 import { shouldAlwaysShowImageRefBar } from './imageNodeManifestPolicies.js';
 export function createAIGenerateNodeSelectionStateModule({ store: store } = {}) {
   class value {
-    ['syncSelectionState']({ selected: selected = ![], visible: visible = !![] } = {}) {
+    ['syncSelectionState']({ selected: selected = false, visible: visible = true } = {}) {
       const item =
           typeof store?.['getStateRaw'] === 'function'
             ? store['getStateRaw']()
             : store?.['getState']?.() || {},
         key = item?.['pickConnectMode'] || {},
         enabled =
-          selected === !![] ||
+          selected === true ||
           (key['active'] && key['sourceNodeId'] === this['nodeId']) ||
           shouldAlwaysShowImageRefBar(this['_data']?.['model']);
-      if (visible !== !![] || this['_rendererMediaDeferred'] === !![] || !enabled)
-        return ((this['_renderRefBarPendingWhenVisible'] = !![]), ![]);
-      if (this['_renderRefBarPendingWhenVisible'] !== !![]) return ![];
-      return ((this['_renderRefBarPendingWhenVisible'] = ![]), void this['_renderRefBar'](), !![]);
+      if (visible !== true || this['_rendererMediaDeferred'] === true || !enabled)
+        return ((this['_renderRefBarPendingWhenVisible'] = true), false);
+      if (this['_renderRefBarPendingWhenVisible'] !== true) return false;
+      return ((this['_renderRefBarPendingWhenVisible'] = false), void this['_renderRefBar'](), true);
     }
   }
   return value['prototype'];

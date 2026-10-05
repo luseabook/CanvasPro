@@ -26,7 +26,7 @@ export function bindImageHdAction(value) {
           })
         : imageHdOutputText({ status: imageHdText('status.cancelled') });
     };
-  let enabled = ![];
+  let enabled = false;
   const button = toolbarEl['querySelector']('.act-hd');
   button &&
     (_hdTaskMachine['bindButton'](button),
@@ -93,11 +93,11 @@ export function bindImageHdAction(value) {
         return;
       }
       if (enabled) return;
-      enabled = !![];
+      enabled = true;
       const target = window['currentProjectId'];
-      let enabled2 = ![];
+      let enabled2 = false;
       const source = () => {
-          enabled2 = !![];
+          enabled2 = true;
         },
         handler = () =>
           !enabled2 &&
@@ -116,7 +116,7 @@ export function bindImageHdAction(value) {
       } catch (error) {
         window['showToast']?.(error?.['message'] || String(error), 'error');
       } finally {
-        ((enabled = ![]), window['removeEventListener']('aicanvas:active-canvas-changed', source));
+        ((enabled = false), window['removeEventListener']('aicanvas:active-canvas-changed', source));
       }
     }));
 }

@@ -425,11 +425,11 @@ export function setDragContextGetter(value19) {
   _getDragContext = typeof value19 === 'function' ? value19 : () => ({});
 }
 export function isValidConnection(enabled10, enabled11) {
-  if (!enabled10 || !enabled11) return ![];
-  if (enabled10['id'] === enabled11['id']) return ![];
+  if (!enabled10 || !enabled11) return false;
+  if (enabled10['id'] === enabled11['id']) return false;
   const value20 = enabled10['type'] || '',
     value21 = enabled11['type'] || '';
-  if (value20 === 'debug' || _isBlockedOutputNodeType(value20)) return ![];
+  if (value20 === 'debug' || _isBlockedOutputNodeType(value20)) return false;
   const run = (value22) =>
     value22 === 'ai-image' ||
     value22 === 'ai-text' ||
@@ -440,23 +440,23 @@ export function isValidConnection(enabled10, enabled11) {
     value22 === 'group' ||
     _isPanorama360TargetType(value22) ||
     value22 === 'whiteboard';
-  if (!run(value21)) return ![];
+  if (!run(value21)) return false;
   if (value21 === 'whiteboard') return value20 === 'source-image' || value20 === 'ai-image';
   if (value20 === 'group') return value21 === 'group' || _isSharedInputPolicyTargetType(value21);
   if (_isPanorama360TargetType(value21)) {
-    if (!_isPanorama360ImageSourceType(value20)) return ![];
+    if (!_isPanorama360ImageSourceType(value20)) return false;
   }
   if (isMediaClipNodeType(value21)) return isSupportedMediaClipInput(enabled10);
   if (value21 === 'ai-image') {
     const list6 = ['source-image', 'image', 'ai-image', 'source-text', 'text', 'ai-text'];
-    if (!list6['includes'](value20)) return ![];
+    if (!list6['includes'](value20)) return false;
   }
   if (value21 === 'ai-audio') {
-    if (value20 === 'source-image' || value20 === 'image' || value20 === 'ai-image') return ![];
+    if (value20 === 'source-image' || value20 === 'image' || value20 === 'ai-image') return false;
   }
   if (_isSharedInputPolicyTargetType(value21)) {
     const effectiveInputKind = resolveEffectiveInputKind(enabled10);
-    if (effectiveInputKind && !isInputKindAllowed(getTargetInputPolicy(enabled11), effectiveInputKind)) return ![];
+    if (effectiveInputKind && !isInputKindAllowed(getTargetInputPolicy(enabled11), effectiveInputKind)) return false;
     const fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(enabled11);
     if (fixedInputSlotConfigFromManifest && effectiveInputKind && effectiveInputKind !== 'text') {
       const map2 = new Set(fixedInputSlotConfigFromManifest['visibleSlots'] || []),
@@ -467,11 +467,11 @@ export function isValidConnection(enabled10, enabled11) {
         list9['length'] > 0 &&
         !list9['some']((value24) => fixedInputSlotAcceptsSource(fixedInputSlotConfigFromManifest, value24, enabled10))
       )
-        return ![];
+        return false;
     }
   }
-  if (resolveEffectiveInputKind(enabled10) === 'video' && !hasUsableInputNodeSource(enabled10)) return ![];
-  return !![];
+  if (resolveEffectiveInputKind(enabled10) === 'video' && !hasUsableInputNodeSource(enabled10)) return false;
+  return true;
 }
 function _videoSourceKey(response) {
   if (!response || typeof response !== 'object') return '';
@@ -490,9 +490,9 @@ function _videoSourceKey(response) {
 }
 function _isUnavailableVideoRecord(value25) {
   const _videoSourceKey2 = _videoSourceKey(value25);
-  if (!_videoSourceKey2) return ![];
+  if (!_videoSourceKey2) return false;
   return (
-    value25?.['mediaUnavailable'] === !![] &&
+    value25?.['mediaUnavailable'] === true &&
     String(value25?.['mediaUnavailableSource'] || '')['trim']() === _videoSourceKey2
   );
 }
@@ -513,8 +513,8 @@ export function isSidePlusPointerBlockedByElement(el30) {
     el30 && typeof el30['closest'] === 'function'
       ? el30
       : el30?.['parentElement'] || null;
-  if (!el31) return ![];
-  if (el31['closest']('.side-plus-btn, #v2-side-plus-holder')) return ![];
+  if (!el31) return false;
+  if (el31['closest']('.side-plus-btn, #v2-side-plus-holder')) return false;
   return !!el31['closest'](SIDE_PLUS_POINTER_BLOCKER_SELECTOR);
 }
 function _isSidePlusPointerOnCanvasSurface(el32) {
@@ -522,15 +522,15 @@ function _isSidePlusPointerOnCanvasSurface(el32) {
     el32 && typeof el32['closest'] === 'function'
       ? el32
       : el32?.['parentElement'] || null;
-  if (!enabled12 || typeof document === 'undefined') return !![];
+  if (!enabled12 || typeof document === 'undefined') return true;
   const el33 = document['getElementById']?.('v2-canvas');
-  if (!el33) return !![];
+  if (!el33) return true;
   const value26 = el33['closest']?.('.v2-canvas-stage') || null;
   return (
     enabled12 === el33 ||
-    el33['contains']?.(enabled12) === !![] ||
+    el33['contains']?.(enabled12) === true ||
     enabled12 === value26 ||
-    value26?.['contains']?.(enabled12) === !![]
+    value26?.['contains']?.(enabled12) === true
   );
 }
 function _resolveSidePlusPointerElementAt(value27, value28, value29) {
@@ -580,42 +580,42 @@ export function resolveSidePlusButtonPosition({
   return { left: screenX - screenRadius, top: screenY - screenRadius };
 }
 export function resolveSidePlusRenderState({
-  isDraggingPlus: isDraggingPlus = ![],
-  isNodeDragging: isNodeDragging = ![],
-  isBoxSelecting: isBoxSelecting = ![],
-  isConnecting: isConnecting = ![],
-  isPanning: isPanning = ![],
-  isZooming: isZooming = ![],
-  isViewportAnimating: isViewportAnimating = ![],
-  isSpaceHeld: isSpaceHeld = ![],
+  isDraggingPlus: isDraggingPlus = false,
+  isNodeDragging: isNodeDragging = false,
+  isBoxSelecting: isBoxSelecting = false,
+  isConnecting: isConnecting = false,
+  isPanning: isPanning = false,
+  isZooming: isZooming = false,
+  isViewportAnimating: isViewportAnimating = false,
+  isSpaceHeld: isSpaceHeld = false,
   selectedCount: selectedCount = 0,
-  requestedSelectionOnly: requestedSelectionOnly = ![],
+  requestedSelectionOnly: requestedSelectionOnly = false,
 } = {}) {
   const count = Number(selectedCount) || 0,
     value42 = count > 0,
     value43 = count >= 2;
-  if (isDraggingPlus) return { shouldClear: !![], selectionOnly: ![] };
-  if (isNodeDragging) return { shouldClear: !![], selectionOnly: ![] };
+  if (isDraggingPlus) return { shouldClear: true, selectionOnly: false };
+  if (isNodeDragging) return { shouldClear: true, selectionOnly: false };
   if (value42 && (isBoxSelecting || isConnecting || isSpaceHeld))
-    return { shouldClear: ![], selectionOnly: !![] };
-  if (isBoxSelecting || isConnecting) return { shouldClear: !![], selectionOnly: ![] };
+    return { shouldClear: false, selectionOnly: true };
+  if (isBoxSelecting || isConnecting) return { shouldClear: true, selectionOnly: false };
   const selectionOnly2 = requestedSelectionOnly || value43;
-  if (isSpaceHeld && !isPanning && !selectionOnly2) return { shouldClear: !![], selectionOnly: ![] };
-  return { shouldClear: ![], selectionOnly: selectionOnly2 };
+  if (isSpaceHeld && !isPanning && !selectionOnly2) return { shouldClear: true, selectionOnly: false };
+  return { shouldClear: false, selectionOnly: selectionOnly2 };
 }
 export function shouldShowSidePlusForNode({
   sideDistance: sideDistance,
   threshold: threshold,
-  isSelected: isSelected = ![],
-  isHovered: isHovered = ![],
-  isInside: isInside = ![],
+  isSelected: isSelected = false,
+  isHovered: isHovered = false,
+  isInside: isInside = false,
   nodeType: nodeType = '',
 } = {}) {
-  if (isSelected) return !![];
-  if (!isHovered) return ![];
+  if (isSelected) return true;
+  if (!isHovered) return false;
   const value44 = Number(sideDistance),
     value45 = Number(threshold);
-  if (Number['isFinite'](value44) && Number['isFinite'](value45) && value44 < value45) return !![];
+  if (Number['isFinite'](value44) && Number['isFinite'](value45) && value44 < value45) return true;
   return !!isInside && String(nodeType || '')['trim']() !== 'group';
 }
 export function shouldUseInlineMediaClipAddSlot(value46 = '') {
@@ -623,11 +623,11 @@ export function shouldUseInlineMediaClipAddSlot(value46 = '') {
 }
 export function shouldShowRightSidePlusForNodeType(value47 = '') {
   const value48 = String(value47 || '')['trim']();
-  if (value48 === 'debug') return ![];
-  if (value48 === 'comment-note') return ![];
-  if (value48 === 'whiteboard') return ![];
-  if (value48 === 'storyboard') return ![];
-  if (value48 === 'collage') return ![];
+  if (value48 === 'debug') return false;
+  if (value48 === 'comment-note') return false;
+  if (value48 === 'whiteboard') return false;
+  if (value48 === 'storyboard') return false;
+  if (value48 === 'collage') return false;
   return !_isBlockedOutputNodeType(value48) && !shouldUseInlineMediaClipAddSlot(value48);
 }
 export function getGroupSidePlusAnchorCandidateIds({
@@ -665,8 +665,8 @@ export function getGroupSidePlusAnchorCandidateIds({
 }
 export function resolveSidePlusCandidateIds({
   selectedIds: selectedIds = [],
-  isMultiSelection: isMultiSelection = ![],
-  selectionOnly: selectionOnly = ![],
+  isMultiSelection: isMultiSelection = false,
+  selectionOnly: selectionOnly = false,
   hoverNodeId: hoverNodeId = null,
   groupAnchorIds: groupAnchorIds = [],
 } = {}) {
@@ -699,7 +699,7 @@ export function computeMultiSelectionBoundsForSidePlus(value58, value59, value60
   for (const value63 of list12) {
     const box2 = value59?.[value63];
     if (!box2) continue;
-    const value64 = map3?.['has'](value63) === !![],
+    const value64 = map3?.['has'](value63) === true,
       value65 = box2['x'] + (value64 ? value61 : 0),
       value66 = box2['y'] + (value64 ? value62 : 0);
     count2 += 1;
@@ -746,12 +746,12 @@ function _getDraftEdgePath() {
   let el38 = _draftEdgeCache['pathEl'];
   return (
     el38 &&
-      (el38['parentNode'] !== el37 || el38['isConnected'] === ![]) &&
+      (el38['parentNode'] !== el37 || el38['isConnected'] === false) &&
       (el38['remove']?.(), (el38 = null)),
     !el38 &&
       ((el38 = el37['querySelector']?.('#v2-draft-edge') || null),
       el38 &&
-        (el38['parentNode'] !== el37 || el38['isConnected'] === ![]) &&
+        (el38['parentNode'] !== el37 || el38['isConnected'] === false) &&
         (el38 = null)),
     !el38 &&
       ((el38 = document['createElementNS']('http://www.w3.org/2000/svg', 'path')),
@@ -814,19 +814,19 @@ function _clearDraftEdgeDirectly() {
 }
 export function createEdgeController() {
   function tryStartHandleConnect(value76, event, value77, value78, value79) {
-    if (!event || !event['target']) return ![];
+    if (!event || !event['target']) return false;
     const el41 = event['target']['closest']('.v2-handle');
-    if (!el41) return ![];
+    if (!el41) return false;
     return (
       event['preventDefault'](),
       event['stopPropagation'](),
-      (value76['isConnecting'] = !![]),
+      (value76['isConnecting'] = true),
       (value76['connectSourceId'] = el41['dataset']['nodeId']),
       (value76['connectStartX'] = value77),
       (value76['connectStartY'] = value78),
       (value76['connectSide'] = 'left'),
       _renderDraftEdgeDirectly(value77, value78, value77, value78, 'left', value79),
-      !![]
+      true
     );
   }
   function updateHandleConnect(side, value80, value81, value82, value83, value84, value85, value86) {
@@ -849,25 +849,25 @@ export function createEdgeController() {
       value85,
       value84,
       side['connectSourceId'],
-      ![],
+      false,
       { spatialIndex: spatialIndex },
     );
     if (hoverId && value86?.['invalidNodeIds']?.['includes'](hoverId)) hoverId = null;
     return (
       (value86?.['hoverId'] || null) !== hoverId &&
         graphStore['setConnOverlay']({ hoverId: hoverId, side: side['connectSide'] }),
-      !![]
+      true
     );
   }
   function finishHandleConnect(sourceId, value87, value88) {
     const stateRaw = getStateRaw(),
       { viewport: viewport3, nodes: nodes3 } = stateRaw,
       spatialIndex2 = _getNodeSpatialIndex(nodes3, stateRaw['_persistRev'], _NODE_SPATIAL_INDEX_DEFAULT_KEY),
-      hitTestNode2 = hitTestNode(value87, value88, nodes3, viewport3, sourceId['connectSourceId'], ![], {
+      hitTestNode2 = hitTestNode(value87, value88, nodes3, viewport3, sourceId['connectSourceId'], false, {
         spatialIndex: spatialIndex2,
       }),
       targetId = hitTestNode2 ? nodes3[hitTestNode2] : null;
-    let addEdgeWithPolicies2 = ![];
+    let addEdgeWithPolicies2 = false;
     return (
       targetId &&
         (addEdgeWithPolicies2 = addEdgeWithPolicies({
@@ -907,7 +907,7 @@ export function initConnectionHandles(value89) {
     map6 = new Map(),
     map7 = createGroupSidePlusCandidateIdCache();
   let side2 = {
-    dragging: ![],
+    dragging: false,
     srcId: null,
     sourceNodeIds: [],
     plusKind: 'node',
@@ -920,7 +920,7 @@ export function initConnectionHandles(value89) {
     lastY: 0,
     anchorWorldX: null,
     anchorWorldY: null,
-    didAssistPan: ![],
+    didAssistPan: false,
     assistPanViewport: null,
   };
   const store = createViewportPreviewCoordinator({
@@ -953,15 +953,15 @@ export function initConnectionHandles(value89) {
     edges: edges,
     outMap: outMap3,
   }) {
-    if (!sourceNodeId || !targetNodeId || sourceNodeId === targetNodeId) return ![];
+    if (!sourceNodeId || !targetNodeId || sourceNodeId === targetNodeId) return false;
     const enabled17 = nodes4?.[sourceNodeId],
       enabled18 = nodes4?.[targetNodeId];
-    if (!enabled17 || !enabled18) return ![];
+    if (!enabled17 || !enabled18) return false;
     const sourceId2 = side3 === 'right' ? enabled17 : enabled18,
       targetId2 = side3 === 'right' ? enabled18 : enabled17;
-    if (!sourceId2?.['id'] || !targetId2?.['id']) return ![];
+    if (!sourceId2?.['id'] || !targetId2?.['id']) return false;
     const value95 = !!outMap3['get'](sourceId2['id'])?.['has'](targetId2['id']);
-    if (value95) return ![];
+    if (value95) return false;
     if (
       String(sourceId2['type'] || '')['trim']() === 'group' &&
       String(targetId2['type'] || '')['trim']() === 'group' &&
@@ -972,7 +972,7 @@ export function initConnectionHandles(value89) {
         edges: edges,
       })
     )
-      return ![];
+      return false;
     return isValidConnection(sourceId2, targetId2);
   }
   function run3(value96, value97, value98, box5, value99) {
@@ -1057,7 +1057,7 @@ export function initConnectionHandles(value89) {
         invalidNodeIds['push'](targetNodeId2);
         continue;
       }
-      let enabled19 = ![];
+      let enabled19 = false;
       for (const sourceNodeId2 of value109) {
         if (
           !run2({
@@ -1070,7 +1070,7 @@ export function initConnectionHandles(value89) {
           })
         )
           continue;
-        enabled19 = !![];
+        enabled19 = true;
         break;
       }
       if (!enabled19) invalidNodeIds['push'](targetNodeId2);
@@ -1135,7 +1135,7 @@ export function initConnectionHandles(value89) {
         (sx['stopPropagation'](),
           sx['preventDefault'](),
           (side2 = {
-            dragging: !![],
+            dragging: true,
             srcId: srcId['nodeId'],
             sourceNodeIds: sourceNodeIds2,
             plusKind: srcId['plusKind'] === 'multi' ? 'multi' : 'node',
@@ -1148,7 +1148,7 @@ export function initConnectionHandles(value89) {
             lastY: sx['clientY'],
             anchorWorldX: anchorWorldX?.['x'] ?? null,
             anchorWorldY: anchorWorldX?.['y'] ?? null,
-            didAssistPan: ![],
+            didAssistPan: false,
             assistPanViewport: null,
           }),
           run4(),
@@ -1206,7 +1206,7 @@ export function initConnectionHandles(value89) {
       (el47['style']['justifyContent'] = 'center'));
     let screenX2 = value121,
       screenY2 = value122,
-      enabled21 = ![];
+      enabled21 = false;
     if (value124 !== undefined && value125 !== undefined) {
       const value133 = value124 - value121,
         value134 = value125 - value122,
@@ -1218,7 +1218,7 @@ export function initConnectionHandles(value89) {
         ((screenX2 += Math['cos'](value138) * value137),
           (screenY2 += Math['sin'](value138) * value137),
           (el47['style']['background'] = 'var(--white-10)'),
-          (enabled21 = !![]));
+          (enabled21 = true));
       }
     }
     if (!enabled21) el47['style']['background'] = '';
@@ -1298,7 +1298,7 @@ export function initConnectionHandles(value89) {
         isViewportAnimating: isPanning2['isViewportAnimating'],
         isSpaceHeld: !!window['_spaceHeld'],
         selectedCount: selectedCount2['size'],
-        requestedSelectionOnly: requestedSelectionOnly2['selectionOnly'] === !![] || value142 === 'selection-only',
+        requestedSelectionOnly: requestedSelectionOnly2['selectionOnly'] === true || value142 === 'selection-only',
       });
     el42['classList']['toggle'](
       'is-selection-plus-visible',
@@ -1310,13 +1310,13 @@ export function initConnectionHandles(value89) {
     }
     const selectionOnly3 = sidePlusRenderState['selectionOnly'];
     let hoverNodeId2 = null,
-      enabled22 = ![];
-    if (selectionOnly3) ((hoverNodeId2 = null), (enabled22 = ![]));
+      enabled22 = false;
+    if (selectionOnly3) ((hoverNodeId2 = null), (enabled22 = false));
     else {
       if (interactionState['isDragging'] && interactionState['targetNodeId'])
-        ((hoverNodeId2 = interactionState['targetNodeId']), (enabled22 = !![]));
+        ((hoverNodeId2 = interactionState['targetNodeId']), (enabled22 = true));
       else {
-        if (value146) ((hoverNodeId2 = value146), (enabled22 = !![]));
+        if (value146) ((hoverNodeId2 = value146), (enabled22 = true));
         else {
           const spatialIndex3 = _getNodeSpatialIndex(
               nodes6,
@@ -1331,7 +1331,7 @@ export function initConnectionHandles(value89) {
               overrideNodeIds: overrideNodeIds,
               viewport: viewport5,
               spatialIndex: spatialIndex3,
-              ignoreGroup: !![],
+              ignoreGroup: true,
             });
           closestNodeWithGeometryOverrides && ((hoverNodeId2 = closestNodeWithGeometryOverrides['nodeId']), (enabled22 = closestNodeWithGeometryOverrides['isInside']));
         }
@@ -1392,7 +1392,7 @@ export function initConnectionHandles(value89) {
         sideDistance3 = Math['hypot'](screenX3 - value156, screenY3 - value154),
         isHovered2 = value150 === hoverNodeId2 || sideAnchorHoverIds2['has'](value150),
         isSelected2 = selectedCount2['has'](value150),
-        isInside2 = value150 === hoverNodeId2 ? enabled22 : ![],
+        isInside2 = value150 === hoverNodeId2 ? enabled22 : false,
         value157 = isInside2 || (interactionState['isDragging'] && value150 === interactionState['targetNodeId']),
         shouldShowSidePlusForNode2 = shouldShowSidePlusForNode({
           sideDistance: sideDistance2,
@@ -1524,7 +1524,7 @@ export function initConnectionHandles(value89) {
     return box11;
   }
   const run15 = rafSampleLatest((clientX, clientY) => {
-    run16({ clientX: clientX, clientY: clientY }, !![]);
+    run16({ clientX: clientX, clientY: clientY }, true);
   });
   function run17() {
     const value167 = {
@@ -1532,23 +1532,23 @@ export function initConnectionHandles(value89) {
       sourceNodeIds: sourceNodeIds(side2['sourceNodeIds'], side2['srcId']),
     };
     return (
-      (side2['dragging'] = ![]),
+      (side2['dragging'] = false),
       (side2['srcId'] = null),
       (side2['sourceNodeIds'] = []),
       (side2['plusKind'] = 'node'),
       (side2['anchorWorldX'] = null),
       (side2['anchorWorldY'] = null),
-      (side2['didAssistPan'] = ![]),
+      (side2['didAssistPan'] = false),
       (side2['assistPanViewport'] = null),
       run5(),
       value167
     );
   }
   function run18() {
-    if (!side2['dragging']) return ![];
-    return (run15['cancel']?.(), run13(), run17(), _clearDraftEdgeDirectly(), !![]);
+    if (!side2['dragging']) return false;
+    return (run15['cancel']?.(), run13(), run17(), _clearDraftEdgeDirectly(), true);
   }
-  function run16(pointerTarget, enabled24 = ![]) {
+  function run16(pointerTarget, enabled24 = false) {
     if (side2['dragging'] && !enabled24 && pointerTarget?.['buttons'] === 0) {
       run18();
       return;
@@ -1565,7 +1565,7 @@ export function initConnectionHandles(value89) {
         _persistRev: _persistRev2,
       } = getStateRaw();
       viewport6 = side2['assistPanViewport'] || viewport6;
-      if (window['_spaceHeld'] === !![]) {
+      if (window['_spaceHeld'] === true) {
         const value168 = pointerTarget['clientX'] - side2['lastX'],
           value169 = pointerTarget['clientY'] - side2['lastY'];
         if (value168 || value169) {
@@ -1581,8 +1581,8 @@ export function initConnectionHandles(value89) {
             }),
             (side2['assistPanViewport'] = viewport6),
             store['update'](SIDE_PLUS_ASSIST_PAN_PREVIEW_OWNER, viewport6),
-            (side2['didAssistPan'] = !![]),
-            !enabled25 && window['_v2ScheduleMinimapViewportPreview']?.(box12, { force: !![] }),
+            (side2['didAssistPan'] = true),
+            !enabled25 && window['_v2ScheduleMinimapViewportPreview']?.(box12, { force: true }),
             window['_v2ScheduleMinimapViewportPreview']?.(viewport6));
         }
       }
@@ -1644,7 +1644,7 @@ export function initConnectionHandles(value89) {
   function run19(clientX2) {
     if (!side2['dragging']) return;
     (run15['cancel']?.(),
-      run16({ clientX: clientX2['clientX'], clientY: clientX2['clientY'] }, !![]),
+      run16({ clientX: clientX2['clientX'], clientY: clientX2['clientY'] }, true),
       run13());
     const {
         srcId: srcId2,
@@ -1679,7 +1679,7 @@ export function initConnectionHandles(value89) {
       nodes8,
       viewport7,
       srcId2,
-      ![],
+      false,
       { spatialIndex: spatialIndex4 },
     );
     if (targetId3 && map13['has'](targetId3)) targetId3 = null;
@@ -1687,7 +1687,7 @@ export function initConnectionHandles(value89) {
       handler3();
       if (plusKind === 'multi') {
         if (side5 !== 'right') return;
-        let enabled27 = ![];
+        let enabled27 = false;
         for (const sourceId3 of sourceNodeIds4) {
           if (!sourceId3 || sourceId3 === targetId3) continue;
           const stateRaw6 = getStateRaw(),
@@ -1697,7 +1697,7 @@ export function initConnectionHandles(value89) {
           if (!isValidConnection(enabled28, enabled29)) continue;
           const addEdgeWithPolicies3 = addEdgeWithPolicies({ sourceId: sourceId3, targetId: targetId3 });
           if (!addEdgeWithPolicies3) continue;
-          ((enabled27 = !![]), run3(sourceId3, targetId3, enabled28, enabled29, side5));
+          ((enabled27 = true), run3(sourceId3, targetId3, enabled28, enabled29, side5));
         }
         if (!enabled27) return;
         return;
@@ -1766,8 +1766,8 @@ export function initConnectionHandles(value89) {
     }
     _showQuoteMenu(clientX2['clientX'], clientX2['clientY'], srcId2, viewport7, handler3);
   }
-  (window['addEventListener']('pointerup', run19, { capture: !![] }),
-    window['addEventListener']('pointercancel', run18, { capture: !![] }),
+  (window['addEventListener']('pointerup', run19, { capture: true }),
+    window['addEventListener']('pointercancel', run18, { capture: true }),
     window['addEventListener']('blur', run18));
 }
 const _RH_ANIME_REAL_MODEL = ANIME_REAL_MODEL_ID,
@@ -1813,7 +1813,7 @@ const _RH_ANIME_REAL_MODEL = ANIME_REAL_MODEL_ID,
   };
 function _finishManifestFixedInputResult(value187, value188, value189) {
   const refSlot = String(value189 || '')['trim']();
-  if (!refSlot) return { ok: !![], refSlot: '' };
+  if (!refSlot) return { ok: true, refSlot: '' };
   const list16 = getExclusiveSlotsForFixedSlot(value187?.['exclusiveGroups'], refSlot);
   if (list16['length'] > 1) {
     const map15 = new Set(list16);
@@ -1825,7 +1825,7 @@ function _finishManifestFixedInputResult(value187, value188, value189) {
         graphStore['removeEdge'](value190['id']);
     }
   }
-  return { ok: !![], refSlot: refSlot };
+  return { ok: true, refSlot: refSlot };
 }
 function _canUseManifestFixedInputOverflow({
   config: config2,
@@ -1835,14 +1835,14 @@ function _canUseManifestFixedInputOverflow({
   nodes: nodes9,
 }) {
   const enabled34 = String(srcKind || '')['trim']();
-  if (!enabled34 || enabled34 === 'text') return ![];
+  if (!enabled34 || enabled34 === 'text') return false;
   const map16 = new Set(config2?.['visibleSlots'] || []),
     value192 = (config2?.['slotOrderByType']?.[enabled34] || [])['filter']((value193) =>
       map16['has'](value193),
     )['length'],
     targetInputPolicy2 = getTargetInputPolicy(tgtData2),
     value194 = Number(targetInputPolicy2?.['maxByKind']?.[enabled34]);
-  if (!Number['isFinite'](value194) || value194 <= value192) return ![];
+  if (!Number['isFinite'](value194) || value194 <= value192) return false;
   const value195 = (Array['isArray'](incomingEdges2) ? incomingEdges2 : [])['filter'](
     (value196) => _getRhV54RefKind(nodes9?.[value196?.['sourceId']]) === enabled34,
   )['length'];
@@ -1850,7 +1850,7 @@ function _canUseManifestFixedInputOverflow({
 }
 function _allowsManifestFixedInputOverflow({ config: config3, srcKind: srcKind2, tgtData: tgtData3 }) {
   const enabled35 = String(srcKind2 || '')['trim']();
-  if (!enabled35 || enabled35 === 'text') return ![];
+  if (!enabled35 || enabled35 === 'text') return false;
   const map17 = new Set(config3?.['visibleSlots'] || []),
     value197 = (config3?.['slotOrderByType']?.[enabled35] || [])['filter']((value198) =>
       map17['has'](value198),
@@ -1870,7 +1870,7 @@ function _cycleManifestFixedInputWhenFull({
 }) {
   const enabled36 = String(srcKind3 || '')['trim']();
   if (!enabled36 || enabled36 === 'text') return null;
-  if (config4?.['manifest']?.['inputSlots']?.['cycleFixedInputWhenFull'] !== !![]) return null;
+  if (config4?.['manifest']?.['inputSlots']?.['cycleFixedInputWhenFull'] !== true) return null;
   const targetInputPolicy4 = getTargetInputPolicy(tgtData4),
     count17 = Number(targetInputPolicy4?.['maxByKind']?.[enabled36]);
   if (!Number['isFinite'](count17) || count17 <= 0) return null;
@@ -1890,7 +1890,7 @@ function _cycleManifestFixedInputWhenFull({
     count17 <= value200 && Array['isArray'](slotOrder) && slotOrder['includes'](value205)
       ? value205
       : '';
-  return { ok: !![], refSlot: refSlot2 };
+  return { ok: true, refSlot: refSlot2 };
 }
 function _applyRhPersonReplaceV3FixedInputs({
   srcData: srcData2,
@@ -1899,8 +1899,8 @@ function _applyRhPersonReplaceV3FixedInputs({
   nodes: nodes11,
   targetId: targetId5,
 }) {
-  if (!_isRhPersonReplaceV3Target(tgtData5)) return { ok: !![], refSlot: '' };
-  if (!_isAnimeRealImageSrc(srcData2)) return { ok: ![], refSlot: '' };
+  if (!_isRhPersonReplaceV3Target(tgtData5)) return { ok: true, refSlot: '' };
+  if (!_isAnimeRealImageSrc(srcData2)) return { ok: false, refSlot: '' };
   const list18 = ['replaceTarget', 'replacedImage'],
     list19 = Array['isArray'](incomingEdges4) ? incomingEdges4 : [],
     list20 = list19['filter']((value206) => {
@@ -1913,7 +1913,7 @@ function _applyRhPersonReplaceV3FixedInputs({
       ),
     ),
     refSlot3 = list18['find']((value210) => !map19['has'](value210)) || '';
-  if (refSlot3) return { ok: !![], refSlot: refSlot3 };
+  if (refSlot3) return { ok: true, refSlot: refSlot3 };
   let enabled38 = null;
   for (const value211 of list20) {
     if (list18['includes'](String(value211['refSlot'] || ''))) {
@@ -1929,7 +1929,7 @@ function _applyRhPersonReplaceV3FixedInputs({
     enabled38 && list18['includes'](String(enabled38['refSlot'] || ''))
       ? String(enabled38['refSlot'])
       : list18[0];
-  return { ok: !![], refSlot: refSlot4 };
+  return { ok: true, refSlot: refSlot4 };
 }
 function _applyManifestFixedInputs({
   srcData: srcData3,
@@ -1941,12 +1941,12 @@ function _applyManifestFixedInputs({
 }) {
   const value213 = String(tgtData6?.['type'] || '')['trim']();
   if (value213 !== 'ai-video' && value213 !== 'ai-audio' && value213 !== 'ai-image')
-    return { ok: !![], refSlot: '' };
-  if (value213 === 'ai-image' && _isRhPersonReplaceV3Target(tgtData6)) return { ok: !![], refSlot: '' };
+    return { ok: true, refSlot: '' };
+  if (value213 === 'ai-image' && _isRhPersonReplaceV3Target(tgtData6)) return { ok: true, refSlot: '' };
   const config5 = _getManifestFixedInputConfig(tgtData6);
-  if (!config5) return { ok: !![], refSlot: '' };
+  if (!config5) return { ok: true, refSlot: '' };
   const srcKind4 = _getRhV54RefKind(srcData3);
-  if (srcKind4 === 'text') return { ok: !![], refSlot: '' };
+  if (srcKind4 === 'text') return { ok: true, refSlot: '' };
   const map20 = new Set(config5['visibleSlots'] || []),
     list21 = config5['slotOrderByType']?.[srcKind4] || [],
     list22 = list21['filter'](
@@ -1968,8 +1968,8 @@ function _applyManifestFixedInputs({
         nodes: nodes12,
       })
     )
-      return { ok: !![], refSlot: '' };
-    return { ok: ![], refSlot: '' };
+      return { ok: true, refSlot: '' };
+    return { ok: false, refSlot: '' };
   }
   const value217 = slotOrder2['includes'](String(preferredRefSlot || '')) ? String(preferredRefSlot || '') : '',
     incomingEdges6 = Array['isArray'](incomingEdges5) ? incomingEdges5 : [],
@@ -2029,7 +2029,7 @@ function _applyManifestFixedInputs({
       nodes: nodes12,
     })
   )
-    return { ok: !![], refSlot: '' };
+    return { ok: true, refSlot: '' };
   const _cycleManifestFixedInputWhenFull2 = _cycleManifestFixedInputWhenFull({
     config: config5,
     srcKind: srcKind4,
@@ -2086,12 +2086,12 @@ function _applyDreaminaVideoFixedInputs({
   nodes: nodes13,
   targetId: targetId7,
 }) {
-  if (!_isDreaminaVideoTarget(tgtData7)) return { ok: !![], refSlot: '' };
+  if (!_isDreaminaVideoTarget(tgtData7)) return { ok: true, refSlot: '' };
   const dreaminaVideoRouteMode = normalizeDreaminaVideoRouteMode(tgtData7?.['dreaminaRouteMode'], tgtData7?.['mode']),
     _getRhV54RefKind2 = _getRhV54RefKind(srcData4),
     list24 = Array['isArray'](incomingEdges7) ? incomingEdges7 : [];
   if (dreaminaVideoRouteMode === 'frames2video') {
-    if (_getRhV54RefKind2 !== 'image') return { ok: ![], refSlot: '' };
+    if (_getRhV54RefKind2 !== 'image') return { ok: false, refSlot: '' };
     for (const value238 of list24) {
       const value239 = nodes13?.[value238['sourceId']];
       _getRhV54RefKind(value239) !== 'image' && graphStore['removeEdge'](value238['id']);
@@ -2103,10 +2103,10 @@ function _applyDreaminaVideoFixedInputs({
       const value243 = list25['shift']();
       if (value243?.['id']) graphStore['removeEdge'](value243['id']);
     }
-    return { ok: !![], refSlot: '' };
+    return { ok: true, refSlot: '' };
   }
   if (dreaminaVideoRouteMode === 'multiframe2video') {
-    if (_getRhV54RefKind2 !== 'image') return { ok: ![], refSlot: '' };
+    if (_getRhV54RefKind2 !== 'image') return { ok: false, refSlot: '' };
     const list26 = list24['filter'](
       (value244) => _getRhV54RefKind(nodes13?.[value244['sourceId']]) === 'image',
     )['sort']((value245, value246) => _edgeTimeKey(value245) - _edgeTimeKey(value246));
@@ -2114,13 +2114,13 @@ function _applyDreaminaVideoFixedInputs({
       const value247 = list26['shift']();
       if (value247?.['id']) graphStore['removeEdge'](value247['id']);
     }
-    return { ok: !![], refSlot: '' };
+    return { ok: true, refSlot: '' };
   }
-  if (!['image', 'video', 'audio', 'text']['includes'](_getRhV54RefKind2)) return { ok: ![], refSlot: '' };
-  if (_getRhV54RefKind2 === 'text') return { ok: !![], refSlot: '' };
+  if (!['image', 'video', 'audio', 'text']['includes'](_getRhV54RefKind2)) return { ok: false, refSlot: '' };
+  if (_getRhV54RefKind2 === 'text') return { ok: true, refSlot: '' };
   const targetInputPolicy5 = getTargetInputPolicy(tgtData7),
     count19 = Number(targetInputPolicy5?.['maxByKind']?.[_getRhV54RefKind2]);
-  if (!Number['isFinite'](count19) || count19 <= 0) return { ok: ![], refSlot: '' };
+  if (!Number['isFinite'](count19) || count19 <= 0) return { ok: false, refSlot: '' };
   const list27 = list24['filter'](
     (value248) => _getRhV54RefKind(nodes13?.[value248['sourceId']]) === _getRhV54RefKind2,
   )['sort']((value249, value250) => _edgeTimeKey(value249) - _edgeTimeKey(value250));
@@ -2128,7 +2128,7 @@ function _applyDreaminaVideoFixedInputs({
     const value251 = list27['shift']();
     if (value251?.['id']) graphStore['removeEdge'](value251['id']);
   }
-  return { ok: !![], refSlot: '' };
+  return { ok: true, refSlot: '' };
 }
 function _applyGenericInputKindLimit({
   srcData: srcData5,
@@ -2137,20 +2137,20 @@ function _applyGenericInputKindLimit({
   nodes: nodes14,
   sourceId: sourceId5,
 }) {
-  if (!_isModelPolicyTargetType(tgtData8?.['type'])) return { ok: !![] };
-  if (_getManifestFixedInputConfig(tgtData8)) return { ok: !![] };
-  if (_isDreaminaVideoTarget(tgtData8)) return { ok: !![] };
+  if (!_isModelPolicyTargetType(tgtData8?.['type'])) return { ok: true };
+  if (_getManifestFixedInputConfig(tgtData8)) return { ok: true };
+  if (_isDreaminaVideoTarget(tgtData8)) return { ok: true };
   const effectiveInputKind2 = resolveEffectiveInputKind(srcData5);
-  if (!effectiveInputKind2 || effectiveInputKind2 === 'text') return { ok: !![] };
+  if (!effectiveInputKind2 || effectiveInputKind2 === 'text') return { ok: true };
   const targetInputPolicy6 = getTargetInputPolicy(tgtData8);
-  if (!isInputKindAllowed(targetInputPolicy6, effectiveInputKind2)) return { ok: ![] };
+  if (!isInputKindAllowed(targetInputPolicy6, effectiveInputKind2)) return { ok: false };
   const count20 = Number(targetInputPolicy6?.['maxByKind']?.[effectiveInputKind2]);
-  if (!Number['isFinite'](count20)) return { ok: !![] };
-  if (count20 <= 0) return { ok: ![] };
+  if (!Number['isFinite'](count20)) return { ok: true };
+  if (count20 <= 0) return { ok: false };
   const value252 = (Array['isArray'](incomingEdges8) ? incomingEdges8 : [])['some'](
     (value253) => value253?.['sourceId'] === sourceId5,
   );
-  if (value252) return { ok: !![] };
+  if (value252) return { ok: true };
   const list28 = (Array['isArray'](incomingEdges8) ? incomingEdges8 : [])
     ['filter']((value254) => _getRhV54RefKind(nodes14?.[value254?.['sourceId']]) === effectiveInputKind2)
     ['sort']((value255, value256) => _edgeTimeKey(value255) - _edgeTimeKey(value256));
@@ -2158,14 +2158,14 @@ function _applyGenericInputKindLimit({
     const value257 = list28['shift']();
     if (value257?.['id']) graphStore['removeEdge'](value257['id']);
   }
-  return { ok: !![] };
+  return { ok: true };
 }
 function _applyMediaClipInputLimit({ srcData: srcData6, tgtData: tgtData9 }) {
-  if (!isMediaClipNodeType(tgtData9?.['type'])) return { ok: !![] };
+  if (!isMediaClipNodeType(tgtData9?.['type'])) return { ok: true };
   const mediaClipInputKind = getMediaClipInputKind(srcData6);
-  if (mediaClipInputKind !== 'video' && mediaClipInputKind !== 'image' && mediaClipInputKind !== 'audio') return { ok: ![] };
-  if (!isSupportedMediaClipInput(srcData6)) return { ok: ![] };
-  return { ok: !![] };
+  if (mediaClipInputKind !== 'video' && mediaClipInputKind !== 'image' && mediaClipInputKind !== 'audio') return { ok: false };
+  if (!isSupportedMediaClipInput(srcData6)) return { ok: false };
+  return { ok: true };
 }
 function _replacePanorama360IncomingEdges({ tgtData: tgtData10, incomingEdges: incomingEdges9 }) {
   if (!_isPanorama360TargetType(tgtData10?.['type'])) return;
@@ -2190,8 +2190,8 @@ export function addEdgeWithPolicies({
     nodes15 = edges4['nodes'] || {},
     srcData7 = nodes15[sourceId6],
     tgtData12 = nodes15[targetId8];
-  if (!srcData7 || !tgtData12) return ![];
-  if (!isValidConnection(srcData7, tgtData12)) return ![];
+  if (!srcData7 || !tgtData12) return false;
+  if (!isValidConnection(srcData7, tgtData12)) return false;
   const value262 = String(srcData7['type'] || '')['trim']() === 'group';
   if (value262) {
     if (
@@ -2203,28 +2203,28 @@ export function addEdgeWithPolicies({
         edges: edges4['edges'] || {},
       })
     )
-      return ![];
+      return false;
     const stateRaw7 = getStateRaw(),
       value263 = !!_getOutEdgeMap(stateRaw7['edges'], stateRaw7['_edgesRev'])
         ['get'](sourceId6)
         ?.['has'](targetId8);
-    if (value263) return ![];
+    if (value263) return false;
     return (
       graphStore['addEdge']({
         id: 'edge-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 6),
         sourceId: sourceId6,
         targetId: targetId8,
-        isGroupOutputLink: !![],
+        isGroupOutputLink: true,
         createdAt: Date['now'](),
       }),
-      !![]
+      true
     );
   }
   const incomingEdges11 = _getIncomingEdgesByTarget(edges4['edges'], edges4['_edgesRev'], targetId8);
   (_replacePanorama360IncomingEdges({ tgtData: tgtData12, incomingEdges: incomingEdges11 }),
     _replaceWhiteboardIncomingEdges({ tgtData: tgtData12, incomingEdges: incomingEdges11 }));
   if (_isAnimeRealTarget(tgtData12)) {
-    if (!_isAnimeRealImageSrc(srcData7)) return ![];
+    if (!_isAnimeRealImageSrc(srcData7)) return false;
     for (const value264 of incomingEdges11) graphStore['removeEdge'](value264['id']);
     tgtData12['rhAnimeRealRefUrl'] &&
       graphStore['updateNodeData'](targetId8, {
@@ -2240,7 +2240,7 @@ export function addEdgeWithPolicies({
     nodes: nodes15,
     targetId: targetId8,
   });
-  if (!response3['ok']) return ![];
+  if (!response3['ok']) return false;
   const response4 = _applyManifestFixedInputs({
     srcData: srcData7,
     tgtData: tgtData12,
@@ -2249,7 +2249,7 @@ export function addEdgeWithPolicies({
     targetId: targetId8,
     preferredRefSlot: preferredRefSlot2,
   });
-  if (!response4['ok']) return ![];
+  if (!response4['ok']) return false;
   const response5 = _applyDreaminaVideoFixedInputs({
     srcData: srcData7,
     tgtData: tgtData12,
@@ -2257,7 +2257,7 @@ export function addEdgeWithPolicies({
     nodes: nodes15,
     targetId: targetId8,
   });
-  if (!response5['ok']) return ![];
+  if (!response5['ok']) return false;
   const response6 = _applyMediaClipInputLimit({
     srcData: srcData7,
     tgtData: tgtData12,
@@ -2265,7 +2265,7 @@ export function addEdgeWithPolicies({
     nodes: nodes15,
     sourceId: sourceId6,
   });
-  if (!response6['ok']) return ![];
+  if (!response6['ok']) return false;
   const response7 = _applyGenericInputKindLimit({
     srcData: srcData7,
     tgtData: tgtData12,
@@ -2273,12 +2273,12 @@ export function addEdgeWithPolicies({
     nodes: nodes15,
     sourceId: sourceId6,
   });
-  if (!response7['ok']) return ![];
+  if (!response7['ok']) return false;
   const targetNode = getStateRaw(),
     value265 = !!_getOutEdgeMap(targetNode['edges'], targetNode['_edgesRev'])
       ['get'](sourceId6)
       ?.['has'](targetId8);
-  if (value265) return ![];
+  if (value265) return false;
   let sourceMediaKey = '',
     sourceMediaW = 0,
     sourceMediaH = 0;
@@ -2396,7 +2396,7 @@ export function addEdgeWithPolicies({
       }
     }
   } catch {}
-  return !![];
+  return true;
 }
 export function initPickConnect(el50) {
   function run21(value277, value278, value279, value280, value281) {
@@ -2452,7 +2452,7 @@ export function initPickConnect(el50) {
         targetId: targetId9,
         preferredRefSlot: preferredRefSlot3,
       });
-    if (!addEdgeWithPolicies6) return ![];
+    if (!addEdgeWithPolicies6) return false;
     const {
       pickConnectMode: pickConnectMode2,
       nodes: nodes16,
@@ -2469,7 +2469,7 @@ export function initPickConnect(el50) {
       );
       graphStore['setConnOverlay']({ srcId: pickConnectMode2['sourceNodeId'], invalidNodeIds: invalidNodeIds2 });
     }
-    return !![];
+    return true;
   }
   (el50['addEventListener'](
     'contextmenu',
@@ -2479,10 +2479,10 @@ export function initPickConnect(el50) {
       (event2['preventDefault']?.(),
         event2['stopPropagation']?.(),
         event2['stopImmediatePropagation']?.(),
-        (event2['_pickConnectHandled'] = !![]),
-        uiStore['setPickConnectMode']({ active: ![] }));
+        (event2['_pickConnectHandled'] = true),
+        uiStore['setPickConnectMode']({ active: false }));
     },
-    !![],
+    true,
   ),
     el50['addEventListener'](
       'click',
@@ -2493,9 +2493,9 @@ export function initPickConnect(el50) {
         if (el51) {
           const value293 = el51['closest']('.v2-node');
           if (value293 && value293['id'] === pickConnectMode4['sourceNodeId']) {
-            ((event3['_pickConnectHandled'] = !![]),
+            ((event3['_pickConnectHandled'] = true),
               event3['stopImmediatePropagation'](),
-              uiStore['setPickConnectMode']({ active: ![] }));
+              uiStore['setPickConnectMode']({ active: false }));
             return;
           }
         }
@@ -2514,7 +2514,7 @@ export function initPickConnect(el50) {
             stateRaw9['nodes'],
             stateRaw9['viewport'],
             pickConnectMode4['sourceNodeId'],
-            ![],
+            false,
             { spatialIndex: spatialIndex5 },
           );
         }
@@ -2528,9 +2528,9 @@ export function initPickConnect(el50) {
           value299 = stateRaw9['nodes'][value297];
         if (!isValidConnection(value298, value299)) return;
         run22(value296, value297) &&
-          ((event3['_pickConnectHandled'] = !![]), event3['stopImmediatePropagation']());
+          ((event3['_pickConnectHandled'] = true), event3['stopImmediatePropagation']());
       },
-      !![],
+      true,
     ),
     el50['addEventListener']('pointermove', (event4) => {
       const {
@@ -2548,7 +2548,7 @@ export function initPickConnect(el50) {
         nodes17,
         viewport8,
         pickConnectMode5['sourceNodeId'],
-        ![],
+        false,
         { spatialIndex: spatialIndex6 },
       );
       (hitTestNode4 &&
@@ -2562,9 +2562,9 @@ export function initPickConnect(el50) {
     event5['target']['closest']('[contenteditable="true"]') && event5['target']['blur']();
   };
   function run23(value301) {
-    document?.['body']?.['classList']?.['toggle']?.('pick-connect-active', value301 === !![]);
+    document?.['body']?.['classList']?.['toggle']?.('pick-connect-active', value301 === true);
   }
-  let enabled44 = ![],
+  let enabled44 = false,
     value302 = null,
     value303 = null;
   uiStore['subscribeSelector'](
@@ -2577,26 +2577,26 @@ export function initPickConnect(el50) {
       run23(active);
       if (active) {
         (el50['classList']['add']('is-connecting'),
-          document['addEventListener']('focusin', value300, !![]));
+          document['addEventListener']('focusin', value300, true));
         const size = getCursorSize(),
           linkCursor = createLinkCursor({ size: size });
         (document['documentElement']['classList']['add']('is-connecting-mode'),
           document['documentElement']['style']['setProperty']('--connect-cursor', linkCursor));
         if (!enabled44 || value302 !== sourceNodeId4 || value303 !== handleDirection) {
-          ((enabled44 = !![]), (value302 = sourceNodeId4), (value303 = handleDirection));
+          ((enabled44 = true), (value302 = sourceNodeId4), (value303 = handleDirection));
           const { nodes: nodes18, edges: edges6, _edgesRev: _edgesRev4 } = getStateRaw(),
             invalidNodeIds3 = run21(sourceNodeId4, handleDirection, nodes18, edges6, _edgesRev4);
           graphStore['setConnOverlay']({ srcId: sourceNodeId4, invalidNodeIds: invalidNodeIds3 });
         }
       } else
         (el50['classList']['remove']('is-connecting'),
-          document['removeEventListener']('focusin', value300, !![]),
+          document['removeEventListener']('focusin', value300, true),
           document['documentElement']['classList']['remove']('is-connecting-mode'),
           document['documentElement']['style']['removeProperty']('--connect-cursor'),
           enabled44 &&
-            ((enabled44 = ![]),
+            ((enabled44 = false),
             (value302 = null),
-            graphStore['setSelectionBox']({ active: ![] }),
+            graphStore['setSelectionBox']({ active: false }),
             uiStore['setPickConnectHover'](null),
             graphStore['clearConnOverlay']()));
     },
@@ -2653,7 +2653,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
     },
     handler6 = (value323, x8, y4, value324) => {
       const count33 = Number(value324);
-      if (!(Number['isFinite'](count33) && count33 > 0)) return ![];
+      if (!(Number['isFinite'](count33) && count33 > 0)) return false;
       const box19 = getAIGenerationNodeSize(
           count33 >= 1 ? count33 : 1,
           count33 >= 1 ? 1 : 1 / count33,
@@ -2662,7 +2662,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
         height5 = box19['height'],
         stateRaw10 = getStateRaw(),
         enabled46 = stateRaw10['nodes']?.[value323];
-      if (!enabled46) return ![];
+      if (!enabled46) return false;
       return (
         graphStore['updateNodeData'](value323, {
           width: width5,
@@ -2671,7 +2671,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
           y: y4 - height5 / 2,
         }),
         commit(),
-        !![]
+        true
       );
     },
     handler7 = (value325, value326) => {
@@ -2807,7 +2807,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
     el56['className'] = 'v2-menu-row' + (type2['desc'] ? ' has-desc' : '');
     const el57 = document['createElement']('div');
     ((el57['className'] = 'v2-menu-ico'), el57['replaceChildren']());
-    if (type2['iconEl']) el57['appendChild'](type2['iconEl']['cloneNode'](!![]));
+    if (type2['iconEl']) el57['appendChild'](type2['iconEl']['cloneNode'](true));
     if (type2['iconBg']) el57['style']['background'] = type2['iconBg'];
     const el58 = document['createElement']('div');
     el58['className'] = 'v2-menu-txt-wrap';
@@ -2940,7 +2940,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
             name: id2['name'],
           }));
         graphStore['addNode'](id2);
-        let enabled48 = ![],
+        let enabled48 = false,
           enabled49 = '';
         for (const sourceId9 of sourceId8) {
           const stateRaw13 = getStateRaw(),
@@ -2950,7 +2950,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
           if (!isValidConnection(enabled50, enabled51)) continue;
           const addEdgeWithPolicies7 = addEdgeWithPolicies({ sourceId: sourceId9, targetId: id });
           if (!addEdgeWithPolicies7) continue;
-          enabled48 = !![];
+          enabled48 = true;
           if (!enabled49) enabled49 = sourceId9;
         }
         if (!enabled48 && sourceId8['length'] === 1) {
@@ -2961,7 +2961,7 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
             targetId: id,
             createdAt: Date['now'](),
           }),
-            (enabled48 = !![]),
+            (enabled48 = true),
             (enabled49 = sourceId8[0]));
         }
         (graphStore['setSelectedNodes']([id]),
@@ -2989,10 +2989,10 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
       if (el55['contains'](event7['target'])) return;
       (value350?.(),
         el55['remove'](),
-        document['removeEventListener']('mousedown', value352, !![]),
+        document['removeEventListener']('mousedown', value352, true),
         value310?.());
     };
-  requestAnimationFrame(() => document['addEventListener']('mousedown', value352, !![]));
+  requestAnimationFrame(() => document['addEventListener']('mousedown', value352, true));
 }
 function _showLeftQuoteMenu(value353, value354, targetId10, value355, value356) {
   document['querySelector']('.v2-quote-menu')?.['remove']();
@@ -3081,7 +3081,7 @@ function _showLeftQuoteMenu(value353, value354, targetId10, value355, value356) 
     el63['className'] = 'v2-menu-row' + (type3['desc'] ? ' has-desc' : '');
     const el64 = document['createElement']('div');
     ((el64['className'] = 'v2-menu-ico'), el64['replaceChildren']());
-    if (type3['iconEl']) el64['appendChild'](type3['iconEl']['cloneNode'](!![]));
+    if (type3['iconEl']) el64['appendChild'](type3['iconEl']['cloneNode'](true));
     if (type3['iconBg']) el64['style']['background'] = type3['iconBg'];
     const el65 = document['createElement']('div');
     el65['className'] = 'v2-menu-txt-wrap';
@@ -3177,8 +3177,8 @@ function _showLeftQuoteMenu(value353, value354, targetId10, value355, value356) 
       if (el62['contains'](event9['target'])) return;
       (value358?.(),
         el62['remove'](),
-        document['removeEventListener']('mousedown', value360, !![]),
+        document['removeEventListener']('mousedown', value360, true),
         value356?.());
     };
-  requestAnimationFrame(() => document['addEventListener']('mousedown', value360, !![]));
+  requestAnimationFrame(() => document['addEventListener']('mousedown', value360, true));
 }

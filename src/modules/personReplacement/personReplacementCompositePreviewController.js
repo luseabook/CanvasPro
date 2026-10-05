@@ -32,24 +32,24 @@ export function createPersonReplacementCompositePreviewController({
     throw new Error('person replacement composite preview requires workspace adapters');
   const map = createMediaResidency({ projectId: getProject()?.['id'] });
   let playbackBinding = null,
-    result = ![];
+    result = false;
   const stop = () => {
       (playbackBinding?.['destroy']?.(), (playbackBinding = null));
     },
-    releaseOriginalWarmup = ({ composeOnly: composeOnly = ![] } = {}) => {
+    releaseOriginalWarmup = ({ composeOnly: composeOnly = false } = {}) => {
       const enabled = map['peek']('original');
-      if (composeOnly && enabled?.['reason'] !== 'compose') return ![];
-      if (!enabled) return ![];
-      if (enabled['preserveVisibleElement'] === !![] && !enabled['controller'])
+      if (composeOnly && enabled?.['reason'] !== 'compose') return false;
+      if (!enabled) return false;
+      if (enabled['preserveVisibleElement'] === true && !enabled['controller'])
         return map['forget']('original');
       return map['evict']('original');
     },
     releaseReplacementCache = () => map['evict']('replacement'),
     startOriginalWarmup = (data = '') => {
-      if (result) return ![];
+      if (result) return false;
       const sourceUrl = normalizeMediaUrl(data);
-      if (!sourceUrl) return (releaseOriginalWarmup(), ![]);
-      if (map['peek']('original')?.['sourceUrl'] === sourceUrl) return !![];
+      if (!sourceUrl) return (releaseOriginalWarmup(), false);
+      if (map['peek']('original')?.['sourceUrl'] === sourceUrl) return true;
       releaseOriginalWarmup();
       const projectId = getProject(),
         el = getRoot(),
@@ -58,11 +58,11 @@ export function createPersonReplacementCompositePreviewController({
         text3 = normalizeText(el2?.['getAttribute']?.('src') || el2?.['currentSrc'] || el2?.['src']),
         preserveVisibleElement = Boolean(el2 && text2 === sourceUrl && text3),
         videoEl = preserveVisibleElement ? el2 : documentObject?.['createElement']?.('video');
-      if (!videoEl) return ![];
+      if (!videoEl) return false;
       ((videoEl['dataset']['personReplacementCompareVideo'] = 'original'),
         (videoEl['dataset']['personReplacementCompareVideoUrl'] = sourceUrl),
         (videoEl['preload'] = 'auto'),
-        (videoEl['muted'] = !![]));
+        (videoEl['muted'] = true));
       !preserveVisibleElement &&
         (videoEl['classList']?.['add']?.('person-replacement-composite-original-prewarm'),
         videoEl['setAttribute']?.('aria-hidden', 'true'),
@@ -83,16 +83,16 @@ export function createPersonReplacementCompositePreviewController({
               'original',
               'warmup-' + options,
             ]['join'](':'),
-            allowConcurrentPlayback: !![],
-            preferStreamingSource: ![],
+            allowConcurrentPlayback: true,
+            preferStreamingSource: false,
             acquirePlaybackOptions: {
-              bypassConcurrencyLimit: !![],
+              bypassConcurrencyLimit: true,
               maxBytes: PERSON_REPLACEMENT_COMPOSITE_PREWARM_MAX_BYTES,
               timeout: PERSON_REPLACEMENT_COMPOSITE_PREWARM_TIMEOUT_MS,
             },
           });
         } catch {
-          return (videoEl['remove']?.(), ![]);
+          return (videoEl['remove']?.(), false);
         }
       const enabled2 = map['retain']({
         projectId: projectId?.['id'],
@@ -103,7 +103,7 @@ export function createPersonReplacementCompositePreviewController({
         preserveVisibleElement: preserveVisibleElement,
         reason: 'compose',
       });
-      if (!enabled2) return (controller?.['destroy']?.(), videoEl['remove']?.(), ![]);
+      if (!enabled2) return (controller?.['destroy']?.(), videoEl['remove']?.(), false);
       if (!preserveVisibleElement) {
         const el3 =
           el?.['querySelector']?.(
@@ -124,8 +124,8 @@ export function createPersonReplacementCompositePreviewController({
               videoEl['pause']?.();
             } catch {}
           })
-          ['catch'](() => ![]),
-        !![]
+          ['catch'](() => false),
+        true
       );
     },
     handler = (renderedVideo) => {
@@ -164,14 +164,14 @@ export function createPersonReplacementCompositePreviewController({
     },
     prepareOriginalHandoff = () => {
       const enabled4 = map['peek']('original');
-      if (!enabled4 || enabled4['controller'] || enabled4['preserveVisibleElement'] !== !![]) return ![];
+      if (!enabled4 || enabled4['controller'] || enabled4['preserveVisibleElement'] !== true) return false;
       const enabled5 = playbackBinding?.['retainOriginalPlayback']?.(enabled4['sourceUrl']);
-      if (!enabled5?.['controller']) return ![];
-      if (!map['handoff']('original', enabled5)) return (enabled5['controller']['destroy']?.(), ![]);
-      return ((playbackBinding = null), !![]);
+      if (!enabled5?.['controller']) return false;
+      if (!map['handoff']('original', enabled5)) return (enabled5['controller']['destroy']?.(), false);
+      return ((playbackBinding = null), true);
     },
     retainFullVideosForPageRefresh = () => {
-      if (map['has']('original') || map['has']('replacement')) return ![];
+      if (map['has']('original') || map['has']('replacement')) return false;
       const projectId4 = getProject(),
         personReplacementCompositePreviewSnapshot =
           buildPersonReplacementCompositePreviewSnapshot(projectId4)['fullMedia'],
@@ -179,14 +179,14 @@ export function createPersonReplacementCompositePreviewController({
           original: normalizeMediaUrl(personReplacementCompositePreviewSnapshot['originalRef']),
           replacement: normalizeMediaUrl(personReplacementCompositePreviewSnapshot['replacementRef']),
         });
-      if (!args?.['original'] && !args?.['replacement']) return ![];
+      if (!args?.['original'] && !args?.['replacement']) return false;
       return (
         args['original'] &&
           map['retain']({
             ...args['original'],
             projectId: projectId4?.['id'],
             role: 'original',
-            preserveVisibleElement: !![],
+            preserveVisibleElement: true,
             reason: 'mode-cache',
           }),
         args['replacement'] &&
@@ -196,14 +196,14 @@ export function createPersonReplacementCompositePreviewController({
             role: 'replacement',
           }),
         (playbackBinding = null),
-        !![]
+        true
       );
     },
     bind = () => {
       stop();
-      if (result) return ![];
+      if (result) return false;
       const project = getProject();
-      if (project?.['workspace']?.['view'] !== 'project' || project['workspace']['step'] !== 5) return ![];
+      if (project?.['workspace']?.['view'] !== 'project' || project['workspace']['step'] !== 5) return false;
       const root = getRoot(),
         source = root?.['querySelector']?.('[data-person-replacement-compare-video="original"]'),
         adoptedOriginalPlayback = handler(source),
@@ -234,12 +234,12 @@ export function createPersonReplacementCompositePreviewController({
     releaseReplacementCache: releaseReplacementCache,
     prepareOriginalHandoff: prepareOriginalHandoff,
     retainFullVideosForPageRefresh: retainFullVideosForPageRefresh,
-    togglePlayback: () => playbackBinding?.['togglePlayback']?.() ?? ![],
+    togglePlayback: () => playbackBinding?.['togglePlayback']?.() ?? false,
     setTrack: (current) => playbackBinding?.['setTrack']?.(current),
     switchProject: (entry) => map['switchProject'](entry),
     dispose() {
       if (result) return;
-      (stop(), map['dispose'](), (result = !![]));
+      (stop(), map['dispose'](), (result = true));
     },
   });
 }

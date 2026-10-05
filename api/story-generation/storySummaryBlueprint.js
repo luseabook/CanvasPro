@@ -25,7 +25,7 @@ function normalizeStringArray(list) {
 function createStorySummaryResponseSchema(maxItems) {
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: [
       'title',
       'storyType',
@@ -51,7 +51,7 @@ function createStorySummaryResponseSchema(maxItems) {
       logline: { type: 'string' },
       storyContract: {
         type: 'object',
-        additionalProperties: ![],
+        additionalProperties: false,
         required: [
           'protagonistGoal',
           'centralConflict',
@@ -77,7 +77,7 @@ function createStorySummaryResponseSchema(maxItems) {
         maxItems: STORY_SUMMARY_MAX_PLOT_BEATS,
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['stage', 'event', 'consequence'],
           properties: {
             stage: { type: 'string' },
@@ -93,7 +93,7 @@ function createStorySummaryResponseSchema(maxItems) {
         maxItems: STORY_SUMMARY_MAX_CORE_CHARACTERS,
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: [
             'ref',
             'name',
@@ -364,7 +364,7 @@ export function createStorySummaryBlueprint({
     return {
       name: name2,
       schema: createStorySummaryResponseSchema(continuityMaxFacts),
-      strict: !![],
+      strict: true,
       fallback: 'prompt',
     };
   }

@@ -20,7 +20,7 @@ function normalizeText(value) {
 }
 export function resolveStoryVideoProvider(item, key = '') {
   return (
-    resolveModelProvider(item, '', { allowProviderHint: ![], allowPrefixInference: ![] }) ||
+    resolveModelProvider(item, '', { allowProviderHint: false, allowPrefixInference: false }) ||
     resolveModelProvider(item, key)
   );
 }
@@ -28,7 +28,7 @@ export function resolveStoryPromptModeForVideoModel(index, result = 'seedance-2.
   const modelExecution = resolveModelExecution(index);
   return normalizeStoryPromptMode(
     modelExecution?.['modelManifest']?.['extensions']?.['storyWorkspace']?.['promptMode'] || result,
-    { allowDeveloperModes: !![] },
+    { allowDeveloperModes: true },
   );
 }
 export function syncStoryPromptModeForVideoModel(
@@ -40,11 +40,11 @@ export function syncStoryPromptModeForVideoModel(
     enabled = options?.['data']?.['project'];
   if (!enabled || typeof enabled !== 'object') return rememberStoryEpisodeVideoModelSelection2;
   const storyPromptMode = normalizeStoryPromptMode(enabled?.['planning']?.['promptMode'], {
-      allowDeveloperModes: !![],
+      allowDeveloperModes: true,
     }),
     promptMode = resolveStoryPromptModeForVideoModel(data, storyPromptMode);
   if (promptMode === storyPromptMode) return rememberStoryEpisodeVideoModelSelection2;
-  return ((enabled['planning'] = { ...(enabled['planning'] || {}), promptMode: promptMode }), !![]);
+  return ((enabled['planning'] = { ...(enabled['planning'] || {}), promptMode: promptMode }), true);
 }
 function getStoryVideoDurationSchemaField(source) {
   const modelExecution2 = resolveModelExecution(source),
@@ -101,8 +101,8 @@ export function resolveStoryVideoInitialGenerationDurationSeconds(input, output 
   return normalizeDurationSeconds(value4);
 }
 export function initializeStoryClipVideoGenerationDuration(enabled2, value6) {
-  if (!enabled2 || typeof enabled2 !== 'object') return ![];
-  if (getStoryClipVideoGenerationDurationOverride(enabled2)) return ![];
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
+  if (getStoryClipVideoGenerationDurationOverride(enabled2)) return false;
   const durationSeconds3 = normalizeDurationSeconds(
       enabled2['durationSec'] || enabled2['durationSeconds'] || enabled2['duration'],
     ),
@@ -110,8 +110,8 @@ export function initializeStoryClipVideoGenerationDuration(enabled2, value6) {
       value6,
       durationSeconds3,
     );
-  if (!storyVideoInitialGenerationDurationSeconds) return ![];
-  return ((enabled2['videoGenerationDurationSec'] = storyVideoInitialGenerationDurationSeconds), !![]);
+  if (!storyVideoInitialGenerationDurationSeconds) return false;
+  return ((enabled2['videoGenerationDurationSec'] = storyVideoInitialGenerationDurationSeconds), true);
 }
 export function initializeStoryEpisodeVideoGenerationDurations(enabled3, value7) {
   if (!enabled3 || typeof enabled3 !== 'object') return 0;
@@ -121,7 +121,7 @@ export function initializeStoryEpisodeVideoGenerationDurations(enabled3, value7)
   );
 }
 export function setStoryClipVideoGenerationDurationOverride(enabled4, value10) {
-  if (!enabled4 || typeof enabled4 !== 'object') return ![];
+  if (!enabled4 || typeof enabled4 !== 'object') return false;
   const durationSeconds4 = normalizeDurationSeconds(value10),
     storyClipVideoGenerationDurationOverride = getStoryClipVideoGenerationDurationOverride(enabled4);
   return (
@@ -164,8 +164,8 @@ export function reconcileStoryClipVideoGenerationDurationChange({
   modelId: modelId = previousModelId,
   previousGenerationParams: previousGenerationParams = {},
   nextGenerationParams: nextGenerationParams = {},
-  generationParamsChanged: generationParamsChanged = ![],
-  modelChanged: modelChanged = ![],
+  generationParamsChanged: generationParamsChanged = false,
+  modelChanged: modelChanged = false,
 } = {}) {
   const storyVideoGenerationParams2 = normalizeStoryVideoGenerationParams(
     previousModelId,
@@ -173,7 +173,7 @@ export function reconcileStoryClipVideoGenerationDurationChange({
   );
   let generationParams = normalizeStoryVideoGenerationParams(modelId, nextGenerationParams);
   if (!clip2 || modelChanged)
-    return { generationParams: generationParams, durationChanged: ![], overrideChanged: ![] };
+    return { generationParams: generationParams, durationChanged: false, overrideChanged: false };
   const storyVideoGenerationDurationSeconds = resolveStoryVideoGenerationDurationSeconds(
       previousModelId,
       storyVideoGenerationParams2,
@@ -194,7 +194,7 @@ export function reconcileStoryClipVideoGenerationDurationChange({
       storyVideoGenerationDurationSeconds2 !== storyClipVideoGenerationDurationSeconds2,
     overrideChanged = durationChanged
       ? setStoryClipVideoGenerationDurationOverride(clip2, storyVideoGenerationDurationSeconds2)
-      : ![];
+      : false;
   return (
     storyVideoGenerationDurationSeconds > 0 &&
       (durationChanged || value20 || getStoryClipVideoGenerationDurationOverride(clip2)) &&
@@ -279,7 +279,7 @@ export function normalizeStoryVideoGenerationParams(value33, value34 = {}) {
     value35 = Object['keys'](args4)['some']((value36) => !Object['hasOwn'](args3, value36))
       ? { ...args4, ...args3 }
       : args3;
-  return sanitizeModelUiSchemaParams(value33, value35, { includeDefaults: !![] });
+  return sanitizeModelUiSchemaParams(value33, value35, { includeDefaults: true });
 }
 export function applyStoryAspectRatioToVideoGenerationParams(value37, value38 = {}, value39 = '16:9') {
   const storyVideoAspectRatioSchemaField = getStoryVideoAspectRatioSchemaField(value37),
@@ -316,8 +316,8 @@ export function recoverUnavailableStoryVideoModelState(
     isStoryWorkspaceModelVisible('video', modelExecution5['modelManifest'])
   ) {
     const text3 = normalizeText(modelExecution5['modelManifest']['provider']);
-    if (text3 && text3 !== providerHint2) return ((providerProfileIdByModel['videoProvider'] = text3), !![]);
-    return ![];
+    if (text3 && text3 !== providerHint2) return ((providerProfileIdByModel['videoProvider'] = text3), true);
+    return false;
   }
   const video = resolveStoryWorkspaceModelId('video'),
     modelExecution6 = resolveModelExecution(video);
@@ -326,7 +326,7 @@ export function recoverUnavailableStoryVideoModelState(
     modelExecution6?.['modelManifest']?.['kind'] !== 'video' ||
     modelExecution6?.['executionManifest']?.['kind'] !== 'video'
   )
-    return ![];
+    return false;
   const args6 =
       providerProfileIdByModel['videoGenerationParamsByModel'] &&
       typeof providerProfileIdByModel['videoGenerationParamsByModel'] === 'object'
@@ -352,7 +352,7 @@ export function recoverUnavailableStoryVideoModelState(
     })),
     (providerProfileIdByModel['videoGenerationParams'] = args7),
     (providerProfileIdByModel['videoGenerationParamsByModel'] = { ...args6, [video]: { ...args7 } }),
-    !![]
+    true
   );
 }
 export function applyStoryPromptModeVideoModelDefault(options3 = {}, value44 = 'seedance-2.0') {
@@ -360,15 +360,15 @@ export function applyStoryPromptModeVideoModelDefault(options3 = {}, value44 = '
   return applyStoryVideoModelDefault(options3, storyPromptModeDefaultVideoModelId);
 }
 export function applyStoryVideoModelDefault(providerProfileIdByModel2 = {}, value45 = '') {
-  if (!normalizeText(value45)) return ![];
+  if (!normalizeText(value45)) return false;
   const video2 = resolveStoryWorkspaceModelId('video', value45);
-  if (!video2 || video2 !== value45) return ![];
+  if (!video2 || video2 !== value45) return false;
   const modelExecution7 = resolveModelExecution(video2);
   if (
     modelExecution7?.['modelManifest']?.['kind'] !== 'video' ||
     modelExecution7?.['executionManifest']?.['kind'] !== 'video'
   )
-    return ![];
+    return false;
   const args8 =
       providerProfileIdByModel2['videoGenerationParamsByModel'] &&
       typeof providerProfileIdByModel2['videoGenerationParamsByModel'] === 'object'
@@ -390,7 +390,7 @@ export function applyStoryVideoModelDefault(providerProfileIdByModel2 = {}, valu
     })),
     (providerProfileIdByModel2['videoGenerationParams'] = args9),
     (providerProfileIdByModel2['videoGenerationParamsByModel'] = { ...args8, [video2]: { ...args9 } }),
-    !![]
+    true
   );
 }
 export function applyStoryEpisodeVideoModelDefault(options4 = {}, value47 = {}) {
@@ -400,15 +400,15 @@ export function applyStoryEpisodeVideoModelDefault(options4 = {}, value47 = {}) 
   return applyStoryVideoModelDefault(options4, text4);
 }
 export function rememberStoryEpisodeVideoModelSelection(enabled5 = {}, value48 = '') {
-  if (!enabled5 || typeof enabled5 !== 'object' || Array['isArray'](enabled5)) return ![];
+  if (!enabled5 || typeof enabled5 !== 'object' || Array['isArray'](enabled5)) return false;
   const text5 = normalizeText(value48);
   if (
     !text5 ||
     resolveStoryWorkspaceModelId('video', text5) !== text5 ||
     normalizeText(enabled5['videoModelId']) === text5
   )
-    return ![];
-  return ((enabled5['videoModelId'] = text5), !![]);
+    return false;
+  return ((enabled5['videoModelId'] = text5), true);
 }
 export function resolveStoryClipVideoGenerationSettings(
   value49,

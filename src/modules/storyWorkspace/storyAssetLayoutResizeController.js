@@ -11,10 +11,10 @@ export function createStoryAssetLayoutResizeController({
   windowObject: windowObject = globalThis['window'],
   schedulePersistence: schedulePersistence = null,
 } = {}) {
-  const onFinish = () => schedulePersistence?.({ uiOnly: !![] });
+  const onFinish = () => schedulePersistence?.({ uiOnly: true });
   function setAssetSplitRatio(
     value,
-    { shouldPersist: shouldPersist = ![], layout: layout = null, splitter: splitter = null } = {},
+    { shouldPersist: shouldPersist = false, layout: layout = null, splitter: splitter = null } = {},
   ) {
     const el =
         layout ||
@@ -27,7 +27,7 @@ export function createStoryAssetLayoutResizeController({
   }
   function beginAssetSplitResize(event) {
     const splitter2 = event?.['target']?.['closest']?.('[data-story-assets-splitter]');
-    if (!splitter2) return ![];
+    if (!splitter2) return false;
     const layout2 = splitter2['closest']?.('.story-assets-layout');
     return beginStoryHorizontalResizeSession({
       event: event,
@@ -42,7 +42,7 @@ export function createStoryAssetLayoutResizeController({
   }
   function setAssetDetailSplitRatio(
     index,
-    { shouldPersist: shouldPersist = ![], layout: layout = null, splitter: splitter = null } = {},
+    { shouldPersist: shouldPersist = false, layout: layout = null, splitter: splitter = null } = {},
   ) {
     const el2 =
         layout ||
@@ -54,7 +54,7 @@ export function createStoryAssetLayoutResizeController({
   }
   function beginAssetDetailSplitResize(event2) {
     const splitter3 = event2?.['target']?.['closest']?.('[data-story-asset-detail-splitter]');
-    if (!splitter3) return ![];
+    if (!splitter3) return false;
     const layout3 = splitter3['closest']?.('[data-story-asset-detail-layout]');
     return beginStoryVerticalResizeSession({
       event: event2,
@@ -74,19 +74,19 @@ export function createStoryAssetLayoutResizeController({
         event3['preventDefault']?.(),
         event3['stopPropagation']?.(),
         setAssetSplitRatio(state['assetSplitRatio'] + (event3['key'] === 'ArrowLeft' ? -2 : 2), {
-          shouldPersist: !![],
+          shouldPersist: true,
         }),
-        !![]
+        true
       );
     const enabled = event3?.['target']?.['closest']?.('[data-story-asset-detail-splitter]');
-    if (!enabled || !['ArrowUp', 'ArrowDown']['includes'](event3['key'])) return ![];
+    if (!enabled || !['ArrowUp', 'ArrowDown']['includes'](event3['key'])) return false;
     return (
       event3['preventDefault']?.(),
       event3['stopPropagation']?.(),
       setAssetDetailSplitRatio(state['assetDetailSplitRatio'] + (event3['key'] === 'ArrowUp' ? -2 : 2), {
-        shouldPersist: !![],
+        shouldPersist: true,
       }),
-      !![]
+      true
     );
   }
   return Object['freeze']({

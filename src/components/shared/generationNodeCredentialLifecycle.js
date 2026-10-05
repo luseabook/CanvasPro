@@ -1,7 +1,7 @@
 import { bindModelCredentialButtonState } from '../../modules/modelCredentialUi.js';
 export function bindGenerationNodeCredentialLifecycle(value, item = () => {}) {
   const run = bindModelCredentialButtonState(value?.['btnEl'], {
-    syncOnBind: ![],
+    syncOnBind: false,
     onRefresh: () => value?.['_updateSubmitButtonState']?.(),
   });
   return () => {

@@ -15,7 +15,7 @@ export function initCliComponentSettings({
   showToast: showToast = window['showToast'],
   onStatusChanged: onStatusChanged,
 } = {}) {
-  let enabled = ![];
+  let enabled = false;
   const list = [],
     map = new Map(),
     map2 = new Map();
@@ -60,7 +60,7 @@ export function initCliComponentSettings({
     else el5['removeAttribute']('value');
     const el6 = el['querySelector']('[data-component-install]');
     ((el6['hidden'] = enabled2['installed']),
-      (el6['disabled'] = enabled2['supported'] === ![] || enabled3 || map2['has'](index)),
+      (el6['disabled'] = enabled2['supported'] === false || enabled3 || map2['has'](index)),
       (el6['textContent'] = enabled3 ? '下载中…' : enabled2['phase'] === 'failed' ? '重试下载' : '下载组件'),
       (el['querySelector']('[data-component-remove]')['hidden'] = !enabled2['installed']),
       (el['querySelector']('[data-component-remove]')['disabled'] =
@@ -116,14 +116,14 @@ export function initCliComponentSettings({
       el13['addEventListener']('click', next),
       el14['addEventListener']('click', current),
       el15['addEventListener']('click', entry),
-      el16?.['addEventListener']('click', record, !![]),
+      el16?.['addEventListener']('click', record, true),
       list['push'](() => {
         (el11['removeEventListener']('click', target),
           el12['removeEventListener']('click', source),
           el13['removeEventListener']('click', next),
           el14['removeEventListener']('click', current),
           el15['removeEventListener']('click', entry),
-          el16?.['removeEventListener']('click', record, !![]));
+          el16?.['removeEventListener']('click', record, true));
       }));
   }
   const payload = (handle) => {
@@ -135,14 +135,14 @@ export function initCliComponentSettings({
       run(
         state[provider2] || {
           provider: provider2,
-          installed: ![],
-          supported: ![],
+          installed: false,
+          supported: false,
           error: '当前平台暂不支持此组件',
         },
       );
     }
   }
-  let config = ![];
+  let config = false;
   const scope = host['setInterval'](async () => {
       const el17 = documentObject['getElementById']('pane-cli-login');
       if (
@@ -152,14 +152,14 @@ export function initCliComponentSettings({
         !el17['getClientRects']()['length']
       )
         return;
-      config = !![];
+      config = true;
       const input = value;
       try {
         const { components: components } = await fetchCliComponents();
         if (input === value) run3(components);
       } catch {
       } finally {
-        config = ![];
+        config = false;
       }
     }, 3000),
     output = value;
@@ -178,7 +178,7 @@ export function initCliComponentSettings({
       }),
     {
       destroy() {
-        ((enabled = !![]),
+        ((enabled = true),
           host['removeEventListener'](CLI_COMPONENT_CHANGED, payload),
           host['clearInterval'](scope),
           list['forEach']((handler3) => handler3()));

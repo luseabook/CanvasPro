@@ -39,7 +39,7 @@ export async function verifyProviderConnectionOnce(options4 = {}, item = {}) {
     handler2 = item['testProviderConnection'] || testProviderConnection,
     handler3 = item['saveApiConfigToServer'] || saveApiConfigToServer,
     text4 = normalizeText(options4['configProviderId'] || options4['providerId'])['toLowerCase']();
-  if (!text4) return { ok: ![], error: '无法确定需要验证的 API 服务' };
+  if (!text4) return { ok: false, error: '无法确定需要验证的 API 服务' };
   const key = run(text4) || {},
     label = await handler2(text4, key, getProviderTestOptions(options4));
   if (!shouldPersistProviderConnectionResult(text4, label)) return label;
@@ -58,8 +58,8 @@ export async function verifyProviderConnectionOnce(options4 = {}, item = {}) {
     );
   if (currentProviderConnectionResults['staleProviderIds']['length'] > 0)
     return {
-      ok: ![],
-      stale: !![],
+      ok: false,
+      stale: true,
       label: label?.['label'] || text4,
       error: '连接配置已变更，请重新验证',
     };
@@ -67,7 +67,7 @@ export async function verifyProviderConnectionOnce(options4 = {}, item = {}) {
 }
 export function autoVerifyProviderConnection(options5 = {}) {
   const verificationRequestKey = getVerificationRequestKey(options5);
-  if (!verificationRequestKey) return Promise['resolve']({ ok: ![], error: '无法确定需要验证的 API 服务' });
+  if (!verificationRequestKey) return Promise['resolve']({ ok: false, error: '无法确定需要验证的 API 服务' });
   const result = AUTO_VERIFICATION_REQUESTS['get'](verificationRequestKey);
   if (result) return result;
   const verifyProviderConnectionOnce2 = verifyProviderConnectionOnce(options5)['finally'](() => {

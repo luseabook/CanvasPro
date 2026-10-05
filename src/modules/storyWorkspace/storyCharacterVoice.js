@@ -320,7 +320,7 @@ export function createStoryCharacterVoiceEditorDraft({ asset: asset = {}, data: 
         ['filter'](Boolean)
         ['join']('；'),
     nodeData: value28,
-    isGenerating: ![],
+    isGenerating: false,
     error: '',
   };
 }
@@ -385,7 +385,7 @@ export function buildStoryCharacterVoicePayload({
     sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(
       event['key'],
       editor?.['nodeData']?.['generationParams'] || {},
-      { includeDefaults: !![] },
+      { includeDefaults: true },
     ),
     truncateStoryCharacterVoiceSample2 = truncateStoryCharacterVoiceSample(
       normalizeText(editor?.['sampleText']) || STORY_CHARACTER_VOICE_FALLBACK_LINE,
@@ -506,9 +506,9 @@ export async function generateStoryCharacterVoice({
         modelId: payload2['audioWorkflowKey'],
         executionId: payload2['executionId'],
         payload: payload2,
-        async: workflow['async'] === !![],
-        cancellable: workflow['cancellable'] === !![],
-        resumable: workflow['adapterType'] === 'workflow' || workflow['async'] === !![],
+        async: workflow['async'] === true,
+        cancellable: workflow['cancellable'] === true,
+        resumable: workflow['adapterType'] === 'workflow' || workflow['async'] === true,
         submit: async (value38, value39) =>
           generateAudio(payload2, {
             signal: value39['signal'] || abortController['signal'],

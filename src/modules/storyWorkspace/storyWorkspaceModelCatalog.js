@@ -18,10 +18,10 @@ const STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_ID_SET = new Set(
   STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS,
 );
 function isStoryWorkspaceManifestEligible(value, enabled) {
-  if (!enabled || enabled['kind'] !== value) return ![];
+  if (!enabled || enabled['kind'] !== value) return false;
   if (value === 'video' && enabled['provider'] === 'runninghubwf' && enabled['adapterType'] === 'workflow')
     return STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_ID_SET['has'](enabled['modelId']);
-  return !![];
+  return true;
 }
 export function isStoryWorkspaceModelVisible(item, key) {
   const index = typeof key === 'string' ? getModelManifest(key) : key;

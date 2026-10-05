@@ -41,8 +41,8 @@ export function bindStoryVideoPreviewPlayer(
     el5 = el2['querySelector']('[data-story-video-progress-fill]'),
     el6 = el2['querySelector']('[data-story-video-time-current]'),
     el7 = el2['querySelector']('[data-story-video-time-total]');
-  let options = ![],
-    target = ![],
+  let options = false,
+    target = false,
     source = null;
   const next = Math['max'](
       0,
@@ -97,7 +97,7 @@ export function bindStoryVideoPreviewPlayer(
     }),
     handler3 = () => {
       if (options) return;
-      const entry = videoEl['paused'] === ![] && videoEl['ended'] !== !![];
+      const entry = videoEl['paused'] === false && videoEl['ended'] !== true;
       (el3?.['classList']['toggle']('is-playing', entry),
         el3?.['setAttribute']('aria-label', entry ? '暂停视频' : '播放视频'),
         el3?.['setAttribute']('title', entry ? '暂停视频' : '播放视频'),
@@ -107,7 +107,7 @@ export function bindStoryVideoPreviewPlayer(
     storyVideoProgressLoop = createStoryVideoProgressLoop({ videoEl: videoEl, onFrame: onFrame }),
     handler4 = async (event) => {
       (event?.['preventDefault']?.(), event?.['stopPropagation']?.());
-      if (videoEl['paused'] === ![]) {
+      if (videoEl['paused'] === false) {
         videoEl['pause']?.();
         return;
       }
@@ -117,12 +117,12 @@ export function bindStoryVideoPreviewPlayer(
     handler5 = (record) => {
       const duration3 = Number(videoEl['duration']),
         box = el4?.['getBoundingClientRect']?.();
-      if (!(duration3 > 0) || !box?.['width']) return ![];
+      if (!(duration3 > 0) || !box?.['width']) return false;
       const currentTime3 = Math['max'](0, Math['min'](1, (Number(record) - box['left']) / box['width']));
       return (
         (videoEl['currentTime'] = currentTime3 * duration3),
         handler2({ duration: duration3, currentTime: currentTime3 * duration3, ratio: currentTime3 }),
-        !![]
+        true
       );
     },
     handler6 = () => {
@@ -176,12 +176,12 @@ export function bindStoryVideoPreviewPlayer(
     },
     value2 = (event7) => event7['stopPropagation'](),
     value3 = (event8) => {
-      (event8['preventDefault'](), event8['stopPropagation'](), (target = !![]), void handler4());
+      (event8['preventDefault'](), event8['stopPropagation'](), (target = true), void handler4());
     },
     value4 = (event9) => {
       (event9['preventDefault'](), event9['stopPropagation']());
       if (target) {
-        target = ![];
+        target = false;
         return;
       }
       void handler4();
@@ -211,7 +211,7 @@ export function bindStoryVideoPreviewPlayer(
     handler3(),
     {
       destroy() {
-        ((options = !![]),
+        ((options = true),
           storyVideoProgressLoop['destroy'](),
           storyVideoPlayback['destroy'](),
           el3?.['removeEventListener']('pointerdown', value3),

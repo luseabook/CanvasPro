@@ -46,14 +46,14 @@ function buildSidePlusPreviewTransform(box3) {
 }
 function applySidePlusPreviewTransform(index) {
   const el = resolveSidePlusHolderEl();
-  if (!el?.['style']) return ![];
+  if (!el?.['style']) return false;
   const canvasEl2 = resolveCanvasEl();
-  if (canvasEl2?.['contains']?.(el)) return ![];
+  if (canvasEl2?.['contains']?.(el)) return false;
   const sidePlusPreviewTransform = buildSidePlusPreviewTransform(index);
   return (
     el['style']['transform'] !== sidePlusPreviewTransform && (el['style']['transform'] = sidePlusPreviewTransform),
     (el['_lastPanPreviewTransform'] = sidePlusPreviewTransform),
-    !![]
+    true
   );
 }
 function clearSidePlusPreviewTransform() {
@@ -66,7 +66,7 @@ function clearSidePlusPreviewTransform() {
 }
 function applyViewportTransform(box4) {
   const el3 = resolveCanvasEl();
-  if (!el3) return ![];
+  if (!el3) return false;
   const viewportTransform = buildViewportTransform(box4);
   return (
     el3['style']['transform'] !== viewportTransform && (el3['style']['transform'] = viewportTransform),
@@ -74,7 +74,7 @@ function applyViewportTransform(box4) {
     syncViewportGridDots(el3, box4),
     syncViewportZoomCssVars(box4['zoom']),
     applySidePlusPreviewTransform(box4),
-    !![]
+    true
   );
 }
 function dispatchViewportPanPreviewFrame(args) {

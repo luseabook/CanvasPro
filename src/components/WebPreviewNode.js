@@ -68,14 +68,14 @@ function waitForNextFrame() {
 }
 function isCanvasNodeMounted(index) {
   const result = String(index || '')['trim']();
-  return result ? globalThis['window']?.['v2Renderer']?.['isNodeMounted']?.(result) === !![] : ![];
+  return result ? globalThis['window']?.['v2Renderer']?.['isNodeMounted']?.(result) === true : false;
 }
 async function waitForMountedCanvasNode(data) {
   for (let options = 0; options < WEB_PREVIEW_REVERSE_PROMPT_MOUNT_ATTEMPTS; options += 1) {
-    if (isCanvasNodeMounted(data)) return !![];
+    if (isCanvasNodeMounted(data)) return true;
     await waitForNextFrame();
   }
-  return ![];
+  return false;
 }
 function getCanvasCommandFailureText(error) {
   return String(
@@ -103,10 +103,10 @@ export function commitWebPreviewNodeUrl({
   if (!url2)
     return (
       showToast?.(webPreviewText('toasts.addressRequired'), 'warning'),
-      { ok: ![], error: 'invalid-url' }
+      { ok: false, error: 'invalid-url' }
     );
   if (!nodeId2 || typeof storeInstance?.['updateNodeData'] !== 'function')
-    return { ok: ![], error: 'missing-node' };
+    return { ok: false, error: 'missing-node' };
   const next = nodeData ||
       storeInstance['getStateRaw']?.()?.['nodes']?.[nodeId2] ||
       storeInstance['getState']?.()?.['nodes']?.[nodeId2] || {
@@ -115,14 +115,14 @@ export function commitWebPreviewNodeUrl({
         webUrl: '',
       },
     error2 = updateWebPreviewTabUrlData(next, { tabId: tabId, url: url2, title: title });
-  if (error2['ok'] === ![]) return { ok: ![], error: error2['error'] || 'missing-tab' };
+  if (error2['ok'] === false) return { ok: false, error: error2['error'] || 'missing-tab' };
   const patch = { ...error2['patch'], name: webPreviewText('nodeName') };
   return (
     storeInstance['updateNodeData'](nodeId2, { ...patch }),
     recordVisitFn?.({ url: url2, title: title }),
     commitFn?.(),
     dispatchWebPreviewForceSync(nodeId2),
-    { ok: !![], url: url2, tabId: error2['tabId'], patch: patch }
+    { ok: true, url: url2, tabId: error2['tabId'], patch: patch }
   );
 }
 export class WebPreviewNode {
@@ -134,7 +134,7 @@ export class WebPreviewNode {
       (this['_statusText'] = getWebPreviewDefaultStatusText()),
       (this['_unsubscribeNativeEvent'] = null),
       (this['_unsubscribeLocale'] = null),
-      (this['_navigationState'] = { canGoBack: ![], canGoForward: ![] }),
+      (this['_navigationState'] = { canGoBack: false, canGoForward: false }),
       (this['_navigationStateByTabId'] = new Map()),
       (this['_backButtons'] = []),
       (this['_forwardButtons'] = []),
@@ -195,7 +195,7 @@ export class WebPreviewNode {
       (el2['dataset']['webUrl'] = this['_getActiveUrl']()),
       el2['addEventListener']('pointerdown', (event2) => {
         const payload = this['_getTabState']()['activeTab'];
-        (this['_getActiveUrl']() || payload?.['pendingPopup'] === !![]) &&
+        (this['_getActiveUrl']() || payload?.['pendingPopup'] === true) &&
           (this['_requestLiveWebView'](), event2['stopPropagation']());
       }));
     const webPreviewStartPageView = new WebPreviewStartPageView({
@@ -228,7 +228,7 @@ export class WebPreviewNode {
         (value5) => {
           this['_handleRemoteWheelInput'](value5);
         },
-        { passive: ![] },
+        { passive: false },
       ),
       el3['addEventListener']('keydown', (value6) => {
         this['_handleRemoteKeyInput']('keyDown', value6);
@@ -349,7 +349,7 @@ export class WebPreviewNode {
     (altKey['preventDefault'](), altKey['stopPropagation'](), this['_requestLiveWebView']());
     if (type2 === 'mousePressed')
       try {
-        (this['_freezeLayer']?.['focus']?.({ preventScroll: !![] }),
+        (this['_freezeLayer']?.['focus']?.({ preventScroll: true }),
           this['_freezeLayer']?.['setPointerCapture']?.(altKey['pointerId']));
       } catch {}
     else
@@ -363,10 +363,10 @@ export class WebPreviewNode {
       button: Number(altKey['button']),
       buttons: Number(altKey['buttons']),
       clickCount: Math['max'](1, Number(altKey['detail']) || 1),
-      altKey: altKey['altKey'] === !![],
-      ctrlKey: altKey['ctrlKey'] === !![],
-      metaKey: altKey['metaKey'] === !![],
-      shiftKey: altKey['shiftKey'] === !![],
+      altKey: altKey['altKey'] === true,
+      ctrlKey: altKey['ctrlKey'] === true,
+      metaKey: altKey['metaKey'] === true,
+      shiftKey: altKey['shiftKey'] === true,
     });
   }
   ['_handleRemotePointerMoveInput'](altKey2) {
@@ -390,10 +390,10 @@ export class WebPreviewNode {
       button: button,
       buttons: buttons,
       clickCount: 0,
-      altKey: altKey2['altKey'] === !![],
-      ctrlKey: altKey2['ctrlKey'] === !![],
-      metaKey: altKey2['metaKey'] === !![],
-      shiftKey: altKey2['shiftKey'] === !![],
+      altKey: altKey2['altKey'] === true,
+      ctrlKey: altKey2['ctrlKey'] === true,
+      metaKey: altKey2['metaKey'] === true,
+      shiftKey: altKey2['shiftKey'] === true,
     });
   }
   ['_handleRemoteWheelInput'](altKey3) {
@@ -411,10 +411,10 @@ export class WebPreviewNode {
       clickCount: 0,
       deltaX: (Number(event6?.['deltaX']) || 0) + (Number(altKey3['deltaX']) || 0),
       deltaY: (Number(event6?.['deltaY']) || 0) + (Number(altKey3['deltaY']) || 0),
-      altKey: altKey3['altKey'] === !![],
-      ctrlKey: altKey3['ctrlKey'] === !![],
-      metaKey: altKey3['metaKey'] === !![],
-      shiftKey: altKey3['shiftKey'] === !![],
+      altKey: altKey3['altKey'] === true,
+      ctrlKey: altKey3['ctrlKey'] === true,
+      metaKey: altKey3['metaKey'] === true,
+      shiftKey: altKey3['shiftKey'] === true,
     };
     if (this['_remoteWheelTimer'] !== null) return;
     this['_remoteWheelTimer'] = globalThis['setTimeout'](() => {
@@ -440,11 +440,11 @@ export class WebPreviewNode {
       code: String(repeat['code'] || ''),
       text: text ? String(repeat['key'] || '') : '',
       keyCode: Number(repeat['keyCode']) || 0,
-      repeat: repeat['repeat'] === !![],
-      altKey: repeat['altKey'] === !![],
-      ctrlKey: repeat['ctrlKey'] === !![],
-      metaKey: repeat['metaKey'] === !![],
-      shiftKey: repeat['shiftKey'] === !![],
+      repeat: repeat['repeat'] === true,
+      altKey: repeat['altKey'] === true,
+      ctrlKey: repeat['ctrlKey'] === true,
+      metaKey: repeat['metaKey'] === true,
+      shiftKey: repeat['shiftKey'] === true,
     });
   }
   ['_getTabState']() {
@@ -456,30 +456,30 @@ export class WebPreviewNode {
   ['_getActiveUrl']() {
     return getWebPreviewActiveTabUrl(this['_data']);
   }
-  ['_applyTabPatch'](args4, { commitHistory: commitHistory = ![] } = {}) {
+  ['_applyTabPatch'](args4, { commitHistory: commitHistory = false } = {}) {
     if (!args4) return;
     ((this['_data'] = { ...this['_data'], ...args4 }), appStore['updateNodeData'](this['id'], args4));
     if (commitHistory) commit();
     (this['_clearSnapshot'](), this['_syncDom'](), dispatchWebPreviewForceSync(this['id']));
   }
-  ['_addTab']({ id: id = '', url: url = '', title: title = '', pendingPopup: pendingPopup = ![] } = {}) {
+  ['_addTab']({ id: id = '', url: url = '', title: title = '', pendingPopup: pendingPopup = false } = {}) {
     const response = addWebPreviewTabData(this['_data'], {
       id: id,
       url: url,
       title: title,
       pendingPopup: pendingPopup,
     });
-    if (response['ok'] === ![])
+    if (response['ok'] === false)
       return (globalThis['window']?.['showToast']?.(webPreviewText('toasts.maxTabs'), 'warning'), response);
     return (
-      this['_applyTabPatch'](response['patch'], { commitHistory: !![] }),
+      this['_applyTabPatch'](response['patch'], { commitHistory: true }),
       this['_setStatus'](getWebPreviewDefaultStatusText()),
       response
     );
   }
   ['_activateTab'](value13) {
     const response2 = activateWebPreviewTabData(this['_data'], value13);
-    if (response2['ok'] === ![]) return;
+    if (response2['ok'] === false) return;
     (this['_applyTabPatch'](response2['patch']), this['_syncNavigationButtons']());
   }
   ['_disposeNativeTab'](enabled) {
@@ -492,23 +492,23 @@ export class WebPreviewNode {
   }
   ['_closeTab'](value14) {
     const response3 = closeWebPreviewTabData(this['_data'], value14);
-    if (response3['ok'] === ![]) return;
+    if (response3['ok'] === false) return;
     (this['_disposeNativeTab'](response3['closedTabId']),
       this['_navigationStateByTabId']['delete'](response3['closedTabId']),
-      this['_applyTabPatch'](response3['patch'], { commitHistory: !![] }),
+      this['_applyTabPatch'](response3['patch'], { commitHistory: true }),
       this['_syncNavigationButtons']());
     if (!response3['state']['webUrl']) this['_setStatus'](getWebPreviewDefaultStatusText());
   }
-  ['_openPopupTab'](value15, { tabId: tabId = '', pendingPopup: pendingPopup = ![] } = {}) {
+  ['_openPopupTab'](value15, { tabId: tabId = '', pendingPopup: pendingPopup = false } = {}) {
     const url3 = normalizeWebPreviewUrl(value15);
-    if (!url3 && pendingPopup !== !![]) return;
+    if (!url3 && pendingPopup !== true) return;
     const response4 = this['_addTab']({
       id: tabId,
       url: url3,
-      title: pendingPopup === !![] ? webPreviewText('tabs.loginWindow') : '',
-      pendingPopup: pendingPopup === !![] && !url3,
+      title: pendingPopup === true ? webPreviewText('tabs.loginWindow') : '',
+      pendingPopup: pendingPopup === true && !url3,
     });
-    if (response4?.['ok'] === ![]) {
+    if (response4?.['ok'] === false) {
       if (tabId) this['_disposeNativeTab'](tabId);
       return;
     }
@@ -527,7 +527,7 @@ export class WebPreviewNode {
         value19 = value18 === this['_getActiveTabId']();
       if (tabId2['type'] === 'loading')
         value19 &&
-          (tabId2['holdSnapshot'] === !![]
+          (tabId2['holdSnapshot'] === true
             ? this['el']['classList']['add']('is-web-preview-loading')
             : this['_clearSnapshot'](),
           this['_setStatus'](webPreviewText('status.loading')));
@@ -550,7 +550,7 @@ export class WebPreviewNode {
               if (tabId2['type'] === 'open-popup')
                 this['_openPopupTab'](tabId2['url'], {
                   tabId: tabId2['popupTabId'],
-                  pendingPopup: tabId2['pendingPopup'] === !![],
+                  pendingPopup: tabId2['pendingPopup'] === true,
                 });
               else {
                 if (tabId2['type'] === 'closed') {
@@ -703,7 +703,7 @@ export class WebPreviewNode {
     value21?.(webPreviewText(startedKey || 'toasts.reversePromptGenerateStarted'), 'success');
     try {
       const response5 = await value23['executeCanvasCommand']('generation.run', { nodeId: nodeId3 });
-      response5?.['ok'] === ![] && handler2(getCanvasCommandFailureText(response5));
+      response5?.['ok'] === false && handler2(getCanvasCommandFailureText(response5));
     } catch (error3) {
       handler2(error3?.['message'] || error3);
     }
@@ -775,7 +775,7 @@ export class WebPreviewNode {
     if (!this['_getActiveUrl']() || !enabled3['isAvailable']()) return;
     void enabled3['controlView']({ nodeId: this['id'], tabId: tabId5, action: action })
       ['then']((response7) => {
-        response7?.['ok'] === ![] &&
+        response7?.['ok'] === false &&
           response7['error'] === 'no-history' &&
           this['_setNavigationState']({ ...response7, tabId: tabId5 });
       })
@@ -790,7 +790,7 @@ export class WebPreviewNode {
     }
     void enabled4['controlView']({ nodeId: this['id'], tabId: tabId6, action: 'extract-media' })
       ['then']((response8) => {
-        if (response8?.['ok'] === ![]) {
+        if (response8?.['ok'] === false) {
           globalThis['window']?.['showToast']?.(webPreviewText('toasts.extractMediaFailed'), 'error');
           return;
         }
@@ -815,7 +815,7 @@ export class WebPreviewNode {
     }
     void enabled5['controlView']({ nodeId: this['id'], tabId: tabId7, action: 'capture-reference' })
       ['then']((payload2) => {
-        if (payload2?.['ok'] === ![]) {
+        if (payload2?.['ok'] === false) {
           globalThis['window']?.['showToast']?.(webPreviewText('toasts.saveReferenceFailed'), 'error');
           return;
         }
@@ -927,7 +927,7 @@ export class WebPreviewNode {
       title: title2,
       activate: tabId8 === this['_getActiveTabId'](),
     });
-    if (response9['ok'] === ![]) return;
+    if (response9['ok'] === false) return;
     ((this['_data'] = { ...this['_data'], ...response9['patch'] }),
       appStore['updateNodeData'](this['id'], response9['patch']),
       this['_syncDom']());
@@ -937,7 +937,7 @@ export class WebPreviewNode {
       tabId: tabId9,
       faviconUrl: faviconUrl,
     });
-    if (response10['ok'] === ![]) return;
+    if (response10['ok'] === false) return;
     ((this['_data'] = { ...this['_data'], ...response10['patch'] }),
       appStore['updateNodeData'](this['id'], response10['patch']),
       this['_syncDom']());
@@ -954,8 +954,8 @@ export class WebPreviewNode {
   }
   ['_syncNavigationButtons']() {
     this['_navigationState'] = this['_navigationStateByTabId']['get'](this['_getActiveTabId']()) || {
-      canGoBack: ![],
-      canGoForward: ![],
+      canGoBack: false,
+      canGoForward: false,
     };
     for (const el9 of this['_backButtons']) {
       if (el9) el9['disabled'] = !this['_navigationState']['canGoBack'];
@@ -978,7 +978,7 @@ export class WebPreviewNode {
       count3 = Number(box2['zoomFactor']),
       value35 = this['_freezeSnapshotSerial'] + 1;
     this['_freezeSnapshotSerial'] = value35;
-    if (box2['streaming'] === !![]) {
+    if (box2['streaming'] === true) {
       ((this['_freezeImage']['src'] = enabled6),
         (this['el']['dataset']['webPreviewSnapshotToken'] = value34));
       Number['isFinite'](count) &&
@@ -993,11 +993,11 @@ export class WebPreviewNode {
       this['el']['classList']['add']('is-remote-browser-surface', 'has-freeze-snapshot');
       return;
     }
-    let value36 = ![];
+    let value36 = false;
     const run = () => {
         if (value36) return;
         if (this['_freezeSnapshotSerial'] !== value35 || !this['_freezeImage']) return;
-        ((value36 = !![]),
+        ((value36 = true),
           (this['_freezeImage']['src'] = enabled6),
           (this['el']['dataset']['webPreviewSnapshotToken'] = value34),
           Number['isFinite'](count) && count > 0
@@ -1072,7 +1072,7 @@ export class WebPreviewNode {
       ((this['_fullscreenSlot']['dataset']['webUrl'] = webUrl2),
       (this['_fullscreenSlot']['dataset']['nodeId'] = this['id']),
       (this['_fullscreenSlot']['dataset']['tabId'] = activeTabId['activeTabId']));
-    const enabled8 = Boolean(webUrl2 || activeTabId['activeTab']?.['pendingPopup'] === !![]);
+    const enabled8 = Boolean(webUrl2 || activeTabId['activeTab']?.['pendingPopup'] === true);
     this['el']['classList']['toggle']('has-web-url', enabled8);
     if (!enabled8) (this['_renderStartPageTiles'](), this['_setStatus'](getWebPreviewDefaultStatusText()));
     else

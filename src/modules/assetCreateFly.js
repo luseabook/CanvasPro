@@ -18,7 +18,7 @@ export function playAssetCreateFly({
     (el['style']['top'] = box['top'] + 'px'),
     (el['style']['width'] = box['width'] + 'px'),
     (el['style']['height'] = box['height'] + 'px'));
-  const item = enabled['cloneNode'](!![]);
+  const item = enabled['cloneNode'](true);
   if (item?.['id']) item['removeAttribute']('id');
   (el['appendChild'](item), documentObject['body']['appendChild'](el));
   if (typeof el['animate'] !== 'function') return (el['remove'](), null);

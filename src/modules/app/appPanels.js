@@ -6,7 +6,7 @@ import { initEmptyCanvasOnboarding } from '../canvasOnboarding/emptyCanvasOnboar
 import { beginModalInteraction } from '../../services/modalInteractionScope.js';
 export function isSubscriptionAuthorizationClearAvailable(value = globalThis['window']) {
   const item = Boolean(value?.['AI_CANVAS_IS_DEV_BUILD'] || value?.['LOCAL_DEV_BUILD']);
-  return item && value?.['DEV_MODE'] === !![];
+  return item && value?.['DEV_MODE'] === true;
 }
 export function resolveSubscriptionStatusMessageKey(response = {}) {
   if (response['loading']) return 'settings.subscription.loading';
@@ -136,14 +136,14 @@ export function createAppPanels({
       current = Math['max'](1, Number(subscriptionIdentityTimeoutMs) || 15000);
     let entry = 0,
       count = 0,
-      record = ![],
-      enabled2 = ![];
+      record = false,
+      enabled2 = false;
     function run5(locale = '') {
       return t('settings.subscription.contact', {}, locale ? { locale: locale } : {});
     }
     function run6(payload) {
       const enabled3 = String(payload || '')['trim']();
-      if (!enabled3) return !![];
+      if (!enabled3) return true;
       return enabled3 === run5('zh-CN') || enabled3 === run5('en-US');
     }
     function run7(handle) {
@@ -177,11 +177,11 @@ export function createAppPanels({
         return '-';
       }
     }
-    function run10(el6, enabled4, enabled5 = !![]) {
+    function run10(el6, enabled4, enabled5 = true) {
       if (!el6) return;
       el6['replaceChildren']();
       if (!enabled4) {
-        el6['hidden'] = !![];
+        el6['hidden'] = true;
         return;
       }
       el6['hidden'] = !enabled5;
@@ -192,7 +192,7 @@ export function createAppPanels({
       ((el8['type'] = 'text'),
         (el8['className'] = 'settings-contact-copy'),
         (el8['value'] = enabled4),
-        (el8['readOnly'] = !![]),
+        (el8['readOnly'] = true),
         el8['setAttribute']('aria-label', t('settings.subscription.contactInfo.wechatAria')),
         el8['addEventListener']('focus', () => el8['select']()),
         el8['addEventListener']('click', () => {
@@ -219,7 +219,7 @@ export function createAppPanels({
         (el11['referrerPolicy'] = 'no-referrer'),
         (el11['src'] = enabled6),
         el11['addEventListener']('error', () => {
-          el11['hidden'] = !![];
+          el11['hidden'] = true;
           const el12 = document['createElement']('div');
           ((el12['className'] = 'settings-contact-hint'),
             (el12['textContent'] = t('settings.subscription.contactInfo.qrLoadFailed')),
@@ -233,7 +233,7 @@ export function createAppPanels({
       el13['textContent'] = run7(value2);
       const value5 = run(value3 || key),
         enabled7 = String(value4 || index)['trim']();
-      el15 && run10(el15, enabled7, el15['hidden'] === ![]);
+      el15 && run10(el15, enabled7, el15['hidden'] === false);
       run11(el14, value5, !!enabled7);
       if (!el15 && el14 && enabled7) {
         const value6 = document['createElement']('div');
@@ -246,8 +246,8 @@ export function createAppPanels({
       if (!el16 || !el17 || el16['dataset']['contactRevealBound'] === '1') return;
       ((el16['dataset']['contactRevealBound'] = '1'),
         el16['addEventListener']('click', () => {
-          el17['hidden'] = ![];
-          if (el18?.['children']?.['length']) el18['hidden'] = ![];
+          el17['hidden'] = false;
+          if (el18?.['children']?.['length']) el18['hidden'] = false;
         }));
     }
     function run14(value7) {
@@ -275,17 +275,17 @@ export function createAppPanels({
     }
     function run17(value9) {
       const args = normalizeSubscriptionPayload(value9 || {});
-      if (!isSubscriptionActive(args)) return ![];
+      if (!isSubscriptionActive(args)) return false;
       const args2 = run16();
       return (
         store['setSubscriptionState']({
           ...args2,
           ...args,
-          loading: ![],
+          loading: false,
           error: null,
           lastSyncAt: Date['now'](),
         }),
-        !![]
+        true
       );
     }
     function run18() {
@@ -320,7 +320,7 @@ export function createAppPanels({
     function run22(value17) {
       return modelCatalogService?.['loadCachedCatalog']?.(value17);
     }
-    async function run23(subscriptionState, installId, { force: force = ![] } = {}) {
+    async function run23(subscriptionState, installId, { force: force = false } = {}) {
       const response2 = await modelCatalogService?.['sync']?.({
         subscriptionState: subscriptionState,
         installId: installId?.['installId'],
@@ -337,11 +337,11 @@ export function createAppPanels({
     }
     async function run24(options2 = {}) {
       const value18 = ++entry,
-        value19 = options2?.['loadModelCatalogCache'] === !![],
-        enabled8 = options2?.['syncModelCatalog'] === !![],
-        force2 = options2?.['forceModelCatalog'] === !![],
+        value19 = options2?.['loadModelCatalogCache'] === true,
+        enabled8 = options2?.['syncModelCatalog'] === true,
+        force2 = options2?.['forceModelCatalog'] === true,
         args3 = run16();
-      store['setSubscriptionState']({ ...args3, loading: !![], error: null });
+      store['setSubscriptionState']({ ...args3, loading: true, error: null });
       let args4 = null,
         args5 = null;
       try {
@@ -350,7 +350,7 @@ export function createAppPanels({
         if (!String(value20 || '')['trim']())
           return (
             store['setSubscriptionState']({
-              loading: ![],
+              loading: false,
               status: 'none',
               expiresAt: null,
               error: t('settings.subscription.missingInstallIdSync'),
@@ -368,7 +368,7 @@ export function createAppPanels({
           (store['setSubscriptionState']({
             ...run16(),
             ...args5['authorization'],
-            loading: !![],
+            loading: true,
             error: null,
           }),
           run19());
@@ -379,7 +379,7 @@ export function createAppPanels({
           store['setSubscriptionState']({
             ...expiresAt,
             expiresAt: expiresAt?.['expiresAt'] ?? value21?.['expiresAt'] ?? null,
-            loading: ![],
+            loading: false,
             error: null,
             lastSyncAt: Date['now'](),
           }),
@@ -401,7 +401,7 @@ export function createAppPanels({
             ...(status ? response4 : {}),
             status: status ? response4['status'] : 'none',
             expiresAt: status ? response4['expiresAt'] : null,
-            loading: ![],
+            loading: false,
             error: error2?.['message'] || t('settings.subscription.syncFailed'),
             lastSyncAt: Date['now'](),
           }),
@@ -417,10 +417,10 @@ export function createAppPanels({
             ? value23['retryScheduleMs']
             : retryScheduleMs,
         enabled9 = String(value22 || '')['trim']();
-      if (!enabled9) return (window['showToast']?.(t('settings.subscription.enterCdkey'), 'warn'), ![]);
+      if (!enabled9) return (window['showToast']?.(t('settings.subscription.enterCdkey'), 'warn'), false);
       const value25 = await run21(() => ensureInstallId());
       if (!String(value25 || '')['trim']())
-        return (window['showToast']?.(t('settings.subscription.missingInstallIdActivate'), 'error'), ![]);
+        return (window['showToast']?.(t('settings.subscription.missingInstallIdActivate'), 'error'), false);
       const value26 = await run21(() => run20(value25));
       let error3 = null,
         value27 = null;
@@ -437,22 +437,22 @@ export function createAppPanels({
       if (value27) throw value27;
       if (!isActivationRequestAccepted(error3)) {
         const value30 = error3?.['message'] || t('settings.subscription.activationFailed');
-        return (window['showToast']?.(value30, 'error'), ![]);
+        return (window['showToast']?.(value30, 'error'), false);
       }
       entry += 1;
       if (run17(error3))
         return (
-          await run23(run16(), value26, { force: !![] }),
+          await run23(run16(), value26, { force: true }),
           window['showToast']?.(t('settings.subscription.activated')),
-          !![]
+          true
         );
       window['showToast']?.(t('settings.subscription.submitted'));
       for (let attempt = 0; attempt < total['length']; attempt += 1) {
         const count4 = total[attempt];
         value24?.({ phase: 'checking', attempt: attempt + 1, total: total['length'] });
         if (count4 > 0) await new Promise((value31) => setTimeout(value31, count4));
-        const value32 = await run24({ syncModelCatalog: !![], forceModelCatalog: !![] });
-        if (isSubscriptionActive(value32)) return (window['showToast']?.(t('settings.subscription.activated')), !![]);
+        const value32 = await run24({ syncModelCatalog: true, forceModelCatalog: true });
+        if (isSubscriptionActive(value32)) return (window['showToast']?.(t('settings.subscription.activated')), true);
       }
       const value33 = run16(),
         value34 = String(value33['error'] || error3?.['message'] || '')['trim']();
@@ -463,16 +463,16 @@ export function createAppPanels({
               'warning',
             )
           : window['showToast']?.(t('settings.subscription.serverNotConfirmed'), 'warning'),
-        ![]
+        false
       );
     }
     async function run26() {
-      if (!isSubscriptionAuthorizationClearAvailable(window) || typeof clearSubscriptionAuthorization !== 'function') return ![];
+      if (!isSubscriptionAuthorizationClearAvailable(window) || typeof clearSubscriptionAuthorization !== 'function') return false;
       const value35 = window['confirm']?.(t('settings.subscription.clearConfirm'));
-      if (value35 === ![]) return ![];
+      if (value35 === false) return false;
       const value36 = el5?.['textContent'] || t('settings.subscription.clearAuthorization');
       el5 &&
-        ((el5['disabled'] = !![]), (el5['textContent'] = t('settings.subscription.clearing')));
+        ((el5['disabled'] = true), (el5['textContent'] = t('settings.subscription.clearing')));
       try {
         (await clearSubscriptionAuthorization(), (entry += 1));
         const contactText = run16(),
@@ -483,7 +483,7 @@ export function createAppPanels({
             contactText: contactText['contactText'] || args6['contactText'],
             contactUrl: contactText['contactUrl'] || args6['contactUrl'],
             contactWechat: contactText['contactWechat'] || args6['contactWechat'],
-            loading: ![],
+            loading: false,
             status: 'none',
             expiresAt: null,
             entitledModelKeys: [],
@@ -495,15 +495,15 @@ export function createAppPanels({
           modelCatalogService?.['clear']?.(),
           run19(),
           window['showToast']?.(t('settings.subscription.clearSuccess')),
-          !![]
+          true
         );
       } catch (error4) {
         return (
           window['showToast']?.(error4?.['message'] || t('settings.subscription.clearFailed'), 'error'),
-          ![]
+          false
         );
       } finally {
-        el5 && ((el5['disabled'] = ![]), (el5['textContent'] = value36));
+        el5 && ((el5['disabled'] = false), (el5['textContent'] = value36));
       }
     }
     function run27(value37 = DEFAULT_VIP_GATE_MODEL_ID, value38 = '', handler2 = null) {
@@ -568,16 +568,16 @@ export function createAppPanels({
         }));
       const el20 = root['querySelector']('#gateSubmitBtn'),
         el21 = root['querySelector']('#gateCdkeyInput');
-      let enabled10 = ![];
+      let enabled10 = false;
       root['querySelector']('#gateSubmitBtn')?.['addEventListener']('click', async () => {
         if (enabled10) return;
-        enabled10 = !![];
+        enabled10 = true;
         const value40 = el20?.['textContent'] || t('settings.subscription.gate.activate');
         el20 &&
-          ((el20['disabled'] = !![]),
+          ((el20['disabled'] = true),
           (el20['textContent'] = t('settings.subscription.checking') + ' 1/4'));
-        if (el21) el21['disabled'] = !![];
-        let enabled11 = ![];
+        if (el21) el21['disabled'] = true;
+        let enabled11 = false;
         try {
           enabled11 = await run25(el21?.['value'], {
             onProgress: ({ attempt: attempt2, total: total2 }) => {
@@ -589,7 +589,7 @@ export function createAppPanels({
           });
         } catch (error5) {
           (window['showToast']?.(error5?.['message'] || t('settings.subscription.gateFailed'), 'error'),
-            (enabled11 = ![]));
+            (enabled11 = false));
         }
         if (enabled11) {
           onClose();
@@ -599,11 +599,11 @@ export function createAppPanels({
             } catch {}
           return;
         }
-        ((enabled10 = ![]),
+        ((enabled10 = false),
           el20 &&
             el20['isConnected'] &&
-            ((el20['disabled'] = ![]), (el20['textContent'] = value40)),
-          el21 && el21['isConnected'] && ((el21['disabled'] = ![]), el21['focus']()));
+            ((el20['disabled'] = false), (el20['textContent'] = value40)),
+          el21 && el21['isConnected'] && ((el21['disabled'] = false), el21['focus']()));
       });
     }
     async function run28(value41 = DEFAULT_VIP_GATE_MODEL_ID, value42 = '', error6 = null) {
@@ -614,7 +614,7 @@ export function createAppPanels({
         const value45 = String(error6?.['message'] || '')['trim']();
         window['showToast']?.(value45 || t('settings.subscription.activeSyncTip'), 'warning');
         try {
-          await run24({ syncModelCatalog: !![], forceModelCatalog: !![] });
+          await run24({ syncModelCatalog: true, forceModelCatalog: true });
         } catch {}
         return;
       }
@@ -645,8 +645,8 @@ export function createAppPanels({
       el4['addEventListener']('click', async () => {
         if (el4['disabled']) return;
         const value49 = el4['textContent'] || '';
-        ((el4['disabled'] = !![]), (el4['textContent'] = t('settings.subscription.checking')));
-        if (el3) el3['disabled'] = !![];
+        ((el4['disabled'] = true), (el4['textContent'] = t('settings.subscription.checking')));
+        if (el3) el3['disabled'] = true;
         try {
           const value50 = await run25(el3?.['value'], {
             onProgress: ({ attempt: attempt3, total: total3 }) => {
@@ -656,8 +656,8 @@ export function createAppPanels({
           });
           if (value50 && el3) el3['value'] = '';
         } finally {
-          ((el4['disabled'] = ![]), (el4['textContent'] = value49));
-          if (el3) el3['disabled'] = ![];
+          ((el4['disabled'] = false), (el4['textContent'] = value49));
+          if (el3) el3['disabled'] = false;
         }
       });
     el5 &&
@@ -676,22 +676,22 @@ export function createAppPanels({
       const value53 = Date['now']();
       if (record || value53 - count < 15000) return;
       ((count = value53),
-        (record = !![]),
-        void run24({ syncModelCatalog: !![] })
+        (record = true),
+        void run24({ syncModelCatalog: true })
           ['catch'](() => {})
           ['finally'](() => {
-            record = ![];
+            record = false;
           }));
     };
     (window['addEventListener']?.('blur', () => {
-      enabled2 = !![];
+      enabled2 = true;
     }),
       window['addEventListener']?.('focus', () => {
         if (!enabled2) return;
-        ((enabled2 = ![]), (count = 0), run29());
+        ((enabled2 = false), (count = 0), run29());
       }),
       window['addEventListener']?.('online', run29),
-      void run24({ loadModelCatalogCache: !![], syncModelCatalog: !![] }));
+      void run24({ loadModelCatalogCache: true, syncModelCatalog: true }));
   }
   function run30() {
     const el22 = document['getElementById']('aiPanel'),
@@ -911,18 +911,18 @@ export function createAppPanels({
     function run44() {
       run42();
       if (!el45) return;
-      if (el49) el49['hidden'] = !![];
+      if (el49) el49['hidden'] = true;
       (el48 &&
-        ((el48['hidden'] = ![]),
+        ((el48['hidden'] = false),
         (el48['loading'] = 'lazy'),
         (el48['decoding'] = 'async'),
         (el48['referrerPolicy'] = 'no-referrer'),
         (el48['src'] = run43())),
-        (el45['hidden'] = ![]),
-        el47?.['focus']?.({ preventScroll: !![] }));
+        (el45['hidden'] = false),
+        el47?.['focus']?.({ preventScroll: true }));
     }
     function run45() {
-      if (el45) el45['hidden'] = !![];
+      if (el45) el45['hidden'] = true;
     }
     (el46?.['addEventListener']('click', (event8) => {
       (event8['stopPropagation'](), run44());
@@ -932,8 +932,8 @@ export function createAppPanels({
         if (event9['target'] === el45) run45();
       }),
       el48?.['addEventListener']('error', () => {
-        el48['hidden'] = !![];
-        if (el49) el49['hidden'] = ![];
+        el48['hidden'] = true;
+        if (el49) el49['hidden'] = false;
       }),
       document['addEventListener']('keydown', (event10) => {
         event10['key'] === 'Escape' && el45 && !el45['hidden'] && run45();

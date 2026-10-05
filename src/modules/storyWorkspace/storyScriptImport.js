@@ -82,7 +82,7 @@ function deriveUploadedStoryTitle(entry, record, payload) {
 }
 function isUploadedSceneHeading(state) {
   const args2 = normalizeText(state)['replace'](/^#{1,6}\s*/u, '');
-  if (!args2 || [...args2]['length'] > 120) return ![];
+  if (!args2 || [...args2]['length'] > 120) return false;
   return (
     UPLOADED_FOUNTAIN_SCENE_HEADING_PATTERN['test'](args2) ||
     UPLOADED_NUMBERED_SCENE_HEADING_PATTERN['test'](args2) ||

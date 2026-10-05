@@ -271,13 +271,13 @@ function _queueAudioDecode(handler3, value40) {
       };
     if (value40?.['aborted']) return handler4(null);
     if (_activeDecodes < MAX_CONCURRENT_AUDIO_DECODES) void handler5();
-    else (_decodeQueue['push'](handler5), value40?.['addEventListener']('abort', value41, { once: !![] }));
+    else (_decodeQueue['push'](handler5), value40?.['addEventListener']('abort', value41, { once: true }));
   });
 }
 
 function _createDecodedAudioBufferJob(value42, value43) {
   const value44 = typeof AbortController === 'function' ? new AbortController() : null,
-    value45 = { consumers: 0, controller: value44, settled: ![], promise: null };
+    value45 = { consumers: 0, controller: value44, settled: false, promise: null };
   return (
     (value45['promise'] = _queueAudioDecode(async () => {
       let enabled11;
@@ -295,7 +295,7 @@ function _createDecodedAudioBufferJob(value42, value43) {
         return null;
       }
     }, value44?.['signal'])['finally'](() => {
-      value45['settled'] = !![];
+      value45['settled'] = true;
       if (_bufferInflight['get'](value42) === value45) _bufferInflight['delete'](value42);
     })),
     _bufferInflight['set'](value42, value45),
@@ -306,14 +306,14 @@ function _createDecodedAudioBufferJob(value42, value43) {
 async function _waitForDecodedAudioBufferJob(enabled12, value46) {
   if (!enabled12 || value46?.['aborted']) return null;
   enabled12['consumers'] += 1;
-  let value47 = ![],
+  let value47 = false,
     value48 = null;
   const value49 = value46
     ? new Promise((handler6) => {
         ((value48 = () => {
-          ((value47 = !![]), handler6(null));
+          ((value47 = true), handler6(null));
         }),
-          value46['addEventListener']('abort', value48, { once: !![] }));
+          value46['addEventListener']('abort', value48, { once: true }));
       })
     : null;
   try {
@@ -348,7 +348,7 @@ export async function getAudioNodeWaveformPath(value50, value51, args = {}) {
     args['onDuration'] &&
       (audioDurationFromUrl = await getAudioDurationFromUrl(value50, {
         signal: args['signal'],
-        cacheBuffer: ![],
+        cacheBuffer: false,
       }));
     if (args['signal']?.['aborted']) return '';
     return (
@@ -358,7 +358,7 @@ export async function getAudioNodeWaveformPath(value50, value51, args = {}) {
   }
   const waveformBarsPathFromUrl = await getWaveformBarsPathFromUrl(value50, {
     ...args,
-    cacheBuffer: ![],
+    cacheBuffer: false,
     onDuration: (value55) => {
       audioDurationFromUrl = value55;
     },

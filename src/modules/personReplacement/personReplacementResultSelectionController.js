@@ -50,7 +50,7 @@ export function createPersonReplacementResultSelectionController({
     typeof scrollShotCardIntoView !== 'function'
   )
     throw new TypeError('Person replacement result selection requires project and presentation adapters.');
-  const run = (item, key = !![]) =>
+  const run = (item, key = true) =>
       key
         ? transitionPersonReplacementOutput(item, {
             type: PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['INVALIDATE'],
@@ -59,13 +59,13 @@ export function createPersonReplacementResultSelectionController({
     selectImageResult = (
       index,
       result,
-      { selectShot: selectShot = !![], direction: direction = '' } = {},
+      { selectShot: selectShot = true, direction: direction = '' } = {},
     ) => {
       const shots = getProject(),
         text = normalizeText(index),
         enabled = shots['shots']['find']((data) => data['id'] === text),
         results = getPersonReplacementImageResults(enabled);
-      if (!enabled || !results['length']) return ![];
+      if (!enabled || !results['length']) return false;
       const personReplacementActiveImageResultIndex = getPersonReplacementActiveImageResultIndex(
           enabled,
           results,
@@ -82,7 +82,7 @@ export function createPersonReplacementResultSelectionController({
         (!selectShot || text === normalizeText(shots['workspace']['selectedShotId'])) &&
         !enabled2
       )
-        return ![];
+        return false;
       const target = selectShot && text !== normalizeText(shots['workspace']['selectedShotId']),
         source =
           direction ||
@@ -119,14 +119,14 @@ export function createPersonReplacementResultSelectionController({
       ),
         playImagePreviewTransition(source || 'next', next));
       if (selectShot) scrollShotCardIntoView(text);
-      return !![];
+      return true;
     },
     switchImageResult = (current, entry, args2 = {}) => {
       const record = getProject(),
         text2 = normalizeText(entry ?? record['workspace']['selectedShotId']),
         enabled3 = record['shots']['find']((payload) => payload['id'] === text2),
         list = getPersonReplacementImageResults(enabled3);
-      if (!enabled3 || list['length'] < 2) return ![];
+      if (!enabled3 || list['length'] < 2) return false;
       const personReplacementActiveImageResultIndex2 = getPersonReplacementActiveImageResultIndex(
           enabled3,
           list,
@@ -145,7 +145,7 @@ export function createPersonReplacementResultSelectionController({
         enabled4 = config['shots']['find']((scope) => scope['id'] === shotId),
         list2 = getPersonReplacementImageResults(enabled4),
         count = Math['trunc'](Number(resultIndex));
-      if (!enabled4 || !Number['isInteger'](count) || count < 0 || count >= list2['length']) return ![];
+      if (!enabled4 || !Number['isInteger'](count) || count < 0 || count >= list2['length']) return false;
       const personReplacementActiveImageResultIndex3 = getPersonReplacementActiveImageResultIndex(
           enabled4,
           list2,
@@ -174,7 +174,7 @@ export function createPersonReplacementResultSelectionController({
           shotId: shotId,
           resultIndex: resultIndex,
         });
-      if (!setPersonReplacementImageResultAsReference2['changed']) return ![];
+      if (!setPersonReplacementImageResultAsReference2['changed']) return false;
       updateProject(
         reconcilePersonReplacementShotGenerationState(
           setPersonReplacementImageResultAsReference2['project'],
@@ -193,7 +193,7 @@ export function createPersonReplacementResultSelectionController({
             : '已设为下一轮参考图；人物绑定保持不变。',
           'success',
         ),
-        !![]
+        true
       );
     },
     deleteImageResult = (value9, value10) => {
@@ -209,7 +209,7 @@ export function createPersonReplacementResultSelectionController({
         count2 < 0 ||
         count2 >= list3['length']
       )
-        return ![];
+        return false;
       const captureResultHistoryMenu3 = captureResultHistoryMenu(),
         personReplacementActiveImageResultIndex4 = getPersonReplacementActiveImageResultIndex(
           enabled5,
@@ -252,7 +252,7 @@ export function createPersonReplacementResultSelectionController({
           { timelineShotId: timelineShotId },
         ),
         restoreResultHistoryMenu(captureResultHistoryMenu3),
-        !![]
+        true
       );
     },
     selectVideoResult = (value16, value17, { direction: direction = '' } = {}) => {
@@ -260,7 +260,7 @@ export function createPersonReplacementResultSelectionController({
         text3 = normalizeText(value16),
         enabled6 = shots3['shots']['find']((value18) => value18['id'] === text3),
         results3 = getPersonReplacementVideoResults(enabled6);
-      if (!enabled6 || !results3['length']) return ![];
+      if (!enabled6 || !results3['length']) return false;
       const personReplacementActiveVideoResultIndex = getPersonReplacementActiveVideoResultIndex(
           enabled6,
           results3,
@@ -269,7 +269,7 @@ export function createPersonReplacementResultSelectionController({
           0,
           Math['min'](results3['length'] - 1, Math['trunc'](Number(value17) || 0)),
         );
-      if (activeIndex3 === personReplacementActiveVideoResultIndex) return ![];
+      if (activeIndex3 === personReplacementActiveVideoResultIndex) return false;
       const value19 =
           direction || (activeIndex3 > personReplacementActiveVideoResultIndex ? 'next' : 'previous'),
         value20 = captureVideoResultSlide(),
@@ -297,7 +297,7 @@ export function createPersonReplacementResultSelectionController({
           'replacement-video-result',
         ),
         playVideoResultTransition(value19, value20),
-        !![]
+        true
       );
     },
     deleteVideoResult = (value21, value22) => {
@@ -313,7 +313,7 @@ export function createPersonReplacementResultSelectionController({
         count3 < 0 ||
         count3 >= list4['length']
       )
-        return ![];
+        return false;
       const captureResultHistoryMenu4 = captureResultHistoryMenu(),
         personReplacementActiveVideoResultIndex2 = getPersonReplacementActiveVideoResultIndex(
           enabled7,
@@ -356,7 +356,7 @@ export function createPersonReplacementResultSelectionController({
           'delete-replacement-video-result',
         ),
         restoreResultHistoryMenu(captureResultHistoryMenu4),
-        !![]
+        true
       );
     },
     setVideoReference = (shotId2, resultIndex2) => {
@@ -365,7 +365,7 @@ export function createPersonReplacementResultSelectionController({
           shotId: shotId2,
           resultIndex: resultIndex2,
         });
-      if (!setPersonReplacementVideoResultAsReference2['changed']) return ![];
+      if (!setPersonReplacementVideoResultAsReference2['changed']) return false;
       const value28 = setPersonReplacementVideoResultAsReference2['project']['workspace']['selectedShotId'],
         value29 = value27['shots']['find']((value30) => value30['id'] === value28),
         value31 = value28 !== value27['workspace']['selectedShotId'],
@@ -395,7 +395,7 @@ export function createPersonReplacementResultSelectionController({
             : '已设为下一轮原视频；人物绑定保持不变。',
           'success',
         ),
-        !![]
+        true
       );
     },
     switchVideoResult = (value35, value36) => {
@@ -403,7 +403,7 @@ export function createPersonReplacementResultSelectionController({
         text5 = normalizeText(value36 ?? value37['workspace']['selectedShotId']),
         enabled8 = value37['shots']['find']((value38) => value38['id'] === text5),
         list5 = getPersonReplacementVideoResults(enabled8);
-      if (!enabled8 || list5['length'] < 2) return ![];
+      if (!enabled8 || list5['length'] < 2) return false;
       const personReplacementActiveVideoResultIndex4 = getPersonReplacementActiveVideoResultIndex(
           enabled8,
           list5,
@@ -434,7 +434,7 @@ export function createPersonReplacementResultSelectionController({
         list6 = Array['isArray'](personReplacementVideoImageInput['referenceOptions'])
           ? personReplacementVideoImageInput['referenceOptions']
           : [];
-      if (!enabled9 || !list6['length']) return ![];
+      if (!enabled9 || !list6['length']) return false;
       const value44 = Math['max'](
           0,
           Math['min'](list6['length'] - 1, Math['trunc'](Number(value41) || 0)),
@@ -450,8 +450,8 @@ export function createPersonReplacementResultSelectionController({
             normalizeText(referencePersonId) || normalizeText(value45?.['reference']?.['personId']),
           referenceKind: normalizeText(referenceKind) || normalizeText(value45?.['kind']),
         });
-      if (!personReplacementVideoReference['changed']) return ![];
-      return (updateProject(personReplacementVideoReference['project'], 'video-reference-change'), !![]);
+      if (!personReplacementVideoReference['changed']) return false;
+      return (updateProject(personReplacementVideoReference['project'], 'video-reference-change'), true);
     },
     switchVideoReferenceResult = ({
       targetShotId: targetShotId2,
@@ -466,10 +466,10 @@ export function createPersonReplacementResultSelectionController({
           currentResultIndex: currentResultIndex,
           delta: delta,
         });
-      if (!switchPersonReplacementVideoReferenceResult2['changed']) return ![];
+      if (!switchPersonReplacementVideoReferenceResult2['changed']) return false;
       return (
         updateProject(switchPersonReplacementVideoReferenceResult2['project'], 'video-reference-change'),
-        !![]
+        true
       );
     };
   return Object['freeze']({

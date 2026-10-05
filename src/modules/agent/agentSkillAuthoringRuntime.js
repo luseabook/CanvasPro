@@ -57,7 +57,7 @@ export function createAgentSkillAuthoringRuntime({
   author: author = null,
   saveSkill: saveSkill = null,
   localeProvider: localeProvider = () => 'zh-CN',
-  isActiveRun: isActiveRun = () => !![],
+  isActiveRun: isActiveRun = () => true,
 } = {}) {
   const isAvailable = () => typeof author === 'function' && typeof saveSkill === 'function',
     getPending = () => {
@@ -71,10 +71,10 @@ export function createAgentSkillAuthoringRuntime({
         content: content,
         turnId: turnId,
       }),
-        sessionStore?.['setCurrentRun']?.({ id: turnId, status: status, stopped: ![] }));
+        sessionStore?.['setCurrentRun']?.({ id: turnId, status: status, stopped: false }));
     },
     handler2 = () => ({
-      ok: ![],
+      ok: false,
       status: 'stopped',
       reply: formatText('stopped', {}, localeProvider?.()),
       responseChannel: 'skill.authoring',
@@ -109,7 +109,7 @@ export function createAgentSkillAuthoringRuntime({
       });
     } catch (message2) {
       question = {
-        ok: ![],
+        ok: false,
         status: 'failed',
         errorCode: 'SKILL_AUTHORING_FAILED',
         message: message2?.['message'] || formatText('failed', {}, localeProvider?.()),
@@ -127,7 +127,7 @@ export function createAgentSkillAuthoringRuntime({
         }),
         handler(runId, 'need_clarification', question['question']),
         {
-          ok: !![],
+          ok: true,
           status: 'need_clarification',
           reply: question['reply'] || question['question'],
           question: question['question'],
@@ -140,7 +140,7 @@ export function createAgentSkillAuthoringRuntime({
       return (
         handler(runId, 'failed', reply),
         {
-          ok: ![],
+          ok: false,
           status: 'failed',
           reply: reply,
           errorCode: question['errorCode'],
@@ -172,10 +172,10 @@ export function createAgentSkillAuthoringRuntime({
           (response = await saveSkill(requestedId)));
       }
     } catch (message3) {
-      response = { success: ![], errorCode: 'SKILL_SAVE_FAILED', message: message3?.['message'] };
+      response = { success: false, errorCode: 'SKILL_SAVE_FAILED', message: message3?.['message'] };
     }
     if (!isActiveRun(runId)) return handler2();
-    if (response?.['success'] === !![]) {
+    if (response?.['success'] === true) {
       const reply2 = formatText(
         'created',
         { id: requestedId['id'], title: requestedId['title'] || requestedId['id'] },
@@ -190,7 +190,7 @@ export function createAgentSkillAuthoringRuntime({
         }),
         handler(runId, 'success', reply2),
         {
-          ok: !![],
+          ok: true,
           status: 'success',
           reply: reply2,
           skill: requestedId,
@@ -211,7 +211,7 @@ export function createAgentSkillAuthoringRuntime({
     return (
       handler(runId, 'failed', reply3),
       {
-        ok: ![],
+        ok: false,
         status: 'failed',
         reply: reply3,
         errorCode: errorCode,
@@ -230,7 +230,7 @@ export function createAgentSkillAuthoringRuntime({
       const reply4 = formatText('canceled', {}, localeProvider?.());
       return (
         handler(runId, 'cancelled', reply4),
-        { ok: !![], status: 'cancelled', reply: reply4, responseChannel: 'skill.authoring' }
+        { ok: true, status: 'cancelled', reply: reply4, responseChannel: 'skill.authoring' }
       );
     }
     return run({

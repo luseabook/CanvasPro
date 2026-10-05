@@ -85,9 +85,9 @@ function compactSkill(editable = {}) {
     instructions: String(editable['instructions'] || '')['trim'](),
     source: String(editable['source'] || '')['trim'](),
     editable:
-      editable['editable'] === !![] ||
+      editable['editable'] === true ||
       (editable['source'] === 'installed' && editable['managedBy'] === 'shuo-canvas'),
-    enabled: editable['enabled'] !== ![],
+    enabled: editable['enabled'] !== false,
   };
 }
 export function createAgentSkillLifecycleRuntime({
@@ -98,7 +98,7 @@ export function createAgentSkillLifecycleRuntime({
   deleteSkill: deleteSkill = null,
   setSkillEnabled: setSkillEnabled = null,
   localeProvider: localeProvider = () => 'zh-CN',
-  isActiveRun: isActiveRun = () => !![],
+  isActiveRun: isActiveRun = () => true,
 } = {}) {
   const run = () => (skillRegistry?.['listSkills']?.() || [])['map'](compactSkill),
     existingSkills = () => run()['filter']((options) => options['source'] === 'installed'),
@@ -114,7 +114,7 @@ export function createAgentSkillLifecycleRuntime({
         content: content,
         turnId: turnId,
       }),
-        sessionStore?.['setCurrentRun']?.({ id: turnId, status: status, stopped: ![] }));
+        sessionStore?.['setCurrentRun']?.({ id: turnId, status: status, stopped: false }));
     },
     handler3 = (current, status2, reply, args = {}) => {
       return (
@@ -209,7 +209,7 @@ export function createAgentSkillLifecycleRuntime({
       });
     } catch (message3) {
       options2 = {
-        ok: ![],
+        ok: false,
         status: 'failed',
         errorCode: 'SKILL_AUTHORING_FAILED',
         message: message3?.['message'],
@@ -272,10 +272,10 @@ export function createAgentSkillLifecycleRuntime({
           (errorCode = await saveSkill(requestedId)));
       }
     } catch (message4) {
-      errorCode = { success: ![], errorCode: 'SKILL_SAVE_FAILED', message: message4?.['message'] };
+      errorCode = { success: false, errorCode: 'SKILL_SAVE_FAILED', message: message4?.['message'] };
     }
     if (!isActiveRun(runId3)) return handler4(runId3);
-    if (errorCode?.['success'] !== !![])
+    if (errorCode?.['success'] !== true)
       return handler3(runId3, 'failed', formatText('failed', {}, localeProvider?.()), {
         errorCode: errorCode?.['errorCode'] || 'SKILL_SAVE_FAILED',
       });
@@ -341,7 +341,7 @@ export function createAgentSkillLifecycleRuntime({
           typeof setSkillEnabled === 'function'
             ? setSkillEnabled
             : (scope, input) => skillRegistry?.['setSkillEnabled']?.(scope, input);
-      let enabled2 = ![];
+      let enabled2 = false;
       try {
         enabled2 = await handler6(id4['id'], enabled);
       } catch {}
@@ -422,12 +422,12 @@ export function createAgentSkillLifecycleRuntime({
         });
       let errorCode2;
       try {
-        errorCode2 = await deleteSkill({ id: id5['id'], confirmed: !![] });
+        errorCode2 = await deleteSkill({ id: id5['id'], confirmed: true });
       } catch (message5) {
-        errorCode2 = { success: ![], errorCode: 'SKILL_DELETE_FAILED', message: message5?.['message'] };
+        errorCode2 = { success: false, errorCode: 'SKILL_DELETE_FAILED', message: message5?.['message'] };
       }
       if (!isActiveRun(runId)) return handler4(runId);
-      if (errorCode2?.['success'] !== !![])
+      if (errorCode2?.['success'] !== true)
         return handler3(runId, 'failed', formatText('failed', {}, localeProvider?.()), {
           errorCode: errorCode2?.['errorCode'] || 'SKILL_DELETE_FAILED',
         });

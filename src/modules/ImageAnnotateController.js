@@ -128,7 +128,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
   ROTATE_CURSOR_CSS =
     "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28' viewBox='0 0 28 28'%3E%3Cg transform='rotate(35 14 14)'%3E%3Cpath d='M10.2 22.7a8.6 8.6 0 1 0 0-17.4 6.8 6.8 0 1 1 0 17.4Z' fill='%23ffffff' stroke='%23ffffff' stroke-width='1.6' stroke-linejoin='round'/%3E%3Cpath d='M5.3 22.1h4.8v-4.8' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M5.3 22.1l3.9-3.9' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E\") 14 14",
   ImageAnnotateController = {
-    active: ![],
+    active: false,
     nodeId: null,
     nodeData: null,
     overlayEl: null,
@@ -146,7 +146,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     colorButtons: null,
     toolButtons: null,
     cursorEl: null,
-    _cursorHover: ![],
+    _cursorHover: false,
     _cursorLast: { x: 0, y: 0 },
     _cursorRaf: 0,
     _temporaryTool: null,
@@ -156,7 +156,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     _commands: [],
     _redoStack: [],
     _draft: null,
-    _dirty: ![],
+    _dirty: false,
     _view: null,
     _mode: null,
     imageSize: '1K',
@@ -165,7 +165,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     promptText: '',
     _checkerPattern: null,
     _eraseMaskCanvasEl: null,
-    _useWhiteboardBase: ![],
+    _useWhiteboardBase: false,
     _generationModelCatalog: null,
     _fillRegionCache: null,
     _unbindGenerationToolbarUpMenus: null,
@@ -176,7 +176,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       const viewport = appStore['getStateRaw'](),
         enabled3 = viewport['nodes']?.[nodeId];
       if (!enabled3) return;
-      const enabled4 = this['_resolveNodeImageUrl'](enabled3, { preferPreview: !![] });
+      const enabled4 = this['_resolveNodeImageUrl'](enabled3, { preferPreview: true });
       if (!enabled4) {
         window['showToast']?.(imageAnnotateText('toasts.noImage'), 'warn');
         return;
@@ -197,7 +197,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         brushSizePx = payload
           ? clampImageBrushSize(payload['brushSizePx'], 40)
           : clampImageBrushSize(viewport['annotate']?.['brushSizePx'], IMAGE_BRUSH_DEFAULT_SIZE_PX);
-      ((this['active'] = !![]),
+      ((this['active'] = true),
         (this['_localEditSession'] = {}),
         (this['_localEditSubmission'] = null),
         (this['nodeId'] = nodeId),
@@ -208,8 +208,8 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (this['_redoStack'] = []),
         (this['_draft'] = null),
         (this['_selectedTextCommandIndex'] = null),
-        (this['_dirty'] = ![]),
-        (this['_useWhiteboardBase'] = ![]),
+        (this['_dirty'] = false),
+        (this['_useWhiteboardBase'] = false),
         (this['_fillRegionCache'] = new Map()));
       const imageAnnotateText2 = imageAnnotateText('actions.save'),
         imageAnnotateText3 = imageAnnotateText('actions.generate'),
@@ -244,7 +244,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
           node: node,
         }),
         appStore['setAnnotateState']({
-          active: !![],
+          active: true,
           nodeId: nodeId,
           tool: tool,
           color: color,
@@ -320,7 +320,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
             this['_cancelImageReadyWait'] = null;
             if (!this['active']) return;
             (window['showToast']?.(imageAnnotateText('errors.imageLoadFailed'), 'error'),
-              this['exit']({ silent: !![] }));
+              this['exit']({ silent: true }));
           },
         })));
     },
@@ -337,7 +337,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         value5 = appStore['getStateRaw']()['nodes']?.[this['nodeId']];
       return (value5 && appStore['updateNodeData'](this['nodeId'], args), value4);
     },
-    exit({ silent: silent = ![] } = {}) {
+    exit({ silent: silent = false } = {}) {
       if (!this['active']) return;
       (this['_cleanupEvents']?.(),
         (this['_cleanupEvents'] = null),
@@ -348,7 +348,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         this['_cancelImageReadyWait']?.(),
         (this['_cancelImageReadyWait'] = null));
       !silent && this['_dirty'] && window['showToast']?.(imageAnnotateText('toasts.cancelled'), 'ok');
-      ((this['active'] = ![]),
+      ((this['active'] = false),
         (this['_localEditSession'] = null),
         (this['_localEditSubmission'] = null),
         (this['nodeId'] = null),
@@ -356,9 +356,9 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (this['_commands'] = []),
         (this['_redoStack'] = []),
         (this['_draft'] = null),
-        this['_removeTextInput'](![]),
-        (this['_dirty'] = ![]),
-        appStore['setAnnotateState']({ active: ![], nodeId: null }));
+        this['_removeTextInput'](false),
+        (this['_dirty'] = false),
+        appStore['setAnnotateState']({ active: false, nodeId: null }));
       this['_unsubscribe'] && (this['_unsubscribe'](), (this['_unsubscribe'] = null));
       (this['_unsubscribeViewportPreview']?.(),
         (this['_unsubscribeViewportPreview'] = null),
@@ -384,7 +384,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (this['colorButtons'] = null),
         (this['toolButtons'] = null),
         (this['cursorEl'] = null),
-        (this['_cursorHover'] = ![]),
+        (this['_cursorHover'] = false),
         (this['_cursorLast'] = { x: 0, y: 0 }),
         (this['_cursorRaf'] = 0),
         (this['_temporaryTool'] = null),
@@ -398,7 +398,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (this['promptText'] = ''),
         (this['_checkerPattern'] = null),
         (this['_eraseMaskCanvasEl'] = null),
-        (this['_useWhiteboardBase'] = ![]),
+        (this['_useWhiteboardBase'] = false),
         (this['_generationModelCatalog'] = null),
         (this['_fillRegionCache'] = null),
         (this['_unbindGenerationToolbarUpMenus'] = null),
@@ -417,7 +417,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       return this['_mode']?.['scene'] === 'annotate';
     },
     _getFlipState(value6 = this['_commands']) {
-      const enabled5 = { horizontal: ![], vertical: ![] };
+      const enabled5 = { horizontal: false, vertical: false };
       return (
         (Array['isArray'](value6) ? value6 : [])['forEach']((value7) => {
           if (value7?.['type'] === 'flip-horizontal') enabled5['horizontal'] = !enabled5['horizontal'];
@@ -427,7 +427,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       );
     },
     _getCurrentFlipState() {
-      if (!this['_isAnnotateScene']()) return { horizontal: ![], vertical: ![] };
+      if (!this['_isAnnotateScene']()) return { horizontal: false, vertical: false };
       return this['_getFlipState'](this['_commands']);
     },
     _applyFlipToLocalPoint(box3, box4, value8 = this['_getCurrentFlipState']()) {
@@ -500,7 +500,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         value23 = document['createElement']('img');
       ((value23['className'] = 'v2-annotate-img'),
         (value23['src'] = value21),
-        (value23['draggable'] = ![]));
+        (value23['draggable'] = false));
       const value24 = document['createElement']('canvas');
       ((value24['className'] = 'v2-annotate-canvas'),
         stage['appendChild'](value23),
@@ -596,7 +596,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         }
         (event['preventDefault'](), event['stopPropagation']());
       };
-      this['overlayEl']['addEventListener']('wheel', value28, { passive: ![] });
+      this['overlayEl']['addEventListener']('wheel', value28, { passive: false });
       const value30 = () => {
         if (this['_view']) this['_updateView'](this['_view']);
       };
@@ -606,7 +606,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         const value32 = event2['target'],
           value33 = value32?.['tagName']?.['toLowerCase']?.() || '',
           value34 =
-            value33 === 'input' || value33 === 'textarea' || value32?.['isContentEditable'] === !![];
+            value33 === 'input' || value33 === 'textarea' || value32?.['isContentEditable'] === true;
         if (value34) return;
         if (event2['altKey'] || event2['ctrlKey'] || event2['metaKey']) return;
         const value35 = String(event2['key'] || '')['toLowerCase']();
@@ -619,7 +619,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (window['removeEventListener']('resize', value30),
           window['removeEventListener']('keydown', value31),
           this['overlayEl']?.['removeEventListener']('wheel', value28),
-          document['removeEventListener']('pointerdown', value37, !![]));
+          document['removeEventListener']('pointerdown', value37, true));
       };
       ((this['_cleanupEvents'] = value36),
         this['toolbarEl']['addEventListener']('pointerdown', (event3) => event3['stopPropagation']()),
@@ -648,7 +648,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
               !this['_functionControls']?.['containsMenuTarget'](event6['target']) &&
               this['_closeGenerationMenus']());
         };
-      (document['addEventListener']('pointerdown', value37, !![]),
+      (document['addEventListener']('pointerdown', value37, true),
         this['colorWrapEl']?.['addEventListener']('pointerdown', (event7) =>
           event7['stopPropagation'](),
         ));
@@ -707,7 +707,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (value39['lineJoin'] = 'round'),
         (this['_checkerPattern'] = createEraseCheckerboardPattern(value39, 1)));
       const event18 = {
-          down: ![],
+          down: false,
           pointerId: null,
           previousTool: null,
           temporaryTool: null,
@@ -723,12 +723,12 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         handler2 = (value40, value41, value42, count = 0) => {
           const state3 = appStore['getStateRaw'](),
             box9 = state3['nodes']?.[this['nodeId']];
-          if (!box9) return ![];
+          if (!box9) return false;
           const x1 = this['_getLocalFromClient'](value40, value41, state3, box9);
           if (
             !isPointInRect(x1['x'], x1['y'], 0, 0, box9['width'], box9['height'])
           )
-            return ![];
+            return false;
           const value43 = state3['annotate']?.['tool'] || 'brush',
             value44 = count === 1 || count === 2,
             value45 = value44 ? 'eraser' : value43;
@@ -755,19 +755,19 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
               (event18['temporaryTool'] = null),
               (this['_temporaryTool'] = null));
           if (value45 === 'bucket' && !this['_isEraseScene']())
-            return (this['_fillArea'](x1, sizeWorld), !![]);
+            return (this['_fillArea'](x1, sizeWorld), true);
           if (value45 === 'number-label' && this['_isAnnotateScene']())
-            return (this['_addNumberLabel'](x1, sizeWorld), !![]);
+            return (this['_addNumberLabel'](x1, sizeWorld), true);
           if (value45 === 'text') {
             const value47 = this['_findTextHit'](x1, state3['viewport']);
             if (value47) {
-              (this['_removeTextInput'](!![]), (this['_selectedTextCommandIndex'] = value47['index']));
+              (this['_removeTextInput'](true), (this['_selectedTextCommandIndex'] = value47['index']));
               if (value47['mode'] === 'delete')
-                return (this['_deleteTextCommand'](value47['index']), !![]);
+                return (this['_deleteTextCommand'](value47['index']), true);
               if (value47['mode'] === 'copy')
-                return (this['_copyTextCommand'](value47['index'], state3['viewport']), !![]);
+                return (this['_copyTextCommand'](value47['index'], state3['viewport']), true);
               return (
-                (event18['down'] = !![]),
+                (event18['down'] = true),
                 (event18['pointerId'] = value42),
                 (event18['textTransform'] = this['_createTextTransformState'](
                   value47,
@@ -776,13 +776,13 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
                 )),
                 this['canvasEl']['setPointerCapture'](value42),
                 this['_render'](),
-                !![]
+                true
               );
             }
             return (
               (this['_selectedTextCommandIndex'] = null),
               this['_openTextInput'](x1, state3, sizeWorld, value40, value41),
-              !![]
+              true
             );
           }
           if (value45 === 'rect')
@@ -805,11 +805,11 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
                   points: [x1],
                 });
           return (
-            (event18['down'] = !![]),
+            (event18['down'] = true),
             (event18['pointerId'] = value42),
             this['canvasEl']['setPointerCapture'](value42),
             this['_render'](),
-            !![]
+            true
           );
         },
         handler3 = (value48, value49) => {
@@ -892,21 +892,21 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         },
         handler4 = () => {
           if (event18['down'] && event18['textTransform']) {
-            ((event18['down'] = ![]),
+            ((event18['down'] = false),
               (event18['pointerId'] = null),
               (event18['textTransform'] = null),
               (event18['previousTool'] = null),
               (event18['temporaryTool'] = null),
               (this['_temporaryTool'] = null),
               (this['_redoStack'] = []),
-              (this['_dirty'] = !![]),
+              (this['_dirty'] = true),
               this['_persistLocalEditState'](),
               this['_render']());
             return;
           }
           if (!event18['down'] || !this['_draft']) return;
           const value61 = this['_draft'];
-          ((this['_draft'] = null), (event18['down'] = ![]), (event18['pointerId'] = null));
+          ((this['_draft'] = null), (event18['down'] = false), (event18['pointerId'] = null));
           const value62 = event18['previousTool'];
           ((event18['previousTool'] = null),
             (event18['temporaryTool'] = null),
@@ -932,7 +932,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
           }
           (this['_commands']['push'](value61),
             (this['_redoStack'] = []),
-            (this['_dirty'] = !![]),
+            (this['_dirty'] = true),
             this['_persistLocalEditState'](),
             value62 && this['_syncCursor'](value62, this['_view']?.['brushSizePx']),
             this['_render']());
@@ -965,10 +965,10 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
             handler4());
         }),
         this['canvasEl']['addEventListener']('pointerenter', (event24) => {
-          ((this['_cursorHover'] = !![]), handler(event24['clientX'], event24['clientY']));
+          ((this['_cursorHover'] = true), handler(event24['clientX'], event24['clientY']));
         }),
         this['canvasEl']['addEventListener']('pointerleave', () => {
-          ((this['_cursorHover'] = ![]), this['_syncCursor']());
+          ((this['_cursorHover'] = false), this['_syncCursor']());
         }));
     },
     _syncPaletteActive() {
@@ -1103,13 +1103,13 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         this['_syncCursor'](value69, value70));
     },
     _setTool(value71) {
-      if (value71 !== 'text') this['_removeTextInput'](!![]);
+      if (value71 !== 'text') this['_removeTextInput'](true);
       if (value71 !== 'text') this['_selectedTextCommandIndex'] = null;
       const list2 = getAnnotateToolbarToolsForScene(this['_mode']?.['scene'] || 'annotate'),
         tool5 = list2['includes'](value71) ? value71 : 'brush';
       (appStore['setAnnotateState']({ tool: tool5 }), this['_persistLocalEditState']());
     },
-    _removeTextInput(enabled9 = !![], value72 = null) {
+    _removeTextInput(enabled9 = true, value72 = null) {
       const el12 = value72 || this['_textInputEl'];
       if (!el12) return;
       const enabled10 = this['_textInputEl'] === el12,
@@ -1143,12 +1143,12 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       }),
         (this['_selectedTextCommandIndex'] = this['_commands']['length'] - 1),
         (this['_redoStack'] = []),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_persistLocalEditState'](),
         this['_render']());
     },
     _openTextInput(box16, value73, value74, value75, value76) {
-      this['_removeTextInput'](!![]);
+      this['_removeTextInput'](true);
       const el13 = document['createElement']('input');
       ((el13['type'] = 'text'),
         (el13['maxLength'] = 200),
@@ -1167,18 +1167,18 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
           '--annotate-text-input-color',
           el13['dataset']['color'] || getColorCanvas('red'),
         ));
-      let value77 = ![];
+      let value77 = false;
       const run2 = (value78) => {
         if (value77) return;
-        ((value77 = !![]), this['_removeTextInput'](value78, el13));
+        ((value77 = true), this['_removeTextInput'](value78, el13));
       };
       (el13['addEventListener']('pointerdown', (event26) => event26['stopPropagation']()),
         el13['addEventListener']('keydown', (event27) => {
           if (event27['key'] === 'Enter' && !event27['isComposing'])
-            (event27['preventDefault'](), run2(!![]));
-          else event27['key'] === 'Escape' && (event27['preventDefault'](), run2(![]));
+            (event27['preventDefault'](), run2(true));
+          else event27['key'] === 'Escape' && (event27['preventDefault'](), run2(false));
         }),
-        el13['addEventListener']('blur', () => run2(!![])),
+        el13['addEventListener']('blur', () => run2(true)),
         this['overlayEl']?.['appendChild'](el13),
         (this['_textInputEl'] = el13),
         requestAnimationFrame(() => {
@@ -1202,35 +1202,35 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _deleteTextCommand(value86) {
       const value87 = Number(value86);
-      if (!Number['isInteger'](value87) || this['_commands'][value87]?.['type'] !== 'text') return ![];
+      if (!Number['isInteger'](value87) || this['_commands'][value87]?.['type'] !== 'text') return false;
       return (
         this['_commands']['splice'](value87, 1),
         (this['_selectedTextCommandIndex'] = null),
         (this['_redoStack'] = []),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_persistLocalEditState'](),
         this['_render'](),
-        !![]
+        true
       );
     },
     _copyTextCommand(value88, value89 = this['_view']?.['viewport']) {
       const value90 = Number(value88),
         value91 = this['_commands'][value90];
-      if (!Number['isInteger'](value90) || value91?.['type'] !== 'text') return ![];
+      if (!Number['isInteger'](value90) || value91?.['type'] !== 'text') return false;
       const copiedTextCommand = buildCopiedTextCommand(value91, value89);
       return (
         this['_commands']['splice'](value90 + 1, 0, copiedTextCommand),
         (this['_selectedTextCommandIndex'] = value90 + 1),
         (this['_redoStack'] = []),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_persistLocalEditState'](),
         this['_render'](),
-        !![]
+        true
       );
     },
     deleteSelectedTextCommand() {
       const value92 = Number(this['_selectedTextCommandIndex']);
-      if (!Number['isInteger'](value92)) return ![];
+      if (!Number['isInteger'](value92)) return false;
       return this['_deleteTextCommand'](value92);
     },
     _findTextHit(local, viewport4) {
@@ -1317,7 +1317,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         return;
       }
       this['_renderCommands'](ctx, toImageLocalRenderViewport2, this['_commands']);
-      if (this['_draft']) this['_renderCommands'](ctx, toImageLocalRenderViewport2, [this['_draft']], !![]);
+      if (this['_draft']) this['_renderCommands'](ctx, toImageLocalRenderViewport2, [this['_draft']], true);
     },
     _renderEraseSceneCommands(ctx2, viewport6, commands = [], draft = null) {
       this['_eraseMaskCanvasEl'] = renderEraseSceneCommands({
@@ -1331,7 +1331,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         eraseMaskCanvasEl: this['_eraseMaskCanvasEl'],
       });
     },
-    _renderCommands(ctx3, viewport7, commands2, isDraft = ![]) {
+    _renderCommands(ctx3, viewport7, commands2, isDraft = false) {
       renderCommands({
         ctx: ctx3,
         viewport: viewport7,
@@ -1366,7 +1366,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       return (
         this['_commands']['push'](value108),
         (this['_redoStack'] = []),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_persistLocalEditState'](),
         this['_render'](),
         value108
@@ -1382,17 +1382,17 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         };
       (this['_commands']['push'](value111),
         (this['_redoStack'] = []),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_persistLocalEditState'](),
         this['_render']());
     },
     _pushFlipCommand(type) {
       if (!this['active'] || !this['_isAnnotateScene']()) return;
       if (type !== 'flip-horizontal' && type !== 'flip-vertical') return;
-      (this['_removeTextInput'](!![]),
+      (this['_removeTextInput'](true),
         this['_commands']['push']({ type: type }),
         (this['_redoStack'] = []),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_normalizeSelectedTextCommand'](),
         this['_render']());
     },
@@ -1406,7 +1406,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       if (this['_commands']['length'] === 0) return;
       const value112 = this['_commands']['pop']();
       (this['_redoStack']['push'](value112),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_normalizeSelectedTextCommand'](),
         this['_persistLocalEditState'](),
         this['_render']());
@@ -1415,7 +1415,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
       if (this['_redoStack']['length'] === 0) return;
       const value113 = this['_redoStack']['pop']();
       (this['_commands']['push'](value113),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_normalizeSelectedTextCommand'](),
         this['_persistLocalEditState'](),
         this['_render']());
@@ -1426,7 +1426,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
         (this['_redoStack'] = []),
         (this['_draft'] = null),
         (this['_selectedTextCommandIndex'] = null),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_persistLocalEditState'](),
         this['_render']());
     },
@@ -1439,13 +1439,13 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     _createNewWhiteboard() {
       if (!this['active'] || this['_isGenerationScene']()) return;
-      (this['_removeTextInput'](![]),
+      (this['_removeTextInput'](false),
         (this['_commands'] = []),
         (this['_redoStack'] = []),
         (this['_draft'] = null),
         (this['_selectedTextCommandIndex'] = null),
-        (this['_useWhiteboardBase'] = !![]),
-        (this['_dirty'] = !![]),
+        (this['_useWhiteboardBase'] = true),
+        (this['_dirty'] = true),
         appStore['setAnnotateState']({ color: 'black' }),
         this['_applyBaseSurface'](),
         this['_render'](),
@@ -1514,7 +1514,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
     },
     async _save() {
       if (!this['active']) return;
-      this['_removeTextInput'](!![]);
+      this['_removeTextInput'](true);
       const state7 = appStore['getState'](),
         baseNode = state7['nodes'][this['nodeId']];
       if (!baseNode) return;
@@ -1559,7 +1559,7 @@ const ERASE_GENERATE_PROMPT = '擦除绿色的区域 并且填充背景',
             startedAt: startedAt2,
             outputSize: outputSize,
           });
-        ((targetNodeId = targetNodeId2['newNodeId']), (startedAt = startedAt2), this['exit']({ silent: !![] }));
+        ((targetNodeId = targetNodeId2['newNodeId']), (startedAt = startedAt2), this['exit']({ silent: true }));
         const {
           blob: blob,
           exportType: exportType,

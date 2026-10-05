@@ -22,7 +22,7 @@ export function loadPersonReplacementGuideImage(value, el) {
     ((image['crossOrigin'] = 'anonymous'),
       (image['onload'] = () => handler3()),
       (image['onerror'] = () => handler3(new Error('无法加载人物定位示意图，未提交人物替换'))),
-      el?.['addEventListener']('abort', handler4, { once: !![] }));
+      el?.['addEventListener']('abort', handler4, { once: true }));
     if (el?.['aborted']) {
       handler4();
       return;

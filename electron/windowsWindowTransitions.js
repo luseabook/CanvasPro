@@ -8,8 +8,8 @@ export async function disableWindowsWindowTransitions(
     execFileFn: execFileFn = execFile,
   } = {},
 ) {
-  if (platform !== 'win32') return { ok: !![], skipped: !![] };
-  if (targetWindow?.['isDestroyed']?.()) return { ok: ![], reason: 'window-unavailable' };
+  if (platform !== 'win32') return { ok: true, skipped: true };
+  if (targetWindow?.['isDestroyed']?.()) return { ok: false, reason: 'window-unavailable' };
   let windowHandle;
   try {
     const rawHandle = targetWindow?.['getNativeWindowHandle']?.();
@@ -25,7 +25,7 @@ export async function disableWindowsWindowTransitions(
     )
       throw new Error('invalid-handle');
   } catch {
-    return { ok: ![], reason: 'window-unavailable' };
+    return { ok: false, reason: 'window-unavailable' };
   }
   const script =
     "\n$ErrorActionPreference = 'Stop'\nAdd-Type -TypeDefinition @'\nusing System;\nusing System.Runtime.InteropServices;\npublic static class ShuoWindowTransitions {\n  [DllImport(\"user32.dll\")]\n  private static extern uint GetWindowThreadProcessId(IntPtr hwnd, out uint processId);\n  [DllImport(\"dwmapi.dll\")]\n  private static extern int DwmSetWindowAttribute(IntPtr hwnd, uint attribute, ref int value, uint size);\n  public static int Disable(long handle, uint expectedPid) {\n    IntPtr hwnd = new IntPtr(handle);\n    uint actualPid;\n    if (GetWindowThreadProcessId(hwnd, out actualPid) == 0 || actualPid != expectedPid) return -1;\n    int disabled = 1;\n    // DWMWA_TRANSITIONS_FORCEDISABLED = 3, BOOL occupies four bytes.\n    return DwmSetWindowAttribute(hwnd, 3, ref disabled, 4);\n  }\n}\n'@\n$result = [ShuoWindowTransitions]::Disable([long]::Parse('" +
@@ -37,8 +37,8 @@ export async function disableWindowsWindowTransitions(
     const handleResult = (error, stdout) =>
       resolve(
         !error && String(stdout || '')['trim']() === 'APPLIED' && !targetWindow['isDestroyed']?.()
-          ? { ok: !![] }
-          : { ok: ![], reason: 'native-transitions-unavailable' },
+          ? { ok: true }
+          : { ok: false, reason: 'native-transitions-unavailable' },
       );
     try {
       execFileFn(
@@ -52,7 +52,7 @@ export async function disableWindowsWindowTransitions(
           '-EncodedCommand',
           Buffer['from'](script, 'utf16le')['toString']('base64'),
         ],
-        { windowsHide: !![], timeout: 5000, maxBuffer: 16384, encoding: 'utf8' },
+        { windowsHide: true, timeout: 5000, maxBuffer: 16384, encoding: 'utf8' },
         handleResult,
       );
     } catch (thrown) {

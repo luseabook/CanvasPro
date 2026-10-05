@@ -116,7 +116,7 @@ export function clearPersonReplacementShotPersonMappings(
     ),
     enabled6 = new Set(),
     payload = args4['shots']['map']((args5) => {
-      let enabled7 = ![];
+      let enabled7 = false;
       const handle = args5['people']['map']((args6) => {
         const text10 = normalizeText(args6['sourceCharacterId']),
           enabled8 = current['has'](args5['id'] + ':' + args6['id']);
@@ -127,7 +127,7 @@ export function clearPersonReplacementShotPersonMappings(
             !enabled4['get'](text10))
         )
           return args6;
-        return ((enabled7 = !![]), { ...args6, targetCharacterId: '', targetAppearanceId: '' });
+        return ((enabled7 = true), { ...args6, targetCharacterId: '', targetAppearanceId: '' });
       });
       if (!enabled7) return args5;
       return (enabled6['add'](args5['id']), { ...args5, people: handle });
@@ -186,7 +186,7 @@ export function assignPersonReplacementShotPersonMapping(
     ),
     enabled10 = new Set(),
     value9 = args7['shots']['map']((args10) => {
-      let enabled11 = ![];
+      let enabled11 = false;
       const value10 = args10['people']['map']((args11) => {
         const value11 = value3['has'](args10['id'] + ':' + args11['id']);
         if (value11) {
@@ -195,7 +195,7 @@ export function assignPersonReplacementShotPersonMapping(
             normalizeText(args11['targetAppearanceId']) === text14
           )
             return args11;
-          return ((enabled11 = !![]), { ...args11, targetCharacterId: text13, targetAppearanceId: text14 });
+          return ((enabled11 = true), { ...args11, targetCharacterId: text13, targetAppearanceId: text14 });
         }
         const text16 = normalizeText(args11['sourceCharacterId']),
           value12 = value7['get'](text16) || '',
@@ -207,7 +207,7 @@ export function assignPersonReplacementShotPersonMapping(
             normalizeText(args11['targetCharacterId']) === value12,
           );
         if (!enabled12) return args11;
-        return ((enabled11 = !![]), { ...args11, targetCharacterId: '', targetAppearanceId: '' });
+        return ((enabled11 = true), { ...args11, targetCharacterId: '', targetAppearanceId: '' });
       });
       if (!enabled11) return args10;
       return (enabled10['add'](args10['id']), { ...args10, people: value10 });

@@ -90,7 +90,7 @@ const AI_GENERATION_TYPES = Object['freeze'](['ai-text', 'ai-image', 'ai-video',
     function: 'context-canvas-open-node-section-function',
   });
 function isDevModeOn(value = globalThis['window'], dom = globalThis['document']) {
-  return value?.['DEV_MODE'] === !![] || dom?.['body']?.['classList']?.['contains']('dev-mode');
+  return value?.['DEV_MODE'] === true || dom?.['body']?.['classList']?.['contains']('dev-mode');
 }
 function getAiGenerationActionLabel(item) {
   if (item === 'ai-image') return t('canvasInteraction.generation.image');
@@ -157,7 +157,7 @@ export function createCanvasContextMenuController({
     const el = documentObject?.['querySelector']?.('.v2-canvas-stage') || null,
       next = Number(el?.['getBoundingClientRect']?.()?.['top']);
     return {
-      ensureItemIcons: !![],
+      ensureItemIcons: true,
       viewportTop: Number['isFinite'](next) ? Math['max'](0, next) : 0,
     };
   };
@@ -310,8 +310,8 @@ export function createCanvasContextMenuController({
           ));
     };
     let nodeLocalPathForNativeAction = '',
-      canShowItemInFolder2 = ![],
-      canOpenKnownFolder2 = ![];
+      canShowItemInFolder2 = false,
+      canOpenKnownFolder2 = false;
     value2 &&
       list4['length'] === 1 &&
       ((nodeLocalPathForNativeAction = resolveNodeLocalPathForNativeAction(value2)),
@@ -397,7 +397,7 @@ export function createCanvasContextMenuController({
       () => {
         handler('delete_nodes', { ids: [...list4] });
       },
-      { danger: !![], icon: 'delete', shortcutActionId: 'delete' },
+      { danger: true, icon: 'delete', shortcutActionId: 'delete' },
     );
     if (value2 && list4['length'] === 1) {
       handler6();
@@ -415,7 +415,7 @@ export function createCanvasContextMenuController({
               width: type3['width'],
               height: type3['height'],
               name: type3['name'],
-              inheritSource: !![],
+              inheritSource: true,
             });
           },
           {
@@ -624,7 +624,7 @@ export function createCanvasContextMenuController({
           () => {
             handler('delete_nodes', { ids: [value36] });
           },
-          { danger: !![], icon: 'delete', shortcutActionId: 'delete' },
+          { danger: true, icon: 'delete', shortcutActionId: 'delete' },
         ),
       pushSeparator(value28),
       AI_GENERATION_TYPES['forEach']((type4) => {

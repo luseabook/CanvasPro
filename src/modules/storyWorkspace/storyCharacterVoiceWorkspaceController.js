@@ -44,7 +44,7 @@ export function syncStoryCharacterVoicePlayerPreviewUi(
     result = Number(audioEl?.['currentTime']),
     data =
       Number['isFinite'](count) && count > 0 ? Math['max'](0, Math['min'](1, result / count)) : 0,
-    options = Boolean(audioEl && audioEl['paused'] === ![] && audioEl['ended'] !== !![]);
+    options = Boolean(audioEl && audioEl['paused'] === false && audioEl['ended'] !== true);
   el?.['querySelectorAll']?.('[data-story-character-voice-player]')?.['forEach']?.((el2) => {
     const enabled = el2['dataset']['storyCharacterVoicePlayer'] === assetId,
       el3 = el2['querySelector']("[data-story-action='play-character-voice']"),
@@ -71,16 +71,16 @@ export function createStoryCharacterVoiceWorkspaceController({
   render: render = () => {},
   schedulePersistence: schedulePersistence = () => {},
   showToast: showToast = () => {},
-  showTaskApiKeyError: showTaskApiKeyError = () => ![],
-  showTaskResultToast: showTaskResultToast = () => ![],
-  showNavigableTaskResultToast: showNavigableTaskResultToast = () => ![],
-  isEditorSurfaceActive: isEditorSurfaceActive = () => ![],
+  showTaskApiKeyError: showTaskApiKeyError = () => false,
+  showTaskResultToast: showTaskResultToast = () => false,
+  showNavigableTaskResultToast: showNavigableTaskResultToast = () => false,
+  isEditorSurfaceActive: isEditorSurfaceActive = () => false,
 } = {}) {
   let audioEl2 = null,
     next = '',
     assetId2 = '',
     enabled2 = null,
-    enabled3 = ![];
+    enabled3 = false;
   const storyCharacterVoicePreviewGuard = createStoryCharacterVoicePreviewGuard(),
     handler = projectTasks['createToken'] || (() => createStoryProjectTaskToken(state)),
     handler2 =
@@ -119,13 +119,13 @@ export function createStoryCharacterVoiceWorkspaceController({
     }
     let audioEl3 = null,
       handle = null,
-      config = ![];
+      config = false;
     try {
       root?.['querySelectorAll']?.('[data-story-character-voice-audio]')?.['forEach']?.((scope) => {
         scope['pause']?.();
       });
       const enabled4 = audioEl2 && next === source2 && assetId2 === assetId3;
-      if (enabled4 && audioEl2['paused'] === ![]) {
+      if (enabled4 && audioEl2['paused'] === false) {
         (audioEl2['pause']?.(), syncPlayerUi());
         return;
       }
@@ -135,7 +135,7 @@ export function createStoryCharacterVoiceWorkspaceController({
         (audioEl2['preload'] = 'auto'),
         (next = source2),
         run(audioEl2),
-        (config = !![]));
+        (config = true));
       ((audioEl3 = audioEl2),
         (handle = storyCharacterVoicePreviewGuard['begin']({
           assetId: assetId3,
@@ -192,7 +192,7 @@ export function createStoryCharacterVoiceWorkspaceController({
       return;
     }
     (stopPreview(),
-      schedulePersistence({ immediate: !![] }),
+      schedulePersistence({ immediate: true }),
       render(),
       showToast('已恢复历史声音参考。', 'success'));
   }
@@ -309,9 +309,9 @@ export function createStoryCharacterVoiceWorkspaceController({
       ((editor2['error'] = '当前没有可用的音频模型。'), render());
       return;
     }
-    if (modelId2['vip'] === !![]) {
+    if (modelId2['vip'] === true) {
       const run3 = windowObject?.['isModelAllowedBySubscription'],
-        enabled6 = typeof run3 === 'function' ? run3(modelId2['key'], modelId2['provider']) : !![];
+        enabled6 = typeof run3 === 'function' ? run3(modelId2['key'], modelId2['provider']) : true;
       if (!enabled6) {
         windowObject?.['openSubscriptionDialog']?.({
           modelId: modelId2['key'],
@@ -321,52 +321,52 @@ export function createStoryCharacterVoiceWorkspaceController({
       }
     }
     const projectToken2 = handler();
-    (setStoryAssetVoiceGenerating(state, asset6['id'], !![]),
-      (editor2['isGenerating'] = !![]),
+    (setStoryAssetVoiceGenerating(state, asset6['id'], true),
+      (editor2['isGenerating'] = true),
       (editor2['error'] = ''),
       render());
     try {
       const installId2 =
-        modelId2['vip'] === !![] && typeof windowObject?.['ensureSubscriptionInstallId'] === 'function'
+        modelId2['vip'] === true && typeof windowObject?.['ensureSubscriptionInstallId'] === 'function'
           ? await windowObject['ensureSubscriptionInstallId']()
           : windowObject?.['__aicInstallId'] || '';
-      if (!handler3(projectToken2)) return ![];
+      if (!handler3(projectToken2)) return false;
       const enabled7 = await requestGeneration({
         asset: asset6,
         editor: editor2,
         installId: installId2,
         projectToken: projectToken2,
       });
-      if (!handler3(projectToken2)) return ![];
+      if (!handler3(projectToken2)) return false;
       if (!enabled7) throw new Error('音频模型没有返回可用的声音结果。');
       if (handler2(projectToken2)) stopPreview();
       return (
         replaceStoryCharacterVoiceReference(asset6, enabled7),
         (editor2['error'] = ''),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         showNavigableTaskResultToast('角色声音参考已生成。', 'success', projectToken2, {
           step: 2,
           assetId: asset6['id'],
         }),
-        !![]
+        true
       );
     } catch (error2) {
-      if (!handler3(projectToken2)) return ![];
+      if (!handler3(projectToken2)) return false;
       editor2['error'] = error2?.['message'] || '声音参考生成失败。';
       const showTaskApiKeyError2 = showTaskApiKeyError(error2, {
         provider: modelId2['provider'],
         modelId: modelId2['key'],
       });
       if (!showTaskApiKeyError2) showTaskResultToast(editor2['error'], 'error', error2);
-      return ![];
+      return false;
     } finally {
       handler2(projectToken2) &&
-        (setStoryAssetVoiceGenerating(state, asset6['id'], ![]), (editor2['isGenerating'] = ![]), render());
+        (setStoryAssetVoiceGenerating(state, asset6['id'], false), (editor2['isGenerating'] = false), render());
     }
   }
   function destroy() {
     if (enabled3) return;
-    ((enabled3 = !![]), run2(), stopPreview(), (audioEl2 = null), (next = ''));
+    ((enabled3 = true), run2(), stopPreview(), (audioEl2 = null), (next = ''));
   }
   return Object['freeze']({
     closeEditor: closeEditor,

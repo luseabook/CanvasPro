@@ -30,7 +30,7 @@ export function getModelProviderProfileStyleId(key) {
   if (modelProviderProfile2 === 'international') return RUNNINGHUB_INTERNATIONAL_PROFILE_ID;
   return index;
 }
-export function buildModelProviderProfileBadgesHtml(result, { vip: vip = ![] } = {}) {
+export function buildModelProviderProfileBadgesHtml(result, { vip: vip = false } = {}) {
   const list = getModelProviderProfileIds(result);
   if (!list['length'] && !vip) return '';
   const data = list['map']((options) => {
@@ -73,7 +73,7 @@ function ensureProfileReadiness(modelId2, providerProfileId2) {
 }
 function readinessToAvailability(response) {
   if (response?.['status'] === 'loading') return null;
-  return response?.['ready'] === !![];
+  return response?.['ready'] === true;
 }
 export function resolveConfiguredModelProviderProfileId(
   options2 = {},
@@ -116,14 +116,14 @@ export async function requestModelProviderProfileSelection({
 } = {}) {
   const enabled = String(nodeData?.['model'] || '')['trim'](),
     enabled2 = String(targetProfileId || '')['trim']();
-  if (!enabled || !enabled2) return { changed: ![], readiness: null };
+  if (!enabled || !enabled2) return { changed: false, readiness: null };
   let readiness = getProfileReadiness(enabled, enabled2);
   readiness?.['status'] === 'loading' &&
     (readiness = await ensureProfileReady(enabled, enabled2)['catch'](() => readiness));
   if (!readiness?.['ready'])
-    return (onUnavailable?.(readiness, enabled2, enabled), { changed: ![], readiness: readiness });
+    return (onUnavailable?.(readiness, enabled2, enabled), { changed: false, readiness: readiness });
   const patch = buildModelProviderProfileSelectionPatch(nodeData, enabled, enabled2);
-  return (onChange?.(patch), { changed: !![], readiness: readiness, patch: patch });
+  return (onChange?.(patch), { changed: true, readiness: readiness, patch: patch });
 }
 export function createModelProviderProfileControl({
   panel: panel,
@@ -194,7 +194,7 @@ export function createModelProviderProfileControl({
         modelProviderProfileShortLabel = getModelProviderProfileShortLabel(configuredModelProviderProfileId),
         modelProviderProfileShortLabel2 = getModelProviderProfileShortLabel(nextModelProviderProfileId),
         profileReadiness = getProfileReadiness(scope?.['model'], nextModelProviderProfileId),
-        availability = readinessToAvailability(profileReadiness) === ![];
+        availability = readinessToAvailability(profileReadiness) === false;
       (el4['classList']['remove']('is-hidden'),
         (!el2 || el2['parentNode'] !== el4) &&
           ((el2 = panel['ownerDocument']['createElement']('span')),

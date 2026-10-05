@@ -269,7 +269,7 @@ function getAudioVoiceSegmentContextMenuItems(imitateToneEnabled, onAction) {
     modelOptions: getAudioVoicePanelModelOptions(),
     selectedModelId: selectedModelId,
     imitateToneAvailable: isSegmentImitateToneAvailable(imitateToneEnabled),
-    imitateToneEnabled: imitateToneEnabled['imitateToneEnabled'] === !![],
+    imitateToneEnabled: imitateToneEnabled['imitateToneEnabled'] === true,
     text: panelText,
     onAction: onAction,
   });
@@ -280,7 +280,7 @@ export function isVolcengineSpeechAsrAuthFailure(error = '') {
 }
 export function shouldShowVolcengineSpeechApiKeyHelp(options2 = {}, index = '') {
   const result = String(options2?.['category'] || '')['trim']();
-  if (result === 'missing_key' || result === 'auth_failed' || result === 'bad_base_url') return !![];
+  if (result === 'missing_key' || result === 'auth_failed' || result === 'bad_base_url') return true;
   return isVolcengineSpeechAsrAuthFailure(
     [index, options2?.['summary'], options2?.['suggestion'], options2?.['detail'], options2?.['error']]
       ['filter'](Boolean)
@@ -357,10 +357,10 @@ export function createDefaultAudioVoiceSegments() {
       endMs: 4270,
       sourceText: '马某人这个县长买来的，嗯，买官就是为了挣钱。',
       targetText: '',
-      sourceAudioReady: !![],
-      convertedAudioReady: ![],
+      sourceAudioReady: true,
+      convertedAudioReady: false,
       activeAudio: 'source',
-      imitateToneEnabled: ![],
+      imitateToneEnabled: false,
       status: 'detected',
     },
     {
@@ -369,10 +369,10 @@ export function createDefaultAudioVoiceSegments() {
       endMs: 10132,
       sourceText: '今天参加会议的人里面，就有一个人是怪物伪装的。',
       targetText: '',
-      sourceAudioReady: !![],
-      convertedAudioReady: ![],
+      sourceAudioReady: true,
+      convertedAudioReady: false,
       activeAudio: 'source',
-      imitateToneEnabled: ![],
+      imitateToneEnabled: false,
       status: 'detected',
     },
     {
@@ -381,10 +381,10 @@ export function createDefaultAudioVoiceSegments() {
       endMs: 11849,
       sourceText: '谁有钱就挣谁的。',
       targetText: '',
-      sourceAudioReady: !![],
-      convertedAudioReady: ![],
+      sourceAudioReady: true,
+      convertedAudioReady: false,
       activeAudio: 'source',
-      imitateToneEnabled: ![],
+      imitateToneEnabled: false,
       status: 'detected',
     },
     {
@@ -393,10 +393,10 @@ export function createDefaultAudioVoiceSegments() {
       endMs: 15380,
       sourceText: '那你想挣谁的钱呢？',
       targetText: '',
-      sourceAudioReady: !![],
-      convertedAudioReady: ![],
+      sourceAudioReady: true,
+      convertedAudioReady: false,
       activeAudio: 'source',
-      imitateToneEnabled: ![],
+      imitateToneEnabled: false,
       status: 'detected',
     },
   ]['map']((args) => ({ ...args }));
@@ -425,9 +425,9 @@ function toAudioVoicePanelModelOption(icon = {}) {
     provider: icon['provider'] || '',
     adapterType: icon['adapterType'] || '',
     executionId: icon['executionId'] || '',
-    async: icon['async'] === !![],
-    cancellable: icon['cancellable'] === !![],
-    vip: icon['vip'] === !![],
+    async: icon['async'] === true,
+    cancellable: icon['cancellable'] === true,
+    vip: icon['vip'] === true,
   };
 }
 export function getAudioVoicePanelModelOptions() {
@@ -521,7 +521,7 @@ function buildAudioVoiceWorkflowAudioRefs(options8 = {}, value29 = '', value30 =
       list2['push'](
         createAudioVoiceWorkflowAudioRef(audioVoiceSegmentAudioInput2, audioVoicePrimaryAudioSlot),
       );
-      if (options8['imitateToneEnabled'] === !![]) {
+      if (options8['imitateToneEnabled'] === true) {
         if (!audioVoiceSegmentAudioInput['audioUrl'])
           throw createAudioVoicePayloadError('missingSourceAudio');
         list2['push'](createAudioVoiceWorkflowAudioRef(audioVoiceSegmentAudioInput, 'audio2'));
@@ -597,7 +597,7 @@ export function buildAudioVoiceGeneratePayload(
 export async function resolveAudioVoiceGenerateInstallId(value38 = globalThis['window'], value39 = '') {
   const value40 = String(value38?.['__aicInstallId'] || globalThis['__aicInstallId'] || '')['trim'](),
     modelManifest = getModelManifest(String(value39 || '')['trim']());
-  if (modelManifest?.['vip'] !== !![]) return value40;
+  if (modelManifest?.['vip'] !== true) return value40;
   if (typeof value38?.['ensureSubscriptionInstallId'] === 'function')
     try {
       const value41 = String(await value38['ensureSubscriptionInstallId']())['trim']();
@@ -748,7 +748,7 @@ function shouldShowConvertedRow(response3 = {}) {
   return (
     !!String(response3['targetText'] || '')['trim']() ||
     !!String(response3['error'] || '')['trim']() ||
-    response3['convertedAudioReady'] === !![] ||
+    response3['convertedAudioReady'] === true ||
     response3['status'] === 'generating' ||
     response3['status'] === 'ready'
   );
@@ -758,7 +758,7 @@ function hasSegmentSourceAudio(options16 = {}) {
 }
 function hasSegmentConvertedAudio(options17 = {}) {
   return (
-    options17['convertedAudioReady'] === !![] &&
+    options17['convertedAudioReady'] === true &&
     !!resolveSegmentLocalAudioUrl(options17['convertedAudioUrl'], options17['convertedAudioLocalPath'])
   );
 }
@@ -887,7 +887,7 @@ export function initAudioVoicePanel({
   fabBtnEl: fabBtnEl,
   root: root = document['body'],
   windowObject: windowObject = window,
-  embedded: embedded = ![],
+  embedded: embedded = false,
   composeTimeline: composeTimeline = composeAudioVoiceTimelineNearNode,
   translateSegments: translateSegments = translateAudioVoiceSegments,
   playCompletion: playCompletion = playCompletionSound,
@@ -951,7 +951,7 @@ export function initAudioVoicePanel({
             srcs: srcs,
             args: { srcs: srcs, duration: Math['max'](0, Number(durationMs2 || 0) / 1000) },
           },
-          { wait: !![], timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
+          { wait: true, timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
         ),
       commitSegments: commitSegments,
       render: render,
@@ -966,7 +966,7 @@ export function initAudioVoicePanel({
       documentObject: root?.['ownerDocument'] || globalThis['document'],
     }),
     panel = createEl('aside', 'audio-voice-panel');
-  (panel['classList']['toggle']('is-embedded', embedded === !![]),
+  (panel['classList']['toggle']('is-embedded', embedded === true),
     panel['setAttribute']('aria-hidden', 'true'),
     panel['setAttribute']('aria-label', panelText('title') + ' ' + panelText('betaBadge')));
   const el = createEl('div', 'audio-voice-panel-resize-handle panel-resize-handle');
@@ -985,7 +985,7 @@ export function initAudioVoicePanel({
   const el5 = createEl('div', 'audio-voice-panel-main');
   (panel['append'](el, el2, el5), root['appendChild'](panel));
   const noticeElement = createEl('div', 'audio-voice-pick-notice', panelText('source.pickNotice'));
-  ((noticeElement['hidden'] = !![]),
+  ((noticeElement['hidden'] = true),
     noticeElement['setAttribute']('role', 'status'),
     noticeElement['setAttribute']('aria-live', 'polite'),
     root['appendChild'](noticeElement));
@@ -1024,11 +1024,11 @@ export function initAudioVoicePanel({
   function run6() {
     return Boolean(value85);
   }
-  function run7(enabled3 = ![]) {
+  function run7(enabled3 = false) {
     audioVoiceConfirmDialog['close'](enabled3);
   }
   function run8() {
-    ((value86 += 1), (value85 = null), run7(![]));
+    ((value86 += 1), (value85 = null), run7(false));
   }
   function confirmAction(options23 = {}) {
     return audioVoiceConfirmDialog['confirm'](options23);
@@ -1087,10 +1087,10 @@ export function initAudioVoicePanel({
     try {
       await ensureConfig();
     } catch {
-      return (run11('invalid', panelText('toasts.asrConfigReadFailed')), ![]);
+      return (run11('invalid', panelText('toasts.asrConfigReadFailed')), false);
     }
     const providerConfig = getProviderConfig(requiredCapabilities['configProviderId']);
-    if (!String(providerConfig?.['apiKey'] || '')['trim']()) return (run11('missing'), ![]);
+    if (!String(providerConfig?.['apiKey'] || '')['trim']()) return (run11('missing'), false);
     const response7 = await testProviderConnection(requiredCapabilities['configProviderId'], providerConfig, {
       requiredCapabilities: requiredCapabilities['requiredCapabilities'],
     })['catch'](() => null);
@@ -1102,9 +1102,9 @@ export function initAudioVoicePanel({
               response7['summary'] || response7['suggestion'] || panelText('toasts.analysisFailed'),
               'error',
             ),
-        ![]
+        false
       );
-    return (run12(), !![]);
+    return (run12(), true);
   }
   function run14(value98 = 'invalid', value99 = '') {
     const reason3 = String(value98 || '')['trim']() === 'missing' ? 'missing' : 'invalid',
@@ -1137,12 +1137,12 @@ export function initAudioVoicePanel({
     try {
       await ensureConfig();
     } catch {
-      return (run15('invalid', panelText('toasts.translationConfigReadFailed')), ![]);
+      return (run15('invalid', panelText('toasts.translationConfigReadFailed')), false);
     }
     const providerConfig2 = getProviderConfig(AUDIO_VOICE_TRANSLATION_PROVIDER_ID);
     if (!String(providerConfig2?.['apiKey'] || '')['trim']())
-      return (run15('missing', panelText('translationApiKeyHelp.missingMessage')), ![]);
-    return (run16(), !![]);
+      return (run15('missing', panelText('translationApiKeyHelp.missingMessage')), false);
+    return (run16(), true);
   }
   function run18(value103) {
     return AUDIO_VOICE_INLINE_ERROR_CODES['has'](String(value103?.['code'] || '')['trim']());
@@ -1172,7 +1172,7 @@ export function initAudioVoicePanel({
     );
   }
   function cancellable(options26 = {}) {
-    return resolveModelOption(options26)?.['cancellable'] === !![];
+    return resolveModelOption(options26)?.['cancellable'] === true;
   }
   function run20(value110, value111 = sourceNodeId3) {
     return 'audio-voice:' + (value111 || 'source') + ':' + value110;
@@ -1183,7 +1183,7 @@ export function initAudioVoicePanel({
       ...isGenerating,
       provider: provider?.['provider'] || 'runninghubwf',
       adapterType: provider?.['adapterType'] || 'workflow',
-      isGenerating: isGenerating['isGenerating'] === !![] || isGenerating['status'] === 'generating',
+      isGenerating: isGenerating['isGenerating'] === true || isGenerating['status'] === 'generating',
       jobStatus:
         isGenerating['jobStatus'] ||
         (isGenerating['status'] === 'generating'
@@ -1237,7 +1237,7 @@ export function initAudioVoicePanel({
         tooltip: panelText('actions.cancelGeneration'),
         ariaLabel: panelText('actions.cancelGeneration'),
         color: 'var(--red)',
-        busy: !![],
+        busy: true,
       });
       return;
     }
@@ -1275,7 +1275,7 @@ export function initAudioVoicePanel({
     const args5 = { [AUDIO_VOICE_ANALYSIS_STATE_FIELD]: enabled4 };
     (store2['updateNodeData'](sourceNodeId3, args5), (sourceNode3 = { ...args4, ...args5 }));
   }
-  function run5({ markLastUsed: markLastUsed = ![] } = {}) {
+  function run5({ markLastUsed: markLastUsed = false } = {}) {
     markLastUsed && sourceNodeId3 && (lastUsedAt2 = Math['max'](lastUsedAt2, Date['now']()));
     const event3 = buildAudioVoiceVideoAnalysisMemorySnapshot({
       sourceNode: sourceNode3,
@@ -1306,7 +1306,7 @@ export function initAudioVoicePanel({
         (analysisStatus2 = 'idle'),
         (lastUsedAt2 = 0),
         (completedComposeKey2 = ''),
-        ![]
+        false
       );
     ((segments3 = event4['segments']['map']((value122) =>
       cloneAudioVoiceSegment(normalizeAudioVoiceSegmentModelSelection(value122, defaultAudioVoiceModelId)),
@@ -1334,10 +1334,10 @@ export function initAudioVoicePanel({
         getErrorMessage: (value124) => error3(value124, panelText('toasts.generateFailed')),
         cancelledMessage: panelText('toasts.generationCancelled'),
       }),
-      !![]
+      true
     );
   }
-  function loadSourceNode(value125, { markLastUsed: markLastUsed = ![] } = {}) {
+  function loadSourceNode(value125, { markLastUsed: markLastUsed = false } = {}) {
     (run8(),
       void analysisSession['invalidate'](),
       session['invalidateAll'](),
@@ -1350,7 +1350,7 @@ export function initAudioVoicePanel({
       (lastUsedAt2 = 0),
       map10['clear'](),
       run25(sourceNode3));
-    if (markLastUsed) run5({ markLastUsed: !![] });
+    if (markLastUsed) run5({ markLastUsed: true });
     (render(), run23());
   }
   function run23() {
@@ -1652,7 +1652,7 @@ export function initAudioVoicePanel({
       const el40 = createEl('img', 'audio-voice-hero-img');
       ((el40['src'] = value137),
         (el40['alt'] = getSourceName(sourceNode3)),
-        (el40['draggable'] = ![]),
+        (el40['draggable'] = false),
         el39['appendChild'](el40));
     } else el39['innerHTML'] = iconSvg(isAudioVoiceAudioNode(sourceNode3) ? 'audio' : 'video');
     const el41 = createEl('div', 'audio-voice-hero-body');
@@ -2005,7 +2005,7 @@ export function initAudioVoicePanel({
       (el55['value'] = String(value178 || '')),
       (el55['placeholder'] = String(value179 || '')),
       (el55['autocomplete'] = 'off'),
-      (el55['spellcheck'] = !![]),
+      (el55['spellcheck'] = true),
       (el55['dataset']['audioVoiceTextInput'] = 'true'),
       (el55['dataset']['audioVoiceTextKind'] = value180 === 'source' ? 'source' : 'converted'),
       (el55['dataset']['segmentId'] = value177['id']),
@@ -2197,7 +2197,7 @@ export function initAudioVoicePanel({
       const el75 = createEl('img', 'audio-voice-audio-param-image');
       ((el75['src'] = error7['imageUrl']),
         (el75['alt'] = error7['name'] || panelText('actions.voiceCloneInputParam')),
-        (el75['draggable'] = ![]),
+        (el75['draggable'] = false),
         el74['appendChild'](el75));
     }
     (el73['appendChild'](el74), el72['appendChild'](el73));
@@ -2242,7 +2242,7 @@ export function initAudioVoicePanel({
   }
   function run71(el80) {
     el80?.['querySelectorAll']?.('button, input, textarea, select, [role="button"]')?.['forEach']((el81) => {
-      if ('disabled' in el81) el81['disabled'] = !![];
+      if ('disabled' in el81) el81['disabled'] = true;
       el81['setAttribute']?.('aria-disabled', 'true');
       if (el81['hasAttribute']?.('tabindex')) el81['tabIndex'] = -1;
     });
@@ -2377,9 +2377,9 @@ export function initAudioVoicePanel({
     );
   }
   function run78(el94, enabled15) {
-    if (!el94 || !enabled15 || el94 === enabled15) return !![];
-    if (!el94['isConnected']) return ![];
-    return (el94['replaceWith'](enabled15), !![]);
+    if (!el94 || !enabled15 || el94 === enabled15) return true;
+    if (!el94['isConnected']) return false;
+    return (el94['replaceWith'](enabled15), true);
   }
   function run79() {
     const value212 = value81,
@@ -2389,9 +2389,9 @@ export function initAudioVoicePanel({
   function run27() {
     const enabled16 = panel['querySelector']?.('.audio-voice-analysis-progress'),
       enabled17 = run29();
-    if (enabled16 && enabled17) return (enabled16['replaceWith'](enabled17), !![]);
-    if (!enabled16 && !enabled17) return !![];
-    return (render(), ![]);
+    if (enabled16 && enabled17) return (enabled16['replaceWith'](enabled17), true);
+    if (!enabled16 && !enabled17) return true;
+    return (render(), false);
   }
   function run80() {
     const enabled18 = run77(),
@@ -2405,9 +2405,9 @@ export function initAudioVoicePanel({
     !run78(value214, value215) && render();
   }
   function run81() {
-    let enabled20 = !![];
+    let enabled20 = true;
     getVisibleAudioVoiceSegments(segments3)['forEach']((value216) => {
-      if (!run82(value216['id'])) enabled20 = ![];
+      if (!run82(value216['id'])) enabled20 = false;
     });
     if (!enabled20) render();
     return enabled20;
@@ -2426,7 +2426,7 @@ export function initAudioVoicePanel({
       typeof run85 === 'function' &&
       run85(AUDIO_VOICE_STUDIO_VIP_MODEL_ID, AUDIO_VOICE_STUDIO_VIP_PROVIDER)
     )
-      return !![];
+      return true;
     return (
       typeof windowObject?.['openSubscriptionDialog'] === 'function'
         ? windowObject['openSubscriptionDialog']({
@@ -2435,29 +2435,29 @@ export function initAudioVoicePanel({
             onSuccess: onSuccess,
           })
         : windowObject?.['showToast']?.(panelText('vip.needAuthorization'), 'warn'),
-      ![]
+      false
     );
   }
   function open(args7 = {}) {
-    if (args7['skipSubscriptionGate'] !== !![]) {
+    if (args7['skipSubscriptionGate'] !== true) {
       const enabled21 = run84(() => {
-        open({ ...args7, skipSubscriptionGate: !![] });
+        open({ ...args7, skipSubscriptionGate: true });
       });
-      if (!enabled21) return ![];
+      if (!enabled21) return false;
     }
     const stateSnapshot3 = getStateSnapshot(store2);
     return (
       progressTracker['clear'](),
       canSelectAudioReference['stopAll'](),
       loadSourceNode(resolveAudioVoicePanelOpenSourceNode(stateSnapshot3, args7, sourceNodeId3), {
-        markLastUsed: !![],
+        markLastUsed: true,
       }),
-      run83(!![]),
-      !![]
+      run83(true),
+      true
     );
   }
   function close() {
-    (run5({ markLastUsed: !![] }),
+    (run5({ markLastUsed: true }),
       run8(),
       void analysisSession['invalidate'](),
       session['invalidateAll'](),
@@ -2469,7 +2469,7 @@ export function initAudioVoicePanel({
       closeVolcengineSpeechApiKeyGuide(),
       closeProviderApiKeyGuide(),
       audioVoiceSegmentContextMenuController['close'](),
-      run83(![]),
+      run83(false),
       closeInlineMenus());
   }
   function toggle() {
@@ -2479,7 +2479,7 @@ export function initAudioVoicePanel({
     }
     open();
   }
-  function run86(value218, { persist: persist = ![] } = {}) {
+  function run86(value218, { persist: persist = false } = {}) {
     const clampAudioVoicePanelWidth2 = clampAudioVoicePanelWidth(value218);
     document?.['body']?.['style']?.['setProperty']?.(
       '--audio-voice-panel-width',
@@ -2504,7 +2504,7 @@ export function initAudioVoicePanel({
           document?.['removeEventListener']?.('pointerup', value222),
           document?.['body']?.['classList']?.['remove']?.('audio-voice-panel-resizing'));
         const value223 = Number(event7['clientX']);
-        Number['isFinite'](value223) && run86(enabled22 + (value219 - value223), { persist: !![] });
+        Number['isFinite'](value223) && run86(enabled22 + (value219 - value223), { persist: true });
       };
     (document?.['addEventListener']?.('pointermove', value220),
       document?.['addEventListener']?.('pointerup', value222));
@@ -2538,15 +2538,15 @@ export function initAudioVoicePanel({
     const enabled24 = segments3[run21(value232)],
       el96 = run90(value232),
       enabled25 = el96?.['querySelector']?.('.audio-voice-more-wrap');
-    if (!enabled24 || !enabled25) return ![];
-    return (enabled25['replaceWith'](run64(enabled24)), !![]);
+    if (!enabled24 || !enabled25) return false;
+    return (enabled25['replaceWith'](run64(enabled24)), true);
   }
   function run91(value233) {
     const enabled26 = segments3[run21(value233)],
       el97 = run90(value233),
       enabled27 = el97?.['querySelector']?.('.audio-voice-audio-param-wrap');
-    if (!enabled26 || !enabled27) return ![];
-    return (enabled27['replaceWith'](run66(enabled26)), !![]);
+    if (!enabled26 || !enabled27) return false;
+    return (enabled27['replaceWith'](run66(enabled26)), true);
   }
   function syncAudioTargetUi(list31 = []) {
     const list32 = [
@@ -2558,25 +2558,25 @@ export function initAudioVoicePanel({
     ];
     let enabled28 = run79();
     list32['forEach']((value235) => {
-      if (!run91(value235)) enabled28 = ![];
-      if (!run82(value235)) enabled28 = ![];
+      if (!run91(value235)) enabled28 = false;
+      if (!run82(value235)) enabled28 = false;
     });
     if (!enabled28) render();
     return enabled28;
   }
   function run92(el98, value236 = {}) {
     const el99 = el98?.['querySelector']?.('[data-audio-voice-text-input]');
-    if (!el99) return ![];
+    if (!el99) return false;
     const value237 = String(value236['targetText'] || value236['sourceText'] || '');
     return (
       el99 !== document?.['activeElement'] && el99['value'] !== value237 && (el99['value'] = value237),
       (el99['dataset']['segmentId'] = value236['id']),
-      !![]
+      true
     );
   }
   function run93(el100, value238 = {}, value239 = {}) {
     const el101 = el100?.['querySelector']?.('.audio-voice-segment-lines');
-    if (!el101) return ![];
+    if (!el101) return false;
     let el102 = el101['querySelector']('.audio-voice-audio-line-source');
     const enabled29 = run59(value238),
       enabled30 = run59(value239);
@@ -2585,15 +2585,15 @@ export function initAudioVoicePanel({
         (el102 = el101['querySelector']('.audio-voice-audio-line-source')));
     else el102 && el102['classList']['toggle']('audio-voice-audio-line-source-has-draft', enabled30);
     const el103 = el101['querySelector']('.audio-voice-audio-line-converted');
-    if (!enabled30) return (el103?.['remove']?.(), !![]);
+    if (!enabled30) return (el103?.['remove']?.(), true);
     if (!el103) {
       const el104 = run62(value239, 'converted');
-      return (el104['classList']['add']('is-entering'), el101['appendChild'](el104), !![]);
+      return (el104['classList']['add']('is-entering'), el101['appendChild'](el104), true);
     }
     const value240 =
       !!String(value238['error'] || '')['trim']() !== !!String(value239['error'] || '')['trim']();
-    if (!enabled29 || value240) return (el103['replaceWith'](run62(value239, 'converted')), !![]);
-    if (!run92(el103, value239)) return (el103['replaceWith'](run62(value239, 'converted')), !![]);
+    if (!enabled29 || value240) return (el103['replaceWith'](run62(value239, 'converted')), true);
+    if (!run92(el103, value239)) return (el103['replaceWith'](run62(value239, 'converted')), true);
     const value241 = el103['querySelector']('.audio-voice-history-wrap');
     if (value241) value241['replaceWith'](run61(value239));
     const value242 = el103['querySelector']('.audio-voice-generate-btn');
@@ -2605,7 +2605,7 @@ export function initAudioVoicePanel({
         : panelText('actions.generateAudio');
       ((el105['title'] = value243), el105['setAttribute']('aria-label', value243));
     }
-    return !![];
+    return true;
   }
   function run94(el106, response12 = {}) {
     const el107 = [...el106['children']]['find']((el108) =>
@@ -2669,24 +2669,24 @@ export function initAudioVoicePanel({
       String(options33['voiceRefAudioUrl'] || '') !== String(value249['voiceRefAudioUrl'] || '') ||
       String(options33['voiceRefAudioLocalPath'] || '') !==
         String(value249['voiceRefAudioLocalPath'] || '') ||
-      (options33['imitateToneEnabled'] === !![]) !== (value249['imitateToneEnabled'] === !![])
+      (options33['imitateToneEnabled'] === true) !== (value249['imitateToneEnabled'] === true)
     );
   }
-  function run97(value250, response13 = {}, response14 = {}, { syncToolbar: syncToolbar = !![] } = {}) {
+  function run97(value250, response13 = {}, response14 = {}, { syncToolbar: syncToolbar = true } = {}) {
     const el115 = run90(value250);
-    if (!el115 || !response14) return ![];
+    if (!el115 || !response14) return false;
     const value251 = 'is-' + (response13['status'] || 'detected'),
       value252 = 'is-' + (response14['status'] || 'detected');
     value251 !== value252 && (el115['classList']['remove'](value251), el115['classList']['add'](value252));
     const value253 = map5['has'](value250);
     (el115['classList']['toggle']('is-selected', value253),
       el115['setAttribute']('aria-selected', value253 ? 'true' : 'false'));
-    if (!run93(el115, response13, response14)) return ![];
+    if (!run93(el115, response13, response14)) return false;
     (run95(el115, response14), run94(el115, response14));
     if (run96(response13, response14)) {
-      if (!run82(value250)) return ![];
+      if (!run82(value250)) return false;
     }
-    return syncToolbar ? run79() : !![];
+    return syncToolbar ? run79() : true;
   }
   function run98(list33 = []) {
     let enabled33 = run79();
@@ -2695,7 +2695,7 @@ export function initAudioVoicePanel({
         const enabled34 = segments3[run21(value255)],
           enabled35 = run90(value255);
         if (!enabled34 || !enabled35) {
-          enabled33 = ![];
+          enabled33 = false;
           return;
         }
         run94(enabled35, enabled34);
@@ -2712,7 +2712,7 @@ export function initAudioVoicePanel({
       const enabled37 = segments3[run21(value257)],
         enabled38 = run90(value257);
       if (!enabled37 || !enabled38) {
-        enabled36 = ![];
+        enabled36 = false;
         return;
       }
       run94(enabled38, enabled37);
@@ -2722,16 +2722,16 @@ export function initAudioVoicePanel({
     return enabled36;
   }
   function run100(map12, list35 = []) {
-    let enabled39 = !![];
+    let enabled39 = true;
     [...new Set(list35['map']((value258) => String(value258 || '')['trim']())['filter'](Boolean))]['forEach'](
       (value259) => {
         const enabled40 = map12['get'](value259),
           enabled41 = segments3[run21(value259)];
-        (!enabled40 || !enabled41 || !run97(value259, enabled40, enabled41, { syncToolbar: ![] })) &&
-          (enabled39 = ![]);
+        (!enabled40 || !enabled41 || !run97(value259, enabled40, enabled41, { syncToolbar: false })) &&
+          (enabled39 = false);
       },
     );
-    if (!run79()) enabled39 = ![];
+    if (!run79()) enabled39 = false;
     if (!enabled39) render();
     return enabled39;
   }
@@ -2764,20 +2764,20 @@ export function initAudioVoicePanel({
   }
   function run103(value268, imitateToneEnabled2) {
     const list37 = run102(value268);
-    if (list37['length'] <= 0) return ![];
+    if (list37['length'] <= 0) return false;
     const map13 = new Set(list37);
     ((segments3 = segments3['map']((args11) =>
       map13['has'](args11['id'])
-        ? { ...args11, imitateToneEnabled: imitateToneEnabled2 === !![], error: '' }
+        ? { ...args11, imitateToneEnabled: imitateToneEnabled2 === true, error: '' }
         : args11,
     )),
       run5());
-    let enabled44 = !![];
+    let enabled44 = true;
     list37['forEach']((value269) => {
-      if (!run82(value269)) enabled44 = ![];
+      if (!run82(value269)) enabled44 = false;
     });
     if (!enabled44) render();
-    return !![];
+    return true;
   }
   function run104(enabled45) {
     if (!enabled45) return;
@@ -2806,67 +2806,67 @@ export function initAudioVoicePanel({
   }
   function run105(value277, enabled47 = 'converted') {
     const enabled48 = String(value277 || '')['trim']();
-    if (!enabled48) return ![];
+    if (!enabled48) return false;
     const el116 =
       [...panel['querySelectorAll']('[data-audio-voice-text-input]')]['find'](
         (el117) =>
           el117['dataset']['segmentId'] === enabled48 &&
           (!enabled47 || el117['dataset']['audioVoiceTextKind'] === enabled47),
       ) || null;
-    if (!el116) return ![];
+    if (!el116) return false;
     el116['focus']?.();
     const value278 = String(el116['value'] || '')['length'];
-    return (el116['setSelectionRange']?.(value278, value278), !![]);
+    return (el116['setSelectionRange']?.(value278, value278), true);
   }
   function run106(value279, el118 = {}) {
     const value280 = String(value279 || '')['trim'](),
       count14 = run21(value280);
-    if (count14 < 0) return ![];
+    if (count14 < 0) return false;
     const args14 = segments3[count14],
       _audioVoiceConvertedRowVisible = run59(args14);
     map6['add'](value280);
     const value281 = { ...args14, _audioVoiceConvertedRowVisible: _audioVoiceConvertedRowVisible };
     if (!run97(value280, value281, args14)) render();
-    return (el118['focus'] !== ![] && run105(value280, 'converted'), !![]);
+    return (el118['focus'] !== false && run105(value280, 'converted'), true);
   }
   function run107(value282) {
     const value283 = String(value282 || '')['trim'](),
       count15 = run21(value283);
-    if (count15 < 0 || !map6['has'](value283)) return ![];
+    if (count15 < 0 || !map6['has'](value283)) return false;
     const args15 = segments3[count15];
-    if (shouldShowConvertedRow(args15)) return ![];
+    if (shouldShowConvertedRow(args15)) return false;
     map6['delete'](value283);
-    const value284 = { ...args15, _audioVoiceConvertedRowVisible: !![] };
+    const value284 = { ...args15, _audioVoiceConvertedRowVisible: true };
     if (!run97(value283, value284, args15)) render();
-    return !![];
+    return true;
   }
   function run108(value285, value286 = 1) {
     const list39 = getVisibleAudioVoiceSegments(segments3),
       count16 = list39['findIndex']((value287) => value287['id'] === value285);
-    if (count16 < 0) return ![];
+    if (count16 < 0) return false;
     const enabled49 = list39[count16 + value286];
-    if (!enabled49) return ![];
-    return run106(enabled49['id'], { focus: !![] });
+    if (!enabled49) return false;
+    return run106(enabled49['id'], { focus: true });
   }
   function run109(event8, el119) {
-    if (!el119) return ![];
+    if (!el119) return false;
     const enabled50 = String(el119['dataset']['segmentId'] || '')['trim']();
-    if (!enabled50) return ![];
+    if (!enabled50) return false;
     if (shouldCloseAudioVoiceEmptyConvertedTextEdit(event8, el119) && run107(enabled50))
-      return (event8['preventDefault']?.(), event8['stopPropagation']?.(), !![]);
+      return (event8['preventDefault']?.(), event8['stopPropagation']?.(), true);
     if (event8['key'] === 'Enter' && el119['dataset']['audioVoiceTextKind'] === 'source')
       return (
         event8['preventDefault']?.(),
         event8['stopPropagation']?.(),
-        run106(enabled50, { focus: !![] }),
-        !![]
+        run106(enabled50, { focus: true }),
+        true
       );
     if (event8['key'] === 'Tab') {
       const value288 = event8['shiftKey'] ? -1 : 1;
-      if (!run108(enabled50, value288)) return ![];
-      return (event8['preventDefault']?.(), event8['stopPropagation']?.(), !![]);
+      if (!run108(enabled50, value288)) return false;
+      return (event8['preventDefault']?.(), event8['stopPropagation']?.(), true);
     }
-    return ![];
+    return false;
   }
   function run110(value289, value290, value291 = 'converted') {
     const count17 = run21(value289);
@@ -2909,7 +2909,7 @@ export function initAudioVoicePanel({
             end: Math['max'](0, (Number(options35['endMs'] || 0) - value296) / 1000),
           },
         },
-        { wait: !![], timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
+        { wait: true, timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
       ),
       localPath = normalizeLocalPath(response15?.['localPath'] || response15?.['path'] || ''),
       audioUrl = firstNonEmptyString(response15?.['url'], localPathToUrl(localPath));
@@ -2950,8 +2950,8 @@ export function initAudioVoicePanel({
       initialStartSec: 0,
       initialEndSec:
         Math['max'](AUDIO_VOICE_SOURCE_CLIP_MIN_MS, Number(sourceLocalPath2['durationMs'] || 0)) / 1000,
-      allowSplit: !![],
-      dimMode: ![],
+      allowSplit: true,
+      dimMode: false,
       onConfirm: async ({ startSec: startSec, endSec: endSec, splitSec: splitSec, ranges: ranges }) => {
         const enabled52 = session['begin']({
           kind: 'source-clip',
@@ -3114,7 +3114,7 @@ export function initAudioVoicePanel({
             end: Math['max'](0, Number(args19['endMs'] || 0) / 1000),
           },
         },
-        { wait: !![], timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
+        { wait: true, timeout: AUDIO_CUT_TASK_TIMEOUT_MS },
       ),
       args20 = {
         sourceAudioLocalPath: normalizeLocalPath(response17?.['localPath'] || response17?.['path'] || ''),
@@ -3122,8 +3122,8 @@ export function initAudioVoicePanel({
           response17?.['url'],
           localPathToUrl(response17?.['localPath'] || response17?.['path']),
         ),
-        sourceAudioReady: !![],
-        needsSourceAudioRecut: ![],
+        sourceAudioReady: true,
+        needsSourceAudioRecut: false,
       };
     return (taskStore?.['updateNodeData']?.(targetNodeId, args20), { ...args19, ...args20 });
   }
@@ -3137,7 +3137,7 @@ export function initAudioVoicePanel({
         (targetText['sourceText'] || panelText('sentences.sourcePlaceholder')) +
           ' ' +
           panelText('sentences.convertedSuffix'),
-      convertedAudioReady: ![],
+      convertedAudioReady: false,
       convertedAudioDuration: 0,
       activeAudio: 'source',
       status: 'edited',
@@ -3183,7 +3183,7 @@ export function initAudioVoicePanel({
         localPathToUrl(args21['localPath']),
       ),
       convertedAudioDuration: pickAudioDurationSec(args21['audioDuration'], args21['duration']),
-      convertedAudioReady: !![],
+      convertedAudioReady: true,
       activeAudio: 'converted',
       status: 'ready',
       error: '',
@@ -3197,7 +3197,7 @@ export function initAudioVoicePanel({
     return ((el122['dataset']['segmentId'] = value316), el122);
   }
   function run120(value317) {
-    if (windowObject?.['DEV_MODE'] !== !![]) return;
+    if (windowObject?.['DEV_MODE'] !== true) return;
     const enabled56 = value317 ? segments3[run21(value317)] : run45()[0];
     openDebugRequestWindow({
       windowObject: windowObject,
@@ -3225,8 +3225,8 @@ export function initAudioVoicePanel({
     const response18 = cloneAudioVoiceSegment(segments3[count19]);
     if (response18['status'] === 'generating') return { status: 'skipped' };
     if (cancelInFlight['getRun'](sourceNodeId9, segmentId6)) return { status: 'skipped' };
-    const value319 = runningHubWorkflowConcurrency['showResultToast'] !== ![],
-      value320 = runningHubWorkflowConcurrency['notifyCompletion'] !== ![],
+    const value319 = runningHubWorkflowConcurrency['showResultToast'] !== false,
+      value320 = runningHubWorkflowConcurrency['notifyCompletion'] !== false,
       workflowLabel3 = run4(response18),
       modelId2 = workflowLabel3?.['id'] || defaultAudioVoiceModelId,
       ownerAnalysisSourceAudioLocalPath2 = analysisSourceAudioLocalPath3,
@@ -3243,7 +3243,7 @@ export function initAudioVoicePanel({
       rhStatusMessage: null,
       jobStatus: 'running',
       rhTaskStatus: 'pending',
-      isGenerating: !![],
+      isGenerating: true,
     });
     try {
       const fallbackSegment2 = await run118(response18, {
@@ -3256,7 +3256,7 @@ export function initAudioVoicePanel({
         return (
           taskStore2['updateNodeData'](targetNodeId5, {
             status: 'edited',
-            isGenerating: ![],
+            isGenerating: false,
             jobStatus: '',
             rhTaskStatus: '',
           }),
@@ -3284,9 +3284,9 @@ export function initAudioVoicePanel({
             modelId: modelId2,
             executionId: workflowLabel3?.['executionId'] || 'runninghub.audio.' + (modelId2 || 'workflow'),
             payload: payload2,
-            cancellable: workflowLabel3?.['cancellable'] === !![],
-            resumable: !![],
-            completionFeedback: ![],
+            cancellable: workflowLabel3?.['cancellable'] === true,
+            resumable: true,
+            completionFeedback: false,
             startBuilder: () => ({
               provider: payload2['provider'],
               audioWorkflowKey: payload2['audioWorkflowKey'],
@@ -3294,7 +3294,7 @@ export function initAudioVoicePanel({
               model: payload2['audioWorkflowKey'],
               taskModelId: modelId2,
               rhInstanceType: payload2['rhInstanceType'],
-              rhTaskUseOpenapiQuery: !![],
+              rhTaskUseOpenapiQuery: true,
               status: 'generating',
               error: '',
             }),
@@ -3313,7 +3313,7 @@ export function initAudioVoicePanel({
                   if (apiKey) value321['apiKey'] = String(apiKey || '')['trim']();
                   (signal['onTaskId'](enabled58),
                     taskStore2['updateNodeData'](targetNodeId5, {
-                      rhTaskUseOpenapiQuery: useOpenapiQuery === !![],
+                      rhTaskUseOpenapiQuery: useOpenapiQuery === true,
                     }));
                 },
               });
@@ -3372,7 +3372,7 @@ export function initAudioVoicePanel({
       return (
         taskStore2['updateNodeData'](targetNodeId5, {
           status: 'edited',
-          isGenerating: ![],
+          isGenerating: false,
           jobStatus: 'error',
           rhTaskStatus: 'failed',
           error: error9,
@@ -3406,14 +3406,14 @@ export function initAudioVoicePanel({
       if (!enabled59) cancelInFlight['finish'](cancelInFlight2);
       return;
     }
-    cancelInFlight['setCancelInFlight'](cancelInFlight2, !![]);
+    cancelInFlight['setCancelInFlight'](cancelInFlight2, true);
     if (!run97(segmentId7, taskId3, taskId3)) render();
     try {
       (await cancelTask(targetNodeId6, {
         store: cancelInFlight2['store'],
-        cancellable: !![],
+        cancellable: true,
         taskId: taskId3['rhTaskId'],
-        abortLocal: !![],
+        abortLocal: true,
         cancel: async ({ taskId: taskId4 }) => {
           const value328 = resolveModelOption(taskId3),
             providerConfig4 = getProviderConfig(value328?.['provider']) || {},
@@ -3430,7 +3430,7 @@ export function initAudioVoicePanel({
         cancelInFlight2['abortController']?.['abort']?.(),
         windowObject?.['showToast']?.(panelText('toasts.generationCancelled'), 'info'));
     } finally {
-      cancelInFlight['setCancelInFlight'](cancelInFlight2, ![]);
+      cancelInFlight['setCancelInFlight'](cancelInFlight2, false);
       if (!enabled59) cancelInFlight['finish'](cancelInFlight2);
       if (String(sourceNodeId3 || '')['trim']() === sourceNodeId10) {
         const value329 = segments3[run21(segmentId7)] || taskId3;
@@ -3459,8 +3459,8 @@ export function initAudioVoicePanel({
           run116(value330['id'], {
             ownerSourceNodeId: ownerSourceNodeId2,
             runningHubWorkflowConcurrency: runningHubWorkflowConcurrency2,
-            notifyCompletion: ![],
-            showResultToast: ![],
+            notifyCompletion: false,
+            showResultToast: false,
           }),
         {
           concurrency: runningHubWorkflowConcurrency2,
@@ -3500,13 +3500,13 @@ export function initAudioVoicePanel({
   }
   async function run123() {
     const enabled60 = value84;
-    if (!runAudioVoiceBatchGenerationQueue2 || !enabled60?.['request']?.()) return ![];
+    if (!runAudioVoiceBatchGenerationQueue2 || !enabled60?.['request']?.()) return false;
     run79();
     const list44 = [...map8]['filter'](Boolean);
     return (
       await Promise['allSettled'](list44['map']((value332) => run121(value332))),
       windowObject?.['showToast']?.(panelText('toasts.batchCancellationRequested'), 'info'),
-      !![]
+      true
     );
   }
   function run124(value333) {
@@ -3678,7 +3678,7 @@ export function initAudioVoicePanel({
       value85?.['id'] === id2 && ((value85 = null), run99([...segmentIds]));
     }
   }
-  async function run127({ runtimeRepairAttempted: runtimeRepairAttempted = ![] } = {}) {
+  async function run127({ runtimeRepairAttempted: runtimeRepairAttempted = false } = {}) {
     if (!sourceNode3) {
       windowObject?.['showToast']?.(panelText('toasts.selectSource'), 'warn');
       return;
@@ -3824,7 +3824,7 @@ export function initAudioVoicePanel({
             },
           });
           recoverAudioVoiceLocalAsrRuntime2 &&
-            (analysisSession['complete'](operation), await run127({ runtimeRepairAttempted: !![] }));
+            (analysisSession['complete'](operation), await run127({ runtimeRepairAttempted: true }));
         } else windowObject?.['showToast']?.(message2, 'error');
       }
     } finally {
@@ -3976,7 +3976,7 @@ export function initAudioVoicePanel({
           convertedAudioLocalPath['audioDuration'],
           convertedAudioLocalPath['duration'],
         ),
-        convertedAudioReady: !![],
+        convertedAudioReady: true,
         activeAudio: 'converted',
         status: 'ready',
         error: '',
@@ -4081,7 +4081,7 @@ export function initAudioVoicePanel({
               voiceRefAudioUrl: '',
               voiceRefName: '',
               voiceRefImageUrl: '',
-              imitateToneEnabled: ![],
+              imitateToneEnabled: false,
               error: '',
             }
           : args26,
@@ -4093,7 +4093,7 @@ export function initAudioVoicePanel({
     if (value362 === 'toggle-imitate-tone') {
       const enabled72 = segments3[run21(value363)];
       if (!enabled72) return;
-      run103(value363, enabled72['imitateToneEnabled'] !== !![]);
+      run103(value363, enabled72['imitateToneEnabled'] !== true);
       return;
     }
     if (value362 === 'remove') {
@@ -4124,7 +4124,7 @@ export function initAudioVoicePanel({
       event10['preventDefault']?.();
       const value377 = panel['getBoundingClientRect']?.()['width'] || panel['offsetWidth'] || 0,
         value378 = event10['key'] === 'ArrowLeft' ? 24 : -24;
-      run86(value377 + value378, { persist: !![] });
+      run86(value377 + value378, { persist: true });
     }),
     panel['addEventListener']('pointerdown', (event11) => {
       event11['stopPropagation']();
@@ -4197,7 +4197,7 @@ export function initAudioVoicePanel({
       open: open,
       close: close,
       toggle: toggle,
-      setWidth: (value385) => run86(value385, { persist: !![] }),
+      setWidth: (value385) => run86(value385, { persist: true }),
       getSourceNodeId: () => sourceNodeId3,
       getSegments: () => getVisibleAudioVoiceSegments(segments3)['map'](cloneAudioVoiceSegment),
       canSelectAudioReference: canSelectAudioReference['canSelectAudioReference'],

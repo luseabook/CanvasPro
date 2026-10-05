@@ -44,7 +44,7 @@ function renderModeOptions(data, options = 'set-smart-clip-mode') {
     ['join']('');
 }
 export function createPersonReplacementSmartDetectPresentation({ renderIcon: renderIcon = () => '' } = {}) {
-  const renderPanel = (next, { smartDetecting: smartDetecting = ![] } = {}) =>
+  const renderPanel = (next, { smartDetecting: smartDetecting = false } = {}) =>
       '<div id="person-replacement-shot-cut-smart-detect-panel" class="person-replacement-shot-cut-smart-detect-panel" role="dialog" aria-label="智能检测切口">\n      <strong class="person-replacement-smart-clip-settings-title">智能检测</strong>\n      <div class="person-replacement-smart-clip-setting-row">\n        ' +
       renderSettingLabel(panelText('mode'), panelText('modeTip')) +
       '\n        <div class="person-replacement-smart-clip-option-group" role="group" aria-label="' +
@@ -61,9 +61,9 @@ export function createPersonReplacementSmartDetectPresentation({ renderIcon: ren
       (smartDetecting ? '检测中…' : '确定') +
       '</button>\n      </div>\n    </div>',
     renderTrigger = ({
-      smartDetectOpen: smartDetectOpen = ![],
-      smartDetecting: smartDetecting = ![],
-      disabled: disabled = ![],
+      smartDetectOpen: smartDetectOpen = false,
+      smartDetecting: smartDetecting = false,
+      disabled: disabled = false,
     } = {}) => {
       const current = smartDetecting ? '智能检测中' : '智能检测';
       return (

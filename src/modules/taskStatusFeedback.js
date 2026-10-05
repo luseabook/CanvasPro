@@ -17,7 +17,7 @@ export function createTaskStatusFeedback({
   const createdAt = now(),
     waitingTasks = new Map(),
     pendingFailures = new Map();
-  let destroyed = ![];
+  let destroyed = false;
   function emitNotification(payload) {
     if (destroyed) return;
     try {
@@ -65,7 +65,7 @@ export function createTaskStatusFeedback({
       group['tasks']['push']({ ...task, navigation: pickNavigation(task) }));
   }
   return {
-    observe(task, previous, { silent: silent = ![] } = {}) {
+    observe(task, previous, { silent: silent = false } = {}) {
       if (destroyed) return;
       const waitingEntry = waitingTasks['get'](task['taskId']);
       if (ACTIVE_TASK_STATUSES['has'](task['status'])) {
@@ -97,7 +97,7 @@ export function createTaskStatusFeedback({
       if (['failed', 'complete']['includes'](task['status'])) queueFailureNotice(task);
     },
     destroy() {
-      destroyed = !![];
+      destroyed = true;
       for (const entry of waitingTasks['values']()) clearTimer(entry['timer']);
       for (const entry of pendingFailures['values']()) clearTimer(entry['timer']);
       (waitingTasks['clear'](), pendingFailures['clear']());

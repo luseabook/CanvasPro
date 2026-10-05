@@ -2,7 +2,7 @@ import { renderDirectorCurveEditor } from './directorCurveEditor.js';
 export function renderDirectorCameraPathPanel(enabled, value) {
   const list = enabled['points'](),
     enabled2 = list['find']((item) => item['id'] === enabled['selectedId']) || list[0],
-    handler = (key, index, result = ![]) =>
+    handler = (key, index, result = false) =>
       '<button type="button" data-storyboard-3d-action="timeline-camera-path-' +
       key +
       '" ' +

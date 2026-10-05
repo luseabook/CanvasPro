@@ -12,7 +12,7 @@ export function renderWorkspaceAudioAssetDetail({
   characters: characters = [],
   selectedCharacterId: selectedCharacterId = '',
   boundNames: boundNames = [],
-  isLibrary: isLibrary = ![],
+  isLibrary: isLibrary = false,
   className: className = '',
   detailAttributes: detailAttributes = '',
   playerClassName: playerClassName = '',

@@ -12,7 +12,7 @@ export function publishTaskCenterSnapshot(item, list, key = globalThis['window']
     if (response['source'] !== item['source'] || response['projectId'] !== item['projectId']) continue;
     if (map['has'](response['taskId']) || !ACTIVE_TASK_STATUSES['has'](response['status'])) continue;
     emitGenerationTaskCenterUpdate(
-      { ...response, status: 'untracked', cancellable: ![], message: '', finishedAt: Date['now']() },
+      { ...response, status: 'untracked', cancellable: false, message: '', finishedAt: Date['now']() },
       key,
     );
   }
@@ -20,13 +20,13 @@ export function publishTaskCenterSnapshot(item, list, key = globalThis['window']
 }
 
 export function emitGenerationTaskCenterUpdate(detail = {}, enabled = globalThis['window']) {
-  if (!detail || typeof detail !== 'object' || !enabled) return ![];
-  if (typeof enabled['dispatchEvent'] !== 'function') return ![];
+  if (!detail || typeof detail !== 'object' || !enabled) return false;
+  if (typeof enabled['dispatchEvent'] !== 'function') return false;
   const enabled2 = String(detail['taskId'] || '');
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   const map2 = snapshots['get'](enabled) || new Map(),
     data = map2['get'](enabled2);
-  if (data && JSON['stringify'](data) === JSON['stringify'](detail)) return ![];
+  if (data && JSON['stringify'](data) === JSON['stringify'](detail)) return false;
   (map2['set'](enabled2, detail),
     snapshots['set'](
       enabled,
@@ -43,5 +43,5 @@ export function emitGenerationTaskCenterUpdate(detail = {}, enabled = globalThis
     target = run
       ? new run(GENERATION_TASK_CENTER_EVENT, { detail: detail })
       : { type: GENERATION_TASK_CENTER_EVENT, detail: detail };
-  return (enabled['dispatchEvent'](target), !![]);
+  return (enabled['dispatchEvent'](target), true);
 }

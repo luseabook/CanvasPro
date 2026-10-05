@@ -59,26 +59,26 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
           return !!enabled2 || entry;
         },
         list = [];
-      let record = ![],
-        enabled3 = ![];
+      let record = false,
+        enabled3 = false;
       return (
         Array['from'](el['childNodes'])['forEach']((el3) => {
           if (el3['nodeType'] === Node['TEXT_NODE']) {
             if (!handler4(el3['textContent'] || '')['trim']()) return;
-            enabled3 && (list['push'](document['createElement']('br')), (enabled3 = ![]));
-            (list['push'](el3), (record = !![]));
+            enabled3 && (list['push'](document['createElement']('br')), (enabled3 = false));
+            (list['push'](el3), (record = true));
             return;
           }
           if (el3['nodeType'] !== Node['ELEMENT_NODE']) return;
           if (run2(el3)) {
-            if (record) enabled3 = !![];
+            if (record) enabled3 = true;
             return;
           }
           const payload = el3;
           if (!handler7(payload)) return;
-          (enabled3 && (list['push'](document['createElement']('br')), (enabled3 = ![])),
+          (enabled3 && (list['push'](document['createElement']('br')), (enabled3 = false)),
             list['push'](payload),
-            (record = !![]));
+            (record = true));
         }),
         el['replaceChildren'](...list),
         el['innerHTML'] || ''
@@ -124,7 +124,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
     el5 = toolbarEl['querySelector']('.act-copy');
   if (el5) {
     const list2 = Array['from'](el5['childNodes'])['map']((value3) =>
-        value3['cloneNode'](!![]),
+        value3['cloneNode'](true),
       ),
       value4 = el5['getAttribute']('data-tooltip') || textToolbarText('copy'),
       value5 = el5['getAttribute']('aria-label') || '';
@@ -158,7 +158,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
             el5['setAttribute']('data-tooltip', textToolbarText('copied')),
             el5['setAttribute']('aria-label', textToolbarText('copied')),
             (setTimeout2 = setTimeout(() => {
-              (el5['replaceChildren'](...list2['map']((value7) => value7['cloneNode'](!![]))),
+              (el5['replaceChildren'](...list2['map']((value7) => value7['cloneNode'](true))),
                 el5['setAttribute']('data-tooltip', value4));
               if (value5) el5['setAttribute']('aria-label', value5);
               else el5['removeAttribute']('aria-label');
@@ -420,7 +420,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
             (el20['onmouseenter'] = () => (el20['style']['background'] = 'var(--white-10)')),
             (el20['onmouseleave'] = () => (el20['style']['background'] = 'transparent')),
             (el20['onclick'] = (event6) => {
-              (event6['preventDefault'](), document['execCommand'](value18, ![], value19));
+              (event6['preventDefault'](), document['execCommand'](value18, false, value19));
             }),
             el20
           );
@@ -496,7 +496,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
         whiteSpace: 'pre-wrap',
       }),
         (rawText3['contentEditable'] = 'true'),
-        (rawText3['spellcheck'] = ![]));
+        (rawText3['spellcheck'] = false));
       sanitizeRichTextHtml4 ? (rawText3['innerHTML'] = sanitizeRichTextHtml4) : (rawText3['textContent'] = value15);
       ((rawText3['className'] = 'v2-rt-editor'),
         el11['appendChild'](el12),
@@ -506,7 +506,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
           navigator['clipboard']['writeText'](text2)['then'](() => {
             markSystemClipboardWrite({ text: text2 });
             const list4 = Array['from'](el14['childNodes'])['map']((value22) =>
-              value22['cloneNode'](!![]),
+              value22['cloneNode'](true),
             );
             el14['replaceChildren']();
             const el39 = document['createElementNS'](value17, 'svg');
@@ -522,7 +522,7 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
               el14['appendChild'](el39),
               setTimeout(() => {
                 el14['replaceChildren'](
-                  ...list4['map']((value23) => value23['cloneNode'](!![])),
+                  ...list4['map']((value23) => value23['cloneNode'](true)),
                 );
               }, 2000));
           });

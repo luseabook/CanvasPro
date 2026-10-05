@@ -151,7 +151,7 @@ export function createCollaborationMedia({
           );
         return list3;
       }
-      (handler2(), run(value2, ![]));
+      (handler2(), run(value2, false));
       const list4 = [...args];
       for (let value7 = 0; value7 < list4['length']; value7 += 1000) {
         const list5 = list4['slice'](value7, value7 + 1000),
@@ -169,7 +169,7 @@ export function createCollaborationMedia({
           (map2['set'](list7, value9), map['set'](normalizeCollaborationMediaSource(value9), list7));
         }
       }
-      return run(value2, !![]);
+      return run(value2, true);
     },
     dispose() {
       (map['clear'](), map2['clear']());

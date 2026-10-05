@@ -43,7 +43,7 @@ export function readStoredImagePromptParts(index) {
     }
     if ((nodeId['class'] || '')['split'](/\s+/)['includes']('ref-pill'))
       ((response = {
-        reference: !![],
+        reference: true,
         text: '',
         nodeId: nodeId['data-node-id'] || '',
         label: nodeId['data-label'] || '',
@@ -68,7 +68,7 @@ export function readImagePromptParts(enabled4, target) {
         else {
           if (text2['nodeType'] === 1 && text2['classList']?.['contains']('ref-pill'))
             list3['push']({
-              reference: !![],
+              reference: true,
               domNode: text2,
               nodeId: text2['dataset']['nodeId'] || '',
               label: text2['dataset']['label'] || text2['textContent']['trim'](),

@@ -29,12 +29,12 @@ export function createPersonReplacementTimelineExportPrompt({
         const root = el['querySelector']('[role=dialog]'),
           el2 = el['querySelector']('.confirm-cancel'),
           el3 = el['querySelector']('.confirm-ok');
-        let enabled = ![],
-          index = ![],
+        let enabled = false,
+          index = false,
           handler2 = () => {};
         const run = (result) => {
           if (index) return;
-          ((index = !![]), (value = null), el['remove'](), handler2(), handler(result));
+          ((index = true), (value = null), el['remove'](), handler2(), handler(result));
         };
         value = () => run({ ...args, jianyingLaunch: 'skipped' });
         const onClose = () => {
@@ -46,13 +46,13 @@ export function createPersonReplacementTimelineExportPrompt({
           }),
           el3['addEventListener']('click', async () => {
             if (enabled || index) return;
-            ((enabled = !![]),
-              (el3['disabled'] = !![]),
-              (el2['disabled'] = !![]),
+            ((enabled = true),
+              (el3['disabled'] = true),
+              (el2['disabled'] = true),
               el3['setAttribute']('aria-busy', 'true'),
               (el3['innerHTML'] =
                 '<span class="storyboard-script-loading-spinner" aria-hidden="true"></span><span>正在打开…</span>'),
-              root['focus']({ preventScroll: !![] }));
+              root['focus']({ preventScroll: true }));
             try {
               const response = await openJianying();
               run(

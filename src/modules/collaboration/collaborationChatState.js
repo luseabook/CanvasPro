@@ -4,9 +4,9 @@ export function createCollaborationChatState({
   onMention: onMention = () => {},
 }) {
   let enabled = null,
-    enabled2 = ![],
+    enabled2 = false,
     value = 0,
-    enabled3 = ![],
+    enabled3 = false,
     item = 0,
     failed = null;
   const map = new Map(),
@@ -15,16 +15,16 @@ export function createCollaborationChatState({
       body: '',
       nodeIds: [],
       mentions: [],
-      loading: ![],
-      sending: ![],
+      loading: false,
+      sending: false,
       error: '',
       unread: 0,
-      mentioned: ![],
-      hasMore: ![],
+      mentioned: false,
+      hasMore: false,
       revision: -1,
     });
   let body2 = handler(),
-    enabled4 = ![];
+    enabled4 = false;
   const run = () => {
       if (!enabled2) onChange(body2);
     },
@@ -39,7 +39,7 @@ export function createCollaborationChatState({
           mentions: [...body2['mentions']],
           failed: failed,
         });
-      ((enabled = index), value++, (enabled3 = ![]), (item = 0));
+      ((enabled = index), value++, (enabled3 = false), (item = 0));
       const body3 = map['get'](handler2(index));
       ((failed = body3?.['failed'] || null),
         (body2 = {
@@ -60,7 +60,7 @@ export function createCollaborationChatState({
     if (!enabled || enabled3 || enabled2) return;
     const result = enabled,
       data = value;
-    ((enabled3 = !![]), (body2['loading'] = !![]), (body2['error'] = ''), run());
+    ((enabled3 = true), (body2['loading'] = true), (body2['error'] = ''), run());
     try {
       let options;
       do {
@@ -76,7 +76,7 @@ export function createCollaborationChatState({
           for (const record of args) {
             if (!enabled4 && record['actor'] !== result['state']['actorId']) body2['unread']++;
             if (record['mentions']['includes'](result['state']['actorId'])) {
-              if (!enabled4) body2['mentioned'] = !![];
+              if (!enabled4) body2['mentioned'] = true;
               onMention(record);
             }
           }
@@ -87,14 +87,14 @@ export function createCollaborationChatState({
     } catch (error) {
       if (data === value && !enabled2) body2['error'] = error['message'] || '聊天加载失败';
     } finally {
-      data === value && !enabled2 && ((enabled3 = ![]), (body2['loading'] = ![]), run());
+      data === value && !enabled2 && ((enabled3 = false), (body2['loading'] = false), run());
     }
   }
   async function older() {
     if (!enabled || enabled3 || !body2['hasMore'] || !body2['messages']['length']) return;
     const payload = enabled,
       handle = value;
-    ((enabled3 = !![]), (body2['loading'] = !![]), (body2['error'] = ''), run());
+    ((enabled3 = true), (body2['loading'] = true), (body2['error'] = ''), run());
     try {
       const args2 = await payload['review']['readChat']({ before: body2['messages'][0]['seq'] });
       if (handle !== value || enabled2) return;
@@ -105,17 +105,17 @@ export function createCollaborationChatState({
       if (handle === value && !enabled2) body2['error'] = error2['message'];
     } finally {
       if (handle === value && !enabled2) {
-        ((enabled3 = ![]), (body2['loading'] = ![]), run());
+        ((enabled3 = false), (body2['loading'] = false), run());
         if (body2['revision'] < item && !body2['error']) void refresh();
       }
     }
   }
   function edit(scope) {
-    if (body2['sending']) return ![];
-    return (Object['assign'](body2, scope), run(), !![]);
+    if (body2['sending']) return false;
+    return (Object['assign'](body2, scope), run(), true);
   }
   async function send() {
-    if (!enabled || body2['sending'] || (!body2['body']['trim']() && !body2['nodeIds']['length'])) return ![];
+    if (!enabled || body2['sending'] || (!body2['body']['trim']() && !body2['nodeIds']['length'])) return false;
     const input = enabled,
       output = value,
       args3 = {
@@ -126,25 +126,25 @@ export function createCollaborationChatState({
       fingerprint = JSON['stringify'](args3),
       messageId = failed?.['fingerprint'] === fingerprint ? failed['messageId'] : crypto['randomUUID']();
     ((failed = { fingerprint: fingerprint, messageId: messageId }),
-      (body2['sending'] = !![]),
+      (body2['sending'] = true),
       (body2['error'] = ''),
       run());
     try {
       await input['review']['write']('chatSend', { ...args3, messageId: messageId });
-      if (output !== value || enabled2) return ![];
+      if (output !== value || enabled2) return false;
       return (
         (body2['body'] = ''),
         (body2['nodeIds'] = []),
         (body2['mentions'] = []),
         (failed = null),
         await refresh(),
-        !![]
+        true
       );
     } catch (error3) {
       if (output === value && !enabled2) body2['error'] = error3['message'] || '发送失败，请重试';
-      return ![];
+      return false;
     } finally {
-      output === value && !enabled2 && ((body2['sending'] = ![]), run());
+      output === value && !enabled2 && ((body2['sending'] = false), run());
     }
   }
   return {
@@ -155,10 +155,10 @@ export function createCollaborationChatState({
     send: send,
     snapshot: () => body2,
     setVisible(value2) {
-      ((enabled4 = value2), value2 && ((body2['unread'] = 0), (body2['mentioned'] = ![])), run());
+      ((enabled4 = value2), value2 && ((body2['unread'] = 0), (body2['mentioned'] = false)), run());
     },
     destroy() {
-      ((enabled2 = !![]), value++, map['clear']());
+      ((enabled2 = true), value++, map['clear']());
     },
   };
 }

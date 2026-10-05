@@ -58,7 +58,7 @@ export function getHappyHorseModelApiVideoOptions(value5, value6 = '') {
   return getModelApiVideoFamilyOptions(value5, value6, 'happyHorse');
 }
 export function supportsHappyHorseModelApiVideoEdit(value7, value8 = '') {
-  return getHappyHorseModelApiVideoOptions(value7, value8)?.['supportsEdit'] !== ![];
+  return getHappyHorseModelApiVideoOptions(value7, value8)?.['supportsEdit'] !== false;
 }
 export function isSeedance2ModelApiVideo(value9, value10 = '') {
   return isModelApiVideoFamily(value9, value10, 'seedance2');

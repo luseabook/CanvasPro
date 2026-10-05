@@ -101,7 +101,7 @@ const getCanvasRenderSize = (el) => ({
     const value10 = Number(opposite?.['x']) - Number(point?.['x']),
       value11 = Number(opposite?.['y']) - Number(point?.['y']),
       count2 = Math['hypot'](value10, value11);
-    if (!ctx || !Number['isFinite'](count2) || count2 < 0.5) return ![];
+    if (!ctx || !Number['isFinite'](count2) || count2 < 0.5) return false;
     const value12 = Math['max'](lineWidth, Math['min'](lineWidth * 3, compareLength / 5)),
       value13 = {
         x: point['x'] + (value10 / count2) * value12,
@@ -115,7 +115,7 @@ const getCanvasRenderSize = (el) => ({
       ctx['lineTo'](point['x'], point['y']),
       ctx['lineTo'](box10['x'], box10['y']),
       ctx['stroke'](),
-      !![]
+      true
     );
   },
   drawArrowTerminal = ({
@@ -126,7 +126,7 @@ const getCanvasRenderSize = (el) => ({
     lineWidth: lineWidth2,
     compareLength: compareLength2,
   } = {}) => {
-    if (!ctx2 || !style || style === 'none') return ![];
+    if (!ctx2 || !style || style === 'none') return false;
     if (style === 'arrow')
       return drawArrowHead({
         ctx: ctx2,
@@ -138,7 +138,7 @@ const getCanvasRenderSize = (el) => ({
     const x2 = Number(opposite2?.['x']) - Number(point2?.['x']),
       y = Number(opposite2?.['y']) - Number(point2?.['y']),
       count3 = Math['hypot'](x2, y);
-    if (!Number['isFinite'](count3) || count3 < 0.5) return ![];
+    if (!Number['isFinite'](count3) || count3 < 0.5) return false;
     const y2 = { x: x2 / count3, y: y / count3 },
       box11 = { x: -y2['y'], y: y2['x'] },
       value14 = Math['max'](lineWidth2 * 1.6, Math['min'](lineWidth2 * 3.2, compareLength2 / 5)),
@@ -168,7 +168,7 @@ const getCanvasRenderSize = (el) => ({
         ),
         ctx2['fill'](),
         ctx2['stroke'](),
-        !![]
+        true
       );
     }
     if (style === 'bar')
@@ -182,7 +182,7 @@ const getCanvasRenderSize = (el) => ({
           point2['y'] - box11['y'] * value15,
         ),
         ctx2['stroke'](),
-        !![]
+        true
       );
     if (style === 'inverted')
       return (
@@ -198,7 +198,7 @@ const getCanvasRenderSize = (el) => ({
         ctx2['closePath'](),
         ctx2['fill'](),
         ctx2['stroke'](),
-        !![]
+        true
       );
     if (style === 'diamond') {
       const box14 = {
@@ -219,7 +219,7 @@ const getCanvasRenderSize = (el) => ({
         ctx2['closePath'](),
         ctx2['fill'](),
         ctx2['stroke'](),
-        !![]
+        true
       );
     }
     if (style === 'square')
@@ -237,7 +237,7 @@ const getCanvasRenderSize = (el) => ({
         ctx2['closePath'](),
         ctx2['fill'](),
         ctx2['stroke'](),
-        !![]
+        true
       );
     return (
       ctx2['moveTo'](point2['x'], point2['y']),
@@ -246,14 +246,14 @@ const getCanvasRenderSize = (el) => ({
       ctx2['closePath'](),
       ctx2['fill'](),
       ctx2['stroke'](),
-      !![]
+      true
     );
   },
   drawArrowCommand = ({
     ctx: ctx3,
     cmd: cmd,
     viewport: viewport,
-    isDraft: isDraft = ![],
+    isDraft: isDraft = false,
     opacityMultiplier: opacityMultiplier = 1,
   } = {}) => {
     const viewportZoom2 = getViewportZoom(viewport),
@@ -261,7 +261,7 @@ const getCanvasRenderSize = (el) => ({
       point3 = worldToScreenPoint(list['start'], viewport),
       point4 = worldToScreenPoint(list['end'], viewport),
       compareLength3 = list['length'] * viewportZoom2;
-    if (!ctx3 || compareLength3 < 0.5) return ![];
+    if (!ctx3 || compareLength3 < 0.5) return false;
     const lineWidth3 = getBrushLineWidth(cmd['sizeWorld'], viewportZoom2, 'brush');
     (ctx3['save'](),
       (ctx3['globalCompositeOperation'] = 'source-over'),
@@ -320,17 +320,17 @@ const getCanvasRenderSize = (el) => ({
           compareLength: compareLength3,
         }),
       ctx3['restore'](),
-      !![]
+      true
     );
   },
   drawWhiteboardShapeCommand = ({
     ctx: ctx4,
     cmd: cmd2,
     viewport: viewport2,
-    isDraft: isDraft = ![],
+    isDraft: isDraft = false,
     opacityMultiplier: opacityMultiplier = 1,
   } = {}) => {
-    if (!ctx4) return ![];
+    if (!ctx4) return false;
     const viewportZoom3 = getViewportZoom(viewport2),
       x4 = getWhiteboardShapeBounds(cmd2),
       x5 = worldToScreenPoint({ x: x4['x'], y: x4['y'] }, viewport2),
@@ -340,7 +340,7 @@ const getCanvasRenderSize = (el) => ({
         width: x4['width'] * viewportZoom3,
         height: x4['height'] * viewportZoom3,
       };
-    if (box17['width'] < 0.5 && box17['height'] < 0.5) return ![];
+    if (box17['width'] < 0.5 && box17['height'] < 0.5) return false;
     const brushLineWidth = getBrushLineWidth(cmd2['sizeWorld'], viewportZoom3, 'brush');
     (ctx4['save'](),
       rotateCanvasAroundBounds(ctx4, box17, cmd2['rotation']),
@@ -355,7 +355,7 @@ const getCanvasRenderSize = (el) => ({
     else applyStrokeDash(ctx4, cmd2['dash'], brushLineWidth);
     (ctx4['beginPath'](), traceWhiteboardShapePath(ctx4, cmd2['shapeType'], box17));
     if (cmd2['fill'] === 'solid' && isClosedWhiteboardShape(cmd2['shapeType'])) ctx4['fill']();
-    return (ctx4['stroke'](), ctx4['restore'](), !![]);
+    return (ctx4['stroke'](), ctx4['restore'](), true);
   },
   drawTextControlButton = (ctx5, box18, handler, value19) => {
     (ctx5['save'](),
@@ -556,8 +556,8 @@ export const renderCommands = ({
   viewport: viewport4,
   canvasEl: canvasEl2,
   commands: commands = [],
-  isDraft: isDraft = ![],
-  isEraseScene: isEraseScene = ![],
+  isDraft: isDraft = false,
+  isEraseScene: isEraseScene = false,
   checkerPattern: checkerPattern2,
   defaultTextColor: defaultTextColor,
   getTextGeometry: getTextGeometry,
@@ -605,7 +605,7 @@ export const renderCommands = ({
           checkerPattern: checkerPattern3,
           checkerZoom: checkerZoom,
           checkerAlpha: 0.8,
-          includeErasePass: ![],
+          includeErasePass: false,
         });
       } else
         ((ctx12['globalAlpha'] = getCommandOpacity(strokeStyle, opacityMultiplier2)),

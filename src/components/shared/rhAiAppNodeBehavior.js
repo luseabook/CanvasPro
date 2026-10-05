@@ -99,6 +99,6 @@ export function buildRhAiAppResultDisplayPatch({
     x: Math['round'](value7 - (width['width'] - value5) / 2),
     y: Math['round'](value8 - (width['height'] - value6)),
     [RH_AI_APP_RESULT_RATIO_KEY]: value4,
-    [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![],
+    [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: false,
   };
 }

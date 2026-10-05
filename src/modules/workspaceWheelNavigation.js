@@ -23,19 +23,19 @@ export function shouldPreserveWorkspaceNestedWheel(
 ) {
   const selector = normalizeSelector(nestedSelector),
     result = selector ? el2?.['closest']?.(selector) : null;
-  if (result && (!boundaryRoot || boundaryRoot['contains']?.(result))) return !![];
+  if (result && (!boundaryRoot || boundaryRoot['contains']?.(result))) return true;
   const run =
     getComputedStyle ||
     el2?.['ownerDocument']?.['defaultView']?.['getComputedStyle']?.['bind'](
       el2['ownerDocument']['defaultView'],
     );
-  if (typeof run !== 'function') return ![];
+  if (typeof run !== 'function') return false;
   const selector2 = normalizeSelector(boundarySelector);
   for (let data = el2; data; data = data['parentElement']) {
-    if (hasWorkspaceScrollableOverflow(data, run(data))) return !![];
+    if (hasWorkspaceScrollableOverflow(data, run(data))) return true;
     if (data === boundaryRoot || (selector2 && data['matches']?.(selector2))) break;
   }
-  return ![];
+  return false;
 }
 export function captureWorkspaceScrollPosition(enabled) {
   if (!enabled) return null;
@@ -45,11 +45,11 @@ export function captureWorkspaceScrollPosition(enabled) {
   };
 }
 export function restoreWorkspaceScrollPosition(enabled2, box) {
-  if (!enabled2 || !box) return ![];
+  if (!enabled2 || !box) return false;
   return (
     (enabled2['scrollTop'] = Math['max'](0, Number(box['top']) || 0)),
     (enabled2['scrollLeft'] = Math['max'](0, Number(box['left']) || 0)),
-    !![]
+    true
   );
 }
 export function captureWorkspaceNestedScrollPositions(el3, list = []) {
@@ -71,9 +71,9 @@ export function captureWorkspaceNestedScrollPositions(el3, list = []) {
   );
 }
 export function restoreWorkspaceNestedScrollPositions(el4, list3) {
-  if (!el4?.['querySelectorAll'] || !Array['isArray'](list3) || !list3['length']) return ![];
+  if (!el4?.['querySelectorAll'] || !Array['isArray'](list3) || !list3['length']) return false;
   const map = new Map();
-  let restoreWorkspaceScrollPosition2 = ![];
+  let restoreWorkspaceScrollPosition2 = false;
   return (
     list3['forEach']((target) => {
       const selector4 = normalizeSelector(target?.['selector']);
@@ -89,6 +89,6 @@ export function restoreWorkspaceNestedScrollPositions(el4, list3) {
 }
 export function scrollWorkspaceTrackWithWheel(source, next, current = {}) {
   const selector5 = normalizeSelector(next);
-  if (!selector5) return ![];
+  if (!selector5) return false;
   return scrollClosestElementHorizontallyWithWheel(source, selector5, current);
 }

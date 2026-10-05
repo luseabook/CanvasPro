@@ -44,7 +44,7 @@ export function bindStoryAudioToCharacter(payload, handle, state) {
   const enabled2 = payload['assets']['find'](
     (config) => config['kind'] === 'character' && config['id'] === state,
   );
-  if (!enabled2 || !getStoryAudioUrl(handle)) return ![];
+  if (!enabled2 || !getStoryAudioUrl(handle)) return false;
   const [scope] = addStoryAudioAssets(payload, [handle]);
   return Boolean(
     scope &&

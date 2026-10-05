@@ -167,10 +167,10 @@ function shouldReadPreviewUploadNaturalSize(options2 = {}) {
 
 function setToolbarUploadButtonBusy(enabled, next) {
   if (!enabled) return;
-  ((enabled['disabled'] = next === !![]),
-    enabled['classList']?.['toggle']?.('is-uploading', next === !![]),
-    enabled['classList']?.['toggle']?.('is-task-running', next === !![]),
-    next === !![]
+  ((enabled['disabled'] = next === true),
+    enabled['classList']?.['toggle']?.('is-uploading', next === true),
+    enabled['classList']?.['toggle']?.('is-task-running', next === true),
+    next === true
       ? enabled['setAttribute']?.('aria-busy', 'true')
       : enabled['removeAttribute']?.('aria-busy'));
 }
@@ -179,7 +179,7 @@ function createToolbarUploadInput(el2) {
   const enabled2 = el2?.['ownerDocument'] || globalThis['document'] || null;
   if (!enabled2?.['createElement']) return null;
   const el3 = enabled2['createElement']('input');
-  ((el3['type'] = 'file'), (el3['hidden'] = !![]), (el3['className'] = 'node-toolbar-upload-input'));
+  ((el3['type'] = 'file'), (el3['hidden'] = true), (el3['className'] = 'node-toolbar-upload-input'));
   const current =
     el2?.['closest']?.('.node-floating-toolbar') || el2?.['parentNode'] || enabled2['body'] || null;
   return (current?.['appendChild']?.(el3), el3);
@@ -228,7 +228,7 @@ function getMountedPreviewElement(entry) {
 function clearExistingOptimisticImagePreview(enabled6) {
   if (!enabled6) return;
   if (typeof enabled6['_previewUploadOptimisticCleanup'] === 'function') {
-    enabled6['_previewUploadOptimisticCleanup']({ delayMs: 0, force: !![] });
+    enabled6['_previewUploadOptimisticCleanup']({ delayMs: 0, force: true });
     return;
   }
   enabled6['querySelectorAll']?.(OPTIMISTIC_IMAGE_PREVIEW_SELECTOR)?.['forEach']((config) =>
@@ -272,9 +272,9 @@ function normalizeUrlPathForCompare(value5 = '') {
 
 function imageSrcMatchesExpected(value6 = '', value7 = []) {
   const urlPathForCompare = normalizeUrlPathForCompare(value6);
-  if (!urlPathForCompare) return ![];
+  if (!urlPathForCompare) return false;
   const list3 = value7['map']((value8) => normalizeUrlPathForCompare(value8))['filter'](Boolean);
-  if (list3['length'] === 0) return !![];
+  if (list3['length'] === 0) return true;
   return list3['some']((value9) => urlPathForCompare === value9 || urlPathForCompare['endsWith'](value9));
 }
 
@@ -321,16 +321,16 @@ function waitForUploadedPreviewImageCommit({
   onPoll: onPoll = null,
 } = {}) {
   const enabled9 = String(nodeId2 || '')['trim']();
-  if (!enabled9) return Promise['resolve'](![]);
+  if (!enabled9) return Promise['resolve'](false);
   return new Promise((handler2) => {
-    let value14 = ![],
+    let value14 = false,
       setTimeout2 = null,
       setTimeout3 = null;
     const map = new Set(),
       list4 = [],
       handler3 = (value15) => {
         if (value14) return;
-        value14 = !![];
+        value14 = true;
         if (setTimeout2 !== null) clearTimeout(setTimeout2);
         if (setTimeout3 !== null) clearTimeout(setTimeout3);
         for (const run of list4['splice'](0)) run();
@@ -344,21 +344,21 @@ function waitForUploadedPreviewImageCommit({
           getImageElementAttributeSrc(el6) ||
           getImageElementSrc(el6);
         if (el6['complete'] && value16 !== previousSrc && imageSrcMatchesExpected(value16, expectedUrls)) {
-          handler3(!![]);
+          handler3(true);
           return;
         }
         const value17 = () => {
             const value18 = String(el6['currentSrc'] || '')['trim']() || getImageElementSrc(el6);
-            value18 !== previousSrc && imageSrcMatchesExpected(value18, expectedUrls) && handler3(!![]);
+            value18 !== previousSrc && imageSrcMatchesExpected(value18, expectedUrls) && handler3(true);
           },
           value19 = () => {
             const imageElementAttributeSrc = getImageElementAttributeSrc(el6) || getImageElementSrc(el6);
             imageElementAttributeSrc !== previousSrc &&
               imageSrcMatchesExpected(imageElementAttributeSrc, expectedUrls) &&
-              handler3(!![]);
+              handler3(true);
           };
-        (el6['addEventListener']('load', value17, { once: !![] }),
-          el6['addEventListener']('error', value19, { once: !![] }),
+        (el6['addEventListener']('load', value17, { once: true }),
+          el6['addEventListener']('error', value19, { once: true }),
           list4['push'](() => {
             (el6['removeEventListener']?.('load', value17), el6['removeEventListener']?.('error', value19));
           }));
@@ -372,15 +372,15 @@ function waitForUploadedPreviewImageCommit({
             getImageElementAttributeSrc(value20) || getImageElementSrc(value20);
           if (!imageElementAttributeSrc2 || imageElementAttributeSrc2 === previousSrc) continue;
           if (!imageSrcMatchesExpected(imageElementAttributeSrc2, expectedUrls)) continue;
-          return (handler4(value20), ![]);
+          return (handler4(value20), false);
         }
-        return ![];
+        return false;
       },
       handler6 = () => {
         if (value14 || handler5()) return;
         setTimeout2 = setTimeout(handler6, 80);
       };
-    ((setTimeout3 = setTimeout(() => handler3(![]), Math['max'](0, Number(timeoutMs) || 0))), handler6());
+    ((setTimeout3 = setTimeout(() => handler3(false), Math['max'](0, Number(timeoutMs) || 0))), handler6());
   });
 }
 
@@ -395,15 +395,15 @@ function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}
   const mountedPreviewImageSrc = getMountedPreviewImageSrc(mountedPreviewElement2),
     el8 = el7['createElement']('img');
   ((el8['className'] = 'preview-upload-optimistic-media'),
-    (el8['draggable'] = ![]),
+    (el8['draggable'] = false),
     (el8['alt'] = ''),
     (el8['dataset']['previewUploadOptimistic'] = 'true'),
     (el8['src'] = safelyCreateObjectUrl2));
-  let value21 = ![],
+  let value21 = false,
     setTimeout4 = null,
     value22 = null;
   const run2 = (el9 = getMountedPreviewElement(nodeId3)) => {
-      if (value21 || !el9?.['appendChild']) return ![];
+      if (value21 || !el9?.['appendChild']) return false;
       return (
         value22 &&
           value22 !== el9 &&
@@ -412,19 +412,19 @@ function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}
         el8['parentNode'] !== el9 && el9['appendChild'](el8),
         (el9['_previewUploadOptimisticCleanup'] = run3),
         (value22 = el9),
-        !![]
+        true
       );
     },
     handler7 = () => {
       if (value21) return;
-      ((value21 = !![]),
+      ((value21 = true),
         (setTimeout4 = null),
         el8['remove']?.(),
         safelyRevokeObjectUrl(safelyCreateObjectUrl2),
         value22?.['_previewUploadOptimisticCleanup'] === run3 &&
           delete value22['_previewUploadOptimisticCleanup']);
     };
-  function run3({ delayMs: delayMs = 0, force: force = ![] } = {}) {
+  function run3({ delayMs: delayMs = 0, force: force = false } = {}) {
     if (value21) return;
     setTimeout4 !== null && (clearTimeout(setTimeout4), (setTimeout4 = null));
     const run4 = () => {
@@ -448,11 +448,11 @@ function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}
 
 function flushUploadedPreviewNode(value23) {
   const enabled10 = String(value23 || '')['trim']();
-  if (!enabled10) return ![];
+  if (!enabled10) return false;
   try {
-    return globalThis['window']?.['v2Renderer']?.['flushNode']?.(enabled10) === !![];
+    return globalThis['window']?.['v2Renderer']?.['flushNode']?.(enabled10) === true;
   } catch {
-    return ![];
+    return false;
   }
 }
 
@@ -481,7 +481,7 @@ export function bindPreviewUploadToolbarAction({
     async3 = async () => {
       const enabled11 = el10['files']?.[0];
       if (!enabled11) return;
-      setToolbarUploadButtonBusy(button3, !![]);
+      setToolbarUploadButtonBusy(button3, true);
       try {
         await handlePreviewUploadFile({
           file: enabled11,
@@ -493,7 +493,7 @@ export function bindPreviewUploadToolbarAction({
           applyResults: applyResults3,
         });
       } finally {
-        (setToolbarUploadButtonBusy(button3, ![]), (el10['value'] = ''));
+        (setToolbarUploadButtonBusy(button3, false), (el10['value'] = ''));
       }
     };
   return (

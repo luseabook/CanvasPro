@@ -30,7 +30,7 @@ export function buildStoryAssetStyleReferenceMentionCandidate(options = {}, { qu
     thumbUrl: thumbUrl,
     iconType: 'image',
     pillKind: STORY_ASSET_STYLE_REFERENCE_PILL_KIND,
-    suppressTooltip: !![],
+    suppressTooltip: true,
   };
 }
 export function renderStoryAssetPromptMentions(index = '', result = {}) {
@@ -62,7 +62,7 @@ export function readStoryAssetPromptText(enabled2 = null) {
     handler = (target) => {
       if (target) list['push'](String(target));
     },
-    handler2 = (el, { root: root = ![] } = {}) => {
+    handler2 = (el, { root: root = false } = {}) => {
       const count = Number(el?.['nodeType']);
       if (count === 3) {
         handler(el['textContent'] || '');
@@ -87,7 +87,7 @@ export function readStoryAssetPromptText(enabled2 = null) {
       if (next && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
     };
   return (
-    handler2(enabled2, { root: !![] }),
+    handler2(enabled2, { root: true }),
     list['join']('')
       ['replace'](/\u00a0/g, ' ')
       ['replace'](/\n{3,}/g, '\n\n')

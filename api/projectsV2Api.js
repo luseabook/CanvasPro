@@ -410,7 +410,7 @@ function _readLocalMediaStatCache(value37) {
 function _rememberLocalMediaStat(enabled9, exists) {
   if (!enabled9) return;
   const stat = {
-      exists: exists?.['exists'] === !![],
+      exists: exists?.['exists'] === true,
       sizeBytes:
         Number['isSafeInteger'](Number(exists?.['sizeBytes'])) && Number(exists['sizeBytes']) >= 0
           ? Number(exists['sizeBytes'])
@@ -435,7 +435,7 @@ function _normalizeLegacyProjectFilename(value40) {
 
 export async function renameV2ProjectOnServer(value41, value42) {
   const name = String(value42 || '')['trim']();
-  if (!name) return { success: ![] };
+  if (!name) return { success: false };
   const _normalizeProjectFilename4 = _normalizeProjectFilename(value41);
   return await requester({
     url: '/api/v2/projects/' + encodeURIComponent(_normalizeProjectFilename4),
@@ -478,7 +478,7 @@ export async function discardStagedAssetUploadToServer(value43) {
   const stageId = String(value43 || '')
     ['trim']()
     ['toLowerCase']();
-  if (!/^[a-f0-9]{32}$/['test'](stageId)) return { success: ![], removed: ![] };
+  if (!/^[a-f0-9]{32}$/['test'](stageId)) return { success: false, removed: false };
   return await post(
     '/api/v2/assets/stage/discard',
     { stageId: stageId },
@@ -492,7 +492,7 @@ export async function statLocalMediaOnServer(value44) {
         ? value44
         : String(value44?.['localPath'] || value44?.['path'] || '')['trim'](),
     url4 = _localPathToStaticRequestPath(value45);
-  if (!url4) return { exists: ![], sizeBytes: 0, contentType: '', lastModified: '' };
+  if (!url4) return { exists: false, sizeBytes: 0, contentType: '', lastModified: '' };
   const _readLocalMediaStatCache2 = _readLocalMediaStatCache(url4);
   if (_readLocalMediaStatCache2 !== undefined) return _readLocalMediaStatCache2;
   if (_localMediaStatInflight['has'](url4)) return await _localMediaStatInflight['get'](url4);
@@ -501,8 +501,8 @@ export async function statLocalMediaOnServer(value44) {
     method: 'HEAD',
     provider: 'local',
     responseType: 'text',
-    allow404Null: !![],
-    returnMeta: !![],
+    allow404Null: true,
+    returnMeta: true,
     timeout: 10000,
   })
     ['then']((response3) => {
@@ -520,7 +520,7 @@ export async function statLocalMediaOnServer(value44) {
     })
     ['catch'](() => {
       return _rememberLocalMediaStat(url4, {
-        exists: ![],
+        exists: false,
         sizeBytes: 0,
         contentType: '',
         lastModified: '',

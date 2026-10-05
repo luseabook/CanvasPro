@@ -17,7 +17,7 @@ export function openImageHdEditor(args) {
       overlayDataKey: 'imageHdEditor',
       renderSelector: renderAIGenImageModelSelectorMarkup,
       bindSelector: bindAIGenImageModelSelector,
-      selectorOptions: { allowedWorkflowModelIds: allowedModelIds, showSchemaControls: !![] },
+      selectorOptions: { allowedWorkflowModelIds: allowedModelIds, showSchemaControls: true },
     })
   );
 }

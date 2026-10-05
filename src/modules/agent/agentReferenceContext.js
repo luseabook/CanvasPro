@@ -25,7 +25,7 @@ export function buildAgentReferenceContext({
     )
       break;
     const response = list[count] || {};
-    if (response['status'] !== 'success' || response['ok'] === ![]) continue;
+    if (response['status'] !== 'success' || response['ok'] === false) continue;
     const nodeIds = (Array['isArray'](response['createdNodeIds']) ? response['createdNodeIds'] : [])
       ['map'](normalizeId)
       ['filter']((key) => key && map['has'](key) && !map2['has'](key))

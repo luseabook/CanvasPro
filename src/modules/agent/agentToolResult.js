@@ -62,12 +62,12 @@ function trimToBudget(ok, options = DEFAULT_MAX_CHARS) {
   let list3 = JSON['stringify'](ok);
   if (list3['length'] <= options) return ok;
   const ok2 = {
-    ok: ok?.['ok'] === !![],
+    ok: ok?.['ok'] === true,
     status: String(ok?.['status'] || ''),
     commandId: String(ok?.['commandId'] || ''),
     errorCode: String(ok?.['errorCode'] || ''),
     message: truncateText(ok?.['message'] || '', Math['max'](160, options - 320)),
-    truncated: !![],
+    truncated: true,
   };
   list3 = JSON['stringify'](ok2);
   if (list3['length'] <= options) return ok2;
@@ -75,7 +75,7 @@ function trimToBudget(ok, options = DEFAULT_MAX_CHARS) {
     ok: ok2['ok'],
     status: ok2['status'],
     commandId: ok2['commandId'],
-    truncated: !![],
+    truncated: true,
   };
 }
 export function sanitizeAgentToolResult(target, source = {}) {
@@ -91,12 +91,12 @@ function normalizeStringArray(list4) {
     : [];
 }
 export function deriveAgentCapabilityDiscovery({ action: action = {}, execution: execution = {} } = {}) {
-  if (execution['ok'] !== !![]) return { commandIds: [], modelIds: [] };
+  if (execution['ok'] !== true) return { commandIds: [], modelIds: [] };
   const entry = String(action['type'] || ''),
     actionResponse = getActionResponse(execution)?.['result'] || {};
   if (entry === 'agent.capabilities.search')
     return { commandIds: normalizeStringArray(actionResponse['commandIds']), modelIds: [] };
-  if (entry === 'agent.command.describe' && actionResponse['found'] !== ![])
+  if (entry === 'agent.command.describe' && actionResponse['found'] !== false)
     return {
       commandIds: normalizeStringArray([actionResponse['commandId'] || action['args']?.['commandId']]),
       modelIds: [],
@@ -114,8 +114,8 @@ export function buildAgentToolResult({
   return sanitizeAgentToolResult({
     step: Number(step) || 0,
     commandId: String(action['type'] || result2['commandId'] || ''),
-    ok: execution['ok'] === !![],
-    status: String(execution['status'] || (execution['ok'] === !![] ? 'success' : 'failed')),
+    ok: execution['ok'] === true,
+    status: String(execution['status'] || (execution['ok'] === true ? 'success' : 'failed')),
     errorCode: String(execution['errorCode'] || result2['errorCode'] || ''),
     message: String(execution['message'] || result2['message'] || ''),
     result: result2['result'],
@@ -145,12 +145,12 @@ export function deriveAgentRuntimeProvenance({
     args2 = new Set(Array['isArray'](previous['createdEdgeIds']) ? previous['createdEdgeIds'] : []),
     actionResponse2 = getActionResponse(execution);
   return (
-    execution['ok'] === !![] &&
+    execution['ok'] === true &&
       ['node.create', 'node.createConnected', 'node.duplicate', 'collage.createFromSelection']['includes'](
         String(action['type'] || ''),
       ) &&
       collectIds(actionResponse2['result'], ['nodeId', 'id'], args),
-    execution['ok'] === !![] &&
+    execution['ok'] === true &&
       String(action['type'] || '') === 'graph.connect' &&
       collectIds(actionResponse2['result'], ['edgeId', 'id'], args2),
     { createdNodeIds: [...args], createdEdgeIds: [...args2] }

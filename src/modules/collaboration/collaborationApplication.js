@@ -31,8 +31,8 @@ export function createCollaborationApplication({
       storage2 = globalThis['localStorage'] || storage;
     } catch {}
   const actorId = {
-    authenticated: ![],
-    authenticating: ![],
+    authenticated: false,
+    authenticating: false,
     authError: null,
     actorId: '',
     rooms: [],
@@ -46,8 +46,8 @@ export function createCollaborationApplication({
     displayName = '成员',
     clientId = crypto['randomUUID'](),
     value = 0,
-    enabled = ![],
-    item = ![],
+    enabled = false,
+    item = false,
     enabled2 = null,
     key = 0,
     value2 = null,
@@ -65,7 +65,7 @@ export function createCollaborationApplication({
       storage: storage2,
       canvasTabs: canvasTabs,
       actorId: () => actorId['actorId'],
-      hosting: ![],
+      hosting: false,
     }),
     getState = () => ({
       ...actorId,
@@ -105,7 +105,7 @@ export function createCollaborationApplication({
     } catch (result) {
       ['SESSION_EXPIRED', 'ACTIVATION_REQUIRED']['includes'](result['code']) &&
         !resumeRoom &&
-        ((actorId['authenticated'] = ![]), storage?.['removeItem'](STORAGE_KEY), refreshCanvas());
+        ((actorId['authenticated'] = false), storage?.['removeItem'](STORAGE_KEY), refreshCanvas());
       throw result;
     }
   }
@@ -122,7 +122,7 @@ export function createCollaborationApplication({
         options === key &&
         ['SESSION_EXPIRED', 'ACTIVATION_REQUIRED']['includes'](source['code']) &&
         !resumeRoom &&
-        ((actorId['authenticated'] = ![]), storage?.['removeItem'](STORAGE_KEY), refreshCanvas());
+        ((actorId['authenticated'] = false), storage?.['removeItem'](STORAGE_KEY), refreshCanvas());
       throw source;
     }
   }
@@ -136,7 +136,7 @@ export function createCollaborationApplication({
     )
       throw new Error('请等待当前生成任务结束后开启协作');
   }
-  async function run5(room, publish = ![]) {
+  async function run5(room, publish = false) {
     run();
     if (!room['roomId'] || !room['document'] || !room['role'] || !Array['isArray'](room['members']))
       throw new Error('协作房间响应无效，请检查服务部署');
@@ -149,7 +149,7 @@ export function createCollaborationApplication({
       throw new Error('此画布的上次同步记录不可用，已保留本机内容，请勿覆盖保存');
     run();
     if (!publish && !mediaBindings) {
-      if ((await canvasTabs['addCanvas']()) === ![]) throw new Error('无法创建协作画布标签页');
+      if ((await canvasTabs['addCanvas']()) === false) throw new Error('无法创建协作画布标签页');
       (run(), canvasTabs['renameCanvas'](getCanvasId(), room['name']));
     }
     const canvasId = getCanvasId(),
@@ -268,19 +268,19 @@ export function createCollaborationApplication({
     }
     refreshCanvas();
   }
-  async function run6(handler3, handler4, value5 = ![], canvasId2 = getCanvasId(), replacePort = ![]) {
+  async function run6(handler3, handler4, value5 = false, canvasId2 = getCanvasId(), replacePort = false) {
     run4();
     if (!actorId['authenticated'] || !api) throw new Error('请先验证已激活的画布身份');
     const value6 = api;
     enabled2 = null;
-    let enabled7 = ![];
-    item = !![];
+    let enabled7 = false;
+    item = true;
     try {
       (await handler3(value6, { replacePort: replacePort }), run());
       const value7 = await handler4();
       run();
       if (canvasId2 && getCanvasId() !== canvasId2) throw new Error('画布已切换，请返回原画布重新开房');
-      (await run5(value7, value5), (enabled7 = !![]));
+      (await run5(value7, value5), (enabled7 = true));
       if (replacePort)
         onNotice('协作端口已更换，请在邀请区域生成并重新发送邀请信息；此前所有房间的旧邀请地址不再可用');
       if (value5) await refreshRooms();
@@ -307,15 +307,15 @@ export function createCollaborationApplication({
         refreshCanvas());
       throw message;
     } finally {
-      item = ![];
+      item = false;
     }
   }
   const actions = {
-    async retryHostPort(enabled8 = ![]) {
+    async retryHostPort(enabled8 = false) {
       run4();
       if (!enabled2 || enabled2['canvasId'] !== getCanvasId() || enabled2['actorId'] !== actorId['actorId'])
         throw new Error('画布已切换，请重新开房');
-      return enabled2['retry'](enabled8 === !![]);
+      return enabled2['retry'](enabled8 === true);
     },
     async authenticate(options2 = {}) {
       (await ready, run());
@@ -323,7 +323,7 @@ export function createCollaborationApplication({
       if (resumeRoom || item) throw new Error('请先结束当前画布的联机');
       const value9 = ++key;
       return (
-        (actorId['authenticating'] = !![]),
+        (actorId['authenticating'] = true),
         (actorId['authError'] = null),
         refreshCanvas(),
         (value2 = (async () => {
@@ -342,7 +342,7 @@ export function createCollaborationApplication({
             )
               ['trim']()
               ['slice'](0, 32)),
-              (actorId['authenticated'] = !![]),
+              (actorId['authenticated'] = true),
               (actorId['actorId'] = args3['actorId']),
               (index = args3['expiresAt']),
               storage?.['setItem'](
@@ -358,7 +358,7 @@ export function createCollaborationApplication({
           } catch (code) {
             !enabled &&
               value9 === key &&
-              ((actorId['authenticated'] = ![]),
+              ((actorId['authenticated'] = false),
               (actorId['rooms'] = []),
               (actorId['authError'] = {
                 code: code['code'] || 'AUTH_UNAVAILABLE',
@@ -368,7 +368,7 @@ export function createCollaborationApplication({
             throw code;
           } finally {
             ((value2 = null),
-              !enabled && value9 === key && ((actorId['authenticating'] = ![]), refreshCanvas()));
+              !enabled && value9 === key && ((actorId['authenticating'] = false), refreshCanvas()));
           }
         })()),
         value2
@@ -387,7 +387,7 @@ export function createCollaborationApplication({
       } catch {}
       refreshCanvas();
     },
-    async create({ fresh: fresh = ![] } = {}) {
+    async create({ fresh: fresh = false } = {}) {
       const value12 = getCanvasId(),
         value13 = collaborationCanvasBinding['roomFor'](
           value12,
@@ -403,7 +403,7 @@ export function createCollaborationApplication({
             displayName: displayName,
             document: { nodes: {}, edges: {} },
           }),
-        !![],
+        true,
         value12,
       );
     },
@@ -486,7 +486,7 @@ export function createCollaborationApplication({
       resumeRoom['command']('resolveTask', {
         nodeId: nodeId['node'],
         taskId: nodeId['id'],
-        confirmedStopped: !![],
+        confirmedStopped: true,
       }),
     remove: (memberId2) => resumeRoom['command']('remove', { memberId: memberId2 }),
     revokeInvites: () => resumeRoom['command']('revokeInvites'),
@@ -511,7 +511,7 @@ export function createCollaborationApplication({
       if (!force?.['preserveDraft']) await enabled11['prepareDetach'](force);
       if (resumeRoom !== enabled11 || force?.['signal']?.['aborted'])
         throw new DOMException('Aborted', 'AbortError');
-      await enabled11['detach']({ force: force?.['preserveDraft'] === !![] });
+      await enabled11['detach']({ force: force?.['preserveDraft'] === true });
     },
     async saveAndDisconnect(value34) {
       const enabled12 = resumeRoom,
@@ -525,7 +525,7 @@ export function createCollaborationApplication({
       const value36 = await saveProject();
       if (resumeRoom !== enabled12 || getCanvasId() !== value35 || value34?.['signal']?.['aborted'])
         throw new DOMException('Aborted', 'AbortError');
-      if (value36 !== !![]) throw new Error('未完成项目保存，已保留联机状态');
+      if (value36 !== true) throw new Error('未完成项目保存，已保留联机状态');
       if (!enabled12['canDetach']() || canvasTabs['isCanvasDirty']?.(value35))
         throw new Error('保存期间画布又有修改，请再次保存后结束；或选择“确定”直接结束联机');
       await enabled12['detach']();
@@ -537,8 +537,8 @@ export function createCollaborationApplication({
         (key += 1),
         void api?.['disconnect'](),
         (api = null),
-        (actorId['authenticated'] = ![]),
-        (actorId['authenticating'] = ![]),
+        (actorId['authenticated'] = false),
+        (actorId['authenticating'] = false),
         (actorId['authError'] = null),
         (actorId['actorId'] = ''),
         (actorId['rooms'] = []),
@@ -561,12 +561,12 @@ export function createCollaborationApplication({
       ((api = createApi({ ...serverUrl, token: token['token'] })),
         (displayName = token['displayName']),
         (clientId = token['clientId'] || clientId),
-        (actorId['authenticated'] = !![]),
+        (actorId['authenticated'] = true),
         (actorId['actorId'] = token['actorId']),
         (index = token['expiresAt']),
         await refreshRooms());
     } catch {
-      !enabled && value37 === key && ((actorId['authenticated'] = ![]), refreshCanvas());
+      !enabled && value37 === key && ((actorId['authenticated'] = false), refreshCanvas());
     }
   }
   const ready = Promise['resolve']()['then'](run7);
@@ -582,17 +582,17 @@ export function createCollaborationApplication({
       if (resumeRoom) return;
       const value39 = key;
       (!actorId['authenticated'] || index * 1000 <= Date['now']()) &&
-        ((actorId['authenticating'] = !![]), refreshCanvas());
+        ((actorId['authenticating'] = true), refreshCanvas());
       (await ready, run());
       if (value2) return value2;
       if (value39 !== key) return;
       if (!actorId['authenticated'] || index * 1000 <= Date['now']()) await actions['authenticate']();
-      else ((actorId['authenticating'] = ![]), refreshCanvas());
+      else ((actorId['authenticating'] = false), refreshCanvas());
     },
     destroy() {
       if (enabled) return value38;
       return (
-        (enabled = !![]),
+        (enabled = true),
         (value += 1),
         (key += 1),
         handler(),

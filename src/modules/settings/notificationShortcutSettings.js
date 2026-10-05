@@ -13,10 +13,10 @@ export function syncNotificationShortcut(keys) {
       try {
         response = await desktopBridge['notification']['updateGlobalShortcut']({ keys: keys });
       } catch {
-        response = { success: ![] };
+        response = { success: false };
       }
       if (value !== revision) return;
-      if (response?.['success'] === ![]) {
+      if (response?.['success'] === false) {
         const item = keys['join']('+');
         (lastFailure !== item &&
           globalThis['window']?.['showToast']?.(

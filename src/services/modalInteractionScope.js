@@ -1,7 +1,7 @@
 import { focusFirstElement, restoreFocus, trapTabKey } from '../utils/focusTrap.js';
 const scopes = [];
 export function hasActiveModalInteraction() {
-  return scopes['some'](({ root: root }) => root['isConnected'] !== ![]);
+  return scopes['some'](({ root: root }) => root['isConnected'] !== false);
 }
 export function beginModalInteraction({
   root: root2,
@@ -36,18 +36,18 @@ export function beginModalInteraction({
     };
   (scopes['at'](-1)?.['onSuspend']?.(),
     scopes['push'](value),
-    el2?.['addEventListener']?.('keydown', key, !![]),
+    el2?.['addEventListener']?.('keydown', key, true),
     el?.['addEventListener']?.('focusin', result),
     root2['addEventListener']?.('keydown', data),
     root2['addEventListener']?.('keyup', data),
     focusFirstElement(root2, { preferredSelector: preferredSelector }));
-  let options = ![];
-  return ({ restoreFocus: restoreFocus2 = !![] } = {}) => {
+  let options = false;
+  return ({ restoreFocus: restoreFocus2 = true } = {}) => {
     if (options) return;
-    options = !![];
+    options = true;
     const target = handler();
     (scopes['splice'](scopes['indexOf'](value), 1),
-      el2?.['removeEventListener']?.('keydown', key, !![]),
+      el2?.['removeEventListener']?.('keydown', key, true),
       el?.['removeEventListener']?.('focusin', result),
       root2['removeEventListener']?.('keydown', data),
       root2['removeEventListener']?.('keyup', data));

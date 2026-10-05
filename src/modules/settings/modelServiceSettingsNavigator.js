@@ -29,7 +29,7 @@ export function modelServiceKindsMatchCategory(data, options = 'all') {
   const target = String(options || 'all')
     ['trim']()
     ['toLowerCase']();
-  if (target === 'all') return !![];
+  if (target === 'all') return true;
   return normalizeModelServiceKinds(data)['includes'](target);
 }
 export function aggregateModelServiceProviderStatus(list = []) {
@@ -92,7 +92,7 @@ function cloneProviderIcon(value5, value6) {
   ((value9['className'] = 'model-service-provider-option-icon'),
     value9['setAttribute']('aria-hidden', 'true'));
   if (value8?.['cloneNode']) {
-    const value10 = value8['cloneNode'](!![]);
+    const value10 = value8['cloneNode'](true);
     (value10['removeAttribute']?.('id'), value9['appendChild'](value10));
   }
   return value9;
@@ -107,20 +107,20 @@ function getRouteLabel(value11, value12) {
   );
 }
 function isCardAvailable(enabled2, enabled3) {
-  if (!enabled2 || enabled2['hidden']) return ![];
-  if (!isModelProviderPubliclyListed(enabled2['dataset']?.['modelServiceProvider'])) return ![];
+  if (!enabled2 || enabled2['hidden']) return false;
+  if (!isModelProviderPubliclyListed(enabled2['dataset']?.['modelServiceProvider'])) return false;
   if (
     enabled2['classList']?.['contains']('dev-mode-only') &&
     !enabled3?.['body']?.['classList']?.['contains']('dev-mode')
   )
-    return ![];
-  return !![];
+    return false;
+  return true;
 }
 function createProviderGroup(value14, id, cards, value15) {
   const wrapper = value14['createElement']('section');
   ((wrapper['className'] = 'model-service-provider-detail'),
     (wrapper['dataset']['modelServiceProviderDetail'] = id),
-    (wrapper['hidden'] = !![]));
+    (wrapper['hidden'] = true));
   const routeButtons = new Map();
   if (cards['length'] > 1) {
     const value16 = value14['createElement']('div');
@@ -253,7 +253,7 @@ function createNavigatorController({
         }));
     },
     activateRoute = (enabled6, value43 = '') => {
-      if (!enabled6?.['routeButtons']?.['size']) return ![];
+      if (!enabled6?.['routeButtons']?.['size']) return false;
       const value44 = Array['from'](enabled6['routeButtons']['entries']())['filter'](([, value45]) =>
           isCardAvailable(value45['card'], documentObject),
         ),
@@ -261,7 +261,7 @@ function createNavigatorController({
           value44['find'](([value46]) => value46 === value43) ||
           value44['find'](([value47]) => value47 === enabled6['activeRouteId']) ||
           value44[0];
-      if (!enabled7) return ![];
+      if (!enabled7) return false;
       return (
         (enabled6['activeRouteId'] = enabled7[0]),
         enabled6['routeButtons']['forEach']((value48, value49) => {
@@ -273,7 +273,7 @@ function createNavigatorController({
             value48['card']['classList']['toggle']('is-route-hidden', !enabled8),
             value48['card']['setAttribute']('aria-hidden', enabled8 ? 'false' : 'true'));
         }),
-        !![]
+        true
       );
     },
     handler4 = (value50) =>
@@ -281,9 +281,9 @@ function createNavigatorController({
     handler5 = () => groups['find']((value51) => handler4(value51)) || null,
     activateProvider = (value52, value53 = {}) => {
       const enabled9 = groups['find']((value54) => value54['id'] === value52);
-      if (!enabled9 || !handler(enabled9)['length']) return ![];
+      if (!enabled9 || !handler(enabled9)['length']) return false;
       !modelServiceKindsMatchCategory(enabled9['kinds'], value32) &&
-        setCategory('all', { preserveProvider: !![] });
+        setCategory('all', { preserveProvider: true });
       ((value33 = enabled9['id']),
         groups['forEach']((value55) => {
           const enabled10 = value55['id'] === value33;
@@ -293,7 +293,7 @@ function createNavigatorController({
         }),
         activateRoute(enabled9, value53['routeId']));
       if (value53['focusButton']) enabled9['button']['focus']?.();
-      return !![];
+      return true;
     },
     sync = () => {
       groups['forEach']((value56) => {
@@ -342,14 +342,14 @@ function createNavigatorController({
   }
   const revealField = (value69) => {
     const enabled16 = value69?.['closest']?.('[data-model-service-provider]');
-    if (!enabled16) return ![];
+    if (!enabled16) return false;
     const value70 = String(enabled16['dataset']['modelServiceProvider'] || '')['trim'](),
       routeId = String(enabled16['dataset']['modelServiceRoute'] || '')['trim'](),
       enabled17 = groups['find']((value71) => value71['id'] === value70);
-    if (!enabled17) return ![];
+    if (!enabled17) return false;
     return (
       !modelServiceKindsMatchCategory(enabled17['kinds'], value32) &&
-        setCategory('all', { preserveProvider: !![] }),
+        setCategory('all', { preserveProvider: true }),
       activateProvider(value70, { routeId: routeId })
     );
   };
@@ -384,11 +384,11 @@ function createNavigatorController({
         });
         (value77['cards']['forEach']((value80) => {
           value79['observe'](value80, {
-            attributes: !![],
+            attributes: true,
             attributeFilter: ['hidden', 'class'],
-            childList: !![],
-            subtree: !![],
-            characterData: !![],
+            childList: true,
+            subtree: true,
+            characterData: true,
           });
         }),
           value34['push'](value79));
@@ -397,7 +397,7 @@ function createNavigatorController({
   if (typeof globalThis['MutationObserver'] === 'function' && documentObject['body']) {
     const value81 = new globalThis['MutationObserver'](sync);
     (value81['observe'](documentObject['body'], {
-      attributes: !![],
+      attributes: true,
       attributeFilter: ['class'],
     }),
       value34['push'](value81));
@@ -475,7 +475,7 @@ export function initModelServiceSettingsNavigator(documentObject2 = globalThis['
   );
 }
 export function revealModelServiceSettingsField(value96) {
-  return activeNavigator?.['revealField']?.(value96) || ![];
+  return activeNavigator?.['revealField']?.(value96) || false;
 }
 export function setModelServiceSettingsSearchCards(value97) {
   activeNavigator?.['setSearchCards'](value97);

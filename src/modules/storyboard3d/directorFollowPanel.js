@@ -70,7 +70,7 @@ export function renderDirectorFollowPanel(item, key) {
 }
 export function changeDirectorFollow(state, event) {
   const el = event['target'];
-  if (!el['matches']?.('[data-director-follow]')) return ![];
+  if (!el['matches']?.('[data-director-follow]')) return false;
   const config = el['closest']('[data-director-follow-clip]')?.['dataset']['directorFollowClip'];
   return (
     state['mutate']('调整跟拍方式与片段', (scope) => {
@@ -93,11 +93,11 @@ export function changeDirectorFollow(state, event) {
       }
       return scope;
     }),
-    !![]
+    true
   );
 }
 export function clickDirectorFollow(value4, enabled2, el2) {
-  if (!enabled2['startsWith']('timeline-follow-')) return ![];
+  if (!enabled2['startsWith']('timeline-follow-')) return false;
   return (
     value4['mutate']('编辑分段跟拍', (value5) => {
       if (enabled2 === 'timeline-follow-delete')
@@ -116,6 +116,6 @@ export function clickDirectorFollow(value4, enabled2, el2) {
       return value5;
     }),
     value4['timeline']['requestRender']?.(),
-    !![]
+    true
   );
 }

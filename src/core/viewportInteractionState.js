@@ -23,8 +23,8 @@ function readBodyClassState(dom = getDefaultDocument()) {
 export function readViewportInteractionState({
   documentRef: documentRef = getDefaultDocument(),
   interactionState: interactionState = null,
-  panPreviewActive: panPreviewActive = ![],
-  pendingPanFreezeActive: pendingPanFreezeActive = ![],
+  panPreviewActive: panPreviewActive = false,
+  pendingPanFreezeActive: pendingPanFreezeActive = false,
 } = {}) {
   const bodyClassState = readBodyClassState(documentRef),
     isPanning = Boolean(
@@ -47,7 +47,7 @@ export function isRendererInteractionBusy({
   documentRef: documentRef = getDefaultDocument(),
   interactionState: interactionState = null,
 } = {}) {
-  if (BUSY_INTERACTION_FLAGS['some']((item) => interactionState?.[item] === !![])) return !![];
+  if (BUSY_INTERACTION_FLAGS['some']((item) => interactionState?.[item] === true)) return true;
   return readViewportInteractionState({ documentRef: documentRef, interactionState: interactionState })[
     'isViewportBusy'
   ];

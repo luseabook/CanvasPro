@@ -7,7 +7,7 @@ export async function runAppCanvasFileImport({
 } = {}) {
   const value = await handleFileDrop?.(event, projectId || 'default_v2_project');
   if (value) commit?.();
-  return value === !![];
+  return value === true;
 }
 export function openAppCanvasFilePicker({
   documentObject: documentObject = typeof document === 'undefined' ? null : document,
@@ -23,21 +23,21 @@ export function openAppCanvasFilePicker({
     typeof documentObject?.['createElement'] !== 'function' ||
     typeof documentObject?.['body']?.['appendChild'] !== 'function'
   )
-    return ![];
+    return false;
   const el = documentObject['createElement']('input');
   ((el['type'] = 'file'),
     (el['accept'] = 'image/*,video/*,audio/*'),
-    (el['multiple'] = !![]),
+    (el['multiple'] = true),
     (el['style']['position'] = 'fixed'),
     (el['style']['left'] = '-9999px'),
     (el['style']['top'] = '-9999px'),
     (el['style']['opacity'] = '0'));
-  let item = ![];
+  let item = false;
   const run = () => {
     if (item) return;
-    ((item = !![]), el['remove']?.());
+    ((item = true), el['remove']?.());
   };
-  (el['addEventListener']?.('cancel', run, { once: !![] }),
+  (el['addEventListener']?.('cancel', run, { once: true }),
     el['addEventListener']?.(
       'change',
       (event2) => {
@@ -64,12 +64,12 @@ export function openAppCanvasFilePicker({
             onError?.(key);
           });
       },
-      { once: !![] },
+      { once: true },
     ));
   try {
-    return (documentObject['body']['appendChild'](el), el['click'](), !![]);
+    return (documentObject['body']['appendChild'](el), el['click'](), true);
   } catch (index) {
-    return (run(), onError?.(index), ![]);
+    return (run(), onError?.(index), false);
   }
 }
 function isCanvasDropBlocked(event4) {

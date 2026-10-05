@@ -44,7 +44,7 @@ function collectTaskIds(enabled, source, count2 = 0) {
 }
 function nodeHasTaskId(options2 = {}, record = '') {
   const trimString3 = trimString(record);
-  if (!trimString3) return ![];
+  if (!trimString3) return false;
   const map = new Set();
   return (collectTaskIds(options2, map), map['has'](trimString3));
 }
@@ -98,8 +98,8 @@ function normalizeStatus(response = {}, value5 = {}) {
       '',
     trimString4 = trimString(value6)['toLowerCase']();
   if (trimString4) return trimString4;
-  if (response?.['ok'] === ![]) return 'failed';
-  if (response?.['ok'] === !![]) return 'success';
+  if (response?.['ok'] === false) return 'failed';
+  if (response?.['ok'] === true) return 'success';
   return '';
 }
 function pickTaskId(options4 = {}, value7 = {}, value8 = '') {
@@ -130,19 +130,19 @@ export function registerTaskCommands(value9) {
         options: { type: 'object' },
       },
       defaults: { padding: 80, durationMs: 800 },
-      selectionFallback: !![],
+      selectionFallback: true,
     },
     capabilitySchema: {
       reads: ['nodes', 'selection'],
       writes: ['viewport'],
-      selectionFallback: !![],
-      requiresMountedRuntime: ![],
+      selectionFallback: true,
+      requiresMountedRuntime: false,
     },
     returnSchema: { aliasFields: ['taskId', 'nodeIds', 'focused'] },
     validate(options5 = {}, value10 = {}) {
       if (typeof value10['focusNodes'] !== 'function')
         return {
-          ok: ![],
+          ok: false,
           errorCode: 'VIEWPORT_FOCUS_UNAVAILABLE',
           message: 'task.focusResult requires a viewport focus service.',
         };
@@ -164,7 +164,7 @@ export function registerTaskCommands(value9) {
         };
       } catch (errorCode) {
         return {
-          ok: ![],
+          ok: false,
           errorCode: errorCode['errorCode'] || 'TASK_TARGET_NOT_FOUND',
           message: errorCode['message'],
           details: errorCode['details'],
@@ -177,7 +177,7 @@ export function registerTaskCommands(value9) {
         taskId: taskId2['taskId'],
         ...taskId2['options'],
       });
-      return { taskId: taskId2['taskId'], nodeIds: taskId2['nodeIds'], focused: focused !== ![] };
+      return { taskId: taskId2['taskId'], nodeIds: taskId2['nodeIds'], focused: focused !== false };
     },
   }),
     value9['register']({
@@ -192,13 +192,13 @@ export function registerTaskCommands(value9) {
           resultNodeId: { type: 'string' },
           options: { type: 'object' },
         },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes', 'selection', 'nodeRuntimeRegistry'],
         writes: ['nodes', 'generationTasks'],
-        selectionFallback: !![],
-        requiresMountedRuntime: ![],
+        selectionFallback: true,
+        requiresMountedRuntime: false,
       },
       returnSchema: { aliasFields: ['nodeId', 'targetNodeId', 'status', 'taskId', 'value'] },
       validate(options6 = {}, value12 = {}) {
@@ -206,7 +206,7 @@ export function registerTaskCommands(value9) {
           const nodeIds = resolveTaskTargetNodeIds(options6, value12);
           if (nodeIds['length'] !== 1)
             return {
-              ok: ![],
+              ok: false,
               errorCode: 'AMBIGUOUS_TASK_TARGET',
               message: 'task.retry requires exactly one target node.',
               details: { nodeIds: nodeIds },
@@ -226,7 +226,7 @@ export function registerTaskCommands(value9) {
           };
         } catch (errorCode2) {
           return {
-            ok: ![],
+            ok: false,
             errorCode: errorCode2['errorCode'] || 'TASK_TARGET_NOT_FOUND',
             message: errorCode2['message'],
             details: errorCode2['details'],
@@ -244,7 +244,7 @@ export function registerTaskCommands(value9) {
         const enabled2 = {
           ...nodeId2['options'],
           source: nodeId2['options']['source'] || 'task.retry',
-          retry: !![],
+          retry: true,
         };
         if (nodeId2['taskId'] && !enabled2['taskId']) enabled2['taskId'] = nodeId2['taskId'];
         const value14 = await nodeRuntime['runGeneration'](enabled2),

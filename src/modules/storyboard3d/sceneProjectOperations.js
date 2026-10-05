@@ -152,7 +152,7 @@ function remapDirectorIdentities(list, value8) {
 }
 function updateProject(value12, handler, value13) {
   const cloneStoryboard3DProject2 = cloneStoryboard3DProject(value12),
-    value14 = handler(cloneStoryboard3DProject2) !== ![];
+    value14 = handler(cloneStoryboard3DProject2) !== false;
   if (value14) cloneStoryboard3DProject2['updatedAt'] = resolveNow(value12, value13);
   return cloneStoryboard3DProject2;
 }
@@ -226,8 +226,8 @@ export function renameStoryboard3DScene(value27, value28, value29, { now: now4 }
     value27,
     (value30) => {
       const scene = findScene(value30, value28);
-      if (!scene || !name5 || scene['name'] === name5) return ![];
-      return ((scene['name'] = name5), !![]);
+      if (!scene || !name5 || scene['name'] === name5) return false;
+      return ((scene['name'] = name5), true);
     },
     now4,
   );
@@ -243,7 +243,7 @@ export function duplicateStoryboard3DScene(
     value31,
     (value33) => {
       const count2 = value33['scenes']['findIndex']((value34) => value34['id'] === value32);
-      if (count2 < 0) return ![];
+      if (count2 < 0) return false;
       const cloneSceneWithNewIds3 = cloneSceneWithNewIds(value33['scenes'][count2], {
         usedIds: projectIds2,
         idFactory: idFactory4,
@@ -253,7 +253,7 @@ export function duplicateStoryboard3DScene(
       return (
         value33['scenes']['splice'](count2 + 1, 0, cloneSceneWithNewIds3),
         (value33['activeSceneId'] = cloneSceneWithNewIds3['id']),
-        !![]
+        true
       );
     },
     now6,
@@ -263,15 +263,15 @@ export function deleteStoryboard3DScene(value35, value36, { now: now7 } = {}) {
   return updateProject(
     value35,
     (value37) => {
-      if (!Array['isArray'](value37['scenes']) || value37['scenes']['length'] <= 1) return ![];
+      if (!Array['isArray'](value37['scenes']) || value37['scenes']['length'] <= 1) return false;
       const count3 = value37['scenes']['findIndex']((value38) => value38['id'] === value36);
-      if (count3 < 0) return ![];
+      if (count3 < 0) return false;
       return (
         value37['scenes']['splice'](count3, 1),
         value37['activeSceneId'] === value36 &&
           (value37['activeSceneId'] =
             value37['scenes'][Math['min'](count3, value37['scenes']['length'] - 1)]['id']),
-        !![]
+        true
       );
     },
     now7,
@@ -282,11 +282,11 @@ export function reorderStoryboard3DScene(value39, value40, value41, { now: now8 
     value39,
     (value42) => {
       const count4 = value42['scenes']['findIndex']((value43) => value43['id'] === value40);
-      if (count4 < 0) return ![];
+      if (count4 < 0) return false;
       const clamp2 = clamp(Math['round'](finite(value41, count4)), 0, value42['scenes']['length'] - 1);
-      if (clamp2 === count4) return ![];
+      if (clamp2 === count4) return false;
       const [value44] = value42['scenes']['splice'](count4, 1);
-      return (value42['scenes']['splice'](clamp2, 0, value44), !![]);
+      return (value42['scenes']['splice'](clamp2, 0, value44), true);
     },
     now8,
   );
@@ -303,20 +303,20 @@ export function applyStoryboard3DEnvironmentPreset(
     value45,
     (value48) => {
       const scene2 = findScene(value48, value46);
-      if (!scene2) return ![];
+      if (!scene2) return false;
       return (
         (scene2['environment'] = {
           ...cloneStoryboard3DProject(enabled),
           ...(overrides && typeof overrides === 'object' ? overrides : {}),
           type: enabled['type'],
           groundSize: Math['max'](1, finite(overrides?.['groundSize'], enabled['groundSize'])),
-          showGrid: overrides?.['showGrid'] !== ![],
-          showOutline: overrides?.['showOutline'] !== ![],
-          enableShadows: overrides?.['enableShadows'] !== ![],
+          showGrid: overrides?.['showGrid'] !== false,
+          showOutline: overrides?.['showOutline'] !== false,
+          enableShadows: overrides?.['enableShadows'] !== false,
         }),
         !normalizeName(scene2['environment']['backgroundColor']) &&
           delete scene2['environment']['backgroundColor'],
-        !![]
+        true
       );
     },
     now9,
@@ -339,7 +339,7 @@ export function replaceStoryboard3DShotFromCurrentView(
     value49,
     (value50) => {
       const count5 = value50['scenes']['findIndex']((value51) => value51['id'] === sceneId);
-      if (count5 < 0 || !findShot(value50['scenes'][count5], shotId)) return ![];
+      if (count5 < 0 || !findShot(value50['scenes'][count5], shotId)) return false;
       const replaceStoryboard3DShotCamera2 = replaceStoryboard3DShotCamera(
           value50['scenes'][count5],
           shotId,
@@ -353,7 +353,7 @@ export function replaceStoryboard3DShotFromCurrentView(
         ),
         shot = findShot(replaceStoryboard3DShotCamera2, shotId);
       if (shot) delete shot['thumbnailUrl'];
-      return ((value50['scenes'][count5] = replaceStoryboard3DShotCamera2), !![]);
+      return ((value50['scenes'][count5] = replaceStoryboard3DShotCamera2), true);
     },
     now11,
   );
@@ -373,21 +373,21 @@ export function createStoryboard3DShotThumbnailToken(enabled2, enabled3) {
 export function applyStoryboard3DShotThumbnail(value52, value53, value54, { now: now12 } = {}) {
   const cloneStoryboard3DProject3 = cloneStoryboard3DProject(value52);
   if (value53?.['kind'] !== 'storyboard3d-shot-thumbnail-token' || value53?.['version'] !== 1)
-    return { project: cloneStoryboard3DProject3, applied: ![], reason: 'invalid-token' };
+    return { project: cloneStoryboard3DProject3, applied: false, reason: 'invalid-token' };
   const scene3 = findScene(cloneStoryboard3DProject3, value53['sceneId']),
     shot2 = findShot(scene3, value53['shotId']);
-  if (!shot2) return { project: cloneStoryboard3DProject3, applied: ![], reason: 'shot-not-found' };
+  if (!shot2) return { project: cloneStoryboard3DProject3, applied: false, reason: 'shot-not-found' };
   if (
     stableCameraSignature(shot2['camera']) !== value53['cameraSignature'] ||
     Math['max'](0, finite(shot2['updatedAt'], 0)) !== value53['shotUpdatedAt']
   )
-    return { project: cloneStoryboard3DProject3, applied: ![], reason: 'stale-token' };
+    return { project: cloneStoryboard3DProject3, applied: false, reason: 'stale-token' };
   const name7 = normalizeName(value54);
-  if (!name7) return { project: cloneStoryboard3DProject3, applied: ![], reason: 'invalid-thumbnail' };
+  if (!name7) return { project: cloneStoryboard3DProject3, applied: false, reason: 'invalid-thumbnail' };
   return (
     (shot2['thumbnailUrl'] = name7),
     (shot2['updatedAt'] = resolveNow(value52, now12)),
     (cloneStoryboard3DProject3['updatedAt'] = shot2['updatedAt']),
-    { project: cloneStoryboard3DProject3, applied: !![], reason: 'applied' }
+    { project: cloneStoryboard3DProject3, applied: true, reason: 'applied' }
   );
 }

@@ -6,7 +6,7 @@ export function togglePersonReplacementShotReverseAtTimelineSec(draft = [], item
   const position = getPersonReplacementShotCutPositionAtTimelineSec(draft, item),
     enabled = draft[position['shotIndex']];
   if (!enabled) return null;
-  const isReversed = enabled['isReversed'] !== !![];
+  const isReversed = enabled['isReversed'] !== true;
   return {
     draft: draft['map']((args, key) =>
       key === position['shotIndex'] ? { ...args, isReversed: isReversed } : args,
@@ -16,7 +16,7 @@ export function togglePersonReplacementShotReverseAtTimelineSec(draft = [], item
     message: isReversed ? '当前片段已倒放。' : '已取消当前片段倒放。',
   };
 }
-export function resolveShotCutSubmissionUi(index = '', loadingTitle = ![]) {
+export function resolveShotCutSubmissionUi(index = '', loadingTitle = false) {
   const reversePending = index === 'reverse',
     cutSubmitting = index === 'cuts';
   return {
@@ -34,7 +34,7 @@ export function resolveShotCutSubmissionUi(index = '', loadingTitle = ![]) {
 export async function materializePersonReplacementShotPlayback({
   currentShot: currentShot,
   range: range,
-  isNewShot: isNewShot = ![],
+  isNewShot: isNewShot = false,
   sourceVideoRef: sourceVideoRef,
   outputFps: outputFps,
   epsilonSec: epsilonSec,
@@ -65,31 +65,31 @@ export async function materializePersonReplacementShotPlayback({
         : normalizeText(currentShot['videoRef']) && currentShot['isReversed'],
     );
   let src = normalizeText(currentShot['videoRef']);
-  const videoRefIsCropped = Boolean(currentShot['videoRefIsCropped'] === !![] && !enabled2 && src),
+  const videoRefIsCropped = Boolean(currentShot['videoRefIsCropped'] === true && !enabled2 && src),
     enabled3 = Boolean(videoRefIsCropped && reverseChanged);
-  if (enabled2 || !src || (result && range['isReversed'] !== !![] && !enabled3)) {
+  if (enabled2 || !src || (result && range['isReversed'] !== true && !enabled3)) {
     const error = await enqueueMediaTask(
       {
         kind: 'mediaClipExport',
         src: sourceVideoRef,
         args: { videoStart: range['startSec'], videoEnd: range['endSec'], fps: outputFps },
       },
-      { wait: !![], timeout: 600000 },
+      { wait: true, timeout: 600000 },
     );
     src = resolveMediaRef(error);
-    if (error?.['success'] === ![] || !src)
+    if (error?.['success'] === false || !src)
       throw new Error(error?.['error'] || error?.['message'] || '镜头片段导出失败');
   }
   if (
     enabled3 ||
-    (range['isReversed'] === !![] && (enabled2 || reverseChanged || !normalizeText(currentShot['videoRef'])))
+    (range['isReversed'] === true && (enabled2 || reverseChanged || !normalizeText(currentShot['videoRef'])))
   ) {
     const error2 = await enqueueMediaTask(
       { kind: 'videoReverse', src: src },
-      { wait: !![], timeout: 600000 },
+      { wait: true, timeout: 600000 },
     );
     src = resolveMediaRef(error2);
-    if (error2?.['success'] === ![] || !src)
+    if (error2?.['success'] === false || !src)
       throw new Error(error2?.['error'] || error2?.['message'] || '镜头片段倒放失败');
   }
   return { videoRef: src, reverseChanged: reverseChanged, videoRefIsCropped: videoRefIsCropped };

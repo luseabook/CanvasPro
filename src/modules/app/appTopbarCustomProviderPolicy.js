@@ -4,11 +4,11 @@ export function isCustomProviderAccessAllowed(options = {}) {
 }
 export function applyCustomProviderModelSelectionState(
   value,
-  { modelKey: modelKey = '', detectedKind: detectedKind = 'unknown', selected: selected = ![] } = {},
+  { modelKey: modelKey = '', detectedKind: detectedKind = 'unknown', selected: selected = false } = {},
 ) {
   const enabled = String(modelKey || '')['trim']();
-  if (!enabled) return ![];
-  if (selected) return (value['selectedModelKeys']['add'](enabled), ![]);
+  if (!enabled) return false;
+  if (selected) return (value['selectedModelKeys']['add'](enabled), false);
   value['selectedModelKeys']['delete'](enabled);
   const item =
     String(detectedKind || 'unknown')
@@ -17,9 +17,9 @@ export function applyCustomProviderModelSelectionState(
   return (item && value['assignedModelKinds']['delete'](enabled), item);
 }
 export function scrollCustomProviderModelListFromWheel(el, event = {}) {
-  if (!el) return ![];
+  if (!el) return false;
   const count = Number(event?.['deltaY']);
-  if (!Number['isFinite'](count) || count === 0) return ![];
+  if (!Number['isFinite'](count) || count === 0) return false;
   const key = Math['max'](0, Number(el['clientHeight']) || 0),
     index = Math['max'](key, Number(el['scrollHeight']) || 0),
     result = Math['max'](0, index - key),
@@ -27,16 +27,16 @@ export function scrollCustomProviderModelListFromWheel(el, event = {}) {
     count2 = Number(event?.['deltaMode']) || 0,
     target = count2 === 1 ? 16 : count2 === 2 ? Math['max'](key, 1) : 1,
     source = Math['min'](result, Math['max'](0, data + count * target));
-  if (source === data) return ![];
-  return ((el['scrollTop'] = source), !![]);
+  if (source === data) return false;
+  return ((el['scrollTop'] = source), true);
 }
 export function handleCustomProviderResultWheel(event2, enabled2) {
   const el2 = event2?.['target']?.['closest']?.('[data-custom-provider-result]');
-  if (!el2 || !enabled2?.['contains']?.(el2)) return ![];
-  if (event2['target']?.['closest']?.('.custom-provider-model-options')) return ![];
+  if (!el2 || !enabled2?.['contains']?.(el2)) return false;
+  if (event2['target']?.['closest']?.('.custom-provider-model-options')) return false;
   const next = el2['querySelector']?.('.custom-provider-model-options');
-  if (!scrollCustomProviderModelListFromWheel(next, event2)) return ![];
-  return (event2['preventDefault']?.(), !![]);
+  if (!scrollCustomProviderModelListFromWheel(next, event2)) return false;
+  return (event2['preventDefault']?.(), true);
 }
 export function captureCustomProviderModelSelectionScroll(el3) {
   const current = el3?.['querySelector']?.('.custom-provider-model-options');
@@ -46,7 +46,7 @@ export function captureCustomProviderModelSelectionScroll(el3) {
   };
 }
 export function restoreCustomProviderModelSelectionScroll(el4, entry = {}) {
-  if (!el4) return ![];
+  if (!el4) return false;
   const enabled3 = el4['querySelector']?.('.custom-provider-model-options');
   return (
     (el4['scrollTop'] = Math['max'](0, Number(entry['resultScrollTop']) || 0)),
@@ -109,12 +109,12 @@ export function getCustomProviderSaveStatus(list4 = []) {
   };
 }
 export function getCustomProviderModelActionState({
-  hasDiscovery: hasDiscovery = ![],
-  hasSavedBundle: hasSavedBundle = ![],
-  isAddingModels: isAddingModels = ![],
+  hasDiscovery: hasDiscovery = false,
+  hasSavedBundle: hasSavedBundle = false,
+  isAddingModels: isAddingModels = false,
   selectedCount: selectedCount = 0,
   unverifiedCount: unverifiedCount = selectedCount,
-  busy: busy = ![],
+  busy: busy = false,
 } = {}) {
   return {
     saveHidden: !hasDiscovery,
@@ -125,7 +125,7 @@ export function getCustomProviderModelActionState({
     saveLabelKey: 'saveModels',
   };
 }
-export function mergeCustomProviderDiscoveryCapabilities(args = {}, output = {}, value2 = !![]) {
+export function mergeCustomProviderDiscoveryCapabilities(args = {}, output = {}, value2 = true) {
   const map = new Map(
       (Array['isArray'](output?.['models']) ? output['models'] : [])
         ['map']((value3) => {
@@ -134,7 +134,7 @@ export function mergeCustomProviderDiscoveryCapabilities(args = {}, output = {},
           return [
             getCustomProviderManifestUpstreamModelId(value3),
             {
-              ...(value2 ? { isSaved: !![] } : {}),
+              ...(value2 ? { isSaved: true } : {}),
               ...(isCustomProviderModelCapabilityRecognized2
                 ? {
                     capabilitySource: String(value4['source'] || 'stored-bundle')['trim'](),
@@ -242,8 +242,8 @@ export function resolveCustomProviderDocumentationFailureKey(options5 = {}) {
 export function getRememberedCustomProviderConfigs(options6 = {}) {
   return Object['entries'](options6 && typeof options6 === 'object' ? options6 : {})
     ['filter'](([value20, enabled7]) => {
-      if (!String(value20 || '')['startsWith']('custom_')) return ![];
-      if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) return ![];
+      if (!String(value20 || '')['startsWith']('custom_')) return false;
+      if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) return false;
       return !!(String(enabled7['apiUrl'] || '')['trim']() && String(enabled7['apiKey'] || '')['trim']());
     })
     ['map'](([value21, value22]) => ({

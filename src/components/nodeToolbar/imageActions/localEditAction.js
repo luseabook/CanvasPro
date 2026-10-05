@@ -34,7 +34,7 @@ export function bindImageLocalEditAction(item) {
       scene: scene === 'repaint' || scene === 'erase' ? scene : 'local-edit',
       submitLabel: imageToolbarText('generate'),
       submitBusyLabel: imageToolbarText('generating'),
-      submitNoop: !![],
+      submitNoop: true,
     });
   };
   (button['addEventListener']('click', result), button['addEventListener']('image-local-edit-open', result));

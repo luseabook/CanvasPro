@@ -61,7 +61,7 @@ export const VIDEO_AUDIO_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '生成音频',
-  defaultValue: ![],
+  defaultValue: false,
 });
 export const VIDEO_WATERMARK_FIELD = Object['freeze']({
   id: 'watermark',
@@ -69,7 +69,7 @@ export const VIDEO_WATERMARK_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '添加水印',
-  defaultValue: ![],
+  defaultValue: false,
 });
 export const VIDEO_WATERMARK_CN_FIELD = Object['freeze']({ ...VIDEO_WATERMARK_FIELD, label: '添加水印' });
 export const VIDEO_SEED_FIELD = Object['freeze']({
@@ -86,7 +86,7 @@ export const VIDEO_SEED_FIELD = Object['freeze']({
   randomSeedMax: 0x7fffffff,
   randomSeedModeField: 'seed_mode',
   randomSeedDefaultMode: 'random',
-  randomizeOnSubmit: !![],
+  randomizeOnSubmit: true,
   description:
     '随机：每次生成都会换一个值，画面更有变化。\n固定：一直使用当前数字，方便复现相近效果。\n可以左右拖动数字修改，点“随机”会立即换一个值。',
 });
@@ -117,7 +117,7 @@ export const VIDEO_PROMPT_EXTEND_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '提示词扩写',
-  defaultValue: !![],
+  defaultValue: true,
 });
 export const VIDEO_PROMPT_OPTIMIZER_FIELD = Object['freeze']({
   id: 'prompt_optimizer',
@@ -125,7 +125,7 @@ export const VIDEO_PROMPT_OPTIMIZER_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '自动优化提示词',
-  defaultValue: !![],
+  defaultValue: true,
 });
 export const VIDEO_FAST_PRETREATMENT_FIELD = Object['freeze']({
   id: 'fast_pretreatment',
@@ -133,7 +133,7 @@ export const VIDEO_FAST_PRETREATMENT_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '快速预处理',
-  defaultValue: ![],
+  defaultValue: false,
 });
 export const VIDEO_ENABLE_GIF_FIELD = Object['freeze']({
   id: 'enable_gif',
@@ -141,7 +141,7 @@ export const VIDEO_ENABLE_GIF_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '启用 GIF 输出格式',
-  defaultValue: ![],
+  defaultValue: false,
 });
 export const VIDEO_AUDIO_SETTING_FIELD = Object['freeze']({
   id: 'audio_setting',
@@ -200,7 +200,7 @@ export const KLING_O1_KEEP_ORIGINAL_SOUND_FIELD = Object['freeze']({
   variant: 'advancedRow',
   label: '保留原声',
   description: '仅接入编辑视频或特征参考视频时生效。',
-  defaultValue: ![],
+  defaultValue: false,
 });
 export const KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD = Object['freeze']({
   id: 'multi_shot',
@@ -209,8 +209,8 @@ export const KLING_V3_MULTI_SHOT_PLACEHOLDER_FIELD = Object['freeze']({
   variant: 'advancedRow',
   label: '多镜头分镜模式',
   description: '暂未开放，后续接入分镜参数后启用。',
-  defaultValue: ![],
-  disabled: !![],
+  defaultValue: false,
+  disabled: true,
 });
 export const VEO3_MODEL_FIELD = Object['freeze']({
   id: 'mode',
@@ -269,7 +269,7 @@ export const VEO3_FIXED_DURATION_FIELD = Object['freeze']({
   variant: 'pillMenu',
   label: '视频时长',
   defaultValue: 8,
-  readOnly: !![],
+  readOnly: true,
   options: Object['freeze']([Object['freeze']({ value: 8, label: '8s' })]),
 });
 export const VEO3_ENABLE_GIF_FIELD = Object['freeze']({
@@ -353,7 +353,7 @@ export const RUNNINGHUB_VEO3_GENERATE_AUDIO_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '生成音频',
-  defaultValue: ![],
+  defaultValue: false,
   hideWhen: Object['freeze']({
     any: Object['freeze']([
       Object['freeze']({ field: 'rh_veo3_channel', value: 'lowCost' }),
@@ -467,7 +467,7 @@ export const VIDU_Q3_MODEL_FIELD = Object['freeze']({
 });
 export const VIDU_Q3_AUDIO_FIELD = Object['freeze']({
   ...VIDEO_AUDIO_FIELD,
-  defaultValue: !![],
+  defaultValue: true,
   hideWhen: Object['freeze']({ field: 'vidu_q3_generation_mode', value: 'reference' }),
 });
 export const VIDU_Q3_HELP_TOOLTIP = [
@@ -521,7 +521,7 @@ export const GEMINI_OMNI_FLASH_EXTEND_TASK_FIELD = Object['freeze']({
   variant: 'advancedRow',
   label: '续写任务 ID',
   defaultValue: '',
-  allowEmpty: !![],
+  allowEmpty: true,
   description: '可选；填写上一次生成返回的 task_id，用于基于上个任务继续生成。',
 });
 export const HAILUO_23_PROMPT_EXAMPLE = '[推进]一只猫咪在花园中奔跑，镜头缓缓推进特写';
@@ -552,7 +552,7 @@ export const RUNNINGHUB_HAILUO_23_ENABLE_PROMPT_EXPANSION_FIELD = Object['freeze
   placement: 'advanced',
   variant: 'advancedRow',
   label: '提示词扩写',
-  defaultValue: !![],
+  defaultValue: true,
 });
 export const RUNNINGHUB_HAILUO_23_PROMPT_PLACEHOLDER =
   '描述视频内容和镜头变化。例如：[推进]画面中的猫咪向镜头奔跑，镜头缓缓推进，草地和阳光有电影感。';
@@ -671,7 +671,7 @@ export const HAPPYHORSE_MODE_FIELD = Object['freeze']({
   description: HAPPYHORSE_HELP_TOOLTIP,
   defaultValue: 'image',
   options: Object['freeze']([
-    Object['freeze']({ value: 'auto', label: '模式选择', displayLabel: '模式选择', hidden: !![] }),
+    Object['freeze']({ value: 'auto', label: '模式选择', displayLabel: '模式选择', hidden: true }),
     Object['freeze']({ value: 'image', label: '图生视频' }),
     Object['freeze']({ value: 'reference', label: '参考图生视频' }),
     Object['freeze']({ value: 'edit', label: '视频编辑' }),
@@ -681,7 +681,7 @@ export const HAPPYHORSE_11_MODE_FIELD = Object['freeze']({
   ...HAPPYHORSE_MODE_FIELD,
   description: HAPPYHORSE_11_HELP_TOOLTIP,
   options: Object['freeze']([
-    Object['freeze']({ value: 'auto', label: '模式选择', displayLabel: '模式选择', hidden: !![] }),
+    Object['freeze']({ value: 'auto', label: '模式选择', displayLabel: '模式选择', hidden: true }),
     Object['freeze']({ value: 'image', label: '图生视频' }),
     Object['freeze']({ value: 'reference', label: '参考图生视频' }),
   ]),
@@ -805,7 +805,7 @@ export const RUNNINGHUB_SEEDANCE_2_RESOLUTION_FIELD = Object['freeze']({
   label: '分辨率',
   defaultValue: '720p',
   options: Object['freeze']([
-    Object['freeze']({ value: 'auto', label: 'Auto', hidden: !![] }),
+    Object['freeze']({ value: 'auto', label: 'Auto', hidden: true }),
     Object['freeze']({ value: '480p', label: '480p', groupLabel: '原生输出分辨率' }),
     Object['freeze']({ value: '720p', label: '720p', groupLabel: '原生输出分辨率' }),
     Object['freeze']({ value: 'native1080p', label: 'native1080p', groupLabel: '原生输出分辨率' }),
@@ -820,7 +820,7 @@ export const RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '生成音频',
-  defaultValue: !![],
+  defaultValue: true,
 });
 export const RUNNINGHUB_SEEDANCE_2_WEB_SEARCH_FIELD = Object['freeze']({
   id: 'webSearch',
@@ -828,7 +828,7 @@ export const RUNNINGHUB_SEEDANCE_2_WEB_SEARCH_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '联网搜索',
-  defaultValue: ![],
+  defaultValue: false,
   showWhen: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'text2video' }),
 });
 export const RUNNINGHUB_SEEDANCE_2_REAL_PERSON_FIELD = Object['freeze']({
@@ -837,11 +837,11 @@ export const RUNNINGHUB_SEEDANCE_2_REAL_PERSON_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '真人模式',
-  defaultValue: ![],
+  defaultValue: false,
 });
 export function createVolcengineSeedance2ResolutionField({
-  include1080p: include1080p = !![],
-  include4k: include4k = ![],
+  include1080p: include1080p = true,
+  include4k: include4k = false,
 } = {}) {
   const list = [
     Object['freeze']({ value: '480p', label: '480p' }),
@@ -883,7 +883,7 @@ export const VOLCENGINE_SEEDANCE_2_RATIO_FIELD = Object['freeze']({
 });
 export const VOLCENGINE_SEEDANCE_2_GENERATE_AUDIO_FIELD = Object['freeze']({
   ...RUNNINGHUB_SEEDANCE_2_GENERATE_AUDIO_FIELD,
-  defaultValue: !![],
+  defaultValue: true,
 });
 export const VOLCENGINE_SEEDANCE_2_WEB_SEARCH_FIELD = Object['freeze']({
   id: 'webSearch',
@@ -891,7 +891,7 @@ export const VOLCENGINE_SEEDANCE_2_WEB_SEARCH_FIELD = Object['freeze']({
   placement: 'advanced',
   variant: 'advancedRow',
   label: '联网搜索',
-  defaultValue: ![],
+  defaultValue: false,
 });
 export const VOLCENGINE_SEEDANCE_2_PRIORITY_FIELD = Object['freeze']({
   id: 'priority',
@@ -1854,8 +1854,8 @@ export function createVideoInputSlots({
   minImage: minImage = 0,
   fixedSlots: fixedSlots = null,
   exclusiveGroups: exclusiveGroups = null,
-  cycleFixedInputWhenFull: cycleFixedInputWhenFull = ![],
-  preserveHiddenInputsByKind: preserveHiddenInputsByKind = ![],
+  cycleFixedInputWhenFull: cycleFixedInputWhenFull = false,
+  preserveHiddenInputsByKind: preserveHiddenInputsByKind = false,
   preserveHiddenInputsByKindFields: preserveHiddenInputsByKindFields = null,
   maxTotalDurationSecondsByKind: maxTotalDurationSecondsByKind = null,
   mediaConstraintsByKind: mediaConstraintsByKind = null,
@@ -1888,9 +1888,9 @@ export function createVideoInputSlots({
         }),
       ),
     ));
-  cycleFixedInputWhenFull === !![] && (next['cycleFixedInputWhenFull'] = !![]);
-  if (preserveHiddenInputsByKind === !![]) {
-    next['preserveHiddenInputsByKind'] = !![];
+  cycleFixedInputWhenFull === true && (next['cycleFixedInputWhenFull'] = true);
+  if (preserveHiddenInputsByKind === true) {
+    next['preserveHiddenInputsByKind'] = true;
     const list8 = Array['from'](
       new Set(
         (Array['isArray'](preserveHiddenInputsByKindFields) ? preserveHiddenInputsByKindFields : [])
@@ -1943,7 +1943,7 @@ export const SEEDANCE_VIDEO_RATIO_POLICY = Object['freeze']({
 });
 export const VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY = Object['freeze']({
   ...SEEDANCE_VIDEO_RATIO_POLICY,
-  preserveAdaptive: !![],
+  preserveAdaptive: true,
 });
 export function freezeBodyMapping(list9) {
   return Object['freeze'](
@@ -1971,13 +1971,13 @@ export const APIMART_VIDEO_LEGACY_BODY_MAPPING = Object['freeze']([
     field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio', 'size']),
     defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
     transform: 'apimartVideoRatio',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({ path: 'quality', from: 'param', field: 'videoSize', defaultValue: 'standard' }),
-  Object['freeze']({ path: 'duration', from: 'param', field: 'duration', omitWhenEmpty: !![] }),
-  Object['freeze']({ path: 'resolution', from: 'param', field: 'resolution', omitWhenEmpty: !![] }),
-  Object['freeze']({ path: 'image_urls', from: 'inputImages', omitWhenEmpty: !![] }),
-  Object['freeze']({ path: 'video_url', from: 'inputVideos', transform: 'first', omitWhenEmpty: !![] }),
+  Object['freeze']({ path: 'duration', from: 'param', field: 'duration', omitWhenEmpty: true }),
+  Object['freeze']({ path: 'resolution', from: 'param', field: 'resolution', omitWhenEmpty: true }),
+  Object['freeze']({ path: 'image_urls', from: 'inputImages', omitWhenEmpty: true }),
+  Object['freeze']({ path: 'video_url', from: 'inputVideos', transform: 'first', omitWhenEmpty: true }),
 ]);
 export const APIMART_VIDEO_ASPECT_RATIO_ENTRY = Object['freeze']({
   path: 'aspect_ratio',
@@ -1985,7 +1985,7 @@ export const APIMART_VIDEO_ASPECT_RATIO_ENTRY = Object['freeze']({
   field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio', 'aspect_ratio']),
   defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
   transform: 'apimartVideoRatio',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_SIZE_ENTRY = Object['freeze']({
   path: 'size',
@@ -1993,13 +1993,13 @@ export const APIMART_VIDEO_SIZE_ENTRY = Object['freeze']({
   field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio', 'size']),
   defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
   transform: 'apimartVideoRatio',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_DURATION_ENTRY = Object['freeze']({
   path: 'duration',
   from: 'param',
   field: Object['freeze'](['generationParams.duration', 'duration']),
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_RESOLUTION_UPPER_ENTRY = Object['freeze']({
   path: 'resolution',
@@ -2037,84 +2037,84 @@ export const APIMART_VIDEO_RESOLUTION_VIDU_ENTRY = Object['freeze']({
 export const APIMART_VIDEO_IMAGE_URLS_ENTRY = Object['freeze']({
   path: 'image_urls',
   from: 'inputImages',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_VEO3_IMAGE_URLS_ENTRY = Object['freeze']({
   path: 'image_urls',
   from: 'inputImages',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_AUDIO_URL_ENTRY = Object['freeze']({
   path: 'audio_url',
   from: 'inputAudios',
   transform: 'first',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY = Object['freeze']({
   path: 'negative_prompt',
   from: 'param',
   field: Object['freeze'](['generationParams.negative_prompt', 'negative_prompt']),
   transform: 'apimartOptionalText',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_SEED_ENTRY = Object['freeze']({
   path: 'seed',
   from: 'param',
   field: Object['freeze'](['generationParams.seed', 'seed']),
   transform: 'apimartOptionalInteger',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_AUDIO_ENTRY = Object['freeze']({
   path: 'audio',
   from: 'param',
   field: Object['freeze'](['generationParams.audio', 'audio']),
-  defaultValue: ![],
+  defaultValue: false,
   transform: 'booleanParam',
 });
 export const APIMART_VIDEO_KEEP_ORIGINAL_SOUND_ENTRY = Object['freeze']({
   path: 'keep_original_sound',
   from: 'param',
   field: Object['freeze'](['generationParams.keep_original_sound', 'keep_original_sound']),
-  defaultValue: ![],
+  defaultValue: false,
   transform: 'booleanParam',
 });
 export const APIMART_VIDEO_AUDIO_TRUE_ENTRY = Object['freeze']({
   ...APIMART_VIDEO_AUDIO_ENTRY,
-  defaultValue: !![],
+  defaultValue: true,
 });
 export const APIMART_VIDEO_WATERMARK_ENTRY = Object['freeze']({
   path: 'watermark',
   from: 'param',
   field: Object['freeze'](['generationParams.watermark', 'watermark']),
-  defaultValue: ![],
+  defaultValue: false,
   transform: 'booleanParam',
 });
 export const APIMART_VIDEO_PROMPT_EXTEND_ENTRY = Object['freeze']({
   path: 'prompt_extend',
   from: 'param',
   field: Object['freeze'](['generationParams.prompt_extend', 'prompt_extend']),
-  defaultValue: !![],
+  defaultValue: true,
   transform: 'booleanParam',
 });
 export const APIMART_VIDEO_ENABLE_GIF_ENTRY = Object['freeze']({
   path: 'enable_gif',
   from: 'param',
   field: Object['freeze'](['generationParams.enable_gif', 'enable_gif']),
-  defaultValue: ![],
+  defaultValue: false,
   transform: 'booleanParam',
 });
 export const APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY = Object['freeze']({
   path: 'prompt_optimizer',
   from: 'param',
   field: Object['freeze'](['generationParams.prompt_optimizer', 'prompt_optimizer']),
-  defaultValue: !![],
+  defaultValue: true,
   transform: 'booleanParam',
 });
 export const APIMART_VIDEO_FAST_PRETREATMENT_ENTRY = Object['freeze']({
   path: 'fast_pretreatment',
   from: 'param',
   field: Object['freeze'](['generationParams.fast_pretreatment', 'fast_pretreatment']),
-  defaultValue: ![],
+  defaultValue: false,
   transform: 'booleanParam',
 });
 export const APIMART_VIDEO_GENERATION_TYPE_ENTRY = Object['freeze']({
@@ -2122,7 +2122,7 @@ export const APIMART_VIDEO_GENERATION_TYPE_ENTRY = Object['freeze']({
   from: 'param',
   field: Object['freeze'](['generationParams.generation_type', 'generation_type']),
   defaultValue: 'frame',
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const APIMART_VIDEO_SHOT_TYPE_ENTRY = Object['freeze']({
   path: 'shot_type',
@@ -2157,7 +2157,7 @@ export const APIMART_VIDEO_HAILUO_23_BODY_MAPPING = createApimartVideoBodyMappin
     path: 'first_frame_image',
     from: 'inputImages',
     transform: 'first',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   APIMART_VIDEO_PROMPT_OPTIMIZER_ENTRY,
   APIMART_VIDEO_FAST_PRETREATMENT_ENTRY,
@@ -2198,7 +2198,7 @@ export const RUNNINGHUB_VIDEO_HAPPYHORSE_BODY_MAPPING = freezeBodyMapping([
     field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio']),
     defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
     transform: 'runninghubHappyHorseAspectRatio',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({
     path: 'audioSetting',
@@ -2211,14 +2211,14 @@ export const RUNNINGHUB_VIDEO_HAPPYHORSE_BODY_MAPPING = freezeBodyMapping([
     ]),
     defaultValue: 'auto',
     transform: 'runninghubHappyHorseAudioSetting',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({
     path: 'seed',
     from: 'param',
     field: Object['freeze'](['generationParams.seed', 'seed']),
     transform: 'apimartOptionalInteger',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
 ]);
 export const RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
@@ -2260,21 +2260,21 @@ export const RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
     path: 'generateAudio',
     from: 'param',
     field: Object['freeze'](['generationParams.generateAudio', 'generateAudio']),
-    defaultValue: !![],
+    defaultValue: true,
     transform: 'booleanParam',
   }),
   Object['freeze']({
     path: 'webSearch',
     from: 'param',
     field: Object['freeze'](['generationParams.webSearch', 'webSearch']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
     path: 'realPersonMode',
     from: 'param',
     field: Object['freeze'](['generationParams.realPersonMode', 'realPersonMode']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({ path: 'conversionSlots', from: 'constant', value: Object['freeze'](['all']) }),
@@ -2282,7 +2282,7 @@ export const RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
     path: 'returnLastFrame',
     from: 'param',
     field: Object['freeze'](['generationParams.returnLastFrame', 'returnLastFrame']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
@@ -2290,7 +2290,7 @@ export const RUNNINGHUB_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
     from: 'param',
     field: Object['freeze'](['generationParams.seed', 'seed']),
     transform: 'apimartOptionalInteger',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
 ]);
 export const APIMART_VIDEO_WAN27_BODY_MAPPING = createApimartVideoBodyMapping([
@@ -2299,7 +2299,7 @@ export const APIMART_VIDEO_WAN27_BODY_MAPPING = createApimartVideoBodyMapping([
   APIMART_VIDEO_RESOLUTION_UPPER_1080_ENTRY,
   APIMART_VIDEO_IMAGE_URLS_ENTRY,
   APIMART_VIDEO_NEGATIVE_PROMPT_ENTRY,
-  Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: !![] }),
+  Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
   APIMART_VIDEO_AUDIO_URL_ENTRY,
   APIMART_VIDEO_PROMPT_EXTEND_ENTRY,
   APIMART_VIDEO_WATERMARK_ENTRY,
@@ -2386,7 +2386,7 @@ export const RUNNINGHUB_VIDEO_KLING_O1_BODY_MAPPING = freezeBodyMapping([
       'keepOriginalSound',
       'keep_original_sound',
     ]),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
 ]);
@@ -2411,7 +2411,7 @@ export const RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING = freezeBodyMapping([
     field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio']),
     defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
     transform: 'runninghubKlingO3AspectRatio',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({
     path: 'duration',
@@ -2424,7 +2424,7 @@ export const RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING = freezeBodyMapping([
     path: 'sound',
     from: 'param',
     field: Object['freeze'](['generationParams.audio', 'generationParams.sound', 'audio', 'sound']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
@@ -2436,7 +2436,7 @@ export const RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING = freezeBodyMapping([
       'keepOriginalSound',
       'keep_original_sound',
     ]),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
@@ -2448,7 +2448,7 @@ export const RUNNINGHUB_VIDEO_KLING_O3_BODY_MAPPING = freezeBodyMapping([
       'multiShot',
       'multi_shot',
     ]),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
@@ -2474,7 +2474,7 @@ export const RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING = freezeBodyMapping([
     field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio']),
     defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
     transform: 'runninghubKlingV3AspectRatio',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({
     path: 'duration',
@@ -2494,7 +2494,7 @@ export const RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING = freezeBodyMapping([
     path: 'sound',
     from: 'param',
     field: Object['freeze'](['generationParams.audio', 'generationParams.sound', 'audio', 'sound']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
@@ -2506,7 +2506,7 @@ export const RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING = freezeBodyMapping([
       'multiShot',
       'multi_shot',
     ]),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
@@ -2526,7 +2526,7 @@ export const RUNNINGHUB_VIDEO_KLING_V3_BODY_MAPPING = freezeBodyMapping([
       'negativePrompt',
     ]),
     transform: 'apimartOptionalText',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
 ]);
 export const RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING = freezeBodyMapping([
@@ -2562,7 +2562,7 @@ export const RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING = freezeBodyMapping([
     field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio']),
     defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
     transform: 'runninghubVeo3AspectRatio',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({
     path: 'duration',
@@ -2580,7 +2580,7 @@ export const RUNNINGHUB_VIDEO_VEO3_BODY_MAPPING = freezeBodyMapping([
       'generateAudio',
       'generate_audio',
     ]),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
 ]);
@@ -2605,7 +2605,7 @@ export const RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING = freezeBodyMapping([
     field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio']),
     defaultValue: APIMART_VIDEO_ADAPTIVE_RATIO_VALUE,
     transform: 'runninghubWan27AspectRatio',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({
     path: 'duration',
@@ -2623,7 +2623,7 @@ export const RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING = freezeBodyMapping([
       'prompt_extend',
       'promptExtend',
     ]),
-    defaultValue: !![],
+    defaultValue: true,
     transform: 'booleanParam',
   }),
   Object['freeze']({
@@ -2636,9 +2636,9 @@ export const RUNNINGHUB_VIDEO_WAN27_BODY_MAPPING = freezeBodyMapping([
       'negativePrompt',
     ]),
     transform: 'apimartOptionalText',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
-  Object['freeze']({ path: 'audioUrl', from: 'inputAudios', transform: 'first', omitWhenEmpty: !![] }),
+  Object['freeze']({ path: 'audioUrl', from: 'inputAudios', transform: 'first', omitWhenEmpty: true }),
 ]);
 export const RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING = freezeBodyMapping([
   Object['freeze']({ path: 'prompt', from: 'prompt' }),
@@ -2664,7 +2664,7 @@ export const RUNNINGHUB_VIDEO_HAILUO_23_BODY_MAPPING = freezeBodyMapping([
       'enablePromptExpansion',
       'enable_prompt_expansion',
     ]),
-    defaultValue: !![],
+    defaultValue: true,
     transform: 'booleanParam',
   }),
 ]);
@@ -2708,12 +2708,12 @@ export const APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING = createApimartVideoBodyMappi
       label: 'Gemini Omni 1.1 Flash Ext',
     }),
   }),
-  Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: !![] }),
+  Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
   Object['freeze']({
     path: 'nsfw_check',
     from: 'param',
     field: Object['freeze'](['generationParams.nsfw_check', 'nsfw_check']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
 ]);
@@ -2721,14 +2721,14 @@ export const APIMART_VIDEO_GEMINI_OMNI_FLASH_PREVIEW_BODY_MAPPING = createApimar
   APIMART_VIDEO_ASPECT_RATIO_ENTRY,
   Object['freeze']({ path: 'resolution', from: 'constant', value: '720p' }),
   APIMART_VIDEO_IMAGE_URLS_ENTRY,
-  Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: !![] }),
+  Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
   Object['freeze']({
     path: 'extend_from_task_id',
     from: 'param',
     field: Object['freeze'](['generationParams.extend_from_task_id', 'extend_from_task_id']),
     defaultValue: '',
     transform: 'apimartOptionalText',
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
 ]);
 export const VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
@@ -2766,28 +2766,28 @@ export const VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING = freezeBodyMapping([
       'generateAudio',
       'generate_audio',
     ]),
-    defaultValue: !![],
+    defaultValue: true,
     transform: 'booleanParam',
   }),
   Object['freeze']({
     path: 'watermark',
     from: 'param',
     field: Object['freeze'](['generationParams.watermark', 'watermark']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
     path: 'webSearch',
     from: 'param',
     field: Object['freeze'](['generationParams.webSearch', 'webSearch']),
-    defaultValue: ![],
+    defaultValue: false,
     transform: 'booleanParam',
   }),
   Object['freeze']({
     path: 'priority',
     from: 'param',
     field: Object['freeze'](['generationParams.priority', 'priority']),
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
 ]);
 export const APIMART_VIDEO_RESPONSE_MAPPING = Object['freeze']({
@@ -2840,14 +2840,14 @@ export const APIMART_SEEDANCE_2_0_VIDEO_POLICY = Object['freeze']({
   ratioField: 'size',
   defaultResolution: '720p',
   allowedResolutions: Object['freeze'](['480p', '720p', '1080p', '4k']),
-  supportsVideoReferences: !![],
-  supportsAudioReferences: !![],
+  supportsVideoReferences: true,
+  supportsAudioReferences: true,
   maxRoleImageCount: 2,
   maxImageCount: 9,
   maxVideoReferenceCount: 3,
   maxAudioReferenceCount: 3,
   privateAvatarAssets: Object['freeze']({
-    enabled: !![],
+    enabled: true,
     provider: 'apimart',
     capability: 'seedance2PrivateAvatar',
     models: Object['freeze'](['doubao-seedance-2.0', 'doubao-seedance-2.0-fast']),
@@ -2856,18 +2856,18 @@ export const APIMART_SEEDANCE_2_0_VIDEO_POLICY = Object['freeze']({
 export const VOLCENGINE_SEEDANCE_IMAGE_INPUT_UPLOAD_POLICY = Object['freeze']({
   provider: 'freeImageHost',
   inputKinds: Object['freeze'](['image']),
-  applyInputQualityProfile: !![],
-  strictUpload: !![],
+  applyInputQualityProfile: true,
+  strictUpload: true,
 });
 export const VOLCENGINE_SEEDANCE_VIDEO_INPUT_UPLOAD_POLICY = Object['freeze']({
   provider: 'runninghub',
   inputKinds: Object['freeze'](['video']),
-  strictUpload: !![],
+  strictUpload: true,
 });
 export const VOLCENGINE_SEEDANCE_AUDIO_INPUT_UPLOAD_POLICY = Object['freeze']({
   provider: 'runninghub',
   inputKinds: Object['freeze'](['audio']),
-  strictUpload: !![],
+  strictUpload: true,
 });
 export const VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY = Object['freeze']({
   defaultRatio: 'adaptive',
@@ -2881,18 +2881,18 @@ export const VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY = Object['freeze']({
 export const APIMART_SEEDANCE_1_5_VIDEO_POLICY = Object['freeze']({
   ratioField: 'aspect_ratio',
   defaultResolution: '720p',
-  supportsVideoReferences: ![],
-  supportsAudioReferences: ![],
+  supportsVideoReferences: false,
+  supportsAudioReferences: false,
   maxRoleImageCount: 2,
   maxImageCount: 2,
-  supportsGenerateAudioParam: !![],
-  supportsCameraFixedParam: !![],
+  supportsGenerateAudioParam: true,
+  supportsCameraFixedParam: true,
 });
 export const APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY = Object['freeze']({
   ratioField: 'aspect_ratio',
   defaultResolution: '1080p',
-  supportsVideoReferences: ![],
-  supportsAudioReferences: ![],
+  supportsVideoReferences: false,
+  supportsAudioReferences: false,
   maxRoleImageCount: 1,
   maxImageCount: 1,
   roleImageLimitError: 'Seedance 1.0 Pro Fast does not support last-frame input',
@@ -2900,8 +2900,8 @@ export const APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY = Object['freeze']({
 export const APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY = Object['freeze']({
   ratioField: 'aspect_ratio',
   defaultResolution: '1080p',
-  supportsVideoReferences: ![],
-  supportsAudioReferences: ![],
+  supportsVideoReferences: false,
+  supportsAudioReferences: false,
   maxRoleImageCount: 2,
   maxImageCount: 1,
 });
@@ -2995,7 +2995,7 @@ export function createVideoModelApiManifest({
   executionId: executionId,
   displayName: displayName,
   provider: provider = 'apimart',
-  vip: vip = ![],
+  vip: vip = false,
   aliases: aliases = null,
   icon: icon = 'AM',
   description: description = null,
@@ -3019,7 +3019,7 @@ export function createVideoModelApiManifest({
       adapterType: 'modelApi',
       executionId: executionId,
       displayName: displayName,
-      ...(vip === !![] ? { vip: !![] } : {}),
+      ...(vip === true ? { vip: true } : {}),
       icon: icon,
       description:
         description ||
@@ -3031,8 +3031,8 @@ export function createVideoModelApiManifest({
       }),
       ...(prompt && typeof prompt === 'object' ? { prompt: Object['freeze'](prompt) } : {}),
       ...(help && typeof help === 'object' ? { help: Object['freeze'](help) } : {}),
-      async: !![],
-      cancellable: ![],
+      async: true,
+      cancellable: false,
       outputType: 'video',
       extensions: Object['freeze']({ ratioPolicy: ratioPolicy }),
     };

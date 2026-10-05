@@ -39,7 +39,7 @@ export function shouldRenderAllEdgesAtLowZoom({
   lowZoomThreshold: lowZoomThreshold = EDGE_RENDER_ALL_LOW_ZOOM_THRESHOLD,
 } = {}) {
   const count2 = Number(edgeCount) || 0;
-  if (count2 <= 0 || count2 > maxEdgeCount) return ![];
+  if (count2 <= 0 || count2 > maxEdgeCount) return false;
   return normalizeEdgeLodZoom(viewport) <= lowZoomThreshold;
 }
 function edgeVisibilityCellCoord(source, next = EDGE_VISIBILITY_CELL_SIZE) {

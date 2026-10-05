@@ -8,7 +8,7 @@ export function summarizeAudioVoiceGenerationResults(list = [], key = 0) {
   const list2 = Array['isArray'](list) ? list : [],
     total = Math['max'](list2['length'], Math['max'](0, Math['trunc'](Number(key) || 0))),
     succeeded = list2['filter']((el) => {
-      if (el?.['status'] !== 'fulfilled') return ![];
+      if (el?.['status'] !== 'fulfilled') return false;
       const enabled = String(el?.['value']?.['status'] || '')
         ['trim']()
         ['toLowerCase']();

@@ -367,7 +367,7 @@ export function buildRhAiAppVideoMenuItems(value21, { allowedModelIds: allowedMo
         description: manifestVideoMenu?.['subtitle'] || value24['description'] || '',
         icon: value24['icon'] || 'images/RH.png',
         iconAlt: 'runninghub',
-        vip: value24['vip'] === !![],
+        vip: value24['vip'] === true,
       },
       { activeModel: value21 },
     );
@@ -452,7 +452,7 @@ function buildComfyUiVideoWorkflowMenuItems(value40, value41) {
           label: manifestVideoMenu3?.['label'] || value45['displayName'],
           description: manifestVideoMenu3?.['subtitle'] || value45['description'] || '',
           iconHtml: getComfyUiVideoWorkflowIconHtml(manifestVideoMenu3),
-          vip: value45['vip'] === !![],
+          vip: value45['vip'] === true,
         },
         { activeModel: value40 },
       );
@@ -549,7 +549,7 @@ export function buildCustomProviderVideoMenuGroups(value49) {
                 label: manifestVideoMenu5?.['label'] || value56['displayName'],
                 description: manifestVideoMenu5?.['subtitle'] || value56['description'] || '',
                 iconHtml: buildCustomProviderVideoLogoHTML(value56),
-                vip: value56['vip'] === !![],
+                vip: value56['vip'] === true,
               },
               { activeModel: value49 },
             );
@@ -563,8 +563,8 @@ export function buildCustomProviderVideoMenuGroups(value49) {
 function getMinimaxVideoModelMenuManifests() {
   return getModelsByKind('video')
     ['filter']((value57) => {
-      if (value57?.['provider'] !== 'minimax') return ![];
-      if (value57?.['adapterType'] !== 'modelApi') return ![];
+      if (value57?.['provider'] !== 'minimax') return false;
+      if (value57?.['adapterType'] !== 'modelApi') return false;
       return getManifestVideoMenu(value57)?.['role'] === 'minimaxOfficialModel';
     })
     ['sort'](
@@ -577,8 +577,8 @@ function getMinimaxVideoModelMenuManifests() {
 function getBinghuoVideoModelMenuManifests() {
   return getModelsByKind('video')
     ['filter']((value60) => {
-      if (value60?.['provider'] !== 'binghuo') return ![];
-      if (value60?.['adapterType'] !== 'modelApi') return ![];
+      if (value60?.['provider'] !== 'binghuo') return false;
+      if (value60?.['adapterType'] !== 'modelApi') return false;
       return getManifestVideoMenu(value60)?.['role'] === 'binghuoModel';
     })
     ['sort'](
@@ -619,7 +619,7 @@ export function buildBinghuoVideoMenuItemsHtml(value65) {
           priceText: manifestVideoMenu7?.['priceText'] || '',
           description: manifestVideoMenu7?.['subtitle'] || value66['description'] || '',
           iconHtml: buildBinghuoVideoLogoHTML(20),
-          disabled: manifestVideoMenu7?.['disabled'] === !![],
+          disabled: manifestVideoMenu7?.['disabled'] === true,
         },
         { activeModel: value65 },
       );

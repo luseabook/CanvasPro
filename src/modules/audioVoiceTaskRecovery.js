@@ -24,7 +24,7 @@ function buildRecoveryNode(isGenerating = {}, result = {}) {
     ...isGenerating,
     provider: normalizeText(result['provider']) || 'runninghubwf',
     adapterType: normalizeText(result['adapterType']) || 'workflow',
-    isGenerating: isGenerating['isGenerating'] === !![] || text2 === 'generating',
+    isGenerating: isGenerating['isGenerating'] === true || text2 === 'generating',
     jobStatus: normalizeText(isGenerating['jobStatus']) || (text2 === 'generating' ? 'running' : ''),
     rhTaskStatus:
       normalizeText(isGenerating['rhTaskStatus']) ||
@@ -33,7 +33,7 @@ function buildRecoveryNode(isGenerating = {}, result = {}) {
 }
 export function isAudioVoiceTaskRecoveryCandidate(response = {}, data = {}) {
   return (
-    response['isGenerating'] === !![] ||
+    response['isGenerating'] === true ||
     normalizeText(response['status'])['toLowerCase']() === 'generating' ||
     isTaskRunning(buildRecoveryNode(response, data))
   );
@@ -80,8 +80,8 @@ export function createAudioVoiceTaskRecoveryManager({
           adapterType: adapterType,
           cancelledBuilder: cancelledBuilder,
         },
-        cancellable: !![],
-        abortLocal: !![],
+        cancellable: true,
+        abortLocal: true,
         cancelledBuilder: cancelledBuilder,
       });
     const payload = { provider: provider, adapterType: adapterType, audioWorkflowKey: audioWorkflowKey },
@@ -101,16 +101,16 @@ export function createAudioVoiceTaskRecoveryManager({
         executionId: normalizeText(modelOption?.['executionId']),
         taskId: taskId,
         startedAt: startedAt,
-        cancellable: modelOption?.['cancellable'] === !![],
-        resumable: !![],
-        pauseOnAbort: ![],
-        completionFeedback: ![],
+        cancellable: modelOption?.['cancellable'] === true,
+        resumable: true,
+        pauseOnAbort: false,
+        completionFeedback: false,
         startBuilder: () => ({ status: 'generating', error: '' }),
         poll: ({ taskId: taskId2, signal: signal }) =>
           resumeAudioTaskFn(taskId2, payload, {
             signal: signal,
-            useOpenapiQuery: !![],
-            pollImmediately: !![],
+            useOpenapiQuery: true,
+            pollImmediately: true,
           }),
         resultBuilder: (source, next) =>
           buildResultPatch(source, next, {

@@ -17,7 +17,7 @@ export function selectToolbarResultNodes(key) {
   if (!list['length']) return [];
   return (appStore['setSelectedNodes'](list), list);
 }
-export function addToolbarPendingResultNodes({ nodes: nodes = [], persist: persist = !![] } = {}) {
+export function addToolbarPendingResultNodes({ nodes: nodes = [], persist: persist = true } = {}) {
   const list2 = (Array['isArray'](nodes) ? nodes : [nodes])['filter'](
     (index) => index && typeof index === 'object' && String(index['id'] || '')['trim'](),
   );
@@ -33,9 +33,9 @@ export function addToolbarPendingResultNodes({ nodes: nodes = [], persist: persi
 }
 export function updateToolbarResultNode(target, enabled) {
   const enabled2 = String(target || '')['trim']();
-  if (!enabled2 || !enabled || typeof enabled !== 'object') return ![];
-  if (!getStateSnapshot()['nodes']?.[enabled2]) return ![];
-  return (appStore['updateNodeData'](enabled2, enabled), !![]);
+  if (!enabled2 || !enabled || typeof enabled !== 'object') return false;
+  if (!getStateSnapshot()['nodes']?.[enabled2]) return false;
+  return (appStore['updateNodeData'](enabled2, enabled), true);
 }
 export function updateToolbarResultNodes(list3 = []) {
   const list4 = (Array['isArray'](list3) ? list3 : [])['filter'](

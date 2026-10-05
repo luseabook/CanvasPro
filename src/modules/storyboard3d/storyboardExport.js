@@ -185,19 +185,19 @@ function drawThirdsGuide(ctx2, box4, value2) {
 function buildShotMetaLines(value4, value5, value6) {
   const value7 = value4?.['camera'] || {},
     list = [];
-  value6['includeShotNumber'] !== ![] &&
+  value6['includeShotNumber'] !== false &&
     list['push'](
       'SHOT ' + String(value5 + 1)['padStart'](2, '0') + ' · ' + (value4?.['shotSize'] || 'MED'),
     );
   const value8 = [
-    value6['includeShotAngle'] !== ![] ? value4?.['shotAngle'] : '',
-    value6['includeFocalLength'] !== ![] && value7['focalLength'] ? value7['focalLength'] + 'mm' : '',
+    value6['includeShotAngle'] !== false ? value4?.['shotAngle'] : '',
+    value6['includeFocalLength'] !== false && value7['focalLength'] ? value7['focalLength'] + 'mm' : '',
   ]
     ['filter'](Boolean)
     ['join'](' · ');
   if (value8) list['push'](value8);
   return (
-    value6['includeDescription'] !== ![] &&
+    value6['includeDescription'] !== false &&
       value4?.['description'] &&
       list['push'](String(value4['description'])),
     list
@@ -232,11 +232,11 @@ export async function renderStoryboardGrid({
   metadataHeight: metadataHeight3,
   gap: gap3,
   padding: padding3,
-  includeThirds: includeThirds = ![],
-  includeShotNumber: includeShotNumber = !![],
-  includeShotAngle: includeShotAngle = !![],
-  includeFocalLength: includeFocalLength = !![],
-  includeDescription: includeDescription = !![],
+  includeThirds: includeThirds = false,
+  includeShotNumber: includeShotNumber = true,
+  includeShotAngle: includeShotAngle = true,
+  includeFocalLength: includeFocalLength = true,
+  includeDescription: includeDescription = true,
   mimeType: mimeType = 'image/png',
   quality: quality = 0.92,
   palette: palette = DEFAULT_PALETTE,

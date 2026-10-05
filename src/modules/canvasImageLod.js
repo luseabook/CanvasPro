@@ -237,7 +237,7 @@ export function resolveCanvasImageLodMode({
   viewport: viewport = {},
   previousMode: previousMode = '',
   devicePixelRatio: devicePixelRatio2,
-  interactionBusy: interactionBusy = ![],
+  interactionBusy: interactionBusy = false,
 } = {}) {
   const value4 =
     previousMode === MEDIA_LOD_MODE_THUMB

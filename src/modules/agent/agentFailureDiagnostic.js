@@ -106,7 +106,7 @@ function getDiagnosticCopy(data, options, target) {
   return { phaseLabel: phaseLabel[options] || phaseLabel['planning'], summary: summary, detail: detail };
 }
 function countCompletedSteps(list = []) {
-  return (Array['isArray'](list) ? list : [])['filter']((response) => response?.['ok'] === !![])['length'];
+  return (Array['isArray'](list) ? list : [])['filter']((response) => response?.['ok'] === true)['length'];
 }
 export function buildAgentPlannerDiagnostic({
   loopState: loopState = {},
@@ -132,7 +132,7 @@ export function buildAgentPlannerDiagnostic({
       ['slice'](0, 120),
     step: Math['max'](1, Math['trunc'](Number(loopState['step'] || 0)) + 1),
     completedSteps: countCompletedSteps(loopState['toolResults']),
-    retryable: !![],
+    retryable: true,
   };
 }
 export function buildAgentExecutionDiagnostic({
@@ -148,7 +148,7 @@ export function buildAgentExecutionDiagnostic({
     ),
     phaseLabel3 = getDiagnosticCopy(locale, 'execution', 'EXECUTION_ACTION_FAILED'),
     next = (Array['isArray'](execution['results']) ? execution['results'] : [])['filter'](
-      (response2) => response2?.['ok'] !== ![],
+      (response2) => response2?.['ok'] !== false,
     )['length'],
     completedSteps2 =
       completedSteps != null && Number['isFinite'](Number(completedSteps))

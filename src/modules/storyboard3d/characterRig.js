@@ -168,45 +168,45 @@ export const STORYBOARD_3D_BODY_PRESETS = Object['freeze']([
   }),
 ]);
 export const STORYBOARD_3D_ACTIONS = Object['freeze']([
-  Object['freeze']({ id: 'standing', name: '站立', poseId: 'neutral', loop: ![], duration: 1 }),
+  Object['freeze']({ id: 'standing', name: '站立', poseId: 'neutral', loop: false, duration: 1 }),
   Object['freeze']({
     id: 'standing-relaxed',
     name: '放松站立',
     poseId: 'idle-relaxed',
-    loop: !![],
+    loop: true,
     duration: 2.4,
   }),
-  Object['freeze']({ id: 'seated', name: '坐姿', poseId: 'sit', loop: ![], duration: 1 }),
+  Object['freeze']({ id: 'seated', name: '坐姿', poseId: 'sit', loop: false, duration: 1 }),
   Object['freeze']({
     id: 'walking-left',
     name: '行走（左脚）',
     poseId: 'walk-left',
-    loop: !![],
+    loop: true,
     duration: 0.9,
   }),
   Object['freeze']({
     id: 'walking-right',
     name: '行走（右脚）',
     poseId: 'walk-right',
-    loop: !![],
+    loop: true,
     duration: 0.9,
   }),
   Object['freeze']({
     id: 'running-left',
     name: '跑步（左脚）',
     poseId: 'run-left',
-    loop: !![],
+    loop: true,
     duration: 0.62,
   }),
   Object['freeze']({
     id: 'running-right',
     name: '跑步（右脚）',
     poseId: 'run-right',
-    loop: !![],
+    loop: true,
     duration: 0.62,
   }),
-  Object['freeze']({ id: 'dialogue', name: '对话', poseId: 'point-right', loop: !![], duration: 2.2 }),
-  Object['freeze']({ id: 'jump', name: '跳跃', poseId: 'dance-jump', loop: ![], duration: 1.1 }),
+  Object['freeze']({ id: 'dialogue', name: '对话', poseId: 'point-right', loop: true, duration: 2.2 }),
+  Object['freeze']({ id: 'jump', name: '跳跃', poseId: 'dance-jump', loop: false, duration: 1.1 }),
   ...[
     ['squat', '蹲姿'],
     ['wave-left', '左手挥手'],
@@ -224,7 +224,7 @@ export const STORYBOARD_3D_ACTIONS = Object['freeze']([
     ['lean-left', '左侧倾身'],
     ['lean-right', '右侧倾身'],
   ]['map'](([id2, name2]) =>
-    Object['freeze']({ id: id2, name: name2, poseId: id2, loop: ![], duration: 1 }),
+    Object['freeze']({ id: id2, name: name2, poseId: id2, loop: false, duration: 1 }),
   ),
 ]);
 export const STORYBOARD_3D_HAND_POSES = Object['freeze']([
@@ -336,7 +336,7 @@ export function normalizeStoryboard3DCharacterState(actionPlaying = {}) {
     bodyPresetId: bodyPresetId,
     actionId: actionId,
     actionTime: Math['max'](0, Number(actionPlaying['actionTime']) || 0),
-    actionPlaying: actionPlaying['actionPlaying'] === !![],
+    actionPlaying: actionPlaying['actionPlaying'] === true,
     leftHandPoseId: leftHandPoseId,
     rightHandPoseId: rightHandPoseId,
     boneOverrides: normalizeStoryboard3DBoneOverrides(actionPlaying['boneOverrides']),
@@ -406,11 +406,11 @@ export function applyStoryboard3DCharacterPoseToModel(
       typeof enabled['quaternion']['set'] === 'function' &&
         enabled['quaternion']['set'](x3[0], x3[1], x3[2], x3[3]);
   }
-  return (value14?.['updateMatrixWorld']?.(!![]), value14);
+  return (value14?.['updateMatrixWorld']?.(true), value14);
 }
 export function setStoryboard3DCharacterActionPlayback(value17, actionPlaying2) {
   const args4 = normalizeStoryboard3DCharacterState(value17);
-  return { ...args4, actionPlaying: actionPlaying2 === !![] };
+  return { ...args4, actionPlaying: actionPlaying2 === true };
 }
 export function seekStoryboard3DCharacterAction(value18, value19) {
   const args5 = normalizeStoryboard3DCharacterState(value18),
@@ -429,7 +429,7 @@ export function advanceStoryboard3DCharacterAction(value22, value23) {
     actionTime2 = Math['max'](0.001, Number(value24['duration']) || 1),
     actionTime3 = args6['actionTime'] + Math['max'](0, Number(value23) || 0);
   if (value24['loop']) return { ...args6, actionTime: actionTime3 % actionTime2 };
-  if (actionTime3 >= actionTime2) return { ...args6, actionTime: actionTime2, actionPlaying: ![] };
+  if (actionTime3 >= actionTime2) return { ...args6, actionTime: actionTime2, actionPlaying: false };
   return { ...args6, actionTime: actionTime3 };
 }
 export function quaternionToStoryboard3DEuler(list4 = []) {
@@ -454,7 +454,7 @@ export function quaternionToStoryboard3DEuler(list4 = []) {
 }
 export function createStoryboard3DBoneEditState(
   options5 = {},
-  { selectedBoneName: selectedBoneName = 'pelvis', showControls: showControls = !![] } = {},
+  { selectedBoneName: selectedBoneName = 'pelvis', showControls: showControls = true } = {},
 ) {
   const boneOverrides = normalizeStoryboard3DCharacterState(options5),
     localEulerByBone = {};
@@ -463,7 +463,7 @@ export function createStoryboard3DBoneEditState(
   }
   return {
     selectedBoneName: BONE_SET['has'](selectedBoneName) ? selectedBoneName : 'pelvis',
-    showControls: showControls !== ![],
+    showControls: showControls !== false,
     localEulerByBone: localEulerByBone,
     boneOverrides: boneOverrides['boneOverrides'],
   };

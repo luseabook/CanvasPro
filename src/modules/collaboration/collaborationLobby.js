@@ -10,7 +10,7 @@ export function createCollaborationLobby({
   isBusy: isBusy,
 }) {
   let value = 'host',
-    item = ![],
+    item = false,
     enabled = '';
   const el = element('div', 'collaboration-profile'),
     el2 = input('协作昵称', el);
@@ -80,7 +80,7 @@ export function createCollaborationLobby({
     el8 = element('span', 'collaboration-node-count collaboration-subtle');
   (target['append'](element('strong', '', '当前画布'), el8), el7['append'](target));
   let enabled2 = '',
-    enabled3 = ![];
+    enabled3 = false;
   const source = element('div', 'collaboration-host-actions');
   el7['append'](source);
   const el9 = element('button', 'collaboration-button collaboration-primary', '立即开房');
@@ -88,24 +88,24 @@ export function createCollaborationLobby({
     source['append'](el9),
     el9['addEventListener']('click', () => {
       if (!enabled2) return run(el9, () => actions['create']());
-      ((enabled3 = !![]),
-        (el9['hidden'] = !![]),
-        (el10['hidden'] = ![]),
+      ((enabled3 = true),
+        (el9['hidden'] = true),
+        (el10['hidden'] = false),
         el7['classList']['add']('is-choosing'),
         el11['focus']());
     }));
   const el10 = element('div', 'collaboration-host-choice');
-  ((el10['hidden'] = !![]),
+  ((el10['hidden'] = true),
     el10['setAttribute']('role', 'group'),
     el10['setAttribute']('aria-label', '恢复上次协作或新建协作'),
     source['append'](el10));
   const el11 = button('恢复上次', () => actions['resume'](), el10);
   (el11['classList']['add']('collaboration-primary'),
-    button('新建协作', () => actions['create']({ fresh: !![] }), el10));
+    button('新建协作', () => actions['create']({ fresh: true }), el10));
   function resetHostChoice() {
-    ((enabled3 = ![]),
-      (el9['hidden'] = ![]),
-      (el10['hidden'] = !![]),
+    ((enabled3 = false),
+      (el9['hidden'] = false),
+      (el10['hidden'] = true),
       el7['classList']['remove']('is-choosing'));
   }
   (el10['addEventListener']('keydown', (event2) => {
@@ -114,11 +114,11 @@ export function createCollaborationLobby({
   }),
     list['host']['append'](el7));
   const el12 = element('div', 'collaboration-section');
-  ((el12['hidden'] = !![]), el12['setAttribute']('aria-label', '协作端口恢复'));
+  ((el12['hidden'] = true), el12['setAttribute']('aria-label', '协作端口恢复'));
   const el13 = element('p', 'collaboration-subtle'),
     next = element('div', 'collaboration-actions'),
     el14 = button('重试原端口', () => actions['retryHostPort'](), next, '正在重试协作连接…'),
-    el15 = button('更换端口并继续', () => actions['retryHostPort'](!![]), next, '正在更换协作端口…');
+    el15 = button('更换端口并继续', () => actions['retryHostPort'](true), next, '正在更换协作端口…');
   (el12['append'](
     el13,
     element(
@@ -136,7 +136,7 @@ export function createCollaborationLobby({
   const el16 = input('邀请连接信息', list['join'], { placeholder: '粘贴房主生成的 AICLAN2.…' }),
     el17 = button('加入协作', () => actions['join'](el16['value']['trim']()), list['join']);
   (el17['classList']['add']('collaboration-primary'),
-    (el17['disabled'] = !![]),
+    (el17['disabled'] = true),
     el16['addEventListener']('input', () => {
       el17['disabled'] = isBusy() || !el16['value']['trim']();
     }),

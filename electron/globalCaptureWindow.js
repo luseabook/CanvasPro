@@ -17,10 +17,10 @@ const api = globalThis['globalCaptureWindow'],
   state = {
     captureId: '',
     activeIndex: 0,
-    runImmediately: ![],
-    busy: ![],
+    runImmediately: false,
+    busy: false,
     phase: 'ready',
-    expanded: ![],
+    expanded: false,
     layoutVersion: 0,
     revision: 0,
     failedAction: null,
@@ -35,7 +35,7 @@ panel['querySelectorAll']('[data-icon]')['forEach']((iconNode) => {
   if (iconElement) iconNode['prepend'](iconElement);
 });
 function updateRunImmediately(nextRunImmediately) {
-  ((state['runImmediately'] = nextRunImmediately === !![]),
+  ((state['runImmediately'] = nextRunImmediately === true),
     toggle['setAttribute']('aria-checked', String(state['runImmediately'])),
     actions['slice'](1, 4)['forEach']((actionButton, aiIndex) => {
       const [generatedLabel, createdLabel, nodeLabel] = aiLabels[aiIndex];
@@ -68,40 +68,40 @@ function showFeedback(statusText = '', hintText = '') {
     (details['hidden'] = Boolean(statusText) || !state['expanded']),
     (retry['hidden'] = !state['failedAction'] || state['busy']));
 }
-async function setExpanded(nextExpanded, { restoreFocus: restoreFocus = ![] } = {}) {
-  ((state['expanded'] = nextExpanded === !![]),
+async function setExpanded(nextExpanded, { restoreFocus: restoreFocus = false } = {}) {
+  ((state['expanded'] = nextExpanded === true),
     (details['hidden'] = !state['expanded']),
     more['setAttribute']('aria-expanded', String(state['expanded'])));
   const requestCaptureId = state['captureId'],
     requestLayoutVersion = ++state['layoutVersion'];
-  if (restoreFocus) more['focus']({ preventScroll: !![] });
+  if (restoreFocus) more['focus']({ preventScroll: true });
   try {
     const expandResult = await api?.['setExpanded']?.({
       captureId: requestCaptureId,
       expanded: state['expanded'],
     });
     if (requestCaptureId !== state['captureId'] || requestLayoutVersion !== state['layoutVersion']) return;
-    (expandResult?.['ok'] === ![] &&
-      ((state['expanded'] = ![]), (details['hidden'] = !![]), more['setAttribute']('aria-expanded', 'false')),
+    (expandResult?.['ok'] === false &&
+      ((state['expanded'] = false), (details['hidden'] = true), more['setAttribute']('aria-expanded', 'false')),
       panel['classList']['toggle'](
         'is-above',
-        expandResult?.['ok'] === !![] && expandResult['opensUp'] === !![],
+        expandResult?.['ok'] === true && expandResult['opensUp'] === true,
       ));
   } catch {
     if (requestCaptureId !== state['captureId'] || requestLayoutVersion !== state['layoutVersion']) return;
-    ((state['expanded'] = ![]), (details['hidden'] = !![]), more['setAttribute']('aria-expanded', 'false'));
+    ((state['expanded'] = false), (details['hidden'] = true), more['setAttribute']('aria-expanded', 'false'));
   }
 }
-function setActiveIndex(nextIndex, { focus: focus = !![] } = {}) {
+function setActiveIndex(nextIndex, { focus: focus = true } = {}) {
   ((state['activeIndex'] = Math['max'](0, Math['min'](toolbarButtons['length'] - 1, nextIndex))),
     toolbarButtons['forEach']((toolbarButton, toolbarButtonIndex) => {
       toolbarButton['tabIndex'] = toolbarButtonIndex === state['activeIndex'] ? 0 : -1;
     }));
   const activeButton = toolbarButtons[state['activeIndex']];
   activeButton['scrollIntoView']({ block: 'nearest', inline: 'nearest' });
-  if (focus) activeButton['focus']({ preventScroll: !![] });
+  if (focus) activeButton['focus']({ preventScroll: true });
 }
-async function choose(actionId, runImmediately = state['runImmediately'], rememberRunImmediately = !![]) {
+async function choose(actionId, runImmediately = state['runImmediately'], rememberRunImmediately = true) {
   if (state['busy'] || state['phase'] !== 'ready' || !state['captureId'] || !actionIds['includes'](actionId))
     return;
   const requestCaptureId = state['captureId'],
@@ -109,34 +109,34 @@ async function choose(actionId, runImmediately = state['runImmediately'], rememb
     dispatchPayload = {
       actionId: actionId,
       runImmediately: runImmediately,
-      ...(rememberRunImmediately ? {} : { rememberRunImmediately: ![] }),
+      ...(rememberRunImmediately ? {} : { rememberRunImmediately: false }),
     };
-  ((state['busy'] = !![]),
+  ((state['busy'] = true),
     (state['failedAction'] = null),
-    void setExpanded(![]),
+    void setExpanded(false),
     syncControls(),
     showFeedback('正在发送到画布…'));
   try {
     const dispatchResult = await api['chooseAction']({ captureId: requestCaptureId, ...dispatchPayload });
     if (state['captureId'] !== requestCaptureId || state['revision'] !== requestRevision) return;
-    if (dispatchResult?.['ok'] !== !![])
+    if (dispatchResult?.['ok'] !== true)
       throw Object['assign'](new Error('dispatch-failed'), { retryable: dispatchResult?.['retryable'] });
-    ((state['busy'] = ![]), (state['captureId'] = ''), showFeedback('已发送到画布'), syncControls());
+    ((state['busy'] = false), (state['captureId'] = ''), showFeedback('已发送到画布'), syncControls());
   } catch (dispatchError) {
     if (state['captureId'] !== requestCaptureId || state['revision'] !== requestRevision) return;
-    ((state['busy'] = ![]),
-      (state['failedAction'] = dispatchError?.['retryable'] === !![] ? dispatchPayload : null),
+    ((state['busy'] = false),
+      (state['failedAction'] = dispatchError?.['retryable'] === true ? dispatchPayload : null),
       syncControls(),
       showFeedback('发送失败', '选中文字已保留'),
       (state['failedAction'] ? retry : document['getElementById']('closeCapture'))['focus']({
-        preventScroll: !![],
+        preventScroll: true,
       }));
   }
 }
 async function cancel() {
   if (!state['captureId']) return;
   const cancelCaptureId = state['captureId'];
-  ((state['captureId'] = ''), (state['revision'] += 1), (state['busy'] = ![]), syncControls());
+  ((state['captureId'] = ''), (state['revision'] += 1), (state['busy'] = false), syncControls());
   try {
     await api?.['cancel']?.({ captureId: cancelCaptureId });
   } catch {}
@@ -155,9 +155,9 @@ function present(presentation = {}) {
       presentation['phase'] === 'capturing' || presentation['phase'] === 'error'
         ? presentation['phase']
         : 'ready'),
-    (state['busy'] = ![]),
+    (state['busy'] = false),
     (state['failedAction'] = null),
-    (state['expanded'] = ![]),
+    (state['expanded'] = false),
     more['setAttribute']('aria-expanded', 'false'),
     panel['classList']['remove']('is-above'),
     (preview['textContent'] = String(presentation['text'] || '')),
@@ -166,7 +166,7 @@ function present(presentation = {}) {
     (document['getElementById']('textCount')['textContent'] =
       Array['from'](preview['textContent'])['length'] + ' 字'),
     (document['documentElement']['dataset']['theme'] = presentation['theme'] === 'light' ? 'light' : 'dark'),
-    updateRunImmediately(presentation['runImmediately'] === !![]),
+    updateRunImmediately(presentation['runImmediately'] === true),
     syncControls());
   const shortcutLabel = String(presentation['shortcutLabel'] || 'Control+Alt+Shift+C');
   if (state['phase'] === 'capturing') showFeedback('正在读取选中文字…');
@@ -174,14 +174,14 @@ function present(presentation = {}) {
     state['phase'] === 'error'
       ? showFeedback(...captureError(presentation['errorReason'], shortcutLabel))
       : showFeedback();
-  setActiveIndex(Math['max'](0, actionIds['indexOf'](presentation['activeActionId'])), { focus: ![] });
+  setActiveIndex(Math['max'](0, actionIds['indexOf'](presentation['activeActionId'])), { focus: false });
   const presentRevision = state['revision'];
   (requestAnimationFrame(() => {
     if (!state['captureId'] || state['revision'] !== presentRevision || state['busy']) return;
-    if (state['phase'] === 'ready') toolbarButtons[state['activeIndex']]['focus']({ preventScroll: !![] });
+    if (state['phase'] === 'ready') toolbarButtons[state['activeIndex']]['focus']({ preventScroll: true });
     else {
       if (state['phase'] === 'error')
-        document['getElementById']('closeCapture')['focus']({ preventScroll: !![] });
+        document['getElementById']('closeCapture')['focus']({ preventScroll: true });
     }
   }),
     requestAnimationFrame(() =>
@@ -201,7 +201,7 @@ function present(presentation = {}) {
 }),
   toolbarButtons['forEach']((boundToolbarButton, boundToolbarButtonIndex) => {
     boundToolbarButton['addEventListener']('focus', () => {
-      setActiveIndex(boundToolbarButtonIndex, { focus: ![] });
+      setActiveIndex(boundToolbarButtonIndex, { focus: false });
     });
   }),
   toolbar['addEventListener'](
@@ -210,7 +210,7 @@ function present(presentation = {}) {
       if (!wheelEvent['ctrlKey'] && !wheelEvent['metaKey'])
         scrollElementHorizontallyWithWheel(wheelEvent, toolbar);
     },
-    { passive: ![] },
+    { passive: false },
   ),
   more['addEventListener']('click', () => {
     void setExpanded(!state['expanded']);
@@ -223,7 +223,7 @@ function present(presentation = {}) {
       void choose(
         state['failedAction']['actionId'],
         state['failedAction']['runImmediately'],
-        state['failedAction']['rememberRunImmediately'] !== ![],
+        state['failedAction']['rememberRunImmediately'] !== false,
       );
   }),
   document['getElementById']('closeCapture')['addEventListener']('click', () => {
@@ -232,7 +232,7 @@ function present(presentation = {}) {
   window['addEventListener']('keydown', (keyboardEvent) => {
     if (keyboardEvent['key'] === 'Escape') {
       keyboardEvent['preventDefault']();
-      if (state['expanded']) void setExpanded(![], { restoreFocus: !![] });
+      if (state['expanded']) void setExpanded(false, { restoreFocus: true });
       else void cancel();
       return;
     }
@@ -255,8 +255,8 @@ function present(presentation = {}) {
     if (eventTarget?.['closest']?.('#captureDetails')) return;
     if (keyboardEvent['key'] === 'ArrowDown' && eventTarget === more) {
       (keyboardEvent['preventDefault'](),
-        void setExpanded(!![])['then'](() => {
-          if (state['expanded'] && !state['busy']) actions[4]['focus']({ preventScroll: !![] });
+        void setExpanded(true)['then'](() => {
+          if (state['expanded'] && !state['busy']) actions[4]['focus']({ preventScroll: true });
         }));
       return;
     }

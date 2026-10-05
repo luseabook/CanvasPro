@@ -43,8 +43,8 @@ function readPngSize(list2) {
   )
     return null;
   const dataView = new DataView(list2['buffer'], list2['byteOffset'], list2['byteLength']),
-    width2 = dataView['getUint32'](16, ![]),
-    height2 = dataView['getUint32'](20, ![]);
+    width2 = dataView['getUint32'](16, false),
+    height2 = dataView['getUint32'](20, false);
   return width2 > 0 && height2 > 0 ? { width: width2, height: height2 } : null;
 }
 function readGifSize(list3) {
@@ -126,7 +126,7 @@ function createPreviewCanvas(
   const image = documentRef['createElement']('canvas');
   ((image['width'] = positiveInteger(outputWidth)), (image['height'] = positiveInteger(outputHeight)));
   if (!image['width'] || !image['height']) return null;
-  const ctx = image['getContext']?.('2d', { alpha: !![] });
+  const ctx = image['getContext']?.('2d', { alpha: true });
   if (!ctx?.['drawImage']) return null;
   ctx['drawImage'](enabled, 0, 0, image['width'], image['height']);
   let thumbnailDataUrl = '';

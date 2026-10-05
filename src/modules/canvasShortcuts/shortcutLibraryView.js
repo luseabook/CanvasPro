@@ -10,13 +10,13 @@ export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate })
   ownerElement['classList']['add']('v2-node-menu-compact');
   const list = createDefaultShortcutCatalog()['items'];
   let args,
-    enabled = ![],
+    enabled = false,
     showContextMenu2 = null,
     value = null;
   function close() {
-    showContextMenu2?.['close']({ restoreFocus: ![] });
+    showContextMenu2?.['close']({ restoreFocus: false });
   }
-  function run(restoreTarget, autoFocus = ![]) {
+  function run(restoreTarget, autoFocus = false) {
     if (value === restoreTarget) {
       close();
       return;
@@ -35,7 +35,7 @@ export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate })
         box['left'],
         box['top'] - 8,
         list2['map']((label) => {
-          const desc = createShortcutCard(label, { preview: !![] });
+          const desc = createShortcutCard(label, { preview: true });
           return {
             label: label['name'],
             desc: desc['querySelector']('.canvas-shortcut-description')['textContent'],
@@ -51,7 +51,7 @@ export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate })
           restoreTarget: restoreTarget,
           ownerElement: ownerElement,
           ownerRoot: ownerRoot,
-          dismissOnOwnerPointerDown: ![],
+          dismissOnOwnerPointerDown: false,
           autoFocus: autoFocus,
           onClose: () => {
             (restoreTarget['setAttribute']('aria-expanded', 'false'),
@@ -76,7 +76,7 @@ export function createShortcutLibraryView(ownerRoot, { onActivate: onActivate })
           (event2['preventDefault'](), event2['stopPropagation']());
           if (value === enabled3)
             showContextMenu2?.['menu']['querySelector']('[role="menuitem"]')?.['focus']();
-          else run(enabled3, !![]);
+          else run(enabled3, true);
         }
       }
     }),

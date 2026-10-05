@@ -83,18 +83,18 @@ export function createPersonReplacementShotCutViewportController({
       if (entry) el3['setAttribute']?.('disabled', '');
       else el3['removeAttribute']?.('disabled');
     },
-    commitDraft = (record, { recordHistory: recordHistory = !![] } = {}) => {
-      if (!Array['isArray'](record)) return ![];
+    commitDraft = (record, { recordHistory: recordHistory = true } = {}) => {
+      if (!Array['isArray'](record)) return false;
       const enabled3 = session['commitDraft'](record, { recordHistory: recordHistory });
-      if (!enabled3) return ![];
-      return (syncUndoButton(), !![]);
+      if (!enabled3) return false;
+      return (syncUndoButton(), true);
     },
     applyTimelineZoom = (delta = 'reset', { clientX: clientX = Number['NaN'] } = {}) => {
-      if (!enabled['isOpen']) return ![];
+      if (!enabled['isOpen']) return false;
       const el4 = getRoot(),
         width2 = el4?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]'),
         el5 = el4?.['querySelector']?.('[data-person-replacement-shot-cut-timeline]');
-      if (!width2 || !el5) return ![];
+      if (!width2 || !el5) return false;
       const currentZoom = Math['max'](0.08, Number(enabled['timelineZoom']) || 1),
         zoom =
           delta === 'reset'
@@ -169,7 +169,7 @@ export function createPersonReplacementShotCutViewportController({
       );
     },
     toggleSound = (el7) => {
-      if (!enabled['isOpen'] || isBusy()) return ![];
+      if (!enabled['isOpen'] || isBusy()) return false;
       enabled['soundEnabled'] = !enabled['soundEnabled'];
       const root = getRoot()?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
       if (root) root['muted'] = !enabled['soundEnabled'];
@@ -180,7 +180,7 @@ export function createPersonReplacementShotCutViewportController({
         el7?.['setAttribute']?.('aria-label', payload),
         el7?.['setAttribute']?.('data-tooltip', payload),
         el7 && (el7['innerHTML'] = renderIcon(enabled['soundEnabled'] ? 'soundOn' : 'soundOff')),
-        !![]
+        true
       );
     };
   return Object['freeze']({

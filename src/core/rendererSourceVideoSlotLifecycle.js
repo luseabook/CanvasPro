@@ -25,33 +25,33 @@ export function createRendererSourceVideoSlotLifecycle({
     if (!isManagedNode(data)) return undefined;
     return read(data)['surface'] === 'media';
   }
-  function prepareSource(enabled, sourceKey, { slotIndex: slotIndex = 0, rebind: rebind = ![] } = {}) {
+  function prepareSource(enabled, sourceKey, { slotIndex: slotIndex = 0, rebind: rebind = false } = {}) {
     if (!enabled || !isManagedNode(enabled)) return null;
     const options = rendererMediaSlotLifecycle['transition'](getSlotKey(enabled, slotIndex), {
       type: 'source-intent',
       sourceKey: sourceKey,
-      rebind: rebind === !![],
+      rebind: rebind === true,
     });
     if (options['changed']) clearReleasedPreviewDataset(getWrapper?.(enabled));
     return options['state'];
   }
   function reportFrame(enabled2, sourceKey2 = {}) {
-    if (!enabled2 || !isManagedNode(enabled2)) return ![];
+    if (!enabled2 || !isManagedNode(enabled2)) return false;
     const enabled3 = rendererMediaSlotLifecycle['transition'](getSlotKey(enabled2, sourceKey2['slotIndex']), {
       type: 'frame-observed',
       sourceKey: sourceKey2['sourceKey'],
       sourceEpoch: sourceKey2['sourceEpoch'],
       facts: sourceKey2['facts'],
     });
-    if (!enabled3['accepted'] || !isRendererMediaSlotStable(enabled3['state'])) return ![];
-    if (releasePreview?.(enabled2) !== !![]) return ![];
+    if (!enabled3['accepted'] || !isRendererMediaSlotStable(enabled3['state'])) return false;
+    if (releasePreview?.(enabled2) !== true) return false;
     const el2 = getWrapper?.(enabled2);
     return (
       el2?.['dataset'] &&
         ((el2['dataset']['fastPreviewReleasedForPlayback'] = '1'),
         (el2['dataset']['fastPreviewReleasedSourceKey'] = enabled3['state']['sourceKey'])),
       forgetScheduledRelease?.(enabled2),
-      !![]
+      true
     );
   }
   function syncVisibility(enabled4, visibilityTier, target = 0) {
@@ -64,9 +64,9 @@ export function createRendererSourceVideoSlotLifecycle({
   function syncViewportVisibility(
     source,
     {
-      isSelected: isSelected = ![],
-      isVisible: isVisible = ![],
-      isPreviewCandidate: isPreviewCandidate = ![],
+      isSelected: isSelected = false,
+      isVisible: isVisible = false,
+      isPreviewCandidate: isPreviewCandidate = false,
     } = {},
   ) {
     return syncVisibility(
@@ -86,7 +86,7 @@ export function createRendererSourceVideoSlotLifecycle({
     );
   }
   function shouldRetainPresentedSurface(entry, record = 0) {
-    if (!isManagedNode(entry)) return ![];
+    if (!isManagedNode(entry)) return false;
     const payload = read(entry, record);
     return payload['surface'] === 'media' && payload['visibilityTier'] !== 'far';
   }
@@ -96,7 +96,7 @@ export function createRendererSourceVideoSlotLifecycle({
       state = rendererMediaSlotLifecycle['transition'](getSlotKey(enabled6, handle), {
         type: 'source-intent',
         sourceKey: sourceKey3['sourceKey'],
-        rebind: !![],
+        rebind: true,
       });
     return (clearReleasedPreviewDataset(getWrapper?.(enabled6)), state['state']);
   }

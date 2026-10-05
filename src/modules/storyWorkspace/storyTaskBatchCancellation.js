@@ -6,8 +6,8 @@ export function createStoryTaskBatchCancellationRegistry() {
   return {
     request(item) {
       const batchId = normalizeBatchId(item);
-      if (!batchId) return ![];
-      return (map['add'](batchId), !![]);
+      if (!batchId) return false;
+      return (map['add'](batchId), true);
     },
     isRequested(key) {
       const batchId2 = normalizeBatchId(key);

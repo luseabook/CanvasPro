@@ -185,8 +185,8 @@ function buildAudioVoiceComposedNodePayload(
       src: url2,
       audioUrl: url2,
       localPath: localPath3,
-      needsAutoResize: ![],
-      fixedSize: !![],
+      needsAutoResize: false,
+      fixedSize: true,
     });
   const value9 = String(result?.['posterLocalPath'] || result?.['thumbLocalPath'] || '')['trim'](),
     value10 = String(result?.['posterUrl'] || result?.['thumbUrl'] || localPathToUrl(value9))['trim']();
@@ -209,8 +209,8 @@ function buildAudioVoiceComposedNodePayload(
     videoHeight: Number(result?.['videoHeight'] || result?.['height'] || 0) || 0,
     videoFps: Number(result?.['videoFps'] || result?.['fps'] || 0) || 0,
     fps: Number(result?.['fps'] || result?.['videoFps'] || 0) || 0,
-    needsAutoResize: ![],
-    fixedSize: !![],
+    needsAutoResize: false,
+    fixedSize: true,
   });
 }
 
@@ -227,7 +227,7 @@ async function composeMediaSourcesNearNode({
     ['filter'](Boolean);
   if (list4['length'] < 2)
     return (window['showToast']?.(mediaComposeText(enabled3, 'invalidSource'), 'error'), null);
-  triggerEl && ((triggerEl['dataset']['loading'] = 'true'), (triggerEl['disabled'] = !![]));
+  triggerEl && ((triggerEl['dataset']['loading'] = 'true'), (triggerEl['disabled'] = true));
   window['showToast']?.(mediaComposeText(enabled3, 'progress'), 'info');
   try {
     const response2 = await runMediaComposeRequest(enabled3, list4),
@@ -267,7 +267,7 @@ async function composeMediaSourcesNearNode({
       null
     );
   } finally {
-    triggerEl && ((triggerEl['dataset']['loading'] = 'false'), (triggerEl['disabled'] = ![]));
+    triggerEl && ((triggerEl['dataset']['loading'] = 'false'), (triggerEl['disabled'] = false));
   }
 }
 
@@ -299,7 +299,7 @@ export async function composeAudioVoiceTimelineNearNode({
     return (window['showToast']?.(audioVoiceComposeText('invalidSource'), 'error'), null);
   if (!canUseElectronMediaTask())
     return (window['showToast']?.(audioVoiceComposeText('missingTask'), 'error'), null);
-  triggerEl && ((triggerEl['dataset']['loading'] = 'true'), (triggerEl['disabled'] = !![]));
+  triggerEl && ((triggerEl['dataset']['loading'] = 'true'), (triggerEl['disabled'] = true));
   window['showToast']?.(
     audioVoiceComposeText(value16 === 'video' ? 'videoProgress' : 'audioProgress'),
     'info',
@@ -311,7 +311,7 @@ export async function composeAudioVoiceTimelineNearNode({
           src: enabled4,
           args: { sourceKind: value16, durationSec: durationSec, clips: value17 },
         },
-        { wait: !![], timeout: 600000 },
+        { wait: true, timeout: 600000 },
       ),
       resultLocalPath2 = pickResultLocalPath(enqueueElectronMediaTask2);
     if (!enqueueElectronMediaTask2?.['success'] || !resultLocalPath2)
@@ -356,6 +356,6 @@ export async function composeAudioVoiceTimelineNearNode({
       null
     );
   } finally {
-    triggerEl && ((triggerEl['dataset']['loading'] = 'false'), (triggerEl['disabled'] = ![]));
+    triggerEl && ((triggerEl['dataset']['loading'] = 'false'), (triggerEl['disabled'] = false));
   }
 }

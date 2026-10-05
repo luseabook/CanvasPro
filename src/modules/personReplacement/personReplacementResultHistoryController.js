@@ -9,7 +9,7 @@ export function createPersonReplacementResultHistoryController({
   getProject: getProject,
   renderHistoryMenu: renderHistoryMenu,
   selectShot: selectShot,
-  isCutEditorOpen: isCutEditorOpen = () => ![],
+  isCutEditorOpen: isCutEditorOpen = () => false,
 } = {}) {
   let kind = null,
     focus = null,
@@ -46,8 +46,8 @@ export function createPersonReplacementResultHistoryController({
     data = (options) =>
       scrollClosestElementHorizontallyWithWheel(options, '.story-media-history-list', {
         boundaryRoot: focus,
-        stopPropagation: !![],
-        preserveNestedScrollable: !![],
+        stopPropagation: true,
+        preserveNestedScrollable: true,
       }),
     handler2 = () => {
       for (const el3 of getRoot()?.['querySelectorAll']?.(TOGGLE) || []) {
@@ -59,18 +59,18 @@ export function createPersonReplacementResultHistoryController({
           ));
       }
     },
-    hide = ({ animate: animate = ![] } = {}) => {
+    hide = ({ animate: animate = false } = {}) => {
       const source = ++item,
         next = focus;
       kind = null;
       focus &&
         (focus['classList']['remove']('is-visible'),
         focus['setAttribute']('aria-hidden', 'true'),
-        (focus['inert'] = !![]));
+        (focus['inert'] = true));
       handler2();
       const run = () => {
           if (source !== item || next !== focus) return;
-          (focus && ((focus['hidden'] = !![]), (focus['innerHTML'] = '')), (value = ''));
+          (focus && ((focus['hidden'] = true), (focus['innerHTML'] = '')), (value = ''));
         },
         list = personReplacementResultHistoryLayout['hide']({ animate: animate });
       if (list['length']) {
@@ -85,7 +85,7 @@ export function createPersonReplacementResultHistoryController({
         (focus?.['removeEventListener']?.('wheel', data),
         (focus = entry),
         (value = ''),
-        focus?.['addEventListener']?.('wheel', data, { passive: ![] }));
+        focus?.['addEventListener']?.('wheel', data, { passive: false }));
       const shot = getProject(),
         record = shot['workspace'];
       if (
@@ -98,30 +98,30 @@ export function createPersonReplacementResultHistoryController({
         record['shotSelectionMode'] ||
         isCutEditorOpen()
       )
-        return (hide(), ![]);
+        return (hide(), false);
       const count = shot['shots']['findIndex']((payload) => payload['id'] === kind['shotId']);
-      if (count < 0) return (hide(), ![]);
+      if (count < 0) return (hide(), false);
       const enabled = renderHistoryMenu({
         kind: kind['step'] === 3 ? 'video' : 'image',
         shot: shot['shots'][count],
         title: '片段' + String(count + 1)['padStart'](2, '0'),
-        allowSingleResult: !![],
+        allowSingleResult: true,
       });
-      if (!enabled) return (hide(), ![]);
+      if (!enabled) return (hide(), false);
       const handle =
         '<div class="person-replacement-result-history-content"><button type="button" class="person-replacement-result-history-close" data-person-replacement-result-history-close aria-label="收起结果">收起</button>' +
         enabled +
         '</div>';
       if (value !== handle) {
-        const el5 = focus['cloneNode']?.(![]);
+        const el5 = focus['cloneNode']?.(false);
         (el5 && value
-          ? ((el5['innerHTML'] = handle), reconcileElementTree(focus, el5, { preserveImageNodes: !![] }))
+          ? ((el5['innerHTML'] = handle), reconcileElementTree(focus, el5, { preserveImageNodes: true }))
           : (focus['innerHTML'] = handle),
           (value = handle));
       }
       (++item,
-        (focus['inert'] = ![]),
-        (focus['hidden'] = ![]),
+        (focus['inert'] = false),
+        (focus['hidden'] = false),
         focus['classList']['add']('is-visible'),
         focus['setAttribute']('aria-hidden', 'false'),
         (focus['dataset']['shotId'] = kind['shotId']),
@@ -135,29 +135,29 @@ export function createPersonReplacementResultHistoryController({
           const el6 = Array['from'](focus['querySelectorAll']('button'))['find']((el7) =>
             Object['entries'](el4['focus'])['every'](([config, scope]) => el7['dataset'][config] === scope),
           );
-          el6?.['focus']?.({ preventScroll: !![] });
+          el6?.['focus']?.({ preventScroll: true });
         }
       }
-      return !![];
+      return true;
     },
     handleClick = (event) => {
       const enabled2 = event['target']?.['closest']?.(CLOSE),
         el8 = event['target']?.['closest']?.(TOGGLE);
-      if ((!el8 && !enabled2) || !getRoot()?.['contains']?.(el8 || enabled2)) return ![];
+      if ((!el8 && !enabled2) || !getRoot()?.['contains']?.(el8 || enabled2)) return false;
       (event['preventDefault']?.(), event['stopPropagation']?.());
       if (enabled2 || kind?.['shotId'] === el8['dataset']['shotId']) {
         const el9 = handler(kind?.['shotId']);
-        return (hide({ animate: !![] }), el9?.['focus']?.({ preventScroll: !![] }), !![]);
+        return (hide({ animate: true }), el9?.['focus']?.({ preventScroll: true }), true);
       }
-      if (el8['disabled']) return !![];
+      if (el8['disabled']) return true;
       const shotId = el8['dataset']['shotId'];
-      selectShot(shotId, { ensureVisible: ![] });
+      selectShot(shotId, { ensureVisible: false });
       const projectId = getProject();
       return (
         (kind = { projectId: projectId['id'], step: projectId['workspace']['step'], shotId: shotId }),
         refresh(null),
-        handler(shotId)?.['focus']?.({ preventScroll: !![] }),
-        !![]
+        handler(shotId)?.['focus']?.({ preventScroll: true }),
+        true
       );
     };
   return Object['freeze']({
@@ -166,7 +166,7 @@ export function createPersonReplacementResultHistoryController({
     hide: hide,
     handleClick: handleClick,
     restore(projectId2) {
-      if (!projectId2) return ![];
+      if (!projectId2) return false;
       return (
         (kind = {
           projectId: projectId2['projectId'],
@@ -177,14 +177,14 @@ export function createPersonReplacementResultHistoryController({
       );
     },
     handleKeyDown(event2) {
-      if (event2['key'] !== 'Escape' || !kind) return ![];
+      if (event2['key'] !== 'Escape' || !kind) return false;
       const el10 = handler(kind['shotId']);
       return (
-        hide({ animate: !![] }),
-        el10?.['focus']?.({ preventScroll: !![] }),
+        hide({ animate: true }),
+        el10?.['focus']?.({ preventScroll: true }),
         event2['preventDefault']?.(),
         event2['stopPropagation']?.(),
-        !![]
+        true
       );
     },
     destroy() {

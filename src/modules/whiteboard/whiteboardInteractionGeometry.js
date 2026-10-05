@@ -21,7 +21,7 @@ const EPSILON = 0.000001,
       ((cross2 > EPSILON && cross3 < -EPSILON) || (cross2 < -EPSILON && cross3 > EPSILON)) &&
       ((cross4 > EPSILON && cross5 < -EPSILON) || (cross4 < -EPSILON && cross5 > EPSILON))
     )
-      return !![];
+      return true;
     return (
       (Math['abs'](cross2) <= EPSILON && isPointOnSegment(data, index, result)) ||
       (Math['abs'](cross3) <= EPSILON && isPointOnSegment(options, index, result)) ||
@@ -72,14 +72,14 @@ export function getSegmentToSegmentDistance(value4, value5, value6, value7) {
 }
 export function doesSegmentHitPolyline(value8, value9, value10, value11 = 0) {
   const list = (Array['isArray'](value10) ? value10 : [])['map'](toPoint);
-  if (list['length'] === 0) return ![];
+  if (list['length'] === 0) return false;
   const value12 = Math['max'](0, finiteNumberOr(value11));
   if (list['length'] === 1) return getPointToSegmentDistance(list[0], value8, value9) <= value12;
   for (let value13 = 1; value13 < list['length']; value13 += 1) {
     if (getSegmentToSegmentDistance(value8, value9, list[value13 - 1], list[value13]) <= value12)
-      return !![];
+      return true;
   }
-  return ![];
+  return false;
 }
 export function getPolylineBounds(value14, value15 = 0) {
   let x2 = Infinity,
@@ -119,7 +119,7 @@ export function doesSegmentHitBounds(value19, value20, box15, value21 = 0) {
     },
     toPoint6 = toPoint(value19),
     toPoint7 = toPoint(value20);
-  if (isPointInBounds(toPoint6, x3) || isPointInBounds(toPoint7, x3)) return !![];
+  if (isPointInBounds(toPoint6, x3) || isPointInBounds(toPoint7, x3)) return true;
   const value23 = { x: x3['x'], y: x3['y'] },
     value24 = { x: x3['x'] + x3['width'], y: x3['y'] },
     value25 = { x: x3['x'] + x3['width'], y: x3['y'] + x3['height'] },
@@ -135,7 +135,7 @@ export function doesSegmentHitCircle(value29, value30, value31, value32) {
   return getPointToSegmentDistance(value31, value29, value30) <= Math['max'](0, finiteNumberOr(value32));
 }
 const isPointInPolygon = (box16, list2) => {
-  let enabled = ![];
+  let enabled = false;
   for (let value33 = 0, value34 = list2['length'] - 1; value33 < list2['length']; value34 = value33++) {
     const box17 = list2[value33],
       box18 = list2[value34],
@@ -150,15 +150,15 @@ const isPointInPolygon = (box16, list2) => {
 };
 export function doesSegmentHitPolygon(value36, value37, value38, value39 = 0) {
   const list3 = (Array['isArray'](value38) ? value38 : [])['map'](toPoint);
-  if (list3['length'] < 2) return ![];
+  if (list3['length'] < 2) return false;
   const toPoint8 = toPoint(value36),
     toPoint9 = toPoint(value37);
-  if (isPointInPolygon(toPoint8, list3) || isPointInPolygon(toPoint9, list3)) return !![];
+  if (isPointInPolygon(toPoint8, list3) || isPointInPolygon(toPoint9, list3)) return true;
   const value40 = Math['max'](0, finiteNumberOr(value39));
   for (let value41 = 0; value41 < list3['length']; value41 += 1) {
     const value42 = list3[value41],
       value43 = list3[(value41 + 1) % list3['length']];
-    if (getSegmentToSegmentDistance(toPoint8, toPoint9, value42, value43) <= value40) return !![];
+    if (getSegmentToSegmentDistance(toPoint8, toPoint9, value42, value43) <= value40) return true;
   }
-  return ![];
+  return false;
 }

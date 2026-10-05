@@ -7,12 +7,12 @@ function normalizeInputKey(input) {
 }
 export function isPackagedBrowserShortcut(input) {
   const normalized = normalizeInputKey(input);
-  if (normalized === 'f5' || normalized === 'f12') return !![];
-  const withModifier = input?.['control'] === !![] || input?.['meta'] === !![];
-  if (withModifier && normalized === 'r') return !![];
+  if (normalized === 'f5' || normalized === 'f12') return true;
+  const withModifier = input?.['control'] === true || input?.['meta'] === true;
+  if (withModifier && normalized === 'r') return true;
   const devToolsChord =
-    (input?.['control'] === !![] && input?.['shift'] === !![]) ||
-    (input?.['meta'] === !![] && input?.['alt'] === !![]);
+    (input?.['control'] === true && input?.['shift'] === true) ||
+    (input?.['meta'] === true && input?.['alt'] === true);
   return devToolsChord && ['c', 'i', 'j']['includes'](normalized);
 }
 export function installDevReloadShortcuts({ app: app, window: window }) {

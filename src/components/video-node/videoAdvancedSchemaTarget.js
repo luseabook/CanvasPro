@@ -15,7 +15,7 @@ function hasModelUiSchemaPlacement(key, index) {
   const enabled = String(index || '')
     ['trim']()
     ['toLowerCase']();
-  if (!enabled) return ![];
+  if (!enabled) return false;
   const list = Array['isArray'](key?.['uiSchema']?.['fields']) ? key['uiSchema']['fields'] : [];
   return list['some']((result) => {
     return (

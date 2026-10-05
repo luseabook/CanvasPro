@@ -23,7 +23,7 @@ export function rotatePointAroundCenter(box, x, source) {
     y: x['y'] + record * entry + payload * current,
   };
 }
-export function getImageRotationLayout(width, height, handle, state = ![]) {
+export function getImageRotationLayout(width, height, handle, state = false) {
   const box2 = getRotatedSize(width, height, handle);
   return state
     ? {
@@ -33,7 +33,7 @@ export function getImageRotationLayout(width, height, handle, state = ![]) {
       }
     : { ...box2, scale: 1 };
 }
-export function inverseImageRotationPoint(box3, x2, y, config, scope = ![]) {
+export function inverseImageRotationPoint(box3, x2, y, config, scope = false) {
   const { scale: scale } = getImageRotationLayout(x2, y, config, scope),
     x3 = { x: x2 / 2, y: y / 2 };
   return rotatePointAroundCenter(

@@ -30,7 +30,7 @@ export function createStoryboard3DBackgroundImageController({
 } = {}) {
   let imageUrl = '',
     args = null,
-    value = ![];
+    value = false;
   function run() {
     if (imageUrl) urlApi['revokeObjectURL'](imageUrl);
     ((imageUrl = ''), (args = null));
@@ -70,7 +70,7 @@ export function createStoryboard3DBackgroundImageController({
       return args ? { ...args } : null;
     },
     dispose() {
-      (run(), (value = !![]));
+      (run(), (value = true));
     },
   };
 }

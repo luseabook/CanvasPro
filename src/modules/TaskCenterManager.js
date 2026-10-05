@@ -52,7 +52,7 @@ function normalizeTask(navigation = {}) {
     message: String(navigation['message'] || '')['trim'](),
     error: String(navigation['error'] || '')['trim'](),
     remoteTaskId: String(navigation['remoteTaskId'] || '')['trim'](),
-    cancellable: navigation['cancellable'] === !![],
+    cancellable: navigation['cancellable'] === true,
     result: navigation['result'] && typeof navigation['result'] === 'object' ? navigation['result'] : null,
     thumbnail: navigation['thumbnail'] || null,
     createdAt:
@@ -167,7 +167,7 @@ export class TaskCenterManager {
       this['panel']['addEventListener']('click', (config) => this['handleClick'](config)),
       this['panel']['addEventListener']('contextmenu', (scope) => this['handleContextMenu'](scope)),
       this['panel']['addEventListener']('wheel', (input) => this['handleWheel'](input), {
-        passive: ![],
+        passive: false,
       }),
       this['render']());
   }
@@ -197,7 +197,7 @@ export class TaskCenterManager {
       return;
     }
     const map = new Set();
-    let enabled7 = !![];
+    let enabled7 = true;
     (typeof electronMediaTaskApi['onUpdate'] === 'function' &&
       (this['unsubscribe'] = electronMediaTaskApi['onUpdate']((output) => {
         if (enabled7 && output?.['taskId']) map['add'](output['taskId']);
@@ -208,15 +208,15 @@ export class TaskCenterManager {
             ['then']((list) => {
               if (!Array['isArray'](list)) return;
               (list['forEach']((value2) => {
-                if (!map['has'](value2['taskId'])) this['upsertTask'](value2, { silent: !![] });
+                if (!map['has'](value2['taskId'])) this['upsertTask'](value2, { silent: true });
               }),
                 this['scheduleRender']());
             })
             ['catch'](() => {})
             ['finally'](() => {
-              ((enabled7 = ![]), map['clear']());
+              ((enabled7 = false), map['clear']());
             })
-        : (enabled7 = ![]));
+        : (enabled7 = false));
   }
   ['bindGenerationTasks']() {
     if (!globalThis['window']?.['addEventListener']) return;
@@ -228,7 +228,7 @@ export class TaskCenterManager {
     };
     (window['addEventListener'](GENERATION_TASK_CENTER_EVENT, value3),
       listGenerationTaskCenterUpdates()['forEach']((value4) =>
-        this['upsertTask'](value4, { silent: !![] }),
+        this['upsertTask'](value4, { silent: true }),
       ),
       (this['unsubscribeGenerationTasks'] = () => {
         window['removeEventListener'](GENERATION_TASK_CENTER_EVENT, value3);
@@ -236,14 +236,14 @@ export class TaskCenterManager {
   }
   ['show']() {
     (this['panel']?.['classList']['add']('show'),
-      this['mediaController']?.['setVisible'](!![]),
+      this['mediaController']?.['setVisible'](true),
       document['getElementById']('btnTasks')?.['classList']['add']('active'),
       this['render'](),
       this['startClock']());
   }
   ['hide']() {
     (this['closeContextMenu'](),
-      this['mediaController']?.['setVisible'](![]),
+      this['mediaController']?.['setVisible'](false),
       this['panel']?.['classList']['remove']('show'),
       document['getElementById']('btnTasks')?.['classList']['remove']('active'),
       this['stopClock']());
@@ -298,10 +298,10 @@ export class TaskCenterManager {
           finishedAt: message['finishedAt'] || Date['now'](),
           updatedAt: Date['now'](),
         }),
-        this['statusFeedback']?.['observe'](this['tasks']['get'](value5), message, { silent: !![] }));
+        this['statusFeedback']?.['observe'](this['tasks']['get'](value5), message, { silent: true }));
     }
   }
-  ['upsertTask'](createdAt, { silent: silent = ![] } = {}) {
+  ['upsertTask'](createdAt, { silent: silent = false } = {}) {
     const response6 = this['tasks']['get'](createdAt?.['taskId']),
       response7 = normalizeTask({
         ...response6,
@@ -437,7 +437,7 @@ export class TaskCenterManager {
           ...args2,
         });
     if (ACTIVE_TASK_STATUSES['has'](title['status']) && title['cancellable'])
-      handler('cancel', 'actions.cancel', { danger: !![] });
+      handler('cancel', 'actions.cancel', { danger: true });
     if (title['navigation']) handler('locate', 'actions.locate');
     if (getProviderTaskConsoleUrl(title)) handler('api-console', 'actions.apiConsole');
     if (title['remoteTaskId']) handler('copy-task-id', 'actions.copyTaskId');
@@ -491,11 +491,11 @@ export class TaskCenterManager {
     if (!response13) return;
     const list5 = [];
     ACTIVE_TASK_STATUSES['has'](response13['status']) &&
-      response13['cancellable'] === !![] &&
+      response13['cancellable'] === true &&
       list5['push']({
         label: taskCenterText('actions.cancel'),
         icon: 'cancel',
-        danger: !![],
+        danger: true,
         shortcutActionId: 'context-task-cancel',
         action: () => this['runTaskAction']('cancel', { taskId: taskId4 }),
       });
@@ -524,7 +524,7 @@ export class TaskCenterManager {
         event3['clientX'],
         event3['clientY'],
         list5,
-        { ensureItemIcons: !![], ownerElement: ownerElement, ownerRoot: this['panel'] },
+        { ensureItemIcons: true, ownerElement: ownerElement, ownerRoot: this['panel'] },
       )));
   }
   ['runTaskAction'](value14, { taskId: taskId = '', localPath: localPath = '' } = {}) {

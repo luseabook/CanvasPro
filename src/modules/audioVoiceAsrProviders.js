@@ -37,8 +37,8 @@ const PROVIDERS = Object['freeze']([
       openSettingsPanelToField({
         paneName: 'api-input',
         fieldIds: ['providerKey-bailian'],
-        select: !![],
-        highlight: !![],
+        select: true,
+        highlight: true,
       }),
   },
   { id: 'funasr', iconName: 'device', icon: '', iconAlt: 'local' },

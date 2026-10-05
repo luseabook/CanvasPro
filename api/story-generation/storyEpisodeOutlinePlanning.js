@@ -68,12 +68,12 @@ export function createStoryEpisodeOutlinePlanningApi({
       '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
     ]['join']('\n');
   function structuredOutput(name, schema) {
-    return { name: name, schema: schema, strict: !![], fallback: 'prompt' };
+    return { name: name, schema: schema, strict: true, fallback: 'prompt' };
   }
   function endingState() {
     return {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['characters', 'props', 'unresolvedThreads'],
       properties: {
         characters: {
@@ -90,10 +90,10 @@ export function createStoryEpisodeOutlinePlanningApi({
       },
     };
   }
-  function items({ includeArcFields: includeArcFields = !![] } = {}) {
+  function items({ includeArcFields: includeArcFields = true } = {}) {
     return {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: [
         'ref',
         'number',
@@ -127,7 +127,7 @@ export function createStoryEpisodeOutlinePlanningApi({
     const maxItems = Math['max'](1, Math['trunc'](Number(item) || 1));
     return {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['storyFacts', 'episodes'],
       properties: {
         storyFacts: { type: 'array', maxItems: STORY_CONTINUITY_MAX_FACTS, items: { type: 'string' } },
@@ -139,7 +139,7 @@ export function createStoryEpisodeOutlinePlanningApi({
     const maxItems2 = Math['max'](1, Math['trunc'](Number(key) || 1));
     return {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['storyFacts', 'episodes'],
       properties: {
         storyFacts: { type: 'array', maxItems: STORY_CONTINUITY_MAX_FACTS, items: { type: 'string' } },
@@ -149,7 +149,7 @@ export function createStoryEpisodeOutlinePlanningApi({
           maxItems: maxItems2,
           items: {
             type: 'object',
-            additionalProperties: ![],
+            additionalProperties: false,
             required: ['ref', 'number', 'title', 'coreBeat', 'endingEvent', 'activeCharacters'],
             properties: {
               ref: { type: 'string' },
@@ -168,14 +168,14 @@ export function createStoryEpisodeOutlinePlanningApi({
     const minItems = Math['max'](1, Math['trunc'](Number(index) || 1));
     return {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['episodes'],
       properties: {
         episodes: {
           type: 'array',
           minItems: minItems,
           maxItems: minItems,
-          items: items({ includeArcFields: ![] }),
+          items: items({ includeArcFields: false }),
         },
       },
     };
@@ -706,7 +706,7 @@ export function createStoryEpisodeOutlinePlanningApi({
       onRequestError: ({ attempt: attempt3, error: error2, requestPayload: requestPayload4 }) =>
         handler({
           state:
-            error2?.['safeToRetry'] === !![] || error2?.['requestSubmitted'] === ![]
+            error2?.['safeToRetry'] === true || error2?.['requestSubmitted'] === false
               ? 'not-submitted'
               : 'outcome-unknown',
           stepId: stepId,

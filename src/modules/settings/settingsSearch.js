@@ -4,16 +4,16 @@ import { listFocusableElements } from '../../utils/focusTrap.js';
 import { setModelServiceSettingsSearchCards } from './modelServiceSettingsNavigator.js';
 function isSearchable(value, enabled) {
   const item = value['closest']('[data-model-service-provider]');
-  if (item && !isModelProviderPubliclyListed(item['dataset']['modelServiceProvider'])) return ![];
+  if (item && !isModelProviderPubliclyListed(item['dataset']['modelServiceProvider'])) return false;
   for (let enabled2 = value; enabled2 && enabled2 !== enabled; enabled2 = enabled2['parentElement']) {
-    if (enabled2['hidden'] && !enabled2['classList']['contains']('model-service-provider-detail')) return ![];
+    if (enabled2['hidden'] && !enabled2['classList']['contains']('model-service-provider-detail')) return false;
     if (
       enabled2['classList']['contains']('dev-mode-only') &&
       !enabled['ownerDocument']['body']['classList']['contains']('dev-mode')
     )
-      return ![];
+      return false;
   }
-  return !![];
+  return true;
 }
 export function collectSettingsSearchEntries(key) {
   const index = [];
@@ -62,8 +62,8 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
     enabled5 = root?.['querySelector']?.('#settingsSearchStatus');
   if (!enabled3 || !enabled4 || !enabled5) return null;
   let next = 'general',
-    enabled6 = ![],
-    enabled7 = ![];
+    enabled6 = false,
+    enabled7 = false;
   const current = Array['from'](root['querySelectorAll']('.settings-pane:not(#pane-search)')),
     entry = new Set(),
     record = new Map(),
@@ -80,7 +80,7 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
           : (scope['classList']['add']('is-settings-search-hidden'), entry['add'](scope));
       }
     },
-    clear = ({ restore: restore = !![] } = {}) => {
+    clear = ({ restore: restore = true } = {}) => {
       ((enabled3['value'] = ''),
         (enabled5['textContent'] = ''),
         handler(),
@@ -91,13 +91,13 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
         ((output['scrollTop'] = top), (output['scrollLeft'] = left));
       }),
         record['clear'](),
-        (enabled6 = ![]));
+        (enabled6 = false));
     },
     handler3 = () => {
       if (enabled7) return;
       const enabled8 = enabled3['value']['trim']()['toLocaleLowerCase']();
       if (!enabled8) {
-        clear({ restore: !![] });
+        clear({ restore: true });
         return;
       }
       !enabled6 &&
@@ -110,7 +110,7 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
               left: top2['scrollLeft'],
             });
         }),
-        (enabled6 = !![]));
+        (enabled6 = true));
       const value3 = enabled8['split'](/\s+/),
         settingsSearchEntries = collectSettingsSearchEntries(root)['filter']((value4) => {
           const value5 = (value4['category'] + ' ' + value4['title'] + ' ' + value4['description'])[
@@ -153,8 +153,8 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
       if (value17['key'] === 'Escape' && enabled6)
         (value17['preventDefault'](),
           value17['stopPropagation'](),
-          clear({ restore: !![] }),
-          enabled3['focus']({ preventScroll: !![] }));
+          clear({ restore: true }),
+          enabled3['focus']({ preventScroll: true }));
       else
         value17['key'] === 'ArrowDown' &&
           value17['target'] === enabled3 &&
@@ -162,10 +162,10 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
           (value17['preventDefault'](), listFocusableElements(enabled4)[0]?.['focus']());
     },
     value18 = () => {
-      enabled7 = !![];
+      enabled7 = true;
     },
     value19 = () => {
-      ((enabled7 = ![]), handler3());
+      ((enabled7 = false), handler3());
     };
   (enabled3['addEventListener']('input', handler3),
     enabled3['addEventListener']('compositionstart', value18),
@@ -180,7 +180,7 @@ export function initSettingsSearch({ root: root, activatePane: activatePane }) {
   return {
     clear: clear,
     destroy() {
-      (clear({ restore: !![] }),
+      (clear({ restore: true }),
         enabled3['removeEventListener']('input', handler3),
         enabled3['removeEventListener']('compositionstart', value18),
         enabled3['removeEventListener']('compositionend', value19),

@@ -119,11 +119,11 @@ export function prepareRendererNodeRuntime({
   }),
     (wrapperEl['_posKey'] = node['x'] + ',' + node['y'] + ',' + node['width'] + ',' + node['height']),
     syncRendererNodeDragTransform(wrapperEl, node, {
-      active: active['isDragging'] === !![] && dragTargets?.['has']?.(nodeId) === !![],
+      active: active['isDragging'] === true && dragTargets?.['has']?.(nodeId) === true,
       offsetX: active['pendingDx'],
       offsetY: active['pendingDy'],
     }));
-  const data = active['isDragging'] === !![] && dragTargets?.['has']?.(nodeId) === !![];
+  const data = active['isDragging'] === true && dragTargets?.['has']?.(nodeId) === true;
   data && wrapperEl['classList']['add']('is-dragging');
   data &&
     (active['hasMoved'] || !active['wasSelectedOnDown']) &&
@@ -147,10 +147,10 @@ export function prepareRendererNodeRuntime({
   const run = getNodeClass(node['type']),
     instance = new run(
       withRendererDeferredMountHints(node, {
-        deferMedia: options['deferMediaOnMount'] === !![],
-        deferDetails: options['deferDetailsOnMount'] === !![],
-        eagerVideoPreview: options['eagerVideoPreviewOnMount'] === !![],
-        prebuildOffscreen: options['prebuildOffscreen'] === !![],
+        deferMedia: options['deferMediaOnMount'] === true,
+        deferDetails: options['deferDetailsOnMount'] === true,
+        eagerVideoPreview: options['eagerVideoPreviewOnMount'] === true,
+        prebuildOffscreen: options['prebuildOffscreen'] === true,
       }),
     ),
     el7 = instance['mount']();

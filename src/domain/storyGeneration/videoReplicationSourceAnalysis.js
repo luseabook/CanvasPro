@@ -35,7 +35,7 @@ const text = (value) => String(value ?? '')['trim'](),
   strings = { type: 'array', items: string },
   object = (item) => ({
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: Object['keys'](item),
     properties: item,
   });
@@ -81,7 +81,7 @@ export function createVideoReplicationSourceOutput({ durationSec: durationSec = 
   };
   return {
     name: 'video_replication_source_analysis',
-    strict: !![],
+    strict: true,
     fallback: 'prompt',
     schema: object({
       videoObserved: { type: 'boolean' },
@@ -193,7 +193,7 @@ export function parseVideoReplicationSourceResult(current, { durationSec: durati
   } catch {
     throw new Error('原视频分析未返回有效 JSON，请重试分析。');
   }
-  if (entry?.['videoObserved'] !== !![])
+  if (entry?.['videoObserved'] !== true)
     throw new Error(
       '模型未确认读取到原视频，不能确定人物数量。' +
         (text(entry?.['observationError']) || '请检查视频地址或更换支持视频理解的模型后重新分析。'),
@@ -259,7 +259,7 @@ export function normalizeVideoReplicationSource(enabled2, { durationSec: duratio
         list3 = (handle['dialogue'] || [])['map']((response3) => ({
           speakerId: text(response3['speakerId']),
           text: text(response3['text']),
-          uncertain: response3['uncertain'] === !![] || !text(response3['speakerId']),
+          uncertain: response3['uncertain'] === true || !text(response3['speakerId']),
         })),
         list4 = normalizeReplicationVoiceover(handle['voiceover'], enabled3),
         scope =

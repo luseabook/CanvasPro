@@ -49,7 +49,7 @@ export function bindTimelineScroll(persist, scrollLeft) {
       }
       const maxScrollPx2 = Math['max'](0, scrollLeft['scrollWidth'] - scrollLeft['clientWidth']);
       if (maxScrollPx2 <= 0) {
-        persist['_mediaClip']['expanded'] === !![] && (event['preventDefault'](), event['stopPropagation']());
+        persist['_mediaClip']['expanded'] === true && (event['preventDefault'](), event['stopPropagation']());
         return;
       }
       const enabled2 =
@@ -59,7 +59,7 @@ export function bindTimelineScroll(persist, scrollLeft) {
         (event['preventDefault'](), event['stopPropagation']());
         Math['abs'](scrollLeft['scrollLeft']) > 0.5 &&
           ((scrollLeft['scrollLeft'] = 0),
-          persist['_updateTimelineView']({ scrollLeft: 0 }, { persist: !![], renderOnPersist: ![] }));
+          persist['_updateTimelineView']({ scrollLeft: 0 }, { persist: true, renderOnPersist: false }));
         persist['_syncTimelineScrollFade'](scrollLeft);
         return;
       }
@@ -72,11 +72,11 @@ export function bindTimelineScroll(persist, scrollLeft) {
         )),
         persist['_updateTimelineView'](
           { scrollLeft: scrollLeft['scrollLeft'] },
-          { persist: !![], renderOnPersist: ![] },
+          { persist: true, renderOnPersist: false },
         ),
         persist['_syncTimelineScrollFade'](scrollLeft));
     },
-    { passive: ![] },
+    { passive: false },
   ),
     scrollLeft['addEventListener']('scroll', () => {
       const scrollLeft2 = persist['_clampTimelineScrollLeft'](scrollLeft, scrollLeft['scrollLeft']);
@@ -88,7 +88,7 @@ export function bindTimelineScroll(persist, scrollLeft) {
         { scrollLeft: scrollLeft2 },
         {
           persist: persist['_restoringTimelineScroll'] !== scrollLeft && !persist['_timelineDrag'](),
-          renderOnPersist: ![],
+          renderOnPersist: false,
         },
       ),
         persist['_syncTimelineScrollFade'](scrollLeft));
@@ -112,7 +112,7 @@ export function bindTimelineScroll(persist, scrollLeft) {
   else setTimeout(result, 0);
 }
 export function shouldLockTimelineWheelScroll(options, el, target = {}) {
-  if (!el) return ![];
+  if (!el) return false;
   const maxScrollPx4 = Math['max'](
       0,
       toNumber(target['maxScrollPx'], el['scrollWidth'] - el['clientWidth']),
@@ -260,7 +260,7 @@ export function handleTimelineZoomWheel(durationSec2, width2, event2) {
           mediaClipTimelineDisplayDuration,
       ),
     );
-  durationSec2['_updateTimelineView']({ zoom: zoom }, { persist: ![] });
+  durationSec2['_updateTimelineView']({ zoom: zoom }, { persist: false });
   const trackWidthPx4 = durationSec2['_timelineTrackContentWidth']({ timelineZoom: zoom }),
     durationSec3 = getMediaClipTimelineDisplayDuration(
       durationSec2['_primaryDuration']({ timelineZoom: zoom }),
@@ -276,12 +276,12 @@ export function handleTimelineZoomWheel(durationSec2, width2, event2) {
           timelineZoom: zoom,
         },
       ),
-      syncTimelineWidth: ![],
+      syncTimelineWidth: false,
     });
   durationSec2['_mediaClip']['tracks']?.['audio'] &&
     durationSec2['_updateTrackVisuals']('audio', {
       durationSec: durationSec2['_timelineDurationForKind']('audio', { timelineZoom: zoom }),
-      syncTimelineWidth: ![],
+      syncTimelineWidth: false,
     });
   const maxScrollPx6 = Math['max'](0, nextContentWidthPx - viewportWidthPx3),
     scrollLeft3 = durationSec2['_clampTimelineScrollLeft'](
@@ -297,7 +297,7 @@ export function handleTimelineZoomWheel(durationSec2, width2, event2) {
       { trackWidthPx: trackWidthPx4, viewportWidthPx: viewportWidthPx3, maxScrollPx: maxScrollPx6 },
     );
   ((width2['scrollLeft'] = scrollLeft3),
-    durationSec2['_updateTimelineView']({ scrollLeft: scrollLeft3 }, { persist: !![], renderOnPersist: ![] }),
+    durationSec2['_updateTimelineView']({ scrollLeft: scrollLeft3 }, { persist: true, renderOnPersist: false }),
     durationSec2['_syncTimelineScrollFade'](width2));
 }
 export function syncTimelineScrollFade(enabled3, el4) {
@@ -389,7 +389,7 @@ export function runTimelineDragAutoScroll(value29, value30) {
     });
   if (Math['abs'](scrollLeft4 - toNumber6) <= 0.01) return;
   ((el6['scrollLeft'] = scrollLeft4),
-    value29['_updateTimelineView']({ scrollLeft: scrollLeft4 }, { persist: ![], renderOnPersist: ![] }),
+    value29['_updateTimelineView']({ scrollLeft: scrollLeft4 }, { persist: false, renderOnPersist: false }),
     value29['_syncTimelineScrollFade'](el6),
     value29['_applyTimelineDragPreviewFromPointer'](enabled8, { clientX: clientX }),
     value29['_scheduleTimelineDragAutoScroll'](enabled8));
@@ -401,5 +401,5 @@ export function persistTimelineDragScroll(value31, value32 = value31['_timelineD
   (Math['abs'](scrollLeft5 - toNumber(enabled10['scrollLeft'], 0)) > 0.01 &&
     (enabled10['scrollLeft'] = scrollLeft5),
     value31['_syncTimelineScrollFade'](enabled10),
-    value31['_updateTimelineView']({ scrollLeft: scrollLeft5 }, { persist: !![], renderOnPersist: ![] }));
+    value31['_updateTimelineView']({ scrollLeft: scrollLeft5 }, { persist: true, renderOnPersist: false }));
 }

@@ -114,7 +114,7 @@ export function createPersonReplacementImageTaskRuntime({
 } = {}) {
   const map = new Map(),
     map2 = new Map();
-  let data = ![];
+  let data = false;
   const currentProject = (options = '') => {
       const text2 = normalizeText(options);
       return text2 && typeof getProjectById === 'function' ? getProjectById(text2) : getProject?.();
@@ -145,7 +145,7 @@ export function createPersonReplacementImageTaskRuntime({
       });
       return (
         showToast('生成期间检测框或生成设置已变化，旧结果未应用，请重新生成。', 'warn'),
-        { project: project, ok: ![], stale: !![], shotId: shotId2 }
+        { project: project, ok: false, stale: true, shotId: shotId2 }
       );
     },
     acceptUploadedResult = ({
@@ -276,7 +276,7 @@ export function createPersonReplacementImageTaskRuntime({
           }) === requestRevision2
         );
       } catch {
-        return ![];
+        return false;
       }
     },
     handler5 = ({
@@ -289,19 +289,19 @@ export function createPersonReplacementImageTaskRuntime({
       sourceImageSize: sourceImageSize3,
       taskIdentity: taskIdentity = {},
     } = {}) => {
-      if (data) return ![];
+      if (data) return false;
       const currentProject4 = currentProject(projectId3);
-      if (normalizeText(currentProject4?.['id']) !== normalizeText(projectId3)) return ![];
+      if (normalizeText(currentProject4?.['id']) !== normalizeText(projectId3)) return false;
       const currentShot2 = currentProject4?.['shots']?.['find']?.(
         (entry) => normalizeText(entry?.['id']) === normalizeText(shotId3),
       );
-      if (!currentShot2) return ![];
+      if (!currentShot2) return false;
       const personReplacementImageGenerationState2 = resolvePersonReplacementImageGenerationState(
         currentProject4['workspace'],
         shotId3,
       );
       if (normalizeText(personReplacementImageGenerationState2['requestId']) !== normalizeText(requestId2))
-        return ![];
+        return false;
       return (
         !requestRevision ||
         handler4({
@@ -315,8 +315,8 @@ export function createPersonReplacementImageTaskRuntime({
         })
       );
     },
-    handler6 = (shotId4, args2 = {}, { persistIdentity: persistIdentity = ![] } = {}) => {
-      if (!handler5(shotId4)) return ![];
+    handler6 = (shotId4, args2 = {}, { persistIdentity: persistIdentity = false } = {}) => {
+      if (!handler5(shotId4)) return false;
       const args3 = currentProject(shotId4['projectId']),
         args4 = resolvePersonReplacementImageGenerationState(args3['workspace'], shotId4['shotId']),
         record = {
@@ -328,7 +328,7 @@ export function createPersonReplacementImageTaskRuntime({
         enabled =
           Object['keys'](record)['some']((handle) => !Object['is'](record[handle], args4[handle])) ||
           Object['keys'](args4)['some']((state) => !Object['hasOwn'](record, state));
-      if (!enabled) return !![];
+      if (!enabled) return true;
       return (
         handler({
           ...args3,
@@ -338,14 +338,14 @@ export function createPersonReplacementImageTaskRuntime({
           normalizeText(record['taskId']) &&
           hasPersonReplacementGenerationTaskIdentityChanged(args4, record) &&
           void Promise['resolve'](persistNow())['catch'](() => {}),
-        !![]
+        true
       );
     },
     generate = async ({
       projectId: projectId4 = '',
       shotId: shotId = '',
       sourceImageSize: sourceImageSize4,
-      notifyCompletion: notifyCompletion2 = !![],
+      notifyCompletion: notifyCompletion2 = true,
       recoveryTask: recoveryTask = null,
     } = {}) => {
       if (data) return null;
@@ -443,7 +443,7 @@ export function createPersonReplacementImageTaskRuntime({
         if (
           !error['manual'] &&
           !promptEnhancement3 &&
-          project4['settings']?.['replacementPromptEnhancementEnabled'] === !![]
+          project4['settings']?.['replacementPromptEnhancementEnabled'] === true
         ) {
           if (typeof enhancePrompt !== 'function') throw new Error('AI 提示词增强服务尚未初始化');
           const input = getPromptEnhancementModel?.() || {},
@@ -522,7 +522,7 @@ export function createPersonReplacementImageTaskRuntime({
               normalizeText(taskIdentity2?.['executionId']) ||
               normalizeText(modelExecution2?.['executionManifest']?.['id']),
             startedAt: startedAt,
-            useOpenapiQuery: taskIdentity2?.['useOpenapiQuery'] === !![],
+            useOpenapiQuery: taskIdentity2?.['useOpenapiQuery'] === true,
           },
           handler7 = (taskId, meta = {}) => {
             const args8 = resolvePersonReplacementImageGenerationState(
@@ -539,12 +539,12 @@ export function createPersonReplacementImageTaskRuntime({
               handler6(
                 promptEnhancement2,
                 { status: 'running', ...args9, error: '' },
-                { persistIdentity: !![] },
+                { persistIdentity: true },
               ));
           },
           value2 = {
             signal: abortController['signal'],
-            useOpenapiQuery: taskIdentity2?.['useOpenapiQuery'] === !![],
+            useOpenapiQuery: taskIdentity2?.['useOpenapiQuery'] === true,
             onTaskId: (value3) => handler7(value3),
             onTaskMeta: (options2 = {}) => handler7(options2['taskId'], options2),
             onRunningHubWorkflowQueueChange: (response3 = {}) => {
@@ -649,11 +649,11 @@ export function createPersonReplacementImageTaskRuntime({
               error: '',
             }),
           });
-        let enabled2 = !![];
+        let enabled2 = true;
         try {
           await persistNow();
         } catch {
-          enabled2 = ![];
+          enabled2 = false;
         }
         if (data) return null;
         const project6 = currentProject(projectId5);
@@ -666,14 +666,14 @@ export function createPersonReplacementImageTaskRuntime({
         );
         if (personReplacementImageGenerationState4['requestId'] !== requestId3) return null;
         return (
-          (!enabled2 || notifyCompletion2 === ![]) &&
+          (!enabled2 || notifyCompletion2 === false) &&
             showToast(
               enabled2 ? '替换首帧已生成。' : '替换首帧已生成，项目数据正在重试保存，请暂时不要刷新。',
               enabled2 ? 'success' : 'warn',
             ),
-          notifyCompletion2 !== ![] &&
+          notifyCompletion2 !== false &&
             notifyCompletion({ kind: 'image', mediaRef: replacementImageRef, projectId: projectId5 }),
-          { project: project6 || value8, ok: !![], shotId: shotId5 }
+          { project: project6 || value8, ok: true, shotId: shotId5 }
         );
       } catch (error4) {
         if (data) return null;
@@ -717,7 +717,7 @@ export function createPersonReplacementImageTaskRuntime({
               error: error5,
             }),
           });
-        return { project: project7, ok: ![], shotId: shotId5, error: error5 };
+        return { project: project7, ok: false, shotId: shotId5, error: error5 };
       } finally {
         map['delete'](scope);
       }
@@ -725,7 +725,7 @@ export function createPersonReplacementImageTaskRuntime({
     resume = async ({
       projectId: projectId6 = '',
       shotId: shotId = '',
-      notifyCompletion: notifyCompletion = !![],
+      notifyCompletion: notifyCompletion = true,
     } = {}) => {
       const shotId6 = normalizeText(shotId),
         projectId7 = currentProject(projectId6),
@@ -756,7 +756,7 @@ export function createPersonReplacementImageTaskRuntime({
         normalizeText(personReplacementImageGenerationState6['requestId']) !==
         normalizeText(enabled4['requestId'])
       )
-        return { ok: !![], shotId: shotId8 };
+        return { ok: true, shotId: shotId8 };
       const project8 = handler({
         ...args11,
         workspace: updatePersonReplacementImageGenerationState(args11['workspace'], {
@@ -765,7 +765,7 @@ export function createPersonReplacementImageTaskRuntime({
           error: '',
         }),
       });
-      return { ok: !![], shotId: shotId8, project: project8 };
+      return { ok: true, shotId: shotId8, project: project8 };
     },
     resumeRecoverable = async () => {
       if (data) return [];
@@ -781,10 +781,10 @@ export function createPersonReplacementImageTaskRuntime({
     },
     destroy = () => {
       if (data) return null;
-      data = !![];
+      data = true;
       const args12 = getProject?.();
       let workspace = args12?.['workspace'],
-        enabled5 = ![];
+        enabled5 = false;
       args12?.['id'] &&
         map['forEach']((shotId10) => {
           if (shotId10['projectId'] !== args12['id']) return;
@@ -798,7 +798,7 @@ export function createPersonReplacementImageTaskRuntime({
             shotId: shotId10['shotId'],
             error: '',
           })),
-            (enabled5 = !![]));
+            (enabled5 = true));
         });
       (map['clear'](), map2['clear']());
       if (!enabled5) return null;

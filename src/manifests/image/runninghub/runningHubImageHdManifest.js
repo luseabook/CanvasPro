@@ -18,7 +18,7 @@ export const rhImageHdModelManifest = Object['freeze']({
   extensions: {
     providerProfiles: ['runninghub', 'runninghub-international'],
     imageMenu: { group: 'runninghubWorkflow' },
-    imageHdMenu: { enabled: !![] },
+    imageHdMenu: { enabled: true },
   },
   capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 1 },
   inputSlots: {
@@ -45,8 +45,8 @@ export const rhImageHdModelManifest = Object['freeze']({
       RH_IMAGE_INSTANCE_FIELD,
     ],
   },
-  async: !![],
-  cancellable: !![],
+  async: true,
+  cancellable: true,
   outputType: 'image',
 });
 export const rhImageHdExecutionManifest = Object['freeze']({
@@ -65,7 +65,7 @@ export const rhImageHdExecutionManifest = Object['freeze']({
   },
   mapping: {
     nodeInfoList: [
-      { nodeId: '416', fieldName: 'image', source: 'imageInput', required: !![] },
+      { nodeId: '416', fieldName: 'image', source: 'imageInput', required: true },
       {
         nodeId: '413',
         fieldName: 'value',

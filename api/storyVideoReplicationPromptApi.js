@@ -26,7 +26,7 @@ export async function analyzeVideoReplicationClip({
   speechEvidence: speechEvidence = null,
   onSourceAnalysis: onSourceAnalysis,
   onProgress: onProgress,
-  isActive: isActive = () => !![],
+  isActive: isActive = () => true,
   request: request = generateText,
 } = {}) {
   if (!String(videoRef || '')['trim']()) throw new Error('待分析片段缺少视频地址');
@@ -68,7 +68,7 @@ export async function analyzeVideoReplicationClip({
         ),
         inputVideoUrls: [String(videoRef)['trim']()],
         mediaPolicy: 'image-video',
-        allowVideo: !![],
+        allowVideo: true,
         structuredOutput: structuredOutput,
         thinking: { type: 'disabled' },
         temperature: 0.2,

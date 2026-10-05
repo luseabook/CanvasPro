@@ -90,8 +90,8 @@ function _buildRunningHubTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
-  useOpenapiQuery: useOpenapiQuery = ![],
+  recovering: recovering = false,
+  useOpenapiQuery: useOpenapiQuery = false,
 } = {}) {
   return buildRunningHubTaskPatch({
     taskId: taskId,
@@ -107,7 +107,7 @@ function _buildDreaminaTaskPatch({
   phase: phase = 'generating',
   label: label = freeAngleText('task.generating'),
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
+  recovering: recovering = false,
 } = {}) {
   return buildDreaminaTaskPatch({
     submitId: submitId,
@@ -125,7 +125,7 @@ function _buildAsyncTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
+  recovering: recovering = false,
 } = {}) {
   return buildAsyncTaskPatch({
     provider: provider,
@@ -143,8 +143,8 @@ function _persistRunningHubResumeCache() {
 }
 export function createRunningHubTaskStateMachine() {
   const apiKey = {
-      active: ![],
-      cancelRequested: ![],
+      active: false,
+      cancelRequested: false,
       apiKey: '',
       providerProfileId: '',
       taskId: '',
@@ -190,8 +190,8 @@ export function createRunningHubTaskStateMachine() {
       abortController: abortController,
       outNodeId: outNodeId,
     }) => {
-      ((apiKey['active'] = !![]),
-        (apiKey['cancelRequested'] = ![]),
+      ((apiKey['active'] = true),
+        (apiKey['cancelRequested'] = false),
         (apiKey['apiKey'] = apiKey2 || ''),
         (apiKey['providerProfileId'] = String(providerProfileId || '')['trim']()),
         (apiKey['taskId'] = ''),
@@ -205,7 +205,7 @@ export function createRunningHubTaskStateMachine() {
     isCancelled = () =>
       !!apiKey['cancelRequested'] || !!apiKey['abortController']?.['signal']?.['aborted'],
     cancel = async () => {
-      apiKey['cancelRequested'] = !![];
+      apiKey['cancelRequested'] = true;
       try {
         apiKey['abortController']?.['abort']?.();
       } catch {}
@@ -231,8 +231,8 @@ export function createRunningHubTaskStateMachine() {
       });
     },
     reset = (next) => {
-      ((apiKey['active'] = ![]),
-        (apiKey['cancelRequested'] = ![]),
+      ((apiKey['active'] = false),
+        (apiKey['cancelRequested'] = false),
         (apiKey['apiKey'] = ''),
         (apiKey['providerProfileId'] = ''),
         (apiKey['taskId'] = ''),
@@ -252,7 +252,7 @@ export function createRunningHubTaskStateMachine() {
   };
 }
 const ImageFreeAngleController = {
-  active: ![],
+  active: false,
   nodeId: null,
   nodeData: null,
   state: { rotation: 35, pitch: 20, scale: 0.5, pan: { x: 0, y: 0 } },
@@ -267,7 +267,7 @@ const ImageFreeAngleController = {
     if (!enabled4) return;
     if (this['active'] && this['nodeId'] === current) return;
     this['active'] && this['nodeId'] !== current && this['_exit']();
-    ((this['active'] = !![]),
+    ((this['active'] = true),
       (this['nodeId'] = current),
       (this['nodeData'] = enabled4),
       (this['containerEl'] = entry),
@@ -370,7 +370,7 @@ const ImageFreeAngleController = {
       const image = await getImage(thumbId);
       if (!image) return;
       const input = URL['createObjectURL'](image);
-      if (!this['active'] || this['nodeId'] !== nodeId2 || imageEl2?.['isConnected'] === ![]) {
+      if (!this['active'] || this['nodeId'] !== nodeId2 || imageEl2?.['isConnected'] === false) {
         URL['revokeObjectURL'](input);
         return;
       }
@@ -442,12 +442,12 @@ const ImageFreeAngleController = {
           this['_updateView']());
       }));
     const value9 = el7['querySelector']('.fa-preview-area');
-    let enabled5 = ![],
-      enabled6 = ![],
+    let enabled5 = false,
+      enabled6 = false,
       box = { x: 0, y: 0 };
     value9['onmousedown'] = (x) => {
-      enabled5 = !![];
-      if (x['button'] === 2) enabled6 = !![];
+      enabled5 = true;
+      if (x['button'] === 2) enabled6 = true;
       ((box = { x: x['clientX'], y: x['clientY'] }),
         x['preventDefault'](),
         x['stopPropagation']());
@@ -465,7 +465,7 @@ const ImageFreeAngleController = {
           this['_updateView']());
       },
       value13 = () => {
-        ((enabled5 = ![]), (enabled6 = ![]));
+        ((enabled5 = false), (enabled6 = false));
       };
     (window['addEventListener']('mousemove', value10),
       window['addEventListener']('mouseup', value13),
@@ -506,7 +506,7 @@ const ImageFreeAngleController = {
     if (!this['active']) return;
     (this['_functionControls']?.['destroy'](),
       (this['_functionControls'] = null),
-      (this['active'] = ![]),
+      (this['active'] = false),
       (this['nodeId'] = null));
     String(this['_faceImageObjectUrl'] || '')['startsWith']('blob:') &&
       URL['revokeObjectURL'](this['_faceImageObjectUrl']);
@@ -639,7 +639,7 @@ const ImageFreeAngleController = {
               taskId: '',
               status: 'pending',
               startedAt: startedAt2,
-              recovering: ![],
+              recovering: false,
               useOpenapiQuery: useOpenapiQuery2,
             })
           : {}),
@@ -650,7 +650,7 @@ const ImageFreeAngleController = {
               phase: 'generating',
               label: freeAngleText('task.submitting'),
               startedAt: startedAt2,
-              recovering: ![],
+              recovering: false,
             })
           : {}),
         ...(value17
@@ -660,7 +660,7 @@ const ImageFreeAngleController = {
               taskId: '',
               status: 'pending',
               startedAt: startedAt2,
-              recovering: ![],
+              recovering: false,
             })
           : {}),
         outputText: buildFreeAngleOutputText(imageFunctionModelDisplayName, {
@@ -700,8 +700,8 @@ const ImageFreeAngleController = {
                 taskId: taskId3,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: ![],
-                useOpenapiQuery: useOpenapiQuery3 === !![],
+                recovering: false,
+                useOpenapiQuery: useOpenapiQuery3 === true,
               }),
             }),
               _persistRunningHubResumeCache());
@@ -715,7 +715,7 @@ const ImageFreeAngleController = {
                 phase: 'generating',
                 label: freeAngleText('task.generating'),
                 startedAt: startedAt2,
-                recovering: ![],
+                recovering: false,
               }),
             }),
               _persistRunningHubResumeCache());
@@ -729,7 +729,7 @@ const ImageFreeAngleController = {
                 taskId: taskId3,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: ![],
+                recovering: false,
               }),
             }),
             _persistRunningHubResumeCache());
@@ -746,8 +746,8 @@ const ImageFreeAngleController = {
                 taskId: taskId4,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: ![],
-                useOpenapiQuery: useOpenapiQuery4?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
+                recovering: false,
+                useOpenapiQuery: useOpenapiQuery4?.['rhTaskUseOpenapiQuery'] === true || useOpenapiQuery2,
               }),
             }),
               _persistRunningHubResumeCache());
@@ -761,7 +761,7 @@ const ImageFreeAngleController = {
                 phase: 'generating',
                 label: freeAngleText('task.generating'),
                 startedAt: startedAt2,
-                recovering: ![],
+                recovering: false,
               }),
             }),
               _persistRunningHubResumeCache());
@@ -775,7 +775,7 @@ const ImageFreeAngleController = {
                 taskId: taskId4,
                 status: 'running',
                 startedAt: startedAt2,
-                recovering: ![],
+                recovering: false,
               }),
             }),
             _persistRunningHubResumeCache());
@@ -824,8 +824,8 @@ const ImageFreeAngleController = {
               taskId: taskId5?.['rhTaskId'] || '',
               status: 'success',
               startedAt: startedAt2,
-              recovering: ![],
-              useOpenapiQuery: taskId5?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
+              recovering: false,
+              useOpenapiQuery: taskId5?.['rhTaskUseOpenapiQuery'] === true || useOpenapiQuery2,
             })
           : {}),
         ...(_isDreaminaTaskModel2
@@ -835,7 +835,7 @@ const ImageFreeAngleController = {
               phase: 'done',
               label: freeAngleText('task.completed'),
               startedAt: startedAt2,
-              recovering: ![],
+              recovering: false,
             })
           : {}),
         ...(value17
@@ -845,7 +845,7 @@ const ImageFreeAngleController = {
               taskId: taskId5?.['asyncTaskId'] || '',
               status: 'success',
               startedAt: startedAt2,
-              recovering: ![],
+              recovering: false,
             })
           : {}),
       }),
@@ -872,8 +872,8 @@ const ImageFreeAngleController = {
                 taskId: taskId6?.['rhTaskId'] || '',
                 status: 'failed',
                 startedAt: startedAt2,
-                recovering: ![],
-                useOpenapiQuery: taskId6?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
+                recovering: false,
+                useOpenapiQuery: taskId6?.['rhTaskUseOpenapiQuery'] === true || useOpenapiQuery2,
               })
             : {}),
           ...(_isDreaminaTaskModel2
@@ -883,7 +883,7 @@ const ImageFreeAngleController = {
                 phase: 'failed',
                 label: error2 || freeAngleText('task.failed'),
                 startedAt: startedAt2,
-                recovering: ![],
+                recovering: false,
               })
             : {}),
           ...(value17
@@ -893,7 +893,7 @@ const ImageFreeAngleController = {
                 taskId: taskId6?.['asyncTaskId'] || '',
                 status: 'failed',
                 startedAt: startedAt2,
-                recovering: ![],
+                recovering: false,
               })
             : {}),
           outputText: freeAngleText('output.failedReason', { error: error2 }),

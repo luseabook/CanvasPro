@@ -23,14 +23,14 @@ export function initCanvasMcp({
   const timer = createCanvasMcpAutoConnection({
     allowGeneration,
     getBinding: getCanvasIdentity,
-    isReady: () => windowObject['_isAppLoaded'] === !![],
+    isReady: () => windowObject['_isAppLoaded'] === true,
     createSession: (onChange) =>
       createCanvasMcpSession({
         request: requestCanvasMcp,
         registry: canvasCommandRegistry,
         execute: (value, item) =>
           executeCanvasCommand(value, item, { ...commandContext, recordCommand: null }),
-        getBinding: () => (windowObject['_isAppLoaded'] === !![] ? getCanvasIdentity() : ''),
+        getBinding: () => (windowObject['_isAppLoaded'] === true ? getCanvasIdentity() : ''),
         listModels: listModelManifests,
         owner: owner,
         onChange: onChange,

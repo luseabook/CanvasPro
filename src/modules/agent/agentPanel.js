@@ -106,7 +106,7 @@ function createAgentPromptAttachmentButton({ title: title = '', className: class
 }
 function setEditorText(el5, item = '') {
   ((el5['textContent'] = String(item || '')),
-    el5['dispatchEvent']?.(new Event('input', { bubbles: !![] })));
+    el5['dispatchEvent']?.(new Event('input', { bubbles: true })));
 }
 function getEditorText(el6) {
   return String(el6?.['innerText'] || el6?.['textContent'] || '')['trim']();
@@ -135,7 +135,7 @@ function normalizeQuickAction(custom = {}, target = '', locale = getLocale()) {
     id: id,
     label: truncateUiText(next || prompt, 28),
     prompt: prompt,
-    custom: custom['custom'] === !![],
+    custom: custom['custom'] === true,
   };
 }
 function normalizeQuickActionList(list2 = [], locale2 = getLocale()) {
@@ -191,7 +191,7 @@ function migrateQuickActionsToCurrentDefaults(list5 = []) {
   );
 }
 function isKnownDefaultQuickActionContent(options3 = {}) {
-  if (options3['custom'] === !![]) return ![];
+  if (options3['custom'] === true) return false;
   return AGENT_PANEL_LOCALES['some']((value3) =>
     [...getDefaultQuickActions(value3), ...getLegacyQuickActions(value3)]['some']((value4) =>
       isSameQuickActionContent(options3, value4),
@@ -262,11 +262,11 @@ function isLikelyRenderableImageUrl(value19 = '') {
   const enabled2 = String(value19 || '')
     ['trim']()
     ['toLowerCase']();
-  if (!enabled2) return ![];
-  if (enabled2['startsWith']('data:image/')) return !![];
+  if (!enabled2) return false;
+  if (enabled2['startsWith']('data:image/')) return true;
   return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?|#|$)/i['test'](enabled2);
 }
-function resolveFirstAgentThumbUrl(list11 = [], { imageLikeOnly: imageLikeOnly = ![] } = {}) {
+function resolveFirstAgentThumbUrl(list11 = [], { imageLikeOnly: imageLikeOnly = false } = {}) {
   for (const value20 of list11) {
     const agentRenderableMediaUrl = normalizeAgentRenderableMediaUrl(value20);
     if (imageLikeOnly && !isLikelyRenderableImageUrl(agentRenderableMediaUrl)) continue;
@@ -297,7 +297,7 @@ function resolveAgentInputRefThumbUrl(options5 = {}, inferAgentInputKind2 = infe
         options5['thumbLocalPath'],
         options5['posterLocalPath'],
       ],
-      { imageLikeOnly: !![] },
+      { imageLikeOnly: true },
     );
   if (value22 === 'video') {
     const primaryVideoItem = getPrimaryVideoItem(options5);
@@ -316,7 +316,7 @@ function resolveAgentInputRefThumbUrl(options5 = {}, inferAgentInputKind2 = infe
         options5['thumbLocalPath'],
         options5['posterLocalPath'],
       ],
-      { imageLikeOnly: !![] },
+      { imageLikeOnly: true },
     );
   }
   return resolveFirstAgentThumbUrl([
@@ -477,7 +477,7 @@ function formatActionSummary(options7 = {}) {
 }
 function readParamControlValue(el7, value51 = {}) {
   const value52 = String(value51['type'] || '')['toLowerCase']();
-  if (value52 === 'toggle') return el7['checked'] === !![];
+  if (value52 === 'toggle') return el7['checked'] === true;
   if (value52 === 'slider' || value52 === 'stepper') {
     const value53 = Number(el7['value']);
     return Number['isFinite'](value53) ? value53 : el7['value'];
@@ -492,7 +492,7 @@ function getSelectedParamOption(el8 = {}) {
     ) || null
   );
 }
-function getParamOptionLabel(options8 = {}, { selected: selected = ![] } = {}) {
+function getParamOptionLabel(options8 = {}, { selected: selected = false } = {}) {
   const value55 = selected
     ? (options8['displayLabel'] ?? options8['selectedLabel'] ?? options8['label'])
     : (options8['label'] ?? options8['selectedLabel'] ?? options8['displayLabel']);
@@ -515,7 +515,7 @@ function createParamControl(field = {}, value56 = null, value57 = null) {
       trigger['setAttribute']('aria-haspopup', 'menu'),
       trigger['setAttribute']('aria-expanded', 'false'));
     const selectedParamOption = getSelectedParamOption(field),
-      value60 = selectedParamOption ? getParamOptionLabel(selectedParamOption, { selected: !![] }) : '—';
+      value60 = selectedParamOption ? getParamOptionLabel(selectedParamOption, { selected: true }) : '—';
     ((value59 = enabled5 + '：' + value60),
       trigger['append'](
         createAgentElement('span', 'agent-param-select-value', value60),
@@ -538,7 +538,7 @@ function createParamControl(field = {}, value56 = null, value57 = null) {
     if (value58 === 'toggle')
       ((trigger = createAgentElement('input', 'agent-param-input agent-param-checkbox')),
         (trigger['type'] = 'checkbox'),
-        (trigger['checked'] = field['value'] === !![]));
+        (trigger['checked'] = field['value'] === true));
     else {
       ((trigger = createAgentElement('input', 'agent-param-input agent-param-number')),
         (trigger['type'] = value58 === 'slider' || value58 === 'stepper' ? 'number' : 'text'),
@@ -571,7 +571,7 @@ function renderEditableParams(
   value62 = null,
   value63 = null,
   {
-    advancedExpanded: advancedExpanded = ![],
+    advancedExpanded: advancedExpanded = false,
     onAdvancedExpandedChange: onAdvancedExpandedChange = null,
   } = {},
 ) {
@@ -618,7 +618,7 @@ function renderEditableParams(
           el15['setAttribute']('aria-expanded', enabled6 ? 'true' : 'false'),
           onAdvancedExpandedChange?.(enabled6));
       }));
-  } else onAdvancedExpandedChange?.(![]);
+  } else onAdvancedExpandedChange?.(false);
   el12['appendChild'](el13);
 }
 function renderActionGroup(el18, value69, list19 = []) {
@@ -650,16 +650,16 @@ function renderPlanPreview(
 ) {
   advancedExpanded2['replaceChildren']();
   if (!enabled7) {
-    (delete advancedExpanded2['dataset']['agentAdvancedExpanded'], (advancedExpanded2['hidden'] = !![]));
+    (delete advancedExpanded2['dataset']['agentAdvancedExpanded'], (advancedExpanded2['hidden'] = true));
     return;
   }
   const enabled8 = enabled7['confirmationSummary'] || null,
     list21 = Array['isArray'](enabled7['actions']) ? enabled7['actions'] : [];
   if (!enabled8 && list21['length'] === 0) {
-    advancedExpanded2['hidden'] = !![];
+    advancedExpanded2['hidden'] = true;
     return;
   }
-  advancedExpanded2['hidden'] = ![];
+  advancedExpanded2['hidden'] = false;
   const agentElement = createAgentElement('div', 'agent-plan-title', agentPanelText('confirmTitle')),
     el24 = createAgentElement('div', 'agent-plan-body');
   if (enabled8) {
@@ -746,24 +746,24 @@ function renderRecovery(
           (setEditorText(editor, agentPanelText('recoveryEditPromptDraft')),
             editor?.['focus']?.(),
             setNotice?.(agentPanelText('recoveryEditPromptNotice')),
-            (el27['hidden'] = !![]));
+            (el27['hidden'] = true));
           return;
         }
         if (value81 === 'changeModel') {
           (setEditorText(editor, agentPanelText('recoveryChangeModelDraft')),
             editor?.['focus']?.(),
             setNotice?.(agentPanelText('recoveryChangeModelNotice')),
-            (el27['hidden'] = !![]));
+            (el27['hidden'] = true));
           return;
         }
         if (value81 === 'editRequest') {
           (setEditorText(editor, value80['draft'] || ''),
             editor?.['focus']?.(),
             setNotice?.(agentPanelText('recoveryEditRequestNotice')),
-            (el27['hidden'] = !![]));
+            (el27['hidden'] = true));
           return;
         }
-        value78?.(!![], { stoppable: !![] });
+        value78?.(true, { stoppable: true });
         try {
           const value82 =
             value81 === 'keepPrepared'
@@ -771,11 +771,11 @@ function renderRecovery(
               : value81 === 'retryPlanner'
                 ? await value77['retryPlannerRun']?.()
                 : await value77['retryFailedPlan']?.();
-          handler(value82 || { ok: ![], status: 'failed', reply: 'Recovery failed.' });
+          handler(value82 || { ok: false, status: 'failed', reply: 'Recovery failed.' });
         } catch (reply2) {
-          handler({ ok: ![], status: 'failed', reply: reply2?.['message'] || 'Agent recovery failed.' });
+          handler({ ok: false, status: 'failed', reply: reply2?.['message'] || 'Agent recovery failed.' });
         } finally {
-          value78?.(![], { stoppable: ![] });
+          value78?.(false, { stoppable: false });
         }
       }),
       el28['appendChild'](el29));
@@ -837,14 +837,14 @@ function renderHistory(value86, value87, { onSelect: onSelect = null, onDelete: 
     value86['append'](agentElement3, el30));
 }
 function isAgentPopoverOpen(el34) {
-  if (!el34) return ![];
-  if (el34['classList']?.['contains']('agent-history-popover')) return el34['hidden'] !== !![];
+  if (!el34) return false;
+  if (el34['classList']?.['contains']('agent-history-popover')) return el34['hidden'] !== true;
   return el34['classList']?.['contains']('show');
 }
 function hideAgentPopover(el35) {
   if (!el35) return;
   if (el35['classList']?.['contains']('agent-history-popover')) {
-    ((el35['hidden'] = !![]), el35['classList']?.['remove']?.('show'));
+    ((el35['hidden'] = true), el35['classList']?.['remove']?.('show'));
     return;
   }
   (el35['classList']?.['remove']?.('show'),
@@ -853,7 +853,7 @@ function hideAgentPopover(el35) {
 function showAgentPopover(el36) {
   if (!el36) return;
   if (el36['classList']?.['contains']('agent-history-popover')) {
-    ((el36['hidden'] = ![]), el36['classList']?.['add']?.('show'));
+    ((el36['hidden'] = false), el36['classList']?.['add']?.('show'));
     return;
   }
   (el36['classList']?.['add']?.('show'),
@@ -939,9 +939,9 @@ export function initAgentPanel({
   );
   const messagesEl = createAgentElement('div', 'agent-messages'),
     runStepsEl = createAgentElement('div', 'agent-run-steps');
-  runStepsEl['hidden'] = !![];
+  runStepsEl['hidden'] = true;
   const el45 = createAgentElement('div', 'agent-history-popover');
-  ((el45['hidden'] = !![]), agentElement7['append'](el44, messagesEl, runStepsEl, el45));
+  ((el45['hidden'] = true), agentElement7['append'](el44, messagesEl, runStepsEl, el45));
   const el46 = createAgentElement('div', 'agent-quick-actions-shell'),
     el47 = createAgentElement('div', 'agent-quick-actions');
   el46['appendChild'](el47);
@@ -962,7 +962,7 @@ export function initAgentPanel({
           list25,
           {
             className: 'v2-canvas-ctx-menu agent-context-menu',
-            ensureItemIcons: !![],
+            ensureItemIcons: true,
             ownerElement: ownerElement['target'],
             ownerRoot: ownerRoot,
           },
@@ -983,7 +983,7 @@ export function initAgentPanel({
           return {
             label: label,
             checked: String(disabled?.['value'] ?? '') === String(field2['value'] ?? ''),
-            disabled: disabled?.['disabled'] === !![],
+            disabled: disabled?.['disabled'] === true,
             action: () => onSelect2?.(disabled['value']),
             paramValue: disabled['value'],
           };
@@ -1002,7 +1002,7 @@ export function initAgentPanel({
           restoreTarget: trigger2,
           ownerElement: trigger2,
           ownerRoot: ownerRoot,
-          dismissOnOwnerPointerDown: ![],
+          dismissOnOwnerPointerDown: false,
           ariaLabel: String(field2['label'] || ''),
           onClose: () => {
             trigger2['setAttribute']('aria-expanded', 'false');
@@ -1022,7 +1022,7 @@ export function initAgentPanel({
       (surface['quickActions'] || readCustomQuickActions(windowObject))['forEach']((icon) => {
         const el49 = createAgentButton('agent-quick-card', icon['label'], {
           icon:
-            icon['custom'] === !![]
+            icon['custom'] === true
               ? agentIconSvg('wand')
               : icon['id'] === 'canvas-gap-check'
                 ? agentIconSvg('scan')
@@ -1036,7 +1036,7 @@ export function initAgentPanel({
   }
   run3();
   const el50 = createAgentElement('div', 'agent-custom-panel');
-  ((el50['hidden'] = !![]), el50['setAttribute']('aria-hidden', 'true'));
+  ((el50['hidden'] = true), el50['setAttribute']('aria-hidden', 'true'));
   const agentElement8 = createAgentElement('div', 'agent-custom-panel-header'),
     agentElement9 = createAgentElement('div', 'agent-custom-panel-copy');
   agentElement9['append'](
@@ -1083,15 +1083,15 @@ export function initAgentPanel({
     agentElement10['append'](agentElement11, el54),
     el50['append'](agentElement8, agentElement10));
   const el60 = createAgentElement('div', 'agent-notice');
-  el60['hidden'] = !![];
+  el60['hidden'] = true;
   const el61 = createAgentElement('div', 'agent-plan-preview');
-  el61['hidden'] = !![];
+  el61['hidden'] = true;
   const el62 = createAgentElement('div', 'agent-options');
-  el62['hidden'] = !![];
+  el62['hidden'] = true;
   const el63 = createAgentElement('div', 'agent-recovery');
-  el63['hidden'] = !![];
+  el63['hidden'] = true;
   const el64 = createAgentElement('div', 'agent-actions');
-  el64['hidden'] = !![];
+  el64['hidden'] = true;
   const el65 = createAgentButton('agent-primary-btn', agentPanelText('confirmExecute')),
     el66 = createAgentButton('agent-secondary-btn', agentPanelText('cancel'));
   el64['append'](el65, el66);
@@ -1105,11 +1105,11 @@ export function initAgentPanel({
     el70 = createAgentElement('div', 'agent-ref-placeholder', agentPanelText('addReference')),
     el71 = createAgentElement('div', 'ref-thumb-container agent-input-ref-list');
   (el71['setAttribute']('role', 'list'), el68['append'](el69, el70, el71));
-  if (surface['textOnly']) el68['hidden'] = !![];
+  if (surface['textOnly']) el68['hidden'] = true;
   const el72 = createAgentElement('div', 'agent-input-wrapper prompt-input-wrapper'),
     slashTrigger = createAgentElement('div', 'agent-compose-input prompt-textarea custom-textarea');
   ((slashTrigger['contentEditable'] = 'true'),
-    (slashTrigger['spellcheck'] = ![]),
+    (slashTrigger['spellcheck'] = false),
     (slashTrigger['dataset']['placeholder'] = surface['placeholder'] || agentPanelText('inputPlaceholder')),
     el72['appendChild'](slashTrigger));
   const agentElement14 = createAgentElement('div', 'agent-compose-footer prompt-panel-footer'),
@@ -1130,7 +1130,7 @@ export function initAgentPanel({
     ((el76['dataset']['placeholderAction'] = value95), el75['appendChild'](el76));
   }),
     el73['append'](el74, el75));
-  if (surface['textOnly']) el73['hidden'] = !![];
+  if (surface['textOnly']) el73['hidden'] = true;
   const activeModel = modelSettings?.['getSettings']?.() || {},
     el77 = createAgentElement(
       'div',
@@ -1161,7 +1161,7 @@ export function initAgentPanel({
   const agentButton = createAgentButton('model-provider-profile-selector-toggle is-hidden', ''),
     el82 = createAgentElement('div', 'ui-schema-placement ui-schema-mode-slot');
   ((el82['dataset']['aigenTextUiSchemaModeSlot'] = ''),
-    (el82['hidden'] = !![]),
+    (el82['hidden'] = true),
     el77['append'](agentElement16, agentButton, el82));
   const el83 = createAgentElement('div', 'agent-menu-wrap'),
     el84 = createAgentButton('agent-pill-btn agent-mode-btn', '', {
@@ -1191,7 +1191,7 @@ export function initAgentPanel({
       el87['appendChild'](el88));
   }),
     el83['append'](el84, el87),
-    (el83['hidden'] = !![]));
+    (el83['hidden'] = true));
   const onCatalogChange = createAgentSkillPicker({
     registry: skillRegistry,
     text: agentPanelText,
@@ -1199,7 +1199,7 @@ export function initAgentPanel({
     onSelect: (value100) => {
       const value101 = String(value100?.['id'] || '')['trim']();
       if (value101) setEditorText(slashTrigger, '$' + value101 + ' ');
-      (setMenuOpen(onCatalogChange['menu'], ![], ownerRoot), slashTrigger['focus']());
+      (setMenuOpen(onCatalogChange['menu'], false, ownerRoot), slashTrigger['focus']());
     },
   });
   agentElement15['append'](el73, el77);
@@ -1213,7 +1213,7 @@ export function initAgentPanel({
     icon: agentIconSvg('stop'),
   });
   ((el90['type'] = 'button'),
-    (el90['hidden'] = !![]),
+    (el90['hidden'] = true),
     agentElement14['append'](agentElement15, el89, el90),
     agentElement13['append'](el68, el72, agentElement14, onCatalogChange['element']));
   const agentSkillPanel = createAgentSkillPanel({
@@ -1239,14 +1239,14 @@ export function initAgentPanel({
             : '' + value105 + (editorText ? ' ' + editorText : ' '),
         );
       }
-      (setMenuOpen(onCatalogChange['menu'], ![], ownerRoot), slashTrigger['focus']());
+      (setMenuOpen(onCatalogChange['menu'], false, ownerRoot), slashTrigger['focus']());
     },
     onCatalogChange: onCatalogChange['render'],
     onNotice: onNotice,
     windowObject: windowObject,
   });
   function run5() {
-    (run6(![]), agentSkillPanel['open']());
+    (run6(false), agentSkillPanel['open']());
   }
   const args = createAgentComposerAttachmentController({
     documentObject: document,
@@ -1291,7 +1291,7 @@ export function initAgentPanel({
       initialSettings: activeModel,
       documentObject: document,
     })));
-  let enabled11 = ![];
+  let enabled11 = false;
   const agentPanelContinuity = createAgentPanelContinuity({
     getConversation: () =>
       runtime['sessionStore']?.['getActiveConversation']?.() || runtime['getActiveConversation']?.(),
@@ -1301,7 +1301,7 @@ export function initAgentPanel({
   let agentConversationPresentation = null,
     agentConversationActions = null,
     timer = null,
-    value109 = ![],
+    value109 = false,
     value110 = null;
   const storedSidebarWidth = readStoredSidebarWidth(windowObject);
   storedSidebarWidth &&
@@ -1309,30 +1309,30 @@ export function initAgentPanel({
   function run7() {
     timer !== null && (clearTimeout(timer), (timer = null));
   }
-  function onNotice(value111, { sticky: sticky = ![] } = {}) {
+  function onNotice(value111, { sticky: sticky = false } = {}) {
     run7();
     const value112 =
       ownerRoot['classList']['contains']('is-open') && runtime['sessionStore']?.['getPersistenceError']?.();
     ((value109 = Boolean(value112)),
-      value112 && ((value111 = value112), (sticky = !![])),
+      value112 && ((value111 = value112), (sticky = true)),
       (el60['textContent'] = String(value111 || '')),
       (el60['hidden'] = !el60['textContent']),
       el60['textContent'] &&
         !sticky &&
         ((timer = setTimeout(() => {
-          ((timer = null), (el60['textContent'] = ''), (el60['hidden'] = !![]));
+          ((timer = null), (el60['textContent'] = ''), (el60['hidden'] = true));
         }, AGENT_NOTICE_AUTO_HIDE_MS)),
         timer?.['unref']?.()));
   }
   async function onCopy(value113 = '') {
     const enabled12 = String(value113 || '')['trim']();
-    if (!enabled12) return ![];
+    if (!enabled12) return false;
     try {
       const enabled13 = windowObject?.['navigator']?.['clipboard'] || globalThis['navigator']?.['clipboard'];
       if (!enabled13?.['writeText']) throw new Error('Clipboard unavailable');
-      return (await enabled13['writeText'](enabled12), onNotice(agentPanelText('copyMessageDone')), !![]);
+      return (await enabled13['writeText'](enabled12), onNotice(agentPanelText('copyMessageDone')), true);
     } catch {
-      return (onNotice(agentPanelText('copyMessageFailed')), ![]);
+      return (onNotice(agentPanelText('copyMessageFailed')), false);
     }
   }
   function onImagePreview(value114 = '', alt = '') {
@@ -1347,7 +1347,7 @@ export function initAgentPanel({
     const value116 =
         document?.['getSelection']?.() || windowObject?.['getSelection']?.() || globalThis['getSelection']?.(),
       enabled15 = String(value116?.['toString']?.() || '')['trim']();
-    if (!enabled15 || value116?.['isCollapsed'] === !![]) return '';
+    if (!enabled15 || value116?.['isCollapsed'] === true) return '';
     const count4 = Number(value116?.['rangeCount']) || 0;
     if (count4 > 0 && typeof value116['getRangeAt'] === 'function') {
       for (let value117 = 0; value117 < count4; value117 += 1) {
@@ -1391,7 +1391,7 @@ export function initAgentPanel({
       el46['classList']['toggle']('has-right-fade', value120 && scrollLeft2 < maxScroll2 - 1));
   }
   function run11(value121) {
-    const value122 = value121 === !![];
+    const value122 = value121 === true;
     ((el47['hidden'] = value122), (el46['hidden'] = value122), run4());
   }
   function run12(event4) {
@@ -1411,7 +1411,7 @@ export function initAgentPanel({
   }
   function run6(value124) {
     if (value124) {
-      ((el50['hidden'] = ![]),
+      ((el50['hidden'] = false),
         el50['setAttribute']('aria-hidden', 'false'),
         el50['classList']['remove']('is-open'),
         void el50['offsetWidth'],
@@ -1420,11 +1420,11 @@ export function initAgentPanel({
     }
     (el50['classList']['remove']('is-open'),
       el50['setAttribute']('aria-hidden', 'true'),
-      (el50['hidden'] = !![]));
+      (el50['hidden'] = true));
   }
-  let enabled20 = ![],
+  let enabled20 = false,
     list27 = [],
-    enabled21 = ![],
+    enabled21 = false,
     el91 = null;
   function run13(el92, value125) {
     if (!el92) return;
@@ -1496,7 +1496,7 @@ export function initAgentPanel({
     isAgentPopoverOpen(el45) &&
       renderHistory(el45, runtime, { onSelect: onSelect3, onDelete: onDelete2 });
     if (!el50['hidden']) renderCustomShortcutList();
-    enabled21 && onNotice(agentPanelText('materialPickStarted'), { sticky: !![] });
+    enabled21 && onNotice(agentPanelText('materialPickStarted'), { sticky: true });
   }
   function run16(options11 = {}) {
     if (options11['thumbUrl']) {
@@ -1504,7 +1504,7 @@ export function initAgentPanel({
       return (
         (agentElement18['src'] = options11['thumbUrl']),
         (agentElement18['alt'] = options11['label'] || options11['nodeId'] || ''),
-        (agentElement18['draggable'] = ![]),
+        (agentElement18['draggable'] = false),
         agentElement18
       );
     }
@@ -1565,9 +1565,9 @@ export function initAgentPanel({
     );
   }
   function run17() {
-    ((list27 = []), args['clearDocuments']({ notify: ![] }), onDocumentChange());
+    ((list27 = []), args['clearDocuments']({ notify: false }), onDocumentChange());
   }
-  function run18({ clearWhenMissing: clearWhenMissing = ![] } = {}) {
+  function run18({ clearWhenMissing: clearWhenMissing = false } = {}) {
     const value133 =
         runtime?.['sessionStore']?.['getPendingClarification']?.() ||
         runtime?.['sessionStore']?.['getState']?.()['pendingClarification'] ||
@@ -1580,7 +1580,7 @@ export function initAgentPanel({
           nodeId: String(args2['nodeId'] || args2['id'] || '')['trim'](),
         }))
         ['slice'](0, AGENT_CONVERSATION_INPUT_REF_LIMIT);
-    if (list30['length'] === 0 && !clearWhenMissing) return ![];
+    if (list30['length'] === 0 && !clearWhenMissing) return false;
     return ((list27 = list30), onDocumentChange(), list30['length'] > 0);
   }
   function run19() {
@@ -1607,7 +1607,7 @@ export function initAgentPanel({
   }
   function run24({ noticeText: noticeText = '' } = {}) {
     if (!enabled21) return;
-    ((enabled21 = ![]),
+    ((enabled21 = false),
       run22(),
       ownerRoot['classList']['remove']('is-material-picking'),
       el69['classList']['remove']('is-picking', 'is-connecting-active'),
@@ -1617,17 +1617,17 @@ export function initAgentPanel({
     const el103 = run20();
     (el103?.['classList']?.['remove']?.('is-connecting-mode'),
       el103?.['style']?.['removeProperty']?.('--connect-cursor'),
-      document?.['removeEventListener']?.('click', run25, !![]),
-      document?.['removeEventListener']?.('pointermove', run26, !![]),
-      document?.['removeEventListener']?.('keydown', run27, !![]));
+      document?.['removeEventListener']?.('click', run25, true),
+      document?.['removeEventListener']?.('pointermove', run26, true),
+      document?.['removeEventListener']?.('keydown', run27, true));
     if (noticeText) onNotice(noticeText);
   }
-  function run28({ toggle: toggle = !![] } = {}) {
+  function run28({ toggle: toggle = true } = {}) {
     if (enabled21) {
       toggle && run24({ noticeText: agentPanelText('materialPickCancelled') });
       return;
     }
-    ((enabled21 = !![]),
+    ((enabled21 = true),
       ownerRoot['classList']['add']('is-material-picking'),
       el69['classList']['add']('is-picking', 'is-connecting-active'),
       el69['setAttribute']('aria-pressed', 'true'));
@@ -1636,10 +1636,10 @@ export function initAgentPanel({
     const el105 = run20();
     (el105?.['classList']?.['add']?.('is-connecting-mode'),
       el105?.['style']?.['setProperty']?.('--connect-cursor', run21()),
-      document?.['addEventListener']?.('click', run25, !![]),
-      document?.['addEventListener']?.('pointermove', run26, !![]),
-      document?.['addEventListener']?.('keydown', run27, !![]),
-      onNotice(agentPanelText('materialPickStarted'), { sticky: !![] }));
+      document?.['addEventListener']?.('click', run25, true),
+      document?.['addEventListener']?.('pointermove', run26, true),
+      document?.['addEventListener']?.('keydown', run27, true),
+      onNotice(agentPanelText('materialPickStarted'), { sticky: true }));
   }
   function run29(el106) {
     const nodeEl = el106?.['closest']?.('.v2-node') || null,
@@ -1663,11 +1663,11 @@ export function initAgentPanel({
       event6['stopPropagation']?.(),
       event6['stopImmediatePropagation']?.());
     if (!isAgentMaterialRef(ref3)) {
-      onNotice(agentPanelText('materialPickUnsupported'), { sticky: !![] });
+      onNotice(agentPanelText('materialPickUnsupported'), { sticky: true });
       return;
     }
     (addInputRefs([ref3]),
-      onNotice(formatAgentPanelText('attachSelected', { count: 1 }), { sticky: !![] }));
+      onNotice(formatAgentPanelText('attachSelected', { count: 1 }), { sticky: true }));
   }
   function run27(event7) {
     if (!enabled21 || event7['key'] !== 'Escape') return;
@@ -1694,11 +1694,11 @@ export function initAgentPanel({
       count7 || list33['length']
     );
   }
-  function run31({ toggle: toggle = !![] } = {}) {
+  function run31({ toggle: toggle = true } = {}) {
     if (enabled21) return (run28({ toggle: toggle }), 0);
     const count8 = run30();
     if (count8 > 0) return count8;
-    return (run28({ toggle: ![] }), 0);
+    return (run28({ toggle: false }), 0);
   }
   let id3 = '';
   function run32() {
@@ -1744,8 +1744,8 @@ export function initAgentPanel({
       run32(),
       !el56['value'] && value143 && (el56['value'] = truncateUiText(value143, 18)));
   }
-  function run35({ prefillFromInput: prefillFromInput = ![] } = {}) {
-    run6(!![]);
+  function run35({ prefillFromInput: prefillFromInput = false } = {}) {
+    run6(true);
     const customQuickActions2 = readCustomQuickActions(windowObject),
       prompt2 = prefillFromInput ? getEditorText(slashTrigger) : '';
     (prompt2
@@ -1766,7 +1766,7 @@ export function initAgentPanel({
         id: id3 || 'custom-' + Date['now'](),
         label: label2,
         prompt: prompt3,
-        custom: custom2 ? custom2['custom'] === !![] : !![],
+        custom: custom2 ? custom2['custom'] === true : true,
       },
       count9 = list35['findIndex']((value146) => value146['id'] === value145['id']),
       value147 =
@@ -1809,10 +1809,10 @@ export function initAgentPanel({
     (run2(),
       renderPlanPreview(el61, null),
       el62['replaceChildren'](),
-      (el62['hidden'] = !![]),
+      (el62['hidden'] = true),
       el63['replaceChildren'](),
-      (el63['hidden'] = !![]),
-      (el64['hidden'] = !![]));
+      (el63['hidden'] = true),
+      (el64['hidden'] = true));
   }
   function run39(options13 = {}) {
     agentConversationPresentation?.['appendEntry'](options13);
@@ -1820,9 +1820,9 @@ export function initAgentPanel({
   function run40({ hasMessages: hasMessages } = {}) {
     const value152 = hasMessages ?? messagesEl['children']['length'] > 0;
     ((el44['hidden'] = value152), run11(value152));
-    if (value152) run6(![]);
+    if (value152) run6(false);
   }
-  function run41({ preserveNotice: preserveNotice = ![] } = {}) {
+  function run41({ preserveNotice: preserveNotice = false } = {}) {
     if (!ownerRoot['classList']['contains']('is-open')) {
       onNotice('');
       return;
@@ -1836,14 +1836,14 @@ export function initAgentPanel({
       runtime?.['sessionStore']?.['getState']?.()['activeConversation'] ||
       null;
     if (value153?.['hasUnfinishedOperation']) {
-      onNotice(agentPanelText('unfinishedNotice'), { sticky: !![] });
+      onNotice(agentPanelText('unfinishedNotice'), { sticky: true });
       return;
     }
     if (!preserveNotice) onNotice('');
   }
   function run42({
-    preserveNotice: preserveNotice = ![],
-    restorePendingInputRefs: restorePendingInputRefs = ![],
+    preserveNotice: preserveNotice = false,
+    restorePendingInputRefs: restorePendingInputRefs = false,
   } = {}) {
     run38();
     const sessionSnapshot = runtime?.['sessionStore']?.['getState']?.() || {};
@@ -1851,8 +1851,8 @@ export function initAgentPanel({
     const value154 = sessionSnapshot['pendingPlan'] || null;
     (value154 &&
       (renderPlanPreview(el61, value154, { onParamChange: onParamChange2, onOpenParamOptions: onOpenParamOptions2 }),
-      (el64['hidden'] = ![])),
-      restorePendingInputRefs && run18({ clearWhenMissing: !![] }),
+      (el64['hidden'] = false)),
+      restorePendingInputRefs && run18({ clearWhenMissing: true }),
       run43(runtime['getPendingAssistantChoice']?.() || sessionSnapshot['pendingClarification']),
       run40(),
       run41({ preserveNotice: preserveNotice }));
@@ -1862,8 +1862,8 @@ export function initAgentPanel({
       list36 = Array['isArray'](value155) ? value155 : [];
     return (agentConversationPresentation?.['renderMessages'](list36), run40(), list36['length'] > 0);
   }
-  function setBusy(value156, { stoppable: stoppable = ![] } = {}) {
-    enabled11 = value156 === !![];
+  function setBusy(value156, { stoppable: stoppable = false } = {}) {
+    enabled11 = value156 === true;
     if (enabled11) run2();
     (el67['setAttribute']('aria-busy', enabled11 ? 'true' : 'false'),
       el90['setAttribute']('aria-busy', enabled11 && stoppable ? 'true' : 'false'),
@@ -1897,30 +1897,30 @@ export function initAgentPanel({
       (runtime['sessionStore']?.['retryPersistence']?.(),
         bindAgentModelControls2?.['sync']?.(modelSettings?.['getSettings']?.() || activeModel));
       if (!enabled11 && !agentPanelContinuity['canResume']())
-        run42({ preserveNotice: !![], restorePendingInputRefs: !agentPanelContinuity['isSameConversation']() });
+        run42({ preserveNotice: true, restorePendingInputRefs: !agentPanelContinuity['isSameConversation']() });
       run4();
       if (!enabled20)
         (messagesEl['querySelector']('.agent-message-edit-input') || slashTrigger)['focus']({
-          preventScroll: !![],
+          preventScroll: true,
         });
-      run41({ preserveNotice: !![] });
+      run41({ preserveNotice: true });
     } else (run24(), run2(), closeFloatingMenus(ownerRoot), onNotice(''));
   }
   function toggle2() {
     run45(!ownerRoot['classList']['contains']('is-open'));
   }
   function run46(value157) {
-    ((enabled20 = value157 === !![]),
+    ((enabled20 = value157 === true),
       ownerRoot['classList']['toggle']('is-collapsed', enabled20),
       stateRoot['classList']?.['toggle'](
         'agent-sidebar-collapsed',
         enabled20 && ownerRoot['classList']['contains']('is-open'),
       ));
     if (!enabled20 && ownerRoot['classList']['contains']('is-open'))
-      slashTrigger['focus']({ preventScroll: !![] });
+      slashTrigger['focus']({ preventScroll: true });
     enabled20 && (run24(), closeFloatingMenus(ownerRoot), onNotice(''));
   }
-  function run47(value158, { persist: persist = ![] } = {}) {
+  function run47(value158, { persist: persist = false } = {}) {
     const clampAgentSidebarWidth2 = clampAgentSidebarWidth(value158);
     stateRoot['style']?.['setProperty']?.('--agent-sidebar-width', clampAgentSidebarWidth2 + 'px');
     if (persist) writeStoredSidebarWidth(clampAgentSidebarWidth2, windowObject);
@@ -1943,7 +1943,7 @@ export function initAgentPanel({
           document?.['removeEventListener']?.('pointerup', handler3),
           stateRoot['classList']?.['remove']?.('agent-sidebar-resizing'));
         const value162 = Number(event10['clientX']);
-        Number['isFinite'](value162) && run47(enabled27 + (value159 - value162), { persist: !![] });
+        Number['isFinite'](value162) && run47(enabled27 + (value159 - value162), { persist: true });
       };
     (value110?.(),
       (value110 = () => handler3({})),
@@ -1954,12 +1954,12 @@ export function initAgentPanel({
     (agentPanelContinuity['invalidate'](),
       run24(),
       runtime['startNewConversation']?.(),
-      run42({ preserveNotice: !![], restorePendingInputRefs: !![] }),
-      setBusy(![]),
+      run42({ preserveNotice: true, restorePendingInputRefs: true }),
+      setBusy(false),
       setEditorText(slashTrigger, ''),
       run17(),
-      run6(![]),
-      (el45['hidden'] = !![]),
+      run6(false),
+      (el45['hidden'] = true),
       onNotice(agentPanelText('newConversationNotice')));
   }
   function onSelect3(value163) {
@@ -1968,10 +1968,10 @@ export function initAgentPanel({
       run24(),
       setEditorText(slashTrigger, ''),
       run17(),
-      run6(![]),
-      (el45['hidden'] = !![]),
-      run42({ restorePendingInputRefs: !![] }),
-      setBusy(![]));
+      run6(false),
+      (el45['hidden'] = true),
+      run42({ restorePendingInputRefs: true }),
+      setBusy(false));
   }
   function onDelete2(value164) {
     const value165 = value164 === runtime['getActiveConversation']?.()?.['id'];
@@ -1980,15 +1980,15 @@ export function initAgentPanel({
       value165 &&
         (setEditorText(slashTrigger, ''),
         run17(),
-        run6(![]),
-        run42({ restorePendingInputRefs: !![] }),
-        setBusy(![])),
+        run6(false),
+        run42({ restorePendingInputRefs: true }),
+        setBusy(false)),
       renderHistory(el45, runtime, { onSelect: onSelect3, onDelete: onDelete2 }));
   }
   async function onParamChange2(value166, value167) {
     if (typeof runtime?.['updatePendingGenerationParams'] !== 'function') return;
     const value168 = agentPanelContinuity['capture']();
-    setBusy(!![]);
+    setBusy(true);
     try {
       const error2 = await runtime['updatePendingGenerationParams']({
         params: { [value166]: value167 },
@@ -2008,7 +2008,7 @@ export function initAgentPanel({
       if (agentPanelContinuity['isCurrent'](value168))
         onNotice(error3?.['message'] || agentPanelText('paramUpdateFailed'));
     } finally {
-      if (agentPanelContinuity['isCurrent'](value168)) setBusy(![]);
+      if (agentPanelContinuity['isCurrent'](value168)) setBusy(false);
     }
   }
   function onResult(diagnostic) {
@@ -2031,7 +2031,7 @@ export function initAgentPanel({
       }),
       (el64['hidden'] = diagnostic?.['status'] !== 'need_confirmation'),
       agentConversationPresentation['renderRunSteps'](runtime?.['sessionStore']?.['getState']?.() || {}),
-      run18({ clearWhenMissing: !![] }),
+      run18({ clearWhenMissing: true }),
       agentConversationPresentation?.['acknowledgeSessionState']?.({ taskMessages: diagnostic?.['taskMessages'] || [] }));
   }
   function run43(value171) {
@@ -2040,14 +2040,14 @@ export function initAgentPanel({
       value171,
       runtime,
       onResult,
-      (stoppable2) => setBusy(stoppable2, { stoppable: stoppable2 === !![] }),
+      (stoppable2) => setBusy(stoppable2, { stoppable: stoppable2 === true }),
       {
         onAnswer: (enabled28) => {
           if (!enabled28) return;
           const inputRefs = list27['slice']();
           (run17(),
             agentConversationPresentation['appendMessage']('user', enabled28, { inputRefs: inputRefs }),
-            (el44['hidden'] = !![]));
+            (el44['hidden'] = true));
         },
         onWaitingStart: () => agentConversationPresentation['appendWaiting'](),
         onWaitingEnd: (value172) => agentConversationPresentation['removeWaiting'](value172),
@@ -2064,13 +2064,13 @@ export function initAgentPanel({
       inputRefs3 = [...inputRefs2, ...documentFiles['displayRefs']];
     (run17(),
       setEditorText(slashTrigger, ''),
-      run6(![]),
+      run6(false),
       agentSkillPanel['close'](),
-      run11(!![]),
+      run11(true),
       agentConversationPresentation['appendMessage']('user', editorText2, { inputRefs: inputRefs3 }),
-      (el44['hidden'] = !![]),
-      (el62['hidden'] = !![]),
-      setBusy(!![], { stoppable: !![] }));
+      (el44['hidden'] = true),
+      (el62['hidden'] = true),
+      setBusy(true, { stoppable: true }));
     const el112 = agentConversationPresentation['appendWaiting']();
     try {
       const value174 = await runtime['handleUserMessage'](editorText2, {
@@ -2087,7 +2087,7 @@ export function initAgentPanel({
       if (agentPanelContinuity['isCurrent'](value173)) {
         const value175 = Boolean(el112['parentNode']);
         agentConversationPresentation['removeWaiting'](el112);
-        if (value175) setBusy(![]);
+        if (value175) setBusy(false);
       }
     }
   }
@@ -2095,7 +2095,7 @@ export function initAgentPanel({
     (event11['stopPropagation'](), toggle2());
   };
   (fabBtnEl['addEventListener']('click', value176),
-    el43['addEventListener']('click', () => run45(![])),
+    el43['addEventListener']('click', () => run45(false)),
     el41['addEventListener']('click', reset),
     el42['addEventListener']('click', (event12) => {
       event12['stopPropagation']?.();
@@ -2131,7 +2131,7 @@ export function initAgentPanel({
     }),
     el59['addEventListener']('click', run36),
     el51['addEventListener']('click', () => {
-      (run6(![]), slashTrigger['focus']());
+      (run6(false), slashTrigger['focus']());
     }),
     el74['addEventListener']('click', (event15) => {
       (event15['stopPropagation'](),
@@ -2146,7 +2146,7 @@ export function initAgentPanel({
       else {
         if (value179 === 'document') args['openDocumentPicker']();
         else {
-          if (value179 === 'custom') (agentSkillPanel['close'](), run35({ prefillFromInput: !![] }));
+          if (value179 === 'custom') (agentSkillPanel['close'](), run35({ prefillFromInput: true }));
           else value179 === 'skills' && run5();
         }
       }
@@ -2199,20 +2199,20 @@ export function initAgentPanel({
       (messagesEl['querySelectorAll']?.('.agent-message--typing')?.['forEach']((value183) =>
         agentConversationPresentation['removeWaiting'](value183),
       ),
-        setBusy(![]),
+        setBusy(false),
         onNotice(value182?.['notice'] || agentPanelText('stopRequested')));
     }),
     slashTrigger['addEventListener']('input', () => {
       if (surface['textOnly']) return;
       const editorText3 = getEditorText(slashTrigger)['match'](/^\/([^\s]*)$/);
       if (!editorText3) {
-        setMenuOpen(onCatalogChange['menu'], ![], ownerRoot);
+        setMenuOpen(onCatalogChange['menu'], false, ownerRoot);
         return;
       }
       (agentSkillPanel['close'](),
-        run6(![]),
+        run6(false),
         onCatalogChange['openSlash'](editorText3[1]),
-        setMenuOpen(onCatalogChange['menu'], !![], ownerRoot));
+        setMenuOpen(onCatalogChange['menu'], true, ownerRoot));
     }),
     slashTrigger['addEventListener']('keydown', (event23) => {
       if (isAgentPopoverOpen(onCatalogChange['menu']) && !event23['isComposing']) {
@@ -2227,7 +2227,7 @@ export function initAgentPanel({
         }
         if (event23['key'] === 'Escape') {
           (event23['preventDefault'](),
-            setMenuOpen(onCatalogChange['menu'], ![], ownerRoot),
+            setMenuOpen(onCatalogChange['menu'], false, ownerRoot),
             slashTrigger['focus']());
           return;
         }
@@ -2274,7 +2274,7 @@ export function initAgentPanel({
           {
             label: agentPanelText('historyDelete'),
             icon: 'delete',
-            danger: !![],
+            danger: true,
             shortcutActionId: 'context-agent-delete-history',
             action: () => onDelete2(enabled30),
           },
@@ -2318,16 +2318,16 @@ export function initAgentPanel({
       event30['preventDefault']();
       const value188 = ownerRoot['getBoundingClientRect']?.()['width'] || ownerRoot['offsetWidth'] || 0,
         value189 = event30['key'] === 'ArrowLeft' ? 24 : -24;
-      run47(value188 + value189, { persist: !![] });
+      run47(value188 + value189, { persist: true });
     }),
     el65['addEventListener']('click', async () => {
       if (enabled11) return;
       const value190 = agentPanelContinuity['capture'](),
         displayAnswer = agentPanelText('confirmUserMessage');
       (agentConversationPresentation['appendMessage']('user', displayAnswer),
-        (el44['hidden'] = !![]),
-        (el64['hidden'] = !![]),
-        setBusy(!![], { stoppable: !![] }));
+        (el44['hidden'] = true),
+        (el64['hidden'] = true),
+        setBusy(true, { stoppable: true }));
       const el122 = agentConversationPresentation['appendWaiting']();
       try {
         const value191 = await runtime['confirmPendingPlan']({ displayAnswer: displayAnswer });
@@ -2338,16 +2338,16 @@ export function initAgentPanel({
       } finally {
         agentPanelContinuity['isCurrent'](value190) &&
           el122['parentNode'] &&
-          (agentConversationPresentation['removeWaiting'](el122), setBusy(![]));
+          (agentConversationPresentation['removeWaiting'](el122), setBusy(false));
       }
     }),
     el66['addEventListener']('click', () => {
       if (enabled11) return;
-      ((el64['hidden'] = !![]), setBusy(!![]));
+      ((el64['hidden'] = true), setBusy(true));
       try {
         onResult(runtime['cancelPendingPlan']());
       } finally {
-        setBusy(![]);
+        setBusy(false);
       }
     }),
     (agentConversationActions = createAgentConversationActions({
@@ -2372,8 +2372,8 @@ export function initAgentPanel({
         (run40(), agentConversationActions['render']());
         if (!ownerRoot['classList']['contains']('is-open')) agentPanelContinuity['rememberClosed']();
       },
-      onConversationInvalidated: ({ historyOnly: historyOnly = ![] } = {}) => {
-        if (!historyOnly) return run42({ preserveNotice: !![] });
+      onConversationInvalidated: ({ historyOnly: historyOnly = false } = {}) => {
+        if (!historyOnly) return run42({ preserveNotice: true });
         (agentConversationPresentation?.['render']({
           history: getHistory(),
           sessionSnapshot: runtime?.['sessionStore']?.['getState']?.() || {},
@@ -2383,20 +2383,20 @@ export function initAgentPanel({
     })));
   const run50 = onLocaleChange(run15);
   return (
-    run42({ restorePendingInputRefs: !![] }),
+    run42({ restorePendingInputRefs: true }),
     {
       panel: ownerRoot,
       sendMessage: (value192) => {
         if (enabled11) return;
         return (setEditorText(slashTrigger, value192), run49());
       },
-      open: () => run45(!![]),
-      close: () => run45(![]),
+      open: () => run45(true),
+      close: () => run45(false),
       toggle: toggle2,
-      collapse: () => run46(!![]),
-      expand: () => run46(![]),
+      collapse: () => run46(true),
+      expand: () => run46(false),
       reset: reset,
-      setWidth: (value193) => run47(value193, { persist: !![] }),
+      setWidth: (value193) => run47(value193, { persist: true }),
       destroy: () => {
         (agentPanelContinuity['destroy'](),
           value110?.(),
@@ -2408,7 +2408,7 @@ export function initAgentPanel({
           agentConversationActions?.['destroy'](),
           run50(),
           run24(),
-          args['clearDocuments']({ notify: ![] }),
+          args['clearDocuments']({ notify: false }),
           run7(),
           document?.['removeEventListener']?.('click', value186),
           document?.['removeEventListener']?.('keydown', value187),

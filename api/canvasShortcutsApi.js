@@ -4,5 +4,5 @@ export async function fetchCanvasShortcuts() {
   return get(PATH, { provider: 'local' });
 }
 export async function saveCanvasShortcuts(catalog, revision) {
-  return post(PATH, { catalog: catalog, revision: revision, developerMode: !![] }, { provider: 'local' });
+  return post(PATH, { catalog: catalog, revision: revision, developerMode: true }, { provider: 'local' });
 }

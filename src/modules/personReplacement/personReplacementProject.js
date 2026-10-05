@@ -41,30 +41,30 @@ export const PERSON_REPLACEMENT_VIDEO_MODEL_IDS = Object['freeze']([
 const PERSON_REPLACEMENT_VIDEO_PARAMETER_POLICIES = Object['freeze']({
   [RH_VIDEO_V54_MODEL_ID]: Object['freeze']({
     [PERSON_REPLACEMENT_VIDEO_INPUT_MODE_FIRST_FRAME]: Object['freeze']({
-      defaultParams: Object['freeze']({ rhSubtractSubject: ![] }),
-      transitionParams: Object['freeze']({ rhSubtractSubject: ![] }),
+      defaultParams: Object['freeze']({ rhSubtractSubject: false }),
+      transitionParams: Object['freeze']({ rhSubtractSubject: false }),
     }),
     [PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE]: Object['freeze']({
-      transitionParams: Object['freeze']({ rhSubtractSubject: !![] }),
+      transitionParams: Object['freeze']({ rhSubtractSubject: true }),
     }),
   }),
   [RH_VIDEO_SCAIL2_V1_MODEL_ID]: Object['freeze']({
     [PERSON_REPLACEMENT_VIDEO_INPUT_MODE_FIRST_FRAME]: Object['freeze']({
-      defaultParams: Object['freeze']({ rhScail2ReplaceSubject: ![] }),
-      transitionParams: Object['freeze']({ rhScail2ReplaceSubject: ![] }),
+      defaultParams: Object['freeze']({ rhScail2ReplaceSubject: false }),
+      transitionParams: Object['freeze']({ rhScail2ReplaceSubject: false }),
     }),
     [PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE]: Object['freeze']({
-      forcedParams: Object['freeze']({ rhScail2ReplaceSubject: !![] }),
+      forcedParams: Object['freeze']({ rhScail2ReplaceSubject: true }),
       lockedFields: Object['freeze'](['rhScail2ReplaceSubject']),
     }),
   }),
   [RH_VIDEO_SCAIL_V2_MODEL_ID]: Object['freeze']({
     [PERSON_REPLACEMENT_VIDEO_INPUT_MODE_FIRST_FRAME]: Object['freeze']({
-      defaultParams: Object['freeze']({ rhScail2ReplaceSubject: ![] }),
-      transitionParams: Object['freeze']({ rhScail2ReplaceSubject: ![] }),
+      defaultParams: Object['freeze']({ rhScail2ReplaceSubject: false }),
+      transitionParams: Object['freeze']({ rhScail2ReplaceSubject: false }),
     }),
     [PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE]: Object['freeze']({
-      forcedParams: Object['freeze']({ rhScail2ReplaceSubject: !![] }),
+      forcedParams: Object['freeze']({ rhScail2ReplaceSubject: true }),
       lockedFields: Object['freeze'](['rhScail2ReplaceSubject']),
     }),
   }),
@@ -150,7 +150,7 @@ export function resolvePersonReplacementVideoParameterPolicy({
   modelId: modelId = PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID,
   inputMode: inputMode = PERSON_REPLACEMENT_VIDEO_INPUT_MODE_FIRST_FRAME,
   generationParams: generationParams = {},
-  resetModeDefaults: resetModeDefaults = ![],
+  resetModeDefaults: resetModeDefaults = false,
 } = {}) {
   const modelId2 = resolvePersonReplacementVideoModelId(modelId),
     inputMode2 = normalizePersonReplacementVideoInputMode(inputMode),
@@ -165,7 +165,7 @@ export function resolvePersonReplacementVideoParameterPolicy({
   return (
     (Array['isArray'](next['lockedFields']) ? next['lockedFields'] : [])['forEach']((current) => {
       const text4 = normalizeText(current);
-      if (text4) uiSchemaFieldState[text4] = { disabled: !![] };
+      if (text4) uiSchemaFieldState[text4] = { disabled: true };
     }),
     {
       modelId: modelId2,
@@ -351,8 +351,8 @@ function normalizeDepth(value14) {
   return 'unknown';
 }
 function normalizeOcclusion(response2) {
-  if (response2 === !![]) return 'partial';
-  if (response2 === ![]) return 'none';
+  if (response2 === true) return 'partial';
+  if (response2 === false) return 'none';
   const text10 = normalizeText(
     response2 && typeof response2 === 'object'
       ? firstDefined(response2['level'], response2['type'], response2['status'])
@@ -415,7 +415,7 @@ function normalizeGenerationStatus(value22) {
     ? text12
     : 'pending';
 }
-function normalizeMaterializationStatus(value23, value24 = ![]) {
+function normalizeMaterializationStatus(value23, value24 = false) {
   const text13 = normalizeText(value23)['toLowerCase']();
   if (['pending', 'running', 'succeeded', 'failed']['includes'](text13)) return text13;
   return value24 ? 'succeeded' : 'pending';
@@ -472,9 +472,9 @@ export function normalizePersonReplacementPerson(
     targetAppearanceId: normalizeText(
       firstDefined(promptMarkerIndex['targetAppearanceId'], promptMarkerIndex['target_appearance_id']),
     ),
-    ...(promptMarkerIndex['projectMappingDisabled'] === !![] ||
-    promptMarkerIndex['project_mapping_disabled'] === !![]
-      ? { projectMappingDisabled: !![] }
+    ...(promptMarkerIndex['projectMappingDisabled'] === true ||
+    promptMarkerIndex['project_mapping_disabled'] === true
+      ? { projectMappingDisabled: true }
       : {}),
     replacementScope: normalizePersonReplacementScope(
       firstDefined(promptMarkerIndex['replacementScope'], promptMarkerIndex['replacement_scope']),
@@ -558,7 +558,7 @@ export function normalizePersonReplacementPerson(
       normalizeText(promptMarkerIndex['identityReviewStatus']),
     )
       ? normalizeText(promptMarkerIndex['identityReviewStatus'])
-      : firstDefined(promptMarkerIndex['reviewRequired'], promptMarkerIndex['needsReview'], ![])
+      : firstDefined(promptMarkerIndex['reviewRequired'], promptMarkerIndex['needsReview'], false)
         ? 'needs_review'
         : 'auto',
     identityMethod: IDENTITY_METHODS['has'](normalizeText(promptMarkerIndex['identityMethod']))
@@ -571,7 +571,7 @@ export function normalizePersonReplacementPerson(
         promptMarkerIndex['identityReviewRequired'],
         promptMarkerIndex['reviewRequired'],
         promptMarkerIndex['needsReview'],
-        ![],
+        false,
       ),
     ),
     ambiguousIdentityIds: toArray(
@@ -1022,19 +1022,19 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
                 videoIterationInputRef: resolvePersonReplacementVideoResultRef(
                   imagePromptReferences['videoIterationInputRef'],
                 ),
-                ...(imagePromptReferences['videoIterationInputIsReversed'] === !![]
-                  ? { videoIterationInputIsReversed: !![] }
+                ...(imagePromptReferences['videoIterationInputIsReversed'] === true
+                  ? { videoIterationInputIsReversed: true }
                   : {}),
               }
             : {}),
         }
       : {}),
-    ...(imagePromptReferences['videoRefIsCropped'] === !![] ? { videoRefIsCropped: !![] } : {}),
-    ...(imagePromptReferences['isReversed'] === !![] ? { isReversed: !![] } : {}),
+    ...(imagePromptReferences['videoRefIsCropped'] === true ? { videoRefIsCropped: true } : {}),
+    ...(imagePromptReferences['isReversed'] === true ? { isReversed: true } : {}),
     materializedIsReversed:
       typeof imagePromptReferences['materializedIsReversed'] === 'boolean'
         ? imagePromptReferences['materializedIsReversed']
-        : Boolean(videoRef) && imagePromptReferences['isReversed'] === !![],
+        : Boolean(videoRef) && imagePromptReferences['isReversed'] === true,
     keyframeRef: keyframeRef || text17,
     ...(imageIterationReferenceRef ? { imageIterationReferenceRef: imageIterationReferenceRef } : {}),
     keyframeIndex: Math['max'](
@@ -1052,7 +1052,7 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
         startTimeSec,
       ),
     ),
-    ...(imagePromptReferences['keyframeManuallySelected'] === !![] ? { keyframeManuallySelected: !![] } : {}),
+    ...(imagePromptReferences['keyframeManuallySelected'] === true ? { keyframeManuallySelected: true } : {}),
     outputFps: normalizeNonNegativeNumber(
       firstDefined(
         imagePromptReferences['outputFps'],
@@ -1094,7 +1094,7 @@ export function normalizePersonReplacementShot(imagePromptReferences = {}, value
         imagePromptReferences['reviewRequired'],
         imagePromptReferences['needsReview'],
         imagePromptReferences['needs_review'],
-        ![],
+        false,
       ),
     ),
     replacementPromptMode: normalizePersonReplacementPromptMode(
@@ -1362,7 +1362,7 @@ function normalizeProjectAudioAsset(error6 = {}, value56 = 0) {
     assetName: normalizeText(error6['assetName']) || name3,
     occurrences: normalizeText(error6['occurrences']) || '当前项目',
     description: description,
-    isLibraryAsset: ![],
+    isLibraryAsset: false,
   };
 }
 export function getPersonReplacementCharacterBaseImageRef(options15 = {}) {
@@ -1397,7 +1397,7 @@ export function getPersonReplacementShotCharacterReferences(options16 = {}, valu
       const text24 = normalizeText(value64?.['targetCharacterId']),
         characterId =
           text24 ||
-          (value64?.['projectMappingDisabled'] === !![]
+          (value64?.['projectMappingDisabled'] === true
             ? ''
             : map5['get'](normalizeText(value64?.['sourceCharacterId']))) ||
           '';
@@ -1602,10 +1602,10 @@ function normalizeSourceCharacter(error10 = {}, value82 = 0) {
       firstDefined(error10['imageRefs'], error10['keyframeRefs'], error10['images']),
     ),
     confidence: normalizeConfidence(firstDefined(error10['confidence'], error10['identityConfidence'])),
-    reviewRequired: Boolean(firstDefined(error10['reviewRequired'], error10['needsReview'], ![])),
+    reviewRequired: Boolean(firstDefined(error10['reviewRequired'], error10['needsReview'], false)),
     identityReviewStatus: IDENTITY_REVIEW_STATUSES['has'](normalizeText(error10['identityReviewStatus']))
       ? normalizeText(error10['identityReviewStatus'])
-      : firstDefined(error10['reviewRequired'], error10['needsReview'], ![])
+      : firstDefined(error10['reviewRequired'], error10['needsReview'], false)
         ? 'needs_review'
         : 'auto',
     memberCount: Math['max'](0, Math['trunc'](normalizeNonNegativeNumber(error10['memberCount']))),
@@ -1776,7 +1776,7 @@ export function normalizePersonReplacementProject(providerProfileId = {}) {
         providerProfileId['settings']?.['replacementImageGenerationParamsByModel'],
       ),
       replacementPromptEnhancementEnabled:
-        providerProfileId['settings']?.['replacementPromptEnhancementEnabled'] === !![],
+        providerProfileId['settings']?.['replacementPromptEnhancementEnabled'] === true,
       replacementVideoGenerationParams: replacementVideoGenerationParams['generationParams'],
       smartClipMode: normalizeSmartClipMode(
         firstDefined(providerProfileId['settings']?.['smartClipMode'], 'balanced'),
@@ -1830,7 +1830,7 @@ export function createPersonReplacementProject(options19 = {}) {
 export function canTransitionPersonReplacementProject(value87, value88) {
   const value89 = STATUS_INDEX['get'](normalizeText(value87)),
     value90 = STATUS_INDEX['get'](normalizeText(value88));
-  if (value89 === undefined || value90 === undefined) return ![];
+  if (value89 === undefined || value90 === undefined) return false;
   return value90 === value89 || value90 === value89 + 1;
 }
 export function transitionPersonReplacementProject(value91, value92) {
@@ -1864,7 +1864,7 @@ export function resolvePersonReplacementTargetCharacterId(value95, value96) {
     value97 = value96 && typeof value96 === 'object' ? value96 : null,
     text33 = normalizeText(value97?.['targetCharacterId']);
   if (text33) return text33;
-  if (value97?.['projectMappingDisabled'] === !![]) return '';
+  if (value97?.['projectMappingDisabled'] === true) return '';
   const text34 = normalizeText(value97 ? value97['sourceCharacterId'] : value96);
   return (
     personReplacementProject['mappings']['find']((value98) => value98['sourceCharacterId'] === text34)?.[
@@ -1974,7 +1974,7 @@ export function mergePersonReplacementSourceCharacters(
       confidence: confidence['length']
         ? Math['min'](...confidence['map']((value122) => normalizeConfidence(value122['confidence'])))
         : 0,
-      reviewRequired: ![],
+      reviewRequired: false,
       identityReviewStatus: 'confirmed',
       memberCount: confidence['reduce'](
         (value123, value124) => value123 + Math['max'](0, Number(value124['memberCount']) || 0),
@@ -2002,7 +2002,7 @@ export function mergePersonReplacementSourceCharacters(
               label: label3['name'] || args9['label'],
               targetCharacterId: targetCharacterId5 || args9['targetCharacterId'] || '',
               identityReviewStatus: 'confirmed',
-              identityReviewRequired: ![],
+              identityReviewRequired: false,
               identityMethod: 'manual',
               ambiguousIdentityIds: toArray(args9['ambiguousIdentityIds'])['filter'](
                 (value128) => !map8['has'](value128),
@@ -2051,7 +2051,7 @@ export function splitPersonReplacementSourceCharacter(
                 ...args12,
                 label: label4,
                 identityReviewStatus: 'needs_review',
-                identityReviewRequired: !![],
+                identityReviewRequired: true,
                 identityMethod: 'manual',
                 ambiguousIdentityIds: [],
               }
@@ -2063,7 +2063,7 @@ export function splitPersonReplacementSourceCharacter(
           ? {
               ...args13,
               name: label4,
-              reviewRequired: !![],
+              reviewRequired: true,
               identityReviewStatus: 'needs_review',
               ambiguousIdentityIds: [],
               notes: '人工纠正人物身份',
@@ -2102,7 +2102,7 @@ export function splitPersonReplacementSourceCharacter(
               targetCharacterId: '',
               targetAppearanceId: '',
               identityReviewStatus: 'needs_review',
-              identityReviewRequired: !![],
+              identityReviewRequired: true,
               identityMethod: 'manual',
               ambiguousIdentityIds: [],
             }
@@ -2128,7 +2128,7 @@ export function splitPersonReplacementSourceCharacter(
         confidence: Math['min'](
           ...memberCount['map'](({ person: person3 }) => normalizeConfidence(person3['identityConfidence'])),
         ),
-        reviewRequired: !![],
+        reviewRequired: true,
         identityReviewStatus: 'needs_review',
         memberCount: memberCount['length'],
         exemplarShotId: memberCount[0]['shot']['id'],
@@ -2237,7 +2237,7 @@ export function confirmPersonReplacementSourceCharacter(
           orientationConfidence: orientation && enabled9 ? 1 : args19['orientationConfidence'],
           orientationModelId: orientation && enabled9 ? '' : args19['orientationModelId'],
           identityReviewStatus: 'confirmed',
-          identityReviewRequired: ![],
+          identityReviewRequired: false,
           ambiguousIdentityIds: [],
         };
       }),
@@ -2255,7 +2255,7 @@ export function confirmPersonReplacementSourceCharacter(
         ? {
             ...error12,
             name: label6 || error12['name'],
-            reviewRequired: ![],
+            reviewRequired: false,
             identityReviewStatus: 'confirmed',
             ambiguousIdentityIds: [],
           }

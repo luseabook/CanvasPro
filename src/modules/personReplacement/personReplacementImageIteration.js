@@ -23,7 +23,7 @@ export function setPersonReplacementImageResultAsReference(
     activeIndex >= results['length'] ||
     !replacementImageRef
   )
-    return { project: project, changed: ![], changedShotIds: [], imageRef: '' };
+    return { project: project, changed: false, changedShotIds: [], imageRef: '' };
   const imageRef = normalizeText(args?.['keyframeRef']),
     text = normalizeText(args?.['imageIterationReferenceRef']),
     args2 = {
@@ -46,17 +46,17 @@ export function setPersonReplacementImageResultAsReference(
       delete data['imageIterationReferenceRef'],
       {
         project: project2(data),
-        changed: !![],
+        changed: true,
         changedShotIds: [selectedShotId],
         imageRef: imageRef,
-        clearedReference: !![],
+        clearedReference: true,
       }
     );
   }
   const options = { ...args2, imageIterationReferenceRef: replacementImageRef };
   return {
     project: project2(options),
-    changed: !![],
+    changed: true,
     changedShotIds: [selectedShotId],
     imageRef: replacementImageRef,
   };

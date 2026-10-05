@@ -27,8 +27,8 @@ export class DirectorMultiView {
       (this['canvas'] = this['layer']['querySelector']('canvas')),
       (this['renderer'] = new threeRuntime['WebGLRenderer']({
         canvas: this['canvas'],
-        antialias: !![],
-        alpha: !![],
+        antialias: true,
+        alpha: true,
       })),
       (this['renderer']['outputColorSpace'] = enabled['bridge']['renderer']['outputColorSpace']),
       (this['renderer']['toneMapping'] = enabled['bridge']['renderer']['toneMapping']),
@@ -40,7 +40,7 @@ export class DirectorMultiView {
       (this['abort'] = new this['timeline']['window']['AbortController']()));
     const signal = this['abort']['signal'];
     (this['layer']['addEventListener']('pointerdown', (key) => this['down'](key), {
-      capture: !![],
+      capture: true,
       signal: signal,
     }),
       this['layer']['addEventListener']('contextmenu', (event) => event['preventDefault'](), {
@@ -59,7 +59,7 @@ export class DirectorMultiView {
               Math['min'](1000, this['scale'] * (event2['deltaY'] > 0 ? 1.1 : 0.9)),
             )));
         },
-        { signal: signal, passive: ![] },
+        { signal: signal, passive: false },
       ),
       this['layer']['addEventListener'](
         'keydown',
@@ -70,7 +70,7 @@ export class DirectorMultiView {
             else this['destroy']();
           }
         },
-        { capture: !![], signal: signal },
+        { capture: true, signal: signal },
       ));
     let count = 0;
     const index = (result) => {
@@ -89,7 +89,7 @@ export class DirectorMultiView {
       aspect = Math['floor'](data / 2),
       target = Math['floor'](options / 2);
     if (this['canvas']['width'] !== data || this['canvas']['height'] !== options)
-      this['renderer']['setSize'](data, options, ![]);
+      this['renderer']['setSize'](data, options, false);
     const near = this['runtime']['bridge']['camera'],
       source = new threeRuntime['Vector3'](...this['offset']),
       next = this['cameras'][0];
@@ -123,7 +123,7 @@ export class DirectorMultiView {
           current['updateMatrixWorld']());
       }),
       this['runtime']['bridge']['_withCleanCaptureFrame'](() => {
-        (this['renderer']['setScissorTest'](!![]),
+        (this['renderer']['setScissorTest'](true),
           this['cameras']['forEach']((entry, count3) => {
             const record = (count3 % 2) * aspect,
               payload = count3 < 2 ? target : 0;
@@ -131,7 +131,7 @@ export class DirectorMultiView {
               this['renderer']['setScissor'](record, payload, aspect, target),
               this['renderer']['render'](this['runtime']['bridge']['scene'], entry));
           }),
-          this['renderer']['setScissorTest'](![]));
+          this['renderer']['setScissorTest'](false));
       }));
   }
   ['ray'](event4, handle) {

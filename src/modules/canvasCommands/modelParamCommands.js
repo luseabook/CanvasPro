@@ -46,38 +46,38 @@ function normalizeModelArgs(preserveParams = {}) {
   return {
     modelId: String(preserveParams['model'] || preserveParams['modelId'] || '')['trim'](),
     providerHint: String(preserveParams['provider'] || '')['trim'](),
-    preserveParams: preserveParams['resetParams'] === !![] ? ![] : preserveParams['preserveParams'] !== ![],
+    preserveParams: preserveParams['resetParams'] === true ? false : preserveParams['preserveParams'] !== false,
     params: getPlainObject(preserveParams['params']),
   };
 }
 function validateModelPatchArgs(message, next = {}, current = {}) {
   const nodeId = String(next['nodeId'] || '')['trim']();
   if (!nodeId)
-    return { ok: ![], errorCode: 'MISSING_NODE_ID', message: message + ' requires nodeId.' };
+    return { ok: false, errorCode: 'MISSING_NODE_ID', message: message + ' requires nodeId.' };
   const node = getNode(current, nodeId);
   if (!node)
-    return { ok: ![], errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId };
+    return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId };
   const providerHint = normalizeModelArgs(next);
   if (!providerHint['modelId'])
-    return { ok: ![], errorCode: 'MISSING_MODEL_ID', message: message + ' requires model or modelId.' };
+    return { ok: false, errorCode: 'MISSING_MODEL_ID', message: message + ' requires model or modelId.' };
   const modelExecution = resolveModelExecution(providerHint['modelId'], { providerHint: providerHint['providerHint'] }),
     modelId = modelExecution?.['modelManifest'] || null;
   if (!modelId)
     return {
-      ok: ![],
+      ok: false,
       errorCode: 'MODEL_MANIFEST_NOT_FOUND',
       message: 'Model manifest not found: ' + providerHint['modelId'],
     };
   const enabled = MODEL_NODE_KINDS[String(node['type'] || '')['trim']()] || '';
   if (!enabled)
     return {
-      ok: ![],
+      ok: false,
       errorCode: 'MODEL_UNSUPPORTED_NODE',
       message: 'Canvas node does not support model selection: ' + nodeId,
     };
   if (String(modelId['kind'] || '') !== enabled)
     return {
-      ok: ![],
+      ok: false,
       errorCode: 'MODEL_KIND_MISMATCH',
       message:
         'Model ' +
@@ -92,7 +92,7 @@ function validateModelPatchArgs(message, next = {}, current = {}) {
     params = sanitizeModelUiSchemaParams(
       modelId['modelId'],
       { ...args, ...providerHint['params'] },
-      { includeDefaults: !![] },
+      { includeDefaults: true },
     );
   return {
     args: {
@@ -119,7 +119,7 @@ function executeModelPatch(model, store) {
         nodeData: nodeData,
         modelId: model['modelId'],
         generationParams: model['params'],
-        force: !![],
+        force: true,
       }),
     }),
     store['commit']?.(),
@@ -150,7 +150,7 @@ export function registerModelParamCommands(entry) {
           preserveParams: { type: 'boolean' },
           resetParams: { type: 'boolean' },
         },
-        defaults: { preserveParams: !![], resetParams: ![] },
+        defaults: { preserveParams: true, resetParams: false },
       },
       capabilitySchema: { reads: ['nodes', 'modelRegistry'], writes: ['nodes'] },
       returnSchema: { aliasFields: ['nodeId', 'modelId', 'model', 'provider', 'params'] },
@@ -185,28 +185,28 @@ export function registerModelParamCommands(entry) {
       validate(options3 = {}, payload = {}) {
         const nodeId2 = String(options3['nodeId'] || '')['trim']();
         if (!nodeId2)
-          return { ok: ![], errorCode: 'MISSING_NODE_ID', message: 'node.setParams requires nodeId.' };
+          return { ok: false, errorCode: 'MISSING_NODE_ID', message: 'node.setParams requires nodeId.' };
         const node2 = getNode(payload, nodeId2);
         if (!node2)
-          return { ok: ![], errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId2 };
+          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId2 };
         const modelId2 = String(options3['modelId'] || node2['model'] || '')['trim']();
         if (!modelId2)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MISSING_MODEL_ID',
             message: 'node.setParams requires a node model backed by a manifest.',
           };
         const modelManifest = getModelManifest(modelId2);
         if (!modelManifest)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MODEL_MANIFEST_NOT_FOUND',
             message: 'Model manifest not found: ' + modelId2,
           };
         const map = getDeclaredParamIds(modelManifest);
         if (map['size'] === 0)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MODEL_PARAMS_UNSUPPORTED',
             message: 'Model has no uiSchema params: ' + modelId2,
           };
@@ -214,21 +214,21 @@ export function registerModelParamCommands(entry) {
           changedParamIds = Object['keys'](args2);
         if (changedParamIds['length'] === 0)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MISSING_PARAMS',
             message: 'node.setParams requires params or field/value.',
           };
         const unknown = changedParamIds['filter']((handle) => !map['has'](handle));
         if (unknown['length'] > 0)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'UNSUPPORTED_MODEL_PARAM',
             message: 'Unsupported model param(s): ' + unknown['join'](', '),
             details: { modelId: modelId2, unknown: unknown },
           };
         const args3 = getPlainObject(node2['generationParams']),
           state = { ...args3, ...args2 },
-          params2 = sanitizeModelUiSchemaParams(modelId2, state, { includeDefaults: ![] });
+          params2 = sanitizeModelUiSchemaParams(modelId2, state, { includeDefaults: false });
         return {
           args: { nodeId: nodeId2, modelId: modelId2, params: params2, changedParamIds: changedParamIds },
         };

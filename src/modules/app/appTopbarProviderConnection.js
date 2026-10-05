@@ -390,7 +390,7 @@ export function createProviderSettingsController({
     const el11 = run13(value32, comfyUiConnectionTarget2);
     (el11 &&
       (providerStatusTooltipController['hide'](el11),
-      (el11['hidden'] = !![]),
+      (el11['hidden'] = true),
       (el11['textContent'] = ''),
       el11['removeAttribute']('title'),
       el11['removeAttribute']('data-tooltip'),
@@ -414,7 +414,7 @@ export function createProviderSettingsController({
     if (!el12) return;
     const value39 = String(value36 || '')['trim'](),
       value40 = String(value37 || '')['trim']();
-    ((el12['hidden'] = ![]),
+    ((el12['hidden'] = false),
       (el12['textContent'] = value39),
       el12['setAttribute']('aria-busy', String(value35 === 'testing')),
       el12['removeAttribute']('title'),
@@ -500,7 +500,7 @@ export function createProviderSettingsController({
     const el16 = run14(value46);
     if (!el16) return;
     (providerStatusTooltipController['hide'](el16),
-      (el16['hidden'] = !![]),
+      (el16['hidden'] = true),
       (el16['textContent'] = ''),
       el16['removeAttribute']('aria-label'),
       el16['removeAttribute']('data-provider-test-tooltip'));
@@ -514,7 +514,7 @@ export function createProviderSettingsController({
       return;
     }
     const value49 = String(value48?.['detailText'] || enabled3)['trim']();
-    ((el17['hidden'] = ![]),
+    ((el17['hidden'] = false),
       (el17['textContent'] = enabled3),
       el17['setAttribute']('aria-label', value49),
       el17['setAttribute']('data-provider-test-tooltip', value49));
@@ -611,7 +611,7 @@ export function createProviderSettingsController({
       target3 = value66 === 'comfyui' ? normalizeComfyUiConnectionTarget(value65?.['comfyUiTarget']) : '',
       list = value66 ? [value66] : run9(enabled5);
     value66 ? run15(value66, target3) : run26();
-    const enabled6 = target3 ? isComfyUiEndpointConfigured(enabled5, target3) : !![];
+    const enabled6 = target3 ? isComfyUiEndpointConfigured(enabled5, target3) : true;
     if (value66 && (!run12(enabled5, value66) || !enabled6)) {
       (run18(enabled5, value66),
         el4['showToast']?.(
@@ -632,7 +632,7 @@ export function createProviderSettingsController({
     const el20 = el19?.['querySelector']?.('.settings-btn-label'),
       value68 = el20?.['textContent'] || el19?.['textContent'] || trApiInput('testConnection');
     if (el19) {
-      el19['disabled'] = !![];
+      el19['disabled'] = true;
       if (el20) el20['textContent'] = trApiInput('diagnostics.testingBusy');
       else el19['textContent'] = trApiInput('diagnostics.testingBusy');
     }
@@ -653,7 +653,7 @@ export function createProviderSettingsController({
             providerResults[label] = value69?.[label];
           } catch (error) {
             providerResults[label] = {
-              ok: ![],
+              ok: false,
               label: label,
               error: error?.['message'] || trApiInput('diagnostics.testFailed'),
             };
@@ -768,7 +768,7 @@ export function createProviderSettingsController({
         ));
     } finally {
       if (el19) {
-        el19['disabled'] = ![];
+        el19['disabled'] = false;
         if (el20) el20['textContent'] = value68;
         else el19['textContent'] = value68;
       }
@@ -783,7 +783,7 @@ export function createProviderSettingsController({
         collectConfig: collectConfig,
         saveConfig: saveConfig,
         onStateChange: onStateChange['update'],
-        onSaved: (value79, { showSuccess: showSuccess = ![] } = {}) => {
+        onSaved: (value79, { showSuccess: showSuccess = false } = {}) => {
           (onConfigSnapshotChange(value79),
             run19(value79),
             syncModelServiceReadinessSummary(value79),
@@ -865,13 +865,13 @@ export function createProviderSettingsController({
         })
         ['finally'](() => {
           dreaminaLoginSessionController['syncDevVisibility']() &&
-            dreaminaLoginSessionController['refreshStatus']({ force: !![], silent: !![] })['catch'](() => {});
+            dreaminaLoginSessionController['refreshStatus']({ force: true, silent: true })['catch'](() => {});
         })),
       el21 &&
         el21['addEventListener']('click', () => {
-          apiConfigAutoSaveController['persist']({ showSuccess: !![] })['then']((enabled10) => {
+          apiConfigAutoSaveController['persist']({ showSuccess: true })['then']((enabled10) => {
             if (!enabled10) return;
-            dreaminaLoginSessionController['refreshStatus']({ force: !![], silent: !![] })['catch'](() => {});
+            dreaminaLoginSessionController['refreshStatus']({ force: true, silent: true })['catch'](() => {});
           });
         }),
       el4['addEventListener']('settings-panel-closed', () => {

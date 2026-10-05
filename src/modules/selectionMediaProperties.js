@@ -64,9 +64,9 @@ function buildImageModel(args2) {
     duration: 0,
     fps: 0,
     frameCount: 0,
-    frameCountApproximate: ![],
+    frameCountApproximate: false,
     metaSource: '',
-    needsVideoProbe: ![],
+    needsVideoProbe: false,
   };
 }
 function buildVideoModel(args3) {
@@ -149,9 +149,9 @@ function buildAudioModel(args4) {
     duration: duration2,
     fps: 0,
     frameCount: 0,
-    frameCountApproximate: ![],
+    frameCountApproximate: false,
     metaSource: '',
-    needsVideoProbe: ![],
+    needsVideoProbe: false,
   };
 }
 function buildTextEditingModel(current, characterCount) {
@@ -164,10 +164,10 @@ function buildTextEditingModel(current, characterCount) {
     duration: 0,
     fps: 0,
     frameCount: 0,
-    frameCountApproximate: ![],
+    frameCountApproximate: false,
     characterCount: characterCount,
     metaSource: '',
-    needsVideoProbe: ![],
+    needsVideoProbe: false,
   };
 }
 export function buildSelectionMediaPropertiesModel(entry) {
@@ -184,9 +184,9 @@ export function selectSelectionMediaPropertiesModel(state = {}) {
   return buildSelectionMediaPropertiesModel(record);
 }
 function isSupportedTextEditor(enabled) {
-  if (!enabled?.['matches']?.(TEXT_EDITOR_SELECTOR)) return ![];
-  if (!enabled['matches']('.source-text-content')) return !![];
-  return enabled['isContentEditable'] === !![] || enabled['getAttribute']?.('contenteditable') === 'true';
+  if (!enabled?.['matches']?.(TEXT_EDITOR_SELECTOR)) return false;
+  if (!enabled['matches']('.source-text-content')) return true;
+  return enabled['isContentEditable'] === true || enabled['getAttribute']?.('contenteditable') === 'true';
 }
 function readEditorText(el) {
   if (typeof el?.['value'] === 'string') return el['value'];
@@ -250,15 +250,15 @@ function setText(el4, value9, value10) {
 }
 function setRowVisible(el6, value11, value12) {
   const el7 = el6?.['querySelector']?.('[data-selection-media-row="' + value11 + '"]');
-  if (el7) el7['hidden'] = value12 !== !![];
+  if (el7) el7['hidden'] = value12 !== true;
 }
 export function renderSelectionMediaProperties(el8, box2) {
   if (!el8) return;
   if (!box2) {
-    ((el8['hidden'] = !![]), el8['removeAttribute']?.('data-media-kind'));
+    ((el8['hidden'] = true), el8['removeAttribute']?.('data-media-kind'));
     return;
   }
-  ((el8['hidden'] = ![]),
+  ((el8['hidden'] = false),
     el8['setAttribute']?.('data-media-kind', box2['kind']),
     setText(el8, '[data-selection-media-kind]', t('selectionMediaProperties.' + box2['kind'])),
     setText(
@@ -286,7 +286,7 @@ export function renderSelectionMediaProperties(el8, box2) {
       setText(
         el8,
         '[data-selection-media-value="frames"]',
-        formatFrameCount(box2['frameCount'], box2['frameCountApproximate'] === !![]),
+        formatFrameCount(box2['frameCount'], box2['frameCountApproximate'] === true),
       )),
     value16 &&
       setText(
@@ -319,21 +319,21 @@ export function initSelectionMediaProperties({
   documentObject: documentObject = globalThis['document'],
 } = {}) {
   if (!graphStore?.['subscribeSelector'] || !uiStore?.['subscribeSelector'] || !element) return () => {};
-  let enabled3 = uiStore['getState']?.()?.['ui']?.['showSelectionMediaProperties'] !== ![],
+  let enabled3 = uiStore['getState']?.()?.['ui']?.['showSelectionMediaProperties'] !== false,
     selectionMediaPropertiesModel = selectSelectionMediaPropertiesModel(
       graphStore['getStateRaw']?.() || graphStore['getState']?.(),
     ),
     scheduleIdleTask2 = null,
     value18 = '',
-    enabled4 = ![],
-    value19 = ![];
+    enabled4 = false,
+    value19 = false;
   const map = new Map(),
     handler = () => {
       (scheduleIdleTask2?.(), (scheduleIdleTask2 = null), (value18 = ''));
     },
     handler2 = (value20) => {
       const enabled5 = String(value20?.['metaSource'] || '')['trim']();
-      if (!enabled3 || value20?.['kind'] !== 'video' || value20?.['needsVideoProbe'] !== !![] || !enabled5) {
+      if (!enabled3 || value20?.['kind'] !== 'video' || value20?.['needsVideoProbe'] !== true || !enabled5) {
         handler();
         return;
       }
@@ -364,14 +364,14 @@ export function initSelectionMediaProperties({
             !enabled3 ||
             selectionMediaPropertiesModel2?.['nodeId'] !== value20['nodeId'] ||
             selectionMediaPropertiesModel2?.['metaSource'] !== enabled5 ||
-            selectionMediaPropertiesModel2?.['needsVideoProbe'] !== !![]
+            selectionMediaPropertiesModel2?.['needsVideoProbe'] !== true
           )
             return;
           map['set'](enabled5, { status: 'pending' });
           try {
             const response2 = await fetchVideoMeta(enabled5);
             if (enabled4) return;
-            if (!response2 || response2['success'] !== !![]) throw new Error('video metadata unavailable');
+            if (!response2 || response2['success'] !== true) throw new Error('video metadata unavailable');
             const patch = buildVideoMetaPatch(response2, enabled5);
             map['set'](enabled5, {
               status: 'success',
@@ -403,9 +403,9 @@ export function initSelectionMediaProperties({
     },
     handler4 = () => {
       if (value19 || enabled4) return;
-      value19 = !![];
+      value19 = true;
       const value21 = () => {
-        value19 = ![];
+        value19 = false;
         if (!enabled4) handler3();
       };
       typeof queueMicrotask === 'function' ? queueMicrotask(value21) : Promise['resolve']()['then'](value21);
@@ -421,25 +421,25 @@ export function initSelectionMediaProperties({
       ((selectionMediaPropertiesModel = value25), handler3());
     }),
     value26 = uiStore['subscribeSelector'](
-      (value27) => value27['ui']?.['showSelectionMediaProperties'] !== ![],
+      (value27) => value27['ui']?.['showSelectionMediaProperties'] !== false,
       (value28) => {
-        ((enabled3 = value28 !== ![]), handler3());
+        ((enabled3 = value28 !== false), handler3());
       },
     ),
     onLocaleChange2 = onLocaleChange(handler3);
   return (
-    documentObject?.['addEventListener']?.('focusin', value22, !![]),
-    documentObject?.['addEventListener']?.('focusout', value22, !![]),
-    documentObject?.['addEventListener']?.('input', value23, !![]),
+    documentObject?.['addEventListener']?.('focusin', value22, true),
+    documentObject?.['addEventListener']?.('focusout', value22, true),
+    documentObject?.['addEventListener']?.('input', value23, true),
     () => {
-      ((enabled4 = !![]),
+      ((enabled4 = true),
         handler(),
         value24?.(),
         value26?.(),
         onLocaleChange2?.(),
-        documentObject?.['removeEventListener']?.('focusin', value22, !![]),
-        documentObject?.['removeEventListener']?.('focusout', value22, !![]),
-        documentObject?.['removeEventListener']?.('input', value23, !![]));
+        documentObject?.['removeEventListener']?.('focusin', value22, true),
+        documentObject?.['removeEventListener']?.('focusout', value22, true),
+        documentObject?.['removeEventListener']?.('input', value23, true));
     }
   );
 }

@@ -52,7 +52,7 @@ export function createStoryProjectPersistenceWorkspaceController({
 } = {}) {
   const syncCurrentProjectEntry = () => projectData['syncCurrentEntry'](),
     coordinator = createWorkspacePersistenceCoordinator({
-      ready: ![],
+      ready: false,
       debounceMs: 1000,
       maxWaitMs: 5000,
       save: saveWorkspace,
@@ -65,12 +65,12 @@ export function createStoryProjectPersistenceWorkspaceController({
       },
     });
   function persistNow() {
-    if (!coordinator['isReady']() || typeof saveWorkspace !== 'function') return Promise['resolve'](![]);
-    return coordinator['flush']({ force: !![] })
-      ['then'](() => !![])
-      ['catch'](() => ![]);
+    if (!coordinator['isReady']() || typeof saveWorkspace !== 'function') return Promise['resolve'](false);
+    return coordinator['flush']({ force: true })
+      ['then'](() => true)
+      ['catch'](() => false);
   }
-  function schedule({ immediate: immediate = ![], uiOnly: uiOnly = ![], action: action = '' } = {}) {
+  function schedule({ immediate: immediate = false, uiOnly: uiOnly = false, action: action = '' } = {}) {
     if (!immediate && TRANSIENT_ACTIONS['has'](action)) return;
     coordinator['schedule']({
       immediate: immediate,
@@ -130,7 +130,7 @@ export function createStoryProjectPersistenceWorkspaceController({
       advanceProjectSession(importedStoryProjectEntry['id']),
       (state['openProjectMenuId'] = ''),
       (state['pendingDeleteProjectId'] = ''),
-      schedule({ immediate: !![] }),
+      schedule({ immediate: true }),
       openStoredProject(importedStoryProjectEntry['id']),
       JSON['parse'](JSON['stringify'](importedStoryProjectEntry))
     );

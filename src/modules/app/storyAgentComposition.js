@@ -16,16 +16,16 @@ export function createStoryAgentComposition({
   let value = '',
     runtime = null,
     initAgentPanel2 = null,
-    enabled = ![],
-    enabled2 = ![];
+    enabled = false,
+    enabled2 = false;
   function run() {
     (initAgentPanel2?.['destroy'](),
       runtime?.['dispose'](),
       (initAgentPanel2 = null),
       (runtime = null),
       (value = ''),
-      (enabled = ![]),
-      (enabled2 = ![]));
+      (enabled = false),
+      (enabled2 = false));
   }
   const run2 = collaboration['subscribe'](
     ({
@@ -77,7 +77,7 @@ export function createStoryAgentComposition({
             stateRoot: root,
             fabBtnEl: trigger,
             surface: {
-              textOnly: !![],
+              textOnly: true,
               title: '剧本创作助手',
               kicker: '一起把想法写成故事',
               greeting: '从哪个方向开始？',
@@ -104,13 +104,13 @@ export function createStoryAgentComposition({
               {
                 label: '应用到选中段落',
                 className: 'agent-adopt-selection',
-                apply: (index) => collaboration['apply'](index, { projectId: projectId, selectedOnly: !![] }),
+                apply: (index) => collaboration['apply'](index, { projectId: projectId, selectedOnly: true }),
               },
             ],
           })));
       }
       if (enabled2 || (editing && !enabled)) initAgentPanel2['open']();
-      ((enabled2 = ![]), (enabled = editing));
+      ((enabled2 = false), (enabled = editing));
       if (response) void initAgentPanel2['sendMessage'](response['text']);
     },
   );

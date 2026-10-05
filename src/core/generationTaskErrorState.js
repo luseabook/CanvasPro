@@ -1,6 +1,6 @@
 export function isGenerationAbortError(error) {
-  if (!error) return ![];
-  if (error?.['name'] === 'AbortError') return !![];
+  if (!error) return false;
+  if (error?.['name'] === 'AbortError') return true;
   return String(error?.['message'] || '')['trim']() === 'CANCELLED';
 }
 export function getGenerationErrorMessage(error2, value = '') {

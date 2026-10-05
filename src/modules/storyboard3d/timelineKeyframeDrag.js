@@ -5,7 +5,7 @@ export class TimelineKeyframeDrag {
     ((this['timeline'] = value),
       (this['root'] = null),
       (this['session'] = null),
-      (this['suppressClick'] = ![]),
+      (this['suppressClick'] = false),
       (this['onDown'] = (item) => this['start'](item)));
   }
   ['bind']() {
@@ -21,7 +21,7 @@ export class TimelineKeyframeDrag {
     const { shot: shot } = this['timeline']['_context'](),
       box = el2['closest']('.storyboard-3d-timeline-lane')?.['getBoundingClientRect']();
     if (!shot || !box?.['width']) return;
-    (this['cancel'](), (this['suppressClick'] = ![]), this['timeline']['stopPlayback']({ render: ![] }));
+    (this['cancel'](), (this['suppressClick'] = false), this['timeline']['stopPlayback']({ render: false }));
     const el3 = this['root']['ownerDocument']['defaultView'],
       key = new el3['AbortController'](),
       storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(shot['animation']),
@@ -34,7 +34,7 @@ export class TimelineKeyframeDrag {
         startX: event['clientX'],
         startTime: Number(el2['dataset']['keyframeTime']),
         time: Number(el2['dataset']['keyframeTime']),
-        moved: ![],
+        moved: false,
         animation: storyboard3DShotAnimation,
       };
     this['session'] = enabled;
@@ -77,7 +77,7 @@ export class TimelineKeyframeDrag {
         if (event3['pointerId'] !== enabled['pointerId']) return;
         this['cancel']();
         if (!enabled['moved'] || this['timeline']['_context']()['shot']?.['id'] !== enabled['shotId']) return;
-        ((this['suppressClick'] = !![]),
+        ((this['suppressClick'] = true),
           this['timeline']['_mutateAnimation']('move-keyframe', '拖动关键帧', (source) => {
             if (enabled['selection']['size'] > 1)
               try {
@@ -131,7 +131,7 @@ export class TimelineKeyframeDrag {
   }
   ['consumeClick'](payload) {
     const handle = this['suppressClick'];
-    return ((this['suppressClick'] = ![]), handle && payload?.['detail'] !== 0);
+    return ((this['suppressClick'] = false), handle && payload?.['detail'] !== 0);
   }
   ['destroy']() {
     (this['cancel'](),

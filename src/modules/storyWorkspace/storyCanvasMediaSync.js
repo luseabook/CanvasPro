@@ -220,10 +220,10 @@ export function reconcileStoryCanvasMediaNodes(
     now: now = Date['now'],
   } = {},
 ) {
-  if (!projectData2?.['project'] || !Array['isArray'](nodes)) return ![];
+  if (!projectData2?.['project'] || !Array['isArray'](nodes)) return false;
   const canvasId3 = normalizeText(canvasId);
   if (!canvasId3 || normalizeText(projectData2['project']['canvasBinding']?.['canvasId']) !== canvasId3)
-    return ![];
+    return false;
   const text5 = normalizeText(projectData2['project']['id']),
     storyClipFrames = normalizeStoryClipFrames(projectData2['clipFrames']);
   let list6 = storyClipFrames;
@@ -258,8 +258,8 @@ export function reconcileStoryCanvasMediaNodes(
     }
     list6 = upsertStoryClipFrame(list6, storyCanvasMediaFrame);
   }
-  if (JSON['stringify'](storyClipFrames) === JSON['stringify'](list6)) return ![];
-  return ((projectData2['clipFrames'] = list6), !![]);
+  if (JSON['stringify'](storyClipFrames) === JSON['stringify'](list6)) return false;
+  return ((projectData2['clipFrames'] = list6), true);
 }
 export function buildStoryClipFrameCanvasNodeData({ project: project = {}, frame: frame = {} } = {}) {
   const error = normalizeStoryClipFrame(frame),
@@ -298,7 +298,7 @@ export function buildStoryClipFrameCanvasNodeData({ project: project = {}, frame
     ...args,
     type: 'source-image',
     imageUrl: resolveStoryClipFrameImageUrl(error),
-    needsAutoResize: !![],
+    needsAutoResize: true,
   };
 }
 export function createStoryClipFrameCanvasAdapter({
@@ -321,17 +321,17 @@ export function createStoryClipFrameCanvasAdapter({
   return {
     canvasExists(value8) {
       const text8 = normalizeText(value8);
-      if (!text8) return ![];
-      const value9 = canvasTabManager['getMultiDataSnapshot']?.({ captureVisualSnapshot: ![] }) || {};
+      if (!text8) return false;
+      const value9 = canvasTabManager['getMultiDataSnapshot']?.({ captureVisualSnapshot: false }) || {};
       return Array['isArray'](value9['canvases'])
         ? value9['canvases']['some']((value10) => normalizeText(value10?.['id']) === text8)
         : normalizeText(canvasTabManager['getActiveCanvasId']()) === text8;
     },
     async switchCanvas(value11) {
       const text9 = normalizeText(value11);
-      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text9) return !![];
-      if (!text9 || typeof canvasTabManager['switchTo'] !== 'function') return ![];
-      return (await canvasTabManager['switchTo'](text9)) !== ![];
+      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text9) return true;
+      if (!text9 || typeof canvasTabManager['switchTo'] !== 'function') return false;
+      return (await canvasTabManager['switchTo'](text9)) !== false;
     },
     nodeExists(value12) {
       return Boolean(run(value12));
@@ -358,12 +358,12 @@ export function createStoryClipFrameCanvasAdapter({
       return (updateNodeData(id3, withoutNodeType(args3)), commit(), run(id3) || { id: id3, ...args3 });
     },
     deleteNodes(list7 = []) {
-      if (typeof deleteNodes2 !== 'function') return ![];
+      if (typeof deleteNodes2 !== 'function') return false;
       const list8 = (Array['isArray'](list7) ? list7 : [])
         ['map'](normalizeText)
         ['filter']((value14) => value14 && run(value14));
-      if (!list8['length']) return ![];
-      return (deleteNodes2(list8), commit(), !![]);
+      if (!list8['length']) return false;
+      return (deleteNodes2(list8), commit(), true);
     },
   };
 }
@@ -377,9 +377,9 @@ export async function deleteStoryCanvasMediaNodes({
     throw new Error('deleteStoryCanvasMediaNodes requires a complete canvas adapter');
   const canvasId4 = normalizeText(canvasId),
     list10 = (Array['isArray'](nodeIds) ? nodeIds : [])['map'](normalizeText)['filter'](Boolean);
-  if (!canvasId4 || !list10['length'] || !(await adapter['canvasExists'](canvasId4))) return ![];
-  if ((await adapter['switchCanvas'](canvasId4)) === ![]) throw new Error('无法切换到关联画布：' + canvasId4);
-  return adapter['deleteNodes'](list10, { canvasId: canvasId4 }) !== ![];
+  if (!canvasId4 || !list10['length'] || !(await adapter['canvasExists'](canvasId4))) return false;
+  if ((await adapter['switchCanvas'](canvasId4)) === false) throw new Error('无法切换到关联画布：' + canvasId4);
+  return adapter['deleteNodes'](list10, { canvasId: canvasId4 }) !== false;
 }
 export async function syncStoryClipFrameToCanvas({
   project: project = {},
@@ -391,8 +391,8 @@ export async function syncStoryClipFrameToCanvas({
     throw new Error('syncStoryClipFrameToCanvas requires a complete canvas adapter');
   const canvasId5 = normalizeText(project['canvasBinding']?.['canvasId']);
   if (!canvasId5 || !(await adapter2['canvasExists'](canvasId5)))
-    return { synced: ![], reason: 'canvas-unavailable' };
-  if ((await adapter2['switchCanvas'](canvasId5)) === ![])
+    return { synced: false, reason: 'canvas-unavailable' };
+  if ((await adapter2['switchCanvas'](canvasId5)) === false)
     throw new Error('无法切换到已绑定的项目画布：' + canvasId5);
   const storyClipFrameCanvasNodeData = buildStoryClipFrameCanvasNodeData({ project: project, frame: frame }),
     text10 = normalizeText(frame['canvasId']) === canvasId5 ? normalizeText(frame['canvasNodeId']) : '',
@@ -406,7 +406,7 @@ export async function syncStoryClipFrameToCanvas({
     nodeId = normalizeText(node3?.['id'] || (enabled ? text10 : ''));
   if (!nodeId) throw new Error('同步片段帧到项目画布失败');
   return {
-    synced: !![],
+    synced: true,
     created: !enabled,
     canvasId: canvasId5,
     nodeId: nodeId,

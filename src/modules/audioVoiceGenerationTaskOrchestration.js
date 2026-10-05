@@ -148,8 +148,8 @@ export function createAudioVoiceGenerationTaskOrchestration({ createStore: creat
       id: ++output,
       abortController: abortController,
       apiKey: '',
-      cancelInFlight: ![],
-      cancelRequested: ![],
+      cancelInFlight: false,
+      cancelRequested: false,
     };
     return (map2['set'](event3['key'], value4), value4);
   }
@@ -160,21 +160,21 @@ export function createAudioVoiceGenerationTaskOrchestration({ createStore: creat
     return !!event4 && map2['get'](event4['key']) === event4;
   }
   function finish(event5) {
-    if (!isCurrent(event5)) return ![];
-    return (map2['delete'](event5['key']), !![]);
+    if (!isCurrent(event5)) return false;
+    return (map2['delete'](event5['key']), true);
   }
   function setCancelInFlight(value7, value8) {
-    if (!isCurrent(value7)) return ![];
-    value7['cancelInFlight'] = value8 === !![];
-    if (value7['cancelInFlight']) value7['cancelRequested'] = !![];
-    return !![];
+    if (!isCurrent(value7)) return false;
+    value7['cancelInFlight'] = value8 === true;
+    if (value7['cancelInFlight']) value7['cancelRequested'] = true;
+    return true;
   }
   return {
     begin: begin,
     finish: finish,
     getRun: getRun,
     getStore: getStore,
-    isCancelInFlight: (value9, value10) => getRun(value9, value10)?.['cancelInFlight'] === !![],
+    isCancelInFlight: (value9, value10) => getRun(value9, value10)?.['cancelInFlight'] === true,
     isCurrent: isCurrent,
     setCancelInFlight: setCancelInFlight,
   };

@@ -51,16 +51,16 @@ export function isExpectedBackendProcess(processInfo = {}, expectations = {}) {
     backendCommandPath = normalizeExecutablePath(expectations['backendCommand'], platform),
     commandLine = normalizeCommandLine(processInfo['commandLine'], platform);
   if (!backendCommandPath || !commandLine || !hasBackendLaunchArguments(commandLine, expectations))
-    return ![];
+    return false;
   if (expectations['appIsPackaged']) {
     if (platform === 'win32') return executablePath === backendCommandPath;
     return executablePath === backendCommandPath || commandLine['includes'](backendCommandPath);
   }
   if (pathImpl['isAbsolute'](String(expectations['backendCommand'] || ''))) {
-    if (executablePath !== backendCommandPath) return ![];
+    if (executablePath !== backendCommandPath) return false;
   } else {
     const basename = pathImpl['basename'](executablePath || commandLine)['toLowerCase']();
-    if (!/^python(?:3(?:\.\d+)?)?(?:\.exe)?$/['test'](basename)) return ![];
+    if (!/^python(?:3(?:\.\d+)?)?(?:\.exe)?$/['test'](basename)) return false;
   }
   const serverScriptPath = normalizeCommandLine(
     pathImpl['join'](String(expectations['appRoot'] || ''), 'server.py'),
@@ -92,7 +92,7 @@ function inspectWindowsBackendProcesses({ pids: pids, env: env, spawnProcess: sp
           [WINDOWS_PID_ENV_NAME]: Buffer['from'](JSON['stringify'](pids), 'utf8')['toString']('base64'),
         },
         timeout: PROCESS_QUERY_TIMEOUT_MS,
-        windowsHide: !![],
+        windowsHide: true,
       },
     );
   } catch (cause) {

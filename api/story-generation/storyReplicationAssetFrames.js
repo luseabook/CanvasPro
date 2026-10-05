@@ -24,7 +24,7 @@ export function addReplicationAssetFrameSchema(item, enabled2) {
         { type: 'null' },
         {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['episodeId', 'eventId', 'timeSec'],
           properties: {
             episodeId: { type: 'string' },

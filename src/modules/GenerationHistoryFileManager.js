@@ -148,7 +148,7 @@ function isSupportedOutputMediaKind(payload) {
 }
 function isFileManagerActionableRecord(state4) {
   const recordMediaKind = getRecordMediaKind(state4);
-  if (!isSupportedOutputMediaKind(recordMediaKind)) return ![];
+  if (!isSupportedOutputMediaKind(recordMediaKind)) return false;
   return Array['isArray'](state4?.['nodes']) && state4['nodes']['length'] > 0;
 }
 function resolveRecordLocalPath(state5) {
@@ -328,10 +328,10 @@ class GenerationHistoryFileManager {
       (this['titleEl'] = null),
       (this['contentEl'] = null),
       (this['records'] = []),
-      (this['_loading'] = ![]),
+      (this['_loading'] = false),
       (this['_savingIds'] = new Set()),
       (this['_savingRecordKeys'] = new Set()),
-      (this['_backfillInFlight'] = ![]),
+      (this['_backfillInFlight'] = false),
       (this['_activeFilter'] = 'all'),
       (this['_activeSource'] = 'current-canvas'),
       (this['_sortOrder'] = 'desc'),
@@ -339,23 +339,23 @@ class GenerationHistoryFileManager {
       (this['_outputDir'] = ''),
       (this['_outputParent'] = ''),
       (this['_outputBreadcrumbs'] = [{ name: 'output', dir: '' }]),
-      (this['_outputLoading'] = ![]),
-      (this['_outputLoaded'] = ![]),
+      (this['_outputLoading'] = false),
+      (this['_outputLoaded'] = false),
       (this['_outputNextOffset'] = 0),
-      (this['_outputHasMore'] = !![]),
+      (this['_outputHasMore'] = true),
       (this['_outputTotalItems'] = 0),
       (this['_outputLoadToken'] = 0),
       (this['_panelWidth'] = 0),
       (this['_resizeState'] = null),
-      (this['_recordsLoaded'] = ![]),
-      (this['_recordsDirty'] = ![]),
+      (this['_recordsLoaded'] = false),
+      (this['_recordsDirty'] = false),
       (this['_nextOffset'] = 0),
-      (this['_hasMore'] = !![]),
+      (this['_hasMore'] = true),
       (this['_totalRecords'] = 0),
       (this['_loadToken'] = 0),
       (this['_selectedRecordIds'] = new Set()),
       (this['_selectionDrag'] = null),
-      (this['_suppressNextClick'] = ![]),
+      (this['_suppressNextClick'] = false),
       (this['_unsubscribeLocale'] = null),
       (this['_videoThumbnailQueue'] = createVideoThumbnailRequestQueue({ concurrency: 1 })),
       (this['_videoThumbnailObserver'] = null),
@@ -368,7 +368,7 @@ class GenerationHistoryFileManager {
       this['_bindGenerationEvents']());
   }
   ['_isOpen']() {
-    return this['panel']?.['classList']['contains']('show') === !![];
+    return this['panel']?.['classList']['contains']('show') === true;
   }
   ['_getCurrentProjectId']() {
     return normalizeProjectId(window['currentProjectId']);
@@ -431,7 +431,7 @@ class GenerationHistoryFileManager {
   }
   ['_hasRecord'](value20) {
     const historyRecordIdentityKey = buildHistoryRecordIdentityKey(value20);
-    if (!historyRecordIdentityKey) return ![];
+    if (!historyRecordIdentityKey) return false;
     return this['records']['some']((value21) => buildHistoryRecordIdentityKey(value21) === historyRecordIdentityKey);
   }
   ['_visibleRecords']() {
@@ -459,7 +459,7 @@ class GenerationHistoryFileManager {
       ['filter'](Boolean)
       ['filter']((value22) => {
         const recordMediaKind2 = getRecordMediaKind(value22);
-        if (value22?.['outputItem']?.['isDir']) return !![];
+        if (value22?.['outputItem']?.['isDir']) return true;
         if (this['_activeFilter'] === 'all') return recordMediaKind2 !== 'file';
         return recordMediaKind2 === this['_activeFilter'];
       });
@@ -497,7 +497,7 @@ class GenerationHistoryFileManager {
     if (this['_selectedRecordIds']['size'] === 0) return;
     (this['_selectedRecordIds']['clear'](), this['_syncSelectionClasses']());
   }
-  ['_selectRecord'](recordId, { shiftKey: shiftKey = ![] } = {}) {
+  ['_selectRecord'](recordId, { shiftKey: shiftKey = false } = {}) {
     const value31 = this['_findVisibleRecordById'](recordId),
       fileManagerSelectionAfterClick = getFileManagerSelectionAfterClick({
         current: Array['from'](this['_selectedRecordIds']),
@@ -529,9 +529,9 @@ class GenerationHistoryFileManager {
         ['filter'](isFileManagerActionableRecord)
         ['map']((value35) => String(value35?.['id'] || '')),
     );
-    let value36 = ![];
+    let value36 = false;
     for (const value37 of Array['from'](this['_selectedRecordIds'])) {
-      !map['has'](value37) && (this['_selectedRecordIds']['delete'](value37), (value36 = !![]));
+      !map['has'](value37) && (this['_selectedRecordIds']['delete'](value37), (value36 = true));
     }
     if (value36) this['_syncSelectionClasses']();
   }
@@ -556,7 +556,7 @@ class GenerationHistoryFileManager {
       this['_bindDoubleClickToCanvas'](),
       this['panel']['addEventListener']('click', (shiftKey2) => {
         if (this['_suppressNextClick']) {
-          (shiftKey2['preventDefault'](), shiftKey2['stopPropagation'](), (this['_suppressNextClick'] = ![]));
+          (shiftKey2['preventDefault'](), shiftKey2['stopPropagation'](), (this['_suppressNextClick'] = false));
           return;
         }
         const dir2 = shiftKey2['target']['closest']('[data-file-action]'),
@@ -570,7 +570,7 @@ class GenerationHistoryFileManager {
             this['_clearSelection'](),
             this['render'](),
             isHistorySource(this['_activeSource']) &&
-              (this['_resetPageState'](), void this['loadRecords']({ reset: !![] })));
+              (this['_resetPageState'](), void this['loadRecords']({ reset: true })));
           return;
         }
         if (value38 === 'source') {
@@ -582,11 +582,11 @@ class GenerationHistoryFileManager {
           ) {
             ((this['_activeSource'] = value40), this['_clearSelection'](), this['render']());
             if (isHistorySource(value40))
-              void this['loadRecords']({ backfillAfterLoad: !![], reset: !![] });
+              void this['loadRecords']({ backfillAfterLoad: true, reset: true });
             else
               value40 === 'output' &&
                 !this['_outputLoaded'] &&
-                void this['loadOutputFiles']({ dir: this['_outputDir'], reset: !![] });
+                void this['loadOutputFiles']({ dir: this['_outputDir'], reset: true });
           }
           return;
         }
@@ -597,15 +597,15 @@ class GenerationHistoryFileManager {
             this['_clearSelection'](),
             this['render']());
           isHistorySource(this['_activeSource'])
-            ? (this['_resetPageState'](), void this['loadRecords']({ reset: !![] }))
-            : void this['loadOutputFiles']({ dir: this['_outputDir'], reset: !![] });
+            ? (this['_resetPageState'](), void this['loadRecords']({ reset: true }))
+            : void this['loadOutputFiles']({ dir: this['_outputDir'], reset: true });
           return;
         }
         if (value38 === 'output-dir') {
           (shiftKey2['preventDefault'](),
             shiftKey2['stopPropagation'](),
             this['_clearSelection'](),
-            void this['loadOutputFiles']({ dir: dir2['dataset']['dir'] || '', reset: !![] }));
+            void this['loadOutputFiles']({ dir: dir2['dataset']['dir'] || '', reset: true }));
           return;
         }
         const el3 = shiftKey2['target']['closest']('.v2-file-history-card');
@@ -615,7 +615,7 @@ class GenerationHistoryFileManager {
           if (dir3?.['isDir']) {
             void this['loadOutputFiles']({
               dir: dir3['dir'] || dir3['relPath'] || '',
-              reset: !![],
+              reset: true,
             });
             return;
           }
@@ -633,7 +633,7 @@ class GenerationHistoryFileManager {
         if (!this['panel']?.['classList']['contains']('show')) return;
         (event3['stopPropagation'](), event3['stopImmediatePropagation']?.());
       },
-      { passive: ![], capture: !![] },
+      { passive: false, capture: true },
     );
   }
   ['_bindContentPaging']() {
@@ -653,7 +653,7 @@ class GenerationHistoryFileManager {
           this['_recordsLoaded'] &&
           value41 <= FILE_HISTORY_SCROLL_PREFETCH_PX
         ) {
-          void this['loadRecords']({ reset: ![] });
+          void this['loadRecords']({ reset: false });
           return;
         }
         this['_isOpen']() &&
@@ -662,9 +662,9 @@ class GenerationHistoryFileManager {
           this['_outputHasMore'] &&
           this['_outputLoaded'] &&
           value41 <= FILE_HISTORY_SCROLL_PREFETCH_PX &&
-          void this['loadOutputFiles']({ dir: this['_outputDir'], reset: ![] });
+          void this['loadOutputFiles']({ dir: this['_outputDir'], reset: false });
       },
-      { passive: !![] },
+      { passive: true },
     );
   }
   ['_bindMarqueeSelection']() {
@@ -674,7 +674,7 @@ class GenerationHistoryFileManager {
       if (event4['target']['closest']('[data-file-action], .v2-file-history-resize-handle')) return;
       const startX = event4['clientX'],
         startY = event4['clientY'],
-        enabled5 = { startX: startX, startY: startY, active: ![], marqueeEl: null };
+        enabled5 = { startX: startX, startY: startY, active: false, marqueeEl: null };
       this['_selectionDrag'] = enabled5;
       const value42 = (event5) => {
           if (this['_selectionDrag'] !== enabled5) return;
@@ -682,7 +682,7 @@ class GenerationHistoryFileManager {
             value44 = event5['clientY'] - startY;
           if (!enabled5['active'] && Math['hypot'](value43, value44) < 6) return;
           !enabled5['active'] &&
-            ((enabled5['active'] = !![]),
+            ((enabled5['active'] = true),
             (enabled5['marqueeEl'] = document['createElement']('div')),
             (enabled5['marqueeEl']['className'] = 'v2-file-history-marquee'),
             this['contentEl']['appendChild'](enabled5['marqueeEl']));
@@ -705,9 +705,9 @@ class GenerationHistoryFileManager {
           });
         },
         value45 = () => {
-          (window['removeEventListener']('pointermove', value42, !![]),
-            window['removeEventListener']('pointerup', value45, !![]),
-            window['removeEventListener']('pointercancel', value45, !![]));
+          (window['removeEventListener']('pointermove', value42, true),
+            window['removeEventListener']('pointerup', value45, true),
+            window['removeEventListener']('pointercancel', value45, true));
           if (this['_selectionDrag'] !== enabled5) return;
           this['_selectionDrag'] = null;
           if (!enabled5['active'] || !enabled5['marqueeEl']) return;
@@ -725,12 +725,12 @@ class GenerationHistoryFileManager {
               ['map']((el6) => String(el6['dataset']['recordId'] || ''))
               ['filter'](Boolean);
           (enabled5['marqueeEl']['remove'](),
-            (this['_suppressNextClick'] = !![]),
+            (this['_suppressNextClick'] = true),
             this['_setSelection'](value46));
         };
-      (window['addEventListener']('pointermove', value42, !![]),
-        window['addEventListener']('pointerup', value45, !![]),
-        window['addEventListener']('pointercancel', value45, !![]));
+      (window['addEventListener']('pointermove', value42, true),
+        window['addEventListener']('pointerup', value45, true),
+        window['addEventListener']('pointercancel', value45, true));
     });
   }
   ['_bindContextMenu']() {
@@ -747,8 +747,8 @@ class GenerationHistoryFileManager {
         list5 = this['_buildContextMenuItems'](value49);
       if (list5['length'] === 0) return;
       showContextMenu(event6['clientX'], event6['clientY'], list5, {
-        ensureItemIcons: !![],
-        includeNodePicker: ![],
+        ensureItemIcons: true,
+        includeNodePicker: false,
         ownerElement: ownerElement,
         ownerRoot: this['panel'],
         sidebarSubmenuOwner: FILE_MANAGER_SIDEBAR_KEY,
@@ -823,7 +823,7 @@ class GenerationHistoryFileManager {
                     ? fileManagerText('contextMenu.deleteMany', { count: records['length'] })
                     : fileManagerText('contextMenu.delete'),
                 icon: 'delete',
-                danger: !![],
+                danger: true,
                 shortcutActionId: 'context-history-delete',
                 action: () => void this['_deleteRecords'](records),
               });
@@ -845,9 +845,9 @@ class GenerationHistoryFileManager {
     if (!this['panel'] || !this['resizeHandleEl']) return;
     const value58 = () => {
         if (!this['_resizeState']) return;
-        (window['removeEventListener']('pointermove', value59, !![]),
-          window['removeEventListener']('pointerup', value58, !![]),
-          window['removeEventListener']('pointercancel', value58, !![]),
+        (window['removeEventListener']('pointermove', value59, true),
+          window['removeEventListener']('pointerup', value58, true),
+          window['removeEventListener']('pointercancel', value58, true),
           this['panel']['classList']['remove']('is-resizing'),
           (this['_resizeState'] = null));
       },
@@ -881,9 +881,9 @@ class GenerationHistoryFileManager {
       }),
         this['panel']['classList']['add']('is-resizing'),
         this['resizeHandleEl']['setPointerCapture']?.(startX2['pointerId']),
-        window['addEventListener']('pointermove', value59, !![]),
-        window['addEventListener']('pointerup', value58, !![]),
-        window['addEventListener']('pointercancel', value58, !![]));
+        window['addEventListener']('pointermove', value59, true),
+        window['addEventListener']('pointerup', value58, true),
+        window['addEventListener']('pointercancel', value58, true));
     });
   }
   ['_bindLocaleChange']() {
@@ -916,7 +916,7 @@ class GenerationHistoryFileManager {
   }
   ['_shouldKeepOpenForExternalPointerDown'](event9) {
     const el8 = event9?.['target'];
-    if (!el8?.['closest']) return ![];
+    if (!el8?.['closest']) return false;
     return !!el8['closest'](FILE_MANAGER_KEEP_OPEN_SELECTOR);
   }
   ['_bindGenerationEvents']() {
@@ -942,18 +942,18 @@ class GenerationHistoryFileManager {
   }
   ['_resetPageState']() {
     ((this['records'] = []),
-      (this['_recordsLoaded'] = ![]),
-      (this['_recordsDirty'] = ![]),
+      (this['_recordsLoaded'] = false),
+      (this['_recordsDirty'] = false),
       (this['_nextOffset'] = 0),
-      (this['_hasMore'] = !![]),
+      (this['_hasMore'] = true),
       (this['_totalRecords'] = 0));
     if (this['contentEl']) this['contentEl']['scrollTop'] = 0;
   }
   ['_resetOutputPageState']() {
     ((this['outputItems'] = []),
-      (this['_outputLoaded'] = ![]),
+      (this['_outputLoaded'] = false),
       (this['_outputNextOffset'] = 0),
-      (this['_outputHasMore'] = !![]),
+      (this['_outputHasMore'] = true),
       (this['_outputTotalItems'] = 0));
     if (this['contentEl']) this['contentEl']['scrollTop'] = 0;
   }
@@ -969,7 +969,7 @@ class GenerationHistoryFileManager {
       hasMore: Boolean(nextOffset?.['hasMore']),
     };
   }
-  async ['loadOutputFiles']({ dir: dir = this['_outputDir'], reset: reset = !![] } = {}) {
+  async ['loadOutputFiles']({ dir: dir = this['_outputDir'], reset: reset = true } = {}) {
     if (this['_outputLoading'] && !reset) return;
     const dir4 = String(dir || '')['trim'](),
       value66 = dir4 !== String(this['_outputDir'] || '')['trim']();
@@ -977,7 +977,7 @@ class GenerationHistoryFileManager {
     else {
       if (!this['_outputHasMore'] && this['_outputLoaded']) return;
     }
-    ((this['_activeSource'] = 'output'), (this['_outputLoading'] = !![]));
+    ((this['_activeSource'] = 'output'), (this['_outputLoading'] = true));
     const value67 = ++this['_outputLoadToken'];
     if (this['_isOpen']()) this['render']();
     const offset = reset || value66 ? 0 : this['_outputNextOffset'];
@@ -999,8 +999,8 @@ class GenerationHistoryFileManager {
           ...this['outputItems'],
           ...args2['items']['filter']((value69) => {
             const outputRecordIdForItem = getOutputRecordIdForItem(value69);
-            if (!outputRecordIdForItem || map3['has'](outputRecordIdForItem)) return ![];
-            return (map3['add'](outputRecordIdForItem), !![]);
+            if (!outputRecordIdForItem || map3['has'](outputRecordIdForItem)) return false;
+            return (map3['add'](outputRecordIdForItem), true);
           }),
         ];
       }
@@ -1016,15 +1016,15 @@ class GenerationHistoryFileManager {
             : args2['nextOffset']),
         (this['_outputHasMore'] = args2['hasMore']),
         (this['_outputTotalItems'] = args2['total']),
-        (this['_outputLoaded'] = !![]));
+        (this['_outputLoaded'] = true));
     } catch (value70) {
       if (value67 !== this['_outputLoadToken']) return;
       console['error']('[GenerationHistoryFileManager] 加载输出文件夹失败:', value70);
       if (offset === 0) this['outputItems'] = [];
-      this['_outputLoaded'] = !![];
+      this['_outputLoaded'] = true;
     } finally {
       if (value67 === this['_outputLoadToken']) {
-        this['_outputLoading'] = ![];
+        this['_outputLoading'] = false;
         if (this['_isOpen']()) this['render']();
       }
     }
@@ -1046,7 +1046,7 @@ class GenerationHistoryFileManager {
         items: items2['filter'](isGenerationHistoryAsset),
         total: items2['length'],
         nextOffset: null,
-        hasMore: ![],
+        hasMore: false,
       };
     const items3 = Array['isArray'](items2?.['items'])
       ? items2['items']['filter'](isGenerationHistoryAsset)
@@ -1061,14 +1061,14 @@ class GenerationHistoryFileManager {
       hasMore: Boolean(items2?.['hasMore']),
     };
   }
-  async ['loadRecords']({ backfillAfterLoad: backfillAfterLoad = ![], reset: reset = ![] } = {}) {
+  async ['loadRecords']({ backfillAfterLoad: backfillAfterLoad = false, reset: reset = false } = {}) {
     if (this['_loading'] && !reset) return;
     if (reset) this['_resetPageState']();
     if (!this['_hasMore'] && this['_recordsLoaded']) return;
     const value74 = ++this['_loadToken'];
-    this['_loading'] = !![];
+    this['_loading'] = true;
     if (this['_isOpen']()) this['render']();
-    let value75 = ![];
+    let value75 = false;
     const count7 = reset ? 0 : this['_nextOffset'];
     try {
       const fetchAssetsFromServer2 = await fetchAssetsFromServer(this['_buildAssetPageParams'](count7));
@@ -1093,15 +1093,15 @@ class GenerationHistoryFileManager {
             : args3['nextOffset']),
         (this['_hasMore'] = args3['hasMore']),
         (this['_totalRecords'] = args3['total']),
-        (this['_recordsLoaded'] = !![]),
-        (this['_recordsDirty'] = ![]),
+        (this['_recordsLoaded'] = true),
+        (this['_recordsDirty'] = false),
         (value75 = backfillAfterLoad && count7 === 0));
     } catch (value79) {
       if (value74 !== this['_loadToken']) return;
       console['error']('[GenerationHistoryFileManager] 加载生成媒体历史失败:', value79);
     } finally {
       if (value74 === this['_loadToken']) {
-        this['_loading'] = ![];
+        this['_loading'] = false;
         if (this['_isOpen']()) this['render']();
       }
     }
@@ -1119,12 +1119,12 @@ class GenerationHistoryFileManager {
       list9 = list8['filter']((enabled6) => {
         const enabled7 = String(enabled6?.['resultFingerprint'] || '')['trim'](),
           recordLocalPath = resolveRecordLocalPath(enabled6);
-        if (!enabled6?.['id'] || (!enabled7 && !recordLocalPath)) return ![];
+        if (!enabled6?.['id'] || (!enabled7 && !recordLocalPath)) return false;
         const historyRecordIdentityKey2 = buildHistoryRecordIdentityKey(enabled6);
-        if (map4['has'](historyRecordIdentityKey2)) return ![];
+        if (map4['has'](historyRecordIdentityKey2)) return false;
         map4['add'](historyRecordIdentityKey2);
-        if (this['_savingIds']['has'](enabled6['id'])) return ![];
-        if (this['_savingRecordKeys']['has'](historyRecordIdentityKey2)) return ![];
+        if (this['_savingIds']['has'](enabled6['id'])) return false;
+        if (this['_savingRecordKeys']['has'](historyRecordIdentityKey2)) return false;
         if (
           historyCaptureSource === 'backfill' &&
           this['records']['some']((value81) =>
@@ -1134,7 +1134,7 @@ class GenerationHistoryFileManager {
             }),
           )
         )
-          return ![];
+          return false;
         return !this['_hasRecord'](enabled6);
       });
     if (list9['length'] === 0) return 0;
@@ -1159,13 +1159,13 @@ class GenerationHistoryFileManager {
     }
     if (count8 > 0) {
       if (this['_isOpen']()) this['render']();
-      else this['_recordsDirty'] = !![];
+      else this['_recordsDirty'] = true;
     }
     return count8;
   }
   async ['_backfillCurrentCanvas']() {
     if (this['_backfillInFlight']) return;
-    this['_backfillInFlight'] = !![];
+    this['_backfillInFlight'] = true;
     try {
       const projectId2 = this['_getCurrentProjectId'](),
         canvasId2 = this['_getCurrentCanvasId'](),
@@ -1209,7 +1209,7 @@ class GenerationHistoryFileManager {
       }
       await this['_saveRecords'](list10, { captureSource: 'backfill' });
     } finally {
-      this['_backfillInFlight'] = ![];
+      this['_backfillInFlight'] = false;
     }
   }
   ['show']() {
@@ -1220,16 +1220,16 @@ class GenerationHistoryFileManager {
       (this['panel']['style']['width'] = this['_panelWidth'] + 'px'));
     if (this['_activeSource'] === 'output') {
       !this['_outputLoaded'] && !this['_outputLoading']
-        ? void this['loadOutputFiles']({ dir: this['_outputDir'], reset: !![] })
+        ? void this['loadOutputFiles']({ dir: this['_outputDir'], reset: true })
         : this['render']();
       return;
     }
     if (!this['_recordsLoaded'] || this['_recordsDirty']) {
-      if (!this['_loading']) void this['loadRecords']({ backfillAfterLoad: !![], reset: !![] });
+      if (!this['_loading']) void this['loadRecords']({ backfillAfterLoad: true, reset: true });
       else this['render']();
       return;
     }
-    (void this['_backfillCurrentCanvas'](), (this['_recordsDirty'] = ![]), this['render']());
+    (void this['_backfillCurrentCanvas'](), (this['_recordsDirty'] = false), this['render']());
   }
   ['hide']() {
     (this['_releaseVideoUiResources'](),
@@ -1550,9 +1550,9 @@ class GenerationHistoryFileManager {
     this['_mediaPreviewDisposers']['clear']();
   }
   ['_relayoutMasonry']() {
-    if (!this['contentEl'] || !this['_isOpen']()) return ![];
+    if (!this['contentEl'] || !this['_isOpen']()) return false;
     const el21 = this['contentEl']['querySelector']('.v2-file-history-masonry-canvas');
-    if (!el21) return (this['render'](), ![]);
+    if (!el21) return (this['render'](), false);
     const list15 = this['_visibleRecords'](),
       map5 = new Map(
         Array['from'](el21['querySelectorAll']('.v2-file-history-card'))['map']((el22) => [
@@ -1560,14 +1560,14 @@ class GenerationHistoryFileManager {
           el22,
         ]),
       );
-    if (list15['length'] !== map5['size']) return (this['render'](), ![]);
+    if (list15['length'] !== map5['size']) return (this['render'](), false);
     const { contentWidth: contentWidth2 } = this['_getMasonryMetrics'](),
       list16 = [];
     let value123 = 0;
     for (const value124 of list15) {
       const value125 = String(value124?.['id'] || ''),
         el23 = map5['get'](value125);
-      if (!el23) return (this['render'](), ![]);
+      if (!el23) return (this['render'](), false);
       const box13 = this['_getRecordDisplaySize'](value124, contentWidth2),
         box14 = this['_findMasonrySlot'](list16, box13, contentWidth2);
       ((el23['style']['left'] = box14['x'] + 'px'),
@@ -1577,7 +1577,7 @@ class GenerationHistoryFileManager {
         list16['push']({ ...box14, ...box13 }),
         (value123 = Math['max'](value123, box14['y'] + box13['height'])));
     }
-    return ((el21['style']['height'] = value123 + 'px'), !![]);
+    return ((el21['style']['height'] = value123 + 'px'), true);
   }
   ['_renderFilters']() {
     if (!this['filterEl']) return;
@@ -1645,7 +1645,7 @@ class GenerationHistoryFileManager {
               const value130 = document['createElement']('img');
               ((value130['src'] = value128),
                 (value130['alt'] = fileManagerText('alt.imageHistory')),
-                (value130['draggable'] = ![]),
+                (value130['draggable'] = false),
                 (value130['decoding'] = 'async'),
                 (value130['loading'] = 'lazy'),
                 el28['appendChild'](value130));
@@ -1697,12 +1697,12 @@ class GenerationHistoryFileManager {
           ((el33['className'] = 'v2-file-history-hover-video'), (el33['src'] = enabled11));
           const value137 = String(el29['dataset']['videoPosterSrc'] || '')['trim']();
           if (value137) el33['poster'] = value137;
-          ((el33['muted'] = ![]),
+          ((el33['muted'] = false),
             (el33['volume'] = 0.72),
-            (el33['loop'] = !![]),
-            (el33['playsInline'] = !![]),
+            (el33['loop'] = true),
+            (el33['playsInline'] = true),
             (el33['preload'] = 'metadata'),
-            (el33['draggable'] = ![]),
+            (el33['draggable'] = false),
             el33['addEventListener']('timeupdate', value133),
             el33['addEventListener']('loadedmetadata', value133));
           const value138 = el32['querySelector']('.v2-file-history-video-preview-overlay');
@@ -1714,7 +1714,7 @@ class GenerationHistoryFileManager {
             typeof promise['catch'] === 'function' &&
             promise['catch'](() => {
               if (enabled12 !== el33) return;
-              el33['muted'] = !![];
+              el33['muted'] = true;
               const promise2 = el33['play']();
               promise2 &&
                 typeof promise2['catch'] === 'function' &&
@@ -1775,14 +1775,14 @@ class GenerationHistoryFileManager {
             void attachMediaElementPlaybackSource(value144, enabled13, {
               preload: 'auto',
               shouldAssign: () =>
-                value141 === value144 && value142 === value145 && el29['isConnected'] !== ![],
+                value141 === value144 && value142 === value145 && el29['isConnected'] !== false,
             })
               ['then'](async (enabled14) => {
-                if (!enabled14 || value141 !== value144 || value142 !== value145) return ![];
-                return (await value144['play']?.(), !![]);
+                if (!enabled14 || value141 !== value144 || value142 !== value145) return false;
+                return (await value144['play']?.(), true);
               })
               ['then']((value146) => {
-                value146 === !![] &&
+                value146 === true &&
                   value141 === value144 &&
                   value142 === value145 &&
                   el29['classList']['add']('is-preview-playing');
@@ -1810,7 +1810,7 @@ class GenerationHistoryFileManager {
       (value150['className'] = 'v2-file-history-video-poster'),
       (value150['src'] = String(value149 || '')['trim']()),
       (value150['alt'] = fileManagerText('alt.videoHistory')),
-      (value150['draggable'] = ![]),
+      (value150['draggable'] = false),
       (value150['decoding'] = 'async'),
       (value150['loading'] = 'lazy'),
       value150
@@ -1980,7 +1980,7 @@ class GenerationHistoryFileManager {
     }
   }
   ['_showDeleteRecordsConfirm'](count11) {
-    if (typeof document === 'undefined' || !document['body']) return Promise['resolve'](![]);
+    if (typeof document === 'undefined' || !document['body']) return Promise['resolve'](false);
     return (
       document['getElementById']('file-manager-delete-confirm-overlay')?.['remove'](),
       new Promise((handler3) => {
@@ -2018,29 +2018,29 @@ class GenerationHistoryFileManager {
           el46['appendChild'](el49),
           el45['appendChild'](el46),
           document['body']['appendChild'](el45));
-        let value167 = ![];
+        let value167 = false;
         const run4 = (value168) => {
             if (value167) return;
-            ((value167 = !![]),
-              document['removeEventListener']('keydown', value169, !![]),
+            ((value167 = true),
+              document['removeEventListener']('keydown', value169, true),
               el45['remove'](),
               handler3(value168));
           },
           value169 = (event13) => {
             if (event13['key'] === 'Escape') {
-              (event13['preventDefault'](), run4(![]));
+              (event13['preventDefault'](), run4(false));
               return;
             }
             event13['key'] === 'Enter' &&
               !event13['isComposing'] &&
-              (event13['preventDefault'](), run4(!![]));
+              (event13['preventDefault'](), run4(true));
           };
         (el45['addEventListener']('click', (event14) => {
-          if (event14['target'] === el45) run4(![]);
+          if (event14['target'] === el45) run4(false);
         }),
-          el50['addEventListener']('click', () => run4(![])),
-          el51['addEventListener']('click', () => run4(!![])),
-          document['addEventListener']('keydown', value169, !![]),
+          el50['addEventListener']('click', () => run4(false)),
+          el51['addEventListener']('click', () => run4(true)),
+          document['addEventListener']('keydown', value169, true),
           el50['focus']?.());
       })
     );
@@ -2062,7 +2062,7 @@ class GenerationHistoryFileManager {
       } else {
         const list19 = list18['map']((value173) => String(value173?.['id'] || ''))['filter'](Boolean),
           list20 = await Promise['all'](list19['map']((value174) => deleteAssetFromServer(value174)));
-        if (list20['some']((value175) => value175 === ![])) throw new Error('delete asset failed');
+        if (list20['some']((value175) => value175 === false)) throw new Error('delete asset failed');
         const map8 = new Set(list19);
         ((this['records'] = (Array['isArray'](this['records']) ? this['records'] : [])['filter'](
           (value176) => !map8['has'](String(value176?.['id'] || '')),

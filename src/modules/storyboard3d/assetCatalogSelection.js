@@ -110,8 +110,8 @@ export function selectRelevantStoryboard3DAssets(
         score: scoreAsset(asset, text2, searchTokens),
       }))
       ['filter']((event) => {
-        if (!event['key'] || map3['has'](event['key'])) return ![];
-        return (map3['add'](event['key']), !![]);
+        if (!event['key'] || map3['has'](event['key'])) return false;
+        return (map3['add'](event['key']), true);
       });
   if (list9['length'] <= config) return list9['map']((scope) => scope['asset']);
   const args = list9['filter']((input) => input['score'] > 0)['sort'](

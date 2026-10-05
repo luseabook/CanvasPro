@@ -4,10 +4,10 @@ export function removeStoryReplicationCharacterAppearance(args, enabled, value) 
     args['data']?.['project']?.['sourceMode'] !== 'video-replication' ||
     !['character', 'scene', 'prop']['includes'](enabled?.['kind'])
   )
-    return ![];
+    return false;
   const list = getStoryAssetAppearances(enabled),
     count = list['findIndex']((item) => item['id'] === value);
-  if (count < 0 || (list['length'] === 1 && !list[count]['imageUrl'])) return ![];
+  if (count < 0 || (list['length'] === 1 && !list[count]['imageUrl'])) return false;
   const key = list[count];
   return (
     (enabled['appearances'] = list['filter']((index) => index !== key)),
@@ -29,6 +29,6 @@ export function removeStoryReplicationCharacterAppearance(args, enabled, value) 
       [enabled['id']]: Math['min'](count, enabled['appearances']['length'] - 1),
     }),
     (args['pendingDeleteAssetAppearanceKey'] = ''),
-    !![]
+    true
   );
 }

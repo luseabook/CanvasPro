@@ -29,7 +29,7 @@ function isPrivateIpv4(options) {
   const list = String(options || '')
     ['split']('.')
     ['map']((target) => Number(target));
-  if (list['length'] !== 4 || list['some']((source) => !Number['isInteger'](source))) return ![];
+  if (list['length'] !== 4 || list['some']((source) => !Number['isInteger'](source))) return false;
   const [count, count2] = list;
   return (
     count === 10 ||
@@ -43,12 +43,12 @@ export function shouldAllowCloudComfyUiBaseUrl(next) {
   try {
     const uRL2 = new URL(normalizeBaseUrl(next)),
       enabled3 = uRL2['hostname']['replace'](/^\[|\]$/g, '')['toLowerCase']();
-    if (!enabled3 || enabled3 === 'localhost' || enabled3['endsWith']('.localhost')) return ![];
-    if (isPrivateIpv4(enabled3)) return ![];
-    if (enabled3 === '::1' || enabled3['startsWith']('fc') || enabled3['startsWith']('fd')) return ![];
-    return !![];
+    if (!enabled3 || enabled3 === 'localhost' || enabled3['endsWith']('.localhost')) return false;
+    if (isPrivateIpv4(enabled3)) return false;
+    if (enabled3 === '::1' || enabled3['startsWith']('fc') || enabled3['startsWith']('fd')) return false;
+    return true;
   } catch {
-    return ![];
+    return false;
   }
 }
 function createClientId() {
@@ -109,12 +109,12 @@ function getUserMappedComfyUiSeedInputs(options3 = {}) {
 function isCustomComfyUiWorkflowExecution(value7, value8) {
   return Boolean(value7?.['extensions']?.['comfyUiWorkflow'] || value8?.['extensions']?.['comfyui']);
 }
-function relaxCustomWorkflowMediaInputMappings(args = null, { enabled: enabled = ![] } = {}) {
+function relaxCustomWorkflowMediaInputMappings(args = null, { enabled: enabled = false } = {}) {
   if (!enabled || !args || typeof args !== 'object' || Array['isArray'](args)) return args;
   const inputs = Array['isArray'](args['inputs'])
     ? args['inputs']['map']((args2) =>
         CUSTOM_WORKFLOW_MEDIA_INPUT_SOURCES['has'](String(args2?.['source'] || '')['trim']())
-          ? { ...args2, required: ![] }
+          ? { ...args2, required: false }
           : args2,
       )
     : args['inputs'];
@@ -163,7 +163,7 @@ function resolveComfyUiBaseUrl(value19, value20, value21) {
   }
   return normalizeBaseUrl(providerConfig['apiUrl'] || providerConfig['baseUrl'] || DEFAULT_COMFYUI_BASE_URL);
 }
-function resolvePayloadValue(value24, value25 = [], value26 = undefined, value27 = ![]) {
+function resolvePayloadValue(value24, value25 = [], value26 = undefined, value27 = false) {
   const list3 = Array['isArray'](value25) ? value25 : [value25];
   for (const value28 of list3['filter'](Boolean)) {
     const comfyUiPayloadPathValue = getComfyUiPayloadPathValue(value24, value28);
@@ -285,7 +285,7 @@ async function resolveComfyUiMediaInput(payload2, item2, kind, value49, baseUrl2
   const value50 = String(item2?.['field'] || item2?.['slot'] || item2?.['urlField'] || '')['trim'](),
     args4 = [value50, ...(Array['isArray'](item2?.['fields']) ? item2['fields'] : [])]['filter'](Boolean),
     value51 = [...args4, ...getGenerationParamFallbackFields(args4)];
-  let payloadValue = resolvePayloadValue(payload2, value51, undefined, item2?.['allowEmpty'] === !![]);
+  let payloadValue = resolvePayloadValue(payload2, value51, undefined, item2?.['allowEmpty'] === true);
   if (
     (payloadValue === undefined || payloadValue === null || String(payloadValue)['trim']() === '') &&
     Array['isArray'](payload2?.['inputUrls']) &&
@@ -383,7 +383,7 @@ function isComfyUiFailureStatus(value59) {
   return /failed|failure|error|exception|cancelled|canceled/['test'](comfyUiStatusText);
 }
 function hasComfyUiErrorShape(response) {
-  if (!response || typeof response !== 'object' || Array['isArray'](response)) return ![];
+  if (!response || typeof response !== 'object' || Array['isArray'](response)) return false;
   return Boolean(
     response['error'] || getComfyUiNodeErrors(response) || isComfyUiFailureStatus(response['status']),
   );
@@ -540,9 +540,9 @@ async function buildComfyUiWorkflowRequest({
       baseUrl: baseUrl4,
       prompt: prompt,
       clientId: clientId,
-      ...(allowCloudBaseUrl2 ? { allowCloudBaseUrl: !![] } : {}),
+      ...(allowCloudBaseUrl2 ? { allowCloudBaseUrl: true } : {}),
     },
-    isAsync: !![],
+    isAsync: true,
     taskIdPath: taskIdPath['taskIdPath'] || 'prompt_id',
     responseMapping: {
       taskIdPath: taskIdPath['taskIdPath'] || 'prompt_id',

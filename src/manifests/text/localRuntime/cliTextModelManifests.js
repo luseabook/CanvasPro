@@ -64,8 +64,8 @@ function createCliTextModelManifest({
     description: subtitle,
     inputSlots: CLI_TEXT_INPUT_SLOTS,
     uiSchema: CLI_TEXT_UI_SCHEMA,
-    async: ![],
-    cancellable: ![],
+    async: false,
+    cancellable: false,
     outputType: 'text',
     extensions: Object['freeze']({
       textMenu: Object['freeze']({

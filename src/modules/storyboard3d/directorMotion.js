@@ -11,7 +11,7 @@ function normalizeConstraint(entry, handler) {
     followOffset: vector(entry['followOffset']),
     followObjectId: handler(entry['followObjectId']) ? entry['followObjectId'] : '',
     lookAtObjectId: handler(entry['lookAtObjectId']) ? entry['lookAtObjectId'] : '',
-    followHeading: entry['followHeading'] === !![],
+    followHeading: entry['followHeading'] === true,
     lookAtOffset: vector(entry['lookAtOffset'], [0, 1.2, 0]),
   };
 }

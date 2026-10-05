@@ -67,7 +67,7 @@ export function normalizeStoryboard3DBackgroundCalibration(verticalFov = {}) {
     ),
     imageScale: clamp(finite(verticalFov['imageScale'], 1), 0.1, 10),
     imageOffset: [clamp(vector23[0], -2, 2), clamp(vector23[1], -2, 2)],
-    lockedCamera: verticalFov['lockedCamera'] === !![],
+    lockedCamera: verticalFov['lockedCamera'] === true,
     lockedCameraSnapshot: verticalFov['lockedCameraSnapshot']
       ? normalizeStoryboard3DBackgroundCamera(verticalFov['lockedCameraSnapshot'])
       : null,
@@ -150,8 +150,8 @@ export function setStoryboard3DBackgroundCameraLock(value15, lockedCamera, value
   const args3 = normalizeStoryboard3DBackgroundCalibration(value15);
   return {
     ...args3,
-    lockedCamera: lockedCamera === !![],
-    lockedCameraSnapshot: lockedCamera === !![] ? normalizeStoryboard3DBackgroundCamera(value16) : null,
+    lockedCamera: lockedCamera === true,
+    lockedCameraSnapshot: lockedCamera === true ? normalizeStoryboard3DBackgroundCamera(value16) : null,
   };
 }
 function camerasEqual(value17, value18, value19 = 0.000001) {
@@ -181,11 +181,11 @@ export function guardStoryboard3DBackgroundCameraChange(value22, value23) {
     !storyboard3DBackgroundCalibration2['lockedCamera'] ||
     !storyboard3DBackgroundCalibration2['lockedCameraSnapshot']
   )
-    return { allowed: !![], camera: normalizeStoryboard3DBackgroundCamera(value23), reason: '' };
+    return { allowed: true, camera: normalizeStoryboard3DBackgroundCamera(value23), reason: '' };
   if (camerasEqual(storyboard3DBackgroundCalibration2['lockedCameraSnapshot'], value23))
-    return { allowed: !![], camera: normalizeStoryboard3DBackgroundCamera(value23), reason: '' };
+    return { allowed: true, camera: normalizeStoryboard3DBackgroundCamera(value23), reason: '' };
   return {
-    allowed: ![],
+    allowed: false,
     camera: structuredClone(storyboard3DBackgroundCalibration2['lockedCameraSnapshot']),
     reason: '背景相机已锁定；请先解除锁定再修改机位、焦距或画幅。',
   };

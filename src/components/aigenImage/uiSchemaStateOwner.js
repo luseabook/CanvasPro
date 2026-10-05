@@ -63,13 +63,13 @@ export function getRenderedOptionDisableWhen(el) {
 }
 export function optionDisableWhenMatches(el2, record = {}) {
   if (Array['isArray'](el2)) return el2['some']((payload) => optionDisableWhenMatches(payload, record));
-  if (!el2 || typeof el2 !== 'object') return ![];
+  if (!el2 || typeof el2 !== 'object') return false;
   if (Array['isArray'](el2['any']))
     return el2['any']['some']((handle) => optionDisableWhenMatches(handle, record));
   if (Array['isArray'](el2['all']))
     return el2['all']['every']((state) => optionDisableWhenMatches(state, record));
   const enabled2 = String(el2?.['field'] || el2?.['param'] || '')['trim']();
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   const config = el2['values'] !== undefined ? el2['values'] : el2['value'],
     list = Array['isArray'](config) ? config : [config],
     list2 = list['map'](normalizeCompareValue),
@@ -110,7 +110,7 @@ function resolveMatchingOptionDisableRepair(el3, value3 = {}) {
     }
     return null;
   }
-  if (!el3 || typeof el3 !== 'object' || el3['not'] !== !![]) return null;
+  if (!el3 || typeof el3 !== 'object' || el3['not'] !== true) return null;
   const enabled4 = String(el3['field'] || el3['param'] || '')['trim'](),
     value7 = el3['values'] !== undefined ? el3['values'] : el3['value'],
     list3 = Array['isArray'](value7) ? value7 : [value7];
@@ -127,13 +127,13 @@ export function getOptionDisableRepairPatch(value10, value11 = {}) {
 }
 export function uiSchemaConditionMatches(el4, value12 = {}) {
   if (Array['isArray'](el4)) return el4['some']((value13) => uiSchemaConditionMatches(value13, value12));
-  if (!el4 || typeof el4 !== 'object') return ![];
+  if (!el4 || typeof el4 !== 'object') return false;
   if (Array['isArray'](el4['any']))
     return el4['any']['some']((value14) => uiSchemaConditionMatches(value14, value12));
   if (Array['isArray'](el4['all']))
     return el4['all']['every']((value15) => uiSchemaConditionMatches(value15, value12));
   const enabled5 = String(el4?.['field'] || el4?.['param'] || '')['trim']();
-  if (!enabled5) return ![];
+  if (!enabled5) return false;
   const value16 = el4['values'] !== undefined ? el4['values'] : el4['value'],
     list4 = Array['isArray'](value16) ? value16 : [value16],
     list5 = list4['map'](normalizeCompareValue);
@@ -141,9 +141,9 @@ export function uiSchemaConditionMatches(el4, value12 = {}) {
 }
 export function filterVisibleUiSchemaFields(list6 = [], value17 = {}) {
   return (Array['isArray'](list6) ? list6 : [])['filter']((value18) => {
-    if (value18?.['showWhen'] && !uiSchemaConditionMatches(value18['showWhen'], value17)) return ![];
-    if (value18?.['hideWhen'] && uiSchemaConditionMatches(value18['hideWhen'], value17)) return ![];
-    return !![];
+    if (value18?.['showWhen'] && !uiSchemaConditionMatches(value18['showWhen'], value17)) return false;
+    if (value18?.['hideWhen'] && uiSchemaConditionMatches(value18['hideWhen'], value17)) return false;
+    return true;
   });
 }
 function getUiSchemaModelIdForNode(providerHint = {}) {
@@ -210,7 +210,7 @@ export function buildUiSchemaParamPatch(nodeData = {}, value22 = '', value23 = '
     uiSchemaModelIdForNode || nodeData?.['model'],
     plainGenerationParams,
     {
-      includeDefaults: ![],
+      includeDefaults: false,
     },
   );
   for (const value30 of Object['keys'](plainGenerationParams)) {
@@ -238,14 +238,14 @@ export function evaluateUiSchemaNumberExpression(value33) {
     handler = () => {
       run();
       const value35 = value34;
-      let enabled8 = ![];
+      let enabled8 = false;
       while (/\d/['test'](list7[value34] || '')) {
-        ((enabled8 = !![]), (value34 += 1));
+        ((enabled8 = true), (value34 += 1));
       }
       if (list7[value34] === '.') {
         value34 += 1;
         while (/\d/['test'](list7[value34] || '')) {
-          ((enabled8 = !![]), (value34 += 1));
+          ((enabled8 = true), (value34 += 1));
         }
       }
       if (!enabled8) return NaN;
@@ -270,7 +270,7 @@ export function evaluateUiSchemaNumberExpression(value33) {
     },
     handler3 = () => {
       let value39 = handler2();
-      while (!![]) {
+      while (true) {
         run();
         const value40 = list7[value34];
         if (value40 !== '*' && value40 !== '/') return value39;
@@ -283,7 +283,7 @@ export function evaluateUiSchemaNumberExpression(value33) {
     };
   function run2() {
     let value41 = handler3();
-    while (!![]) {
+    while (true) {
       run();
       const value42 = list7[value34];
       if (value42 !== '+' && value42 !== '-') return value41;
@@ -350,12 +350,12 @@ export function createUiSchemaStateOwner({
       el8['classList']?.['toggle']('disabled', value49);
       if (value49) {
         ((el8['dataset']['uiSchemaDisabled'] = 'true'), el8['setAttribute']('aria-disabled', 'true'));
-        if ('disabled' in el8) el8['disabled'] = !![];
+        if ('disabled' in el8) el8['disabled'] = true;
       } else {
         (delete el8['dataset']['uiSchemaDisabled'],
           el8['removeAttribute']('data-ui-schema-disabled'),
           el8['removeAttribute']('aria-disabled'));
-        if ('disabled' in el8) el8['disabled'] = ![];
+        if ('disabled' in el8) el8['disabled'] = false;
       }
     });
   }
@@ -364,7 +364,7 @@ export function createUiSchemaStateOwner({
       value52 = String(el9?.['dataset']?.['rhV54DisableOnSpecial'] || '')['trim'](),
       value53 =
         value52 && normalizeRhV54SpecialMode(getNodeFieldValue(value50, 'rhSpecialMode', '')) === value52,
-      value54 = value51 === 'rhSubtractSubject' && value50?.['rhV54HasMaskVideo'] === !![];
+      value54 = value51 === 'rhSubtractSubject' && value50?.['rhV54HasMaskVideo'] === true;
     (value52 || value54) && el9['classList']['toggle']('is-rh-disabled', Boolean(value53 || value54));
     if (el9['classList']?.['contains']('ui-schema-rh-v54-control-mode')) {
       const value55 = String(getNodeFieldValue(value50, 'rhControlMode', 'single') || 'single'),
@@ -414,7 +414,7 @@ export function createUiSchemaStateOwner({
     const el18 = findFirstEnabledUiSchemaValueOption(el15);
     return el18?.['dataset']?.['uiSchemaValue'] ?? value60;
   }
-  function run8(value62, value63, { adaptive: adaptive = ![] } = {}) {
+  function run8(value62, value63, { adaptive: adaptive = false } = {}) {
     const el19 = findUiSchemaValueOption(value62, value63),
       value64 = String(el19?.['dataset']?.['uiSchemaOptionLabel'] || el19?.['textContent'] || value63 || '')[
         'trim'
@@ -453,7 +453,7 @@ export function createUiSchemaStateOwner({
     if (!list8['length'] || !enabled12 || !el21) return;
     const value70 = run7(enabled12, value67),
       list9 = list8['map']((value71) => run8(value71, run7(value71, value67))),
-      value72 = run8(enabled12, value70, { adaptive: !![] });
+      value72 = run8(enabled12, value70, { adaptive: true });
     el21['textContent'] =
       list9['length'] > 1
         ? [...list9, value72]['join'](' · ')

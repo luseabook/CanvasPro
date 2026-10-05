@@ -141,7 +141,7 @@ function canLocallyRevalidateEveryStoryAssetBlocker(state, list, list2) {
 export function createStoryAssetPaidRerunChoiceDescriptor(
   list3 = [],
   output = [],
-  { allowLocalRevalidate: allowLocalRevalidate = ![] } = {},
+  { allowLocalRevalidate: allowLocalRevalidate = false } = {},
 ) {
   const list4 = Array['isArray'](list3) ? list3 : [],
     title = Array['isArray'](output) ? output : [],
@@ -172,18 +172,18 @@ export function createStoryAssetPaidRerunChoiceDescriptor(
       ['filter'](Boolean)
       ['join']('。'),
     choices: [
-      { label: '取消', value: null, autofocus: !![] },
+      { label: '取消', value: null, autofocus: true },
       ...(allowLocalRevalidate ? [{ label: '免费本地重校验', value: 'local-revalidate' }] : []),
-      { label: '确认仅重跑 ' + value9, value: 'paid-rerun', primary: !![] },
+      { label: '确认仅重跑 ' + value9, value: 'paid-rerun', primary: true },
     ],
   };
 }
 export function createStoryAssetPaidRerunChoiceGate() {
-  let value10 = ![];
+  let value10 = false;
   return async function run({
     draft: draft = {},
     requestChoice: requestChoice,
-    isCurrent: isCurrent = () => !![],
+    isCurrent: isCurrent = () => true,
   } = {}) {
     const blockedLanes = getStoryAssetPaidRerunBlockedLanes(draft),
       blockedBatches = getStoryAssetPaidRerunBlockedBatches(draft);
@@ -201,7 +201,7 @@ export function createStoryAssetPaidRerunChoiceGate() {
         blockedBatches: blockedBatches,
         paidRerunAuthorization: null,
       };
-    value10 = !![];
+    value10 = true;
     try {
       const allowLocalRevalidate2 = canLocallyRevalidateEveryStoryAssetBlocker(
           draft,
@@ -236,7 +236,7 @@ export function createStoryAssetPaidRerunChoiceGate() {
           blockedLanes: blockedLanes,
           blockedBatches: blockedBatches,
           paidRerunAuthorization: {
-            confirmed: !![],
+            confirmed: true,
             ...(blockedLanes['length']
               ? { authorizedKinds: blockedLanes['map']((value11) => value11['kind']) }
               : {}),
@@ -252,7 +252,7 @@ export function createStoryAssetPaidRerunChoiceGate() {
         paidRerunAuthorization: null,
       };
     } finally {
-      value10 = ![];
+      value10 = false;
     }
   };
 }
@@ -273,14 +273,14 @@ function getStoryAssetEvidenceProgress(options5 = {}) {
   };
 }
 export function isStoryAssetPlannedContinuationDraft(response6 = {}) {
-  if (!/^evidence-batched-api-v\d+$/u['test'](normalizeText(response6?.['strategy']))) return ![];
-  if (normalizeText(response6?.['status']) !== 'partial') return ![];
-  if (Array['isArray'](response6?.['failures']) && response6['failures']['length']) return ![];
+  if (!/^evidence-batched-api-v\d+$/u['test'](normalizeText(response6?.['strategy']))) return false;
+  if (normalizeText(response6?.['status']) !== 'partial') return false;
+  if (Array['isArray'](response6?.['failures']) && response6['failures']['length']) return false;
   if (
     getStoryAssetPaidRerunBlockedLanes(response6)['length'] ||
     getStoryAssetPaidRerunBlockedBatches(response6)['length']
   )
-    return ![];
+    return false;
   return getStoryAssetEvidenceProgress(response6)['remaining'] > 0;
 }
 function getStoryAssetExtractionErrorLabel(value15 = '') {
@@ -475,11 +475,11 @@ export function getStoryAssetExperimentalDraftDisplay(response7 = {}) {
               : retryCount3
                 ? '继续提取（' + retryCount3 + '）'
                 : '提取角色、场景与道具',
-    ...(actionLabel ? { needsModelChange: !![], modelChangeKinds: modelChangeKinds } : {}),
+    ...(actionLabel ? { needsModelChange: true, modelChangeKinds: modelChangeKinds } : {}),
   };
 }
 export function isStoryAssetLocalQualityRevalidationDraft(enabled2 = {}) {
-  if (!enabled2 || typeof enabled2 !== 'object') return ![];
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
   if (enabled2['qualityReview'] && typeof enabled2['qualityReview'] === 'object')
     return normalizeText(enabled2['qualityReview']['recoveryMode']) !== 'paid-rerun-required';
   const value31 =
@@ -488,15 +488,15 @@ export function isStoryAssetLocalQualityRevalidationDraft(enabled2 = {}) {
       enabled2['assetsByKind'] && typeof enabled2['assetsByKind'] === 'object'
         ? enabled2['assetsByKind']
         : {};
-  let value33 = ![];
+  let value33 = false;
   const value34 = STORY_ASSET_KINDS['every']((value35) => {
     const response13 = value31[value35] || {};
-    if (normalizeText(response13['status']) === 'succeeded') return !![];
+    if (normalizeText(response13['status']) === 'succeeded') return true;
     const text11 =
       normalizeText(response13['status']) === 'failed' &&
       normalizeText(response13['errorType']) === 'validation' &&
       Array['isArray'](value32[value35]);
-    if (text11) value33 = !![];
+    if (text11) value33 = true;
     return text11;
   });
   return value33 && value34;

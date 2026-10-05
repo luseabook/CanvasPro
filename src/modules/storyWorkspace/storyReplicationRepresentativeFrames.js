@@ -6,7 +6,7 @@ export async function captureStoryReplicationRepresentativeFrame({
   timeSec: timeSec,
   projectId: projectId,
   crop: crop,
-  isActive: isActive = () => !![],
+  isActive: isActive = () => true,
   capture: capture = captureStoryClipFrameFromSource,
   save: save = uploadFile,
 } = {}) {
@@ -29,7 +29,7 @@ export async function captureStoryReplicationRepresentativeFrame({
 export async function collectStoryReplicationRepresentativeFrames({
   episode: episode,
   projectId: projectId2,
-  isActive: isActive = () => !![],
+  isActive: isActive = () => true,
   onProgress: onProgress,
   capture: capture = captureStoryReplicationRepresentativeFrame,
 } = {}) {

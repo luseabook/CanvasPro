@@ -382,8 +382,8 @@ export function renderStoryboard3DShotTimeline({
   selectedObjectIds: selectedObjectIds = [],
   activeTool: activeTool = 'select',
   currentTime: currentTime = 0,
-  playing: playing = ![],
-  autoKey: autoKey = ![],
+  playing: playing = false,
+  autoKey: autoKey = false,
   expandedObjectIds: expandedObjectIds = new Set(),
   activeProperties: activeProperties = new Map(),
   selectedKeyframe: selectedKeyframe = null,
@@ -396,7 +396,7 @@ export function renderStoryboard3DShotTimeline({
     clamp2 = clamp(currentTime, 0, animation4['duration']),
     value31 = selectedObjectIds['at'](-1) || '',
     list4 = (scene2['objects'] || [])['filter'](
-      (value32) => value32['visible'] !== ![] && value32['type'] !== 'group' && value32['type'] !== 'camera',
+      (value32) => value32['visible'] !== false && value32['type'] !== 'group' && value32['type'] !== 'camera',
     ),
     value33 = list4['map']((object2) =>
       renderObjectTrack({
@@ -509,14 +509,14 @@ export class Storyboard3DShotTimelineController {
       (this['activeProperties'] = new Map()),
       (this['expandedObjectIds'] = new Set()),
       (this['selectedKeyframe'] = null),
-      (this['drawerOpen'] = ![]),
-      (this['autoKey'] = ![]),
-      (this['playing'] = ![]),
+      (this['drawerOpen'] = false),
+      (this['autoKey'] = false),
+      (this['playing'] = false),
       (this['playbackFrame'] = null),
       (this['playbackStartedAt'] = 0),
       (this['playbackStartTime'] = 0),
       (this['activeShotId'] = ''),
-      (this['hasPreview'] = ![]),
+      (this['hasPreview'] = false),
       (this['directorPanel'] = new DirectorTimelinePanel(this)),
       (this['cameraPath'] = new DirectorCameraPathController(this)),
       (this['editing'] = new DirectorTimelineEditing(this)),
@@ -552,10 +552,10 @@ export class Storyboard3DShotTimelineController {
     const value39 = value38?.['id'] || '';
     if (value39 === this['activeShotId']) return;
     if (this['cameraPath']['active']) this['cameraPath']['stop']();
-    (this['stopPlayback']({ render: ![], clear: !![] }),
+    (this['stopPlayback']({ render: false, clear: true }),
       (this['activeShotId'] = value39),
       (this['selectedKeyframe'] = null),
-      (this['hasPreview'] = ![]));
+      (this['hasPreview'] = false));
   }
   ['render']() {
     this['keyframeDrag']['bind']();
@@ -611,7 +611,7 @@ export class Storyboard3DShotTimelineController {
         objectTransforms: createObjectTransforms(scene6),
         objects: scene6['objects'],
       });
-    this['hasPreview'] = !![];
+    this['hasPreview'] = true;
     if (!this['cameraPath']['preview'](sampleStoryboard3DShotAnimation2))
       this['previewSample']?.(sampleStoryboard3DShotAnimation2);
     return (this['_syncDisplay'](value43, shot6), sampleStoryboard3DShotAnimation2);
@@ -650,7 +650,7 @@ export class Storyboard3DShotTimelineController {
       if (storyboard3DShotAnimation4['loop'] && storyboard3DShotAnimation4['duration'] > 0)
         value48 %= storyboard3DShotAnimation4['duration'];
       if (!storyboard3DShotAnimation4['loop'] && value48 >= storyboard3DShotAnimation4['duration']) {
-        (this['_sampleAt'](storyboard3DShotAnimation4['duration']), this['stopPlayback']({ clear: ![] }));
+        (this['_sampleAt'](storyboard3DShotAnimation4['duration']), this['stopPlayback']({ clear: false }));
         return;
       }
       (this['_sampleAt'](value48), this['_schedulePlayback']());
@@ -658,13 +658,13 @@ export class Storyboard3DShotTimelineController {
   }
   ['startPlayback']() {
     const { shot: shot8 } = this['_context']();
-    if (!shot8) return ![];
+    if (!shot8) return false;
     const storyboard3DShotAnimation5 = normalizeStoryboard3DShotAnimation(shot8['animation'], {
         camera: shot8['camera'],
       }),
       value49 = this['_timeForShot'](shot8);
     return (
-      (this['playing'] = !![]),
+      (this['playing'] = true),
       (this['playbackStartTime'] = value49 >= storyboard3DShotAnimation5['duration'] ? 0 : value49),
       this['currentTimes']['set'](shot8['id'], this['playbackStartTime']),
       (this['playbackStartedAt'] =
@@ -674,21 +674,21 @@ export class Storyboard3DShotTimelineController {
       this['requestRender']?.(),
       this['_sampleAt'](this['playbackStartTime']),
       this['_schedulePlayback'](),
-      !![]
+      true
     );
   }
-  ['stopPlayback']({ render: render = !![], clear: clear = ![] } = {}) {
+  ['stopPlayback']({ render: render = true, clear: clear = false } = {}) {
     const value50 =
       this['window']?.['cancelAnimationFrame']?.['bind'](this['window']) ||
       globalThis['cancelAnimationFrame']?.['bind'](globalThis);
     if (this['playbackFrame'] != null) value50?.(this['playbackFrame']);
     const value51 = this['playing'];
-    ((this['playbackFrame'] = null), (this['playing'] = ![]));
-    clear && ((this['hasPreview'] = ![]), this['clearPreview']?.());
+    ((this['playbackFrame'] = null), (this['playing'] = false));
+    clear && ((this['hasPreview'] = false), this['clearPreview']?.());
     if (render && value51) this['requestRender']?.();
   }
   ['togglePlayback']() {
-    if (this['playing']) return (this['stopPlayback']({ clear: ![] }), !![]);
+    if (this['playing']) return (this['stopPlayback']({ clear: false }), true);
     return this['startPlayback']();
   }
   ['_activeProperty'](value52, value53) {
@@ -704,7 +704,7 @@ export class Storyboard3DShotTimelineController {
       el8 = el5?.['querySelector']?.('.storyboard-3d-shot-keyframe-trigger'),
       el9 = el5?.['querySelector']?.('.storyboard-3d-timeline-drawer-handle'),
       el10 = el5?.['querySelector']?.('.storyboard-3d-timeline-drawer-content');
-    if (!el6 || !el7 || !el8 || !el9 || !el10) return ![];
+    if (!el6 || !el7 || !el8 || !el9 || !el10) return false;
     const enabled = this['drawerOpen'];
     (el6['classList']['toggle']('is-timeline-open', enabled),
       el6['classList']['toggle']('is-timeline-collapsed', !enabled),
@@ -720,44 +720,44 @@ export class Storyboard3DShotTimelineController {
       (el10['inert'] = !enabled));
     if (enabled) el10['removeAttribute']('inert');
     else el10['setAttribute']('inert', '');
-    return !![];
+    return true;
   }
   ['setDrawerOpen'](value55) {
-    const enabled2 = value55 === !![];
-    if (enabled2 === this['drawerOpen']) return ![];
+    const enabled2 = value55 === true;
+    if (enabled2 === this['drawerOpen']) return false;
     this['drawerOpen'] = enabled2;
     !enabled2 &&
-      (this['directorPanel']['mobile']['disconnect']({ render: ![] }),
+      (this['directorPanel']['mobile']['disconnect']({ render: false }),
       this['multiView']['destroy'](),
       this['cameraPath']['stop'](),
-      this['stopPlayback']({ render: ![], clear: !![] }));
+      this['stopPlayback']({ render: false, clear: true }));
     if (!this['_syncDrawerPresentation']()) this['requestRender']?.();
-    return !![];
+    return true;
   }
   ['handleClick'](value56, type2, value57) {
-    if (!String(value56 || '')['startsWith']('timeline-')) return ![];
-    if (value56 === 'timeline-select-keyframe' && this['keyframeDrag']['consumeClick'](value57)) return !![];
-    if (this['editing']['handleClick'](value56, type2, value57)) return !![];
-    if (this['clips']['handleClick'](value56, type2, value57)) return !![];
-    if (this['directorPanel']['handleClick'](value56, type2, value57)) return !![];
-    if (value56 === 'timeline-toggle-drawer') return (this['setDrawerOpen'](!this['drawerOpen']), !![]);
+    if (!String(value56 || '')['startsWith']('timeline-')) return false;
+    if (value56 === 'timeline-select-keyframe' && this['keyframeDrag']['consumeClick'](value57)) return true;
+    if (this['editing']['handleClick'](value56, type2, value57)) return true;
+    if (this['clips']['handleClick'](value56, type2, value57)) return true;
+    if (this['directorPanel']['handleClick'](value56, type2, value57)) return true;
+    if (value56 === 'timeline-toggle-drawer') return (this['setDrawerOpen'](!this['drawerOpen']), true);
     const { scene: scene7, shot: shot9, editorState: editorState3 } = this['_context']();
-    if (!scene7 || !shot9) return !![];
-    if (value56 === 'timeline-toggle-play') return (this['togglePlayback'](), !![]);
+    if (!scene7 || !shot9) return true;
+    if (value56 === 'timeline-toggle-play') return (this['togglePlayback'](), true);
     if (value56 === 'timeline-go-start' || value56 === 'timeline-go-end') {
-      this['stopPlayback']({ render: ![], clear: ![] });
+      this['stopPlayback']({ render: false, clear: false });
       const animation5 = normalizeAnimation(scene7, shot9);
       return (
         this['_sampleAt'](value56 === 'timeline-go-start' ? 0 : animation5['duration']),
         this['requestRender']?.(),
-        !![]
+        true
       );
     }
     if (value56 === 'timeline-toggle-object') {
       const value58 = type2['dataset']['objectId'];
       if (this['expandedObjectIds']['has'](value58)) this['expandedObjectIds']['delete'](value58);
       else this['expandedObjectIds']['add'](value58);
-      return (this['requestRender']?.(), !![]);
+      return (this['requestRender']?.(), true);
     }
     if (value56 === 'timeline-set-object-property') {
       const value59 = type2['dataset']['objectId'],
@@ -765,12 +765,12 @@ export class Storyboard3DShotTimelineController {
       return (
         STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['includes'](value60) &&
           (this['activeProperties']['set'](value59, value60), this['requestRender']?.()),
-        !![]
+        true
       );
     }
     if (value56 === 'timeline-add-camera-keyframe') {
       const camera5 = this['readCurrentCamera']?.();
-      if (!camera5) return (this['setMessage']?.('当前摄像机状态不可用。'), !![]);
+      if (!camera5) return (this['setMessage']?.('当前摄像机状态不可用。'), true);
       const time = this['_timeForShot'](shot9);
       return (
         this['_mutateAnimation']('add-camera-keyframe', 'Add camera keyframe', (value61) =>
@@ -781,7 +781,7 @@ export class Storyboard3DShotTimelineController {
             formatFrameTime(time, normalizeAnimation(scene7, shot9)['fps']) +
             ' 添加摄像机关键帧。',
         ),
-        !![]
+        true
       );
     }
     if (value56 === 'timeline-add-object-keyframe') {
@@ -789,7 +789,7 @@ export class Storyboard3DShotTimelineController {
         property3 =
           type2['dataset']['property'] || this['_activeProperty'](objectId2, editorState3['activeTool']),
         transform = scene7['objects']['find']((value62) => value62['id'] === objectId2);
-      if (!transform || !STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['includes'](property3)) return !![];
+      if (!transform || !STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['includes'](property3)) return true;
       const time2 = this['_timeForShot'](shot9);
       return (
         this['_mutateAnimation']('add-object-keyframe', 'Add object keyframe', (value63) =>
@@ -803,12 +803,12 @@ export class Storyboard3DShotTimelineController {
         this['setMessage']?.(
           '已为“' + transform['name'] + '”的' + PROPERTY_LABELS[property3] + '添加关键帧。',
         ),
-        !![]
+        true
       );
     }
     if (value56 === 'timeline-select-keyframe')
       return (
-        this['stopPlayback']({ render: ![], clear: ![] }),
+        this['stopPlayback']({ render: false, clear: false }),
         (this['selectedKeyframe'] = {
           shotId: shot9['id'],
           type: type2['dataset']['keyframeType'],
@@ -818,7 +818,7 @@ export class Storyboard3DShotTimelineController {
         }),
         this['_sampleAt'](Number(type2['dataset']['keyframeTime']) || 0),
         this['requestRender']?.(),
-        !![]
+        true
       );
     if (value56 === 'timeline-copy-keyframe') {
       const args3 = this['selectedKeyframe'],
@@ -835,38 +835,38 @@ export class Storyboard3DShotTimelineController {
                 time: time3,
               });
         }),
-        !![]
+        true
       );
     }
     if (value56 === 'timeline-delete-keyframe') {
-      if (!this['selectedKeyframe']) return !![];
+      if (!this['selectedKeyframe']) return true;
       const value65 = { ...this['selectedKeyframe'] };
       return (
         this['_mutateAnimation']('delete-animation-keyframe', 'Delete animation keyframe', (value66) =>
           removeStoryboard3DAnimationKeyframe(value66, value65),
         ),
         (this['selectedKeyframe'] = null),
-        !![]
+        true
       );
     }
-    return !![];
+    return true;
   }
   ['handleInput'](event2) {
     if (event2['target']?.['matches']?.('[data-storyboard-3d-timeline-scrubber]'))
       return (
-        this['stopPlayback']({ render: ![], clear: ![] }),
+        this['stopPlayback']({ render: false, clear: false }),
         this['_sampleAt'](Number(event2['target']['value']) || 0),
-        !![]
+        true
       );
-    return ![];
+    return false;
   }
   ['handleChange'](event3) {
-    if (this['editing']['handleChange'](event3)) return !![];
-    if (this['directorPanel']['handleChange'](event3)) return !![];
+    if (this['editing']['handleChange'](event3)) return true;
+    if (this['directorPanel']['handleChange'](event3)) return true;
     const { scene: scene8, shot: shot10 } = this['_context']();
-    if (!scene8 || !shot10) return ![];
+    if (!scene8 || !shot10) return false;
     if (event3['target']?.['matches']?.('[data-storyboard-3d-timeline-auto-key]'))
-      return ((this['autoKey'] = event3['target']['checked'] === !![]), this['requestRender']?.(), !![]);
+      return ((this['autoKey'] = event3['target']['checked'] === true), this['requestRender']?.(), true);
     if (event3['target']?.['matches']?.('[data-storyboard-3d-timeline-setting]')) {
       const value67 = event3['target']['dataset']['storyboard3dTimelineSetting'],
         value68 = value67 === 'loop' ? event3['target']['checked'] : Number(event3['target']['value']);
@@ -874,12 +874,12 @@ export class Storyboard3DShotTimelineController {
         this['_mutateAnimation']('update-animation-settings', 'Update animation settings', (value69) =>
           updateStoryboard3DShotAnimationSettings(value69, { [value67]: value68 }),
         ),
-        !![]
+        true
       );
     }
     if (event3['target']?.['matches']?.('[data-storyboard-3d-timeline-key-time]')) {
       const value70 = Number(event3['target']['value']);
-      if (!Number['isFinite'](value70)) return !![];
+      if (!Number['isFinite'](value70)) return true;
       return (
         this['_mutateAnimation']('move-animation-keyframe', '移动关键帧', (value71) => {
           const selectedKeyframe4 = findSelectedKeyframe(value71, this['selectedKeyframe']);
@@ -907,12 +907,12 @@ export class Storyboard3DShotTimelineController {
             normalizeStoryboard3DShotAnimation(value71)
           );
         }),
-        !![]
+        true
       );
     }
     if (event3['target']?.['matches']?.('[data-storyboard-3d-timeline-key-value]')) {
       const enabled3 = this['selectedKeyframe'];
-      if (!enabled3 || enabled3['type'] !== 'object') return !![];
+      if (!enabled3 || enabled3['type'] !== 'object') return true;
       const count = Number(event3['target']['dataset']['storyboard3dTimelineKeyValue']),
         value75 = Number(event3['target']['value']),
         value76 = enabled3['property'] === 'rotation' ? (value75 * Math['PI']) / 180 : value75;
@@ -933,12 +933,12 @@ export class Storyboard3DShotTimelineController {
             normalizeStoryboard3DShotAnimation(value77)
           );
         }),
-        !![]
+        true
       );
     }
     if (event3['target']?.['matches']?.('[data-storyboard-3d-timeline-key-easing]')) {
       const enabled4 = this['selectedKeyframe'];
-      if (!enabled4 || enabled4['type'] !== 'object') return !![];
+      if (!enabled4 || enabled4['type'] !== 'object') return true;
       const value81 = String(event3['target']['value'] || 'ease-in-out');
       return (
         this['_mutateAnimation']('update-animation-easing', 'Update animation easing', (value82) => {
@@ -951,30 +951,30 @@ export class Storyboard3DShotTimelineController {
           if (value85) value85['easing'] = value81;
           return normalizeStoryboard3DShotAnimation(value82);
         }),
-        !![]
+        true
       );
     }
-    return ![];
+    return false;
   }
   ['isAutoKeyEnabled']() {
     return this['autoKey'];
   }
   ['recordCameraKeyframe'](camera6) {
-    if (!this['autoKey'] || !camera6) return ![];
+    if (!this['autoKey'] || !camera6) return false;
     const { shot: shot11 } = this['_context']();
-    if (!shot11) return ![];
+    if (!shot11) return false;
     const time4 = this['_timeForShot'](shot11);
     return (
       this['_mutateAnimation']('auto-key-camera', 'Auto key camera', (value87) =>
         upsertStoryboard3DCameraKeyframe(value87, { time: time4, camera: camera6 }),
       ),
-      !![]
+      true
     );
   }
   ['recordObjectTransforms'](value88, value89) {
-    if (!this['autoKey']) return ![];
+    if (!this['autoKey']) return false;
     const { scene: scene9, shot: shot12 } = this['_context']();
-    if (!scene9 || !shot12) return ![];
+    if (!scene9 || !shot12) return false;
     const property4 = TOOL_PROPERTIES[value89] || 'position',
       time5 = this['_timeForShot'](shot12);
     return (
@@ -995,7 +995,7 @@ export class Storyboard3DShotTimelineController {
           upsertStoryboard3DObjectKeyframe2
         );
       }),
-      !![]
+      true
     );
   }
   ['getPreviewTransform'](value91) {
@@ -1029,12 +1029,12 @@ export class Storyboard3DShotTimelineController {
       this['cameraPath']['destroy'](),
       this['keyframeDrag']['destroy'](),
       this['directorPanel']['destroy'](),
-      this['stopPlayback']({ render: ![], clear: !![] }),
+      this['stopPlayback']({ render: false, clear: true }),
       this['currentTimes']['clear'](),
       this['activeProperties']['clear'](),
       this['expandedObjectIds']['clear'](),
       (this['selectedKeyframe'] = null),
-      (this['drawerOpen'] = ![]));
+      (this['drawerOpen'] = false));
   }
 }
 export function createStoryboard3DShotTimelineController(value92) {

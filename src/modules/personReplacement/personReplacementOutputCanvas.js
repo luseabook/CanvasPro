@@ -134,7 +134,7 @@ function buildMediaLocation(payload) {
     localPath = normalizeLocalPath(text2);
   return { localPath: localPath, url: localPathToUrl(localPath) };
 }
-function normalizeInlineLocationGuideRef(handle, state = ![]) {
+function normalizeInlineLocationGuideRef(handle, state = false) {
   const text3 = normalizeText(handle);
   return state && /^data:image\/svg\+xml(?:;|,)/i['test'](text3) ? text3 : '';
 }
@@ -209,7 +209,7 @@ async function materializePersonReplacementLocationGuides({
   plan: plan = [],
   project: project = {},
   adapter: adapter,
-  canReuseCanvas: canReuseCanvas = ![],
+  canReuseCanvas: canReuseCanvas = false,
   previousNodes: previousNodes = {},
   canvasId: canvasId = '',
   saveOutputBlob: saveOutputBlob = null,
@@ -286,7 +286,7 @@ function buildPersonReplacementVideoCanvasNodeData({
   providerProfileId: providerProfileId = '',
   providerProfileIdByModel: providerProfileIdByModel = {},
   generationParams: generationParams = {},
-  allowEmpty: allowEmpty = ![],
+  allowEmpty: allowEmpty = false,
 } = {}) {
   const localPath3 = buildMediaLocation(videoRef),
     { items: items, activeIndex: activeIndex2 } = resolveGenerationResultSelection(
@@ -308,7 +308,7 @@ function buildPersonReplacementVideoCanvasNodeData({
     prompt: normalizeText(prompt),
     videos: items,
     mainVideoIndex: activeIndex2,
-    isVideosExpanded: ![],
+    isVideosExpanded: false,
     videoUrl: normalizeText(enabled2?.['videoUrl']),
     localPath: normalizeText(enabled2?.['localPath']),
     displayLocalPath: normalizeText(enabled2?.['displayLocalPath']),
@@ -341,8 +341,8 @@ function buildPersonReplacementImageCanvasNodeData({
   providerProfileId: providerProfileId = '',
   providerProfileIdByModel: providerProfileIdByModel = {},
   generationParams: generationParams = {},
-  allowEmpty: allowEmpty = ![],
-  allowInlineSvg: allowInlineSvg = ![],
+  allowEmpty: allowEmpty = false,
+  allowInlineSvg: allowInlineSvg = false,
 } = {}) {
   const localPath4 = buildMediaLocation(imageRef),
     imageUrl = normalizeInlineLocationGuideRef(imageRef, allowInlineSvg),
@@ -372,7 +372,7 @@ function buildPersonReplacementImageCanvasNodeData({
     prompt: normalizeText(prompt),
     images: items2,
     mainImageIndex: activeIndex3,
-    isImagesExpanded: ![],
+    isImagesExpanded: false,
     imageUrl: normalizeText(enabled3?.['imageUrl']),
     sourceUrl: normalizeText(enabled3?.['sourceUrl']),
     thumbUrl: normalizeText(enabled3?.['thumbUrl']),
@@ -406,7 +406,7 @@ function resolveShotImageCanvasGeometry(options3 = {}) {
     imageHeight: imageHeight,
   };
 }
-function applyImageCanvasGeometry(args2, box3, { source: source = ![] } = {}) {
+function applyImageCanvasGeometry(args2, box3, { source: source = false } = {}) {
   const imageWidth2 = Math['max'](0, Number(box3?.['imageWidth']) || 0),
     imageHeight2 = Math['max'](0, Number(box3?.['imageHeight']) || 0);
   return {
@@ -416,7 +416,7 @@ function applyImageCanvasGeometry(args2, box3, { source: source = ![] } = {}) {
     ...(imageWidth2 > 0 && imageHeight2 > 0
       ? { imageWidth: imageWidth2, imageHeight: imageHeight2 }
       : {}),
-    ...(source ? { needsAutoResize: ![] } : {}),
+    ...(source ? { needsAutoResize: false } : {}),
   };
 }
 function resolveShotVideoCanvasGeometry(options4 = {}) {
@@ -449,7 +449,7 @@ function applyVideoCanvasGeometry(args3, box4) {
           videoHeight: naturalHeight,
           selectedVideoWidth: naturalWidth,
           selectedVideoHeight: naturalHeight,
-          needsAutoResize: ![],
+          needsAutoResize: false,
           videos: normalizeList(args3?.['videos'])['map']((args4) => ({
             ...args4,
             videoWidth: naturalWidth,
@@ -573,7 +573,7 @@ function buildPersonReplacementAudioCanvasNodeData({
   prompt: prompt = '',
   model: model = '',
   binding: binding = {},
-  allowEmpty: allowEmpty = ![],
+  allowEmpty: allowEmpty = false,
 } = {}) {
   const audioUrl2 = buildMediaLocation(audioRef);
   if (!audioUrl2['url'] && !allowEmpty)
@@ -598,7 +598,7 @@ function buildStageAnnotationNodeData({
   stage: stage = '',
   title: title = '',
   content: content = '',
-  isProjectAnchor: isProjectAnchor = ![],
+  isProjectAnchor: isProjectAnchor = false,
 } = {}) {
   const canvasScope2 = PERSON_REPLACEMENT_CANVAS_SCOPES['PROJECT'];
   return {
@@ -688,7 +688,7 @@ function appendAssetStage(list11, project3, y, list12) {
         stage: 'assets',
         title: '阶段 1 · 人物素材',
         content: '人物素材及形象参考图。',
-        isProjectAnchor: !![],
+        isProjectAnchor: true,
       }),
       { x: 0, y: y },
     ),
@@ -715,7 +715,7 @@ function appendAssetStage(list11, project3, y, list12) {
                 providerProfileId: project3['settings']?.['characterImageProviderProfileId'],
                 providerProfileIdByModel: project3['settings']?.['characterImageProviderProfileIdByModel'],
                 generationParams: project3['settings']?.['characterImageGenerationParams'],
-                allowEmpty: !![],
+                allowEmpty: true,
                 binding: {
                   characterId: appearance2['characterId'],
                   appearanceId: appearance2['appearanceId'],
@@ -822,7 +822,7 @@ function appendImageReplacementStage(list16, project5, y3, value24) {
                 },
               }),
               width8,
-              { source: !![] },
+              { source: true },
             ),
             { x: x2, y: y4 },
             { width: width8['width'], height: width8['height'] },
@@ -861,7 +861,7 @@ function appendImageReplacementStage(list16, project5, y3, value24) {
                 },
               }),
               width8,
-              { source: !![] },
+              { source: true },
             ),
             { x: x2, y: y4 },
             { width: width8['width'], height: width8['height'] },
@@ -906,7 +906,7 @@ function appendImageReplacementStage(list16, project5, y3, value24) {
                 providerProfileId: project5['settings']?.['replacementImageProviderProfileId'],
                 providerProfileIdByModel: project5['settings']?.['replacementImageProviderProfileIdByModel'],
                 generationParams: project5['settings']?.['replacementImageGenerationParams'],
-                allowEmpty: !![],
+                allowEmpty: true,
                 binding: {
                   shotId: shotId,
                   kind: 'replacement-image',
@@ -991,7 +991,7 @@ function appendVideoReplacementStage(list17, project6, y5) {
                 providerProfileId: project6['settings']?.['replacementVideoProviderProfileId'],
                 providerProfileIdByModel: project6['settings']?.['replacementVideoProviderProfileIdByModel'],
                 generationParams: project6['settings']?.['replacementVideoGenerationParams'],
-                allowEmpty: !![],
+                allowEmpty: true,
                 binding: {
                   shotId: shotId2,
                   kind: 'replacement-video',
@@ -1106,7 +1106,7 @@ function appendVoiceReplacementStage(list19, project7, y7) {
           name: '声音片段' + formatSequence4 + ' · 替换音频',
           prompt: audioRef2['targetText'] || audioRef2['sourceText'],
           model: audioRef2['voiceModelId'],
-          allowEmpty: !![],
+          allowEmpty: true,
           binding: {
             sourceId: sourceId,
             segmentId: segmentId,
@@ -1462,7 +1462,7 @@ function buildCurrentInterfacePlan(value68) {
         );
       if (workspaceStep2 === 4)
         return event4['key']['startsWith']('stage:voice:') || event4['key']['startsWith']('voice:');
-      return ![];
+      return false;
     },
     list31 = list30['filter'](value69),
     value70 = new Set(list31['map']((event5) => event5['key'])),
@@ -1518,41 +1518,41 @@ async function shouldReflowManagedNodes({
     list33['some']((value73) => !normalizeText(asObject3[value73])) ||
     list34['some']((value74) => !(value74 in planLayout))
   )
-    return !![];
+    return true;
   const asObject4 = asObject(previousBinding['layout']);
   if (Object['keys'](asObject4)['length'])
     return list33['some'](
       (value75) => !hasSameGeometry(asObject(asObject4[value75]), asObject(planLayout[value75])),
     );
-  if (typeof adapter2?.['getNode'] !== 'function') return ![];
+  if (typeof adapter2?.['getNode'] !== 'function') return false;
   for (const box25 of plan) {
     const text12 = normalizeText(asObject3[box25['key']]);
-    if (!text12 || !(await adapter2['nodeExists'](text12, canvasId))) return !![];
+    if (!text12 || !(await adapter2['nodeExists'](text12, canvasId))) return true;
     const box26 = await adapter2['getNode'](text12, canvasId);
     if (
       Number(box26?.['width']) !== Number(box25['width']) ||
       Number(box26?.['height']) !== Number(box25['height'])
     )
-      return !![];
+      return true;
   }
-  return !![];
+  return true;
 }
 async function rollbackCanvasMutation({
   adapter: adapter3,
   canvasId: canvasId = '',
-  reused: reused = ![],
+  reused: reused = false,
   mutationSnapshot: mutationSnapshot,
 } = {}) {
   if (!reused && typeof adapter3?.['deleteCanvas'] === 'function')
     try {
-      const value76 = await adapter3['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] });
-      if (value76 !== ![]) return !![];
+      const value76 = await adapter3['deleteCanvas'](canvasId, { skipDirtyConfirm: true });
+      if (value76 !== false) return true;
     } catch {}
   if (typeof adapter3?.['restoreMutationSnapshot'] === 'function' && mutationSnapshot)
     try {
-      return (await adapter3['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== ![];
+      return (await adapter3['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== false;
     } catch {}
-  return ![];
+  return false;
 }
 export async function syncPersonReplacementCanvas({
   project: project = {},
@@ -1605,7 +1605,7 @@ export async function syncPersonReplacementCanvas({
   let canvasId2 = '';
   if (canReuseCanvas2) {
     const value84 = await adapter4['switchCanvas'](text14);
-    if (value84 === ![]) throw new Error('无法切换到已绑定的人物替换画布：' + text14);
+    if (value84 === false) throw new Error('无法切换到已绑定的人物替换画布：' + text14);
     canvasId2 = text14;
   } else canvasId2 = normalizeText(await adapter4['createCanvas'](canvasName));
   if (!canvasId2) throw new Error('新建人物替换画布后未获得活动画布 ID');
@@ -1619,7 +1619,7 @@ export async function syncPersonReplacementCanvas({
           adapter: adapter4,
           canvasId: canvasId2,
         })
-      : ![],
+      : false,
     nodes2 = {},
     nodes3 = [];
   let createdCount = 0,
@@ -1649,7 +1649,7 @@ export async function syncPersonReplacementCanvas({
         if (typeof adapter4['deleteNodes'] !== 'function')
           throw new Error('人物替换画布适配器缺少托管节点清理能力');
         const value87 = await adapter4['deleteNodes']([...new Set(list36)], { canvasId: canvasId2 });
-        if (value87 === ![]) throw new Error('清理已失效的人物替换画布节点失败');
+        if (value87 === false) throw new Error('清理已失效的人物替换画布节点失败');
         deletedCount = new Set(list36)['size'];
       }
     }
@@ -1687,7 +1687,7 @@ export async function syncPersonReplacementCanvas({
         text19 = normalizeText(nodes2[event7['parentKey']]);
       if (!text18 || !text19) throw new Error('人物替换画布分组缺少节点：' + event7['key']);
       const value89 = await adapter4['setNodeParent'](text18, text19, { canvasId: canvasId2 });
-      if (value89 === ![]) throw new Error('人物替换画布节点分组失败：' + event7['key']);
+      if (value89 === false) throw new Error('人物替换画布节点分组失败：' + event7['key']);
     }
     for (const targetKey of plan2) {
       const text20 = normalizeText(nodes2[targetKey['key']]);
@@ -1700,7 +1700,7 @@ export async function syncPersonReplacementCanvas({
           sourceKey: sourceKey,
           targetKey: targetKey['key'],
         });
-        if (value90 === ![])
+        if (value90 === false)
           throw new Error('人物替换画布节点连线失败：' + sourceKey + ' → ' + targetKey['key']);
       }
     }

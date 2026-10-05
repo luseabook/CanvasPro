@@ -142,7 +142,7 @@ export function createStoryEpisodeOutlineRun({
 export function canResumeStoryEpisodeOutlineRun(next, current = {}) {
   const response = normalizeStoryEpisodeOutlineRun(next);
   if (!response || !['running', 'failed_retryable', 'ready_to_commit']['includes'](response['status']))
-    return ![];
+    return false;
   const runInput = getRunInput(current);
   return response['inputFingerprint'] === fingerprintValue(runInput);
 }
@@ -152,7 +152,7 @@ export function storyEpisodeOutlineRunRequiresPaidRetry(entry) {
     storyEpisodeOutlineRun?.['invocations']['some'](
       (enabled) =>
         ['prepared', 'outcome-unknown']['includes'](enabled['state']) && !enabled['retryAuthorizedAt'],
-    ) === !![]
+    ) === true
   );
 }
 export function authorizeStoryEpisodeOutlinePaidRetry(record) {
@@ -236,7 +236,7 @@ export function createStoryEpisodeOutlineApplication({ planEpisodes: planEpisode
         execution: execution2,
       });
     if (resumed && response3['status'] === 'ready_to_commit' && response3['candidateArtifact'])
-      return { result: cloneJson(response3['candidateArtifact']), run: cloneJson(response3), resumed: !![] };
+      return { result: cloneJson(response3['candidateArtifact']), run: cloneJson(response3), resumed: true };
     let model = resumed
       ? response3
       : createStoryEpisodeOutlineRun({
@@ -335,11 +335,11 @@ export function createStoryEpisodeOutlineWorkspaceController({
     typeof planEpisodes2 === 'function'
       ? createStoryEpisodeOutlineApplication({ planEpisodes: planEpisodes2 })
       : null;
-  async function execute2({ confirmRegeneration: confirmRegeneration = !![] } = {}) {
-    if (state2['storyPlanningOperation']) return ![];
-    if (!enabled2) return (host['showToast']?.('分集规划 Agent 尚未初始化。', 'error'), ![]);
+  async function execute2({ confirmRegeneration: confirmRegeneration = true } = {}) {
+    if (state2['storyPlanningOperation']) return false;
+    if (!enabled2) return (host['showToast']?.('分集规划 Agent 尚未初始化。', 'error'), false);
     if (!normalizeText(state2['data']['project']?.['summary']))
-      return (host['showToast']?.('请先生成剧本摘要。', 'warn'), ![]);
+      return (host['showToast']?.('请先生成剧本摘要。', 'warn'), false);
     const selectedEpisodeId = host['createProjectTaskToken'](),
       value4 = selectedEpisodeId['data'],
       modelId = host['getPlanningContext'](value4, selectedEpisodeId),
@@ -362,7 +362,7 @@ export function createStoryEpisodeOutlineWorkspaceController({
         title: '重新规划分集',
         message: '重新生成分集大纲会清空受影响的完整分集剧本，请确认是否继续。',
       });
-      if (!regenerationMode3) return ![];
+      if (!regenerationMode3) return false;
     }
     if (resumeRun2 && storyEpisodeOutlineRunRequiresPaidRetry(execution4)) {
       const value6 = await host['requestChoice']?.({
@@ -371,11 +371,11 @@ export function createStoryEpisodeOutlineWorkspaceController({
         message: '上次请求可能已经提交并计费，但没有收到确定结果。只有你确认后才会重新请求当前批次。',
         fallbackValue: null,
         choices: [
-          { label: '暂不重试', value: null, autofocus: !![] },
-          { label: '确认重新请求', value: 'retry', primary: !![] },
+          { label: '暂不重试', value: null, autofocus: true },
+          { label: '确认重新请求', value: 'retry', primary: true },
         ],
       });
-      if (value6 !== 'retry') return ![];
+      if (value6 !== 'retry') return false;
       execution4 = authorizeStoryEpisodeOutlinePaidRetry(execution4);
     }
     const value7 = state2['data']['episodes']['length'];
@@ -385,7 +385,7 @@ export function createStoryEpisodeOutlineWorkspaceController({
           type: 'episode-planning',
           label: '生成分集大纲',
           status: status['status'] === 'failed_retryable' ? 'failed' : 'running',
-          resumable: !![],
+          resumable: true,
           modelId: status['input']['execution']['modelId'],
           provider: status['input']['execution']['provider'],
           message: status['error'] || state2['storyPlanningStatus'],
@@ -415,8 +415,8 @@ export function createStoryEpisodeOutlineWorkspaceController({
               ((state2['storyPlanningStatus'] = message2), host['syncPlanningLoading']()));
         },
       });
-      if (!host['isProjectTaskLive'](selectedEpisodeId)) return ![];
-      const assets = invalidateStoryPlanningDownstream(value4, { clearEpisodeOutlines: !![] });
+      if (!host['isProjectTaskLive'](selectedEpisodeId)) return false;
+      const assets = invalidateStoryPlanningDownstream(value4, { clearEpisodeOutlines: true });
       ((assets['project']['storyFacts'] = [
         ...new Set([
           ...normalizeGeneratedStoryContinuityFacts(assets['project']['continuityFacts']),
@@ -425,7 +425,7 @@ export function createStoryEpisodeOutlineWorkspaceController({
       ]),
         (assets['episodes'] = mergeStoryEpisodePlans(assets['episodes'], value9['result']?.['episodes'], {
           assets: assets['assets'],
-          preserveMedia: ![],
+          preserveMedia: false,
         })),
         (selectedEpisodeId['data'] = assets),
         host['registerProjectData'](selectedEpisodeId),
@@ -439,7 +439,7 @@ export function createStoryEpisodeOutlineWorkspaceController({
         host['resetDownstreamUi']({
           selectedEpisodeId: selectedEpisodeId['data']['episodes'][0]?.['id'] || '',
         }));
-      host['schedulePersistence']({ immediate: !![] });
+      host['schedulePersistence']({ immediate: true });
       const value10 = Math['max'](0, selectedEpisodeId['data']['episodes']['length'] - value7);
       return (
         host['notifyComplete'](
@@ -453,21 +453,21 @@ export function createStoryEpisodeOutlineWorkspaceController({
         host['finishBackgroundTask'](selectedEpisodeId, id, {
           status: 'succeeded',
           message: '已规划 ' + selectedEpisodeId['data']['episodes']['length'] + ' 集',
-          resumable: ![],
+          resumable: false,
           resumePayload: createStoryEpisodeOutlineRunPayload(completeStoryEpisodeOutlineRun(value9['run'])),
         }),
         await host['persistNow'](),
         host['isProjectTaskCurrent'](selectedEpisodeId) &&
           ((state2['storyPlanningOperation'] = ''), (state2['storyPlanningStatus'] = ''), host['render']()),
-        !![]
+        true
       );
     } catch (error3) {
-      if (!host['isProjectTaskLive'](selectedEpisodeId)) return ![];
+      if (!host['isProjectTaskLive'](selectedEpisodeId)) return false;
       host['finishBackgroundTask'](selectedEpisodeId, id, {
         status: 'failed',
         message: '分集规划失败',
         error: error3?.['message'] || '分集规划失败。',
-        resumable: !![],
+        resumable: true,
         ...(error3?.['storyEpisodeOutlineRun']
           ? { resumePayload: createStoryEpisodeOutlineRunPayload(error3['storyEpisodeOutlineRun']) }
           : {}),
@@ -479,7 +479,7 @@ export function createStoryEpisodeOutlineWorkspaceController({
           'error',
           error3,
         ),
-        ![]
+        false
       );
     } finally {
       host['isProjectTaskCurrent'](selectedEpisodeId) &&

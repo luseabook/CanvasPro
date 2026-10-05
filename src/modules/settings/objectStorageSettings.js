@@ -32,9 +32,9 @@ const FIELD_IDS = Object['freeze']([
       badge: 'R2',
       consoleUrl: 'https://dash.cloudflare.com/?to=%2F%3Aaccount%2Fr2%2Foverview',
       tutorialId: 'a8d21eaa-ee3b-4f44-8820-c6efed668ca9',
-      showEndpoint: !![],
-      showRegion: ![],
-      showAddressingStyle: ![],
+      showEndpoint: true,
+      showRegion: false,
+      showAddressingStyle: false,
       endpointPlaceholder: 'https://<account-id>.r2.cloudflarestorage.com',
       regionPlaceholder: 'auto',
       bucketPlaceholder: 'aicanvas-assets',
@@ -45,9 +45,9 @@ const FIELD_IDS = Object['freeze']([
       badge: 'COS',
       consoleUrl: 'https://console.cloud.tencent.com/cos',
       tutorialId: '13e4eb99-d4c3-4a0b-b724-ad137708a3b5',
-      showEndpoint: ![],
-      showRegion: !![],
-      showAddressingStyle: ![],
+      showEndpoint: false,
+      showRegion: true,
+      showAddressingStyle: false,
       endpointPlaceholder: '',
       regionPlaceholder: 'ap-guangzhou',
       bucketPlaceholder: 'examplebucket-1250000000',
@@ -58,9 +58,9 @@ const FIELD_IDS = Object['freeze']([
       badge: 'OSS',
       consoleUrl: 'https://oss.console.aliyun.com/overview',
       tutorialUrl: '',
-      showEndpoint: ![],
-      showRegion: !![],
-      showAddressingStyle: ![],
+      showEndpoint: false,
+      showRegion: true,
+      showAddressingStyle: false,
       endpointPlaceholder: '',
       regionPlaceholder: 'cn-hangzhou',
       bucketPlaceholder: 'aicanvas-assets',
@@ -71,9 +71,9 @@ const FIELD_IDS = Object['freeze']([
       badge: 'S3',
       consoleUrl: '',
       tutorialUrl: '',
-      showEndpoint: !![],
-      showRegion: !![],
-      showAddressingStyle: !![],
+      showEndpoint: true,
+      showRegion: true,
+      showAddressingStyle: true,
       endpointPlaceholder: 'https://storage.example.com',
       regionPlaceholder: 'us-east-1',
       bucketPlaceholder: 'aicanvas-assets',
@@ -127,7 +127,7 @@ function isObjectStorageBusy(target) {
   return target['card']?.['dataset']?.['objectStorageToggleBusy'] === 'true';
 }
 export function setObjectStorageFormEnabled(source, next) {
-  const enabled = next === !![];
+  const enabled = next === true;
   (setToggleButtonState(source['enabledOn'], enabled),
     setToggleButtonState(source['enabledOff'], !enabled),
     FIELD_IDS['forEach']((current) => {
@@ -146,7 +146,7 @@ function setStatus(response, entry, record) {
     el2['classList']?.['toggle']('is-warning', entry === 'warning'));
 }
 function setObjectStorageToggleBusy(payload, handle) {
-  const state = handle === !![];
+  const state = handle === true;
   if (payload['enabledOn']) payload['enabledOn']['disabled'] = state;
   if (payload['enabledOff']) payload['enabledOff']['disabled'] = state;
   (FIELD_IDS['forEach']((config) => {
@@ -200,7 +200,7 @@ function getAddressingStyle(value9) {
   return value9['addressingVirtualHosted']?.['classList']?.['contains']('active') ? 'virtual-hosted' : 'path';
 }
 function setHidden(el7, value10) {
-  if (el7) el7['hidden'] = value10 === !![];
+  if (el7) el7['hidden'] = value10 === true;
 }
 function setPlaceholder(enabled3, value11) {
   if (!enabled3) return;
@@ -276,7 +276,7 @@ export function collectObjectStorageFormConfig(endpoint, objectStorageConfig = g
     });
   return serializeObjectStorageSettings({
     ...args,
-    enabled: endpoint['enabledOn']?.['classList']?.['contains']('active') === !![],
+    enabled: endpoint['enabledOn']?.['classList']?.['contains']('active') === true,
   });
 }
 export function renderObjectStorageForm(value17, value18 = {}) {
@@ -308,7 +308,7 @@ export function renderObjectStorageForm(value17, value18 = {}) {
 }
 function setTestButtonBusy(el9, value19, value20, value21) {
   if (!el9) return;
-  (el9['classList']?.['toggle']('is-testing', value19 === !![]),
+  (el9['classList']?.['toggle']('is-testing', value19 === true),
     el9['setAttribute']?.('aria-busy', value19 ? 'true' : 'false'),
     (el9['textContent'] = value19 ? value20 : value21));
 }
@@ -321,37 +321,37 @@ export async function saveObjectStorageEnabledState(
     saveConfig: saveConfig = saveApiConfigToServer,
   } = {},
 ) {
-  if (isObjectStorageBusy(value22)) return { ok: ![], ignored: !![] };
+  if (isObjectStorageBusy(value22)) return { ok: false, ignored: true };
   const currentConfig = getCurrentConfig();
   setObjectStorageFormEnabled(value22, value23);
   const args2 = collectObjectStorageFormConfig(value22, currentConfig);
   if (value23 && !isObjectStorageProviderVerified(args2, args2['providerId'])) {
-    const objectStorage = serializeObjectStorageSettings({ ...args2, enabled: ![] });
+    const objectStorage = serializeObjectStorageSettings({ ...args2, enabled: false });
     renderObjectStorageForm(value22, objectStorage);
     const message = tr('status.testRequired');
     return (
       setStatus(value22, 'warning', message),
-      { ok: ![], blocked: !![], message: message, objectStorage: objectStorage }
+      { ok: false, blocked: true, message: message, objectStorage: objectStorage }
     );
   }
-  (setObjectStorageToggleBusy(value22, !![]), setStatus(value22, 'warning', tr('actions.saving')));
+  (setObjectStorageToggleBusy(value22, true), setStatus(value22, 'warning', tr('actions.saving')));
   try {
     const objectStorage2 = value23
-      ? serializeObjectStorageSettings({ ...args2, enabled: !![] })
-      : serializeObjectStorageSettings({ ...args2, enabled: ![] });
+      ? serializeObjectStorageSettings({ ...args2, enabled: true })
+      : serializeObjectStorageSettings({ ...args2, enabled: false });
     if (value23) validateObjectStorageConfig(objectStorage2);
     await saveConfig({ ...getCurrentSnapshot(), objectStorage: objectStorage2 });
     const message2 = value23 ? tr('status.savedEnabled') : tr('status.savedDisabled');
     return (
       setStatus(value22, value23 ? 'success' : '', message2),
-      { ok: !![], message: message2, objectStorage: objectStorage2 }
+      { ok: true, message: message2, objectStorage: objectStorage2 }
     );
   } catch (error) {
     renderObjectStorageForm(value22, currentConfig);
     const message3 = tr('status.saveFailed', { error: error?.['message'] || tr('status.unknownError') });
-    return (setStatus(value22, 'error', message3), { ok: ![], error: error, message: message3 });
+    return (setStatus(value22, 'error', message3), { ok: false, error: error, message: message3 });
   } finally {
-    setObjectStorageToggleBusy(value22, ![]);
+    setObjectStorageToggleBusy(value22, false);
   }
 }
 export async function saveObjectStorageFieldChanges(
@@ -362,10 +362,10 @@ export async function saveObjectStorageFieldChanges(
     saveConfig: saveConfig = saveApiConfigToServer,
   } = {},
 ) {
-  if (isObjectStorageBusy(value24)) return { ok: ![], ignored: !![] };
+  if (isObjectStorageBusy(value24)) return { ok: false, ignored: true };
   const currentConfig2 = getCurrentConfig(),
     objectStorageSettings3 = normalizeObjectStorageSettings(currentConfig2)['enabled'];
-  (setObjectStorageToggleBusy(value24, !![]), setStatus(value24, 'warning', tr('actions.saving')));
+  (setObjectStorageToggleBusy(value24, true), setStatus(value24, 'warning', tr('actions.saving')));
   try {
     const objectStorage3 = collectObjectStorageFormConfig(value24, currentConfig2),
       disabledAfterChange = objectStorageSettings3 && !objectStorage3['enabled'];
@@ -375,14 +375,14 @@ export async function saveObjectStorageFieldChanges(
     const message4 = disabledAfterChange ? tr('status.changedRequiresRetest') : tr('status.saveSuccess');
     return (
       setStatus(value24, disabledAfterChange ? 'warning' : 'success', message4),
-      { ok: !![], disabledAfterChange: disabledAfterChange, message: message4, objectStorage: objectStorage3 }
+      { ok: true, disabledAfterChange: disabledAfterChange, message: message4, objectStorage: objectStorage3 }
     );
   } catch (error2) {
     renderObjectStorageForm(value24, currentConfig2);
     const message5 = tr('status.saveFailed', { error: error2?.['message'] || tr('status.unknownError') });
-    return (setStatus(value24, 'error', message5), { ok: ![], error: error2, message: message5 });
+    return (setStatus(value24, 'error', message5), { ok: false, error: error2, message: message5 });
   } finally {
-    setObjectStorageToggleBusy(value24, ![]);
+    setObjectStorageToggleBusy(value24, false);
   }
 }
 export async function saveObjectStorageProviderSelection(
@@ -395,12 +395,12 @@ export async function saveObjectStorageProviderSelection(
   } = {},
 ) {
   if (isObjectStorageBusy(value25) || !Object['prototype']['hasOwnProperty']['call'](PROVIDER_UI, providerId))
-    return { ok: ![], ignored: !![] };
+    return { ok: false, ignored: true };
   const currentConfig3 = getCurrentConfig(),
     enabled5 = normalizeObjectStorageSettings(currentConfig3)['enabled'],
     objectStorage4 = collectObjectStorageFormConfig(value25, currentConfig3);
   if (objectStorage4['providerId'] === providerId)
-    return { ok: !![], ignored: !![], objectStorage: objectStorage4 };
+    return { ok: true, ignored: true, objectStorage: objectStorage4 };
   let objectStorage5 = serializeObjectStorageSettings({
       ...objectStorage4,
       providerId: providerId,
@@ -411,11 +411,11 @@ export async function saveObjectStorageProviderSelection(
     try {
       validateObjectStorageConfig(objectStorage5);
     } catch {
-      ((objectStorage5 = serializeObjectStorageSettings({ ...objectStorage5, enabled: ![] })),
-        (disabledAfterSelection = !![]));
+      ((objectStorage5 = serializeObjectStorageSettings({ ...objectStorage5, enabled: false })),
+        (disabledAfterSelection = true));
     }
   (renderObjectStorageForm(value25, objectStorage5),
-    setObjectStorageToggleBusy(value25, !![]),
+    setObjectStorageToggleBusy(value25, true),
     setStatus(value25, 'warning', tr('actions.saving')));
   try {
     (await saveConfig({ ...getCurrentSnapshot(), objectStorage: objectStorage5 }),
@@ -428,7 +428,7 @@ export async function saveObjectStorageProviderSelection(
     return (
       setStatus(value25, disabledAfterSelection ? 'warning' : 'success', message6),
       {
-        ok: !![],
+        ok: true,
         disabledAfterSelection: disabledAfterSelection,
         message: message6,
         objectStorage: objectStorage5,
@@ -437,9 +437,9 @@ export async function saveObjectStorageProviderSelection(
   } catch (error3) {
     renderObjectStorageForm(value25, currentConfig3);
     const message7 = tr('status.saveFailed', { error: error3?.['message'] || tr('status.unknownError') });
-    return (setStatus(value25, 'error', message7), { ok: ![], error: error3, message: message7 });
+    return (setStatus(value25, 'error', message7), { ok: false, error: error3, message: message7 });
   } finally {
-    setObjectStorageToggleBusy(value25, ![]);
+    setObjectStorageToggleBusy(value25, false);
   }
 }
 export async function verifyObjectStorageConnection(
@@ -452,15 +452,15 @@ export async function verifyObjectStorageConnection(
     now: now = Date['now'],
   } = {},
 ) {
-  if (isObjectStorageBusy(value27)) return { ok: ![], ignored: !![] };
+  if (isObjectStorageBusy(value27)) return { ok: false, ignored: true };
   const tr3 = tr('actions.test'),
     currentConfig4 = getCurrentConfig();
   let objectStorage6;
   try {
     ((objectStorage6 = collectObjectStorageFormConfig(value27, currentConfig4)),
-      validateObjectStorageConfig(objectStorage6, { requireEnabled: ![] }),
-      setObjectStorageToggleBusy(value27, !![]),
-      setTestButtonBusy(value27['test'], !![], tr('actions.testing'), tr3),
+      validateObjectStorageConfig(objectStorage6, { requireEnabled: false }),
+      setObjectStorageToggleBusy(value27, true),
+      setTestButtonBusy(value27['test'], true, tr('actions.testing'), tr3),
       setStatus(value27, 'warning', tr('status.testing')));
     const result2 = await testConnection(objectStorage6),
       objectStorage7 = serializeObjectStorageSettings(
@@ -470,21 +470,21 @@ export async function verifyObjectStorageConnection(
       );
     (await saveConfig({ ...getCurrentSnapshot(), objectStorage: objectStorage7 }),
       renderObjectStorageForm(value27, objectStorage7));
-    const value28 = result2?.['cleanupOk'] === ![] ? ' ' + tr('status.testCleanupWarning') : '',
+    const value28 = result2?.['cleanupOk'] === false ? ' ' + tr('status.testCleanupWarning') : '',
       message8 = '' + tr('status.testSuccess') + value28;
     return (
       setStatus(value27, 'success', message8),
-      { ok: !![], message: message8, objectStorage: objectStorage7, result: result2 }
+      { ok: true, message: message8, objectStorage: objectStorage7, result: result2 }
     );
   } catch (error4) {
     const message9 = tr('status.testFailed', { error: error4?.['message'] || tr('status.unknownError') });
     return (
       setStatus(value27, 'error', message9),
-      { ok: ![], error: error4, message: message9, objectStorage: objectStorage6 }
+      { ok: false, error: error4, message: message9, objectStorage: objectStorage6 }
     );
   } finally {
-    (setTestButtonBusy(value27['test'], ![], tr('actions.testing'), tr3),
-      setObjectStorageToggleBusy(value27, ![]));
+    (setTestButtonBusy(value27['test'], false, tr('actions.testing'), tr3),
+      setObjectStorageToggleBusy(value27, false));
   }
 }
 function showToast(value29, value30 = '') {
@@ -495,7 +495,7 @@ export function initObjectStorageSettings({
   windowObject: windowObject = globalThis['window'],
 } = {}) {
   const elements = getElements(documentObject);
-  if (!elements['card'] || elements['card']['dataset']?.['objectStorageBound'] === 'true') return ![];
+  if (!elements['card'] || elements['card']['dataset']?.['objectStorageBound'] === 'true') return false;
   ((elements['card']['dataset']['objectStorageBound'] = 'true'),
     renderObjectStorageForm(elements, getObjectStorageConfig()));
   const run = async (value31) => {
@@ -507,10 +507,10 @@ export function initObjectStorageSettings({
     );
   };
   (elements['enabledOn']?.['addEventListener']('click', () => {
-    void run(!![]);
+    void run(true);
   }),
     elements['enabledOff']?.['addEventListener']('click', () => {
-      void run(![]);
+      void run(false);
     }),
     elements['providerButtons']?.['forEach']((el10) => {
       el10['addEventListener']?.('click', async () => {
@@ -548,7 +548,7 @@ export function initObjectStorageSettings({
     windowObject?.['addEventListener']?.(API_CONFIG_CHANGED_EVENT, () => {
       renderObjectStorageForm(elements, getObjectStorageConfig());
     }),
-    !![]
+    true
   );
 }
 export const __objectStorageSettingsForTest = Object['freeze']({

@@ -14,8 +14,8 @@ export class DirectorCameraPathController {
   constructor(value) {
     ((this['timeline'] = value),
       (this['curves'] = new DirectorCurveEditor(this)),
-      (this['active'] = ![]),
-      (this['drawing'] = ![]),
+      (this['active'] = false),
+      (this['drawing'] = false),
       (this['plane'] = 1),
       (this['planeOffset'] = 1.6),
       (this['selectedId'] = ''),
@@ -26,16 +26,16 @@ export class DirectorCameraPathController {
       (this['onDown'] = (item) => this['pointerDown'](item)),
       (this['onMove'] = (key) => this['pointerMove'](key)),
       (this['onUp'] = (index) => this['pointerEnd'](index)),
-      (this['onCancel'] = (result) => this['pointerEnd'](result, !![])),
+      (this['onCancel'] = (result) => this['pointerEnd'](result, true)),
       (this['onKey'] = (event) => {
-        if (this['curves']['key'](event)) return !![];
+        if (this['curves']['key'](event)) return true;
         const el = event['target']['closest']?.('[data-camera-path-point]');
         if (this['active'] && el && ['Enter', ' ']['includes'](event['key']))
           return (
             event['preventDefault'](),
             event['stopImmediatePropagation'](),
             this['select'](this['points']()[Number(el['dataset']['cameraPathPoint'])]?.['id']),
-            !![]
+            true
           );
         if (!this['active'] || event['key'] !== 'Escape') return;
         (event['preventDefault'](), event['stopImmediatePropagation']());
@@ -43,11 +43,11 @@ export class DirectorCameraPathController {
         else {
           if (this['cancelDrawing']) this['cancelDrawing']();
           else {
-            if (this['drag']) this['pointerEnd'](null, !![]);
+            if (this['drag']) this['pointerEnd'](null, true);
             else (this['stop'](), this['timeline']['requestRender']?.());
           }
         }
-        return !![];
+        return true;
       }),
       (this['onWheel'] = (event2) => {
         if (
@@ -60,7 +60,7 @@ export class DirectorCameraPathController {
         (event2['preventDefault'](),
           event2['stopImmediatePropagation'](),
           this['change']({
-            camera: adjustSpatialCamera(this['selected']()['camera'], 0, -event2['deltaY'], !![]),
+            camera: adjustSpatialCamera(this['selected']()['camera'], 0, -event2['deltaY'], true),
           }));
       }));
   }
@@ -98,7 +98,7 @@ export class DirectorCameraPathController {
       ]
     )
       throw new Error('请先解锁物体再编辑路径。');
-    (this['timeline']['stopPlayback']({ render: ![] }),
+    (this['timeline']['stopPlayback']({ render: false }),
       this['timeline']['_mutateAnimation']('camera-path', '编辑摄像机轨道', (entry) =>
         normalizeStoryboard3DShotAnimation(handler(entry)),
       ));
@@ -148,13 +148,13 @@ export class DirectorCameraPathController {
     }
   }
   ['handleClick'](enabled2) {
-    if (!enabled2['startsWith']('timeline-camera-path-')) return ![];
+    if (!enabled2['startsWith']('timeline-camera-path-')) return false;
     try {
       if (enabled2 === 'timeline-camera-path-edit') {
         if (this['active']) this['stop']();
         else
-          (this['timeline']['stopPlayback']({ render: ![], clear: !![] }),
-            (this['active'] = !![]),
+          (this['timeline']['stopPlayback']({ render: false, clear: true }),
+            (this['active'] = true),
             (this['owner'] = this['identity']()),
             (this['drawing'] = !this['points']()['length']),
             this['timeline']['multiView']?.['destroy'](),
@@ -225,10 +225,10 @@ export class DirectorCameraPathController {
     } catch (error2) {
       this['timeline']['setMessage']?.(error2['message']);
     }
-    return !![];
+    return true;
   }
   ['handleChange'](event3) {
-    if (this['curves']['change'](event3)) return !![];
+    if (this['curves']['change'](event3)) return true;
     const easing = event3['target'];
     if (easing['matches']?.('[data-camera-path-object]'))
       return (
@@ -244,36 +244,36 @@ export class DirectorCameraPathController {
             'transform'
           ]['position'][this['plane']] ?? 1.6),
         this['timeline']['requestRender']?.(),
-        !![]
+        true
       );
     if (easing['matches']?.('[data-camera-path-draw-mode]'))
-      return ((this['drawMode'] = easing['value']), !![]);
+      return ((this['drawMode'] = easing['value']), true);
     if (easing['matches']?.('[data-camera-path-draw-duration]'))
       return (
         (this['drawDuration'] = Math['max'](0.1, Math['min'](3600, Number(easing['value']) || 3))),
-        !![]
+        true
       );
     if (easing['matches']?.('[data-camera-path-selection]'))
-      return (this['select'](this['points']()[Number(easing['value'])]?.['id']), !![]);
+      return (this['select'](this['points']()[Number(easing['value'])]?.['id']), true);
     if (easing['matches']?.('[data-camera-path-plane]'))
       return (
         (this['plane'] = Number(easing['value'])),
         (this['planeOffset'] = this['selected']()?.['camera']['position'][this['plane']] || 0),
         this['timeline']['requestRender']?.(),
-        !![]
+        true
       );
     if (easing['matches']?.('[data-camera-path-easing]'))
-      return (this['change']({ easing: easing['value'] }), !![]);
-    if (!easing['matches']?.('[data-camera-path-field]')) return ![];
+      return (this['change']({ easing: easing['value'] }), true);
+    if (!easing['matches']?.('[data-camera-path-field]')) return false;
     const value23 = easing['dataset']['cameraPathField'],
       time = Number(easing['value']);
-    if (!Number['isFinite'](time)) return !![];
-    if (value23 === 'planeOffset') return ((this['planeOffset'] = time), !![]);
+    if (!Number['isFinite'](time)) return true;
+    if (value23 === 'planeOffset') return ((this['planeOffset'] = time), true);
     const enabled3 = this['selected']();
-    if (!enabled3) return !![];
+    if (!enabled3) return true;
     if (value23 === 'time') {
       if (enabled3['time'] !== time) this['change']({ time: time });
-      return !![];
+      return true;
     }
     const camera = structuredClone(enabled3['camera']),
       [value24, value25] = value23['split']('-');
@@ -284,7 +284,7 @@ export class DirectorCameraPathController {
     }
     if (JSON['stringify'](camera) !== JSON['stringify'](enabled3['camera']))
       this['change']({ camera: camera });
-    return !![];
+    return true;
   }
   ['select'](value26) {
     this['selectedId'] = value26 || '';
@@ -293,11 +293,11 @@ export class DirectorCameraPathController {
     this['timeline']['requestRender']?.();
   }
   ['preview'](args2) {
-    if (!this['active']) return ![];
+    if (!this['active']) return false;
     return (
       this['timeline']['getRuntime']?.()?.['previewTimelineSample']({ ...args2, camera: null }),
       (this['monitorCamera'] = args2['camera']),
-      !![]
+      true
     );
   }
   ['sync']() {
@@ -321,8 +321,8 @@ export class DirectorCameraPathController {
         (this['svg'] = this['layer']['querySelector']('svg')),
         (this['monitorCanvas'] = this['layer']['querySelector']('canvas')),
         (this['root'] = this['timeline']['getRoot']()),
-        this['root']['addEventListener']('pointerdown', this['onDown'], !![]),
-        this['root']['addEventListener']('wheel', this['onWheel'], { capture: !![], passive: ![] }));
+        this['root']['addEventListener']('pointerdown', this['onDown'], true),
+        this['root']['addEventListener']('wheel', this['onWheel'], { capture: true, passive: false }));
     }
     if (this['frame'] == null) {
       const value29 = () => {
@@ -375,11 +375,11 @@ export class DirectorCameraPathController {
             sampleSpatialCurve(list3[value38], list3[value38 + 1], value40 / 24, 'camera'),
           ),
         );
-        let enabled5 = ![];
+        let enabled5 = false;
         const value41 = list4['map']((box) => {
-          if (!box) return ((enabled5 = ![]), '');
+          if (!box) return ((enabled5 = false), '');
           const value42 = '' + (enabled5 ? 'L' : 'M') + box['x'] + ' ' + box['y'];
-          return ((enabled5 = !![]), value42);
+          return ((enabled5 = true), value42);
         })['join'](' ');
         el6['setAttribute']('d', value41);
         return;
@@ -413,13 +413,13 @@ export class DirectorCameraPathController {
     !this['monitorPending'] &&
       (!this['monitorPaintAt'] || value47 - this['monitorPaintAt'] > 33) &&
       ((this['monitorPaintAt'] = value47),
-      (this['monitorPending'] = !![]),
+      (this['monitorPending'] = true),
       Promise['resolve'](this['viewport']['renderMonitor'](this['monitorCanvas'], value46))
         ['catch']((error3) => {
           (this['timeline']['setMessage']?.('镜头监看失败：' + error3['message']), this['stop']());
         })
         ['finally'](() => {
-          this['monitorPending'] = ![];
+          this['monitorPending'] = false;
         }));
   }
   ['pointerDown'](x) {
@@ -511,9 +511,9 @@ export class DirectorCameraPathController {
     }),
       x['target']['setPointerCapture']?.(x['pointerId']));
     const el9 = this['timeline']['window'];
-    (el9['addEventListener']('pointermove', this['onMove'], !![]),
-      el9['addEventListener']('pointerup', this['onUp'], !![]),
-      el9['addEventListener']('pointercancel', this['onCancel'], !![]),
+    (el9['addEventListener']('pointermove', this['onMove'], true),
+      el9['addEventListener']('pointerup', this['onUp'], true),
+      el9['addEventListener']('pointercancel', this['onCancel'], true),
       x['target']['addEventListener']('lostpointercapture', this['onCancel']));
   }
   ['pointerMove'](event4) {
@@ -602,24 +602,24 @@ export class DirectorCameraPathController {
                 ),
                 start: this['timeline']['_timeForShot'](this['context']()['shot']),
                 duration: this['drawDuration'],
-                smooth: !![],
+                smooth: true,
               }),
             );
           } catch (error5) {
             this['timeline']['setMessage']?.(error5['message']);
           }
         },
-        { once: !![], signal: signal['signal'] },
+        { once: true, signal: signal['signal'] },
       ));
   }
-  ['pointerEnd'](event6, value66 = ![]) {
+  ['pointerEnd'](event6, value66 = false) {
     const camera3 = this['drag'];
     if (!camera3 || (event6 && event6['pointerId'] !== camera3['pointerId'])) return;
     (event6?.['stopImmediatePropagation'](), (this['drag'] = null));
     const el10 = this['timeline']['window'];
-    (el10['removeEventListener']('pointermove', this['onMove'], !![]),
-      el10['removeEventListener']('pointerup', this['onUp'], !![]),
-      el10['removeEventListener']('pointercancel', this['onCancel'], !![]),
+    (el10['removeEventListener']('pointermove', this['onMove'], true),
+      el10['removeEventListener']('pointerup', this['onUp'], true),
+      el10['removeEventListener']('pointercancel', this['onCancel'], true),
       camera3['target']['removeEventListener']('lostpointercapture', this['onCancel']));
     if (camera3['target']['hasPointerCapture']?.(camera3['pointerId']))
       camera3['target']['releasePointerCapture'](camera3['pointerId']);
@@ -636,9 +636,9 @@ export class DirectorCameraPathController {
   ['detach']() {
     (this['curves']['cancel']?.(),
       this['cancelDrawing']?.(),
-      this['pointerEnd'](null, !![]),
-      this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
-      this['root']?.['removeEventListener']('wheel', this['onWheel'], !![]));
+      this['pointerEnd'](null, true),
+      this['root']?.['removeEventListener']('pointerdown', this['onDown'], true),
+      this['root']?.['removeEventListener']('wheel', this['onWheel'], true));
     if (this['frame'] != null) this['timeline']['window']['cancelAnimationFrame'](this['frame']);
     ((this['frame'] = null),
       this['viewport']?.['disposeMonitor'](),
@@ -648,8 +648,8 @@ export class DirectorCameraPathController {
   }
   ['stop']() {
     if (!this['active'] && !this['layer']) return;
-    ((this['active'] = ![]),
-      (this['drawing'] = ![]),
+    ((this['active'] = false),
+      (this['drawing'] = false),
       (this['monitorCamera'] = null),
       this['detach'](),
       this['timeline']['clearPreview']?.());

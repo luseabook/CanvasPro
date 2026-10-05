@@ -4,9 +4,9 @@ export function startMediaProgressDragSession({
   onMove: onMove,
   onEnd: onEnd,
   onCancel: onCancel = onEnd,
-  capture: capture = !![],
+  capture: capture = true,
 } = {}) {
-  let enabled = !![];
+  let enabled = true;
   const run = (event) =>
       pointerId == null || event?.['pointerId'] == null || event['pointerId'] === pointerId,
     value = (item) => {
@@ -14,14 +14,14 @@ export function startMediaProgressDragSession({
       onMove?.(item);
     },
     dispose = () => {
-      if (!enabled) return ![];
+      if (!enabled) return false;
       return (
-        (enabled = ![]),
+        (enabled = false),
         target?.['removeEventListener']?.('pointermove', value, capture),
         target?.['removeEventListener']?.('pointerup', key, capture),
         target?.['removeEventListener']?.('pointercancel', cancel, capture),
         target?.['removeEventListener']?.('blur', cancel, capture),
-        !![]
+        true
       );
     },
     key = (index) => {

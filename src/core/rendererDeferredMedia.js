@@ -141,9 +141,9 @@ const MAX_VISIBLE_AUDIO_WARMUP_COUNT = 4;
 export function shouldActivateRendererMediaHoverPlayback({
   viewport: viewport,
   nodeCount: nodeCount = 0,
-  isSelected: isSelected = ![],
+  isSelected: isSelected = false,
 } = {}) {
-  if (isSelected === !![]) return !![];
+  if (isSelected === true) return true;
   return resolveRendererLowZoomMountLimit({ viewport: viewport, nodeCount: nodeCount }) <= 0;
 }
 
@@ -158,20 +158,20 @@ export function scheduleRendererVisibleAudioSurfaceHydration({
   component: component,
   deferredMedia: deferredMedia,
 } = {}) {
-  if (!nodeId) return ![];
-  if (!isNodeType(node, ['source-audio', 'ai-audio', 'audio'])) return ![];
-  component?.['setRendererAudioSurfaceVisible']?.(isVisible === !![]);
-  if (isVisible !== !![]) return ![];
+  if (!nodeId) return false;
+  if (!isNodeType(node, ['source-audio', 'ai-audio', 'audio'])) return false;
+  component?.['setRendererAudioSurfaceVisible']?.(isVisible === true);
+  if (isVisible !== true) return false;
   if (
-    isSelected2 !== !![] &&
+    isSelected2 !== true &&
     (resolveRendererLowZoomMountLimit({ viewport: viewport2, nodeCount: nodeCount2 }) > 0 ||
       Number(visibleAudioRank) > MAX_VISIBLE_AUDIO_WARMUP_COUNT)
   )
-    return ![];
-  if (component?.['prepareRendererVisibleAudioSurface']?.() !== !![]) return ![];
+    return false;
+  if (component?.['prepareRendererVisibleAudioSurface']?.() !== true) return false;
   if (isSelected2) deferredMedia?.['hydrateNow']?.(nodeId);
-  else deferredMedia?.['enqueue']?.(nodeId, { urgent: !![] });
-  return !![];
+  else deferredMedia?.['enqueue']?.(nodeId, { urgent: true });
+  return true;
 }
 
 export function createRendererVisibleAudioSurfaceHydrationPass({
@@ -188,7 +188,7 @@ export function createRendererVisibleAudioSurfaceHydrationPass({
     component: component2,
   } = {}) => {
     const source =
-      isSelected3 !== !![] && isVisible2 === !![] && isNodeType(node2, ['source-audio', 'ai-audio', 'audio'])
+      isSelected3 !== true && isVisible2 === true && isNodeType(node2, ['source-audio', 'ai-audio', 'audio'])
         ? (target += 1)
         : 1;
     return scheduleRendererVisibleAudioSurfaceHydration({

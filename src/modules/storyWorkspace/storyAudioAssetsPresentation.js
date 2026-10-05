@@ -9,13 +9,13 @@ const escape = (value) =>
   );
 export const renderStoryAudioArtwork = () =>
   '<span class="story-audio-artwork">' + renderWorkspaceAssetTabIcon('audio') + '<span>音频</span></span>';
-export function renderStoryAudioActions(key, list, index = ![]) {
+export function renderStoryAudioActions(key, list, index = false) {
   if (key['assetFilter'] === 'audio')
     return (
       '<button class="story-secondary-button" type="button" data-story-audio-action="upload" ' +
       (index ? 'disabled aria-busy="true"' : '') +
       '>' +
-      (index ? renderStoryGenerationSpinner({ button: !![] }) + '上传中' : '上传音频') +
+      (index ? renderStoryGenerationSpinner({ button: true }) + '上传中' : '上传音频') +
       '</button><input type="file" class="story-hidden-input" data-story-audio-files multiple accept="audio/*,.mp3,.wav,.m4a,.ogg,.flac">'
     );
   const list2 = list['filter'](

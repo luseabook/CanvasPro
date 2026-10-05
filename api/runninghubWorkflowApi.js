@@ -116,7 +116,7 @@ export async function runRunninghubAiApp(args3, concurrency2 = {}) {
   );
 }
 export async function queryRunninghubWorkflow(next, signal = {}) {
-  const current = signal?.['useOpenapiQuery'] === !![],
+  const current = signal?.['useOpenapiQuery'] === true,
     post2 = await post(
       current ? '/api/v2/proxy/image' : '/api/v2/runninghubwf/query',
       current
@@ -180,7 +180,7 @@ async function resumeRunninghubWorkflowTaskOnce(providerProfileId2, signal2 = {}
           rhProviderProfileId: providerProfileId2?.['rhProviderProfileId'],
           runningHubApiUrl: providerProfileId2?.['runningHubApiUrl'],
         },
-        { signal: signal2?.['signal'], useOpenapiQuery: signal2?.['useOpenapiQuery'] === !![] },
+        { signal: signal2?.['signal'], useOpenapiQuery: signal2?.['useOpenapiQuery'] === true },
       ),
       count = typeof queryRunninghubWorkflow2?.['code'] === 'number' ? queryRunninghubWorkflow2['code'] : null;
     if (count !== null && RH_PENDING_CODES['has'](count)) continue;

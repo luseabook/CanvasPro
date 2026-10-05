@@ -105,7 +105,7 @@ export function createCollaborationApi({
     result = 0;
   async function run(data, options) {
     const response = await controlRequest(data, options);
-    if (!response || response['success'] === ![]) {
+    if (!response || response['success'] === false) {
       const response2 = new Error(response?.['message'] || '本机协作服务不可用');
       ((response2['code'] = response?.['code'] || 'HOST_UNAVAILABLE'),
         (response2['status'] = response?.['status']),
@@ -118,7 +118,7 @@ export function createCollaborationApi({
     const signal2 = new AbortController(),
       handler = () => signal2['abort']();
     if (el?.['aborted']) handler();
-    el?.['addEventListener']('abort', handler, { once: !![] });
+    el?.['addEventListener']('abort', handler, { once: true });
     const setTimeout2 = setTimeout(handler, 30000);
     try {
       let status;
@@ -154,7 +154,7 @@ export function createCollaborationApi({
       } catch {
         throw new Error('协作服务返回了无效响应，请检查服务部署和网络连接');
       }
-      if (!status['ok'] || error['success'] === ![]) {
+      if (!status['ok'] || error['success'] === false) {
         const response3 = new Error(error['message'] || '协作请求失败');
         ((response3['code'] = error['code'] || 'COLLABORATION_UNAVAILABLE'),
           (response3['status'] = status['status']));
@@ -219,7 +219,7 @@ export function createCollaborationApi({
         throw new Error('协作服务尚未部署或返回了不兼容的响应');
       return ((token = enabled3['token']), enabled3);
     },
-    startHost: (payload, { replacePort: replacePort = ![] } = {}) =>
+    startHost: (payload, { replacePort: replacePort = false } = {}) =>
       run3({ action: 'start', replacePort: replacePort }, payload),
     connectHost: (endpoint, handle) => run3({ action: 'connect', endpoint: endpoint }, handle),
     listRooms: (clientId, state) => run({ action: 'list', identityToken: token, clientId: clientId }, state),
@@ -342,7 +342,7 @@ export function createCollaborationApi({
           connectionId: connectionId6['connectionId'],
           payload: {
             ...clientId2,
-            ...(['join', 'open', 'sync']['includes'](clientId2['action']) ? { paged: !![] } : {}),
+            ...(['join', 'open', 'sync']['includes'](clientId2['action']) ? { paged: true } : {}),
           },
         },
         value7,
@@ -405,7 +405,7 @@ export async function readCollaborationMedia(value10, el2) {
     signal3 = new AbortController(),
     handler3 = () => signal3['abort']();
   if (el2?.['aborted']) handler3();
-  el2?.['addEventListener']('abort', handler3, { once: !![] });
+  el2?.['addEventListener']('abort', handler3, { once: true });
   const setTimeout3 = setTimeout(handler3, 30000);
   try {
     const response5 = await fetch(value11, { signal: signal3['signal'] });

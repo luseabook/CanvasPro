@@ -3,7 +3,7 @@ export function resolveWorkspaceLibraryContextSelection(value, item, list = []) 
 }
 export function createWorkspaceAssetLibraryContextMenuItems({
   selectedCount: selectedCount = 0,
-  selectionMode: selectionMode = ![],
+  selectionMode: selectionMode = false,
   items: items = [],
 } = {}) {
   return [

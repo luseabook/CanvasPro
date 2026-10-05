@@ -176,7 +176,7 @@ function renderReplacementResultReferenceButton(options2 = {}, value4 = 0, value
 function renderReplacementImageHistoryMenu(
   options3 = {},
   title2 = '镜头片段',
-  { allowSingleResult: allowSingleResult = ![] } = {},
+  { allowSingleResult: allowSingleResult = false } = {},
 ) {
   const results = getPersonReplacementImageResults(options3),
     activeIndex = getPersonReplacementActiveImageResultIndex(options3, results);
@@ -224,7 +224,7 @@ function renderReplacementImageHistoryMenu(
 function renderReplacementVideoHistoryMenu(
   options4 = {},
   title3 = '镜头片段',
-  { allowSingleResult: allowSingleResult = ![] } = {},
+  { allowSingleResult: allowSingleResult = false } = {},
 ) {
   const results2 = getPersonReplacementVideoResults(options4),
     activeIndex2 = getPersonReplacementActiveVideoResultIndex(options4, results2);
@@ -281,11 +281,11 @@ function renderReplacementVideoHistoryMenu(
 function renderShotTimeline(
   selectedAssetId,
   {
-    allowCutEditing: allowCutEditing = ![],
+    allowCutEditing: allowCutEditing = false,
     mode: mode = 'image',
-    isBatchGenerating: isBatchGenerating = ![],
+    isBatchGenerating: isBatchGenerating = false,
     batchGeneratingShotIds: batchGeneratingShotIds = [],
-    batchCancelRequested: batchCancelRequested = ![],
+    batchCancelRequested: batchCancelRequested = false,
   } = {},
 ) {
   const name = mode === 'video',
@@ -342,10 +342,10 @@ function renderShotTimeline(
       batchCancelAction: 'cancel-shot-batch-generation',
       batchCancelRequested: batchCancelRequested,
       batchGeneratingAssetIds: isBatchGenerating ? generatingAppearanceKeys : [],
-      allowDeleteAssetCard: ![],
-      allowAssetRename: ![],
-      hideAssetRoleTag: !![],
-      hideAssetNameTooltip: !![],
+      allowDeleteAssetCard: false,
+      allowAssetRename: false,
+      hideAssetRoleTag: true,
+      hideAssetNameTooltip: true,
     },
     value45 =
       (allowCutEditing
@@ -461,7 +461,7 @@ function renderShotTimeline(
             ['filter'](Boolean)
             ['join'](' '),
           accessoryHtml: accessoryHtml + value52,
-          preserveShell: !![],
+          preserveShell: true,
         },
       );
     })['join'](''),
@@ -490,14 +490,14 @@ function renderShotCutEditor(
   value56,
   list4 = [],
   {
-    submitting: submitting = ![],
-    keyframeCapturing: keyframeCapturing = ![],
-    smartDetecting: smartDetecting = ![],
+    submitting: submitting = false,
+    keyframeCapturing: keyframeCapturing = false,
+    smartDetecting: smartDetecting = false,
     playheadSec: playheadSec = 0,
     previewShotId: previewShotId = '',
     timelineZoom: timelineZoom = 1,
-    soundEnabled: soundEnabled = ![],
-    canUndo: canUndo = ![],
+    soundEnabled: soundEnabled = false,
+    canUndo: canUndo = false,
     selectedShotIds: selectedShotIds = [],
   } = {},
   handler = () => '',
@@ -576,7 +576,7 @@ function renderShotCutEditor(
           value65 +
           '</span>',
       );
-      if (value62['keyframeManuallySelected'] === !![] && normalizeText(value62['keyframeRef'])) {
+      if (value62['keyframeManuallySelected'] === true && normalizeText(value62['keyframeRef'])) {
         const personReplacementShotCutTimelineSec = getPersonReplacementShotCutTimelineSec(
             list4,
             value62['shotId'],
@@ -645,7 +645,7 @@ function renderShotCutEditor(
         ' ' +
         (value68 ? 'is-source-start' : '') +
         ' ' +
-        (value62['isReversed'] === !![] ? 'is-reversed' : '') +
+        (value62['isReversed'] === true ? 'is-reversed' : '') +
         '" style="left:' +
         mediaClipTimelineRangeRect['leftPct']['toFixed'](5) +
         '%;width:' +
@@ -663,7 +663,7 @@ function renderShotCutEditor(
         ' ' +
         (value69 ? 'data-person-replacement-cut-merge-selected="true"' : '') +
         ' ' +
-        (value62['isReversed'] === !![] ? 'data-person-replacement-cut-reversed="true"' : '') +
+        (value62['isReversed'] === true ? 'data-person-replacement-cut-reversed="true"' : '') +
         ' role="button" tabindex="0" aria-pressed="' +
         text3 +
         '" aria-label="' +
@@ -673,7 +673,7 @@ function renderShotCutEditor(
             formatClock(value62['startSec']) +
             ' 到 ' +
             formatClock(value62['endSec']) +
-            (value62['isReversed'] === !![] ? '，已设为倒放' : '') +
+            (value62['isReversed'] === true ? '，已设为倒放' : '') +
             (value69 ? '，已框选' : ''),
         ) +
         '">\n      ' +
@@ -683,7 +683,7 @@ function renderShotCutEditor(
         '">' +
         formatDurationLabel(value64) +
         '</div></div>\n      ' +
-        (value62['isReversed'] === !![]
+        (value62['isReversed'] === true
           ? '<span class="person-replacement-shot-cut-reverse-badge" aria-hidden="true">倒放</span>'
           : '') +
         '\n      ' +
@@ -693,7 +693,7 @@ function renderShotCutEditor(
       );
     })['join'](''),
     mediaClipReverseControlState = resolveMediaClipReverseControlState({
-      isReversed: isReversed?.['isReversed'] === !![],
+      isReversed: isReversed?.['isReversed'] === true,
       pending: reversePending,
     }),
     value76 = mediaClipReverseControlState['isReversed'];
@@ -811,24 +811,24 @@ function renderShotCutEditor(
 function renderShotTimelineStage(
   value77,
   {
-    cutEditorOpen: cutEditorOpen = ![],
-    cutEditorOpening: cutEditorOpening = ![],
+    cutEditorOpen: cutEditorOpen = false,
+    cutEditorOpening: cutEditorOpening = false,
     cutEditorMotion: cutEditorMotion = '',
     cutEditorDraft: cutEditorDraft = [],
-    cutEditorSubmitting: cutEditorSubmitting = ![],
-    cutEditorKeyframeCapturing: cutEditorKeyframeCapturing = ![],
-    cutEditorSmartDetecting: cutEditorSmartDetecting = ![],
+    cutEditorSubmitting: cutEditorSubmitting = false,
+    cutEditorKeyframeCapturing: cutEditorKeyframeCapturing = false,
+    cutEditorSmartDetecting: cutEditorSmartDetecting = false,
     cutEditorPlayheadSec: cutEditorPlayheadSec = 0,
     cutEditorPreviewShotId: cutEditorPreviewShotId = '',
     cutEditorTimelineZoom: cutEditorTimelineZoom = 1,
-    cutEditorSoundEnabled: cutEditorSoundEnabled = ![],
+    cutEditorSoundEnabled: cutEditorSoundEnabled = false,
     cutEditorSelectedShotIds: cutEditorSelectedShotIds = [],
-    cutEditorCanUndo: cutEditorCanUndo = ![],
-    allowCutEditing: allowCutEditing = ![],
+    cutEditorCanUndo: cutEditorCanUndo = false,
+    allowCutEditing: allowCutEditing = false,
     timelineMode: timelineMode = 'image',
-    shotBatchGenerationActive: shotBatchGenerationActive = ![],
+    shotBatchGenerationActive: shotBatchGenerationActive = false,
     shotBatchGeneratingShotIds: shotBatchGeneratingShotIds = [],
-    shotBatchCancelRequested: shotBatchCancelRequested = ![],
+    shotBatchCancelRequested: shotBatchCancelRequested = false,
   } = {},
   value78 = () => '',
 ) {
@@ -904,7 +904,7 @@ export function createPersonReplacementShotTimelinePresentation({ renderIcon: re
       kind: kind = 'image',
       shot: shot = {},
       title: title = '镜头片段',
-      allowSingleResult: allowSingleResult = ![],
+      allowSingleResult: allowSingleResult = false,
     } = {}) {
       const value84 = { allowSingleResult: allowSingleResult };
       return kind === 'video'

@@ -130,20 +130,20 @@ export function createCanvasViewportVideoWarmupController({
     enabled4 = null;
   const map = new Map(),
     map2 = new Map();
-  let config = ![],
-    enabled5 = !![],
+  let config = false,
+    enabled5 = true,
     scope = '',
     input = '',
     output = null,
     map3 = new Set();
   const run = () => {
-      if (timer === null) return ![];
-      return (clearTimer(timer), (timer = null), !![]);
+      if (timer === null) return false;
+      return (clearTimer(timer), (timer = null), true);
     },
     handler = () => {
       ((queuedCount = []), (enabled3 = ''), (enabled4 = null));
-      if (timer2 === null) return ![];
-      return (clearTimer(timer2), (timer2 = null), !![]);
+      if (timer2 === null) return false;
+      return (clearTimer(timer2), (timer2 = null), true);
     },
     handler2 = (value2) => {
       for (const [value3, value4] of map2) {
@@ -151,8 +151,8 @@ export function createCanvasViewportVideoWarmupController({
       }
     },
     handler3 = (enabled6) => {
-      if (!enabled6 || map['get'](enabled6['nodeId']) !== enabled6) return ![];
-      return (map['delete'](enabled6['nodeId']), handler2(enabled6), !![]);
+      if (!enabled6 || map['get'](enabled6['nodeId']) !== enabled6) return false;
+      return (map['delete'](enabled6['nodeId']), handler2(enabled6), true);
     },
     handler4 = (options3 = {}) => {
       const value5 = String(options3?.['taskId'] || options3?.['id'] || '')['trim']();
@@ -181,7 +181,7 @@ export function createCanvasViewportVideoWarmupController({
           Array['from'](map['values']())['some'](
             (response2) => response2?.['status'] === 'submitting' && !response2?.['taskId'],
           );
-        if (!enabled8) return ![];
+        if (!enabled8) return false;
       }
       if (!map2['has'](enabled7))
         while (map2['size'] >= MAX_PENDING_PROXY_MIGRATION_UPDATE_COUNT) {
@@ -189,7 +189,7 @@ export function createCanvasViewportVideoWarmupController({
           map2['delete'](value11);
         }
       else map2['delete'](enabled7);
-      return (map2['set'](enabled7, { entry: entry2, event: event }), !![]);
+      return (map2['set'](enabled7, { entry: entry2, event: event }), true);
     },
     handler6 = (value12, value13) => {
       let value14 = null;
@@ -208,8 +208,8 @@ export function createCanvasViewportVideoWarmupController({
         response3['status'] !== 'waiting' ||
         !response3['taskId']
       )
-        return ![];
-      response3['cancelRequested'] = !![];
+        return false;
+      response3['cancelRequested'] = true;
       try {
         void Promise['resolve'](cancelProxyMigrationTask(response3['taskId']))
           ['then']((response4) => {
@@ -222,18 +222,18 @@ export function createCanvasViewportVideoWarmupController({
               handler3(response3) && handler8();
               return;
             }
-            (response4?.['skipped'] === !![] || response4?.['ok'] === ![]) &&
-              (response3['cancelRequested'] = ![]);
+            (response4?.['skipped'] === true || response4?.['ok'] === false) &&
+              (response3['cancelRequested'] = false);
           })
           ['catch']((value19) => {
-            ((response3['cancelRequested'] = ![]),
+            ((response3['cancelRequested'] = false),
               console['warn']('[canvasViewportVideoWarmup] proxy migration cancel failed:', value19));
           });
       } catch (value20) {
-        ((response3['cancelRequested'] = ![]),
+        ((response3['cancelRequested'] = false),
           console['warn']('[canvasViewportVideoWarmup] proxy migration cancel failed:', value20));
       }
-      return !![];
+      return true;
     },
     handler9 = (value21) => output === input && !map3['has'](value21['nodeId']),
     handler10 = () => {
@@ -249,7 +249,7 @@ export function createCanvasViewportVideoWarmupController({
         status: 'submitting',
         signature: signature,
         viewport: viewport3,
-        cancelRequested: ![],
+        cancelRequested: false,
       };
       map['set'](nodeId2, response5);
       try {
@@ -284,9 +284,9 @@ export function createCanvasViewportVideoWarmupController({
     },
     handler13 = (viewport4) => {
       try {
-        return isViewportInteractionActive({ viewport: viewport4, containerEl: containerEl3 }) === !![];
+        return isViewportInteractionActive({ viewport: viewport4, containerEl: containerEl3 }) === true;
       } catch {
-        return ![];
+        return false;
       }
     },
     handler14 = (value26, viewport5) => {
@@ -448,7 +448,7 @@ export function createCanvasViewportVideoWarmupController({
       : handler15(readStoreSnapshot(store2));
   const value41 = () => {
     if (config) return;
-    ((config = !![]),
+    ((config = true),
       run(),
       handler(),
       map['clear'](),
@@ -459,8 +459,8 @@ export function createCanvasViewportVideoWarmupController({
   };
   return (
     (value41['setPresentationActive'] = (value42) => {
-      if (config || enabled5 === (value42 === !![])) return;
-      ((enabled5 = value42 === !![]), run(), handler(), (scope = ''));
+      if (config || enabled5 === (value42 === true)) return;
+      ((enabled5 = value42 === true), run(), handler(), (scope = ''));
       if (enabled5) handler15(readStoreSnapshot(store2));
       else clearWarmup();
     }),

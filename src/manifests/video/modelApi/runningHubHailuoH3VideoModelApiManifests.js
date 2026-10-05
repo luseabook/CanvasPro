@@ -156,8 +156,8 @@ export const RUNNINGHUB_HAILUO_H3_VIDEO_MODELS = Object['freeze']([
       video: 3,
       audio: 3,
       fixedSlots: RUNNINGHUB_HAILUO_H3_FIXED_INPUT_SLOTS,
-      cycleFixedInputWhenFull: !![],
-      preserveHiddenInputsByKind: !![],
+      cycleFixedInputWhenFull: true,
+      preserveHiddenInputsByKind: true,
       policyVariants: RUNNINGHUB_HAILUO_H3_INPUT_POLICY_VARIANTS,
       mediaConstraintsByKind: RUNNINGHUB_HAILUO_H3_MEDIA_CONSTRAINTS,
     }),
@@ -169,7 +169,7 @@ export const RUNNINGHUB_HAILUO_H3_VIDEO_MODELS = Object['freeze']([
       bodyResolver: 'runninghubHailuoH3Video',
       endpointResolver: 'runninghubHailuoH3VideoEndpoint',
     }),
-    ratioPolicy: Object['freeze']({ capability: 'size', preserveAdaptive: !![] }),
+    ratioPolicy: Object['freeze']({ capability: 'size', preserveAdaptive: true }),
     prompt: Object['freeze']({
       placeholder: RUNNINGHUB_HAILUO_H3_FRAMES_PROMPT_PLACEHOLDER,
       variants: Object['freeze']([

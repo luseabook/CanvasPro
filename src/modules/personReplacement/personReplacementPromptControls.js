@@ -104,7 +104,7 @@ export function syncPersonReplacementPromptModeControl(el2, project, current = [
         'aria-pressed',
         String(
           !isPersonReplacementManualPromptMode2 &&
-            project['settings']?.['replacementPromptEnhancementEnabled'] === !![],
+            project['settings']?.['replacementPromptEnhancementEnabled'] === true,
         ),
       ),
       el4['setAttribute'](
@@ -120,7 +120,7 @@ export function applyPersonReplacementPromptControlAction(args, entry, el5, reco
   if (entry === 'toggle-prompt-enhancement') {
     if (isPersonReplacementManualPromptMode(args)) return null;
     const replacementPromptEnhancementEnabled =
-      args['settings']['replacementPromptEnhancementEnabled'] !== !![];
+      args['settings']['replacementPromptEnhancementEnabled'] !== true;
     return (
       el5['setAttribute']?.('aria-pressed', String(replacementPromptEnhancementEnabled)),
       {

@@ -19,12 +19,12 @@ async function getPoseLandmarker() {
   return (
     !poseLandmarkerPromise &&
       (poseLandmarkerPromise = (async () => {
-        const value = await FilesetResolver['forVisionTasks'](WASM_ROOT_URL, !![]);
+        const value = await FilesetResolver['forVisionTasks'](WASM_ROOT_URL, true);
         return PoseLandmarker['createFromOptions'](value, {
           baseOptions: { modelAssetPath: MODEL_URL },
           ...STORYBOARD_3D_IMAGE_POSE_RUNTIME['options'],
           numPoses: STORYBOARD_3D_IMAGE_POSE_RUNTIME['maxPoses'],
-          outputSegmentationMasks: ![],
+          outputSegmentationMasks: false,
         });
       })()['catch']((item) => {
         poseLandmarkerPromise = null;

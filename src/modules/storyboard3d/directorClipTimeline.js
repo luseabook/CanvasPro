@@ -55,14 +55,14 @@ export class DirectorClipTimeline {
   ['bind']() {
     const el = this['timeline']['getRoot']?.();
     if (el === this['root']) return;
-    (this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
+    (this['root']?.['removeEventListener']('pointerdown', this['onDown'], true),
       (this['root'] = el),
-      el?.['addEventListener']('pointerdown', this['onDown'], !![]));
+      el?.['addEventListener']('pointerdown', this['onDown'], true));
   }
   ['handleClick'](enabled, id) {
-    if (!enabled['startsWith']('timeline-clip-')) return ![];
+    if (!enabled['startsWith']('timeline-clip-')) return false;
     const enabled2 = this['timeline']['_context']()['shot']?.['animation'];
-    if (!enabled2) return !![];
+    if (!enabled2) return true;
     const result = this['selected'],
       data =
         result &&
@@ -134,7 +134,7 @@ export class DirectorClipTimeline {
           });
         break;
     }
-    return (this['timeline']['requestRender']?.(), !![]);
+    return (this['timeline']['requestRender']?.(), true);
   }
   ['drag'](event) {
     const id2 = event['target']['closest']?.('.storyboard-3d-motion-clip');
@@ -208,7 +208,7 @@ export class DirectorClipTimeline {
           event3['key'] === 'Escape' &&
             (event3['preventDefault'](), event3['stopImmediatePropagation'](), this['cancel']?.());
         },
-        { capture: !![], signal: signal['signal'] },
+        { capture: true, signal: signal['signal'] },
       ),
       this['timeline']['window']['addEventListener'](
         'pointerup',
@@ -226,12 +226,12 @@ export class DirectorClipTimeline {
             editDirectorClip(value10, { ...args3, start: start, end: end, move: !enabled3 }),
           );
         },
-        { once: !![], signal: signal['signal'] },
+        { once: true, signal: signal['signal'] },
       ));
   }
   ['handleKey'](event5) {
     const kind = event5['target']['closest']?.('.storyboard-3d-motion-clip');
-    if (!kind) return ![];
+    if (!kind) return false;
     this['selected'] = { kind: kind['dataset']['clipKind'], id: kind['dataset']['clipId'] };
     const value11 = event5['key']['toLowerCase'](),
       value12 = event5['ctrlKey'] || event5['metaKey'],
@@ -245,17 +245,17 @@ export class DirectorClipTimeline {
               : ['enter', ' ']['includes'](value11)
                 ? 'select'
                 : null;
-    if (!enabled4) return ![];
+    if (!enabled4) return false;
     return (
       event5['preventDefault'](),
       event5['stopImmediatePropagation'](),
       this['handleClick']('timeline-clip-' + enabled4, kind),
-      !![]
+      true
     );
   }
   ['destroy']() {
     (this['cancel']?.(),
-      this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
+      this['root']?.['removeEventListener']('pointerdown', this['onDown'], true),
       (this['root'] = null));
   }
 }

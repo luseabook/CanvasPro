@@ -7,12 +7,12 @@ export function createCanvasMcpAutoConnection({
   cancel: cancel = clearTimeout,
   allowGeneration = false,
 }) {
-  let enabled = ![],
-    enabled2 = ![],
+  let enabled = false,
+    enabled2 = false,
     allowGeneration2 = allowGeneration === true,
     value = '',
-    item = ![],
-    args = { enabled: ![] },
+    item = false,
+    args = { enabled: false },
     schedule2;
   let backendUnavailable = false;
   const run = () => onChange({ ...args, allowGeneration: allowGeneration2 }),
@@ -43,7 +43,7 @@ export function createCanvasMcpAutoConnection({
       run2(1000);
       return;
     }
-    enabled2 = !![];
+    enabled2 = true;
     const allowGeneration3 = allowGeneration2;
     let data = 1000;
     try {
@@ -52,9 +52,9 @@ export function createCanvasMcpAutoConnection({
     } catch (reason) {
       const status = Number(reason?.status || reason?.statusCode);
       backendUnavailable = [401, 403, 404, 405, 501].includes(status) || reason?.code === 'UNSUPPORTED';
-      ((args = { enabled: ![], reason: reason['message'] }), run(), (data = 5000));
+      ((args = { enabled: false, reason: reason['message'] }), run(), (data = 5000));
     } finally {
-      ((enabled2 = ![]), run2(data));
+      ((enabled2 = false), run2(data));
     }
   }
   return (
@@ -64,10 +64,10 @@ export function createCanvasMcpAutoConnection({
         (key['checkBinding'](), run2(0));
       },
       setAllowGeneration(target) {
-        ((allowGeneration2 = target === !![]), void key['disable'](), run2(0));
+        ((allowGeneration2 = target === true), void key['disable'](), run2(0));
       },
       async destroy() {
-        ((enabled = !![]), cancel(schedule2), await key['destroy']());
+        ((enabled = true), cancel(schedule2), await key['destroy']());
       },
     }
   );

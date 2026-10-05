@@ -130,7 +130,7 @@ export function compactAgentExternalInformationForPrompt(
       title: truncateText(truncated['title'] || displayName, 300),
       contentType: truncateText(truncated['contentType'], 160),
       content: truncateText(list6, handle),
-      truncated: truncated['truncated'] === !![] || list6['length'] > handle,
+      truncated: truncated['truncated'] === true || list6['length'] > handle,
       trust: 'untrusted_external',
     };
   })['filter'](

@@ -45,7 +45,7 @@ export function createCollaborationSession({
   actorId: actorId,
   clientId: clientId,
   getCanvasId: getCanvasId,
-  hosting: hosting = ![],
+  hosting: hosting = false,
   onChange: onChange = () => {},
   onPresence: onPresence = () => {},
   onDetach: onDetach = () => {},
@@ -68,19 +68,19 @@ export function createCollaborationSession({
       clientId: clientId,
       status: 'connecting',
       message: '正在同步画布',
-      pending: ![],
+      pending: false,
     };
   let before2 = cloneGraph(room['document']),
     base = null,
     packet = null,
     enabled = null,
     setTimeout2 = null,
-    enabled2 = ![],
+    enabled2 = false,
     item = null,
-    enabled3 = ![];
+    enabled3 = false;
   const map = new Set();
-  let pending = ![],
-    enabled4 = ![],
+  let pending = false,
+    enabled4 = false,
     key = -1,
     value2 = null,
     setTimeout3 = null,
@@ -90,7 +90,7 @@ export function createCollaborationSession({
     data = '',
     options = Promise['resolve']();
   const map2 = new WeakSet();
-  let enabled5 = ![],
+  let enabled5 = false,
     target = room['attention']?.['id'],
     handler = () => {},
     handler2 = () => {},
@@ -111,7 +111,7 @@ export function createCollaborationSession({
         (revision['mediaNodes'] = media['states'](store['getStateRaw']())));
       for (const id of map)
         if (!revision['mediaNodes']['some']((current) => current['id'] === id))
-          revision['mediaNodes']['push']({ id: id, owned: !![] });
+          revision['mediaNodes']['push']({ id: id, owned: true });
       if (!enabled2)
         onChange({
           ...revision,
@@ -134,7 +134,7 @@ export function createCollaborationSession({
       readGraph: () => store['getStateRaw'](),
       onChange() {
         if (current2()) {
-          (result++, (enabled3 = !![]), run());
+          (result++, (enabled3 = true), run());
           if (!setTimeout4)
             setTimeout4 = setTimeout(() => {
               setTimeout4 = null;
@@ -302,12 +302,12 @@ export function createCollaborationSession({
             },
           })
         : null;
-  let enabled8 = ![];
+  let enabled8 = false;
   function run2() {
-    enabled8 = !![];
+    enabled8 = true;
     if (!enabled)
       queueMicrotask(() => {
-        current2() && enabled8 && ((enabled8 = ![]), void run7());
+        current2() && enabled8 && ((enabled8 = false), void run7());
       });
   }
   function run6(error) {
@@ -371,7 +371,7 @@ export function createCollaborationSession({
           delete sharedNode['_collaborationPendingMedia'];
           if (value28['_collaborationPendingMedia'])
             sharedNode['_collaborationPendingMedia'] = value28['_collaborationPendingMedia'];
-          store['updateNodeData'](value27, sharedNode, { replace: !![] });
+          store['updateNodeData'](value27, sharedNode, { replace: true });
         }
         const list5 = list['filter']((value29) => value29['kind'] === 'edges');
         if (list5['length'] || list4['length'])
@@ -400,14 +400,14 @@ export function createCollaborationSession({
   }
   async function run9() {
     if (!enabled3 || packet) return;
-    enabled3 = ![];
+    enabled3 = false;
     const value38 = media['prepare'](store['getStateRaw']());
     (handler6(), map['clear']());
     const changes = graphChanges(base, value38)['filter']((value39) => {
-      if (conflicts['has'](value39)) return ![];
+      if (conflicts['has'](value39)) return false;
       if (value39['kind'] === 'nodes' && handler7(value39) && handler8(value39['id']))
-        return (map['add'](value39['id']), ![]);
-      return !![];
+        return (map['add'](value39['id']), false);
+      return true;
     });
     changes['length'] &&
       ((packet = {
@@ -435,8 +435,8 @@ export function createCollaborationSession({
           }
         await run8(before2, list6);
         if (!enabled4) base = before3();
-        else enabled3 = !![];
-        ((enabled4 = ![]), (pending = ![]));
+        else enabled3 = true;
+        ((enabled4 = false), (pending = false));
       }
       if (value2) {
         const value42 = value2,
@@ -455,7 +455,7 @@ export function createCollaborationSession({
           conflicts['hold'](value42['conflicts'] || []),
           (value2 = null));
       }
-      if (map['size']) enabled3 = !![];
+      if (map['size']) enabled3 = true;
       (await run9(), handler6());
       if (packet) {
         const operationId = packet;
@@ -478,11 +478,11 @@ export function createCollaborationSession({
           (['NODE_BUSY', 'TASK_BUSY']['includes'](value45['code']) &&
             !operationId['historyMode'] &&
             (changes2['blocked'] = changes2['blocked']['filter']((value46) => {
-              if (!handler7(value46)) return !![];
+              if (!handler7(value46)) return true;
               return (
                 map['add'](value46['id']),
                 (base[value46['kind']][value46['id']] = value46['before']),
-                ![]
+                false
               );
             })),
             conflicts['hold'](changes2['blocked']),
@@ -603,7 +603,7 @@ export function createCollaborationSession({
       });
     return enabled;
   }
-  async function run3(handler9 = () => !![]) {
+  async function run3(handler9 = () => true) {
     await run7();
     while (handler9() && current2() && revision['status'] === 'online' && (enabled3 || packet)) await run7();
   }
@@ -620,7 +620,7 @@ export function createCollaborationSession({
     (clearTimeout(setTimeout4), (setTimeout4 = null));
     if (enabled2) return item;
     return (
-      (enabled2 = !![]),
+      (enabled2 = true),
       clearTimeout(setTimeout2),
       value12?.['stop'](),
       value16?.['stop'](),
@@ -639,26 +639,26 @@ export function createCollaborationSession({
     );
   }
   function run4({ name: name, args: args7, nodeIds: nodeIds2, removedNodeIds: removedNodeIds }) {
-    if (!current2()) return ![];
+    if (!current2()) return false;
     if (
       name === 'updateNodeData' &&
-      args7[2]?.['replace'] !== !![] &&
+      args7[2]?.['replace'] !== true &&
       args7[1] &&
       Object['keys'](sharedValue(args7[1]))['length'] === 0
     )
-      return !![];
-    if (packet?.['historyMode']) return ![];
+      return true;
+    if (packet?.['historyMode']) return false;
     const enabled12 = name === 'updateNodeData' && executing['has'](args7[0]);
-    if (revision['status'] !== 'online' && !enabled12) return ![];
-    if (revision['role'] === 'viewer') return ![];
-    if (conflicts['blocks'](nodeIds2, store['getStateRaw']())) return ![];
+    if (revision['status'] !== 'online' && !enabled12) return false;
+    if (revision['role'] === 'viewer') return false;
+    if (conflicts['blocks'](nodeIds2, store['getStateRaw']())) return false;
     return nodeIds2['every']((value55) => {
-      if (map3['has'](value55)) return ![];
+      if (map3['has'](value55)) return false;
       const enabled13 = revision['locks']?.[value55],
         enabled14 = revision['jobs']?.['find'](
           (response3) => response3['node'] === value55 && response3['status'] === 'running',
         );
-      if (removedNodeIds['includes'](value55) && (executing['has'](value55) || enabled14)) return ![];
+      if (removedNodeIds['includes'](value55) && (executing['has'](value55) || enabled14)) return false;
       return (
         (!enabled13 ||
           (enabled13['clientId'] === clientId && enabled13['actorId'] === actorId) ||
@@ -696,13 +696,13 @@ export function createCollaborationSession({
   const enabled15 = {
     state: revision,
     async start({
-      publish: publish = ![],
+      publish: publish = false,
       hostBase: hostBase = null,
       mediaBindings: mediaBindings = [],
     } = {}) {
       try {
         const value58 = await journal['read']();
-        ((enabled5 = !![]), media['restore'](value58?.['media']));
+        ((enabled5 = true), media['restore'](value58?.['media']));
         if (
           value58?.['schema'] === 1 &&
           value58['base']?.['nodes'] &&
@@ -722,11 +722,11 @@ export function createCollaborationSession({
           async beforeWorkspaceTransition() {
             await run7();
             if (!enabled15['canDetach']())
-              return ((revision['message'] = '请先完成同步和生成任务，再切换画布'), handler4(), ![]);
-            return (await enabled15['detach'](), !![]);
+              return ((revision['message'] = '请先完成同步和生成任务，再切换画布'), handler4(), false);
+            return (await enabled15['detach'](), true);
           },
           before(value60) {
-            if (!run4(value60)) return ![];
+            if (!run4(value60)) return false;
             const { name: name2, args: args8 } = value60,
               value61 =
                 name2 === 'updateNodeData' && !args8[2]?.['replace']
@@ -752,7 +752,7 @@ export function createCollaborationSession({
               )
             )
               map2['add'](value60);
-            return !![];
+            return true;
           },
           after(value67) {
             if (map2['delete'](value67)) {
@@ -767,18 +767,18 @@ export function createCollaborationSession({
                   }),
                 ),
               ),
-              (enabled3 = !![]),
+              (enabled3 = true),
               handler4(),
               run());
             if (value16) run2();
           },
           beforeReplace() {
-            if (!enabled15['canDetach']()) return ![];
-            return (enabled15['detach'](), !![]);
+            if (!enabled15['canDetach']()) return false;
+            return (enabled15['detach'](), true);
           },
           history: {
             commit() {
-              return (index++, (enabled3 = !![]), handler4(), run(), { id: 'collaboration-pending' });
+              return (index++, (enabled3 = true), handler4(), run(), { id: 'collaboration-pending' });
             },
             undo: () => {
               void run12('undo');
@@ -798,9 +798,9 @@ export function createCollaborationSession({
               throw new Error('该节点正在请求或执行生成，请等待结束');
             (map3['add'](nodeId2), handler4());
             let taskId2,
-              value72 = ![];
+              value72 = false;
             try {
-              ((enabled3 = !![]), await run3(), handler6());
+              ((enabled3 = true), await run3(), handler6());
               if (enabled3 || packet || revision['status'] !== 'online') throw new Error('请先完成画布同步');
               const map6 = new Set([nodeId2]);
               for (let value73 = -1; value73 !== map6['size'];) {
@@ -816,32 +816,32 @@ export function createCollaborationSession({
                 );
                 if (!taskId3 || taskId3['client'] !== clientId || taskId3['actor'] !== actorId)
                   throw new Error('只能恢复当前客户端拥有的协作生成任务');
-                const value76 = { taskId: taskId3['id'], released: ![] };
+                const value76 = { taskId: taskId3['id'], released: false };
                 return (
                   executing['set'](nodeId2, value76),
                   async () => {
-                    ((value76['released'] = !![]), (enabled3 = !![]), await run7());
+                    ((value76['released'] = true), (enabled3 = true), await run7());
                   }
                 );
               }
               ((taskId2 = crypto['randomUUID']()),
-                (value72 = !![]),
+                (value72 = true),
                 await rpc({ action: 'claimTask', nodeId: nodeId2, taskId: taskId2 }),
                 handler6());
-              const value77 = { taskId: taskId2, released: ![] };
+              const value77 = { taskId: taskId2, released: false };
               return (
                 executing['set'](nodeId2, value77),
                 handler4(),
                 async () => {
-                  ((value77['released'] = !![]), (enabled3 = !![]), await run7());
+                  ((value77['released'] = true), (enabled3 = true), await run7());
                 }
               );
             } catch (response5) {
               value72 &&
                 current2() &&
                 !(response5['status'] >= 400 && response5['status'] < 500) &&
-                (executing['set'](nodeId2, { taskId: taskId2, released: !![], uncertain: !![] }),
-                (enabled3 = !![]),
+                (executing['set'](nodeId2, { taskId: taskId2, released: true, uncertain: true }),
+                (enabled3 = true),
                 run6(response5));
               throw response5;
             } finally {
@@ -854,9 +854,9 @@ export function createCollaborationSession({
       return (
         (handler2 = () => list13['forEach']((handler10) => handler10())),
         publish
-          ? ((base = cloneGraph(before2)), (enabled3 = !![]))
-          : (hostBase?.['nodes'] && hostBase?.['edges'] && ((base = cloneGraph(hostBase)), (enabled4 = !![])),
-            (pending = !![])),
+          ? ((base = cloneGraph(before2)), (enabled3 = true))
+          : (hostBase?.['nodes'] && hostBase?.['edges'] && ((base = cloneGraph(hostBase)), (enabled4 = true)),
+            (pending = true)),
         await run7(),
         run11(),
         handler4(),
@@ -899,7 +899,7 @@ export function createCollaborationSession({
             base[value84['kind']][value84['id']] = structuredClone(before2[value84['kind']][value84['id']]);
           else delete base[value84['kind']][value84['id']];
         }
-        enabled3 = !![];
+        enabled3 = true;
       } else await run8(before2, value83);
       (await run7(), handler4());
     },
@@ -917,16 +917,16 @@ export function createCollaborationSession({
       if (conflicts['list']()['length'])
         throw new Error('存在未处理的冲突，请先处理；也可选择“结束本次联机 → 确定”，保留当前本机内容后退出');
       if (enabled15['canDetach']()) return;
-      let enabled17 = !![],
+      let enabled17 = true,
         setTimeout5,
         value85;
       const value86 = new Promise((value87, handler11) => {
         ((value85 = () => {
-          ((enabled17 = ![]), handler11(run13()));
+          ((enabled17 = false), handler11(run13()));
         }),
-          signal2?.['addEventListener']('abort', value85, { once: !![] }),
+          signal2?.['addEventListener']('abort', value85, { once: true }),
           (setTimeout5 = setTimeout(() => {
-            ((enabled17 = ![]),
+            ((enabled17 = false),
               handler11(
                 new Error('同步等待超时，修改仍保留在当前画布；请重试，或选择“结束本次联机 → 确定”直接退出'),
               ));
@@ -935,7 +935,7 @@ export function createCollaborationSession({
       try {
         await Promise['race']([run3(() => enabled17), value86]);
       } finally {
-        ((enabled17 = ![]), clearTimeout(setTimeout5), signal2?.['removeEventListener']('abort', value85));
+        ((enabled17 = false), clearTimeout(setTimeout5), signal2?.['removeEventListener']('abort', value85));
       }
       if (signal2?.['aborted']) throw run13();
       handler6();
@@ -981,7 +981,7 @@ export function createCollaborationSession({
         !conflicts['list']()['length']
       );
     },
-    detach({ force: force = ![] } = {}) {
+    detach({ force: force = false } = {}) {
       if (handler3()) throw new Error('请等待当前生成任务结束后退出协作');
       if (!force && (handler5() || packet || enabled3 || conflicts['list']()['length']))
         throw new Error('当前有未同步素材、修改或冲突，请先保留画布草稿');

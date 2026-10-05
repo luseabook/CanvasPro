@@ -12,9 +12,9 @@ export function isStartupVisualComplete({
   windowObject: windowObject = globalThis['window'],
 } = {}) {
   const loader = documentObject?.['getElementById']?.(STARTUP_LOADER_ID);
-  if (!loader || loader['isConnected'] === ![] || loader['hidden'] === !![]) return !![];
+  if (!loader || loader['isConnected'] === false || loader['hidden'] === true) return true;
   const presentation = readLoaderPresentation(loader, windowObject);
-  if (!presentation) return ![];
+  if (!presentation) return false;
   const display = String(presentation['display'] || '')
       ['trim']()
       ['toLowerCase'](),
@@ -39,13 +39,13 @@ export function waitForStartupVisualComplete({
         ? windowObject['clearTimeout']['bind'](windowObject)
         : globalThis['clearTimeout'];
   return new Promise((resolve) => {
-    let settled = ![],
+    let settled = false,
       observer = null,
       pollTimer = null;
     const loaderElement = documentObject?.['getElementById']?.(STARTUP_LOADER_ID),
       finish = () => {
         if (settled) return;
-        ((settled = !![]),
+        ((settled = true),
           observer?.['disconnect']?.(),
           loaderElement?.['removeEventListener']?.('animationend', checkComplete),
           loaderElement?.['removeEventListener']?.('transitionend', checkComplete),
@@ -54,8 +54,8 @@ export function waitForStartupVisualComplete({
       },
       checkComplete = () => {
         if (isStartupVisualComplete({ documentObject: documentObject, windowObject: windowObject }))
-          return (finish(), !![]);
-        return ![];
+          return (finish(), true);
+        return false;
       },
       poll = () => {
         if (settled || checkComplete()) return;
@@ -69,10 +69,10 @@ export function waitForStartupVisualComplete({
       observeTarget &&
       ((observer = new MutationObserverCtor(checkComplete)),
       observer['observe'](observeTarget, {
-        attributes: !![],
+        attributes: true,
         attributeFilter: ['class', 'hidden', 'style'],
-        childList: !![],
-        subtree: !![],
+        childList: true,
+        subtree: true,
       }));
     (loaderElement?.['addEventListener']?.('animationend', checkComplete),
       loaderElement?.['addEventListener']?.('transitionend', checkComplete));
@@ -104,8 +104,8 @@ export function createLatestStartupVisualTaskQueue({
       pending = null;
     },
     defer(task) {
-      if (typeof task !== 'function' || isReady()) return ![];
-      return ((pending = task), startRun(), !![]);
+      if (typeof task !== 'function' || isReady()) return false;
+      return ((pending = task), startRun(), true);
     },
     hasPending() {
       return typeof pending === 'function';

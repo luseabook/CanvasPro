@@ -11,12 +11,12 @@ export const STORYBOARD_3D_NAVIGATION_MODE = Object['freeze']({
 });
 export function resolveStoryboard3DNavigationMode(
   event = {},
-  { flyMode: flyMode = ![], preset: preset = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET } = {},
+  { flyMode: flyMode = false, preset: preset = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET } = {},
 ) {
   const count = Number(event['button']),
-    enabled = event['altKey'] === !![],
-    value = event['shiftKey'] === !![],
-    item = event['ctrlKey'] === !![] || event['metaKey'] === !![],
+    enabled = event['altKey'] === true,
+    value = event['shiftKey'] === true,
+    item = event['ctrlKey'] === true || event['metaKey'] === true,
     key = STORYBOARD_3D_NAVIGATION_PRESETS[preset] ? preset : DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET;
   if (flyMode && count === 2) return STORYBOARD_3D_NAVIGATION_MODE['FLY_LOOK'];
   if (key === 'blender') {
@@ -38,7 +38,7 @@ export function resolveStoryboard3DNavigationMode(
   return null;
 }
 export function getStoryboard3DNavigationHelpText({
-  flyMode: flyMode = ![],
+  flyMode: flyMode = false,
   preset: preset = DEFAULT_STORYBOARD_3D_NAVIGATION_PRESET,
 } = {}) {
   return flyMode

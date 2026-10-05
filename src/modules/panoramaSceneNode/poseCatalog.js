@@ -326,8 +326,8 @@ export function listMannequinPosePresets({ category: category = 'all', query: qu
       ['trim']()
       ['toLowerCase']();
   return PRESETS['filter']((error) => {
-    if (next !== 'all' && error['category'] !== next) return ![];
-    if (!enabled) return !![];
+    if (next !== 'all' && error['category'] !== next) return false;
+    if (!enabled) return true;
     return [error['id'], error['name'], error['category'], ...error['tags']]
       ['join'](' ')
       ['toLowerCase']()

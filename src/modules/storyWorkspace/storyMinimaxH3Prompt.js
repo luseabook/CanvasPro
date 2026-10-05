@@ -52,8 +52,8 @@ function normalizeAssetUsages(list3 = []) {
     const text5 = normalizeText(entry?.['assetRef']),
       text6 = normalizeText(entry?.['appearanceRef']),
       record = text5 + '\x00' + text6;
-    if (!text5 || map2['has'](record)) return ![];
-    return (map2['add'](record), !![]);
+    if (!text5 || map2['has'](record)) return false;
+    return (map2['add'](record), true);
   });
 }
 function buildReferenceSubjects(list4 = [], payload = []) {
@@ -217,7 +217,7 @@ function buildShotReferenceApplication(list11 = [], value37 = 0) {
     })
     ['join'](' ');
 }
-function buildDialogueDescription(value40, value41, value42, value43, { voiceover: voiceover = ![] } = {}) {
+function buildDialogueDescription(value40, value41, value42, value43, { voiceover: voiceover = false } = {}) {
   const value44 = value42['ensureSpeaker'](value40['speaker'], value41, voiceover ? 'voiceover' : 'dialogue'),
     value45 =
       value44['subject']?.['label'] ||
@@ -287,7 +287,7 @@ function buildDetailedDescription({
           buildDialogueDescription(value56, value53, speakerRegistry, subjects),
         ),
         ...parseDialogueTurns(value52?.['voiceover'])['map']((value57) =>
-          buildDialogueDescription(value57, value53, speakerRegistry, subjects, { voiceover: !![] }),
+          buildDialogueDescription(value57, value53, speakerRegistry, subjects, { voiceover: true }),
         ),
         normalizeText(value52?.['audio']) && !isNonDiegeticMusic(value52['audio'])
           ? STORY_MINIMAX_H3_DIEGETIC_SOUND_LABEL + '：' + ensureSentence(value52['audio'])

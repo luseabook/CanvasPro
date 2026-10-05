@@ -11,7 +11,7 @@ export function createStoryAssetPromptDragController({
   root: root,
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'],
-  insertMention: insertMention = () => ![],
+  insertMention: insertMention = () => false,
   hideHoverPreview: hideHoverPreview = () => {},
 } = {}) {
   let event = null,
@@ -38,7 +38,7 @@ export function createStoryAssetPromptDragController({
       ((enabled = documentObject['createElement']('img')),
         (enabled['src'] = response['url']),
         (enabled['alt'] = ''),
-        (enabled['draggable'] = ![]));
+        (enabled['draggable'] = false));
     else {
       if (response['mediaType'] === 'video') {
         const box2 = documentObject['createElement']('canvas'),
@@ -53,14 +53,14 @@ export function createStoryAssetPromptDragController({
           enabled = null;
         }
         if (!enabled && typeof el5['cloneNode'] === 'function') {
-          ((enabled = el5['cloneNode'](!![])),
-            (enabled['muted'] = !![]),
+          ((enabled = el5['cloneNode'](true)),
+            (enabled['muted'] = true),
             enabled['removeAttribute']?.('controls'));
           try {
             enabled['currentTime'] = Number(el5['currentTime']) || 0;
           } catch {}
         }
-      } else typeof el5['cloneNode'] === 'function' && (enabled = el5['cloneNode'](!![]));
+      } else typeof el5['cloneNode'] === 'function' && (enabled = el5['cloneNode'](true));
     }
     if (!enabled) return null;
     return (el6['appendChild'](enabled), documentObject['body']?.['appendChild']?.(el6), (el = el6), el6);
@@ -88,7 +88,7 @@ export function createStoryAssetPromptDragController({
   }
   function hideCaret() {
     (el3?.['classList']?.['remove']('is-story-asset-drop-caret-active'), (el3 = null));
-    if (el2) el2['hidden'] = !![];
+    if (el2) el2['hidden'] = true;
   }
   function clear() {
     ((event = null),
@@ -148,7 +148,7 @@ export function createStoryAssetPromptDragController({
       (el2['style']['left'] = Math['round'](value2) + 'px'),
       (el2['style']['top'] = Math['round'](value6) + 'px'),
       (el2['style']['height'] = Math['round'](output) + 'px'),
-      (el2['hidden'] = ![]),
+      (el2['hidden'] = false),
       el10
     );
   }
@@ -159,7 +159,7 @@ export function createStoryAssetPromptDragController({
         0,
         Math['trunc'](Number(element?.['dataset']?.['storyReferenceAssetIndex']) || 0),
       );
-    if (!element || !assetId || pointerId['button'] !== 0) return ((event = null), ![]);
+    if (!element || !assetId || pointerId['button'] !== 0) return ((event = null), false);
     return (
       (event = {
         assetId: assetId,
@@ -168,21 +168,21 @@ export function createStoryAssetPromptDragController({
         pointerId: pointerId['pointerId'],
         startX: Number(pointerId['clientX']) || 0,
         startY: Number(pointerId['clientY']) || 0,
-        active: ![],
+        active: false,
       }),
-      (element['draggable'] = ![]),
+      (element['draggable'] = false),
       element['setPointerCapture']?.(pointerId['pointerId']),
-      !![]
+      true
     );
   }
   function run4(event5) {
     const event6 = event;
-    if (!event6 || event6['pointerId'] !== event5['pointerId']) return ![];
+    if (!event6 || event6['pointerId'] !== event5['pointerId']) return false;
     if (!event6['active']) {
       const value7 = (Number(event5['clientX']) || 0) - event6['startX'],
         value8 = (Number(event5['clientY']) || 0) - event6['startY'];
-      if (Math['hypot'](value7, value8) < 8) return ![];
-      ((event6['active'] = !![]),
+      if (Math['hypot'](value7, value8) < 8) return false;
+      ((event6['active'] = true),
         event6['element']?.['classList']['add']('is-story-asset-dragging'),
         hideHoverPreview(),
         run(event6['element']));
@@ -196,17 +196,17 @@ export function createStoryAssetPromptDragController({
     const value9 = el12?.['querySelector']?.('[data-story-clip-prompt]');
     event6['triggerRange'] = value9 ? showCaret(value9, event5) : null;
     if (!el12) hideCaret();
-    return (event5['preventDefault']?.(), !![]);
+    return (event5['preventDefault']?.(), true);
   }
-  function finish(event7, { cancelled: cancelled = ![] } = {}) {
+  function finish(event7, { cancelled: cancelled = false } = {}) {
     const assetIndex2 = event;
-    if (!assetIndex2 || assetIndex2['pointerId'] !== event7['pointerId']) return ![];
+    if (!assetIndex2 || assetIndex2['pointerId'] !== event7['pointerId']) return false;
     const el13 = cancelled ? null : run3(event7),
       value10 = assetIndex2['active'] && Boolean(el13);
-    ((event = null), (assetIndex2['element']['draggable'] = !![]));
+    ((event = null), (assetIndex2['element']['draggable'] = true));
     assetIndex2['element']['hasPointerCapture']?.(event7['pointerId']) &&
       assetIndex2['element']['releasePointerCapture'](event7['pointerId']);
-    if (!assetIndex2['active']) return ![];
+    if (!assetIndex2['active']) return false;
     (event7['preventDefault']?.(), event7['stopPropagation']?.());
     const value11 = value10 ? el13['querySelector']?.('[data-story-clip-prompt]') : null,
       triggerRange = value10 ? showCaret(value11, event7) || assetIndex2['triggerRange'] : null;
@@ -217,7 +217,7 @@ export function createStoryAssetPromptDragController({
           assetIndex: assetIndex2['assetIndex'],
           triggerRange: triggerRange,
         }),
-      !![]
+      true
     );
   }
   function handleWindowPointerMove(event8) {
@@ -228,7 +228,7 @@ export function createStoryAssetPromptDragController({
     finish(value12);
   }
   function handleWindowPointerCancel(event9) {
-    if (finish(event9, { cancelled: !![] })) return;
+    if (finish(event9, { cancelled: true })) return;
     if (event?.['pointerId'] === event9['pointerId']) event = null;
   }
   return Object['freeze']({
@@ -243,7 +243,7 @@ export function createStoryAssetPromptDragController({
     handleWindowPointerUp: handleWindowPointerUp,
     hasSession: () => Boolean(event),
     hideCaret: hideCaret,
-    isActive: () => event?.['active'] === !![],
+    isActive: () => event?.['active'] === true,
     showCaret: showCaret,
   });
 }

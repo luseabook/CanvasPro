@@ -245,11 +245,11 @@ function storyCharacterNamesOverlap(scope, input) {
   return getStoryAssetNameAliases(scope)['some']((value2) => map['has'](value2['toLowerCase']()));
 }
 function storyCharacterNamesStronglyOverlap(value3, value4) {
-  if (storyCharacterNamesOverlap(value3, value4)) return !![];
+  if (storyCharacterNamesOverlap(value3, value4)) return true;
   const list = normalizeDeterministicStoryCharacterCandidate(value3)['toLowerCase'](),
     list2 = normalizeDeterministicStoryCharacterCandidate(value4)['toLowerCase']();
-  if (!list || !list2) return ![];
-  if (/[a-z0-9]/u['test'](list) || /[a-z0-9]/u['test'](list2)) return ![];
+  if (!list || !list2) return false;
+  if (/[a-z0-9]/u['test'](list) || /[a-z0-9]/u['test'](list2)) return false;
   const [args5, list3] = list['length'] <= list2['length'] ? [list, list2] : [list2, list];
   return (
     [...args5]['length'] >= 2 &&
@@ -343,13 +343,13 @@ function extractStorySourceCastNames(value27 = '') {
   return normalizeStringArray(list10);
 }
 function isLikelyStorySourceDialogueSpeaker(args9, list11 = []) {
-  if (!args9) return ![];
-  if (list11['includes'](args9)) return !![];
-  if (list11['some']((value32) => args9['startsWith'](value32))) return ![];
-  if ([...args9]['length'] > 6) return ![];
-  if (/^(?:他|她|它|他们|她们|它们|众人|人群|观众|评论区|弹幕)/u['test'](args9)) return ![];
-  if (/^(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?/u['test'](args9)) return ![];
-  if (/(?:若干|数人|多人|等人)$/u['test'](args9)) return ![];
+  if (!args9) return false;
+  if (list11['includes'](args9)) return true;
+  if (list11['some']((value32) => args9['startsWith'](value32))) return false;
+  if ([...args9]['length'] > 6) return false;
+  if (/^(?:他|她|它|他们|她们|它们|众人|人群|观众|评论区|弹幕)/u['test'](args9)) return false;
+  if (/^(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?/u['test'](args9)) return false;
+  if (/(?:若干|数人|多人|等人)$/u['test'](args9)) return false;
   return !/(?:面无表情|面不改色|一把|抓住|咳着|喊出声|已经|炸了|冷笑|苦笑|说道|问道|答道|开口|皱眉|点头|摇头|转身|抬手|挥手|走向|看向|望着|盯着|站起|坐下|推开|握住|拿起|放下)$/u[
     'test'
   ](args9);
@@ -364,7 +364,7 @@ function normalizeStorySourceDialogueSpeaker(value33) {
 }
 function isDeclaredStorySourceSpeakerAlias(value34, list12 = []) {
   const args10 = normalizeText(value34);
-  if (!args10) return ![];
+  if (!args10) return false;
   return list12['some'](
     (value35) =>
       storyCharacterNamesOverlap(value35, args10) ||
@@ -420,7 +420,7 @@ export function normalizeStoryAssetExtractionSources(list14 = []) {
           heading: heading,
           assetHeading: heading,
           source: normalizeText(characters2?.['source']),
-          isSourceWindow: ![],
+          isSourceWindow: false,
           characters: characters3,
           body: body2,
         });
@@ -510,7 +510,7 @@ function normalizeStoryAssetFinalCharacterRole(value54 = '') {
 }
 function normalizeInventoryAssets(
   value55,
-  { sourceScenes: sourceScenes = [], allowEmpty: allowEmpty = ![] } = {},
+  { sourceScenes: sourceScenes = [], allowEmpty: allowEmpty = false } = {},
 ) {
   const map6 = new Map(sourceScenes['map']((value56) => [value56['ref'], value56])),
     map7 = new Set(map6['keys']()),
@@ -628,7 +628,7 @@ export function buildStoryAssetInventoryPrompt({
       ref: ref4['ref'],
       heading: ref4['heading'],
       ...(ref4['isSourceWindow']
-        ? { assetHeading: ref4['assetHeading'] || ref4['heading'], isSourceWindow: !![] }
+        ? { assetHeading: ref4['assetHeading'] || ref4['heading'], isSourceWindow: true }
         : {}),
       ...(ref4['characters']['length'] ? { characters: ref4['characters'] } : {}),
       body: ref4['body'],
@@ -706,7 +706,7 @@ export function parseStoryAssetInventoryResult(value73, { sourceScenes: sourceSc
   const strictJson = parseStrictJson(getResultText(value73), 'Agent 未返回轻量资产清单。'),
     assets = normalizeInventoryAssets(strictJson?.['assets'], {
       sourceScenes: sourceScenes,
-      allowEmpty: !![],
+      allowEmpty: true,
     }),
     map9 = new Set(sourceScenes['map']((value74) => value74['ref'])),
     list34 = (Array['isArray'](strictJson?.['sceneAudits']) ? strictJson['sceneAudits'] : [])['map'](
@@ -1032,7 +1032,7 @@ function parseStoryAssetInventoryRepairResult(
   const strictJson2 = parseStrictJson(getResultText(value119), 'Agent 未返回资产清单修复结果。'),
     upserts = normalizeInventoryAssets(strictJson2?.['upserts'], {
       sourceScenes: sourceScenes,
-      allowEmpty: !![],
+      allowEmpty: true,
     }),
     map18 = new Set((inventory['assets'] || [])['map']((value120) => value120['ref'])),
     removeAssetRefs = normalizeStringArray(strictJson2?.['removeAssetRefs']),
@@ -1151,7 +1151,7 @@ export function buildStoryAssetDetailBatchPrompt({
         name: ref6['name'],
       })),
     })),
-    evidenceDossiers = createStoryAssetEvidenceDossiers(list49, sourceScenes, { includeSourceMappings: ![] }),
+    evidenceDossiers = createStoryAssetEvidenceDossiers(list49, sourceScenes, { includeSourceMappings: false }),
     style = normalizeText(visualStyle) || title['visualStyle'];
   return JSON['stringify']({
     task: 'detail_story_asset_batch',
@@ -1515,7 +1515,7 @@ function createCoverageError(issues) {
 const STORY_ASSET_EXTRACTION_DRAFT_STRATEGY = 'kind-compact-v7',
   STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY = 'evidence-batched-api-v2';
 function createStoryAssetStructuredOutput(name4, schema) {
-  return { name: name4, schema: schema, strict: !![], fallback: 'none' };
+  return { name: name4, schema: schema, strict: true, fallback: 'none' };
 }
 function createStoryAssetKindStructuredOutput(value179) {
   const storyAssetKind = normalizeStoryAssetKind(value179),
@@ -1530,12 +1530,12 @@ function createStoryAssetKindStructuredOutput(value179) {
       required['push']('sourceSceneRefs')),
     createStoryAssetStructuredOutput('story_asset_' + storyAssetKind + '_compact_v7', {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['assets'],
       properties: {
         assets: {
           type: 'array',
-          items: { type: 'object', additionalProperties: ![], required: required, properties: properties },
+          items: { type: 'object', additionalProperties: false, required: required, properties: properties },
         },
       },
     })
@@ -1544,20 +1544,20 @@ function createStoryAssetKindStructuredOutput(value179) {
 function createStoryAssetInventoryStructuredOutput() {
   const items = {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['name', 'sourceSceneRefs'],
     properties: { name: { type: 'string' }, sourceSceneRefs: { type: 'array', items: { type: 'string' } } },
   };
   return createStoryAssetStructuredOutput('story_asset_inventory_v5', {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['assets', 'sceneAudits'],
     properties: {
       assets: {
         type: 'array',
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['kind', 'name', 'role', 'sourceSceneRefs', 'appearances'],
           properties: {
             kind: { type: 'string', enum: STORY_ASSET_EXPERIMENTAL_KINDS },
@@ -1572,7 +1572,7 @@ function createStoryAssetInventoryStructuredOutput() {
         type: 'array',
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['sourceSceneRef', 'characterNames', 'keyPropNames'],
           properties: {
             sourceSceneRef: { type: 'string' },
@@ -1587,7 +1587,7 @@ function createStoryAssetInventoryStructuredOutput() {
 function createStoryAssetInventoryRepairStructuredOutput() {
   return createStoryAssetStructuredOutput('story_asset_inventory_repair_v5', {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['upserts', 'removeAssetRefs'],
     properties: {
       upserts: createStoryAssetInventoryStructuredOutput()['schema']['properties']['assets'],
@@ -1607,7 +1607,7 @@ function createStoryAssetDetailStructuredOutput(value180 = 0, value181 = []) {
     );
   return createStoryAssetStructuredOutput('story_asset_detail_v5_' + (value180 + 1), {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['assets'],
     properties: {
       assets: {
@@ -1615,7 +1615,7 @@ function createStoryAssetDetailStructuredOutput(value180 = 0, value181 = []) {
         ...(minItems['length'] ? { minItems: minItems['length'], maxItems: minItems['length'] } : {}),
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['ref', 'scriptFacts', 'visualDesign', 'voiceDescription', 'appearances'],
           properties: {
             ref: minItems['length'] ? { type: 'string', enum: minItems } : { type: 'string' },
@@ -1627,7 +1627,7 @@ function createStoryAssetDetailStructuredOutput(value180 = 0, value181 = []) {
               minItems: 1,
               items: {
                 type: 'object',
-                additionalProperties: ![],
+                additionalProperties: false,
                 required: ['ref', 'scriptFacts', 'visualDesign', 'prompt'],
                 properties: {
                   ref: ref9['length'] ? { type: 'string', enum: ref9 } : { type: 'string' },
@@ -1652,22 +1652,22 @@ function extractBalancedStoryAssetObjects(value185, value186 = 'assets') {
   const list62 = [];
   let count6 = -1,
     count7 = 0,
-    value187 = ![],
-    value188 = ![];
+    value187 = false,
+    value188 = false;
   for (let value189 = count5 + 1; value189 < list61['length']; value189 += 1) {
     const value190 = list61[value189];
     if (value187) {
-      if (value188) value188 = ![];
+      if (value188) value188 = false;
       else {
-        if (value190 === '\\') value188 = !![];
+        if (value190 === '\\') value188 = true;
         else {
-          if (value190 === '"') value187 = ![];
+          if (value190 === '"') value187 = false;
         }
       }
       continue;
     }
     if (value190 === '"') {
-      value187 = !![];
+      value187 = true;
       continue;
     }
     if (value190 === '{') {
@@ -1692,7 +1692,7 @@ function salvageStoryAssetInventoryResult(value191, { sourceScenes: sourceScenes
   const list63 = extractBalancedStoryAssetObjects(value191, 'assets'),
     assets5 = list63['flatMap']((value192) => {
       try {
-        return normalizeInventoryAssets([value192], { sourceScenes: sourceScenes, allowEmpty: !![] });
+        return normalizeInventoryAssets([value192], { sourceScenes: sourceScenes, allowEmpty: true });
       } catch {
         return [];
       }
@@ -1726,7 +1726,7 @@ function salvageStoryAssetInventoryResult(value191, { sourceScenes: sourceScenes
           )['map']((error18) => error18['name']),
         ),
       })),
-      salvaged: !![],
+      salvaged: true,
     }
   );
 }
@@ -2080,7 +2080,7 @@ export function reconcileStoryAssetInventory(
           text13 = normalizeText(error29?.['name'])['toLowerCase']();
         if (text12['startsWith']('local-source-character-')) return map31['has'](text13);
         if (text12['startsWith']('local-action-prop-')) return map32['has'](text13);
-        return !![];
+        return true;
       })
       ['flatMap']((appearances4) => {
         if (appearances4?.['kind'] === 'scene') {
@@ -2638,9 +2638,9 @@ function normalizeStorySceneAssetsForCoverage(
       );
     },
     handler6 = (error43, value306) => {
-      if (storySceneIdentitiesOverlap(error43?.['name'], value306?.['heading'])) return !![];
+      if (storySceneIdentitiesOverlap(error43?.['name'], value306?.['heading'])) return true;
       const storySceneHeadingIdentity = normalizeStorySceneHeadingIdentity(value306?.['heading']);
-      if (!enabled13['test'](storySceneHeadingIdentity)) return ![];
+      if (!enabled13['test'](storySceneHeadingIdentity)) return false;
       const count10 = map40['get'](value306['ref']),
         value307 = count10 > 0 ? sourceScenes[count10 - 1]?.['ref'] : '';
       return Boolean(value307 && normalizeStringArray(error43?.['sourceSceneRefs'])['includes'](value307));
@@ -3106,7 +3106,7 @@ function createStoryAssetPipelineContinuation(value345, value346, value347 = {})
   const error48 = new Error(value346);
   return (
     (error48['type'] = 'ASSET_EXTRACTION_CONTINUE_REQUIRED'),
-    (error48['isContinuation'] = !![]),
+    (error48['isContinuation'] = true),
     (error48['remaining'] = cloneStoryAssetExtractionValue(value347)),
     (error48['assetExtractionDraft'] = cloneStoryAssetExtractionValue(value345)),
     error48
@@ -3129,7 +3129,7 @@ function createStoryAssetPipelineKindStates(
   list102 = [],
   list103 = [],
   list104 = [],
-  { inventoryRunning: inventoryRunning = ![] } = {},
+  { inventoryRunning: inventoryRunning = false } = {},
 ) {
   const map44 = new Set(list103['map']((value352) => value352['ref']));
   return Object['fromEntries'](
@@ -3500,7 +3500,7 @@ export async function extractStoryAssetsEvidenceBatched({
   resumeDraft: resumeDraft = null,
   diagnostics: diagnostics = null,
   requestLimit: requestLimit = STORY_ASSET_AUTOMATIC_CALL_LIMIT,
-  allowLocalBaselineFallback: allowLocalBaselineFallback = !![],
+  allowLocalBaselineFallback: allowLocalBaselineFallback = true,
   paidRerunAuthorization: paidRerunAuthorization = null,
 } = {}) {
   request = withReplicationRequestPolicy(request, project);
@@ -3580,7 +3580,7 @@ export async function extractStoryAssetsEvidenceBatched({
       Math['max'](1, Math['trunc'](Number(requestLimit) || 0)),
     );
   let requestCount = 0,
-    enabled19 = ![],
+    enabled19 = false,
     fallbackReason = '';
   const run5 = (paidBatchHistory = {}) => ({
     strategy: STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY,
@@ -3656,7 +3656,7 @@ export async function extractStoryAssetsEvidenceBatched({
         }));
     },
     handler8 = (value376) => {
-      if (paidRerunAuthorization?.['confirmed'] !== !![]) return ![];
+      if (paidRerunAuthorization?.['confirmed'] !== true) return false;
       const list114 = Array['isArray'](paidRerunAuthorization?.['authorizedBatchIds'])
         ? paidRerunAuthorization['authorizedBatchIds']
         : [];
@@ -3992,8 +3992,8 @@ export async function extractStoryAssetsEvidenceBatched({
         id: batchId['id'],
         status: 'succeeded',
         sourceSceneRefs: batchId['sourceScenes']['map']((value395) => value395['ref']),
-        salvaged: ![],
-        localFallback: !![],
+        salvaged: false,
+        localFallback: true,
         fallbackReason: normalizeText(value393) || '清单请求不可用，已使用本地确定性清单',
         inventory: inventory2,
       }),
@@ -4096,7 +4096,7 @@ export async function extractStoryAssetsEvidenceBatched({
             temperature: 0.1,
             timeoutMs: STORY_ASSET_EXPERIMENTAL_REQUEST_TIMEOUT_MS,
             maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
-            allowOversizedPrompt: !![],
+            allowOversizedPrompt: true,
           },
           value400,
         );
@@ -4131,7 +4131,7 @@ export async function extractStoryAssetsEvidenceBatched({
         )
           throw value406;
         const error55 = classifyStoryAssetKindError(value406);
-        ((enabled19 = !![]),
+        ((enabled19 = true),
           (fallbackReason =
             getStoryAssetKindErrorLabel(error55['type'], error55['message']) + '，已熔断后续请求'),
           await handler14(batchId2, fallbackReason));
@@ -4304,7 +4304,7 @@ export async function extractStoryAssetsEvidenceBatched({
         assetRefs: assetPlans3['map']((value427) => value427['ref']),
         completedAssetRefs: completedAssetRefs['map']((value428) => value428['ref']),
         fallbackAssetRefs: [],
-        recoveredFromSavedResponse: !![],
+        recoveredFromSavedResponse: true,
         submissionBatchKey: submissionBatchKey,
         reconciledRemovedAssetRefs: reconciledRemovedAssetRefs,
       }),
@@ -4312,7 +4312,7 @@ export async function extractStoryAssetsEvidenceBatched({
         ...args47,
         status: 'validated',
         validatedAt: Date['now'](),
-        recoveredFromSavedResponse: !![],
+        recoveredFromSavedResponse: true,
         reconciledRemovedAssetRefs: reconciledRemovedAssetRefs,
       }),
       map52['add'](submissionBatchKey));
@@ -4354,7 +4354,7 @@ export async function extractStoryAssetsEvidenceBatched({
         (response13['status'] = assetPlans4['every']((value435) => map55['has'](value435['ref']))
           ? 'succeeded'
           : 'partial'),
-        (response13['recoveredFromSavedResponse'] = !![]));
+        (response13['recoveredFromSavedResponse'] = true));
       if (response13['status'] === 'succeeded') delete response13['rawResponse'];
     }));
   const map56 = new Set(current2['completedAssets']['map']((value436) => value436['ref'])),
@@ -4417,7 +4417,7 @@ export async function extractStoryAssetsEvidenceBatched({
           completedAssetRefs: completedAssetRefs2['map']((value445) => value445['ref']),
           fallbackAssetRefs: completedAssetRefs2['map']((value446) => value446['ref']),
           fallbackReason: fallbackReason2,
-          circuitBreakerFallback: !![],
+          circuitBreakerFallback: true,
         }),
         await run6({ stage: 'detail', message: message6 }));
     };
@@ -4607,7 +4607,7 @@ export async function extractStoryAssetsEvidenceBatched({
       }),
         handler11(batchKey3));
       status5 &&
-        ((enabled19 = !![]),
+        ((enabled19 = true),
         (fallbackReason =
           (normalizeText(error60?.['message']) ||
             'AI 响应缺少 ' + fallbackAssetRefs['length'] + ' 个资产') + '，已熔断后续细化请求'));
@@ -4652,7 +4652,7 @@ export async function extractStoryAssetsEvidenceBatched({
         throw value464;
       const errorType3 = classifyStoryAssetKindError(value464);
       if (value450 === null) {
-        enabled19 = !![];
+        enabled19 = true;
         const storyAssetKindErrorLabel = getStoryAssetKindErrorLabel(
           errorType3['type'],
           errorType3['message'],
@@ -4894,7 +4894,7 @@ export async function extractStoryAssetsExperimental({
             temperature: 0.1,
             timeoutMs: STORY_ASSET_EXPERIMENTAL_REQUEST_TIMEOUT_MS,
             maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
-            allowOversizedPrompt: !![],
+            allowOversizedPrompt: true,
           }),
           finishReason4 = getStoryAssetResponseFinishReason(request4)['toLowerCase']();
         if (isStoryAssetResponseTruncated(finishReason4))

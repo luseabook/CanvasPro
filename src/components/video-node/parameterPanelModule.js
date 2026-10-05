@@ -225,7 +225,7 @@ export function createVideoNodeParameterPanelModule(scope) {
           rhVideoSourceFrameCount: this['_getRhV5SourceVideoFrameCount']?.(rhVideoFpsByPolicy) || 0,
         };
       }
-      if (runningHubVideoParameterPanelPolicy['maskVideoDisablesSubtractSubject'] !== !![]) return args;
+      if (runningHubVideoParameterPanelPolicy['maskVideoDisablesSubtractSubject'] !== true) return args;
       const enabled = (store['getIncomingEdges'](this['nodeId']) || [])['some']((value2) => {
         const value3 = String(value2?.['refSlot'] || '')['trim']();
         return value3 === 'videoMask' || value3 === 'maskVideo';
@@ -233,11 +233,11 @@ export function createVideoNodeParameterPanelModule(scope) {
       if (!enabled) return args;
       return {
         ...args,
-        rhV54HasMaskVideo: !![],
-        rhSubtractSubject: ![],
+        rhV54HasMaskVideo: true,
+        rhSubtractSubject: false,
         generationParams: {
           ...getPlainGenerationParams(args?.['generationParams']),
-          rhSubtractSubject: ![],
+          rhSubtractSubject: false,
         },
       };
     }
@@ -289,7 +289,7 @@ export function createVideoNodeParameterPanelModule(scope) {
     }
     ['_renderFooterImpl'](el2) {
       if (el2?.['dataset']) delete el2['dataset']['deferredDetailsShell'];
-      let value9 = ![];
+      let value9 = false;
       const el3 = el2['querySelector']('.rh-vram-adv-panel');
       el3 && (value9 = el3['classList']['contains']('show'));
       const decorateSegmentRetakeParameterNodeData2 = decorateSegmentRetakeParameterNodeData(this['_data']),
@@ -362,7 +362,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         value24 = hasRunningHubVideoWorkflowUiPlacement2
           ? renderModelUiSchemaControls(model, value23, {
               placement: 'videoParams',
-              unwrap: !![],
+              unwrap: true,
               rhVideoFpsOptions: getRunningHubVideoWorkflowFpsOptions(model, {
                 v54FpsOptions: getRhV54FpsOptions(),
               }),
@@ -627,14 +627,14 @@ export function createVideoNodeParameterPanelModule(scope) {
       );
     }
     ['_runVipRetryOnce'](handler) {
-      let value49 = ![];
+      let value49 = false;
       return () => {
         if (value49) return;
-        ((value49 = !![]), (this['_vipSelectionRetryInProgress'] = !![]));
+        ((value49 = true), (this['_vipSelectionRetryInProgress'] = true));
         try {
           handler();
         } finally {
-          this['_vipSelectionRetryInProgress'] = ![];
+          this['_vipSelectionRetryInProgress'] = false;
         }
       };
     }
@@ -645,11 +645,11 @@ export function createVideoNodeParameterPanelModule(scope) {
       typeof value51 === 'function'
         ? (onSuccess = value51)
         : (provider = String(value51 || '')['trim']());
-      if (!isVideoVipModel(modelId, provider)) return !![];
+      if (!isVideoVipModel(modelId, provider)) return true;
       const run2 = window['isModelAllowedBySubscription'],
-        value53 = typeof run2 === 'function' ? run2(modelId, provider) : !![];
-      if (value53) return !![];
-      if (this['_vipSelectionRetryInProgress']) return ![];
+        value53 = typeof run2 === 'function' ? run2(modelId, provider) : true;
+      if (value53) return true;
+      if (this['_vipSelectionRetryInProgress']) return false;
       return (
         typeof window['openSubscriptionDialog'] === 'function'
           ? window['openSubscriptionDialog']({
@@ -658,7 +658,7 @@ export function createVideoNodeParameterPanelModule(scope) {
               onSuccess: onSuccess,
             })
           : window['showToast']?.(videoPanelText('vipRequired'), 'warn'),
-        ![]
+        false
       );
     }
     ['_bindFooterEvents'](el6) {
@@ -666,7 +666,7 @@ export function createVideoNodeParameterPanelModule(scope) {
       const trigger = el6['querySelector']('.img-model-btn-trigger'),
         menu = el6['querySelector']('.img-model-menu'),
         value54 = {
-          listenConfigChanges: ![],
+          listenConfigChanges: false,
           getProviderProfileId: () => {
             const value55 = store['getState']?.()?.['nodes']?.[this['nodeId']] || this['_data'] || {};
             return value55['providerProfileId'] || value55['rhProviderProfileId'] || '';
@@ -739,13 +739,13 @@ export function createVideoNodeParameterPanelModule(scope) {
         handler6 = ({
           model: model2,
           provider: provider2,
-          useRememberedRouteModel: useRememberedRouteModel = ![],
+          useRememberedRouteModel: useRememberedRouteModel = false,
         } = {}) => {
           const enabled7 = String(model2 || '')['trim']();
           if (!enabled7) return null;
           const value59 = handler5(),
             value60 = this['_getDreaminaEffectiveNodeData'](value59),
-            value61 = this['_syncDreaminaTaskState'](value59, { syncStore: ![] }),
+            value61 = this['_syncDreaminaTaskState'](value59, { syncStore: false }),
             aspectRatio = value61?.['nodeData'] || value60 || value59,
             provider3 = resolveDreaminaStyleVideoProvider(
               enabled7,
@@ -883,7 +883,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         if (providerProfileId['closest']('.apimart-video-submenu')) {
           const model4 = providerProfileId['dataset']['value'] || APIMART_DREAMINA_VIDEO_DEFAULT_MODEL;
           if (isApimartDreaminaVideoModel(model4, 'apimart')) {
-            handler6({ model: model4, provider: 'apimart', useRememberedRouteModel: !![] });
+            handler6({ model: model4, provider: 'apimart', useRememberedRouteModel: true });
             return;
           }
         }
@@ -910,7 +910,7 @@ export function createVideoNodeParameterPanelModule(scope) {
             Object['assign'](
               value69,
               buildVideoWorkflowModelSelectionPatch(value68, model5, {
-                preserveMaskTouchedState: !![],
+                preserveMaskTouchedState: true,
                 v54FpsOptions: getRhV54FpsOptions(),
               }),
             );
@@ -945,7 +945,7 @@ export function createVideoNodeParameterPanelModule(scope) {
             run4();
             return;
           }
-          handler6({ model: model6, provider: provider5, useRememberedRouteModel: !![] });
+          handler6({ model: model6, provider: provider5, useRememberedRouteModel: true });
           return;
         }
         const value72 = this['_runVipRetryOnce'](() => providerProfileId['click']());
@@ -1000,7 +1000,7 @@ export function createVideoNodeParameterPanelModule(scope) {
               el8['classList']['remove']('show');
               return;
             }
-            handler6({ model: model7, provider: provider6, useRememberedRouteModel: ![] });
+            handler6({ model: model7, provider: provider6, useRememberedRouteModel: false });
           }),
         ));
       if (el15) {
@@ -1076,7 +1076,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         el14 &&
         bindVideoPanelInput(el13, 'duration-slider', () => {
           if (enabled6) {
-            const value80 = this['_syncDreaminaTaskState'](this['_data'], { syncStore: ![] }),
+            const value80 = this['_syncDreaminaTaskState'](this['_data'], { syncStore: false }),
               value81 = value80?.['resolvedTaskType'] || this['_getResolvedDreaminaTaskType'](),
               dreaminaStyleVideoProvider = resolveDreaminaStyleVideoProvider(
                 this['_data']?.['model'],
@@ -1153,7 +1153,7 @@ export function createVideoNodeParameterPanelModule(scope) {
             label: label[1] + ':' + label[2],
           };
         },
-        handler7 = (value86 = '', enabled9 = ![]) => {
+        handler7 = (value86 = '', enabled9 = false) => {
           const value87 = String(value86 || '')['trim'](),
             value88 = !!enabled9 || value87 === '自适应';
           el6['querySelectorAll'](
@@ -1174,10 +1174,10 @@ export function createVideoNodeParameterPanelModule(scope) {
           );
         },
         handler8 = (value89, value90, aspectRatio2, value91 = {}) => {
-          const value92 = value91?.['persistAspectRatio'] !== ![],
-            enabled10 = value91?.['forceManualDisplaySize'] === !![],
+          const value92 = value91?.['persistAspectRatio'] !== false,
+            enabled10 = value91?.['forceManualDisplaySize'] === true,
             box = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {};
-          if (!enabled10 && box?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === !![]) return;
+          if (!enabled10 && box?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === true) return;
           const width = box['width'] || this['_data']['width'] || 300,
             height = box['height'] || this['_data']['height'] || 300,
             box2 = getAIGenerationNodeSize(value89, value90),
@@ -1193,7 +1193,7 @@ export function createVideoNodeParameterPanelModule(scope) {
             x: Math['round']((box['x'] ?? this['_data']['x'] ?? 0) - count3 / 2),
             y: Math['round']((box['y'] ?? this['_data']['y'] ?? 0) - count4),
           };
-          enabled10 && (args6[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] = ![]);
+          enabled10 && (args6[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] = false);
           value92 &&
             (this['_isDreaminaVideoNode'](this['_data'])
               ? Object['assign'](
@@ -1227,14 +1227,14 @@ export function createVideoNodeParameterPanelModule(scope) {
               nodeData: { width: width, height: height },
               patch: { width: width2, height: height2 },
               ms: GENERATION_RATIO_RESIZE_ANIMATION_MS,
-              deferStart: ![],
+              deferStart: false,
             }));
         },
         handler9 = (value95, value96 = {}) => {
           const enabled11 = run5(value95);
           if (!enabled11) return;
           (handler8(enabled11['w'], enabled11['h'], enabled11['label'], value96),
-            handler7(enabled11['label'], ![]));
+            handler7(enabled11['label'], false));
         };
       !enabled6 &&
         el6['querySelectorAll']('.img-rp-ratio-item:not([data-ui-schema-value])')['forEach'](
@@ -1246,7 +1246,7 @@ export function createVideoNodeParameterPanelModule(scope) {
                 el31['getAttribute']('aria-disabled') === 'true'
               )
                 return;
-              handler9(el31['dataset']['label'], { forceManualDisplaySize: !![] });
+              handler9(el31['dataset']['label'], { forceManualDisplaySize: true });
             }),
         );
       const run6 = (options3 = {}) => {
@@ -1255,11 +1255,11 @@ export function createVideoNodeParameterPanelModule(scope) {
           value97 = String(nodeData2?.['model'] || ''),
           adaptivePolicy = getRunningHubVideoParameterPanelPolicy(value97)['adaptiveRatio'] || {};
         let inEdges = store['getIncomingEdges'](this['nodeId']);
-        adaptivePolicy['scopeTargetEdges'] === !![] &&
+        adaptivePolicy['scopeTargetEdges'] === true &&
           (inEdges = inEdges['filter']((value98) => value98?.['targetId'] === this['nodeId']));
         inEdges = inEdges['filter']((value99) => {
           const list5 = String(value99?.['refSlot'] || '')['toLowerCase']();
-          if (list5['includes']('mask')) return ![];
+          if (list5['includes']('mask')) return false;
           const effectiveInputKind = resolveEffectiveInputKind(
             nodes2['nodes']?.[value99?.['sourceId']],
             value99,
@@ -1269,9 +1269,9 @@ export function createVideoNodeParameterPanelModule(scope) {
         const run7 = (value100, value101) => {
           const count5 = Number(value100),
             count6 = Number(value101);
-          if (!(Number['isFinite'](count5) && count5 > 0)) return ![];
-          if (!(Number['isFinite'](count6) && count6 > 0)) return ![];
-          return (handler8(count5, count6, '自适应', options3), !![]);
+          if (!(Number['isFinite'](count5) && count5 > 0)) return false;
+          if (!(Number['isFinite'](count6) && count6 > 0)) return false;
+          return (handler8(count5, count6, '自适应', options3), true);
         };
         if (inEdges['length'] > 0) {
           const videoAdaptiveRatioSource = resolveVideoAdaptiveRatioSource({
@@ -1292,7 +1292,7 @@ export function createVideoNodeParameterPanelModule(scope) {
               nodeId: nodeId,
               nodeData: nodeData3,
               edge: edge,
-              includeNodeFrame: !![],
+              includeNodeFrame: true,
             });
           if (run7(box3?.['width'], box3?.['height'])) return;
           const value102 = String(nodeData3?.['type'] || ''),
@@ -1402,11 +1402,11 @@ export function createVideoNodeParameterPanelModule(scope) {
           el32 = el6['querySelector']('.img-rp-large-adaptive:not([data-ui-schema-value])');
         if (this['_isDreaminaVideoNode'](value145)) {
           (this['_commitDreaminaSchemaAspectRatio']('自适应', value145, options4),
-            handler7('自适应', !![]),
+            handler7('自适应', true),
             el32?.['classList']['add']('active'));
           return;
         }
-        (run6(options4), handler7('自适应', !![]), el32?.['classList']['add']('active'));
+        (run6(options4), handler7('自适应', true), el32?.['classList']['add']('active'));
       }),
         (this['_applyStoredAspectRatio'] = () => {
           const value146 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
@@ -1416,17 +1416,17 @@ export function createVideoNodeParameterPanelModule(scope) {
             this['_runAdaptiveRatio']?.();
             return;
           }
-          handler9(value148, { persistAspectRatio: !![] });
+          handler9(value148, { persistAspectRatio: true });
         }),
         (this['_applyDreaminaSchemaAspectRatio'] = (value149) => {
           const value150 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {};
-          this['_commitDreaminaSchemaAspectRatio'](value149, value150, { forceManualDisplaySize: !![] });
+          this['_commitDreaminaSchemaAspectRatio'](value149, value150, { forceManualDisplaySize: true });
         }));
       const value151 = el6['querySelector']('.img-rp-large-adaptive:not([data-ui-schema-value])');
       value151 &&
         !enabled6 &&
         bindVideoPanelClick(value151, 'adaptive-ratio', () =>
-          this['_runAdaptiveRatio']({ forceManualDisplaySize: !![] }),
+          this['_runAdaptiveRatio']({ forceManualDisplaySize: true }),
         );
       bindVideoPanelClick(this['btnEl'], 'submit', () => {
         (flushPromptHtmlCommit(this), this['_handleGenerateOrCancel']());
@@ -1434,7 +1434,7 @@ export function createVideoNodeParameterPanelModule(scope) {
       const el33 = el6['querySelector']('.debug-wrench-btn');
       el33?.['addEventListener']('click', (event11) => {
         event11['stopPropagation']();
-        if (globalThis['window']?.['DEV_MODE'] !== !![]) return;
+        if (globalThis['window']?.['DEV_MODE'] !== true) return;
         (flushPromptHtmlCommit(this),
           openDebugRequestWindow({
             prepare: async () => {
@@ -1553,7 +1553,7 @@ export function createVideoNodeParameterPanelModule(scope) {
       }
       if (value166 === 'aspectRatio')
         return this['_commitDreaminaSchemaAspectRatio'](value164, args12, {
-          forceManualDisplaySize: !![],
+          forceManualDisplaySize: true,
         });
       const args13 = buildUiSchemaParamPatch(args12, value166, value164);
       return (
@@ -1563,7 +1563,7 @@ export function createVideoNodeParameterPanelModule(scope) {
       );
     }
     ['_normalizeDreaminaNodeData'](value168, value169 = {}) {
-      const value170 = value169?.['syncStore'] !== ![],
+      const value170 = value169?.['syncStore'] !== false,
         args14 = this['_getDreaminaEffectiveNodeData'](value168),
         dreaminaStyleVideoNodeNormalizationPatch = buildDreaminaStyleVideoNodeNormalizationPatch(args14);
       if (!dreaminaStyleVideoNodeNormalizationPatch) return args14;
@@ -1678,9 +1678,9 @@ export function createVideoNodeParameterPanelModule(scope) {
     }
     ['_commitDreaminaSchemaAspectRatio'](value184, value185 = this['_data'], value186 = {}) {
       const nodeData4 = this['_getDreaminaEffectiveNodeData'](value185),
-        enabled18 = value186?.['forceManualDisplaySize'] === !![],
-        aspectRatio3 = normalizeDreaminaVideoAspectRatio(value184, { preserveAdaptive: !![] });
-      if (!enabled18 && nodeData4?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === !![]) {
+        enabled18 = value186?.['forceManualDisplaySize'] === true,
+        aspectRatio3 = normalizeDreaminaVideoAspectRatio(value184, { preserveAdaptive: true });
+      if (!enabled18 && nodeData4?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === true) {
         const args16 = this['_buildDreaminaParamPatch'](nodeData4, { aspectRatio: aspectRatio3 });
         return (
           store['updateNodeData'](this['nodeId'], args16),
@@ -1701,7 +1701,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         }),
         args17 = this['_buildDreaminaParamPatch'](nodeData4, { aspectRatio: aspectRatio3 }),
         args18 = {
-          ...(enabled18 ? { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![] } : {}),
+          ...(enabled18 ? { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: false } : {}),
           ...patch,
           ...args17,
         };
@@ -1755,7 +1755,7 @@ export function createVideoNodeParameterPanelModule(scope) {
     }
     ['_getDreaminaRatioDisplayState'](value189 = this['_data'], value190 = null) {
       if (!this['_isDreaminaVideoNode'](value189)) return null;
-      const value191 = value190 || this['_syncDreaminaTaskState'](value189, { syncStore: ![] }),
+      const value191 = value190 || this['_syncDreaminaTaskState'](value189, { syncStore: false }),
         nodeData5 = value191?.['nodeData'] || value189,
         summary = value191?.['summary'] || this['_getDreaminaReferenceSummary'](nodeData5),
         resolvedTaskType =
@@ -1803,7 +1803,7 @@ export function createVideoNodeParameterPanelModule(scope) {
           resolvedTaskType: '',
           routeMode: '',
         };
-      const syncStore = value193?.['syncStore'] !== ![];
+      const syncStore = value193?.['syncStore'] !== false;
       let nodeData7 = this['_normalizeDreaminaNodeData'](nodeData6, { syncStore: syncStore });
       const imageCount2 = this['_getDreaminaReferenceSummary'](nodeData7),
         routeMode2 = normalizeDreaminaVideoRouteMode(nodeData7?.['dreaminaRouteMode'], nodeData7?.['mode']),
@@ -1839,7 +1839,7 @@ export function createVideoNodeParameterPanelModule(scope) {
       }
       if (imageCount2['imageCount'] <= 0) {
         const dreaminaVideoAspectRatio = normalizeDreaminaVideoAspectRatio(nodeData7?.['aspectRatio'], {
-          preserveAdaptive: !![],
+          preserveAdaptive: true,
         });
         dreaminaVideoAspectRatio !== String(nodeData7?.['aspectRatio'] || '')['trim']() &&
           String(nodeData7?.['aspectRatio'] || '')['trim']() &&
@@ -1878,7 +1878,7 @@ export function createVideoNodeParameterPanelModule(scope) {
       const value201 =
           value200 ||
           this['_syncDreaminaTaskState'](decorateSegmentRetakeParameterNodeData(this['_data']), {
-            syncStore: ![],
+            syncStore: false,
           }),
         args20 = decorateSegmentRetakeParameterNodeData(value201?.['nodeData'] || this['_data']),
         resolutionOptions2 = this['_getDreaminaRatioDisplayState'](args20, value201),
@@ -1912,7 +1912,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         value204 = el39['querySelector']('.img-model-btn-trigger'),
         el42 = el39['querySelector']('.img-model-label'),
         el43 = el39['querySelector']('.img-model-menu');
-      if (el41) el41['hidden'] = ![];
+      if (el41) el41['hidden'] = false;
       el42 && (el42['textContent'] = getDreaminaProviderLabel(provider7));
       if (value204) {
         const value205 = this['_getModelIconHTML'](model8, provider7),
@@ -2027,7 +2027,7 @@ export function createVideoNodeParameterPanelModule(scope) {
       const value219 = this['_resolveModelExecution'](value217, value218),
         providerId = normalizeProviderId(value219?.['modelManifest']?.['provider']);
       if (providerId) return providerId;
-      return resolveModelProvider(value217, value218, { allowPrefixInference: ![] }) || null;
+      return resolveModelProvider(value217, value218, { allowPrefixInference: false }) || null;
     }
     ['_isRunninghubWorkflowModel'](value220, value221) {
       return isRunningHubVideoWorkflowModel(value220, value221);
@@ -2048,8 +2048,8 @@ export function createVideoNodeParameterPanelModule(scope) {
       }
       const value229 = this['_getModelProviderId'](value226, value227);
       if (value229 === 'runninghub' || value229 === 'runninghubwf')
-        return { ratio: !![], mode: ![], duration: ![] };
-      return { ratio: !![], mode: !![], duration: !![] };
+        return { ratio: true, mode: false, duration: false };
+      return { ratio: true, mode: true, duration: true };
     }
     ['_getRatioIconHTML'](value230) {
       if (value230 === '自适应')
@@ -2071,11 +2071,11 @@ export function createVideoNodeParameterPanelModule(scope) {
     }
     ['_updateSubmitButtonState']() {
       if (!this['btnEl']) return;
-      if (this['_segmentRetakePreparing'] === !![]) {
+      if (this['_segmentRetakePreparing'] === true) {
         const title = getVideoGenerateTitle();
         (setGenerateButtonLoadingUi(this['btnEl'], {
           title: title,
-          disabled: !![],
+          disabled: true,
           ariaLabel: title,
         }),
           this['btnEl']['setAttribute']?.('aria-busy', 'true'));
@@ -2098,7 +2098,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         cancellable = this['_isRunninghubWorkflowModel'](modelId2?.['model'], modelId2?.['provider']),
         el51 = resolveGenerationButtonMode(modelId2, {
           cancellable: cancellable,
-          cancelInFlight: this['_rhCancelInFlight'] === !![],
+          cancelInFlight: this['_rhCancelInFlight'] === true,
         });
       if (el51['busy']) {
         if (cancellable) {
@@ -2108,13 +2108,13 @@ export function createVideoNodeParameterPanelModule(scope) {
             tooltip: title2,
             ariaLabel: videoPanelText('cancelGenerateAria'),
             color: 'var(--red)',
-            busy: !![],
+            busy: true,
           });
         } else {
           const title3 = getVideoGenerateTitle();
           setGenerateButtonLoadingUi(this['btnEl'], {
             title: title3,
-            disabled: !![],
+            disabled: true,
             ariaLabel: title3,
           });
         }
@@ -2134,7 +2134,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         getPanelModelManifest(modelId2)?.['kind'] !== 'video'
       ) {
         const videoPanelText2 = videoPanelText('modelUnavailable');
-        ((this['btnEl']['disabled'] = !![]),
+        ((this['btnEl']['disabled'] = true),
           (this['btnEl']['title'] = videoPanelText2),
           this['btnEl']['setAttribute']?.('aria-label', videoPanelText2));
         return;
@@ -2145,7 +2145,7 @@ export function createVideoNodeParameterPanelModule(scope) {
         nodes: nodes4,
       });
       if (modelId2['segmentRetake'] && !getSegmentRetakeValidation(modelId2['segmentRetake'])['ok']) {
-        this['btnEl']['disabled'] = !![];
+        this['btnEl']['disabled'] = true;
         return;
       }
       if (this['_isDreaminaVideoNode'](modelId2)) {
@@ -2157,7 +2157,7 @@ export function createVideoNodeParameterPanelModule(scope) {
           taskType2 = value234['resolvedTaskType'] || this['_getResolvedDreaminaTaskType'](),
           routeMode3 = value234['routeMode'] || 'multimodal2video';
         if (!isDreaminaVideoRouteModeEnabled(routeMode3)) {
-          this['btnEl']['disabled'] = !![];
+          this['btnEl']['disabled'] = true;
           return;
         }
         const validateDreaminaVideoRouteSelection2 = validateDreaminaVideoRouteSelection({
@@ -2177,7 +2177,7 @@ export function createVideoNodeParameterPanelModule(scope) {
             else {
               if (taskType2 === 'frames2video') enabled19 = !!promptText && imageCount3['imageCount'] === 2;
               else {
-                if (taskType2 === 'multiframe2video') enabled19 = ![];
+                if (taskType2 === 'multiframe2video') enabled19 = false;
                 else
                   taskType2 === 'multimodal2video' &&
                     (enabled19 =
@@ -2198,7 +2198,7 @@ export function createVideoNodeParameterPanelModule(scope) {
           model: modelId2?.['model'],
           provider: modelId2?.['provider'],
           promptText: promptText,
-          hasInput: ![],
+          hasInput: false,
         })['ok'];
       if (isHappyHorsePanelModel(modelId2)) {
         this['btnEl']['disabled'] = !promptText;
@@ -2208,10 +2208,10 @@ export function createVideoNodeParameterPanelModule(scope) {
       const shouldAllowEmptyCustomAiAppInputs2 = shouldAllowEmptyCustomAiAppInputs(getPanelModelManifest(modelId2)),
         fixedInputConfig = getFixedInputSlotConfigFromManifest(this['_data'] || {}),
         list12 = (fixedInputConfig?.['fixedSlots'] || [])['filter'](
-          (value235) => value235?.['required'] === !![],
+          (value235) => value235?.['required'] === true,
         ),
         list13 = (fixedInputConfig?.['exclusiveGroups'] || [])['filter'](
-          (value236) => value236?.['required'] === !![] || Number(value236?.['min'] || 0) > 0,
+          (value236) => value236?.['required'] === true || Number(value236?.['min'] || 0) > 0,
         );
       if (!shouldAllowEmptyCustomAiAppInputs2 && (list12['length'] > 0 || list13['length'] > 0)) {
         const nodeData8 = nodes4?.[this['nodeId']] || this['_data'] || {},

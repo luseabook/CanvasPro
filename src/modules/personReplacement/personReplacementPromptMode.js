@@ -3,7 +3,7 @@ export const PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING = 'positioning';
 export const PERSON_REPLACEMENT_PROMPT_MODE_REGULAR = 'regular';
 export const PERSON_REPLACEMENT_PROMPT_MODE_MANUAL = 'manual';
 export const PERSON_REPLACEMENT_PROMPT_MODE_TEST = 'annotated-source-test';
-export const isPersonReplacementTestModeAvailable = () => globalThis['window']?.['DEV_MODE'] === !![];
+export const isPersonReplacementTestModeAvailable = () => globalThis['window']?.['DEV_MODE'] === true;
 export const PERSON_REPLACEMENT_MARKER_COLORS = [
   '--annotate-red',
   '--cyan',

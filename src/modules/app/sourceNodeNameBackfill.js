@@ -35,7 +35,7 @@ export function createSourceNodeNameBackfill({
   }
   function run3(result, data) {
     const enabled2 = String(result || '');
-    if (!enabled2) return !![];
+    if (!enabled2) return true;
     const defaultNodeKind = getDefaultNodeKind(data);
     return (
       enabled2 === run2(data) || SOURCE_NODE_LEGACY_DEFAULT_NAMES[defaultNodeKind]?.['includes'](enabled2)

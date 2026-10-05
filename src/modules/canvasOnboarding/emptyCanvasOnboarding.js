@@ -15,19 +15,19 @@ export function hasConfiguredApi(options = {}) {
 }
 export function createCanvasOnboardingState() {
   let visible = null,
-    configured = ![],
-    enabled = ![];
+    configured = false,
+    enabled = false;
   return {
     update(key, count = 0) {
       configured = hasConfiguredApi(key);
       if (visible === null) visible = !configured;
-      !configured && ((visible = !![]), (enabled = ![]));
-      if (visible && configured && count > 0) enabled = !![];
+      !configured && ((visible = true), (enabled = false));
+      if (visible && configured && count > 0) enabled = true;
       return { visible: visible && !enabled, configured: configured };
     },
     onNodesChanged(count2) {
-      if (visible && configured && count2 > 0) enabled = !![];
-      return { visible: visible === !![] && !enabled, configured: configured };
+      if (visible && configured && count2 > 0) enabled = true;
+      return { visible: visible === true && !enabled, configured: configured };
     },
   };
 }
@@ -35,7 +35,7 @@ export function initEmptyCanvasOnboarding({ store: store }) {
   const el = document['querySelector']('#emptyHint .empty-hint-main');
   if (!el || el['querySelector']('.canvas-onboarding')) return;
   const el2 = document['createElement']('div');
-  ((el2['className'] = 'canvas-onboarding'), (el2['hidden'] = !![]), el2['setAttribute']('role', 'group'));
+  ((el2['className'] = 'canvas-onboarding'), (el2['hidden'] = true), el2['setAttribute']('role', 'group'));
   const el3 = document['createElement']('button');
   ((el3['type'] = 'button'), (el3['className'] = 'canvas-onboarding-step canvas-onboarding-connect'));
   const el4 = document['createElement']('span');
@@ -45,8 +45,8 @@ export function initEmptyCanvasOnboarding({ store: store }) {
     el2['append'](el3, el4, el5),
     el['prepend'](el2));
   const canvasOnboardingState = createCanvasOnboardingState();
-  let index = { visible: ![], configured: ![] },
-    enabled2 = ![];
+  let index = { visible: false, configured: false },
+    enabled2 = false;
   function run(enabled3 = index) {
     ((index = enabled3),
       (el2['hidden'] = !enabled3['visible']),
@@ -84,7 +84,7 @@ export function initEmptyCanvasOnboarding({ store: store }) {
       ['then'](handler)
       ['catch'](() => {}),
     () => {
-      ((enabled2 = !![]),
+      ((enabled2 = true),
         window['removeEventListener'](API_CONFIG_CHANGED_EVENT, result),
         target?.(),
         handler2(),

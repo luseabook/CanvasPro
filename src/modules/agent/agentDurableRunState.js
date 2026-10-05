@@ -24,7 +24,7 @@ function normalizeToolResult(ok = {}) {
   return {
     step: Math['max'](0, Math['trunc'](Number(ok['step'] || 0))),
     commandId: commandId,
-    ok: ok['ok'] === !![],
+    ok: ok['ok'] === true,
     status: String(ok['status'] || '')['trim'](),
     errorCode: String(ok['errorCode'] || '')
       ['trim']()
@@ -68,7 +68,7 @@ export function normalizeAgentOperation(ok2 = {}, options = Date['now']()) {
       ['trim']()
       ['slice'](0, 120),
     status: String(ok2['status'] || 'pending')['trim'](),
-    ok: ok2['ok'] === !![] ? !![] : ok2['ok'] === ![] ? ![] : null,
+    ok: ok2['ok'] === true ? true : ok2['ok'] === false ? false : null,
     errorCode: String(ok2['errorCode'] || '')
       ['trim']()
       ['slice'](0, 120),
@@ -106,7 +106,7 @@ export function normalizeAgentTaskBinding(notifiedTerminal = {}) {
     messageStatus: String(notifiedTerminal['messageStatus'] || '')['trim'](),
     createdAt: normalizeTimestamp(notifiedTerminal['createdAt']),
     updatedAt: normalizeTimestamp(notifiedTerminal['updatedAt']),
-    notifiedTerminal: notifiedTerminal['notifiedTerminal'] === !![],
+    notifiedTerminal: notifiedTerminal['notifiedTerminal'] === true,
   };
 }
 export function normalizeAgentTaskBindings(list4 = []) {

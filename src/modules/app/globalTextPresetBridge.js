@@ -32,10 +32,10 @@ function getCommandFailureMessage(commandResult) {
 
 function waitForNextFrame(scheduleFrame) {
   return new Promise((resolve) => {
-    let settled = ![];
+    let settled = false;
     const finish = () => {
         if (settled) return;
-        ((settled = !![]), clearTimeout(timeoutId), resolve());
+        ((settled = true), clearTimeout(timeoutId), resolve());
       },
       timeoutId = setTimeout(finish, DEFAULT_MOUNT_DELAY_MS);
     if (typeof scheduleFrame === 'function') {
@@ -56,12 +56,12 @@ export async function waitForGlobalCaptureNodeMounted({
   attempts: attempts = DEFAULT_MOUNT_ATTEMPTS,
 } = {}) {
   const normalizedNodeId = String(nodeId || '')['trim']();
-  if (!normalizedNodeId || typeof isNodeMounted !== 'function') return ![];
+  if (!normalizedNodeId || typeof isNodeMounted !== 'function') return false;
   for (let attempt = 0; attempt < attempts; attempt += 1) {
-    if (isNodeMounted(normalizedNodeId) === !![]) return !![];
+    if (isNodeMounted(normalizedNodeId) === true) return true;
     await waitForNextFrame(scheduleFrame);
   }
-  return ![];
+  return false;
 }
 
 export function installGlobalTextPresetBridge({
@@ -71,7 +71,7 @@ export function installGlobalTextPresetBridge({
   openDraft: openDraft = openQuickCapturePromptPresetDraft,
   executeCanvasCommand: executeCanvasCommand,
   isNodeMounted: isNodeMounted = (candidateNodeId) =>
-    globalThis['window']?.['v2Renderer']?.['isNodeMounted']?.(candidateNodeId) === !![],
+    globalThis['window']?.['v2Renderer']?.['isNodeMounted']?.(candidateNodeId) === true,
   isNodeGenerationReady: isNodeGenerationReady = (candidateNodeId) =>
     typeof nodeRuntimeRegistry['resolve'](candidateNodeId, { store: appStore })?.['runGeneration'] ===
     'function',
@@ -86,7 +86,7 @@ export function installGlobalTextPresetBridge({
   getCanvasIdentity: getCanvasIdentity = () => '',
 } = {}) {
   if (!textPresetApi) return () => {};
-  let disposed = ![];
+  let disposed = false;
   const resolveText =
     typeof translate === 'function'
       ? translate
@@ -97,14 +97,14 @@ export function installGlobalTextPresetBridge({
     return (
       !draftResult?.['hasConfiguredDefault'] &&
         showToast?.(resolveText('globalTextPreset.defaultMissing'), 'warn'),
-      { ok: !![] }
+      { ok: true }
     );
   }
 
   async function createCaptureNode(actionId, text) {
     const actionConfig = NODE_ACTION_CONFIGS[actionId];
     if (!actionConfig || typeof executeCanvasCommand !== 'function')
-      return { ok: ![], reason: 'canvas-command-unavailable' };
+      return { ok: false, reason: 'canvas-command-unavailable' };
     const createResult = await executeCanvasCommand('node.create', {
       type: actionConfig['type'],
       name: resolveText(actionConfig['nameKey']),
@@ -112,9 +112,9 @@ export function installGlobalTextPresetBridge({
       placement: 'viewport-center-sequence',
       sequenceKey: 'global-capture',
     });
-    if (createResult?.['ok'] === ![])
+    if (createResult?.['ok'] === false)
       return {
-        ok: ![],
+        ok: false,
         reason: getCommandFailureMessage(createResult) || 'node-create-failed',
         retryable: Boolean(
           createResult['errorCode'] && createResult['errorCode'] !== 'COMMAND_EXECUTION_FAILED',
@@ -124,8 +124,8 @@ export function installGlobalTextPresetBridge({
       createResult?.['result']?.['nodeId'] || createResult?.['result']?.['node']?.['id'] || '',
     )['trim']();
     return createdNodeId
-      ? { ok: !![], nodeId: createdNodeId, result: createResult }
-      : { ok: ![], reason: 'node-id-missing' };
+      ? { ok: true, nodeId: createdNodeId, result: createResult }
+      : { ok: false, reason: 'node-id-missing' };
   }
 
   async function runCaptureGeneration(nodeId, isCanvasCurrent) {
@@ -135,12 +135,12 @@ export function installGlobalTextPresetBridge({
         !isCanvasCurrent() || isNodeGenerationReady(candidateNodeId) || isNodeMounted(candidateNodeId),
       scheduleFrame: scheduleFrame,
     });
-    if (!isCanvasCurrent()) return { ok: ![], reason: 'canvas-changed' };
-    if (!mounted) return { ok: ![], reason: 'node-not-ready' };
+    if (!isCanvasCurrent()) return { ok: false, reason: 'canvas-changed' };
+    if (!mounted) return { ok: false, reason: 'node-not-ready' };
     const generationResult = await executeCanvasCommand('generation.run', { nodeId: nodeId });
-    return generationResult?.['ok'] === ![]
-      ? { ok: ![], reason: getCommandFailureMessage(generationResult) || 'generation-failed' }
-      : { ok: !![], result: generationResult };
+    return generationResult?.['ok'] === false
+      ? { ok: false, reason: getCommandFailureMessage(generationResult) || 'generation-failed' }
+      : { ok: true, result: generationResult };
   }
 
   async function handleSelectedText(payload = {}) {
@@ -150,7 +150,7 @@ export function installGlobalTextPresetBridge({
     if (!text)
       return (
         showToast?.(resolveText('globalTextPreset.noSelectedText'), 'warn'),
-        { ok: ![], reason: 'no-selected-text', retryable: !![] }
+        { ok: false, reason: 'no-selected-text', retryable: true }
       );
     const actionId = String(payload?.['actionId'] || '')['trim']();
     try {
@@ -158,13 +158,13 @@ export function installGlobalTextPresetBridge({
       if (!NODE_ACTION_CONFIGS[actionId])
         return (
           showToast?.(resolveText('globalCapture.unsupportedAction'), 'error'),
-          { ok: ![], reason: 'unsupported-action', retryable: ![] }
+          { ok: false, reason: 'unsupported-action', retryable: false }
         );
-      const shouldRunImmediately = payload?.['runImmediately'] === !![] && actionId !== 'source-text';
+      const shouldRunImmediately = payload?.['runImmediately'] === true && actionId !== 'source-text';
       shouldRunImmediately && showToast?.(resolveText('globalCapture.preparingGeneration'), 'info');
       const createOutcome = await createCaptureNode(actionId, text);
       if (!isCanvasCurrent())
-        return { ok: createOutcome['ok'], reason: createOutcome['reason'], retryable: ![] };
+        return { ok: createOutcome['ok'], reason: createOutcome['reason'], retryable: false };
       if (!createOutcome['ok'])
         return (
           showToast?.(
@@ -174,7 +174,7 @@ export function installGlobalTextPresetBridge({
           createOutcome
         );
       if (!shouldRunImmediately)
-        return (showToast?.(resolveText('globalCapture.nodeAdded'), 'success'), { ok: !![] });
+        return (showToast?.(resolveText('globalCapture.nodeAdded'), 'success'), { ok: true });
       return (
         void runCaptureGeneration(createOutcome['nodeId'], isCanvasCurrent)
           ['then']((generationOutcome) => {
@@ -195,7 +195,7 @@ export function installGlobalTextPresetBridge({
                 'error',
               );
           }),
-        { ok: !![] }
+        { ok: true }
       );
     } catch (error) {
       return (
@@ -204,7 +204,7 @@ export function installGlobalTextPresetBridge({
           resolveText('globalCapture.actionFailed', { reason: String(error?.['message'] || error || '') }),
           'error',
         ),
-        { ok: ![], reason: String(error?.['message'] || error || ''), retryable: ![] }
+        { ok: false, reason: String(error?.['message'] || error || ''), retryable: false }
       );
     }
   }
@@ -216,7 +216,7 @@ export function installGlobalTextPresetBridge({
     );
   typeof selectedTextUnsubscribe === 'function' && disposers['push'](selectedTextUnsubscribe);
   const shortcutStatusUnsubscribe = textPresetApi['onGlobalShortcutStatus']?.((status = {}) => {
-    if (status?.['registered'] === ![] && status?.['reason'] === 'registration-failed') {
+    if (status?.['registered'] === false && status?.['reason'] === 'registration-failed') {
       showToast?.(
         resolveText('globalTextPreset.shortcutRegistrationFailed', {
           accelerator: status?.['accelerator'] || 'Alt+C',
@@ -225,14 +225,14 @@ export function installGlobalTextPresetBridge({
       );
       return;
     }
-    status?.['registered'] === !![] &&
+    status?.['registered'] === true &&
       COPY_FAILURE_REASONS['has'](status?.['reason']) &&
       showToast?.(resolveText('globalTextPreset.noSelectedText'), 'warn');
   });
   return (
     typeof shortcutStatusUnsubscribe === 'function' && disposers['push'](shortcutStatusUnsubscribe),
     () => {
-      ((disposed = !![]), receiver['dispose'](), disposers['forEach']((dispose) => dispose()));
+      ((disposed = true), receiver['dispose'](), disposers['forEach']((dispose) => dispose()));
     }
   );
 }

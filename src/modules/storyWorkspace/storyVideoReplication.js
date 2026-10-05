@@ -20,7 +20,7 @@ export function isStoryVideoReplicationHomeAvailable({ workspaceSurface: workspa
 }
 export function resolveStoryVideoReplicationHomeTab(options = {}, value = 'upload') {
   if (options['workspaceSurface'] === 'replication') return 'replication';
-  if (value === 'collaborate' && options['developerModeAvailable'] !== !![]) return 'generate';
+  if (value === 'collaborate' && options['developerModeAvailable'] !== true) return 'generate';
   const item = ['upload', 'generate', 'collaborate', 'replication']['includes'](value) ? value : 'upload';
   return item === 'replication' && !isStoryVideoReplicationHomeAvailable(options) ? 'upload' : item;
 }
@@ -202,8 +202,8 @@ export function shouldUseStoryVideoReplicationUnifiedAssetLocalization(
     maxSourceCharacters: maxSourceCharacters = STORY_VIDEO_REPLICATION_UNIFIED_ASSET_MAX_SOURCE_CHARACTERS,
   } = {},
 ) {
-  if (options6?.['project']?.['sourceMode'] !== 'video-replication') return ![];
-  if (options6['assetExtractionDraft'] && typeof options6['assetExtractionDraft'] === 'object') return ![];
+  if (options6?.['project']?.['sourceMode'] !== 'video-replication') return false;
+  if (options6['assetExtractionDraft'] && typeof options6['assetExtractionDraft'] === 'object') return false;
   const storyVideoReplicationAssetExtractionProject =
       buildStoryVideoReplicationAssetExtractionProject(options6),
     list6 = Array['isArray'](storyVideoReplicationAssetExtractionProject['chapters'])
@@ -226,13 +226,13 @@ export function validateStoryReplicationVideoFile(error3 = {}, value18 = '') {
   const text10 = normalizeText(error3['name']),
     videoExtension = getVideoExtension(error3),
     enabled = Math['max'](0, Number(error3['size']) || 0);
-  if (!text10) return { ok: ![], error: '视频文件缺少文件名。' };
+  if (!text10) return { ok: false, error: '视频文件缺少文件名。' };
   if (!SUPPORTED_VIDEO_EXTENSIONS['has'](videoExtension))
-    return { ok: ![], error: '“' + text10 + '”格式不支持，仅支持 MP4、MOV、AVI。' };
+    return { ok: false, error: '“' + text10 + '”格式不支持，仅支持 MP4、MOV、AVI。' };
   const response2 = validateStoryReplicationVideoSize(error3, value18);
   if (!response2['ok']) return response2;
-  if (!enabled) return { ok: ![], error: '“' + text10 + '”是空文件。' };
-  return { ok: !![], error: '' };
+  if (!enabled) return { ok: false, error: '“' + text10 + '”是空文件。' };
+  return { ok: true, error: '' };
 }
 export function mergeStoryReplicationSourceFiles(list7 = [], value19 = [], value20 = '') {
   const list8 = [],
@@ -373,27 +373,27 @@ export function markStoryVideoReplicationAssetLocalizationComplete(
   enabled2 = {},
   { completedAt: completedAt = Date['now']() } = {},
 ) {
-  if (enabled2?.['project']?.['sourceMode'] !== 'video-replication') return ![];
+  if (enabled2?.['project']?.['sourceMode'] !== 'video-replication') return false;
   if (
     !Array['isArray'](enabled2['assets']) ||
     !enabled2['assets']['some']((value24) => value24?.['kind'] === 'scene')
   )
-    return ![];
+    return false;
   const assetLocalizationCompletedAt = Math['max'](0, Math['trunc'](Number(completedAt) || 0));
-  if (!assetLocalizationCompletedAt) return ![];
+  if (!assetLocalizationCompletedAt) return false;
   return (
     (enabled2['project']['replication'] = {
       ...(enabled2['project']['replication'] || {}),
       assetLocalizationCompletedAt: assetLocalizationCompletedAt,
     }),
-    !![]
+    true
   );
 }
 export function invalidateStoryVideoReplicationAssetLocalization(options8 = {}) {
-  if (options8?.['project']?.['sourceMode'] !== 'video-replication') return ![];
+  if (options8?.['project']?.['sourceMode'] !== 'video-replication') return false;
   const args4 = options8['project']['replication'];
-  if (!args4 || !args4['assetLocalizationCompletedAt']) return ![];
-  return ((options8['project']['replication'] = { ...args4, assetLocalizationCompletedAt: 0 }), !![]);
+  if (!args4 || !args4['assetLocalizationCompletedAt']) return false;
+  return ((options8['project']['replication'] = { ...args4, assetLocalizationCompletedAt: 0 }), true);
 }
 export function applyStoryVideoReplicationUpload(
   response4 = {},
@@ -682,12 +682,12 @@ export function getStoryVideoReplicationSummary(options11 = {}) {
 }
 export function getStoryVideoReplicationFooterState(
   options12 = {},
-  { localizing: localizing = ![], planningStatus: planningStatus = '' } = {},
+  { localizing: localizing = false, planningStatus: planningStatus = '' } = {},
 ) {
   const storyVideoReplicationSummary = getStoryVideoReplicationSummary(options12),
     value48 = (options12['episodes'] || [])['some']((value49) => {
       const enabled4 = value49['replication']?.['sourceAnalysis'];
-      if (!enabled4) return ![];
+      if (!enabled4) return false;
       const videoReplicationDialogueSummary = getVideoReplicationDialogueSummary(enabled4);
       return (
         videoReplicationDialogueSummary['total'] === 0 || videoReplicationDialogueSummary['pending'] > 0
@@ -704,8 +704,8 @@ export function getStoryVideoReplicationFooterState(
       busy: busy,
       action: 'localize-replication-assets',
       actionLabel: '提取元素中',
-      actionAttention: ![],
-      actionDisabled: !![],
+      actionAttention: false,
+      actionDisabled: true,
       title: normalizeText(planningStatus) || '正在识别角色、场景与道具',
       hint: '原片分析已保留，提取完成后指定替换人物',
     };

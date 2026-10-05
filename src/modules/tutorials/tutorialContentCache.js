@@ -9,8 +9,8 @@ export function readTutorialCache(value) {
 }
 export function writeTutorialCache(item, key) {
   try {
-    return (item['setItem'](KEY, JSON['stringify'](normalizeTutorialCatalog(key))), !![]);
+    return (item['setItem'](KEY, JSON['stringify'](normalizeTutorialCatalog(key))), true);
   } catch {
-    return ![];
+    return false;
   }
 }

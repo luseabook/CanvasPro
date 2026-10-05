@@ -128,7 +128,7 @@ export async function savePersonReplacementAppearanceToAssetPackage({
       imageUrl: imageUrl2,
       updatedAt: Date['now'](),
     },
-    itemCreated: itemCreated?.['itemCreated'] !== ![],
+    itemCreated: itemCreated?.['itemCreated'] !== false,
     request: itemKey,
     result: itemCreated,
   };
@@ -170,7 +170,7 @@ export function createPersonReplacementAppearanceAssetLibraryOperation({
         }),
         args = getProject?.() || {};
       if (normalizeText(args['id']) !== text4) return null;
-      let enabled2 = ![];
+      let enabled2 = false;
       const characters = (Array['isArray'](args['characters']) ? args['characters'] : [])['map'](
         (appearances) => {
           if (normalizeText(appearances['id']) !== imageUrl3['characterId']) return appearances;
@@ -179,7 +179,7 @@ export function createPersonReplacementAppearanceAssetLibraryOperation({
             appearances: appearances['appearances']['map']((args2) => {
               if (normalizeText(args2['id']) !== imageUrl3['appearanceId']) return args2;
               return (
-                (enabled2 = !![]),
+                (enabled2 = true),
                 {
                   ...args2,
                   imageUrl: imageUrl3['imageUrl'] || args2['imageUrl'],
@@ -199,7 +199,7 @@ export function createPersonReplacementAppearanceAssetLibraryOperation({
         ),
         {
           project: project3,
-          ok: !![],
+          ok: true,
           assetId: imageUrl3['totalAssetRef']['assetId'],
           itemIndex: imageUrl3['totalAssetRef']['itemIndex'],
         }

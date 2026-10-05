@@ -50,7 +50,7 @@ export function renderRunningHubInstanceControl(
     '" data-ui-schema-normal-default="' +
     escapeHtmlAttr(target) +
     '" data-ui-schema-developer-mode="' +
-    (globalThis['window']?.['DEV_MODE'] === !![] && list2['length'] ? 'true' : 'false') +
+    (globalThis['window']?.['DEV_MODE'] === true && list2['length'] ? 'true' : 'false') +
     '" data-ui-schema-normal-options="' +
     escapeHtmlAttr(JSON['stringify'](list3)) +
     '" data-ui-schema-developer-values="' +

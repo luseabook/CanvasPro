@@ -25,7 +25,7 @@ export async function stageProjectPackageFile(item, signal = {}) {
 }
 export async function discardStagedProjectPackage(key) {
   const stageId2 = String(key || '')['trim']();
-  if (!stageId2) return { success: !![], removed: ![] };
+  if (!stageId2) return { success: true, removed: false };
   return await post(
     '/api/v2/desktop/project/discard-staged-package',
     { stageId: stageId2 },

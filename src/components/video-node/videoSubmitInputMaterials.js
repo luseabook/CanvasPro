@@ -219,9 +219,9 @@ function appendUniqueAudio(list5, list6, value10, args5 = {}) {
     ...args6,
     ...Object['fromEntries'](
       Object['entries'](value11)['filter'](([, value12]) => {
-        if (value12 === '' || value12 == null) return ![];
-        if (Number(value12) === 0) return ![];
-        return !![];
+        if (value12 === '' || value12 == null) return false;
+        if (Number(value12) === 0) return false;
+        return true;
       }),
     ),
   };

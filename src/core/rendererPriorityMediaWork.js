@@ -20,8 +20,8 @@ const PRIORITY_MEDIA_TYPES = Object['freeze']([
   ]),
   PRIORITY_VIDEO_TYPES = Object['freeze'](['source-video', 'video', 'ai-video']);
 function hasResolvedVideo(value) {
-  if (!isNodeType(value, PRIORITY_VIDEO_TYPES)) return ![];
-  if (resolveCanvasVideoDisplayUrl(value)) return !![];
+  if (!isNodeType(value, PRIORITY_VIDEO_TYPES)) return false;
+  if (resolveCanvasVideoDisplayUrl(value)) return true;
   const list = Array['isArray'](value?.['videos']) ? value['videos'] : [];
   return list['some']((item) => !!resolveCanvasVideoDisplayUrl(item));
 }
@@ -81,12 +81,12 @@ export function syncRendererPendingSourceVideoActivationIds({
   sourceKeysByNodeId: sourceKeysByNodeId,
   pendingNodeIds: pendingNodeIds,
   isPresented: isPresented,
-  scanNodes: scanNodes = !![],
+  scanNodes: scanNodes = true,
 } = {}) {
   const entry = nodes2 && typeof nodes2 === 'object' ? nodes2 : {},
     map3 = sourceKeysByNodeId instanceof Map ? sourceKeysByNodeId : new Map(),
     map4 = pendingNodeIds instanceof Set ? pendingNodeIds : new Set();
-  if (scanNodes !== ![]) {
+  if (scanNodes !== false) {
     const map5 = new Set();
     for (const [enabled, record] of Object['entries'](entry)) {
       if (!enabled || !isNodeType(record, 'source-video')) continue;
@@ -105,7 +105,7 @@ export function syncRendererPendingSourceVideoActivationIds({
   if (typeof isPresented === 'function')
     for (const state of Array['from'](map4)) {
       const enabled3 = String(map3['get'](state) || '')['trim']();
-      (!enabled3 || isPresented(state, enabled3) === !![]) && map4['delete'](state);
+      (!enabled3 || isPresented(state, enabled3) === true) && map4['delete'](state);
     }
   return map4;
 }
@@ -119,7 +119,7 @@ export function applyRendererLowZoomRealVideoCandidates(args, config) {
   return { ...args, mountCandidateIds: mountCandidateIds, parkCandidateIds: parkCandidateIds };
 }
 function hasResolvedPriorityMedia(input) {
-  if (!isNodeType(input, PRIORITY_MEDIA_TYPES)) return ![];
+  if (!isNodeType(input, PRIORITY_MEDIA_TYPES)) return false;
   if (isNodeType(input, ['source-audio', 'audio', 'ai-audio'])) return !!resolveCanvasAudioUrl(input);
   return hasResolvedVideo(input);
 }
@@ -167,19 +167,19 @@ export function hasRendererPriorityMediaWork({
       pickConnectMode: pickConnectMode2,
     });
   for (const value4 of activeNodeIds) {
-    if (hasResolvedPriorityMedia(value3[value4])) return !![];
+    if (hasResolvedPriorityMedia(value3[value4])) return true;
   }
   const count3 = Number(containerWidth2),
     count4 = Number(containerHeight2);
-  if (!viewport2 || !(count3 > 0) || !(count4 > 0)) return ![];
+  if (!viewport2 || !(count3 > 0) || !(count4 > 0)) return false;
   const run = (value5) =>
     hasResolvedPriorityMedia(value5) &&
     isNodeInsideViewportPadding(value5, viewport2, count3, count4, viewportPadding);
   if (candidateNodeIds2 != null && typeof candidateNodeIds2[Symbol['iterator']] === 'function') {
     for (const value6 of candidateNodeIds2) {
-      if (run(value3[value6])) return !![];
+      if (run(value3[value6])) return true;
     }
-    return ![];
+    return false;
   }
   return Object['values'](value3)['some'](run);
 }
@@ -192,8 +192,8 @@ export function shouldDeferInitialVideoMediaOnMount({
   nodeCount: nodeCount = 0,
   mountCandidateCount: mountCandidateCount = 0,
 } = {}) {
-  if (!nodeId || !isNodeType(node, ['source-video', 'video', 'ai-video'])) return ![];
-  if (isSelected || isSelectionRelated || dragTargets?.['has']?.(nodeId)) return ![];
+  if (!nodeId || !isNodeType(node, ['source-video', 'video', 'ai-video'])) return false;
+  if (isSelected || isSelectionRelated || dragTargets?.['has']?.(nodeId)) return false;
   return (
     Number(nodeCount || 0) >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'] ||
     Number(mountCandidateCount || 0) >= 12
@@ -203,7 +203,7 @@ export function shouldEagerPosterlessSourceVideoOnMount({
   node: node2,
   isVisibleVideoMediaNode: isVisibleVideoMediaNode,
 } = {}) {
-  if (!isVisibleVideoMediaNode || !isNodeType(node2, 'source-video')) return ![];
+  if (!isVisibleVideoMediaNode || !isNodeType(node2, 'source-video')) return false;
   return !!resolveCanvasVideoUrl(node2) && !resolveCanvasVideoPosterUrl(node2);
 }
 export const __rendererPriorityMediaWorkForTest = { hasResolvedPriorityMedia: hasResolvedPriorityMedia };

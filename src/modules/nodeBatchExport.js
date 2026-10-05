@@ -14,7 +14,7 @@ const TEXT_NODE_TYPES = Object['freeze'](['source-text', 'text', 'ai-text']),
   IMAGE_NODE_TYPES = Object['freeze'](['source-image', 'image', 'ai-image']),
   VIDEO_NODE_TYPES = Object['freeze'](['source-video', 'video', 'ai-video']),
   AUDIO_NODE_TYPES = Object['freeze'](['source-audio', 'audio', 'ai-audio']);
-let batchExportPending = ![];
+let batchExportPending = false;
 const batchExportListeners = new Set();
 export function isNodeBatchExportPending() {
   return batchExportPending;
@@ -240,8 +240,8 @@ export async function downloadNodeOutput({
     return (
       show(showToast, t('nodeBatchExport.toasts.noExportable'), 'warn'),
       {
-        success: ![],
-        canceled: ![],
+        success: false,
+        canceled: false,
         code: 'NO_EXPORTABLE_ITEMS',
         nodeId: nodeId7,
         kind: '',
@@ -278,8 +278,8 @@ export async function downloadNodeOutput({
           );
     if (saveResult?.['canceled'])
       return {
-        success: ![],
-        canceled: !![],
+        success: false,
+        canceled: true,
         code: 'CANCELED',
         nodeId: nodeId7,
         kind: nodeName['kind'],
@@ -287,13 +287,13 @@ export async function downloadNodeOutput({
         skipped: skipped2,
         saveResult: saveResult,
       };
-    if (saveResult?.['success'] === ![]) {
+    if (saveResult?.['success'] === false) {
       const message = normalizeDownloadFailureMessage(saveResult, t('nodeBatchExport.toasts.failed'));
       return (
         show(showToast, t('nodeBatchExport.toasts.failedWithMessage', { message: message }), 'error'),
         {
-          success: ![],
-          canceled: ![],
+          success: false,
+          canceled: false,
           code: firstNonEmpty(saveResult?.['code'], 'DOWNLOAD_FAILED'),
           error: message,
           nodeId: nodeId7,
@@ -307,8 +307,8 @@ export async function downloadNodeOutput({
     return (
       show(showToast, t('nodeBatchExport.toasts.completed', { count: 1 }), 'success'),
       {
-        success: !![],
-        canceled: ![],
+        success: true,
+        canceled: false,
         code: 'DOWNLOADED',
         nodeId: nodeId7,
         kind: nodeName['kind'],
@@ -322,8 +322,8 @@ export async function downloadNodeOutput({
     return (
       show(showToast, t('nodeBatchExport.toasts.failedWithMessage', { message: message2 }), 'error'),
       {
-        success: ![],
-        canceled: ![],
+        success: false,
+        canceled: false,
         code: 'DOWNLOAD_FAILED',
         error: message2,
         nodeId: nodeId7,
@@ -349,7 +349,7 @@ export async function exportSelectedNodesBatch({
   showToast: showToast = globalThis['window']?.['showToast'],
   consoleObject: consoleObject = globalThis['console'],
 } = {}) {
-  if (batchExportPending) return { success: ![], code: 'EXPORT_IN_PROGRESS' };
+  if (batchExportPending) return { success: false, code: 'EXPORT_IN_PROGRESS' };
   const selectedNodeIds3 = normalizeSelectedIds(state?.['selectedNodeIds']),
     { items: items3, skipped: skipped3 } = collectSelectedNodeExportItems({
       nodes: state?.['nodes'] || {},
@@ -360,8 +360,8 @@ export async function exportSelectedNodesBatch({
       show(showToast, t('nodeBatchExport.toasts.noExportable'), 'warn'),
       skipped3['length'] > 0 && consoleObject?.['info']?.('[node-batch-export] skipped', skipped3),
       {
-        success: ![],
-        canceled: ![],
+        success: false,
+        canceled: false,
         code: 'NO_EXPORTABLE_ITEMS',
         exportedCount: 0,
         skipped: skipped3,
@@ -372,9 +372,9 @@ export async function exportSelectedNodesBatch({
   if (typeof run2 !== 'function')
     return (
       show(showToast, t('nodeBatchExport.toasts.unsupported'), 'error'),
-      { success: ![], canceled: ![], code: 'UNSUPPORTED', exportedCount: 0, skipped: skipped3, counts: {} }
+      { success: false, canceled: false, code: 'UNSUPPORTED', exportedCount: 0, skipped: skipped3, counts: {} }
     );
-  setBatchExportPending(!![]);
+  setBatchExportPending(true);
   try {
     show(showToast, t('nodeBatchExport.toasts.started'), 'info');
     const items4 = getDownloadUseOriginalFilename()
@@ -385,7 +385,7 @@ export async function exportSelectedNodesBatch({
               fileName: nodeName2['filenameHint'],
               kind: nodeName2['kind'],
               sources: [nodeName2['localPath'], nodeName2['url']],
-              useOriginalFilename: !![],
+              useOriginalFilename: true,
             });
             return {
               ...nodeName2,
@@ -432,9 +432,9 @@ export async function exportSelectedNodesBatch({
         }),
         'error',
       ),
-      { success: ![], canceled: ![], error: message3, exportedCount: 0, skipped: skipped3, counts: {} }
+      { success: false, canceled: false, error: message3, exportedCount: 0, skipped: skipped3, counts: {} }
     );
   } finally {
-    setBatchExportPending(![]);
+    setBatchExportPending(false);
   }
 }

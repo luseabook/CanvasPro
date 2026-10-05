@@ -101,16 +101,16 @@ export function createPersonReplacementPromptEnhancementStructuredOutput(list3 =
   const minItems = normalizeStringList(list3);
   return {
     name: 'person_replacement_prompt_enhancement',
-    strict: !![],
+    strict: true,
     fallback: 'prompt',
     schema: {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['scene', 'people', 'integration'],
       properties: {
         scene: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['composition', 'lighting', 'color', 'focus', 'texture'],
           properties: {
             composition: { type: 'string' },
@@ -126,7 +126,7 @@ export function createPersonReplacementPromptEnhancementStructuredOutput(list3 =
           maxItems: minItems['length'],
           items: {
             type: 'object',
-            additionalProperties: ![],
+            additionalProperties: false,
             required: ['label', 'pose', 'gaze', 'expression', 'visibleRange', 'occlusion', 'adaptation'],
             properties: {
               label: minItems['length']

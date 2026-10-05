@@ -13,7 +13,7 @@ import { updateNodeReference } from './collaborationNodeReference.js';
 import { bindTextareaMentions } from '../../components/shared/textareaMentions.js';
 export function createCollaborationChat({ store: store, getSession: getSession, openNode: openNode }) {
   const root = reviewElement('section', 'collaboration-chat');
-  ((root['hidden'] = !![]),
+  ((root['hidden'] = true),
     root['setAttribute']('aria-label', '协作聊天'),
     root['setAttribute']('popover', 'manual'));
   const el = reviewElement('button', 'collaboration-chat-bubble');
@@ -46,7 +46,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
     (input['placeholder'] = '发送消息，@ 节点或成员'),
     input['setAttribute']('aria-label', '聊天消息'));
   const menu = reviewElement('div', 'collaboration-chat-picker');
-  ((menu['hidden'] = !![]), menu['setAttribute']('aria-label', '引用节点或成员'));
+  ((menu['hidden'] = true), menu['setAttribute']('aria-label', '引用节点或成员'));
   const reviewElement3 = reviewElement('div', 'collaboration-actions'),
     trigger = reviewElement('button', 'collaboration-button', '@ 引用'),
     el13 = reviewElement('button', 'collaboration-button', '加入所选节点'),
@@ -64,10 +64,10 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
     handles: [reviewElement2, el],
     resizeHandle: resizeHandle,
   });
-  let enabled = !![],
+  let enabled = true,
     enabled2 = null,
     value = '',
-    item = ![];
+    item = false;
   const map = new Map(),
     mentions = createCollaborationChatState({
       getSession: getSession,
@@ -237,7 +237,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
                 return showToast('该成员已离开房间', 'ok');
               const mentions2 = [...new Set([...args['mentions'], output])];
               if (mentions2['length'] > 20) return showToast('每条消息最多提及 20 位成员', 'warn');
-              (mentions['edit']({ mentions: mentions2 }), input['focus']({ preventScroll: !![] }));
+              (mentions['edit']({ mentions: mentions2 }), input['focus']({ preventScroll: true }));
             }),
             reviewElement4['append'](el19));
         }
@@ -268,7 +268,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
         el21,
         store['getStateRaw']()['nodes'][el21['dataset']['nodeId']],
         el21['dataset']['referenceName'],
-        { compact: !![] },
+        { compact: true },
       );
     if (state) el8['scrollTop'] = payload + el8['scrollHeight'] - record;
     else {
@@ -322,7 +322,7 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
     for (const el24 of el12['querySelectorAll']('[data-node-id]')) {
       const value13 = el24['dataset']['nodeId'];
       updateNodeReference(el24, store['getStateRaw']()['nodes'][value13], '已删除节点', {
-        compact: !![],
+        compact: true,
         onOpen: () => run4(value13),
         onRemove: () =>
           mentions['edit']({
@@ -360,21 +360,21 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
       );
   }
   function run() {
-    (run5(!![]), input['focus']({ preventScroll: !![] }));
+    (run5(true), input['focus']({ preventScroll: true }));
   }
   function run6() {
-    (run5(![]), el['focus']({ preventScroll: !![] }));
+    (run5(false), el['focus']({ preventScroll: true }));
   }
   function addNodes(list2) {
-    if (!getSession() || mentions['snapshot']()['sending']) return ![];
+    if (!getSession() || mentions['snapshot']()['sending']) return false;
     const nodeIds = [
       ...new Set([
         ...mentions['snapshot']()['nodeIds'],
         ...list2['filter']((value16) => !!store['getStateRaw']()['nodes'][value16]),
       ]),
     ];
-    if (nodeIds['length'] > 20) return (showToast('每条消息最多引用 20 个节点，请分批发送', 'warn'), ![]);
-    return (mentions['edit']({ nodeIds: nodeIds }), run(), !![]);
+    if (nodeIds['length'] > 20) return (showToast('每条消息最多引用 20 个节点，请分批发送', 'warn'), false);
+    return (mentions['edit']({ nodeIds: nodeIds }), run(), true);
   }
   (input['addEventListener']('input', () => mentions['edit']({ body: input['value'] })),
     input['addEventListener']('keydown', (event) => {
@@ -401,14 +401,14 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
     () => onChange(mentions['snapshot']()),
   );
   return (
-    mentions['setVisible'](!![]),
+    mentions['setVisible'](true),
     {
       update: mentions['sync'],
       addNodes: addNodes,
       isOpen: () => !!getSession() && enabled,
       root: root,
       destroy() {
-        ((item = !![]),
+        ((item = true),
           bindTextareaMentions2['destroy'](),
           mentions['destroy'](),
           run7(),

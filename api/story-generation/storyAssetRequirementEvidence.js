@@ -99,9 +99,9 @@ function isUsableLocalCandidateName(target, source) {
     /[\r\n]/u['test'](args) ||
     STORY_ASSET_LOCAL_CANDIDATE_PLACEHOLDER_PATTERN['test'](args)
   )
-    return ![];
-  if (target === 'prop' && isNoisyStoryPropCandidateName(args)) return ![];
-  if (target !== 'character') return !![];
+    return false;
+  if (target === 'prop' && isNoisyStoryPropCandidateName(args)) return false;
+  if (target !== 'character') return true;
   return (
     count <= 8 &&
     /^[\p{Script=Han}A-Za-z0-9·•._-]+$/u['test'](args) &&
@@ -116,7 +116,7 @@ function isNoisyStoryPropCandidateName(next = '') {
     STORY_PROP_CANDIDATE_NOISE_PATTERN['test'](args2) ||
     /(?:中段标记|场次标记|剧情标记|唯一标记|核对编号)$/u['test'](args2)
   )
-    return !![];
+    return true;
   return !/^[\p{L}\p{N}·•._-]+$/u['test'](args2);
 }
 function normalizeStoryPropActionCandidate(current = '') {
@@ -258,7 +258,7 @@ function createHardRequiredStoryAssetKindsByName(list9 = [], value14 = null) {
 function filterCandidatesByHardRequiredKinds(list11 = [], map6 = new Map()) {
   return list11['filter']((event) => {
     const map7 = map6['get'](event['key']);
-    if (!map7) return !![];
+    if (!map7) return true;
     return map7['size'] === 1 && map7['has'](event['kind']);
   });
 }
@@ -384,14 +384,14 @@ function selectBudgetedStoryAssetOptionalCandidates(
     list22 = [],
     map15 = new Set();
   let value45 = 2,
-    value46 = !![];
+    value46 = true;
   while (value46 && list22['length'] < value41) {
-    value46 = ![];
+    value46 = false;
     for (const value47 of fairSourceRefOrder) {
       const value48 = map14['get'](value47) || [],
         name3 = value48['shift']();
       if (!name3 || map15['has'](name3['key'])) continue;
-      value46 = !![];
+      value46 = true;
       const value49 = {
           kind: kind4,
           name: name3['name'],

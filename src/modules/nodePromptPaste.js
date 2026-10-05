@@ -5,9 +5,9 @@ import { matchPromptMentions } from './promptMentionMatcher.js';
 import { t } from '../i18n/index.js';
 function insertHtml(value) {
   try {
-    return globalThis['document']?.['execCommand']?.('insertHTML', ![], value) === !![];
+    return globalThis['document']?.['execCommand']?.('insertHTML', false, value) === true;
   } catch {
-    return ![];
+    return false;
   }
 }
 function escapeText(item) {
@@ -23,7 +23,7 @@ function prepareMentions(args, list, key) {
   const enabled = globalThis['window']?.['getSelection']?.()?.['rangeCount']
       ? window['getSelection']()['getRangeAt'](0)
       : null,
-    promptEl = args['promptEl']['cloneNode'](!![]),
+    promptEl = args['promptEl']['cloneNode'](true),
     list3 = [...args['promptEl']['querySelectorAll']('.ref-pill')],
     index = [...promptEl['querySelectorAll']('.ref-pill')];
   list3['forEach']((result, data) => {
@@ -69,7 +69,7 @@ function prepareMentions(args, list, key) {
   );
 }
 export function pasteNodePrompt(enabled3, event, store) {
-  if (!enabled3?.['promptEl']) return ![];
+  if (!enabled3?.['promptEl']) return false;
   event?.['preventDefault']?.();
   const next = event?.['clipboardData'] || globalThis['window']?.['clipboardData'],
     current = String(next?.['getData']?.('text/html') || ''),
@@ -88,7 +88,7 @@ export function pasteNodePrompt(enabled3, event, store) {
     const insertVirtualizedPromptTextAtSelection2 =
       insertVirtualizedPromptTextAtSelection(enabled3['promptEl'], entry) ||
       insertPlainTextAtSelection(entry);
-    if (!insertVirtualizedPromptTextAtSelection2) return ![];
+    if (!insertVirtualizedPromptTextAtSelection2) return false;
     if (!store['schedule'](enabled3)) store['commit'](enabled3);
   }
   if (args2?.['issues']['size']) {
@@ -101,5 +101,5 @@ export function pasteNodePrompt(enabled3, event, store) {
       'warn',
     );
   }
-  return !![];
+  return true;
 }

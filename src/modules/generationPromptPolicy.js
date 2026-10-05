@@ -77,7 +77,7 @@ export function evaluateGenerationPromptBoundary({
   model: model = '',
   provider: provider = '',
   promptText: promptText = '',
-  hasInput: hasInput = ![],
+  hasInput: hasInput = false,
   modelManifest: modelManifest = null,
   executionManifest: executionManifest = null,
 } = {}) {
@@ -89,14 +89,14 @@ export function evaluateGenerationPromptBoundary({
     }),
     promptLength = countPromptCharacters(promptText);
   if (promptLength >= reason['minLength'])
-    return { ok: !![], reason: '', promptLength: promptLength, ...reason };
-  if (promptLength > 0) return { ok: ![], reason: 'promptTooShort', promptLength: promptLength, ...reason };
+    return { ok: true, reason: '', promptLength: promptLength, ...reason };
+  if (promptLength > 0) return { ok: false, reason: 'promptTooShort', promptLength: promptLength, ...reason };
   if (reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW'])
-    return { ok: !![], reason: '', promptLength: promptLength, ...reason };
-  if (reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT'] && hasInput === !![])
-    return { ok: !![], reason: '', promptLength: promptLength, ...reason };
+    return { ok: true, reason: '', promptLength: promptLength, ...reason };
+  if (reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT'] && hasInput === true)
+    return { ok: true, reason: '', promptLength: promptLength, ...reason };
   return {
-    ok: ![],
+    ok: false,
     reason:
       reason['emptyPolicy'] === PROMPT_EMPTY_POLICIES['ALLOW_WITH_INPUT']
         ? 'promptOrInputRequired'

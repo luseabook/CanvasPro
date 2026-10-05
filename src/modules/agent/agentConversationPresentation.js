@@ -96,7 +96,7 @@ function appendTaskImageMedia(el2, entry = {}, { onImagePreview: onImagePreview 
       const el5 = createEl('img', 'agent-message-media-image');
       ((el5['src'] = error3['thumbUrl']),
         (el5['alt'] = error3['name'] || entry['nodeId'] || ''),
-        (el5['draggable'] = ![]),
+        (el5['draggable'] = false),
         el4['appendChild'](el5),
         error3['name'] &&
           el4['appendChild'](
@@ -133,7 +133,7 @@ function appendMessageInputRefs(el6, payload = []) {
         const el9 = createEl('img', 'agent-message-input-ref-thumb');
         ((el9['src'] = error4['thumbUrl']),
           (el9['alt'] = config),
-          (el9['draggable'] = ![]),
+          (el9['draggable'] = false),
           el8['appendChild'](el9));
       } else {
         const el10 = createEl(
@@ -153,7 +153,7 @@ function appendMessageInputRefs(el6, payload = []) {
 function appendFailureDiagnostic(el11, code = null) {
   if (!code || typeof code !== 'object' || !code['summary']) return;
   const el12 = createEl('section', 'agent-diagnostic');
-  ((el12['hidden'] = ![]), el12['setAttribute']('aria-label', agentPanelText('diagnosticTitle')));
+  ((el12['hidden'] = false), el12['setAttribute']('aria-label', agentPanelText('diagnosticTitle')));
   const el13 = createEl('div', 'agent-diagnostic-header');
   el13['append'](
     createEl('span', 'agent-diagnostic-title', agentPanelText('diagnosticTitle')),
@@ -176,7 +176,7 @@ function appendFailureDiagnostic(el11, code = null) {
     ),
   );
   const el16 = createEl('div', 'agent-diagnostic-detail');
-  el16['hidden'] = !![];
+  el16['hidden'] = true;
   if (code['detail']) el16['appendChild'](createEl('div', '', code['detail']));
   code['errorCode'] &&
     el16['appendChild'](
@@ -190,7 +190,7 @@ function appendFailureDiagnostic(el11, code = null) {
   ((el17['type'] = 'button'),
     el17['setAttribute']('aria-expanded', 'false'),
     el17['addEventListener']('click', () => {
-      const enabled4 = el16['hidden'] === !![];
+      const enabled4 = el16['hidden'] === true;
       ((el16['hidden'] = !enabled4),
         el17['setAttribute']('aria-expanded', enabled4 ? 'true' : 'false'),
         (el17['textContent'] = agentPanelText(enabled4 ? 'diagnosticDetailsHide' : 'diagnosticDetails')));
@@ -283,17 +283,17 @@ export function createAgentConversationPresentation({
 } = {}) {
   if (!messagesEl || !runStepsEl)
     throw new TypeError('[agentConversationPresentation] messagesEl and runStepsEl are required');
-  let enabled5 = ![],
-    enabled6 = ![],
-    enabled7 = ![];
+  let enabled5 = false,
+    enabled6 = false,
+    enabled7 = false;
   const map = new Set();
-  let value3 = ![];
+  let value3 = false;
   const agentRunStatusPresentation = createAgentRunStatusPresentation({ root: runStepsEl }),
     agentConversationStreamingPresentation = createAgentConversationStreamingPresentation({
       messagesEl: messagesEl,
       appendEntry: appendEntry,
       onSettled: () => {
-        ((enabled7 = ![]), (enabled6 = map['size'] > 0), run());
+        ((enabled7 = false), (enabled6 = map['size'] > 0), run());
       },
     }),
     value4 = sessionStore?.['subscribeAssistantStream']?.(agentConversationStreamingPresentation['handle']);
@@ -351,7 +351,7 @@ export function createAgentConversationPresentation({
         delete messagesEl['dataset']['sessionProjectionMismatches']);
       return;
     }
-    ((messagesEl['dataset']['sessionProjection'] = response4['ok'] === !![] ? 'matched' : 'mismatch'),
+    ((messagesEl['dataset']['sessionProjection'] = response4['ok'] === true ? 'matched' : 'mismatch'),
       Array['isArray'](response4['mismatches']) && response4['mismatches']['length'] > 0
         ? (messagesEl['dataset']['sessionProjectionMismatches'] = response4['mismatches']['join'](','))
         : delete messagesEl['dataset']['sessionProjectionMismatches']);
@@ -376,9 +376,9 @@ export function createAgentConversationPresentation({
     (removeElement(value7), run());
   }
   function setBusy(value8) {
-    enabled5 = value8 === !![];
+    enabled5 = value8 === true;
     if (enabled5 || !enabled6 || value3) return;
-    ((enabled6 = ![]), (enabled7 = ![]), map['clear'](), onConversationInvalidated?.({ historyOnly: !![] }));
+    ((enabled6 = false), (enabled7 = false), map['clear'](), onConversationInvalidated?.({ historyOnly: true }));
   }
   function acknowledgeSessionState({ taskMessages: taskMessages = [] } = {}) {
     ((Array['isArray'](taskMessages) ? taskMessages : [])['forEach']((value9) => {
@@ -387,10 +387,10 @@ export function createAgentConversationPresentation({
     }),
       (enabled6 = enabled7 || map['size'] > 0));
   }
-  let value10 = !![];
+  let value10 = true;
   const value11 = sessionStore?.['subscribe']?.((value12, value13 = {}) => {
     if (value10) {
-      value10 = ![];
+      value10 = false;
       return;
     }
     if (value3) return;
@@ -402,8 +402,8 @@ export function createAgentConversationPresentation({
     if (enabled5) {
       value13?.['type'] === 'run_event' && renderRunSteps(value12 || {});
       const taskResultEntryKey2 = getTaskResultEntryKey(value13?.['entry']);
-      if (taskResultEntryKey2) ((enabled6 = !![]), map['add'](taskResultEntryKey2));
-      else value13?.['type'] === 'history' && value13['entry'] && ((enabled6 = !![]), (enabled7 = !![]));
+      if (taskResultEntryKey2) ((enabled6 = true), map['add'](taskResultEntryKey2));
+      else value13?.['type'] === 'history' && value13['entry'] && ((enabled6 = true), (enabled7 = true));
       return;
     }
     if (value13?.['type'] === 'history' && value13['entry']) {
@@ -423,9 +423,9 @@ export function createAgentConversationPresentation({
     setBusy: setBusy,
     acknowledgeSessionState: acknowledgeSessionState,
     destroy() {
-      ((value3 = !![]),
-        (enabled6 = ![]),
-        (enabled7 = ![]),
+      ((value3 = true),
+        (enabled6 = false),
+        (enabled7 = false),
         map['clear'](),
         agentRunStatusPresentation['destroy'](),
         agentConversationStreamingPresentation['destroy'](),

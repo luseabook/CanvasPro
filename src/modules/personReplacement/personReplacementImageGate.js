@@ -16,7 +16,7 @@ export function buildPersonReplacementImageGate({
   promptPackage: promptPackage = {},
   inputUrls: inputUrls = null,
   modelId: modelId = '',
-  recovering: recovering = ![],
+  recovering: recovering = false,
 } = {}) {
   promptPackage ||= {};
   const value =
@@ -48,7 +48,7 @@ export function buildPersonReplacementImageGate({
           ['map']((target) => String(target || '')['trim']())
           ['filter'](Boolean),
       )['size'] + (index ? 1 : 0),
-    source = modelManifest?.['extensions']?.['inputValidation']?.['rejectImageOverflow'] === !![],
+    source = modelManifest?.['extensions']?.['inputValidation']?.['rejectImageOverflow'] === true,
     args = source && Number['isFinite'](item) && data > item,
     enabled2 = promptPackage['promptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL,
     enabled3 = new Set(promptPackage['activePersonIds'] || []),

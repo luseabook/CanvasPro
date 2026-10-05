@@ -1,6 +1,6 @@
 export function openStoryProjectPage(
   { state: state, canEnterStep: canEnterStep, render: render },
-  { resetStep: resetStep = ![], restoreView: restoreView = ![] } = {},
+  { resetStep: resetStep = false, restoreView: restoreView = false } = {},
 ) {
   if (!restoreView || !['project', 'episode']['includes'](state['view'])) state['view'] = 'project';
   if (

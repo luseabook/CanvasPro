@@ -22,7 +22,7 @@ export function initLocalAssetCleanupSettings() {
     el5 = document['getElementById']('localAssetCleanupCount'),
     el6 = document['getElementById']('localAssetCleanupSize');
   let response = null,
-    result = ![];
+    result = false;
   const localAssetCleanupList = createLocalAssetCleanupList({
     list: document['getElementById']('localAssetCleanupList'),
     toolbar: document['getElementById']('localAssetCleanupToolbar'),
@@ -62,7 +62,7 @@ export function initLocalAssetCleanupSettings() {
     run(text('idle')),
     el2['addEventListener']('click', async () => {
       if (result) return;
-      (run3(null), run2(!![], 'scan'), run(text('scanning')));
+      (run3(null), run2(true, 'scan'), run(text('scanning')));
       try {
         run3(await scanLocalAssetCleanup());
       } catch (error) {
@@ -71,11 +71,11 @@ export function initLocalAssetCleanupSettings() {
             runtimeText('scanFailedDetail', { error: error?.['message'] || runtimeText('scanFailed') }),
           ));
       } finally {
-        run2(![]);
+        run2(false);
       }
     }),
     el3['addEventListener']('click', async () => {
-      if (result || !response?.['ok'] || response['canTrash'] === ![]) return;
+      if (result || !response?.['ok'] || response['canTrash'] === false) return;
       const count = localAssetCleanupList['selectedItems']();
       if (!count['length']) return;
       const enabled = window['confirm']?.(
@@ -87,7 +87,7 @@ export function initLocalAssetCleanupSettings() {
         }),
       );
       if (!enabled) return;
-      (run2(!![], 'trash'), run(text('trashing')));
+      (run2(true, 'trash'), run(text('trashing')));
       try {
         const count2 = await trashLocalAssetCleanup(
             response,
@@ -129,7 +129,7 @@ export function initLocalAssetCleanupSettings() {
             runtimeText('trashFailedDetail', { error: error3?.['message'] || runtimeText('trashFailed') }),
           ));
       } finally {
-        run2(![]);
+        run2(false);
       }
     }));
 }

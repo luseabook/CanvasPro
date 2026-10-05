@@ -137,13 +137,13 @@ function getPreviewMediaPriorityDistanceSq(config, scope, input = {}) {
     return getMotionAdjustedPreviewDistanceSq(config, scope || getViewportWorldCenter(input), input);
   const output = Number(input?.['viewport']?.['zoom']),
     enabled4 =
-      input?.['viewportBusy'] === !![] || (Number['isFinite'](output) && output <= LOW_ZOOM_THRESHOLD);
+      input?.['viewportBusy'] === true || (Number['isFinite'](output) && output <= LOW_ZOOM_THRESHOLD);
   if (!enabled4) return getMotionAdjustedPreviewDistanceSq(config, scope, input);
   const motionAheadViewportOptions = getMotionAheadViewportOptions(input);
   return getPreviewViewportDistanceSq(config, motionAheadViewportOptions || input);
 }
 export function isRendererFastPreviewGeometryVisible(box8, value2 = {}, value3 = 0) {
-  if (!box8) return ![];
+  if (!box8) return false;
   const box9 = normalizeViewport(value2['viewport']),
     { width: width3, height: height3 } = getViewportContainerSize(value2),
     value4 = box8['x'] * box9['zoom'] + box9['x'],
@@ -167,7 +167,7 @@ function isGeometryMotionAhead(value9, value10 = {}) {
 }
 function isGeometryInMotionDirection(box10, value11 = {}) {
   const enabled5 = value11?.['previewMotion'];
-  if (!box10 || !enabled5?.['active']) return ![];
+  if (!box10 || !enabled5?.['active']) return false;
   const box11 = getViewportWorldRect(value11),
     value12 = (Number(box10['x']) || 0) + Math['max'](1, Number(box10['width']) || 0) / 2,
     value13 = (Number(box10['y']) || 0) + Math['max'](1, Number(box10['height']) || 0) / 2;
@@ -206,7 +206,7 @@ export function isRendererFastPreviewMediaReadable(box12, value21 = {}) {
   );
 }
 function isGeometryAtVideoPrefetchEdge(value22, value23 = {}) {
-  if (value23?.['viewportBusy'] === !![]) return ![];
+  if (value23?.['viewportBusy'] === true) return false;
   return isRendererFastPreviewGeometryVisible(value22, value23, VIDEO_EDGE_PREFETCH_PADDING);
 }
 function isGeometryNearViewport(value24, value25 = {}) {
@@ -216,7 +216,7 @@ function isGeometryNearViewport(value24, value25 = {}) {
     value26 < LOW_ZOOM_EDGE_PREFETCH_MIN_ZOOM ||
     value26 > LOW_ZOOM_THRESHOLD
   )
-    return ![];
+    return false;
   return isRendererFastPreviewGeometryVisible(value24, value25, LOW_ZOOM_EDGE_PREFETCH_PADDING);
 }
 function resolveImmediateCreateLimit(value27) {
@@ -237,7 +237,7 @@ function getCandidateUserRank(options6 = {}) {
 }
 function hasCandidateMedia(options7 = {}) {
   return (
-    options7['hasMediaHint'] === !![] ||
+    options7['hasMediaHint'] === true ||
     (Array['isArray'](options7['sources']) && options7['sources']['length'] > 0)
   );
 }
@@ -250,14 +250,14 @@ export function resolveRendererFastPreviewMediaQueuePriority(options8 = {}, valu
   };
 }
 function shouldPrioritizeMediaOrder(list2, value31 = {}) {
-  if (!Array['isArray'](list2) || list2['length'] === 0) return ![];
+  if (!Array['isArray'](list2) || list2['length'] === 0) return false;
   const count2 = list2['filter']((value32) => hasCandidateMedia(value32))['length'];
-  if (count2 === 0) return ![];
+  if (count2 === 0) return false;
   const value33 = Number(value31?.['viewport']?.['zoom']),
     value34 = list2['some']((value35) => value35['visible'] && hasCandidateMedia(value35)),
     value36 = list2['some']((enabled6) => !enabled6['visible'] && hasCandidateMedia(enabled6));
-  if (count2 > NORMAL_IMMEDIATE_SRC_LIMIT && value34 && value36) return !![];
-  return value31['viewportBusy'] === !![] || (Number['isFinite'](value33) && value33 <= LOW_ZOOM_THRESHOLD);
+  if (count2 > NORMAL_IMMEDIATE_SRC_LIMIT && value34 && value36) return true;
+  return value31['viewportBusy'] === true || (Number['isFinite'](value33) && value33 <= LOW_ZOOM_THRESHOLD);
 }
 function buildCandidatePriority(candidate, value37, value38) {
   return {
@@ -284,8 +284,8 @@ function orderCandidates(list3, value41 = {}) {
     ['map'](({ candidate: candidate2 }) => candidate2);
 }
 function resolveImmediateMediaSrcLimit(value44, value45, value46 = {}) {
-  if (value46['deferVisibleMediaSrc'] === !![]) return DENSE_INITIAL_IMMEDIATE_SRC_LIMIT;
-  if (value46['viewportBusy'] === !![]) return BUSY_IMMEDIATE_SRC_LIMIT;
+  if (value46['deferVisibleMediaSrc'] === true) return DENSE_INITIAL_IMMEDIATE_SRC_LIMIT;
+  if (value46['viewportBusy'] === true) return BUSY_IMMEDIATE_SRC_LIMIT;
   if (value44?.['lowPriority']) {
     if (value45 >= LARGE_CANDIDATE_COUNT) return LOW_PRIORITY_LARGE_IMMEDIATE_SRC_LIMIT;
     return LOW_PRIORITY_IMMEDIATE_SRC_LIMIT;
@@ -293,8 +293,8 @@ function resolveImmediateMediaSrcLimit(value44, value45, value46 = {}) {
   return NORMAL_IMMEDIATE_SRC_LIMIT;
 }
 function resolveImmediateVideoMediaSrcLimit(value47, value48 = {}) {
-  if (value48['deferVisibleMediaSrc'] === !![]) return DENSE_INITIAL_VIDEO_IMMEDIATE_SRC_LIMIT;
-  if (value48['viewportBusy'] === !![]) return BUSY_VIDEO_IMMEDIATE_SRC_LIMIT;
+  if (value48['deferVisibleMediaSrc'] === true) return DENSE_INITIAL_VIDEO_IMMEDIATE_SRC_LIMIT;
+  if (value48['viewportBusy'] === true) return BUSY_VIDEO_IMMEDIATE_SRC_LIMIT;
   if (value47 >= HUGE_CANDIDATE_COUNT) return HUGE_VIDEO_IMMEDIATE_SRC_LIMIT;
   if (value47 >= LARGE_CANDIDATE_COUNT) return LARGE_VIDEO_IMMEDIATE_SRC_LIMIT;
   return VIDEO_IMMEDIATE_SRC_LIMIT;
@@ -308,7 +308,7 @@ function resolveMediaLimit({
 }) {
   if (suppressNewMedia) return 0;
   if (!isLowZoom) return MEDIA_LIMIT;
-  if (options9?.['viewportBusy'] === !![]) return BUSY_LOW_ZOOM_MEDIA_LIMIT;
+  if (options9?.['viewportBusy'] === true) return BUSY_LOW_ZOOM_MEDIA_LIMIT;
   const value49 = isVeryLowZoom ? VERY_LOW_ZOOM_MEDIA_LIMIT : LOW_ZOOM_MEDIA_LIMIT,
     value50 = Number(candidateCount) || 0,
     value51 = Math['max'](1, Number(options9['containerWidth'] ?? options9['containerW']) || 0),
@@ -334,7 +334,7 @@ function resolveMediaPlan(candidateCount2, options10 = {}) {
             ),
           )
         : null,
-    suppressNewMedia2 = options10?.['suppressNewMedia'] === !![],
+    suppressNewMedia2 = options10?.['suppressNewMedia'] === true,
     mediaLimit = resolveMediaLimit({
       candidateCount: candidateCount2['length'],
       isLowZoom: isLowZoom2,
@@ -356,7 +356,7 @@ function resolveMediaPlan(candidateCount2, options10 = {}) {
       nodeIdsWithMedia: new Set(list4['map']((value57) => value57['nodeId'])),
       explicitMediaSourceOwnerIds: explicitMediaSourceOwnerIds,
       lowPriority: isLowZoom2,
-      prefetchAhead: ![],
+      prefetchAhead: false,
     };
   const value58 = options10?.['previewMotion']?.['center'],
     map = new Set(
@@ -372,7 +372,7 @@ function resolveMediaPlan(candidateCount2, options10 = {}) {
       )['map']((value60) => value60['nodeId']),
     );
   isLowZoom2 &&
-    options10?.['viewportBusy'] === !![] &&
+    options10?.['viewportBusy'] === true &&
     list4['filter'](
       (enabled8) => !map['has'](enabled8['nodeId']) && !enabled8['visible'] && enabled8['motionFront'],
     )
@@ -387,7 +387,7 @@ function resolveMediaPlan(candidateCount2, options10 = {}) {
       })
       ['slice'](0, BUSY_MOTION_AHEAD_MEDIA_LIMIT)
       ['forEach']((value63) => map['add'](value63['nodeId']));
-  const value64 = isLowZoom2 && options10?.['viewportBusy'] === !![] && map['size'] > 0,
+  const value64 = isLowZoom2 && options10?.['viewportBusy'] === true && map['size'] > 0,
     value65 = value64 ? 0 : Math['max'](0, mediaLimit - map['size']),
     list5 = list4['filter']((value66) => !map['has'](value66['nodeId']))
       ['map']((priorityRank) => ({
@@ -407,7 +407,7 @@ function resolveMediaPlan(candidateCount2, options10 = {}) {
     nodeIdsWithMedia: new Set([...map, ...list5['map']((value69) => value69['nodeId'])]),
     explicitMediaSourceOwnerIds: explicitMediaSourceOwnerIds,
     lowPriority: isLowZoom2,
-    prefetchAhead: ![],
+    prefetchAhead: false,
   };
 }
 function isRequiredCandidate(value70) {
@@ -480,7 +480,7 @@ export function planRendererFastPreviewAdmission({
       options,
     ),
     mediaPlan = resolveMediaPlan(candidates, options),
-    handler = (value78) => existingPreviewNodeIds?.['has']?.(value78) === !![],
+    handler = (value78) => existingPreviewNodeIds?.['has']?.(value78) === true,
     value79 = candidates['reduce'](
       (value80, value81) =>
         !handler(value81['nodeId']) && isRequiredImmediateCandidate(value81) ? value80 + 1 : value80,
@@ -501,7 +501,7 @@ export function planRendererFastPreviewAdmission({
     if (!enabled10) count5 -= 1;
     immediateCandidates['push'](value82);
   }
-  const mediaSrcBatchLimit = options['deferVisibleMediaSrc'] === !![];
+  const mediaSrcBatchLimit = options['deferVisibleMediaSrc'] === true;
   return {
     candidates: candidates,
     createBatchSize: resolveCreateBatchSize(candidates['length']),

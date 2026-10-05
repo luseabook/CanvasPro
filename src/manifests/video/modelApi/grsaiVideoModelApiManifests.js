@@ -47,8 +47,8 @@ const DURATION_VALUES = Array['from']({ length: 15 }, (value, item) => item + 1)
     { path: 'resolution', from: 'param', field: 'generationParams.resolution' },
     { path: 'duration', from: 'param', field: 'generationParams.duration', transform: 'integerParam' },
     { path: 'seed', from: 'param', field: 'generationParams.seed', transform: 'integerParam' },
-    { path: 'images', from: 'inputImages', omitWhenEmpty: !![] },
-    { path: 'audios', from: 'inputAudios', omitWhenEmpty: !![] },
+    { path: 'images', from: 'inputImages', omitWhenEmpty: true },
+    { path: 'audios', from: 'inputAudios', omitWhenEmpty: true },
   ]);
 export const GRSAI_VIDEO_MODELS = Object['freeze']([
   Object['freeze']({

@@ -87,17 +87,17 @@ function isMissingUploadUrlError(error) {
   );
 }
 function isRetryableImageUploadError(handle) {
-  if (handle?.['retryable'] === !![] || isMissingUploadUrlError(handle)) return !![];
+  if (handle?.['retryable'] === true || isMissingUploadUrlError(handle)) return true;
   const errorStatus = getErrorStatus(handle);
   return errorStatus === 408 || errorStatus === 425 || errorStatus === 429 || errorStatus >= 500;
 }
 function _buildKey(state, config, scope) {
   const {
-      compress: compress = !![],
+      compress: compress = true,
       maxDim: maxDim = 2048,
       quality: quality = 0.9,
       provider: provider = DEFAULT_IMAGE_UPLOAD_PROVIDER,
-      preferFree: preferFree = ![],
+      preferFree: preferFree = false,
       apiUrl: apiUrl = '',
       multipartField: multipartField = '',
       responsePath: responsePath = '',
@@ -108,7 +108,7 @@ function _buildKey(state, config, scope) {
     output = config ? 1 : 0,
     value2 = compress ? 1 : 0,
     value3 = preferFree ? 1 : 0,
-    enabled = scope?.['forceProviderUpload'] === !![] ? 1 : 0,
+    enabled = scope?.['forceProviderUpload'] === true ? 1 : 0,
     isConfiguredObjectStorageEnabled2 = isConfiguredObjectStorageEnabled() && !enabled ? 1 : 0;
   return [
     state,
@@ -146,7 +146,7 @@ function isReusableRunningHubUrl(value7, value8 = '') {
       uRL2 = new URL(String(value8 || 'https://www.runninghub.cn')['trim']())['hostname'];
     return uRL === uRL2;
   } catch {
-    return ![];
+    return false;
   }
 }
 function isProviderAssetIdentifier(value9) {
@@ -203,16 +203,16 @@ async function normalizeCustomProviderImageBlob(value17, value18, value19 = {}) 
 }
 async function _processSingle(value20, apiKey, fileName) {
   const {
-    compress: compress = !![],
+    compress: compress = true,
     maxDim: maxDim = 2048,
     quality: quality = 0.9,
     provider: provider = DEFAULT_IMAGE_UPLOAD_PROVIDER,
-    fallbackCompressOnError: fallbackCompressOnError = ![],
+    fallbackCompressOnError: fallbackCompressOnError = false,
     fallbackMaxDim: fallbackMaxDim = 2048,
     fallbackQuality: fallbackQuality = 0.9,
   } = fileName || {};
   if (isProviderAssetIdentifier(value20)) return value20;
-  const enabled2 = fileName?.['forceProviderUpload'] === !![];
+  const enabled2 = fileName?.['forceProviderUpload'] === true;
   if (!enabled2 && isConfiguredObjectStoragePublicUrl(value20)) return value20;
   const isConfiguredObjectStorageEnabled3 = isConfiguredObjectStorageEnabled() && !enabled2;
   if (!isConfiguredObjectStorageEnabled3 && provider === 'runninghub' && isReusableRunningHubUrl(value20, fileName?.['apiUrl']))
@@ -235,10 +235,10 @@ async function _processSingle(value20, apiKey, fileName) {
       if (provider === 'apimart')
         return await uploadImageToApimart(value21, { ...(fileName || {}), apiKey: apiKey });
       if (provider === 'grsai')
-        return await uploadImageToBed(value21, apiKey, { ...(fileName || {}), preferFree: ![] });
+        return await uploadImageToBed(value21, apiKey, { ...(fileName || {}), preferFree: false });
       if (isFreeImageHostProvider(provider))
-        return await uploadImageToBed(value21, '', { ...(fileName || {}), preferFree: !![] });
-      return await uploadImageToBed(value21, '', { ...(fileName || {}), preferFree: !![] });
+        return await uploadImageToBed(value21, '', { ...(fileName || {}), preferFree: true });
+      return await uploadImageToBed(value21, '', { ...(fileName || {}), preferFree: true });
     },
     handler3 = async (value22) => {
       const retryCount = normalizeRetryCount(fileName?.['uploadRetries']),
@@ -248,7 +248,7 @@ async function _processSingle(value20, apiKey, fileName) {
           const enabled3 = String((await run3(value22)) || '')['trim']();
           if (!enabled3) {
             const error2 = new Error(provider + ' 图片上传失败: 未返回可用文件 URL，请重试');
-            error2['retryable'] = !![];
+            error2['retryable'] = true;
             throw error2;
           }
           return enabled3;
@@ -263,19 +263,19 @@ async function _processSingle(value20, apiKey, fileName) {
     try {
       compressImage2 = await compressImage(value20, maxDim, quality);
     } catch (value25) {
-      compressImage2 = await get(value20, { provider: 'remote', buildUrl: ![], responseType: 'blob' });
+      compressImage2 = await get(value20, { provider: 'remote', buildUrl: false, responseType: 'blob' });
     }
     return await handler3(compressImage2);
   }
   if (fallbackCompressOnError)
     try {
-      const get2 = await get(value20, { provider: 'remote', buildUrl: ![], responseType: 'blob' });
+      const get2 = await get(value20, { provider: 'remote', buildUrl: false, responseType: 'blob' });
       return await handler3(get2);
     } catch (value26) {
       const compressImage3 = await compressImage(value20, fallbackMaxDim, fallbackQuality);
       return await handler3(compressImage3);
     }
-  const get3 = await get(value20, { provider: 'remote', buildUrl: ![], responseType: 'blob' });
+  const get3 = await get(value20, { provider: 'remote', buildUrl: false, responseType: 'blob' });
   return await handler3(get3);
 }
 async function uploadToTelegraph(value27) {
@@ -299,7 +299,7 @@ async function uploadToQiniu(value33, value34) {
   const post3 = await post(
     getProviderConfig('grsai')['apiUrl']['replace'](/\/v1\/?$/i, '') + '/client/resource/newUploadTokenZH',
     { sux: 'png' },
-    { provider: 'grsai', buildUrl: ![], headers: headers },
+    { provider: 'grsai', buildUrl: false, headers: headers },
   );
   if (!post3['data']) throw new Error('GRSAI 返回了无效的上传凭证');
   const { token: token, key: key2, url: url, domain: domain } = post3['data'],
@@ -308,12 +308,12 @@ async function uploadToQiniu(value33, value34) {
     formData2['append']('token', token),
     formData2['append']('key', key2),
     formData2['append']('file', value33, 'image.png'),
-    await post(url, formData2, { provider: 'qiniu', buildUrl: ![] }),
+    await post(url, formData2, { provider: 'qiniu', buildUrl: false }),
     domain + '/' + key2
   );
 }
 export async function uploadImageToBed(value35, value36, value37 = {}) {
-  const { preferFree: preferFree = ![] } = value37;
+  const { preferFree: preferFree = false } = value37;
   if (isConfiguredObjectStorageEnabled())
     return await uploadPublicMediaToConfiguredObjectStorage('image', value35, value37);
   if (!preferFree && value36)
@@ -357,11 +357,11 @@ export async function uploadToRunningHub(value38, enabled4, value39 = {}) {
 }
 async function _processInputImagesOrdered(list3, value43, value44 = {}) {
   const args =
-      value44?.['applyInputQualityProfile'] === !![]
+      value44?.['applyInputQualityProfile'] === true
         ? resolveImageInputUploadQualityOptions(value44)
         : value44 || {},
     {
-      compress: compress = !![],
+      compress: compress = true,
       maxDim: maxDim = 2048,
       quality: quality = 0.9,
       provider: provider = DEFAULT_IMAGE_UPLOAD_PROVIDER,
@@ -374,8 +374,8 @@ async function _processInputImagesOrdered(list3, value43, value44 = {}) {
       quality: quality,
       provider: provider,
     },
-    value46 = value45['strictUpload'] === !![],
-    enabled5 = value45['forceProviderUpload'] === !![],
+    value46 = value45['strictUpload'] === true,
+    enabled5 = value45['forceProviderUpload'] === true,
     isConfiguredObjectStorageEnabled4 = isConfiguredObjectStorageEnabled() && !enabled5,
     value47 = new Array(list3['length'])['fill'](''),
     list4 = [];
@@ -427,7 +427,7 @@ async function _processInputImagesOrdered(list3, value43, value44 = {}) {
 export async function processInputImages(value50, value51, strictUpload = {}) {
   const list5 = await _processInputImagesOrdered(value50, value51, {
     ...strictUpload,
-    strictUpload: strictUpload['strictUpload'] !== ![],
+    strictUpload: strictUpload['strictUpload'] !== false,
   });
   return list5['filter'](Boolean);
 }

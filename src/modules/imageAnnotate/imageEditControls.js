@@ -17,7 +17,7 @@ export function getImageRotation(list = []) {
 }
 export const getEditorRotation = (index) => index['_rotationPreview'] ?? getImageRotation(index['_commands']);
 export const getKeepImageRatio = (list2 = []) =>
-  list2['findLast']((result) => result?.['type'] === 'keep-image-ratio')?.['enabled'] === !![];
+  list2['findLast']((result) => result?.['type'] === 'keep-image-ratio')?.['enabled'] === true;
 export function setImageRotation(enabled, data) {
   if (
     !enabled['active'] ||
@@ -29,10 +29,10 @@ export function setImageRotation(enabled, data) {
   const degrees = normalizeRotationDegrees(data),
     imageRotation = getImageRotation(enabled['_commands']);
   if (degrees === imageRotation) return;
-  (enabled['_removeTextInput'](!![]),
+  (enabled['_removeTextInput'](true),
     enabled['_commands']['push']({ type: 'rotate-image', degrees: degrees - imageRotation }),
     (enabled['_redoStack'] = []),
-    (enabled['_dirty'] = !![]),
+    (enabled['_dirty'] = true),
     enabled['_render']());
 }
 export function syncImageEditControls(enabled2) {
@@ -81,8 +81,8 @@ export function syncImageEditControls(enabled2) {
 export function mountImageEditControls(current) {
   const el2 = current['toolbarEl'];
   (el2['classList']['add']('v2-image-edit-toolbar'), el2['setAttribute']('aria-label', text('title')));
-  const entry = (record) => scrollElementHorizontallyWithWheel(record, el2, { stopPropagation: !![] });
-  (el2['addEventListener']('wheel', entry, { passive: ![] }),
+  const entry = (record) => scrollElementHorizontallyWithWheel(record, el2, { stopPropagation: true });
+  (el2['addEventListener']('wheel', entry, { passive: false }),
     current['containerEl']['classList']['add']('v2-image-edit-surface'),
     (current['_rotationPreview'] = null));
   const el3 = el2['ownerDocument'],
@@ -150,7 +150,7 @@ export function mountImageEditControls(current) {
       enabled: !getKeepImageRatio(current['_commands']),
     }),
       (current['_redoStack'] = []),
-      (current['_dirty'] = !![]),
+      (current['_dirty'] = true),
       current['_render']());
   });
   (keepButton['setAttribute']('aria-pressed', 'false'),

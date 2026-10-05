@@ -19,10 +19,10 @@ export function createAgentConversationCanvasTransferRuntime({
   commandContext: commandContext,
   text: text,
 } = {}) {
-  function replyWithText(runId, content, { ok: ok = !![], status: status = 'chat', extra: extra = {} } = {}) {
+  function replyWithText(runId, content, { ok: ok = true, status: status = 'chat', extra: extra = {} } = {}) {
     return (
       sessionStore['pushHistory']?.({ role: 'assistant', status: status, content: content, ...extra }),
-      sessionStore['setCurrentRun']?.({ id: runId, status: status, stopped: ![] }),
+      sessionStore['setCurrentRun']?.({ id: runId, status: status, stopped: false }),
       {
         ok: ok,
         status: status,
@@ -52,7 +52,7 @@ export function createAgentConversationCanvasTransferRuntime({
       );
     return (
       isActiveRun(runId) &&
-        sessionStore['setCurrentRun']?.({ id: runId, status: planResult['status'], stopped: ![] }),
+        sessionStore['setCurrentRun']?.({ id: runId, status: planResult['status'], stopped: false }),
       { ...planResult, responseChannel: 'canvas.tool' }
     );
   }

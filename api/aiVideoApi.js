@@ -1354,19 +1354,19 @@ function hasExplicitVideoSubmitFailureSignal(value117) {
       '处理中',
     ]);
   for (const response15 of videoSubmitDiagnosticCandidates2) {
-    if (response15['success'] === ![] || response15['ok'] === ![]) return !![];
+    if (response15['success'] === false || response15['ok'] === false) return true;
     const value118 = String(
       response15['status'] || response15['taskStatus'] || response15['task_status'] || '',
     )
       ['trim']()
       ['toLowerCase']();
-    if (map5['has'](value118)) return !![];
+    if (map5['has'](value118)) return true;
     const videoSubmitDiagnosticToken2 = normalizeVideoSubmitDiagnosticToken(
       response15['errorCode'] ?? response15['error_code'],
     );
-    if (videoSubmitDiagnosticToken2 && videoSubmitDiagnosticToken2 !== '0') return !![];
+    if (videoSubmitDiagnosticToken2 && videoSubmitDiagnosticToken2 !== '0') return true;
     const videoSubmitDiagnosticToken3 = normalizeVideoSubmitDiagnosticToken(response15['code']);
-    if (videoSubmitDiagnosticToken3 && !isVideoSubmitSuccessCode(videoSubmitDiagnosticToken3)) return !![];
+    if (videoSubmitDiagnosticToken3 && !isVideoSubmitSuccessCode(videoSubmitDiagnosticToken3)) return true;
     for (const value119 of [
       'error',
       'errorMessage',
@@ -1377,18 +1377,18 @@ function hasExplicitVideoSubmitFailureSignal(value117) {
       'failure_reason',
     ]) {
       const value120 = response15[value119];
-      if (value120 !== null && value120 !== undefined && value120 !== '') return !![];
+      if (value120 !== null && value120 !== undefined && value120 !== '') return true;
     }
     const value121 = String(response15['message'] || response15['msg'] || '')['trim']();
-    if (value121 && !enabled17['has'](value121['toLowerCase']())) return !![];
+    if (value121 && !enabled17['has'](value121['toLowerCase']())) return true;
   }
-  return ![];
+  return false;
 }
 
 function buildVideoSubmitMissingResultError(
   value122,
   value123,
-  { expectsTaskId: expectsTaskId = !![] } = {},
+  { expectsTaskId: expectsTaskId = true } = {},
 ) {
   const videoSubmitDiagnosticToken4 = getVideoSubmitDiagnosticToken(value123, [
       'status',
@@ -1430,11 +1430,11 @@ function buildVideoSubmitMissingResultError(
     code: value124 || undefined,
     message: '' + value127 + (list28['length'] ? '（' + list28['join']('；') + '）' : ''),
     raw: value123,
-    retryable: ![],
+    retryable: false,
   });
 }
 
-function normalizeDreaminaVideoTaskResult(value128, value129, { allowPending: allowPending = ![] } = {}) {
+function normalizeDreaminaVideoTaskResult(value128, value129, { allowPending: allowPending = false } = {}) {
   const dreaminaTaskSnapshot = normalizeDreaminaTaskSnapshot(value128, { submitId: value129 });
   if (dreaminaTaskSnapshot?.['phase'] === 'failed') {
     const error14 = new Error(
@@ -1445,7 +1445,7 @@ function normalizeDreaminaVideoTaskResult(value128, value129, { allowPending: al
   }
   if (allowPending && dreaminaTaskSnapshot?.['phase'] !== 'done')
     return {
-      pending: !![],
+      pending: true,
       message: dreaminaTaskSnapshot?.['label'] || '',
       dreaminaSnapshot: dreaminaTaskSnapshot,
     };
@@ -1474,12 +1474,12 @@ export async function probeDreaminaVideoTask(value132, value133 = {}) {
   const enabled18 = String(value132 || '')['trim']();
   if (!enabled18) throw new Error('缺少 Dreamina 提交ID，无法核验视频任务');
   const queryDreaminaResult2 = await queryDreaminaResult(enabled18, {
-    autoDownload: !![],
+    autoDownload: true,
     retries: value133?.['retries'],
     retryDelay: value133?.['retryDelay'],
     signal: value133?.['signal'],
   });
-  return normalizeDreaminaVideoTaskResult(queryDreaminaResult2, enabled18, { allowPending: !![] });
+  return normalizeDreaminaVideoTaskResult(queryDreaminaResult2, enabled18, { allowPending: true });
 }
 
 function buildManifestVideoTaskPollUrls(value134, value135) {
@@ -1509,7 +1509,7 @@ const ASYNC_VIDEO_FAILURE_STATUSES = new Set([
 ]);
 
 function isAgnesTaskNotExistError(value138) {
-  if (!(value138 instanceof ApiError)) return ![];
+  if (!(value138 instanceof ApiError)) return false;
   const value139 = String(value138['message'] || '')
     ['trim']()
     ['toLowerCase']();
@@ -1535,12 +1535,12 @@ function shouldTryManifestPollFallback({
   pollUrl: pollUrl,
   taskId: taskId7,
 } = {}) {
-  if (pollIndex >= pollUrls['length'] - 1 || !(err instanceof ApiError)) return ![];
+  if (pollIndex >= pollUrls['length'] - 1 || !(err instanceof ApiError)) return false;
   const value141 = String(providerId2 || '')
     ['trim']()
     ['toLowerCase']();
-  if (value141 === 'agnes' && isAgnesVideoId(taskId7)) return ![];
-  if (Number(err['status'] || err['code'] || 0) === 404) return !![];
+  if (value141 === 'agnes' && isAgnesVideoId(taskId7)) return false;
+  if (Number(err['status'] || err['code'] || 0) === 404) return true;
   return (
     value141 === 'agnes' && String(pollUrl || '')['includes']('/agnesapi?') && isAgnesTaskNotExistError(err)
   );
@@ -1577,7 +1577,7 @@ function resolveVideoTransportErrorPolicy(options8 = {}) {
     ),
     retryableStatuses: run2(enabled21['retryableStatuses']),
     terminalStatuses: run2(enabled21['terminalStatuses']),
-    surfaceLastError: enabled21['surfaceLastError'] !== ![],
+    surfaceLastError: enabled21['surfaceLastError'] !== false,
   };
 }
 
@@ -1740,7 +1740,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
         headers: value176,
         body: JSON['stringify'](dom['body']),
         responseType: 'text',
-        returnMeta: !![],
+        returnMeta: true,
       });
       ((value178 = String(requester6?.['data'] ?? '')),
         (value179 = requester6?.['headers'] || null),
@@ -1811,7 +1811,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
           taskId: value183,
         });
       args20 = resolveVideoRuntimeProviderKey(value175, videoProviderId) + ':video:' + value183;
-      const value184 = dom['useOpenapiQuery'] === !![] || dom['url'] === '/api/v2/proxy/image';
+      const value184 = dom['useOpenapiQuery'] === true || dom['url'] === '/api/v2/proxy/image';
       (args16?.['onTaskMeta']?.({
         taskId: value183,
         useOpenapiQuery: value184,
@@ -1835,7 +1835,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
       args20 = resolveVideoRuntimeProviderKey(args15, videoProviderId) + ':video:' + value186;
       const videoProviderConfig = resolveVideoProviderConfig(args15, videoProviderId),
         args21 =
-          dom['useOpenapiQuery'] === !![] ||
+          dom['useOpenapiQuery'] === true ||
           (videoProviderId === 'runninghub' && dom['url'] === '/api/v2/proxy/image'),
         value187 =
           args15['apiKey'] ||
@@ -1845,7 +1845,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
         taskId: value186,
         provider: videoProviderId,
         kind: 'video',
-        ...(args21 ? { useOpenapiQuery: !![] } : {}),
+        ...(args21 ? { useOpenapiQuery: true } : {}),
       }),
         args16?.['onTaskId']?.(value186));
       if (args21) {
@@ -1853,7 +1853,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
           value186,
           { ...args15, apiKey: value187 },
           videoProviderId,
-          { ...args19, useOpenapiQuery: !![] },
+          { ...args19, useOpenapiQuery: true },
         );
         processVideoTaskResult5 = processVideoTaskResult(pollRunningHubVideoTask6, videoProviderId, args19);
       } else processVideoTaskResult5 = await pollVideoTask(value186, videoProviderId, value187, args19);
@@ -1875,13 +1875,13 @@ async function generateVideoUnqueued(args15, args16 = {}) {
             provider: videoProviderId,
             message: extractAsyncVideoTaskFailureReason2,
             raw: error16,
-            retryable: ![],
+            retryable: false,
           });
       }
       throw buildVideoSubmitMissingResultError(videoProviderId, error16, {
         expectsTaskId:
           value173 ||
-          dom?.['isAsync'] === !![] ||
+          dom?.['isAsync'] === true ||
           Boolean(args19['taskPolling']) ||
           Boolean(args18?.['taskIdPath']),
       });
@@ -1910,7 +1910,7 @@ function createRunningHubWorkflowQueueChangeEmitter(handler6) {
       value190 = Number(options10?.['queueIndex'] ?? -1),
       value191 = Number(options10?.['queueLength'] ?? 0),
       value192 = value189 + ':' + value190 + ':' + value191;
-    if (value192 === value188) return ![];
-    return ((value188 = value192), handler6(options10), !![]);
+    if (value192 === value188) return false;
+    return ((value188 = value192), handler6(options10), true);
   };
 }

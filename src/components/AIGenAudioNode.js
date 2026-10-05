@@ -230,7 +230,7 @@ const AUDIO_WORKFLOW_VALIDATORS = Object['freeze']({
 export function doesAudioWorkflowAcceptTextInput(next = '') {
   const modelManifest = getModelManifest(String(next || '')['trim']()),
     list3 = modelManifest?.['inputSlots']?.['allowedKinds'];
-  if (!Array['isArray'](list3)) return !![];
+  if (!Array['isArray'](list3)) return true;
   return list3['map']((current) => String(current || '')['trim']())['includes']('text');
 }
 function resolveAudioWorkflowPromptPlaceholder(entry = '') {
@@ -297,9 +297,9 @@ function createDynamicWorkflowItemFromManifest(state) {
     provider: key2['provider'],
     adapterType: key2['adapterType'],
     executionId: key2['executionId'] || '',
-    async: key2['async'] === !![],
-    cancellable: key2['cancellable'] === !![],
-    vip: key2['vip'] === !![],
+    async: key2['async'] === true,
+    cancellable: key2['cancellable'] === true,
+    vip: key2['vip'] === true,
     group: isCustomAiAppManifest(key2) ? 'rhAiApp' : label['group'] || 'runninghubWorkflow',
     validate: () => '',
   });
@@ -362,8 +362,8 @@ function isLikelyImageUrl(value11) {
   const enabled8 = String(value11 || '')
     ['trim']()
     ['toLowerCase']();
-  if (!enabled8) return ![];
-  if (enabled8['startsWith']('data:image/')) return !![];
+  if (!enabled8) return false;
+  if (enabled8['startsWith']('data:image/')) return true;
   return /\.(png|jpe?g|webp|gif|bmp|svg|avif)(\?|#|$)/i['test'](enabled8);
 }
 function localUrlFromPath(value12) {
@@ -396,11 +396,11 @@ export class AIGenAudioNode {
       (this['_audioLoadInFlightPreload'] = ''),
       (this['_audioPlayAttemptToken'] = 0),
       (this['_audioPlayDeadlineTimer'] = null),
-      (this['_audioPlayPending'] = ![]),
+      (this['_audioPlayPending'] = false),
       (this['_playbackResumeSource'] = ''),
       (this['_playbackResumeTime'] = 0),
       (this['_lastEdgeSig'] = null),
-      (this['_isGenerating'] = ![]),
+      (this['_isGenerating'] = false),
       (this['_modelMenu'] = null),
       (this['_runninghubSubmenu'] = null),
       (this['_modelLabelEl'] = null),
@@ -426,7 +426,7 @@ export class AIGenAudioNode {
       (this['_audioMultiBackplateEls'] = []),
       (this['_lastAudioResultsKeyStr'] = ''),
       (this['_lastMainAudioIndex'] = 0),
-      (this['_lastIsAudiosExpanded'] = ![]),
+      (this['_lastIsAudiosExpanded'] = false),
       (this['_waveBgEl'] = null),
       (this['_wavePlayed'] = null),
       (this['_progressLine'] = null),
@@ -441,19 +441,19 @@ export class AIGenAudioNode {
       (this['_cancelDeferredWaveform'] = null),
       (this['_waveformAbortController'] = null),
       (this['_statusOverlayEl'] = null),
-      (this['_isSeeking'] = ![]),
+      (this['_isSeeking'] = false),
       (this['_progressController'] = null),
       (this['_audioDurationProbeToken'] = 0),
       (this['_promptPanel'] = null),
       (this['_promptInputWrap'] = null),
-      (this['_isPromptBoxResizing'] = ![]),
-      (this['_promptResizeHandle'] = ![]),
+      (this['_isPromptBoxResizing'] = false),
+      (this['_promptResizeHandle'] = false),
       (this['_promptResizeCleanup'] = null),
-      (this['_rhCancelInFlight'] = ![]),
+      (this['_rhCancelInFlight'] = false),
       (this['_assetMentionRegistryUnsubscribe'] = null),
-      (this['_assetMentionRegistryRefreshPending'] = ![]),
+      (this['_assetMentionRegistryRefreshPending'] = false),
       (this['_vipInstallId'] = ''),
-      (this['_vipSelectionRetryInProgress'] = ![]),
+      (this['_vipSelectionRetryInProgress'] = false),
       (this['_generationNodeHelpTip'] = null),
       (this['_modelProviderProfileControl'] = null),
       (this['_uiSchemaCleanup'] = null),
@@ -487,7 +487,7 @@ export class AIGenAudioNode {
           if (value19) startLoading(this['previewEl']);
           else stopLoading(this['previewEl']);
         },
-        onSuccess: (value20, { recovering: recovering = ![] } = {}) => {
+        onSuccess: (value20, { recovering: recovering = false } = {}) => {
           if (recovering) return;
           window['showToast']?.(aigenAudioText('generation.completed'), 'success');
         },
@@ -519,11 +519,11 @@ export class AIGenAudioNode {
     if (!workflow2) return;
     if (
       !this['_guardVipWorkflowSelection'](workflow2['key'], () => {
-        this['_vipSelectionRetryInProgress'] = !![];
+        this['_vipSelectionRetryInProgress'] = true;
         try {
           this['_setSelectedWorkflow'](workflow2['key']);
         } finally {
-          this['_vipSelectionRetryInProgress'] = ![];
+          this['_vipSelectionRetryInProgress'] = false;
         }
       })
     )
@@ -586,12 +586,12 @@ export class AIGenAudioNode {
       this['_syncModelProviderProfileControl']());
   }
   ['refreshModelRegistryUi']() {
-    if (this['_rendererDetailsDeferred'] === !![] || !this['footerEl']) return ![];
+    if (this['_rendererDetailsDeferred'] === true || !this['footerEl']) return false;
     return (
       this['_renderFooter'](this['footerEl']),
       this['_refreshWorkflowUi'](),
       this['_updateSubmitButtonState'](),
-      !![]
+      true
     );
   }
   ['_getGenerationNodeHelpText'](key3 = this['_getCurrentWorkflow']()['key']) {
@@ -817,7 +817,7 @@ export class AIGenAudioNode {
             this['_selectMainAudioResult'](value46['mainAudioIndex'] ?? this['_lastMainAudioIndex'] ?? 0);
             return;
           }
-          appStore['updateNodeData'](this['nodeId'], { isAudiosExpanded: !![] });
+          appStore['updateNodeData'](this['nodeId'], { isAudiosExpanded: true });
         }),
         el12['addEventListener']('click', (event7) => {
           (event7['preventDefault'](), event7['stopPropagation']());
@@ -856,7 +856,7 @@ export class AIGenAudioNode {
     if (!audioUrl2) return;
     const value50 = {
       mainAudioIndex: mainAudioIndex,
-      isAudiosExpanded: ![],
+      isAudiosExpanded: false,
       audioUrl: audioUrl2,
       src: audioUrl2,
       localPath: normalizeLocalPath(value49['localPath'] || audioUrl2),
@@ -917,9 +917,9 @@ export class AIGenAudioNode {
     const value58 = String(value57?.['provider'] || '')
       ['trim']()
       ['toLowerCase']();
-    if (value58 !== 'runninghubwf' && value58 !== 'runninghub') return ![];
+    if (value58 !== 'runninghubwf' && value58 !== 'runninghub') return false;
     const enabled13 = String(value57?.['rhTaskId'] || '')['trim']();
-    if (!enabled13) return ![];
+    if (!enabled13) return false;
     const value59 = String(value57?.['rhTaskStatus'] || '')
       ['trim']()
       ['toLowerCase']();
@@ -929,10 +929,10 @@ export class AIGenAudioNode {
       value59 === 'idle' ||
       value59 === 'cancelled'
     )
-      return ![];
-    return !![];
+      return false;
+    return true;
   }
-  ['_stopRunningHubRecovery'](resetRecovering = ![]) {
+  ['_stopRunningHubRecovery'](resetRecovering = false) {
     this['_audioTaskOrchestration']?.['resetRecovery']({ resetRecovering: resetRecovering });
   }
   ['_setGeneratingUi']() {
@@ -942,7 +942,7 @@ export class AIGenAudioNode {
       cancellable = value61 === 'runninghubwf' || value61 === 'runninghub',
       el13 = resolveGenerationButtonMode(value60, {
         cancellable: cancellable,
-        cancelInFlight: this['_rhCancelInFlight'] === !![],
+        cancelInFlight: this['_rhCancelInFlight'] === true,
       });
     if (el13['busy']) {
       cancellable
@@ -951,11 +951,11 @@ export class AIGenAudioNode {
             tooltip: aigenAudioText('buttons.generateCancellable'),
             ariaLabel: aigenAudioText('buttons.cancelAudioGeneration'),
             color: 'var(--red)',
-            busy: !![],
+            busy: true,
           })
         : setGenerateButtonLoadingUi(this['btnEl'], {
             title: aigenAudioText('buttons.generate'),
-            disabled: !![],
+            disabled: true,
             ariaLabel: aigenAudioText('buttons.generate'),
           });
       ((this['btnEl']['disabled'] = el13['disabled']),
@@ -967,11 +967,11 @@ export class AIGenAudioNode {
   }
   ['_guardVipWorkflowSelection'](value62, onSuccess = null) {
     const modelId = getWorkflowGateModelId(value62);
-    if (!modelId) return !![];
+    if (!modelId) return true;
     const run = window['isModelAllowedBySubscription'],
-      value63 = typeof run === 'function' ? run(modelId, 'runninghubwf') : !![];
-    if (value63) return !![];
-    if (this['_vipSelectionRetryInProgress']) return ![];
+      value63 = typeof run === 'function' ? run(modelId, 'runninghubwf') : true;
+    if (value63) return true;
+    if (this['_vipSelectionRetryInProgress']) return false;
     return (
       typeof window['openSubscriptionDialog'] === 'function'
         ? window['openSubscriptionDialog']({
@@ -980,7 +980,7 @@ export class AIGenAudioNode {
             onSuccess: onSuccess,
           })
         : window['showToast']?.(aigenAudioText('vip.needAuthorization'), 'warn'),
-      ![]
+      false
     );
   }
   async ['runGeneration'](options3 = {}) {
@@ -1001,7 +1001,7 @@ export class AIGenAudioNode {
     if (
       shouldAllowCancel(value65, {
         cancellable: cancellable2,
-        cancelInFlight: this['_rhCancelInFlight'] === !![],
+        cancelInFlight: this['_rhCancelInFlight'] === true,
       })
     ) {
       await this['_cancelRunningHubWorkflowTask']();
@@ -1034,12 +1034,12 @@ export class AIGenAudioNode {
     };
     return (
       this['_dispatchGenerationHistoryAudio'](audioUrl3['audios'] || finalUrl, value69),
-      this['_applyResultWideLayout']({ ...this['_data'], ...audioUrl3, ...finalUrl }, !![]),
+      this['_applyResultWideLayout']({ ...this['_data'], ...audioUrl3, ...finalUrl }, true),
       this['_syncAudioMultiResultStack']({ ...this['_data'], ...audioUrl3, ...finalUrl }),
       { finalUrl: finalUrl['audioUrl'], finalLocalPath: finalUrl['localPath'], patch: audioUrl3 }
     );
   }
-  async ['_applyAudioResultAndStore'](value70, value71, { writeStore: writeStore = !![] } = {}) {
+  async ['_applyAudioResultAndStore'](value70, value71, { writeStore: writeStore = true } = {}) {
     const value72 = await this['_buildAudioResultPatch'](value70, value71);
     if (writeStore) appStore['updateNodeData'](this['nodeId'], value72);
     return this['_applyAudioResultProjection'](value72, value71);
@@ -1071,9 +1071,9 @@ export class AIGenAudioNode {
   }
   async ['_maybeResumeRunningHubTask']() {
     const storeSnapshot2 = getStoreSnapshot()['nodes']?.[this['nodeId']] || this['_data'] || {};
-    if (this['_isGenerating'] && storeSnapshot2?.['rhTaskRecovering'] !== !![]) return null;
+    if (this['_isGenerating'] && storeSnapshot2?.['rhTaskRecovering'] !== true) return null;
     if (!this['_isRunningHubRecoverableRunningTask'](storeSnapshot2))
-      return (this['_stopRunningHubRecovery'](![]), null);
+      return (this['_stopRunningHubRecovery'](false), null);
     const payload2 = await this['_buildPayload']();
     if (!payload2) return null;
     return this['_audioTaskOrchestration']['resumeIfNeeded']({
@@ -1083,7 +1083,7 @@ export class AIGenAudioNode {
       ),
     });
   }
-  ['_applyResultWideLayout'](value75 = null, enabled14 = ![]) {
+  ['_applyResultWideLayout'](value75 = null, enabled14 = false) {
     const box3 = value75 || this['_data'] || {},
       enabled15 = this['_resolveNodeAudioUrl'](box3);
     if (!enabled15) return;
@@ -1309,8 +1309,8 @@ export class AIGenAudioNode {
   ['_setPlaybackBuffering'](value97) {
     const el20 = this['_playBtn'];
     if (!el20) return;
-    el20['classList']?.['toggle']?.('is-buffering', value97 === !![]);
-    if (value97 === !![]) el20['setAttribute']?.('aria-busy', 'true');
+    el20['classList']?.['toggle']?.('is-buffering', value97 === true);
+    if (value97 === true) el20['setAttribute']?.('aria-busy', 'true');
     else el20['removeAttribute']?.('aria-busy');
   }
   ['_seekTo'](value98) {
@@ -1322,21 +1322,21 @@ export class AIGenAudioNode {
     value99 = Math['max'](0, Math['min'](1, value99));
     const currentTime2 = value99 * duration;
     if (!isFinite(currentTime2)) return;
-    ((this['_isSeeking'] = !![]),
+    ((this['_isSeeking'] = true),
       (this['audioEl']['currentTime'] = currentTime2),
       this['_progressController']?.['sync']({
         currentTime: currentTime2,
         duration: duration,
-        force: !![],
-        showLine: !![],
+        force: true,
+        showLine: true,
       }),
       this['audioEl']['addEventListener'](
         'seeked',
         () => {
-          ((this['_isSeeking'] = ![]),
-            this['_progressController']?.['sync']({ force: !![], showLine: !![] }));
+          ((this['_isSeeking'] = false),
+            this['_progressController']?.['sync']({ force: true, showLine: true }));
         },
-        { once: !![] },
+        { once: true },
       ));
   }
   ['_setAudioPreviewResultState'](enabled17) {
@@ -1353,15 +1353,15 @@ export class AIGenAudioNode {
   }
   async ['_ensureVipAccessForCurrentWorkflow']() {
     const modelId2 = this['_getCurrentGateModelId']();
-    if (!modelId2) return ((this['_vipInstallId'] = ''), !![]);
+    if (!modelId2) return ((this['_vipInstallId'] = ''), true);
     const run2 = window['isModelAllowedBySubscription'],
-      enabled18 = typeof run2 === 'function' ? run2(modelId2, 'runninghubwf') : !![];
+      enabled18 = typeof run2 === 'function' ? run2(modelId2, 'runninghubwf') : true;
     if (!enabled18)
       return (
         typeof window['openSubscriptionDialog'] === 'function'
           ? window['openSubscriptionDialog']({ modelId: modelId2, provider: 'runninghubwf' })
           : window['showToast']?.(aigenAudioText('vip.needAuthorization'), 'warn'),
-        ![]
+        false
       );
     if (typeof window['ensureSubscriptionInstallId'] === 'function')
       try {
@@ -1370,7 +1370,7 @@ export class AIGenAudioNode {
         this['_vipInstallId'] = '';
       }
     else this['_vipInstallId'] = String(window['__aicInstallId'] || '')['trim']();
-    return !![];
+    return true;
   }
   async ['_resolveAudioDurationSec'](value101) {
     const enabled19 = String(value101 || '')['trim']();
@@ -1378,7 +1378,7 @@ export class AIGenAudioNode {
     return await loadAudioDurationMetadataSec(enabled19, { timeoutMs: 5000 });
   }
   async ['_validateAdvancedVoiceCloneDurations'](list12 = []) {
-    if (this['_getCurrentWorkflow']()['key'] !== ADVANCED_VOICE_CLONE_WORKFLOW_KEY) return !![];
+    if (this['_getCurrentWorkflow']()['key'] !== ADVANCED_VOICE_CLONE_WORKFLOW_KEY) return true;
     const value102 = Array['isArray'](list12) ? list12 : [];
     for (const response2 of value102) {
       const duration2 = await this['_resolveAudioDurationSec'](response2?.['url']);
@@ -1399,11 +1399,11 @@ export class AIGenAudioNode {
             }),
             'warn',
           ),
-          ![]
+          false
         );
       }
     }
-    return !![];
+    return true;
   }
   ['_createStatusCard'](value103, value104) {
     const el21 = document['createElement']('div');
@@ -1463,7 +1463,7 @@ export class AIGenAudioNode {
     if (!this['_statusOverlayEl']) return;
     (this['_statusOverlayEl']['remove'](), (this['_statusOverlayEl'] = null));
   }
-  ['_syncStatusOverlay'](value107 = this['_data'], enabled20 = ![]) {
+  ['_syncStatusOverlay'](value107 = this['_data'], enabled20 = false) {
     const value108 =
         String(value107?.['rhStatusMessage'] || '')['trim']() ||
         (String(value107?.['jobStatus'] || '')['toLowerCase']() === 'error'
@@ -1489,7 +1489,7 @@ export class AIGenAudioNode {
   }
   async ['_ensureWaveform'](value111) {
     const enabled21 = String(value111 || '')['trim']();
-    if (!enabled21 || this['_rendererWaveformVisible'] !== !![]) return;
+    if (!enabled21 || this['_rendererWaveformVisible'] !== true) return;
     const value112 = JSON['stringify']([enabled21, this['_data']?.['waveformLocalPath'] || '']);
     if (value112 === this['_waveformLoadingKey']) return;
     this['_cancelWaveformRequest']();
@@ -1619,7 +1619,7 @@ export class AIGenAudioNode {
       })),
       el24?.['addEventListener']('click', (event11) => {
         event11['stopPropagation']();
-        if (globalThis['window']?.['DEV_MODE'] !== !![]) return;
+        if (globalThis['window']?.['DEV_MODE'] !== true) return;
         (flushPromptHtmlCommit(this),
           openDebugRequestWindow({
             prepare: async () => {
@@ -1636,7 +1636,7 @@ export class AIGenAudioNode {
         activateMenuKeyboard: activateMenuKeyboard,
       }));
     const value122 = {
-      listenConfigChanges: ![],
+      listenConfigChanges: false,
       getProviderProfileId: () => {
         const value123 = appStore['getState']?.()?.['nodes']?.[this['nodeId']] || this['_data'] || {};
         return value123['providerProfileId'] || value123['rhProviderProfileId'] || '';
@@ -1721,8 +1721,8 @@ export class AIGenAudioNode {
       (this['_timeEl'] = el35['querySelector']('.audio-time-display')),
       (this['audioEl'] = document['createElement']('audio')),
       (this['audioEl']['className'] = 'audio-player'),
-      (this['audioEl']['controls'] = ![]),
-      (this['audioEl']['draggable'] = ![]),
+      (this['audioEl']['controls'] = false),
+      (this['audioEl']['draggable'] = false),
       (this['audioEl']['preload'] = 'none'),
       (this['_progressController'] = createAudioPlaybackProgressController({
         audioEl: this['audioEl'],
@@ -1784,8 +1784,8 @@ export class AIGenAudioNode {
           this['_progressController']?.['sync']({
             currentTime: currentTime3,
             duration: this['audioEl']['duration'],
-            force: !![],
-            showLine: !![],
+            force: true,
+            showLine: true,
           }));
       }),
       this['_bar']?.['addEventListener']('click', (event15) => {
@@ -1797,18 +1797,18 @@ export class AIGenAudioNode {
         if (this['audioEl']['paused']) this['_playAudio']();
         else this['audioEl']['pause']();
       }),
-      this['audioEl']['addEventListener']('play', () => this['_setPlayIcon'](![])),
+      this['audioEl']['addEventListener']('play', () => this['_setPlayIcon'](false)),
       this['audioEl']['addEventListener']('pause', () => {
-        (this['_setPlaybackBuffering'](![]), this['_setPlayIcon'](!![]));
+        (this['_setPlaybackBuffering'](false), this['_setPlayIcon'](true));
       }),
       this['audioEl']['addEventListener']('waiting', () => {
-        if (this['audioEl']?.['paused'] === ![]) this['_setPlaybackBuffering'](!![]);
+        if (this['audioEl']?.['paused'] === false) this['_setPlaybackBuffering'](true);
       }),
       this['audioEl']['addEventListener']('playing', () => {
-        this['_setPlaybackBuffering'](![]);
+        this['_setPlaybackBuffering'](false);
       }),
       this['audioEl']['addEventListener']('ended', () => {
-        this['_setPlaybackBuffering'](![]);
+        this['_setPlaybackBuffering'](false);
       }),
       this['_unregisterAudioPlaybackClient']?.(),
       (this['_unregisterAudioPlaybackClient'] = registerAudioPlaybackClient(this['nodeId'], {
@@ -1821,11 +1821,11 @@ export class AIGenAudioNode {
       ? this['_rendererMediaDeferred']
         ? this['_prepareDeferredAudio'](value130)
         : (this['_prepareAudio'](value130),
-          this['_applyResultWideLayout'](this['_data'], ![]),
-          this['_setAudioPreviewResultState'](!![]),
+          this['_applyResultWideLayout'](this['_data'], false),
+          this['_setAudioPreviewResultState'](true),
           this['_syncAudioMultiResultStack'](this['_data']))
-      : (this['_setAudioPreviewResultState'](![]),
-        this['_syncStatusOverlay'](this['_data'], ![]),
+      : (this['_setAudioPreviewResultState'](false),
+        this['_syncStatusOverlay'](this['_data'], false),
         this['_syncAudioMultiResultStack'](this['_data']));
     el31['appendChild'](this['previewEl']);
     const panel = document['createElement']('div');
@@ -1852,7 +1852,7 @@ export class AIGenAudioNode {
           ((this['_audioRefUploadSlot'] = enabled24),
             (this['_audioRefUploadAnchorNodeId'] = this['nodeId']),
             (this['_audioRefUploadInput']['accept'] =
-              getAudioWorkflowSlots(this['_getCurrentWorkflow']()['key'], { includeImages: !![] })['find'](
+              getAudioWorkflowSlots(this['_getCurrentWorkflow']()['key'], { includeImages: true })['find'](
                 (value131) => value131['slot'] === enabled24,
               )?.['kind'] === 'image'
                 ? 'image/png,image/jpeg,image/webp'
@@ -1865,9 +1865,9 @@ export class AIGenAudioNode {
         (event19['stopPropagation'](), event19['preventDefault']());
         const value132 = appStore['getState']()['pickConnectMode'];
         (value132 && value132['active'] && value132['sourceNodeId'] === this['nodeId']
-          ? appStore['setPickConnectMode']({ active: ![] })
+          ? appStore['setPickConnectMode']({ active: false })
           : appStore['setPickConnectMode']({
-              active: !![],
+              active: true,
               sourceNodeId: this['nodeId'],
               handleDirection: 'left',
               preferredRefSlot: undefined,
@@ -1900,13 +1900,13 @@ export class AIGenAudioNode {
         const value133 = this['_getCurrentWorkflow']()['key'],
           el38 = this['_root'],
           el39 = this['refBarEl'];
-        ((this['_audioRefUploadPending'] = !![]),
+        ((this['_audioRefUploadPending'] = true),
           el39?.['setAttribute']('aria-busy', 'true'),
           startLoading(el39),
           this['_updateSubmitButtonState']());
         try {
           const sourceKind =
-            getAudioWorkflowSlots(this['_getCurrentWorkflow']()['key'], { includeImages: !![] })['find'](
+            getAudioWorkflowSlots(this['_getCurrentWorkflow']()['key'], { includeImages: true })['find'](
               (value134) => value134['slot'] === refSlot,
             )?.['kind'] || 'audio';
           if (!String(fileSize['type'] || '')['startsWith'](sourceKind + '/'))
@@ -1985,7 +1985,7 @@ export class AIGenAudioNode {
               fileName: assetId['filename'] || fileSize['name'] || '',
               fileSize: fileSize['size'],
               name: fileSize['name'] || aigenAudioText('upload.sourceAudioName'),
-              ...(sourceKind === 'image' ? buildCanvasLocalImageFields(assetId, { includeSrc: !![] }) : {}),
+              ...(sourceKind === 'image' ? buildCanvasLocalImageFields(assetId, { includeSrc: true }) : {}),
             }),
               appStore['addEdge']({
                 id: generateId('edge'),
@@ -2000,7 +2000,7 @@ export class AIGenAudioNode {
         } catch (error2) {
           window['showToast']?.(error2?.['message'] || aigenAudioText('upload.failedRetry'), 'error');
         } finally {
-          ((this['_audioRefUploadPending'] = ![]),
+          ((this['_audioRefUploadPending'] = false),
             el39?.['removeAttribute']('aria-busy'),
             stopLoading(el39),
             (this['_audioRefUploadInput']['value'] = ''),
@@ -2015,7 +2015,7 @@ export class AIGenAudioNode {
       (this['promptEl'] = document['createElement']('div')),
       (this['promptEl']['className'] = 'prompt-textarea custom-textarea'),
       (this['promptEl']['contentEditable'] = 'true'),
-      (this['promptEl']['spellcheck'] = ![]),
+      (this['promptEl']['spellcheck'] = false),
       syncAudioPromptPlaceholder(this['promptEl'], this['_getCurrentWorkflow']()['key']),
       (this['_flushPromptHtmlCommit'] = () => flushPromptHtmlCommit(this)),
       this['promptEl']['addEventListener']('input', (value144) => {
@@ -2091,7 +2091,7 @@ export class AIGenAudioNode {
           bindRunningHubToolbarTaskButton({
             button: button,
             getTask: () => getRunningAudioSeparationTaskForNode(this['nodeId']),
-            cancelTask: () => cancelAudioSeparationTaskForNode(this['nodeId'], { notify: !![] }),
+            cancelTask: () => cancelAudioSeparationTaskForNode(this['nodeId'], { notify: true }),
             cancelTooltip: aigenAudioText('toolbar.cancelAudioSeparation'),
             eventTypes: ['pointerdown', 'click'],
           }),
@@ -2100,7 +2100,7 @@ export class AIGenAudioNode {
           if (getRunningAudioSeparationTaskForNode(this['nodeId'])) {
             (event25['preventDefault'](),
               event25['stopPropagation'](),
-              void cancelAudioSeparationTaskForNode(this['nodeId'], { notify: !![] }));
+              void cancelAudioSeparationTaskForNode(this['nodeId'], { notify: true }));
             return;
           }
           (event25['stopPropagation'](), void runAudioSeparationFromNode(this['nodeId']));
@@ -2127,9 +2127,9 @@ export class AIGenAudioNode {
     (this['_assetMentionRegistryUnsubscribe']?.(),
       (this['_assetMentionRegistryUnsubscribe'] = subscribeAssetMentionRegistry(() => {
         if (this['_assetMentionRegistryRefreshPending']) return;
-        ((this['_assetMentionRegistryRefreshPending'] = !![]),
+        ((this['_assetMentionRegistryRefreshPending'] = true),
           queueMicrotask(() => {
-            this['_assetMentionRegistryRefreshPending'] = ![];
+            this['_assetMentionRegistryRefreshPending'] = false;
             if (!appStore['getState']()['nodes']?.[this['nodeId']]) return;
             if (this['_rendererDetailsDeferred']) return;
             (_rehydratePromptPills(this), this['_renderRefBar'](), this['_updateSubmitButtonState']());
@@ -2139,7 +2139,7 @@ export class AIGenAudioNode {
     if (!this['_rendererDetailsDeferred']) this['_syncLocaleTexts']();
     return (
       (this['_unsubscribeLocale'] = onLocaleChange(() => {
-        this['_syncLocaleTexts']({ rerenderRefs: !![] });
+        this['_syncLocaleTexts']({ rerenderRefs: true });
       })),
       queueMicrotask(() => {
         appStore['getState']()['nodes']?.[this['nodeId']] && this['_maybeResumeRunningHubTask']();
@@ -2148,8 +2148,8 @@ export class AIGenAudioNode {
     );
   }
   ['hydrateDeferredDetails']() {
-    if (this['_rendererDetailsDeferred'] !== !![]) return ![];
-    ((this['_rendererDetailsDeferred'] = ![]),
+    if (this['_rendererDetailsDeferred'] !== true) return false;
+    ((this['_rendererDetailsDeferred'] = false),
       (this['_data'] = appStore['getState']?.()?.['nodes']?.[this['nodeId']] || this['_data']),
       this['_syncWorkflowDefaults'](),
       (this['_data'] = appStore['getState']?.()?.['nodes']?.[this['nodeId']] || this['_data']));
@@ -2176,7 +2176,7 @@ export class AIGenAudioNode {
       this['_renderRefBar'](),
       this['_syncPickConnectVisualState'](),
       this['_syncLocaleTexts'](),
-      !![]
+      true
     );
   }
   ['_syncLocaleTexts'](options4 = {}) {
@@ -2185,7 +2185,7 @@ export class AIGenAudioNode {
       this['_root']
         ?.['querySelector']?.('.debug-wrench-btn')
         ?.['setAttribute']?.('title', aigenAudioText('debug.buttonTitle')),
-      options4['rerenderRefs'] === !![] &&
+      options4['rerenderRefs'] === true &&
         this['refBarEl'] &&
         ((this['_refBarWorkflowKey'] = ''), this['_renderRefBar']()),
       this['_updateSubmitButtonState']());
@@ -2195,7 +2195,7 @@ export class AIGenAudioNode {
     const storeSnapshot5 = getStoreSnapshot()['nodes']?.[this['nodeId']] || this['_data'] || {},
       el44 = resolveGenerationButtonMode(storeSnapshot5, {
         cancellable: String(storeSnapshot5?.['provider'] || 'runninghubwf')['toLowerCase']() === 'runninghubwf',
-        cancelInFlight: this['_rhCancelInFlight'] === !![],
+        cancelInFlight: this['_rhCancelInFlight'] === true,
       });
     if (el44['busy']) {
       String(storeSnapshot5?.['provider'] || 'runninghubwf')['toLowerCase']() === 'runninghubwf'
@@ -2204,11 +2204,11 @@ export class AIGenAudioNode {
             tooltip: aigenAudioText('buttons.generateCancellable'),
             ariaLabel: aigenAudioText('buttons.cancelAudioGeneration'),
             color: 'var(--red)',
-            busy: !![],
+            busy: true,
           })
         : setGenerateButtonLoadingUi(this['btnEl'], {
             title: aigenAudioText('buttons.generate'),
-            disabled: !![],
+            disabled: true,
             ariaLabel: aigenAudioText('buttons.generate'),
           });
       ((this['btnEl']['disabled'] = el44['disabled']),
@@ -2220,8 +2220,8 @@ export class AIGenAudioNode {
     const { payload: payload4, validation: validation2 } = this['_buildPayloadSnapshot'](),
       enabled27 = validation2['ok'] && !!payload4['audioWorkflowKey'] && !this['_audioRefUploadPending'];
     !enabled27
-      ? ((this['btnEl']['disabled'] = !![]), (this['btnEl']['style']['cursor'] = 'var(--unavailable-cursor)'))
-      : ((this['btnEl']['disabled'] = ![]),
+      ? ((this['btnEl']['disabled'] = true), (this['btnEl']['style']['cursor'] = 'var(--unavailable-cursor)'))
+      : ((this['btnEl']['disabled'] = false),
         (this['btnEl']['style']['cursor'] = ''),
         applyModelCredentialButtonState(this['btnEl'], {
           modelId: payload4['audioWorkflowKey'] || storeSnapshot5?.['model'],
@@ -2240,7 +2240,7 @@ export class AIGenAudioNode {
     return getMediaElementCurrentSource(this['audioEl']);
   }
   ['_isAudioElementReady']() {
-    if (!this['audioEl'] || !this['_getAudioElementCurrentSource']()) return ![];
+    if (!this['audioEl'] || !this['_getAudioElementCurrentSource']()) return false;
     const count7 = Number(this['audioEl']['readyState'] || 0);
     return count7 >= 2;
   }
@@ -2259,15 +2259,15 @@ export class AIGenAudioNode {
     }
     return audioDurationSec;
   }
-  ['_syncKnownAudioDurationUi']({ currentTime: currentTime = 0, showLine: showLine = ![] } = {}) {
+  ['_syncKnownAudioDurationUi']({ currentTime: currentTime = 0, showLine: showLine = false } = {}) {
     const duration3 = this['_readAudioDurationSec']();
-    if (!(duration3 > 0)) return ![];
+    if (!(duration3 > 0)) return false;
     const value155 = Number(currentTime),
       currentTime4 = Number['isFinite'](value155) ? Math['max'](0, Math['min'](value155, duration3)) : 0,
       enabled28 = this['_progressController']?.['sync']({
         currentTime: currentTime4,
         duration: duration3,
-        force: !![],
+        force: true,
         showLine: showLine,
       });
     if (!showLine) this['_progressController']?.['hideLine']?.();
@@ -2275,13 +2275,13 @@ export class AIGenAudioNode {
       !enabled28 &&
         this['_timeEl'] &&
         (this['_timeEl']['textContent'] = this['_fmtTime'](currentTime4) + ' / ' + this['_fmtTime'](duration3)),
-      !![]
+      true
     );
   }
   ['_applyResolvedAudioDuration'](value156, value157 = this['_currentSrc']) {
-    if (value157 && this['_currentSrc'] !== value157) return ![];
+    if (value157 && this['_currentSrc'] !== value157) return false;
     const audioDuration2 = normalizeAudioDurationSec(value156);
-    if (!(audioDuration2 > 0)) return ![];
+    if (!(audioDuration2 > 0)) return false;
     const storeSnapshot7 = getStoreSnapshot()['nodes']?.[this['nodeId']],
       audioDurationSec3 = pickAudioDurationSec(
         storeSnapshot7?.['audioDuration'],
@@ -2295,7 +2295,7 @@ export class AIGenAudioNode {
           showLine: Number(this['audioEl']?.['currentTime'] || 0) > 0,
         });
       const value158 = Math['max'](1, audioDurationSec3 * 0.25);
-      if (Math['abs'](audioDurationSec3 - audioDuration2) > value158) return ![];
+      if (Math['abs'](audioDurationSec3 - audioDuration2) > value158) return false;
     }
     return (
       storeSnapshot7
@@ -2310,7 +2310,7 @@ export class AIGenAudioNode {
             currentTime: this['audioEl']?.['currentTime'] || 0,
             showLine: Number(this['audioEl']?.['currentTime'] || 0) > 0,
           })),
-      !![]
+      true
     );
   }
   ['_rememberAudioDuration'](value159 = this['_currentSrc']) {
@@ -2325,15 +2325,15 @@ export class AIGenAudioNode {
     if (!(duration4 > 0)) return;
     const value160 = Number(this['audioEl']['currentTime'] || 0),
       enabled29 = Number['isFinite'](value160) && value160 >= duration4 - 0.05;
-    if (this['audioEl']['ended'] !== !![] && !enabled29) return;
+    if (this['audioEl']['ended'] !== true && !enabled29) return;
     try {
       this['audioEl']['currentTime'] = 0;
     } catch {}
     this['_progressController']?.['sync']({
       currentTime: 0,
       duration: duration4,
-      force: !![],
-      showLine: !![],
+      force: true,
+      showLine: true,
     });
   }
   ['_clearPlaybackResume']() {
@@ -2346,7 +2346,7 @@ export class AIGenAudioNode {
       this['_currentSrc'] !== value161 ||
       this['_playbackResumeSource'] !== value161
     )
-      return ![];
+      return false;
     const value162 = Number(this['_playbackResumeTime'] || 0);
     let currentTime5 = Number['isFinite'](value162) ? Math['max'](0, value162) : 0;
     const duration5 = this['_readAudioDurationSec']();
@@ -2357,7 +2357,7 @@ export class AIGenAudioNode {
     try {
       this['audioEl']['currentTime'] = currentTime5;
     } catch {
-      return ![];
+      return false;
     }
     return (
       this['_clearPlaybackResume'](),
@@ -2365,14 +2365,14 @@ export class AIGenAudioNode {
         this['_progressController']?.['sync']({
           currentTime: currentTime5,
           duration: duration5,
-          force: !![],
+          force: true,
           showLine: currentTime5 > 0,
         }),
-      !![]
+      true
     );
   }
   ['_clearAudioElementSource']() {
-    (this['_setPlaybackBuffering'](![]), (this['_audioPlayPending'] = ![]));
+    (this['_setPlaybackBuffering'](false), (this['_audioPlayPending'] = false));
     if (!this['audioEl']) return;
     this['_audioPlayAttemptToken'] = Number(this['_audioPlayAttemptToken'] || 0) + 1;
     this['_audioPlayDeadlineTimer'] &&
@@ -2398,7 +2398,7 @@ export class AIGenAudioNode {
       },
       value165 = () => {
         this['_currentSrc'] === value163 &&
-          (this['_rememberAudioDuration'](value163), this['_setPlaybackBuffering'](![]));
+          (this['_rememberAudioDuration'](value163), this['_setPlaybackBuffering'](false));
       };
     ((this['audioEl']['onloadedmetadata'] = value164),
       (this['audioEl']['ondurationchange'] = value164),
@@ -2406,7 +2406,7 @@ export class AIGenAudioNode {
       (this['audioEl']['oncanplay'] = value165),
       (this['audioEl']['onplaying'] = value165),
       (this['audioEl']['onerror'] = () => {
-        if (this['_currentSrc'] === value163) this['_setPlaybackBuffering'](![]);
+        if (this['_currentSrc'] === value163) this['_setPlaybackBuffering'](false);
       }));
   }
   ['_prepareAudio'](value166) {
@@ -2421,7 +2421,7 @@ export class AIGenAudioNode {
         this['_clearPlaybackResume'](),
         this['_progressController']?.['reset'](),
         (this['_audioDurationProbeToken'] += 1),
-        ![]
+        false
       );
     const value167 = this['_currentSrc'] !== enabled30;
     ((this['_currentSrc'] = enabled30), this['_clearStatusOverlay']());
@@ -2431,11 +2431,11 @@ export class AIGenAudioNode {
     this['_getAudioElementSource']() && !enabled31 && this['_clearAudioElementSource']();
     if (!enabled31) this['audioEl']['preload'] = 'none';
     (this['_bindAudioLoadHandlers'](enabled30),
-      this['_syncKnownAudioDurationUi']({ currentTime: 0, showLine: ![] }),
+      this['_syncKnownAudioDurationUi']({ currentTime: 0, showLine: false }),
       stopLoading(this['previewEl']),
       void this['_ensureWaveform'](enabled30));
     if (this['_placeholderEl']) this['_placeholderEl']['style']['display'] = 'none';
-    return (this['_setAudioPreviewResultState'](!![]), this['_syncStatusOverlay'](this['_data'], !![]), !![]);
+    return (this['_setAudioPreviewResultState'](true), this['_syncStatusOverlay'](this['_data'], true), true);
   }
   ['_prepareDeferredAudio'](value169) {
     const enabled32 = String(value169 || '')['trim']();
@@ -2447,30 +2447,30 @@ export class AIGenAudioNode {
     (this['_cancelWaveformRequest'](),
       this['_clearStatusOverlay'](),
       this['_progressController']?.['reset']?.(),
-      this['_syncKnownAudioDurationUi']({ currentTime: 0, showLine: ![] }));
+      this['_syncKnownAudioDurationUi']({ currentTime: 0, showLine: false }));
     if (this['_placeholderEl']) this['_placeholderEl']['style']['display'] = 'none';
-    (this['_setAudioPreviewResultState'](!![]), this['_syncStatusOverlay'](this['_data'], !![]));
-    if (this['_rendererWaveformVisible'] === !![]) void this['_ensureWaveform'](enabled32);
-    return !![];
+    (this['_setAudioPreviewResultState'](true), this['_syncStatusOverlay'](this['_data'], true));
+    if (this['_rendererWaveformVisible'] === true) void this['_ensureWaveform'](enabled32);
+    return true;
   }
   ['prepareRendererVisibleAudioSurface']() {
-    return this['_rendererMediaDeferred'] === !![] && !!this['audioEl'] && !!this['_currentSrc'];
+    return this['_rendererMediaDeferred'] === true && !!this['audioEl'] && !!this['_currentSrc'];
   }
   async ['hydrateDeferredMedia']() {
-    if (this['_rendererMediaDeferred']) this['_rendererMediaDeferred'] = ![];
+    if (this['_rendererMediaDeferred']) this['_rendererMediaDeferred'] = false;
     const enabled33 = this['_resolveNodeAudioUrl'](this['_data']);
     return (
       enabled33
         ? (this['_prepareAudio'](enabled33),
-          this['_applyResultWideLayout'](this['_data'], ![]),
+          this['_applyResultWideLayout'](this['_data'], false),
           this['_syncAudioMultiResultStack'](this['_data']))
-        : (this['_setAudioPreviewResultState'](![]),
-          this['_syncStatusOverlay'](this['_data'], ![]),
+        : (this['_setAudioPreviewResultState'](false),
+          this['_syncStatusOverlay'](this['_data'], false),
           this['_syncAudioMultiResultStack'](this['_data'])),
       !!enabled33 && !!this['audioEl']
     );
   }
-  async ['_loadAudio'](value170, { showLoading: showLoading = !![], preload: preload = 'auto' } = {}) {
+  async ['_loadAudio'](value170, { showLoading: showLoading = true, preload: preload = 'auto' } = {}) {
     const enabled34 = String(value170 || '')['trim']();
     if (!enabled34) return this['_prepareAudio']('');
     const preload2 = preload === 'metadata' ? 'metadata' : 'auto',
@@ -2494,10 +2494,10 @@ export class AIGenAudioNode {
           preload2 === 'auto' &&
             this['audioEl']['preload'] !== 'auto' &&
             (this['audioEl']['preload'] = 'auto'),
-          this['_setPlaybackBuffering'](![]),
-          !![]
+          this['_setPlaybackBuffering'](false),
+          true
         );
-      showLoading && (enabled36 || value173) && this['_setPlaybackBuffering'](!![]);
+      showLoading && (enabled36 || value173) && this['_setPlaybackBuffering'](true);
       if (!enabled36) {
         const value174 = preload2 === 'auto' || this['audioEl']['preload'] === 'auto' ? 'auto' : 'metadata';
         this['audioEl']['preload'] !== value174 && (this['audioEl']['preload'] = value174);
@@ -2508,18 +2508,18 @@ export class AIGenAudioNode {
       } else
         await attachMediaElementPlaybackSource(this['audioEl'], enabled34, {
           preload: preload2,
-          warmRanges: ![],
+          warmRanges: false,
           shouldAssign: () =>
             this['_audioLoadToken'] === value172 &&
             this['_currentSrc'] === enabled34 &&
-            this['audioEl']?.['isConnected'] !== ![],
+            this['audioEl']?.['isConnected'] !== false,
         });
-      if (this['_isAudioElementReady']()) this['_setPlaybackBuffering'](![]);
+      if (this['_isAudioElementReady']()) this['_setPlaybackBuffering'](false);
       if (this['_placeholderEl']) this['_placeholderEl']['style']['display'] = 'none';
       return (
-        this['_setAudioPreviewResultState'](!![]),
-        this['_syncStatusOverlay'](this['_data'], !![]),
-        !![]
+        this['_setAudioPreviewResultState'](true),
+        this['_syncStatusOverlay'](this['_data'], true),
+        true
       );
     } finally {
       this['_audioLoadToken'] === value172 &&
@@ -2527,15 +2527,15 @@ export class AIGenAudioNode {
     }
   }
   async ['_playAudio']() {
-    if (!this['audioEl'] || !this['_currentSrc'] || this['_audioPlayPending'] === !![]) return;
-    ((this['_audioPlayPending'] = !![]), beginAudioPlayback(this['nodeId']));
+    if (!this['audioEl'] || !this['_currentSrc'] || this['_audioPlayPending'] === true) return;
+    ((this['_audioPlayPending'] = true), beginAudioPlayback(this['nodeId']));
     const value175 = this['_currentSrc'],
       value176 = Number(this['_audioPlayAttemptToken'] || 0) + 1;
     this['_audioPlayAttemptToken'] = value176;
     if (this['_audioPlayDeadlineTimer']) clearTimeout(this['_audioPlayDeadlineTimer']);
     const run3 = () => {
       if (this['_audioPlayAttemptToken'] !== value176) return;
-      ((this['_audioPlayPending'] = ![]),
+      ((this['_audioPlayPending'] = false),
         this['_audioPlayDeadlineTimer'] &&
           (clearTimeout(this['_audioPlayDeadlineTimer']), (this['_audioPlayDeadlineTimer'] = null)));
     };
@@ -2543,18 +2543,18 @@ export class AIGenAudioNode {
       if (this['_audioPlayAttemptToken'] !== value176 || this['_currentSrc'] !== value175) return;
       ((this['_audioPlayDeadlineTimer'] = null),
         this['_clearAudioElementSource'](),
-        this['_setPlayIcon'](!![]));
+        this['_setPlayIcon'](true));
     }, AUDIO_PLAY_LOADING_DEADLINE_MS);
-    let enabled37 = ![];
+    let enabled37 = false;
     try {
-      enabled37 = await this['_loadAudio'](value175, { showLoading: !![], preload: 'metadata' });
+      enabled37 = await this['_loadAudio'](value175, { showLoading: true, preload: 'metadata' });
     } catch (error3) {
-      (run3(), this['_setPlaybackBuffering'](![]));
+      (run3(), this['_setPlaybackBuffering'](false));
       if (error3?.['name'] !== 'AbortError') console['warn']('[AIGenAudioNode] load failed:', error3);
       return;
     }
     if (!enabled37 || !this['_getAudioElementCurrentSource']()) {
-      (run3(), this['_setPlaybackBuffering'](![]));
+      (run3(), this['_setPlaybackBuffering'](false));
       return;
     }
     (this['_restorePlaybackPosition'](value175), this['_rewindEndedAudioIfNeeded']());
@@ -2563,19 +2563,19 @@ export class AIGenAudioNode {
       promise = this['audioEl']['play']();
     } catch (value177) {
       (run3(),
-        this['_setPlaybackBuffering'](![]),
+        this['_setPlaybackBuffering'](false),
         console['warn']('[AIGenAudioNode] play failed:', value177));
       return;
     }
     promise && typeof promise['catch'] === 'function'
       ? promise['then'](() => {
-          (run3(), this['_setPlaybackBuffering'](![]));
+          (run3(), this['_setPlaybackBuffering'](false));
         })['catch']((error4) => {
-          (run3(), this['_setPlaybackBuffering'](![]));
+          (run3(), this['_setPlaybackBuffering'](false));
           if (error4?.['name'] === 'AbortError') return;
           console['warn']('[AIGenAudioNode] play failed:', error4);
         })
-      : (run3(), this['_setPlaybackBuffering'](![]));
+      : (run3(), this['_setPlaybackBuffering'](false));
   }
   ['_stopAudioForExternalPlayback']() {
     if (!this['audioEl']) return;
@@ -2597,19 +2597,19 @@ export class AIGenAudioNode {
           currentTime: this['_playbackResumeTime'],
           showLine: this['_playbackResumeTime'] > 0,
         })),
-      this['_setPlaybackBuffering'](![]),
-      this['_setPlayIcon'](!![]));
+      this['_setPlaybackBuffering'](false),
+      this['_setPlayIcon'](true));
   }
   ['getRendererMediaState']() {
     return {
-      deferred: this['_rendererMediaDeferred'] === !![],
-      interactionActive: this['_isSeeking'] === !![],
+      deferred: this['_rendererMediaDeferred'] === true,
+      interactionActive: this['_isSeeking'] === true,
     };
   }
   ['suspendRendererMedia']() {
-    this['setRendererAudioSurfaceVisible'](![]);
-    if (!this['audioEl'] || this['audioEl']['paused'] === ![]) return ![];
-    return (this['_stopAudioForExternalPlayback'](), !![]);
+    this['setRendererAudioSurfaceVisible'](false);
+    if (!this['audioEl'] || this['audioEl']['paused'] === false) return false;
+    return (this['_stopAudioForExternalPlayback'](), true);
   }
   ['_syncPromptBoxSizeFromData'](value181 = this['_data']) {
     if (!this['promptEl'] || this['_isPromptBoxResizing']) return;
@@ -2619,11 +2619,11 @@ export class AIGenAudioNode {
   }
   ['_setupPromptBoxResize']() {
     if (!this['_promptPanel'] || this['_promptResizeHandle']) return;
-    this['_promptResizeHandle'] = !![];
+    this['_promptResizeHandle'] = true;
     const value182 = 20,
       value183 = 10,
       handler = () =>
-        getStoreSnapshot()['ui']?.['promptBoxResizeEnabled'] !== ![] &&
+        getStoreSnapshot()['ui']?.['promptBoxResizeEnabled'] !== false &&
         !this['_promptPanel']['classList']['contains']('is-prompt-expanded'),
       handler2 = (el45) => !!el45?.['closest']('.floating-menu, .img-model-menu'),
       handler3 = (value184) => {
@@ -2657,7 +2657,7 @@ export class AIGenAudioNode {
       const promptBoxHeightBounds2 = getPromptBoxHeightBounds(this['_promptPanel']),
         value187 = event28['clientY'],
         value188 = this['promptEl']['getBoundingClientRect']()['height'];
-      ((this['_isPromptBoxResizing'] = !![]),
+      ((this['_isPromptBoxResizing'] = true),
         this['_promptInputWrap']['classList']['add']('is-resizing'),
         this['_promptPanel']['classList']['add']('is-resize-hover'));
       const value189 = (event29) => {
@@ -2679,7 +2679,7 @@ export class AIGenAudioNode {
           );
           (applyPromptBoxHeight(this['promptEl'], promptBoxHeight3),
             this['_promptInputWrap']['classList']['remove']('is-resizing'),
-            (this['_isPromptBoxResizing'] = ![]),
+            (this['_isPromptBoxResizing'] = false),
             this['_promptPanel']['classList']['remove']('is-resize-hover'),
             handler4(event30),
             appStore['updateNodeData'](this['nodeId'], { promptBoxHeight: promptBoxHeight3 }));
@@ -2716,13 +2716,13 @@ export class AIGenAudioNode {
             currentTime: this['audioEl']?.['currentTime'] || 0,
             showLine: Number(this['audioEl']?.['currentTime'] || 0) > 0,
           }),
-          this['_setAudioPreviewResultState'](!![]),
-          this['_syncStatusOverlay'](value191, !![]));
+          this['_setAudioPreviewResultState'](true),
+          this['_syncStatusOverlay'](value191, true));
     else {
       if (enabled38 && enabled38 !== this['_currentSrc'] && this['audioEl'])
         (this['_prepareAudio'](enabled38),
-          this['_applyResultWideLayout'](value191, ![]),
-          this['_syncStatusOverlay'](value191, !![]));
+          this['_applyResultWideLayout'](value191, false),
+          this['_syncStatusOverlay'](value191, true));
       else {
         if (!enabled38 && this['audioEl'])
           (typeof this['_cancelDeferredWaveform'] === 'function' &&
@@ -2733,18 +2733,18 @@ export class AIGenAudioNode {
             this['_clearPlaybackResume'](),
             this['_progressController']?.['reset'](),
             (this['_audioDurationProbeToken'] += 1),
-            this['_setAudioPreviewResultState'](![]),
-            this['_syncStatusOverlay'](value191, ![]));
+            this['_setAudioPreviewResultState'](false),
+            this['_syncStatusOverlay'](value191, false));
         else
           enabled38
             ? (this['_syncKnownAudioDurationUi']({
                 currentTime: this['audioEl']?.['currentTime'] || 0,
                 showLine: Number(this['audioEl']?.['currentTime'] || 0) > 0,
               }),
-              this['_applyResultWideLayout'](value191, ![]),
-              this['_setAudioPreviewResultState'](!![]),
-              this['_syncStatusOverlay'](value191, !![]))
-            : this['_syncStatusOverlay'](value191, ![]);
+              this['_applyResultWideLayout'](value191, false),
+              this['_setAudioPreviewResultState'](true),
+              this['_syncStatusOverlay'](value191, true))
+            : this['_syncStatusOverlay'](value191, false);
       }
     }
     enabled38 &&
@@ -2752,8 +2752,8 @@ export class AIGenAudioNode {
       void this['_ensureWaveform'](enabled38);
     if (!this['_rendererMediaDeferred']) this['_syncAudioMultiResultStack'](value191);
     shouldShowGenerationBusyUi(value191) &&
-      ((this['_isGenerating'] = !![]), startLoading(this['previewEl']));
-    if (this['_rendererDetailsDeferred'] === !![]) {
+      ((this['_isGenerating'] = true), startLoading(this['previewEl']));
+    if (this['_rendererDetailsDeferred'] === true) {
       this['_maybeResumeRunningHubTask']();
       return;
     }
@@ -2838,7 +2838,7 @@ export class AIGenAudioNode {
   ['_getPreviewGenerateButtonLoadingOptions']() {
     return createPreviewGenerateButtonCallbacks(this, aigenAudioText('buttons.generate'));
   }
-  async ['_handleAudioTaskFailure'](error5, { payload: payload6, recovering: recovering = ![] } = {}) {
+  async ['_handleAudioTaskFailure'](error5, { payload: payload6, recovering: recovering = false } = {}) {
     if (recovering) return;
     if (String(error5?.['code'] || '') === 'SUBSCRIPTION_REQUIRED') {
       const modelId3 =
@@ -2873,7 +2873,7 @@ export class AIGenAudioNode {
   async ['_onGenerate'](template2 = null, value203 = {}) {
     if (this['_audioRefUploadPending']) return;
     if (this['_isGenerating']) return;
-    if (value203?.['insertPrompt'] === !![]) {
+    if (value203?.['insertPrompt'] === true) {
       (insertPresetPromptIntoEditor({
         storeApi: appStore,
         nodeId: this['nodeId'],
@@ -2960,7 +2960,7 @@ export class AIGenAudioNode {
       ((this['_refBarWorkflowKey'] = workflowKey2),
       (this['refBarEl']['innerHTML'] = ''),
       this['refBarEl']['classList']['remove']('active', 'rh-v5-refbar'));
-    const list17 = getAudioWorkflowSlots(workflowKey2, { includeImages: !![] }),
+    const list17 = getAudioWorkflowSlots(workflowKey2, { includeImages: true }),
       enabled40 = list17['length'] > 0,
       promptAttachmentButtonHTML = createPromptAttachmentButtonHTML(),
       list18 = appStore['getIncomingEdges'](this['nodeId']),
@@ -3151,7 +3151,7 @@ export class AIGenAudioNode {
           sourceId: 'asset:' + assetId2 + ':' + assetIndex,
           sig: sig3,
           html: createReferenceInputThumbnailHtml({ kind: 'audio', thumbnailUrl: thumbnailUrl3 }),
-          virtual: !![],
+          virtual: true,
           assetId: assetId2,
           assetIndex: assetIndex,
           assetOccurrence: assetOccurrence,
@@ -3263,7 +3263,7 @@ export class AIGenAudioNode {
     for (const run6 of this['_toolbarActionCleanups']['splice'](0)) run6();
   }
   ['unmount']() {
-    ((this['_rendererWaveformVisible'] = ![]),
+    ((this['_rendererWaveformVisible'] = false),
       this['_releaseRendererPlaybackPin']?.(),
       (this['_releaseRendererPlaybackPin'] = null),
       this['_clearToolbarActionBindings'](),
@@ -3274,7 +3274,7 @@ export class AIGenAudioNode {
       this['_flushPromptHtmlCommit']?.(),
       this['_assetMentionRegistryUnsubscribe']?.(),
       (this['_assetMentionRegistryUnsubscribe'] = null),
-      (this['_assetMentionRegistryRefreshPending'] = ![]),
+      (this['_assetMentionRegistryRefreshPending'] = false),
       this['_audioTaskOrchestration']['dispose']({
         preserveTask: shouldPreserveGenerationTaskOnUnmount(this['nodeId']),
       }),
@@ -3307,6 +3307,6 @@ export class AIGenAudioNode {
       (this['_modelProviderProfileControl'] = null),
       this['_promptPanel']?.['classList']['remove']('is-resize-hover'),
       this['_promptInputWrap']?.['classList']['remove']('is-resizing'),
-      (this['_isPromptBoxResizing'] = ![]));
+      (this['_isPromptBoxResizing'] = false));
   }
 }

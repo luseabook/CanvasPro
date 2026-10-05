@@ -18,26 +18,26 @@ export function previewNodeResizeGeometry(
     renderEdgesByIds: renderEdgesByIds,
   } = {},
 ) {
-  if (!nodeId || !snapshot?.['nodes']?.[nodeId]) return ![];
+  if (!nodeId || !snapshot?.['nodes']?.[nodeId]) return false;
   const width2 = toFiniteNumber(width),
     height2 = toFiniteNumber(height);
-  if (width2 === null || height2 === null) return ![];
+  if (width2 === null || height2 === null) return false;
   const index = snapshot['edges'] || {},
     result = Number['isFinite'](snapshot['_edgesRev']) ? snapshot['_edgesRev'] : 0;
   ensureEdgeIndex?.(index, result);
   const edgeIds = normalizeEdgeIds(nodeToEdgeIds?.['get']?.(nodeId));
-  if (edgeIds['size'] === 0) return !![];
+  if (edgeIds['size'] === 0) return true;
   return (
     renderEdgesByIds?.(
       edgeIds,
       createNodeGeometryOverlay(snapshot['nodes'], { [nodeId]: { width: width2, height: height2 } }),
       snapshot,
     ),
-    !![]
+    true
   );
 }
 export function installNodeResizeGeometryPreviewer(bridge, snapshot2, ensureEdgeIndex2, nodeToEdgeIds2, renderEdgesByIds2) {
-  if (!bridge) return ![];
+  if (!bridge) return false;
   bridge['v2Renderer'] = bridge['v2Renderer'] || {};
   const cache = new Map();
   return (
@@ -57,6 +57,6 @@ export function installNodeResizeGeometryPreviewer(bridge, snapshot2, ensureEdge
         nodeToEdgeIds: nodeToEdgeIds2,
         renderEdgesByIds: renderEdgesByIds2,
       })),
-    !![]
+    true
   );
 }

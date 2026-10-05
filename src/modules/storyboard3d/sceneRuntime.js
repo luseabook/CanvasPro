@@ -116,13 +116,13 @@ function collectGeometryTopViewPoints(enabled, enabled2) {
   return list5;
 }
 function collectObjectTopViewFootprint(enabled4) {
-  if (!enabled4 || enabled4['visible'] === ![] || typeof enabled4['traverse'] !== 'function') return [];
-  enabled4['updateMatrixWorld']?.(!![]);
+  if (!enabled4 || enabled4['visible'] === false || typeof enabled4['traverse'] !== 'function') return [];
+  enabled4['updateMatrixWorld']?.(true);
   const list6 = [];
   return (
     enabled4['traverse']((enabled5) => {
-      if (!enabled5?.['isMesh'] || enabled5['visible'] === ![] || !enabled5['geometry']) return;
-      (enabled5['updateWorldMatrix']?.(!![], ![]),
+      if (!enabled5?.['isMesh'] || enabled5['visible'] === false || !enabled5['geometry']) return;
+      (enabled5['updateWorldMatrix']?.(true, false),
         list6['push'](...collectGeometryTopViewPoints(enabled5['geometry'], enabled5['matrixWorld'])));
     }),
     convexHullXZ(list6)
@@ -132,7 +132,7 @@ function collectInstanceTopViewFootprint(state, config) {
   const count3 = state?.['objectIds']?.['indexOf']?.(config) ?? -1,
     enabled6 = state?.['mesh'];
   if (count3 < 0 || !enabled6?.['geometry'] || typeof enabled6['getMatrixAt'] !== 'function') return [];
-  enabled6['updateMatrixWorld']?.(!![]);
+  enabled6['updateMatrixWorld']?.(true);
   const scope = new threeRuntime['Matrix4']();
   enabled6['getMatrixAt'](count3, scope);
   const input = enabled6['matrixWorld']['clone']()['multiply'](scope);
@@ -216,7 +216,7 @@ function createImportedModelNormalizationRoot(value22) {
         storyboard3DModelNormalization['translation']['z'],
       ),
       error['scale']['setScalar'](storyboard3DModelNormalization['uniformScale'])),
-    error['add'](value22['clone'](!![])),
+    error['add'](value22['clone'](true)),
     error
   );
 }
@@ -245,7 +245,7 @@ function createSelection(value25, value26, value27) {
     map2 = new Map((value25?.['objects'] || [])['map']((value29) => [value29['id'], value29])),
     selectedObjects = list10['map']((value30) => map2['get'](value30))
       ['filter'](Boolean)
-      ['filter']((value31) => value31['visible'] !== ![] && value31['locked'] !== !![])
+      ['filter']((value31) => value31['visible'] !== false && value31['locked'] !== true)
       ['filter']((value32) => canStoryboard3DObjectUseTransformTool(value32, value27))
       ['map']((objectId) => ({ objectType: bridgeObjectType(objectId), objectId: objectId['id'] }))
       ['filter']((value33) => value33['objectType']),
@@ -264,7 +264,7 @@ function createSelection(value25, value26, value27) {
 }
 function mapSceneObjects(value36) {
   const list11 = (Array['isArray'](value36?.['objects']) ? value36['objects'] : [])['filter'](
-      (value37) => value37?.['visible'] !== ![],
+      (value37) => value37?.['visible'] !== false,
     ),
     mannequins = [],
     cubes = [],
@@ -349,7 +349,7 @@ export function adaptStoryboard3DSceneToDirectorState({
         activeCameraId: null,
         sceneView: cameraToSceneView(activeShot?.['camera']),
       },
-      panorama: { imageUrl: null, isLoaded: ![] },
+      panorama: { imageUrl: null, isLoaded: false },
       ...args2,
       selection: createSelection(environmentMode, selectedObjectIds, activeTool),
       groups: [],
@@ -358,11 +358,11 @@ export function adaptStoryboard3DSceneToDirectorState({
         transformTool: transformTool,
         activeTool: transformTool,
         transformSpace: 'world',
-        snapEnabled: ![],
-        groundLock: ![],
-        uniformScale: ![],
-        isEditing: !![],
-        showOutline: environmentMode['environment']?.['showOutline'] !== ![],
+        snapEnabled: false,
+        groundLock: false,
+        uniformScale: false,
+        isEditing: true,
+        showOutline: environmentMode['environment']?.['showOutline'] !== false,
       },
     },
     state2 = normalizePanoramaSceneState(value40);
@@ -407,14 +407,14 @@ export class Storyboard3DSceneRuntime {
       (this['backgroundTexture'] = null),
       (this['backgroundTextureUrl'] = ''),
       (this['backgroundTextureToken'] = 0),
-      (this['backgroundCameraLockApplied'] = ![]),
+      (this['backgroundCameraLockApplied'] = false),
       (this['characterAnimationFrame'] = null),
       (this['timelinePreviewObjectIds'] = new Set()),
       (this['sceneId'] = null),
       (this['selectedObjectIds'] = []),
       (this['activeTool'] = 'select'),
       (this['adapted'] = null),
-      (this['disposed'] = ![]));
+      (this['disposed'] = false));
   }
   ['sync']({
     project: project2,
@@ -450,13 +450,13 @@ export class Storyboard3DSceneRuntime {
       this['bridge']['setDefaultSceneFocalLength']?.(
         this['viewportFocalLengthOverride'] ?? this['adapted']['focalLength'],
       ),
-      this['bridge']['setGridVisible']?.(this['adapted']['scene']['environment']?.['showGrid'] !== ![]),
+      this['bridge']['setGridVisible']?.(this['adapted']['scene']['environment']?.['showGrid'] !== false),
       this['directorScene']['prepareMaterials'](),
       this['bridge']['sync'](this['adapted']['state']),
       this['_syncBackgroundCameraLock'](),
       this['bridge']['renderer']?.['shadowMap'] &&
         (this['bridge']['renderer']['shadowMap']['enabled'] =
-          this['adapted']['scene']['environment']?.['enableShadows'] !== ![]),
+          this['adapted']['scene']['environment']?.['enableShadows'] !== false),
       this['_syncImportedModels'](),
       this['_syncSceneLights'](),
       this['_syncFlatBackground'](),
@@ -475,7 +475,7 @@ export class Storyboard3DSceneRuntime {
     (box14?.['position']?.['set']?.(box15['position']['x'], box15['position']['y'], box15['position']['z']),
       box14?.['rotation']?.['set']?.(box15['rotation']['x'], box15['rotation']['y'], box15['rotation']['z']),
       box14?.['scale']?.['set']?.(box15['scale']['x'], box15['scale']['y'], box15['scale']['z']),
-      box14?.['updateMatrixWorld']?.(!![]));
+      box14?.['updateMatrixWorld']?.(true));
   }
   ['_clearImportedModels']() {
     const list12 = new Set([
@@ -510,7 +510,7 @@ export class Storyboard3DSceneRuntime {
     this['_clearSceneLights']();
     if (!this['bridge']['scene']) return;
     for (const enabled8 of this['adapted']?.['scene']?.['objects'] || []) {
-      if (enabled8['type'] !== 'light' || enabled8['visible'] === ![]) continue;
+      if (enabled8['type'] !== 'light' || enabled8['visible'] === false) continue;
       const color = enabled8['color'] || 0xffffff,
         value55 = Math['max'](0, Number(enabled8['intensity']) || 0);
       let event2;
@@ -534,7 +534,7 @@ export class Storyboard3DSceneRuntime {
           else event2 = new threeRuntime['DirectionalLight'](color, value55);
         }
       }
-      event2['castShadow'] = enabled8['castShadow'] === !![];
+      event2['castShadow'] = enabled8['castShadow'] === true;
       const group = new threeRuntime['Group']();
       ((group['name'] = 'storyboard3d-light-' + enabled8['id']),
         (group['userData']['storyboardObjectId'] = enabled8['id']),
@@ -560,7 +560,7 @@ export class Storyboard3DSceneRuntime {
       if (enabled8['lightType'] !== 'ambient') {
         this['bridge']['setObjectVisualOverride']?.('cube', enabled8['id'], { group: group });
         const value58 = this['bridge']['_cubeMap']?.['get']?.(enabled8['id']);
-        if (value58?.['group']) value58['group']['visible'] = ![];
+        if (value58?.['group']) value58['group']['visible'] = false;
       }
     }
     this['bridge']['requestRender']?.();
@@ -580,14 +580,14 @@ export class Storyboard3DSceneRuntime {
           ...args3['lockedCameraSnapshot'],
           fov: computeStoryboard3DVerticalFov(args3['horizontalFov'], value59),
         }),
-        (this['backgroundCameraLockApplied'] = !![]),
-        !![]
+        (this['backgroundCameraLockApplied'] = true),
+        true
       );
     }
     return (
       this['backgroundCameraLockApplied'] &&
-        (this['bridge']['clearDraftView']?.(), (this['backgroundCameraLockApplied'] = ![])),
-      ![]
+        (this['bridge']['clearDraftView']?.(), (this['backgroundCameraLockApplied'] = false)),
+      false
     );
   }
   ['_syncFlatBackground']() {
@@ -614,7 +614,7 @@ export class Storyboard3DSceneRuntime {
         ),
         value66 =
           (2 * Math['atan'](Math['tan']((value64 * Math['PI']) / 360) / value65) * 180) / Math['PI'],
-        value67 = value60['lockedCamera'] === !![] && value60['lockedCameraSnapshot'],
+        value67 = value60['lockedCamera'] === true && value60['lockedCameraSnapshot'],
         value68 = Math['max'](
           0.01,
           Math['min'](
@@ -646,7 +646,7 @@ export class Storyboard3DSceneRuntime {
             (Number(value71[1]) || 0) +
             (value67 ? 0 : 0.5 - (Number(value60['horizonY']) || 0.5)),
         ),
-        (value61['needsUpdate'] = !![]),
+        (value61['needsUpdate'] = true),
         (this['bridge']['scene']['background'] = value61),
         this['bridge']['requestRender']?.());
     };
@@ -679,7 +679,7 @@ export class Storyboard3DSceneRuntime {
         undefined,
         () => {
           value72 === this['backgroundTextureToken'] &&
-            ((this['backgroundTextureUrl'] = ''), this['bridge']['setGroundFillVisible']?.(!![]));
+            ((this['backgroundTextureUrl'] = ''), this['bridge']['setGroundFillVisible']?.(true));
         },
       ));
   }
@@ -695,7 +695,7 @@ export class Storyboard3DSceneRuntime {
     this['_stopCharacterAnimation']();
     if (this['timelinePreviewActive']) return;
     const list13 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
-      (value75) => value75['type'] === 'character' && value75['actionPlaying'] === !![],
+      (value75) => value75['type'] === 'character' && value75['actionPlaying'] === true,
     );
     if (list13['length'] === 0 || typeof globalThis['requestAnimationFrame'] !== 'function') return;
     const value76 = globalThis['performance']?.['now']?.() || Date['now'](),
@@ -727,15 +727,15 @@ export class Storyboard3DSceneRuntime {
     this['_clearImportedModels']();
     if (!this['importedModelResolver'] || !this['bridge']['scene']) return;
     const list14 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
-        (value82) => value82['type'] === 'prop' && value82['visible'] !== ![],
+        (value82) => value82['type'] === 'prop' && value82['visible'] !== false,
       ),
       map3 = new Map();
     list14['forEach']((value83) => {
       const value84 = [
         value83['assetId'],
         value83['tint'] || '',
-        value83['castShadow'] !== ![] ? 'cast' : 'no-cast',
-        value83['receiveShadow'] !== ![] ? 'receive' : 'no-receive',
+        value83['castShadow'] !== false ? 'cast' : 'no-cast',
+        value83['receiveShadow'] !== false ? 'receive' : 'no-receive',
       ]['join']('|');
       if (!map3['has'](value84)) map3['set'](value84, []);
       map3['get'](value84)['push'](value83);
@@ -750,8 +750,8 @@ export class Storyboard3DSceneRuntime {
         template: template,
         objects: objects,
         tint: objects[0]['tint'] || '',
-        castShadow: objects[0]['castShadow'] !== ![],
-        receiveShadow: objects[0]['receiveShadow'] !== ![],
+        castShadow: objects[0]['castShadow'] !== false,
+        receiveShadow: objects[0]['receiveShadow'] !== false,
       });
       ((storyboard3DInstanceBatch['mesh']['name'] = 'storyboard3d-instances-' + objects[0]['assetId']),
         this['bridge']['scene']['add'](storyboard3DInstanceBatch['mesh']),
@@ -761,7 +761,7 @@ export class Storyboard3DSceneRuntime {
             this['importedInstanceByObjectId']['set'](value87['id'], storyboard3DInstanceBatch),
             this['_syncImportedInstanceVisual'](value87, storyboard3DInstanceBatch, value87['transform']));
           const value88 = this['bridge']['_cubeMap']?.['get']?.(value87['id']);
-          if (value88?.['group']) value88['group']['visible'] = ![];
+          if (value88?.['group']) value88['group']['visible'] = false;
         }));
     }
     for (const storyboardObjectId of list14) {
@@ -778,8 +778,8 @@ export class Storyboard3DSceneRuntime {
       const list15 = [];
       (group2['traverse']?.((enabled11) => {
         if (!enabled11?.['isMesh']) return;
-        ((enabled11['castShadow'] = storyboardObjectId['castShadow'] !== ![]),
-          (enabled11['receiveShadow'] = storyboardObjectId['receiveShadow'] !== ![]));
+        ((enabled11['castShadow'] = storyboardObjectId['castShadow'] !== false),
+          (enabled11['receiveShadow'] = storyboardObjectId['receiveShadow'] !== false));
         if (!storyboardObjectId['tint'] || !enabled11['material']) return;
         const list16 = Array['isArray'](enabled11['material'])
             ? enabled11['material']
@@ -797,7 +797,7 @@ export class Storyboard3DSceneRuntime {
         this['importedModelRoots']['set'](storyboardObjectId['id'], group2),
         this['bridge']['setObjectVisualOverride']?.('cube', storyboardObjectId['id'], { group: group2 }));
       const value92 = this['bridge']['_cubeMap']?.['get']?.(storyboardObjectId['id']);
-      if (value92?.['group']) value92['group']['visible'] = ![];
+      if (value92?.['group']) value92['group']['visible'] = false;
     }
     this['bridge']['requestRender']?.();
   }
@@ -814,7 +814,7 @@ export class Storyboard3DSceneRuntime {
     const count4 = enabled13['objectIds']['indexOf'](enabled12['id']);
     if (count4 < 0) return;
     const value94 = new threeRuntime['Matrix4']();
-    (enabled13['mesh']['getMatrixAt'](count4, value94), enabled13['mesh']['updateMatrixWorld']?.(!![]));
+    (enabled13['mesh']['getMatrixAt'](count4, value94), enabled13['mesh']['updateMatrixWorld']?.(true));
     const value95 = enabled13['mesh']['matrixWorld']['clone']()['multiply'](value94);
     (enabled15['boundsBox']['copy'](enabled14['boundingBox'])['applyMatrix4'](value95),
       this['bridge']['setObjectVisualOverride']?.('cube', enabled12['id'], enabled15));
@@ -841,12 +841,12 @@ export class Storyboard3DSceneRuntime {
     );
     let objectId2 = null;
     for (const [objectId3, value99] of [...this['importedModelRoots'], ...this['lightRoots']]) {
-      const args6 = value98['intersectObject'](value99, !![])[0];
+      const args6 = value98['intersectObject'](value99, true)[0];
       if (args6 && (!objectId2 || args6['distance'] < objectId2['distance']))
         objectId2 = { ...args6, objectId: objectId3 };
     }
     for (const value100 of this['importedInstanceBatches']['values']()) {
-      const args7 = value98['intersectObject'](value100['mesh'], ![])[0],
+      const args7 = value98['intersectObject'](value100['mesh'], false)[0],
         objectId4 = Number['isInteger'](args7?.['instanceId'])
           ? value100['objectIds'][args7['instanceId']]
           : null;
@@ -908,8 +908,8 @@ export class Storyboard3DSceneRuntime {
     );
     if (
       !storyboardObjectId2 ||
-      storyboardObjectId2['visible'] === ![] ||
-      storyboardObjectId2['locked'] === !![]
+      storyboardObjectId2['visible'] === false ||
+      storyboardObjectId2['locked'] === true
     )
       return null;
     return {
@@ -922,7 +922,7 @@ export class Storyboard3DSceneRuntime {
     const list17 = this['bridge']['pickObjectsInRect']?.(value109) || [],
       map5 = new Set(
         (this['adapted']?.['scene']?.['objects'] || [])
-          ['filter']((value110) => value110['visible'] !== ![] && value110['locked'] !== !![])
+          ['filter']((value110) => value110['visible'] !== false && value110['locked'] !== true)
           ['map']((value111) => value111['id']),
       );
     return list17['filter']((value112) => map5['has'](value112['objectId']));
@@ -982,7 +982,7 @@ export class Storyboard3DSceneRuntime {
         : null;
     const value124 = value122 || value123?.['proxyRoot'] || value123?.['group'];
     if (!enabled20 && value124) {
-      value124['updateMatrixWorld']?.(!![]);
+      value124['updateMatrixWorld']?.(true);
       const enabled21 = new threeRuntime['Box3']()['setFromObject'](value124);
       if (!enabled21['isEmpty']()) enabled20 = enabled21;
     }
@@ -1001,16 +1001,16 @@ export class Storyboard3DSceneRuntime {
     return this['previewObjectTransforms']({ [value128]: value129 });
   }
   ['previewTimelineSample'](args10) {
-    if (!args10) return ![];
+    if (!args10) return false;
     if (!this['timelinePreviewActive']) this['_stopCharacterAnimation']();
-    this['timelinePreviewActive'] = !![];
+    this['timelinePreviewActive'] = true;
     if (args10['camera']) this['previewCamera'](args10['camera']);
     const map6 = new Set(Object['keys'](args10['objectTransforms'] || {}));
     for (const value130 of this['timelinePreviewObjectIds']) {
       if (!map6['has'](value130)) this['clearObjectTransformPreview'](value130);
     }
     ((this['timelinePreviewObjectIds'] = map6),
-      this['previewObjectTransforms'](args10['objectTransforms'] || {}, { includeLocked: !![] }));
+      this['previewObjectTransforms'](args10['objectTransforms'] || {}, { includeLocked: true }));
     for (const args11 of this['adapted']?.['scene']?.['objects'] || []) {
       if (args11['type'] !== 'character') continue;
       const args12 = resolveStoryboard3DCharacterPose({
@@ -1028,11 +1028,11 @@ export class Storyboard3DSceneRuntime {
         ),
       });
     }
-    return (this['bridge']['requestRender']?.(), !![]);
+    return (this['bridge']['requestRender']?.(), true);
   }
-  ['previewObjectTransforms'](options2 = {}, { includeLocked: includeLocked = ![] } = {}) {
+  ['previewObjectTransforms'](options2 = {}, { includeLocked: includeLocked = false } = {}) {
     const list18 = new Set();
-    let value133 = ![];
+    let value133 = false;
     (Object['entries'](options2)['forEach'](([value134, value135]) => {
       const value136 = this['adapted']?.['scene']?.['objects']?.['find'](
           (value137) => value137['id'] === value134,
@@ -1043,7 +1043,7 @@ export class Storyboard3DSceneRuntime {
         enabled23 = this['importedInstanceByObjectId']['get'](value136?.['id']);
       if (
         (!bridgeObjectType2 && !enabled22 && !enabled23) ||
-        (!includeLocked && value136?.['locked'] === !![])
+        (!includeLocked && value136?.['locked'] === true)
       )
         return;
       if (bridgeObjectType2)
@@ -1054,10 +1054,10 @@ export class Storyboard3DSceneRuntime {
         );
       if (enabled22) this['_applyImportedModelTransform'](enabled22, value135);
       (enabled23 &&
-        (updateStoryboard3DInstanceTransform(enabled23, value136['id'], value135, { recomputeBounds: ![] }),
+        (updateStoryboard3DInstanceTransform(enabled23, value136['id'], value135, { recomputeBounds: false }),
         list18['add'](enabled23),
         this['_syncImportedInstanceVisual'](value136, enabled23, value135)),
-        (value133 = !![]));
+        (value133 = true));
     }),
       list18['forEach']((value138) => refreshStoryboard3DInstanceBatchBounds(value138)));
     if (value133) this['_notifyVisualChange']('preview-object-transform');
@@ -1071,7 +1071,7 @@ export class Storyboard3DSceneRuntime {
       enabled24 =
         this['importedModelRoots']['get'](value140?.['id']) || this['lightRoots']['get'](value140?.['id']),
       enabled25 = this['importedInstanceByObjectId']['get'](value140?.['id']);
-    if (!bridgeObjectType3 && !enabled24 && !enabled25) return ![];
+    if (!bridgeObjectType3 && !enabled24 && !enabled25) return false;
     if (bridgeObjectType3) this['bridge']['clearDraftObjectTransform']?.(bridgeObjectType3, value140['id']);
     if (enabled24) this['_applyImportedModelTransform'](enabled24, value140['transform']);
     return (
@@ -1079,11 +1079,11 @@ export class Storyboard3DSceneRuntime {
         (updateStoryboard3DInstanceTransform(enabled25, value140['id'], value140['transform']),
         this['_syncImportedInstanceVisual'](value140, enabled25, value140['transform'])),
       this['_notifyVisualChange']('clear-object-transform-preview'),
-      !![]
+      true
     );
   }
   ['clearPreviews']() {
-    ((this['timelinePreviewActive'] = ![]),
+    ((this['timelinePreviewActive'] = false),
       this['timelinePreviewObjectIds']['clear'](),
       this['bridge']['clearAllDrafts']?.(),
       this['_syncCharacterAnimation']());
@@ -1097,7 +1097,7 @@ export class Storyboard3DSceneRuntime {
       const value145 = this['importedInstanceByObjectId']['get'](value142['id']);
       value145 &&
         (updateStoryboard3DInstanceTransform(value145, value142['id'], value142['transform'], {
-          recomputeBounds: ![],
+          recomputeBounds: false,
         }),
         list19['add'](value145),
         this['_syncImportedInstanceVisual'](value142, value145, value142['transform']));
@@ -1108,7 +1108,7 @@ export class Storyboard3DSceneRuntime {
   ['getMiniMapFootprints']() {
     const list20 = (this['adapted']?.['scene']?.['objects'] || [])['filter'](
       (value147) =>
-        value147?.['visible'] !== ![] && ['prop', 'character', 'light']['includes'](value147?.['type']),
+        value147?.['visible'] !== false && ['prop', 'character', 'light']['includes'](value147?.['type']),
     );
     return list20['map']((objectId5) => {
       const value148 = this['importedInstanceByObjectId']['get'](objectId5['id']),
@@ -1205,7 +1205,7 @@ export class Storyboard3DSceneRuntime {
   }
   ['setViewportUIPatch'](args13 = {}) {
     this['viewportUIPatch'] = { ...this['viewportUIPatch'], ...args13 };
-    if (!this['adapted']) return ![];
+    if (!this['adapted']) return false;
     return (
       (this['adapted']['state']['ui'] = { ...this['adapted']['state']['ui'], ...this['viewportUIPatch'] }),
       this['directorScene']['prepareMaterials'](),
@@ -1215,28 +1215,28 @@ export class Storyboard3DSceneRuntime {
       this['_syncSceneLights'](),
       this['_syncFlatBackground'](),
       this['directorScene']['sync'](),
-      !![]
+      true
     );
   }
   ['previewSceneView'](enabled26) {
-    if (!enabled26) return ![];
+    if (!enabled26) return false;
     return (
       this['bridge']['setDraftView']?.({
         kind: 'scene-default',
         sceneView: structuredClone(enabled26),
-        disableSmoothing: !![],
+        disableSmoothing: true,
       }),
-      !![]
+      true
     );
   }
   ['setViewportFocalLength'](value165) {
-    if (!this['adapted']) return ![];
+    if (!this['adapted']) return false;
     const clampSceneFocalLength2 = clampSceneFocalLength(value165);
     ((this['viewportFocalLengthOverride'] = clampSceneFocalLength2),
       this['bridge']['setDefaultSceneFocalLength']?.(clampSceneFocalLength2));
     const value166 = this['getSceneView']();
     if (value166) this['previewSceneView'](value166);
-    return !![];
+    return true;
   }
   ['getViewportFocalLength']() {
     if (!this['adapted']) return null;
@@ -1247,7 +1247,7 @@ export class Storyboard3DSceneRuntime {
     return value167 == null ? null : focalLengthToFov(value167);
   }
   ['previewCamera'](event3) {
-    if (!event3) return ![];
+    if (!event3) return false;
     const box22 = vectorFromArray(event3['position'], { x: 5, y: 4, z: 7 }),
       box23 = vectorFromArray(event3['target'], { x: 0, y: 1.2, z: 0 }),
       x7 = new threeRuntime['Vector3'](box22['x'], box22['y'], box22['z']),
@@ -1273,13 +1273,13 @@ export class Storyboard3DSceneRuntime {
         fov: Number['isFinite'](Number(event3['fov']))
           ? Number(event3['fov'])
           : focalLengthToFov(event3['focalLength']),
-        disableSmoothing: !![],
+        disableSmoothing: true,
       }),
-      !![]
+      true
     );
   }
   ['commitSceneView'](enabled27) {
-    if (!enabled27 || !this['adapted']?.['scene']?.['id']) return ![];
+    if (!enabled27 || !this['adapted']?.['scene']?.['id']) return false;
     const structuredClone2 = structuredClone(enabled27);
     return (
       this['viewOverrides']['set'](this['adapted']['scene']['id'], structuredClone2),
@@ -1292,7 +1292,7 @@ export class Storyboard3DSceneRuntime {
       this['_syncFlatBackground'](),
       this['bridge']['clearDraftView']?.(),
       this['directorScene']['sync'](),
-      !![]
+      true
     );
   }
   ['readCurrentCamera']() {
@@ -1309,7 +1309,7 @@ export class Storyboard3DSceneRuntime {
   }
   async ['waitForCaptureReady']({ signal: signal, timeout: timeout = 30000 } = {}) {
     const value170 = Date['now']();
-    while (!![]) {
+    while (true) {
       if (signal?.['aborted'] || this['disposed']) throw new DOMException('已取消录制', 'AbortError');
       const list21 = [...(this['bridge']['_mannequinMap']?.['values']() || [])],
         value171 = list21['find']((value172) => value172['modelLoadError']);
@@ -1343,7 +1343,7 @@ export class Storyboard3DSceneRuntime {
   }
   ['dispose']() {
     if (this['disposed']) return;
-    ((this['disposed'] = !![]),
+    ((this['disposed'] = true),
       this['directorScene']['dispose'](),
       this['directorViewport']?.['disposeMonitor'](),
       this['_clearImportedModels'](),

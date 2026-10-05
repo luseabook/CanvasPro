@@ -32,8 +32,8 @@ export function canVirtualizePromptPaste(
   result,
   { documentObject: documentObject = globalThis['document'] } = {},
 ) {
-  if (String(result || '')['length'] < PROMPT_VIRTUAL_PASTE_THRESHOLD) return ![];
-  if (typeof documentObject?.['execCommand'] !== 'function') return ![];
+  if (String(result || '')['length'] < PROMPT_VIRTUAL_PASTE_THRESHOLD) return false;
+  if (typeof documentObject?.['execCommand'] !== 'function') return false;
   const data = documentObject?.['defaultView']?.['CSS'] || globalThis['CSS'];
   return typeof data?.['supports'] === 'function' && data['supports']('content-visibility', 'auto');
 }
@@ -49,7 +49,7 @@ export function removeVirtualPromptPasteEndMarker(
         documentObject?.['defaultView']?.['getSelection']?.() || globalThis['window']?.['getSelection']?.();
     if (options && target) {
       (options['setStartBefore'](el2),
-        options['collapse'](!![]),
+        options['collapse'](true),
         el2['remove']?.(),
         target['removeAllRanges']?.(),
         target['addRange']?.(options));
@@ -63,15 +63,15 @@ export function insertVirtualizedPromptTextAtSelection(
   source,
   { documentObject: documentObject = globalThis['document'] } = {},
 ) {
-  if (!enabled || !canVirtualizePromptPaste(source, { documentObject: documentObject })) return ![];
+  if (!enabled || !canVirtualizePromptPaste(source, { documentObject: documentObject })) return false;
   const virtualizedPromptPasteHtml = buildVirtualizedPromptPasteHtml(source);
-  if (!virtualizedPromptPasteHtml) return ![];
+  if (!virtualizedPromptPasteHtml) return false;
   try {
-    const enabled2 = documentObject['execCommand']('insertHTML', ![], virtualizedPromptPasteHtml);
-    if (!enabled2) return ![];
-    return (removeVirtualPromptPasteEndMarker(enabled, { documentObject: documentObject }), !![]);
+    const enabled2 = documentObject['execCommand']('insertHTML', false, virtualizedPromptPasteHtml);
+    if (!enabled2) return false;
+    return (removeVirtualPromptPasteEndMarker(enabled, { documentObject: documentObject }), true);
   } catch {
-    return ![];
+    return false;
   }
 }
 export function hasVirtualizedPromptChunks(el3) {

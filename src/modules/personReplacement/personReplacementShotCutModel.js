@@ -62,7 +62,7 @@ function getPersonReplacementShotCutKeyframePatch(options2 = {}) {
   return {
     keyframeRef: keyframeRef,
     keyframeTimeSec: Number['isFinite'](value6) ? clamp(value6, value4, value5, value4) : value4,
-    ...(options2?.['keyframeManuallySelected'] === !![] ? { keyframeManuallySelected: !![] } : {}),
+    ...(options2?.['keyframeManuallySelected'] === true ? { keyframeManuallySelected: true } : {}),
     ...(width && height ? { frame: { width: width, height: height } } : {}),
   };
 }
@@ -149,7 +149,7 @@ export function buildPersonReplacementDetectedShotCutRanges({
 export function normalizePersonReplacementShotCutRanges(
   list6 = [],
   value23 = [],
-  { allowTimelineReplacement: allowTimelineReplacement = ![] } = {},
+  { allowTimelineReplacement: allowTimelineReplacement = false } = {},
 ) {
   const list7 = Array['isArray'](list6) ? list6 : [],
     map3 = new Map(list7['map']((value24) => [normalizeText(value24?.['id']), value24])),
@@ -190,12 +190,12 @@ export function normalizePersonReplacementShotCutRanges(
         startSec: startSec4,
         endSec: endSec3,
         ...(originShotId2 ? { originShotId: originShotId2 } : {}),
-        ...(value25?.['isReversed'] === !![] ? { isReversed: !![] } : {}),
+        ...(value25?.['isReversed'] === true ? { isReversed: true } : {}),
         ...(keyframeRef3
           ? {
               keyframeRef: keyframeRef3,
               keyframeTimeSec: keyframeTimeSec2,
-              ...(value25?.['keyframeManuallySelected'] === !![] ? { keyframeManuallySelected: !![] } : {}),
+              ...(value25?.['keyframeManuallySelected'] === true ? { keyframeManuallySelected: true } : {}),
               ...(width2 && height2 ? { frame: { width: width2, height: height2 } } : {}),
             }
           : {}),
@@ -351,7 +351,7 @@ export function createPersonReplacementShotCutDraft(options5 = {}) {
       const startSec6 = Math['max'](0, Number(args3['startTimeSec']) || 0),
         endSec5 = Math['max'](startSec6, Number(args3['endTimeSec']) || startSec6),
         value59 =
-          args3?.['keyframeManuallySelected'] === !![]
+          args3?.['keyframeManuallySelected'] === true
             ? getPersonReplacementShotCutKeyframePatch({
                 ...args3,
                 startSec: startSec6,
@@ -366,7 +366,7 @@ export function createPersonReplacementShotCutDraft(options5 = {}) {
         endSec: endSec5,
         durationSec: Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, endSec5 - startSec6),
         outputFps: Math['max'](1, Number(args3['outputFps']) || PERSON_REPLACEMENT_CUT_DEFAULT_FPS),
-        ...(args3['isReversed'] === !![] ? { isReversed: !![] } : {}),
+        ...(args3['isReversed'] === true ? { isReversed: true } : {}),
         ...(value59 || {}),
       };
     });
@@ -409,12 +409,12 @@ export function createPersonReplacementShotCutUpdateRequest(list19 = [], value67
       startSec: shotId4['startSec'],
       endSec: shotId4['endSec'],
       ...(shotId4['originShotId'] ? { originShotId: shotId4['originShotId'] } : {}),
-      ...(shotId4['isReversed'] === !![] ? { isReversed: !![] } : {}),
+      ...(shotId4['isReversed'] === true ? { isReversed: true } : {}),
       ...(shotId4['keyframeRef']
         ? {
             keyframeRef: shotId4['keyframeRef'],
             keyframeTimeSec: shotId4['keyframeTimeSec'],
-            ...(shotId4['keyframeManuallySelected'] === !![] ? { keyframeManuallySelected: !![] } : {}),
+            ...(shotId4['keyframeManuallySelected'] === true ? { keyframeManuallySelected: true } : {}),
             frame: shotId4['frame'],
           }
         : {}),
@@ -425,7 +425,7 @@ export function hasPersonReplacementShotCutUpdateChanges(list20 = [], value69 = 
   const list21 = Array['isArray'](list20) ? list20 : [],
     list22 = Array['isArray'](value69) ? value69 : [],
     map7 = new Map(list21['map']((value70) => [normalizeText(value70?.['id']), value70]));
-  if (list21['length'] !== list22['length']) return !![];
+  if (list21['length'] !== list22['length']) return true;
   return list22['some']((value71) => {
     const text4 = normalizeText(value71?.['shotId']),
       enabled6 = map7['get'](text4) || map7['get'](normalizeText(value71?.['originShotId'])),
@@ -518,7 +518,7 @@ export function getPersonReplacementShotCutPositionAtTimelineSec(list28 = [], va
         sourceId: normalizeText(sourceTimeSec?.['sourceId']),
         shotIndex: shotIndex,
         sourceTimeSec:
-          sourceTimeSec?.['isReversed'] === !![]
+          sourceTimeSec?.['isReversed'] === true
             ? clamp(value85 + value87 * (1 - value88), value85, value86, value85)
             : clamp(value85 + clamp5, value85, value86, value85),
         timelineSec: timelineSec,
@@ -593,7 +593,7 @@ export function getPersonReplacementShotCutTimelineSec(list32 = [], value99, val
   for (const value102 of Array['isArray'](list32) ? list32 : []) {
     const value103 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, Number(value102?.['durationSec']) || 0);
     if (normalizeText(value102?.['shotId']) === text6) {
-      if (value102?.['isReversed'] === !![]) {
+      if (value102?.['isReversed'] === true) {
         const value104 = Number(value102?.['startSec']) || 0,
           value105 = Math['max'](value104, Number(value102?.['endSec']) || value104),
           personReplacementShotCutSplitFrameSec3 = getPersonReplacementShotCutSplitFrameSec(value102),

@@ -1,7 +1,7 @@
 const QWEN_MODELS = Object['freeze']([
-    ['qwen3.8-max', 'Qwen 3.8 Max', !![]],
+    ['qwen3.8-max', 'Qwen 3.8 Max', true],
     ['qwen3.8-max-0902', 'Qwen 3.8 Max 0902'],
-    ['qwen3.8-flash', 'Qwen 3.8 Flash', ![], 'enable_thinking'],
+    ['qwen3.8-flash', 'Qwen 3.8 Flash', false, 'enable_thinking'],
     ['qwen3.8-27b', 'Qwen 3.8 27B'],
     ['qwen3.8-2.4t-a95b', 'Qwen 3.8 2.4T A95B'],
   ]),
@@ -9,7 +9,7 @@ const QWEN_MODELS = Object['freeze']([
   CHAT_RESPONSE_MAPPING = Object['freeze']({ resultPaths: Object['freeze'](['choices[].message.content']) }),
   CHAT_EXTENSIONS = Object['freeze']({
     chatCompletionInputPolicy: 'image-video',
-    strictUpload: !![],
+    strictUpload: true,
     structuredOutputMode: 'json_object',
   });
 export const apimartQwenTextModelManifests = Object['freeze'](
@@ -40,12 +40,12 @@ export const apimartQwenTextModelManifests = Object['freeze'](
                 placement: 'mode',
                 variant: 'pillMenu',
                 label: '联网',
-                defaultValue: ![],
+                defaultValue: false,
                 menuDescription: '开启后允许模型搜索和读取网页，工具按实际调用次数额外计费。',
                 options: Object['freeze']([
-                  Object['freeze']({ value: ![], label: '关闭', selectedLabel: '联网：关' }),
+                  Object['freeze']({ value: false, label: '关闭', selectedLabel: '联网：关' }),
                   Object['freeze']({
-                    value: !![],
+                    value: true,
                     label: '搜索与读取网页',
                     selectedLabel: '联网：开',
                     subtitle: '工具按实际调用次数额外计费',
@@ -96,8 +96,8 @@ export const apimartQwenTextModelManifests = Object['freeze'](
           icon: 'qwen',
         }),
       }),
-      async: ![],
-      cancellable: ![],
+      async: false,
+      cancellable: false,
       outputType: 'text',
     }),
   ),
@@ -123,7 +123,7 @@ export const apimartQwenTextExecutionManifests = Object['freeze'](
       responseMapping: endpoint
         ? Object['freeze']({
             resultPaths: Object['freeze'](['output_text', 'output[].content[].text']),
-            includeSources: !![],
+            includeSources: true,
             imageResults: 'markdown',
           })
         : CHAT_RESPONSE_MAPPING,
@@ -135,7 +135,7 @@ export const apimartQwenTextExecutionManifests = Object['freeze'](
       extensions: endpoint
         ? Object['freeze']({
             chatCompletionInputPolicy: 'image-video',
-            strictUpload: !![],
+            strictUpload: true,
             videoChatCompletion: Object['freeze']({
               endpoint: '/v1/chat/completions',
               structuredOutputMode: 'json_object',
@@ -149,7 +149,7 @@ export const apimartQwenTextExecutionManifests = Object['freeze'](
             ]),
             imageSearchTools: Object['freeze']({
               text: Object['freeze']({ type: 'web_search_image' }),
-              image: Object['freeze']({ type: 'image_search', requiresImage: !![] }),
+              image: Object['freeze']({ type: 'image_search', requiresImage: true }),
             }),
             imageSearchInstructions:
               'When presenting image search results, use only actual image URLs returned by the search tool. Format each image as [![short description](<image URL>)](<source page URL>), or ![short description](<image URL>) if no source page is provided. Do not invent URLs. If the tool returns no usable image URLs, explain that no images were found. Return at most 24 images.',

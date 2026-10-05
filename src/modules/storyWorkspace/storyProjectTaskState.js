@@ -46,7 +46,7 @@ function getStoryBackgroundTaskClip(options = {}, data = {}) {
 }
 function isStoryClipVideoBackgroundTaskCurrent(options2 = {}, entry = {}) {
   const storyBackgroundTaskClip = getStoryBackgroundTaskClip(options2, entry);
-  if (!storyBackgroundTaskClip) return !![];
+  if (!storyBackgroundTaskClip) return true;
   return STORY_ACTIVE_CLIP_VIDEO_STATUSES['has'](
     normalizeText(storyBackgroundTaskClip?.['generation']?.['status'])['toLowerCase'](),
   );
@@ -75,7 +75,7 @@ export function reconcileStoryClipVideoBackgroundTasks(options3 = {}) {
   return record;
 }
 export function reconcilePersistedStoryProjectTasks(enabled = {}) {
-  if (!enabled?.['project']) return ![];
+  if (!enabled?.['project']) return false;
   let interruptStoryBackgroundTasks2 = interruptStoryBackgroundTasks(enabled, {
     message: '应用上次关闭时任务尚未完成，请重新发起不可恢复的任务。',
   });
@@ -126,7 +126,7 @@ export function reconcilePersistedStoryProjectTasks(enabled = {}) {
         label: '生成片段视频',
         message: '正在恢复视频生成任务',
         status: 'recovering',
-        resumable: !![],
+        resumable: true,
         remoteTaskId: remoteTaskId['taskId'],
         modelId: remoteTaskId['modelId'],
         provider: remoteTaskId['provider'],
@@ -144,37 +144,37 @@ export function deriveStoryProjectTaskState(options4 = {}) {
     handler2 = (output) =>
       list3['map']((value2) => value2['batch'])['find']((value3) => value3?.['type'] === output),
     value4 = {
-      isGeneratingStory: ![],
+      isGeneratingStory: false,
       generationStatus: '',
       storyPlanningOperation: '',
       storyPlanningStatus: '',
       generatingEpisodeScriptId: '',
-      isBatchGeneratingScripts: ![],
+      isBatchGeneratingScripts: false,
       episodeScriptBatchId: '',
-      episodeScriptBatchCancelRequested: ![],
-      scriptGenerationFocusMode: ![],
+      episodeScriptBatchCancelRequested: false,
+      scriptGenerationFocusMode: false,
       episodeScriptGenerationStatus: '',
       splittingEpisodeIds: [],
       episodeBatchSplitOperation: '',
       episodeBatchSplitStatus: '',
       episodeBatchSplitId: '',
-      episodeBatchSplitCancelRequested: ![],
+      episodeBatchSplitCancelRequested: false,
       generatingClipId: '',
       generatingClipIds: [],
       clipBatchGenerationByEpisode: {},
       generatingAppearanceKeys: [],
       generatingVoiceAssetIds: [],
-      isBatchGenerating: ![],
+      isBatchGenerating: false,
       batchGeneratingAssetIds: [],
       batchGeneratingAppearanceKeys: [],
       batchGeneratingVoiceAssetIds: [],
       assetBatchId: '',
-      assetBatchCancelRequested: ![],
+      assetBatchCancelRequested: false,
       batchGenerationLabel: '',
     },
     error = handler('story-summary');
   error &&
-    ((value4['isGeneratingStory'] = !![]),
+    ((value4['isGeneratingStory'] = true),
     (value4['generationStatus'] = error['message'] || error['label'] || '正在生成剧本摘要'));
   const value5 = list3['find']((value6) => normalizeText(value6?.['type'])['startsWith']('asset-extraction')),
     error2 = value5 || handler('episode-planning');
@@ -186,11 +186,11 @@ export function deriveStoryProjectTaskState(options4 = {}) {
   const list4 = list3['filter']((value7) => value7['type'] === 'episode-script'),
     value8 = handler2('episode-scripts');
   list4['length'] &&
-    ((value4['scriptGenerationFocusMode'] = !![]),
+    ((value4['scriptGenerationFocusMode'] = true),
     (value4['generatingEpisodeScriptId'] = normalizeText(list4[0]?.['scope']?.['episodeId'])),
     (value4['isBatchGeneratingScripts'] = Boolean(value8) || list4['length'] > 1),
     (value4['episodeScriptBatchId'] = normalizeText(value8?.['id'])),
-    (value4['episodeScriptBatchCancelRequested'] = value8?.['cancelRequested'] === !![]),
+    (value4['episodeScriptBatchCancelRequested'] = value8?.['cancelRequested'] === true),
     (value4['episodeScriptGenerationStatus'] =
       value8?.['label'] || list4[0]?.['message'] || '正在生成分集剧本'),
     (value4['storyPlanningOperation'] = value4['isBatchGeneratingScripts']
@@ -210,7 +210,7 @@ export function deriveStoryProjectTaskState(options4 = {}) {
     ((value4['episodeBatchSplitOperation'] = normalizeText(value10['operation']) || 'splitting-all'),
     (value4['episodeBatchSplitStatus'] = normalizeText(value10['label']) || '正在批量拆分'),
     (value4['episodeBatchSplitId'] = normalizeText(value10['id'])),
-    (value4['episodeBatchSplitCancelRequested'] = value10['cancelRequested'] === !![]));
+    (value4['episodeBatchSplitCancelRequested'] = value10['cancelRequested'] === true));
   ((value4['generatingAppearanceKeys'] = normalizeStoryTaskBatchIds(
     list3['filter']((value12) => ['asset-image', 'asset-image-upload']['includes'](value12['type']))['map'](
       (value13) =>
@@ -227,9 +227,9 @@ export function deriveStoryProjectTaskState(options4 = {}) {
     )));
   const value16 = handler2('asset-generation');
   value16 &&
-    ((value4['isBatchGenerating'] = !![]),
+    ((value4['isBatchGenerating'] = true),
     (value4['assetBatchId'] = normalizeText(value16['id'])),
-    (value4['assetBatchCancelRequested'] = value16['cancelRequested'] === !![]),
+    (value4['assetBatchCancelRequested'] = value16['cancelRequested'] === true),
     (value4['batchGeneratingAssetIds'] = normalizeStoryTaskBatchIds(value16['pendingAssetIds'])),
     (value4['batchGeneratingAppearanceKeys'] = normalizeStoryTaskBatchIds(value16['pendingAppearanceKeys'])),
     (value4['batchGeneratingVoiceAssetIds'] = normalizeStoryTaskBatchIds(value16['pendingVoiceAssetIds'])),
@@ -253,7 +253,7 @@ export function deriveStoryProjectTaskState(options4 = {}) {
       value4['clipBatchGenerationByEpisode'][text6] = {
         label: normalizeText(cancelRequested['label']) || '批量生成中',
         batchId: normalizeText(cancelRequested['id']),
-        cancelRequested: cancelRequested['cancelRequested'] === !![],
+        cancelRequested: cancelRequested['cancelRequested'] === true,
       };
     }),
     value4

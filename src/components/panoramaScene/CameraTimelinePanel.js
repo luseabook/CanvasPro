@@ -6,7 +6,7 @@ function sceneText(value, item = {}) {
 function formatTime(key) {
   return Math['max'](0, Number(key) || 0)['toFixed'](2) + 's';
 }
-function syncStaticText(el, { isPlaying: isPlaying = ![] } = {}) {
+function syncStaticText(el, { isPlaying: isPlaying = false } = {}) {
   const el2 = el['querySelector']('.panorama-camera-timeline__play');
   el2 &&
     ((el2['textContent'] = isPlaying ? 'Ⅱ' : '▶'),

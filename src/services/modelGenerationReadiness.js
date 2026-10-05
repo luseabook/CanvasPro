@@ -162,9 +162,9 @@ export function resolveModelCredentialRequirement(options3 = {}) {
     }),
     providerLabel = getCustomProviderDisplayName(modelId2['modelManifest'], configProviderId2 || providerId4),
     cliProviderId = resolveCliProviderId(providerId4, modelId2);
-  if (options3['credentialRequired'] === ![] || !providerId4)
+  if (options3['credentialRequired'] === false || !providerId4)
     return {
-      required: ![],
+      required: false,
       adapterType: adapterType2,
       providerId: providerId4,
       configProviderId: configProviderId2,
@@ -175,7 +175,7 @@ export function resolveModelCredentialRequirement(options3 = {}) {
     };
   if (cliProviderId)
     return {
-      required: !![],
+      required: true,
       requirementType: 'cliLogin',
       adapterType: adapterType2,
       providerId: providerId4,
@@ -189,7 +189,7 @@ export function resolveModelCredentialRequirement(options3 = {}) {
     };
   if (adapterType2 === 'localRuntime' || CREDENTIAL_FREE_PROVIDERS['has'](providerId4))
     return {
-      required: ![],
+      required: false,
       adapterType: adapterType2,
       providerId: providerId4,
       configProviderId: configProviderId2,
@@ -201,7 +201,7 @@ export function resolveModelCredentialRequirement(options3 = {}) {
   const enabled2 = /^custom_[a-z0-9_-]+$/i['test'](providerId4);
   if (!enabled && !enabled2 && !KNOWN_CONFIGURABLE_PROVIDERS['has'](providerId4))
     return {
-      required: ![],
+      required: false,
       adapterType: adapterType2,
       providerId: providerId4,
       configProviderId: configProviderId2,
@@ -225,7 +225,7 @@ export function resolveModelCredentialRequirement(options3 = {}) {
     authorizationCapability = getModelAuthorizationCapability(modelId2),
     connectionCapability2 = getComfyUiConnectionCapability(providerId4, modelId2);
   return {
-    required: !![],
+    required: true,
     ...(authorizationCapability
       ? { requirementType: 'modelAuthorization', authorizationCapability: authorizationCapability }
       : {}),
@@ -312,7 +312,7 @@ function buildUnverifiedConnectionMessage(value10, value11 = '') {
 }
 function isModelAuthorizationVerified(value12, value13 = {}) {
   const enabled3 = String(value12?.['authorizationCapability'] || '')['trim']();
-  if (!enabled3) return ![];
+  if (!enabled3) return false;
   return (
     String(value13?.['connectionVerification']?.['capabilities']?.[enabled3]?.['status'] || '')
       ['trim']()
@@ -326,15 +326,15 @@ function getModelAuthorizationStatus(value14, value15 = {}) {
 export function evaluateModelGenerationReadiness(providerConfig = {}) {
   const message = providerConfig['requirement'] || resolveModelCredentialRequirement(providerConfig);
   if (!message['required'])
-    return { ready: !![], status: 'ready', reason: 'credential-not-required', ...message, message: '' };
+    return { ready: true, status: 'ready', reason: 'credential-not-required', ...message, message: '' };
   if (message['credentialField'] === 'cliLogin') {
     const enabled4 = providerConfig['cliStatus'];
     if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4))
-      return { ready: ![], status: 'loading', reason: 'cli-status-loading', ...message, message: '' };
-    if (enabled4['loggedIn'] === !![])
-      return { ready: !![], status: 'ready', reason: 'cli-login-present', ...message, message: '' };
+      return { ready: false, status: 'loading', reason: 'cli-status-loading', ...message, message: '' };
+    if (enabled4['loggedIn'] === true)
+      return { ready: true, status: 'ready', reason: 'cli-login-present', ...message, message: '' };
     return {
-      ready: ![],
+      ready: false,
       status: 'missing',
       reason: 'cli-login-missing',
       ...message,
@@ -342,11 +342,11 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
     };
   }
   if (
-    providerConfig['configLoaded'] === ![] &&
+    providerConfig['configLoaded'] === false &&
     !providerConfig['providerConfig'] &&
     !providerConfig['payload']
   )
-    return { ready: ![], status: 'loading', reason: 'config-loading', ...message, message: '' };
+    return { ready: false, status: 'loading', reason: 'config-loading', ...message, message: '' };
   const credentialValue = readCredentialValue(message, providerConfig);
   if (credentialValue) {
     const value17 =
@@ -357,28 +357,28 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
         ? Boolean(
             readCredentialValue(message, { providerConfig: providerConfig['providerConfig'], payload: {} }),
           )
-        : ![];
+        : false;
     if (message['requirementType'] === 'modelAuthorization') {
       if (value17 && isModelAuthorizationVerified(message, providerConfig['providerConfig']))
         return {
-          ready: !![],
+          ready: true,
           status: 'ready',
           reason: 'model-authorization-verified',
           ...message,
           message: '',
         };
       if (!enabled5)
-        return { ready: !![], status: 'ready', reason: 'credential-present', ...message, message: '' };
+        return { ready: true, status: 'ready', reason: 'credential-present', ...message, message: '' };
       if (getModelAuthorizationStatus(message, providerConfig['providerConfig']) === 'failed')
         return {
-          ready: ![],
+          ready: false,
           status: 'missing',
           reason: 'model-authorization-missing',
           ...message,
           message: '请在设置中重新测试 ' + message['providerLabel'] + '，确认当前模型服务已开通',
         };
       return {
-        ready: !![],
+        ready: true,
         status: 'unverified',
         reason: 'model-authorization-unverified',
         ...message,
@@ -400,14 +400,14 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
             ['local', 'cloud']['includes'](message2)
           )
             return {
-              ready: !![],
+              ready: true,
               status: 'unverified',
               reason: 'connection-capability-retry-required',
               ...message,
               message: buildUnverifiedConnectionMessage(message, message2) + '失败；本次生成将重新验证',
             };
           return {
-            ready: ![],
+            ready: false,
             status: 'missing',
             reason: 'connection-validation-failed',
             ...message,
@@ -420,7 +420,7 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
           };
         }
         return {
-          ready: !![],
+          ready: true,
           status: 'unverified',
           reason: message2 ? 'connection-capability-unverified' : 'connection-unverified',
           ...message,
@@ -429,7 +429,7 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
       }
     }
     return {
-      ready: !![],
+      ready: true,
       status: 'ready',
       reason:
         message['verificationRequired'] && value17
@@ -442,7 +442,7 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
     };
   }
   return {
-    ready: ![],
+    ready: false,
     status: 'missing',
     reason: 'credential-missing',
     ...message,
@@ -475,7 +475,7 @@ async function ensureCliProviderStatus(value19) {
   if (CLI_STATUS_REQUESTS['has'](value19)) return CLI_STATUS_REQUESTS['get'](value19);
   const value21 =
     value19 === 'dreamina'
-      ? fetchDreaminaCliStatusFromServer({ refresh: !![] })
+      ? fetchDreaminaCliStatusFromServer({ refresh: true })
       : fetchCliProviderStatuses()['then'](() => getCachedCliProviderStatus(value19));
   CLI_STATUS_REQUESTS['set'](value19, value21);
   try {
@@ -490,18 +490,18 @@ export async function ensureModelGenerationReadiness(options7 = {}) {
     return (await ensureCliProviderStatus(message3['cliProviderId']), getModelGenerationReadiness(options7));
   await ensureConfig();
   const response = getModelGenerationReadiness(options7);
-  if (options7['autoVerify'] !== !![] || response['status'] !== 'unverified') return response;
+  if (options7['autoVerify'] !== true || response['status'] !== 'unverified') return response;
   let validationResult;
   try {
     validationResult = await autoVerifyProviderConnection(message3);
   } catch (error) {
-    validationResult = { ok: ![], error: error?.['message'] || 'API 连接验证失败' };
+    validationResult = { ok: false, error: error?.['message'] || 'API 连接验证失败' };
   }
   const response2 = getModelGenerationReadiness(options7);
   if (response2['ready'] && response2['status'] !== 'unverified') return response2;
   return {
     ...response2,
-    ready: ![],
+    ready: false,
     status: 'missing',
     reason: 'connection-validation-failed',
     message:

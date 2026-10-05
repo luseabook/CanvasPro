@@ -39,7 +39,7 @@ export function normalizeStoryProjectSortOrder(result) {
 }
 export function getStoryProjectHomeEntries(
   list2 = [],
-  { query: query = '', sortOrder: sortOrder = 'updated-desc', showArchived: showArchived = ![] } = {},
+  { query: query = '', sortOrder: sortOrder = 'updated-desc', showArchived: showArchived = false } = {},
 ) {
   return getWorkspaceProjectHomeEntries(list2, {
     query: query,
@@ -49,7 +49,7 @@ export function getStoryProjectHomeEntries(
 }
 function hasStoryProjectClipVideoResult(options = {}) {
   if (normalizeText(options?.['result']?.['videoUrl'] || options?.['videoUrl'] || options?.['resultUrl']))
-    return !![];
+    return true;
   return (Array['isArray'](options?.['video']?.['results']) ? options['video']['results'] : [])['some'](
     (response) =>
       normalizeText(
@@ -130,7 +130,7 @@ export function duplicateStoryProjectEntry(
       createdAt: Number(now) || Date['now'](),
       updatedAt: Number(now) || Date['now'](),
       archivedAt: 0,
-      projectTitleEdited: !![],
+      projectTitleEdited: true,
       data: data2,
     }
   );
@@ -151,7 +151,7 @@ export function normalizeStoryProjectVoiceEditor(current, entry) {
       (record) => normalizeText(record?.['id']) === assetId && record?.['kind'] === 'character',
     );
   if (!enabled3) return null;
-  return { ...args5, assetId: assetId, isGenerating: ![] };
+  return { ...args5, assetId: assetId, isGenerating: false };
 }
 export function createStoryProjectUiState(view = {}) {
   return {
@@ -178,7 +178,7 @@ export function createStoryProjectUiState(view = {}) {
     selectedEpisodeId: normalizeText(view['selectedEpisodeId']),
     selectedClipId: normalizeText(view['selectedClipId']),
     characterVoiceEditor: view['characterVoiceEditor']
-      ? { ...cloneStoryProjectUiValue(view['characterVoiceEditor'], {}), isGenerating: ![] }
+      ? { ...cloneStoryProjectUiValue(view['characterVoiceEditor'], {}), isGenerating: false }
       : null,
     assetBreakdownVisibleCount: Math['max'](
       0,
@@ -198,7 +198,7 @@ export function applyStoryLibraryAdditionUiState(
         ...(enabled4['assetAppearanceIndexes'] || {}),
         [text5]: Math['max'](0, Math['trunc'](Number(selectedAppearanceIndex) || 0)),
       }),
-    (enabled4['assetSelectionMode'] = ![]),
+    (enabled4['assetSelectionMode'] = false),
     (enabled4['selectedAssetIds'] = []),
     enabled4
   );

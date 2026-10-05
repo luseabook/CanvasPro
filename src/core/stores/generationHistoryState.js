@@ -16,7 +16,7 @@ const RUNNING = new Set([
   ]),
   STATUS_FIELDS = ['jobStatus', 'rhTaskStatus', 'dreaminaTaskStatus', 'dreaminaTaskPhase', 'asyncTaskStatus'];
 function hasResult(enabled) {
-  if (!enabled || enabled['error']) return ![];
+  if (!enabled || enabled['error']) return false;
   return [
     'imageUrl',
     'videoUrl',
@@ -34,10 +34,10 @@ function hasResult(enabled) {
 }
 function normalizeUnownedGeneration(item) {
   const enabled2 =
-    item['isGenerating'] === !![] ||
-    item['rhTaskRecovering'] === !![] ||
-    item['dreaminaTaskRecovering'] === !![] ||
-    item['asyncTaskRecovering'] === !![] ||
+    item['isGenerating'] === true ||
+    item['rhTaskRecovering'] === true ||
+    item['dreaminaTaskRecovering'] === true ||
+    item['asyncTaskRecovering'] === true ||
     STATUS_FIELDS['some']((key) =>
       RUNNING['has'](
         String(item[key] || '')
@@ -52,7 +52,7 @@ function normalizeUnownedGeneration(item) {
       (index) => Array['isArray'](item[index]) && item[index]['some'](hasResult),
     );
   Object['assign'](item, buildIdleGenerationProtocolPatch(), {
-    isGenerating: ![],
+    isGenerating: false,
     jobStatus: jobStatus ? 'success' : null,
     jobError: null,
     statusMessage: '',

@@ -296,9 +296,9 @@ export function resolveVideoWorkflowSchemaParam(value56, value57, value58) {
 }
 
 export function resolveBerniniVideoReplaceInputMode({
-  hasSourceVideo: hasSourceVideo = ![],
-  hasRefImage: hasRefImage = ![],
-  hasReferenceVideo: hasReferenceVideo = ![],
+  hasSourceVideo: hasSourceVideo = false,
+  hasRefImage: hasRefImage = false,
+  hasReferenceVideo: hasReferenceVideo = false,
 } = {}) {
   if (hasSourceVideo && hasReferenceVideo) return 'videoVideo';
   if (hasSourceVideo && hasRefImage) return 'videoImage';

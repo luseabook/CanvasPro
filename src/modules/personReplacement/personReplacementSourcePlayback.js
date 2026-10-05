@@ -51,7 +51,7 @@ export async function hydratePersonReplacementSourcePlaybackRefs(
     !Array['isArray'](project['sources']) ||
     typeof checkMediaExists !== 'function'
   )
-    return { project: project, changed: ![] };
+    return { project: project, changed: false };
   const map = new Map(),
     handler = (index) => {
       return (
@@ -60,13 +60,13 @@ export async function hydratePersonReplacementSourcePlaybackRefs(
             index,
             Promise['resolve']()
               ['then'](() => checkMediaExists(index))
-              ['then']((result) => result === !![])
-              ['catch'](() => ![]),
+              ['then']((result) => result === true)
+              ['catch'](() => false),
           ),
         map['get'](index)
       );
     };
-  let data = ![];
+  let data = false;
   const sources = await Promise['all'](
     project['sources']['map'](async (args) => {
       if (!args || typeof args !== 'object') return args;
@@ -78,15 +78,15 @@ export async function hydratePersonReplacementSourcePlaybackRefs(
       if (target) {
         if (text2) return args;
         return (
-          (data = !![]),
+          (data = true),
           { ...args, assetId: getPersonReplacementSourceAssetId(args), playbackVideoRef: playbackVideoRef }
         );
       }
       if (!enabled) return args;
-      return ((data = !![]), { ...args, playbackVideoRef: '' });
+      return ((data = true), { ...args, playbackVideoRef: '' });
     }),
   );
   return data
-    ? { project: { ...project, sources: sources }, changed: !![] }
-    : { project: project, changed: ![] };
+    ? { project: { ...project, sources: sources }, changed: true }
+    : { project: project, changed: false };
 }

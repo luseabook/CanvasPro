@@ -39,7 +39,7 @@ function validateIds(args, data, target) {
     return { args: { ...args, ids: normalizeIds(args, data, target) } };
   } catch (errorCode) {
     return {
-      ok: ![],
+      ok: false,
       errorCode: errorCode['errorCode'] || 'INVALID_NODE_IDS',
       message: errorCode['message'],
       details: errorCode['details'],
@@ -68,12 +68,12 @@ export function registerEditingCommands(scope) {
     riskLevel: 'safe',
     argsSchema: {
       properties: { ids: { type: 'array', items: { type: 'string' } }, name: { type: 'string' } },
-      selectionFallback: !![],
+      selectionFallback: true,
     },
     capabilitySchema: {
       reads: ['nodes', 'selection'],
       writes: ['nodes', 'selection'],
-      selectionFallback: !![],
+      selectionFallback: true,
     },
     returnSchema: { aliasFields: ['groupId', 'nodeId', 'ids'] },
     validate(options2 = {}, input = {}) {
@@ -108,24 +108,24 @@ export function registerEditingCommands(scope) {
       riskLevel: 'safe',
       argsSchema: {
         properties: { ids: { type: 'array', items: { type: 'string' } }, nodeId: { type: 'string' } },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes', 'selection'],
         writes: ['nodes', 'selection'],
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       returnSchema: { aliasFields: ['groupIds', 'childIds'] },
       validate(options3 = {}, value3 = {}) {
         const response = validateIds(options3, value3, { min: 1 });
-        if (response['ok'] === ![]) return response;
+        if (response['ok'] === false) return response;
         const state3 = getState(value3),
           ids2 = response['args']['ids']['filter'](
             (value4) => String(state3['nodes']?.[value4]?.['type'] || '') === 'group',
           );
         if (ids2['length'] === 0)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'GROUP_NOT_FOUND',
             message: 'node.ungroup requires at least one group node.',
           };
@@ -159,12 +159,12 @@ export function registerEditingCommands(scope) {
       riskLevel: 'safe',
       argsSchema: {
         properties: { ids: { type: 'array', items: { type: 'string' } } },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes', 'edges', 'selection'],
         writes: ['clipboard'],
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       returnSchema: { aliasFields: ['ids', 'nodeCount', 'edgeCount'] },
       validate(options4 = {}, value8 = {}) {
@@ -252,24 +252,24 @@ export function registerEditingCommands(scope) {
       riskLevel: 'safe',
       argsSchema: {
         properties: { ids: { type: 'array', items: { type: 'string' } } },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes', 'selection'],
         writes: ['nodes', 'selection'],
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       returnSchema: { aliasFields: ['nodeId', 'sourceNodeIds'] },
       validate(options5 = {}, value20 = {}) {
         const response2 = validateIds(options5, value20, { min: 1 });
-        if (response2['ok'] === ![]) return response2;
+        if (response2['ok'] === false) return response2;
         const state5 = getState(value20),
           imageNodeIds = response2['args']['ids']
             ['map']((value21) => state5['nodes']?.[value21])
             ['filter'](isCollageImageNode);
         if (imageNodeIds['length'] === 0)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'NO_COLLAGE_IMAGES',
             message: translate(
               value20,

@@ -43,7 +43,7 @@ export function normalizeDirectorRecycleBin(current, scene) {
         ['filter']((record) => record?.['scene'])
         ['map']((wholeScene, payload) => ({
           scene: scene(wholeScene['scene'], payload),
-          wholeScene: wholeScene['wholeScene'] === !![],
+          wholeScene: wholeScene['wholeScene'] === true,
           objectIds: (Array['isArray'](wholeScene['objectIds']) ? wholeScene['objectIds'] : [])['filter'](
             (handle) => typeof handle === 'string',
           ),

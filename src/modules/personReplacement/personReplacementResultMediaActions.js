@@ -66,12 +66,12 @@ export function createPersonReplacementResultMediaActions({
         : null;
     },
     handler = (handler2, entry, record, enabled) => {
-      if (!enabled) return ![];
+      if (!enabled) return false;
       return (
         void handler2(record, () =>
-          Promise['resolve'](runIntent(entry, enabled, {}, { applyCallbackResult: ![] })),
+          Promise['resolve'](runIntent(entry, enabled, {}, { applyCallbackResult: false })),
         ),
-        !![]
+        true
       );
     };
   return {

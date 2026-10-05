@@ -67,7 +67,7 @@ export function createStoryboard3DWorkerGeometryImportTask({
   const run = workerFactory2 || createDefaultWorkerFactory(WorkerConstructor);
   if (!run) throw workerError({ code: 'MODEL_WORKER_UNAVAILABLE', message: 'Module Worker is unavailable.' });
   let enabled = null,
-    target = ![],
+    target = false,
     source,
     handler2 = () => {},
     handler3 = () => {},
@@ -75,24 +75,24 @@ export function createStoryboard3DWorkerGeometryImportTask({
   const requestId =
       globalThis['crypto']?.['randomUUID']?.() ||
       'geometry-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 9),
-    handler5 = ({ terminate: terminate = !![] } = {}) => {
+    handler5 = ({ terminate: terminate = true } = {}) => {
       (handler2(), handler3(), handler4());
       if (terminate) enabled?.['terminate']?.();
     },
     promise = new Promise((next, handler6) => {
       source = handler6;
       if (signal?.['aborted']) {
-        ((target = !![]), handler6(abortError(signal['reason'])));
+        ((target = true), handler6(abortError(signal['reason'])));
         return;
       }
       try {
         enabled = run(workerUrl, { type: 'module', name: 'storyboard3d-geometry-import' });
       } catch (current) {
-        ((target = !![]), handler6(workerError(current, 'Module Worker could not be created.')));
+        ((target = true), handler6(workerError(current, 'Module Worker could not be created.')));
         return;
       }
       if (!enabled || typeof enabled['postMessage'] !== 'function') {
-        ((target = !![]),
+        ((target = true),
           enabled?.['terminate']?.(),
           handler6(
             workerError({
@@ -104,14 +104,14 @@ export function createStoryboard3DWorkerGeometryImportTask({
       }
       const run2 = (handler7, entry) => {
         if (target) return;
-        ((target = !![]), handler5(), handler7(entry));
+        ((target = true), handler5(), handler7(entry));
       };
       ((handler2 = bindWorkerListener(enabled, 'message', (record) => {
         const payload = record?.['data'] || {};
         if (payload['requestId'] !== requestId) return;
         if (payload['type'] === 'progress') {
           const handle = Math['max'](0, Math['min'](1, Number(payload['progress']) || 0));
-          onProgress?.(handle, { format: format2, worker: !![] });
+          onProgress?.(handle, { format: format2, worker: true });
         } else {
           if (payload['type'] === 'result') run2(next, payload['payload']);
           else payload['type'] === 'error' && run2(handler6, workerError(payload));
@@ -122,10 +122,10 @@ export function createStoryboard3DWorkerGeometryImportTask({
         })));
       if (signal?.['addEventListener']) {
         const config = () => run2(handler6, abortError(signal['reason']));
-        (signal['addEventListener']('abort', config, { once: !![] }),
+        (signal['addEventListener']('abort', config, { once: true }),
           (handler4 = () => signal['removeEventListener']?.('abort', config)));
       }
-      onProgress?.(0, { format: format2, worker: !![] });
+      onProgress?.(0, { format: format2, worker: true });
       try {
         enabled['postMessage'](
           {
@@ -142,8 +142,8 @@ export function createStoryboard3DWorkerGeometryImportTask({
       }
     }),
     terminate2 = (input = 'Model geometry worker import was terminated.') => {
-      if (target) return ![];
-      return ((target = !![]), handler5(), source?.(abortError(input)), !![]);
+      if (target) return false;
+      return ((target = true), handler5(), source?.(abortError(input)), true);
     };
   return {
     requestId: requestId,
@@ -213,7 +213,7 @@ export function rebuildStoryboard3DWorkerGeometryPayload(
       scene['add'](error6));
   }
   return (
-    (scene['userData']['storyboard3dWorkerImport'] = !![]),
+    (scene['userData']['storyboard3dWorkerImport'] = true),
     (scene['userData']['materialLibraries'] = [...(format3['materialLibraries'] || [])]),
     {
       scene: scene,
@@ -224,13 +224,13 @@ export function rebuildStoryboard3DWorkerGeometryPayload(
       bounds: format3['bounds'] || null,
       triangleCount: Math['max'](0, Number(format3['triangleCount']) || 0),
       materialLibraries: [...(format3['materialLibraries'] || [])],
-      workerImport: { used: !![], format: format3['format'] },
+      workerImport: { used: true, format: format3['format'] },
     }
   );
 }
 function isAbort(error7, value4) {
   return (
-    value4?.['aborted'] === !![] || error7?.['name'] === 'AbortError' || error7?.['code'] === 'ABORT_ERR'
+    value4?.['aborted'] === true || error7?.['name'] === 'AbortError' || error7?.['code'] === 'ABORT_ERR'
   );
 }
 function createWorkerBackedParser({
@@ -261,12 +261,12 @@ function createWorkerBackedParser({
     if (
       !supportsStoryboard3DGeometryImportWorker2 ||
       buffer2['byteLength'] < value6 ||
-      signal2['disableWorker'] === !![]
+      signal2['disableWorker'] === true
     )
       return (
         onProgress3?.(0, {
           format: format4,
-          worker: ![],
+          worker: false,
           reason: !supportsStoryboard3DGeometryImportWorker2 ? 'unavailable' : 'below-threshold',
         }),
         fallbackParser(name2, signal2)
@@ -287,7 +287,7 @@ function createWorkerBackedParser({
     } catch (error8) {
       if (isAbort(error8, signal2['signal'])) throw error8;
       return (
-        onProgress3?.(0, { format: format4, worker: ![], reason: 'worker-fallback', error: error8 }),
+        onProgress3?.(0, { format: format4, worker: false, reason: 'worker-fallback', error: error8 }),
         fallbackParser(name2, signal2)
       );
     }

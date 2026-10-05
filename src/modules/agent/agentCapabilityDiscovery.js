@@ -99,13 +99,13 @@ export function describeAgentCommand({ commandRegistry: commandRegistry2, comman
     commandId3 = commandRegistry2?.['get']?.(commandId2) || null;
   if (!commandId3)
     return {
-      found: ![],
+      found: false,
       commandId: commandId2,
       errorCode: 'AGENT_COMMAND_NOT_FOUND',
       message: 'Canvas command is not registered: ' + commandId2,
     };
   return {
-    found: !![],
+    found: true,
     commandId: commandId3['id'],
     description: String(commandId3['description'] || ''),
     riskLevel: String(commandId3['riskLevel'] || 'safe'),
@@ -121,7 +121,7 @@ function summarizeInputSlots(minItems = {}) {
     ['map']((required = {}) => ({
       id: String(required['id'] || required['slotId'] || ''),
       kind: String(required['kind'] || required['type'] || ''),
-      required: required['required'] === !![],
+      required: required['required'] === true,
       ...(required['showWhen'] ? { showWhen: required['showWhen'] } : {}),
     }))
     ['filter']((input) => input['id']);
@@ -143,11 +143,11 @@ function summarizeInputSlots(minItems = {}) {
 }
 function modelAcceptsInputKind(options3 = {}, output = '') {
   const agentSearchText = normalizeAgentSearchText(output);
-  if (!agentSearchText) return !![];
+  if (!agentSearchText) return true;
   const map = new Set(normalizeStringArray(options3['allowedKinds'])['map'](normalizeAgentSearchText));
-  if (map['has'](agentSearchText)) return !![];
-  if (Number(options3['maxByKind']?.[agentSearchText]) > 0) return !![];
-  if (Number(options3['minByKind']?.[agentSearchText]) > 0) return !![];
+  if (map['has'](agentSearchText)) return true;
+  if (Number(options3['maxByKind']?.[agentSearchText]) > 0) return true;
+  if (Number(options3['minByKind']?.[agentSearchText]) > 0) return true;
   return (options3['fixedSlots'] || [])['some'](
     (value2) => normalizeAgentSearchText(value2['kind']) === agentSearchText,
   );
@@ -156,7 +156,7 @@ function summarizeModelField(required2 = {}) {
   const value3 = {
     id: String(required2['id'] || required2['key'] || ''),
     type: String(required2['type'] || ''),
-    required: required2['required'] === !![],
+    required: required2['required'] === true,
   };
   for (const value4 of ['label', 'default', 'min', 'max', 'step', 'placeholder', 'showWhen']) {
     if (required2[value4] !== undefined) value3[value4] = required2[value4];

@@ -72,8 +72,8 @@ export function createStoryClipAdjustmentApi({
     instruction: instruction = '',
     currentPrompt: currentPrompt = '',
     selectedText: selectedText = '',
-    preserveAssetRefs: preserveAssetRefs = !![],
-    preserveDuration: preserveDuration = !![],
+    preserveAssetRefs: preserveAssetRefs = true,
+    preserveDuration: preserveDuration = true,
     lockedAssetTokens: lockedAssetTokens = [],
     lockedDurationTokens: lockedDurationTokens = [],
     duration: duration = '',
@@ -85,10 +85,10 @@ export function createStoryClipAdjustmentApi({
   } = {}) {
     const args2 = run(scope),
       count = normalizePositiveNumber(maxDurationSeconds),
-      key = preserveDuration !== !![] && args2 !== 'selection' && count > 0,
+      key = preserveDuration !== true && args2 !== 'selection' && count > 0,
       args3 = Boolean(normalizeText(targetPromptMode)),
-      storyPromptMode = normalizeStoryPromptMode(sourcePromptMode, { allowDeveloperModes: !![] }),
-      storyPromptMode2 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: !![] }),
+      storyPromptMode = normalizeStoryPromptMode(sourcePromptMode, { allowDeveloperModes: true }),
+      storyPromptMode2 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: true }),
       args4 = args3
         ? getStoryClipPromptModeRewriteRequirements(storyPromptMode2, {
             hasAssetRefs: run2(lockedAssetTokens)['length'] > 0,
@@ -103,11 +103,11 @@ export function createStoryClipAdjustmentApi({
       currentPrompt: normalizeText(currentPrompt),
       ...(args2 === 'selection' ? { selectedText: normalizeText(selectedText) } : {}),
       locked: {
-        preserveAssetRefs: preserveAssetRefs === !![],
-        preserveDuration: preserveDuration === !![],
-        assetTokens: preserveAssetRefs === !![] ? run2(lockedAssetTokens) : [],
-        durationTokens: preserveDuration === !![] ? run2(lockedDurationTokens) : [],
-        clipDuration: preserveDuration === !![] ? normalizeText(duration) : '',
+        preserveAssetRefs: preserveAssetRefs === true,
+        preserveDuration: preserveDuration === true,
+        assetTokens: preserveAssetRefs === true ? run2(lockedAssetTokens) : [],
+        durationTokens: preserveDuration === true ? run2(lockedDurationTokens) : [],
+        clipDuration: preserveDuration === true ? normalizeText(duration) : '',
       },
       timing: {
         sourceDuration: normalizeText(duration),
@@ -143,13 +143,13 @@ export function createStoryClipAdjustmentApi({
         args2 === 'selection'
           ? '替换内容的信息密度与原镜头时长自然匹配。'
           : '镜头语言与动作节拍、情绪落点和对应时长自然匹配；静止或运动镜头都按当前表达需要选择。',
-        preserveAssetRefs === !![]
+        preserveAssetRefs === true
           ? key
             ? 'assetTokens 中的每个引用必须在最终候选中逐字保留，不能改名或删除；因重新拆分镜头，可以在不同镜头中按需要重复引用同一资产。'
             : 'assetTokens 中的每个引用必须在最终候选中逐字保留，不能改名、删除或重复添加。'
           : '可以按用户说明调整资产引用。',
         ...args4,
-        preserveDuration === !![]
+        preserveDuration === true
           ? '保持 clipDuration 和 durationTokens，不增加超过当前时长的动作、对白或镜头节拍。'
           : key
             ? args3
@@ -181,7 +181,7 @@ export function createStoryClipAdjustmentApi({
     }
     return target;
   }
-  function run7(current, { allowMinimaxH3Tags: allowMinimaxH3Tags = ![] } = {}) {
+  function run7(current, { allowMinimaxH3Tags: allowMinimaxH3Tags = false } = {}) {
     const entry = [],
       record = (payload) => {
         const handle = 'story-h3-tag-' + entry['length'] + '';
@@ -214,7 +214,7 @@ export function createStoryClipAdjustmentApi({
     if (!enabled) throw new Error('AI 没有返回候选片段总时长。');
     if (count4 > 0 && enabled > count4 + 0.001)
       throw new Error('候选片段总时长不能超过 ' + count4 + ' 秒。');
-    const storyPromptMode3 = normalizeStoryPromptMode(value2, { allowDeveloperModes: !![] });
+    const storyPromptMode3 = normalizeStoryPromptMode(value2, { allowDeveloperModes: true });
     if (isStorySeedance25PromptMode(storyPromptMode3) || isStoryWan30PromptMode(storyPromptMode3)) {
       const enabled2 = [
         ...String(input || '')['matchAll'](/(?:\[)?(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)秒(?:\])?/gu),
@@ -260,7 +260,7 @@ export function createStoryClipAdjustmentApi({
   function run9(
     value11,
     {
-      requireDuration: requireDuration = ![],
+      requireDuration: requireDuration = false,
       maxDurationSeconds: maxDurationSeconds = 0,
       promptMode: promptMode = '',
     } = {},
@@ -268,7 +268,7 @@ export function createStoryClipAdjustmentApi({
     const value12 = parseStrictJson(getResultText(value11), 'AI 没有返回候选提示词。');
     let enabled3 = normalizeText(value12['candidateText']);
     if (!enabled3) throw new Error('AI 返回的候选提示词为空。');
-    const storyPromptMode4 = normalizeStoryPromptMode(promptMode, { allowDeveloperModes: !![] }),
+    const storyPromptMode4 = normalizeStoryPromptMode(promptMode, { allowDeveloperModes: true }),
       isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode4);
     isStoryMinimaxH3PromptMode2 && (enabled3 = normalizeStoryMinimaxH3OfficialTags(enabled3));
     enabled3 = run7(enabled3, { allowMinimaxH3Tags: isStoryMinimaxH3PromptMode2 });
@@ -282,7 +282,7 @@ export function createStoryClipAdjustmentApi({
   function run10(value14, value15) {
     return String(value14 || '')['split'](value15)['length'] - 1;
   }
-  function run11(value16, value17, value18, value19, { allowCountChange: allowCountChange = ![] } = {}) {
+  function run11(value16, value17, value18, value19, { allowCountChange: allowCountChange = false } = {}) {
     const list2 = run2(value18)['filter']((value20) =>
       allowCountChange ? run10(value16, value20) < 1 : run10(value16, value20) !== run10(value17, value20),
     );
@@ -299,8 +299,8 @@ export function createStoryClipAdjustmentApi({
     instruction: instruction = '',
     currentPrompt: currentPrompt = '',
     selection: selection = null,
-    preserveAssetRefs: preserveAssetRefs = !![],
-    preserveDuration: preserveDuration = !![],
+    preserveAssetRefs: preserveAssetRefs = true,
+    preserveDuration: preserveDuration = true,
     lockedAssetTokens: lockedAssetTokens = [],
     lockedDurationTokens: lockedDurationTokens = [],
     duration: duration = '',
@@ -318,12 +318,12 @@ export function createStoryClipAdjustmentApi({
     ((request = withReplicationRequestPolicy(request, project)), assertPlanningModel(model, provider));
     const value21 = run(scope),
       enabled4 = normalizeText(instruction),
-      storyPromptMode5 = normalizeStoryPromptMode(sourcePromptMode, { allowDeveloperModes: !![] }),
+      storyPromptMode5 = normalizeStoryPromptMode(sourcePromptMode, { allowDeveloperModes: true }),
       enabled5 = Boolean(normalizeText(targetPromptMode)),
-      storyPromptMode6 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: !![] }),
+      storyPromptMode6 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: true }),
       list3 = normalizeText(currentPrompt),
       count8 = normalizePositiveNumber(maxDurationSeconds),
-      value22 = preserveDuration !== !![] && value21 !== 'selection' && count8 > 0,
+      value22 = preserveDuration !== true && value21 !== 'selection' && count8 > 0,
       value23 = run5(duration),
       storyPromptLanguage = normalizeStoryPromptLanguage(targetLanguage);
     if (targetLanguage && !storyPromptLanguage) throw new Error('请选择支持的转换语言。');
@@ -389,9 +389,9 @@ export function createStoryClipAdjustmentApi({
                   )
                 : value28['candidateText'];
           return (
-            preserveAssetRefs === !![] &&
+            preserveAssetRefs === true &&
               run11(value29, list3, lockedAssetTokens, '资产引用', { allowCountChange: value22 }),
-            preserveDuration === !![] && run11(value29, list3, lockedDurationTokens, '时间标记'),
+            preserveDuration === true && run11(value29, list3, lockedDurationTokens, '时间标记'),
             {
               schemaVersion: STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION,
               scope: value21,

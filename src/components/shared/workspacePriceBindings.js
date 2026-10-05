@@ -2,8 +2,8 @@ import { bindGenerationPriceControl } from './generationPriceControl.js';
 import { resolveGenerationPriceContext } from '../../services/generationPriceContext.js';
 export function bindWorkspacePrices(el, list) {
   const map = new Map();
-  let value = ![],
-    enabled = ![];
+  let value = false,
+    enabled = false;
   const syncPrices = () => {
       if (value) return;
       for (const [enabled2, item] of map) {
@@ -27,9 +27,9 @@ export function bindWorkspacePrices(el, list) {
     result = list['map']((data) => data['selector'])['join'](','),
     handler = () => {
       if (enabled || value) return;
-      ((enabled = !![]),
+      ((enabled = true),
         queueMicrotask(() => {
-          ((enabled = ![]), syncPrices());
+          ((enabled = false), syncPrices());
         }));
     };
   (el?.['addEventListener']?.('input', handler), el?.['addEventListener']?.('change', handler));
@@ -45,14 +45,14 @@ export function bindWorkspacePrices(el, list) {
         })
       : null;
   return (
-    options?.['observe'](el, { childList: !![], subtree: !![] }),
+    options?.['observe'](el, { childList: true, subtree: true }),
     syncPrices(),
     {
       syncPrices: syncPrices,
       destroy() {
         (el?.['removeEventListener']?.('input', handler),
           el?.['removeEventListener']?.('change', handler),
-          (value = !![]),
+          (value = true),
           options?.['disconnect'](),
           map['forEach']((source) => source['destroy']()),
           map['clear']());

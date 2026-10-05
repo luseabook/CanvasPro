@@ -31,8 +31,8 @@ export function getPersonReplacementVoiceLibraryBoundCharacters(options3 = {}, i
     librarySourceKey = getLibrarySourceKey(index);
   return (Array['isArray'](options3['characters']) ? options3['characters'] : [])['filter']((result) => {
     const enabled = result?.['voiceReference'];
-    if (!enabled || normalizeText(enabled['source'])['toLowerCase']() !== 'library') return ![];
-    if (text5 && normalizeText(enabled['libraryAssetId']) === text5) return !![];
+    if (!enabled || normalizeText(enabled['source'])['toLowerCase']() !== 'library') return false;
+    if (text5 && normalizeText(enabled['libraryAssetId']) === text5) return true;
     return Boolean(librarySourceKey && getLibrarySourceKey(enabled) === librarySourceKey);
   });
 }
@@ -87,7 +87,7 @@ export function bindPersonReplacementCharacterVoice({
           itemIndex: assetId['sourceItemIndex'] ?? assetId['itemIndex'],
         },
       ],
-      notify: ![],
+      notify: false,
     })['project']);
   const voiceReference = buildPersonReplacementLibraryVoiceReference(assetId, {
       audioUrl: resolveMediaUrl(personReplacementLibraryAudioRef),

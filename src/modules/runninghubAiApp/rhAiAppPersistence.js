@@ -4,13 +4,13 @@ export function createRhAiAppPersistence({
   onWarning: onWarning,
 }) {
   let promise = Promise['resolve']();
-  return (handler, { saveApps: saveApps = ![], onCommitted: onCommitted = () => {} } = {}) => {
+  return (handler, { saveApps: saveApps = false, onCommitted: onCommitted = () => {} } = {}) => {
     const promise2 = promise['then'](async () => {
       const value = handler(),
-        enabled = externalBridge?.['isAvailable']?.() === !![];
+        enabled = externalBridge?.['isAvailable']?.() === true;
       if (enabled) {
         const response = await externalBridge['write'](value);
-        if (response?.['ok'] !== !![]) throw new Error(response?.['error'] || '模型文件保存失败，请重试');
+        if (response?.['ok'] !== true) throw new Error(response?.['error'] || '模型文件保存失败，请重试');
       }
       if (saveApps)
         try {
@@ -20,7 +20,7 @@ export function createRhAiAppPersistence({
           if (!enabled) throw item;
           onWarning('[RH AI App] local cache update failed:', item);
         }
-      return (onCommitted(), { ok: !![] });
+      return (onCommitted(), { ok: true });
     });
     return ((promise = promise2['catch'](() => {})), promise2);
   };

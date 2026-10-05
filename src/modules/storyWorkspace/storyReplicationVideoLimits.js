@@ -10,7 +10,7 @@ export function validateStoryReplicationVideoSize(error = {}, item = '') {
   const storyReplicationVideoMaxBytes = getStoryReplicationVideoMaxBytes(item);
   return Number(error['size']) > storyReplicationVideoMaxBytes
     ? {
-        ok: ![],
+        ok: false,
         error:
           '“' +
           (error['name'] || '原视频') +
@@ -18,5 +18,5 @@ export function validateStoryReplicationVideoSize(error = {}, item = '') {
           storyReplicationVideoMaxBytes / 1024 / 1024 +
           'MB 上限，请压缩视频或选择支持更大文件的模型。',
       }
-    : { ok: !![], error: '' };
+    : { ok: true, error: '' };
 }

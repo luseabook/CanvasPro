@@ -45,8 +45,8 @@ export function openRunningHubApiKeySettings(data = 'runninghub') {
     openSettingsPanelToField({
       paneName: 'api-input',
       fieldIds: getRunningHubGuideEdition(data)['fieldIds'],
-      select: !![],
-      highlight: !![],
+      select: true,
+      highlight: true,
     }));
 }
 function createGuideNote(options) {

@@ -19,10 +19,10 @@ export function createStoryboard3DProjectActions({
   function deleteStoryboard3DProject(result) {
     const enabled2 = String(result || '')['trim'](),
       list2 = readProjects();
-    if (!enabled2 || !Array['isArray'](list2)) return ![];
+    if (!enabled2 || !Array['isArray'](list2)) return false;
     const list3 = list2['filter']((data) => String(data?.['id'] || '') !== enabled2);
-    if (list3['length'] === list2['length']) return ![];
-    return (writeProjects(list3), !![]);
+    if (list3['length'] === list2['length']) return false;
+    return (writeProjects(list3), true);
   }
   return {
     upsertStoryboard3DProject: upsertStoryboard3DProject,

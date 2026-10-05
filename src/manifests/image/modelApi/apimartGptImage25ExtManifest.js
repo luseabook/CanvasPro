@@ -25,7 +25,7 @@ export const apimartGptImage25ExtModelManifest = createImageModelApiManifest({
     BATCH_SIZE_FIELD,
   ],
   extensions: Object['freeze']({
-    imageFunctionMenu: Object['freeze']({ enabled: !![] }),
+    imageFunctionMenu: Object['freeze']({ enabled: true }),
     imageMenu: Object['freeze']({
       group: 'apimart',
       order: 42,
@@ -67,16 +67,16 @@ export const apimartGptImage25ExtExecutionManifest = createModelApiExecutionMani
       path: 'size',
       from: 'param',
       field: 'generationParams.aspectRatio',
-      omitWhenEmpty: !![],
+      omitWhenEmpty: true,
       when: Object['freeze']([
         Object['freeze']({
           field: 'generationParams.aspectRatio',
           notIn: Object['freeze'](['自适应', 'auto']),
         }),
-        Object['freeze']({ field: 'suppressAspectRatio', falsy: !![] }),
+        Object['freeze']({ field: 'suppressAspectRatio', falsy: true }),
       ]),
     }),
-    Object['freeze']({ path: 'image_urls', from: 'inputImages', omitWhenEmpty: !![] }),
+    Object['freeze']({ path: 'image_urls', from: 'inputImages', omitWhenEmpty: true }),
   ]),
   responseMapping: Object['freeze']({
     ...apimartGptImage25ExecutionManifest['responseMapping'],

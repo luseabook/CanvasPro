@@ -43,10 +43,10 @@ export async function removeCliComponent(key) {
   );
 }
 export function updateCliComponent(index) {
-  return ensureCliComponent(index, { update: !![] });
+  return ensureCliComponent(index, { update: true });
 }
 export function repairCliComponent(result) {
-  return ensureCliComponent(result, { repair: !![] });
+  return ensureCliComponent(result, { repair: true });
 }
 export async function checkCliComponentUpdate(data) {
   return notify(
@@ -56,7 +56,7 @@ export async function checkCliComponentUpdate(data) {
     ),
   );
 }
-export function ensureCliComponent(provider, { update: update = ![], repair: repair = ![] } = {}) {
+export function ensureCliComponent(provider, { update: update = false, repair: repair = false } = {}) {
   if (pending['has'](provider)) return pending['get'](provider);
   let args;
   const options = (async () => {

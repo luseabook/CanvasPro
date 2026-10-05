@@ -56,7 +56,7 @@ export function renderPersonReplacementVoiceCloneCharacterCards(target) {
       source = Boolean(characterVoiceUrl),
       renderPersonReplacementVoicePreviewPlayer2 = renderPersonReplacementVoicePreviewPlayer(
         { ...error, kind: 'character' },
-        { className: 'person-replacement-voice-asset-preview', showWaveform: ![] },
+        { className: 'person-replacement-voice-asset-preview', showWaveform: false },
       );
     return (
       '<article class="person-replacement-voice-asset-shell' +

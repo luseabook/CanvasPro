@@ -26,7 +26,7 @@ function renderWorkflowLoading(index) {
     '</span>\n  </div>'
   );
 }
-function renderOutlineField(result, data, options, { singleLine: singleLine = ![] } = {}) {
+function renderOutlineField(result, data, options, { singleLine: singleLine = false } = {}) {
   const source = singleLine
     ? '<input type="text" value="' +
       escapeHtml(data || '') +
@@ -51,7 +51,7 @@ function renderSummaryCharacterField(
   current,
   entry,
   record,
-  { multiline: multiline = !![], value: value = next?.[entry] || '' } = {},
+  { multiline: multiline = true, value: value = next?.[entry] || '' } = {},
 ) {
   const payload =
       'data-story-summary-character-index="' +
@@ -78,7 +78,7 @@ function renderSummaryCharacters(list = []) {
         state +
         '" data-story-summary-character-field="name" aria-label="角色姓名">\n      <div class="story-summary-character-fields">\n        ' +
         renderSummaryCharacterField(value2, state, 'roleType', '角色类型', {
-          multiline: ![],
+          multiline: false,
           value: value2['roleType'] || '其他角色',
         }) +
         '\n        ' +
@@ -87,7 +87,7 @@ function renderSummaryCharacters(list = []) {
         }) +
         '\n        ' +
         renderSummaryCharacterField(value2, state, 'coreTags', '核心标签', {
-          multiline: ![],
+          multiline: false,
           value: Array['isArray'](value2['coreTags']) ? value2['coreTags']['join']('、') : '',
         }) +
         '\n        ' +
@@ -171,7 +171,7 @@ function renderSummary(response = {}) {
     '" data-story-outline-field="story-target-audience"></label>\n    </div>\n    ' +
     renderOutlineField('一句话故事', response['logline'], 'story-logline') +
     '\n    ' +
-    renderOutlineField('核心梗', response['coreHook'], 'story-core-hook', { singleLine: !![] }) +
+    renderOutlineField('核心梗', response['coreHook'], 'story-core-hook', { singleLine: true }) +
     '\n    ' +
     renderOutlineField('故事梗概', response['synopsis'], 'story-summary') +
     '\n    <div class="story-summary-secondary-fields">\n      ' +
@@ -195,8 +195,8 @@ function renderInlineRegenerationControl({
   confirmLabel: confirmLabel = '',
   episodeId: episodeId = '',
   placement: placement = 'heading',
-  isConfirming: isConfirming = ![],
-  disabled: disabled = ![],
+  isConfirming: isConfirming = false,
+  disabled: disabled = false,
 } = {}) {
   const text = normalizeText(target);
   if (!text) return '';

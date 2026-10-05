@@ -62,7 +62,7 @@ import {
 const REMOVE_POS_POINT_LIMIT = 3000,
   REMOVE_MASK_MAX_SIDE = 512,
   VideoKeyingController = {
-    active: ![],
+    active: false,
     nodeId: null,
     wrapperEl: null,
     barEl: null,
@@ -94,7 +94,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
     _marksRedo: null,
     _removeDraft: null,
     _removeDrawPointerId: null,
-    _removeCursorHover: ![],
+    _removeCursorHover: false,
     _removeCursorLast: { x: 0, y: 0 },
     _removeCursorRaf: 0,
     _removeWheelCleanup: null,
@@ -124,7 +124,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
     _lastConfirmEnabled: null,
     _unsubscribeLocale: null,
     isActiveFor(enabled) {
-      return !!enabled && this['active'] === !![] && this['nodeId'] === enabled;
+      return !!enabled && this['active'] === true && this['nodeId'] === enabled;
     },
     _isRemoveUiMode() {
       return this['uiMode'] === 'remove';
@@ -265,7 +265,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
         cursorEl = this['removeCursorEl'];
       if (!this['_isRemoveUiMode']() || !canvasEl || !cursorEl) return;
       const run = () =>
-        syncCircularBrushCursor({ cursorEl: cursorEl, canvasEl: canvasEl, visible: ![] });
+        syncCircularBrushCursor({ cursorEl: cursorEl, canvasEl: canvasEl, visible: false });
       if (!this['_removeCursorHover']) {
         run();
         return;
@@ -299,12 +299,12 @@ const REMOVE_POS_POINT_LIMIT = 3000,
       syncCircularBrushCursor({
         cursorEl: cursorEl,
         canvasEl: canvasEl,
-        visible: !![],
+        visible: true,
         tool: this['_getRemoveToolType'](),
         allowedTools: ['brush', 'eraser'],
         sizePx: sizePx,
         cursorLast: { x: x, y: y },
-        isEraseBrush: !![],
+        isEraseBrush: true,
       });
     },
     _attachMarkLayerListeners() {
@@ -362,7 +362,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
         count3 = Math['max'](1, Math['round'](value13 * value14)),
         box2 = document['createElement']('canvas');
       ((box2['width'] = count2), (box2['height'] = count3));
-      const ctx = box2['getContext']('2d', { willReadFrequently: !![] });
+      const ctx = box2['getContext']('2d', { willReadFrequently: true });
       if (!ctx) return [];
       const eraseCanvasPalette = getEraseCanvasPalette(),
         value15 = count2 / Math['max'](1, Number(el5?.['offsetWidth']) || count2);
@@ -406,10 +406,10 @@ const REMOVE_POS_POINT_LIMIT = 3000,
               const value25 = (value23 * count2 + value24) * 4;
               if (value18[value25 + 3] < 8) continue;
               handler(value24, value23);
-              if (list8['length'] >= value11) return !![];
+              if (list8['length'] >= value11) return true;
             }
           }
-          return ![];
+          return false;
         },
         count4 = Math['max'](1, Math['floor'](Math['max'](count2, count3) / 220)),
         enabled6 = handler2(count4);
@@ -609,7 +609,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
       const value55 = this['nodeId'],
         value56 = value55 ? getRunningVideoKeyingTaskForNode(value55) : null;
       if (value56) {
-        if (this['confirmBtnEl']['disabled']) this['confirmBtnEl']['disabled'] = ![];
+        if (this['confirmBtnEl']['disabled']) this['confirmBtnEl']['disabled'] = false;
         return;
       }
       const { pos_points: pos_points, neg_points: neg_points } = this['getPosNegPoints'](),
@@ -679,7 +679,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
     },
     init(nodeId, value64 = {}) {
       if (!nodeId) return;
-      if (this['active']) this['exit']({ silent: !![] });
+      if (this['active']) this['exit']({ silent: true });
       const enabled12 = appStore['getState']()['nodes'][nodeId];
       if (!enabled12) return;
       ((this['uiMode'] = value64?.['uiMode'] === 'remove' ? 'remove' : 'keying'),
@@ -687,15 +687,15 @@ const REMOVE_POS_POINT_LIMIT = 3000,
         (this['_removeBrushSizePx'] = 40),
         (this['_removeDraft'] = null),
         (this['_removeDrawPointerId'] = null),
-        (this['_removeCursorHover'] = ![]),
+        (this['_removeCursorHover'] = false),
         (this['_removeCursorLast'] = { x: 0, y: 0 }));
       if (this['_removeCursorRaf']) cancelAnimationFrame(this['_removeCursorRaf']);
       ((this['_removeCursorRaf'] = 0),
-        (this['active'] = !![]),
+        (this['active'] = true),
         (this['nodeId'] = nodeId),
         (this['_marks'] = []),
         (this['_marksRedo'] = []),
-        appStore['setVideoKeyingState']({ active: !![], nodeId: nodeId, pos_points: [], neg_points: [] }),
+        appStore['setVideoKeyingState']({ active: true, nodeId: nodeId, pos_points: [], neg_points: [] }),
         (this['_unsubscribeLocale'] = onLocaleChange(() => this['_syncLocaleTexts']())),
         (this['_retryCount'] = 0),
         this['_mountWhenReady']());
@@ -708,15 +708,15 @@ const REMOVE_POS_POINT_LIMIT = 3000,
           if (!enabled13) {
             this['_retryCount']++;
             if (this['_retryCount'] > 10) {
-              this['exit']({ silent: !![] });
+              this['exit']({ silent: true });
               return;
             }
             this['_retryRaf'] = requestAnimationFrame(value66);
             return;
           }
           ((this['wrapperEl'] = enabled13),
-            this['_applyFrozenUI'](!![]),
-            this['_applyDimMode'](!![]),
+            this['_applyFrozenUI'](true),
+            this['_applyDimMode'](true),
             releaseCanvasPanShortcut(),
             this['_createUI'](),
             this['_syncDurationAndDefaults'](),
@@ -1244,18 +1244,18 @@ const REMOVE_POS_POINT_LIMIT = 3000,
           (el64['style']['display'] = 'none'),
           el63['appendChild'](el64),
           (this['removeCursorEl'] = el64),
-          (this['_removeCursorHover'] = ![]));
+          (this['_removeCursorHover'] = false));
       } else
         ((this['markCanvasEl'] = null),
           (this['removeMaskCanvasEl'] = null),
           (this['removeCursorEl'] = null),
-          (this['_removeCursorHover'] = ![]));
+          (this['_removeCursorHover'] = false));
       (el61['appendChild'](el63),
         (this['markLayerEl'] = el63),
         this['_attachMarkLayerListeners']());
       this['_isRemoveUiMode']()
         ? ((this['_onMarkWheel'] = (value105) => this['_onRemoveCanvasWheel'](value105)),
-          el63['addEventListener']('wheel', this['_onMarkWheel'], { passive: ![] }),
+          el63['addEventListener']('wheel', this['_onMarkWheel'], { passive: false }),
           (this['_removeWheelCleanup'] = () => {
             this['_onMarkWheel'] && el63['removeEventListener']('wheel', this['_onMarkWheel']);
           }))
@@ -1273,7 +1273,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
           if (!this['active'] || !this['nodeId']) return;
           const rhSourceNodeId = this['nodeId'];
           if (getRunningVideoKeyingTaskForNode(rhSourceNodeId)) {
-            await this['_cancelRhTaskForSourceNode'](rhSourceNodeId, { notify: !![] });
+            await this['_cancelRhTaskForSourceNode'](rhSourceNodeId, { notify: true });
             return;
           }
           const value106 = appStore['getState']()['nodes']?.[this['nodeId']] || {},
@@ -1388,11 +1388,11 @@ const REMOVE_POS_POINT_LIMIT = 3000,
                 rhTaskId: '',
                 rhTaskStatus: 'pending',
                 rhTaskStartedAt: startedAt,
-                rhTaskRecovering: ![],
-                rhTaskUseOpenapiQuery: ![],
+                rhTaskRecovering: false,
+                rhTaskUseOpenapiQuery: false,
                 rhSourceNodeId: rhSourceNodeId,
                 rhToolbarTaskType: 'video-remove',
-                fixedSize: !![],
+                fixedSize: true,
                 outputText: buildVideoKeyingOutputText('remove', 'processing'),
               }),
             ),
@@ -1417,7 +1417,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
                 rhInstanceType: instanceType3,
               },
             });
-            (this['exit']({ silent: !![], preserveRh: !![] }), await runVideoKeyingTask2);
+            (this['exit']({ silent: true, preserveRh: true }), await runVideoKeyingTask2);
             return;
           }
           const name = value106,
@@ -1452,11 +1452,11 @@ const REMOVE_POS_POINT_LIMIT = 3000,
               rhTaskId: '',
               rhTaskStatus: 'pending',
               rhTaskStartedAt: startedAt2,
-              rhTaskRecovering: ![],
-              rhTaskUseOpenapiQuery: ![],
+              rhTaskRecovering: false,
+              rhTaskUseOpenapiQuery: false,
               rhSourceNodeId: rhSourceNodeId,
               rhToolbarTaskType: 'video-keying',
-              fixedSize: !![],
+              fixedSize: true,
               outputText: buildVideoKeyingOutputText('keying', 'processing'),
             }),
           ),
@@ -1488,7 +1488,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
               rhMaskMode: rhMaskMode,
             },
           });
-          (this['exit']({ silent: !![], preserveRh: !![] }), await runVideoKeyingTask3);
+          (this['exit']({ silent: true, preserveRh: true }), await runVideoKeyingTask3);
         }));
       const el65 = this['barEl']['querySelector']('.rh-keying-settings-wrap'),
         el66 = this['barEl']['querySelector']('.rh-keying-settings-btn'),
@@ -1522,7 +1522,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
             const run5 = () => {
                 (el65['classList']['remove']('show'),
                   this['_onKeyingSettingsDocDown'] &&
-                    (document['removeEventListener']('pointerdown', this['_onKeyingSettingsDocDown'], !![]),
+                    (document['removeEventListener']('pointerdown', this['_onKeyingSettingsDocDown'], true),
                     (this['_onKeyingSettingsDocDown'] = null)));
               },
               enabled15 = !el65['classList']['contains']('show');
@@ -1537,7 +1537,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
                   if (el65['contains'](event19['target'])) return;
                   run5();
                 }),
-                document['addEventListener']('pointerdown', this['_onKeyingSettingsDocDown'], !![])));
+                document['addEventListener']('pointerdown', this['_onKeyingSettingsDocDown'], true)));
           }),
           el67['querySelectorAll']('.rh-keying-fps-btn')['forEach']((el72) => {
             el72['addEventListener']('click', (event20) => {
@@ -1792,10 +1792,10 @@ const REMOVE_POS_POINT_LIMIT = 3000,
             return;
           }
           const handleShortcutKeydown2 = handleShortcutKeydown(event29, {
-            mattingActive: ![],
-            annotateActive: ![],
-            videoKeyingActive: !![],
-            featureModeActive: !![],
+            mattingActive: false,
+            annotateActive: false,
+            videoKeyingActive: true,
+            featureModeActive: true,
             selectedNodeType: 'source-video',
           });
           if (!handleShortcutKeydown2) return;
@@ -1842,7 +1842,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
             this['_clearAllMarks'](),
             window['showToast']?.(videoKeyingText('toasts.clearedPoints'), 'info'));
         }),
-        window['addEventListener']('keydown', this['_onKeyDown'], !![]));
+        window['addEventListener']('keydown', this['_onKeyDown'], true));
       const run7 = () => {
         const layerEl2 = this['markLayerEl'],
           videoEl4 = this['videoEl'] || this['_getVideoEl'](),
@@ -1947,15 +1947,15 @@ const REMOVE_POS_POINT_LIMIT = 3000,
         layerEl2['replaceChildren'](el80);
       };
       this['_renderMarksFn'] = run7;
-      const event30 = { down: ![], pointerId: null },
-        handler7 = (enabled18 = !![]) => {
+      const event30 = { down: false, pointerId: null },
+        handler7 = (enabled18 = true) => {
           const value149 = this['markLayerEl'],
             value150 = event30['pointerId'];
           if (value149 && Number['isFinite'](value150))
             try {
               value149['releasePointerCapture'](value150);
             } catch {}
-          ((event30['down'] = ![]), (event30['pointerId'] = null), (this['_removeDrawPointerId'] = null));
+          ((event30['down'] = false), (event30['pointerId'] = null), (this['_removeDrawPointerId'] = null));
           const type2 = this['_removeDraft'];
           this['_removeDraft'] = null;
           if (!enabled18 || !type2) {
@@ -2009,7 +2009,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
             brushSizePx: this['_clampRemoveBrushSize'](this['_removeBrushSizePx']),
             points: [{ nx: nx['nx'], ny: nx['ny'] }],
           }),
-            (event30['down'] = !![]),
+            (event30['down'] = true),
             (event30['pointerId'] = event31['pointerId']),
             (this['_removeDrawPointerId'] = event31['pointerId']));
           try {
@@ -2072,22 +2072,22 @@ const REMOVE_POS_POINT_LIMIT = 3000,
           this['_scheduleRemoveCursor'](event33['clientX'], event33['clientY']);
           if (Number['isFinite'](event30['pointerId']) && event33['pointerId'] !== event30['pointerId'])
             return;
-          (event33['preventDefault'](), event33['stopPropagation'](), handler7(!![]));
+          (event33['preventDefault'](), event33['stopPropagation'](), handler7(true));
         }),
         (this['_onMarkPointerCancel'] = (event34) => {
           if (!this['active'] || !this['_isRemoveUiMode']()) return;
           if (Number['isFinite'](event30['pointerId']) && event34['pointerId'] !== event30['pointerId'])
             return;
-          handler7(!![]);
+          handler7(true);
         }),
         (this['_onMarkPointerEnter'] = (event35) => {
           if (!this['_isRemoveUiMode']()) return;
-          ((this['_removeCursorHover'] = !![]),
+          ((this['_removeCursorHover'] = true),
             this['_scheduleRemoveCursor'](event35['clientX'], event35['clientY']));
         }),
         (this['_onMarkPointerLeave'] = () => {
           if (!this['_isRemoveUiMode']()) return;
-          ((this['_removeCursorHover'] = ![]), this['_syncRemoveCursor']());
+          ((this['_removeCursorHover'] = false), this['_syncRemoveCursor']());
         }),
         this['_detachMarkLayerListeners'](),
         this['_attachMarkLayerListeners'](),
@@ -2129,7 +2129,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
             value158 === this['_sourceToken'] &&
             this['videoEl'] === value159 &&
             this['nodeId'] === value160;
-        setVideoKeyingMediaKeepAlive(this['videoEl'], !![]);
+        setVideoKeyingMediaKeepAlive(this['videoEl'], true);
         if (value156 && value157 !== value156) {
           await attachVideoKeyingPlaybackSource(value159, value156, { shouldAssign: shouldAssign });
           if (!shouldAssign()) return;
@@ -2151,7 +2151,7 @@ const REMOVE_POS_POINT_LIMIT = 3000,
             const count16 = this['_readDurationSec'](this['videoEl']);
             if (count16 > 0) this['durationSec'] = count16;
           }),
-          this['videoEl']['addEventListener']('loadedmetadata', this['_onLoadedMeta'], { once: !![] }),
+          this['videoEl']['addEventListener']('loadedmetadata', this['_onLoadedMeta'], { once: true }),
           this['videoEl']['addEventListener']('durationchange', this['_onDurationChange'])),
         this['_startPlayheadLoop'](),
         this['wrapperEl'] &&
@@ -2165,8 +2165,8 @@ const REMOVE_POS_POINT_LIMIT = 3000,
               value161['pause']();
             } catch {}
           }),
-          this['wrapperEl']['addEventListener']('play', this['_onVideoPlay'], !![]),
-          this['wrapperEl']['addEventListener']('playing', this['_onVideoPlay'], !![])));
+          this['wrapperEl']['addEventListener']('play', this['_onVideoPlay'], true),
+          this['wrapperEl']['addEventListener']('playing', this['_onVideoPlay'], true)));
     },
     _startPlayheadLoop() {
       if (this['_playheadRaf']) cancelAnimationFrame(this['_playheadRaf']);
@@ -2188,16 +2188,16 @@ const REMOVE_POS_POINT_LIMIT = 3000,
         this['playheadEl']['style']['display'] = 'none';
         return;
       }
-      let value163 = ![];
+      let value163 = false;
       if (this['videoEl'] !== enabled20)
         ((this['videoEl'] = enabled20),
           this['_ensureMarkLayer'](),
           this['_attachMarkLayerListeners'](),
-          (value163 = !![]));
+          (value163 = true));
       else
         this['markLayerEl'] &&
           !this['markLayerEl']['isConnected'] &&
-          (this['_ensureMarkLayer'](), this['_attachMarkLayerListeners'](), (value163 = !![]));
+          (this['_ensureMarkLayer'](), this['_attachMarkLayerListeners'](), (value163 = true));
       const value164 = Math['max'](0, Math['min'](count17, Number(enabled20['currentTime']) || 0)),
         value165 = Math['max'](0, Math['min'](1, value164 / count17)),
         value166 = appStore['getState']()['nodes']?.[this['nodeId']] || {},

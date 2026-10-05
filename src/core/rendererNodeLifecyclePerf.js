@@ -14,7 +14,7 @@ export function createRendererNodeLifecycleStats({
     renderNodeCount: Number['isFinite'](Number(renderNodeCount)) ? Number(renderNodeCount) : 0,
     mountCandidateCount: Number['isFinite'](Number(mountCandidateCount)) ? Number(mountCandidateCount) : 0,
     parkCandidateCount: Number['isFinite'](Number(parkCandidateCount)) ? Number(parkCandidateCount) : 0,
-    viewportBusy: viewportBusy === !![],
+    viewportBusy: viewportBusy === true,
     createdCount: 0,
     createRuntimeMs: 0,
     createRuntimeMaxMs: 0,

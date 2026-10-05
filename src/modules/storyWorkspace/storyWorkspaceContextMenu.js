@@ -34,7 +34,7 @@ function audioBindingItems(value, item, key, index) {
                 index['bindAudioCharacter']?.(value, label['id']);
             },
           }))
-        : [{ label: '暂无可绑定的角色', disabled: !![] }],
+        : [{ label: '暂无可绑定的角色', disabled: true }],
     },
   ];
 }
@@ -97,12 +97,12 @@ function libraryAssignmentItems(source, projectAssets, list2, getTabLabel, next)
               ...label3['appearances']['map']((error) => ({
                 label: normalizeText(error['name']) || '未命名形象',
                 disabled: selectedCount['length'] !== 1,
-                action: () => handler(label3['id'], error['id'], ![]),
+                action: () => handler(label3['id'], error['id'], false),
               })),
-              { label: '新增形象', icon: 'add', action: () => handler(label3['id'], '', !![]) },
+              { label: '新增形象', icon: 'add', action: () => handler(label3['id'], '', true) },
             ],
           }))
-        : [{ label: '本剧暂无可绑定的' + label2['label'], disabled: !![] }],
+        : [{ label: '本剧暂无可绑定的' + label2['label'], disabled: true }],
     })),
   });
 }
@@ -149,7 +149,7 @@ export function resolveStoryWorkspaceContextMenuItems({
       deleteLabel: contextMenuText('deleteVersion'),
       deleteShortcutActionId: 'context-story-delete-version',
       onDelete: onDelete ? () => onDelete['click']?.() : null,
-      deleteDisabled: onDelete?.['disabled'] === !![],
+      deleteDisabled: onDelete?.['disabled'] === true,
     });
   }
   const el4 = el?.['closest']?.('.story-clip-card[data-story-clip-id]');
@@ -164,7 +164,7 @@ export function resolveStoryWorkspaceContextMenuItems({
       deleteLabel: contextMenuText('deleteClip'),
       deleteShortcutActionId: 'context-story-delete-clip',
       onDelete: onDelete2 ? () => onDelete2['click']?.() : null,
-      deleteDisabled: onDelete2?.['disabled'] === !![],
+      deleteDisabled: onDelete2?.['disabled'] === true,
     });
   }
   const el6 = el?.['closest']?.('[data-story-asset-id]');
@@ -189,7 +189,7 @@ export function resolveStoryWorkspaceContextMenuItems({
       deleteLabel: contextMenuText('deleteAsset'),
       deleteShortcutActionId: 'context-story-delete-asset',
       onDelete: onDelete3 ? () => onDelete3['click']?.() : null,
-      deleteDisabled: onDelete3?.['disabled'] === !![],
+      deleteDisabled: onDelete3?.['disabled'] === true,
     });
   }
   return [];

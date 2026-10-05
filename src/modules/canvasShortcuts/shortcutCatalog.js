@@ -14,7 +14,7 @@ export function getAvailableShortcutTemplates(index) {
   return index['items']['filter']((result) => result['enabled'] && result['action']['kind'] === 'graph');
 }
 export function canManageCanvasShortcuts(data = globalThis['window']) {
-  return data?.['AI_CANVAS_IS_DEV_BUILD'] === !![] && data?.['DEV_MODE'] === !![];
+  return data?.['AI_CANVAS_IS_DEV_BUILD'] === true && data?.['DEV_MODE'] === true;
 }
 export function createDefaultShortcutCatalog() {
   return {
@@ -25,7 +25,7 @@ export function createDefaultShortcutCatalog() {
       icon: icon,
       badge: '',
       cover: '',
-      enabled: !![],
+      enabled: true,
       action: { kind: 'node', nodeType: 'ai-' + icon },
     })),
   };
@@ -119,9 +119,9 @@ export function validateShortcutGraph(enabled) {
   return enabled;
 }
 export function createShortcutCatalogStore({ load: load2, save: save2, canManage: canManage }) {
-  let enabled4 = { catalog: createDefaultShortcutCatalog(), revision: '', loaded: ![] },
+  let enabled4 = { catalog: createDefaultShortcutCatalog(), revision: '', loaded: false },
     enabled5 = null,
-    record = ![];
+    record = false;
   const list = new Set(),
     handler = (revision) => {
       const payload =
@@ -132,7 +132,7 @@ export function createShortcutCatalogStore({ load: load2, save: save2, canManage
         (enabled4 = {
           catalog: structuredClone(payload),
           revision: revision?.['revision'] || '',
-          loaded: !![],
+          loaded: true,
         }),
         list['forEach']((handler2) => handler2(enabled4)),
         enabled4
@@ -156,11 +156,11 @@ export function createShortcutCatalogStore({ load: load2, save: save2, canManage
     async save(state, config) {
       if (!canManage()) throw new Error('请开启开发者模式，并确认本地 .dev 文件存在');
       if (!enabled4['loaded'] || record || enabled5) throw new Error('配置正在读写，请稍后再试');
-      (validateShortcutCatalog(state), (record = !![]));
+      (validateShortcutCatalog(state), (record = true));
       try {
         return handler(await save2(structuredClone(state), config));
       } finally {
-        record = ![];
+        record = false;
       }
     },
   };

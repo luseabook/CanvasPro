@@ -25,7 +25,7 @@ export function initCanvasCollaboration({
 }) {
   const el = document['querySelector']('.header-right');
   if (!el) return null;
-  let enabled = ![];
+  let enabled = false;
   const el2 = document['createElement']('div');
   el2['className'] = 'collaboration-controls';
   const collaborationConnectionIndicator = createCollaborationConnectionIndicator(),
@@ -70,7 +70,7 @@ export function initCanvasCollaboration({
       ensureInstallId: ensureInstallId,
       ensureDeviceId: ensureDeviceId,
       resetHistory: resetHistory,
-      saveProject: () => windowObject['_v2SaveProjectFromShortcut']?.({ waitForDialog: !![] }),
+      saveProject: () => windowObject['_v2SaveProjectFromShortcut']?.({ waitForDialog: true }),
       onNotice: (index) => showToast(index),
       onComment: (result) => run2(result),
       onChange(data) {
@@ -101,7 +101,7 @@ export function initCanvasCollaboration({
     chat = createCollaborationChat({
       store: store,
       getSession: getSession['getSession'],
-      openNode: (entry) => openNode(entry, ![]),
+      openNode: (entry) => openNode(entry, false),
     }),
     handler = bindCollaborationChatInput({
       chat: chat,
@@ -150,7 +150,7 @@ export function initCanvasCollaboration({
       ...getSession['actions'],
       activate: () => windowObject['openSubscriptionDialog']?.(),
       copy: (record) => navigator['clipboard']['writeText'](record),
-      refreshReview: () => getSession['getSession']()?.['review']['refresh'](undefined, !![]),
+      refreshReview: () => getSession['getSession']()?.['review']['refresh'](undefined, true),
       hasReviewNode: (payload) => !!store['getStateRaw']()['nodes'][payload],
       openReviewNode: openNode,
     },
@@ -184,7 +184,7 @@ export function initCanvasCollaboration({
       show: show,
       getSession: getSession['getSession'],
       destroy() {
-        ((enabled = !![]), handler2(), handler(), chat['destroy']());
+        ((enabled = true), handler2(), handler(), chat['destroy']());
         const config = getSession['destroy']();
         return (
           run4(),

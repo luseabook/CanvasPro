@@ -56,7 +56,7 @@ export function createWorkspaceProjectPackageCoordinator({
   getReplacementStudio: getReplacementStudio = () => null,
   openCanvasProjectPackage: openCanvasProjectPackage = (entry) =>
     windowObject?.['_v2LoadImportedCanvasProjectPackage']?.(entry),
-  requestWorkspaceMode: requestWorkspaceMode = () => ![],
+  requestWorkspaceMode: requestWorkspaceMode = () => false,
   showToast: showToast = (...args) => windowObject?.['showToast']?.(...args),
 } = {}) {
   let record = null,
@@ -79,7 +79,7 @@ export function createWorkspaceProjectPackageCoordinator({
         operationId: operationId,
       });
       if (!response || response['canceled']) return response;
-      if (response['blocked'] || response['success'] === ![])
+      if (response['blocked'] || response['success'] === false)
         return (showToast(getPackageBlockedMessage(response), 'error'), response);
       return (showToast('项目已收集为“' + (response['filename'] || '项目包') + '”。', 'success'), response);
     } catch (error4) {
@@ -163,10 +163,10 @@ export function createWorkspaceProjectPackageCoordinator({
   }
   function importProjectFromDrop(event) {
     const file2 = getWorkspaceProjectPackageFile(event?.['dataTransfer']);
-    if (!file2) return ![];
+    if (!file2) return false;
     (event['preventDefault']?.(), event['stopPropagation']?.());
     const path2 = normalizeText(file2['path']);
-    return (void importProject(path2 ? { path: path2 } : { file: file2 }), !![]);
+    return (void importProject(path2 ? { path: path2 } : { file: file2 }), true);
   }
   return Object['freeze']({
     applyImportedProject: applyImportedProject,

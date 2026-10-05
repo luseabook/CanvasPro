@@ -5,11 +5,11 @@ export function createCharacterClayMaterial(color) {
     color: color?.['isColor'] ? color['clone']() : new threeRuntime['Color'](color),
     roughness: 0.72,
     metalness: 0,
-    vertexColors: !![],
+    vertexColors: true,
   });
 }
 export function buildArticulatedCharacterShell(value) {
-  value['updateMatrixWorld'](!![]);
+  value['updateMatrixWorld'](true);
   const list = [];
   let enabled;
   value['traverse']((item) => {
@@ -111,10 +111,10 @@ export function buildArticulatedCharacterShell(value) {
     (error3['name'] = 'ArticulatedDirectorMannequin'),
     list['forEach']((value4) => value4['removeFromParent']()),
     value['add'](error3),
-    value['updateMatrixWorld'](!![]),
+    value['updateMatrixWorld'](true),
     error3['bind'](new threeRuntime['Skeleton'](list2)),
-    (error3['frustumCulled'] = ![]),
-    (error3['receiveShadow'] = !![]),
+    (error3['frustumCulled'] = false),
+    (error3['receiveShadow'] = true),
     (value['userData']['characterStyle'] = 'articulated'),
     value
   );

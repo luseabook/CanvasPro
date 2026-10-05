@@ -218,8 +218,8 @@ function groupWorkflowItems(list2 = []) {
           iconHtml: value4['iconHtml'] || undefined,
           icon: value4['icon'] || args['icon'],
           iconAlt: value4['iconAlt'] || args['iconAlt'],
-          vip: value4['vip'] === !![],
-          badgeHtml: buildModelProviderProfileBadgesHtml(value4['key'], { vip: value4['vip'] === !![] }),
+          vip: value4['vip'] === true,
+          badgeHtml: buildModelProviderProfileBadgesHtml(value4['key'], { vip: value4['vip'] === true }),
         }));
     }),
     Array['from'](map['values']())['sort']((value7, value8) => {

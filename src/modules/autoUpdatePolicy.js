@@ -8,7 +8,7 @@ export const AUTO_UPDATE_PRIMARY_ACTIONS = Object['freeze']({
 });
 export function resolveAutoUpdatePrimaryAction(
   enabled = {},
-  { desktopUpdaterAvailable: desktopUpdaterAvailable = ![] } = {},
+  { desktopUpdaterAvailable: desktopUpdaterAvailable = false } = {},
 ) {
   if (enabled['previewOnly'] || !enabled['hasUpdate']) return AUTO_UPDATE_PRIMARY_ACTIONS['CLOSE'];
   if (enabled['installDownloadedUpdate']) return AUTO_UPDATE_PRIMARY_ACTIONS['INSTALL_DESKTOP'];
@@ -27,7 +27,7 @@ export async function ensureDesktopUpdateAvailable(value) {
   )
     return item;
   const response = await value['checkForUpdates']();
-  if (response?.['skipped'] || response?.['ok'] === ![]) throw new Error('desktop updater unavailable');
+  if (response?.['skipped'] || response?.['ok'] === false) throw new Error('desktop updater unavailable');
   const key = await value['getUpdateState']();
   if (
     key?.['state'] !== 'available' &&

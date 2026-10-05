@@ -11,7 +11,7 @@ export function createApiConfigSavePresentation(
   let item = 'auto',
     value2 = null,
     key = 0,
-    index = ![];
+    index = false;
   const run = () => {
       key += 1;
       if (value2 !== null) timerHost['clearTimeout'](value2);
@@ -42,7 +42,7 @@ export function createApiConfigSavePresentation(
         }
       },
       destroy() {
-        ((index = !![]), run(), onLocaleChange2?.());
+        ((index = true), run(), onLocaleChange2?.());
       },
     }
   );

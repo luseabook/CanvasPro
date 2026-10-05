@@ -333,14 +333,14 @@ const AGNES_VIDEO_FRAME_RATE = 24,
         kind: 'image',
         label: '首帧图',
         description: '可选。放入后作为图生视频参考；同时放尾帧时作为开始画面。',
-        required: ![],
+        required: false,
       }),
       Object['freeze']({
         id: 'lastFrame',
         kind: 'image',
         label: '尾帧图',
         description: '可选。与首帧图一起放入时作为结束画面。',
-        required: ![],
+        required: false,
       }),
     ]),
   }),
@@ -402,7 +402,7 @@ const AGNES_VIDEO_FRAME_RATE = 24,
         min: 0,
         max: 0x7fffffff,
       }),
-      omitWhenEmpty: !![],
+      omitWhenEmpty: true,
     }),
     Object['freeze']({
       path: 'negative_prompt',
@@ -415,7 +415,7 @@ const AGNES_VIDEO_FRAME_RATE = 24,
       ]),
       defaultValue: AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT,
       transform: 'apimartOptionalText',
-      omitWhenEmpty: !![],
+      omitWhenEmpty: true,
     }),
     Object['freeze']({
       path: 'num_inference_steps',
@@ -428,9 +428,9 @@ const AGNES_VIDEO_FRAME_RATE = 24,
       ]),
       defaultValue: 'none',
       transform: 'apimartOptionalInteger',
-      omitWhenEmpty: !![],
+      omitWhenEmpty: true,
     }),
-    Object['freeze']({ path: 'extra_body.image', from: 'inputImages', omitWhenEmpty: !![] }),
+    Object['freeze']({ path: 'extra_body.image', from: 'inputImages', omitWhenEmpty: true }),
   ]),
   AGNES_VIDEO_RESPONSE_MAPPING = Object['freeze']({
     taskIdPath: Object['freeze'](['video_id', 'data.video_id']),
@@ -443,7 +443,7 @@ const AGNES_VIDEO_FRAME_RATE = 24,
     method: 'GET',
     pollIntervalMs: 30 * 1000,
     maxWaitMs: 30 * 60 * 1000,
-    continuePollingOnSuccessWithoutResult: !![],
+    continuePollingOnSuccessWithoutResult: true,
     urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=agnes-video-v2.0',
     headersMode: 'bearer',
     transportErrorPolicy: Object['freeze']({
@@ -452,7 +452,7 @@ const AGNES_VIDEO_FRAME_RATE = 24,
         408, 425, 429, 500, 502, 503, 504, 520, 522, 524,
       ]),
       terminalStatuses: Object['freeze']([400, 401, 403, 404, 405, 409, 410, 413, 422]),
-      surfaceLastError: !![],
+      surfaceLastError: true,
     }),
   }),
   AGNES_VIDEO_25_MODE_FIELD = Object['freeze']({
@@ -502,11 +502,11 @@ function createAgnesVideo25FixedSlot({
     label: label,
     description: description,
     displayOrder: displayOrder,
-    required: ![],
+    required: false,
     showWhen: Object['freeze']({ field: 'mode', value: mode }),
   });
 }
-function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
+function createAgnesVideo25InputSlots({ flash: flash = false } = {}) {
   const key = [
     createAgnesVideo25FixedSlot({
       id: 'firstFrame',
@@ -560,8 +560,8 @@ function createAgnesVideo25InputSlots({ flash: flash = ![] } = {}) {
       video: flash ? 0 : 3,
       audio: 3,
       fixedSlots: Object['freeze'](key),
-      cycleFixedInputWhenFull: !![],
-      preserveHiddenInputsByKind: !![],
+      cycleFixedInputWhenFull: true,
+      preserveHiddenInputsByKind: true,
       preserveHiddenInputsByKindFields: ['mode'],
       policyVariants: Object['freeze']([
         Object['freeze']({
@@ -611,7 +611,7 @@ const AGNES_VIDEO_25_BODY_MAPPING = createApimartVideoBodyMapping([
       min: 0,
       max: 0x7fffffff,
     }),
-    omitWhenEmpty: !![],
+    omitWhenEmpty: true,
   }),
   Object['freeze']({ path: 'n', from: 'constant', value: 1 }),
 ]);
@@ -622,7 +622,7 @@ function createAgnesVideo25TaskPolling(index) {
     urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=' + index,
   });
 }
-function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
+function createAgnesVideo25Manifest({ flash: flash = false } = {}) {
   const model = flash ? 'agnes-video-2.5-flash' : 'agnes-video-2.5',
     displayName = flash ? 'Agnes Video 2.5 Flash' : 'Agnes Video 2.5';
   return Object['freeze']({
@@ -651,8 +651,8 @@ function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
     resultTaskIdPath: 'video_id',
     executionExtensions: Object['freeze']({
       bodyResolver: 'agnesVideo25',
-      strictInputCounts: !![],
-      strictUiSchemaParams: !![],
+      strictInputCounts: true,
+      strictUiSchemaParams: true,
       agnesVideo25: Object['freeze']({
         maxReferenceImages: flash ? 5 : 9,
         maxReferenceVideos: flash ? 0 : 3,
@@ -688,7 +688,7 @@ function createAgnesVideo25Manifest({ flash: flash = ![] } = {}) {
         label: displayName,
         subtitle: flash ? '高速 · 720P' : '多模态 · 最高 2K',
       }),
-      videoInputSurface: Object['freeze']({ hideFixedInputSlots: !![] }),
+      videoInputSurface: Object['freeze']({ hideFixedInputSlots: true }),
     }),
   });
 }
@@ -733,5 +733,5 @@ export const AGNES_VIDEO_MODELS = Object['freeze']([
     }),
   }),
   createAgnesVideo25Manifest(),
-  createAgnesVideo25Manifest({ flash: !![] }),
+  createAgnesVideo25Manifest({ flash: true }),
 ]);

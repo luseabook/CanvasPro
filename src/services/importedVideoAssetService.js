@@ -49,12 +49,12 @@ export async function prepareImportedVideoAsset(
   if (isReadyAsset(args2) || !needsCanonicalVideoPreparation(args2)) return args2;
   const text4 = normalizeText(args2['assetId']);
   return new Promise((index, result) => {
-    let data = ![],
+    let data = false,
       handler = null,
       target = null;
     const run = () => {
         if (data) return;
-        ((data = !![]), globalThis['clearTimeout'](target));
+        ((data = true), globalThis['clearTimeout'](target));
         if (typeof handler === 'function') handler();
       },
       handler2 = (handler3, source) => {

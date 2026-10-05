@@ -57,7 +57,7 @@ export function reviewAvatar(error6) {
     el3
   );
 }
-export function reviewSendButton(el4, source = ![]) {
+export function reviewSendButton(el4, source = false) {
   (el4['setAttribute']('aria-label', source ? '发送中…' : '发送'),
     el4['replaceChildren'](createContextMenuIcon('send')));
 }

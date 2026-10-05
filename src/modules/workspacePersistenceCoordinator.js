@@ -8,7 +8,7 @@ function getErrorMessage(error2) {
 export function createWorkspacePersistenceCoordinator({
   save: save,
   getSnapshot: getSnapshot,
-  ready: ready = !![],
+  ready: ready = true,
   debounceMs: debounceMs = 500,
   maxWaitMs: maxWaitMs = 0,
   retryBaseMs: retryBaseMs = 1000,
@@ -23,8 +23,8 @@ export function createWorkspacePersistenceCoordinator({
     delay2 = normalizeDelay(maxWaitMs, 0),
     delay3 = normalizeDelay(retryBaseMs, 1000),
     key = Math['max'](delay3, normalizeDelay(retryMaxMs, 10000));
-  let enabled = ready === !![],
-    enabled2 = ![],
+  let enabled = ready === true,
+    enabled2 = false,
     setTimeoutFn2 = 0,
     setTimeoutFn3 = 0,
     value2 = null,
@@ -68,7 +68,7 @@ export function createWorkspacePersistenceCoordinator({
           ((setTimeoutFn4 = 0), void flush()['catch'](onError));
         }, source) || 0;
     },
-    handler5 = ({ allowStopped: allowStopped = ![] } = {}) => {
+    handler5 = ({ allowStopped: allowStopped = false } = {}) => {
       if (!enabled || !status || (enabled2 && !allowStopped)) return Promise['resolve'](options);
       (handler3(), handler2());
       if (data) return data;
@@ -76,10 +76,10 @@ export function createWorkspacePersistenceCoordinator({
           while (result < index) {
             handler3();
             const next = index;
-            let current = ![];
+            let current = false;
             try {
               const entry = getSnapshot();
-              ((current = !![]), run('saving', { attempt: attempt2 }), (options = await save(entry)));
+              ((current = true), run('saving', { attempt: attempt2 }), (options = await save(entry)));
             } catch (record) {
               handler3();
               current
@@ -96,7 +96,7 @@ export function createWorkspacePersistenceCoordinator({
         });
       return ((data = payload), payload);
     };
-  function flush({ force: force = ![] } = {}) {
+  function flush({ force: force = false } = {}) {
     return (
       force && status && !enabled2 && index <= result && ((index = result + 1), run('pending')),
       handler5()
@@ -118,7 +118,7 @@ export function createWorkspacePersistenceCoordinator({
               ((setTimeoutFn3 = 0), void flush()['catch'](onError));
             }, delay2) || 0));
     },
-    schedule = ({ immediate: immediate = ![], delayMs: delayMs = delay } = {}) => {
+    schedule = ({ immediate: immediate = false, delayMs: delayMs = delay } = {}) => {
       if (enabled2) return index;
       index += 1;
       if (status && !['error', 'saving']['includes'](response['status'])) run('pending');
@@ -128,26 +128,26 @@ export function createWorkspacePersistenceCoordinator({
         index
       );
     },
-    setReady = (state = !![], { immediate: immediate = ![] } = {}) => {
-      enabled = state === !![];
+    setReady = (state = true, { immediate: immediate = false } = {}) => {
+      enabled = state === true;
       if (!enabled || enabled2 || index <= result) return;
       immediate ? void flush()['catch'](onError) : run3();
     },
     setHydrationError = (config) => {
-      ((enabled = ![]),
+      ((enabled = false),
         (attempt2 = 0),
         handler3(),
         handler2(),
         run('error', { error: getErrorMessage(config), attempt: 0 }));
     },
-    destroy = async ({ flush: flush2 = !![], force: force = ![] } = {}) => {
+    destroy = async ({ flush: flush2 = true, force: force = false } = {}) => {
       if (enabled2) return data || options;
       (handler3(), handler2());
       force && status && index <= result && ((index = result + 1), run('pending'));
-      enabled2 = !![];
+      enabled2 = true;
       if (!flush2 || !enabled || !status) return data || options;
       try {
-        return await handler5({ allowStopped: !![] });
+        return await handler5({ allowStopped: true });
       } finally {
         (handler(), handler2());
       }

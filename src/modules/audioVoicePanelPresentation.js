@@ -89,7 +89,7 @@ export function createAudioVoiceModelIcon(options2 = {}, output = '') {
   return (
     (el6['src'] = enabled2),
     (el6['alt'] = value3),
-    (el6['draggable'] = ![]),
+    (el6['draggable'] = false),
     el5['appendChild'](el6),
     el5
   );

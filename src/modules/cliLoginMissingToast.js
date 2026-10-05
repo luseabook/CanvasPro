@@ -22,20 +22,20 @@ export function openCliLoginSettings(options = {}) {
   return openSettingsPanelToField({
     paneName: options['paneName'] || item?.['paneName'] || 'cli-login',
     fieldIds: key,
-    select: ![],
-    highlight: !![],
+    select: false,
+    highlight: true,
   });
 }
 export function showCliLoginMissingToast(index, result = {}) {
   const data = String(index || '')['trim']() || '请先完成 CLI 登录',
     handler = () => openCliLoginSettings(result),
     handler2 = globalThis['window']?.['showToast'];
-  if (typeof handler2 !== 'function') return (handler(), !![]);
+  if (typeof handler2 !== 'function') return (handler(), true);
   return (
     handler2(data, result['type'] || 'warn', result['duration'], {
       actionLabel: result['actionLabel'] || CLI_LOGIN_ACTION_LABEL,
       onAction: handler,
     }),
-    !![]
+    true
   );
 }

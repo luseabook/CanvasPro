@@ -94,7 +94,7 @@ export function normalizeStoryBackgroundTask(options3 = {}) {
     label: normalizeText(resumable['label']) || '生成任务',
     message: normalizeText(resumable['message']),
     status: status2,
-    resumable: resumable['resumable'] === !![],
+    resumable: resumable['resumable'] === true,
     remoteTaskId: normalizeText(resumable['remoteTaskId'] || resumable['taskId']),
     modelId: normalizeText(resumable['modelId']),
     provider: normalizeText(resumable['provider']),
@@ -211,7 +211,7 @@ export function finishStoryBackgroundTask(
 export function interruptStoryBackgroundTasks(
   options10 = {},
   {
-    includeResumable: includeResumable = ![],
+    includeResumable: includeResumable = false,
     message: message = '应用已关闭或项目上下文已切换，请重新发起任务。',
   } = {},
 ) {

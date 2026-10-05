@@ -2,7 +2,7 @@ import { syncViewportGridDots } from './viewportGridDots.js';
 let lastZoomInv = null,
   lastZoomInvRaw = null,
   lastNodeLabelComp = null;
-export function renderViewport(viewportEl, viewport, nodeLabels = ![]) {
+export function renderViewport(viewportEl, viewport, nodeLabels = false) {
   const originValue = '0 0';
   viewportEl['style']['transformOrigin'] !== originValue &&
     (viewportEl['style']['transformOrigin'] = originValue);
@@ -23,7 +23,7 @@ export function syncViewportZoomCssVars(zoom, nodeLabels) {
     zoomInvRaw = 1 / safeZoom,
     labelComp = numericZoom > 0 ? Math['pow'](1 / numericZoom, 0.35) : 1,
     hasLabelsFlag = typeof nodeLabels === 'boolean',
-    nodeLabelComp = nodeLabels === !![] ? Math['min'](labelComp, 1.6) : 1;
+    nodeLabelComp = nodeLabels === true ? Math['min'](labelComp, 1.6) : 1;
   (lastZoomInv !== zoomInv &&
     ((lastZoomInv = zoomInv), rootElement['style']['setProperty']('--zoom-inv', zoomInv)),
     lastZoomInvRaw !== zoomInvRaw &&

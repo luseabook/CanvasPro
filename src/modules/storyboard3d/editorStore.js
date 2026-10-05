@@ -6,11 +6,11 @@ export function createStoryboard3DEditorStore(args2 = {}) {
   let args3 = {
     selectedObjectIds: [],
     activeTool: 'select',
-    assetLibraryOpen: ![],
-    inspectorOpen: ![],
+    assetLibraryOpen: false,
+    inspectorOpen: false,
     inspectorTab: 'properties',
-    objectOutlineOpen: ![],
-    flyMode: ![],
+    objectOutlineOpen: false,
+    flyMode: false,
     ...args2,
   };
   args3['selectedObjectIds'] = Array['isArray'](args3['selectedObjectIds'])
@@ -54,12 +54,12 @@ export function createStoryboard3DEditorStore(args2 = {}) {
     },
     setAssetLibraryOpen(assetLibraryOpen) {
       return (
-        (args3 = { ...args3, assetLibraryOpen: assetLibraryOpen === !![] }),
-        run(assetLibraryOpen === !![] ? 'open-asset-library' : 'close-asset-library')
+        (args3 = { ...args3, assetLibraryOpen: assetLibraryOpen === true }),
+        run(assetLibraryOpen === true ? 'open-asset-library' : 'close-asset-library')
       );
     },
     setInspectorOpen(inspectorOpen) {
-      return ((args3 = { ...args3, inspectorOpen: inspectorOpen === !![] }), run('toggle-inspector'));
+      return ((args3 = { ...args3, inspectorOpen: inspectorOpen === true }), run('toggle-inspector'));
     },
     setInspectorTab(result) {
       return (
@@ -72,12 +72,12 @@ export function createStoryboard3DEditorStore(args2 = {}) {
     },
     setObjectOutlineOpen(objectOutlineOpen) {
       return (
-        (args3 = { ...args3, objectOutlineOpen: objectOutlineOpen === !![] }),
+        (args3 = { ...args3, objectOutlineOpen: objectOutlineOpen === true }),
         run('toggle-object-outline')
       );
     },
     setFlyMode(flyMode) {
-      return ((args3 = { ...args3, flyMode: flyMode === !![] }), run('toggle-fly-mode'));
+      return ((args3 = { ...args3, flyMode: flyMode === true }), run('toggle-fly-mode'));
     },
     destroy() {
       map['clear']();

@@ -13,7 +13,7 @@ function normalizeProviderId(value = '') {
     ['toLowerCase']();
 }
 function getVerificationStepStatus(response = {}) {
-  if (response['ok'] === !![] && !response['skipped']) return 'passed';
+  if (response['ok'] === true && !response['skipped']) return 'passed';
   return response['skipped'] ? 'unknown' : 'failed';
 }
 function getRunningHubConfiguredCapabilities(options = {}) {
@@ -163,17 +163,17 @@ export function isProviderConnectionVerified(options7 = {}, value23 = '') {
   return response3?.['status'] === PASSED_PROVIDER_CONNECTION_STATUS;
 }
 export function shouldPersistProviderConnectionResult(value24 = '', response4 = {}) {
-  if (response4?.['ok'] === !![]) return !![];
+  if (response4?.['ok'] === true) return true;
   const providerId2 = normalizeProviderId(value24);
   if (providerId2 === 'comfyui')
     return (Array['isArray'](response4?.['steps']) ? response4['steps'] : [])['some'](
       (enabled3) => COMFYUI_CAPABILITY_BY_STEP_ID[enabled3?.['id']] && !enabled3?.['skipped'],
     );
-  if (!RUNNINGHUB_PROVIDER_IDS['has'](providerId2)) return ![];
+  if (!RUNNINGHUB_PROVIDER_IDS['has'](providerId2)) return false;
   return (Array['isArray'](response4?.['steps']) ? response4['steps'] : [])['some'](
     (response5) =>
       RUNNINGHUB_CAPABILITY_BY_STEP_ID[response5?.['id']] &&
-      response5?.['ok'] === !![] &&
+      response5?.['ok'] === true &&
       !response5?.['skipped'],
   );
 }
@@ -256,7 +256,7 @@ export function mergePassedProviderApiConfig(
           const value35 = String(status?.['id'] || '')['trim']();
           if (!VOLCENGINE_SPEECH_CAPABILITY_IDS['has'](value35)) return;
           value34[value35] = {
-            status: status['ok'] === !![] ? 'passed' : status['skipped'] ? 'unknown' : 'failed',
+            status: status['ok'] === true ? 'passed' : status['skipped'] ? 'unknown' : 'failed',
             verifiedAt: verifiedAt3,
           };
         }),

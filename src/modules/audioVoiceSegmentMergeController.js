@@ -47,7 +47,7 @@ export function createAudioVoiceSegmentMergeController({
   }
   function isMerging(options = {}) {
     const enabled = String(options?.['id'] || options || '')['trim']();
-    if (!enabled) return ![];
+    if (!enabled) return false;
     return run()['some']((item) => item['currentSegmentId'] === enabled);
   }
   function isReserved(options2 = {}) {

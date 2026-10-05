@@ -2,14 +2,14 @@ import { agentIconSvg, createAgentButton, createAgentElement } from './agentPane
 import { createAgentScrollableWheelHandler } from './agentScrollableWheel.js';
 function listSelectableSkills(value) {
   return (value?.['listSkills']?.() || [])['filter'](
-    (item) => item['source'] === 'installed' && item['enabled'] !== ![],
+    (item) => item['source'] === 'installed' && item['enabled'] !== false,
   );
 }
 function matchesSkillQuery(key, index = '') {
   const enabled = String(index || '')
     ['trim']()
     ['toLowerCase']();
-  if (!enabled) return !![];
+  if (!enabled) return true;
   return [key['id'], key['title'], key['description']]['some']((result) =>
     String(result || '')
       ['toLowerCase']()
@@ -37,7 +37,7 @@ export function createAgentSkillPicker({
     id: id = '',
     title: title = '',
     description: description = '',
-    selected: selected = ![],
+    selected: selected = false,
   } = {}) {
     const el = createAgentButton('agent-menu-item agent-skill-picker-item', '', {
       icon: agentIconSvg(id ? 'skills' : 'check'),
@@ -84,7 +84,7 @@ export function createAgentSkillPicker({
     const list3 = Array['from'](menu['querySelectorAll']('[data-agent-skill-pick]'))['filter'](
       (el3) => el3['dataset']['agentSkillPick'],
     );
-    if (list3['length'] === 0) return ![];
+    if (list3['length'] === 0) return false;
     const count = list3['findIndex']((el4) => el4['dataset']['agentSkillPick'] === options),
       count2 = Number(next) < 0 ? -1 : 1;
     let current;
@@ -97,7 +97,7 @@ export function createAgentSkillPicker({
         (el5['classList']['toggle']('active', record), el5['setAttribute']('aria-selected', String(record)));
       }),
       list3[current]['scrollIntoView']?.({ block: 'nearest' }),
-      !![]
+      true
     );
   }
   function chooseActive() {
@@ -105,12 +105,12 @@ export function createAgentSkillPicker({
         (el6) => el6['dataset']['agentSkillPick'],
       ),
       el7 = list4['find']((el8) => el8['dataset']['agentSkillPick'] === options) || list4[0];
-    if (!el7) return ![];
+    if (!el7) return false;
     const listSelectableSkills2 = listSelectableSkills(registry)['find'](
       (payload) => payload['id'] === el7['dataset']['agentSkillPick'],
     );
-    if (!listSelectableSkills2) return ![];
-    return (onSelect?.(listSelectableSkills2), !![]);
+    if (!listSelectableSkills2) return false;
+    return (onSelect?.(listSelectableSkills2), true);
   }
   function run3(event) {
     const el9 = event['target']?.['closest']?.('[data-agent-skill-pick]');
@@ -124,7 +124,7 @@ export function createAgentSkillPicker({
   const agentScrollableWheelHandler = createAgentScrollableWheelHandler(menu);
   return (
     menu['addEventListener']('click', run3),
-    menu['addEventListener']('wheel', agentScrollableWheelHandler, { passive: ![] }),
+    menu['addEventListener']('wheel', agentScrollableWheelHandler, { passive: false }),
     render(),
     {
       element: element,

@@ -1,4 +1,4 @@
-export function createSharedProjectIcon(value = document, { host: host = ![] } = {}) {
+export function createSharedProjectIcon(value = document, { host: host = false } = {}) {
   const el = value['createElementNS']('http://www.w3.org/2000/svg', 'svg');
   for (const [item, key] of Object['entries']({
     viewBox: '0 0 24 24',

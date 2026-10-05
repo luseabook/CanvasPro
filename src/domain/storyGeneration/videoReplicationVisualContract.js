@@ -2,7 +2,7 @@ const text = (value) => (typeof value === 'string' ? value['trim']() : ''),
   spatialKeys = ['subject', 'landmark', 'relation', 'facing', 'pose', 'heldObject'],
   object = (properties) => ({
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: Object['keys'](properties),
     properties: properties,
   }),
@@ -57,7 +57,7 @@ export function formatReplicationSpatial(list = []) {
     )
     ['join']('');
 }
-export function formatReplicationText(list2 = [], next = ![]) {
+export function formatReplicationText(list2 = [], next = false) {
   return list2['filter'](
     (response2) =>
       response2['text'] && (next || response2['kind'] === 'physical' || response2['kind'] === 'graphic'),

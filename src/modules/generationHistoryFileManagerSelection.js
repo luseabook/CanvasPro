@@ -141,7 +141,7 @@ function defaultHistoryLocalPath(state) {
 export function isFileManagerHistoryBackfillRecord(config) {
   const scope = String(config?.['historyCaptureSource'] || '')['trim']();
   if (scope) return scope === 'backfill';
-  if (!String(config?.['generationRunId'] || '')['trim']()) return ![];
+  if (!String(config?.['generationRunId'] || '')['trim']()) return false;
   const count = Number(config?.['generationStartedAt'] || 0),
     input = Number(config?.['createdAt'] || 0),
     output = Math['max'](0, Math['trunc'](Number(config?.['sourceIndex']) || 0));
@@ -180,7 +180,7 @@ export function isFileManagerBackfillDuplicate(
     getLocalPath: getLocalPath = defaultHistoryLocalPath,
   } = {},
 ) {
-  if (!isFileManagerHistoryBackfillRecord(value5)) return ![];
+  if (!isFileManagerHistoryBackfillRecord(value5)) return false;
   const fileManagerBackfillMatchKey = buildFileManagerBackfillMatchKey(value5, {
     getMediaKind: getMediaKind,
     getLocalPath: getLocalPath,

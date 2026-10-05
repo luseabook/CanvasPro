@@ -31,7 +31,7 @@ export function getRhAiAppVideoResultMediaKey(response = {}, item = {}) {
 }
 export function isRhAiAppVideoNodeData(options2 = {}) {
   const enabled = String(options2?.['model'] || '')['trim']();
-  if (!enabled) return ![];
+  if (!enabled) return false;
   const providerHint = String(options2?.['provider'] || '')['trim'](),
     modelExecution =
       resolveModelExecution(enabled, { providerHint: providerHint }) || resolveModelExecution(enabled);

@@ -10,13 +10,13 @@ import {
 } from './storyAudioAssets.js';
 export function addStoryLibraryAudioToProject(value, item) {
   const list = addStoryAudioAssets(value['data'], item);
-  if (!list['length']) return ![];
+  if (!list['length']) return false;
   return (
     (value['assetFilter'] = 'audio'),
     (value['selectedAssetId'] = list[0]['id']),
-    (value['assetSelectionMode'] = ![]),
+    (value['assetSelectionMode'] = false),
     (value['selectedAssetIds'] = []),
-    !![]
+    true
   );
 }
 export function bindStoryAudioAssets(
@@ -40,7 +40,7 @@ export function bindStoryAudioAssets(
     el2 = el['querySelector']('[data-story-audio-detail]'),
     key = el2?.['ownerDocument'] ? bindWorkspaceSelects(el2) : null;
   let audioPlaybackSurfaceController = null,
-    enabled = ![];
+    enabled = false;
   queueMicrotask(() => {
     if (!enabled)
       audioPlaybackSurfaceController = createAudioPlaybackSurfaceController(
@@ -61,13 +61,13 @@ export function bindStoryAudioAssets(
             : state['selectedAssetId'] === index['id']),
       ),
     handler2 = () => {
-      (syncEntry(sourceProjectId), persist({ immediate: !![] }));
+      (syncEntry(sourceProjectId), persist({ immediate: true }));
       if (isCurrent(sourceProjectId)) render();
     },
     handler3 = () =>
       el['querySelectorAll']('.story-voice-source-menu-wrap')['forEach']((el3) => {
         (el3['querySelector']('[aria-expanded]')?.['setAttribute']('aria-expanded', 'false'),
-          (el3['querySelector']('[role="menu"]')['hidden'] = !![]));
+          (el3['querySelector']('[role="menu"]')['hidden'] = true));
       }),
     result = (event) => {
       if (!event['target']['closest']('.story-voice-source-menu-wrap')) handler3();
@@ -94,7 +94,7 @@ export function bindStoryAudioAssets(
         ((state['audioTargetCharacterId'] = state['selectedAssetId']),
           (state['assetFilter'] = 'audio'),
           (state['selectedAssetId'] = state['data']['audioAssets']?.[0]?.['id'] || ''),
-          (state['assetSelectionMode'] = ![]),
+          (state['assetSelectionMode'] = false),
           (state['selectedAssetIds'] = []),
           handler2());
         return;
@@ -201,7 +201,7 @@ export function bindStoryAudioAssets(
           ]);
           if (isCurrent(sourceProjectId) && state['assetFilter'] === 'audio')
             state['selectedAssetId'] = addStoryAudioAssets2['at'](-1)?.['id'] || state['selectedAssetId'];
-          (syncEntry(sourceProjectId), persist({ immediate: !![] }));
+          (syncEntry(sourceProjectId), persist({ immediate: true }));
         }
         finishTask(sourceProjectId, id, { status: 'succeeded', message: '项目音频已保存' });
       } catch (error2) {
@@ -224,7 +224,7 @@ export function bindStoryAudioAssets(
     el['ownerDocument']?.['addEventListener']('keydown', data),
     {
       destroy() {
-        ((enabled = !![]),
+        ((enabled = true),
           key?.['destroy'](),
           audioPlaybackSurfaceController?.['destroy'](),
           el['removeEventListener']('click', options),

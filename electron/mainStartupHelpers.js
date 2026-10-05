@@ -54,7 +54,7 @@ export function createStartupHelpers({
       const parsed = new URL(rawUrl);
       return parsed['origin'] === appOrigin;
     } catch {
-      return ![];
+      return false;
     }
   }
   function openExternalUrl(rawUrl) {
@@ -68,7 +68,7 @@ export function createStartupHelpers({
           message: 'Blocked external link',
           context: { reason: 'invalid-or-disallowed-protocol' },
         }),
-        { ok: ![], error: '不允许打开该外部链接' }
+        { ok: false, error: '不允许打开该外部链接' }
       );
     return (
       void shellApi['openExternal'](url),
@@ -79,7 +79,7 @@ export function createStartupHelpers({
         message: 'Opened external link',
         context: { url: formatExternalUrlForLog(url) },
       }),
-      { ok: !![], url: url }
+      { ok: true, url: url }
     );
   }
   return {

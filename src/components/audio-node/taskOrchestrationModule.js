@@ -23,7 +23,7 @@ function isRunningHubProvider(key) {
 function supportsAudioTaskCancellation(options = {}) {
   const modelManifest = getModelManifest(options['audioWorkflowKey'] || options['model'] || '');
   return modelManifest
-    ? modelManifest['cancellable'] === !![]
+    ? modelManifest['cancellable'] === true
     : normalizeProvider(options['provider']) === 'runninghubwf';
 }
 function getResultPatch(index) {
@@ -32,11 +32,11 @@ function getResultPatch(index) {
 }
 function isAbortLike(error, result) {
   return (
-    result?.['aborted'] === !![] || error?.['name'] === 'AbortError' || error?.['message'] === 'CANCELLED'
+    result?.['aborted'] === true || error?.['name'] === 'AbortError' || error?.['message'] === 'CANCELLED'
   );
 }
 function throwIfAborted(data) {
-  if (data?.['aborted'] !== !![]) return;
+  if (data?.['aborted'] !== true) return;
   const error2 = new Error('CANCELLED');
   error2['name'] = 'AbortError';
   throw error2;
@@ -64,7 +64,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
     throw new Error('[audioTaskOrchestration] nodeId is required');
   if (!store || typeof store['getState'] !== 'function')
     throw new Error('[audioTaskOrchestration] store is required');
-  let enabled = ![],
+  let enabled = false,
     enabled2 = null,
     enabled3 = null,
     enabled4 = null,
@@ -73,13 +73,13 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
     source = '',
     next = '',
     taskProviderProfileId = '',
-    enabled5 = ![],
-    cancelInFlight = ![],
-    enabled6 = ![];
+    enabled5 = false,
+    cancelInFlight = false,
+    enabled6 = false;
   const run = () => store['getState']()?.['nodes']?.[nodeId] || {},
     handler = (current, entry) => {
       if (typeof current?.['updateTaskNode'] === 'function') return current['updateTaskNode'](entry);
-      return (store['updateNodeData'](nodeId, entry), !![]);
+      return (store['updateNodeData'](nodeId, entry), true);
     },
     rhStatusMessage = (record, payload) => {
       const run2 = messages[record];
@@ -105,15 +105,15 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         isGenerating
       );
     },
-    resetRecovery = ({ resetRecovering: resetRecovering = ![] } = {}) => {
-      (value2 && value2['signal']['aborted'] !== !![] && value2['abort'](),
+    resetRecovery = ({ resetRecovering: resetRecovering = false } = {}) => {
+      (value2 && value2['signal']['aborted'] !== true && value2['abort'](),
         (value2 = null),
         (target = ''),
         (enabled4 = null),
         resetRecovering &&
-          run()['rhTaskRecovering'] === !![] &&
-          (store['updateNodeData'](nodeId, { rhTaskRecovering: ![] }),
-          persistTaskState2({ patch: { rhTaskRecovering: ![] } })));
+          run()['rhTaskRecovering'] === true &&
+          (store['updateNodeData'](nodeId, { rhTaskRecovering: false }),
+          persistTaskState2({ patch: { rhTaskRecovering: false } })));
     },
     resultBuilder = async (state, config) => ({
       ...getResultPatch(await buildResultPatch(state, config['startedAt'], config)),
@@ -142,7 +142,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
           model: provider['audioWorkflowKey'],
         };
       return (
-        isRunningHubProvider(provider2) && (scope['rhTaskUseOpenapiQuery'] = !![]),
+        isRunningHubProvider(provider2) && (scope['rhTaskUseOpenapiQuery'] = true),
         provider2 === 'runninghubwf' && (scope['rhInstanceType'] = provider['rhInstanceType']),
         isRunningHubProvider(provider2) &&
           provider['providerProfileId'] &&
@@ -152,24 +152,24 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
       );
     };
   async function runGeneration({ payload: payload2, startedAt: startedAt = now() } = {}) {
-    if (enabled) return { ok: ![], status: 'disposed' };
+    if (enabled) return { ok: false, status: 'disposed' };
     if (enabled2) return enabled2;
     if (!payload2 || typeof payload2 !== 'object')
       throw new Error('[audioTaskOrchestration] payload is required');
-    resetRecovery({ resetRecovering: !![] });
+    resetRecovery({ resetRecovering: true });
     const provider3 = normalizeProvider(payload2['provider']),
       signal = createAbortController();
     ((enabled3 = signal),
-      (enabled5 = ![]),
-      (cancelInFlight = ![]),
-      (enabled6 = ![]),
+      (enabled5 = false),
+      (cancelInFlight = false),
+      (enabled6 = false),
       (source = ''),
       (next = String(payload2['apiKey'] || '')['trim']()),
       (taskProviderProfileId = String(payload2['providerProfileId'] || payload2['rhProviderProfileId'] || '')[
         'trim'
       ]()),
-      setBusyState({ isGenerating: !![], cancelInFlight: ![], taskId: '' }),
-      setLoading(!![]));
+      setBusyState({ isGenerating: true, cancelInFlight: false, taskId: '' }),
+      setLoading(true));
     const generationSubmitPlan = createGenerationSubmitPlan({
         kind: 'audio',
         sourceNodeId: nodeId,
@@ -183,7 +183,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         payload: payload2,
         cancellable: supportsAudioTaskCancellation(payload2),
         resumable: isRunningHubProvider(provider3),
-        pauseOnAbort: isRunningHubProvider(provider3) ? 'afterTaskId' : ![],
+        pauseOnAbort: isRunningHubProvider(provider3) ? 'afterTaskId' : false,
         startBuilder: () => handler3(payload2),
         persistTaskState: persistTaskState2,
         submit: async (input, runningHubWorkflowQueueLease) =>
@@ -205,7 +205,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
                   next),
                 runningHubWorkflowQueueLease['onTaskId'](taskId),
                 handler(runningHubWorkflowQueueLease, {
-                  rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery['useOpenapiQuery'] === !![],
+                  rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery['useOpenapiQuery'] === true,
                   ...(taskProviderProfileId
                     ? {
                         taskProviderProfileId: taskProviderProfileId,
@@ -222,7 +222,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
               if (!taskId2) return;
               ((source = taskId2),
                 runningHubWorkflowQueueLease['onTaskId'](taskId2),
-                handler(runningHubWorkflowQueueLease, { rhTaskUseOpenapiQuery: !![] }),
+                handler(runningHubWorkflowQueueLease, { rhTaskUseOpenapiQuery: true }),
                 persistTaskState2({ taskId: taskId2 }),
                 enabled5 && !cancelInFlight && !enabled6 && void cancelGeneration());
             },
@@ -230,7 +230,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         cancel: async ({ taskId: taskId3 }) => {
           const apiKey = String(next || payload2['apiKey'] || '')['trim']();
           if (!apiKey || !taskId3) return;
-          ((enabled6 = !![]),
+          ((enabled6 = true),
             await api['cancelRunningHubAudioTask']?.({
               apiKey: apiKey,
               taskId: taskId3,
@@ -258,10 +258,10 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         abortController: signal,
       })
         ['then'](async (result2) => {
-          if (result2?.['status'] === 'success' && !enabled && signal['signal']['aborted'] !== !![]) {
+          if (result2?.['status'] === 'success' && !enabled && signal['signal']['aborted'] !== true) {
             const resultPatch = getResultPatch(result2['patch'] || run());
             (await afterResultCommit(resultPatch, startedAt, result2),
-              await onSuccess(result2, { recovering: ![], payload: payload2 }));
+              await onSuccess(result2, { recovering: false, payload: payload2 }));
           } else
             result2?.['status'] === 'failed' &&
               !enabled &&
@@ -271,19 +271,19 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         ['finally'](() => {
           enabled2 = null;
           if (enabled3 === signal) enabled3 = null;
-          const enabled7 = enabled ? ![] : handler2();
+          const enabled7 = enabled ? false : handler2();
           (!enabled7 && ((source = ''), !enabled5 && ((next = ''), (taskProviderProfileId = ''))),
-            (enabled5 = ![]),
-            (cancelInFlight = ![]),
-            (enabled6 = ![]));
+            (enabled5 = false),
+            (cancelInFlight = false),
+            (enabled6 = false));
         });
     return ((enabled2 = value3), value3);
   }
   async function cancelGeneration() {
-    if (!supportsAudioTaskCancellation(run())) return { ok: ![], reason: 'not-cancellable' };
-    enabled5 = !![];
-    if (cancelInFlight) return { ok: !![], status: 'cancelling' };
-    cancelInFlight = !![];
+    if (!supportsAudioTaskCancellation(run())) return { ok: false, reason: 'not-cancellable' };
+    enabled5 = true;
+    if (cancelInFlight) return { ok: true, status: 'cancelling' };
+    cancelInFlight = true;
     const node = run(),
       taskId4 = String(source || node['rhTaskId'] || '')['trim']();
     source = taskId4;
@@ -326,7 +326,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         taskId: taskId4,
         startedAt: startedAt2,
         cancellable: supportsAudioTaskCancellation(node),
-        resumable: !![],
+        resumable: true,
         persistTaskState: persistTaskState2,
       }),
       cancelledBuilder2 = ({
@@ -358,19 +358,19 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
             taskId: taskId4,
             status: 'cancelled',
             startedAt: Number(startedAt3 || startedAt2 || 0),
-            recovering: ![],
-            useOpenapiQuery: node['rhTaskUseOpenapiQuery'] === !![],
+            recovering: false,
+            useOpenapiQuery: node['rhTaskUseOpenapiQuery'] === true,
           }),
         };
       };
-    setBusyState({ isGenerating: !![], cancelInFlight: !![], taskId: taskId4 });
+    setBusyState({ isGenerating: true, cancelInFlight: true, taskId: taskId4 });
     try {
       return (
-        (enabled6 = !![]),
+        (enabled6 = true),
         await runtime['cancelTask'](nodeId, {
           store: store,
           taskId: taskId4,
-          cancellable: !![],
+          cancellable: true,
           cancel: async ({ taskId: taskId5 }) => {
             if (!apiKey2) throw new Error(rhStatusMessage('missingApiKey', 'RunningHub API key is required'));
             return api['cancelRunningHubAudioTask']?.({
@@ -390,13 +390,13 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         })
       );
     } finally {
-      ((cancelInFlight = ![]), (enabled6 = ![]));
+      ((cancelInFlight = false), (enabled6 = false));
       const enabled8 = handler2();
-      !enabled8 && ((source = ''), (next = ''), (taskProviderProfileId = ''), (enabled5 = ![]));
+      !enabled8 && ((source = ''), (next = ''), (taskProviderProfileId = ''), (enabled5 = false));
     }
   }
   async function resumeIfNeeded({ payload: payload3, startedAt: startedAt4 } = {}) {
-    if (enabled) return { ok: ![], status: 'disposed' };
+    if (enabled) return { ok: false, status: 'disposed' };
     const useOpenapiQuery = run(),
       provider4 = normalizeProvider(useOpenapiQuery['provider']),
       taskId6 = String(useOpenapiQuery['rhTaskId'] || '')['trim'](),
@@ -428,7 +428,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
     taskProviderProfileId = providerProfileId2;
     const payload4 = {
       ...payload3,
-      useOpenapiQuery: useOpenapiQuery['rhTaskUseOpenapiQuery'] !== ![],
+      useOpenapiQuery: useOpenapiQuery['rhTaskUseOpenapiQuery'] !== false,
       ...(providerProfileId2
         ? { providerProfileId: providerProfileId2, rhProviderProfileId: providerProfileId2 }
         : {}),
@@ -442,8 +442,8 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
           ]()));
       } catch {}
     ((next = enabled9),
-      setBusyState({ isGenerating: !![], cancelInFlight: ![], taskId: taskId6 }),
-      setLoading(!![]));
+      setBusyState({ isGenerating: true, cancelInFlight: false, taskId: taskId6 }),
+      setLoading(true));
     const generationResumePlanFromNode = createGenerationResumePlanFromNode({
         kind: 'audio',
         node: useOpenapiQuery,
@@ -460,8 +460,8 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         taskId: taskId6,
         startedAt: startedAt5,
         cancellable: supportsAudioTaskCancellation(payload4),
-        resumable: !![],
-        pauseOnAbort: !![],
+        resumable: true,
+        pauseOnAbort: true,
         startBuilder: () => handler3(payload4),
         persistTaskState: persistTaskState2,
         poll: async () => {
@@ -481,7 +481,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
             taskId: taskId6,
             status: 'success',
             startedAt: startedAt6['startedAt'],
-            recovering: ![],
+            recovering: false,
             useOpenapiQuery: payload4['useOpenapiQuery'],
           }),
         }),
@@ -491,7 +491,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
             taskId: taskId6,
             status: 'failed',
             startedAt: startedAt7['startedAt'],
-            recovering: ![],
+            recovering: false,
             useOpenapiQuery: payload4['useOpenapiQuery'],
           }),
         }),
@@ -501,7 +501,7 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
             taskId: taskId6,
             status: 'cancelled',
             startedAt: startedAt8['startedAt'],
-            recovering: ![],
+            recovering: false,
             useOpenapiQuery: payload4['useOpenapiQuery'],
           }),
         }),
@@ -514,29 +514,29 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
         abortController: signal2,
       })
         ['then'](async (result3) => {
-          if (result3?.['status'] === 'success' && !enabled && signal2['signal']['aborted'] !== !![]) {
+          if (result3?.['status'] === 'success' && !enabled && signal2['signal']['aborted'] !== true) {
             const resultPatch2 = getResultPatch(result3['patch'] || run());
             (await afterResultCommit(resultPatch2, startedAt5, result3),
-              await onSuccess(result3, { recovering: !![], payload: payload4 }));
+              await onSuccess(result3, { recovering: true, payload: payload4 }));
           } else
             result3?.['status'] === 'failed' &&
               !enabled &&
               (await onFailure(result3['error'], {
                 payload: payload4,
                 result: result3,
-                recovering: !![],
+                recovering: true,
               }));
           return result3;
         })
         ['catch']((value8) => {
-          if (isAbortLike(value8, signal2['signal'])) return { ok: !![], status: 'pending', paused: !![] };
+          if (isAbortLike(value8, signal2['signal'])) return { ok: true, status: 'pending', paused: true };
           throw value8;
         })
         ['finally'](() => {
           if (value2 === signal2) value2 = null;
           if (target === taskId6) target = '';
           enabled4 = null;
-          const enabled10 = enabled ? ![] : handler2();
+          const enabled10 = enabled ? false : handler2();
           if (!enabled10) source = '';
         });
     return ((enabled4 = value7), value7);
@@ -556,8 +556,8 @@ export function createAudioNodeTaskOrchestration(options2 = {}) {
       cancelInFlight: cancelInFlight,
     };
   }
-  function dispose({ preserveTask: preserveTask = ![] } = {}) {
-    enabled = !![];
+  function dispose({ preserveTask: preserveTask = false } = {}) {
+    enabled = true;
     !preserveTask && enabled3 && !enabled3['signal']['aborted'] && enabled3['abort']();
     enabled3 = null;
     if (!preserveTask) resetRecovery();

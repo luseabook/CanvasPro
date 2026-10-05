@@ -3,8 +3,8 @@ export const apimartAdditionalTextModels = Object['freeze'](
     { model: 'gpt-6-astra', displayName: 'GPT-6 Astra', icon: 'oa', reasoningEffortMode: 'openai' },
     { model: 'claude-fable-5.1', displayName: 'Claude Fable 5.1' },
     { model: 'claude-opus-5', displayName: 'Claude Opus 5' },
-    { model: 'gemini-3.8-flash', displayName: 'Gemini 3.8 Flash', icon: 'gemini', videoInput: !![] },
-    { model: 'gemini-3.7-flash', displayName: 'Gemini 3.7 Flash', icon: 'gemini', videoInput: !![] },
+    { model: 'gemini-3.8-flash', displayName: 'Gemini 3.8 Flash', icon: 'gemini', videoInput: true },
+    { model: 'gemini-3.7-flash', displayName: 'Gemini 3.7 Flash', icon: 'gemini', videoInput: true },
     {
       model: 'glm-5.3',
       displayName: 'GLM-5.3',

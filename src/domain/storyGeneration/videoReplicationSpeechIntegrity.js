@@ -66,7 +66,7 @@ export function getReplicationSourceSpeechReviewReasons(source, { durationSec: d
 export function inspectReplicationSpeechIntegrity(
   { clips: clips = [] } = {},
   entry = {},
-  { compareSource: compareSource = !![] } = {},
+  { compareSource: compareSource = true } = {},
 ) {
   return clips['flatMap']((record) => {
     const payload = entry['replication']?.['segmentPlan']?.['find'](

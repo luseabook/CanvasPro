@@ -290,13 +290,13 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     '只返回一个完整 JSON 对象。',
   ]['join']('\n'),
   getStoryEpisodeSplitRequestSystemPrompt = ({
-    compactPrompt: compactPrompt = ![],
+    compactPrompt: compactPrompt = false,
     promptMode: promptMode = 'seedance-2.0',
   } = {}) =>
     appendStoryEpisodePromptModeSystemPrompt(
       compactPrompt ? STORY_EPISODES_SPLIT_SYSTEM_PROMPT : STORY_EPISODE_SPLIT_SYSTEM_PROMPT,
       promptMode,
-      { announceTimelineContract: !![] },
+      { announceTimelineContract: true },
     ),
   STORY_EPISODES_SPLIT_VALIDATION_SYSTEM_PROMPT =
     '只检查并修复已有分镜结果的 JSON 格式和字段包装。不得增删、改写或重新生成分镜内容。只返回修复后的完整 JSON。',
@@ -351,7 +351,7 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
     '避免无动机地连续重复同一主体、景别、机位和构图；也不要把普通争吵默认处理成双人纯侧面一镜到底。',
   ]['join']('\n'),
   getStoryEpisodeExperimentalExpansionSystemPrompt = ({
-    promptExperiment: promptExperiment = ![],
+    promptExperiment: promptExperiment = false,
     promptMode: promptMode = 'seedance-2.0',
   } = {}) =>
     appendStoryEpisodePromptModeSystemPrompt(
@@ -361,7 +361,7 @@ const STORY_SOURCE_DIGEST_SYSTEM_PROMPT = [
       promptMode,
     );
 function createStoryEpisodeExperimentalStructuredOutput(name, schema) {
-  return { name: name, schema: schema, strict: !![], fallback: 'prompt' };
+  return { name: name, schema: schema, strict: true, fallback: 'prompt' };
 }
 function normalizeStoryContinuityFacts(value) {
   return normalizeStringArray(value)['slice'](0, STORY_CONTINUITY_MAX_FACTS);
@@ -454,7 +454,7 @@ export function captureStoryEpisodeScriptDevResponse({
   consoleObject: consoleObject = globalThis['console'],
   capturedAt: capturedAt = new Date()['toISOString'](),
 } = {}) {
-  if (windowObject?.['AI_CANVAS_IS_DEV_BUILD'] !== !![]) return null;
+  if (windowObject?.['AI_CANVAS_IS_DEV_BUILD'] !== true) return null;
   const handle = {
       capturedAt: normalizeText(capturedAt),
       attempt: Math['max'](1, Math['trunc'](Number(attempt) || 1)),
@@ -960,41 +960,41 @@ function extractStoryEpisodeScriptStringProperty(value31, value32 = []) {
 }
 function isStoryEpisodeScriptArrayClosed(value34, enabled4) {
   const list6 = getResultText(value34);
-  if (typeof list6 !== 'string' || !list6 || !enabled4) return ![];
+  if (typeof list6 !== 'string' || !list6 || !enabled4) return false;
   const list7 = '"' + enabled4 + '"',
     count = list6['indexOf'](list7);
-  if (count < 0) return ![];
+  if (count < 0) return false;
   const count2 = list6['indexOf'](':', count + list7['length']),
     count3 = count2 >= 0 ? list6['indexOf']('[', count2 + 1) : -1;
-  if (count3 < 0) return ![];
+  if (count3 < 0) return false;
   let count4 = 0,
-    value35 = ![],
-    value36 = ![];
+    value35 = false,
+    value36 = false;
   for (let value37 = count3; value37 < list6['length']; value37 += 1) {
     const value38 = list6[value37];
     if (value35) {
-      if (value36) value36 = ![];
+      if (value36) value36 = false;
       else {
-        if (value38 === '\\') value36 = !![];
+        if (value38 === '\\') value36 = true;
         else {
-          if (value38 === '"') value35 = ![];
+          if (value38 === '"') value35 = false;
         }
       }
       continue;
     }
     if (value38 === '"') {
-      value35 = !![];
+      value35 = true;
       continue;
     }
     if (value38 === '[') count4 += 1;
     else {
       if (value38 === ']') {
         count4 -= 1;
-        if (count4 === 0) return !![];
+        if (count4 === 0) return true;
       }
     }
   }
-  return ![];
+  return false;
 }
 function parseStoryEpisodeScriptPayload(value39) {
   const resultText = getResultText(value39),
@@ -1010,8 +1010,8 @@ function parseStoryEpisodeScriptPayload(value39) {
   }
   let storyEpisodeScriptPayload = findStoryEpisodeScriptPayload(strictJson3),
     scenes2 = getStoryEpisodeScriptSceneEntries(storyEpisodeScriptPayload),
-    mode3 = ![],
-    isStoryEpisodeScriptArrayClosed2 = ![];
+    mode3 = false,
+    isStoryEpisodeScriptArrayClosed2 = false;
   if (!scenes2['length'])
     for (const value43 of ['scenes', 'sceneList', 'scene_list', 'scriptScenes', 'script_scenes']) {
       const list8 = extractCompleteJsonArrayItems(value40, value43);
@@ -1047,7 +1047,7 @@ function parseStoryEpisodeScriptPayload(value39) {
       recovery && strictJson3
         ? {
             mode: 'missing-scene-body-string-terminators',
-            incompleteJson: ![],
+            incompleteJson: false,
             repairedBodyTerminators: recovery,
           }
         : mode3 || isStoryEpisodeScriptArrayClosed2
@@ -1066,7 +1066,7 @@ export function parseStoryEpisodeScriptResult(
     episodeRef: episodeRef = 'episode-1',
     episodeNumber: episodeNumber = 1,
     episodeTitle: episodeTitle = '',
-    requireEndingState: requireEndingState = ![],
+    requireEndingState: requireEndingState = false,
     fallbackContinuityFacts: fallbackContinuityFacts = [],
     fallbackEndingState: fallbackEndingState = null,
   } = {},
@@ -1242,7 +1242,7 @@ function isCompleteStoryEpisodeScriptResponse(value55) {
     Array['isArray'](value55['scenes']) &&
     value55['scenes']['length'] &&
     normalizeText(value55['fullText']) &&
-    value55['recovery']?.['incompleteJson'] !== !![],
+    value55['recovery']?.['incompleteJson'] !== true,
   );
 }
 function chooseBestStoryEpisodeScriptResult(list13 = []) {
@@ -1331,7 +1331,7 @@ export async function generateStoryEpisodeScript({
       episodeRef: episodeRef3,
       episodeNumber: episodeNumber2,
       episodeTitle: episode?.['title'],
-      requireEndingState: !![],
+      requireEndingState: true,
       fallbackContinuityFacts: episode?.['continuityFacts'],
       fallbackEndingState: episode?.['endingState'],
     },
@@ -1352,7 +1352,7 @@ export async function generateStoryEpisodeScript({
           stepId: stepId,
           attempt: attempt4,
           onInvocation: onInvocation,
-          allowTruncatedOutput: !![],
+          allowTruncatedOutput: true,
           serializeResponse: serializeStoryEpisodeScriptResponse,
         });
       return (
@@ -1433,7 +1433,7 @@ export async function generateStoryEpisodeScript({
         return preserveStoryEpisodeScriptWithoutTimingReview(script3, episode, value69);
       }
     },
-    value70 = repairDraft?.['skipPostGenerationReview'] === !![],
+    value70 = repairDraft?.['skipPostGenerationReview'] === true,
     handler4 = async ({
       rejectedResponse: rejectedResponse2,
       finishReason: finishReason = '',
@@ -1562,7 +1562,7 @@ function normalizePlanningAssetSummary(error4 = {}, value74 = 0) {
 }
 function compactStoryEpisodePromptAsset(
   error7 = {},
-  { includeVisualDetails: includeVisualDetails = ![], includeBindings: includeBindings = ![] } = {},
+  { includeVisualDetails: includeVisualDetails = false, includeBindings: includeBindings = false } = {},
 ) {
   const kind3 = normalizeText(error7?.['kind']),
     value79 = includeVisualDetails && kind3 !== 'character',
@@ -1791,8 +1791,8 @@ function getStoryEpisodeSplitSourceSceneMetadata(options8 = {}) {
 }
 function isStoryEpisodeSplitSourceMetadataLine(value112 = '', value113 = {}) {
   const text14 = normalizeText(value112);
-  if (!text14) return ![];
-  if (/[。！？!?；;“”「」]|\.(?:\s|$)/u['test'](text14)) return ![];
+  if (!text14) return false;
+  if (/[。！？!?；;“”「」]|\.(?:\s|$)/u['test'](text14)) return false;
   const map4 = new Set(
     getStoryEpisodeSplitSourceSceneMetadata(value113)
       ['map']((value114) => value114['heading'])
@@ -1985,7 +1985,7 @@ export function buildStoryAssetExtractionPrompt({
   requiredAssetNamesByKind: requiredAssetNamesByKind = null,
   candidateAssetsByKind: candidateAssetsByKind = null,
   requiredAssetsByKind: requiredAssetsByKind = null,
-  compactOutput: compactOutput = ![],
+  compactOutput: compactOutput = false,
 } = {}) {
   const storyPlanningConstraints = resolveStoryPlanningConstraints(project),
     title3 = normalizeStoryProjectInput(project);
@@ -2058,7 +2058,7 @@ export function buildStoryAssetExtractionPrompt({
             assets: [
               {
                 clientKey: '输入中原样提供的短键',
-                include: !![],
+                include: true,
                 description: '可直接公开展示的最终资产简介；未采纳候选可为空字符串',
                 visualPrompt: '可直接提交图片模型的最终正向提示词；未采纳候选可为空字符串',
                 voiceDescription: STORY_ASSET_VOICE_DESCRIPTION_RULE,
@@ -2122,10 +2122,10 @@ function getStoryAssetExtractionFinishReason(value153) {
 function isStoryAssetExtractionInputEcho(value154, value155) {
   const list41 = normalizeText(getResultText(value154)),
     list42 = normalizeText(value155);
-  if (!list41 || !list42) return ![];
-  if (list41 === list42) return !![];
+  if (!list41 || !list42) return false;
+  if (list41 === list42) return true;
   const list43 = list42['slice'](0, 240);
-  if (list43['length'] >= 120 && list41['startsWith'](list43)) return !![];
+  if (list43['length'] >= 120 && list41['startsWith'](list43)) return true;
   return (
     list41['includes']('<story_input_json>') ||
     (/"task"\s*:\s*"extract_story_assets(?:_by_kind)?"/u['test'](list41) &&
@@ -2200,7 +2200,7 @@ async function requestStoryAssetExtractionResult({
   assetKinds: assetKinds3,
   chapterIds: chapterIds2,
   onProgress: onProgress2,
-  automaticRecovery: automaticRecovery = ![],
+  automaticRecovery: automaticRecovery = false,
 }) {
   const response12 = await request2(requestPayload3);
   try {
@@ -2279,7 +2279,7 @@ async function requestStoryAssetExtractionResult({
         throw error17;
       }
       value165['automaticRecovery'] = {
-        attempted: !![],
+        attempted: true,
         mode: mode4['mode'],
         reason: mode4['reason'],
       };
@@ -2298,10 +2298,10 @@ export async function extractStoryAssets({
   requiredAssetNamesByKind: requiredAssetNamesByKind = null,
   candidateAssetsByKind: candidateAssetsByKind = null,
   requiredAssetsByKind: requiredAssetsByKind = null,
-  compactOutput: compactOutput = ![],
+  compactOutput: compactOutput = false,
   maxOutputTokens: maxOutputTokens = 0,
-  allowOversizedPrompt: allowOversizedPrompt = ![],
-  automaticRecovery: automaticRecovery = ![],
+  allowOversizedPrompt: allowOversizedPrompt = false,
+  automaticRecovery: automaticRecovery = false,
   structuredOutputFallback: structuredOutputFallback = 'none',
   request: request = generateText,
   onProgress: onProgress = null,
@@ -2345,7 +2345,7 @@ export async function extractStoryAssets({
           requiredAssetNamesByKind,
           candidateAssetsByKind,
           requiredAssetsByKind,
-          { includeClientKeys: !![] },
+          { includeClientKeys: true },
         )['payload']
       : {},
     value170 = [...(value169['requiredAssets'] || []), ...(value169['candidateAssets'] || [])]['map'](
@@ -2373,7 +2373,7 @@ export async function extractStoryAssets({
       ...(Math['trunc'](Number(maxOutputTokens) || 0) > 0
         ? { maxOutputTokens: Math['trunc'](Number(maxOutputTokens)) }
         : {}),
-      ...(allowOversizedPrompt ? { allowOversizedPrompt: !![] } : {}),
+      ...(allowOversizedPrompt ? { allowOversizedPrompt: true } : {}),
     },
     parse: (value172) =>
       compactOutput
@@ -2682,8 +2682,8 @@ function selectStoryEpisodeSplitAssets(list48 = [], value188 = {}) {
   return [...args16, ...args17, ...args18]
     ['map'](({ normalized: normalized5 }) => normalized5)
     ['filter']((value200) => {
-      if (map11['has'](value200['ref'])) return ![];
-      return (map11['add'](value200['ref']), !![]);
+      if (map11['has'](value200['ref'])) return false;
+      return (map11['add'](value200['ref']), true);
     });
 }
 function getStoryEpisodeReferenceAliases(options13 = {}) {
@@ -2703,8 +2703,8 @@ function getStoryEpisodeReferenceAliases(options13 = {}) {
 function storyEpisodeSourceSceneRefsMatch(value202 = '', value203 = '', value204 = []) {
   const text17 = normalizeText(value202),
     text18 = normalizeText(value203);
-  if (!text17 || !text18) return ![];
-  if (text17 === text18) return !![];
+  if (!text17 || !text18) return false;
+  if (text17 === text18) return true;
   const stringArray2 = normalizeStringArray(value204),
     handler7 = (list53) => {
       for (const value205 of stringArray2) {
@@ -2717,7 +2717,7 @@ function storyEpisodeSourceSceneRefsMatch(value202 = '', value203 = '', value204
 }
 function storyAssetMatchesEpisode(options14 = {}, value206 = []) {
   const list55 = normalizeStringArray(options14?.['sourceEpisodeRefs']);
-  if (!list55['length']) return !![];
+  if (!list55['length']) return true;
   const map12 = new Set(normalizeStringArray(value206));
   return list55['some']((value207) => map12['has'](value207));
 }
@@ -2727,8 +2727,8 @@ function getStoryEpisodeSceneAssetCandidates(
   { episodeRefs: episodeRefs = [] } = {},
 ) {
   return (Array['isArray'](value208) ? value208 : [])['filter']((value209) => {
-    if (value209?.['kind'] !== 'scene') return ![];
-    if (!storyAssetMatchesEpisode(value209, episodeRefs)) return ![];
+    if (value209?.['kind'] !== 'scene') return false;
+    if (!storyAssetMatchesEpisode(value209, episodeRefs)) return false;
     const list56 = normalizeStringArray(value209?.['sourceSceneRefs']);
     return list56['some']((value210) =>
       storyEpisodeSourceSceneRefsMatch(value210, options15?.['ref'], episodeRefs),
@@ -2804,7 +2804,7 @@ function assertStoryEpisodeSceneAssetCoverage(
 }
 function normalizeStoryEpisodeSplitContinuityEpisode(
   enabled8 = null,
-  { includeEnding: includeEnding = ![] } = {},
+  { includeEnding: includeEnding = false } = {},
 ) {
   if (!enabled8 || typeof enabled8 !== 'object') return null;
   const value224 = Array['isArray'](enabled8?.['script']?.['scenes']) ? enabled8['script']['scenes'] : [],
@@ -3321,8 +3321,8 @@ export function parseStoryEpisodeSplitBlueprint(
     sourceBeats: sourceBeats = [],
     assets: assets = [],
     constraints: constraints = {},
-    enforceMaxDuration: enforceMaxDuration = !![],
-    includeDirectorContinuity: includeDirectorContinuity = ![],
+    enforceMaxDuration: enforceMaxDuration = true,
+    includeDirectorContinuity: includeDirectorContinuity = false,
   } = {},
 ) {
   const strictJson5 = parseStrictJson(getResultText(value263), 'Agent 未返回分镜蓝图。'),
@@ -3476,7 +3476,7 @@ function createLocalStoryEpisodeSplitBlueprint({
   sourceScenes: sourceScenes = [],
   sourceBeats: sourceBeats = [],
   assets: assets = [],
-  includeDirectorContinuity: includeDirectorContinuity = ![],
+  includeDirectorContinuity: includeDirectorContinuity = false,
 } = {}) {
   const ref11 = normalizeStoryAssetReference(episodeRef, 'episode-1'),
     map19 = new Map(
@@ -3619,9 +3619,9 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
   nextEpisode: nextEpisode = null,
   assets: assets = [],
   constraints: constraints = {},
-  enforceMaxDuration: enforceMaxDuration = !![],
+  enforceMaxDuration: enforceMaxDuration = true,
   sourceBeatsOverride: sourceBeatsOverride = null,
-  promptExperiment: promptExperiment = ![],
+  promptExperiment: promptExperiment = false,
   promptMode: promptMode = '',
 } = {}) {
   const scriptMode5 = normalizeStoryProjectInput(project);
@@ -3677,7 +3677,7 @@ export function buildStoryEpisodeSplitBlueprintPrompt({
       }),
     ),
     continuity: {
-      previousEpisode: normalizeStoryEpisodeSplitContinuityEpisode(previousEpisode, { includeEnding: !![] }),
+      previousEpisode: normalizeStoryEpisodeSplitContinuityEpisode(previousEpisode, { includeEnding: true }),
       nextEpisode: normalizeStoryEpisodeSplitContinuityEpisode(nextEpisode),
     },
     constraints: enforceMaxDuration ? episodeCount : { episodeCount: episodeCount['episodeCount'] },
@@ -3857,9 +3857,9 @@ export function buildStoryEpisodeSplitBatchPrompt({
   planBatch: planBatch = null,
   batchNumber: batchNumber = 0,
   batchTotal: batchTotal = 0,
-  enforceMaxDuration: enforceMaxDuration = !![],
+  enforceMaxDuration: enforceMaxDuration = true,
   sourceBeatsOverride: sourceBeatsOverride = null,
-  promptExperiment: promptExperiment = ![],
+  promptExperiment: promptExperiment = false,
   promptMode: promptMode = '',
   timingCorrection: timingCorrection = null,
 } = {}) {
@@ -3900,7 +3900,7 @@ export function buildStoryEpisodeSplitBatchPrompt({
       getStoryEpisodeReferenceAliases(episode),
     )['map']((value345) =>
       compactStoryEpisodePromptAsset(value345, {
-        includeVisualDetails: !![],
+        includeVisualDetails: true,
         includeBindings: Array['isArray'](sourceBeatsOverride),
       }),
     ),
@@ -3964,9 +3964,9 @@ export function buildStoryEpisodeSplitBatchPrompt({
     constraints: enforceMaxDuration ? episodeCount2 : { episodeCount: episodeCount2['episodeCount'] },
     visualDirection: { aspectRatio: scriptMode6['aspectRatio'] || '16:9', style: scriptMode6['visualStyle'] },
     timingBudget: {
-      ...(!enforceMaxDuration ? { preserveSourceDialogueUnits: !![] } : {}),
-      singleActionBeatPerShot: !![],
-      singleContinuousCameraPerShot: !![],
+      ...(!enforceMaxDuration ? { preserveSourceDialogueUnits: true } : {}),
+      singleActionBeatPerShot: true,
+      singleContinuousCameraPerShot: true,
     },
     durationBudgets: clipPlans5['map']((ref14) => ({
       ref: ref14['ref'],
@@ -4247,10 +4247,10 @@ function normalizeStoryEpisodeSplitShot(
     index: index = 0,
     assetCatalog: assetCatalog = buildStoryEpisodeSplitAssetCatalog(),
     fallbacks: fallbacks = {},
-    allowEmptyAudio: allowEmptyAudio = !![],
-    includeCutAfter: includeCutAfter = ![],
-    includeTimeline: includeTimeline = ![],
-    preserveCameraCuts: preserveCameraCuts = ![],
+    allowEmptyAudio: allowEmptyAudio = true,
+    includeCutAfter: includeCutAfter = false,
+    includeTimeline: includeTimeline = false,
+    preserveCameraCuts: preserveCameraCuts = false,
   } = {},
 ) {
   const positiveNumber3 =
@@ -4359,7 +4359,7 @@ function getStoryEpisodeSplitShotCharacterText(options19 = {}) {
     ['join'](' ');
 }
 function hasStoryEpisodeSplitVisualCharacterReference(value381, list126) {
-  if (normalizeText(value381?.['camera'])['includes'](list126)) return !![];
+  if (normalizeText(value381?.['camera'])['includes'](list126)) return true;
   const list127 = normalizeText(value381?.['visual'])
     ['split'](/[，,。；;！？!?：:\r\n]+/u)
     ['map']((value382) => value382['trim']())
@@ -4372,8 +4372,8 @@ function hasStoryEpisodeSplitVisualCharacterReference(value381, list126) {
         STORY_EPISODE_CHARACTER_VISIBLE_SUBJECT_PATTERN['test'](list130) ||
         STORY_EPISODE_CHARACTER_VISIBLE_OBJECT_PATTERN['test'](value384) ||
         STORY_EPISODE_CHARACTER_VISUAL_PRESENCE_PATTERN['test'](list130['slice'](0, 12));
-    if (value385) return !![];
-    if (STORY_EPISODE_AUDIO_ONLY_CHARACTER_REFERENCE_PATTERN['test'](list129)) return ![];
+    if (value385) return true;
+    if (STORY_EPISODE_AUDIO_ONLY_CHARACTER_REFERENCE_PATTERN['test'](list129)) return false;
     return !STORY_EPISODE_INDIRECT_CHARACTER_REFERENCE_PATTERN['test'](list129);
   });
 }
@@ -4383,7 +4383,7 @@ function completeStoryEpisodeSplitCharacterAssetUsages(
     clipPlan: clipPlan = null,
     assetCatalog: assetCatalog = buildStoryEpisodeSplitAssetCatalog(),
     clipTitle: clipTitle = '片段',
-    requireAllPlanCharacters: requireAllPlanCharacters = !![],
+    requireAllPlanCharacters: requireAllPlanCharacters = true,
   } = {},
 ) {
   const list132 = [
@@ -4534,7 +4534,7 @@ function getStoryEpisodeSplitShotsDuration(list139 = []) {
 }
 function tokenizeStoryEpisodeExperimentalShotText(
   value409 = '',
-  { preserveSpeaker: preserveSpeaker = ![] } = {},
+  { preserveSpeaker: preserveSpeaker = false } = {},
 ) {
   const enabled15 = String(value409 || '')['trim']();
   if (!enabled15) return [];
@@ -4561,7 +4561,7 @@ function tokenizeStoryEpisodeExperimentalShotText(
     list140
   );
 }
-function splitStoryEpisodeExperimentalClause(value416 = '', value417 = ![]) {
+function splitStoryEpisodeExperimentalClause(value416 = '', value417 = false) {
   const value418 = value417 ? value416['match'](/^([^：:\n]{1,20}[：:])(.*)$/u) : null,
     value419 = value418?.[1] || '',
     args31 = value418?.[2] || value416,
@@ -4576,7 +4576,7 @@ function splitStoryEpisodeExperimentalClause(value416 = '', value417 = ![]) {
 function splitStoryEpisodeExperimentalShotText(
   value421 = '',
   value422 = 1,
-  { preserveSpeaker: preserveSpeaker = ![], splitFragments: splitFragments = !![] } = {},
+  { preserveSpeaker: preserveSpeaker = false, splitFragments: splitFragments = true } = {},
 ) {
   const length = Math['max'](1, Math['trunc'](Number(value422) || 1)),
     list144 = tokenizeStoryEpisodeExperimentalShotText(value421, { preserveSpeaker: preserveSpeaker });
@@ -4643,27 +4643,27 @@ function splitStoryEpisodeExperimentalOverlongEntry(
       args34['visual'],
       length2,
       {
-        splitFragments: ![],
+        splitFragments: false,
       },
     ),
     splitStoryEpisodeExperimentalShotText3 = splitStoryEpisodeExperimentalShotText(
       args34['dialogue'],
       length2,
       {
-        preserveSpeaker: !![],
-        splitFragments: ![],
+        preserveSpeaker: true,
+        splitFragments: false,
       },
     ),
     splitStoryEpisodeExperimentalShotText4 = splitStoryEpisodeExperimentalShotText(
       args34['voiceover'],
       length2,
       {
-        preserveSpeaker: !![],
-        splitFragments: ![],
+        preserveSpeaker: true,
+        splitFragments: false,
       },
     ),
     splitStoryEpisodeExperimentalShotText5 = splitStoryEpisodeExperimentalShotText(args34['audio'], length2, {
-      splitFragments: ![],
+      splitFragments: false,
     });
   let value438 = Number(positiveNumber4['toFixed'](1));
   const ref15 = normalizeText(args33?.['sourceClip']?.['ref']) || 'clip-' + (entryIndex + 1);
@@ -4784,8 +4784,8 @@ export function repackStoryEpisodeExperimentalClips({
   completedPlanResults: completedPlanResults = [],
   maxDurationSeconds: maxDurationSeconds = 15,
   minDurationSeconds: minDurationSeconds = STORY_EPISODE_EXPERIMENTAL_MIN_CLIP_DURATION_SECONDS,
-  promptExperiment: promptExperiment = ![],
-  preserveSourceGroups: preserveSourceGroups = ![],
+  promptExperiment: promptExperiment = false,
+  preserveSourceGroups: preserveSourceGroups = false,
 } = {}) {
   const ref16 = normalizeStoryAssetReference(episodeRef, 'episode-1'),
     map32 = new Map(
@@ -4903,7 +4903,7 @@ function addStoryEpisodeDirectorContinuityHandoffs(list157 = []) {
       value479 = args37?.['shots']?.[0] || null;
     return {
       ...args37,
-      directorContinuityTest: !![],
+      directorContinuityTest: true,
       continuityHandoff: {
         previousExitState: normalizeText(value478?.['visual']),
         previousEndCamera: normalizeText(value478?.['camera']),
@@ -5006,20 +5006,20 @@ function createStoryEpisodeClipDurationConstraintError({
   );
 }
 function isStoryEpisodeClipDurationSupported(value481, enabled19 = null) {
-  if (!enabled19) return !![];
+  if (!enabled19) return true;
   const count14 = Number(value481);
-  if (!Number['isFinite'](count14) || count14 <= 0) return ![];
+  if (!Number['isFinite'](count14) || count14 <= 0) return false;
   const list158 = Array['isArray'](enabled19['allowedSeconds']) ? enabled19['allowedSeconds'] : [];
   if (list158['length'])
     return list158['some']((value482) => Math['abs'](Number(value482) - count14) < 0.000001);
-  if (enabled19['minSeconds'] && count14 < enabled19['minSeconds']) return ![];
-  if (enabled19['maxSeconds'] && count14 > enabled19['maxSeconds']) return ![];
+  if (enabled19['minSeconds'] && count14 < enabled19['minSeconds']) return false;
+  if (enabled19['maxSeconds'] && count14 > enabled19['maxSeconds']) return false;
   if (enabled19['stepSeconds']) {
     const value483 = enabled19['minSeconds'] || 0,
       value484 = (count14 - value483) / enabled19['stepSeconds'];
-    if (Math['abs'](value484 - Math['round'](value484)) >= 0.000001) return ![];
+    if (Math['abs'](value484 - Math['round'](value484)) >= 0.000001) return false;
   }
-  return !![];
+  return true;
 }
 function tokenizeStorySpokenTextAtAuthoredPauses(value485 = '') {
   const list159 = normalizeText(value485);
@@ -5130,10 +5130,10 @@ function splitStoryEpisodeOverlongSpokenShot(args38 = {}, { maximum: maximum = 1
   const durationSec7 = [...list164];
   let count15 = value514 - durationSec7['reduce']((value517, value518) => value517 + value518, 0);
   while (count15 > 0) {
-    let enabled21 = ![];
+    let enabled21 = false;
     for (let value519 = 0; value519 < durationSec7['length'] && count15 > 0; value519 += 1) {
       if (durationSec7[value519] >= value513) continue;
-      ((durationSec7[value519] += 1), (count15 -= 1), (enabled21 = !![]));
+      ((durationSec7[value519] += 1), (count15 -= 1), (enabled21 = true));
     }
     if (!enabled21) break;
   }
@@ -5228,17 +5228,17 @@ export function parseStoryEpisodeSplitResult(
     clipPlans: clipPlans = [],
     minimumShotsPerClip: minimumShotsPerClip = 2,
     maximumShotsPerClip: maximumShotsPerClip = 5,
-    enforceMaxDuration: enforceMaxDuration = !![],
-    repairMissingShotFields: repairMissingShotFields = ![],
-    allowEmptyAudio: allowEmptyAudio = !![],
-    requireAllPlanCharacters: requireAllPlanCharacters = !![],
-    completeCharacterAssetUsages: completeCharacterAssetUsages = !![],
-    completePlanSceneUsage: completePlanSceneUsage = ![],
-    includeCutAfter: includeCutAfter = ![],
-    repackOverlongClips: repackOverlongClips = ![],
-    enforceSingleSceneAssetUsage: enforceSingleSceneAssetUsage = !![],
+    enforceMaxDuration: enforceMaxDuration = true,
+    repairMissingShotFields: repairMissingShotFields = false,
+    allowEmptyAudio: allowEmptyAudio = true,
+    requireAllPlanCharacters: requireAllPlanCharacters = true,
+    completeCharacterAssetUsages: completeCharacterAssetUsages = true,
+    completePlanSceneUsage: completePlanSceneUsage = false,
+    includeCutAfter: includeCutAfter = false,
+    repackOverlongClips: repackOverlongClips = false,
+    enforceSingleSceneAssetUsage: enforceSingleSceneAssetUsage = true,
     clipDurationConstraints: clipDurationConstraints = null,
-    rejectUnsupportedClipDuration: rejectUnsupportedClipDuration = !![],
+    rejectUnsupportedClipDuration: rejectUnsupportedClipDuration = true,
     promptMode: promptMode = 'seedance-2.0',
   } = {},
 ) {
@@ -5504,16 +5504,16 @@ function normalizeStoryEpisodeSplitDraft(
     clipPlans: clipPlans = [],
     minimumShotsPerClip: minimumShotsPerClip = 2,
     maximumShotsPerClip: maximumShotsPerClip = 5,
-    enforceMaxDuration: enforceMaxDuration = !![],
-    repairMissingShotFields: repairMissingShotFields = ![],
-    allowEmptyAudio: allowEmptyAudio = !![],
-    requireAllPlanCharacters: requireAllPlanCharacters = !![],
-    completePlanSceneUsage: completePlanSceneUsage = ![],
-    includeCutAfter: includeCutAfter = ![],
-    repackOverlongClips: repackOverlongClips = ![],
-    enforceSingleSceneAssetUsage: enforceSingleSceneAssetUsage = !![],
+    enforceMaxDuration: enforceMaxDuration = true,
+    repairMissingShotFields: repairMissingShotFields = false,
+    allowEmptyAudio: allowEmptyAudio = true,
+    requireAllPlanCharacters: requireAllPlanCharacters = true,
+    completePlanSceneUsage: completePlanSceneUsage = false,
+    includeCutAfter: includeCutAfter = false,
+    repackOverlongClips: repackOverlongClips = false,
+    enforceSingleSceneAssetUsage: enforceSingleSceneAssetUsage = true,
     clipDurationConstraints: clipDurationConstraints = null,
-    rejectUnsupportedClipDuration: rejectUnsupportedClipDuration = !![],
+    rejectUnsupportedClipDuration: rejectUnsupportedClipDuration = true,
     promptMode: promptMode = 'seedance-2.0',
   } = {},
 ) {
@@ -5801,7 +5801,7 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
   runId: runId,
   phase: phase3,
   nextRequestSequence: nextRequestSequence,
-  carriesFullEpisodeContext: carriesFullEpisodeContext = ![],
+  carriesFullEpisodeContext: carriesFullEpisodeContext = false,
   context: context = {},
 } = {}) {
   let phaseAttempt = 0;
@@ -5812,7 +5812,7 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
       requestPayloadCharacters = getStoryEpisodeSplitSerializedMetrics(prompt7),
       automaticCallLimit2 = {
         status: 'started',
-        countsTowardRequestTotal: !![],
+        countsTowardRequestTotal: true,
         runId: runId,
         requestId: requestId,
         requestSequence: requestSequence,
@@ -5851,7 +5851,7 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
             details: {
               ...automaticCallLimit2,
               status: 'succeeded',
-              countsTowardRequestTotal: ![],
+              countsTowardRequestTotal: false,
               elapsedMs: Math['max'](0, Date['now']() - value586),
               responseCharacters: responseCharacters['characters'],
               responseBytes: responseCharacters['bytes'],
@@ -5879,7 +5879,7 @@ function createStoryEpisodeExperimentalDiagnosticRequest({
           details: {
             ...automaticCallLimit2,
             status: 'failed',
-            countsTowardRequestTotal: ![],
+            countsTowardRequestTotal: false,
             elapsedMs: Math['max'](0, Date['now']() - value586),
             errorType: normalizeText(error29?.['type'] || error29?.['name']),
             errorStatus: Math['max'](
@@ -5916,16 +5916,16 @@ export function createStoryEpisodeDefaultSplitParseContext({
     assets: assets,
     minimumShotsPerClip: 1,
     maximumShotsPerClip: 0,
-    enforceMaxDuration: ![],
-    repairMissingShotFields: !![],
-    allowEmptyAudio: !![],
-    requireAllPlanCharacters: ![],
+    enforceMaxDuration: false,
+    repairMissingShotFields: true,
+    allowEmptyAudio: true,
+    requireAllPlanCharacters: false,
     completeCharacterAssetUsages: !episode['replication']?.['sourceAnalysis'],
-    completePlanSceneUsage: ![],
+    completePlanSceneUsage: false,
     repackOverlongClips: Boolean(clipDurationConstraints) && !isStoryContinuousTimelinePromptMode2,
-    enforceSingleSceneAssetUsage: ![],
+    enforceSingleSceneAssetUsage: false,
     clipDurationConstraints: clipDurationConstraints,
-    rejectUnsupportedClipDuration: ![],
+    rejectUnsupportedClipDuration: false,
     promptMode: promptMode,
   };
 }
@@ -5968,20 +5968,20 @@ function serializeStoryEpisodeSplitTransportRaw(value588) {
   }
 }
 function hasStoryEpisodeSplitTransportModelOutput(list176) {
-  if (!list176) return ![];
+  if (!list176) return false;
   if (typeof list176 === 'string') {
     const text37 = normalizeText(list176);
-    if (!text37) return ![];
+    if (!text37) return false;
     try {
       return hasStoryEpisodeSplitTransportModelOutput(JSON['parse'](text37));
     } catch {
-      return ![];
+      return false;
     }
   }
   if (Array['isArray'](list176))
     return list176['some']((value590) => hasStoryEpisodeSplitTransportModelOutput(value590));
-  if (typeof list176 !== 'object') return ![];
-  if (Array['isArray'](list176['clips']) && list176['clips']['length']) return !![];
+  if (typeof list176 !== 'object') return false;
+  if (Array['isArray'](list176['clips']) && list176['clips']['length']) return true;
   const value591 = [
     list176['text'],
     list176['outputText'],
@@ -5991,14 +5991,14 @@ function hasStoryEpisodeSplitTransportModelOutput(list176) {
   ]
     ['map'](normalizeText)
     ['find'](Boolean);
-  if (value591) return !![];
+  if (value591) return true;
   const list177 = Array['isArray'](list176['choices']) ? list176['choices'] : [];
   if (
     list177['some']((error31) =>
       hasStoryEpisodeSplitTransportModelOutput(error31?.['message'] || error31?.['delta'] || error31),
     )
   )
-    return !![];
+    return true;
   return [list176['data'], list176['result'], list176['response'], list176['output']]['some'](
     (value592) => value592 && value592 !== list176 && hasStoryEpisodeSplitTransportModelOutput(value592),
   );
@@ -6170,7 +6170,7 @@ async function splitStoryEpisodesCombinedRequest({
       provider: normalizeText(provider),
       ...buildStoryTextProviderProfilePayload(providerProfileId),
       prompt: prompt8,
-      systemPrompt: getStoryEpisodeSplitRequestSystemPrompt({ compactPrompt: !![], promptMode: promptMode5 }),
+      systemPrompt: getStoryEpisodeSplitRequestSystemPrompt({ compactPrompt: true, promptMode: promptMode5 }),
       thinking: { type: 'disabled' },
       temperature: STORY_EPISODE_SPLIT_TEMPERATURE,
       maxOutputTokens: STORY_EPISODE_SPLIT_MAX_OUTPUT_TOKENS,
@@ -6194,7 +6194,7 @@ async function splitStoryEpisodesCombinedRequest({
         episodeCount: episodes4['length'],
         outputTokenLimitMode: 'provider-default',
         requestTimeoutMode: 'provider-default',
-        assetDetailsIncluded: ![],
+        assetDetailsIncluded: false,
       },
     }));
   const value604 = Date['now']();
@@ -6285,7 +6285,7 @@ async function splitStoryEpisodesCombinedRequest({
         episodeCount: episodes4['length'],
         outputTokenLimitMode: 'provider-default',
         requestTimeoutMode: 'provider-default',
-        includesOriginalScripts: ![],
+        includesOriginalScripts: false,
       },
     }));
   const value608 = Date['now']();
@@ -6425,7 +6425,7 @@ async function splitStoryEpisodesCombinedRequest({
   return { rawResponse: rawResponse4, items: items3 };
 }
 export function splitStoryEpisodeChecked(args47 = {}) {
-  return splitStoryEpisode({ ...args47, compactPrompt: !![], skipRequestQueue: !![] });
+  return splitStoryEpisode({ ...args47, compactPrompt: true, skipRequestQueue: true });
 }
 export async function splitStoryEpisodesBatch({
   episodes: episodes = [],
@@ -6478,8 +6478,8 @@ export async function splitStoryEpisode({
   repairDraft: repairDraft = null,
   diagnostics: diagnostics = null,
   clipDurationConstraints: clipDurationConstraints = null,
-  compactPrompt: compactPrompt = ![],
-  skipRequestQueue: skipRequestQueue = ![],
+  compactPrompt: compactPrompt = false,
+  skipRequestQueue: skipRequestQueue = false,
   onInvocation: onInvocation = null,
 } = {}) {
   assertPlanningModel(model, provider);
@@ -6563,7 +6563,7 @@ export async function splitStoryEpisode({
         requestTimeoutMode: 'bounded',
         requestTimeoutMs: STORY_EPISODE_SPLIT_REQUEST_TIMEOUT_MS,
         assetCount: assets11['length'],
-        includesAdjacentEpisodes: ![],
+        includesAdjacentEpisodes: false,
         blueprintRequestCount: 0,
       },
     });
@@ -6770,7 +6770,7 @@ export async function splitStoryEpisode({
         prompt: prompt11,
         systemPrompt: systemPrompt3,
         failedClipCount: total4,
-        carriesFullEpisodeContext: ![],
+        carriesFullEpisodeContext: false,
         automaticCallLimit: 1,
         details: { status: 'queued', requestIndex: 1, requestCount: 1 },
       }));
@@ -6857,7 +6857,7 @@ function createStoryEpisodeExperimentalFingerprint({
   model: model = '',
   provider: provider = '',
   providerProfileId: providerProfileId = '',
-  promptExperiment: promptExperiment = ![],
+  promptExperiment: promptExperiment = false,
   promptMode: promptMode = 'seedance-2.0',
   timingBudget: timingBudget = null,
 } = {}) {
@@ -6870,7 +6870,7 @@ function createStoryEpisodeExperimentalFingerprint({
     model: normalizeText(model),
     provider: normalizeText(provider),
     providerProfileId: normalizeText(providerProfileId),
-    promptExperiment: promptExperiment === !![],
+    promptExperiment: promptExperiment === true,
     promptMode: normalizeText(promptMode)['toLowerCase']() || 'seedance-2.0',
     timingBudget: timingBudget,
     scriptMode: scriptMode7['scriptMode'],
@@ -6898,7 +6898,7 @@ function isStoryEpisodeExperimentalBatchShrinkable(value628) {
 function isStoryEpisodeExperimentalRetryable(response29) {
   const count21 = Number(response29?.['status'] || response29?.['statusCode'] || 0);
   return (
-    response29?.['retryable'] === !![] ||
+    response29?.['retryable'] === true ||
     isStoryEpisodeExperimentalTimeout(response29) ||
     count21 === 429 ||
     count21 >= 500
@@ -6937,7 +6937,7 @@ async function requestStoryEpisodeExperimentalWithRetry(
   {
     maxAttempts: maxAttempts = STORY_EPISODE_EXPERIMENTAL_TRANSPORT_ATTEMPTS,
     retryWait: retryWait = waitForStoryEpisodeExperimentalRetry,
-    splitOversizedBatch: splitOversizedBatch = ![],
+    splitOversizedBatch: splitOversizedBatch = false,
   } = {},
 ) {
   const value636 = Math['max'](1, Math['trunc'](Number(maxAttempts) || 1));
@@ -6967,7 +6967,7 @@ function restoreStoryEpisodeExperimentalDraft(
     sourceBeats: sourceBeats = [],
     assets: assets = [],
     constraints: constraints = {},
-    promptExperiment: promptExperiment = ![],
+    promptExperiment: promptExperiment = false,
     promptMode: promptMode = 'seedance-2.0',
   } = {},
 ) {
@@ -6987,8 +6987,8 @@ function restoreStoryEpisodeExperimentalDraft(
         sourceBeats: sourceBeats,
         assets: assets,
         constraints: constraints,
-        enforceMaxDuration: ![],
-        includeDirectorContinuity: promptExperiment === !![],
+        enforceMaxDuration: false,
+        includeDirectorContinuity: promptExperiment === true,
       }),
       map40 = new Map(
         blueprint2['clipPlans']['map']((value641) => [normalizeText(value641?.['ref']), value641]),
@@ -7019,12 +7019,12 @@ function restoreStoryEpisodeExperimentalDraft(
           clipPlans: [sourcePlanRef],
           minimumShotsPerClip: 1,
           maximumShotsPerClip: STORY_EPISODE_EXPERIMENTAL_MAX_SHOTS_PER_CLIP,
-          enforceMaxDuration: ![],
-          repairMissingShotFields: !![],
-          allowEmptyAudio: !![],
-          requireAllPlanCharacters: ![],
-          completePlanSceneUsage: !![],
-          includeCutAfter: !![],
+          enforceMaxDuration: false,
+          repairMissingShotFields: true,
+          allowEmptyAudio: true,
+          requireAllPlanCharacters: false,
+          completePlanSceneUsage: true,
+          includeCutAfter: true,
           promptMode: promptMode,
         },
       );
@@ -7073,12 +7073,12 @@ function createStoryEpisodeExperimentalBatchDraft(
       clipPlans: clipPlans,
       minimumShotsPerClip: 1,
       maximumShotsPerClip: STORY_EPISODE_EXPERIMENTAL_MAX_SHOTS_PER_CLIP,
-      enforceMaxDuration: ![],
-      repairMissingShotFields: !![],
-      allowEmptyAudio: !![],
-      requireAllPlanCharacters: ![],
-      completePlanSceneUsage: !![],
-      includeCutAfter: !![],
+      enforceMaxDuration: false,
+      repairMissingShotFields: true,
+      allowEmptyAudio: true,
+      requireAllPlanCharacters: false,
+      completePlanSceneUsage: true,
+      includeCutAfter: true,
       promptMode: promptMode,
     }),
     sourceIndex3 = clipPlans['map']((value653) => normalizeText(value653?.['ref'])),
@@ -7173,7 +7173,7 @@ function assertStoryEpisodeExperimentalPlanTiming(options29 = {}, value655 = [])
       ['join']('；'),
     error43 = new Error('实验分批时长自检未通过：' + value660 + '。');
   ((error43['code'] = 'STORY_EPISODE_EXPERIMENTAL_PLAN_TIMING_MISMATCH'),
-    (error43['retryable'] = !![]),
+    (error43['retryable'] = true),
     (error43['timingMismatches'] = list190));
   throw error43;
 }
@@ -7185,7 +7185,7 @@ async function requestStoryEpisodeExperimentalBatchResult({
   constraints: constraints = {},
   assets: assets = [],
   promptMode: promptMode = 'seedance-2.0',
-  enforcePlanDurationTargets: enforcePlanDurationTargets = ![],
+  enforcePlanDurationTargets: enforcePlanDurationTargets = false,
 } = {}) {
   const value662 = {
       episodeRef: episodeRef,
@@ -7235,7 +7235,7 @@ export async function splitStoryEpisodeExperimental({
   model: model = '',
   provider: provider = '',
   providerProfileId: providerProfileId = '',
-  promptExperiment: promptExperiment = ![],
+  promptExperiment: promptExperiment = false,
   request: request = generateText,
   onProgress: onProgress = null,
   onCheckpoint: onCheckpoint = null,
@@ -7276,7 +7276,7 @@ export async function splitStoryEpisodeExperimental({
       model: model3,
       provider: provider3,
       providerProfileId: providerProfileId,
-      promptExperiment: promptExperiment === !![],
+      promptExperiment: promptExperiment === true,
       promptMode: promptMode7,
       timingBudget: timingBudget3,
     }),
@@ -7289,7 +7289,7 @@ export async function splitStoryEpisodeExperimental({
         invokeStoryGenerationRequest({
           request: request6,
           requestPayload: requestPayload7,
-          allowTruncatedOutput: !![],
+          allowTruncatedOutput: true,
           stepId: stepId2,
           attempt: attempt5,
           onInvocation: onInvocation,
@@ -7316,7 +7316,7 @@ export async function splitStoryEpisodeExperimental({
       sourceBeats: sourceBeats4,
       assets: assets14,
       constraints: constraints9,
-      promptExperiment: promptExperiment === !![],
+      promptExperiment: promptExperiment === true,
       promptMode: promptMode7,
     }),
     blueprint3 = completedClipCount?.['blueprint']
@@ -7337,9 +7337,9 @@ export async function splitStoryEpisodeExperimental({
         nextEpisode: nextEpisode,
         assets: assets13,
         constraints: constraints9,
-        enforceMaxDuration: ![],
+        enforceMaxDuration: false,
         sourceBeatsOverride: sourceBeats4,
-        promptExperiment: promptExperiment === !![],
+        promptExperiment: promptExperiment === true,
         promptMode: promptMode7,
       }),
       value670 = JSON['parse'](prompt12),
@@ -7349,7 +7349,7 @@ export async function splitStoryEpisodeExperimental({
         runId: runId2,
         phase: 'experimental-blueprint',
         nextRequestSequence: nextRequestSequence2,
-        carriesFullEpisodeContext: !![],
+        carriesFullEpisodeContext: true,
         context: {
           ...args56,
           promptSectionCharacters: getStoryEpisodeExperimentalPromptSectionCharacters(value670),
@@ -7369,17 +7369,17 @@ export async function splitStoryEpisodeExperimental({
               ? STORY_EPISODE_DIRECTOR_CONTINUITY_BLUEPRINT_SYSTEM_PROMPT
               : STORY_EPISODE_BATCHED_BLUEPRINT_SYSTEM_PROMPT,
             thinking: { type: 'disabled' },
-            allowOversizedPrompt: !![],
+            allowOversizedPrompt: true,
             structuredOutput: createStoryEpisodeExperimentalStructuredOutput(
               'story_episode_split_blueprint_v3',
               buildStoryEpisodeSplitBlueprintResponseSchema({
                 ...constraints9,
-                enforceMaxDuration: ![],
+                enforceMaxDuration: false,
                 includeSceneAssetRef: Object['prototype']['hasOwnProperty']['call'](
                   value670?.['outputSchema']?.['clipPlans']?.[0] || {},
                   'sceneAssetRef',
                 ),
-                includeDirectorContinuity: promptExperiment === !![],
+                includeDirectorContinuity: promptExperiment === true,
               }),
             ),
             temperature: STORY_EPISODE_SPLIT_TEMPERATURE,
@@ -7401,19 +7401,19 @@ export async function splitStoryEpisodeExperimental({
                 sourceBeats: sourceBeats4,
                 assets: assets13,
                 constraints: constraints9,
-                enforceMaxDuration: ![],
-                includeDirectorContinuity: promptExperiment === !![],
+                enforceMaxDuration: false,
+                includeDirectorContinuity: promptExperiment === true,
               });
             } catch (error46) {
               if (error46?.['type'] === 'OUTPUT_LENGTH') throw error46;
               return (
                 reportStoryEpisodeSplitRequestDiagnostics(diagnostics, {
                   phase: 'experimental-blueprint-local-fallback',
-                  carriesFullEpisodeContext: ![],
+                  carriesFullEpisodeContext: false,
                   automaticCallLimit: 1,
                   details: {
                     status: 'recovered-locally',
-                    countsTowardRequestTotal: ![],
+                    countsTowardRequestTotal: false,
                     runId: runId2,
                     errorCode: normalizeText(error46?.['code']),
                     errorMessage: normalizeText(error46?.['message'] || error46),
@@ -7426,7 +7426,7 @@ export async function splitStoryEpisodeExperimental({
                   sourceScenes: sourceScenes3,
                   sourceBeats: sourceBeats4,
                   assets: assets13,
-                  includeDirectorContinuity: promptExperiment === !![],
+                  includeDirectorContinuity: promptExperiment === true,
                 })
               );
             }
@@ -7514,9 +7514,9 @@ export async function splitStoryEpisodeExperimental({
           planBatch: planBatch2,
           batchNumber: batchNumber2,
           batchTotal: batchTotal2['length'],
-          enforceMaxDuration: ![],
+          enforceMaxDuration: false,
           sourceBeatsOverride: sourceBeats4,
-          promptExperiment: promptExperiment === !![],
+          promptExperiment: promptExperiment === true,
           promptMode: promptMode7,
           timingCorrection:
             previousError?.['code'] === 'STORY_EPISODE_EXPERIMENTAL_PLAN_TIMING_MISMATCH'
@@ -7534,7 +7534,7 @@ export async function splitStoryEpisodeExperimental({
           runId: runId2,
           phase: 'experimental-batch-' + batchNumber2,
           nextRequestSequence: nextRequestSequence2,
-          carriesFullEpisodeContext: ![],
+          carriesFullEpisodeContext: false,
           context: {
             ...args56,
             batchSequence: batchNumber2,
@@ -7563,7 +7563,7 @@ export async function splitStoryEpisodeExperimental({
             promptMode: promptMode7,
           }),
           thinking: { type: 'disabled' },
-          allowOversizedPrompt: !![],
+          allowOversizedPrompt: true,
           structuredOutput: createStoryEpisodeExperimentalStructuredOutput(
             'story_episode_split_batch_v3',
             buildStoryEpisodeSplitBatchResponseSchema({
@@ -7580,8 +7580,8 @@ export async function splitStoryEpisodeExperimental({
                 'camera',
                 ...(promptExperiment ? ['transitionFromPrevious'] : []),
               ],
-              compactExperimental: !![],
-              includeDirectorContinuity: promptExperiment === !![],
+              compactExperimental: true,
+              includeDirectorContinuity: promptExperiment === true,
               includeTimeline: isStoryContinuousTimelinePromptMode(promptMode7),
             }),
           ),
@@ -7676,7 +7676,7 @@ export async function splitStoryEpisodeExperimental({
     completedPlanResults: completedPlanResults3,
     maxDurationSeconds: resolveStoryPromptModeClipMaxSeconds(promptMode7, constraints9['sceneMaxSeconds']),
     minDurationSeconds: STORY_EPISODE_EXPERIMENTAL_MIN_CLIP_DURATION_SECONDS,
-    promptExperiment: promptExperiment === !![],
+    promptExperiment: promptExperiment === true,
     preserveSourceGroups: isStoryContinuousTimelinePromptMode(promptMode7),
   });
   return (

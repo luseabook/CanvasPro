@@ -9,7 +9,7 @@ export function syncTextResultSources(value) {
   const enabled = value['_data'] || {},
     list = normalizeTextResultSources(enabled['outputSources']),
     search = normalizeTextToolUsage(enabled['outputToolUsage']),
-    enabled2 = enabled['outputWebSearchRequested'] === !![],
+    enabled2 = enabled['outputWebSearchRequested'] === true,
     item = JSON['stringify']([list, search, enabled2, t('aigenText.result.sources')]),
     el2 = value['_textResultSourcesElement'];
   if (value['_textResultSourcesSignature'] === item && el2?.['parentNode'] === el) return;

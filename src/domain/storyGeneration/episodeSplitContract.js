@@ -20,7 +20,7 @@ function normalizePositiveNumber(value) {
 function createAssetUsageResponseSchema() {
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['assetRef', 'appearanceRef'],
     properties: { assetRef: { type: 'string' }, appearanceRef: { type: 'string' } },
   };
@@ -28,9 +28,9 @@ function createAssetUsageResponseSchema() {
 function createShotResponseSchema({
   maxDurationSeconds: maxDurationSeconds = 0,
   requiredFields: requiredFields = null,
-  compactExperimental: compactExperimental = ![],
-  includeDirectorContinuity: includeDirectorContinuity = ![],
-  includeTimeline: includeTimeline = ![],
+  compactExperimental: compactExperimental = false,
+  includeDirectorContinuity: includeDirectorContinuity = false,
+  includeTimeline: includeTimeline = false,
 } = {}) {
   const args = normalizePositiveNumber(maxDurationSeconds),
     item = Array['isArray'](requiredFields)
@@ -38,7 +38,7 @@ function createShotResponseSchema({
       : ['durationSec', 'assetUsages', 'visual', 'camera', 'dialogue', 'voiceover', 'audio'];
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: item,
     properties: {
       durationSec: { type: 'number', minimum: 0.1, ...(args ? { maximum: args } : {}) },
@@ -64,15 +64,15 @@ function createClipResponseSchema({
   maximumShotsPerClip: maximumShotsPerClip = 5,
   requiredClipFields: requiredClipFields = null,
   requiredShotFields: requiredShotFields = null,
-  compactExperimental: compactExperimental = ![],
-  includeDirectorContinuity: includeDirectorContinuity = ![],
-  includeTimeline: includeTimeline = ![],
+  compactExperimental: compactExperimental = false,
+  includeDirectorContinuity: includeDirectorContinuity = false,
+  includeTimeline: includeTimeline = false,
 } = {}) {
   const key = Math['max'](1, Math['trunc'](Number(minimumShotsPerClip) || 1)),
     args2 = Math['max'](0, Math['trunc'](Number(maximumShotsPerClip) || 0));
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: Array['isArray'](requiredClipFields)
       ? requiredClipFields
       : compactExperimental
@@ -100,16 +100,16 @@ function createClipResponseSchema({
 }
 export function buildStoryEpisodeSplitBlueprintResponseSchema({
   sceneMaxSeconds: sceneMaxSeconds = STORY_SCENE_MAX_SECONDS_OPTIONS[1],
-  enforceMaxDuration: enforceMaxDuration = !![],
-  includeSceneAssetRef: includeSceneAssetRef = !![],
-  includeDirectorContinuity: includeDirectorContinuity = ![],
+  enforceMaxDuration: enforceMaxDuration = true,
+  includeSceneAssetRef: includeSceneAssetRef = true,
+  includeDirectorContinuity: includeDirectorContinuity = false,
 } = {}) {
   const storyPlanningConstraints = normalizeStoryPlanningConstraints({ sceneMaxSeconds: sceneMaxSeconds })[
     'sceneMaxSeconds'
   ];
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['episodeRef', 'clipPlans'],
     properties: {
       episodeRef: { type: 'string' },
@@ -118,7 +118,7 @@ export function buildStoryEpisodeSplitBlueprintResponseSchema({
         minItems: 1,
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: [
             'sourceBeatRefs',
             'beat',
@@ -161,14 +161,14 @@ export function buildStoryEpisodeSplitBatchResponseSchema({
   maximumShotsPerClip: maximumShotsPerClip = 5,
   requiredClipFields: requiredClipFields = null,
   requiredShotFields: requiredShotFields = null,
-  compactExperimental: compactExperimental = ![],
-  includeDirectorContinuity: includeDirectorContinuity = ![],
-  includeTimeline: includeTimeline = ![],
+  compactExperimental: compactExperimental = false,
+  includeDirectorContinuity: includeDirectorContinuity = false,
+  includeTimeline: includeTimeline = false,
 } = {}) {
   const index = Math['max'](1, Math['trunc'](Number(clipCount) || 1));
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['episodeRef', 'clips'],
     properties: {
       episodeRef: { type: 'string' },
@@ -193,7 +193,7 @@ export function buildStoryEpisodeSplitBatchResponseSchema({
 export function buildStoryEpisodeSplitSingleResponseSchema() {
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['clips'],
     properties: {
       clips: {
@@ -201,7 +201,7 @@ export function buildStoryEpisodeSplitSingleResponseSchema() {
         minItems: 1,
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['s', 'shots'],
           properties: {
             s: { type: 'string' },
@@ -210,7 +210,7 @@ export function buildStoryEpisodeSplitSingleResponseSchema() {
               minItems: 1,
               items: {
                 type: 'object',
-                additionalProperties: ![],
+                additionalProperties: false,
                 required: ['v'],
                 properties: {
                   d: { type: 'number', minimum: 0.1 },

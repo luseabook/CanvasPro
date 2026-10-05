@@ -1,12 +1,12 @@
 import { AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT, validateAgentDocumentFile } from './agentDocumentInput.js';
-function createHiddenFileInput(documentObject, className, accept, multiple = ![]) {
+function createHiddenFileInput(documentObject, className, accept, multiple = false) {
   const input = documentObject['createElement']('input');
   return (
     (input['className'] = className),
     (input['type'] = 'file'),
     (input['accept'] = accept),
     (input['multiple'] = multiple),
-    (input['hidden'] = !![]),
+    (input['hidden'] = true),
     input
   );
 }
@@ -20,9 +20,9 @@ export function createAgentComposerAttachmentController({
   normalizeMaterialNode: normalizeMaterialNode,
   addInputRefs: addInputRefs,
   setBusy: setBusy,
-  getBusy: getBusy = () => ![],
+  getBusy: getBusy = () => false,
   captureContext: captureContext = () => null,
-  isContextCurrent: isContextCurrent = () => !![],
+  isContextCurrent: isContextCurrent = () => true,
   setNotice: setNotice,
   text: text,
   formatText: formatText,
@@ -34,7 +34,7 @@ export function createAgentComposerAttachmentController({
       'agent-upload-input',
       'image/*,video/*,audio/*',
     ),
-    documentInput = createHiddenFileInput(documentObject, 'agent-document-input', '.txt,.docx,.pdf', !![]);
+    documentInput = createHiddenFileInput(documentObject, 'agent-document-input', '.txt,.docx,.pdf', true);
   let documentSeq = 0,
     documents = [];
   function getDocumentDisplayRefs() {
@@ -48,7 +48,7 @@ export function createAgentComposerAttachmentController({
       source: 'document-upload',
     }));
   }
-  function clearDocuments({ notify: notify = !![] } = {}) {
+  function clearDocuments({ notify: notify = true } = {}) {
     documents = [];
     if (notify) onDocumentChange?.();
   }
@@ -61,8 +61,8 @@ export function createAgentComposerAttachmentController({
   }
   function removeDocument(id) {
     const remaining = documents['filter']((entry) => entry['id'] !== String(id || ''));
-    if (remaining['length'] === documents['length']) return ![];
-    return ((documents = remaining), onDocumentChange?.(), !![]);
+    if (remaining['length'] === documents['length']) return false;
+    return ((documents = remaining), onDocumentChange?.(), true);
   }
   function attachDocuments(files = []) {
     const knownKeys = new Set(documents['map']((entry) => documentKey(entry['file'])));
@@ -102,7 +102,7 @@ export function createAgentComposerAttachmentController({
       setNotice?.(text?.('uploadMaterialMissing'));
       return;
     }
-    setBusy?.(!![]);
+    setBusy?.(true);
     try {
       const uploaded = await uploadMaterial(file);
       if (!isContextCurrent(context)) return;
@@ -116,7 +116,7 @@ export function createAgentComposerAttachmentController({
     } catch (error) {
       if (isContextCurrent(context)) setNotice?.(error?.['message'] || text?.('uploadMaterialFailed'));
     } finally {
-      if (isContextCurrent(context)) setBusy?.(![]);
+      if (isContextCurrent(context)) setBusy?.(false);
     }
   }
   return (

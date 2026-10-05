@@ -4,7 +4,7 @@ export function createCollaborationCanvasBinding({
   storage: storage,
   canvasTabs: canvasTabs,
   actorId: actorId,
-  hosting: hosting = !![],
+  hosting: hosting = true,
 }) {
   const value = hosting ? KEY : 'aicanvas.collaboration.guest-canvases.v1',
     store = new Map(),
@@ -91,12 +91,12 @@ export function createCollaborationCanvasBinding({
     },
     async activate(value3) {
       const enabled2 = run2()[actorId() + ':' + value3];
-      if (!enabled2) return ![];
+      if (!enabled2) return false;
       if (
         canvasTabs['getActiveCanvasId']() === enabled2['canvasId'] &&
         (!enabled2['projectId'] || projectId(enabled2['canvasId']) === enabled2['projectId'])
       )
-        return !![];
+        return true;
       const list2 = canvasTabs['getPersistenceRevisionSnapshot']?.()?.['canvases'] || [],
         enabled3 =
           list2['find'](
@@ -106,11 +106,11 @@ export function createCollaborationCanvasBinding({
           ) ||
           (enabled2['projectId'] &&
             list2['find']((value5) => projectId(value5['id']) === enabled2['projectId']));
-      if (!enabled3) return ![];
+      if (!enabled3) return false;
       await canvasTabs['switchTo'](enabled3['id']);
       if (canvasTabs['getActiveCanvasId']() !== enabled3['id'])
         throw new Error('无法切换到此房间的原画布，请先完成当前画布的操作');
-      return !![];
+      return true;
     },
   };
 }

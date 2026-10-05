@@ -130,5 +130,5 @@ export function applyPanoramaCharacterBonePose(value7, value8, value9 = {}) {
     );
     enabled4['quaternion']['multiply'](value11);
   }
-  return (value7?.['updateMatrixWorld']?.(!![]), value7);
+  return (value7?.['updateMatrixWorld']?.(true), value7);
 }

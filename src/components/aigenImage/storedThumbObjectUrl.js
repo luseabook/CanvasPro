@@ -9,7 +9,7 @@ export function scheduleStoredThumbObjectUrl({
   getImage: getImage,
   onResolved: onResolved,
   ownerId: ownerId = '',
-  isCurrent: isCurrent = () => !![],
+  isCurrent: isCurrent = () => true,
 }) {
   const sourceUrl = String(thumbId || '')['trim']();
   if (!sourceUrl || objectUrls['has'](sourceUrl) || pendingLoads['has'](sourceUrl)) return;

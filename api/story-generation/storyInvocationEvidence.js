@@ -1,6 +1,6 @@
 import { withStoryRequestPolicy } from './storyRequestPolicy.js';
 function classifyRequestFailure(value) {
-  return value?.['safeToRetry'] === !![] || value?.['requestSubmitted'] === ![]
+  return value?.['safeToRetry'] === true || value?.['requestSubmitted'] === false
     ? 'not-submitted'
     : 'outcome-unknown';
 }
@@ -37,12 +37,12 @@ export async function invokeStoryGenerationRequest({
   stepId: stepId2,
   attempt: attempt4,
   onInvocation: onInvocation = null,
-  allowTruncatedOutput: allowTruncatedOutput = ![],
+  allowTruncatedOutput: allowTruncatedOutput = false,
   serializeResponse: serializeResponse = (response2) =>
     typeof response2 === 'string' ? response2 : (response2?.['text'] ?? JSON['stringify'](response2)),
 } = {}) {
   requestPayload4 = withStoryRequestPolicy(requestPayload4);
-  if (allowTruncatedOutput) requestPayload4 = { ...requestPayload4, allowTruncatedOutput: !![] };
+  if (allowTruncatedOutput) requestPayload4 = { ...requestPayload4, allowTruncatedOutput: true };
   await onInvocation?.({
     state: 'prepared',
     stepId: stepId2,

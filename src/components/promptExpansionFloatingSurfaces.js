@@ -33,8 +33,8 @@ export function hostPromptFloatingSurfaces(
     }
   });
   return (
-    key['observe'](dom['body'], { childList: !![] }),
-    key['observe'](el, { childList: !![] }),
+    key['observe'](dom['body'], { childList: true }),
+    key['observe'](el, { childList: true }),
     () => {
       key['disconnect']();
       for (const [el4, el5] of map) {

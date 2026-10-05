@@ -7,7 +7,7 @@ import {
 import { separateReplicationGeneratedFields } from './videoReplicationFieldLayout.js';
 import { projectReplicationObservedShots } from './videoReplicationVisualDelivery.js';
 export function usesOriginalAsrSpeech(enabled, value = {}) {
-  if (!enabled['replication']?.['sourceAnalysis']?.['speechEvidence']) return ![];
+  if (!enabled['replication']?.['sourceAnalysis']?.['speechEvidence']) return false;
   const item = enabled['replication']['targetLocale'] || value['replication']?.['targetLocale'] || 'source',
     key = enabled['replication']['sourceAnalysis']['sourceLanguage'];
   return (

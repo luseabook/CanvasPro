@@ -2,7 +2,7 @@ import { mergeStoryPlanningAssets } from './storyPlanningData.js';
 import { getStoryReplicationSubjects } from './storyReplicationReplacement.js';
 import { reconcileStoryReplicationAssetIdentity } from './storyReplicationAssetIdentity.js';
 export function mergeStoryReplicationAssets(value, list = [], item = {}) {
-  const key = item['preserveMedia'] !== ![],
+  const key = item['preserveMedia'] !== false,
     storyReplicationSubjects = getStoryReplicationSubjects(value),
     list2 = key ? reconcileStoryReplicationAssetIdentity(value, storyReplicationSubjects) : [],
     list3 = list2['filter']((index) => index['kind'] === 'character'),

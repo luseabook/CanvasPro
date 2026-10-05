@@ -45,7 +45,7 @@ function getNormalizedProfileIdentity(options = {}) {
   return JSON['stringify'](PROFILE_FIELDS['map']((item) => String(options[item] || '')['trim']()));
 }
 function hasLegacyProfile(key) {
-  if (!isPlainObject(key)) return ![];
+  if (!isPlainObject(key)) return false;
   return LEGACY_PROFILE_HINT_FIELDS['some']((index) =>
     Object['prototype']['hasOwnProperty']['call'](key, index),
   );
@@ -112,7 +112,7 @@ export function normalizeObjectStorageSettings(options4 = {}) {
   !profiles[providerId] && (profiles[providerId] = normalizeObjectStorageProfile({}, providerId));
   const payload =
     profiles[providerId]?.['connectionVerification']?.['status'] === PASSED_OBJECT_STORAGE_CONNECTION_STATUS;
-  return { enabled: enabled2['enabled'] === !![] && payload, providerId: providerId, profiles: profiles };
+  return { enabled: enabled2['enabled'] === true && payload, providerId: providerId, profiles: profiles };
 }
 export function getObjectStorageProviderProfile(options5 = {}, handle) {
   const objectStorageSettings = normalizeObjectStorageSettings(options5),

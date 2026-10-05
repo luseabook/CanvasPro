@@ -54,7 +54,7 @@ export function reportStoryTaskCenter(options2 = {}) {
       createdAt: kind['startedAt'],
       finishedAt: kind['finishedAt'],
       progress: null,
-      cancellable: ![],
+      cancellable: false,
       thumbnail: status === 'complete' ? resultThumbnail(options2, kind) : null,
       navigation: { source: 'story-workspace', projectId: projectId['id'], ...kind['scope'] },
     });

@@ -1,4 +1,4 @@
-let canvasPanShortcutHeld = ![];
+let canvasPanShortcutHeld = false;
 export function setCanvasPanShortcutHeld(
   value,
   {
@@ -6,13 +6,13 @@ export function setCanvasPanShortcutHeld(
     documentObject: documentObject = globalThis['document'],
   } = {},
 ) {
-  canvasPanShortcutHeld = value === !![];
+  canvasPanShortcutHeld = value === true;
   if (windowObject) windowObject['_spaceHeld'] = canvasPanShortcutHeld;
   const el = documentObject?.['getElementById']?.('v2-wrap');
   el && (el['style']['cursor'] = canvasPanShortcutHeld ? 'var(--grab-cursor)' : '');
 }
 export function releaseCanvasPanShortcut(item) {
-  setCanvasPanShortcutHeld(![], item);
+  setCanvasPanShortcutHeld(false, item);
 }
 export function isCanvasPanShortcutHeld() {
   return canvasPanShortcutHeld;

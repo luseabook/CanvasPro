@@ -52,7 +52,7 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     placement: 'advanced',
     variant: 'advancedRow',
     label: '返回尾帧',
-    defaultValue: ![],
+    defaultValue: false,
   }),
   RUNNINGHUB_SEEDANCE_2_5_FIXED_INPUT_SLOTS = Object['freeze'](
     RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS['map']((args) =>
@@ -66,8 +66,8 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
     video: 10,
     audio: 10,
     fixedSlots: RUNNINGHUB_SEEDANCE_2_5_FIXED_INPUT_SLOTS,
-    cycleFixedInputWhenFull: !![],
-    preserveHiddenInputsByKind: !![],
+    cycleFixedInputWhenFull: true,
+    preserveHiddenInputsByKind: true,
     maxTotalDurationSecondsByKind: Object['freeze']({ video: 30, audio: 30 }),
     mediaConstraintsByKind: Object['freeze']({
       image: Object['freeze']({
@@ -132,14 +132,14 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
       path: 'generateAudio',
       from: 'param',
       field: Object['freeze'](['generationParams.generateAudio', 'generateAudio']),
-      defaultValue: !![],
+      defaultValue: true,
       transform: 'booleanParam',
     }),
     Object['freeze']({
       path: 'watermark',
       from: 'param',
       field: Object['freeze'](['generationParams.watermark', 'watermark']),
-      defaultValue: ![],
+      defaultValue: false,
       transform: 'booleanParam',
     }),
     Object['freeze']({
@@ -158,14 +158,14 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
       path: 'webSearch',
       from: 'param',
       field: Object['freeze'](['generationParams.webSearch', 'webSearch']),
-      defaultValue: ![],
+      defaultValue: false,
       transform: 'booleanParam',
     }),
     Object['freeze']({
       path: 'realPersonMode',
       from: 'param',
       field: Object['freeze'](['generationParams.realPersonMode', 'realPersonMode']),
-      defaultValue: ![],
+      defaultValue: false,
       transform: 'booleanParam',
     }),
     Object['freeze']({ path: 'conversionSlots', from: 'constant', value: Object['freeze'](['all']) }),
@@ -174,7 +174,7 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
       path: 'returnLastFrame',
       from: 'param',
       field: Object['freeze'](['generationParams.returnLastFrame', 'returnLastFrame']),
-      defaultValue: ![],
+      defaultValue: false,
       transform: 'booleanParam',
     }),
     Object['freeze']({
@@ -182,13 +182,13 @@ const RUNNINGHUB_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
       from: 'param',
       field: Object['freeze'](['generationParams.seed', 'seed']),
       transform: 'apimartOptionalInteger',
-      omitWhenEmpty: !![],
+      omitWhenEmpty: true,
     }),
   ]),
   RUNNINGHUB_SEEDANCE_2_5_RATIO_POLICY = Object['freeze']({
     ...SEEDANCE_VIDEO_RATIO_POLICY,
-    preserveAdaptive: !![],
-    preserveAdaptiveAtSubmit: !![],
+    preserveAdaptive: true,
+    preserveAdaptiveAtSubmit: true,
   }),
   RUNNINGHUB_SEEDANCE_2_5_HELP_TOOLTIP = [
     'RunningHub Seedance 2.5',
@@ -263,7 +263,7 @@ export const RUNNINGHUB_SEEDANCE_2_5_VIDEO_MODEL = Object['freeze']({
   help: Object['freeze']({ tooltip: RUNNINGHUB_SEEDANCE_2_5_HELP_TOOLTIP }),
   extensions: Object['freeze']({
     segmentRetake: Object['freeze']({
-      supported: !![],
+      supported: true,
       parameterPolicy: Object['freeze']({
         mode: Object['freeze']({ fieldId: 'rh_seedance_2_mode', value: 'multimodal2video' }),
         duration: Object['freeze']({ fieldId: 'duration', value: -1 }),
@@ -275,7 +275,7 @@ export const RUNNINGHUB_SEEDANCE_2_5_VIDEO_MODEL = Object['freeze']({
       label: 'Seedance 2.5',
       subtitle: '最长 30 秒，文生 / 图生 / 首尾帧 / 全能参考',
     }),
-    videoInputSurface: Object['freeze']({ hideFixedInputSlots: !![] }),
+    videoInputSurface: Object['freeze']({ hideFixedInputSlots: true }),
     storyWorkspace: Object['freeze']({ promptMode: 'seedance-2.5' }),
   }),
 });

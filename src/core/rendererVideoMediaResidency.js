@@ -30,7 +30,7 @@ export function createRendererVideoMediaResidencyController({
   getComponent: getComponent,
   getWrapper: getWrapper,
   isMounted: isMounted,
-  isMediaDeferred: isMediaDeferred = (result, data) => data?.['_rendererMediaDeferred'] === !![],
+  isMediaDeferred: isMediaDeferred = (result, data) => data?.['_rendererMediaDeferred'] === true,
   isPlaybackActive: isPlaybackActive,
   isRetentionProtected: isRetentionProtected,
   shouldRetainPresentedMedia: shouldRetainPresentedMedia,
@@ -60,8 +60,8 @@ export function createRendererVideoMediaResidencyController({
   }
   function run4(source, next, current) {
     return (
-      isPlaybackActive?.(source, next, current) === !![] ||
-      isRetentionProtected?.(source, next, current) === !![]
+      isPlaybackActive?.(source, next, current) === true ||
+      isRetentionProtected?.(source, next, current) === true
     );
   }
   function run5(nodeId, enabled3) {
@@ -69,7 +69,7 @@ export function createRendererVideoMediaResidencyController({
     enabled3['timer'] = setTimeout(() => {
       enabled3['timer'] = null;
       if (enabled3['withinResidency']) return;
-      const enabled4 = enabled3['parked'] === !![];
+      const enabled4 = enabled3['parked'] === true;
       if (!enabled4 && !isMounted?.(nodeId)) return;
       const enabled5 = getComponent?.(nodeId),
         entry = getWrapper?.(nodeId);
@@ -89,19 +89,19 @@ export function createRendererVideoMediaResidencyController({
         recordRendererRuntimeDiagnostic({
           kind: 'video-media-suspend',
           nodeId: nodeId,
-          suspended: suspended !== ![],
+          suspended: suspended !== false,
           durationMs: nowMs() - record,
         }),
-        suspended === ![] && !enabled3['withinResidency'] && isMounted?.(nodeId) && run5(nodeId, enabled3));
+        suspended === false && !enabled3['withinResidency'] && isMounted?.(nodeId) && run5(nodeId, enabled3));
     }, options);
   }
   function run6() {
     const enabled6 = map2['keys']()['next']()['value'];
-    if (!enabled6) return ![];
+    if (!enabled6) return false;
     const enabled7 = map['get'](enabled6);
     run3(enabled6);
-    if (!enabled7 || enabled7['withinResidency']) return !![];
-    return (run5(enabled6, enabled7), !![]);
+    if (!enabled7 || enabled7['withinResidency']) return true;
+    return (run5(enabled6, enabled7), true);
   }
   function run7() {
     while (map2['size'] > count2) {
@@ -128,27 +128,27 @@ export function createRendererVideoMediaResidencyController({
         ((enabled8 = {
           timer: null,
           presentedLeaseTimer: null,
-          withinResidency: ![],
-          initialized: ![],
-          parked: ![],
+          withinResidency: false,
+          initialized: false,
+          parked: false,
           leaseKey: '',
         }),
         map['set'](state, enabled8)),
       enabled8
     );
   }
-  function sync(nodeId2, { withinResidency: withinResidency = ![], leaseKey: leaseKey = '' } = {}) {
+  function sync(nodeId2, { withinResidency: withinResidency = false, leaseKey: leaseKey = '' } = {}) {
     if (!nodeId2) return;
     const config = run9(nodeId2),
       scope = String(leaseKey || ''),
-      input = config['initialized'] === !![] && config['leaseKey'] !== scope;
+      input = config['initialized'] === true && config['leaseKey'] !== scope;
     input && (run3(nodeId2), run(config));
     const output = config['withinResidency'],
       enabled9 = config['initialized'];
-    ((config['initialized'] = !![]),
-      (config['parked'] = ![]),
+    ((config['initialized'] = true),
+      (config['parked'] = false),
       (config['leaseKey'] = scope),
-      (config['withinResidency'] = withinResidency === !![]));
+      (config['withinResidency'] = withinResidency === true));
     if (config['withinResidency']) {
       (run3(nodeId2), run(config));
       const value2 = getComponent?.(nodeId2);
@@ -159,7 +159,7 @@ export function createRendererVideoMediaResidencyController({
           recordRendererRuntimeDiagnostic({
             kind: 'video-media-resume',
             nodeId: nodeId2,
-            resumed: resumed !== ![],
+            resumed: resumed !== false,
             durationMs: nowMs() - value3,
           });
       }
@@ -173,7 +173,7 @@ export function createRendererVideoMediaResidencyController({
       count2 > 0 &&
       count > 0 &&
       (input || !enabled9 || output) &&
-      shouldRetainPresentedMedia?.(nodeId2, getComponent?.(nodeId2), getWrapper?.(nodeId2)) === !![]
+      shouldRetainPresentedMedia?.(nodeId2, getComponent?.(nodeId2), getWrapper?.(nodeId2)) === true
     ) {
       run8(nodeId2, config);
       return;
@@ -183,19 +183,19 @@ export function createRendererVideoMediaResidencyController({
   }
   function park(
     enabled10,
-    { retainPresentedMedia: retainPresentedMedia = ![], leaseKey: leaseKey = '' } = {},
+    { retainPresentedMedia: retainPresentedMedia = false, leaseKey: leaseKey = '' } = {},
   ) {
     if (!enabled10) return;
     const value4 = run9(enabled10);
     (run(value4),
       run3(enabled10),
-      (value4['initialized'] = !![]),
-      (value4['withinResidency'] = ![]),
-      (value4['parked'] = !![]),
+      (value4['initialized'] = true),
+      (value4['withinResidency'] = false),
+      (value4['parked'] = true),
       (value4['leaseKey'] = String(leaseKey || '')));
     const value5 = getComponent?.(enabled10),
       value6 = getWrapper?.(enabled10);
-    if (retainPresentedMedia === !![] && count2 > 0 && count > 0 && !run4(enabled10, value5, value6)) {
+    if (retainPresentedMedia === true && count2 > 0 && count > 0 && !run4(enabled10, value5, value6)) {
       run8(enabled10, value4);
       return;
     }
@@ -207,12 +207,12 @@ export function createRendererVideoMediaResidencyController({
   }
   function unpark(value7) {
     const enabled11 = map['get'](value7);
-    if (!enabled11 || enabled11['parked'] !== !![]) return;
-    (run(enabled11), run3(value7), (enabled11['parked'] = ![]));
+    if (!enabled11 || enabled11['parked'] !== true) return;
+    (run(enabled11), run3(value7), (enabled11['parked'] = false));
   }
   function isHydrationAllowed(value8) {
     const enabled12 = map['get'](value8);
-    if (!enabled12 || enabled12['withinResidency']) return !![];
+    if (!enabled12 || enabled12['withinResidency']) return true;
     const value9 = getComponent?.(value8),
       value10 = getWrapper?.(value8);
     return run4(value8, value9, value10);

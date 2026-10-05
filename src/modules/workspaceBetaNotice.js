@@ -2,14 +2,14 @@ function hasSeenWorkspaceBetaNotice(value, item) {
   try {
     return value?.['localStorage']?.['getItem']?.(item) === '1';
   } catch {
-    return ![];
+    return false;
   }
 }
 function markWorkspaceBetaNoticeSeen(key, index) {
   try {
-    return (key?.['localStorage']?.['setItem']?.(index, '1'), !![]);
+    return (key?.['localStorage']?.['setItem']?.(index, '1'), true);
   } catch {
-    return ![];
+    return false;
   }
 }
 export function hasSeenBetaNotice({
@@ -31,8 +31,8 @@ export function showWorkspaceBetaNotice({
   title: title = '',
   message: message = '',
 } = {}) {
-  if (!documentObject?.['body']) return ![];
-  if (hasSeenWorkspaceBetaNotice(windowObject, storageKey)) return ![];
+  if (!documentObject?.['body']) return false;
+  if (hasSeenWorkspaceBetaNotice(windowObject, storageKey)) return false;
   markWorkspaceBetaNoticeSeen(windowObject, storageKey);
   const result = 'story-beta-notice-overlay',
     el = documentObject['getElementById'](result);
@@ -53,14 +53,14 @@ export function showWorkspaceBetaNotice({
   ((el6['type'] = 'button'),
     (el6['className'] = 'confirm-btn confirm-ok'),
     (el6['textContent'] = '我知道了'));
-  let options = ![];
+  let options = false;
   const target = (event) => {
       if (event['key'] !== 'Escape') return;
       (event['preventDefault'](), handler());
     },
     handler = () => {
       if (options) return;
-      ((options = !![]), documentObject['removeEventListener']('keydown', target, !![]), el2['remove']());
+      ((options = true), documentObject['removeEventListener']('keydown', target, true), el2['remove']());
     };
   return (
     (el2['_workspaceNoticeClose'] = handler),
@@ -72,8 +72,8 @@ export function showWorkspaceBetaNotice({
     data['append'](el3, el4, el5),
     el2['appendChild'](data),
     documentObject['body']['appendChild'](el2),
-    documentObject['addEventListener']('keydown', target, !![]),
+    documentObject['addEventListener']('keydown', target, true),
     el6['focus']?.(),
-    !![]
+    true
   );
 }

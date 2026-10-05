@@ -24,14 +24,14 @@ export function bindVideoRemoveAction(item) {
     (bindRunningHubToolbarTaskButton({
       button: button,
       getTask: () => getRunningVideoKeyingTaskForNode(nodeData['id'], { mode: 'remove' }),
-      cancelTask: () => cancelVideoKeyingTaskForNode(nodeData['id'], { mode: 'remove', notify: !![] }),
+      cancelTask: () => cancelVideoKeyingTaskForNode(nodeData['id'], { mode: 'remove', notify: true }),
       cancelTooltip: videoToolbarText('cancelRemoveTask'),
     }),
     button['addEventListener']('click', (event) => {
       if (hasRunningVideoKeyingTaskForNode(nodeData['id'], { mode: 'remove' })) {
         (event['preventDefault'](),
           event['stopPropagation'](),
-          void cancelVideoKeyingTaskForNode(nodeData['id'], { mode: 'remove', notify: !![] }));
+          void cancelVideoKeyingTaskForNode(nodeData['id'], { mode: 'remove', notify: true }));
         return;
       }
       event['stopPropagation']();
@@ -44,7 +44,7 @@ export function bindVideoRemoveAction(item) {
         window['showToast']?.(videoToolbarText('exitClipMode'), 'info');
         return;
       }
-      (VideoClipController['exit']({ silent: !![] }),
+      (VideoClipController['exit']({ silent: true }),
         window['v2FocusOnNode']
           ? (window['v2FocusOnNode'](nodeData['id'], VIDEO_TOOLBAR_FOCUS_PADDING, VIDEO_TOOLBAR_FOCUS_DURATION_MS, VIDEO_TOOLBAR_FOCUS_MAX_ZOOM),
             setTimeout(() => {

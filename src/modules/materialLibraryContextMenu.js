@@ -33,28 +33,28 @@ export function createMaterialLibraryContextMenuController({
       (presentMenu2?.['close']?.(), (presentMenu2 = null));
     },
     handler = (ownerElement, list) => {
-      if (!list['length']) return ![];
+      if (!list['length']) return false;
       return (
         ownerElement['preventDefault'](),
         ownerElement['stopPropagation'](),
         closeAssetMenu?.(),
         (presentMenu2 = presentMenu(ownerElement['clientX'], ownerElement['clientY'], list, {
-          ensureItemIcons: !![],
+          ensureItemIcons: true,
           ownerElement: ownerElement['target'],
           ownerRoot: getPanel?.(),
         })),
-        !![]
+        true
       );
     },
     handleContextMenu = (event) => {
-      if (event['target']?.['closest']?.(EDITABLE_SELECTOR)) return ![];
+      if (event['target']?.['closest']?.(EDITABLE_SELECTOR)) return false;
       const enabled = getPanel?.(),
         el2 = event['target']?.['closest']?.('.v2-material-item-row');
       if (el2 && enabled?.['contains']?.(el2)) {
         const enabled2 = String(el2['dataset']['assetId'] || ''),
           value = Number(el2['dataset']['itemIndex']),
           el3 = el2['querySelector']?.('[data-ui-action="material-item-rename"]');
-        if (!enabled2 || !Number['isInteger'](value)) return ![];
+        if (!enabled2 || !Number['isInteger'](value)) return false;
         const list2 = [
           {
             label: getText?.('loadToCanvas') || '',
@@ -81,18 +81,18 @@ export function createMaterialLibraryContextMenuController({
             el4['querySelector']?.('[data-asset-id]')?.['dataset']?.['assetId'] ||
             '',
         );
-        if (!enabled3) return ![];
+        if (!enabled3) return false;
         return (
           event['preventDefault'](),
           event['stopPropagation'](),
           close(),
           removePresentedMenus?.(),
           openAssetMenu?.(enabled3, el4),
-          !![]
+          true
         );
       }
       const el5 = event['target']?.['closest']?.('.v2-material-folder-row');
-      if (!el5 || !enabled?.['contains']?.(el5)) return ![];
+      if (!el5 || !enabled?.['contains']?.(el5)) return false;
       const list3 = Array['from'](el5['querySelectorAll']?.(FOLDER_ACTION_SELECTOR) || []);
       return handler(
         event,
@@ -100,7 +100,7 @@ export function createMaterialLibraryContextMenuController({
           label: getActionLabel(disabled),
           icon: MATERIAL_CONTEXT_MENU_ICONS[disabled['dataset']['uiAction']] || 'action',
           shortcutActionId: MATERIAL_CONTEXT_MENU_SHORTCUTS[disabled['dataset']['uiAction']],
-          disabled: disabled['disabled'] === !![] || disabled['getAttribute']?.('aria-disabled') === 'true',
+          disabled: disabled['disabled'] === true || disabled['getAttribute']?.('aria-disabled') === 'true',
           danger: disabled['dataset']['uiAction'] === 'material-folder-delete-request',
           action: () => disabled['click']?.(),
         })),

@@ -36,7 +36,7 @@ export function createNativeContextMenuIconFactory(
     const svgMarkup = renderNativeContextMenuSvg(definition, stroke),
       dataUrl = 'data:image/svg+xml;base64,' + Buffer['from'](svgMarkup, 'utf8')['toString']('base64'),
       nativeIcon = nativeImageApi['createFromDataURL'](dataUrl);
-    if (!nativeIcon || nativeIcon['isEmpty']?.() === !![]) return null;
+    if (!nativeIcon || nativeIcon['isEmpty']?.() === true) return null;
     const sizedIcon =
       typeof nativeIcon['resize'] === 'function'
         ? nativeIcon['resize']({ width: size, height: size, quality: 'best' })

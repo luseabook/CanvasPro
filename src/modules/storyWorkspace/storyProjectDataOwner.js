@@ -12,8 +12,8 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
   const map = new Map();
   function run(result) {
     const projectId = getProjectId(result);
-    if (!projectId) return ![];
-    return (map['set'](projectId, result), !![]);
+    if (!projectId) return false;
+    return (map['set'](projectId, result), true);
   }
   function getEntry(data) {
     const text = normalizeText(data);
@@ -31,10 +31,10 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
   }
   function run2(
     title,
-    { isCurrent: isCurrent = title === state['data'], projectTitleEdited: projectTitleEdited = ![] } = {},
+    { isCurrent: isCurrent = title === state['data'], projectTitleEdited: projectTitleEdited = false } = {},
   ) {
     const id = getProjectId(title);
-    if (!id) return ![];
+    if (!id) return false;
     run(title);
     const list = (state['projects'] ||= []),
       count = list['findIndex']((source) => getEntryId(source) === id),
@@ -46,8 +46,8 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
         createdAt: Number(args['createdAt'] || 0) || Date['now'](),
         updatedAt: Date['now'](),
         projectTitleEdited: isCurrent
-          ? state['projectTitleEdited'] === !![]
-          : projectTitleEdited === !![] || args['projectTitleEdited'] === !![],
+          ? state['projectTitleEdited'] === true
+          : projectTitleEdited === true || args['projectTitleEdited'] === true,
         ui:
           isCurrent && state['view'] !== 'home'
             ? createStoryProjectUiState(state)
@@ -56,16 +56,16 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
       };
     if (count >= 0) list[count] = next;
     else list['unshift'](next);
-    return !![];
+    return true;
   }
   function syncCurrentEntry() {
-    return state['hasCreatedProject'] === !![] && run2(state['data']);
+    return state['hasCreatedProject'] === true && run2(state['data']);
   }
   function registerTaskData(current) {
     return isStoryProjectTaskTokenLive(state, current) && run(current['data']);
   }
   function syncTaskEntry(projectTitleEdited2) {
-    if (!isStoryProjectTaskTokenLive(state, projectTitleEdited2)) return ![];
+    if (!isStoryProjectTaskTokenLive(state, projectTitleEdited2)) return false;
     return run2(projectTitleEdited2['data'], {
       isCurrent: isStoryProjectTaskTokenCurrent(state, projectTitleEdited2),
       projectTitleEdited: projectTitleEdited2['projectTitleEdited'],
@@ -83,13 +83,13 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
   }
   function addEntry(args2) {
     const id2 = getEntryId(args2);
-    if (!id2 || !args2?.['data']?.['project']) return ![];
+    if (!id2 || !args2?.['data']?.['project']) return false;
     const payload = (state['projects'] ||= []);
-    if (getEntry(id2)) return ![];
+    if (getEntry(id2)) return false;
     return (
       run(args2['data']),
       payload['unshift']({ ...args2, id: id2, data: cloneData(args2['data']) }),
-      !![]
+      true
     );
   }
   function removeEntry(handle) {
@@ -101,7 +101,7 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
       state['projects']['length'] !== list2['length']
     );
   }
-  function restoreEntries(scope, { preserveLive: preserveLive = ![] } = {}) {
+  function restoreEntries(scope, { preserveLive: preserveLive = false } = {}) {
     if (!preserveLive) map['clear']();
     state['projects'] = (scope || [])['map']((args3) => {
       const entryId = getEntryId(args3),
@@ -123,13 +123,13 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
     return [...args4]['map'](getData)['filter'](Boolean);
   }
   function applyChanges(handler) {
-    let changed = ![],
-      currentProjectChanged = ![];
+    let changed = false,
+      currentProjectChanged = false;
     for (const output of getAllData()) {
       const isCurrent2 = output === state['data'];
       if (!handler(output, { isCurrent: isCurrent2 })) continue;
       if (!isCurrent2 || state['hasCreatedProject']) run2(output, { isCurrent: isCurrent2 });
-      ((changed = !![]), (currentProjectChanged ||= isCurrent2));
+      ((changed = true), (currentProjectChanged ||= isCurrent2));
     }
     return { changed: changed, currentProjectChanged: currentProjectChanged };
   }

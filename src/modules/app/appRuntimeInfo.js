@@ -26,10 +26,10 @@ export async function initAppRuntimeInfo({
       runtimeInfo2
     );
   } catch (value) {
-    const runtimeInfo3 = { isDevBuild: ![], isAdvancedMode: ![] };
+    const runtimeInfo3 = { isDevBuild: false, isAdvancedMode: false };
     return (
       publishAppRuntimeInfo({ runtimeInfo: runtimeInfo3, windowObject: windowObject, EventCtor: EventCtor }),
-      initDevEntries?.({ isDevBuild: ![] }),
+      initDevEntries?.({ isDevBuild: false }),
       runtimeInfo3
     );
   }

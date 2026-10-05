@@ -46,7 +46,7 @@ const isFiniteCommandPoint = (box) =>
     MAX_MATTING_BRUSH_SIZE_PX +
     '" step="1"></div>\n      <div class="v2-matting-divider"></div>\n      <button class="v2-matting-btn icon-only act-undo" data-matting-tooltip="undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a6 6 0 1 1 0 12h-3"/></svg></button>\n      <button class="v2-matting-btn icon-only act-redo" data-matting-tooltip="redo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M15 14l4-4-4-4"/><path d="M19 10H10a6 6 0 1 0 0 12h3"/></svg></button>\n      <button class="v2-matting-btn icon-only act-clear" data-matting-tooltip="clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 16h10l1-16"/></svg></button>\n      <button class="v2-matting-btn v2-matting-save act-save"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M19 21H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2Z"/><path d="M17 21v-8H7v8"/><path d="M7 3v4h8"/></svg><span class="v2-matting-save-label"></span></button>\n    ',
   ImageMattingController = {
-    active: ![],
+    active: false,
     nodeId: null,
     nodeData: null,
     overlayEl: null,
@@ -58,15 +58,15 @@ const isFiniteCommandPoint = (box) =>
     sizeRangeEl: null,
     toolButtons: null,
     cursorEl: null,
-    _cursorHover: ![],
+    _cursorHover: false,
     _cursorLast: { x: 0, y: 0 },
     _cursorRaf: 0,
     _unsubscribe: null,
     _commands: [],
     _redoStack: [],
     _draft: null,
-    _dirty: ![],
-    _baseMaskCleared: ![],
+    _dirty: false,
+    _baseMaskCleared: false,
     _view: null,
     _normalMaskCanvas: null,
     _normalOverlayCanvas: null,
@@ -74,7 +74,7 @@ const isFiniteCommandPoint = (box) =>
     _alphaOverlayCanvas: null,
     _fillRegionCache: null,
     _unsubscribeLocale: null,
-    _isSaving: ![],
+    _isSaving: false,
     init(nodeId) {
       if (this['active']) return;
       const viewport = appStore['getStateRaw'](),
@@ -89,16 +89,16 @@ const isFiniteCommandPoint = (box) =>
         tool = map['has'](viewport['matting']?.['tool']) ? viewport['matting']['tool'] : 'brush',
         brushSizePx = clampMattingBrushSize(viewport['matting']?.['brushSizePx']),
         brushMode = viewport['matting']?.['brushMode'] || 'normal';
-      ((this['active'] = !![]),
+      ((this['active'] = true),
         (this['nodeId'] = nodeId),
         (this['nodeData'] = node),
         (this['_commands'] = []),
         (this['_redoStack'] = []),
         (this['_draft'] = null),
-        (this['_dirty'] = ![]),
-        (this['_baseMaskCleared'] = ![]),
+        (this['_dirty'] = false),
+        (this['_baseMaskCleared'] = false),
         (this['_fillRegionCache'] = new Map()),
-        (this['_isSaving'] = ![]),
+        (this['_isSaving'] = false),
         (this['_view'] = {
           tool: tool,
           brushSizePx: brushSizePx,
@@ -107,7 +107,7 @@ const isFiniteCommandPoint = (box) =>
           node: node,
         }),
         appStore['setMattingState']({
-          active: !![],
+          active: true,
           nodeId: nodeId,
           tool: tool,
           brushSizePx: brushSizePx,
@@ -181,33 +181,33 @@ const isFiniteCommandPoint = (box) =>
             this['_cancelImageReadyWait'] = null;
             if (!this['active']) return;
             (window['showToast']?.(imageMattingText('errors.imageLoadFailed'), 'error'),
-              this['exit']({ silent: !![] }));
+              this['exit']({ silent: true }));
           },
         })));
     },
-    exit({ silent: silent = ![] } = {}) {
+    exit({ silent: silent = false } = {}) {
       if (!this['active']) return;
       (this['_unsubscribeViewportPreview']?.(),
         (this['_unsubscribeViewportPreview'] = null),
         this['_cancelImageReadyWait']?.(),
         (this['_cancelImageReadyWait'] = null));
       !silent && this['_dirty'] && window['showToast']?.(imageMattingText('toasts.cancelled'), 'ok');
-      ((this['active'] = ![]),
+      ((this['active'] = false),
         (this['nodeId'] = null),
         (this['nodeData'] = null),
         (this['_commands'] = []),
         (this['_redoStack'] = []),
         (this['_draft'] = null),
-        (this['_dirty'] = ![]),
+        (this['_dirty'] = false),
         (this['_normalMaskCanvas'] = null),
         (this['_normalOverlayCanvas'] = null),
         (this['_alphaMaskCanvas'] = null),
         (this['_alphaOverlayCanvas'] = null),
         this['_unsubscribeLocale']?.(),
         (this['_unsubscribeLocale'] = null),
-        (this['_isSaving'] = ![]),
+        (this['_isSaving'] = false),
         (this['_fillRegionCache'] = null),
-        appStore['setMattingState']({ active: ![], nodeId: null }));
+        appStore['setMattingState']({ active: false, nodeId: null }));
       this['_unsubscribe'] && (this['_unsubscribe'](), (this['_unsubscribe'] = null));
       if (this['overlayEl']) this['overlayEl']['remove']();
       if (this['toolbarEl']) this['toolbarEl']['remove']();
@@ -220,7 +220,7 @@ const isFiniteCommandPoint = (box) =>
         (this['sizeRangeEl'] = null),
         (this['toolButtons'] = null),
         (this['cursorEl'] = null),
-        (this['_cursorHover'] = ![]),
+        (this['_cursorHover'] = false),
         (this['_cursorLast'] = { x: 0, y: 0 }),
         (this['_cursorRaf'] = 0),
         (this['_view'] = null));
@@ -233,7 +233,7 @@ const isFiniteCommandPoint = (box) =>
       const current = document['createElement']('img');
       ((current['className'] = 'v2-matting-img'),
         (current['src'] = source),
-        (current['draggable'] = ![]));
+        (current['draggable'] = false));
       const entry = document['createElement']('canvas');
       entry['className'] = 'v2-matting-canvas';
       const el3 = document['createElement']('div');
@@ -277,7 +277,7 @@ const isFiniteCommandPoint = (box) =>
         }
         (event['preventDefault'](), event['stopPropagation']());
       };
-      this['overlayEl']['addEventListener']('wheel', payload, { passive: ![] });
+      this['overlayEl']['addEventListener']('wheel', payload, { passive: false });
       const config = () => {
         if (this['_view']) this['_updateView'](this['_view']);
       };
@@ -321,7 +321,7 @@ const isFiniteCommandPoint = (box) =>
         }));
       const input = this['canvasEl']['getContext']('2d');
       ((input['lineCap'] = 'round'), (input['lineJoin'] = 'round'));
-      const event10 = { down: ![], pointerId: null },
+      const event10 = { down: false, pointerId: null },
         handler2 = (x2, y2) => {
           this['_cursorLast'] = { x: x2, y: y2 };
           if (this['_cursorRaf']) return;
@@ -332,7 +332,7 @@ const isFiniteCommandPoint = (box) =>
         handler3 = (output, value2, value3, value4 = 0) => {
           const state2 = appStore['getStateRaw'](),
             box2 = state2['nodes']?.[this['nodeId']];
-          if (!box2) return ![];
+          if (!box2) return false;
           const x3 = screenToWorld(output, value2, state2['viewport']);
           if (
             !isPointInRect(
@@ -344,13 +344,13 @@ const isFiniteCommandPoint = (box) =>
               box2['height'],
             )
           )
-            return ![];
+            return false;
           const value5 = { x: x3['x'] - box2['x'], y: x3['y'] - box2['y'] },
             value6 = state2['matting']?.['tool'] || 'brush';
           if (value6 === 'bucket') {
             const clampMattingBrushSize3 = clampMattingBrushSize(state2['matting']?.['brushSizePx']),
               value7 = clampMattingBrushSize3 / (state2['viewport']['zoom'] || 1);
-            return (this['_fillArea'](value5, value7), !![]);
+            return (this['_fillArea'](value5, value7), true);
           }
           const clampMattingBrushSize4 = clampMattingBrushSize(state2['matting']?.['brushSizePx']),
             sizeWorld = clampMattingBrushSize4 / (state2['viewport']['zoom'] || 1),
@@ -364,11 +364,11 @@ const isFiniteCommandPoint = (box) =>
                   points: [value5],
                   mode: mode,
                 }),
-            (event10['down'] = !![]),
+            (event10['down'] = true),
             (event10['pointerId'] = value3),
             this['canvasEl']['setPointerCapture'](value3),
             this['_render'](),
-            !![]
+            true
           );
         },
         handler4 = (value8, value9) => {
@@ -383,14 +383,14 @@ const isFiniteCommandPoint = (box) =>
         handler5 = () => {
           if (!event10['down'] || !this['_draft']) return;
           const value11 = this['_draft'];
-          ((this['_draft'] = null), (event10['down'] = ![]), (event10['pointerId'] = null));
+          ((this['_draft'] = null), (event10['down'] = false), (event10['pointerId'] = null));
           if (shouldDiscardStrokeCommand(value11)) {
             this['_render']();
             return;
           }
           (this['_commands']['push'](value11),
             (this['_redoStack'] = []),
-            (this['_dirty'] = !![]),
+            (this['_dirty'] = true),
             this['_render']());
         };
       (this['canvasEl']['addEventListener']('pointerdown', (event11) => {
@@ -418,10 +418,10 @@ const isFiniteCommandPoint = (box) =>
             handler5());
         }),
         this['canvasEl']['addEventListener']('pointerenter', (event15) => {
-          ((this['_cursorHover'] = !![]), handler2(event15['clientX'], event15['clientY']));
+          ((this['_cursorHover'] = true), handler2(event15['clientX'], event15['clientY']));
         }),
         this['canvasEl']['addEventListener']('pointerleave', () => {
-          ((this['_cursorHover'] = ![]), this['_syncCursor']());
+          ((this['_cursorHover'] = false), this['_syncCursor']());
         }));
     },
     _onCanvasWheel(event16) {
@@ -572,14 +572,14 @@ const isFiniteCommandPoint = (box) =>
       const boundarySource = this['_commands'],
         normalMaskCtx = this['_prepareNormalMaskCanvas'](value29, value30),
         alphaMaskCtx = this['_prepareAlphaMaskCanvas'](value29, value30);
-      this['_renderCommands'](ctx, value28, boundarySource, ![], {
+      this['_renderCommands'](ctx, value28, boundarySource, false, {
         normalMaskCtx: normalMaskCtx,
         alphaMaskCtx: alphaMaskCtx,
         boundarySource: boundarySource,
       });
       if (this['_draft']) {
         const boundarySource2 = boundarySource['concat']([this['_draft']]);
-        this['_renderCommands'](ctx, value28, [this['_draft']], !![], {
+        this['_renderCommands'](ctx, value28, [this['_draft']], true, {
           normalMaskCtx: normalMaskCtx,
           alphaMaskCtx: alphaMaskCtx,
           boundarySource: boundarySource2,
@@ -698,7 +698,7 @@ const isFiniteCommandPoint = (box) =>
         ctx6['drawImage'](this['_alphaOverlayCanvas'], 0, 0, value45, value46),
         ctx6['restore']());
     },
-    _renderCommands(ctx8, box12, list, value49 = ![], cache = {}) {
+    _renderCommands(ctx8, box12, list, value49 = false, cache = {}) {
       const zoom2 = box12['zoom'] || 1,
         width = Number(this['canvasEl']?.['style']?.['width']?.['replace']('px', '')) || 1,
         height = Number(this['canvasEl']?.['style']?.['height']?.['replace']('px', '')) || 1,
@@ -907,26 +907,26 @@ const isFiniteCommandPoint = (box) =>
         };
       (this['_commands']['push'](value66),
         (this['_redoStack'] = []),
-        (this['_dirty'] = !![]),
+        (this['_dirty'] = true),
         this['_render']());
     },
     _undo() {
       if (this['_commands']['length'] === 0) return;
       const value67 = this['_commands']['pop']();
-      (this['_redoStack']['push'](value67), (this['_dirty'] = !![]), this['_render']());
+      (this['_redoStack']['push'](value67), (this['_dirty'] = true), this['_render']());
     },
     _redo() {
       if (this['_redoStack']['length'] === 0) return;
       const value68 = this['_redoStack']['pop']();
-      (this['_commands']['push'](value68), (this['_dirty'] = !![]), this['_render']());
+      (this['_commands']['push'](value68), (this['_dirty'] = true), this['_render']());
     },
     _clear() {
       if (this['_commands']['length'] === 0 && this['_redoStack']['length'] === 0) return;
       ((this['_commands'] = []),
         (this['_redoStack'] = []),
         (this['_draft'] = null),
-        (this['_dirty'] = !![]),
-        (this['_baseMaskCleared'] = !![]),
+        (this['_dirty'] = true),
+        (this['_baseMaskCleared'] = true),
         this['_render']());
     },
     async _save() {
@@ -939,7 +939,7 @@ const isFiniteCommandPoint = (box) =>
       const el13 = this['toolbarEl']['querySelector']('.act-save'),
         el14 = el13['querySelector']('span'),
         value69 = el14 ? el14['textContent'] : '';
-      this['_isSaving'] = !![];
+      this['_isSaving'] = true;
       if (el14) el14['textContent'] = imageMattingText('actions.saving');
       el13['style']['pointerEvents'] = 'none';
       try {
@@ -984,7 +984,7 @@ const isFiniteCommandPoint = (box) =>
             maskSaveToken: null,
           }),
             window['_triggerLocalCacheSave']?.(),
-            this['exit']({ silent: !![] }));
+            this['exit']({ silent: true }));
           return;
         }
         const value74 = this['_baseMaskCleared'] ? '' : normalizeLocalPath(box16?.['mask']),
@@ -993,7 +993,7 @@ const isFiniteCommandPoint = (box) =>
         const maskPreviewUrl = URL['createObjectURL'](enabled4);
         (appStore['updateNodeData'](value70, { maskPreviewUrl: maskPreviewUrl, maskSaveToken: maskSaveToken }),
           window['_triggerLocalCacheSave']?.(),
-          this['exit']({ silent: !![] }),
+          this['exit']({ silent: true }),
           (async () => {
             const box18 = await this['_loadImage'](enabled3),
               width2 = box18['naturalWidth'] || box18['width'],
@@ -1014,7 +1014,7 @@ const isFiniteCommandPoint = (box) =>
               box20 = document['createElement']('canvas');
             ((box20['width'] = width2), (box20['height'] = height2));
             const ctx12 = box20['getContext']('2d');
-            ctx12['imageSmoothingEnabled'] = ![];
+            ctx12['imageSmoothingEnabled'] = false;
             const fillStyle2 = getCssVar('--canvas-white'),
               cssVar = getCssVar('--canvas-black');
             ((ctx12['fillStyle'] = cssVar), ctx12['fillRect'](0, 0, width2, height2));
@@ -1091,7 +1091,7 @@ const isFiniteCommandPoint = (box) =>
             });
             const value93 = ctx12['getImageData'](0, 0, width2, height2)['data'],
               value94 = Math['max'](1, Math['floor'](Math['max'](width2, height2) / 256));
-            let enabled5 = ![];
+            let enabled5 = false;
             for (let value95 = 0; value95 < height2 && !enabled5; value95 += value94) {
               for (let value96 = 0; value96 < width2; value96 += value94) {
                 const value97 = (value95 * width2 + value96) * 4,
@@ -1099,7 +1099,7 @@ const isFiniteCommandPoint = (box) =>
                   count5 = value93[value97 + 1],
                   count6 = value93[value97 + 2];
                 if (count4 > 5 || count5 > 5 || count6 > 5) {
-                  enabled5 = !![];
+                  enabled5 = true;
                   break;
                 }
               }
@@ -1162,7 +1162,7 @@ const isFiniteCommandPoint = (box) =>
       } finally {
         if (el14) el14['textContent'] = value69;
         ((el13['style']['pointerEvents'] = 'auto'),
-          (this['_isSaving'] = ![]),
+          (this['_isSaving'] = false),
           this['_syncLocaleTexts']());
       }
     },
@@ -1201,7 +1201,7 @@ const isFiniteCommandPoint = (box) =>
         value109 = Math['max'](1, Number(box24?.['naturalHeight'] || box24?.['height']) || 1),
         box25 = document['createElement']('canvas');
       ((box25['width'] = value108), (box25['height'] = value109));
-      const ctx13 = box25['getContext']('2d', { willReadFrequently: !![] });
+      const ctx13 = box25['getContext']('2d', { willReadFrequently: true });
       if (!ctx13) return null;
       ctx13['drawImage'](box24, 0, 0, value108, value109);
       const value110 = ctx13['getImageData'](0, 0, value108, value109),

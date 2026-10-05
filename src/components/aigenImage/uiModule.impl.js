@@ -2340,10 +2340,10 @@ const AIGEN_IMAGE_MULTI_STACK_MOTION_DURATION_MS = 500;
 const AIGEN_IMAGE_BACKPLATE_MEDIA_HIDE_CLEAR_DELAY_MS = 180;
 
 export function shouldShowImagePromptInput(enabled36) {
-  if (!enabled36 || typeof enabled36 !== 'object') return !![];
-  if (enabled36?.['prompt']?.['visible'] === ![]) return ![];
-  if (enabled36?.['prompt']?.['hidden'] === !![]) return ![];
-  return !![];
+  if (!enabled36 || typeof enabled36 !== 'object') return true;
+  if (enabled36?.['prompt']?.['visible'] === false) return false;
+  if (enabled36?.['prompt']?.['hidden'] === true) return false;
+  return true;
 }
 
 function getRhAiAppImageResultMediaKey(options3 = {}) {
@@ -2387,17 +2387,17 @@ function flushAIGenImageReferenceUploadNodes(list21 = []) {
   const value197 = Array['from'](
     new Set(list21['map']((value198) => String(value198 || '')['trim']())['filter'](Boolean)),
   );
-  if (value197['length'] === 0) return ![];
+  if (value197['length'] === 0) return false;
   const value199 = globalThis['window']?.['v2Renderer'];
   if (typeof value199?.['flushNodes'] === 'function')
     try {
-      if (value199['flushNodes'](value197) === !![]) return !![];
+      if (value199['flushNodes'](value197) === true) return true;
     } catch {}
-  if (typeof value199?.['flushNode'] !== 'function') return ![];
-  let value200 = ![];
+  if (typeof value199?.['flushNode'] !== 'function') return false;
+  let value200 = false;
   for (const value201 of value197) {
     try {
-      value200 = value199['flushNode'](value201) === !![] || value200;
+      value200 = value199['flushNode'](value201) === true || value200;
     } catch {}
   }
   return value200;

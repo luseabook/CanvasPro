@@ -29,18 +29,18 @@ export function createRendererVideoHydrationBackpressure({
   longFrameThresholdMs: longFrameThresholdMs = DEFAULT_LONG_FRAME_THRESHOLD_MS,
   maxNonPriorityBlockMs: maxNonPriorityBlockMs = DEFAULT_MAX_NON_PRIORITY_BLOCK_MS,
 } = {}) {
-  let enabled = !![],
+  let enabled = true,
     requestFrame2 = null,
     requestFrame3 = null,
     item = 0,
     key = 0,
-    enabled2 = !![],
+    enabled2 = true,
     value2 = null,
-    enabled3 = ![];
+    enabled3 = false;
   const run = () => {
       if (requestFrame2 !== null) return;
       requestFrame2 = requestFrame(() => {
-        ((requestFrame2 = null), (enabled = !![]));
+        ((requestFrame2 = null), (enabled = true));
       });
     },
     handler2 = () => {
@@ -56,7 +56,7 @@ export function createRendererVideoHydrationBackpressure({
           (result <= Math['max'](16, Number(longFrameThresholdMs) || 0) ||
             data >= Math['max'](0, Number(maxNonPriorityBlockMs) || 0))
         ) {
-          ((enabled2 = !![]), (enabled3 = !![]));
+          ((enabled2 = true), (enabled3 = true));
           return;
         }
         handler2();
@@ -68,18 +68,18 @@ export function createRendererVideoHydrationBackpressure({
     (value2 === null && (value2 = options),
       (item = Math['max'](item, options + Math['max'](0, Number(priorityCooldownMs) || 0))),
       (key = options),
-      (enabled2 = ![]),
+      (enabled2 = false),
       handler2());
   }
-  function tryAcquire({ priority: priority = ![] } = {}) {
-    if (priority) return (markPriorityWork(), !![]);
-    if (!enabled3 && (!enabled2 || (Number(now()) || 0) < item)) return ![];
-    if (!enabled) return ![];
+  function tryAcquire({ priority: priority = false } = {}) {
+    if (priority) return (markPriorityWork(), true);
+    if (!enabled3 && (!enabled2 || (Number(now()) || 0) < item)) return false;
+    if (!enabled) return false;
     return (
-      (enabled = ![]),
-      enabled3 && ((enabled3 = ![]), (value2 = null), (item = 0), (enabled2 = !![])),
+      (enabled = false),
+      enabled3 && ((enabled3 = false), (value2 = null), (item = 0), (enabled2 = true)),
       run(),
-      !![]
+      true
     );
   }
   function reset() {
@@ -89,10 +89,10 @@ export function createRendererVideoHydrationBackpressure({
       (requestFrame3 = null),
       (item = 0),
       (key = 0),
-      (enabled2 = !![]),
+      (enabled2 = true),
       (value2 = null),
-      (enabled3 = ![]),
-      (enabled = !![]));
+      (enabled3 = false),
+      (enabled = true));
   }
   return { markPriorityWork: markPriorityWork, reset: reset, tryAcquire: tryAcquire };
 }

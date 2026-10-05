@@ -19,7 +19,7 @@ export function resolveRunningHubPricingContext(value, item, args, handler = get
     executionManifest['extensions']?.['inputResolutionMode'] === 'resolverOwned'
   )
     return null;
-  args = sanitizeModelUiSchemaParams(modelManifest['modelId'], args, { includeDefaults: !![] });
+  args = sanitizeModelUiSchemaParams(modelManifest['modelId'], args, { includeDefaults: true });
   const runningHubModelApiProfileId = resolveRunningHubModelApiProfileId(
       modelManifest['modelId'],
       getRunningHubProviderProfileId(value),
@@ -46,7 +46,7 @@ export function resolveRunningHubPricingContext(value, item, args, handler = get
     params: result,
     resolved: item,
     apiKey: index,
-    persist: ![],
+    persist: false,
     debounceMs: 350,
     key:
       'runninghub|' +
@@ -77,7 +77,7 @@ export async function fetchRunningHubPricing(enabled) {
                 modelType: options['extensions']['modelType'],
                 prompt: data['prompt'],
                 params: sanitizeModelUiSchemaParams(enabled['model'], data['generationParams'], {
-                  includeDefaults: !![],
+                  includeDefaults: true,
                 }),
               }),
             },
@@ -128,9 +128,9 @@ export async function fetchRunningHubPricing(enabled) {
   return {
     estimatedPrice: source['estimatedPrice'],
     currency: source['currency'],
-    isFreeThisCall: source['isFreeThisCall'] === !![],
+    isFreeThisCall: source['isFreeThisCall'] === true,
     excludesReferenceUsage:
-      enabled['hasReferences'] === !![] || (enabled['references'] || [])['length'] > 0,
+      enabled['hasReferences'] === true || (enabled['references'] || [])['length'] > 0,
     referenceBasis:
       enabled['kind'] === 'image' &&
       (enabled['hasReferences'] || (enabled['references'] || [])['length'] > 0)

@@ -7,7 +7,7 @@ export function bindModelPriceDetails(el, handler, handler2) {
     width = el2['defaultView'];
   let el3 = null,
     setTimeout2 = null,
-    enabled = ![],
+    enabled = false,
     registerEscapeScope2 = null;
   const value = 'model-price-details-' + ++nextId,
     handler3 = () => {
@@ -20,15 +20,15 @@ export function bindModelPriceDetails(el, handler, handler2) {
     },
     close = () => {
       (clearTimeout(setTimeout2),
-        (enabled = ![]),
+        (enabled = false),
         registerEscapeScope2?.(),
         (registerEscapeScope2 = null),
         el3?.['remove'](),
         (el3 = null),
         el['setAttribute']('aria-expanded', 'false'),
         width['removeEventListener']('resize', handler3),
-        width['removeEventListener']('scroll', handler3, !![]),
-        el2['removeEventListener']('pointerdown', item, !![]));
+        width['removeEventListener']('scroll', handler3, true),
+        el2['removeEventListener']('pointerdown', item, true));
     },
     item = (event) => {
       if (!el['contains'](event['target']) && !el3?.['contains'](event['target'])) close();
@@ -85,16 +85,16 @@ export function bindModelPriceDetails(el, handler, handler2) {
         el2['body']['appendChild'](el3),
         el['setAttribute']('aria-expanded', 'true'),
         width['addEventListener']('resize', handler3),
-        width['addEventListener']('scroll', handler3, !![]),
-        el2['addEventListener']('pointerdown', item, !![]),
+        width['addEventListener']('scroll', handler3, true),
+        el2['addEventListener']('pointerdown', item, true),
         (registerEscapeScope2 = registerEscapeScope(() => {
-          (el['focus']({ preventScroll: !![] }), close());
+          (el['focus']({ preventScroll: true }), close());
         }))),
         render(),
         handler2());
     },
     entry = (event2) => {
-      (event2['preventDefault'](), event2['stopPropagation'](), handler6(), (enabled = !![]));
+      (event2['preventDefault'](), event2['stopPropagation'](), handler6(), (enabled = true));
     },
     record = (event3) => event3['stopPropagation']();
   return (

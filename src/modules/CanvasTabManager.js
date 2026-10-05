@@ -91,20 +91,20 @@ function markRecoveringGenerationNode(args) {
   if (!args || typeof args !== 'object') return args;
   if (!args['generationStartTime'] || args['generationDuration'] != null) return args;
   const next = { ...args };
-  let enabled2 = ![];
+  let enabled2 = false;
   String(next['rhTaskId'] || '')['trim']() &&
     isRecoverableTaskStatus(next['rhTaskStatus']) &&
-    ((next['rhTaskRecovering'] = !![]), (enabled2 = !![]));
+    ((next['rhTaskRecovering'] = true), (enabled2 = true));
   String(next['dreaminaSubmitId'] || '')['trim']() &&
     isRecoverableTaskStatus(next['dreaminaTaskStatus']) &&
     isRecoverableTaskStatus(next['dreaminaTaskPhase']) &&
-    ((next['dreaminaTaskRecovering'] = !![]), (enabled2 = !![]));
+    ((next['dreaminaTaskRecovering'] = true), (enabled2 = true));
   String(next['asyncTaskId'] || '')['trim']() &&
     isRecoverableTaskStatus(next['asyncTaskStatus']) &&
-    ((next['asyncTaskRecovering'] = !![]), (enabled2 = !![]));
+    ((next['asyncTaskRecovering'] = true), (enabled2 = true));
   if (!enabled2) return args;
   return (
-    (next['isGenerating'] = !![]),
+    (next['isGenerating'] = true),
     (next['jobStatus'] = isRecoverableTaskStatus(next['jobStatus'])
       ? 'running'
       : next['jobStatus']),
@@ -138,8 +138,8 @@ function getCanvasNodesList(options2 = {}) {
   return [];
 }
 function hasLiveGenerationNode(enabled3 = {}) {
-  if (!enabled3 || typeof enabled3 !== 'object') return ![];
-  if (enabled3['isGenerating'] !== !![] || enabled3['generationDuration'] != null) return ![];
+  if (!enabled3 || typeof enabled3 !== 'object') return false;
+  if (enabled3['isGenerating'] !== true || enabled3['generationDuration'] != null) return false;
   const list2 = [
     enabled3['jobStatus'],
     enabled3['rhTaskStatus'],
@@ -152,7 +152,7 @@ function hasLiveGenerationNode(enabled3 = {}) {
     const enabled4 = String(handle || '')
       ['trim']()
       ['toLowerCase']();
-    if (!enabled4 || enabled4 === 'idle') return ![];
+    if (!enabled4 || enabled4 === 'idle') return false;
     return isGenerationTaskTerminalStatus(enabled4);
   });
 }
@@ -182,22 +182,22 @@ export function getCanvasTabScrollMetrics(el = {}) {
   return { clientWidth: clientWidth, maxScrollLeft: maxScrollLeft, scrollLeft: scrollLeft, scrollWidth: scrollWidth };
 }
 export function scrollCanvasTabsWithWheel(enabled5, event = {}) {
-  if (!enabled5) return ![];
+  if (!enabled5) return false;
   const {
     clientWidth: clientWidth2,
     maxScrollLeft: maxScrollLeft2,
     scrollLeft: scrollLeft2,
   } = getCanvasTabScrollMetrics(enabled5);
-  if (maxScrollLeft2 <= 1) return ![];
+  if (maxScrollLeft2 <= 1) return false;
   const count = Number(event['deltaX']) || 0,
     scope = Number(event['deltaY']) || 0,
     enabled6 = Math['abs'](count) > Math['abs'](scope) && count !== 0 ? count : scope;
-  if (!enabled6) return ![];
+  if (!enabled6) return false;
   const count2 = Number(event['deltaMode']) || 0,
     input = count2 === 1 ? 16 : count2 === 2 ? Math['max'](clientWidth2, 1) : 1,
     output = Math['min'](maxScrollLeft2, Math['max'](0, scrollLeft2 + enabled6 * input));
-  if (output === scrollLeft2) return ![];
-  return ((enabled5['scrollLeft'] = output), event['preventDefault']?.(), !![]);
+  if (output === scrollLeft2) return false;
+  return ((enabled5['scrollLeft'] = output), event['preventDefault']?.(), true);
 }
 function normalizeCanvasProjectContext(isTemporary = {}, value2 = {}) {
   const value3 = String(value2['canvasId'] || '')['trim'](),
@@ -209,8 +209,8 @@ function normalizeCanvasProjectContext(isTemporary = {}, value2 = {}) {
     recentId: String(isTemporary['recentId'] || '')['trim'](),
     displayPath: String(isTemporary['displayPath'] || '')['trim'](),
     lastModified: Math['max'](0, Number(isTemporary['lastModified'] || 0) || 0),
-    isTemporary: isTemporary['isTemporary'] === !![],
-    workspaceProjectScoped: isTemporary['workspaceProjectScoped'] !== ![],
+    isTemporary: isTemporary['isTemporary'] === true,
+    workspaceProjectScoped: isTemporary['workspaceProjectScoped'] !== false,
   };
 }
 function captureCurrentProjectContext(canvasId = {}) {
@@ -229,7 +229,7 @@ function captureCurrentProjectContext(canvasId = {}) {
       recentId: window['_v2CurrentRecentProjectId'],
       displayPath: window['_v2CurrentProjectDisplayPath'],
       lastModified: window['_v2CurrentProjectLastModified'],
-      workspaceProjectScoped: window['_v2WorkspaceProjectScoped'] !== ![],
+      workspaceProjectScoped: window['_v2WorkspaceProjectScoped'] !== false,
     },
     { canvasId: canvasId?.['id'], projectName: canvasId?.['name'] },
   );
@@ -243,7 +243,7 @@ const CanvasTabManager = {
   _lastContentPersistRevByCanvas: new Map(),
   _savedSignatureByCanvas: new Map(),
   _lastTabsRenderSignature: '',
-  _tabContainerBound: ![],
+  _tabContainerBound: false,
   _visualSnapshotBackfillTimers: [],
   _visualSnapshotIdleRetryTimer: null,
   _visualSnapshotIdleRetryCanvasId: null,
@@ -265,7 +265,7 @@ const CanvasTabManager = {
     window['showToast']?.(canvasTabsText(value5, { count: count3 }), 'warn');
   },
   async _runTaskSafeCanvasTransition(handler) {
-    if ((await appStore['getGraphMutationPolicy']?.()?.['beforeWorkspaceTransition']?.()) === ![]) return ![];
+    if ((await appStore['getGraphMutationPolicy']?.()?.['beforeWorkspaceTransition']?.()) === false) return false;
     if (this['_taskSafeCanvasTransitionPromise']) return this['_taskSafeCanvasTransitionPromise'];
     const value6 = (async () => {
       return handler();
@@ -295,10 +295,10 @@ const CanvasTabManager = {
   _syncBackgroundTaskCanvas(
     value7,
     store,
-    { persist: persist = !![], updatedNodeId: updatedNodeId } = {},
+    { persist: persist = true, updatedNodeId: updatedNodeId } = {},
   ) {
     const value8 = this['_canvases']['findIndex']((value9) => value9['id'] === value7);
-    if (value8 === -1 || !store) return ![];
+    if (value8 === -1 || !store) return false;
     const captureBackgroundTaskCanvas2 = captureBackgroundTaskCanvas(store, this['_canvases'][value8], updatedNodeId),
       value10 = captureBackgroundTaskCanvas2['snapshot'],
       value11 = Number(store['getStateRaw']()?.['_persistRev'] || 0),
@@ -310,31 +310,31 @@ const CanvasTabManager = {
       (this['_canvases'][value8] = value13),
       captureBackgroundTaskCanvas2['remember'](value13),
       persist && (this['_scheduleWorkspaceCacheSave'](), this['_notifyDirtyStateChanged']()),
-      !![]
+      true
     );
   },
   _handoffActiveCanvasTasks(taskScopeId = this['_activeId']) {
     if (!taskScopeId || !hasActiveGenerationTasksForStore(appStore))
-      return { ok: !![], movedCount: 0, taskScopeId: taskScopeId || '' };
+      return { ok: true, movedCount: 0, taskScopeId: taskScopeId || '' };
     let targetStore = null,
       handoffActiveGenerationTasks2 = null;
     try {
       return (
         (targetStore = createStore()),
-        targetStore['hydrateTrustedSnapshot'](appStore['serialize'](), { preserveLiveGeneration: !![] }),
+        targetStore['hydrateTrustedSnapshot'](appStore['serialize'](), { preserveLiveGeneration: true }),
         (handoffActiveGenerationTasks2 = handoffActiveGenerationTasks({
           sourceStore: appStore,
           targetStore: targetStore,
           taskScopeId: taskScopeId,
           mirrorTaskState: ({ updatedNodeId: updatedNodeId2 } = {}) =>
             this['_syncBackgroundTaskCanvas'](taskScopeId, targetStore, {
-              persist: !![],
+              persist: true,
               updatedNodeId: updatedNodeId2,
             }),
         })),
         handoffActiveGenerationTasks2['movedCount'] > 0 &&
           (this['_backgroundTaskStores']['set'](taskScopeId, targetStore),
-          this['_syncBackgroundTaskCanvas'](taskScopeId, targetStore, { persist: ![] })),
+          this['_syncBackgroundTaskCanvas'](taskScopeId, targetStore, { persist: false })),
         handoffActiveGenerationTasks2
       );
     } catch (error2) {
@@ -343,7 +343,7 @@ const CanvasTabManager = {
         this['_backgroundTaskStores']['delete'](taskScopeId),
         console['error']('[CanvasTabManager] Failed to hand off active generation tasks:', error2),
         {
-          ok: ![],
+          ok: false,
           movedCount: 0,
           activeCount: Number(handoffActiveGenerationTasks2?.['movedCount'] || 1),
           taskScopeId: taskScopeId,
@@ -388,9 +388,9 @@ const CanvasTabManager = {
     }
   },
   _applyActiveCanvasProjectContext() {
-    if (typeof window === 'undefined') return ![];
+    if (typeof window === 'undefined') return false;
     const enabled8 = this['getCanvasProjectContext']();
-    if (!enabled8) return ![];
+    if (!enabled8) return false;
     ((window['currentProjectId'] = enabled8['projectId']),
       (window['_v2CurrentFile'] = enabled8['filename']),
       (window['_v2CurrentRecentProjectId'] = enabled8['recentId']),
@@ -408,9 +408,9 @@ const CanvasTabManager = {
         canvasProjectBadge = createCanvasProjectBadge(value15);
       if (canvasProjectBadge) el2['before']?.(canvasProjectBadge);
     }
-    return !![];
+    return true;
   },
-  setCanvasProjectContext(canvasId3, value16 = {}, { persist: persist = !![] } = {}) {
+  setCanvasProjectContext(canvasId3, value16 = {}, { persist: persist = true } = {}) {
     const projectName2 = this['_canvases']['find']((value17) => value17?.['id'] === canvasId3);
     if (!projectName2) return null;
     const args2 = normalizeCanvasProjectContext(value16, {
@@ -430,7 +430,7 @@ const CanvasTabManager = {
     return args3 ? { ...args3 } : null;
   },
   findCanvasIdByProjectIdentity(options4 = {}) {
-    const run = (value19, { path: path = ![] } = {}) => {
+    const run = (value19, { path: path = false } = {}) => {
         const value20 = String(value19 || '')
           ['trim']()
           ['toLowerCase']();
@@ -439,8 +439,8 @@ const CanvasTabManager = {
       value21 = run(options4['projectName']),
       value22 = [
         ['recentId', run(options4['recentId'])],
-        ['displayPath', run(options4['displayPath'], { path: !![] })],
-        ['filename', run(options4['filename'], { path: !![] })],
+        ['displayPath', run(options4['displayPath'], { path: true })],
+        ['filename', run(options4['filename'], { path: true })],
         ['projectId', run(options4['projectId'])],
       ]['filter'](([, value23]) => value23);
     for (const [path2, value24] of value22) {
@@ -547,7 +547,7 @@ const CanvasTabManager = {
       ]),
     });
   },
-  _resetSavedCanvasSignatures({ markClean: markClean = !![] } = {}) {
+  _resetSavedCanvasSignatures({ markClean: markClean = true } = {}) {
     this['_savedSignatureByCanvas'] = new Map();
     if (!markClean) return;
     this['_canvases']['forEach']((enabled11) => {
@@ -556,7 +556,7 @@ const CanvasTabManager = {
     });
   },
   _removeTabContextMenu() {
-    (this['_tabContextMenuSession']?.['close']?.({ restoreFocus: ![] }),
+    (this['_tabContextMenuSession']?.['close']?.({ restoreFocus: false }),
       (this['_tabContextMenuSession'] = null),
       document['getElementById']('tab-context-menu')?.['remove']());
   },
@@ -569,7 +569,7 @@ const CanvasTabManager = {
     if (!enabled12) return;
     (enabled12['removeAllRanges'](), enabled12['addRange'](value37));
   },
-  _commitTabRename(el4, { deferRender: deferRender = ![] } = {}) {
+  _commitTabRename(el4, { deferRender: deferRender = false } = {}) {
     if (!el4) return;
     const el5 = el4['closest']('.canvas-tab'),
       enabled13 = el5?.['dataset']?.['id'];
@@ -590,7 +590,7 @@ const CanvasTabManager = {
   },
   _bindTabContainerEvents(el6) {
     if (this['_tabContainerBound'] || !el6) return;
-    this['_tabContainerBound'] = !![];
+    this['_tabContainerBound'] = true;
     let value42 = '',
       count4 = 0;
     const run2 = (event3) => {
@@ -599,16 +599,16 @@ const CanvasTabManager = {
         return el7['dataset']['id'] || '';
       },
       handler2 = (event4) => {
-        if (event4['button'] !== 1) return ![];
+        if (event4['button'] !== 1) return false;
         const enabled14 = run2(event4);
-        if (!enabled14) return ![];
+        if (!enabled14) return false;
         return (
           event4['preventDefault'](),
           event4['stopPropagation'](),
           (value42 = enabled14),
           (count4 = Date['now']()),
           void this['deleteCanvas'](enabled14),
-          !![]
+          true
         );
       };
     (el6['addEventListener']('click', (event5) => {
@@ -663,7 +663,7 @@ const CanvasTabManager = {
         const enabled20 = event7['target']['closest']('.canvas-tab-name');
         if (!enabled20 || !el6['contains'](enabled20)) return;
         if (enabled20['contentEditable'] !== 'true') return;
-        this['_commitTabRename'](enabled20, { deferRender: !![] });
+        this['_commitTabRename'](enabled20, { deferRender: true });
       }),
       el6['addEventListener']('keydown', (event8) => {
         const el10 = event8['target']['closest']('.canvas-tab-name');
@@ -682,7 +682,7 @@ const CanvasTabManager = {
         }
       }),
       el6['addEventListener']('scroll', () => this['_updateTabScrollHints'](el6), {
-        passive: !![],
+        passive: true,
       }),
       el6['addEventListener'](
         'wheel',
@@ -690,7 +690,7 @@ const CanvasTabManager = {
           (event9['stopPropagation']?.(),
             scrollCanvasTabsWithWheel(el6, event9) && this['_updateTabScrollHints'](el6));
         },
-        { passive: ![] },
+        { passive: false },
       ));
     const run4 = globalThis['ResizeObserver'];
     if (typeof run4 === 'function') {
@@ -754,7 +754,7 @@ const CanvasTabManager = {
             window['_v2SaveProjectAsLocal']({ canvasId: canvasId4['id'] });
             return;
           }
-          const args6 = this['getMultiDataSnapshot']({ sanitizeForPersistence: !![] }) || {},
+          const args6 = this['getMultiDataSnapshot']({ sanitizeForPersistence: true }) || {},
             list8 = Array['isArray'](args6['canvases']) ? args6['canvases'] : [],
             canvases =
               list8['find'](
@@ -792,13 +792,13 @@ const CanvasTabManager = {
       list7['push']('sep', {
         label: canvasTabsText('contextMenu.delete'),
         icon: 'delete',
-        danger: !![],
+        danger: true,
         shortcutActionId: 'context-canvas-tab-delete',
         action: () => void this['deleteCanvas'](canvasId4['id']),
       }),
       (this['_tabContextMenuSession'] = showContextMenu(clientX, clientY, list7, {
         className: 'v2-canvas-ctx-menu canvas-tab-context-menu',
-        ensureItemIcons: !![],
+        ensureItemIcons: true,
         restoreTarget: document['querySelector']?.(
           '.canvas-tab[data-id="' +
             (globalThis['CSS']?.['escape']?.(String(canvasId4['id'])) || String(canvasId4['id'])) +
@@ -902,10 +902,10 @@ const CanvasTabManager = {
       value58 = this['_visualSnapshotInteractionGuardHandlers'];
     el17 &&
       value58 &&
-      (el17['removeEventListener']?.('pointerdown', value58['pointerdown'], !![]),
-      el17['removeEventListener']?.('pointerup', value58['pointerup'], !![]),
-      el17['removeEventListener']?.('pointercancel', value58['pointercancel'], !![]),
-      el17['removeEventListener']?.('wheel', value58['wheel'], !![]));
+      (el17['removeEventListener']?.('pointerdown', value58['pointerdown'], true),
+      el17['removeEventListener']?.('pointerup', value58['pointerup'], true),
+      el17['removeEventListener']?.('pointercancel', value58['pointercancel'], true),
+      el17['removeEventListener']?.('wheel', value58['wheel'], true));
     this['_visualSnapshotActivePointers'] = new Set();
     const run5 = (event10) =>
         Number['isFinite'](event10?.['pointerId']) ? event10['pointerId'] : 'primary',
@@ -926,10 +926,10 @@ const CanvasTabManager = {
           this['_deferVisualSnapshotBackfillAfterInteraction']();
         },
       };
-    (el16['addEventListener']('pointerdown', value59['pointerdown'], !![]),
-      el16['addEventListener']('pointerup', value59['pointerup'], !![]),
-      el16['addEventListener']('pointercancel', value59['pointercancel'], !![]),
-      el16['addEventListener']('wheel', value59['wheel'], { capture: !![], passive: !![] }),
+    (el16['addEventListener']('pointerdown', value59['pointerdown'], true),
+      el16['addEventListener']('pointerup', value59['pointerup'], true),
+      el16['addEventListener']('pointercancel', value59['pointercancel'], true),
+      el16['addEventListener']('wheel', value59['wheel'], { capture: true, passive: true }),
       (this['_visualSnapshotInteractionGuardDocument'] = el16),
       (this['_visualSnapshotInteractionGuardHandlers'] = value59));
   },
@@ -958,16 +958,16 @@ const CanvasTabManager = {
   },
   _isVisualSnapshotInteractionBusy() {
     if (this['_isViewportBusyForVisualSnapshot']())
-      return (this['_holdVisualSnapshotCaptureAfterInteraction'](), !![]);
-    if ((this['_visualSnapshotActivePointers']?.['size'] || 0) > 0) return !![];
+      return (this['_holdVisualSnapshotCaptureAfterInteraction'](), true);
+    if ((this['_visualSnapshotActivePointers']?.['size'] || 0) > 0) return true;
     return this['_getVisualSnapshotNow']() < (Number(this['_visualSnapshotSettleUntil']) || 0);
   },
   _hasPendingVideoLoadForVisualSnapshot() {
     const value67 = typeof document !== 'undefined' ? document : null,
       el18 = value67?.['getElementById']?.('v2-canvas');
-    if (!el18?.['querySelectorAll']) return ![];
+    if (!el18?.['querySelectorAll']) return false;
     return Array['from'](el18['querySelectorAll']('video'))['some']((el19) => {
-      if (el19?.['isConnected'] === ![] || el19?.['error']) return ![];
+      if (el19?.['isConnected'] === false || el19?.['error']) return false;
       const enabled21 = String(
         el19?.['currentSrc'] || el19?.['getAttribute']?.('src') || el19?.['src'] || '',
       )['trim']();
@@ -975,18 +975,18 @@ const CanvasTabManager = {
     });
   },
   _shouldDeferVisualSnapshotBackfill() {
-    if (this['_isVisualSnapshotInteractionBusy']()) return !![];
-    if (this['_getActiveCanvasNodeCount']() < DENSE_VISUAL_SNAPSHOT_NODE_COUNT) return ![];
-    if (this['_hasPendingVideoLoadForVisualSnapshot']()) return !![];
+    if (this['_isVisualSnapshotInteractionBusy']()) return true;
+    if (this['_getActiveCanvasNodeCount']() < DENSE_VISUAL_SNAPSHOT_NODE_COUNT) return false;
+    if (this['_hasPendingVideoLoadForVisualSnapshot']()) return true;
     const canvasMediaSchedulerStats = getCanvasMediaSchedulerStats();
     return (
       Number(canvasMediaSchedulerStats['imagePreloadActive'] || 0) > 0 ||
       Number(canvasMediaSchedulerStats['imagePreloadQueued'] || 0) > 0
     );
   },
-  _isVisualSnapshotWorthReplacing(enabled22, enabled23, { force: force = ![] } = {}) {
-    if (!enabled23) return ![];
-    if (!enabled22) return !![];
+  _isVisualSnapshotWorthReplacing(enabled22, enabled23, { force: force = false } = {}) {
+    if (!enabled23) return false;
+    if (!enabled22) return true;
     const value68 = Math['max'](
         0,
         Number(enabled22['readyMediaNodeCount'] ?? enabled22['mediaNodeCount']) || 0,
@@ -995,14 +995,14 @@ const CanvasTabManager = {
         0,
         Number(enabled23['readyMediaNodeCount'] ?? enabled23['mediaNodeCount']) || 0,
       );
-    if (value69 > value68) return !![];
-    if (value69 < value68) return ![];
+    if (value69 > value68) return true;
+    if (value69 < value68) return false;
     const value70 = Math['max'](0, Number(enabled22['visibleNodeCount']) || 0),
       value71 = Math['max'](0, Number(enabled23['visibleNodeCount']) || 0);
-    if (value71 > value70) return !![];
+    if (value71 > value70) return true;
     return force && value71 >= value70;
   },
-  _captureActiveVisualSnapshot({ force: force = ![], persistIfChanged: persistIfChanged = ![] } = {}) {
+  _captureActiveVisualSnapshot({ force: force = false, persistIfChanged: persistIfChanged = false } = {}) {
     if (!this['_activeId']) return null;
     if (this['_isVisualSnapshotInteractionBusy']())
       return (this['_scheduleVisualSnapshotIdleRetry'](this['_activeId']), null);
@@ -1029,7 +1029,7 @@ const CanvasTabManager = {
       visualSnapshot
     );
   },
-  _getActiveVisualSnapshotCaptureInput({ force: force = ![] } = {}) {
+  _getActiveVisualSnapshotCaptureInput({ force: force = false } = {}) {
     if (!this['_activeId']) return null;
     const idx = this['_canvases']['findIndex']((value75) => value75['id'] === this['_activeId']);
     if (idx === -1) return null;
@@ -1049,8 +1049,8 @@ const CanvasTabManager = {
     };
   },
   async _captureActiveVisualSnapshotAsync({
-    force: force = ![],
-    persistIfChanged: persistIfChanged = ![],
+    force: force = false,
+    persistIfChanged: persistIfChanged = false,
   } = {}) {
     const value76 = Number(this['_visualSnapshotBackfillGeneration']) || 0,
       enabled24 = this['_getActiveVisualSnapshotCaptureInput']({ force: force });
@@ -1103,7 +1103,7 @@ const CanvasTabManager = {
         delayMs: CANVAS_MEDIA_WARMUP_OPEN_DELAY_MS,
         maxJobs: CANVAS_MEDIA_WARMUP_SNAPSHOT_MAX_JOBS,
       }),
-      ![]
+      false
     );
   },
   _warmupCanvasVisibleMedia(canvas4, { maxJobs: maxJobs2 } = {}) {
@@ -1178,7 +1178,7 @@ const CanvasTabManager = {
     if (this['_shouldDeferVisualSnapshotBackfill']())
       return (this['_scheduleVisualSnapshotIdleRetry'](value87), Promise['resolve'](null));
     if (this['_visualSnapshotBackfillCapturePromise']) return this['_visualSnapshotBackfillCapturePromise'];
-    const value88 = this['_captureActiveVisualSnapshotAsync']({ force: ![], persistIfChanged: !![] }),
+    const value88 = this['_captureActiveVisualSnapshotAsync']({ force: false, persistIfChanged: true }),
       value89 = Promise['resolve'](value88)['finally'](() => {
         this['_visualSnapshotBackfillCapturePromise'] === value89 &&
           (this['_visualSnapshotBackfillCapturePromise'] = null);
@@ -1203,7 +1203,7 @@ const CanvasTabManager = {
     );
     return (timer3?.['unref']?.(), timer3);
   },
-  _hydrateCanvasSnapshot(value93, { preserveLiveGeneration: preserveLiveGeneration = ![] } = {}) {
+  _hydrateCanvasSnapshot(value93, { preserveLiveGeneration: preserveLiveGeneration = false } = {}) {
     (markPerf('hydrateTrustedSnapshot:start'),
       appStore['hydrateTrustedSnapshot'](value93, { preserveLiveGeneration: preserveLiveGeneration }),
       markPerf('hydrateTrustedSnapshot:end'),
@@ -1220,7 +1220,7 @@ const CanvasTabManager = {
       this['_hydrateCanvasSnapshot'](this['_canvases'][value95]),
       this['_scheduleVisualSnapshotBackfill']());
   },
-  init(value97, { markClean: markClean = !![] } = {}) {
+  init(value97, { markClean: markClean = true } = {}) {
     ((this['_projectBadges'] = new Map()),
       this['_bindVisualSnapshotInteractionGuard'](),
       this['_invalidateVisualSnapshotBackfillCapture'](),
@@ -1249,7 +1249,7 @@ const CanvasTabManager = {
         this['_projectContextByCanvasId']['set'](
           id2,
           normalizeCanvasProjectContext(
-            { projectName: this['_canvases'][0]['name'], isTemporary: !![] },
+            { projectName: this['_canvases'][0]['name'], isTemporary: true },
             { canvasId: id2, projectName: this['_canvases'][0]['name'] },
           ),
         ),
@@ -1268,8 +1268,8 @@ const CanvasTabManager = {
               : {
                   projectId: projectId['name'] || projectId['id'],
                   projectName: projectId['name'],
-                  isTemporary: !![],
-                  workspaceProjectScoped: !![],
+                  isTemporary: true,
+                  workspaceProjectScoped: true,
                 };
         this['_projectContextByCanvasId']['set'](
           projectId['id'],
@@ -1292,7 +1292,7 @@ const CanvasTabManager = {
       this['_notifyActiveCanvasChanged']('init'),
       this['_notifyDirtyStateChanged']());
   },
-  replaceWorkspace(value105, { markClean: markClean = !![] } = {}) {
+  replaceWorkspace(value105, { markClean: markClean = true } = {}) {
     return (
       this['_flushCurrentCanvas'](),
       this['_clearVisualSnapshotBackfillTimers'](),
@@ -1300,7 +1300,7 @@ const CanvasTabManager = {
       this['_clearCanvasSurface'](),
       this['init'](value105, { markClean: markClean }),
       this['_scheduleWorkspaceCacheSave'](),
-      !![]
+      true
     );
   },
   _flushCurrentCanvas() {
@@ -1339,14 +1339,14 @@ const CanvasTabManager = {
     if (!this['_canvases']['some']((value110) => value110['id'] === value109)) return;
     return this['_runTaskSafeCanvasTransition'](() => {
       let enabled26 = this['_canvases']['find']((value111) => value111['id'] === value109);
-      if (!enabled26 || value109 === this['_activeId']) return ![];
+      if (!enabled26 || value109 === this['_activeId']) return false;
       this['_flushCurrentCanvas']();
       const response = this['_handoffActiveCanvasTasks'](this['_activeId']);
-      if (response?.['ok'] === ![]) return (this['_showTaskTransitionBlocked'](response), ![]);
+      if (response?.['ok'] === false) return (this['_showTaskTransitionBlocked'](response), false);
       const value112 = this['_backgroundTaskStores']['get'](value109);
       return (
         value112 &&
-          (this['_syncBackgroundTaskCanvas'](value109, value112, { persist: ![] }),
+          (this['_syncBackgroundTaskCanvas'](value109, value112, { persist: false }),
           (enabled26 = this['_canvases']['find']((value113) => value113['id'] === value109))),
         this['_showCanvasVisualSnapshot'](enabled26),
         this['_clearCanvasSurface'](),
@@ -1363,7 +1363,7 @@ const CanvasTabManager = {
         this['_notifyActiveCanvasChanged']('switch'),
         this['_markCanvasMetaDirty'](),
         this['_notifyDirtyStateChanged'](),
-        !![]
+        true
       );
     });
   },
@@ -1371,7 +1371,7 @@ const CanvasTabManager = {
     return this['_runTaskSafeCanvasTransition'](() => {
       this['_flushCurrentCanvas']();
       const response2 = this['_handoffActiveCanvasTasks'](this['_activeId']);
-      if (response2?.['ok'] === ![]) return (this['_showTaskTransitionBlocked'](response2), ![]);
+      if (response2?.['ok'] === false) return (this['_showTaskTransitionBlocked'](response2), false);
       this['_clearCanvasSurface']();
       const id3 = 'canvas_' + Date['now'](),
         name = canvasTabsText('newCanvasName', { index: this['_canvases']['length'] + 1 });
@@ -1380,7 +1380,7 @@ const CanvasTabManager = {
         this['_projectContextByCanvasId']['set'](
           id3,
           normalizeCanvasProjectContext(
-            { projectName: name, isTemporary: !![] },
+            { projectName: name, isTemporary: true },
             { canvasId: id3, projectName: name },
           ),
         ),
@@ -1394,16 +1394,16 @@ const CanvasTabManager = {
         this['_notifyActiveCanvasChanged']('add'),
         this['_markCanvasMetaDirty'](),
         this['_notifyDirtyStateChanged'](),
-        !![]
+        true
       );
     });
   },
-  async _confirmDeleteDirtyCanvas(value114, { skipDirtyConfirm: skipDirtyConfirm = ![] } = {}) {
-    if (skipDirtyConfirm || !this['isCanvasDirty'](value114?.['id'])) return !![];
+  async _confirmDeleteDirtyCanvas(value114, { skipDirtyConfirm: skipDirtyConfirm = false } = {}) {
+    if (skipDirtyConfirm || !this['isCanvasDirty'](value114?.['id'])) return true;
     return this['_showUnsavedDeleteConfirm'](value114);
   },
   _showUnsavedDeleteConfirm(name2) {
-    if (typeof document === 'undefined' || !document['body']) return Promise['resolve'](![]);
+    if (typeof document === 'undefined' || !document['body']) return Promise['resolve'](false);
     return (
       document['getElementById']('canvas-delete-confirm-overlay')?.['remove'](),
       new Promise((handler3) => {
@@ -1437,29 +1437,29 @@ const CanvasTabManager = {
           el21['appendChild'](el24),
           el20['appendChild'](el21),
           document['body']['appendChild'](el20));
-        let value115 = ![];
+        let value115 = false;
         const run6 = (value116) => {
             if (value115) return;
-            ((value115 = !![]),
-              document['removeEventListener']('keydown', value117, !![]),
+            ((value115 = true),
+              document['removeEventListener']('keydown', value117, true),
               el20['remove'](),
               handler3(value116));
           },
           value117 = (event11) => {
             if (event11['key'] === 'Escape') {
-              (event11['preventDefault'](), run6(![]));
+              (event11['preventDefault'](), run6(false));
               return;
             }
             event11['key'] === 'Enter' &&
               !event11['isComposing'] &&
-              (event11['preventDefault'](), run6(!![]));
+              (event11['preventDefault'](), run6(true));
           };
         (el20['addEventListener']('click', (event12) => {
-          if (event12['target'] === el20) run6(![]);
+          if (event12['target'] === el20) run6(false);
         }),
-          el25['addEventListener']('click', () => run6(![])),
-          el26['addEventListener']('click', () => run6(!![])),
-          document['addEventListener']('keydown', value117, !![]),
+          el25['addEventListener']('click', () => run6(false)),
+          el26['addEventListener']('click', () => run6(true)),
+          document['addEventListener']('keydown', value117, true),
           el25['focus']?.());
       })
     );
@@ -1467,19 +1467,19 @@ const CanvasTabManager = {
   async deleteCanvas(value118, value119 = {}) {
     if (
       value118 === this['_activeId'] &&
-      (await appStore['getGraphMutationPolicy']?.()?.['beforeWorkspaceTransition']?.()) === ![]
+      (await appStore['getGraphMutationPolicy']?.()?.['beforeWorkspaceTransition']?.()) === false
     )
-      return ![];
+      return false;
     if (this['_canvases']['length'] <= 1)
-      return (window['showToast'](canvasTabsText('keepOneCanvas'), 'warn'), ![]);
+      return (window['showToast'](canvasTabsText('keepOneCanvas'), 'warn'), false);
     const value120 = this['_canvases']['findIndex']((value121) => value121['id'] === value118);
-    if (value120 === -1) return ![];
+    if (value120 === -1) return false;
     if (value118 === this['_activeId']) this['_flushCurrentCanvas']();
     const value122 = this['_canvases'][value120];
     if (canvasHasLiveGeneration(value122))
-      return (this['_showTaskTransitionBlocked']({ activeCount: 1 }, 'deleteBlockedByTasks'), ![]);
+      return (this['_showTaskTransitionBlocked']({ activeCount: 1 }, 'deleteBlockedByTasks'), false);
     const enabled27 = await this['_confirmDeleteDirtyCanvas'](value122, value119);
-    if (!enabled27) return ![];
+    if (!enabled27) return false;
     (this['_canvases']['splice'](value120, 1),
       this['_projectContextByCanvasId']['delete'](value118),
       this['_backgroundTaskStores']['delete'](value118),
@@ -1504,7 +1504,7 @@ const CanvasTabManager = {
       startVideoThumbBackfill(),
       this['_markCanvasMetaDirty'](),
       this['_notifyDirtyStateChanged'](),
-      !![]
+      true
     );
   },
   renameCanvas(value124, value125) {
@@ -1530,35 +1530,35 @@ const CanvasTabManager = {
     });
   },
   markCanvasClean(enabled29 = this['_activeId'], { checkpoint: checkpoint } = {}) {
-    if (!enabled29) return ![];
-    if (checkpoint && checkpoint['canvasId'] !== enabled29) return ![];
+    if (!enabled29) return false;
+    if (checkpoint && checkpoint['canvasId'] !== enabled29) return false;
     if (enabled29 === this['_activeId']) this['_flushCurrentCanvas']();
     const enabled30 = this['_canvases']['find']((value129) => value129['id'] === enabled29);
-    if (!enabled30) return ![];
+    if (!enabled30) return false;
     return (
       this['_savedSignatureByCanvas']['set'](
         enabled29,
         checkpoint?.['signature'] || this['_buildCanvasSavedSignature'](enabled30),
       ),
       this['_notifyDirtyStateChanged'](),
-      !![]
+      true
     );
   },
   markAllCanvasesClean() {
     return (
       this['_flushCurrentCanvas'](),
-      this['_resetSavedCanvasSignatures']({ markClean: !![] }),
+      this['_resetSavedCanvasSignatures']({ markClean: true }),
       this['_notifyDirtyStateChanged'](),
-      !![]
+      true
     );
   },
   isCanvasDirty(enabled31 = this['_activeId']) {
-    if (!enabled31) return ![];
+    if (!enabled31) return false;
     if (enabled31 === this['_activeId']) this['_flushCurrentCanvas']();
     const enabled32 = this['_canvases']['find']((value130) => value130['id'] === enabled31);
-    if (!enabled32) return ![];
+    if (!enabled32) return false;
     const enabled33 = this['_savedSignatureByCanvas']['get'](enabled31);
-    if (!enabled33) return !![];
+    if (!enabled33) return true;
     return enabled33 !== this['_buildCanvasSavedSignature'](enabled32);
   },
   hasDirtyCanvases() {
@@ -1566,19 +1566,19 @@ const CanvasTabManager = {
       this['_flushCurrentCanvas'](),
       this['_canvases']['some']((value131) => {
         const enabled34 = value131?.['id'];
-        if (!enabled34) return ![];
+        if (!enabled34) return false;
         const enabled35 = this['_savedSignatureByCanvas']['get'](enabled34);
         return !enabled35 || enabled35 !== this['_buildCanvasSavedSignature'](value131);
       })
     );
   },
   getMultiDataSnapshot({
-    sanitizeForPersistence: sanitizeForPersistence = ![],
-    captureVisualSnapshot: captureVisualSnapshot = !![],
-    includeProjectContexts: includeProjectContexts = ![],
+    sanitizeForPersistence: sanitizeForPersistence = false,
+    captureVisualSnapshot: captureVisualSnapshot = true,
+    includeProjectContexts: includeProjectContexts = false,
   } = {}) {
     this['_flushCurrentCanvas']();
-    captureVisualSnapshot && this['_captureActiveVisualSnapshot']({ force: ![] });
+    captureVisualSnapshot && this['_captureActiveVisualSnapshot']({ force: false });
     const cloneMultiDataSnapshot2 = cloneMultiDataSnapshot({
       canvases: this['_canvases'],
       activeCanvasId: this['_activeId'],
@@ -1599,7 +1599,7 @@ const CanvasTabManager = {
   getMultiData() {
     return this['getMultiDataSnapshot']();
   },
-  getPersistableMultiDataSnapshot({ includeProjectContexts: includeProjectContexts = ![] } = {}) {
+  getPersistableMultiDataSnapshot({ includeProjectContexts: includeProjectContexts = false } = {}) {
     return (
       this['_flushCurrentCanvas'](),
       {

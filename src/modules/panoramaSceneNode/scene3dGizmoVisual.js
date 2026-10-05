@@ -24,7 +24,7 @@ export function createScene3DGizmoVisual({
     horizontalColor2 = resolveThemeColor('--green', '--green'),
     horizontalColor3 = resolveThemeColor('--blue', '--blue'),
     root = new threeRuntime['Group']();
-  ((root['visible'] = ![]), configureGizmoObject(root));
+  ((root['visible'] = false), configureGizmoObject(root));
   const group = new threeRuntime['Group'](),
     handles = new Map(),
     pickMeshes = [],
@@ -68,12 +68,12 @@ export function createScene3DGizmoVisual({
       value = configureGizmoMaterial(
         new threeRuntime['MeshBasicMaterial']({
           color: 0xffffff,
-          transparent: !![],
+          transparent: true,
           opacity: 0,
           side: threeRuntime['DoubleSide'],
-          depthWrite: ![],
+          depthWrite: false,
         }),
-        { transparent: !![], opacity: 0 },
+        { transparent: true, opacity: 0 },
       ),
       pickMesh = new threeRuntime['Mesh'](createPlaneCornerPickGeometry(GIZMO_BASE_PLANE_SIZE), value);
     (group3['position']['copy'](offset),
@@ -198,19 +198,19 @@ export function createScene3DGizmoVisual({
     material = configureGizmoMaterial(
       new threeRuntime['MeshBasicMaterial']({
         color: color['clone'](),
-        transparent: !![],
+        transparent: true,
         opacity: 0.98,
       }),
-      { transparent: !![], opacity: 0.98 },
+      { transparent: true, opacity: 0.98 },
     ),
     item = new threeRuntime['Mesh'](new threeRuntime['BoxGeometry'](0.18, 0.18, 0.18), material);
   (configureGizmoObject(item), (item['userData']['gizmoHandleKey'] = 'scale-uniform'), group4['add'](item));
   const index = new threeRuntime['Mesh'](
     new threeRuntime['BoxGeometry'](0.34, 0.34, 0.34),
     configureGizmoMaterial(
-      new threeRuntime['MeshBasicMaterial']({ color: 0xffffff, transparent: !![], opacity: 0 }),
+      new threeRuntime['MeshBasicMaterial']({ color: 0xffffff, transparent: true, opacity: 0 }),
       {
-        transparent: !![],
+        transparent: true,
         opacity: 0,
       },
     ),

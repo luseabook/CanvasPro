@@ -35,7 +35,7 @@ function normalizeTargetKind(value = '') {
 export function deriveRequestedCreatedNodeType(
   key = '',
   index = {},
-  { includeGenerateVerb: includeGenerateVerb = ![] } = {},
+  { includeGenerateVerb: includeGenerateVerb = false } = {},
 ) {
   const enabled = String(key || '')['trim']();
   if (!enabled || NEGATED_CREATE_PATTERN['test'](enabled)) return '';
@@ -59,7 +59,7 @@ export function verifyAgentLoopCompletionEvidence({
   canvasState: canvasState = {},
 } = {}) {
   const requestedNodeType = deriveRequestedCreatedNodeType(userMessage, plannerExtra);
-  if (!requestedNodeType) return { ok: !![] };
+  if (!requestedNodeType) return { ok: true };
   const next = canvasState?.['nodes'] && typeof canvasState['nodes'] === 'object' ? canvasState['nodes'] : {},
     createdNodeIds = Array['isArray'](runtimeProvenance?.['createdNodeIds'])
       ? runtimeProvenance['createdNodeIds']
@@ -68,9 +68,9 @@ export function verifyAgentLoopCompletionEvidence({
       (current) => String(next?.[current]?.['type'] || '')['trim']() === requestedNodeType,
     );
   if (matchingNodeIds['length'] > 0)
-    return { ok: !![], requestedNodeType: requestedNodeType, matchingNodeIds: matchingNodeIds };
+    return { ok: true, requestedNodeType: requestedNodeType, matchingNodeIds: matchingNodeIds };
   return {
-    ok: ![],
+    ok: false,
     errorCode: 'AGENT_COMPLETION_EVIDENCE_MISSING',
     requestedNodeType: requestedNodeType,
     createdNodeIds: createdNodeIds,

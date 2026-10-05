@@ -18,7 +18,7 @@ export function bindImageDepthAction(value) {
     } = value,
     button = toolbarEl['querySelector']('.act-depth-image');
   if (!button) return;
-  let enabled = ![];
+  let enabled = false;
   (bindRunningHubToolbarTaskButton({
     button: button,
     getTask: () =>
@@ -32,11 +32,11 @@ export function bindImageDepthAction(value) {
     button['addEventListener']('click', async (event) => {
       (event['stopPropagation'](), event['preventDefault']());
       if (enabled) return;
-      enabled = !![];
+      enabled = true;
       const key = globalThis['window']?.['currentProjectId'];
-      let enabled2 = ![];
+      let enabled2 = false;
       const index = () => {
-        enabled2 = !![];
+        enabled2 = true;
       };
       window['addEventListener']('aicanvas:active-canvas-changed', index);
       const run = () => (store['getStateRaw']?.() || store['getState']())['nodes']?.[nodeId],
@@ -52,7 +52,7 @@ export function bindImageDepthAction(value) {
           overlayDataKey: 'imageDepthEditor',
           renderSelector: renderAIGenImageModelSelectorMarkup,
           bindSelector: bindAIGenImageModelSelector,
-          selectorOptions: { allowedWorkflowModelIds: [RH_IMAGE_DEPTH_MODEL_ID], showSchemaControls: !![] },
+          selectorOptions: { allowedWorkflowModelIds: [RH_IMAGE_DEPTH_MODEL_ID], showSchemaControls: true },
         });
         if (!openDepthPanel2 || !handler()) return;
         (button['setAttribute']('aria-busy', 'true'),
@@ -62,7 +62,7 @@ export function bindImageDepthAction(value) {
       } catch (error) {
         window['showToast']?.(error?.['message'] || String(error), 'error');
       } finally {
-        ((enabled = ![]),
+        ((enabled = false),
           button['removeAttribute']('aria-busy'),
           button['querySelector']('svg')?.['classList']['remove']('v2-spinning'),
           window['removeEventListener']('aicanvas:active-canvas-changed', index));

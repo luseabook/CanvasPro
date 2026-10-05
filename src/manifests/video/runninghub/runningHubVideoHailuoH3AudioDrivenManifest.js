@@ -48,7 +48,7 @@ const RH_HAILUO_H3_AUDIO_DRIVEN_ACCELERATION_FIELD_ID = 'rhHailuoH3AudioDrivenAc
       label: '音频参考',
       description: '必填，只允许 1 个音频参考',
       displayOrder: 10,
-      required: !![],
+      required: true,
     }),
   ]);
 export const rhVideoHailuoH3AudioDrivenModelManifest = createRunningHubVideoModelManifest({
@@ -56,7 +56,7 @@ export const rhVideoHailuoH3AudioDrivenModelManifest = createRunningHubVideoMode
   executionId: RH_VIDEO_HAILUO_H3_AUDIO_DRIVEN_EXECUTION_ID,
   displayName: '海螺H3音频驱动',
   description: RH_HAILUO_H3_AUDIO_DRIVEN_DESCRIPTION,
-  vip: !![],
+  vip: true,
   help: Object['freeze']({ tooltip: RH_HAILUO_H3_AUDIO_DRIVEN_HELP_TOOLTIP }),
   prompt: Object['freeze']({ emptyPolicy: 'allow', placeholder: '可选：描述人物、动作、镜头或画面要求。' }),
   extensions: Object['freeze']({
@@ -79,7 +79,7 @@ export const rhVideoHailuoH3AudioDrivenModelManifest = createRunningHubVideoMode
       label: '清晰度',
       description:
         '清晰度档位主要控制生成尺寸：草稿长边约 608 像素，经济约 960，标准约 1376，高清约 1664，超清约 1920。实际宽高会按所选比例计算，并对齐到 32 的倍数。',
-      showInfoTip: !![],
+      showInfoTip: true,
       defaultValue: 'economy',
       qualityRatioLabelOrder: 'fieldFirst',
       options: RH_HAILUO_H3_AUDIO_DRIVEN_QUALITY_OPTIONS,
@@ -119,7 +119,7 @@ export const rhVideoHailuoH3AudioDrivenExecutionManifest = createRunningHubVideo
       'runninghub-international': Object['freeze']({ workflowId: '2093687111078051842' }),
     }),
     payloadResolver: 'runninghubHailuoH3AudioDriven',
-    collectMediaInputs: !![],
+    collectMediaInputs: true,
     taskCreate: Object['freeze']({ retainSeconds: 60 }),
   }),
   mapping: {

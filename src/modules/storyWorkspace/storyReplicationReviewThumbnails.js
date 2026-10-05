@@ -3,13 +3,13 @@ export function bindStoryReplicationReviewThumbnails(el, src) {
   const root = el['querySelector']('[data-replication-segments]'),
     value = src['replication']['sourceAnalysis'],
     map = new Set();
-  let enabled = ![],
-    item = ![],
-    enabled2 = ![];
+  let enabled = false,
+    item = false,
+    enabled2 = false;
   const isCurrent = () => !enabled && src['replication']['sourceAnalysis'] === value;
   async function run() {
     if (item || enabled2 || !isCurrent()) return;
-    item = !![];
+    item = true;
     try {
       while (map['size'] && !enabled2 && isCurrent()) {
         const list = [...map]['slice'](0, 6);
@@ -37,7 +37,7 @@ export function bindStoryReplicationReviewThumbnails(el, src) {
         } catch {}
       }
     } finally {
-      item = ![];
+      item = false;
     }
   }
   const intersectionObserver = new IntersectionObserver(
@@ -63,13 +63,13 @@ export function bindStoryReplicationReviewThumbnails(el, src) {
     ),
     {
       suspend() {
-        enabled2 = !![];
+        enabled2 = true;
       },
       resume() {
-        ((enabled2 = ![]), void run());
+        ((enabled2 = false), void run());
       },
       destroy() {
-        ((enabled = !![]), map['clear'](), intersectionObserver['disconnect']());
+        ((enabled = true), map['clear'](), intersectionObserver['disconnect']());
       },
     }
   );

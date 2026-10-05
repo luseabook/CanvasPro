@@ -25,7 +25,7 @@ export function createAudioVoiceInitialAnalysisProgress({ isLocal: isLocal, text
 }
 export async function recoverAudioVoiceLocalAsrRuntime({
   error: error2,
-  repairAttempted: repairAttempted = ![],
+  repairAttempted: repairAttempted = false,
   message: message,
   nodeId: nodeId,
   canCommit: canCommit,
@@ -39,7 +39,7 @@ export async function recoverAudioVoiceLocalAsrRuntime({
   repair: repair = repairAudioVoiceLocalAsrRuntime,
 }) {
   const run = (index) => windowObject?.['showToast']?.(index, 'error');
-  if (repairAttempted || !isAudioVoiceLocalAsrRuntimeFailure(error2)) return (run(message), ![]);
+  if (repairAttempted || !isAudioVoiceLocalAsrRuntimeFailure(error2)) return (run(message), false);
   const enabled = await confirmAction({
     className: 'audio-voice-start-analyze-confirm',
     title: text3('runtimeRepair.title'),
@@ -47,8 +47,8 @@ export async function recoverAudioVoiceLocalAsrRuntime({
     cancelLabel: text3('runtimeRepair.cancel'),
     confirmLabel: text3('runtimeRepair.confirm'),
   });
-  if (!canCommit()) return ![];
-  if (!enabled) return (run(message), ![]);
+  if (!canCommit()) return false;
+  if (!enabled) return (run(message), false);
   setAnalysisState('analyzing', { stage: 'asr-runtime-check', progress: 0 });
   try {
     return (
@@ -62,7 +62,7 @@ export async function recoverAudioVoiceLocalAsrRuntime({
       canCommit()
     );
   } catch (data) {
-    if (!canCommit()) return ![];
+    if (!canCommit()) return false;
     return (
       progressTracker['clear'](),
       setAnalysisState('error', null),
@@ -71,7 +71,7 @@ export async function recoverAudioVoiceLocalAsrRuntime({
           message: errorMessage(data, text3('toasts.analysisFailed')),
         }),
       ),
-      ![]
+      false
     );
   }
 }

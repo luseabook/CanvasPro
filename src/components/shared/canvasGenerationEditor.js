@@ -69,7 +69,7 @@ export function openCanvasGenerationEditor({
   const el2 = panel['querySelector']('.img-gen-btn');
   return (
     unavailableMessage &&
-      ((el2['disabled'] = !![]),
+      ((el2['disabled'] = true),
       el2['setAttribute']('aria-label', unavailableMessage),
       (el2['dataset']['tooltip'] = unavailableMessage),
       (el2['title'] = unavailableMessage)),
@@ -77,7 +77,7 @@ export function openCanvasGenerationEditor({
     overlay['append'](panel),
     document['body']['append'](overlay),
     new Promise((handler) => {
-      let item = ![],
+      let item = false,
         key,
         el3,
         beginModalInteraction2,
@@ -87,7 +87,7 @@ export function openCanvasGenerationEditor({
         result;
       const onClose = (value2 = null) => {
           if (item) return;
-          ((item = !![]),
+          ((item = true),
             cancelAnimationFrame(requestAnimationFrame2),
             index?.(),
             bindImageOverlayViewportPreview2?.(),

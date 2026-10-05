@@ -58,9 +58,9 @@ export function buildRunningHubWorkflowManifestBundle({
   const nodeInfoList = inputSlots['mapping']['inputs']['map'](({ inputName: inputName, ...urlField }) => ({
     ...urlField,
     fieldName: inputName,
-    preserveValueType: !![],
+    preserveValueType: true,
     ...(['prompt', 'param']['includes'](urlField['source']) && typeof urlField['defaultValue'] === 'string'
-      ? { allowEmpty: !![] }
+      ? { allowEmpty: true }
       : {}),
     ...(urlField['source']['endsWith']('Input') ? { urlField: urlField['field'] } : {}),
   }));
@@ -75,11 +75,11 @@ export function buildRunningHubWorkflowManifestBundle({
     displayName: displayName,
     description: description,
     icon: 'images/RH.png',
-    vip: !![],
+    vip: true,
     workflowId: parsed['workflowId'],
     submitMode: 'runninghub-task-create',
     queryMode: 'runninghubwf-query',
-    mapping: { nodeInfoList: nodeInfoList, allowEmptyNodeInfoList: !![] },
+    mapping: { nodeInfoList: nodeInfoList, allowEmptyNodeInfoList: true },
     uiFields: [RH_IMAGE_INSTANCE_FIELD, ...inputSlots['uiFields']],
     inputSlots: inputSlots['inputSlots'],
     capabilities: inputSlots['capabilities'],

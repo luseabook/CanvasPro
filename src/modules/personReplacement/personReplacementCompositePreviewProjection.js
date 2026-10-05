@@ -84,7 +84,7 @@ export function buildPersonReplacementCompositePreviewSnapshot(selectionMode = {
     shots: Object['freeze']([...completed]),
     selectedShot: selectedShot,
     selectedShotIds: Object['freeze']([...args4]),
-    selectionMode: selectionMode['workspace']?.['shotSelectionMode'] === !![],
+    selectionMode: selectionMode['workspace']?.['shotSelectionMode'] === true,
     previewMode: previewMode,
     fullAvailable: fullAvailable,
     composedShots: Object['freeze']([...args3]),

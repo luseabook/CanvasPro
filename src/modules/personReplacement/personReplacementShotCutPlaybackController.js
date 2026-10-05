@@ -19,15 +19,15 @@ export function createPersonReplacementShotCutPlaybackController({
   previewShotCut: previewShotCut,
 } = {}) {
   let options = 0,
-    enabled = ![],
+    enabled = false,
     target = null,
     source = 0,
     next = 0,
-    enabled2 = ![],
+    enabled2 = false,
     enabled3 = 0,
     clamp2 = 0;
   const stop = () => {
-      ((next += 1), (enabled2 = ![]), (enabled3 = 0), (clamp2 = 0));
+      ((next += 1), (enabled2 = false), (enabled3 = 0), (clamp2 = 0));
       const current = target;
       target = null;
       if (options) {
@@ -38,7 +38,7 @@ export function createPersonReplacementShotCutPlaybackController({
         } catch {}
         options = 0;
       }
-      enabled = ![];
+      enabled = false;
       if (source && current?.['cancelVideoFrameCallback'])
         try {
           current['cancelVideoFrameCallback'](source);
@@ -50,8 +50,8 @@ export function createPersonReplacementShotCutPlaybackController({
         !isEditorOpen() ||
         !enabled4 ||
         enabled4 !== target ||
-        enabled4['paused'] !== ![] ||
-        enabled4['ended'] === !![]
+        enabled4['paused'] !== false ||
+        enabled4['ended'] === true
       )
         return;
       if (options || source) return;
@@ -59,10 +59,10 @@ export function createPersonReplacementShotCutPlaybackController({
         record = () => {
           if (entry !== next || enabled4 !== target || !isEditorOpen()) return;
           ((options = 0),
-            (enabled = ![]),
+            (enabled = false),
             (source = 0),
             syncNativePlayback(enabled4),
-            enabled4['paused'] === ![] && enabled4['ended'] !== !![] && handler(enabled4));
+            enabled4['paused'] === false && enabled4['ended'] !== true && handler(enabled4));
         };
       if (typeof enabled4['requestVideoFrameCallback'] === 'function')
         try {
@@ -71,34 +71,34 @@ export function createPersonReplacementShotCutPlaybackController({
         } catch {}
       const run = windowObject?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
       typeof run === 'function'
-        ? ((enabled = ![]), (options = run(record)))
-        : ((enabled = !![]), (options = windowObject?.['setTimeout']?.(record, 16) || 0));
+        ? ((enabled = false), (options = run(record)))
+        : ((enabled = true), (options = windowObject?.['setTimeout']?.(record, 16) || 0));
     },
     startNative = (enabled5) => {
       if (!enabled5) return;
       (enabled5 !== target && (stop(), (target = enabled5)), handler(enabled5));
     },
     startReverse = (el, payload) => {
-      if (!el || !isEditorOpen()) return ![];
+      if (!el || !isEditorOpen()) return false;
       stop();
       try {
         el['pause']?.();
       } catch {}
-      ((target = el), (enabled2 = !![]), (enabled3 = 0));
+      ((target = el), (enabled2 = true), (enabled3 = 0));
       const handle = getDraft();
       ((clamp2 = clamp(payload, 0, getPersonReplacementShotCutTotalDuration(handle), 0)),
-        (el['muted'] = !![]));
+        (el['muted'] = true));
       const state = next,
         handler2 = () => {
           if (state !== next || !enabled2 || el !== target || !isEditorOpen()) return;
           const run2 = windowObject?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
           typeof run2 === 'function'
-            ? ((enabled = ![]), (options = run2(handler3)))
-            : ((enabled = !![]),
+            ? ((enabled = false), (options = run2(handler3)))
+            : ((enabled = true),
               (options = windowObject?.['setTimeout']?.(() => handler3(Date['now']()), 16) || 0));
         },
         handler3 = (config) => {
-          ((options = 0), (enabled = ![]));
+          ((options = 0), (enabled = false));
           if (state !== next || !enabled2 || el !== target || !isEditorOpen()) return;
           const scope = Number['isFinite'](Number(config)) ? Number(config) : Date['now']();
           if (!enabled3) enabled3 = scope;
@@ -112,11 +112,11 @@ export function createPersonReplacementShotCutPlaybackController({
             stop();
             return;
           }
-          if (enabled6['isReversed'] !== !![]) {
+          if (enabled6['isReversed'] !== true) {
             (stop(),
               previewShotCut(timelineSec['shotId'], timelineSec['sourceTimeSec'], {
                 timelineSec: timelineSec['timelineSec'],
-                autoplay: !![],
+                autoplay: true,
               }));
             return;
           }
@@ -128,7 +128,7 @@ export function createPersonReplacementShotCutPlaybackController({
             (stop(),
               previewShotCut(timelineSec['shotId'], timelineSec['sourceTimeSec'], {
                 timelineSec: timelineSec['timelineSec'],
-                autoplay: !![],
+                autoplay: true,
               }));
             return;
           }
@@ -147,7 +147,7 @@ export function createPersonReplacementShotCutPlaybackController({
           }
           handler2();
         };
-      return (handler2(), !![]);
+      return (handler2(), true);
     };
   return {
     isReverseActive: () => enabled2,

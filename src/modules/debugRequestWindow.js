@@ -22,7 +22,7 @@ function readWindowBounds(value) {
 export const DEBUG_GEAR_ICON =
   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m9 3-.6 2.2-2 .9-2-.6-2 3.4 1.5 1.6v2.3L2.4 15l2 3.4 2-.6 2 .9L9 21h4l.6-2.3 2-.9 2 .6 2-3.4-1.5-1.6v-2.3l1.5-1.6-2-3.4-2 .6-2-.9L13 3Z"/><circle cx="11" cy="12" r="3"/></svg>';
 export function isRequestDebugEnabled(key = globalThis['window']) {
-  return key?.['DEV_MODE'] === !![];
+  return key?.['DEV_MODE'] === true;
 }
 export function renderRequestDebugButton(index = '') {
   return (
@@ -46,7 +46,7 @@ export function openDebugRequestWindow({
   tabs: tabs,
   images: images,
   prepare: prepare,
-  requireDeveloperMode: requireDeveloperMode = !![],
+  requireDeveloperMode: requireDeveloperMode = true,
 } = {}) {
   if (!documentObject?.['body'] || (requireDeveloperMode && !isRequestDebugEnabled(windowObject)))
     return null;
@@ -65,9 +65,9 @@ export function openDebugRequestWindow({
     el2 = el['querySelector']('[role="status"]'),
     el3 = el['querySelector']('footer button'),
     source = documentObject['createElement']('div');
-  ((source['className'] = 'request-debug-image-preview'), (source['hidden'] = !![]), el['append'](source));
+  ((source['className'] = 'request-debug-image-preview'), (source['hidden'] = true), el['append'](source));
   let next = '',
-    enabled = ![],
+    enabled = false,
     box2 = null,
     current = null;
   const list = [],
@@ -98,11 +98,11 @@ export function openDebugRequestWindow({
     handler4 = () => {
       if (enabled) return;
       (handler2(),
-        (enabled = !![]),
+        (enabled = true),
         list['forEach']((handler5) => handler5()),
         el['remove'](),
         windows['delete'](documentObject));
-      if (data?.['isConnected']) data['focus']?.({ preventScroll: !![] });
+      if (data?.['isConnected']) data['focus']?.({ preventScroll: true });
     },
     handler6 = (scope, input) => {
       const box4 = el['getBoundingClientRect']();
@@ -129,14 +129,14 @@ export function openDebugRequestWindow({
       }
     }),
     handler(el, 'pointerdown', (value3) => value3['stopPropagation']()),
-    handler(el, 'wheel', (value4) => value4['stopPropagation'](), { passive: !![] }),
+    handler(el, 'wheel', (value4) => value4['stopPropagation'](), { passive: true }),
     handler(
       options,
       'scroll',
       () => {
-        ((source['hidden'] = !![]), source['replaceChildren']());
+        ((source['hidden'] = true), source['replaceChildren']());
       },
-      { passive: !![] },
+      { passive: true },
     ),
     handler(el['querySelector']('header'), 'pointerdown', (value5) => {
       if (value5['button'] !== 0 || value5['target']['closest']('button')) return;
@@ -174,7 +174,7 @@ export function openDebugRequestWindow({
   const run = (args = {}) => {
     if (enabled) return;
     (el['removeAttribute']('aria-busy'),
-      (el3['disabled'] = ![]),
+      (el3['disabled'] = false),
       (el2['textContent'] = '只读预览 · 未提交生成'));
     const list2 = args['tabs'] || [
       {
@@ -216,11 +216,11 @@ export function openDebugRequestWindow({
     (value8['observe'](el), list['push'](() => value8['disconnect']()));
   }
   (windows['set'](documentObject, { close: handler4, root: el }),
-    el['querySelector']('header button')['focus']({ preventScroll: !![] }));
+    el['querySelector']('header button')['focus']({ preventScroll: true }));
   if (prepare)
     (el['setAttribute']('aria-busy', 'true'),
       (options['textContent'] = '正在组装调试内容…'),
-      (el3['disabled'] = !![]),
+      (el3['disabled'] = true),
       (el2['innerHTML'] = DEBUG_WRENCH_ICON_HTML),
       Promise['resolve']()
         ['then'](prepare)

@@ -81,7 +81,7 @@ export function createCollaborationMembers({
                 getState()['session']?.['followActorId'] === person['id'] ? '' : person['id'],
               ),
             controls,
-            ![],
+            false,
           )),
             follow['setAttribute']('aria-label', '跟随 ' + person['name']));
           if (enabled3) {
@@ -105,7 +105,7 @@ export function createCollaborationMembers({
                     throw record;
                   }
                 });
-                entry === ![] && ((el['value'] = person['role']), permission['sync']());
+                entry === false && ((el['value'] = person['role']), permission['sync']());
               }));
             const el3 = button(
               '移除',

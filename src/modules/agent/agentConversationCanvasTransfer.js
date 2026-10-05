@@ -90,7 +90,7 @@ export function resolveAgentConversationCanvasTransfer({
     content2 = resolveSourceEntry(config, requestedVersion);
   if (enabled3)
     return {
-      matched: !![],
+      matched: true,
       target: 'selected_prompt',
       mode: APPEND_PROMPT_PATTERN['test'](payload) ? 'append' : 'replace',
       content: content2['content'],
@@ -99,7 +99,7 @@ export function resolveAgentConversationCanvasTransfer({
       sourceTurnId: String(content2['entry']?.['turnId'] || '')['trim'](),
     };
   return {
-    matched: !![],
+    matched: true,
     nodeType: 'ai-text',
     content: content2['content'],
     requestedVersion: requestedVersion,

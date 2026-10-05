@@ -1,11 +1,11 @@
 export function createGlobalCaptureReceiver({ api: api, handle: handle, capacity: capacity = 64 } = {}) {
   const receiverId = globalThis['crypto']['randomUUID'](),
     pendingEvents = new Map();
-  let disposed = ![];
+  let disposed = false;
   async function acknowledgeEvent(eventId, record) {
     try {
       (await api['acknowledgeEvent']({ eventId: eventId, receiverId: receiverId, ...record['outcome'] }),
-        (record['acknowledged'] = !![]));
+        (record['acknowledged'] = true));
     } catch {}
   }
   async function receive(payload = {}) {
@@ -26,35 +26,35 @@ export function createGlobalCaptureReceiver({ api: api, handle: handle, capacity
       if (!evictKey) return;
       pendingEvents['delete'](evictKey);
     }
-    const entry = { pending: !![], expiresAt: Number(payload['expiresAt']) || Date['now']() + 30000 };
+    const entry = { pending: true, expiresAt: Number(payload['expiresAt']) || Date['now']() + 30000 };
     pendingEvents['set'](eventId, entry);
     try {
       const claimResult = await api['claimEvent']({ eventId: eventId, receiverId: receiverId });
-      if (claimResult?.['ok'] !== !![]) {
+      if (claimResult?.['ok'] !== true) {
         pendingEvents['delete'](eventId);
         return;
       }
       const handleResult = disposed
-        ? { ok: ![], reason: 'receiver-disposed', retryable: !![] }
+        ? { ok: false, reason: 'receiver-disposed', retryable: true }
         : await handle(payload);
       entry['outcome'] = {
-        ok: handleResult?.['ok'] === !![],
-        ...(handleResult?.['ok'] === !![]
+        ok: handleResult?.['ok'] === true,
+        ...(handleResult?.['ok'] === true
           ? {}
           : {
               reason: String(handleResult?.['reason'] || 'action-failed'),
-              retryable: handleResult?.['retryable'] === !![],
+              retryable: handleResult?.['retryable'] === true,
             }),
       };
     } catch {
-      entry['outcome'] = { ok: ![], reason: 'delivery-uncertain', retryable: ![] };
+      entry['outcome'] = { ok: false, reason: 'delivery-uncertain', retryable: false };
     }
-    ((entry['pending'] = ![]), await acknowledgeEvent(eventId, entry));
+    ((entry['pending'] = false), await acknowledgeEvent(eventId, entry));
   }
   return {
     receive: receive,
     dispose: () => {
-      ((disposed = !![]), pendingEvents['clear']());
+      ((disposed = true), pendingEvents['clear']());
     },
   };
 }

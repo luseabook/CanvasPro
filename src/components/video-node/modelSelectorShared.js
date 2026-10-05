@@ -128,7 +128,7 @@ export function buildVideoModelMenuHTML({
       description: modelId['description'] || '',
       icon: modelId['icon'] || (label ? 'images/RH.png' : ''),
       iconAlt: modelId['provider'] || 'video',
-      vip: modelId['vip'] === !![],
+      vip: modelId['vip'] === true,
     }));
     return renderNodeModelMenu({
       kind: 'video',
@@ -325,7 +325,7 @@ export function renderVideoModelTriggerIconHTML({
     resolveModelExecution(entry, { providerHint: providerHint }) || resolveModelExecution(entry) || null,
   resolveProviderId: resolveProviderId = (record, payload, handle) =>
     normalizeProviderId(handle?.['modelManifest']?.['provider']) ||
-    resolveModelProvider(record, payload, { allowPrefixInference: ![] }) ||
+    resolveModelProvider(record, payload, { allowPrefixInference: false }) ||
     '',
 } = {}) {
   const execution = resolveExecution(model, provider),

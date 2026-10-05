@@ -243,7 +243,7 @@ export function createEdgeHitSpatialIndex({
   function upsert({ edgeId: edgeId, geometry: geometry2, order: order = 0 } = {}) {
     const edgeId2 = String(edgeId || ''),
       geometry3 = normalizeGeometry(geometry2);
-    if (!edgeId2 || !geometry3) return ![];
+    if (!edgeId2 || !geometry3) return false;
     remove(edgeId2);
     const value60 = { edgeId: edgeId2, geometry: geometry3, order: normalizeNumber(order) },
       list3 = [];
@@ -275,7 +275,7 @@ export function createEdgeHitSpatialIndex({
         }
       }
     }
-    return (edgeCount['set'](edgeId2, value60), map['set'](edgeId2, value62), !![]);
+    return (edgeCount['set'](edgeId2, value60), map['set'](edgeId2, value62), true);
   }
   function queryCandidates(value66, value67, value68 = 0) {
     const number5 = normalizeNumber(value66),

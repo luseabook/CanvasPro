@@ -250,10 +250,10 @@ export function buildSupportedAgentParamsFromHints(options4 = {}, value23 = {}) 
 }
 export function isAgentEditableParamField(options5 = {}, value27 = {}) {
   const enabled7 = String(options5?.['id'] || '')['trim']();
-  if (!enabled7) return ![];
+  if (!enabled7) return false;
   const value28 = String(options5['type'] || '')['toLowerCase']();
-  if (!['segmented', 'select', 'slider', 'stepper', 'toggle', 'text']['includes'](value28)) return ![];
-  if (Object['prototype']['hasOwnProperty']['call'](value27 || {}, enabled7)) return !![];
+  if (!['segmented', 'select', 'slider', 'stepper', 'toggle', 'text']['includes'](value28)) return false;
+  if (Object['prototype']['hasOwnProperty']['call'](value27 || {}, enabled7)) return true;
   return (
     COMMON_EDITABLE_PARAM_IDS['has'](enabled7) ||
     fieldLooksLike(options5, 'aspectratio', ['aspectRatio', 'ratio']) ||

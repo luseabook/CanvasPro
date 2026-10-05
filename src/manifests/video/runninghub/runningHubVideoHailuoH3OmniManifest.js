@@ -52,7 +52,7 @@ function createModeSlot({
     label: label,
     description: description,
     displayOrder: displayOrder,
-    required: ![],
+    required: false,
     showWhen: Object['freeze']({ field: RH_HAILUO_H3_MODE_FIELD_ID, value: mode }),
   });
 }
@@ -106,7 +106,7 @@ export const rhVideoHailuoH3OmniModelManifest = createRunningHubVideoModelManife
       fallbackIndex: 0,
     }),
     fixedSlots: RH_HAILUO_H3_FIXED_INPUT_SLOTS,
-    cycleFixedInputWhenFull: !![],
+    cycleFixedInputWhenFull: true,
     policyVariants: RH_HAILUO_H3_INPUT_POLICY_VARIANTS,
   },
   uiFields: [
@@ -130,7 +130,7 @@ export const rhVideoHailuoH3OmniModelManifest = createRunningHubVideoModelManife
       label: '清晰度',
       description:
         '清晰度档位主要控制生成尺寸：草稿长边约 608 像素，经济约 960，标准约 1376，高清约 1664，超清约 1920。实际宽高会按所选比例计算，并对齐到 32 的倍数。',
-      showInfoTip: !![],
+      showInfoTip: true,
       defaultValue: 'economy',
       qualityRatioLabelOrder: 'fieldFirst',
       options: RH_HAILUO_H3_QUALITY_OPTIONS,
@@ -196,7 +196,7 @@ export const rhVideoHailuoH3OmniExecutionManifest = createRunningHubVideoExecuti
       'runninghub-international': Object['freeze']({ workflowId: '2084270101859258369' }),
     }),
     payloadResolver: 'runninghubHailuoH3Omni',
-    collectMediaInputs: !![],
+    collectMediaInputs: true,
     taskCreate: Object['freeze']({ retainSeconds: 60 }),
   }),
   mapping: {

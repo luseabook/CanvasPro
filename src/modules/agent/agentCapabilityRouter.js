@@ -256,7 +256,7 @@ function inferNamespaces({
   }
   return (
     targetKind &&
-      (intent?.['canvasAction'] === !![] || intent?.['mutatesCanvas'] === !![]) &&
+      (intent?.['canvasAction'] === true || intent?.['mutatesCanvas'] === true) &&
       !list6['includes']('generation') &&
       list6['push']('generation'),
     list6

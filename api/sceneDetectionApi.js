@@ -43,7 +43,7 @@ export async function buildSceneDetectionRequest(videoUrl) {
     type: 'UNSUPPORTED_PROVIDER',
     provider: provider,
     message: '暂不支持厂商 ' + provider + ' 的场景检测',
-    retryable: ![],
+    retryable: false,
   });
 }
 async function pollSceneDetectionTask(taskId, provider2, apiKey2, value = {}) {
@@ -115,18 +115,18 @@ function processSceneDetectionResult(raw, provider3) {
         type: 'TASK_FAILED',
         provider: provider3,
         message: message['getUserMessage'](),
-        retryable: ![],
+        retryable: false,
       });
     const message2 =
       raw['error'] || raw['errorMessage'] || raw['message'] || raw['failure_reason'];
     if (message2)
-      throw new ApiError({ type: 'TASK_FAILED', provider: provider3, message: message2, retryable: ![] });
+      throw new ApiError({ type: 'TASK_FAILED', provider: provider3, message: message2, retryable: false });
     throw new ApiError({
       type: 'PARSE_ERROR',
       provider: provider3,
       message: '无法从服务器响应中提取场景检测结果',
       raw: raw,
-      retryable: ![],
+      retryable: false,
     });
   }
   return { sceneChanges: sceneChanges, sceneCount: sceneChanges['length'] + 1 };

@@ -2,7 +2,7 @@ import { createWorkspacePresentationLifecycle } from '../workspacePresentationLi
 export function createCanvasWorkspacePresentation({ root: root, renderer: renderer, warmup: warmup } = {}) {
   const workspacePresentationLifecycle = createWorkspacePresentationLifecycle({
     getRoot: () => root,
-    initiallyActive: !![],
+    initiallyActive: true,
   });
   return {
     setPresentationActive(value) {

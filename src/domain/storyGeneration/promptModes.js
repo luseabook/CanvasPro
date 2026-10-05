@@ -11,32 +11,32 @@ export const STORY_PROMPT_MODE_OPTIONS = Object['freeze']([
   Object['freeze']({
     value: STORY_PROMPT_MODE_SEEDANCE_2_0,
     label: 'Seedance 2.0',
-    enabled: !![],
+    enabled: true,
     rules: 'current',
   }),
   Object['freeze']({
     value: STORY_PROMPT_MODE_SEEDANCE_2_5,
     label: 'Seedance 2.5',
-    enabled: !![],
+    enabled: true,
     rules: 'continuous-timeline',
   }),
   Object['freeze']({
     value: STORY_PROMPT_MODE_WAN_3_0,
     label: 'Wan 3.0',
-    enabled: !![],
+    enabled: true,
     rules: 'wan-multimodal-timeline',
   }),
   Object['freeze']({
     value: STORY_PROMPT_MODE_MINIMAX_H3,
     label: 'MiniMax H3',
-    enabled: !![],
+    enabled: true,
     rules: 'minimax-h3-multimodal-story',
   }),
 ]);
 function normalizeText(value) {
   return String(value || '')['trim']();
 }
-export function normalizeStoryPromptMode(item, { allowDeveloperModes: allowDeveloperModes = ![] } = {}) {
+export function normalizeStoryPromptMode(item, { allowDeveloperModes: allowDeveloperModes = false } = {}) {
   const text = normalizeText(item)['toLowerCase']();
   return STORY_PROMPT_MODE_OPTIONS['some'](
     (el) => el['value'] === text && (el['enabled'] || allowDeveloperModes),

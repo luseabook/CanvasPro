@@ -71,12 +71,12 @@ export function syncPersonReplacementVideoStageFrame(el) {
   const count = Math['max'](0, Number(el?.['videoWidth']) || 0),
     count2 = Math['max'](0, Number(el?.['videoHeight']) || 0),
     el2 = el?.['closest']?.('[data-person-replacement-video-playback-stage]');
-  if (!(count > 0 && count2 > 0) || !el2?.['style']) return ![];
+  if (!(count > 0 && count2 > 0) || !el2?.['style']) return false;
   return (
     el2['style']['setProperty']('--frame-aspect', count + ' / ' + count2),
     el2['style']['setProperty']('--frame-width', String(count)),
     el2['style']['setProperty']('--frame-height', String(count2)),
-    !![]
+    true
   );
 }
 function normalizeProgress(data) {
@@ -96,7 +96,7 @@ function buildPreparationPresentation(current, entry, record, enabled) {
     materializationStatus = normalizeText(entry?.['materializationStatus'])['toLowerCase']() || 'idle',
     sourcePending =
       !enabled &&
-      Boolean(record?.['pending'] === !![] || materializationStatus === 'running' || status === 'running'),
+      Boolean(record?.['pending'] === true || materializationStatus === 'running' || status === 'running'),
     sourceFailed =
       !enabled &&
       Boolean(
@@ -124,33 +124,33 @@ function buildGenerationEligibility({
   imageInput: imageInput,
 }) {
   if (!shot)
-    return { canGenerate: ![], reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['MISSING_SHOT'] };
+    return { canGenerate: false, reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['MISSING_SHOT'] };
   if (generation['isActive'])
     return {
-      canGenerate: ![],
+      canGenerate: false,
       reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['GENERATION_RUNNING'],
     };
   if (preparation['sourcePending'])
     return {
-      canGenerate: ![],
+      canGenerate: false,
       reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['SOURCE_PREPARING'],
     };
   if (preparation['sourceFailed'])
     return {
-      canGenerate: ![],
+      canGenerate: false,
       reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['SOURCE_PREPARATION_FAILED'],
     };
   if (!sourceReady)
     return {
-      canGenerate: ![],
+      canGenerate: false,
       reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['MISSING_SOURCE_VIDEO'],
     };
   if (imageInput['status'] !== 'ready')
     return {
-      canGenerate: ![],
+      canGenerate: false,
       reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['MISSING_IMAGE_INPUT'],
     };
-  return { canGenerate: !![], reason: '' };
+  return { canGenerate: true, reason: '' };
 }
 function buildOutputPresentation(handle, state) {
   const config =
@@ -268,7 +268,7 @@ function renderVideoNodeCenterPlayIndicator() {
 }
 function renderVideoReplacementPlaybackControls(
   options4 = {},
-  { role: role = 'source', context: context = 'video-replacement', disabled: disabled = ![] } = {},
+  { role: role = 'source', context: context = 'video-replacement', disabled: disabled = false } = {},
 ) {
   const className = context === 'comparison',
     value6 = role === 'result' ? 'result' : 'source',
@@ -280,43 +280,43 @@ function renderVideoReplacementPlaybackControls(
       ? 'person-replacement-video-playback-controls person-replacement-compare-playback-controls'
       : 'person-replacement-video-playback-controls',
     controlsAttributes: className
-      ? { 'data-person-replacement-compare-playback-controls': !![] }
+      ? { 'data-person-replacement-compare-playback-controls': true }
       : {
           'data-person-replacement-video-controls': value6,
           'data-person-replacement-video-label': label,
         },
     playAttributes: className
       ? {
-          'data-person-replacement-compare-playback-control': !![],
+          'data-person-replacement-compare-playback-control': true,
           'data-person-replacement-action': 'toggle-comparison-playback',
           'aria-pressed': 'false',
         }
-      : { 'data-person-replacement-video-play': !![] },
+      : { 'data-person-replacement-video-play': true },
     currentTimeAttributes: {
       [className
         ? 'data-person-replacement-compare-current-time'
-        : 'data-person-replacement-video-time-current']: !![],
+        : 'data-person-replacement-video-time-current']: true,
     },
     progressAttributes: {
       [className ? 'data-person-replacement-compare-progress' : 'data-person-replacement-video-progress']:
-        !![],
+        true,
     },
     progressFillAttributes: {
       [className
         ? 'data-person-replacement-compare-progress-fill'
-        : 'data-person-replacement-video-progress-fill']: !![],
+        : 'data-person-replacement-video-progress-fill']: true,
     },
     totalTimeAttributes: {
       [className ? 'data-person-replacement-compare-total-time' : 'data-person-replacement-video-time-total']:
-        !![],
+        true,
     },
     volumeAttributes: {
-      [className ? 'data-person-replacement-compare-volume' : 'data-person-replacement-video-volume']: !![],
+      [className ? 'data-person-replacement-compare-volume' : 'data-person-replacement-video-volume']: true,
     },
     volumeToggleAttributes: {
       [className
         ? 'data-person-replacement-compare-volume-toggle'
-        : 'data-person-replacement-video-volume-toggle']: !![],
+        : 'data-person-replacement-video-volume-toggle']: true,
     },
     playLabel: '播放' + label,
     progressLabel: className ? '同步播放进度' : label + '播放进度',
@@ -387,7 +387,7 @@ function renderVideoReplacementPreview(value7, value8, value9) {
     '" data-person-replacement-video-poster="' +
     escapeHtml(mediaUrl2) +
     '" data-person-replacement-video-reversed="' +
-    (value10['materializedIsReversed'] === !![]) +
+    (value10['materializedIsReversed'] === true) +
     '" data-person-replacement-video-center-stage data-shot-id="' +
     escapeHtml(value10['id']) +
     '" style="' +
@@ -407,13 +407,13 @@ function renderVideoReplacementPreview(value7, value8, value9) {
     '\n    </div>\n  </div>'
   );
 }
-function renderVideoReplacementResult(title, { isGenerating: isGenerating = ![] } = {}) {
+function renderVideoReplacementResult(title, { isGenerating: isGenerating = false } = {}) {
   const enabled3 = title?.['shot'] || null,
     value16 = title?.['history'] || {},
     value17 = title?.['media'] || {},
     value18 = Number(value16['activeIndex']) || 0,
     text4 = normalizeText(value17['resultRef']),
-    value19 = value16['hasMultipleResults'] === !![],
+    value19 = value16['hasMultipleResults'] === true,
     value20 = value19
       ? '' +
         renderPersonReplacementPreviewArrow('previous', {
@@ -497,13 +497,13 @@ function renderVideoReplacementGenerateButton(
   value26,
   {
     presentation: presentation = {},
-    shotBatchGenerationActive: shotBatchGenerationActive = ![],
+    shotBatchGenerationActive: shotBatchGenerationActive = false,
     shotBatchGeneratingShotIds: shotBatchGeneratingShotIds = [],
-    shotBatchCancelRequested: shotBatchCancelRequested = ![],
+    shotBatchCancelRequested: shotBatchCancelRequested = false,
   } = {},
 ) {
   const value27 = presentation['shot'] || null,
-    enabled4 = value26['workspace']['shotSelectionMode'] === !![],
+    enabled4 = value26['workspace']['shotSelectionMode'] === true,
     enabled5 = Array['isArray'](value26['workspace']['selectedShotIds'])
       ? value26['workspace']['selectedShotIds']['length']
       : 0,
@@ -650,7 +650,7 @@ function renderVideoReplacementPage(
       providerProfileId: inputMode['settings']['replacementVideoProviderProfileId'],
       providerProfileIdByModel: inputMode['settings']['replacementVideoProviderProfileIdByModel'],
       referenceCounts: referenceCounts['slotState']['referenceCounts'],
-      showSchemaControls: !![],
+      showSchemaControls: true,
       allowedModelIds: PERSON_REPLACEMENT_VIDEO_MODEL_IDS,
       className: 'person-replacement-video-model-selector',
     }) +

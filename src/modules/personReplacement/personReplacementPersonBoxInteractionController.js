@@ -43,7 +43,7 @@ export function createPersonReplacementPersonBoxInteractionController({
     requireFunction(entry, 'requestRender', requestRender),
     requireFunction(entry, 'runRequest', runRequest),
     requireFunction(entry, 'updateStageA11y', updateStageA11y));
-  let enabled = ![],
+  let enabled = false,
     value2 = null,
     value3 = null,
     enabled2 = '',
@@ -79,11 +79,11 @@ export function createPersonReplacementPersonBoxInteractionController({
       handle
     );
   }
-  function selectBox(el4, { focus: focus = !![] } = {}) {
+  function selectBox(el4, { focus: focus = true } = {}) {
     const state = handler(),
       text3 = normalizeText(el4?.['dataset']?.['shotId'] || state['workspace']?.['selectedShotId']),
       text4 = normalizeText(el4?.['dataset']?.['personId']);
-    if (!text3 || !text4) return ![];
+    if (!text3 || !text4) return false;
     ((enabled2 = text3),
       (enabled3 = text4),
       run()
@@ -95,11 +95,11 @@ export function createPersonReplacementPersonBoxInteractionController({
       el4['classList']?.['add']?.(KEYBOARD_SELECTED_CLASS));
     if (focus)
       try {
-        el4['focus']?.({ preventScroll: !![] });
+        el4['focus']?.({ preventScroll: true });
       } catch {
         el4['focus']?.();
       }
-    return !![];
+    return true;
   }
   function run4() {
     const list = Array['from'](run()?.['querySelectorAll']?.(DETECTION_BOX_SELECTOR) || []);
@@ -116,8 +116,8 @@ export function createPersonReplacementPersonBoxInteractionController({
   }
   function bringBoxToFront(scope) {
     const enabled5 = run2(scope);
-    if (!enabled5) return ![];
-    return ((enabled4 = enabled5), run4(), !![]);
+    if (!enabled5) return false;
+    return ((enabled4 = enabled5), run4(), true);
   }
   function run5() {
     const list2 = Array['from'](run()?.['querySelectorAll']?.(DETECTION_BOX_SELECTOR) || []),
@@ -128,8 +128,8 @@ export function createPersonReplacementPersonBoxInteractionController({
       }));
   }
   function clearBatchSelection() {
-    if (!map['size']) return ![];
-    return ((map = new Set()), run5(), !![]);
+    if (!map['size']) return false;
+    return ((map = new Set()), run5(), true);
   }
   function selectBatch(output, value4 = []) {
     const text5 = normalizeText(output);
@@ -161,7 +161,7 @@ export function createPersonReplacementPersonBoxInteractionController({
   function focusBatchSelectionStage() {
     const el9 = run()?.['querySelector']?.('[data-story-marquee-surface="people"]');
     try {
-      el9?.['focus']?.({ preventScroll: !![] });
+      el9?.['focus']?.({ preventScroll: true });
     } catch {
       el9?.['focus']?.();
     }
@@ -172,7 +172,7 @@ export function createPersonReplacementPersonBoxInteractionController({
     const personReplacementBoxDragDistance = getPersonReplacementBoxDragDistance(value8, enabled6);
     if (!enabled6['hasDragged'] && personReplacementBoxDragDistance < MANUAL_SELECTION_DRAG_THRESHOLD_PX)
       return enabled6['items']['map']((value9) => value9['originalBox']);
-    enabled6['hasDragged'] = !![];
+    enabled6['hasDragged'] = true;
     const x = run3(value8, enabled6['stage']),
       box2 = {
         x: x['x'] - enabled6['start']['x'],
@@ -197,9 +197,9 @@ export function createPersonReplacementPersonBoxInteractionController({
       enabled6['items']['map']((value13) => value13['currentBox'])
     );
   }
-  function run7(value14, { cancelled: cancelled = ![] } = {}) {
+  function run7(value14, { cancelled: cancelled = false } = {}) {
     const shotId2 = value3;
-    if (!shotId2) return ![];
+    if (!shotId2) return false;
     if (!cancelled && value14) applyPreview(value14);
     ((value3 = null), shotId2['cleanup']?.());
     if (cancelled)
@@ -207,9 +207,9 @@ export function createPersonReplacementPersonBoxInteractionController({
         shotId2['items']['forEach']((value15) => {
           applyManualBoxPreview(value15['element'], value15['originalBox']);
         }),
-        !![]
+        true
       );
-    if (!shotId2['hasDragged']) return !![];
+    if (!shotId2['hasDragged']) return true;
     onUpdatePeopleRequested({
       shotId: shotId2['shotId'],
       updates: shotId2['items']['map']((personId) => ({
@@ -218,10 +218,10 @@ export function createPersonReplacementPersonBoxInteractionController({
       })),
     });
     if (shotId2['isBatchMove']) focusBatchSelectionStage();
-    return !![];
+    return true;
   }
-  function beginBoxEdit(event2, element, { batch: batch = ![] } = {}) {
-    if (value3 || Number(event2?.['button']) > 0 || !element) return ![];
+  function beginBoxEdit(event2, element, { batch: batch = false } = {}) {
+    if (value3 || Number(event2?.['button']) > 0 || !element) return false;
     const value16 = handler(),
       shotId3 = normalizeText(element['dataset']?.['shotId'] || value16['workspace']?.['selectedShotId']),
       personId2 = normalizeText(element['dataset']?.['personId']),
@@ -232,7 +232,7 @@ export function createPersonReplacementPersonBoxInteractionController({
       args = value19?.['locator']?.['bbox'] || value19?.['bbox'],
       stage = element['closest']?.('[data-person-replacement-keyframe-stage]'),
       isBatchMove = batch && map['has'](run2(element));
-    if (!stage || !args) return ![];
+    if (!stage || !args) return false;
     if (!isBatchMove) selectBox(element);
     const start = run3(event2, stage),
       mode = isBatchMove
@@ -271,7 +271,7 @@ export function createPersonReplacementPersonBoxInteractionController({
               currentBox: { ...args },
             },
           ];
-    if (!items['length']) return ![];
+    if (!items['length']) return false;
     const personReplacementBoxDragPreview = createPersonReplacementBoxDragPreview({
         getSession: () => value3,
         applyPreview: applyPreview,
@@ -280,11 +280,11 @@ export function createPersonReplacementPersonBoxInteractionController({
       }),
       value23 = personReplacementBoxDragPreview['schedule'],
       value24 = (value25) => run7(value25),
-      value26 = () => run7(null, { cancelled: !![] });
+      value26 = () => run7(null, { cancelled: true });
     return (
       windowObject?.['addEventListener']?.('pointermove', value23),
-      windowObject?.['addEventListener']?.('pointerup', value24, { once: !![] }),
-      windowObject?.['addEventListener']?.('pointercancel', value26, { once: !![] }),
+      windowObject?.['addEventListener']?.('pointerup', value24, { once: true }),
+      windowObject?.['addEventListener']?.('pointercancel', value26, { once: true }),
       (value3 = {
         shotId: shotId3,
         stage: stage,
@@ -293,7 +293,7 @@ export function createPersonReplacementPersonBoxInteractionController({
         start: start,
         startClientX: Number['isFinite'](Number(event2?.['clientX'])) ? Number(event2['clientX']) : 0,
         startClientY: Number['isFinite'](Number(event2?.['clientY'])) ? Number(event2['clientY']) : 0,
-        hasDragged: ![],
+        hasDragged: false,
         items: items,
         cleanup: () => {
           (personReplacementBoxDragPreview['cancel'](),
@@ -304,7 +304,7 @@ export function createPersonReplacementPersonBoxInteractionController({
       }),
       event2['preventDefault']?.(),
       event2['stopPropagation']?.(),
-      !![]
+      true
     );
   }
   function run8(value27) {
@@ -317,10 +317,10 @@ export function createPersonReplacementPersonBoxInteractionController({
       enabled7['preview']['style']?.['setProperty']?.('--selection-width', box3['width'] * 100 + '%'),
       enabled7['preview']['style']?.['setProperty']?.('--selection-height', box3['height'] * 100 + '%'));
   }
-  function run9(event3, { cancelled: cancelled = ![] } = {}) {
+  function run9(event3, { cancelled: cancelled = false } = {}) {
     const shotId4 = value2;
-    if (!shotId4) return ![];
-    ((value2 = null), shotId4['cleanup']?.(), (enabled = ![]));
+    if (!shotId4) return false;
+    ((value2 = null), shotId4['cleanup']?.(), (enabled = false));
     const value28 = event3
         ? Math['hypot'](
             Number(event3['clientX']) - shotId4['startClientX'],
@@ -328,15 +328,15 @@ export function createPersonReplacementPersonBoxInteractionController({
           )
         : 0,
       enabled8 = shotId4['hasDragged'] || value28 >= MANUAL_SELECTION_DRAG_THRESHOLD_PX;
-    if (!cancelled && !enabled8) return (requestRender(), !![]);
+    if (!cancelled && !enabled8) return (requestRender(), true);
     const value29 = run3(event3, shotId4['stage']),
       bbox = cancelled ? null : normalizePersonReplacementManualSelection(shotId4['start'], value29);
     if (bbox) runRequest(onManualPersonSelected, { shotId: shotId4['shotId'], bbox: bbox });
     else !cancelled && windowObject?.['showToast']?.('框选范围太小，请完整框住需要替换的主体。', 'info');
-    return (requestRender(), !![]);
+    return (requestRender(), true);
   }
   function beginManualSelection(event4, stage2) {
-    if (!enabled || value2 || !stage2) return ![];
+    if (!enabled || value2 || !stage2) return false;
     const value30 = handler(),
       start2 = run3(event4, stage2),
       preview = documentObject?.['createElement']?.('div') || null;
@@ -350,23 +350,23 @@ export function createPersonReplacementPersonBoxInteractionController({
             Number(event5['clientY']) - Number(event4['clientY']),
           ) >= MANUAL_SELECTION_DRAG_THRESHOLD_PX
         ) {
-          if (value2) value2['hasDragged'] = !![];
+          if (value2) value2['hasDragged'] = true;
         }
         run8(run3(event5, stage2));
       },
       value32 = (value33) => run9(value33),
-      value34 = () => run9(event4, { cancelled: !![] });
+      value34 = () => run9(event4, { cancelled: true });
     return (
       windowObject?.['addEventListener']?.('pointermove', value31),
-      windowObject?.['addEventListener']?.('pointerup', value32, { once: !![] }),
-      windowObject?.['addEventListener']?.('pointercancel', value34, { once: !![] }),
+      windowObject?.['addEventListener']?.('pointerup', value32, { once: true }),
+      windowObject?.['addEventListener']?.('pointercancel', value34, { once: true }),
       (value2 = {
         shotId: normalizeText(stage2['dataset']?.['shotId'] || value30['workspace']?.['selectedShotId']),
         stage: stage2,
         start: start2,
         startClientX: Number(event4['clientX']),
         startClientY: Number(event4['clientY']),
-        hasDragged: ![],
+        hasDragged: false,
         preview: preview,
         cleanup: () => {
           (windowObject?.['removeEventListener']?.('pointermove', value31),
@@ -378,19 +378,19 @@ export function createPersonReplacementPersonBoxInteractionController({
       run8(start2),
       event4['preventDefault']?.(),
       event4['stopPropagation']?.(),
-      !![]
+      true
     );
   }
   function cancelManualSelection() {
-    if (value2) return run9(null, { cancelled: !![] });
-    if (!enabled) return ![];
-    return ((enabled = ![]), requestRender(), !![]);
+    if (value2) return run9(null, { cancelled: true });
+    if (!enabled) return false;
+    return ((enabled = false), requestRender(), true);
   }
   function setManualSelectionActive(value35) {
-    return ((enabled = value35 === !![]), enabled);
+    return ((enabled = value35 === true), enabled);
   }
   function run10() {
-    if (!enabled2 || !enabled3) return ![];
+    if (!enabled2 || !enabled3) return false;
     const value36 = handler(),
       value37 = (Array['isArray'](value36['shots']) ? value36['shots'] : [])['some'](
         (value38) =>
@@ -402,7 +402,7 @@ export function createPersonReplacementPersonBoxInteractionController({
           )
         : null;
     if (value40) return selectBox(value40);
-    return (clearKeyboardSelection(), ![]);
+    return (clearKeyboardSelection(), false);
   }
   function restoreLayerState() {
     (run4(), run5());
@@ -436,7 +436,7 @@ export function createPersonReplacementPersonBoxInteractionController({
   }
   function handleSelectionKeyDown(
     event7,
-    { deletionEnabled: deletionEnabled = ![], isEditableTarget: isEditableTarget = ![] } = {},
+    { deletionEnabled: deletionEnabled = false, isEditableTarget: isEditableTarget = false } = {},
   ) {
     const list4 = run6(),
       value44 = new Set(list4['map']((value45) => value45['shotId']));
@@ -458,11 +458,11 @@ export function createPersonReplacementPersonBoxInteractionController({
         event7['stopPropagation']?.(),
         clearBatchSelection(),
         runRequest(onDeletePeopleRequested, { shotId: shotId5, personIds: personIds }),
-        !![]
+        true
       );
     }
     if (list4['length'] && !isEditableTarget && event7?.['key'] === 'Escape')
-      return (event7['preventDefault']?.(), event7['stopPropagation']?.(), clearBatchSelection(), !![]);
+      return (event7['preventDefault']?.(), event7['stopPropagation']?.(), clearBatchSelection(), true);
     const shotId6 = run12();
     if (
       shotId6 &&
@@ -482,29 +482,29 @@ export function createPersonReplacementPersonBoxInteractionController({
           shotId: shotId6['shot']['id'],
           personIds: [shotId6['person']['id']],
         }),
-        !![]
+        true
       );
-    return ![];
+    return false;
   }
   function handleEscape(event8) {
     if (value3)
       return (
         event8?.['preventDefault']?.(),
         event8?.['stopPropagation']?.(),
-        run7(null, { cancelled: !![] }),
-        !![]
+        run7(null, { cancelled: true }),
+        true
       );
     if (enabled || value2)
-      return (event8?.['preventDefault']?.(), event8?.['stopPropagation']?.(), cancelManualSelection(), !![]);
-    return ![];
+      return (event8?.['preventDefault']?.(), event8?.['stopPropagation']?.(), cancelManualSelection(), true);
+    return false;
   }
   function destroy() {
-    if (value3) run7(null, { cancelled: !![] });
+    if (value3) run7(null, { cancelled: true });
     if (value2) {
       const value47 = value2;
       ((value2 = null), value47['cleanup']?.());
     }
-    ((enabled = ![]), (map = new Set()), (enabled2 = ''), (enabled3 = ''), (enabled4 = ''));
+    ((enabled = false), (map = new Set()), (enabled2 = ''), (enabled3 = ''), (enabled4 = ''));
   }
   return Object['freeze']({
     beginBoxEdit: beginBoxEdit,

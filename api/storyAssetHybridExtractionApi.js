@@ -56,8 +56,8 @@ function cloneValue(enabled) {
   return JSON['parse'](JSON['stringify'](enabled));
 }
 function hasSameStoryAssetAuthoritativeContent(list, list2) {
-  if (!Array['isArray'](list) || !Array['isArray'](list2)) return ![];
-  if (list['length'] !== list2['length']) return ![];
+  if (!Array['isArray'](list) || !Array['isArray'](list2)) return false;
+  if (list['length'] !== list2['length']) return false;
   const list3 = ['ref', 'episodeRef', 'source', 'heading', 'body'];
   return list['every']((value, item) => {
     const key = list2[item];
@@ -93,9 +93,9 @@ function createStoryAssetFocusedContractSnapshot(
   };
 }
 function compareStoryAssetSceneHeadingContractRows(list4, list5) {
-  if (!Array['isArray'](list4) || !Array['isArray'](list5)) return { compatible: ![], changed: ![] };
-  if (list4['length'] !== list5['length']) return { compatible: ![], changed: ![] };
-  let changed = ![];
+  if (!Array['isArray'](list4) || !Array['isArray'](list5)) return { compatible: false, changed: false };
+  if (list4['length'] !== list5['length']) return { compatible: false, changed: false };
+  let changed = false;
   for (let result = 0; result < list4['length']; result += 1) {
     const error = list4[result],
       error2 = list5[result];
@@ -108,14 +108,14 @@ function compareStoryAssetSceneHeadingContractRows(list4, list5) {
       enabled2 === enabled3 ||
       normalizeStorySceneHeadingIdentity(enabled2) !== enabled3
     )
-      return { compatible: ![], changed: ![] };
+      return { compatible: false, changed: false };
     const error3 = cloneValue(error),
       error4 = cloneValue(error2);
     (delete error3['name'], delete error3['clientKey'], delete error4['name'], delete error4['clientKey']);
-    if (JSON['stringify'](error3) !== JSON['stringify'](error4)) return { compatible: ![], changed: ![] };
-    changed = !![];
+    if (JSON['stringify'](error3) !== JSON['stringify'](error4)) return { compatible: false, changed: false };
+    changed = true;
   }
-  return { compatible: !![], changed: changed };
+  return { compatible: true, changed: changed };
 }
 function areStoryAssetSceneHeadingContractSnapshotsCompatible(data, options) {
   const cloneValue2 = cloneValue(data),
@@ -124,12 +124,12 @@ function areStoryAssetSceneHeadingContractSnapshotsCompatible(data, options) {
     delete cloneValue2['candidateAssets'],
     delete cloneValue3['requiredAssets'],
     delete cloneValue3['candidateAssets']);
-  if (JSON['stringify'](cloneValue2) !== JSON['stringify'](cloneValue3)) return ![];
+  if (JSON['stringify'](cloneValue2) !== JSON['stringify'](cloneValue3)) return false;
   const compareStoryAssetSceneHeadingContractRows2 = compareStoryAssetSceneHeadingContractRows(
     data?.['requiredAssets'],
     options?.['requiredAssets'],
   );
-  if (!compareStoryAssetSceneHeadingContractRows2['compatible']) return ![];
+  if (!compareStoryAssetSceneHeadingContractRows2['compatible']) return false;
   const compareStoryAssetSceneHeadingContractRows3 = compareStoryAssetSceneHeadingContractRows(
     data?.['candidateAssets'],
     options?.['candidateAssets'],
@@ -164,9 +164,9 @@ function isStoryAssetSceneHeadingContractMigration({
     resumeDraft2?.['status'] !== 'completed' ||
     resumeDraft2?.['qualityReview']
   )
-    return ![];
+    return false;
   const enabled4 = resumeDraft2?.['rawResponseContractSnapshotsByKind'];
-  if (!enabled4 || typeof enabled4 !== 'object') return ![];
+  if (!enabled4 || typeof enabled4 !== 'object') return false;
   const current = Object['fromEntries'](
     ['character', 'scene', 'prop']['map']((entry) => [
       entry,
@@ -182,8 +182,8 @@ function isStoryAssetSceneHeadingContractMigration({
     JSON['stringify'](enabled4['character']) !== JSON['stringify'](current['character']) ||
     JSON['stringify'](enabled4['prop']) !== JSON['stringify'](current['prop'])
   )
-    return ![];
-  if (JSON['stringify'](enabled4['scene']) === JSON['stringify'](current['scene'])) return ![];
+    return false;
+  if (JSON['stringify'](enabled4['scene']) === JSON['stringify'](current['scene'])) return false;
   return areStoryAssetSceneHeadingContractSnapshotsCompatible(enabled4['scene'], current['scene']);
 }
 function getStoryAssetPaidDraftKinds(record) {
@@ -207,7 +207,7 @@ function getStoryAssetPaidDraftKinds(record) {
 }
 function isStoryAssetPaidLaneRerunAuthorized(handle, state) {
   return Boolean(
-    handle?.['confirmed'] === !![] &&
+    handle?.['confirmed'] === true &&
     Array['isArray'](handle?.['authorizedKinds']) &&
     handle['authorizedKinds']['includes'](state),
   );
@@ -238,7 +238,7 @@ function getStoryAssetProtectedPaidBatchKeys(config) {
 }
 function isStoryAssetPaidBatchRerunAuthorized(value3, value4) {
   return Boolean(
-    value3?.['confirmed'] === !![] &&
+    value3?.['confirmed'] === true &&
     Array['isArray'](value3?.['authorizedBatchIds']) &&
     value3['authorizedBatchIds']['includes'](value4),
   );
@@ -383,14 +383,14 @@ function shouldUseDirectStoryAssetApi(options3 = {}, list8 = []) {
     const list10 = list9['flatMap']((value18) =>
       Array['isArray'](value18?.['characters']) ? value18['characters'] : [],
     );
-    if (!list10['some']((value19) => !isNarrativeStoryCharacterFragment(value19))) return ![];
+    if (!list10['some']((value19) => !isNarrativeStoryCharacterFragment(value19))) return false;
   }
   const count = list8['reduce']((value20, dom) => value20 + String(dom?.['body'] || '')['length'], 0);
   return count > 0 && count <= STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS;
 }
 function hasCompleteStructuredStorySceneEvidence(list11 = [], value21 = {}) {
   const list12 = Array['isArray'](list11) ? list11 : [];
-  if (!list12['length']) return ![];
+  if (!list12['length']) return false;
   const map3 = new Set(getHardRequiredStorySceneRefs(value21));
   return list12['every'](
     (value22) =>
@@ -490,9 +490,9 @@ function getStorySceneQualitySourceRefs(value40 = '', value41 = []) {
 }
 function storyPropQualityRequirementMatches(error7 = {}, value45 = '') {
   const args5 = normalizeStoryAssetQualityName(value45);
-  if (!args5) return ![];
-  if (normalizeStoryAssetQualityName(error7?.['name']) === args5) return !![];
-  if ([...args5]['length'] < 3) return ![];
+  if (!args5) return false;
+  if (normalizeStoryAssetQualityName(error7?.['name']) === args5) return true;
+  if ([...args5]['length'] < 3) return false;
   const list22 = normalizeStoryAssetQualityName(
     [
       error7?.['scriptFacts'],
@@ -609,7 +609,7 @@ export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
 }
 function collectLegacyQuotedStoryProps(
   list32 = [],
-  { includeEpisodeTitles: includeEpisodeTitles = ![] } = {},
+  { includeEpisodeTitles: includeEpisodeTitles = false } = {},
 ) {
   const list33 = [];
   return (
@@ -647,7 +647,7 @@ function createStoryAssetQualityResumeRequirementAliases(enabled5, args8, value6
     },
     value67 = {
       ...args10,
-      prop: collectLegacyQuotedStoryProps(value66, { includeEpisodeTitles: !![] }),
+      prop: collectLegacyQuotedStoryProps(value66, { includeEpisodeTitles: true }),
     },
     value68 = JSON['stringify'](args8),
     map6 = new Map();
@@ -661,19 +661,19 @@ function createStoryAssetQualityResumeRequirementAliases(enabled5, args8, value6
 }
 function promptCopiesStorySource(value71 = '', list35 = []) {
   const list36 = compactStoryAssetQualityText(value71);
-  if (list36['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return ![];
+  if (list36['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return false;
   return list35['some']((dom3) => {
     const list37 = compactStoryAssetQualityText(dom3?.['body']);
-    if (list37['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return ![];
+    if (list37['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return false;
     for (
       let value72 = 0;
       value72 <= list37['length'] - STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS;
       value72 += Math['floor'](STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS / 2)
     ) {
       const value73 = list37['slice'](value72, value72 + STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS);
-      if (list36['includes'](value73)) return !![];
+      if (list36['includes'](value73)) return true;
     }
-    return ![];
+    return false;
   });
 }
 function removeNarrativeUploadFallbackCharacterAssets(
@@ -681,7 +681,7 @@ function removeNarrativeUploadFallbackCharacterAssets(
   value74 = {},
   value75 = [],
   value76 = value75,
-  { requireVerifiedFallbackCharacters: requireVerifiedFallbackCharacters = ![] } = {},
+  { requireVerifiedFallbackCharacters: requireVerifiedFallbackCharacters = false } = {},
 ) {
   const list38 = [
       ...(Array['isArray'](value74?.['hardRequired']) ? value74['hardRequired'] : []),
@@ -788,9 +788,9 @@ export function assertStoryAssetPublicResultQuality(options6 = {}, value79 = [],
         if (map12['has'](value97)) continue;
         map12['add'](value97);
         const value98 = map11['get'](value97);
-        if (value98 === undefined || handler2(value98, map12)) return (map11['set'](value97, value91), !![]);
+        if (value98 === undefined || handler2(value98, map12)) return (map11['set'](value97, value91), true);
       }
-      return ![];
+      return false;
     };
   (list45['forEach']((value99, value100) => {
     !handler2(value100, new Set()) && handler('scene', '缺少原子场景“' + value99 + '”');
@@ -909,8 +909,8 @@ async function checkpointStoryAssetQualityFailure(error19, enabled6, value105) {
 function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
   const response6 = cloneValue(value108);
   if (!response6) return value108;
-  let enabled7 = ![];
-  response6['qualityReview'] && (delete response6['qualityReview'], (enabled7 = !![]));
+  let enabled7 = false;
+  response6['qualityReview'] && (delete response6['qualityReview'], (enabled7 = true));
   let enabled8 = 0;
   ['character', 'scene', 'prop']['forEach']((value109) => {
     const response7 = response6?.['kindStates']?.[value109],
@@ -1116,7 +1116,7 @@ async function prepareStoryAssetQualityRecoveryDraft(enabled10, value116, value1
 export async function extractStoryAssetsHybridExperimental({
   project: project = {},
   episodes: episodes = [],
-  preferLocal: preferLocal = !![],
+  preferLocal: preferLocal = true,
   localExtract: localExtract = undefined,
   onProgress: onProgress = null,
   onCheckpoint: onCheckpoint = null,
@@ -1385,7 +1385,7 @@ export async function extractStoryAssetsHybridExperimental({
           diagnostics: diagnostics,
           onProgress: onProgress,
           resumeDraft: resumeDraft4 ? null : resumeDraft3,
-          allowLocalBaselineFallback: ![],
+          allowLocalBaselineFallback: false,
           requestLimit: 3,
           onCheckpoint: onCheckpoint2,
         });
@@ -1505,8 +1505,8 @@ export async function extractStoryAssetsHybridExperimental({
     }
     const project2 = createBudgetedStoryAssetEvidenceProject(project, sourceScenes, {
         requirementEvidence: requirementEvidence,
-        includeAllSceneHeadings: !![],
-        includeAllSceneCharacters: !![],
+        includeAllSceneHeadings: true,
+        includeAllSceneCharacters: true,
         bodyCharacterBudget: STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS,
       }),
       value142 =
@@ -1586,8 +1586,8 @@ export async function extractStoryAssetsHybridExperimental({
         resumeSourceAliases: resumeSourceAliases,
         resumeSourceFingerprintAliases: [],
         allowSavedPaidResultContractRevalidation: allowSavedPaidResultContractRevalidation,
-        allowOversizedPrompt: !![],
-        automaticRecovery: ![],
+        allowOversizedPrompt: true,
+        automaticRecovery: false,
         structuredOutputFallback: 'none',
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
         onCheckpoint: async (args21) => {
@@ -1635,7 +1635,7 @@ export async function extractStoryAssetsHybridExperimental({
   }
   let extractionMode2 = 'api-fallback',
     localRuntime4 = null,
-    value145 = ![];
+    value145 = false;
   const value146 =
       resumeDraft3?.['qualityReview']?.['status'] === 'blocked'
         ? String(resumeDraft3?.['hybridExtractionMode'] || '')['trim']()
@@ -1701,7 +1701,7 @@ export async function extractStoryAssetsHybridExperimental({
         }
         ((extractionMode2 = 'api-fallback'),
           (evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, [])),
-          (value145 = !![]),
+          (value145 = true),
           reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
             status: 'fallback',
             errorMessage: String(error24?.['message'] || error24 || ''),
@@ -1719,7 +1719,7 @@ export async function extractStoryAssetsHybridExperimental({
           (localRuntime4 = resumeDraft3?.['hybridLocalRuntime']
             ? cloneValue(resumeDraft3['hybridLocalRuntime'])
             : null))
-        : ((evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, [])), (value145 = !![]));
+        : ((evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, [])), (value145 = true));
   }
   if (extractionMode2 === 'local-pp-uie' || value145) {
     const resumeDraft6 = resumeDraft3,
@@ -1737,8 +1737,8 @@ export async function extractStoryAssetsHybridExperimental({
           project,
           evidenceCharacters2,
           includeAllSceneHeadings >= 3
-            ? { requirementEvidence: requirementEvidence, includeAllSceneCharacters: !![] }
-            : { includeAllSceneHeadings: !![], includeAllSceneCharacters: !![] },
+            ? { requirementEvidence: requirementEvidence, includeAllSceneCharacters: true }
+            : { includeAllSceneHeadings: true, includeAllSceneCharacters: true },
         ),
         requiredAssetNamesByKind: requiredAssetNamesByKind4,
       }));
@@ -1748,7 +1748,7 @@ export async function extractStoryAssetsHybridExperimental({
         project: createBudgetedStoryAssetEvidenceProject(project, evidenceCharacters2, {
           requirementEvidence: requirementEvidence,
           includeAllSceneHeadings: includeAllSceneHeadings < 3,
-          includeAllSceneCharacters: !![],
+          includeAllSceneCharacters: true,
           bodyCharacterBudget: Number['MAX_SAFE_INTEGER'],
         }),
         requiredAssetNamesByKind: requiredAssetNamesByKind3,
@@ -1826,8 +1826,8 @@ export async function extractStoryAssetsHybridExperimental({
         resumeSourceAliases: resumeSourceAliases2,
         resumeSourceFingerprintAliases: [],
         allowSavedPaidResultContractRevalidation: allowSavedPaidResultContractRevalidation2,
-        allowOversizedPrompt: !![],
-        automaticRecovery: ![],
+        allowOversizedPrompt: true,
+        automaticRecovery: false,
         structuredOutputFallback: 'none',
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
         resumeDraft: resumeDraft6,
@@ -1847,7 +1847,7 @@ export async function extractStoryAssetsHybridExperimental({
         requirementEvidence,
         evidenceCharacters2,
         sourceScenes,
-        { requireVerifiedFallbackCharacters: !![] },
+        { requireVerifiedFallbackCharacters: true },
       );
     try {
       assertStoryAssetPublicResultQuality(args23, sourceScenes, requiredAssetNamesByKind3);
@@ -1886,7 +1886,7 @@ export async function extractStoryAssetsHybridExperimental({
       diagnostics: diagnostics,
       onProgress: onProgress,
       resumeDraft: resumeDraft3,
-      allowLocalBaselineFallback: ![],
+      allowLocalBaselineFallback: false,
       requestLimit: 3,
       onCheckpoint: onCheckpoint4,
     }),

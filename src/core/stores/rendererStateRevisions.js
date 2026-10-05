@@ -21,10 +21,10 @@ export function createRendererStateRevisionTracker(state) {
     state[key] = (state[key] || 0) + 1;
   }
   function markRevisions({
-    nodes: nodes = ![],
-    membership: membership = ![],
-    geometry: geometry = ![],
-    sourceVideo: sourceVideo = ![],
+    nodes: nodes = false,
+    membership: membership = false,
+    geometry: geometry = false,
+    sourceVideo: sourceVideo = false,
   } = {}) {
     if (nodes) bump('_nodesRev');
     if (membership) bump('_nodeMembershipRev');
@@ -32,10 +32,10 @@ export function createRendererStateRevisionTracker(state) {
     if (sourceVideo) bump('_sourceVideoRev');
   }
   function createBatch() {
-    const pending = { nodes: ![], geometry: ![], sourceVideo: ![] };
+    const pending = { nodes: false, geometry: false, sourceVideo: false };
     return {
       patch(previous, next) {
-        ((pending['nodes'] = !![]),
+        ((pending['nodes'] = true),
           (pending['geometry'] = pending['geometry'] || hasGeometryChange(previous, next)),
           (pending['sourceVideo'] = pending['sourceVideo'] || hasSourceVideoChange(previous, next)));
       },
@@ -47,38 +47,38 @@ export function createRendererStateRevisionTracker(state) {
   return {
     add(node, previousNode) {
       markRevisions({
-        nodes: !![],
-        membership: !![],
-        geometry: !![],
+        nodes: true,
+        membership: true,
+        geometry: true,
         sourceVideo: hasSourceVideoChange(node, previousNode),
       });
     },
     content() {
-      markRevisions({ nodes: !![] });
+      markRevisions({ nodes: true });
     },
     geometry() {
-      markRevisions({ nodes: !![], geometry: !![] });
+      markRevisions({ nodes: true, geometry: true });
     },
     remove(ids) {
       const removed = (ids || [])['map']((id) => state['nodes']?.[id])['filter'](Boolean);
       if (removed['length'] === 0) return;
       markRevisions({
-        nodes: !![],
-        membership: !![],
-        geometry: !![],
+        nodes: true,
+        membership: true,
+        geometry: true,
         sourceVideo: removed['some']((node) => node['type'] === 'source-video'),
       });
     },
     patch(previous, next) {
       markRevisions({
-        nodes: !![],
+        nodes: true,
         geometry: hasGeometryChange(previous, next),
         sourceVideo: hasSourceVideoChange(previous, next),
       });
     },
     batch: createBatch,
     reload() {
-      markRevisions({ nodes: !![], membership: !![], geometry: !![], sourceVideo: !![] });
+      markRevisions({ nodes: true, membership: true, geometry: true, sourceVideo: true });
     },
     renderRequest() {
       bump('_renderRequestRev');

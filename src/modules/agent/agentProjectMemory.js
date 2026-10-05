@@ -47,8 +47,8 @@ function normalizeEntries(index) {
     ['map']((result) => normalizeText(result))
     ['filter']((enabled) => {
       const data = enabled['toLocaleLowerCase']();
-      if (!enabled || map['has'](data)) return ![];
-      return (map['add'](data), !![]);
+      if (!enabled || map['has'](data)) return false;
+      return (map['add'](data), true);
     })
     ['slice'](-AGENT_PROJECT_MEMORY_ENTRY_LIMIT);
 }
@@ -93,11 +93,11 @@ function parseRememberRecords(handle = '') {
 }
 function hasExplicitRememberIntent(scope = '') {
   const text3 = normalizeText(scope, 1200);
-  if (!text3 || MEMORY_QUESTION_PATTERN['test'](text3)) return ![];
-  if (REMEMBER_PREFIX_PATTERN['test'](text3) || FUTURE_PREFIX_PATTERN['test'](text3)) return !![];
+  if (!text3 || MEMORY_QUESTION_PATTERN['test'](text3)) return false;
+  if (REMEMBER_PREFIX_PATTERN['test'](text3) || FUTURE_PREFIX_PATTERN['test'](text3)) return true;
   if (PROJECT_SCOPE_PREFIX_PATTERN['test'](text3))
     return CATEGORY_PATTERNS['some'](([, input]) => input['test'](text3)) || /偏好/['test'](text3);
-  return ![];
+  return false;
 }
 export function normalizeAgentProjectMemory(
   options2 = {},

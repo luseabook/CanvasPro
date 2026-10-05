@@ -8,22 +8,22 @@ function normalizeText(value) {
 }
 function seekVideoToTime(el, item, key = STORY_CLIP_FRAME_SEEK_TIMEOUT_MS) {
   return new Promise((handler) => {
-    let index = ![],
+    let index = false,
       setTimeout2 = null;
     const run = (result) => {
         if (index) return;
-        index = !![];
+        index = true;
         if (setTimeout2) clearTimeout(setTimeout2);
         (el['removeEventListener']?.('seeked', data),
           el['removeEventListener']?.('error', options),
           el['removeEventListener']?.('abort', options),
-          handler(result === !![]));
+          handler(result === true));
       },
-      data = () => run(!![]),
-      options = () => run(![]);
-    (el['addEventListener']?.('seeked', data, { once: !![] }),
-      el['addEventListener']?.('error', options, { once: !![] }),
-      el['addEventListener']?.('abort', options, { once: !![] }),
+      data = () => run(true),
+      options = () => run(false);
+    (el['addEventListener']?.('seeked', data, { once: true }),
+      el['addEventListener']?.('error', options, { once: true }),
+      el['addEventListener']?.('abort', options, { once: true }),
       (setTimeout2 = setTimeout(
         () => run(!el['seeking'] && Math['abs'](Number(el['currentTime']) - Number(item)) <= 0.05),
         key,
@@ -31,12 +31,12 @@ function seekVideoToTime(el, item, key = STORY_CLIP_FRAME_SEEK_TIMEOUT_MS) {
     try {
       el['currentTime'] = item;
     } catch {
-      run(![]);
+      run(false);
       return;
     }
     !el['seeking'] &&
       Math['abs'](Number(el['currentTime']) - Number(item)) <= 0.01 &&
-      queueMicrotask(() => run(!![]));
+      queueMicrotask(() => run(true));
   });
 }
 function resolveCaptureTime(target, source) {
@@ -95,8 +95,8 @@ export async function captureStoryClipFrameFromSource({
   const text3 = normalizeText(sourceUrl2);
   if (!text3 || !documentObject?.['createElement']) throw new Error('片段视频本地源不可用');
   const el2 = documentObject['createElement']('video');
-  ((el2['muted'] = !![]),
-    (el2['playsInline'] = !![]),
+  ((el2['muted'] = true),
+    (el2['playsInline'] = true),
     (el2['preload'] = 'auto'),
     (el2['style']['position'] = 'fixed'),
     (el2['style']['left'] = '-10000px'),

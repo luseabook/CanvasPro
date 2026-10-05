@@ -51,7 +51,7 @@ export class DirectorTimelinePanel {
       (this['delivery'] = new DirectorDeliveryPanel(this)),
       (this['generation'] = new DirectorGenerationPanel(this)),
       (this['mobile'] = new DirectorMobileCamera(this)),
-      (this['open'] = ![]),
+      (this['open'] = false),
       (this['drafts'] = new Map()));
   }
   ['draft'](current, entry) {
@@ -62,11 +62,11 @@ export class DirectorTimelinePanel {
         cameraPreset: 'front-medium',
         duration: 3,
         amount: 3,
-        append: ![],
+        append: false,
         start: 0,
         actionId: 'walking-left',
         speed: 1,
-        orient: !![],
+        orient: true,
         points: [],
         span: 12,
         pathDuration: 3,
@@ -243,29 +243,29 @@ export class DirectorTimelinePanel {
     );
   }
   ['mutate'](value12, value13) {
-    (this['timeline']['stopPlayback']({ render: ![] }),
+    (this['timeline']['stopPlayback']({ render: false }),
       this['timeline']['_mutateAnimation']('director-motion', value12, value13));
     const { shot: shot2 } = this['context']();
     if (shot2) this['timeline']['_sampleAt'](this['timeline']['_timeForShot'](shot2));
   }
   ['handleClick'](enabled, el, event) {
-    if (this['mobile']['click'](enabled)) return !![];
-    if (this['generation']['click'](enabled, el)) return !![];
-    if (this['delivery']['click'](enabled, el)) return !![];
-    if (this['scenePanel']['click'](enabled, el)) return !![];
-    if (this['characters']['click'](enabled)) return !![];
-    if (clickDirectorFollow(this, enabled, el)) return !![];
-    if (this['timeline']['cameraPath']['handleClick'](enabled)) return !![];
-    if (!enabled['startsWith']('timeline-director-')) return ![];
+    if (this['mobile']['click'](enabled)) return true;
+    if (this['generation']['click'](enabled, el)) return true;
+    if (this['delivery']['click'](enabled, el)) return true;
+    if (this['scenePanel']['click'](enabled, el)) return true;
+    if (this['characters']['click'](enabled)) return true;
+    if (clickDirectorFollow(this, enabled, el)) return true;
+    if (this['timeline']['cameraPath']['handleClick'](enabled)) return true;
+    if (!enabled['startsWith']('timeline-director-')) return false;
     if (enabled === 'timeline-director-toggle') {
       this['open'] = !this['open'];
       !this['open'] &&
-        (this['timeline']['cameraPath']['stop'](), this['mobile']['disconnect']({ render: ![] }));
+        (this['timeline']['cameraPath']['stop'](), this['mobile']['disconnect']({ render: false }));
       if (this['open']) this['timeline']['expandDirectorPanel']?.();
-      return (this['timeline']['requestRender']?.(), !![]);
+      return (this['timeline']['requestRender']?.(), true);
     }
     const { scene: scene2, shot: shot3, object: object3 } = this['context']();
-    if (!shot3 || el['disabled']) return !![];
+    if (!shot3 || el['disabled']) return true;
     const preset = this['draft'](shot3, object3);
     try {
       switch (enabled) {
@@ -376,18 +376,18 @@ export class DirectorTimelinePanel {
     } catch (error4) {
       this['timeline']['setMessage']?.(error4['message']);
     }
-    return !![];
+    return true;
   }
   ['handleChange'](event2) {
-    if (this['generation']['change'](event2)) return !![];
-    if (this['delivery']['change'](event2)) return !![];
-    if (this['scenePanel']['change'](event2)) return !![];
-    if (this['characters']['change'](event2)) return !![];
-    if (changeDirectorFollow(this, event2)) return !![];
-    if (this['timeline']['cameraPath']['handleChange'](event2)) return !![];
+    if (this['generation']['change'](event2)) return true;
+    if (this['delivery']['change'](event2)) return true;
+    if (this['scenePanel']['change'](event2)) return true;
+    if (this['characters']['change'](event2)) return true;
+    if (changeDirectorFollow(this, event2)) return true;
+    if (this['timeline']['cameraPath']['handleChange'](event2)) return true;
     const el2 = event2['target'],
       { shot: shot4, object: object4 } = this['context']();
-    if (!shot4) return ![];
+    if (!shot4) return false;
     const value21 = this['draft'](shot4, object4);
     if (el2['matches']?.('[data-director-field]')) {
       const value22 = el2['dataset']['directorField'];
@@ -400,13 +400,13 @@ export class DirectorTimelinePanel {
       if (value22 === 'span')
         value21['span'] = Math['max'](2, Math['min'](200, Number(value21['span']) || 12));
       if (value22 === 'span') this['refreshMap']();
-      return !![];
+      return true;
     }
     if (el2['matches']?.('[data-director-point]')) {
       const value23 = value21['points'][Number(el2['dataset']['directorPoint'])],
         value24 = Number(el2['value']);
       if (value23 && Number['isFinite'](value24)) value23[Number(el2['dataset']['axis'])] = value24;
-      return (this['refreshMap'](), !![]);
+      return (this['refreshMap'](), true);
     }
     if (el2['matches']?.('[data-director-constraint]')) {
       const value25 = el2['dataset']['directorConstraint'];
@@ -418,7 +418,7 @@ export class DirectorTimelinePanel {
             value26['cameraConstraint'][value25] = el2['type'] === 'checkbox' ? el2['checked'] : el2['value'];
           return normalizeStoryboard3DShotAnimation(value26);
         }),
-        !![]
+        true
       );
     }
     if (el2['matches']?.('[data-director-clip-field]')) {
@@ -428,17 +428,17 @@ export class DirectorTimelinePanel {
           el2['dataset']['directorClipField']
         ] === Number(el2['value'])
       )
-        return !![];
+        return true;
       return (
         this['mutate']('调整动作片段', (value29) => {
           const value30 = value29['actionClips']['find']((value31) => value31['id'] === value27);
           if (value30) value30[el2['dataset']['directorClipField']] = Number(el2['value']);
           return normalizeStoryboard3DShotAnimation(value29);
         }),
-        !![]
+        true
       );
     }
-    return ![];
+    return false;
   }
   ['refreshMap']() {
     const enabled2 = this['timeline']

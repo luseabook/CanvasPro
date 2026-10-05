@@ -9,7 +9,7 @@ function buildStoryEpisodeSceneSpatialAnchor(options = {}, value = null) {
 }
 export function createStoryEpisodeSplitCompactSceneCatalog(
   list = [],
-  { includeSpatialAnchors: includeSpatialAnchors = ![] } = {},
+  { includeSpatialAnchors: includeSpatialAnchors = false } = {},
 ) {
   const list2 = [];
   return (

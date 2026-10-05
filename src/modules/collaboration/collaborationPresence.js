@@ -32,7 +32,7 @@ export function createCollaborationPresence({
   let setTimeout2 = null,
     box = null,
     enabled = null,
-    enabled2 = ![],
+    enabled2 = false,
     value = '',
     offscreenMembers = readOffscreenMembers();
   const run = () => ({ ...store['getStateRaw']()['viewport'], ...getViewportPanPreview() }),
@@ -250,7 +250,7 @@ export function createCollaborationPresence({
     }),
     value3 = new windowObject['MutationObserver'](run2);
   (value3['observe'](documentObject['documentElement'], {
-    attributes: !![],
+    attributes: true,
     attributeFilter: ['style', 'class'],
   }),
     run2(),
@@ -261,7 +261,7 @@ export function createCollaborationPresence({
     ((box = { x: x['clientX'], y: x['clientY'] }),
       getSession()?.['setPresence'](screenToWorld(box['x'], box['y'], run())));
   };
-  documentObject['addEventListener']('pointermove', value4, { passive: !![] });
+  documentObject['addEventListener']('pointermove', value4, { passive: true });
   const value5 = (event2) => {
       if (event2['type'] === 'keydown' && ['Shift', 'Control', 'Alt', 'Meta']['includes'](event2['key']))
         return;
@@ -272,7 +272,7 @@ export function createCollaborationPresence({
     },
     value7 = ['pointerdown', 'wheel', 'keydown'];
   for (const value8 of value7)
-    documentObject['addEventListener'](value8, value5, { capture: !![], passive: !![] });
+    documentObject['addEventListener'](value8, value5, { capture: true, passive: true });
   const run3 = store['subscribeSelector'](
     (state2) =>
       [
@@ -289,7 +289,7 @@ export function createCollaborationPresence({
   return {
     redraw: redraw,
     destroy() {
-      ((enabled2 = !![]),
+      ((enabled2 = true),
         clearTimeout(setTimeout2),
         map2['clear'](),
         run3(),
@@ -299,7 +299,7 @@ export function createCollaborationPresence({
         windowObject['removeEventListener']('resize', redraw),
         windowObject['removeEventListener'](VIEWPORT_PAN_PREVIEW_FRAME_EVENT, redraw),
         documentObject['removeEventListener']('pointermove', value4));
-      for (const value9 of value7) documentObject['removeEventListener'](value9, value5, !![]);
+      for (const value9 of value7) documentObject['removeEventListener'](value9, value5, true);
       if (enabled) windowObject['cancelAnimationFrame'](enabled);
       for (const el9 of map['values']()) el9['remove']();
       (map['clear'](), el['remove']());

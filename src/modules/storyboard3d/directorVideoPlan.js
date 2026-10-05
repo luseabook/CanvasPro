@@ -4,7 +4,7 @@ export function createDirectorVideoPlan(value, item, key = {}) {
   const args = item['map']((args2) => {
     const result = key['scenes']?.['find']((data) => data['id'] === args2['sceneId']) || value;
     let storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(
-      { ...args2['animation'], loop: ![] },
+      { ...args2['animation'], loop: false },
       { camera: args2['camera'] },
     );
     const options = key['videoTrack'] || 'all';
@@ -66,7 +66,7 @@ export function sampleDirectorVideoPlan(config, scope, input) {
     config['track'] === 'all'
       ? input['objects']
       : input['objects']['map']((args3) =>
-          args3['id'] === config['track'] ? args3 : { ...args3, actionPlaying: ![] },
+          args3['id'] === config['track'] ? args3 : { ...args3, actionPlaying: false },
         );
   return sampleStoryboard3DShotAnimation(
     output['animation'],

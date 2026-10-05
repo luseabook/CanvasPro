@@ -21,9 +21,9 @@ export function deletePromptMention(controller, pill, selection, key, onDeleted)
     else range['setStart'](selection['startContainer'], selection['startOffset']);
   }
   (windowSelection['removeAllRanges'](), windowSelection['addRange'](range));
-  let removed = ![];
+  let removed = false;
   try {
-    removed = doc['execCommand']('delete', ![]);
+    removed = doc['execCommand']('delete', false);
   } catch {}
   if (removed) onDeleted(controller);
   else (windowSelection['removeAllRanges'](), windowSelection['addRange'](originalRange));
@@ -44,14 +44,14 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
     triggerRange =
       options['triggerRange'] || (windowSelection['rangeCount'] ? windowSelection['getRangeAt'](0) : null),
     pillToEdit = options['pillToEdit'];
-  if (!pillToEdit && (!triggerRange || !promptEl['contains'](triggerRange['startContainer']))) return ![];
-  const clone = promptEl['cloneNode'](!![]),
+  if (!pillToEdit && (!triggerRange || !promptEl['contains'](triggerRange['startContainer']))) return false;
+  const clone = promptEl['cloneNode'](true),
     pill = pillApi['createPill'](mention, controller);
   if (pillToEdit) {
-    if (!promptEl['contains'](pillToEdit)) return ![];
+    if (!promptEl['contains'](pillToEdit)) return false;
     cloneTarget(promptEl, clone, pillToEdit)['replaceWith'](pill);
   } else {
-    if (triggerRange['startContainer']['nodeType'] !== 3) return ![];
+    if (triggerRange['startContainer']['nodeType'] !== 3) return false;
     const textNode = cloneTarget(promptEl, clone, triggerRange['startContainer']),
       caretOffset = triggerRange['startOffset'],
       atIndex =
@@ -61,7 +61,7 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
               textNode['textContent']['lastIndexOf']('@', caretOffset - 1),
               textNode['textContent']['lastIndexOf']('＠', caretOffset - 1),
             );
-    if (atIndex < 0) return ![];
+    if (atIndex < 0) return false;
     const range = doc['createRange']();
     (range['setStart'](textNode, atIndex),
       range['setEnd'](textNode, caretOffset),
@@ -86,33 +86,33 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
       (range['setStart'](node, match['start']),
         range['setEnd'](node, match['end']),
         range['deleteContents'](),
-        range['insertNode'](pill['cloneNode'](!![])));
+        range['insertNode'](pill['cloneNode'](true)));
     }
   }
   const pillIndex = [...clone['querySelectorAll']('.ref-pill')]['indexOf'](pill),
     scrollTop = promptEl['scrollTop'],
     scrollLeft = promptEl['scrollLeft'],
     savedRange = windowSelection['rangeCount'] ? windowSelection['getRangeAt'](0)['cloneRange']() : null;
-  promptEl['focus']({ preventScroll: !![] });
+  promptEl['focus']({ preventScroll: true });
   const range = doc['createRange']();
   (range['selectNodeContents'](promptEl),
     windowSelection['removeAllRanges'](),
     windowSelection['addRange'](range));
-  let inserted = ![];
+  let inserted = false;
   try {
-    inserted = doc['execCommand']('insertHTML', ![], clone['innerHTML']);
+    inserted = doc['execCommand']('insertHTML', false, clone['innerHTML']);
   } catch {}
   if (!inserted) {
     windowSelection['removeAllRanges']();
     if (savedRange) windowSelection['addRange'](savedRange);
-    return ![];
+    return false;
   }
   pillApi['hydrate'](controller);
   const insertedPill = promptEl['querySelectorAll']('.ref-pill')[pillIndex];
   if (insertedPill) {
     const range = doc['createRange']();
     (range['setStartAfter'](insertedPill),
-      range['collapse'](!![]),
+      range['collapse'](true),
       windowSelection['removeAllRanges'](),
       windowSelection['addRange'](range));
   }
@@ -120,6 +120,6 @@ export function insertSelectedPromptMention(controller, mention, options, pillAp
     pillApi['commit'](controller),
     (promptEl['scrollTop'] = scrollTop),
     (promptEl['scrollLeft'] = scrollLeft),
-    !![]
+    true
   );
 }

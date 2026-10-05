@@ -203,7 +203,7 @@ class AssetManager {
       (this['_sidebarTabsLayoutRaf'] = 0),
       (this['_assetPackageUpsertByKey'] = new Map()),
       (this['_materialSearchQuery'] = ''),
-      (this['_materialFavoritesOnly'] = ![]),
+      (this['_materialFavoritesOnly'] = false),
       (this['_expandedMaterialCategories'] = new Set()),
       (this['_expandedMaterialAssets'] = new Set()),
       (this['_pendingMaterialFolderDeleteKey'] = ''),
@@ -270,7 +270,7 @@ class AssetManager {
     return !!this['_findCategoryByName'](value17, HIDDEN_ASSET_CATEGORIES);
   }
   ['_isManagedAsset'](enabled2) {
-    if (!enabled2 || typeof enabled2 !== 'object') return ![];
+    if (!enabled2 || typeof enabled2 !== 'object') return false;
     if (
       HIDDEN_ASSET_KINDS['includes'](
         String(enabled2?.['kind'] || '')
@@ -278,7 +278,7 @@ class AssetManager {
           ['toLowerCase'](),
       )
     )
-      return ![];
+      return false;
     return !this['_isHiddenAssetCategory'](enabled2?.['category']);
   }
   ['_findCategoryByName'](value18, value19 = this['tabs']) {
@@ -371,13 +371,13 @@ class AssetManager {
           pendingFolderDeleteKey: '',
           error: '',
         }),
-        this['_renderCreatePanelFolderTree']({ focusRename: !![] }),
+        this['_renderCreatePanelFolderTree']({ focusRename: true }),
         category
       );
     }
     return (
       this['renderSidebarContent'](),
-      this['_focusMaterialCategoryRenameInput'](value34, { select: !![] }),
+      this['_focusMaterialCategoryRenameInput'](value34, { select: true }),
       category
     );
   }
@@ -667,7 +667,7 @@ class AssetManager {
   }
   async ['_resolveCreatePanelCover'](value75, value76 = {}) {
     const value77 =
-      value76['preferPreview'] === !![]
+      value76['preferPreview'] === true
         ? resolveAssetNodePreviewUrl(value75)
         : resolveAssetNodeCoverUrl(value75);
     if (value77) return { ...this['_buildCreatePanelCoverInfo'](value75, value77), objectUrl: '' };
@@ -697,7 +697,7 @@ class AssetManager {
     const value82 = String(coverType3?.['objectUrl'] || '');
     if (!el10 || this['createPanel'] !== el10 || !this['_createPanelState']) {
       if (value82['startsWith']('blob:')) URL['revokeObjectURL'](value82);
-      return ![];
+      return false;
     }
     this['_createPanelCoverObjectUrl'] &&
       this['_createPanelCoverObjectUrl'] !== value82 &&
@@ -719,7 +719,7 @@ class AssetManager {
       el11 &&
         ((el11['innerHTML'] = coverInfo['coverHtml']),
         this['_applyCreatePanelCoverAspect'](el11, coverInfo['aspectRatio'])),
-      !![]
+      true
     );
   }
   ['_buildAssetPayloadFromSelection'](value83, error = {}) {
@@ -796,7 +796,7 @@ class AssetManager {
       mode: 'create',
       selectedAssetId: '',
       updateSearchKeyword: '',
-      updateConfirmOpen: ![],
+      updateConfirmOpen: false,
       expandedFolderKeys: new Set(),
       selectedFolderCategory: '',
       editingFolderCategory: '',
@@ -804,11 +804,11 @@ class AssetManager {
       folderActionBusyKey: '',
       pendingFolderDeleteKey: '',
       deletingFolderKey: '',
-      customCategoryEditing: ![],
+      customCategoryEditing: false,
       customCategoryDraft: '',
       customCategories: [],
       error: '',
-      saving: ![],
+      saving: false,
       savingAction: '',
       draft: { name: name3 || assetManagerText('newAsset'), category: this['activeTab'] },
       coverInfo: coverInfo2 || {
@@ -854,8 +854,8 @@ class AssetManager {
         category: String(error4?.['category'] || '')['trim']() || this['activeTab'],
       },
       selectedAssetId: String(error4?.['id'] || ''),
-      updateConfirmOpen: ![],
-      customCategoryEditing: ![],
+      updateConfirmOpen: false,
+      customCategoryEditing: false,
       customCategoryDraft: '',
       error: '',
     });
@@ -867,7 +867,7 @@ class AssetManager {
       draft: { category: category3 },
       selectedAssetId: '',
       updateSearchKeyword: '',
-      updateConfirmOpen: ![],
+      updateConfirmOpen: false,
       error: '',
     });
     const error5 = this['_getFilteredUpdateAssets']()[0] || null;
@@ -920,13 +920,13 @@ class AssetManager {
   ['_createMaterialFolderSection']({
     category: category5,
     count: count = 0,
-    expanded: expanded = ![],
-    canManageFolder: canManageFolder = ![],
-    isRenamingFolder: isRenamingFolder = ![],
-    isSavingFolder: isSavingFolder = ![],
-    isDeleteConfirming: isDeleteConfirming = ![],
-    isDeletingFolder: isDeletingFolder = ![],
-    isDeleteRequested: isDeleteRequested = ![],
+    expanded: expanded = false,
+    canManageFolder: canManageFolder = false,
+    isRenamingFolder: isRenamingFolder = false,
+    isSavingFolder: isSavingFolder = false,
+    isDeleteConfirming: isDeleteConfirming = false,
+    isDeletingFolder: isDeletingFolder = false,
+    isDeleteRequested: isDeleteRequested = false,
     actionPrefix: actionPrefix = 'material-folder',
     renameValue: renameValue = '',
   } = {}) {
@@ -1133,7 +1133,7 @@ class AssetManager {
       this['_nestMaterialFolderSections'](el27),
       (el27['scrollTop'] = value111),
       this['_syncCreatePanelError'](),
-      options2['focusRename'] === !![] &&
+      options2['focusRename'] === true &&
         window['requestAnimationFrame'](() => {
           const el29 = el27['querySelector']('.v2-material-folder-name-input');
           (el29?.['focus'](), el29?.['select']?.());
@@ -1345,7 +1345,7 @@ class AssetManager {
         pendingFolderDeleteKey: '',
         error: '',
       }),
-      this['_renderCreatePanelFolderTree']({ focusRename: !![] }));
+      this['_renderCreatePanelFolderTree']({ focusRename: true }));
   }
   async ['_deleteCreatePanelFolder'](value127) {
     const enabled22 = this['_findCategoryByName'](value127, this['tabs']),
@@ -1357,7 +1357,7 @@ class AssetManager {
       this['_createPanelState']?.['pendingFolderDeleteKey'] !== deletingFolderKey ||
       this['_createPanelState']?.['deletingFolderKey']
     )
-      return ![];
+      return false;
     const draft2 = this['_categoryKey'](this['_createPanelState']['draft']?.['category']) === deletingFolderKey,
       selectedFolderCategory = this['_categoryKey'](this['_createPanelState']['selectedFolderCategory']) === deletingFolderKey;
     (this['_setCreatePanelState']({
@@ -1373,7 +1373,7 @@ class AssetManager {
       return (
         this['_setCreatePanelState']({ deletingFolderKey: '', folderActionBusyKey: '' }),
         this['_renderCreatePanelFolderTree'](),
-        ![]
+        false
       );
     const category8 =
         this['_findCategoryByName']('Others', this['tabs']) ||
@@ -1398,7 +1398,7 @@ class AssetManager {
         error: '',
       }),
       this['_renderCreatePanelFolderTree'](),
-      !![]
+      true
     );
   }
   async ['_commitCreatePanelFolderRename'](value129, value130) {
@@ -1411,7 +1411,7 @@ class AssetManager {
       !this['createPanel'] ||
       this['_createPanelState']?.['folderActionBusyKey']
     )
-      return ![];
+      return false;
     const value131 = this['_isUserCategory'](enabled24),
       draft3 = this['_categoryKey'](this['_createPanelState']?.['draft']?.['category']) === folderActionBusyKey,
       selectedFolderCategory2 = this['_categoryKey'](this['_createPanelState']?.['selectedFolderCategory']) === folderActionBusyKey,
@@ -1432,8 +1432,8 @@ class AssetManager {
           folderActionBusyKey: '',
           error: assetManagerText('categoryRenameFailed'),
         }),
-        this['_renderCreatePanelFolderTree']({ focusRename: !![] }),
-        ![]
+        this['_renderCreatePanelFolderTree']({ focusRename: true }),
+        false
       );
     const category9 = value131
         ? this['_findCategoryByName'](value130, this['tabs']) || this['_normalizeCategoryName'](value130)
@@ -1455,7 +1455,7 @@ class AssetManager {
         error: '',
       }),
       this['_renderCreatePanelFolderTree'](),
-      !![]
+      true
     );
   }
   ['_renderCreatePanelContent']() {
@@ -1672,7 +1672,7 @@ class AssetManager {
             value154 = el45?.['value'] ?? this['_createPanelState']?.['customCategoryDraft'] ?? '',
             enabled28 = this['_normalizeCategoryName'](value154);
           if (!enabled28) {
-            (this['_setCreatePanelState']({ customCategoryEditing: ![], customCategoryDraft: '' }),
+            (this['_setCreatePanelState']({ customCategoryEditing: false, customCategoryDraft: '' }),
               run());
             return;
           }
@@ -1688,10 +1688,10 @@ class AssetManager {
           !enabled29 && !this['_findCategoryByName'](category10, customCategories4) && customCategories4['push'](category10);
           this['_setCreatePanelState']({
             draft: { category: category10 },
-            customCategoryEditing: ![],
+            customCategoryEditing: false,
             customCategoryDraft: '',
             customCategories: customCategories4,
-            updateConfirmOpen: ![],
+            updateConfirmOpen: false,
             error: '',
           });
           this['_createPanelState']?.['mode'] === 'update' &&
@@ -1724,7 +1724,7 @@ class AssetManager {
           const value155 = event7['target']['closest']("[data-custom-category='1']");
           if (value155) {
             (this['_setCreatePanelState']({
-              customCategoryEditing: !![],
+              customCategoryEditing: true,
               customCategoryDraft: '',
               error: '',
             }),
@@ -1738,13 +1738,13 @@ class AssetManager {
           if (!el46) return;
           const category11 = this['_normalizeCategoryName'](el46['dataset']['val']) || this['activeTab'];
           (this['_createPanelState']?.['mode'] === 'update'
-            ? (this['_setCreatePanelState']({ customCategoryEditing: ![], customCategoryDraft: '' }),
+            ? (this['_setCreatePanelState']({ customCategoryEditing: false, customCategoryDraft: '' }),
               this['_syncUpdateSelectionForCategory'](category11))
             : this['_setCreatePanelState']({
                 draft: { category: category11 },
-                customCategoryEditing: ![],
+                customCategoryEditing: false,
                 customCategoryDraft: '',
-                updateConfirmOpen: ![],
+                updateConfirmOpen: false,
                 error: '',
               }),
             run2(),
@@ -1762,7 +1762,7 @@ class AssetManager {
           }
           event8['key'] === 'Escape' &&
             (event8['preventDefault'](),
-            this['_setCreatePanelState']({ customCategoryEditing: ![], customCategoryDraft: '' }),
+            this['_setCreatePanelState']({ customCategoryEditing: false, customCategoryDraft: '' }),
             run());
         }),
         el44['addEventListener']('focusout', (event9) => {
@@ -1783,8 +1783,8 @@ class AssetManager {
         if (mode === this['_createPanelState']?.['mode']) return;
         this['_setCreatePanelState']({
           mode: mode,
-          updateConfirmOpen: ![],
-          customCategoryEditing: ![],
+          updateConfirmOpen: false,
+          customCategoryEditing: false,
           customCategoryDraft: '',
           error: '',
         });
@@ -1800,7 +1800,7 @@ class AssetManager {
       el48['addEventListener']('input', (name7) => {
         this['_setCreatePanelState']({
           draft: { name: name7['target']['value'] || '' },
-          updateConfirmOpen: ![],
+          updateConfirmOpen: false,
           error: '',
         });
       });
@@ -1809,7 +1809,7 @@ class AssetManager {
       el49['addEventListener']('input', (updateSearchKeyword) => {
         (this['_setCreatePanelState']({
           updateSearchKeyword: updateSearchKeyword['target']['value'] || '',
-          updateConfirmOpen: ![],
+          updateConfirmOpen: false,
           error: '',
         }),
           this['_renderCreatePanelContent']());
@@ -1861,7 +1861,7 @@ class AssetManager {
         return;
       }
       if (!enabled31['updateConfirmOpen']) {
-        (this['_setCreatePanelState']({ updateConfirmOpen: !![], error: '' }),
+        (this['_setCreatePanelState']({ updateConfirmOpen: true, error: '' }),
           this['_renderCreatePanelContent']());
         return;
       }
@@ -1872,7 +1872,7 @@ class AssetManager {
         createdAt: id3['createdAt'] || id3['updatedAt'] || Date['now'](),
         updatedAt: Date['now'](),
       });
-      (this['_setCreatePanelState']({ saving: !![], savingAction: 'overwrite', error: '' }),
+      (this['_setCreatePanelState']({ saving: true, savingAction: 'overwrite', error: '' }),
         this['_renderCreatePanelContent']());
       try {
         (await saveAssetToServer(value162),
@@ -1885,7 +1885,7 @@ class AssetManager {
           this['sidebarPanel']?.['classList']['contains']('show') && this['renderSidebarContent']());
       } catch (value163) {
         (this['_setCreatePanelState']({
-          saving: ![],
+          saving: false,
           savingAction: '',
           error: assetManagerText('errors.assetUpdateFailed'),
         }),
@@ -1901,7 +1901,7 @@ class AssetManager {
       createdAt: Date['now'](),
       updatedAt: Date['now'](),
     });
-    (this['_setCreatePanelState']({ saving: !![], savingAction: 'create', error: '' }),
+    (this['_setCreatePanelState']({ saving: true, savingAction: 'create', error: '' }),
       this['_renderCreatePanelContent']());
     try {
       (await saveAssetToServer(value164),
@@ -1914,7 +1914,7 @@ class AssetManager {
           ((this['_newAssetPulseId'] = String(value164['id'] || '')), this['renderSidebarContent']()));
     } catch (value165) {
       (this['_setCreatePanelState']({
-        saving: ![],
+        saving: false,
         savingAction: '',
         error: assetManagerText('errors.assetCreateFailed'),
       }),
@@ -1952,7 +1952,7 @@ class AssetManager {
         category: category13,
         updatedAt: Date['now'](),
       });
-    (this['_setCreatePanelState']({ saving: !![], savingAction: 'join', updateConfirmOpen: ![], error: '' }),
+    (this['_setCreatePanelState']({ saving: true, savingAction: 'join', updateConfirmOpen: false, error: '' }),
       this['_renderCreatePanelContent']());
     try {
       (await saveAssetToServer(value168),
@@ -1965,7 +1965,7 @@ class AssetManager {
         this['sidebarPanel']?.['classList']['contains']('show') && this['renderSidebarContent']());
     } catch (value169) {
       (this['_setCreatePanelState']({
-        saving: ![],
+        saving: false,
         savingAction: '',
         error: assetManagerText('errors.assetJoinFailed'),
       }),
@@ -2056,14 +2056,14 @@ class AssetManager {
   }
   ['_preloadThumb'](value190) {
     const enabled38 = String(value190 || '')['trim']();
-    if (!enabled38) return ![];
-    if (enabled38['startsWith']('data:')) return ![];
-    if (this['_isNonImageMediaSrc'](enabled38)) return ![];
-    if (this['_thumbPreloadSet']['has'](enabled38)) return ![];
-    return (this['_thumbPreloadSet']['add'](enabled38), this['_ensureThumbDecoded'](enabled38), !![]);
+    if (!enabled38) return false;
+    if (enabled38['startsWith']('data:')) return false;
+    if (this['_isNonImageMediaSrc'](enabled38)) return false;
+    if (this['_thumbPreloadSet']['has'](enabled38)) return false;
+    return (this['_thumbPreloadSet']['add'](enabled38), this['_ensureThumbDecoded'](enabled38), true);
   }
   ['_isSidebarOpen']() {
-    return this['sidebarPanel']?.['classList']?.['contains']('show') === !![];
+    return this['sidebarPanel']?.['classList']?.['contains']('show') === true;
   }
   ['_renderMaterialLoadingState']() {
     const el54 = this['sidebarPanel']?.['querySelector']('[data-material-loading]');
@@ -2071,7 +2071,7 @@ class AssetManager {
     el54['hidden'] = this['_materialLoadingCount'] <= 0;
   }
   ['_warmVisibleAssetMedia']() {
-    if (!this['_isSidebarOpen']()) return ![];
+    if (!this['_isSidebarOpen']()) return false;
     let count13 = 0;
     for (const value191 of this['_getSortedAssets']()) {
       if (count13 >= 32) break;
@@ -2086,14 +2086,14 @@ class AssetManager {
   }
   ['_ensureThumbDecoded'](value194) {
     const enabled39 = String(value194 || '')['trim']();
-    if (!enabled39) return Promise['resolve'](![]);
-    if (enabled39['startsWith']('data:')) return Promise['resolve'](!![]);
-    if (this['_isNonImageMediaSrc'](enabled39)) return Promise['resolve'](![]);
+    if (!enabled39) return Promise['resolve'](false);
+    if (enabled39['startsWith']('data:')) return Promise['resolve'](true);
+    if (this['_isNonImageMediaSrc'](enabled39)) return Promise['resolve'](false);
     const value195 = this['_thumbDecodePromiseMap']['get'](enabled39);
     if (value195) return value195;
     const preloadCanvasImage2 = preloadCanvasImage(enabled39, { priority: 20, fetchPriority: 'auto' })['then'](
-      () => !![],
-      () => ![],
+      () => true,
+      () => false,
     );
     return (this['_thumbDecodePromiseMap']['set'](enabled39, preloadCanvasImage2), preloadCanvasImage2);
   }
@@ -2121,8 +2121,8 @@ class AssetManager {
     return await new Promise((handler5) => {
       const el55 = document['createElement']('video');
       ((el55['preload'] = 'auto'),
-        (el55['muted'] = !![]),
-        (el55['playsInline'] = !![]),
+        (el55['muted'] = true),
+        (el55['playsInline'] = true),
         (el55['crossOrigin'] = 'anonymous'));
       const run3 = () => {
           (el55['removeAttribute']('src'), el55['load']());
@@ -2155,14 +2155,14 @@ class AssetManager {
                   el55['removeEventListener']('seeked', value203);
                 }
               };
-            (el55['addEventListener']('seeked', value203, { once: !![] }),
+            (el55['addEventListener']('seeked', value203, { once: true }),
               (el55['currentTime'] = value202));
           } catch (value206) {
             handler6();
           }
         };
-      (el55['addEventListener']('error', handler6, { once: !![] }),
-        el55['addEventListener']('loadeddata', async2, { once: !![] }),
+      (el55['addEventListener']('error', handler6, { once: true }),
+        el55['addEventListener']('loadeddata', async2, { once: true }),
         attachMediaElementPlaybackSource(el55, enabled40, { preload: 'auto' })['catch'](() => {
           if (!String(el55['getAttribute']('src') || el55['src'] || '')['trim']()) {
             el55['src'] = enabled40;
@@ -2238,7 +2238,7 @@ class AssetManager {
       '.v2-material-name-input[data-asset-id="' + CSS['escape'](enabled44) + '"]',
     );
     el56?.['setAttribute']('aria-busy', 'true');
-    if (el56) el56['disabled'] = !![];
+    if (el56) el56['disabled'] = true;
     el56?.['closest']('.v2-material-asset-row, .v2-material-project-row')?.['classList']['add'](
       'is-saving',
     );
@@ -2286,7 +2286,7 @@ class AssetManager {
       enabled47 = this['_materialItemKey'](value223, value224),
       name10 = String(value222 || '')['trim']();
     if (!enabled47 || enabled47 !== this['_renamingMaterialItemKey'] || this['_savingMaterialItemKey'])
-      return ![];
+      return false;
     if (!name10)
       return (
         window['showToast']?.(assetManagerText('errors.nameRequired'), 'error'),
@@ -2295,14 +2295,14 @@ class AssetManager {
             '.v2-material-item-name-input[data-item-key="' + CSS['escape'](enabled47) + '"]',
           )
           ?.['focus'](),
-        ![]
+        false
       );
     const args14 = this['_getMaterialAsset'](value223),
       error9 = getMaterialAssetItems(args14)[value224];
-    if (!args14 || !error9) return ![];
+    if (!args14 || !error9) return false;
     const value225 = String(error9?.['name'] || error9?.['nodeData']?.['name'] || '');
     if (value225 === name10)
-      return ((this['_renamingMaterialItemKey'] = ''), this['renderSidebarContent'](), !![]);
+      return ((this['_renamingMaterialItemKey'] = ''), this['renderSidebarContent'](), true);
     const value226 = {
       ...args14,
       updatedAt: Date['now'](),
@@ -2330,20 +2330,20 @@ class AssetManager {
       '.v2-material-item-name-input[data-item-key="' + CSS['escape'](enabled47) + '"]',
     );
     el57?.['setAttribute']('aria-busy', 'true');
-    if (el57) el57['disabled'] = !![];
+    if (el57) el57['disabled'] = true;
     el57?.['closest']('.v2-material-item-row')?.['classList']['add']('is-saving');
     try {
       return (
         await saveAssetToServer(value226),
         this['_upsertLocalAsset'](value226),
         window['showToast']?.(assetManagerText('toasts.renamed'), 'success'),
-        !![]
+        true
       );
     } catch (value229) {
       return (
         console['error'](value229),
         window['showToast']?.(assetManagerText('errors.renameFailed'), 'error'),
-        ![]
+        false
       );
     } finally {
       ((this['_renamingMaterialItemKey'] = ''),
@@ -2359,7 +2359,7 @@ class AssetManager {
       )['find']((el58) => el58['dataset']['categoryKey'] === value230) || null
     );
   }
-  ['_focusMaterialCategoryRenameInput'](value231, { select: select = ![] } = {}) {
+  ['_focusMaterialCategoryRenameInput'](value231, { select: select = false } = {}) {
     window['requestAnimationFrame'](() => {
       const el59 = this['_getMaterialCategoryRenameInput'](value231);
       if (!el59 || el59['disabled'] || !el59['isConnected']) return;
@@ -2380,7 +2380,7 @@ class AssetManager {
       this['_closeMaterialMenu'](),
       this['_hideMaterialPreview'](),
       this['renderSidebarContent'](),
-      this['_focusMaterialCategoryRenameInput'](enabled49, { select: !![] }));
+      this['_focusMaterialCategoryRenameInput'](enabled49, { select: true }));
   }
   ['_cancelRenameMaterialCategory']() {
     if (!this['_renamingMaterialCategoryKey'] || this['_savingMaterialCategoryKey']) return;
@@ -2400,17 +2400,17 @@ class AssetManager {
       this['_renamingMaterialCategoryKey'] !== enabled50 ||
       this['_savingMaterialCategoryKey']
     )
-      return ![];
+      return false;
     if (!nextCategory)
-      return (this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('errors.nameRequired')), ![]);
+      return (this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('errors.nameRequired')), false);
     if (this['_isHiddenAssetCategory'](nextCategory))
       return (
         this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('categoryNameUnavailable')),
-        ![]
+        false
       );
     const value237 = this['_formatCategoryLabel'](currentCategory);
     if (value237 === nextCategory)
-      return ((this['_renamingMaterialCategoryKey'] = ''), this['renderSidebarContent'](), !![]);
+      return ((this['_renamingMaterialCategoryKey'] = ''), this['renderSidebarContent'](), true);
     const value238 = nextCategory['toLocaleLowerCase'](),
       value239 = this['tabs']['some'](
         (value240) =>
@@ -2418,11 +2418,11 @@ class AssetManager {
           this['_formatCategoryLabel'](value240)['toLocaleLowerCase']() === value238,
       );
     if (value239)
-      return (this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('categoryNameExists')), ![]);
+      return (this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('categoryNameExists')), false);
     if (this['_isProtectedCategory'](nextCategory))
       return (
         this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('categoryNameUnavailable')),
-        ![]
+        false
       );
     const userCategories2 = [...this['userCategories']],
       parents3 = { ...this['materialCategoryParents'] },
@@ -2436,13 +2436,13 @@ class AssetManager {
         now: Date['now'](),
       });
     if (nextCategory2['status'] === 'unchanged')
-      return ((this['_renamingMaterialCategoryKey'] = ''), this['renderSidebarContent'](), !![]);
+      return ((this['_renamingMaterialCategoryKey'] = ''), this['renderSidebarContent'](), true);
     if (nextCategory2['status'] === 'duplicate')
-      return (this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('categoryNameExists')), ![]);
+      return (this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('categoryNameExists')), false);
     if (nextCategory2['status'] !== 'ready')
       return (
         this['_rejectMaterialCategoryRename'](enabled50, assetManagerText('categoryRenameFailed')),
-        ![]
+        false
       );
     const renameMaterialFolderParent2 = renameMaterialFolderParent({
       parents: parents3,
@@ -2453,17 +2453,17 @@ class AssetManager {
     this['_savingMaterialCategoryKey'] = enabled50;
     const el60 = this['_getMaterialCategoryRenameInput'](enabled50);
     el60?.['setAttribute']('aria-busy', 'true');
-    if (el60) el60['disabled'] = !![];
+    if (el60) el60['disabled'] = true;
     el60?.['closest']('.v2-material-folder-row')?.['classList']['add']('is-saving');
     const list20 = [];
-    let value243 = ![];
+    let value243 = false;
     try {
       for (let value244 = 0; value244 < nextCategory2['renamedAssets']['length']; value244 += 1) {
         (list20['push'](nextCategory2['originalAssets'][value244]),
           await saveAssetToServer(nextCategory2['renamedAssets'][value244]));
       }
       return (
-        (value243 = !![]),
+        (value243 = true),
         await this['_saveMaterialCategorySettings'](
           nextCategory2['nextUserCategories'],
           this['materialCategoryDisplayNames'],
@@ -2481,7 +2481,7 @@ class AssetManager {
         this['_syncTabsFromAssets'](),
         this['_renderSidebarTabs'](),
         window['showToast']?.(assetManagerText('categoryRenamed'), 'success'),
-        !![]
+        true
       );
     } catch (value246) {
       const list21 = [];
@@ -2506,7 +2506,7 @@ class AssetManager {
         list21['length'] && console['error']('回滚素材文件夹重命名失败', list21),
         console['error'](value246),
         window['showToast']?.(assetManagerText('categoryRenameFailed'), 'error'),
-        ![]
+        false
       );
     } finally {
       ((this['_renamingMaterialCategoryKey'] = ''),
@@ -2790,7 +2790,7 @@ class AssetManager {
               })
             : this['_hideMaterialPreview']();
         },
-        { passive: !![] },
+        { passive: true },
       ),
       this['sidebarPanel']['addEventListener']('click', (event14) => {
         const el68 = event14['target']['closest']('[data-ui-action]'),
@@ -3047,16 +3047,16 @@ class AssetManager {
       this['_installMaterialDropTarget']());
     const button = document['getElementById']('btnAssets');
     if (button) {
-      let enabled59 = ![];
+      let enabled59 = false;
       const open = () => {
         !this['sidebarPanel']['classList']['contains']('show') && this['showSidebarPanel']();
         if (!enabled59) {
-          enabled59 = !![];
+          enabled59 = true;
           const value277 =
             this['_materialLoadingCount'] > 0 ? this['_assetLoadPromise'] : this['loadAssetsFromServer']();
           ((this['_assetLoadPromise'] = Promise['resolve'](value277)),
             this['_assetLoadPromise']['finally'](() => {
-              enabled59 = ![];
+              enabled59 = false;
             }));
         }
       };
@@ -3068,7 +3068,7 @@ class AssetManager {
         close: () => this['hideSidebarPanel'](),
         isOpen: () => this['sidebarPanel']['classList']['contains']('show'),
         ignorePointerDown: (event22) =>
-          this['_materialMenuEl']?.['contains']?.(event22['target']) === !![],
+          this['_materialMenuEl']?.['contains']?.(event22['target']) === true,
       });
     }
   }
@@ -3182,9 +3182,9 @@ class AssetManager {
       (this['_materialMenuState'] = {
         assetId: String(value295),
         anchorEl: anchorEl,
-        showMove: ![],
-        confirmDelete: ![],
-        busy: ![],
+        showMove: false,
+        confirmDelete: false,
+        busy: false,
       }));
     const el84 = document['createElement']('div');
     ((el84['className'] = 'v2-material-context-menu'),
@@ -3217,7 +3217,7 @@ class AssetManager {
             event27,
             list24['map']((el86) => el86['dataset']['shortcutAction']),
           );
-        if (shortcutActionForEvent && event27['repeat'] !== !![]) {
+        if (shortcutActionForEvent && event27['repeat'] !== true) {
           const el87 = list24['find'](
               (el88) => el88['dataset']['shortcutAction'] === shortcutActionForEvent,
             ),
@@ -3232,10 +3232,10 @@ class AssetManager {
         if (event27['key'] !== 'Escape') return;
         (event27['preventDefault'](), event27['stopImmediatePropagation']());
         const el89 = this['_materialMenuState']?.['anchorEl'];
-        (this['_closeMaterialMenu'](), el89?.['focus']?.({ preventScroll: !![] }));
+        (this['_closeMaterialMenu'](), el89?.['focus']?.({ preventScroll: true }));
       }),
       document['addEventListener']('pointerdown', this['_materialMenuOutsideHandler']),
-      document['addEventListener']('keydown', this['_materialMenuKeydownHandler'], !![]));
+      document['addEventListener']('keydown', this['_materialMenuKeydownHandler'], true));
   }
   ['_positionMaterialMenu']() {
     const el90 = this['_materialMenuEl'],
@@ -3389,7 +3389,7 @@ class AssetManager {
       (document['removeEventListener']('pointerdown', this['_materialMenuOutsideHandler']),
       (this['_materialMenuOutsideHandler'] = null)),
       this['_materialMenuKeydownHandler'] &&
-        (document['removeEventListener']('keydown', this['_materialMenuKeydownHandler'], !![]),
+        (document['removeEventListener']('keydown', this['_materialMenuKeydownHandler'], true),
         (this['_materialMenuKeydownHandler'] = null)),
       this['_materialMenuEl']?.['remove'](),
       (this['_materialMenuEl'] = null),
@@ -3398,17 +3398,17 @@ class AssetManager {
   async ['_runMaterialMenuTask'](handler7, value306, value307) {
     const enabled65 = this['_materialMenuState'];
     if (!enabled65 || enabled65['busy']) return;
-    ((enabled65['busy'] = !![]), this['_renderMaterialMenu']());
+    ((enabled65['busy'] = true), this['_renderMaterialMenu']());
     try {
       const value308 = await handler7();
       (this['_closeMaterialMenu'](),
         this['renderSidebarContent'](),
         value306 &&
-          value308 !== ![] &&
-          value308?.['canceled'] !== !![] &&
+          value308 !== false &&
+          value308?.['canceled'] !== true &&
           window['showToast']?.(value306, 'success'));
     } catch (error11) {
-      (this['_materialMenuState'] === enabled65 && ((enabled65['busy'] = ![]), this['_renderMaterialMenu']()),
+      (this['_materialMenuState'] === enabled65 && ((enabled65['busy'] = false), this['_renderMaterialMenu']()),
         window['showToast']?.(
           error11?.['message'] || value307 || assetManagerText('menu.actionFailed'),
           'error',
@@ -3428,11 +3428,11 @@ class AssetManager {
       return;
     }
     if (value309 === 'delete') {
-      ((enabled66['confirmDelete'] = !![]), this['_renderMaterialMenu']());
+      ((enabled66['confirmDelete'] = true), this['_renderMaterialMenu']());
       return;
     }
     if (value309 === 'delete-cancel') {
-      ((enabled66['confirmDelete'] = ![]), this['_renderMaterialMenu']());
+      ((enabled66['confirmDelete'] = false), this['_renderMaterialMenu']());
       return;
     }
     if (value309 === 'favorite') {
@@ -3533,7 +3533,7 @@ class AssetManager {
     return (
       (el94['className'] = 'v2-material-hover-preview'),
       el94['setAttribute']('role', 'tooltip'),
-      (el94['hidden'] = !![]),
+      (el94['hidden'] = true),
       document['body']['appendChild'](el94),
       (this['_materialPreviewEl'] = el94),
       el94
@@ -3589,7 +3589,7 @@ class AssetManager {
           value322['replaceChildren'](el97));
       }
     }
-    el96['hidden'] = ![];
+    el96['hidden'] = false;
     const box7 = el95['getBoundingClientRect'](),
       box8 = this['sidebarPanel']['getBoundingClientRect'](),
       box9 = el96['getBoundingClientRect'](),
@@ -3607,7 +3607,7 @@ class AssetManager {
   }
   ['_hideMaterialPreview']() {
     this['_materialPreviewRow'] = null;
-    if (this['_materialPreviewEl']) this['_materialPreviewEl']['hidden'] = !![];
+    if (this['_materialPreviewEl']) this['_materialPreviewEl']['hidden'] = true;
   }
   ['_getVisibleAssetCardsInList']() {
     const listView = this['sidebarPanel']?.['querySelector'](
@@ -3673,9 +3673,9 @@ class AssetManager {
       value332 = this['_captureRectsById'](cards2);
     try {
       const deleteAssetFromServer2 = await deleteAssetFromServer(enabled73);
-      if (deleteAssetFromServer2 !== !![]) throw new Error(assetManagerText('deleteFailed'));
+      if (deleteAssetFromServer2 !== true) throw new Error(assetManagerText('deleteFailed'));
     } catch (value333) {
-      return (window['showToast']?.(assetManagerText('deleteFailed'), 'error'), ![]);
+      return (window['showToast']?.(assetManagerText('deleteFailed'), 'error'), false);
     }
     ((this['assets'] = (this['assets'] || [])['filter'](
       (value334) => String(value334?.['id'] || '') !== enabled73,
@@ -3695,12 +3695,12 @@ class AssetManager {
           this['_playFlip'](listView3, value332);
         });
       }),
-      !![]
+      true
     );
   }
   async ['_deleteUserCategory'](value335) {
     const category15 = this['_normalizeCategoryName'](value335);
-    if (!category15 || !this['_isUserCategory'](category15)) return ![];
+    if (!category15 || !this['_isUserCategory'](category15)) return false;
     const list28 = this['_getSortedAssets']()['filter'](
         (value336) => this['_categoryKey'](value336?.['category']) === this['_categoryKey'](category15),
       ),
@@ -3725,13 +3725,13 @@ class AssetManager {
         updatedAt: updatedAt2 + value341,
       })),
       list31 = [];
-    let value342 = ![];
+    let value342 = false;
     try {
       for (let value343 = 0; value343 < list30['length']; value343 += 1) {
         (list31['push'](list28[value343]), await saveAssetToServer(list30[value343]));
       }
       return (
-        (value342 = !![]),
+        (value342 = true),
         await this['_saveMaterialCategorySettings'](
           value338,
           this['materialCategoryDisplayNames'],
@@ -3749,7 +3749,7 @@ class AssetManager {
         this['_renderSidebarTabs'](),
         this['renderSidebarContent'](),
         window['showToast']?.(assetManagerText('categoryDeleted'), 'success'),
-        !![]
+        true
       );
     } catch (value345) {
       const list32 = [];
@@ -3774,7 +3774,7 @@ class AssetManager {
         list32['length'] && console['error']('回滚素材文件夹删除失败', list32),
         console['error'](value345),
         window['showToast']?.(assetManagerText('categoryDeleteFailed'), 'error'),
-        ![]
+        false
       );
     }
   }
@@ -3791,7 +3791,7 @@ class AssetManager {
         return;
       const el107 = document['createElement']('img');
       ((el107['alt'] = assetManagerText('thumbnailAlt')),
-        (el107['draggable'] = ![]),
+        (el107['draggable'] = false),
         (el107['decoding'] = 'async'),
         (el107['loading'] = 'eager'),
         (el107['className'] = 'v2-asset-thumb-img'),
@@ -3804,7 +3804,7 @@ class AssetManager {
               (el106['dataset']['thumbSrc'] = ''),
               (el106['innerHTML'] = _renderAssetIcon(value350)));
           },
-          { once: !![] },
+          { once: true },
         ),
         (el106['dataset']['thumbKind'] = 'img'),
         (el106['dataset']['thumbType'] = ''),
@@ -4002,7 +4002,7 @@ class AssetManager {
   ['_renderReplacementStudioProjectFolder'](
     name16,
     el122,
-    { forceExpanded: forceExpanded = ![] } = {},
+    { forceExpanded: forceExpanded = false } = {},
   ) {
     const enabled80 = String(name16?.['id'] || '');
     if (!enabled80) return;
@@ -4362,7 +4362,7 @@ class AssetManager {
         if (!el154) {
           ((el154 = document['createElement']('div')),
             (el154['className'] = 'v2-asset-item-delete-confirm'),
-            (el154['hidden'] = !![]),
+            (el154['hidden'] = true),
             el154['addEventListener']('click', (event28) => {
               if (event28['target'] !== el154) return;
               (event28['stopPropagation'](),

@@ -54,7 +54,7 @@ export function createRhAiAppPreviewPresentation({
       return readState()['appName'] || '';
     }
     get ['previewAppMenuOpen']() {
-      return readState()['previewAppMenuOpen'] === !![];
+      return readState()['previewAppMenuOpen'] === true;
     }
     get ['pendingDeleteSavedAppId']() {
       return readState()['pendingDeleteSavedAppId'] || '';
@@ -69,7 +69,7 @@ export function createRhAiAppPreviewPresentation({
       return readState()['componentDraftKey'] || '';
     }
     get ['comfyCandidatePickerOpen']() {
-      return readState()['comfyCandidatePickerOpen'] === !![];
+      return readState()['comfyCandidatePickerOpen'] === true;
     }
     get ['comfyCandidateSearchText']() {
       return readState()['comfyCandidateSearchText'] || '';
@@ -90,13 +90,13 @@ export function createRhAiAppPreviewPresentation({
       return actions['getSourceMeta']?.() || null;
     }
     ['_shouldShowManualComponentPicker']() {
-      return actions['shouldShowManualComponentPicker']?.() === !![];
+      return actions['shouldShowManualComponentPicker']?.() === true;
     }
     ['_canRemovePreviewParams']() {
-      return actions['canRemovePreviewParams']?.() !== ![];
+      return actions['canRemovePreviewParams']?.() !== false;
     }
     ['_canRemovePreviewInputs']() {
-      return actions['canRemovePreviewInputs']?.() !== ![];
+      return actions['canRemovePreviewInputs']?.() !== false;
     }
     ['_renderComfyCandidatePicker'](options = {}) {
       return actions['renderComfyCandidatePicker']?.(options);
@@ -152,14 +152,14 @@ export function createRhAiAppPreviewPresentation({
     ['_patchPreviewAppChrome']() {
       (this['_patchSaveConfigMenu'](), this['_patchCreateConfigMenu']());
       const el3 = this['nodePreviewEl']?.['querySelector']?.('.rh-ai-app-preview-node .img-model-wrap');
-      if (!el3) return ![];
+      if (!el3) return false;
       const el4 = el3['querySelector']('.rh-ai-app-preview-model-trigger'),
         el5 = el3['querySelector']('.img-model-label');
       if (el5) el5['textContent'] = normalizeAppName(this['appName']);
       actions['syncRunningHubProfileBadge']?.(el3);
       el4 && el4['setAttribute']('aria-expanded', this['previewAppMenuOpen'] ? 'true' : 'false');
       const el6 = el3['querySelector']("[data-role='saved-app-menu']");
-      if (!this['previewAppMenuOpen']) return (this['_closePreviewAppMenuElement'](el6), !![]);
+      if (!this['previewAppMenuOpen']) return (this['_closePreviewAppMenuElement'](el6), true);
       el6?.['remove']();
       const result = renderPreviewAppMenuHtml({
         appName: this['appName'],
@@ -170,7 +170,7 @@ export function createRhAiAppPreviewPresentation({
         pendingOverwriteIntent: this['pendingOverwriteIntent'],
         sourceLabel: this['_getSourceMeta']()?.['label'] || 'RH AI应用',
       });
-      return (result && el4 && el4['insertAdjacentHTML']('afterend', result), !![]);
+      return (result && el4 && el4['insertAdjacentHTML']('afterend', result), true);
     }
     ['_patchSaveConfigMenu']() {
       return this['_patchFooterOverwriteMenu'](this['saveConfigMenuEl'], 'save');
@@ -179,28 +179,28 @@ export function createRhAiAppPreviewPresentation({
       return this['_patchFooterOverwriteMenu'](this['createConfigMenuEl'], 'create');
     }
     ['_patchFooterOverwriteMenu'](el7, intent) {
-      if (!el7) return ![];
+      if (!el7) return false;
       const data = this['pendingOverwriteIntent'] === intent && Boolean(this['pendingOverwriteSavedAppId']),
         savedApp = data ? this['_findSavedApp'](this['pendingOverwriteSavedAppId']) : null;
       if (!savedApp)
         return (
-          (el7['hidden'] = !![]),
+          (el7['hidden'] = true),
           el7['setAttribute']('aria-hidden', 'true'),
           (el7['innerHTML'] = ''),
-          !![]
+          true
         );
       return (
-        (el7['hidden'] = ![]),
+        (el7['hidden'] = false),
         el7['setAttribute']('aria-hidden', 'false'),
         (el7['innerHTML'] = renderSaveConfigOverwriteMenuHtml({ savedApp: savedApp, intent: intent })),
-        !![]
+        true
       );
     }
     ['_patchPreviewPromptArea']() {
       const el8 = this['nodePreviewEl']?.['querySelector']?.('.rh-ai-app-preview-input'),
         el9 = el8?.['querySelector']?.('.rh-ai-app-preview-prompt'),
         target = el8?.['closest']?.('.rh-ai-app-real-preview-panel');
-      if (!el8 || !el9) return ![];
+      if (!el8 || !el9) return false;
       const source = this['componentDrafts']['find'](
           (next) => normalizeComponentKind(next?.['componentKind']) === 'prompt',
         ),
@@ -234,11 +234,11 @@ export function createRhAiAppPreviewPresentation({
       config && el9['insertAdjacentHTML']('beforebegin', config);
       const scope = renderPreviewPromptHelpTipHtml(current, { bundle: this['currentBundle'] });
       if (scope && target) target['insertAdjacentHTML']('afterbegin', scope);
-      return ((el9['dataset']['placeholder'] = entry), !![]);
+      return ((el9['dataset']['placeholder'] = entry), true);
     }
     ['_patchPreviewActionControls'](input = this['currentBundle']) {
       const el13 = this['nodePreviewEl']?.['querySelector']?.('.rh-ai-app-preview-node');
-      if (!el13) return ![];
+      if (!el13) return false;
       const enabled = getPreviewInstanceText(input),
         el14 = el13['querySelector']('.ui-schema-instance-slot');
       if (el14) {
@@ -251,22 +251,22 @@ export function createRhAiAppPreviewPresentation({
       return (
         el16 &&
           ((el16['hidden'] = !enabled2), el16['innerHTML'] !== enabled2 && (el16['innerHTML'] = enabled2)),
-        !![]
+        true
       );
     }
     ['_patchPreviewWithoutRebuild'](
       output = this['currentBundle'],
       {
-        renderInputs: renderInputs = ![],
-        renderParams: renderParams = ![],
-        renderAdvanced: renderAdvanced = ![],
-        renderPrompt: renderPrompt = ![],
-        renderAppChrome: renderAppChrome = ![],
-        renderActionControls: renderActionControls = ![],
+        renderInputs: renderInputs = false,
+        renderParams: renderParams = false,
+        renderAdvanced: renderAdvanced = false,
+        renderPrompt: renderPrompt = false,
+        renderAppChrome: renderAppChrome = false,
+        renderActionControls: renderActionControls = false,
       } = {},
     ) {
       const el17 = this['nodePreviewEl']?.['querySelector']?.('.rh-ai-app-preview-node');
-      if (!el17) return (this['_renderNodePreview'](output), ![]);
+      if (!el17) return (this['_renderNodePreview'](output), false);
       el17['dataset']['previewNodeKind'] = normalizeKind(this['kind']);
       if (renderAppChrome) this['_patchPreviewAppChrome']();
       if (renderPrompt) this['_patchPreviewPromptArea']();
@@ -278,15 +278,15 @@ export function createRhAiAppPreviewPresentation({
             renderParams: renderParams,
             renderAdvanced: renderAdvanced,
           }),
-        !![]
+        true
       );
     }
     ['_renderPreviewMutableZones'](
       bundle2 = this['currentBundle'],
       {
-        renderInputs: renderInputs = ![],
-        renderParams: renderParams = !![],
-        renderAdvanced: renderAdvanced = !![],
+        renderInputs: renderInputs = false,
+        renderParams: renderParams = true,
+        renderAdvanced: renderAdvanced = true,
       } = {},
     ) {
       if (!this['nodePreviewEl']) return;

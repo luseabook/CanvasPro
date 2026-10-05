@@ -361,7 +361,7 @@ export function runninghubSeedance2Video({
     if (list14['length'] > 0) value13['videoUrls'] = list14['slice'](0, 3);
     if (list15['length'] > 0) value13['audioUrls'] = list15['slice'](0, 3);
     return (
-      value13['realPersonMode'] === !![]
+      value13['realPersonMode'] === true
         ? (value13['conversionSlots'] = normalizeRunningHubSeedance2ConversionSlots(
             value13['conversionSlots'],
           ))
@@ -393,7 +393,7 @@ export function runninghubSeedance2Video({
   if (list12[1]) value13['lastFrameUrl'] = list12[1];
   return (
     delete value13['webSearch'],
-    value13['realPersonMode'] === !![]
+    value13['realPersonMode'] === true
       ? (value13['conversionSlots'] = normalizeRunningHubSeedance2ConversionSlots(value13['conversionSlots']))
       : delete value13['conversionSlots'],
     value13

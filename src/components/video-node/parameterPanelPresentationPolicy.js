@@ -39,8 +39,8 @@ export function resolveVideoAdaptiveRatioSource({
   const list = Array['isArray'](inEdges) ? inEdges : [];
   let edge = pickGenerationRatioSourceEdge(list, nodeData) || list[0] || null;
   const result = String(adaptivePolicy?.['preferSlot'] || '')['trim'](),
-    data = adaptivePolicy?.['preferVideoKind'] === !![],
-    fallbackSquare = adaptivePolicy?.['fallbackSquareWhenNoVideo'] === !![];
+    data = adaptivePolicy?.['preferVideoKind'] === true,
+    fallbackSquare = adaptivePolicy?.['fallbackSquareWhenNoVideo'] === true;
   if (result) {
     const options = list['find']((target) => String(target?.['refSlot'] || '') === result);
     if (options) edge = options;
@@ -54,7 +54,7 @@ export function resolveVideoAdaptiveRatioSource({
       }
     }
   }
-  return { edge: edge, fallbackSquare: ![] };
+  return { edge: edge, fallbackSquare: false };
 }
 export function getVideoModeLabel(current) {
   const entry = String(current || '')['trim']() || VIDEO_MODE_ALL_REFERENCE_VALUE;
@@ -88,13 +88,13 @@ function getManifestConditionFieldValue(options2 = {}, handle = '') {
 }
 function manifestConditionMatches(el, config = {}) {
   if (Array['isArray'](el)) return el['some']((scope) => manifestConditionMatches(scope, config));
-  if (!el || typeof el !== 'object') return ![];
+  if (!el || typeof el !== 'object') return false;
   if (Array['isArray'](el['any']))
     return el['any']['some']((input) => manifestConditionMatches(input, config));
   if (Array['isArray'](el['all']))
     return el['all']['every']((output) => manifestConditionMatches(output, config));
   const enabled4 = String(el['field'] || el['param'] || '')['trim']();
-  if (!enabled4) return ![];
+  if (!enabled4) return false;
   const manifestConditionFieldValue = getManifestConditionFieldValue(config, enabled4),
     list3 = Array['isArray'](el['values'])
       ? el['values']
@@ -128,16 +128,16 @@ export function resolveVideoPromptPlaceholder(
   return manifestPromptPlaceholder || String(defaultVideoPromptPlaceholder || '')['trim']();
 }
 export function shouldShowVideoPromptInput(enabled6) {
-  if (!enabled6 || typeof enabled6 !== 'object') return !![];
-  if (enabled6?.['prompt']?.['visible'] === ![]) return ![];
-  if (enabled6?.['prompt']?.['hidden'] === !![]) return ![];
-  return !![];
+  if (!enabled6 || typeof enabled6 !== 'object') return true;
+  if (enabled6?.['prompt']?.['visible'] === false) return false;
+  if (enabled6?.['prompt']?.['hidden'] === true) return false;
+  return true;
 }
 function fieldConditionReferences(list4, value8) {
   const enabled7 = String(value8 || '')['trim']();
   if (Array['isArray'](list4)) return list4['some']((value9) => fieldConditionReferences(value9, enabled7));
-  if (!enabled7 || !list4 || typeof list4 !== 'object') return ![];
-  if (String(list4['field'] || list4['param'] || '')['trim']() === enabled7) return !![];
+  if (!enabled7 || !list4 || typeof list4 !== 'object') return false;
+  if (String(list4['field'] || list4['param'] || '')['trim']() === enabled7) return true;
   return ['all', 'any']['some'](
     (value10) =>
       Array['isArray'](list4[value10]) &&

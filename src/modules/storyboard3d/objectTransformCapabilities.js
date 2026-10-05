@@ -10,13 +10,13 @@ export function getStoryboard3DObjectTransformCapabilities(item) {
     return {
       tools: FULL_TOOLS,
       fields: Object['freeze'](['position', 'rotation', 'scale']),
-      groundSnap: !![],
+      groundSnap: true,
     };
   if (key === 'camera')
-    return { tools: MOVE_ROTATE_TOOLS, fields: Object['freeze'](['position', 'rotation']), groundSnap: ![] };
+    return { tools: MOVE_ROTATE_TOOLS, fields: Object['freeze'](['position', 'rotation']), groundSnap: false };
   if (key === 'light' && item?.['lightType'] !== 'ambient')
-    return { tools: MOVE_ROTATE_TOOLS, fields: Object['freeze'](['position', 'rotation']), groundSnap: ![] };
-  return { tools: EMPTY_TOOLS, fields: EMPTY_TOOLS, groundSnap: ![] };
+    return { tools: MOVE_ROTATE_TOOLS, fields: Object['freeze'](['position', 'rotation']), groundSnap: false };
+  return { tools: EMPTY_TOOLS, fields: EMPTY_TOOLS, groundSnap: false };
 }
 export function canStoryboard3DObjectUseTransformTool(index, result) {
   return getStoryboard3DObjectTransformCapabilities(index)['tools']['includes'](normalizeTool(result));

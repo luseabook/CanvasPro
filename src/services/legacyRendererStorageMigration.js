@@ -4,8 +4,8 @@ const LEGACY_RENDERER_STORAGE_MIGRATION_COMPLETED_KEY = 'aic_legacy_renderer_sto
 function readMigrationAvailabilityHint(value = globalThis['location']) {
   try {
     const uRLSearchParams = new URLSearchParams(value?.['search'] || '')['get']('aicLegacyStorageMigration');
-    if (uRLSearchParams === '1') return !![];
-    if (uRLSearchParams === '0') return ![];
+    if (uRLSearchParams === '1') return true;
+    if (uRLSearchParams === '0') return false;
   } catch {}
   return null;
 }
@@ -13,7 +13,7 @@ function hasCompletedMigrationMarker(item) {
   try {
     return item?.['getItem']?.(LEGACY_RENDERER_STORAGE_MIGRATION_COMPLETED_KEY) === '1';
   } catch {
-    return ![];
+    return false;
   }
 }
 function markMigrationCompleted(key) {
@@ -65,16 +65,16 @@ function openDatabase(record, payload, handle, state, el2) {
   return new Promise((handler2, handler3) => {
     el2?.['throwIfAborted']();
     const config = handle ? record['open'](payload, handle) : record['open'](payload);
-    let scope = ![];
+    let scope = false;
     const run = (input) => {
-        ((scope = !![]), el2?.['removeEventListener']('abort', output));
+        ((scope = true), el2?.['removeEventListener']('abort', output));
         try {
           config['transaction']?.['abort']();
         } catch {}
         handler3(input);
       },
       output = () => run(el2['reason']);
-    (el2?.['addEventListener']('abort', output, { once: !![] }),
+    (el2?.['addEventListener']('abort', output, { once: true }),
       (config['onupgradeneeded'] = (event) => {
         if (scope || el2?.['aborted']) {
           try {
@@ -105,7 +105,7 @@ function createMissingStores(value3, value4) {
     if (!error?.['name'] || value3['objectStoreNames']['contains'](error['name'])) continue;
     const value5 = {};
     if (error['keyPath'] !== null && error['keyPath'] !== undefined) value5['keyPath'] = error['keyPath'];
-    if (error['autoIncrement'] === !![]) value5['autoIncrement'] = !![];
+    if (error['autoIncrement'] === true) value5['autoIncrement'] = true;
     value3['createObjectStore'](error['name'], value5);
   }
 }
@@ -145,7 +145,7 @@ function mergeStoreEntries(value11, error4, el3) {
           value12['abort']();
         } catch {}
       };
-    el3?.['addEventListener']('abort', handler6, { once: !![] });
+    el3?.['addEventListener']('abort', handler6, { once: true });
     const run2 = (value13) => {
         el3?.['removeEventListener']('abort', handler6);
         if (value13) handler5(value13);
@@ -211,17 +211,17 @@ export async function migrateLegacyRendererStorageIfNeeded({
   locationObject: locationObject = globalThis['location'],
   timeoutMs: timeoutMs,
 } = {}) {
-  if (!bridge?.['isAvailable']?.()) return { migrated: ![], reason: 'unavailable' };
+  if (!bridge?.['isAvailable']?.()) return { migrated: false, reason: 'unavailable' };
   const migrationAvailabilityHint = readMigrationAvailabilityHint(locationObject);
-  if (migrationAvailabilityHint === ![]) return { migrated: ![], reason: 'not-staged' };
-  if (hasCompletedMigrationMarker(storage)) return { migrated: ![], reason: 'completed' };
+  if (migrationAvailabilityHint === false) return { migrated: false, reason: 'not-staged' };
+  if (hasCompletedMigrationMarker(storage)) return { migrated: false, reason: 'completed' };
   const signal2 = createMigrationDeadline(timeoutMs);
   try {
     const reason = await signal2['wait'](() => bridge['read']());
     if (!reason?.['available'] || !reason['payload'])
       return (
         reason?.['reason'] === 'completed' && markMigrationCompleted(storage),
-        { migrated: ![], reason: reason?.['reason'] || 'not-staged' }
+        { migrated: false, reason: reason?.['reason'] || 'not-staged' }
       );
     const indexedDbCount = await signal2['wait'](() =>
       importDatabases(reason['payload']['databases'], indexedDBApi, { signal: signal2['signal'] }),
@@ -239,12 +239,12 @@ export async function migrateLegacyRendererStorageIfNeeded({
       await signal2['wait'](() => bridge['complete'](args)),
       signal2['signal']['throwIfAborted'](),
       markMigrationCompleted(storage),
-      { migrated: !![], ...args }
+      { migrated: true, ...args }
     );
   } catch (error6) {
     return (
       console['warn']('[storageMigration] legacy Electron storage migration failed:', error6),
-      { migrated: ![], reason: 'failed', error: String(error6?.['message'] || error6) }
+      { migrated: false, reason: 'failed', error: String(error6?.['message'] || error6) }
     );
   } finally {
     signal2['dispose']();

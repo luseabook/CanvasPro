@@ -3,7 +3,7 @@ export function isVideoAnalysisModel(value) {
   const item = typeof value === 'string' ? getModelManifest(value) : value;
   return (
     item?.['kind'] === 'text' &&
-    item['inputSlots']?.['allowedKinds']?.['includes']('video') === !![] &&
+    item['inputSlots']?.['allowedKinds']?.['includes']('video') === true &&
     Number(item['inputSlots']?.['maxByKind']?.['video']) > 0
   );
 }

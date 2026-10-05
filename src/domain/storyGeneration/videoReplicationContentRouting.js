@@ -18,7 +18,7 @@ export function replicationRoutePolicy(item) {
   const contentType = normalizeReplicationContentType(item);
   return {
     contentType: contentType,
-    includeSpeechSubtitles: ![],
+    includeSpeechSubtitles: false,
     instruction:
       rules[contentType] +
       '生成提示词不呈现画面文字：字幕、人物介绍、物体文字与广告文案均只保存在 textElements 证据，不进入 visual/camera 或其他生成正文；人声原文照常保留。',

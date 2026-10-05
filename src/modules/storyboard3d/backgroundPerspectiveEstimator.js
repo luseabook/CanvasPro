@@ -130,7 +130,7 @@ export function extractStoryboard3DFocalLength35mmFromExif(value31) {
     if (list4[value32] !== 0xff) break;
     const count7 = list4[value32 + 1];
     if (count7 === 218 || count7 === 217) break;
-    const count8 = dataView['getUint16'](value32 + 2, ![]);
+    const count8 = dataView['getUint16'](value32 + 2, false);
     if (count8 < 2 || value32 + 2 + count8 > list4['length']) break;
     if (
       count7 === 225 &&
@@ -246,7 +246,7 @@ export async function analyzeStoryboard3DBackgroundImage(
       value50 = Math['max'](1, Math['round'](sourceWidth2 * value49)),
       value51 = Math['max'](1, Math['round'](sourceHeight2 * value49)),
       box4 = documentObject?.['createElement']?.('canvas'),
-      ctx = box4?.['getContext']?.('2d', { willReadFrequently: !![] });
+      ctx = box4?.['getContext']?.('2d', { willReadFrequently: true });
     if (!box4 || !ctx) throw new Error('无法创建背景透视分析画布。');
     ((box4['width'] = value50),
       (box4['height'] = value51),

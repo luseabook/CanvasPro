@@ -46,7 +46,7 @@ export function createCollaborationCommentNotifications({
           notify('该节点已删除', 'ok');
           return;
         }
-        openNode(error['id'], !![]);
+        openNode(error['id'], true);
       },
     });
   };

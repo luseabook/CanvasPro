@@ -141,7 +141,7 @@ function segmentIntersectsBounds(value32, value33, value34) {
     value35 = 1;
   for (let count4 = 0; count4 < 3; count4 += 1) {
     if (Math['abs'](subtract33[count4]) < 1e-8) {
-      if (value32[count4] < value34['min'][count4] || value32[count4] > value34['max'][count4]) return ![];
+      if (value32[count4] < value34['min'][count4] || value32[count4] > value34['max'][count4]) return false;
       continue;
     }
     const value36 = 1 / subtract33[count4];
@@ -149,7 +149,7 @@ function segmentIntersectsBounds(value32, value33, value34) {
       value38 = (value34['max'][count4] - value32[count4]) * value36;
     if (value37 > value38) [value37, value38] = [value38, value37];
     ((count3 = Math['max'](count3, value37)), (value35 = Math['min'](value35, value38)));
-    if (count3 > value35) return ![];
+    if (count3 > value35) return false;
   }
   return count3 > 0.001 && count3 < 0.98;
 }
@@ -178,7 +178,7 @@ function candidateSimilarity(value41, value42) {
 export function identifyStoryboard3DSubjects(value47, { subjectIds: subjectIds } = {}) {
   const value48 = (Array['isArray'](value47?.['objects']) ? value47['objects'] : [])['filter'](
       (value49) =>
-        value49?.['visible'] !== ![] && !['light', 'camera', 'group']['includes'](value49?.['type']),
+        value49?.['visible'] !== false && !['light', 'camera', 'group']['includes'](value49?.['type']),
     ),
     value50 = new Set((Array['isArray'](subjectIds) ? subjectIds : [])['map'](String)),
     value51 =
@@ -308,7 +308,7 @@ export function generateStoryboard3DShotCandidates(
   const value97 = (Array['isArray'](value95?.['objects']) ? value95['objects'] : [])
       ['filter'](
         (value98) =>
-          value98?.['visible'] !== ![] && !['light', 'camera', 'group']['includes'](value98?.['type']),
+          value98?.['visible'] !== false && !['light', 'camera', 'group']['includes'](value98?.['type']),
       )
       ['map']((value99) => ({ id: String(value99['id'] || ''), bounds: objectBounds(value99) })),
     value100 = new Set(

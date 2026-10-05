@@ -52,7 +52,7 @@ function shouldUseSharedVideoBlobWarmup() {
   const item = String(
     globalThis['location']?.['search'] || globalThis['window']?.['location']?.['search'] || '',
   );
-  if (new URLSearchParams(item)['get']('aicRuntime') === 'chrome-shell') return !![];
+  if (new URLSearchParams(item)['get']('aicRuntime') === 'chrome-shell') return true;
   return !desktopBridge['mediaPreview']['isAvailable']();
 }
 function getElementSize(el) {
@@ -103,8 +103,8 @@ function getEffectiveWarmupMaxJobs(value5, box6) {
 }
 function isWarmupUrl(value7) {
   const enabled = String(value7 || '')['trim']();
-  if (!enabled) return ![];
-  if (/^https?:\/\//i['test'](enabled)) return ![];
+  if (!enabled) return false;
+  if (/^https?:\/\//i['test'](enabled)) return false;
   return (
     enabled['startsWith']('/') ||
     enabled['startsWith']('data:image/') ||
@@ -132,11 +132,11 @@ function pushWarmupJob(order, map, value10, priority, value11, reason2, visible 
       nodeId: String(value11 || ''),
       reason: reason2,
       distanceSq: Number['isFinite'](Number(visible['distanceSq'])) ? Number(visible['distanceSq']) : 0,
-      visible: visible['visible'] === !![],
-      selected: visible['selected'] === !![],
+      visible: visible['visible'] === true,
+      selected: visible['selected'] === true,
       fetchPriority: visible['fetchPriority'] === 'high' ? 'high' : 'auto',
-      allowWhenPaused: visible['allowWhenPaused'] === !![],
-      deferWhenPaused: visible['deferWhenPaused'] === ![] ? ![] : !![],
+      allowWhenPaused: visible['allowWhenPaused'] === true,
+      deferWhenPaused: visible['deferWhenPaused'] === false ? false : true,
       order: order['length'],
     }));
 }
@@ -166,9 +166,9 @@ function addImageWarmupJobs(
   value17,
   value18,
   {
-    primary: primary = !![],
+    primary: primary = true,
     priorityOffset: priorityOffset = 0,
-    includeFull: includeFull = ![],
+    includeFull: includeFull = false,
     meta: meta = {},
   } = {},
 ) {
@@ -185,7 +185,7 @@ function addImageWarmupJobs(
       130 + value19 + priorityOffset,
       value18?.['id'],
       primary ? 'image-display-primary' : 'image-display-nearby',
-      { ...meta, fetchPriority: 'high', allowWhenPaused: !![], deferWhenPaused: ![] },
+      { ...meta, fetchPriority: 'high', allowWhenPaused: true, deferWhenPaused: false },
     ),
     pushWarmupJob(
       value16,
@@ -210,7 +210,7 @@ function addVideoPosterWarmupJobs(
   value20,
   value21,
   value22,
-  { primary: primary = !![], priorityOffset: priorityOffset = 0, meta: meta = {} } = {},
+  { primary: primary = true, priorityOffset: priorityOffset = 0, meta: meta = {} } = {},
 ) {
   const value23 = (primary ? 95 : 70) + priorityOffset;
   for (const value24 of [
@@ -226,8 +226,8 @@ function addVideoPosterWarmupJobs(
 }
 function shouldWarmupVideoPosterAtViewport(value25, box7) {
   const value26 = Number(box7?.['zoom']);
-  if (!Number['isFinite'](value26) || value26 > LOW_ZOOM_WARMUP_THRESHOLD) return !![];
-  return value25?.['visible'] === !![] || value25?.['selected'] === !![];
+  if (!Number['isFinite'](value26) || value26 > LOW_ZOOM_WARMUP_THRESHOLD) return true;
+  return value25?.['visible'] === true || value25?.['selected'] === true;
 }
 function collectCanvasNearbyVideoWarmupCandidates({
   canvas: canvas = null,
@@ -289,7 +289,7 @@ function readCachedVideoStat(value32) {
 }
 function rememberVideoStat(value33, exists) {
   const stat = {
-    exists: exists?.['exists'] === !![],
+    exists: exists?.['exists'] === true,
     sizeBytes:
       Number['isSafeInteger'](Number(exists?.['sizeBytes'])) && Number(exists['sizeBytes']) >= 0
         ? Number(exists['sizeBytes'])
@@ -308,14 +308,14 @@ function drainVideoStatProbeQueue() {
   while (activeVideoStatProbeCount < LOW_ZOOM_VIDEO_STAT_CONCURRENCY && videoStatProbeQueue['length'] > 0) {
     const promise = videoStatProbeQueue['shift']();
     if (!promise || videoStatProbeBySource['get'](promise['sourceUrl']) !== promise) continue;
-    ((promise['active'] = !![]),
+    ((promise['active'] = true),
       (activeVideoStatProbeCount += 1),
       void statLocalMediaOnServer(promise['sourceUrl'])
         ['then']((value34) => rememberVideoStat(promise['sourceUrl'], value34))
-        ['catch'](() => rememberVideoStat(promise['sourceUrl'], { exists: ![], sizeBytes: 0 }))
+        ['catch'](() => rememberVideoStat(promise['sourceUrl'], { exists: false, sizeBytes: 0 }))
         ['then'](promise['resolve'])
         ['finally'](() => {
-          ((promise['active'] = ![]),
+          ((promise['active'] = false),
             (activeVideoStatProbeCount = Math['max'](0, activeVideoStatProbeCount - 1)),
             videoStatProbeBySource['get'](promise['sourceUrl']) === promise &&
               videoStatProbeBySource['delete'](promise['sourceUrl']),
@@ -332,7 +332,7 @@ function probeVideoStat(sourceUrl2) {
   const promise2 = new Promise((value36) => {
       resolve = value36;
     }),
-    value37 = { sourceUrl: sourceUrl2, promise: promise2, resolve: resolve, active: ![] };
+    value37 = { sourceUrl: sourceUrl2, promise: promise2, resolve: resolve, active: false };
   return (
     videoStatProbeBySource['set'](sourceUrl2, value37),
     videoStatProbeQueue['push'](value37),
@@ -347,7 +347,7 @@ function resolveEligibleVideoWarmupSources(value38) {
       count3 =
         value39['knownSizeBytes'] > 0
           ? value39['knownSizeBytes']
-          : cachedVideoStat2?.['exists'] === !![]
+          : cachedVideoStat2?.['exists'] === true
             ? Number(cachedVideoStat2['sizeBytes'] || 0)
             : 0;
     count3 > 0 && count3 <= LOW_ZOOM_VIDEO_WARMUP_MAX_BYTES && list3['push'](value39['sourceUrl']);
@@ -416,7 +416,7 @@ export const __canvasMediaWarmupForTest = {
       !promise3['active'] &&
         videoStatProbeBySource['get'](promise3['sourceUrl']) === promise3 &&
         (videoStatProbeBySource['delete'](promise3['sourceUrl']),
-        promise3['resolve']({ exists: ![], sizeBytes: 0 }));
+        promise3['resolve']({ exists: false, sizeBytes: 0 }));
     }
   },
 };
@@ -474,7 +474,7 @@ export function collectCanvasVisibleMediaWarmupJobs({
         box9['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD && (selected3['visible'] || selected3['selected']);
     if (list6['includes']('image')) {
       addImageWarmupJobs(list5, value45, value48, {
-        primary: !![],
+        primary: true,
         priorityOffset: priorityOffset2,
         includeFull: includeFull2,
         meta: meta2,
@@ -482,7 +482,7 @@ export function collectCanvasVisibleMediaWarmupJobs({
       const primaryListItem2 = getPrimaryListItem(value48['images'], value48['mainImageIndex']);
       primaryListItem2 &&
         addImageWarmupJobs(list5, value45, primaryListItem2, {
-          primary: ![],
+          primary: false,
           priorityOffset: priorityOffset2,
           includeFull: includeFull2,
           meta: meta2,
@@ -493,7 +493,7 @@ export function collectCanvasVisibleMediaWarmupJobs({
           const primaryListItem3 = getPrimaryListItem(value48['videos'], value48['mainVideoIndex']);
           if (primaryListItem3)
             addVideoPosterWarmupJobs(list5, value45, primaryListItem3, {
-              primary: !![],
+              primary: true,
               priorityOffset: priorityOffset2,
               meta: meta2,
             });
@@ -515,7 +515,7 @@ export function collectCanvasVisibleMediaWarmupJobs({
   )['slice'](0, effectiveWarmupMaxJobs);
 }
 export function cancelCanvasVisibleMediaWarmupPreloads({
-  includeActive: includeActive = ![],
+  includeActive: includeActive = false,
   belowPriority: belowPriority = null,
   reason: reason = 'canceled',
 } = {}) {
@@ -530,15 +530,15 @@ export function warmupCanvasVisibleMedia({
   canvas: canvas = null,
   containerEl: containerEl = null,
   maxJobs: maxJobs = DEFAULT_MAX_WARMUP_JOBS,
-  cancelStaleQueued: cancelStaleQueued = !![],
+  cancelStaleQueued: cancelStaleQueued = true,
 } = {}) {
   const box10 = normalizeViewport(canvas?.['viewport']),
     belowPriority2 = box10['zoom'] > LOW_ZOOM_WARMUP_THRESHOLD,
     canceledStaleCount =
-      cancelStaleQueued === ![]
+      cancelStaleQueued === false
         ? 0
         : cancelCanvasVisibleMediaWarmupPreloads({
-            includeActive: ![],
+            includeActive: false,
             belowPriority: belowPriority2 ? HIGH_ZOOM_STALE_WARMUP_CANCEL_PRIORITY_LIMIT : null,
             reason: 'replaced by newer viewport',
           }),

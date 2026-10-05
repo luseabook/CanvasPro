@@ -74,7 +74,7 @@ function renderEpisodeSwitcher(options2 = {}) {
   );
 }
 function renderEpisodeToolbarSide(options3 = {}) {
-  const key = options3['canvasSyncPending'] === !![],
+  const key = options3['canvasSyncPending'] === true,
     index = key ? 'disabled aria-disabled="true"' : '';
   return (
     '<div class="story-episode-toolbar-side">\n      ' +
@@ -134,7 +134,7 @@ export function createStoryWorkspaceChromePresentation() {
         ' aria-busy="' +
         Boolean(options5['busy']) +
         '">' +
-        (options5['busy'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+        (options5['busy'] ? renderStoryGenerationSpinner({ button: true }) : '') +
         '<span>' +
         escapeHtml(options5['nextLabel']) +
         '</span>' +

@@ -4,11 +4,11 @@ function clamp(value, item, key) {
   return Math['max'](item, Math['min'](key, value));
 }
 export function resolveMediaClipReverseControlState({
-  isReversed: isReversed = ![],
-  pending: pending = ![],
+  isReversed: isReversed = false,
+  pending: pending = false,
 } = {}) {
-  const isReversed2 = isReversed === !![],
-    pending2 = pending === !![];
+  const isReversed2 = isReversed === true,
+    pending2 = pending === true;
   return {
     isReversed: isReversed2,
     pending: pending2,

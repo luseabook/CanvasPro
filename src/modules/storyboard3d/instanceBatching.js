@@ -29,11 +29,11 @@ export function createStoryboard3DInstanceMatrix(box, options = null) {
 }
 export function findStoryboard3DInstancingTemplate(enabled) {
   if (!enabled?.['traverse']) return null;
-  enabled['updateMatrixWorld']?.(!![]);
+  enabled['updateMatrixWorld']?.(true);
   const list = [];
-  let source = ![];
+  let source = false;
   enabled['traverse']((enabled2) => {
-    if (enabled2?.['isSkinnedMesh'] || enabled2?.['morphTargetInfluences']?.['length']) source = !![];
+    if (enabled2?.['isSkinnedMesh'] || enabled2?.['morphTargetInfluences']?.['length']) source = true;
     if (enabled2?.['isMesh'] && !enabled2['isInstancedMesh']) list['push'](enabled2);
   });
   if (source || list['length'] !== 1) return null;
@@ -49,8 +49,8 @@ export function createStoryboard3DInstanceBatch({
   template: template,
   objects: objects = [],
   tint: tint = '',
-  castShadow: castShadow = !![],
-  receiveShadow: receiveShadow = !![],
+  castShadow: castShadow = true,
+  receiveShadow: receiveShadow = true,
 } = {}) {
   if (!template?.['geometry'] || !template?.['material'])
     throw new TypeError('An instancing template is required');
@@ -71,8 +71,8 @@ export function createStoryboard3DInstanceBatch({
     );
   return (
     (mesh['name'] = 'storyboard3d-instance-batch'),
-    (mesh['castShadow'] = castShadow !== ![]),
-    (mesh['receiveShadow'] = receiveShadow !== ![]),
+    (mesh['castShadow'] = castShadow !== false),
+    (mesh['receiveShadow'] = receiveShadow !== false),
     (mesh['userData']['storyboardObjectIds'] = list2['map']((record) => record['id'])),
     list2['forEach']((payload, handle) => {
       mesh['setMatrixAt'](
@@ -80,7 +80,7 @@ export function createStoryboard3DInstanceBatch({
         createStoryboard3DInstanceMatrix(payload['transform'], template['sourceMatrix']),
       );
     }),
-    (mesh['instanceMatrix']['needsUpdate'] = !![]),
+    (mesh['instanceMatrix']['needsUpdate'] = true),
     mesh['computeBoundingBox']?.(),
     mesh['computeBoundingSphere']?.(),
     {
@@ -93,21 +93,21 @@ export function createStoryboard3DInstanceBatch({
 }
 export function refreshStoryboard3DInstanceBatchBounds(state) {
   const enabled4 = state?.['mesh'];
-  if (!enabled4) return ![];
-  return (enabled4['computeBoundingBox']?.(), enabled4['computeBoundingSphere']?.(), !![]);
+  if (!enabled4) return false;
+  return (enabled4['computeBoundingBox']?.(), enabled4['computeBoundingSphere']?.(), true);
 }
 export function updateStoryboard3DInstanceTransform(
   enabled5,
   config,
   scope,
-  { recomputeBounds: recomputeBounds = !![] } = {},
+  { recomputeBounds: recomputeBounds = true } = {},
 ) {
   const count = enabled5?.['objectIds']?.['indexOf']?.(config) ?? -1;
-  if (count < 0 || !enabled5?.['mesh']?.['setMatrixAt']) return ![];
+  if (count < 0 || !enabled5?.['mesh']?.['setMatrixAt']) return false;
   (enabled5['mesh']['setMatrixAt'](count, createStoryboard3DInstanceMatrix(scope, enabled5['sourceMatrix'])),
-    (enabled5['mesh']['instanceMatrix']['needsUpdate'] = !![]));
+    (enabled5['mesh']['instanceMatrix']['needsUpdate'] = true));
   if (recomputeBounds) refreshStoryboard3DInstanceBatchBounds(enabled5);
-  return !![];
+  return true;
 }
 export function disposeStoryboard3DInstanceBatch(input) {
   (input?.['mesh']?.['removeFromParent']?.(),

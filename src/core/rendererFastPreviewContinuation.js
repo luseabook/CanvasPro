@@ -11,8 +11,8 @@ function recordFastPreviewContinuationEvent(type, args = {}) {
 }
 function buildContinuationProbeContext(deferFullSync2 = {}) {
   return {
-    deferFullSync: deferFullSync2['deferFullSync'] === !![],
-    hasPendingStructuralOps: deferFullSync2['hasPendingStructuralOps'] === !![],
+    deferFullSync: deferFullSync2['deferFullSync'] === true,
+    hasPendingStructuralOps: deferFullSync2['hasPendingStructuralOps'] === true,
   };
 }
 function buildNodeIdSetKey(enabled) {
@@ -24,18 +24,18 @@ function buildContinuationKey(item, key = {}) {
     index = key['connOverlay'] || {},
     result = key['dragContext'] || {},
     data =
-      key['keepMountedMediaPreview'] === !![] ? key['nonMediaLifecycleRevision'] : key['lifecycleRevision'],
+      key['keepMountedMediaPreview'] === true ? key['nonMediaLifecycleRevision'] : key['lifecycleRevision'],
     options = Array['isArray'](index['invalidNodeIds']) ? index['invalidNodeIds']['join']('\x1f') : '';
   return [
     item,
     box['x'],
     box['y'],
     box['zoom'],
-    key['viewportBusy'] === !![] ? 1 : 0,
-    key['suppressNewMedia'] === !![] ? 1 : 0,
-    key['deferVisibleMediaSrc'] === !![] ? 1 : 0,
-    key['suspendNewMediaSrc'] === !![] ? 1 : 0,
-    key['keepMountedMediaPreview'] === !![] ? 1 : 0,
+    key['viewportBusy'] === true ? 1 : 0,
+    key['suppressNewMedia'] === true ? 1 : 0,
+    key['deferVisibleMediaSrc'] === true ? 1 : 0,
+    key['suspendNewMediaSrc'] === true ? 1 : 0,
+    key['keepMountedMediaPreview'] === true ? 1 : 0,
     buildNodeIdSetKey(key['fullEligibleVisibleImageNodeIds']),
     buildNodeIdSetKey(key['fullEligiblePreviewImageNodeIds']),
     key['mediaSourceOwnerIds'] == null
@@ -47,8 +47,8 @@ function buildContinuationKey(item, key = {}) {
     Number(data) || 0,
     index['side'] || '',
     options,
-    result['isCommittingDrag'] === !![] ? 1 : 0,
-    result['hasMoved'] === !![] ? 1 : 0,
+    result['isCommittingDrag'] === true ? 1 : 0,
+    result['hasMoved'] === true ? 1 : 0,
   ]['join']('|');
 }
 function requestContinuationFrame(target) {
@@ -84,18 +84,18 @@ export function createRendererFastPreviewLifecycleTracker() {
   };
 }
 export function shouldDeferRendererFastPreviewSync({
-  mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame = ![],
-  updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame = ![],
-  hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts = ![],
-  hasExistingPreviewSurface: hasExistingPreviewSurface = ![],
+  mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame = false,
+  updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame = false,
+  hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts = false,
+  hasExistingPreviewSurface: hasExistingPreviewSurface = false,
   dragContext: dragContext = null,
 } = {}) {
-  if (dragContext?.['isDragging'] === !![]) return ![];
-  if (hasExistingPreviewSurface !== !![]) return ![];
+  if (dragContext?.['isDragging'] === true) return false;
+  if (hasExistingPreviewSurface !== true) return false;
   return (
-    mountedHeavyMediaThisFrame === !![] ||
-    updatedHeavyMediaThisFrame === !![] ||
-    hasPendingStructuralVideoMounts === !![]
+    mountedHeavyMediaThisFrame === true ||
+    updatedHeavyMediaThisFrame === true ||
+    hasPendingStructuralVideoMounts === true
   );
 }
 export function syncRendererFastPreviewAfterNodeRender({
@@ -113,22 +113,22 @@ export function syncRendererFastPreviewAfterNodeRender({
   viewport: viewport,
   containerWidth: containerWidth,
   containerHeight: containerHeight,
-  suppressNewMedia: suppressNewMedia = ![],
-  deferVisibleMediaSrc: deferVisibleMediaSrc = ![],
-  freezeRasterSurface: freezeRasterSurface = ![],
-  viewportBusy: viewportBusy = ![],
+  suppressNewMedia: suppressNewMedia = false,
+  deferVisibleMediaSrc: deferVisibleMediaSrc = false,
+  freezeRasterSurface: freezeRasterSurface = false,
+  viewportBusy: viewportBusy = false,
   dragContext: dragContext2,
   dragTargets: dragTargets,
-  suspendNewMediaSrc: suspendNewMediaSrc = ![],
+  suspendNewMediaSrc: suspendNewMediaSrc = false,
   fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds = null,
   fullEligiblePreviewImageNodeIds: fullEligiblePreviewImageNodeIds = null,
   mediaSourceOwnerIds: mediaSourceOwnerIds = null,
   requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds = null,
   lifecycleRevision: lifecycleRevision = 0,
   nonMediaLifecycleRevision: nonMediaLifecycleRevision = 0,
-  mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame = ![],
-  updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame = ![],
-  hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts = ![],
+  mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame = false,
+  updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame = false,
+  hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts = false,
 } = {}) {
   const options2 = {
       connOverlay: connOverlay,
@@ -165,7 +165,7 @@ export function syncRendererFastPreviewAfterNodeRender({
         requiredImmediateMediaSourceOwnerIds != null &&
         typeof requiredImmediateMediaSourceOwnerIds?.[Symbol['iterator']] === 'function' &&
         Array['from'](requiredImmediateMediaSourceOwnerIds)['some'](
-          (next) => layer?.['isNodePreviewReady']?.(next) !== !![],
+          (next) => layer?.['isNodePreviewReady']?.(next) !== true,
         )
       );
   return (
@@ -215,7 +215,7 @@ export function createRendererFastPreviewContinuationController({
       args2 = null;
       if (!args3) return;
       (recordFastPreviewContinuationEvent('deferred-flush', { ...buildContinuationProbeContext(args3) }),
-        syncIfNeeded({ ...args3, deferFullSync: ![] }));
+        syncIfNeeded({ ...args3, deferFullSync: false }));
     })),
       recordFastPreviewContinuationEvent('deferred-created', {
         ...buildContinuationProbeContext(entry),
@@ -230,15 +230,15 @@ export function createRendererFastPreviewContinuationController({
     const continuationKey = buildContinuationKey(candidateSignature2, options3),
       keyChanged = current !== continuationKey,
       nodesChanged = value2 !== nodes2,
-      shouldRun = hasPendingStructuralOps2 !== !![] || keyChanged || nodesChanged;
+      shouldRun = hasPendingStructuralOps2 !== true || keyChanged || nodesChanged;
     return (
       recordFastPreviewContinuationEvent('full-sync-decision', {
-        hasPendingStructuralOps: hasPendingStructuralOps2 === !![],
+        hasPendingStructuralOps: hasPendingStructuralOps2 === true,
         keyChanged: keyChanged,
         nodesChanged: nodesChanged,
         shouldRun: shouldRun,
       }),
-      hasPendingStructuralOps2 === !![] ? ((current = continuationKey), (value2 = nodes2)) : reset2(),
+      hasPendingStructuralOps2 === true ? ((current = continuationKey), (value2 = nodes2)) : reset2(),
       shouldRun
     );
   }
@@ -250,13 +250,13 @@ export function createRendererFastPreviewContinuationController({
     candidateSignature: candidateSignature3,
     hasPendingStructuralOps: hasPendingStructuralOps3,
     options: options4,
-    deferFullSync: deferFullSync = ![],
+    deferFullSync: deferFullSync = false,
   } = {}) {
     recordFastPreviewContinuationEvent('sync-call', {
-      deferFullSync: deferFullSync === !![],
-      hasPendingStructuralOps: hasPendingStructuralOps3 === !![],
+      deferFullSync: deferFullSync === true,
+      hasPendingStructuralOps: hasPendingStructuralOps3 === true,
     });
-    if (deferFullSync === !![])
+    if (deferFullSync === true)
       return (
         run2({
           canvasEl: canvasEl2,
@@ -267,7 +267,7 @@ export function createRendererFastPreviewContinuationController({
           hasPendingStructuralOps: hasPendingStructuralOps3,
           options: options4,
         }),
-        ![]
+        false
       );
     run('direct-sync');
     if (
@@ -280,9 +280,9 @@ export function createRendererFastPreviewContinuationController({
     )
       return (
         recordFastPreviewContinuationEvent('full-sync-skipped', {
-          hasPendingStructuralOps: hasPendingStructuralOps3 === !![],
+          hasPendingStructuralOps: hasPendingStructuralOps3 === true,
         }),
-        ![]
+        false
       );
     const nowContinuationProbeMs2 = nowContinuationProbeMs();
     try {
@@ -290,10 +290,10 @@ export function createRendererFastPreviewContinuationController({
     } finally {
       recordFastPreviewContinuationEvent('full-sync-run', {
         durationMs: Math['max'](0, nowContinuationProbeMs() - nowContinuationProbeMs2),
-        hasPendingStructuralOps: hasPendingStructuralOps3 === !![],
+        hasPendingStructuralOps: hasPendingStructuralOps3 === true,
       });
     }
-    return !![];
+    return true;
   }
   function excludeNodes(payload) {
     if (!args2) return;

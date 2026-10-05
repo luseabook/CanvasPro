@@ -40,7 +40,7 @@ export function parseError(raw, status = 0) {
     provider: PROVIDER,
     status: status,
     raw: raw,
-    retryable: ![],
+    retryable: false,
     message: message,
   });
 }

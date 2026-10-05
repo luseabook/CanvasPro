@@ -16,7 +16,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
   getSelectedShot: getSelectedShot = () => null,
   createVideoPlayback: createVideoPlayback = () => null,
   documentObject: documentObject = globalThis['document'],
-  isDestroyed: isDestroyed = () => ![],
+  isDestroyed: isDestroyed = () => false,
 } = {}) {
   if (!session?.['workspaceState']) throw new TypeError('Shot cut preview media requires a session.');
   const enabled = session['workspaceState'];
@@ -39,7 +39,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
     handler = () => session['clearBufferedWarmup'](),
     handler2 = (el, data) => {
       handler();
-      if (!el) return ![];
+      if (!el) return false;
       const options = Math['max'](0, Number(data) || 0),
         handler3 = () => {
           handler();
@@ -51,24 +51,24 @@ export function createPersonReplacementShotCutPreviewMediaController({
               el['currentTime'] = options;
           } catch {}
         };
-      if (Number(el['readyState']) >= 1) return (handler3(), !![]);
+      if (Number(el['readyState']) >= 1) return (handler3(), true);
       return (
-        el['addEventListener']?.('loadedmetadata', handler3, { once: !![] }),
+        el['addEventListener']?.('loadedmetadata', handler3, { once: true }),
         (enabled['bufferedWarmupCleanup'] = () => {
           el['removeEventListener']?.('loadedmetadata', handler3);
         }),
-        !![]
+        true
       );
     },
     releaseBufferedVideo = () => session['releasePreviewBuffer'](),
     preserveBufferedVideo = () => {
       const el2 = getRoot()?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
-      if (!el2) return ![];
+      if (!el2) return false;
       const text3 = normalizeText(el2['dataset']?.['sourceId']),
         text4 = normalizeText(
           el2['dataset']?.['personReplacementShotCutMediaRef'] || getSourceMediaRef(text3),
         );
-      if (!text3 || !text4) return ![];
+      if (!text3 || !text4) return false;
       ((enabled['bufferedVideo'] = el2),
         (enabled['bufferedSourceId'] = text3),
         (enabled['bufferedMediaRef'] = text4),
@@ -76,7 +76,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
       try {
         el2['remove']?.();
       } catch {}
-      return !![];
+      return true;
     },
     restoreBufferedVideo = () => {
       const el3 = getRoot()?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
@@ -93,7 +93,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
         return (releaseBufferedVideo(), null);
       const el4 = enabled['bufferedVideo'];
       ((el4['preload'] = 'auto'),
-        (el4['playsInline'] = !![]),
+        (el4['playsInline'] = true),
         (el4['muted'] = !enabled['soundEnabled']),
         (el4['dataset']['sourceId'] = text5),
         el4['setAttribute']?.('aria-label', '镜头切口预览'),
@@ -110,7 +110,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
     attachPreviewMedia = (videoEl, next, current) => {
       const text6 = normalizeText(next),
         sourceUrl = normalizeMediaUrl(current);
-      if (!videoEl || !text6 || !sourceUrl) return ![];
+      if (!videoEl || !text6 || !sourceUrl) return false;
       const project = getProject();
       ((videoEl['dataset']['sourceId'] = text6),
         (videoEl['dataset']['personReplacementShotCutMediaRef'] = sourceUrl),
@@ -122,7 +122,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
         try {
           videoEl['load']?.();
         } catch {}
-        return !![];
+        return true;
       };
       if (/^(?:blob:|data:)/i['test'](sourceUrl)) return run();
       let videoPlayback = null;
@@ -133,9 +133,9 @@ export function createPersonReplacementShotCutPreviewMediaController({
           ownerId: ['person-replacement', normalizeText(project['id']) || 'project', 'shot-cut-preview'][
             'join'
           ](':'),
-          allowConcurrentPlayback: !![],
-          preferStreamingSource: !![],
-          acquirePlaybackOptions: { bypassConcurrencyLimit: !![] },
+          allowConcurrentPlayback: true,
+          preferStreamingSource: true,
+          acquirePlaybackOptions: { bypassConcurrencyLimit: true },
         });
       } catch {}
       if (!videoPlayback || typeof videoPlayback['warm'] !== 'function')
@@ -152,12 +152,12 @@ export function createPersonReplacementShotCutPreviewMediaController({
           normalizeText(videoEl['dataset']?.['sourceId']) !== text6 ||
           normalizeText(videoEl['getAttribute']?.('src') || videoEl['src'])
         )
-          return ![];
+          return false;
         return run();
       };
       return (
-        void Promise['resolve'](videoPlayback['warm']())['then']((entry) => (entry ? !![] : run2()), run2),
-        !![]
+        void Promise['resolve'](videoPlayback['warm']())['then']((entry) => (entry ? true : run2()), run2),
+        true
       );
     },
     playPreviewVideo = (record) => {
@@ -173,14 +173,14 @@ export function createPersonReplacementShotCutPreviewMediaController({
         ![1, 2]['includes'](payload)
       ) {
         if (!enabled['isOpen']) releaseBufferedVideo();
-        return ![];
+        return false;
       }
       const handle = 'auto',
         selectedShot = getSelectedShot(project2),
         text7 = normalizeText(selectedShot?.['sourceId']),
         enabled3 = getSourceMediaRef(text7),
         state = Math['max'](0, Number(selectedShot?.['startTimeSec']) || 0);
-      if (!text7 || !enabled3) return (releaseBufferedVideo(), ![]);
+      if (!text7 || !enabled3) return (releaseBufferedVideo(), false);
       if (
         enabled['bufferedVideo'] &&
         enabled['bufferedSourceId'] === text7 &&
@@ -189,18 +189,18 @@ export function createPersonReplacementShotCutPreviewMediaController({
         return (
           (enabled['bufferedVideo']['preload'] = handle),
           enabled['bufferedVideo']['setAttribute']?.('preload', handle),
-          (enabled['bufferedVideo']['muted'] = !![]),
+          (enabled['bufferedVideo']['muted'] = true),
           handler2(enabled['bufferedVideo'], state),
-          !![]
+          true
         );
       releaseBufferedVideo();
-      if (!documentObject?.['defaultView']?.['HTMLVideoElement']) return ![];
+      if (!documentObject?.['defaultView']?.['HTMLVideoElement']) return false;
       const el5 = documentObject?.['createElement']?.('video');
-      if (normalizeText(el5?.['tagName'])['toUpperCase']() !== 'VIDEO') return ![];
+      if (normalizeText(el5?.['tagName'])['toUpperCase']() !== 'VIDEO') return false;
       return (
         (el5['preload'] = handle),
-        (el5['playsInline'] = !![]),
-        (el5['muted'] = !![]),
+        (el5['playsInline'] = true),
+        (el5['muted'] = true),
         (el5['dataset']['sourceId'] = text7),
         el5['setAttribute']?.('preload', handle),
         el5['setAttribute']?.('playsinline', ''),
@@ -208,7 +208,7 @@ export function createPersonReplacementShotCutPreviewMediaController({
         el5['setAttribute']?.('aria-hidden', 'true'),
         attachPreviewMedia(el5, text7, enabled3),
         handler2(el5, state),
-        !![]
+        true
       );
     };
   return Object['freeze']({

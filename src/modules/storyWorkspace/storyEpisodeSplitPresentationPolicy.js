@@ -6,16 +6,16 @@ export function getStoryEpisodeSplitPaidRetryChoice(item) {
     message: '上次请求可能已经计费，或原始响应尚未完成本地提交。确认后才会再次调用模型。',
     fallbackValue: null,
     choices: [
-      { label: '暂不重试', value: null, autofocus: !![] },
-      { label: '确认重新请求', value: 'retry', primary: !![] },
+      { label: '暂不重试', value: null, autofocus: true },
+      { label: '确认重新请求', value: 'retry', primary: true },
     ],
   };
 }
 export function isStoryEpisodeExperimentalSplitAvailable(key = globalThis['window']) {
-  return key?.['DEV_MODE'] === !![];
+  return key?.['DEV_MODE'] === true;
 }
 export function shouldUseStoryEpisodeExperimentalSplit(options = {}) {
-  return ![];
+  return false;
 }
 export function resolveStoryEpisodeExperimentalErrorMessage(
   error,

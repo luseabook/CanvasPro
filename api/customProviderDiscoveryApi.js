@@ -103,11 +103,11 @@ function extractDocumentationAgentText(response3) {
 function createDocumentationAgentStructuredOutput() {
   return {
     name: 'custom_provider_documentation_analysis',
-    strict: !![],
+    strict: true,
     fallback: 'prompt',
     schema: {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['analysisJson'],
       properties: { analysisJson: { type: 'string' } },
     },
@@ -132,19 +132,19 @@ function findDocumentationJsonObjects(list) {
   for (let data = 0; data < list['length']; data += 1) {
     if (list[data] !== '{') continue;
     let count = 0,
-      enabled = ![],
-      target = ![];
+      enabled = false,
+      target = false;
     for (let next = data; next < list['length']; next += 1) {
       const current = list[next];
       if (enabled) {
-        if (target) target = ![];
+        if (target) target = false;
         else {
-          if (current === '\\') target = !![];
-          else current === '"' && (enabled = ![]);
+          if (current === '\\') target = true;
+          else current === '"' && (enabled = false);
         }
         continue;
       }
-      if (current === '"') enabled = !![];
+      if (current === '"') enabled = true;
       else {
         if (current === '{') count += 1;
         else {
@@ -176,7 +176,7 @@ function parseDocumentationAgentJson(record) {
       ['map']((payload) => String(payload[1] || '')['trim']())
       ['filter'](Boolean),
     handle = [args, ...args2, ...findDocumentationJsonObjects(args)];
-  let state = ![];
+  let state = false;
   for (const config of [...new Set(handle)]) {
     try {
       const scope = JSON['parse'](config);
@@ -189,7 +189,7 @@ function parseDocumentationAgentJson(record) {
         const output = JSON['parse'](input);
         if (isDocumentationAgentContract(output)) return output;
       }
-      state = !![];
+      state = true;
     } catch {}
   }
   if (state) throw new Error('API documentation Agent returned an invalid contract');
@@ -389,7 +389,7 @@ function buildDocumentationAgentPrompt({ document: document, models: models2 }) 
 }
 function getDocumentationAgentReviewIssues(value5) {
   const value6 = value5?.['analysis']?.['agentReview'];
-  if (value6?.['needsRepair'] !== !![]) return [];
+  if (value6?.['needsRepair'] !== true) return [];
   const list4 = Array['isArray'](value6['issues'])
     ? value6['issues']
         ['filter']((value7) => value7 && typeof value7 === 'object')
@@ -465,7 +465,7 @@ export async function analyzeCustomProviderDocumentation(
   const provider = String(settings?.['provider'] || '')['trim'](),
     model = String(settings?.['model'] || '')['trim'](),
     providerProfileId = String(settings?.['providerProfileId'] || '')['trim']();
-  if (!provider || !model) return { ...document3, agentUnavailable: !![] };
+  if (!provider || !model) return { ...document3, agentUnavailable: true };
   const prompt = buildDocumentationAgentPrompt({
       document: document3['document'],
       models: models4['models'],
@@ -512,7 +512,7 @@ export async function analyzeCustomProviderDocumentation(
           String(error4?.['message'] || 'invalid JSON') +
           '. Return only the strict JSON contract without introductory text.';
     previousAnalysis2 = parseDocumentationAgentJson(
-      await request({ ...args5, prompt: prompt2, webSearch: webSearch ? ![] : args5['webSearch'] }),
+      await request({ ...args5, prompt: prompt2, webSearch: webSearch ? false : args5['webSearch'] }),
     );
   }
   const run = async (agentAnalysis) => {

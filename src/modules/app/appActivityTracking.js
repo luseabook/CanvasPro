@@ -21,20 +21,20 @@ export async function initAppActivityTracking({
   navigatorObject: navigatorObject = globalThis['navigator'],
 } = {}) {
   if (typeof ensureDeviceId !== 'function' || typeof reportStartupActivity !== 'function')
-    return { success: ![], recorded: ![], reason: 'unavailable' };
+    return { success: false, recorded: false, reason: 'unavailable' };
   try {
     const [data, options] = await Promise['all']([
         Promise['resolve'](runtimeInfoPromise)['catch'](() => ({})),
         ensureDeviceId(),
       ]),
       deviceId = String(options || '')['trim']();
-    if (!deviceId) return { success: ![], recorded: ![], reason: 'missing_device_id' };
+    if (!deviceId) return { success: false, recorded: false, reason: 'missing_device_id' };
     return await reportStartupActivity({
       deviceId: deviceId,
       appVersion: normalizeAppVersion(data?.['localVersion']),
       os: detectClientOperatingSystem(navigatorObject),
     });
   } catch {
-    return { success: ![], recorded: ![], reason: 'report_failed' };
+    return { success: false, recorded: false, reason: 'report_failed' };
   }
 }

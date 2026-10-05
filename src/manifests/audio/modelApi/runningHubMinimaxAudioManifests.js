@@ -56,7 +56,7 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
         ['concat']([
           paramMapping('pronunciation_dict', 'pronunciationDict', { transform: 'lines' }),
           paramMapping('english_normalization', 'englishNormalization'),
-          constantMapping('enable_base64_output', ![]),
+          constantMapping('enable_base64_output', false),
         ]),
       rules: {
         voiceOverride: { target: 'voice_id', custom: 'customVoiceId' },
@@ -89,7 +89,7 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     docId: 0x1ab6bbea,
     order: 231,
     promptPlaceholder: '输入克隆后的试听文本',
-    slots: [audioSlot('referenceVoice', '参考音色', !![])],
+    slots: [audioSlot('referenceVoice', '参考音色', true)],
     fields: [
       audioText(
         'customVoiceId',
@@ -156,7 +156,7 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
       paramMapping('need_volume_normalization', 'volumeNormalization'),
       paramMapping('language_boost', 'languageBoost'),
     ],
-    rules: { customVoiceId: !![], audioExtensions: ['mp3', 'wav'] },
+    rules: { customVoiceId: true, audioExtensions: ['mp3', 'wav'] },
   }),
   createRunningHubAudioCatalogEntry({
     id: 'minimax/music-cover',
@@ -167,12 +167,12 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     promptField: 'prompt',
     promptMaxLength: 2000,
     promptPlaceholder: '描述翻唱后的音乐风格、情绪和配器',
-    slots: [audioSlot('sourceAudio', '原曲（6秒–6分钟）', !![])],
+    slots: [audioSlot('sourceAudio', '原曲（6秒–6分钟）', true)],
     fields: [
       audioTextarea('lyrics', '歌词', '可选，10–1000 字符；留空自动从原曲提取。', { maxLength: 1000 }),
-      audioToggle('preprocess', '先提取原曲特征', ![], {
+      audioToggle('preprocess', '先提取原曲特征', false, {
         description: '先提取音频特征和歌词，再生成翻唱；会额外调用翻唱前处理接口。',
-        showInfoTip: !![],
+        showInfoTip: true,
       }),
       audioText('coverFeatureId', '已有翻唱特征 ID', '可复用 24 小时内的前处理结果；填写后必须提供歌词。'),
       SAMPLE_RATE,

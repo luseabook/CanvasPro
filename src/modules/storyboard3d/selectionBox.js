@@ -27,8 +27,8 @@ export function hasStoryboard3DSelectionDragMoved(box) {
 export function mergeStoryboard3DBoxSelection({
   initialObjectIds: initialObjectIds = [],
   hitObjectIds: hitObjectIds = [],
-  additive: additive = ![],
-  toggle: toggle = ![],
+  additive: additive = false,
+  toggle: toggle = false,
 } = {}) {
   const args = [...new Set(initialObjectIds['filter'](Boolean))],
     list = [...new Set(hitObjectIds['filter'](Boolean))];

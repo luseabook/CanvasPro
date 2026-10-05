@@ -7,8 +7,8 @@ export function createRendererPresentationSubscription({
   requestFrame: requestFrame = (value) => requestAnimationFrame(value),
   cancelFrame: cancelFrame = (item) => cancelAnimationFrame(item),
 } = {}) {
-  let enabled = !![],
-    enabled2 = ![],
+  let enabled = true,
+    enabled2 = false,
     requestFrame2 = null,
     value2 = null,
     key = null,
@@ -41,8 +41,8 @@ export function createRendererPresentationSubscription({
       value2 = null;
     },
     setActive(target) {
-      if (enabled2 || enabled === (target === !![])) return;
-      enabled = target === !![];
+      if (enabled2 || enabled === (target === true)) return;
+      enabled = target === true;
       if (!enabled) (cancelPending(), onSuspend?.());
       else {
         onResume?.();
@@ -50,7 +50,7 @@ export function createRendererPresentationSubscription({
       }
     },
     dispose() {
-      ((enabled2 = !![]), cancelPending(), index?.(), (value2 = key = null));
+      ((enabled2 = true), cancelPending(), index?.(), (value2 = key = null));
     },
   };
 }

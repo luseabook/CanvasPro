@@ -57,15 +57,15 @@ export async function reclaimStartupPort({
       ...(enumerationError?.['details'] && typeof enumerationError['details'] === 'object'
         ? enumerationError['details']
         : {}),
-      portAvailability: available === !![] ? 'free' : 'busy-or-unavailable',
+      portAvailability: available === true ? 'free' : 'busy-or-unavailable',
     };
-    if (available !== !![]) throw enumerationError;
+    if (available !== true) throw enumerationError;
     return (
       onEnumerationUnavailable?.({ port: port, error: enumerationError }),
-      { reclaimed: ![], pids: [], skippedReason: 'enumeration-unavailable-port-free' }
+      { reclaimed: false, pids: [], skippedReason: 'enumeration-unavailable-port-free' }
     );
   }
-  if (initialPids['length'] === 0) return { reclaimed: ![], pids: [] };
+  if (initialPids['length'] === 0) return { reclaimed: false, pids: [] };
   const resolveVerifiedPids = async (pids) =>
       normalizeListenerPids(
         typeof confirmRuntimeIdentity === 'function'
@@ -88,13 +88,13 @@ export async function reclaimStartupPort({
       await delayFn(200);
       const currentPids = normalizeListenerPids(await collectListeningPortPids(port));
       if (currentPids['length'] === 0)
-        return { reclaimed: ![], pids: [], skippedReason: 'listener-exited' };
+        return { reclaimed: false, pids: [], skippedReason: 'listener-exited' };
       if (!samePidSet(initialPids, currentPids)) break;
     }
     throw policyError;
   }
   const currentPids = normalizeListenerPids(await collectListeningPortPids(port));
-  if (currentPids['length'] === 0) return { reclaimed: !![], pids: [] };
+  if (currentPids['length'] === 0) return { reclaimed: true, pids: [] };
   if (!samePidSet(initialPids, currentPids))
     throw createPortRecoveryError(
       'Port ' + port + ' listener ownership changed before termination',
@@ -130,5 +130,5 @@ export async function reclaimStartupPort({
       'AIC_STARTUP_PORT_STILL_BUSY',
       { port: port, pids: remainingPids },
     );
-  return { reclaimed: !![], pids: initialPids };
+  return { reclaimed: true, pids: initialPids };
 }

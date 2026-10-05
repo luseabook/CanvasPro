@@ -83,8 +83,8 @@ function buildRunningHubTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
-  useOpenapiQuery: useOpenapiQuery = ![],
+  recovering: recovering = false,
+  useOpenapiQuery: useOpenapiQuery = false,
 } = {}) {
   return buildRunningHubTaskPatch_2({
     taskId: taskId,
@@ -100,7 +100,7 @@ function buildDreaminaTaskPatch({
   phase: phase = 'generating',
   label: label = imageExpandText('task.generating'),
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
+  recovering: recovering = false,
 } = {}) {
   return buildDreaminaTaskPatch_2({
     submitId: submitId,
@@ -118,7 +118,7 @@ function buildAsyncTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
+  recovering: recovering = false,
 } = {}) {
   return buildAsyncTaskPatch_2({
     provider: provider,
@@ -154,7 +154,7 @@ function buildSeedreamMigrationPatch(record) {
   return (void record, null);
 }
 const ImageExpandController = {
-  active: ![],
+  active: false,
   nodeId: null,
   nodeData: null,
   ratioStr: 'original',
@@ -182,7 +182,7 @@ const ImageExpandController = {
     const viewport = appStore['getStateRaw'](),
       enabled2 = viewport['nodes']?.[payload];
     if (!enabled2) return;
-    ((this['active'] = !![]),
+    ((this['active'] = true),
       (this['nodeId'] = payload),
       (this['_expandModelCatalog'] = buildExpandModelCatalog()));
     const node = this['_normalizeLegacySeedreamNode'](enabled2);
@@ -278,7 +278,7 @@ const ImageExpandController = {
     return (value2 && appStore['updateNodeData'](this['nodeId'], args), output);
   },
   _getImageUrl() {
-    return resolveImageNodeUrl(this['nodeData'] || {}, { preferPreview: !![] });
+    return resolveImageNodeUrl(this['nodeData'] || {}, { preferPreview: true });
   },
   _createExpandedImage(value3, x3) {
     return new Promise((handler, handler2) => {
@@ -321,7 +321,7 @@ const ImageExpandController = {
         (image['onerror'] = () => {
           handler2(new Error(imageExpandText('errors.sourceImageLoadFailed')));
         }));
-      const imageNodeUrl = resolveImageNodeUrl(x3, { preferPreview: ![] });
+      const imageNodeUrl = resolveImageNodeUrl(x3, { preferPreview: false });
       image['src'] = imageNodeUrl;
     });
   },
@@ -337,7 +337,7 @@ const ImageExpandController = {
       prompt: IMAGE_EXPAND_PROMPT,
       model: model2,
       provider: provider2,
-      ...(value13 ? { suppressAspectRatio: !![] } : { aspectRatio: aspectRatio }),
+      ...(value13 ? { suppressAspectRatio: true } : { aspectRatio: aspectRatio }),
       imageSize: this['imageSize'],
       ...args2,
       inputUrls: [value12],
@@ -482,7 +482,7 @@ const ImageExpandController = {
       }));
     const value43 = document['createElement']('img');
     ((value43['className'] = 'v2-expand-img'),
-      (value43['draggable'] = ![]),
+      (value43['draggable'] = false),
       (value43['src'] = this['_getImageUrl']()),
       el2['appendChild'](el3),
       el2['appendChild'](value43),
@@ -599,7 +599,7 @@ const ImageExpandController = {
     };
     window['addEventListener']('keydown', value56);
     const value57 = (event2) => event2['stopPropagation']();
-    (this['overlayEl']['addEventListener']('wheel', value57, { passive: !![] }),
+    (this['overlayEl']['addEventListener']('wheel', value57, { passive: true }),
       this['toolbarEl']['addEventListener']('pointerdown', (event3) => event3['stopPropagation']()),
       (this['toolbarEl']['querySelector']('.exit')['onclick'] = () => this['exit']()));
     const run2 = () => {
@@ -689,7 +689,7 @@ const ImageExpandController = {
               y: y3,
               width: width5,
               height: height2,
-              needsAutoResize: ![],
+              needsAutoResize: false,
               name: imageExpandText('output.generatingName'),
               src: '',
               ...buildGenerationStartPatch({ startedAt: startedAt2 }),
@@ -700,7 +700,7 @@ const ImageExpandController = {
                     taskId: '',
                     status: 'pending',
                     startedAt: startedAt2,
-                    recovering: ![],
+                    recovering: false,
                     useOpenapiQuery: useOpenapiQuery2,
                   })
                 : {}),
@@ -711,7 +711,7 @@ const ImageExpandController = {
                     phase: 'generating',
                     label: imageExpandText('task.submitting'),
                     startedAt: startedAt2,
-                    recovering: ![],
+                    recovering: false,
                   })
                 : {}),
               ...(value61
@@ -721,7 +721,7 @@ const ImageExpandController = {
                     taskId: '',
                     status: 'pending',
                     startedAt: startedAt2,
-                    recovering: ![],
+                    recovering: false,
                   })
                 : {}),
               outputText: buildImageExpandOutputText(getDisplayModelName(this['model'])),
@@ -769,8 +769,8 @@ const ImageExpandController = {
                       taskId: taskId3,
                       status: 'running',
                       startedAt: startedAt2,
-                      recovering: ![],
-                      useOpenapiQuery: useOpenapiQuery3 === !![],
+                      recovering: false,
+                      useOpenapiQuery: useOpenapiQuery3 === true,
                     }),
                   }),
                     persistRunningHubResumeCache());
@@ -784,7 +784,7 @@ const ImageExpandController = {
                       phase: 'generating',
                       label: imageExpandText('task.generating'),
                       startedAt: startedAt2,
-                      recovering: ![],
+                      recovering: false,
                     }),
                   }),
                     persistRunningHubResumeCache());
@@ -798,7 +798,7 @@ const ImageExpandController = {
                       taskId: taskId3,
                       status: 'running',
                       startedAt: startedAt2,
-                      recovering: ![],
+                      recovering: false,
                     }),
                   }),
                   persistRunningHubResumeCache());
@@ -815,8 +815,8 @@ const ImageExpandController = {
                       taskId: taskId4,
                       status: 'running',
                       startedAt: startedAt2,
-                      recovering: ![],
-                      useOpenapiQuery: useOpenapiQuery4?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
+                      recovering: false,
+                      useOpenapiQuery: useOpenapiQuery4?.['rhTaskUseOpenapiQuery'] === true || useOpenapiQuery2,
                     }),
                   }),
                     persistRunningHubResumeCache());
@@ -830,7 +830,7 @@ const ImageExpandController = {
                       phase: 'generating',
                       label: imageExpandText('task.generating'),
                       startedAt: startedAt2,
-                      recovering: ![],
+                      recovering: false,
                     }),
                   }),
                     persistRunningHubResumeCache());
@@ -844,7 +844,7 @@ const ImageExpandController = {
                       taskId: taskId4,
                       status: 'running',
                       startedAt: startedAt2,
-                      recovering: ![],
+                      recovering: false,
                     }),
                   }),
                   persistRunningHubResumeCache());
@@ -868,8 +868,8 @@ const ImageExpandController = {
                     taskId: taskId5?.['rhTaskId'] || '',
                     status: 'failed',
                     startedAt: startedAt2,
-                    recovering: ![],
-                    useOpenapiQuery: taskId5?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
+                    recovering: false,
+                    useOpenapiQuery: taskId5?.['rhTaskUseOpenapiQuery'] === true || useOpenapiQuery2,
                   })
                 : {}),
               ...(isDreaminaTaskModel2
@@ -879,7 +879,7 @@ const ImageExpandController = {
                     phase: 'failed',
                     label: error3['error'] || imageExpandText('task.failed'),
                     startedAt: startedAt2,
-                    recovering: ![],
+                    recovering: false,
                   })
                 : {}),
               ...(value61
@@ -889,7 +889,7 @@ const ImageExpandController = {
                     taskId: taskId5?.['asyncTaskId'] || '',
                     status: 'failed',
                     startedAt: startedAt2,
-                    recovering: ![],
+                    recovering: false,
                   })
                 : {}),
               outputText: buildImageExpandOutputText(getDisplayModelName(this['model']), {
@@ -931,8 +931,8 @@ const ImageExpandController = {
                   taskId: taskId6?.['rhTaskId'] || '',
                   status: 'success',
                   startedAt: startedAt2,
-                  recovering: ![],
-                  useOpenapiQuery: taskId6?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
+                  recovering: false,
+                  useOpenapiQuery: taskId6?.['rhTaskUseOpenapiQuery'] === true || useOpenapiQuery2,
                 })
               : {}),
             ...(isDreaminaTaskModel2
@@ -942,7 +942,7 @@ const ImageExpandController = {
                   phase: 'done',
                   label: imageExpandText('task.completed'),
                   startedAt: startedAt2,
-                  recovering: ![],
+                  recovering: false,
                 })
               : {}),
             ...(value61
@@ -952,7 +952,7 @@ const ImageExpandController = {
                   taskId: taskId6?.['asyncTaskId'] || '',
                   status: 'success',
                   startedAt: startedAt2,
-                  recovering: ![],
+                  recovering: false,
                 })
               : {}),
             outputText: buildImageExpandOutputText(getDisplayModelName(this['model'])),
@@ -980,8 +980,8 @@ const ImageExpandController = {
                     taskId: taskId7?.['rhTaskId'] || '',
                     status: 'failed',
                     startedAt: startedAt2,
-                    recovering: ![],
-                    useOpenapiQuery: taskId7?.['rhTaskUseOpenapiQuery'] === !![] || useOpenapiQuery2,
+                    recovering: false,
+                    useOpenapiQuery: taskId7?.['rhTaskUseOpenapiQuery'] === true || useOpenapiQuery2,
                   })
                 : {}),
               ...(isDreaminaTaskModel2
@@ -991,7 +991,7 @@ const ImageExpandController = {
                     phase: 'failed',
                     label: error5 || imageExpandText('task.failed'),
                     startedAt: startedAt2,
-                    recovering: ![],
+                    recovering: false,
                   })
                 : {}),
               ...(value61
@@ -1001,7 +1001,7 @@ const ImageExpandController = {
                     taskId: taskId7?.['asyncTaskId'] || '',
                     status: 'failed',
                     startedAt: startedAt2,
-                    recovering: ![],
+                    recovering: false,
                   })
                 : {}),
               outputText: buildImageExpandOutputText(getDisplayModelName(this['model']), {
@@ -1027,12 +1027,12 @@ const ImageExpandController = {
       )
         run2();
     };
-    document['addEventListener']('pointerdown', value65, !![]);
+    document['addEventListener']('pointerdown', value65, true);
     const run4 = () => {
         if (!this['_pointerState']) return;
-        (window['removeEventListener']('pointermove', value66, !![]),
-          window['removeEventListener']('pointerup', value67, !![]),
-          window['removeEventListener']('pointercancel', value67, !![]),
+        (window['removeEventListener']('pointermove', value66, true),
+          window['removeEventListener']('pointerup', value67, true),
+          window['removeEventListener']('pointercancel', value67, true),
           (this['_pointerState'] = null));
       },
       handler4 = () => this['ratioStr'] !== 'original',
@@ -1258,15 +1258,15 @@ const ImageExpandController = {
           zoom: this['_view']?.['viewport']?.['zoom'] || 1,
         }),
           this['frameEl']['setPointerCapture']?.(pointerId['pointerId']),
-          window['addEventListener']('pointermove', value66, !![]),
-          window['addEventListener']('pointerup', value67, !![]),
-          window['addEventListener']('pointercancel', value67, !![]));
+          window['addEventListener']('pointermove', value66, true),
+          window['addEventListener']('pointerup', value67, true),
+          window['addEventListener']('pointercancel', value67, true));
       };
     (this['frameEl']['addEventListener']('pointerdown', value93),
       (this['cleanup'] = () => {
         (run4(),
           window['removeEventListener']('keydown', value56),
-          document['removeEventListener']('pointerdown', value65, !![]),
+          document['removeEventListener']('pointerdown', value65, true),
           this['overlayEl']?.['removeEventListener']('wheel', value57),
           this['frameEl']?.['removeEventListener']('pointerdown', value93),
           this['_unbindToolbarUpMenus']?.(),
@@ -1281,7 +1281,7 @@ const ImageExpandController = {
       (this['_functionControls'] = null),
       this['_cancelImageReadyWait']?.(),
       (this['_cancelImageReadyWait'] = null),
-      (this['active'] = ![]));
+      (this['active'] = false));
     this['_unsubscribe'] && (this['_unsubscribe'](), (this['_unsubscribe'] = null));
     (this['_unsubscribeViewportPreview']?.(), (this['_unsubscribeViewportPreview'] = null));
     this['_unsubscribeLocale'] && (this['_unsubscribeLocale'](), (this['_unsubscribeLocale'] = null));

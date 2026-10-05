@@ -10,10 +10,10 @@ function getPayloadParam(item, key, index) {
   if (Object['prototype']['hasOwnProperty']['call'](item || {}, key)) return item[key];
   return index;
 }
-function normalizeBoolean(result, data = ![]) {
+function normalizeBoolean(result, data = false) {
   if (result === undefined || result === null || result === '') return data;
   const options = String(result)['trim']()['toLowerCase']();
-  return result === !![] || ['true', '1', 'yes', 'on']['includes'](options);
+  return result === true || ['true', '1', 'yes', 'on']['includes'](options);
 }
 function isAdaptiveRatio(target) {
   const source = String(target || '')
@@ -112,9 +112,9 @@ export async function resolveRunningHubQwenImage21EditPayload({
         getPayloadParam(
           payload2,
           plainObject4['promptEnhanceNode']?.['field'],
-          plainObject4['promptEnhanceNode']?.['defaultValue'] ?? ![],
+          plainObject4['promptEnhanceNode']?.['defaultValue'] ?? false,
         ),
-        ![],
+        false,
       ),
     ));
   const enabled = list['length'] > 0;

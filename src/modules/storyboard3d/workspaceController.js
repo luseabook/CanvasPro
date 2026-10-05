@@ -65,7 +65,7 @@ export function createStoryboard3DWorkspaceController({
     throw new TypeError('Storyboard 3D Workspace requires project upsert capability.');
   if (typeof storeInstance?.['deleteStoryboard3DProject'] !== 'function')
     throw new TypeError('Storyboard 3D Workspace requires project delete capability.');
-  let source = ![];
+  let source = false;
   const run = (next) => {
       const enabled = String(next || '')['trim']();
       if (!enabled) return null;
@@ -171,7 +171,7 @@ export function createStoryboard3DWorkspaceController({
       return (storeInstance['upsertStoryboard3DProject'](value6), commitChanges?.(), value6);
     },
     onDeleteProject = (value7) => {
-      if (source) return ![];
+      if (source) return false;
       const value8 = storeInstance['deleteStoryboard3DProject'](value7);
       if (value8) commitChanges?.();
       return value8;
@@ -192,7 +192,7 @@ export function createStoryboard3DWorkspaceController({
       if (source) return;
       const value10 = getWorkspaceModeCoordinator?.();
       (value10?.['getMode']?.() !== 'storyboard3d' &&
-        value10?.['setMode']?.('storyboard3d', { activate: ![] }),
+        value10?.['setMode']?.('storyboard3d', { activate: false }),
         workspaceHome['hide']());
     },
     value11 = (value12) => {
@@ -219,12 +219,12 @@ export function createStoryboard3DWorkspaceController({
         return (closeActiveEditor?.(), workspaceHome['show']());
       },
       close() {
-        if (source) return ![];
-        return (workspaceHome['hide'](), closeActiveEditor?.(), !![]);
+        if (source) return false;
+        return (workspaceHome['hide'](), closeActiveEditor?.(), true);
       },
       dispose() {
         if (source) return;
-        ((source = !![]),
+        ((source = true),
           directorGenerationService['dispose'](),
           windowObject?.['removeEventListener']?.('storyboard-3d:generate-layer', scope),
           windowObject?.['removeEventListener']?.(EDITOR_OPENED_EVENT, value9),

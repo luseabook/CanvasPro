@@ -14,8 +14,8 @@ import { exportSelectedNodesBatch } from '../modules/nodeBatchExport.js';
 import { showContextMenu } from '../modules/interaction/contextMenuPresenter.js';
 import { stopActiveSyncVideoPlayback, syncPlaySelectedVideos } from '../modules/videoSyncPlayback.js';
 import { t } from '../i18n/index.js';
-let _inited = ![],
-  _guardInstalled = ![];
+let _inited = false,
+  _guardInstalled = false;
 const LABEL_RENAME_CLICK_THRESHOLD_PX = 5,
   NODE_LABEL_RENAMING_CLASS = 'is-renaming-label',
   EDGE_SCISSOR_HOVER_DELAY_MS = 500,
@@ -31,20 +31,20 @@ export function shouldResolvePooledEdgePointerHit({
   scissorBtn: scissorBtn = null,
   bodyClassList: bodyClassList = null,
 } = {}) {
-  if (!target || !canvasEl) return ![];
-  if (target !== canvasEl && !canvasEl['contains']?.(target)) return ![];
+  if (!target || !canvasEl) return false;
+  if (target !== canvasEl && !canvasEl['contains']?.(target)) return false;
   if (EDGE_POINTER_HIT_DISABLED_BODY_CLASSES['some']((value) => bodyClassList?.['contains']?.(value)))
-    return ![];
-  if (scissorBtn && (target === scissorBtn || scissorBtn['contains']?.(target))) return ![];
-  if (target['closest']?.('g.connection-group[data-conn-id]')) return ![];
-  if (target['closest']?.('.v2-node')) return ![];
-  if (target['closest']?.('[data-ui-stop="1"]')) return ![];
-  if (target['closest']?.('button')) return ![];
-  if (target['closest']?.('input')) return ![];
-  if (target['closest']?.('textarea')) return ![];
-  if (target['closest']?.('select')) return ![];
-  if (target['closest']?.('[contenteditable="true"]')) return ![];
-  return !![];
+    return false;
+  if (scissorBtn && (target === scissorBtn || scissorBtn['contains']?.(target))) return false;
+  if (target['closest']?.('g.connection-group[data-conn-id]')) return false;
+  if (target['closest']?.('.v2-node')) return false;
+  if (target['closest']?.('[data-ui-stop="1"]')) return false;
+  if (target['closest']?.('button')) return false;
+  if (target['closest']?.('input')) return false;
+  if (target['closest']?.('textarea')) return false;
+  if (target['closest']?.('select')) return false;
+  if (target['closest']?.('[contenteditable="true"]')) return false;
+  return true;
 }
 function _formatNodeLabelText(item) {
   const list = String(item || '')['trim']();
@@ -64,7 +64,7 @@ function _escapeHtml(index) {
 }
 function _stackHasRendererJs(data) {
   const list2 = _getGuardCallsite(data);
-  if (!list2) return ![];
+  if (!list2) return false;
   return (
     list2['includes']('renderer.js') ||
     list2['includes']('/renderer.js') ||
@@ -94,7 +94,7 @@ function _createGuardError() {
 }
 export function installRendererEventBindingGuard() {
   if (_guardInstalled) return;
-  _guardInstalled = !![];
+  _guardInstalled = true;
   const current = EventTarget['prototype']['addEventListener'];
   EventTarget['prototype']['addEventListener'] = function (...args) {
     const error = new Error()['stack'];
@@ -125,10 +125,10 @@ export function installRendererEventBindingGuard() {
 export function initRendererUiEvents({
   wrap: wrap,
   store: store,
-  canDeleteEdge: canDeleteEdge = () => !![],
+  canDeleteEdge: canDeleteEdge = () => true,
 }) {
   if (_inited) return;
-  _inited = !![];
+  _inited = true;
   const map = new WeakMap(),
     map2 = new Map(),
     state = {
@@ -155,18 +155,18 @@ export function initRendererUiEvents({
     scope = !!canvasEl2,
     handler = (edgeId, event = null) =>
       typeof canDeleteEdge === 'function'
-        ? canDeleteEdge({ edgeId: edgeId, event: event, store: store }) !== ![]
-        : canDeleteEdge !== ![],
-    handler2 = ({ restoreFocus: restoreFocus = ![] } = {}) => {
+        ? canDeleteEdge({ edgeId: edgeId, event: event, store: store }) !== false
+        : canDeleteEdge !== false,
+    handler2 = ({ restoreFocus: restoreFocus = false } = {}) => {
       const input = value2;
       ((value2 = null), input?.['close']?.({ restoreFocus: restoreFocus }));
     },
     handler3 = () => {
-      (handler2(), store?.['setAlignPanelVisible']?.(![]));
+      (handler2(), store?.['setAlignPanelVisible']?.(false));
     },
     handler4 = (columns = undefined) => {
       const output = store?.['getState']?.();
-      if (output?.['ui']?.['alignFeatureEnabled'] === ![]) {
+      if (output?.['ui']?.['alignFeatureEnabled'] === false) {
         handler3();
         return;
       }
@@ -196,8 +196,8 @@ export function initRendererUiEvents({
         ],
         {
           ariaLabel: t('coreUi.renderer.align.gridMenu'),
-          ensureItemIcons: !![],
-          includeNodePicker: ![],
+          ensureItemIcons: true,
+          includeNodePicker: false,
           restoreTarget: restoreTarget,
           ownerRoot: restoreTarget['ownerDocument'] || document,
           ownerElement: restoreTarget,
@@ -257,10 +257,10 @@ export function initRendererUiEvents({
     handler12 = (value11, value12) => {
       window['v2Renderer']?.['setHoveredEdge']?.(value11, value12);
     },
-    handler13 = ({ preserveHover: preserveHover = ![] } = {}) => {
+    handler13 = ({ preserveHover: preserveHover = false } = {}) => {
       (clearTimeout(setTimeout2), clearTimeout(setTimeout3), (setTimeout2 = null), (setTimeout3 = null));
-      id && handler11(id, ![]);
-      !preserveHover && value3 && (handler12(value3, ![]), (value3 = null));
+      id && handler11(id, false);
+      !preserveHover && value3 && (handler12(value3, false), (value3 = null));
       id = null;
       if (scissorBtn2) scissorBtn2['style']['display'] = 'none';
     },
@@ -346,14 +346,14 @@ export function initRendererUiEvents({
     handler16 = (enabled7, value17 = null) => {
       if (!enabled7) return;
       if (value3 === enabled7) return;
-      value3 && handler12(value3, ![]);
+      value3 && handler12(value3, false);
       if (id && id !== enabled7) {
-        (handler11(id, ![]), (id = null));
+        (handler11(id, false), (id = null));
         if (scissorBtn2) scissorBtn2['style']['display'] = 'none';
       }
-      ((value3 = enabled7), handler12(enabled7, !![]));
+      ((value3 = enabled7), handler12(enabled7, true));
       if (!handler(enabled7, value17)) {
-        handler13({ preserveHover: !![] });
+        handler13({ preserveHover: true });
         return;
       }
       (clearTimeout(setTimeout2),
@@ -363,14 +363,14 @@ export function initRendererUiEvents({
         (setTimeout2 = setTimeout(() => {
           value3 === enabled7 &&
             ((id = enabled7),
-            handler11(enabled7, !![]),
+            handler11(enabled7, true),
             handler15(box['x'], box['y']),
             (scissorBtn2['style']['display'] = 'flex'));
         }, EDGE_SCISSOR_HOVER_DELAY_MS)));
     },
     handler17 = (value18, value19) => {
       if (scissorBtn2 && value19 && (value19 === scissorBtn2 || scissorBtn2['contains'](value19))) return;
-      handler12(value18, ![]);
+      handler12(value18, false);
       if (value3 === value18) value3 = null;
       (clearTimeout(setTimeout2), (setTimeout2 = null));
       if (id !== value18) return;
@@ -391,7 +391,7 @@ export function initRendererUiEvents({
         const value21 = event4['target']?.['closest']?.('.node-label[contenteditable="true"]');
         if (value21) event4['stopPropagation']();
       },
-      !![],
+      true,
     ),
     document['addEventListener'](
       'focusin',
@@ -400,7 +400,7 @@ export function initRendererUiEvents({
           value22 = el11?.['dataset']?.['nodeId'] || el11?.['id'] || '';
         value22 && (handler8(value22), handler9(el11, value22));
       },
-      !![],
+      true,
     ),
     document['addEventListener'](
       'focusout',
@@ -409,7 +409,7 @@ export function initRendererUiEvents({
           value23 = el12?.['dataset']?.['nodeId'] || el12?.['id'] || '';
         if (value23) handler10(el12, value23);
       },
-      !![],
+      true,
     ),
     document['addEventListener']('pointerdown', (x2) => {
       const enabled9 = x2['target']?.['closest']?.('.node-label[data-node-id]');
@@ -428,7 +428,7 @@ export function initRendererUiEvents({
         '.v2-pick-connect-banner [data-ui-action="exit-pick-connect"]',
       );
       if (value24) {
-        (loop['stopPropagation'](), executeCommand('set_pick_connect_mode', { active: ![] }));
+        (loop['stopPropagation'](), executeCommand('set_pick_connect_mode', { active: false }));
         return;
       }
       const el13 = loop['target']?.['closest']?.('#v2-picker button[data-node-type]');
@@ -461,7 +461,7 @@ export function initRendererUiEvents({
         const mode = state[el14['dataset']['uiAction']];
         if (!mode) return;
         const value26 = store?.['getState']?.();
-        if (value26?.['ui']?.['alignFeatureEnabled'] === ![]) {
+        if (value26?.['ui']?.['alignFeatureEnabled'] === false) {
           handler3();
           return;
         }
@@ -481,7 +481,7 @@ export function initRendererUiEvents({
             void syncPlaySelectedVideos({
               selectedIds: selectedIds,
               state: state2,
-              loop: loop['shiftKey'] === !![],
+              loop: loop['shiftKey'] === true,
               shouldStopOnPointerEvent: (event8) =>
                 event8?.['target']?.['closest']?.(
                   '.v2-multi-select-tab button[data-ui-action="ms-sync-video-play"]',
@@ -513,7 +513,7 @@ export function initRendererUiEvents({
             hasActiveSelectedGenerateBatch() ||
             hasRunningSelectedGenerateNodes(state3?.['nodes'] || {}, selectedIds2)
           ) {
-            (cancelSelectedGenerateButtons({ selectedIds: selectedIds2, state: state3 }), onStateChange(![]));
+            (cancelSelectedGenerateButtons({ selectedIds: selectedIds2, state: state3 }), onStateChange(false));
             return;
           }
           selectedIds2['length'] > 0 &&
@@ -547,7 +547,7 @@ export function initRendererUiEvents({
             list7 = state5['selectedNodeIds'] || [],
             value32 = list7['map']((value33) => state5['nodes']?.[value33])['filter'](Boolean);
           if (!hasMaterialComparisonPair(value32)) return;
-          ((el15['disabled'] = !![]),
+          ((el15['disabled'] = true),
             el15['classList']['add']('is-loading'),
             el15['setAttribute']('aria-busy', 'true'),
             import('../modules/materialComparison.js')
@@ -561,7 +561,7 @@ export function initRendererUiEvents({
                 );
               })
               ['finally'](() => {
-                ((el15['disabled'] = ![]),
+                ((el15['disabled'] = false),
                   el15['classList']['remove']('is-loading'),
                   el15['setAttribute']('aria-busy', 'false'));
               }));
@@ -623,7 +623,7 @@ export function initRendererUiEvents({
           event9['stopImmediatePropagation']?.(),
           handler5(enabled10, event9['clientX'], event9['clientY']));
       },
-      !![],
+      true,
     ),
     document['addEventListener']('keydown', (event10) => {
       const el18 = event10['target']?.['closest']?.(
@@ -735,7 +735,7 @@ export function initRendererUiEvents({
     }),
     store?.['subscribeSelector']?.(
       (enabled13) => ({
-        enabled: enabled13?.['ui']?.['alignFeatureEnabled'] !== ![],
+        enabled: enabled13?.['ui']?.['alignFeatureEnabled'] !== false,
         alignableCount: getAlignableSelectionNodes(
           enabled13?.['nodes'] || {},
           Array['isArray'](enabled13?.['selectedNodeIds']) ? enabled13['selectedNodeIds'] : [],

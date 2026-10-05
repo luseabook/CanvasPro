@@ -98,7 +98,7 @@ export function createStoryLibraryAssignmentMenuPortal({
       el16 = [...(storyRoot?.['querySelectorAll']?.('[data-story-library-appearance-menu]') || [])]['find'](
         (el17) => normalizeText(el17['dataset']['storyLibraryAppearanceMenu']) === text,
       );
-    if (!enabled || !text || !el16) return ![];
+    if (!enabled || !text || !el16) return false;
     return (
       closeAppearance(enabled),
       el15['classList']['add']('is-active'),
@@ -110,7 +110,7 @@ export function createStoryLibraryAssignmentMenuPortal({
       el16['classList']['add']('is-portaled', 'is-open'),
       el16['setAttribute']('aria-hidden', 'false'),
       run5(),
-      !![]
+      true
     );
   }
   function closeTarget(el18 = storyRoot) {
@@ -137,10 +137,10 @@ export function createStoryLibraryAssignmentMenuPortal({
       el24 = [...(storyRoot?.['querySelectorAll']?.('[data-story-library-target-menu]') || [])]['find'](
         (el25) => normalizeText(el25['dataset']['storyLibraryTargetMenu']) === text2,
       );
-    if (!el23 || !text2 || !el24) return ![];
+    if (!el23 || !text2 || !el24) return false;
     const enabled2 = !el24['classList']['contains']('is-open');
     closeTarget(el23);
-    if (!enabled2) return ![];
+    if (!enabled2) return false;
     return (
       el23['classList']['add']('has-target-menu-open'),
       el22['classList']['add']('is-active'),
@@ -152,12 +152,12 @@ export function createStoryLibraryAssignmentMenuPortal({
       el24['classList']['add']('is-portaled', 'is-open'),
       el24['setAttribute']('aria-hidden', 'false'),
       run4(),
-      !![]
+      true
     );
   }
   return (
     windowObject?.['addEventListener']?.('resize', run6),
-    storyRoot?.['addEventListener']?.('scroll', reposition, !![]),
+    storyRoot?.['addEventListener']?.('scroll', reposition, true),
     Object['freeze']({
       closeAppearance: closeAppearance,
       openAppearance: openAppearance,
@@ -167,7 +167,7 @@ export function createStoryLibraryAssignmentMenuPortal({
       destroy() {
         (closeTarget(), windowObject?.['removeEventListener']?.('resize', run6));
         if (item) windowObject?.['cancelAnimationFrame']?.(item);
-        storyRoot?.['removeEventListener']?.('scroll', reposition, !![]);
+        storyRoot?.['removeEventListener']?.('scroll', reposition, true);
       },
     })
   );

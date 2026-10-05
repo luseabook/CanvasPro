@@ -17,12 +17,12 @@ export function normalizeDirectorSceneSettings(labels = {}) {
     displayMode: ['solid', 'transparent', 'clay']['includes'](labels['displayMode'])
       ? labels['displayMode']
       : 'solid',
-    labels: labels['labels'] === !![],
-    groundVisible: labels['groundVisible'] !== ![],
+    labels: labels['labels'] === true,
+    groundVisible: labels['groundVisible'] !== false,
     groundHeight: number(labels['groundHeight'], 0, -1000, 1000),
     groundOpacity: number(labels['groundOpacity'], 1, 0, 1),
     panorama: {
-      enabled: enabled['enabled'] === !![],
+      enabled: enabled['enabled'] === true,
       assetId: String(enabled['assetId'] || ''),
       radius: number(enabled['radius'], 100, 5, 2000),
       rotation: [0, 1, 2]['map']((data) =>

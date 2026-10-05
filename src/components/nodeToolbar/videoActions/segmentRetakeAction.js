@@ -38,12 +38,12 @@ export function bindVideoSegmentRetakeAction(index) {
     } = index,
     el = toolbarEl['querySelector']('.act-segment-retake');
   if (!el) return () => {};
-  let enabled = ![];
+  let enabled = false;
   const async2 = async (event) => {
     (event['preventDefault'](), event['stopPropagation']());
     if (enabled) return;
-    ((enabled = !![]),
-      (el['disabled'] = !![]),
+    ((enabled = true),
+      (el['disabled'] = true),
       el['setAttribute']('aria-busy', 'true'),
       closeToolbarMoreMenu?.());
     try {
@@ -80,9 +80,9 @@ export function bindVideoSegmentRetakeAction(index) {
           y: x['y'],
           width: width,
           height: height,
-          fixedSize: !![],
-          needsAutoResize: ![],
-          [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: !![],
+          fixedSize: true,
+          needsAutoResize: false,
+          [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: true,
           name: text('nodeName'),
           model: model,
           provider: provider?.['provider'] || 'apimart',
@@ -125,7 +125,7 @@ export function bindVideoSegmentRetakeAction(index) {
     } catch (error) {
       window['showToast']?.(error?.['message'] || text('errors.createFailed'), 'error');
     } finally {
-      ((enabled = ![]), el['isConnected'] && ((el['disabled'] = ![]), el['removeAttribute']('aria-busy')));
+      ((enabled = false), el['isConnected'] && ((el['disabled'] = false), el['removeAttribute']('aria-busy')));
     }
   };
   return (el['addEventListener']('click', async2), () => el['removeEventListener']('click', async2));

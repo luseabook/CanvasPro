@@ -130,7 +130,7 @@ export function createDuplicateSpawnOffsets({
   const nodeSpawnPrefs2 = getNodeSpawnPrefs(),
     value10 = Math['max'](0, toFiniteNumber(nodeSpawnPrefs2['spacing'], 120)),
     spawnDirection2 = normalizeSpawnDirection(nodeSpawnPrefs2['direction']),
-    value11 = nodeSpawnPrefs2['avoidOverlap'] !== ![],
+    value11 = nodeSpawnPrefs2['avoidOverlap'] !== false,
     clampPositiveInteger3 = clampPositiveInteger(copies, 1),
     value12 = Math['min'](...args['map']((box4) => toFiniteNumber(box4['x'], 0))),
     value13 = Math['min'](...args['map']((box5) => toFiniteNumber(box5['y'], 0))),

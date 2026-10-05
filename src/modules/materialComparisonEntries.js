@@ -55,7 +55,7 @@ function resolveImageEntry(node, key, result) {
     aspectRatio: getEntryAspectRatio(node, response),
     originalPromise: null,
     originalUrl: '',
-    revokeUrlOnClose: ![],
+    revokeUrlOnClose: false,
   };
 }
 function resolveVideoEntry(node2, data, options) {
@@ -75,7 +75,7 @@ function resolveVideoEntry(node2, data, options) {
     aspectRatio: getEntryAspectRatio(node2, target),
     originalPromise: null,
     originalUrl: '',
-    revokeUrlOnClose: ![],
+    revokeUrlOnClose: false,
   };
 }
 export function resolveMaterialComparisonEntries(list = [], source = {}) {

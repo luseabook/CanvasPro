@@ -32,7 +32,7 @@ export function updateNodeReference(
   el,
   enabled,
   data,
-  { compact: compact = ![], onRemove: onRemove, onOpen: onOpen } = {},
+  { compact: compact = false, onRemove: onRemove, onOpen: onOpen } = {},
 ) {
   const response = nodeReferencePresentation(enabled, data),
     options = JSON['stringify']([response, compact, !!onRemove]);
@@ -51,7 +51,7 @@ export function updateNodeReference(
     ((el2['alt'] = ''),
       (el2['loading'] = 'lazy'),
       (el2['decoding'] = 'async'),
-      el2['addEventListener']('error', () => el2['remove'](), { once: !![] }),
+      el2['addEventListener']('error', () => el2['remove'](), { once: true }),
       (el2['src'] = response['url']),
       reviewElement2['append'](el2));
   }

@@ -9,7 +9,7 @@ export function createProviderStatusTooltipController() {
       (el = el2['createElement']('div')),
       (el['className'] = 'settings-provider-test-tooltip'),
       el['setAttribute']('role', 'tooltip'),
-      (el['hidden'] = !![]),
+      (el['hidden'] = true),
       el2['body']['appendChild'](el),
       el
     );
@@ -42,7 +42,7 @@ export function createProviderStatusTooltipController() {
     if (!el5) return;
     ((value = next),
       (el5['textContent'] = enabled2),
-      (el5['hidden'] = ![]),
+      (el5['hidden'] = false),
       run3(next),
       el5['classList']['add']('is-visible'));
   }
@@ -50,7 +50,7 @@ export function createProviderStatusTooltipController() {
     if (value2 && value !== value2) return;
     value = null;
     if (!el) return;
-    (el['classList']['remove']('is-visible'), (el['hidden'] = !![]));
+    (el['classList']['remove']('is-visible'), (el['hidden'] = true));
   }
   function bind(el6) {
     if (!el6 || el6['dataset']['providerTestTooltipBound'] === '1') return;

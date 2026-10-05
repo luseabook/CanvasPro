@@ -9,6 +9,6 @@ export function registerEscapeScope(value) {
   );
 }
 export function dispatchScopedEscape(event) {
-  if (event['key'] !== 'Escape' || event['isComposing'] || !handlers['length']) return ![];
-  return (event['preventDefault'](), event['stopImmediatePropagation'](), handlers['at'](-1)(), !![]);
+  if (event['key'] !== 'Escape' || event['isComposing'] || !handlers['length']) return false;
+  return (event['preventDefault'](), event['stopImmediatePropagation'](), handlers['at'](-1)(), true);
 }

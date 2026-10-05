@@ -32,7 +32,7 @@ export function normalizeAgentRunEvent(ok = {}, data = Date['now']()) {
       status: String(ok['status'] || '')['trim'](),
       step: Math['max'](0, Math['trunc'](Number(ok['step'] || 0))),
       commandId: String(ok['commandId'] || '')['trim'](),
-      ok: ok['ok'] === !![] ? !![] : ok['ok'] === ![] ? ![] : null,
+      ok: ok['ok'] === true ? true : ok['ok'] === false ? false : null,
       errorCode: String(ok['errorCode'] || '')['trim'](),
       message: truncateText(ok['message'] || ok['reason'] || ''),
       channel: String(ok['channel'] || '')
@@ -48,7 +48,7 @@ export function normalizeAgentRunEvent(ok = {}, data = Date['now']()) {
     list6 = normalizeAgentSkillUsageSnapshots(ok['skillSnapshots']);
   if (list5['length'] > 0) options['skillIds'] = list5;
   if (list6['length'] > 0) options['skillSnapshots'] = list6;
-  if (ok['confirmed'] === !![]) options['confirmed'] = !![];
+  if (ok['confirmed'] === true) options['confirmed'] = true;
   return options;
 }
 export function replayAgentRunEvents(list7 = [], { runId: runId = '' } = {}) {
@@ -65,11 +65,11 @@ export function replayAgentRunEvents(list7 = [], { runId: runId = '' } = {}) {
       commandId: commandId['commandId'],
       ok: commandId['ok'],
       step: commandId['step'],
-      confirmed: commandId['confirmed'] === !![],
+      confirmed: commandId['confirmed'] === true,
     })),
     approvalRequestedCount = eventCount['filter']((record) => record['type']['startsWith']('approval.')),
     errors = eventCount['filter'](
-      (response) => response['ok'] === ![] || response['status'] === 'failed' || response['errorCode'],
+      (response) => response['ok'] === false || response['status'] === 'failed' || response['errorCode'],
     ),
     status =
       [...eventCount]
@@ -83,8 +83,8 @@ export function replayAgentRunEvents(list7 = [], { runId: runId = '' } = {}) {
     durationMs: startedAt && endedAt ? Math['max'](0, endedAt['ts'] - startedAt['ts']) : 0,
     eventCount: eventCount['length'],
     commandSequence: commandSequence,
-    toolSuccessCount: commandSequence['filter']((response3) => response3['ok'] === !![])['length'],
-    toolFailureCount: commandSequence['filter']((response4) => response4['ok'] === ![])['length'],
+    toolSuccessCount: commandSequence['filter']((response3) => response3['ok'] === true)['length'],
+    toolFailureCount: commandSequence['filter']((response4) => response4['ok'] === false)['length'],
     approvalRequestedCount: approvalRequestedCount['filter'](
       (payload) => payload['type'] === 'approval.requested',
     )['length'],

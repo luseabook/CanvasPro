@@ -41,7 +41,7 @@ export function normalizeTutorialCategories(list = DEFAULT_CATEGORIES) {
   if (DEFAULT_CATEGORIES['some']((value) => !map['has'](value['id']))) throw new Error('内置分类缺失');
   return list2['sort']((list3, list4) => list3['sort'] - list4['sort']);
 }
-export function tutorialUrl(list5, { cover: cover = ![] } = {}) {
+export function tutorialUrl(list5, { cover: cover = false } = {}) {
   if (typeof list5 !== 'string' || list5['length'] > 2048) return '';
   try {
     const uRL = new URL(
@@ -63,13 +63,13 @@ export function normalizeTutorialCatalog(enabled) {
     throw new Error('教程配置版本无效');
   if (!enabled['guide'] || typeof enabled['guide']['enabled'] !== 'boolean')
     throw new Error('教程指南配置无效');
-  const title2 = (list6, item, key = ![]) => {
+  const title2 = (list6, item, key = false) => {
       if (typeof list6 !== 'string' || list6['length'] > item || (key && !list6['trim']()))
         throw new Error('教程内容格式无效');
       return list6['trim']();
     },
     guide = {
-      title: title2(enabled['guide']['title'], 120, !![]),
+      title: title2(enabled['guide']['title'], 120, true),
       url: tutorialUrl(enabled['guide']['url']),
       enabled: enabled['guide']['enabled'],
     };
@@ -97,7 +97,7 @@ export function normalizeTutorialCatalog(enabled) {
               coverUrl: '',
               duration: '',
               sort: 0,
-              enabled: !![],
+              enabled: true,
             },
           ]
         : []);
@@ -114,13 +114,13 @@ export function normalizeTutorialCatalog(enabled) {
         enabled2['sort'] > 0x1869f
       )
         throw new Error('教程排序无效');
-      const id3 = title2(enabled2['id'], 80, !![]);
+      const id3 = title2(enabled2['id'], 80, true);
       if (map2['has'](id3)) throw new Error('教程 ID 重复');
       map2['add'](id3);
       const next = { id: id3, enabled: enabled2['enabled'], sort: enabled2['sort'] };
       if (source !== 'updates') {
         const videoUrl = tutorialUrl(enabled2['videoUrl']),
-          coverUrl = enabled2['coverUrl'] ? tutorialUrl(enabled2['coverUrl'], { cover: !![] }) : '';
+          coverUrl = enabled2['coverUrl'] ? tutorialUrl(enabled2['coverUrl'], { cover: true }) : '';
         if (
           !videoUrl ||
           (enabled2['coverUrl'] && !coverUrl) ||
@@ -128,7 +128,7 @@ export function normalizeTutorialCatalog(enabled) {
         )
           throw new Error('教程链接或分类无效');
         Object['assign'](next, {
-          title: title2(enabled2['title'], 120, !![]),
+          title: title2(enabled2['title'], 120, true),
           description: title2(enabled2['description'], 500),
           duration: title2(enabled2['duration'], 24),
           videoUrl: videoUrl,
@@ -136,13 +136,13 @@ export function normalizeTutorialCatalog(enabled) {
           category: enabled2['category'],
         });
       } else {
-        const date = title2(enabled2['date'], 10, !![]);
+        const date = title2(enabled2['date'], 10, true);
         if (!/^\d{4}-\d{2}-\d{2}$/['test'](date) || !Number['isFinite'](Date['parse'](date)))
           throw new Error('更新日期无效');
         Object['assign'](next, {
-          version: title2(enabled2['version'], 40, !![]),
+          version: title2(enabled2['version'], 40, true),
           date: date,
-          notes: title2(enabled2['notes'], 12000, !![]),
+          notes: title2(enabled2['notes'], 12000, true),
         });
       }
       return next;
@@ -173,7 +173,7 @@ export function createBundledTutorialCatalog(tutorials, entry = []) {
       duration: '',
       coverUrl: '',
       videoUrl: title4['url'],
-      enabled: !![],
+      enabled: true,
       sort: sort2,
     })),
     updates: [],

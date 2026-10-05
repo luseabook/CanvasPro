@@ -19,10 +19,10 @@ import {
 export function isStoryGenerateShortcut(event) {
   return (
     String(event?.['key'] || '') === 'Enter' &&
-    (event?.['ctrlKey'] === !![] || event?.['metaKey'] === !![]) &&
-    event?.['altKey'] !== !![] &&
-    event?.['shiftKey'] !== !![] &&
-    event?.['isComposing'] !== !![]
+    (event?.['ctrlKey'] === true || event?.['metaKey'] === true) &&
+    event?.['altKey'] !== true &&
+    event?.['shiftKey'] !== true &&
+    event?.['isComposing'] !== true
   );
 }
 const STORY_WORKSPACE_NESTED_WHEEL_SELECTOR =
@@ -67,12 +67,12 @@ export function scrollStoryClipStripWithWheel(target) {
 }
 export function scrollStoryClipPromptHistoryWithWheel(event2) {
   const el3 = event2?.['target']?.['closest']?.('.story-clip-prompt-history-list');
-  if (!el3) return ![];
+  if (!el3) return false;
   const count = Math['max'](0, Number(el3['scrollHeight'] || 0) - Number(el3['clientHeight'] || 0));
-  if (count <= 0) return ![];
+  if (count <= 0) return false;
   const source = Math['max'](0, Number(el3['scrollTop']) || 0),
     next = Math['max'](0, Math['min'](count, source + Number(event2['deltaY'] || 0)));
-  return (event2['preventDefault']?.(), event2['stopPropagation']?.(), (el3['scrollTop'] = next), !![]);
+  return (event2['preventDefault']?.(), event2['stopPropagation']?.(), (el3['scrollTop'] = next), true);
 }
 export function getStoryAssetHoverCard(el4) {
   return el4?.['closest']?.(STORY_ASSET_HOVER_CARD_SELECTOR) || null;

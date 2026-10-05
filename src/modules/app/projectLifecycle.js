@@ -110,11 +110,11 @@ export function waitForInitialRevealFrame({
   timeoutMs: timeoutMs = INITIAL_REVEAL_FRAME_TIMEOUT_MS,
 } = {}) {
   return new Promise((handler) => {
-    let item = ![],
+    let item = false,
       scheduleTimeout2 = null;
     const run = () => {
         if (item) return;
-        ((item = !![]), handler());
+        ((item = true), handler());
       },
       enabled = typeof windowObject?.['requestAnimationFrame'] === 'function',
       key = enabled ? Math['max'](16, Number(timeoutMs) || INITIAL_REVEAL_FRAME_TIMEOUT_MS) : 16;
@@ -143,11 +143,11 @@ export function scheduleInitialLoaderFailOpen({
   shouldReveal: shouldReveal = () => loader2?.['dataset']?.['appReady'] === 'true',
 } = {}) {
   if (!loader2 || typeof scheduleTimeout !== 'function') return () => {};
-  let enabled2 = !![];
+  let enabled2 = true;
   const scheduleTimeout3 = scheduleTimeout(
     () => {
       if (!enabled2) return;
-      enabled2 = ![];
+      enabled2 = false;
       if (!shouldReveal()) return;
       if (canvasEl) canvasEl['style']['transition'] = '';
       (wrapEl &&
@@ -163,7 +163,7 @@ export function scheduleInitialLoaderFailOpen({
   );
   return () => {
     if (!enabled2) return;
-    enabled2 = ![];
+    enabled2 = false;
     if (typeof cancelTimeout === 'function') cancelTimeout(scheduleTimeout3);
   };
 }
@@ -190,8 +190,8 @@ export function hasInitialCanvasImageNodes(index) {
           ['toLowerCase'](),
       )
     )
-      return ![];
-    if (Array['isArray'](options?.['images']) && options['images']['some'](handler2)) return !![];
+      return false;
+    if (Array['isArray'](options?.['images']) && options['images']['some'](handler2)) return true;
     return handler2(options);
   });
 }
@@ -215,7 +215,7 @@ function getInitialRevealImages(el3) {
 function isInitialRevealImageReady(source) {
   return (
     getInitialRevealImageSource(source) &&
-    source?.['complete'] === !![] &&
+    source?.['complete'] === true &&
     Number(source?.['naturalWidth'] || 0) > 0
   );
 }
@@ -257,7 +257,7 @@ function isInitialRevealEntryInViewport(
   { viewportWidth: viewportWidth, viewportHeight: viewportHeight } = {},
 ) {
   const box4 = handle?.['rect'];
-  if (!box4) return ![];
+  if (!box4) return false;
   return (
     (viewportWidth <= 0 || (box4['right'] > 0 && box4['left'] < viewportWidth)) &&
     (viewportHeight <= 0 || (box4['bottom'] > 0 && box4['top'] < viewportHeight))
@@ -298,7 +298,7 @@ export function collectInitialImageRevealEntries(
         nodeId: String(ready?.['nodeId'] || ''),
         objectFit: 'cover',
         objectPosition: '50% 50%',
-        ready: ready?.['ready'] === !![],
+        ready: ready?.['ready'] === true,
         rect: rect2,
         source: source3,
       });
@@ -307,18 +307,18 @@ export function collectInitialImageRevealEntries(
   const map = new Set();
   return list['filter']((enabled3) => {
     if (!isInitialRevealEntryInViewport(enabled3, { viewportWidth: viewportWidth2, viewportHeight: viewportHeight2 }))
-      return ![];
-    if (!enabled3['nodeId']) return !![];
-    if (map['has'](enabled3['nodeId'])) return ![];
-    return (map['add'](enabled3['nodeId']), !![]);
+      return false;
+    if (!enabled3['nodeId']) return true;
+    if (map['has'](enabled3['nodeId'])) return false;
+    return (map['add'](enabled3['nodeId']), true);
   });
 }
 export function shouldUseInitialImageFirstReveal({
   nodes: nodes,
   targetCount: targetCount,
-  reducedMotion: reducedMotion = ![],
+  reducedMotion: reducedMotion = false,
 } = {}) {
-  return reducedMotion !== !![] && hasInitialCanvasImageNodes(nodes) && Number(targetCount || 0) > 0;
+  return reducedMotion !== true && hasInitialCanvasImageNodes(nodes) && Number(targetCount || 0) > 0;
 }
 export function resolveInitialImageRevealDurationMs(output) {
   const value2 = Math['min'](
@@ -346,7 +346,7 @@ export function shouldFinishInitialImageReadinessWait({
   const count4 = Math['max'](0, Math['floor'](Number(totalCount) || 0)),
     value5 = Math['max'](0, Math['floor'](Number(readyCount) || 0));
   if (count4 <= 0) return Number(attempt || 0) >= 2;
-  if (value5 >= count4) return !![];
+  if (value5 >= count4) return true;
   return (
     Number(attempt || 0) >= INITIAL_IMAGE_READY_MIN_ATTEMPTS &&
     value5 / count4 >= INITIAL_IMAGE_READY_MIN_RATIO &&
@@ -436,7 +436,7 @@ function isInitialRevealImageInViewport(
   { viewportWidth: viewportWidth3, viewportHeight: viewportHeight3 } = {},
 ) {
   const box6 = getInitialRevealImageRect(value26);
-  if (!box6) return ![];
+  if (!box6) return false;
   return (
     (viewportWidth3 <= 0 || (box6['right'] > 0 && box6['left'] < viewportWidth3)) &&
     (viewportHeight3 <= 0 || (box6['bottom'] > 0 && box6['top'] < viewportHeight3))
@@ -467,7 +467,7 @@ export function createInitialImageRevealLayer({
         rect3 = args?.['rect'] || getInitialRevealImageRect(image2),
         source4 = args?.['source'] || getInitialRevealImageSource(image2);
       if (
-        args?.['ready'] === ![] ||
+        args?.['ready'] === false ||
         !source4 ||
         !rect3 ||
         (count7 > 0 && (rect3['right'] <= 0 || rect3['left'] >= count7)) ||
@@ -504,7 +504,7 @@ export function createInitialImageRevealLayer({
           value33 = image3 ? windowObject?.['getComputedStyle']?.(image3) : null;
         ((el10['className'] = 'initial-image-reveal-item'),
           (el10['alt'] = ''),
-          (el10['draggable'] = ![]),
+          (el10['draggable'] = false),
           (el10['decoding'] = 'sync'),
           (el10['loading'] = 'eager'),
           (el10['src'] = source5),
@@ -561,7 +561,7 @@ function buildProjectWorkspaceCanvasKey(value37, value38) {
   );
 }
 function inferAsyncProviderByModel(value39, value40 = '') {
-  const modelProvider = resolveModelProvider(value39, '', { allowProviderHint: ![] });
+  const modelProvider = resolveModelProvider(value39, '', { allowProviderHint: false });
   if (modelProvider) return modelProvider;
   const value41 = String(value40 || '')
     ['trim']()
@@ -597,40 +597,40 @@ function resolveProjectLifecycleTaskIdentity(node, value43) {
   });
 }
 function isDreaminaResumeCandidateNode(enabled4) {
-  if (!enabled4 || typeof enabled4 !== 'object') return ![];
+  if (!enabled4 || typeof enabled4 !== 'object') return false;
   const value44 = String(enabled4['type'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (!['ai-video', 'ai-image', 'source-image', 'source-video']['includes'](value44)) return ![];
+  if (!['ai-video', 'ai-image', 'source-image', 'source-video']['includes'](value44)) return false;
   const value45 = String(enabled4['provider'] || '')
       ['trim']()
       ['toLowerCase'](),
     value46 = String(enabled4['model'] || '')['trim'](),
     enabled5 = value45 === 'dreamina' || resolveModelProvider(value46, value45) === 'dreamina';
-  if (!enabled5) return ![];
-  if (hasDreaminaResultError(enabled4)) return ![];
+  if (!enabled5) return false;
+  if (hasDreaminaResultError(enabled4)) return false;
   const value47 = String(enabled4['jobStatus'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (value47 === 'error' || value47 === 'failed') return ![];
-  if (String(enabled4['jobError'] || '')['trim']()) return ![];
+  if (value47 === 'error' || value47 === 'failed') return false;
+  if (String(enabled4['jobError'] || '')['trim']()) return false;
   const projectLifecycleTaskIdentity = resolveProjectLifecycleTaskIdentity(enabled4, 'dreamina');
-  if (!projectLifecycleTaskIdentity['taskId']) return ![];
+  if (!projectLifecycleTaskIdentity['taskId']) return false;
   const value48 = String(enabled4['dreaminaTaskPhase'] || '')
       ['trim']()
       ['toLowerCase'](),
     value49 = String(enabled4['dreaminaTaskStatus'] || '')
       ['trim']()
       ['toLowerCase']();
-  if (value48 === 'done' || value48 === 'failed') return ![];
-  if (value49 === 'failed') return ![];
-  return !![];
+  if (value48 === 'done' || value48 === 'failed') return false;
+  if (value49 === 'failed') return false;
+  return true;
 }
 function hasDreaminaUsableResult(value50) {
   const list7 = [value50?.['images'], value50?.['videos']]['filter'](Array['isArray']);
   return list7['some']((list8) =>
     list8['some']((enabled6) => {
-      if (!enabled6 || typeof enabled6 !== 'object') return ![];
+      if (!enabled6 || typeof enabled6 !== 'object') return false;
       return !!String(
         enabled6['localPath'] ||
           enabled6['originalLocalPath'] ||
@@ -647,8 +647,8 @@ function hasDreaminaUsableResult(value50) {
 }
 function hasDreaminaResultError(value51) {
   const list9 = [value51?.['images'], value51?.['videos']]['filter'](Array['isArray']);
-  if (list9['length'] === 0) return ![];
-  if (hasDreaminaUsableResult(value51)) return ![];
+  if (list9['length'] === 0) return false;
+  if (hasDreaminaUsableResult(value51)) return false;
   return list9['some']((list10) =>
     list10['some'](
       (error) =>
@@ -659,30 +659,30 @@ function hasDreaminaResultError(value51) {
   );
 }
 function isAsyncResumeCandidateNode(enabled7) {
-  if (!enabled7 || typeof enabled7 !== 'object') return ![];
+  if (!enabled7 || typeof enabled7 !== 'object') return false;
   const value52 = String(enabled7['type'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (!['ai-video', 'ai-image', 'source-video', 'source-image']['includes'](value52)) return ![];
+  if (!['ai-video', 'ai-image', 'source-video', 'source-image']['includes'](value52)) return false;
   const projectLifecycleTaskIdentity2 = resolveProjectLifecycleTaskIdentity(enabled7, 'asyncModelApi');
-  if (!projectLifecycleTaskIdentity2['taskId']) return ![];
+  if (!projectLifecycleTaskIdentity2['taskId']) return false;
   const enabled8 = projectLifecycleTaskIdentity2['provider'];
   if (!enabled8 || enabled8 === 'runninghubwf' || enabled8 === 'runninghub' || enabled8 === 'dreamina')
-    return ![];
+    return false;
   const value53 = String(enabled7['asyncTaskKind'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (value53 === 'image' && !['ai-image', 'source-image']['includes'](value52)) return ![];
-  if (value53 === 'video' && !['ai-video', 'source-video']['includes'](value52)) return ![];
+  if (value53 === 'image' && !['ai-image', 'source-image']['includes'](value52)) return false;
+  if (value53 === 'video' && !['ai-video', 'source-video']['includes'](value52)) return false;
   const value54 = String(enabled7['asyncTaskStatus'] || '')
     ['trim']()
     ['toLowerCase']();
   if (value54 === 'success' || value54 === 'failed' || value54 === 'idle' || value54 === 'cancelled')
-    return ![];
-  return !![];
+    return false;
+  return true;
 }
 function isRunningHubResumeCandidateNode(enabled9) {
-  if (!enabled9 || typeof enabled9 !== 'object') return ![];
+  if (!enabled9 || typeof enabled9 !== 'object') return false;
   const value55 = String(enabled9['type'] || '')
     ['trim']()
     ['toLowerCase']();
@@ -691,12 +691,12 @@ function isRunningHubResumeCandidateNode(enabled9) {
       value55,
     )
   )
-    return ![];
+    return false;
   const value56 = String(enabled9['provider'] || '')
       ['trim']()
       ['toLowerCase'](),
     value57 = String(enabled9['model'] || '')['trim'](),
-    modelProvider2 = resolveModelProvider(value57, value56, { allowProviderHint: ![] }),
+    modelProvider2 = resolveModelProvider(value57, value56, { allowProviderHint: false }),
     isWorkflowModel2 = isWorkflowModel(value57, value56 || 'runninghubwf'),
     value58 = modelProvider2 === 'runninghub' && isModelApiModel(value57, 'runninghub'),
     value59 = value55 === 'ai-audio' && value56 === 'runninghubwf',
@@ -714,15 +714,15 @@ function isRunningHubResumeCandidateNode(enabled9) {
       value58 ||
       value56 === 'runninghub' ||
       value56 === 'runninghubwf';
-  if (!enabled10) return ![];
+  if (!enabled10) return false;
   const projectLifecycleTaskIdentity3 = resolveProjectLifecycleTaskIdentity(enabled9, 'workflow');
-  if (!projectLifecycleTaskIdentity3['taskId']) return ![];
+  if (!projectLifecycleTaskIdentity3['taskId']) return false;
   const value63 = String(enabled9['rhTaskStatus'] || '')
     ['trim']()
     ['toLowerCase']();
   if (value63 === 'success' || value63 === 'failed' || value63 === 'idle' || value63 === 'cancelled')
-    return ![];
-  return !![];
+    return false;
+  return true;
 }
 function buildDreaminaResumeBackupPayload({
   projectId: projectId,
@@ -789,7 +789,7 @@ function buildDreaminaResumeBackupPayload({
           rhTaskStatus: String(generationDuration['rhTaskStatus'] || '')['trim'](),
           rhTaskStartedAt: rhTaskId['startedAt'],
           rhTaskRecovering: !!generationDuration['rhTaskRecovering'],
-          rhTaskUseOpenapiQuery: generationDuration['rhTaskUseOpenapiQuery'] === !![],
+          rhTaskUseOpenapiQuery: generationDuration['rhTaskUseOpenapiQuery'] === true,
         });
       });
     }),
@@ -890,7 +890,7 @@ function mergeDreaminaResumeBackupIntoMultiData(value68, enabled13, value69) {
             dreaminaTaskLabel: String(value74['dreaminaTaskLabel'] || '')['trim'](),
             dreaminaTaskStartedAt: Number(value74['dreaminaTaskStartedAt'] || 0),
             dreaminaTaskLastCheckedAt: Number(value74['dreaminaTaskLastCheckedAt'] || 0),
-            dreaminaTaskRecovering: !![],
+            dreaminaTaskRecovering: true,
             dreaminaTaskLastRaw: dreaminaTaskLastRaw || {},
           };
         }
@@ -931,7 +931,7 @@ function mergeDreaminaResumeBackupIntoMultiData(value68, enabled13, value69) {
             asyncTaskId: String(rhTaskUseOpenapiQuery['asyncTaskId'] || '')['trim'](),
             asyncTaskStatus: String(rhTaskUseOpenapiQuery['asyncTaskStatus'] || '')['trim']() || 'pending',
             asyncTaskStartedAt: Number(rhTaskUseOpenapiQuery['asyncTaskStartedAt'] || 0),
-            asyncTaskRecovering: !![],
+            asyncTaskRecovering: true,
           };
         }
         const value78 = String(rhTaskUseOpenapiQuery?.['nodeType'] || '')
@@ -951,8 +951,8 @@ function mergeDreaminaResumeBackupIntoMultiData(value68, enabled13, value69) {
           rhTaskId: String(rhTaskUseOpenapiQuery['rhTaskId'] || '')['trim'](),
           rhTaskStatus: String(rhTaskUseOpenapiQuery['rhTaskStatus'] || '')['trim']() || 'pending',
           rhTaskStartedAt: Number(rhTaskUseOpenapiQuery['rhTaskStartedAt'] || 0),
-          rhTaskRecovering: !![],
-          rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery['rhTaskUseOpenapiQuery'] === !![],
+          rhTaskRecovering: true,
+          rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery['rhTaskUseOpenapiQuery'] === true,
         };
       });
     }),
@@ -1028,7 +1028,7 @@ export function buildWorkspaceShardRecords(value81) {
           ['map']((args6) => ({ ...args6 }))
       : [],
     workspaceScopeVersion = Number(value81?.['workspaceScopeVersion']) === 1 ? 1 : 0,
-    value83 = value81?.['multiDataSanitized'] === !![],
+    value83 = value81?.['multiDataSanitized'] === true,
     map3 = new Map(
       (Array['isArray'](value81?.['persistenceRevision']?.['canvases'])
         ? value81['persistenceRevision']['canvases']
@@ -1244,8 +1244,8 @@ function hasCompleteContentPersistenceRevision(value92) {
     list14['every']((value93) => Number['isFinite'](value93?.['contentPersistRev']))
   );
 }
-export function shouldWritePeriodicRecoverySnapshot({ isChromeShell: isChromeShell = ![] } = {}) {
-  return isChromeShell !== !![];
+export function shouldWritePeriodicRecoverySnapshot({ isChromeShell: isChromeShell = false } = {}) {
+  return isChromeShell !== true;
 }
 export function createProjectLifecycle({
   store: store,
@@ -1262,9 +1262,9 @@ export function createProjectLifecycle({
     value95 = '';
   const map6 = new Map();
   let value96 = new Set(),
-    enabled18 = ![],
+    enabled18 = false,
     value97 = null,
-    enabled19 = ![],
+    enabled19 = false,
     value98 = null,
     count9 = 0,
     setTimeout2 = null,
@@ -1274,10 +1274,10 @@ export function createProjectLifecycle({
     value100 = '',
     value101 = 0,
     value102 = null,
-    value103 = ![],
+    value103 = false,
     handler3 = () => {};
   function run2() {
-    ((value94 = ''), (value95 = ''), map6['clear'](), (value96 = new Set()), (enabled18 = ![]));
+    ((value94 = ''), (value95 = ''), map6['clear'](), (value96 = new Set()), (enabled18 = false));
   }
   function run3(projectId4) {
     const value104 = {
@@ -1295,7 +1295,7 @@ export function createProjectLifecycle({
         if (!record3?.['id']) return;
         (map6['set'](record3['id'], signature), value96['add'](record3['id']));
       }),
-      (enabled18 = !![]));
+      (enabled18 = true));
   }
   const V2LocalCache = {
     dbName: 'TapNowV2Cache',
@@ -1369,7 +1369,7 @@ export function createProjectLifecycle({
             projectName: projectId5?.['projectName'] || getUntitledProjectName(),
             workspaceScopeVersion: Number(projectId5?.['workspaceScopeVersion']) === 1 ? 1 : 0,
             multiData: projectId5?.['multiData'] || { canvases: [], activeCanvasId: null },
-            multiDataSanitized: projectId5?.['multiDataSanitized'] === !![],
+            multiDataSanitized: projectId5?.['multiDataSanitized'] === true,
             persistenceRevision: projectId5?.['persistenceRevision'] || null,
           },
           {
@@ -1430,7 +1430,7 @@ export function createProjectLifecycle({
                 list21['forEach']((value133, value134) => {
                   (map6['set'](value134, value133), value96['add'](value134));
                 }),
-                (enabled18 = !![]),
+                (enabled18 = true),
                 handler12());
             }),
             (value131['onerror'] = (event10) => handler13(event10['target']['error'])),
@@ -1516,7 +1516,7 @@ export function createProjectLifecycle({
             ...metaRecord3,
             projectId: projectId6,
             sessionVersion: 1,
-            hasUnsavedChanges: projectName4?.['hasUnsavedChanges'] !== ![],
+            hasUnsavedChanges: projectName4?.['hasUnsavedChanges'] !== false,
           },
           projectWorkspaceMetaKey,
         ),
@@ -1524,7 +1524,7 @@ export function createProjectLifecycle({
             map13['put'](persistedRecord3, buildProjectWorkspaceCanvasKey(projectId6, record8['id']));
           }),
           list22['forEach']((value149) => map13['delete'](value149)),
-          (value148['oncomplete'] = () => handler14({ success: !![], projectId: projectId6 })),
+          (value148['oncomplete'] = () => handler14({ success: true, projectId: projectId6 })),
           (value148['onerror'] = (event12) => handler15(event12['target']['error'])),
           (value148['onabort'] = (event13) => handler15(event13['target']['error'])));
       });
@@ -1545,8 +1545,8 @@ export function createProjectLifecycle({
         return {
           ...args8,
           projectId: projectId7,
-          hasUnsavedChanges: hasUnsavedChanges['hasUnsavedChanges'] !== ![],
-          session: !![],
+          hasUnsavedChanges: hasUnsavedChanges['hasUnsavedChanges'] !== false,
+          session: true,
         };
       } catch (value153) {
         return (console['warn']('[V2LocalCache] Load project workspace session failed:', value153), null);
@@ -1554,7 +1554,7 @@ export function createProjectLifecycle({
     },
     async clearProjectSession(value154) {
       const projectId8 = normalizeProjectWorkspaceId(value154);
-      if (!projectId8) return { success: ![], reason: 'missing-project-id' };
+      if (!projectId8) return { success: false, reason: 'missing-project-id' };
       try {
         const projectWorkspaceMetaKey2 = buildProjectWorkspaceMetaKey(projectId8),
           value155 = await this['getRecord'](projectWorkspaceMetaKey2),
@@ -1570,14 +1570,14 @@ export function createProjectLifecycle({
             map14 = value159['objectStore'](this['storeName']);
           (map14['delete'](projectWorkspaceMetaKey2),
             list23['forEach']((value160) => map14['delete'](value160)),
-            (value159['oncomplete'] = () => handler16({ success: !![], projectId: projectId8 })),
+            (value159['oncomplete'] = () => handler16({ success: true, projectId: projectId8 })),
             (value159['onerror'] = (event14) => handler17(event14['target']['error'])),
             (value159['onabort'] = (event15) => handler17(event15['target']['error'])));
         });
       } catch (error3) {
         return (
           console['warn']('[V2LocalCache] Clear project workspace session failed:', error3),
-          { success: ![], projectId: projectId8, error: error3 }
+          { success: false, projectId: projectId8, error: error3 }
         );
       }
     },
@@ -1647,7 +1647,7 @@ export function createProjectLifecycle({
     } catch {}
   }
   function run6() {
-    if (window['__perfDebug'] !== !![]) return;
+    if (window['__perfDebug'] !== true) return;
     if (typeof performance?.['getEntriesByName'] !== 'function') return;
     BOOT_PERF_MEASURE_NAMES['forEach']((value177) => {
       const list26 = performance['getEntriesByName'](value177),
@@ -1660,13 +1660,13 @@ export function createProjectLifecycle({
     projectId: projectId10,
     projectName: projectName5,
     multiData: multiData3,
-    multiDataSanitized: multiDataSanitized = ![],
+    multiDataSanitized: multiDataSanitized = false,
     persistenceRevision: persistenceRevision = null,
   }) {
     return {
       projectId: projectId10,
       projectName: projectName5,
-      workspaceScopeVersion: window['_v2WorkspaceProjectScoped'] === !![] ? 1 : 0,
+      workspaceScopeVersion: window['_v2WorkspaceProjectScoped'] === true ? 1 : 0,
       multiData: multiData3 || {},
       multiDataSanitized: multiDataSanitized,
       persistenceRevision: persistenceRevision,
@@ -1676,7 +1676,7 @@ export function createProjectLifecycle({
     projectId: projectId11,
     projectName: projectName6,
     multiData: multiData4,
-    multiDataSanitized: multiDataSanitized = ![],
+    multiDataSanitized: multiDataSanitized = false,
     persistenceRevision: persistenceRevision = null,
   }) {
     const value178 = run7({
@@ -1691,9 +1691,9 @@ export function createProjectLifecycle({
   function run9(
     enabled23,
     {
-      sanitizeForPersistence: sanitizeForPersistence = ![],
-      captureVisualSnapshot: captureVisualSnapshot = ![],
-      includeProjectContexts: includeProjectContexts = ![],
+      sanitizeForPersistence: sanitizeForPersistence = false,
+      captureVisualSnapshot: captureVisualSnapshot = false,
+      includeProjectContexts: includeProjectContexts = false,
     } = {},
   ) {
     if (!enabled23) return null;
@@ -1735,8 +1735,8 @@ export function createProjectLifecycle({
       return value102;
     const value180 = typeof CanvasTabManager?.['getPersistableMultiDataSnapshot'] === 'function',
       value181 = value180
-        ? CanvasTabManager['getPersistableMultiDataSnapshot']({ includeProjectContexts: !![] })
-        : run9(CanvasTabManager, { sanitizeForPersistence: ![], includeProjectContexts: !![] }),
+        ? CanvasTabManager['getPersistableMultiDataSnapshot']({ includeProjectContexts: true })
+        : run9(CanvasTabManager, { sanitizeForPersistence: false, includeProjectContexts: true }),
       multiData5 = value180 ? value181 || {} : sanitizeMultiCanvasDataForPersistence_2(value181 || {}),
       value182 = {
         cacheKey: cacheKey['cacheKey'],
@@ -1764,11 +1764,11 @@ export function createProjectLifecycle({
       recentId: window['_v2CurrentRecentProjectId'] || '',
       displayPath: window['_v2CurrentProjectDisplayPath'] || '',
       lastKnownProjectLastModified: lastKnownProjectLastModified(),
-      workspaceScopeVersion: window['_v2WorkspaceProjectScoped'] === !![] ? 1 : 0,
+      workspaceScopeVersion: window['_v2WorkspaceProjectScoped'] === true ? 1 : 0,
     };
   }
   function run13() {
-    return CanvasTabManager?.['hasDirtyCanvases']?.() === !![];
+    return CanvasTabManager?.['hasDirtyCanvases']?.() === true;
   }
   async function run14(reason2 = 'auto') {
     const value183 = run12();
@@ -1801,9 +1801,9 @@ export function createProjectLifecycle({
       value184 === value100 &&
       (hasCompleteContentPersistenceRevision2 || value185 - value101 < RECOVERY_SNAPSHOT_DEDUPE_MS)
     )
-      return { success: !![], deduped: !![] };
+      return { success: true, deduped: true };
     const { multiData: multiData6, persistenceRevision: persistenceRevision5 } = run11(persistenceRevision4);
-    if (!multiData6?.['canvases']?.['length']) return { success: ![], reason: 'empty-canvas' };
+    if (!multiData6?.['canvases']?.['length']) return { success: false, reason: 'empty-canvas' };
     value184 ||= buildRecoverySnapshotSignature({
       meta: meta2,
       multiData: multiData6,
@@ -1814,7 +1814,7 @@ export function createProjectLifecycle({
       value184 === value100 &&
       (hasCompleteContentPersistenceRevision2 || value185 - value101 < RECOVERY_SNAPSHOT_DEDUPE_MS)
     )
-      return { success: !![], deduped: !![] };
+      return { success: true, deduped: true };
     if (promise && value99 === value184) return promise;
     if (promise) return promise['catch'](() => null)['then'](() => run14(reason2));
     return (
@@ -1862,7 +1862,7 @@ export function createProjectLifecycle({
     (clearTimeout(setTimeout2), (setTimeout2 = null));
   }
   function run18({
-    writeRecovery: writeRecovery = ![],
+    writeRecovery: writeRecovery = false,
     reason: reason = 'dirty-state',
     knownHasUnsavedChanges: knownHasUnsavedChanges = null,
   } = {}) {
@@ -1931,15 +1931,15 @@ export function createProjectLifecycle({
   }
   function run21() {
     if (value103) return;
-    ((value103 = !![]),
+    ((value103 = true),
       (window['__aiCanvasWriteRecoverySnapshotForClose'] = (value193 = 'window-close') =>
         run14(value193)),
       window['addEventListener']('aicanvas:dirty-state-changed', () => {
-        run18({ writeRecovery: !![], reason: 'dirty-state' });
+        run18({ writeRecovery: true, reason: 'dirty-state' });
       }));
   }
   function run22() {
-    if (value97) return ((enabled19 = !![]), value97);
+    if (value97) return ((enabled19 = true), value97);
     const run23 = async () => {
       const { multiData: multiData7, persistenceRevision: persistenceRevision6 } = run11(),
         projectId13 = window['currentProjectId'],
@@ -1949,7 +1949,7 @@ export function createProjectLifecycle({
         projectId: projectId13,
         projectName: projectName8,
         multiData: multiData7,
-        multiDataSanitized: !![],
+        multiDataSanitized: true,
         persistenceRevision: persistenceRevision6,
       });
     };
@@ -1957,7 +1957,7 @@ export function createProjectLifecycle({
       (value97 = (async () => {
         try {
           do {
-            ((enabled19 = ![]), await run23());
+            ((enabled19 = false), await run23());
           } while (enabled19);
         } finally {
           value97 = null;
@@ -2028,7 +2028,7 @@ export function createProjectLifecycle({
       stablePollCount2 = 0;
     for (let attempt2 = 0; attempt2 < INITIAL_IMAGE_READY_MAX_ATTEMPTS; attempt2 += 1) {
       const totalCount2 = collectInitialImageRevealEntries(value202, { windowObject: window });
-      ((readyCount2 = totalCount2['filter']((value204) => value204['ready'] === !![])),
+      ((readyCount2 = totalCount2['filter']((value204) => value204['ready'] === true)),
         (stablePollCount2 = readyCount2['length'] === value203 ? stablePollCount2 + 1 : 0),
         (value203 = readyCount2['length']));
       if (
@@ -2055,13 +2055,13 @@ export function createProjectLifecycle({
   async function run33({
     wrapEl: wrapEl2,
     canvasEl: canvasEl3,
-    animate: animate = ![],
-    imageFirst: imageFirst = !![],
+    animate: animate = false,
+    imageFirst: imageFirst = true,
     afterHidden: afterHidden2,
   } = {}) {
     const loader4 = document['getElementById']('v2-initial-loader'),
       nodes2 = store['getStateRaw']?.()?.['nodes'] || {},
-      reducedMotion2 = window?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![];
+      reducedMotion2 = window?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === true;
     let value205;
     loader4 &&
       !reducedMotion2 &&
@@ -2176,11 +2176,11 @@ export function createProjectLifecycle({
     return list27;
   }
   function run37(enabled27, value211) {
-    if (!enabled27) return ![];
+    if (!enabled27) return false;
     if (value211['idx'] >= 0) {
       const value212 = Array['isArray'](enabled27['images']) ? enabled27['images'] : [],
         enabled28 = value212[value211['idx']];
-      if (!enabled28 || String(enabled28['localPath'] || '')['trim']()) return ![];
+      if (!enabled28 || String(enabled28['localPath'] || '')['trim']()) return false;
       const value213 = String(
         enabled28['remoteFallbackUrl'] ||
           enabled28['sourceUrl'] ||
@@ -2190,7 +2190,7 @@ export function createProjectLifecycle({
       )['trim']();
       return value213 === value211['remote'];
     }
-    if (String(enabled27['localPath'] || '')['trim']()) return ![];
+    if (String(enabled27['localPath'] || '')['trim']()) return false;
     const value214 = String(
       enabled27['remoteFallbackUrl'] ||
         enabled27['sourceUrl'] ||
@@ -2209,18 +2209,18 @@ export function createProjectLifecycle({
         typeof response3 === 'string'
           ? normalizeLocalPath(response3)
           : pickResultLocalPath(response3) || normalizeLocalPath(value216);
-    if (!localPath) return ![];
+    if (!localPath) return false;
     const args9 =
         response3 && typeof response3 === 'object' ? buildImageNodeStorageFields(response3) : {},
       args10 = buildCanvasLocalImageFields(
         response3 && typeof response3 === 'object' ? response3 : { localPath: localPath },
       ),
       value217 = store['getStateRaw']()?.['nodes']?.[value215['nodeId']];
-    if (!run37(value217, value215)) return ![];
+    if (!run37(value217, value215)) return false;
     const value218 = {};
     if (value215['idx'] >= 0) {
       const enabled29 = Array['isArray'](value217['images']) ? value217['images']['slice']() : [];
-      if (!enabled29[value215['idx']]) return ![];
+      if (!enabled29[value215['idx']]) return false;
       ((enabled29[value215['idx']] = {
         ...(enabled29[value215['idx']] || {}),
         ...args10,
@@ -2251,8 +2251,8 @@ export function createProjectLifecycle({
           Number(response3?.['originalWidth'] || 0) || value217['originalWidth']),
         (value218['originalHeight'] =
           Number(response3?.['originalHeight'] || 0) || value217['originalHeight']));
-    if (Object['keys'](value218)['length'] === 0) return ![];
-    return (store['updateNodeData'](value215['nodeId'], value218), !![]);
+    if (Object['keys'](value218)['length'] === 0) return false;
+    return (store['updateNodeData'](value215['nodeId'], value218), true);
   }
   function localPath2(value219) {
     return normalizeLocalPath(value219?.['originalLocalPath'] || value219?.['localPath']);
@@ -2280,24 +2280,24 @@ export function createProjectLifecycle({
     return list30['length'] > 0 && list30['every'](run41);
   }
   async function run43(value224) {
-    if (typeof project?.['checkLocalMediaExists'] !== 'function') return ![];
+    if (typeof project?.['checkLocalMediaExists'] !== 'function') return false;
     const enabled30 = localPath2(value224);
-    if (!enabled30) return ![];
+    if (!enabled30) return false;
     const { displayLocalPath: displayLocalPath2, thumbLocalPath: thumbLocalPath2 } = run39(value224),
       list31 = [displayLocalPath2, thumbLocalPath2]['filter'](Boolean);
-    if (list31['length'] === 0) return ![];
+    if (list31['length'] === 0) return false;
     for (const value225 of list31) {
       try {
-        if (!(await project['checkLocalMediaExists'](value225))) return !![];
+        if (!(await project['checkLocalMediaExists'](value225))) return true;
       } catch {
-        return !![];
+        return true;
       }
     }
-    return ![];
+    return false;
   }
   async function run44(value226) {
-    if (run40(value226)) return !![];
-    if (run42(value226)) return ![];
+    if (run40(value226)) return true;
+    if (run42(value226)) return false;
     return await run43(value226);
   }
   async function run45(value227) {
@@ -2341,24 +2341,24 @@ export function createProjectLifecycle({
     return list32;
   }
   function run46(enabled31, value229) {
-    if (!enabled31) return ![];
+    if (!enabled31) return false;
     if (value229['idx'] >= 0) {
       const value230 = Array['isArray'](enabled31['images']) ? enabled31['images'] : [],
         enabled32 = value230[value229['idx']];
-      if (!enabled32) return ![];
+      if (!enabled32) return false;
       return localPath2(enabled32) === value229['localPath'];
     }
     return localPath2(enabled31) === value229['localPath'];
   }
   function run47(value231, value232) {
     const args11 = buildImageNodeStorageFields(value232);
-    if (!args11['displayLocalPath'] && !args11['thumbLocalPath']) return ![];
+    if (!args11['displayLocalPath'] && !args11['thumbLocalPath']) return false;
     const value233 = store['getStateRaw']()?.['nodes']?.[value231['nodeId']];
-    if (!run46(value233, value231)) return ![];
+    if (!run46(value233, value231)) return false;
     const value234 = {};
     if (value231['idx'] >= 0) {
       const enabled33 = Array['isArray'](value233['images']) ? value233['images']['slice']() : [];
-      if (!enabled33[value231['idx']]) return ![];
+      if (!enabled33[value231['idx']]) return false;
       ((enabled33[value231['idx']] = {
         ...(enabled33[value231['idx']] || {}),
         ...args11,
@@ -2380,8 +2380,8 @@ export function createProjectLifecycle({
         originalWidth: Number(value232?.['originalWidth'] || 0) || value233['originalWidth'],
         originalHeight: Number(value232?.['originalHeight'] || 0) || value233['originalHeight'],
       });
-    if (Object['keys'](value234)['length'] === 0) return ![];
-    return (store['updateNodeData'](value231['nodeId'], value234), !![]);
+    if (Object['keys'](value234)['length'] === 0) return false;
+    return (store['updateNodeData'](value231['nodeId'], value234), true);
   }
   async function run48(enabled34, value235 = 10) {
     if (
@@ -2462,7 +2462,7 @@ export function createProjectLifecycle({
     return run22();
   }
   window['_triggerLocalCacheSave'] = run52;
-  let value247 = ![];
+  let value247 = false;
   const workspaceCacheIdleScheduler2 = createWorkspaceCacheIdleScheduler({
     run: run52,
     isBusy: () => isWorkspaceCacheInteractionBusy({ documentRef: document, CanvasTabManager: CanvasTabManager }),
@@ -2477,12 +2477,12 @@ export function createProjectLifecycle({
   window['_triggerLocalCacheMetaSave'] = run53;
   function resumeProjectPersistenceAfterHydration() {
     (project['clearProjectPersistenceBlock']?.(),
-      (window['_isAppLoaded'] = !![]),
+      (window['_isAppLoaded'] = true),
       window['_checkEmptyHint']?.());
   }
-  function flushPendingLocalCacheSaveNow({ pageLifecycle: pageLifecycle = ![] } = {}) {
+  function flushPendingLocalCacheSaveNow({ pageLifecycle: pageLifecycle = false } = {}) {
     workspaceCacheIdleScheduler2['cancel']();
-    if (window['_isAppLoaded'] !== !![]) return null;
+    if (window['_isAppLoaded'] !== true) return null;
     if (!pageLifecycle) return run52();
     const value249 = Date['now']();
     if (value98) return value98;
@@ -2501,29 +2501,29 @@ export function createProjectLifecycle({
   }
   function bindPersistRevisionAutoSave() {
     if (value247) return;
-    ((value247 = !![]), run21());
-    let enabled38 = ![];
+    ((value247 = true), run21());
+    let enabled38 = false;
     store['subscribeSelector'](
       (value250) => value250['_persistRev'],
       () => {
         if (!enabled38) {
-          enabled38 = !![];
+          enabled38 = true;
           return;
         }
-        if (window['_isAppLoaded'] !== !![]) return;
+        if (window['_isAppLoaded'] !== true) return;
         (workspaceCacheIdleScheduler2['schedule']({ delayMs: WORKSPACE_CACHE_PERSIST_DELAY_MS }),
-          run18({ writeRecovery: !![], reason: 'persist-rev', knownHasUnsavedChanges: !![] }));
+          run18({ writeRecovery: true, reason: 'persist-rev', knownHasUnsavedChanges: true }));
       },
     );
   }
   function onBeforeUnload() {
     return (
       run13() && void run14('beforeunload')['catch'](() => {}),
-      flushPendingLocalCacheSaveNow({ pageLifecycle: !![] })
+      flushPendingLocalCacheSaveNow({ pageLifecycle: true })
     );
   }
   function onPageHide() {
-    return (run13() && void run14('pagehide')['catch'](() => {}), flushPendingLocalCacheSaveNow({ pageLifecycle: !![] }));
+    return (run13() && void run14('pagehide')['catch'](() => {}), flushPendingLocalCacheSaveNow({ pageLifecycle: true }));
   }
   function onVisibilityChange() {
     if (document['visibilityState'] !== 'hidden') {
@@ -2532,12 +2532,12 @@ export function createProjectLifecycle({
     }
     return (
       run13() && void run14('visibility-hidden')['catch'](() => {}),
-      flushPendingLocalCacheSaveNow({ pageLifecycle: !![] })
+      flushPendingLocalCacheSaveNow({ pageLifecycle: true })
     );
   }
   async function initApp() {
     const t2 = t('projectLifecycle.projectPersistenceLoading');
-    (project['setProjectPersistenceBlocked']?.(t2), (window['_isAppLoaded'] = ![]));
+    (project['setProjectPersistenceBlocked']?.(t2), (window['_isAppLoaded'] = false));
     const wrapEl3 = document['getElementById']('v2-wrap'),
       canvasEl4 = document['getElementById']('v2-canvas') || document['querySelector']('.v2-canvas'),
       loader5 = document['getElementById']('v2-initial-loader'),
@@ -2595,7 +2595,7 @@ export function createProjectLifecycle({
             'buildHydrationSafeMultiData:end',
           ),
           run4('CanvasTabManager.init:start'),
-          CanvasTabManager['init'](value252, { markClean: ![] }),
+          CanvasTabManager['init'](value252, { markClean: false }),
           run4('CanvasTabManager.init:end'),
           run5('CanvasTabManager.init', 'CanvasTabManager.init:start', 'CanvasTabManager.init:end'),
           run34({
@@ -2604,7 +2604,7 @@ export function createProjectLifecycle({
             multiData: multiData10,
           }),
           resumeProjectPersistenceAfterHydration(),
-          run18({ writeRecovery: projectName10['recovery'] === !![], reason: 'startup' }),
+          run18({ writeRecovery: projectName10['recovery'] === true, reason: 'startup' }),
           commit(),
           rendererStartupState['complete']('project'));
         if (!(await rendererStartupState['settled'])['ready']) return;
@@ -2613,7 +2613,7 @@ export function createProjectLifecycle({
           await run33({
             wrapEl: wrapEl3,
             canvasEl: canvasEl4,
-            animate: ![],
+            animate: false,
             afterHidden: () => {
               (run50(window['currentProjectId']), run51(window['currentProjectId']));
             },
@@ -2625,7 +2625,7 @@ export function createProjectLifecycle({
       window['showGlobalLoading'] && window['showGlobalLoading'](t('projectLifecycle.loadingWorkspaceFiles'));
       const allowMissing = window['currentProjectId'] || 'default_v2_project';
       ((window['currentProjectId'] = allowMissing),
-        (window['_v2WorkspaceProjectScoped'] = !![]),
+        (window['_v2WorkspaceProjectScoped'] = true),
         run4('project.loadProject:start'));
       const value253 = await project['loadProject'](allowMissing, {
           allowMissing: allowMissing === 'default_v2_project',
@@ -2653,7 +2653,7 @@ export function createProjectLifecycle({
         }),
         patchStoreSourceNodeNamesFromFileName(),
         resumeProjectPersistenceAfterHydration(),
-        run18({ writeRecovery: ![], reason: 'startup' }));
+        run18({ writeRecovery: false, reason: 'startup' }));
       const el12 = document['getElementById']('projectNameText');
       el12 && (el12['textContent'] = getDefaultCanvasName());
       const value255 = CanvasTabManager['getActiveCanvasId']?.() || CanvasTabManager['_activeId'];
@@ -2665,10 +2665,10 @@ export function createProjectLifecycle({
             projectId: allowMissing,
             filename: window['_v2CurrentFile'] || '',
             projectName: getDefaultCanvasName(),
-            isTemporary: ![],
-            workspaceProjectScoped: !![],
+            isTemporary: false,
+            workspaceProjectScoped: true,
           },
-          { persist: ![] },
+          { persist: false },
         );
       rendererStartupState['complete']('project');
       if (!(await rendererStartupState['settled'])['ready']) return;
@@ -2677,7 +2677,7 @@ export function createProjectLifecycle({
         await run33({
           wrapEl: wrapEl3,
           canvasEl: canvasEl4,
-          animate: !![],
+          animate: true,
           afterHidden: () => {
             (run50(allowMissing), run51(allowMissing));
           },
@@ -2711,10 +2711,10 @@ export function createProjectLifecycle({
     return !!enabled39 && Array['from'](enabled39)['includes']('Files');
   }
   function run55(event18) {
-    if (!run54(event18)) return ![];
+    if (!run54(event18)) return false;
     event18['preventDefault']();
     if (event18['dataTransfer']) event18['dataTransfer']['dropEffect'] = 'copy';
-    return !![];
+    return true;
   }
   function onDocumentDragEnter(value258) {
     run55(value258);
@@ -2777,7 +2777,7 @@ export function createProjectLifecycle({
         const name2 = buildUniqueCanvasName(projectId15, CanvasTabManager['_canvases'], {
           fallbackName: getUntitledCanvasName(),
         });
-        if ((await CanvasTabManager['addCanvas']()) === ![]) return;
+        if ((await CanvasTabManager['addCanvas']()) === false) return;
         CanvasTabManager['renameCanvas'](CanvasTabManager['_activeId'], name2);
         const value263 = { ...error4, name: name2 };
         (applySourceNamesFromFileNameToCanvas(value263),
@@ -2786,8 +2786,8 @@ export function createProjectLifecycle({
             projectId: projectId15,
             filename: filename['name'],
             projectName: name2,
-            isTemporary: ![],
-            workspaceProjectScoped: !![],
+            isTemporary: false,
+            workspaceProjectScoped: true,
           }),
           CanvasTabManager['markCanvasClean'](CanvasTabManager['_activeId']),
           commit(),
@@ -2807,9 +2807,9 @@ export function createProjectLifecycle({
     const projectName11 = String(value265 || '')
       ['replace'](/\s+/g, ' ')
       ['trim']();
-    if (!projectName11) return ![];
+    if (!projectName11) return false;
     const enabled41 = CanvasTabManager['getActiveCanvasId']?.() || CanvasTabManager['_activeId'];
-    if (!enabled41) return ![];
+    if (!enabled41) return false;
     CanvasTabManager['renameCanvas']?.(enabled41, projectName11);
     const args12 = CanvasTabManager['getCanvasProjectContext']?.(enabled41);
     args12 && CanvasTabManager['setCanvasProjectContext']?.(enabled41, { ...args12, projectName: projectName11 });

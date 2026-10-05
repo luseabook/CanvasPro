@@ -20,9 +20,9 @@ export function showMediaSaveSuccessToast({
 } = {}) {
   const enabled = SUCCESS_MESSAGE_KEYS[String(kind || '')['toLowerCase']()],
     enabled2 = String(result?.['path'] || '')['trim']();
-  if (result?.['success'] !== !![] || !enabled2 || !enabled) return ![];
-  if (typeof showToast !== 'function') return ![];
+  if (result?.['success'] !== true || !enabled2 || !enabled) return false;
+  if (typeof showToast !== 'function') return false;
   const filename = String(result?.['filename'] || '')['trim']() || basenameFromPath(enabled2);
-  if (!filename) return ![];
-  return (showToast(t(enabled, { filename: filename }), 'success'), !![]);
+  if (!filename) return false;
+  return (showToast(t(enabled, { filename: filename }), 'success'), true);
 }

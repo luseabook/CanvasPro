@@ -1,5 +1,5 @@
 const text = (value) => String(value ?? '')['trim'](),
-  present = (item) => item !== undefined && item !== null && item !== ![] && text(item) !== '';
+  present = (item) => item !== undefined && item !== null && item !== false && text(item) !== '';
 export function validateRunningHubAudioParameters(key, index, args, result, list, list2) {
   if (index['promptRequired'] && !args) throw new Error('请填写生成文本');
   const enabled = index['rules'] || {},

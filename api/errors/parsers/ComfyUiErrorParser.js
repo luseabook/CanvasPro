@@ -107,7 +107,7 @@ function formatNodeErrors(current) {
   return (count > 0 && list5['push']('另有 ' + count + ' 个节点错误'), list5['join']('；'));
 }
 function hasComfyUiErrorShape(error4) {
-  if (!error4 || typeof error4 !== 'object') return ![];
+  if (!error4 || typeof error4 !== 'object') return false;
   return Boolean(
     error4['error'] ||
     error4['message'] ||
@@ -169,7 +169,7 @@ export function parseTaskError(raw2) {
     provider: PROVIDER,
     message: buildComfyUiErrorMessage(raw2),
     raw: raw2,
-    retryable: ![],
+    retryable: false,
   });
 }
 export default { parseError: parseError, parseTaskError: parseTaskError };

@@ -15,13 +15,13 @@ function resolveScreenSpacing(index) {
 }
 export function syncViewportGridDots(data, box = {}) {
   const el = data?.['parentElement'];
-  if (!el?.['style']?.['setProperty']) return ![];
+  if (!el?.['style']?.['setProperty']) return false;
   const toFiniteNumber2 = toFiniteNumber(box['x'], 0),
     toFiniteNumber3 = toFiniteNumber(box['y'], 0),
     toFiniteNumber4 = toFiniteNumber(box['zoom'], 1),
     options = toFiniteNumber4 > 0 ? toFiniteNumber4 : 1,
     target = toFiniteNumber2 + '|' + toFiniteNumber3 + '|' + options;
-  if (el['_lastGridDotsViewport'] === target) return ![];
+  if (el['_lastGridDotsViewport'] === target) return false;
   const screenSpacing = resolveScreenSpacing(options),
     source = toFiniteNumber2 + 'px ' + toFiniteNumber3 + 'px',
     next = screenSpacing + 'px ' + screenSpacing + 'px',
@@ -39,6 +39,6 @@ export function syncViewportGridDots(data, box = {}) {
       (el['classList']?.['toggle']?.('is-grid-dots-emphasized', entry),
       (el['_lastGridDotsEmphasized'] = entry)),
     (el['_lastGridDotsViewport'] = target),
-    !![]
+    true
   );
 }

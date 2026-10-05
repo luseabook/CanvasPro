@@ -66,7 +66,7 @@ export function createVideoPromptEditorElements({
   return (
     (record['className'] = 'prompt-textarea custom-textarea'),
     (record['contentEditable'] = 'true'),
-    (record['spellcheck'] = ![]),
+    (record['spellcheck'] = false),
     (record['dataset']['placeholder'] = String(placeholder || '')),
     (record['innerHTML'] = String(promptHtml || '')),
     el['appendChild'](record),
@@ -107,7 +107,7 @@ function createReferenceMediaMarkup(handle, state) {
 }
 function createReferenceDeleteButtonMarkup(
   scope,
-  { action: action = '', value: value = '', showTitle: showTitle = !![] } = {},
+  { action: action = '', value: value = '', showTitle: showTitle = true } = {},
 ) {
   const output = String(action || '')['trim'](),
     value2 = output
@@ -131,8 +131,8 @@ export function renderVideoFixedInputSlotMarkup({
   fixedInputConfig: fixedInputConfig2,
   slot: slot,
   input: input = null,
-  readOnly: readOnly = ![],
-  showTitle: showTitle = !![],
+  readOnly: readOnly = false,
+  showTitle: showTitle = true,
 } = {}) {
   const value4 = String(slot || '')['trim'](),
     value5 = String(fixedInputConfig2?.['slotKindById']?.[value4] || '')['trim'](),
@@ -179,9 +179,9 @@ export function renderVideoFixedInputSlotMarkup({
 export function renderVideoFixedInputSlotsMarkup({
   fixedInputConfig: fixedInputConfig3,
   inputsBySlot: inputsBySlot = {},
-  readOnly: readOnly = ![],
+  readOnly: readOnly = false,
   readOnlySlots: readOnlySlots = [],
-  showTitles: showTitles = !![],
+  showTitles: showTitles = true,
 } = {}) {
   const value8 = new Set(
     Array['isArray'](readOnlySlots)
@@ -200,7 +200,7 @@ export function renderVideoFixedInputSlotsMarkup({
     )
     ['join']('');
 }
-function renderGenericReferenceItem(error, value11, { showTitle: showTitle = !![] } = {}) {
+function renderGenericReferenceItem(error, value11, { showTitle: showTitle = true } = {}) {
   const value12 = String(error?.['kind'] || 'image')['trim'](),
     value13 = String(error?.['name'] || error?.['label'] || value12 + ' ' + (value11 + 1))['trim'](),
     value14 = String(error?.['slotId'] || value12 + '-' + (value11 + 1))['trim']();
@@ -223,7 +223,7 @@ function renderReadOnlyReferenceItem(response2, value15) {
     value18 = String(response2?.['slotId'] || response2?.['slot'] || '')['trim'](),
     value19 = String(response2?.['removeAction'] || '')['trim'](),
     value20 = String(response2?.['removeValue'] || ''),
-    value21 = response2?.['showTitle'] !== ![],
+    value21 = response2?.['showTitle'] !== false,
     value22 = value16 + ':' + String(response2?.['url'] || normalizeInputUrl(response2))['trim'](),
     value23 = value21 ? ' title="' + escapeHtmlAttr(value17) + '"' : '';
   return (
@@ -247,13 +247,13 @@ function renderReadOnlyReferenceItem(response2, value15) {
     '</div>'
   );
 }
-function renderReadOnlyReferenceInputsMarkup(list = [], { showTitles: showTitles = !![] } = {}) {
+function renderReadOnlyReferenceInputsMarkup(list = [], { showTitles: showTitles = true } = {}) {
   const enabled = Array['isArray'](list) ? list['filter']((value24) => normalizeInputUrl(value24)) : [];
   if (!enabled['length']) return '';
   return (
     '<div class="ref-thumb-container ref-thumb-container--readonly">' +
     enabled['map']((args, value25) =>
-      renderReadOnlyReferenceItem({ ...args, showTitle: showTitles && args?.['showTitle'] !== ![] }, value25),
+      renderReadOnlyReferenceItem({ ...args, showTitle: showTitles && args?.['showTitle'] !== false }, value25),
     )['join']('') +
     '</div>'
   );
@@ -261,11 +261,11 @@ function renderReadOnlyReferenceInputsMarkup(list = [], { showTitles: showTitles
 export function renderVideoReferenceBarContentMarkup({
   fixedInputConfig: fixedInputConfig = null,
   inputsBySlot: inputsBySlot = {},
-  readOnlyFixedInputs: readOnlyFixedInputs = ![],
+  readOnlyFixedInputs: readOnlyFixedInputs = false,
   readOnlyFixedInputSlots: readOnlyFixedInputSlots = [],
   inputs: inputs = [],
   readOnlyInputs: readOnlyInputs = [],
-  showItemTitles: showItemTitles = !![],
+  showItemTitles: showItemTitles = true,
   attachmentButtonHtml: attachmentButtonHtml = createPromptAttachmentButtonHTML({
     stroke: 'var(--white-90)',
   }),

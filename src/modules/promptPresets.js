@@ -164,7 +164,7 @@ const TEMPLATES = {
   staticPromptTemplate = (text) => ({
     type: PROMPT_PRESET_TEMPLATE_TYPE_STATIC,
     text: text,
-    requireInput: !![],
+    requireInput: true,
     emptyInputMessage: IMAGE_PRESET_EMPTY_INPUT_MESSAGE,
   }),
   storyboardInsertPromptPreset = ({ templateKey: templateKey, title: title, desc: desc }) => ({
@@ -519,7 +519,7 @@ export const PROMPT_PRESETS = {
 };
 let customPresets = {},
   promptPresetSettings = { defaultQuickCaptureNodeType: '' },
-  promptPresetSettingsLoaded = ![],
+  promptPresetSettingsLoaded = false,
   promptPresetSettingsLoadPromise = null,
   activePresetManagerOverlay = null,
   closeActivePresetManager = null;
@@ -722,20 +722,20 @@ function normalizePromptPresetSettings(options4 = {}) {
       : '',
   };
 }
-export async function loadPromptPresetSettings({ force: force = ![] } = {}) {
+export async function loadPromptPresetSettings({ force: force = false } = {}) {
   if (promptPresetSettingsLoaded && !force) return { ...promptPresetSettings };
   if (promptPresetSettingsLoadPromise && !force) return promptPresetSettingsLoadPromise;
   const value23 = (async () => {
     const fetchPromptPresetSettingsFromServer2 = await fetchPromptPresetSettingsFromServer();
     return (
       (promptPresetSettings = normalizePromptPresetSettings(fetchPromptPresetSettingsFromServer2)),
-      (promptPresetSettingsLoaded = !![]),
+      (promptPresetSettingsLoaded = true),
       { ...promptPresetSettings }
     );
   })()['catch']((value24) => {
     return (
       console['warn']('[promptPresets] Failed to load preset settings.', value24),
-      (promptPresetSettingsLoaded = !![]),
+      (promptPresetSettingsLoaded = true),
       { ...promptPresetSettings }
     );
   });
@@ -756,7 +756,7 @@ export async function setDefaultQuickCapturePresetNodeType(value25) {
   return (
     await savePromptPresetSettingsToServer({ defaultQuickCaptureNodeType: defaultQuickCaptureNodeType }),
     (promptPresetSettings = { ...promptPresetSettings, defaultQuickCaptureNodeType: defaultQuickCaptureNodeType }),
-    (promptPresetSettingsLoaded = !![]),
+    (promptPresetSettingsLoaded = true),
     { ...promptPresetSettings }
   );
 }
@@ -783,7 +783,7 @@ export function __setCustomPromptPresetsForTest(args6 = {}) {
 }
 export function __setPromptPresetSettingsForTest(options5 = {}) {
   ((promptPresetSettings = normalizePromptPresetSettings(options5)),
-    (promptPresetSettingsLoaded = !![]),
+    (promptPresetSettingsLoaded = true),
     (promptPresetSettingsLoadPromise = null));
 }
 function escapePresetTemplateHtml(value30) {
@@ -837,13 +837,13 @@ function moveCaretAfterNode(value36) {
   if (!enabled) return;
   const value37 = document['createRange']();
   (value37['setStartAfter'](value36),
-    value37['collapse'](!![]),
+    value37['collapse'](true),
     enabled['removeAllRanges'](),
     enabled['addRange'](value37));
 }
 function insertUserInputPill(el3) {
   if (editorHasUserInputPill(el3))
-    return (showPresetManagerToast(promptPresetsText('editor.duplicateUserInput'), 'warn'), ![]);
+    return (showPresetManagerToast(promptPresetsText('editor.duplicateUserInput'), 'warn'), false);
   const el4 = document['createElement']('span');
   el4['innerHTML'] = getUserInputPillHtml();
   const value38 = el4['firstElementChild'],
@@ -862,7 +862,7 @@ function insertUserInputPill(el3) {
       : (el3['appendChild'](value38), el3['appendChild'](value39)),
     moveCaretAfterNode(value39),
     el3['focus'](),
-    !![]
+    true
   );
 }
 function buildPresetModalButton(value42, value43) {
@@ -1073,7 +1073,7 @@ function showPresetManagerToast(value64, value65 = 'info') {
   window['showToast']?.(value64, value65);
 }
 function showPresetButtonPending(el19, value66) {
-  ((el19['disabled'] = !![]),
+  ((el19['disabled'] = true),
     el19['setAttribute']('aria-busy', 'true'),
     (el19['textContent'] = value66));
   const el20 = document['createElement']('span');
@@ -1084,7 +1084,7 @@ function showPresetButtonPending(el19, value66) {
 function createPresetEditor({
   nodeType: nodeType,
   preset: preset = null,
-  isDraft: isDraft = ![],
+  isDraft: isDraft = false,
   onSaved: onSaved,
 }) {
   const element2 = document['createElement']('div');
@@ -1130,7 +1130,7 @@ function createPresetEditor({
   const el30 = document['createElement']('div');
   ((el30['className'] = 'preset-manager-textarea preset-manager-editor'),
     (el30['contentEditable'] = 'true'),
-    (el30['spellcheck'] = ![]),
+    (el30['spellcheck'] = false),
     (el30['innerHTML'] = renderPresetTemplateEditorHtml(preset?.['template'] || '')),
     el28['addEventListener']('click', () => insertUserInputPill(el30)));
   const presetEditorPlaceholder = buildPresetEditorPlaceholder();
@@ -1177,7 +1177,7 @@ function createPresetEditor({
       } catch (error2) {
         showPresetManagerToast(error2?.['message'] || promptPresetsText('editor.saveFailed'), 'error');
       } finally {
-        ((saveButton['disabled'] = ![]),
+        ((saveButton['disabled'] = false),
           saveButton['removeAttribute']('aria-busy'),
           (saveButton['textContent'] = promptPresetsText('editor.save')));
       }
@@ -1209,9 +1209,9 @@ export function openCustomPresetsManager({
   root['className'] = 'preset-modal-overlay';
   let beginModalInteraction2 = null,
     mutationObserver = null,
-    value69 = ![];
+    value69 = false;
   const onClose = () => {
-      ((value69 = !![]),
+      ((value69 = true),
         mutationObserver?.['disconnect'](),
         root['remove'](),
         beginModalInteraction2?.(),
@@ -1241,7 +1241,7 @@ export function openCustomPresetsManager({
   const el37 = document['createElement']('div');
   ((el37['className'] = 'preset-manager-tabs'), el37['setAttribute']('role', 'tablist'));
   const list2 = new Map();
-  let value70 = ![];
+  let value70 = false;
   PRESET_MANAGER_TABS['forEach']((defaultQuickCaptureNodeType2) => {
     const button = buildPresetModalButton('', 'preset-manager-tab');
     (button['setAttribute']('role', 'tab'),
@@ -1263,7 +1263,7 @@ export function openCustomPresetsManager({
         if (value70) return;
         const defaultQuickCaptureNodeType3 = getDefaultQuickCapturePresetNodeType();
         if (defaultQuickCaptureNodeType3 === defaultQuickCaptureNodeType2['nodeType']) return;
-        ((value70 = !![]),
+        ((value70 = true),
           (promptPresetSettings = {
             ...promptPresetSettings,
             defaultQuickCaptureNodeType: defaultQuickCaptureNodeType2['nodeType'],
@@ -1285,7 +1285,7 @@ export function openCustomPresetsManager({
               'error',
             ));
         } finally {
-          value70 = ![];
+          value70 = false;
         }
       }),
       list2['set'](defaultQuickCaptureNodeType2['nodeType'], { button: button, star: star }),
@@ -1368,10 +1368,10 @@ export function openCustomPresetsManager({
         list4['push']({
           key: key3(preset3['draftPreset']),
           preset: preset3['draftPreset'],
-          isDraft: !![],
+          isDraft: true,
         });
       list3['forEach']((preset4) => {
-        list4['push']({ key: key2(preset4), preset: preset4, isDraft: ![] });
+        list4['push']({ key: key2(preset4), preset: preset4, isDraft: false });
       });
       !preset3['selectedKey'] &&
         list4['length'] > 0 &&
@@ -1602,7 +1602,7 @@ export function openCustomPresetsManager({
       ((mutationObserver = new MutationObserver(() => {
         if (!root['isConnected']) onClose();
       })),
-      mutationObserver['observe'](document['body'], { childList: !![] })),
+      mutationObserver['observe'](document['body'], { childList: true })),
     root
   );
 }

@@ -16,7 +16,7 @@ export function createCanvasMcpSession({
   let value = null,
     value2 = null,
     item = 0,
-    enabled = ![],
+    enabled = false,
     promise = Promise['resolve']();
   const run = (key) => !enabled && value === key && key['binding'] === getBinding();
   async function disable(reason = '') {
@@ -25,7 +25,7 @@ export function createCanvasMcpSession({
     ((value = null),
       (value2 = null),
       sessionId?.['controller']['abort'](),
-      onChange({ enabled: ![], reason: reason }));
+      onChange({ enabled: false, reason: reason }));
     if (sessionId)
       try {
         await request({ action: 'disable', owner: owner, sessionId: sessionId['id'] });
@@ -36,7 +36,7 @@ export function createCanvasMcpSession({
     if (!run(sessionId2)) return;
     try {
       if (requestId['name'] === 'canvas_models')
-        result = { ok: !![], result: describeCanvasMcpModels(listModels(), requestId['arguments']) };
+        result = { ok: true, result: describeCanvasMcpModels(listModels(), requestId['arguments']) };
       else {
         const index = sessionId2['commandIds']['get'](requestId['name']),
           enabled2 = registry['list']()['find']((data) => data['id'] === index);
@@ -47,13 +47,13 @@ export function createCanvasMcpSession({
       result = sanitizeMcpResult(result);
       if (JSON['stringify'](result)['length'] > 250000)
         result = {
-          ok: ![],
+          ok: false,
           errorCode: 'RESULT_TOO_LARGE',
           message: 'Operation may have succeeded. Inspect individual node summaries instead of resubmitting.',
         };
     } catch (message) {
       result = {
-        ok: ![],
+        ok: false,
         errorCode: 'CANVAS_COMMAND_FAILED',
         message: message['message'] || String(message),
       };
@@ -101,7 +101,7 @@ export function createCanvasMcpSession({
     if (value === sessionId3) await disable('canvasChanged');
   }
   return {
-    async enable({ allowGeneration: allowGeneration = ![] } = {}) {
+    async enable({ allowGeneration: allowGeneration = false } = {}) {
       await disable();
       if (enabled) return null;
       const target = item,
@@ -127,7 +127,7 @@ export function createCanvasMcpSession({
         (value = { ...sessionId4, ...tools, controller: new AbortController() }),
         (promise = Promise['resolve']()),
         onChange({
-          enabled: !![],
+          enabled: true,
           url: sessionId4['url'],
           token: sessionId4['token'],
           binding: binding,
@@ -142,7 +142,7 @@ export function createCanvasMcpSession({
       if ((value && !run(value)) || (value2 && value2 !== getBinding())) void disable('canvasChanged');
     },
     async destroy() {
-      ((enabled = !![]), await disable());
+      ((enabled = true), await disable());
     },
   };
 }

@@ -47,11 +47,11 @@ export function createPersonReplacementVoiceCloneInteractionController({
     value4 = null,
     el = null,
     value5 = null,
-    enabled = ![];
+    enabled = false;
   const run = () => getRoot() || null,
     handler = () => getProject() || {};
-  function onAudioPickStateChange({ active: active = ![] } = {}) {
-    run()?.['classList']?.['toggle']?.('is-voice-audio-picking', active === !![]);
+  function onAudioPickStateChange({ active: active = false } = {}) {
+    run()?.['classList']?.['toggle']?.('is-voice-audio-picking', active === true);
   }
   function syncPreviewUi() {
     syncPersonReplacementVoicePreviewUi(run(), { audioEl: audioEl, assetId: assetId });
@@ -101,9 +101,9 @@ export function createPersonReplacementVoiceCloneInteractionController({
   function mount() {
     unmount();
     const sourceId2 = handler();
-    if (sourceId2['workspace']?.['step'] !== 4) return ![];
+    if (sourceId2['workspace']?.['step'] !== 4) return false;
     const enabled2 = run()?.['querySelector']?.('[data-person-replacement-voice-studio-host]');
-    if (!enabled2) return ![];
+    if (!enabled2) return false;
     const run3 = mountStudio(enabled2, {
         project: cloneJson(sourceId2),
         sourceId: sourceId2['workspace']['selectedVoiceSourceId'],
@@ -119,7 +119,7 @@ export function createPersonReplacementVoiceCloneInteractionController({
         (value2 = () => {
           (onAudioPickStateChange(), run3());
         }),
-        !![]
+        true
       );
     if (run3 && typeof run3 === 'object')
       return (
@@ -128,9 +128,9 @@ export function createPersonReplacementVoiceCloneInteractionController({
           (value2 = () => {
             (onAudioPickStateChange(), run3['destroy']());
           }),
-        !![]
+        true
       );
-    return ![];
+    return false;
   }
   function selectVoiceAsset(entry, record = {}) {
     const payload = value3?.['selectVoiceAsset']?.(entry, record);
@@ -158,7 +158,7 @@ export function createPersonReplacementVoiceCloneInteractionController({
       await value4;
       return;
     }
-    if (enabled4 && audioEl['paused'] === ![] && audioEl['ended'] !== !![]) {
+    if (enabled4 && audioEl['paused'] === false && audioEl['ended'] !== true) {
       (audioEl['pause']?.(), syncPreviewUi());
       return;
     }
@@ -215,10 +215,10 @@ export function createPersonReplacementVoiceCloneInteractionController({
       workspace: { ...args['workspace'], selectedVoiceSourceId: selectedVoiceSourceId },
     };
     if (typeof value3?.['selectSource'] !== 'function')
-      return commitProject(value9, { reason: 'voice-source', render: !![] });
+      return commitProject(value9, { reason: 'voice-source', render: true });
     const value10 = value3['selectSource'](selectedVoiceSourceId);
-    if (value10?.['selected'] === ![]) return cloneJson(args);
-    const value11 = commitProject(value9, { reason: 'voice-source', render: ![] }),
+    if (value10?.['selected'] === false) return cloneJson(args);
+    const value11 = commitProject(value9, { reason: 'voice-source', render: false }),
       el4 = run();
     return (
       el4?.['querySelectorAll']?.('[data-person-replacement-action="select-voice-source"]')?.['forEach']?.(
@@ -242,12 +242,12 @@ export function createPersonReplacementVoiceCloneInteractionController({
   }
   function refreshSourceCards({
     sourceId: sourceId = '',
-    remountVoiceStudio: remountVoiceStudio = ![],
+    remountVoiceStudio: remountVoiceStudio = false,
   } = {}) {
     const value12 = handler();
-    if (isDestroyed() || value12['workspace']?.['step'] !== 4) return ![];
+    if (isDestroyed() || value12['workspace']?.['step'] !== 4) return false;
     const el8 = run()?.['querySelector']?.('.person-replacement-voice-source-list');
-    if (!el8) return ![];
+    if (!el8) return false;
     const text4 = normalizeText(sourceId),
       el9 = documentObject?.['activeElement']?.['closest']?.('[data-person-replacement-voice-source-shell]'),
       value13 = Boolean(text4 && normalizeText(el9?.['dataset']?.['sourceId']) === text4);
@@ -266,21 +266,21 @@ export function createPersonReplacementVoiceCloneInteractionController({
         )
           ['find']((el10) => normalizeText(el10['dataset']?.['sourceId']) === text4)
           ?.['focus']?.(),
-      !![]
+      true
     );
   }
   function clearDropTarget() {
     (el?.['classList']?.['remove']?.('is-person-replacement-voice-drop-target'), (el = null));
   }
   function resetDropEligibility() {
-    ((value5 = null), (enabled = ![]));
+    ((value5 = null), (enabled = false));
   }
   function canDropOnAudioParam(el11) {
     if (value5 === el11) return enabled;
     const segmentId = normalizeText(el11?.['dataset']?.['segmentId']);
     return (
       (value5 = el11),
-      (enabled = Boolean(segmentId && value3?.['canSelectVoiceAsset']?.({ segmentId: segmentId }) === !![])),
+      (enabled = Boolean(segmentId && value3?.['canSelectVoiceAsset']?.({ segmentId: segmentId }) === true)),
       enabled
     );
   }

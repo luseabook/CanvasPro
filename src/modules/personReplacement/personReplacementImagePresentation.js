@@ -37,7 +37,7 @@ export function syncPersonReplacementImageStageFrame(el) {
   const count = Math['max'](0, Number(el?.['naturalWidth']) || 0),
     count2 = Math['max'](0, Number(el?.['naturalHeight']) || 0),
     el2 = el?.['closest']?.('[data-person-replacement-keyframe-stage]');
-  if (!(count > 0 && count2 > 0) || !el2?.['style']) return ![];
+  if (!(count > 0 && count2 > 0) || !el2?.['style']) return false;
   (el2['style']['setProperty']('--frame-aspect', count + ' / ' + count2),
     el2['style']['setProperty']('--frame-width', String(count)),
     el2['style']['setProperty']('--frame-height', String(count2)),
@@ -55,7 +55,7 @@ export function syncPersonReplacementImageStageFrame(el) {
     (el2['style']['setProperty']('width', index + 'px'),
       el2['style']['setProperty']('height', result + 'px'));
   }
-  return !![];
+  return true;
 }
 function resolveSelectedShot(options = {}) {
   const list = Array['isArray'](options?.['shots']) ? options['shots'] : [],
@@ -183,16 +183,16 @@ function normalizeMediaUrl(payload) {
 }
 function renderPromptEnhancementControl(
   options4 = {},
-  { disabled: disabled = ![], pendingShotIds: pendingShotIds = [], model: model = {} } = {},
+  { disabled: disabled = false, pendingShotIds: pendingShotIds = [], model: model = {} } = {},
 ) {
   const isPersonReplacementManualPromptMode2 = isPersonReplacementManualPromptMode(options4);
   disabled = disabled || isPersonReplacementManualPromptMode2;
   const handle =
       !isPersonReplacementManualPromptMode2 &&
-      options4['settings']?.['replacementPromptEnhancementEnabled'] === !![],
+      options4['settings']?.['replacementPromptEnhancementEnabled'] === true,
     text4 = normalizeText(model['displayName'] || model['modelId']) || '未配置',
     config =
-      model['supportsImage'] === ![]
+      model['supportsImage'] === false
         ? '当前画布 Agent 模型“' +
           text4 +
           '”不支持图片理解。开启增强前，请在画布 Agent 面板切换为支持视觉理解的模型。按钮高亮表示已开启，再次点击关闭。'
@@ -219,12 +219,12 @@ function renderImageReplacementGenerateButton(
   args,
   {
     presentation: presentation = {},
-    shotBatchGenerationActive: shotBatchGenerationActive = ![],
-    shotBatchCancelRequested: shotBatchCancelRequested = ![],
+    shotBatchGenerationActive: shotBatchGenerationActive = false,
+    shotBatchCancelRequested: shotBatchCancelRequested = false,
   } = {},
 ) {
   const enabled = presentation['selectedShot'] || null,
-    scope = args['workspace']['shotSelectionMode'] === !![],
+    scope = args['workspace']['shotSelectionMode'] === true,
     enabled2 = Array['isArray'](args['workspace']['selectedShotIds'])
       ? args['workspace']['selectedShotIds']['length']
       : 0,
@@ -234,7 +234,7 @@ function renderImageReplacementGenerateButton(
         : [],
     ),
     input = args['shots']['some']((output) => {
-      if (!map4['has'](normalizeText(output['id']))) return ![];
+      if (!map4['has'](normalizeText(output['id']))) return false;
       const personReplacementImagePresentation = buildPersonReplacementImagePresentation({
         ...args,
         workspace: { ...args['workspace'], selectedShotId: normalizeText(output['id']) },
@@ -285,9 +285,9 @@ function renderImageReplacementPage(
     ),
     description = presentation2['selectedShot'],
     value6 = presentation2['sourceImageRef'],
-    enabled3 = smartDetectOpen['cutEditorOpen'] === !![],
-    value7 = smartDetectOpen['omitShotTimeline'] === !![],
-    value8 = smartDetectOpen['cutEditorSoundEnabled'] === !![],
+    enabled3 = smartDetectOpen['cutEditorOpen'] === true,
+    value7 = smartDetectOpen['omitShotTimeline'] === true,
+    value8 = smartDetectOpen['cutEditorSoundEnabled'] === true,
     value9 = enabled3
       ? Array['isArray'](smartDetectOpen['cutEditorDraft'])
         ? smartDetectOpen['cutEditorDraft']['find'](
@@ -323,7 +323,7 @@ function renderImageReplacementPage(
     value17 = Boolean(
       !isPersonReplacementManualPromptMode(runtimePreviewRef) &&
       value16 &&
-      runtimePreviewRef['settings']?.['replacementPromptEnhancementEnabled'] === !![] &&
+      runtimePreviewRef['settings']?.['replacementPromptEnhancementEnabled'] === true &&
       !enabled4['promptEnhancement'],
     ),
     text5 =
@@ -421,8 +421,8 @@ function renderImageReplacementPage(
     value33 = !enabled3 && !enabled5,
     value34 = enabled3
       ? renderSmartDetectTrigger2({
-          smartDetectOpen: smartDetectOpen['cutEditorSmartDetectOpen'] === !![],
-          smartDetecting: smartDetectOpen['cutEditorSmartDetecting'] === !![],
+          smartDetectOpen: smartDetectOpen['cutEditorSmartDetectOpen'] === true,
+          smartDetecting: smartDetectOpen['cutEditorSmartDetecting'] === true,
           disabled: Boolean(
             smartDetectOpen['cutEditorSubmitting'] || smartDetectOpen['cutEditorSmartDetecting'],
           ),
@@ -523,7 +523,7 @@ function renderImageReplacementPage(
     '\n       <section class="person-replacement-keyframe-panel person-replacement-middle-layout">' +
     value39 +
     renderLayoutSplitter2('center', box3) +
-    (value7 ? '' : renderShotTimeline2(runtimePreviewRef, { ...smartDetectOpen, allowCutEditing: !![] })) +
+    (value7 ? '' : renderShotTimeline2(runtimePreviewRef, { ...smartDetectOpen, allowCutEditing: true })) +
     '</section>\n      ' +
     renderLayoutSplitter2('right', box3) +
     '\n      <aside class="person-replacement-generation-panel person-replacement-image-generation-panel">\n        <div class="person-replacement-generation-preview ' +
@@ -599,7 +599,7 @@ function renderImageReplacementPage(
       generationParams: runtimePreviewRef['settings']['replacementImageGenerationParams'] || {},
       providerProfileId: runtimePreviewRef['settings']['replacementImageProviderProfileId'],
       providerProfileIdByModel: runtimePreviewRef['settings']['replacementImageProviderProfileIdByModel'],
-      showSchemaControls: !![],
+      showSchemaControls: true,
       runningHubWorkflowModelIds: [QWEN_IMAGE_21_EDIT_MODEL_ID],
       className: 'story-asset-image-model-selector person-replacement-image-model-selector',
     }) +

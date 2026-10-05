@@ -39,7 +39,7 @@ export function normalizePersonReplacementGenerationTaskIdentity(options = {}) {
   return {
     ...args3,
     ...(startedAt ? { startedAt: startedAt } : {}),
-    ...(result['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
+    ...(result['useOpenapiQuery'] === true ? { useOpenapiQuery: true } : {}),
   };
 }
 export function projectPersonReplacementGenerationTaskIdentity({
@@ -61,7 +61,7 @@ export function projectPersonReplacementGenerationTaskIdentity({
     ),
     executionId: firstText(useOpenapiQuery['executionId'], target['executionId']),
     startedAt: firstPositiveNumber(useOpenapiQuery['startedAt'], target['startedAt']),
-    useOpenapiQuery: useOpenapiQuery['useOpenapiQuery'] === !![] || target['useOpenapiQuery'] === !![],
+    useOpenapiQuery: useOpenapiQuery['useOpenapiQuery'] === true || target['useOpenapiQuery'] === true,
   });
 }
 export function hasPersonReplacementGenerationTaskIdentityChanged(options2 = {}, source = {}) {

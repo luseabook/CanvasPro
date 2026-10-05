@@ -10,7 +10,7 @@ export function createLocalAssetCleanupList({
 }) {
   let response = null,
     page = 0,
-    enabled = ![];
+    enabled = false;
   const map = new Set(),
     map2 = new Map(),
     el = document['createElement']('span');
@@ -49,7 +49,7 @@ export function createLocalAssetCleanupList({
   });
   function run3() {
     const count = selectedItems(),
-      enabled2 = response?.['ok'] === !![] && response?.['canTrash'] !== ![] && !enabled;
+      enabled2 = response?.['ok'] === true && response?.['canTrash'] !== false && !enabled;
     ((el['textContent'] = text('selectedSummary', {
       count: count['length'],
       bytes: formatCleanupBytes(

@@ -31,7 +31,7 @@ export function createStoryProjectTaskWorkspaceController({
   replicationAnalysisPromises: replicationAnalysisPromises,
   replicationSourceFileByEpisodeKey: replicationSourceFileByEpisodeKey,
   projectData: projectData,
-  getWorkspaceDestroyed: getWorkspaceDestroyed = () => ![],
+  getWorkspaceDestroyed: getWorkspaceDestroyed = () => false,
   stopAssetBreakdownProgress: stopAssetBreakdownProgress = () => {},
   schedulePersistence: schedulePersistence = () => {},
   render: render = () => {},
@@ -50,7 +50,7 @@ export function createStoryProjectTaskWorkspaceController({
       throw new TypeError('Story project tasks require ' + key + '.');
   }
   let index = 0;
-  const run = () => getWorkspaceDestroyed() === !![],
+  const run = () => getWorkspaceDestroyed() === true,
     resetTaskState = () => {
       (Object['assign'](state, deriveStoryProjectTaskState()), (state['exportingAssetAppearanceKey'] = ''));
     },
@@ -67,7 +67,7 @@ export function createStoryProjectTaskWorkspaceController({
     },
     invalidateRuntime = (data) => {
       const id = normalizeText(data);
-      if (!id) return ![];
+      if (!id) return false;
       for (const [enabled2, options] of activeClipGenerationControllers) {
         if (!enabled2['startsWith'](id + ':')) continue;
         (options['pause'](), activeClipGenerationControllers['delete'](enabled2));
@@ -86,14 +86,14 @@ export function createStoryProjectTaskWorkspaceController({
         projectData['releaseData'](id),
         advanceStoryProjectSession(state, id),
         reportStoryTaskCenter({ project: { id: id, backgroundTasks: [] } }),
-        !![]
+        true
       );
     },
-    beginSession = ({ invalidateCurrentProject: invalidateCurrentProject = ![] } = {}) => {
+    beginSession = ({ invalidateCurrentProject: invalidateCurrentProject = false } = {}) => {
       const text = normalizeText(state['data']?.['project']?.['id']);
       if (invalidateCurrentProject) invalidateRuntime(text);
       return (
-        stopAssetBreakdownProgress({ clearState: !![] }),
+        stopAssetBreakdownProgress({ clearState: true }),
         resetTaskState(),
         createStoryProjectTaskToken(state)
       );
@@ -104,8 +104,8 @@ export function createStoryProjectTaskWorkspaceController({
       return (
         (storyProjectTaskToken['projectTitleEdited'] =
           data2 === state['data']
-            ? state['projectTitleEdited'] === !![]
-            : current?.['projectTitleEdited'] === !![]),
+            ? state['projectTitleEdited'] === true
+            : current?.['projectTitleEdited'] === true),
         storyProjectTaskToken
       );
     },
@@ -118,14 +118,14 @@ export function createStoryProjectTaskWorkspaceController({
       return text2 && text3 ? text2 + ':' + text3 : '';
     },
     syncProjectEntry = (scope) => isLive(scope) && projectData['syncTaskEntry'](scope),
-    persistChange = (input, { refreshHome: refreshHome = ![] } = {}) => {
+    persistChange = (input, { refreshHome: refreshHome = false } = {}) => {
       if (!isLive(input)) return;
       (syncProjectEntry(input),
         reportStoryTaskCenter(input?.['data']),
-        schedulePersistence({ immediate: !![] }),
-        refreshHome && state['view'] === 'home' && !run() && render({ capturePageState: ![] }));
+        schedulePersistence({ immediate: true }),
+        refreshHome && state['view'] === 'home' && !run() && render({ capturePageState: false }));
     },
-    startBackgroundTask = (enabled3, providerProfileId = {}, { refreshHome: refreshHome = !![] } = {}) => {
+    startBackgroundTask = (enabled3, providerProfileId = {}, { refreshHome: refreshHome = true } = {}) => {
       if (!enabled3?.['data']?.['project']) return null;
       registerProjectData(enabled3);
       const startStoryBackgroundTask2 = startStoryBackgroundTask(enabled3['data'], {
@@ -143,7 +143,7 @@ export function createStoryProjectTaskWorkspaceController({
       if (output) activeBackgroundExecutions['add'](output);
       return (persistChange(enabled3, { refreshHome: refreshHome }), startStoryBackgroundTask2);
     },
-    updateBackgroundTask = (enabled4, value2, value3 = {}, { refreshHome: refreshHome = !![] } = {}) => {
+    updateBackgroundTask = (enabled4, value2, value3 = {}, { refreshHome: refreshHome = true } = {}) => {
       if (!enabled4?.['data']?.['project']) return null;
       const updateStoryBackgroundTask2 = updateStoryBackgroundTask(enabled4['data'], value2, value3);
       if (updateStoryBackgroundTask2) persistChange(enabled4, { refreshHome: refreshHome });
@@ -156,7 +156,7 @@ export function createStoryProjectTaskWorkspaceController({
         value4,
         value5,
       );
-      if (updateStoryBackgroundTaskBatch2) persistChange(enabled5, { refreshHome: !![] });
+      if (updateStoryBackgroundTaskBatch2) persistChange(enabled5, { refreshHome: true });
       return updateStoryBackgroundTaskBatch2;
     },
     createTaskBatch = (value6, value7 = {}) => {
@@ -181,7 +181,7 @@ export function createStoryProjectTaskWorkspaceController({
         enabled6
       );
     },
-    finishBackgroundTask = (enabled7, value10, value11 = {}, { refreshHome: refreshHome = !![] } = {}) => {
+    finishBackgroundTask = (enabled7, value10, value11 = {}, { refreshHome: refreshHome = true } = {}) => {
       if (!enabled7?.['data']?.['project']) return null;
       const finishStoryBackgroundTask2 = finishStoryBackgroundTask(enabled7['data'], value10, value11);
       if (finishStoryBackgroundTask2) persistChange(enabled7, { refreshHome: refreshHome });

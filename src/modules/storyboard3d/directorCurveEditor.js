@@ -77,9 +77,9 @@ export class DirectorCurveEditor {
   ['change'](event) {
     const el = event['target'],
       enabled = this['path']['selected']();
-    if (!enabled || !el['matches']?.('[data-curve-value],[data-curve-tangent]')) return ![];
+    if (!enabled || !el['matches']?.('[data-curve-value],[data-curve-tangent]')) return false;
     const next = Number(el['value']);
-    if (!Number['isFinite'](next)) return !![];
+    if (!Number['isFinite'](next)) return true;
     if (el['dataset']['curveValue'] != null) {
       const easingCurve = [...(enabled['easingCurve'] || [0, 0, 1, 1])];
       ((easingCurve[Number(el['dataset']['curveValue'])] = next),
@@ -89,12 +89,12 @@ export class DirectorCurveEditor {
         entry = [...(enabled[current] || [0, 0, 0])];
       ((entry[Number(el['dataset']['axis'])] = next), this['path']['change']({ [current]: entry }));
     }
-    return !![];
+    return true;
   }
   ['key'](event2) {
     const record = event2['target']?.['dataset']?.['curveHandle'];
     if (record == null || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']['includes'](event2['key']))
-      return ![];
+      return false;
     const easingCurve2 = [...(this['path']['selected']()?.['easingCurve'] || [0, 0, 1, 1])],
       payload = event2['key'] === 'ArrowLeft' || event2['key'] === 'ArrowRight' ? 0 : 1;
     return (
@@ -103,12 +103,12 @@ export class DirectorCurveEditor {
       event2['preventDefault'](),
       event2['stopImmediatePropagation'](),
       this['path']['change']({ easingCurve: easingCurve2 }),
-      !![]
+      true
     );
   }
   ['down'](event3) {
     const el2 = event3['target']['closest']?.('[data-curve-handle]');
-    if (!el2 || event3['button'] !== 0) return ![];
+    if (!el2 || event3['button'] !== 0) return false;
     (event3['preventDefault'](), event3['stopImmediatePropagation']());
     const handle = this['path']['selected'](),
       state = this['path']['identity'](),
@@ -157,7 +157,7 @@ export class DirectorCurveEditor {
         },
         { signal: signal['signal'] },
       ),
-      !![]
+      true
     );
   }
 }

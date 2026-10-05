@@ -84,6 +84,6 @@ export function buildVideoSchemaAspectRatioDisplayPatch({
       nodeData: latestNodeData,
       patch: patch,
     }),
-    { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![], aspectRatio: ratioValue, ...patch }
+    { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: false, aspectRatio: ratioValue, ...patch }
   );
 }

@@ -78,7 +78,7 @@ function normalizeAudioVoiceModelSelectionMode(record) {
 function hasAudioVoiceGenerationRecord(response2 = {}, handle = '') {
   const state = String(handle || '')['trim']();
   return (
-    response2['isGenerating'] === !![] ||
+    response2['isGenerating'] === true ||
     String(response2['status'] || '')
       ['trim']()
       ['toLowerCase']() === 'generating' ||
@@ -178,24 +178,24 @@ export function cloneAudioVoiceSegment(imitateToneEnabled = {}) {
     voiceModelId: voiceModelId3 === 'global' ? '' : value2,
     voiceModelSelectionMode: voiceModelId3,
     taskModelId: String(imitateToneEnabled['taskModelId'] || '')['trim'](),
-    imitateToneEnabled: imitateToneEnabled['imitateToneEnabled'] === !![],
+    imitateToneEnabled: imitateToneEnabled['imitateToneEnabled'] === true,
     sourceAudioReady:
-      imitateToneEnabled['sourceAudioReady'] === !![] ||
+      imitateToneEnabled['sourceAudioReady'] === true ||
       !!resolveSegmentLocalAudioUrl(
         imitateToneEnabled['sourceAudioUrl'],
         imitateToneEnabled['sourceAudioLocalPath'],
       ),
-    convertedAudioReady: imitateToneEnabled['convertedAudioReady'] === !![],
+    convertedAudioReady: imitateToneEnabled['convertedAudioReady'] === true,
     activeAudio: imitateToneEnabled['activeAudio'] === 'converted' ? 'converted' : 'source',
     status: String(imitateToneEnabled['status'] || 'detected'),
-    needsSourceAudioRecut: imitateToneEnabled['needsSourceAudioRecut'] === !![],
+    needsSourceAudioRecut: imitateToneEnabled['needsSourceAudioRecut'] === true,
     error: String(imitateToneEnabled['error'] || ''),
     rhTaskId: String(imitateToneEnabled['rhTaskId'] || ''),
     rhTaskStatus: String(imitateToneEnabled['rhTaskStatus'] || ''),
     rhStatusMessage: String(imitateToneEnabled['rhStatusMessage'] || ''),
     rhTaskStartedAt: Number(imitateToneEnabled['rhTaskStartedAt'] || 0) || 0,
-    rhTaskUseOpenapiQuery: imitateToneEnabled['rhTaskUseOpenapiQuery'] === !![],
-    isGenerating: imitateToneEnabled['isGenerating'] === !![],
+    rhTaskUseOpenapiQuery: imitateToneEnabled['rhTaskUseOpenapiQuery'] === true,
+    isGenerating: imitateToneEnabled['isGenerating'] === true,
     jobStatus: String(imitateToneEnabled['jobStatus'] || ''),
     jobError: imitateToneEnabled['jobError'] == null ? null : String(imitateToneEnabled['jobError'] || ''),
     generationStartTime: Number(imitateToneEnabled['generationStartTime'] || 0) || 0,
@@ -229,9 +229,9 @@ export function createAudioVoiceSegmentAfter(options2 = {}, value3 = null) {
     voiceModelId: '',
     voiceModelSelectionMode: 'global',
     taskModelId: '',
-    imitateToneEnabled: ![],
-    sourceAudioReady: ![],
-    convertedAudioReady: ![],
+    imitateToneEnabled: false,
+    sourceAudioReady: false,
+    convertedAudioReady: false,
     activeAudio: 'source',
     status: 'edited',
   };

@@ -17,9 +17,9 @@ function escapeHtml(item) {
 }
 function renderAttributes(options = {}) {
   return Object['entries'](options && typeof options === 'object' ? options : {})
-    ['filter'](([key, index]) => normalizeText(key) && index !== ![] && index != null)
+    ['filter'](([key, index]) => normalizeText(key) && index !== false && index != null)
     ['map'](([result, data]) =>
-      data === !![]
+      data === true
         ? ' ' + escapeHtml(result)
         : ' ' + escapeHtml(result) + '="' + escapeHtml(data) + '"',
     )
@@ -29,7 +29,7 @@ export function renderWorkspaceCardDeleteControl({
   className: className = '',
   ariaLabel: ariaLabel = '删除',
   actionAttributes: actionAttributes = {},
-  disabled: disabled = ![],
+  disabled: disabled = false,
 } = {}) {
   const text = normalizeText(className);
   return (
@@ -49,7 +49,7 @@ export function renderWorkspaceCardDeleteControl({
 export function renderWorkspaceCardImageActions({
   uploadAttributes: uploadAttributes,
   generateAttributes: generateAttributes,
-  disabled: disabled = ![],
+  disabled: disabled = false,
 } = {}) {
   return (
     '<span class="workspace-card-image-actions">' +
@@ -131,7 +131,7 @@ export function renderWorkspaceAssetTabIcon(value2) {
   );
 }
 export function renderWorkspaceAssetLoadingOverlay({
-  compact: compact = ![],
+  compact: compact = false,
   title: title = '图片生成中',
   description: description = '正在等待生成结果，完成后会自动显示。',
 } = {}) {
@@ -207,9 +207,9 @@ export function buildWorkspaceAssetHoverPreviewContent(
     appearanceId: appearanceId = '',
     selectedAssetId: selectedAssetId = '',
     selectedAppearanceId: selectedAppearanceId = '',
-    mediaOnly: mediaOnly = ![],
+    mediaOnly: mediaOnly = false,
     getAppearances: getAppearances = getWorkspaceAssetAppearances,
-    hasVoiceReference: hasVoiceReference = () => ![],
+    hasVoiceReference: hasVoiceReference = () => false,
   } = {},
 ) {
   if (!error) return null;
@@ -295,25 +295,25 @@ export function renderWorkspaceAssetCard({
   appearances: appearances = getWorkspaceAssetAppearances(asset),
   previewAppearance: previewAppearance = null,
   stats: stats = getWorkspaceAssetAppearanceStats(asset),
-  selected: selected = ![],
-  selectionMode: selectionMode = ![],
-  checked: checked = ![],
-  showSelectionIndicator: showSelectionIndicator = !![],
-  loading: loading = ![],
-  draggable: draggable = ![],
+  selected: selected = false,
+  selectionMode: selectionMode = false,
+  checked: checked = false,
+  showSelectionIndicator: showSelectionIndicator = true,
+  loading: loading = false,
+  draggable: draggable = false,
   promptPreview: promptPreview = '',
   statusText: statusText = '',
   cardStatusHtml: cardStatusHtml = '',
   cardClassName: cardClassName = '',
   cardAttributes: cardAttributes = '',
   shellClassName: shellClassName = '',
-  preserveShell: preserveShell = ![],
+  preserveShell: preserveShell = false,
   accessoryHtml: accessoryHtml = '',
   cardMetaHtml: cardMetaHtml = '',
   headingAccessoryHtml: headingAccessoryHtml = '',
   cardMediaHtml: cardMediaHtml = '',
   fallbackImageUrl: fallbackImageUrl = '',
-  workspaceAssetLibraryImage: workspaceAssetLibraryImage = ![],
+  workspaceAssetLibraryImage: workspaceAssetLibraryImage = false,
   nameAttributes: nameAttributes = '',
   roleHtml: roleHtml = '',
   deleteControlHtml: deleteControlHtml = '',
@@ -388,7 +388,7 @@ export function renderWorkspaceAssetCard({
         ? '<span class="story-asset-card-failure" role="status">生成失败</span>'
         : '') +
       '\n      ' +
-      (loading ? renderWorkspaceAssetLoadingOverlay({ compact: !![] }) : '') +
+      (loading ? renderWorkspaceAssetLoadingOverlay({ compact: true }) : '') +
       '\n    </span>\n    <span class="story-asset-card-copy">\n      <span class="story-asset-card-heading"><strong' +
       (nameAttributes ? ' ' + nameAttributes : '') +
       '>' +

@@ -27,7 +27,7 @@ export function buildImageFunctionMenuGroups(imageFunctionModelCatalog = buildIm
         description: label2['subtitle'] || provider['description'],
         icon: modelId['isTextIcon'] ? '' : modelId['icon'],
         iconHtml: label['modelIconStrategy'] === 'provider' ? label['iconHtml'] : modelId['iconHtml'],
-        badgeHtml: buildModelProviderProfileBadgesHtml(provider, { vip: provider['vip'] === !![] }),
+        badgeHtml: buildModelProviderProfileBadgesHtml(provider, { vip: provider['vip'] === true }),
       };
     }),
   }));
@@ -62,8 +62,8 @@ export function getImageFunctionRequestSettings(providerProfileId) {
 export function renderImageFunctionControls(args, item) {
   return renderAIGenImageModelSelectorMarkup({
     ...args,
-    showSchemaControls: !![],
-    showCaret: !![],
+    showSchemaControls: true,
+    showCaret: true,
     excludeFieldIds: EXCLUDED_FIELDS,
     modelMenuGroups: buildImageFunctionMenuGroups(item),
     className: 'image-function-controls canvas-function-controls',
@@ -80,7 +80,7 @@ export function bindImageFunctionControls(
     el2;
   const bindAIGenImageModelSelector2 = bindAIGenImageModelSelector(el, {
       ...selection,
-      showSchemaControls: !![],
+      showSchemaControls: true,
       excludeFieldIds: EXCLUDED_FIELDS,
       floatingMenuHost: floatingMenuHost,
       modelSubmenuPlacement: 'viewport-auto-up',

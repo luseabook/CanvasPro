@@ -1,9 +1,9 @@
 function isUsableWindow(candidateWindow) {
-  return !!candidateWindow && candidateWindow['isDestroyed']?.() !== !![];
+  return !!candidateWindow && candidateWindow['isDestroyed']?.() !== true;
 }
 function focusApp(app) {
   try {
-    app?.['focus']?.({ steal: !![] });
+    app?.['focus']?.({ steal: true });
   } catch {
     try {
       app?.['focus']?.();
@@ -14,7 +14,7 @@ export function createForegroundDialogPresenterCore({
   app,
   dialog,
   getMainWindow = () => null,
-  shouldUseOwnerWindow = () => ![],
+  shouldUseOwnerWindow = () => false,
   BrowserWindowClass,
   screenApi,
 } = {}) {
@@ -36,18 +36,18 @@ export function createForegroundDialogPresenterCore({
   function createOwnerWindow() {
     ((ownerWindow = new BrowserWindowClass({
       ...getOffscreenBounds(),
-      show: ![],
-      frame: ![],
-      transparent: !![],
+      show: false,
+      frame: false,
+      transparent: true,
       opacity: 0,
-      skipTaskbar: !![],
-      alwaysOnTop: !![],
-      focusable: !![],
-      resizable: ![],
-      movable: ![],
-      minimizable: ![],
-      maximizable: ![],
-      webPreferences: { contextIsolation: !![], nodeIntegration: ![], sandbox: !![] },
+      skipTaskbar: true,
+      alwaysOnTop: true,
+      focusable: true,
+      resizable: false,
+      movable: false,
+      minimizable: false,
+      maximizable: false,
+      webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
     })),
       ownerWindow['on']('closed', () => {
         ownerWindow = null;
@@ -65,7 +65,7 @@ export function createForegroundDialogPresenterCore({
     return createOwnerWindow();
   }
   function presentOffscreenOwner(candidateWindow) {
-    if (!isUsableWindow(candidateWindow)) return ![];
+    if (!isUsableWindow(candidateWindow)) return false;
     try {
       candidateWindow['setBounds'](getOffscreenBounds());
     } catch {}
@@ -73,7 +73,7 @@ export function createForegroundDialogPresenterCore({
       candidateWindow['setOpacity'](0);
     } catch {}
     try {
-      candidateWindow['setAlwaysOnTop'](!![], 'screen-saver');
+      candidateWindow['setAlwaysOnTop'](true, 'screen-saver');
     } catch {}
     try {
       candidateWindow['show']();
@@ -85,10 +85,10 @@ export function createForegroundDialogPresenterCore({
     try {
       candidateWindow['moveTop']();
     } catch {}
-    return !![];
+    return true;
   }
   function presentOwnerWindow(candidateWindow) {
-    if (!isUsableWindow(candidateWindow)) return ![];
+    if (!isUsableWindow(candidateWindow)) return false;
     try {
       if (candidateWindow['isMinimized']?.()) candidateWindow['restore']?.();
     } catch {}
@@ -102,7 +102,7 @@ export function createForegroundDialogPresenterCore({
     try {
       candidateWindow['moveTop']();
     } catch {}
-    return !![];
+    return true;
   }
   async function runDialogMethod(methodName, options) {
     const parentWindow = resolveDialogParentWindow(),

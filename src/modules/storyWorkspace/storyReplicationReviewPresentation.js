@@ -13,7 +13,7 @@ const escape = (value) =>
       (item) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' })[item],
     ),
   time = (key) => formatStoryVideoPlaybackTime(key),
-  seek = (index, result, data = ![]) =>
+  seek = (index, result, data = false) =>
     '<button type="button" data-replication-seek="' +
     Number(index) +
     '"' +
@@ -89,7 +89,7 @@ export function renderStoryReplicationReviewTab(
                 (output[value4] || [])['map'](
                   (response, value5) =>
                     '<div class="story-source-dialogue">\n        <div class="story-source-dialogue-heading">' +
-                    seek(response['startSec'] ?? output['startSec'], '回听', !![]) +
+                    seek(response['startSec'] ?? output['startSec'], '回听', true) +
                     '\n        ' +
                     (value4 === 'voiceover'
                       ? '<select aria-label="人声类型" data-replication-edit="voiceover" data-id="' +
@@ -179,7 +179,7 @@ export function renderStoryReplicationReview(value8) {
       ? ' poster="' + escape(value8['sourceVideo']['posterUrl']) + '"'
       : '') +
     '></video><div data-replication-seeking hidden role="status">' +
-    renderStoryGenerationSpinner({ button: !![] }) +
+    renderStoryGenerationSpinner({ button: true }) +
     '正在定位原片画面</div></div><p>本段人物</p><div class="story-source-cast" data-replication-cast>' +
     renderStoryReplicationCast(value8, value8['replication']['sourceAnalysis']['events'][0]?.['id']) +
     '</div></div>\n      <div class="panel-resize-handle story-source-splitter" data-review-splitter="right" role="separator" aria-orientation="vertical" aria-label="调整播放器与编辑区宽度" tabindex="0"></div>\n      <div class="story-source-details"><header class="story-source-detail-heading"><strong data-replication-segment-heading></strong><small data-replication-segment-time></small></header><nav class="story-source-tabs" role="tablist" aria-label="分析内容">' +
@@ -237,7 +237,7 @@ export function renderStoryReplicationCast(value11, value12) {
 export function syncStoryReplicationReviewStatus(
   el,
   value16,
-  { busy: busy = ![], message: message = '' } = {},
+  { busy: busy = false, message: message = '' } = {},
 ) {
   const value17 = value16['clips']?.['length'] > 0;
   ((el['querySelector']('[data-replication-reanalyze]')['disabled'] = busy),
@@ -246,6 +246,6 @@ export function syncStoryReplicationReviewStatus(
   const enabled2 =
     message || (value17 ? '可重新分析原片；已有提示词与生成结果保持不变，需要时再重新生成分镜。' : '');
   ((el['querySelector']('[data-replication-status]')['innerHTML'] =
-    '' + (busy ? renderStoryGenerationSpinner({ button: !![] }) : '') + escape(enabled2)),
+    '' + (busy ? renderStoryGenerationSpinner({ button: true }) : '') + escape(enabled2)),
     (el['querySelector']('.story-source-review-footer')['hidden'] = !enabled2 && !busy));
 }

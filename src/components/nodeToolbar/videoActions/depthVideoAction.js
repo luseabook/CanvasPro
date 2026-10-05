@@ -75,7 +75,7 @@ export function bindVideoDepthAction(data) {
     name = (target, source = {}) => getActionText(modelId2, target, source),
     outputText2 = (next, current) => getOutputText(modelId2, next, current),
     outputText3 = () => outputText2(name('status.cancelled'));
-  let enabled2 = ![];
+  let enabled2 = false;
   (options['bindButton'](button),
     bindRunningHubToolbarTaskButton({
       button: button,
@@ -136,7 +136,7 @@ export function bindVideoDepthAction(data) {
             window['showToast']?.(name('noProcessableVideo'), 'error');
             return;
           }
-          ((enabled2 = !![]),
+          ((enabled2 = true),
             data['closeToolbarMoreMenu']?.(),
             globalThis['window']?.['v2FocusOnNode']?.(sourceNodeId['id']));
           const generationParams = await openDepthPanel({
@@ -205,8 +205,8 @@ export function bindVideoDepthAction(data) {
                     generationParams['generationParams']?.['rhInstanceType'] || modelId2['instanceType'],
                   prompt: '',
                 },
-                cancellable: !![],
-                resumable: !![],
+                cancellable: true,
+                resumable: true,
                 pauseOnAbort: 'afterTaskId',
                 onTaskChange: ({ sourceNodeId: sourceNodeId2, targetNodeId: targetNodeId }) =>
                   notifyRunningHubToolbarTasksChanged({ sourceNodeId: sourceNodeId2, outId: targetNodeId }),
@@ -225,7 +225,7 @@ export function bindVideoDepthAction(data) {
                     ...startPatch,
                     provider: modelId2['provider'],
                     model: modelId2['modelId'],
-                    rhTaskUseOpenapiQuery: !![],
+                    rhTaskUseOpenapiQuery: true,
                     ...protocolPatch,
                     outputText: outputText2(name('status.processing')),
                   }),
@@ -246,7 +246,7 @@ export function bindVideoDepthAction(data) {
                   }),
                     store['setSelectedNodes']([outNodeId['targetNodeId']]),
                     window['showToast']?.(name('uploading'), 'info'));
-                  let enabled3 = ![];
+                  let enabled3 = false;
                   return generateVideo(handle, {
                     signal: outNodeId['signal'],
                     runningHubWorkflowQueueLease: outNodeId['runningHubWorkflowQueueLease'],
@@ -255,7 +255,7 @@ export function bindVideoDepthAction(data) {
                       const state = String(taskId2 || '')['trim']();
                       (state && (options['setTaskId'](state), outNodeId['onTaskId']?.(state)),
                         !enabled3 &&
-                          ((enabled3 = !![]), window['showToast']?.(name('processingToast'), 'info')));
+                          ((enabled3 = true), window['showToast']?.(name('processingToast'), 'info')));
                     },
                   });
                 },
@@ -302,7 +302,7 @@ export function bindVideoDepthAction(data) {
               error6['includes']('aborted');
           !enabled4 && window['showToast']?.(name('failedWithError', { error: error6 }), 'error');
         } finally {
-          ((enabled2 = ![]), options['reset'](button));
+          ((enabled2 = false), options['reset'](button));
         }
       })();
     }));

@@ -17,7 +17,7 @@ export function previewNodeGeometry(
   for (const [index, args] of value) {
     const box = snapshot['nodes'][index];
     if (!box) {
-      (cache['delete'](index), bridge?.['syncNodeDragPreview']?.(index, { active: ![], remove: !![] }));
+      (cache['delete'](index), bridge?.['syncNodeDragPreview']?.(index, { active: false, remove: true }));
       continue;
     }
     const dx = { ...box, ...args },
@@ -48,7 +48,7 @@ export function previewNodeGeometry(
     bridge?.['syncNodeDragPreview']?.(
       index,
       options
-        ? { remove: !![] }
+        ? { remove: true }
         : {
             dx: dx['x'] - box['x'],
             dy: dx['y'] - box['y'],

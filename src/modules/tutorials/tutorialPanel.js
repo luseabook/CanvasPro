@@ -23,7 +23,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
     index = tutorialId,
     enabled3 = null,
     result = null,
-    enabled4 = ![],
+    enabled4 = false,
     handler = () => {};
   const el = document['createElement']('div');
   el['className'] = 'tutorial-backdrop';
@@ -98,10 +98,10 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
         if (response['type'] !== 'external') {
           const el8 = run(response['type'], 'tutorial-player');
           (response['type'] === 'video'
-            ? ((el8['controls'] = !![]), (el8['playsInline'] = !![]), (el8['preload'] = 'metadata'))
+            ? ((el8['controls'] = true), (el8['playsInline'] = true), (el8['preload'] = 'metadata'))
             : (el8['setAttribute']('aria-label', enabled3['title']),
               (el8['allow'] = 'fullscreen; picture-in-picture'),
-              (el8['allowFullscreen'] = !![]),
+              (el8['allowFullscreen'] = true),
               (el8['referrerPolicy'] = 'no-referrer')),
             (el8['src'] = response['url']),
             el2['append'](el8));
@@ -145,7 +145,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
         ((el9['alt'] = ''),
           (el9['loading'] = 'lazy'),
           (el9['src'] = value5),
-          el9['addEventListener']('error', () => el9['remove'](), { once: !![] }),
+          el9['addEventListener']('error', () => el9['remove'](), { once: true }),
           value4['append'](el9));
       }
       value4['append'](run('span', 'tutorial-play', tutorialPlayback?.['type'] === 'external' ? '↗' : '▶'));
@@ -160,7 +160,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
   async function run5() {
     result?.['abort']();
     const signal = new AbortController();
-    ((result = signal), (el4['disabled'] = !![]), (el3['textContent'] = '正在获取最新内容…'));
+    ((result = signal), (el4['disabled'] = true), (el3['textContent'] = '正在获取最新内容…'));
     try {
       const fetchTutorialContent2 = await fetchTutorialContent({ signal: signal['signal'] });
       if (enabled4 || result !== signal) return;
@@ -177,12 +177,12 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
       el3['textContent'] =
         item === 'bundled' ? '暂时无法连接，正在显示内置教程' : '暂时无法连接，正在显示上次获取的内容';
     } finally {
-      if (!enabled4 && result === signal) el4['disabled'] = ![];
+      if (!enabled4 && result === signal) el4['disabled'] = false;
     }
   }
   function onClose() {
     if (enabled4) return;
-    ((enabled4 = !![]),
+    ((enabled4 = true),
       result?.['abort'](),
       tutorialReleaseNotes['close'](),
       tutorialTabs['close'](),
@@ -199,7 +199,7 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
       else void run5();
     }
     el10?.['dataset']['tab'] &&
-      ((index = ''), (enabled2 = !![]), (key = el10['dataset']['tab']), (enabled3 = null), run4());
+      ((index = ''), (enabled2 = true), (key = el10['dataset']['tab']), (enabled3 = null), run4());
   }),
     root['querySelector']('.tutorial-tabs')['addEventListener']('keydown', (event2) => {
       if (!['ArrowLeft', 'ArrowRight', 'Home', 'End']['includes'](event2['key'])) return;

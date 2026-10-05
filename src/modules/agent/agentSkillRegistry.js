@@ -38,7 +38,7 @@ export function normalizeRuntimeAgentSkill(defaultParams = {}, result = 'built-i
         ? { ...defaultParams['defaultParams'] }
         : {},
     commands: normalizeStringArray(defaultParams['commands']),
-    manualOnly: defaultParams['manualOnly'] === !![],
+    manualOnly: defaultParams['manualOnly'] === true,
     managedBy: normalizeText(defaultParams['managedBy'], 80),
     instructions: normalizeText(defaultParams['instructions'], 24 * 1024),
     source: normalizeText(defaultParams['source'], 40) || result,
@@ -46,18 +46,18 @@ export function normalizeRuntimeAgentSkill(defaultParams = {}, result = 'built-i
     resourceNames: normalizeStringArray(defaultParams['resourceNames'], 24),
     resources: normalizeResources(defaultParams['resources']),
     execution: {
-      scriptsAvailable: defaultParams['execution']?.['scriptsAvailable'] === !![],
-      scriptsEnabled: ![],
+      scriptsAvailable: defaultParams['execution']?.['scriptsAvailable'] === true,
+      scriptsEnabled: false,
     },
   };
 }
 function escapeSkillReference(data = '') {
   return String(data || '')['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-function containsSkillReference(options, target, { prefixed: prefixed = ![] } = {}) {
+function containsSkillReference(options, target, { prefixed: prefixed = false } = {}) {
   const text = normalizeText(options),
     text2 = normalizeText(target);
-  if (!text || !text2) return ![];
+  if (!text || !text2) return false;
   if (/[^\x00-\x7f]/u['test'](text2) && !prefixed)
     return text['toLowerCase']()['includes'](text2['toLowerCase']());
   const escapeSkillReference2 = escapeSkillReference(text2),
@@ -70,7 +70,7 @@ function isExplicitSkillRequest(next, current = {}) {
   const text3 = normalizeText(current['id']),
     text4 = normalizeText(current['title']);
   return Boolean(
-    (text3 && containsSkillReference(next, text3, { prefixed: !![] })) ||
+    (text3 && containsSkillReference(next, text3, { prefixed: true })) ||
     (text4 && containsSkillReference(next, text4)),
   );
 }
@@ -129,7 +129,7 @@ function summarizeSkill(id = {}) {
     recommendedModelKind: id['recommendedModelKind'],
     manualOnly: id['manualOnly'],
     editable: id['source'] === 'installed' && id['managedBy'] === 'shuo-canvas',
-    enabled: id['enabled'] !== ![],
+    enabled: id['enabled'] !== false,
   };
 }
 export function createAgentSkillRegistryCore({
@@ -173,7 +173,7 @@ export function createAgentSkillRegistryCore({
         }
         if (map3['has'](packageId2['skill']['id'])) {
           list8['push']({
-            ok: ![],
+            ok: false,
             packageId: packageId2['skill']['packageId'],
             errorCode: 'DUPLICATE_SKILL_ID',
             message: 'Duplicate skill id: ' + packageId2['skill']['id'],
@@ -188,7 +188,7 @@ export function createAgentSkillRegistryCore({
         (diagnostics = list8),
         (rootPath = normalizeText(value6['rootPath'], 500)),
         {
-          available: !![],
+          available: true,
           loaded: loaded['length'],
           rootPath: rootPath,
           diagnostics: diagnostics['map']((args4) => ({ ...args4 })),
@@ -204,18 +204,18 @@ export function createAgentSkillRegistryCore({
       for (const value8 of normalizeStringArray(list9, 100)) map2['add'](value8);
       return [...map2];
     },
-    setSkillEnabled(value9, value10 = !![]) {
+    setSkillEnabled(value9, value10 = true) {
       const text7 = normalizeText(value9, 64)['toLowerCase']();
-      if (!text7 || !listSkills()['some']((value11) => value11['id'] === text7)) return ![];
-      if (value10 === ![]) map2['add'](text7);
+      if (!text7 || !listSkills()['some']((value11) => value11['id'] === text7)) return false;
+      if (value10 === false) map2['add'](text7);
       else map2['delete'](text7);
-      return !![];
+      return true;
     },
     select({ maxSkills: maxSkills = 2, ...args5 } = {}) {
       const value12 = Number(maxSkills),
         value13 = Math['max'](0, Number['isFinite'](value12) ? Math['trunc'](value12) : 2);
       return listSkills()
-        ['filter']((value14) => value14['enabled'] !== ![])
+        ['filter']((value14) => value14['enabled'] !== false)
         ['map']((skill, index2) => ({
           skill: skill,
           index: index2,

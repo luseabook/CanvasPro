@@ -37,7 +37,7 @@ export function buildSourceVideoRecoveryFailurePatch(
       error: message,
       startedAt: startedAt,
       duration: duration,
-      clearMediaFields: ![],
+      clearMediaFields: false,
     }),
     outputText: outputText,
   };
@@ -72,7 +72,7 @@ function createSourceVideoTaskNameRule(enabled2, matchModel) {
     key2 = String(matchModel['key'] || source || 'sourceVideoTask')['trim']();
   return {
     key: key2,
-    matchModel: matchModel['matchModel'] !== ![],
+    matchModel: matchModel['matchModel'] !== false,
     models: new Set(source ? [source] : []),
     textNeedles: asStringArray(matchModel['textNeedles']),
     managedNameRe: createManagedNameRegex(matchModel['managedNamePattern'], enabled2, key2),
@@ -97,9 +97,9 @@ function normalizeRunningHubVideoStatus(entry) {
   return record;
 }
 export function isRunningHubVideoTask(enabled3) {
-  if (!enabled3 || typeof enabled3 !== 'object') return ![];
+  if (!enabled3 || typeof enabled3 !== 'object') return false;
   const providerHint = normalizeProviderId(enabled3['provider']);
-  if (providerHint === 'runninghubwf' || providerHint === 'runninghub') return !![];
+  if (providerHint === 'runninghubwf' || providerHint === 'runninghub') return true;
   const modelExecution = resolveModelExecution(enabled3['model'], { providerHint: providerHint }),
     providerId = normalizeProviderId(modelExecution?.['modelManifest']?.['provider']),
     providerId2 = normalizeProviderId(modelExecution?.['executionManifest']?.['provider']);
@@ -120,8 +120,8 @@ function resolveRunningHubVideoTaskNameRule(error2) {
   if (input) return input;
   return (
     RH_VIDEO_TASK_NAME_RULES['find']((value3) => {
-      if (value3['matchModel'] !== ![] && value3['models']?.['has'](handle)) return !![];
-      return ![];
+      if (value3['matchModel'] !== false && value3['models']?.['has'](handle)) return true;
+      return false;
     }) || null
   );
 }
@@ -143,7 +143,7 @@ export function buildRunningHubVideoTerminalStatePatch(value10, value11, value12
   if (!isRunningHubVideoTask(value10)) return null;
   const rhTaskStatus = normalizeRunningHubVideoStatus(value11 || value10?.['rhTaskStatus']);
   if (!['success', 'failed', 'cancelled']['includes'](rhTaskStatus)) return null;
-  const error4 = { isGenerating: ![], rhTaskStatus: rhTaskStatus, rhTaskRecovering: ![] };
+  const error4 = { isGenerating: false, rhTaskStatus: rhTaskStatus, rhTaskRecovering: false };
   if (rhTaskStatus === 'success') error4['jobStatus'] = 'success';
   if (rhTaskStatus === 'failed') error4['jobStatus'] = 'error';
   if (rhTaskStatus === 'cancelled') error4['jobStatus'] = null;

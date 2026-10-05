@@ -43,7 +43,7 @@ function showRunningHubGuideDialog({
   footerTitle: footerTitle = '说明',
   footerText: footerText,
   settingsButtonLabel: settingsButtonLabel = '打开 API Key 设置',
-  settingsButtonPrimary: settingsButtonPrimary = ![],
+  settingsButtonPrimary: settingsButtonPrimary = false,
 } = {}) {
   closeRunningHubMediaUploadGuide();
   const el4 = createEl('div', 'update-banner-backdrop open');
@@ -145,16 +145,16 @@ export function isRunningHubModelApiKeyMissingError(error2) {
       ['trim']()
       ['toLowerCase'](),
     target = String(error2?.['message'] || error2 || '')['trim']();
-  if (options && options !== 'runninghub') return ![];
-  if (!/api\s*key/i['test'](target)) return ![];
-  if (!/(未配置|not configured|is not configured)/i['test'](target)) return ![];
+  if (options && options !== 'runninghub') return false;
+  if (!/api\s*key/i['test'](target)) return false;
+  if (!/(未配置|not configured|is not configured)/i['test'](target)) return false;
   return options === 'runninghub' || /runninghub/i['test'](target);
 }
 export function showRunningHubModelApiKeyMissingToastForError(source) {
-  if (!isRunningHubModelApiKeyMissingError(source)) return ![];
-  return (showRunningHubModelApiKeyMissingToast(), !![]);
+  if (!isRunningHubModelApiKeyMissingError(source)) return false;
+  return (showRunningHubModelApiKeyMissingToast(), true);
 }
 export function showRunningHubMediaUploadGuideForError(next) {
-  if (!isRunningHubMediaUploadApiKeyMissingError(next)) return ![];
-  return (showRunningHubMediaUploadGuide(), !![]);
+  if (!isRunningHubMediaUploadApiKeyMissingError(next)) return false;
+  return (showRunningHubMediaUploadGuide(), true);
 }

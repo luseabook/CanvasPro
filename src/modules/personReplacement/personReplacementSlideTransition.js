@@ -40,17 +40,17 @@ export function startPersonReplacementSlideTransition({
   direction: direction = 'next',
 } = {}) {
   (cancelTaggedSlideAnimations(incomingSlide), cancelTaggedSlideAnimations(outgoingSlide));
-  const options = windowObject?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![],
+  const options = windowObject?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === true,
     duration2 = options ? 0 : PERSON_REPLACEMENT_SLIDE_DURATION_MS,
     incomingAnimation = startSlideAnimation(incomingSlide, {
       direction: direction,
       duration: duration2,
-      outgoing: ![],
+      outgoing: false,
     }),
     outgoingAnimation = startSlideAnimation(outgoingSlide, {
       direction: direction,
       duration: duration2,
-      outgoing: !![],
+      outgoing: true,
     });
   return {
     duration: duration2,

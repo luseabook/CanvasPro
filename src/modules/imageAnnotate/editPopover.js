@@ -5,7 +5,7 @@ export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose:
     viewportWidth = el['defaultView'];
   let beginModalInteraction2 = null;
   ((submenu['tabIndex'] = -1),
-    (submenu['hidden'] = !![]),
+    (submenu['hidden'] = true),
     el['body']['append'](submenu),
     returnFocus['setAttribute']('aria-expanded', 'false'),
     returnFocus['setAttribute']('aria-haspopup', 'dialog'));
@@ -23,12 +23,12 @@ export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose:
         viewportHeight: viewportWidth['innerHeight'],
       });
     },
-    close = (enabled = ![], value = null) => {
+    close = (enabled = false, value = null) => {
       if (submenu['hidden']) return;
-      ((submenu['hidden'] = !![]),
+      ((submenu['hidden'] = true),
         returnFocus['setAttribute']('aria-expanded', 'false'),
         returnFocus['classList']['remove']('active'),
-        beginModalInteraction2?.({ restoreFocus: ![] }),
+        beginModalInteraction2?.({ restoreFocus: false }),
         (beginModalInteraction2 = null),
         onClose?.(value));
       if (enabled) returnFocus['focus']();
@@ -40,27 +40,27 @@ export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose:
         return;
       }
       (onOpen?.(),
-        (submenu['hidden'] = ![]),
+        (submenu['hidden'] = false),
         returnFocus['setAttribute']('aria-expanded', 'true'),
         returnFocus['classList']['add']('active'),
         position(),
         (beginModalInteraction2 = beginModalInteraction({
           root: submenu,
           returnFocus: returnFocus,
-          onClose: () => close(!![]),
+          onClose: () => close(true),
         })));
     },
     key = (event2) => {
       if (!returnFocus['contains'](event2['target']) && !submenu['contains'](event2['target']))
-        close(![], event2);
+        close(false, event2);
     },
     index = (event3) => {
       if (!submenu['contains'](event3['target'])) position();
     };
   return (
     returnFocus['addEventListener']('click', item),
-    el['addEventListener']('pointerdown', key, !![]),
-    el['addEventListener']('scroll', index, !![]),
+    el['addEventListener']('pointerdown', key, true),
+    el['addEventListener']('scroll', index, true),
     viewportWidth['addEventListener']('resize', position),
     {
       panel: submenu,
@@ -69,8 +69,8 @@ export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose:
       destroy() {
         (close(),
           returnFocus['removeEventListener']('click', item),
-          el['removeEventListener']('pointerdown', key, !![]),
-          el['removeEventListener']('scroll', index, !![]),
+          el['removeEventListener']('pointerdown', key, true),
+          el['removeEventListener']('scroll', index, true),
           viewportWidth['removeEventListener']('resize', position),
           submenu['remove']());
       },

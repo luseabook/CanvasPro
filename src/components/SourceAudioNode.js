@@ -66,10 +66,10 @@ export class SourceAudioNode {
       (this['_audioLoadInFlightPreload'] = ''),
       (this['_audioPlayAttemptToken'] = 0),
       (this['_audioPlayDeadlineTimer'] = null),
-      (this['_audioPlayPending'] = ![]),
+      (this['_audioPlayPending'] = false),
       (this['_playbackResumeSource'] = ''),
       (this['_playbackResumeTime'] = 0),
-      (this['_isUploading'] = ![]),
+      (this['_isUploading'] = false),
       (this['_unsubscribeLocale'] = null),
       (this['_toolbarActionCleanups'] = []));
   }
@@ -156,8 +156,8 @@ export class SourceAudioNode {
               this['_progressController']?.['sync']({
                 currentTime: currentTime2,
                 duration: duration,
-                force: !![],
-                showLine: !![],
+                force: true,
+                showLine: true,
               }));
           }
         }
@@ -170,9 +170,9 @@ export class SourceAudioNode {
         if (!error) return;
         (startLoading(this['_card'], { variant: 'static' }), this['_progressController']?.['reset']());
         const list3 = Array['from'](this['_uploadBtn']['childNodes'])['map']((options) =>
-          options['cloneNode'](!![]),
+          options['cloneNode'](true),
         );
-        ((this['_isUploading'] = !![]),
+        ((this['_isUploading'] = true),
           (this['_uploadBtn']['textContent'] = sourceAudioText('upload.uploading')),
           (this['_uploadBtn']['style']['pointerEvents'] = 'none'));
         try {
@@ -204,13 +204,13 @@ export class SourceAudioNode {
           (console['error']('音频上传失败:', current),
             window['showToast'](sourceAudioText('upload.failedRetry')),
             stopLoading(this['_card']),
-            this['_currentSrc'] && this['_progressController']?.['sync']({ force: !![], showLine: !![] }));
+            this['_currentSrc'] && this['_progressController']?.['sync']({ force: true, showLine: true }));
         } finally {
           (this['_uploadBtn']['replaceChildren'](
-            ...list3['map']((entry) => entry['cloneNode'](!![])),
+            ...list3['map']((entry) => entry['cloneNode'](true)),
           ),
             (this['_uploadBtn']['style']['pointerEvents'] = 'auto'),
-            (this['_isUploading'] = ![]),
+            (this['_isUploading'] = false),
             this['_syncLocaleTexts'](),
             (this['_input']['value'] = ''));
         }
@@ -234,7 +234,7 @@ export class SourceAudioNode {
         bindRunningHubToolbarTaskButton({
           button: this['_separateBtn'],
           getTask: () => getRunningAudioSeparationTaskForNode(this['id']),
-          cancelTask: () => cancelAudioSeparationTaskForNode(this['id'], { notify: !![] }),
+          cancelTask: () => cancelAudioSeparationTaskForNode(this['id'], { notify: true }),
           cancelTooltip: sourceAudioText('toolbar.cancelAudioSeparation'),
           eventTypes: ['pointerdown', 'click'],
         }),
@@ -243,7 +243,7 @@ export class SourceAudioNode {
         if (getRunningAudioSeparationTaskForNode(this['id'])) {
           (event10['preventDefault'](),
             event10['stopPropagation'](),
-            void cancelAudioSeparationTaskForNode(this['id'], { notify: !![] }));
+            void cancelAudioSeparationTaskForNode(this['id'], { notify: true }));
           return;
         }
         (event10['stopPropagation'](), void runAudioSeparationFromNode(this['id']));
@@ -258,18 +258,18 @@ export class SourceAudioNode {
         }),
         bindAudioVoiceStudioAction({ button: this['_voiceStudioBtn'], getNodeId: () => this['id'] }),
       ),
-      this['_audio']['addEventListener']('play', () => this['_setIcon'](![])),
+      this['_audio']['addEventListener']('play', () => this['_setIcon'](false)),
       this['_audio']['addEventListener']('pause', () => {
-        (this['_setPlaybackBuffering'](![]), this['_setIcon'](!![]));
+        (this['_setPlaybackBuffering'](false), this['_setIcon'](true));
       }),
       this['_audio']['addEventListener']('waiting', () => {
-        if (this['_audio']?.['paused'] === ![]) this['_setPlaybackBuffering'](!![]);
+        if (this['_audio']?.['paused'] === false) this['_setPlaybackBuffering'](true);
       }),
       this['_audio']['addEventListener']('playing', () => {
-        this['_setPlaybackBuffering'](![]);
+        this['_setPlaybackBuffering'](false);
       }),
       this['_audio']['addEventListener']('ended', () => {
-        this['_setPlaybackBuffering'](![]);
+        this['_setPlaybackBuffering'](false);
       }),
       this['_unregisterAudioPlaybackClient']?.(),
       (this['_unregisterAudioPlaybackClient'] = registerAudioPlaybackClient(this['id'], {
@@ -310,7 +310,7 @@ export class SourceAudioNode {
     const config = {};
     if (enabled4['generationStartTime']) config['generationStartTime'] = null;
     if (enabled4['generationDuration'] != null) config['generationDuration'] = null;
-    if (enabled4['isGenerating'] === !![]) config['isGenerating'] = ![];
+    if (enabled4['isGenerating'] === true) config['isGenerating'] = false;
     Object['keys'](config)['length'] > 0 && appStore['updateNodeData'](this['id'], config);
   }
   ['_seekTo'](scope) {
@@ -322,21 +322,21 @@ export class SourceAudioNode {
     input = Math['max'](0, Math['min'](1, input));
     const currentTime3 = input * duration2;
     if (!isFinite(currentTime3)) return;
-    ((this['_isSeeking'] = !![]),
+    ((this['_isSeeking'] = true),
       (this['_audio']['currentTime'] = currentTime3),
       this['_progressController']?.['sync']({
         currentTime: currentTime3,
         duration: duration2,
-        force: !![],
-        showLine: !![],
+        force: true,
+        showLine: true,
       }),
       this['_audio']['addEventListener'](
         'seeked',
         () => {
-          ((this['_isSeeking'] = ![]),
-            this['_progressController']?.['sync']({ force: !![], showLine: !![] }));
+          ((this['_isSeeking'] = false),
+            this['_progressController']?.['sync']({ force: true, showLine: true }));
         },
-        { once: !![] },
+        { once: true },
       ));
   }
   ['_getAudioElementSource']() {
@@ -346,7 +346,7 @@ export class SourceAudioNode {
     return getMediaElementCurrentSource(this['_audio']);
   }
   ['_isAudioElementReady']() {
-    if (!this['_audio'] || !this['_getAudioElementCurrentSource']()) return ![];
+    if (!this['_audio'] || !this['_getAudioElementCurrentSource']()) return false;
     const count2 = Number(this['_audio']['readyState'] || 0);
     return count2 >= 2;
   }
@@ -364,15 +364,15 @@ export class SourceAudioNode {
     }
     return audioDurationSec;
   }
-  ['_syncKnownAudioDurationUi']({ currentTime: currentTime = 0, showLine: showLine = ![] } = {}) {
+  ['_syncKnownAudioDurationUi']({ currentTime: currentTime = 0, showLine: showLine = false } = {}) {
     const duration3 = this['_readAudioDurationSec']();
-    if (!(duration3 > 0)) return ![];
+    if (!(duration3 > 0)) return false;
     const value2 = Number(currentTime),
       currentTime4 = Number['isFinite'](value2) ? Math['max'](0, Math['min'](value2, duration3)) : 0,
       enabled6 = this['_progressController']?.['sync']({
         currentTime: currentTime4,
         duration: duration3,
-        force: !![],
+        force: true,
         showLine: showLine,
       });
     if (!showLine) this['_progressController']?.['hideLine']?.();
@@ -380,13 +380,13 @@ export class SourceAudioNode {
       !enabled6 &&
         this['_timeEl'] &&
         (this['_timeEl']['textContent'] = this['_fmt'](currentTime4) + ' / ' + this['_fmt'](duration3)),
-      !![]
+      true
     );
   }
   ['_applyResolvedAudioDuration'](value3, value4 = this['_currentSrc']) {
-    if (value4 && this['_currentSrc'] !== value4) return ![];
+    if (value4 && this['_currentSrc'] !== value4) return false;
     const audioDuration = normalizeAudioDurationSec(value3);
-    if (!(audioDuration > 0)) return ![];
+    if (!(audioDuration > 0)) return false;
     const value5 = appStore['getStateRaw']()['nodes']?.[this['id']],
       audioDurationSec3 = pickAudioDurationSec(value5?.['audioDuration'], this['_data']?.['audioDuration']);
     if (audioDurationSec3 > 0) {
@@ -396,7 +396,7 @@ export class SourceAudioNode {
           showLine: Number(this['_audio']?.['currentTime'] || 0) > 0,
         });
       const value6 = Math['max'](1, audioDurationSec3 * 0.25);
-      if (Math['abs'](audioDurationSec3 - audioDuration) > value6) return ![];
+      if (Math['abs'](audioDurationSec3 - audioDuration) > value6) return false;
     }
     return (
       value5
@@ -411,7 +411,7 @@ export class SourceAudioNode {
             currentTime: this['_audio']?.['currentTime'] || 0,
             showLine: Number(this['_audio']?.['currentTime'] || 0) > 0,
           })),
-      !![]
+      true
     );
   }
   ['_rewindEndedAudioIfNeeded']() {
@@ -420,22 +420,22 @@ export class SourceAudioNode {
     if (!(duration4 > 0)) return;
     const value7 = Number(this['_audio']['currentTime'] || 0),
       enabled7 = Number['isFinite'](value7) && value7 >= duration4 - 0.05;
-    if (this['_audio']['ended'] !== !![] && !enabled7) return;
+    if (this['_audio']['ended'] !== true && !enabled7) return;
     try {
       this['_audio']['currentTime'] = 0;
     } catch {}
     this['_progressController']?.['sync']({
       currentTime: 0,
       duration: duration4,
-      force: !![],
-      showLine: !![],
+      force: true,
+      showLine: true,
     });
   }
   ['_setPlaybackBuffering'](value8) {
     const el4 = this['_playBtn'];
     if (!el4) return;
-    el4['classList']?.['toggle']?.('is-buffering', value8 === !![]);
-    if (value8 === !![]) el4['setAttribute']?.('aria-busy', 'true');
+    el4['classList']?.['toggle']?.('is-buffering', value8 === true);
+    if (value8 === true) el4['setAttribute']?.('aria-busy', 'true');
     else el4['removeAttribute']?.('aria-busy');
   }
   ['_clearPlaybackResume']() {
@@ -448,7 +448,7 @@ export class SourceAudioNode {
       this['_currentSrc'] !== value9 ||
       this['_playbackResumeSource'] !== value9
     )
-      return ![];
+      return false;
     const value10 = Number(this['_playbackResumeTime'] || 0);
     let currentTime5 = Number['isFinite'](value10) ? Math['max'](0, value10) : 0;
     const duration5 = this['_readAudioDurationSec']();
@@ -459,7 +459,7 @@ export class SourceAudioNode {
     try {
       this['_audio']['currentTime'] = currentTime5;
     } catch {
-      return ![];
+      return false;
     }
     return (
       this['_clearPlaybackResume'](),
@@ -467,14 +467,14 @@ export class SourceAudioNode {
         this['_progressController']?.['sync']({
           currentTime: currentTime5,
           duration: duration5,
-          force: !![],
+          force: true,
           showLine: currentTime5 > 0,
         }),
-      !![]
+      true
     );
   }
   ['_clearAudioElementSource']() {
-    (this['_setPlaybackBuffering'](![]), (this['_audioPlayPending'] = ![]));
+    (this['_setPlaybackBuffering'](false), (this['_audioPlayPending'] = false));
     if (!this['_audio']) return;
     this['_audioPlayAttemptToken'] = Number(this['_audioPlayAttemptToken'] || 0) + 1;
     this['_audioPlayDeadlineTimer'] &&
@@ -501,13 +501,13 @@ export class SourceAudioNode {
     ((this['_audio']['onloadedmetadata'] = value12), (this['_audio']['ondurationchange'] = value12));
     const value13 = () => {
       this['_currentSrc'] === value11 &&
-        (this['_rememberAudioDuration'](value11), this['_setPlaybackBuffering'](![]));
+        (this['_rememberAudioDuration'](value11), this['_setPlaybackBuffering'](false));
     };
     ((this['_audio']['onloadeddata'] = value13),
       (this['_audio']['oncanplay'] = value13),
       (this['_audio']['onplaying'] = value13),
       (this['_audio']['onerror'] = () => {
-        if (this['_currentSrc'] === value11) this['_setPlaybackBuffering'](![]);
+        if (this['_currentSrc'] === value11) this['_setPlaybackBuffering'](false);
       }));
   }
   ['_prepareAudio'](enabled8) {
@@ -537,19 +537,19 @@ export class SourceAudioNode {
     this['_getAudioElementSource']() && !enabled9 && this['_clearAudioElementSource']();
     if (!enabled9) this['_audio']['preload'] = 'none';
     (this['_bindAudioLoadHandlers'](enabled8),
-      this['_syncKnownAudioDurationUi']({ currentTime: 0, showLine: ![] }),
+      this['_syncKnownAudioDurationUi']({ currentTime: 0, showLine: false }),
       stopLoading(this['_card']),
       void this['_ensureWaveform'](enabled8));
     if (this['_hint']) this['_hint']['style']['display'] = 'block';
   }
   ['prepareRendererVisibleAudioSurface']() {
-    return ![];
+    return false;
   }
   async ['hydrateDeferredMedia']() {
-    return ![];
+    return false;
   }
-  async ['_loadAudio'](enabled10, { showLoading: showLoading = !![], preload: preload = 'auto' } = {}) {
-    if (!enabled10) return (this['_prepareAudio'](''), ![]);
+  async ['_loadAudio'](enabled10, { showLoading: showLoading = true, preload: preload = 'auto' } = {}) {
+    if (!enabled10) return (this['_prepareAudio'](''), false);
     const preload2 = preload === 'metadata' ? 'metadata' : 'auto',
       value18 = this['_currentSrc'],
       value19 = value18 !== enabled10;
@@ -572,13 +572,13 @@ export class SourceAudioNode {
           preload2 === 'auto' &&
             this['_audio']['preload'] !== 'auto' &&
             (this['_audio']['preload'] = 'auto'),
-          this['_setPlaybackBuffering'](![]),
-          !![]
+          this['_setPlaybackBuffering'](false),
+          true
         );
-      showLoading && (enabled12 || value21) && this['_setPlaybackBuffering'](!![]);
+      showLoading && (enabled12 || value21) && this['_setPlaybackBuffering'](true);
       if (this['_audioLoadToken'] !== value20 || this['_currentSrc'] !== enabled10) {
-        if (showLoading) this['_setPlaybackBuffering'](![]);
-        return ![];
+        if (showLoading) this['_setPlaybackBuffering'](false);
+        return false;
       }
       if (!enabled12) {
         const value22 = preload2 === 'auto' || this['_audio']['preload'] === 'auto' ? 'auto' : 'metadata';
@@ -590,15 +590,15 @@ export class SourceAudioNode {
       } else
         await attachMediaElementPlaybackSource(this['_audio'], enabled10, {
           preload: preload2,
-          warmRanges: ![],
+          warmRanges: false,
           shouldAssign: () =>
             this['_audioLoadToken'] === value20 &&
             this['_currentSrc'] === enabled10 &&
-            this['_audio']?.['isConnected'] !== ![],
+            this['_audio']?.['isConnected'] !== false,
         });
-      if (this['_isAudioElementReady']()) this['_setPlaybackBuffering'](![]);
+      if (this['_isAudioElementReady']()) this['_setPlaybackBuffering'](false);
       if (this['_hint']) this['_hint']['style']['display'] = 'block';
-      return !![];
+      return true;
     } finally {
       this['_audioLoadToken'] === value20 &&
         ((this['_audioLoadInFlightSource'] = ''), (this['_audioLoadInFlightPreload'] = ''));
@@ -614,7 +614,7 @@ export class SourceAudioNode {
   }
   async ['_ensureWaveform'](value24) {
     const enabled13 = String(value24 || '')['trim']();
-    if (!enabled13 || this['_rendererWaveformVisible'] !== !![]) return;
+    if (!enabled13 || this['_rendererWaveformVisible'] !== true) return;
     const value25 = JSON['stringify']([enabled13, this['_data']?.['waveformLocalPath'] || '']);
     if (value25 === this['_waveformLoadingKey']) return;
     this['_cancelWaveformRequest']();
@@ -725,33 +725,33 @@ export class SourceAudioNode {
         (this['_label']['innerText'] = error2['name']));
   }
   async ['_playAudio']() {
-    if (!this['_audio'] || !this['_currentSrc'] || this['_audioPlayPending'] === !![]) return;
-    ((this['_audioPlayPending'] = !![]), beginAudioPlayback(this['id']));
+    if (!this['_audio'] || !this['_currentSrc'] || this['_audioPlayPending'] === true) return;
+    ((this['_audioPlayPending'] = true), beginAudioPlayback(this['id']));
     const value33 = this['_currentSrc'],
       value34 = Number(this['_audioPlayAttemptToken'] || 0) + 1;
     this['_audioPlayAttemptToken'] = value34;
     if (this['_audioPlayDeadlineTimer']) clearTimeout(this['_audioPlayDeadlineTimer']);
     const run = () => {
       if (this['_audioPlayAttemptToken'] !== value34) return;
-      ((this['_audioPlayPending'] = ![]),
+      ((this['_audioPlayPending'] = false),
         this['_audioPlayDeadlineTimer'] &&
           (clearTimeout(this['_audioPlayDeadlineTimer']), (this['_audioPlayDeadlineTimer'] = null)));
     };
     this['_audioPlayDeadlineTimer'] = setTimeout(() => {
       if (this['_audioPlayAttemptToken'] !== value34 || this['_currentSrc'] !== value33) return;
-      ((this['_audioPlayDeadlineTimer'] = null), this['_clearAudioElementSource'](), this['_setIcon'](!![]));
+      ((this['_audioPlayDeadlineTimer'] = null), this['_clearAudioElementSource'](), this['_setIcon'](true));
     }, AUDIO_PLAY_LOADING_DEADLINE_MS);
-    let enabled16 = ![];
+    let enabled16 = false;
     try {
-      enabled16 = await this['_loadAudio'](value33, { showLoading: !![], preload: 'metadata' });
+      enabled16 = await this['_loadAudio'](value33, { showLoading: true, preload: 'metadata' });
     } catch (error3) {
-      (run(), this['_setPlaybackBuffering'](![]));
+      (run(), this['_setPlaybackBuffering'](false));
       if (error3?.['name'] !== 'AbortError')
         console['warn']('[source-audio] load failed:', error3);
       return;
     }
     if (!enabled16 || !this['_getAudioElementCurrentSource']()) {
-      (run(), this['_setPlaybackBuffering'](![]));
+      (run(), this['_setPlaybackBuffering'](false));
       return;
     }
     (this['_restorePlaybackPosition'](value33), this['_rewindEndedAudioIfNeeded']());
@@ -760,19 +760,19 @@ export class SourceAudioNode {
       promise = this['_audio']['play']();
     } catch (value35) {
       (run(),
-        this['_setPlaybackBuffering'](![]),
+        this['_setPlaybackBuffering'](false),
         console['warn']('[source-audio] play failed:', value35));
       return;
     }
     promise && typeof promise['catch'] === 'function'
       ? promise['then'](() => {
-          (run(), this['_rememberAudioDuration'](), this['_setPlaybackBuffering'](![]));
+          (run(), this['_rememberAudioDuration'](), this['_setPlaybackBuffering'](false));
         })['catch']((error4) => {
-          (run(), this['_setPlaybackBuffering'](![]));
+          (run(), this['_setPlaybackBuffering'](false));
           if (error4?.['name'] === 'AbortError') return;
           console['warn']('[source-audio] play failed:', error4);
         })
-      : (run(), this['_setPlaybackBuffering'](![]));
+      : (run(), this['_setPlaybackBuffering'](false));
   }
   ['_stopAudioForExternalPlayback']() {
     if (!this['_audio']) return;
@@ -794,16 +794,16 @@ export class SourceAudioNode {
           currentTime: this['_playbackResumeTime'],
           showLine: this['_playbackResumeTime'] > 0,
         })),
-      this['_setPlaybackBuffering'](![]),
-      this['_setIcon'](!![]));
+      this['_setPlaybackBuffering'](false),
+      this['_setIcon'](true));
   }
   ['getRendererMediaState']() {
-    return { deferred: ![], interactionActive: this['_isSeeking'] === !![] };
+    return { deferred: false, interactionActive: this['_isSeeking'] === true };
   }
   ['suspendRendererMedia']() {
-    this['setRendererAudioSurfaceVisible'](![]);
-    if (!this['_audio'] || this['_audio']['paused'] === ![]) return ![];
-    return (this['_stopAudioForExternalPlayback'](), !![]);
+    this['setRendererAudioSurfaceVisible'](false);
+    if (!this['_audio'] || this['_audio']['paused'] === false) return false;
+    return (this['_stopAudioForExternalPlayback'](), true);
   }
   ['_rememberAudioDuration'](value39 = this['_currentSrc']) {
     if (!this['_audio'] || (value39 && this['_currentSrc'] !== value39)) return;
@@ -817,7 +817,7 @@ export class SourceAudioNode {
   }
   ['_setUploadButtonLabel'](value40) {
     if (!this['_uploadBtn']) return;
-    const value41 = this['_uploadBtn']['querySelector']('svg')?.['cloneNode'](!![]);
+    const value41 = this['_uploadBtn']['querySelector']('svg')?.['cloneNode'](true);
     this['_uploadBtn']['replaceChildren']();
     if (value41) this['_uploadBtn']['appendChild'](value41);
     this['_uploadBtn']['appendChild'](document['createTextNode'](' ' + value40));
@@ -838,7 +838,7 @@ export class SourceAudioNode {
     for (const run2 of this['_toolbarActionCleanups']['splice'](0)) run2();
   }
   ['unmount']() {
-    ((this['_rendererWaveformVisible'] = ![]),
+    ((this['_rendererWaveformVisible'] = false),
       this['_releaseRendererPlaybackPin']?.(),
       (this['_releaseRendererPlaybackPin'] = null),
       this['_clearToolbarActionBindings'](),

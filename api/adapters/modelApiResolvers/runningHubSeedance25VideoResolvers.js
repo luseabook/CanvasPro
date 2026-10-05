@@ -107,7 +107,7 @@ function normalizeConversionSlots(config) {
   return list2['length'] > 0 ? list2 : ['all'];
 }
 function applyRealPersonConversionSlots(input) {
-  input['realPersonMode'] === !![]
+  input['realPersonMode'] === true
     ? (input['conversionSlots'] = normalizeConversionSlots(input['conversionSlots']))
     : delete input['conversionSlots'];
 }

@@ -380,7 +380,7 @@ const personReplacementSmartDetectPresentation = createPersonReplacementSmartDet
   });
 function renderCompositeComposeAction(value21, value22 = {}) {
   const enabled = value21['shots']['some']((value23) => normalizeText(value23['resultVideoRef'])),
-    value24 = value22['composeOutputPending'] === !![],
+    value24 = value22['composeOutputPending'] === true,
     personReplacementCompositePreviewSnapshot =
       buildPersonReplacementCompositePreviewSnapshot(value21)['fullAvailable'],
     value25 = value24
@@ -411,7 +411,7 @@ function renderAssetSettings(value26, args = {}) {
       renderPersonReplacementLayoutSplitter('asset-detail', { assetDetailSplitRatio: assetDetailSplitRatio }),
     footerHtml: personReplacementShellPresentation['renderStepFooter'](value26, {
       nextLabel: '进入图像替换',
-      hidePrevious: !![],
+      hidePrevious: true,
     }),
   });
 }
@@ -430,7 +430,7 @@ function renderCompositePreview(value28, composeOutputPending = {}) {
       personReplacementCompositePreviewSnapshot2['selectedShot'],
       { context: 'comparison', disabled: !personReplacementCompositePreviewSnapshot2['canCompare'] },
     ),
-    composeOutputPending: composeOutputPending['composeOutputPending'] === !![],
+    composeOutputPending: composeOutputPending['composeOutputPending'] === true,
   });
 }
 function renderProject(value29, smartDetecting = {}) {
@@ -447,13 +447,13 @@ function renderProject(value29, smartDetecting = {}) {
         })
       : '',
     value36 =
-      smartDetecting['canvasSyncOverlayInline'] === ![]
+      smartDetecting['canvasSyncOverlayInline'] === false
         ? ''
         : personReplacementShellPresentation['renderCanvasSyncLoadingOverlay'](smartDetecting);
   return (
     personReplacementShellPresentation['renderHeader'](value29, smartDetecting) +
     '<main class="person-replacement-project-body"' +
-    (smartDetecting['canvasSyncPending'] === !![] ? ' aria-hidden="true" inert' : '') +
+    (smartDetecting['canvasSyncPending'] === true ? ' aria-hidden="true" inert' : '') +
     '>' +
     value30[value29['workspace']['step']](value29, smartDetecting) +
     '</main>' +
@@ -506,7 +506,7 @@ export function createReplacementStudioWorkspace({
   const assetLibraryDisclosure = createWorkspaceAssetLibraryDisclosure();
   let floatingMenuHost = null,
     bindWorkspaceEntityContextMenu2 = null,
-    value43 = ![];
+    value43 = false;
   const workspacePresentationLifecycle = createWorkspacePresentationLifecycle({
       getRoot: () => floatingMenuHost,
     }),
@@ -523,14 +523,14 @@ export function createReplacementStudioWorkspace({
     value47 = null,
     el2 = null,
     el3 = null,
-    canvasSyncPending = ![],
+    canvasSyncPending = false,
     canvasSyncScope = '',
-    composeOutputPending2 = ![],
-    exportOutputPending = ![],
+    composeOutputPending2 = false,
+    exportOutputPending = false,
     el4 = null,
     el5 = null;
   const map2 = new Map();
-  let enabled2 = ![],
+  let enabled2 = false,
     value48 = null,
     value49 = null,
     ctx = null,
@@ -691,13 +691,13 @@ export function createReplacementStudioWorkspace({
       handlePointerOver: handlePointerOver,
       hide: hide,
     } = personReplacementAssetHoverPreviewController;
-  let enabled3 = ![],
+  let enabled3 = false,
     value65 = null,
     value66 = null,
     value67 = 'none',
     value68 = 'page',
     value69 = '',
-    handler14 = () => ![];
+    handler14 = () => false;
   const value70 = { accumulator: 0, lockedUntil: 0 },
     value71 = { accumulator: 0, lockedUntil: 0 },
     value72 = { accumulator: 0, lockedUntil: 0 },
@@ -812,12 +812,12 @@ export function createReplacementStudioWorkspace({
       ((value67 = workspaceTabTransitionDirection),
         (value68 = assetScope === 'asset-list' ? 'asset-list' : 'asset-content'));
     },
-    handler28 = (value91, args7 = null, { inPlace: inPlace = ![] } = {}) => {
+    handler28 = (value91, args7 = null, { inPlace: inPlace = false } = {}) => {
       const args8 = value91?.['project'] || value91;
       if (args8 && typeof args8 === 'object') {
         const value92 = args7 ? { ...args8, workspace: { ...(args8['workspace'] || {}), ...args7 } } : args8;
         inPlace
-          ? value93['syncProjectState'](value92, { returnSnapshot: ![] })
+          ? value93['syncProjectState'](value92, { returnSnapshot: false })
           : value93['setProject'](value92);
       }
     },
@@ -826,8 +826,8 @@ export function createReplacementStudioWorkspace({
       value94,
       args9 = {},
       {
-        applyCallbackResult: applyCallbackResult = !![],
-        applyCallbackResultInPlace: applyCallbackResultInPlace = ![],
+        applyCallbackResult: applyCallbackResult = true,
+        applyCallbackResultInPlace: applyCallbackResultInPlace = false,
       } = {},
     ) => {
       const value95 =
@@ -884,12 +884,12 @@ export function createReplacementStudioWorkspace({
         allowedAssetTypes: ['text', 'image', 'video', 'audio'],
       }),
         handler30(promptEl, 'video-prompt-preset'));
-      if (value103?.['insertPrompt'] === !![]) return;
+      if (value103?.['insertPrompt'] === true) return;
       runIntent(
         downloadImageIntent['GENERATE_REPLACEMENT_VIDEO'],
         { projectId: initialProject2['id'], shotId: normalizeText(promptEl['dataset']?.['shotId']) },
         {},
-        { applyCallbackResult: ![] },
+        { applyCallbackResult: false },
       );
     },
     handler32 = (value104, value105 = initialProject2['id']) =>
@@ -926,38 +926,38 @@ export function createReplacementStudioWorkspace({
     handler35 = (el7, enabled4) => {
       const el8 = el7?.['querySelector']?.('[data-person-replacement-action="toggle-library-add-targets"]'),
         el9 = el7?.['querySelector']?.('.story-asset-batch-menu');
-      if (!el7 || !el8 || !el9) return ![];
+      if (!el7 || !el8 || !el9) return false;
       if (enabled4) syncWorkspaceInlineMenuExpandedWidth(el9);
       return (
         el7['classList']?.['toggle']?.('is-open', enabled4),
         el8['setAttribute']?.('aria-expanded', String(enabled4)),
         el9['setAttribute']?.('aria-hidden', String(!enabled4)),
-        !![]
+        true
       );
     },
     handler36 = (value108 = null) => {
       floatingMenuHost?.['querySelectorAll']?.('.person-replacement-library-add-menu-wrap.is-open')?.[
         'forEach'
       ]?.((value109) => {
-        if (value109 !== value108) handler35(value109, ![]);
+        if (value109 !== value108) handler35(value109, false);
       });
     },
     handler37 = (el10, enabled5) => {
       const el11 = el10?.['querySelector']?.('[data-story-action="toggle-character-voice-menu"]'),
         el12 = el10?.['querySelector']?.('.person-replacement-add-voice-menu');
-      if (!el10 || !el11 || !el12) return ![];
+      if (!el10 || !el11 || !el12) return false;
       return (
         el10['classList']?.['toggle']?.('is-open', enabled5),
         el11['setAttribute']?.('aria-expanded', String(enabled5)),
         el12['setAttribute']?.('aria-hidden', String(!enabled5)),
-        !![]
+        true
       );
     },
     handler38 = (value110 = null) => {
       floatingMenuHost?.['querySelectorAll']?.('.person-replacement-add-voice-menu-wrap.is-open')?.[
         'forEach'
       ]?.((value111) => {
-        if (value111 !== value110) handler37(value111, ![]);
+        if (value111 !== value110) handler37(value111, false);
       });
     },
     updateProject = (value112, value113, value114 = {}) => {
@@ -985,9 +985,9 @@ export function createReplacementStudioWorkspace({
         personId = normalizeText(detectionBox?.['dataset']?.['personId']),
         value116 = initialProject2['shots']['find']((value117) => value117['id'] === shotId),
         sourceCharacterId2 = value116?.['people']?.['find']((value118) => value118['id'] === personId);
-      if (!sourceCharacterId2) return ![];
+      if (!sourceCharacterId2) return false;
       const label2 = label === undefined ? normalizeText(sourceCharacterId2['label']) : normalizeText(label);
-      if (!label2) return ![];
+      if (!label2) return false;
       const targetSourceCharacterId = normalizeText(
           sourceCharacterId,
           normalizeText(sourceCharacterId2['sourceCharacterId']),
@@ -1021,9 +1021,9 @@ export function createReplacementStudioWorkspace({
           personId: personId,
           label: label2,
           orientation: orientation2,
-          silent: !![],
+          silent: true,
         }),
-        !![]
+        true
       );
     },
     handler40 = (value120) => {
@@ -1083,9 +1083,9 @@ export function createReplacementStudioWorkspace({
         )['slotEntries']['sourceVideo']?.['url'],
         mediaUrl = normalizeMediaUrl(personReplacementVideoSlotState);
       if (!selectedShot || !stage || !videoEl || !mediaUrl)
-        return (windowObject?.['showToast']?.('当前视频片段尚未准备完成。', 'warn'), ![]);
+        return (windowObject?.['showToast']?.('当前视频片段尚未准备完成。', 'warn'), false);
       if (isPersonReplacementVideoCropReverseRunning(selectedShot))
-        return (windowObject?.['showToast']?.('当前视频片段正在处理倒放，请稍后再裁剪。', 'info'), ![]);
+        return (windowObject?.['showToast']?.('当前视频片段正在处理倒放，请稍后再裁剪。', 'info'), false);
       videoEl['pause']?.();
       const durationSec =
           Number(videoEl['duration']) > 0
@@ -1110,20 +1110,20 @@ export function createReplacementStudioWorkspace({
             },
             requestReverseChange: requestReverseChange,
             onConfirm: (args11) => {
-              (personReplacementVideoPlaybackController['setClipActive'](![]),
+              (personReplacementVideoPlaybackController['setClipActive'](false),
                 updateProject(
                   applyPersonReplacementVideoCrop(initialProject2, { ...args11, shotId: selectedShot['id'] }),
                   'video-crop',
                 ));
             },
             onExit: ({ reason: reason4 } = {}) => {
-              personReplacementVideoPlaybackController['setClipActive'](![]);
+              personReplacementVideoPlaybackController['setClipActive'](false);
               if (['confirm', 'silent']['includes'](reason4) || value43) return;
               if (!handler42()) run();
             },
           }),
         );
-      return personReplacementVideoPlaybackController['setClipActive'](value124 === !![]);
+      return personReplacementVideoPlaybackController['setClipActive'](value124 === true);
     },
     personReplacementLayoutResizeController = createPersonReplacementLayoutResizeController({
       documentObject: documentObject,
@@ -1143,8 +1143,8 @@ export function createReplacementStudioWorkspace({
       const promise3 = runIntent(
         value127,
         value128,
-        { renderWorkspace: ![] },
-        { applyCallbackResultInPlace: !![] },
+        { renderWorkspace: false },
+        { applyCallbackResultInPlace: true },
       );
       if (promise3?.['then']) void promise3['then'](requestRender, () => {});
       else requestRender();
@@ -1161,8 +1161,8 @@ export function createReplacementStudioWorkspace({
         runIntent(
           downloadImageIntent['UPDATE_PEOPLE'],
           value131,
-          { renderWorkspace: ![] },
-          { applyCallbackResultInPlace: !![] },
+          { renderWorkspace: false },
+          { applyCallbackResultInPlace: true },
         ),
       documentObject: documentObject,
       windowObject: windowObject,
@@ -1241,7 +1241,7 @@ export function createReplacementStudioWorkspace({
     handler48 = (el14) => {
       const text5 = normalizeText(el14?.['dataset']?.['storyAssetNameId']),
         error5 = initialProject2['characters']['find']((value141) => value141['id'] === text5);
-      if (!el14 || !error5 || el14['getAttribute']?.('contenteditable') === 'true') return ![];
+      if (!el14 || !error5 || el14['getAttribute']?.('contenteditable') === 'true') return false;
       ((el14['dataset']['storyAssetOriginalName'] = error5['name']),
         el14['setAttribute']?.('contenteditable', 'true'),
         el14['setAttribute']?.('role', 'textbox'),
@@ -1256,13 +1256,13 @@ export function createReplacementStudioWorkspace({
           (value143['selectNodeContents']?.(el14),
           value142['removeAllRanges']?.(),
           value142['addRange']?.(value143)),
-        !![]
+        true
       );
     },
-    handler49 = (el15, { cancel: cancel = ![] } = {}) => {
+    handler49 = (el15, { cancel: cancel = false } = {}) => {
       const text6 = normalizeText(el15?.['dataset']?.['storyAssetNameId']),
         error6 = initialProject2['characters']['find']((value144) => value144['id'] === text6);
-      if (!el15 || !error6 || el15['getAttribute']?.('contenteditable') !== 'true') return ![];
+      if (!el15 || !error6 || el15['getAttribute']?.('contenteditable') !== 'true') return false;
       const value145 = handler47(el15['dataset']['storyAssetOriginalName'], error6['name']),
         name = cancel ? value145 : handler47(el15['textContent'], value145);
       ((initialProject2 = normalizePersonReplacementWorkspaceProject({
@@ -1281,7 +1281,7 @@ export function createReplacementStudioWorkspace({
             delete el16['dataset']['storyAssetOriginalName']);
         }));
       if (!cancel && name !== error6['name']) handler21('character-name');
-      return !![];
+      return true;
     },
     handler50 = () => {
       ((ctx ??= createPersonReplacementResultHistoryController({
@@ -1302,7 +1302,7 @@ export function createReplacementStudioWorkspace({
         getRoot: () => floatingMenuHost,
         getProject: () => initialProject2,
         isDestroyed: () => value43,
-        commitProject: (value148, { reason: reason = 'voice-clone', render: render = ![] } = {}) => {
+        commitProject: (value148, { reason: reason = 'voice-clone', render: render = false } = {}) => {
           if (render) return updateProject(value148, reason);
           return (
             (initialProject2 = normalizePersonReplacementWorkspaceProject(value148)),
@@ -1317,7 +1317,7 @@ export function createReplacementStudioWorkspace({
             downloadImageIntent['RESUME_VOICE_EXTRACTION'],
             value149,
             {},
-            { applyCallbackResult: ![] },
+            { applyCallbackResult: false },
           ),
         resolveCharacterVoiceUrl: getCharacterVoiceUrl,
         documentObject: documentObject,
@@ -1387,7 +1387,7 @@ export function createReplacementStudioWorkspace({
               : initialProject2['settings']['replacementImageGenerationParamsByModel'],
             providerProfileId: providerProfileId,
             providerProfileIdByModel: providerProfileIdByModel,
-            showSchemaControls: !![],
+            showSchemaControls: true,
             documentObject: documentObject,
             windowObject: windowObject,
             floatingMenuHost: floatingMenuHost,
@@ -1444,7 +1444,7 @@ export function createReplacementStudioWorkspace({
           providerProfileId: initialProject2['settings']['replacementVideoProviderProfileId'],
           providerProfileIdByModel: initialProject2['settings']['replacementVideoProviderProfileIdByModel'],
           referenceCounts: referenceCounts['slotState']['referenceCounts'],
-          showSchemaControls: !![],
+          showSchemaControls: true,
           allowedModelIds: PERSON_REPLACEMENT_VIDEO_MODEL_IDS,
           documentObject: documentObject,
           windowObject: windowObject,
@@ -1482,7 +1482,7 @@ export function createReplacementStudioWorkspace({
                   personReplacementVideoPresentation['build'](initialProject2),
                 )['referenceInputsHtml'],
                 nextInputs =
-                  typeof currentInputs['cloneNode'] === 'function' ? currentInputs['cloneNode'](![]) : null;
+                  typeof currentInputs['cloneNode'] === 'function' ? currentInputs['cloneNode'](false) : null;
               (nextInputs && (nextInputs['innerHTML'] = value155),
                 (!nextInputs ||
                   !reconcilePersonReplacementReferenceInputs({
@@ -1571,7 +1571,7 @@ export function createReplacementStudioWorkspace({
       return {
         nodeId: 'person-replacement-image:' + text8,
         promptEl: promptEl2,
-        keepAssetMentionPills: !![],
+        keepAssetMentionPills: true,
         _data: {
           type: 'ai-image',
           model: initialProject2['settings']['replacementImageModelId'],
@@ -1633,7 +1633,7 @@ export function createReplacementStudioWorkspace({
       if (!el18) return;
       const run3 = () => syncPersonReplacementImageStageFrame(el18);
       if (el18['complete'] && Number(el18['naturalWidth']) > 0) run3();
-      else el18['addEventListener']?.('load', run3, { once: !![] });
+      else el18['addEventListener']?.('load', run3, { once: true });
       const value160 = el18['closest']?.('[data-person-replacement-keyframe-stage]')?.['parentElement'],
         handler57 = windowObject?.['ResizeObserver'],
         value161 = typeof handler57 === 'function' ? new handler57(run3) : null;
@@ -1699,7 +1699,7 @@ export function createReplacementStudioWorkspace({
         canvasSyncScope: canvasSyncScope,
         composeOutputPending: composeOutputPending2,
         exportOutputPending: exportOutputPending,
-        canvasSyncOverlayInline: ![],
+        canvasSyncOverlayInline: false,
         assetLibraryDisclosure: assetLibraryDisclosure,
         assetUploadPendingKinds: ['character', 'scene', 'audio']['filter']((value163) =>
           map['has'](handler32(value163)),
@@ -1711,7 +1711,7 @@ export function createReplacementStudioWorkspace({
     },
     handler58 = () => {
       const el19 = floatingMenuHost?.['querySelector']?.('#person-replacement-shot-cut-smart-detect-panel');
-      if (!el19?.['style']) return ![];
+      if (!el19?.['style']) return false;
       const count3 =
         Number(windowObject?.['innerWidth'] || documentObject?.['documentElement']?.['clientWidth']) || 0;
       if (count3 <= 720)
@@ -1719,14 +1719,14 @@ export function createReplacementStudioWorkspace({
           ['top', 'right', 'bottom', 'left']['forEach']((value164) => {
             el19['style']['removeProperty']?.(value164);
           }),
-          !![]
+          true
         );
       const el20 = floatingMenuHost?.['querySelector']?.(
           '[data-person-replacement-action="toggle-shot-cut-smart-detect"]',
         ),
         box = el20?.['getBoundingClientRect']?.(),
         box2 = el19['getBoundingClientRect']?.();
-      if (!box || !box2) return ![];
+      if (!box || !box2) return false;
       const value165 =
           Number(windowObject?.['innerHeight'] || documentObject?.['documentElement']?.['clientHeight']) ||
           0,
@@ -1746,7 +1746,7 @@ export function createReplacementStudioWorkspace({
         el19['style']['setProperty']?.('right', 'auto'),
         el19['style']['setProperty']?.('bottom', 'auto'),
         el19['style']['setProperty']?.('left', value168 + 'px'),
-        !![]
+        true
       );
     },
     value171 = () => {
@@ -1761,7 +1761,7 @@ export function createReplacementStudioWorkspace({
       const el22 = floatingMenuHost?.['querySelector']?.(
         '[data-person-replacement-compare-card="replacement"] .person-replacement-compare-media-frame',
       );
-      if (!el22) return ![];
+      if (!el22) return false;
       (el22['classList']?.['toggle']?.('img-preview-loading', composeOutputPending2),
         el22['setAttribute']?.('aria-busy', String(composeOutputPending2)));
       if (composeOutputPending2) el22['setAttribute']?.('inert', '');
@@ -1776,7 +1776,7 @@ export function createReplacementStudioWorkspace({
         );
         if (value173) el22['appendChild']?.(value173);
       } else !composeOutputPending2 && el23?.['remove']?.();
-      return !![];
+      return true;
     },
     handler61 = (el24, value174) => {
       if (!el24) return;
@@ -1789,7 +1789,7 @@ export function createReplacementStudioWorkspace({
       if (value174) el24['setAttribute']?.('inert', '');
       else el24['removeAttribute']?.('inert');
     },
-    handler62 = ({ restoreFocus: restoreFocus = !![] } = {}) => {
+    handler62 = ({ restoreFocus: restoreFocus = true } = {}) => {
       (map2['forEach']((value175, value176) => {
         handler61(value176, value175);
       }),
@@ -1801,19 +1801,19 @@ export function createReplacementStudioWorkspace({
         floatingMenuHost?.['setAttribute']?.('aria-busy', 'false'));
       if (
         restoreFocus &&
-        floatingMenuHost?.['hidden'] === ![] &&
+        floatingMenuHost?.['hidden'] === false &&
         el5 &&
-        el5['isConnected'] !== ![] &&
+        el5['isConnected'] !== false &&
         typeof el5['focus'] === 'function'
       )
         try {
-          el5['focus']({ preventScroll: !![] });
+          el5['focus']({ preventScroll: true });
         } catch {
           el5['focus']();
         }
       el5 = null;
     },
-    handler63 = ({ captureFocus: captureFocus = ![] } = {}) => {
+    handler63 = ({ captureFocus: captureFocus = false } = {}) => {
       if (!canvasSyncPending) {
         handler62();
         return;
@@ -1826,7 +1826,7 @@ export function createReplacementStudioWorkspace({
       }
       if (!el4) {
         el4 = handler59(
-          personReplacementShellPresentation['renderCanvasSyncLoadingOverlay']({ canvasSyncPending: !![] }),
+          personReplacementShellPresentation['renderCanvasSyncLoadingOverlay']({ canvasSyncPending: true }),
         );
         if (el4) el25['appendChild']?.(el4);
       }
@@ -1834,13 +1834,13 @@ export function createReplacementStudioWorkspace({
         if (value178 === el4) return;
         (!map2['has'](value178) &&
           map2['set'](value178, Boolean(value178?.['inert'] || value178?.['hasAttribute']?.('inert'))),
-          handler61(value178, !![]));
+          handler61(value178, true));
       }),
         documentObject['body']?.['classList']?.['add']?.('person-replacement-canvas-sync-active'),
         floatingMenuHost?.['classList']?.['add']?.('is-canvas-sync-pending'),
         floatingMenuHost?.['setAttribute']?.('aria-busy', 'true'));
       try {
-        el4?.['focus']?.({ preventScroll: !![] });
+        el4?.['focus']?.({ preventScroll: true });
       } catch {
         el4?.['focus']?.();
       }
@@ -1898,7 +1898,7 @@ export function createReplacementStudioWorkspace({
       const isBatchGenerating = getShotRenderState(),
         el29 = handler59(
           personReplacementShotTimelinePresentation['renderTimeline'](initialProject2, {
-            allowCutEditing: !![],
+            allowCutEditing: true,
             mode: 'image',
             isBatchGenerating: isBatchGenerating['active'],
             batchGenerationLabel: isBatchGenerating['label'],
@@ -1907,15 +1907,15 @@ export function createReplacementStudioWorkspace({
           }),
         ),
         nextScroller = el29?.['querySelector']?.('[data-person-replacement-shot-timeline-scroll]');
-      if (!currentScroller || !nextScroller) return ![];
+      if (!currentScroller || !nextScroller) return false;
       const run6 = handler68(currentScroller),
         reconcilePersonReplacementShotTimelineCard2 = reconcilePersonReplacementShotTimelineCard({
           currentScroller: currentScroller,
           nextScroller: nextScroller,
           shotId: shotId2,
         });
-      if (!reconcilePersonReplacementShotTimelineCard2) return (run6(), ![]);
-      return (handler65(currentScroller), run6(), !![]);
+      if (!reconcilePersonReplacementShotTimelineCard2) return (run6(), false);
+      return (handler65(currentScroller), run6(), true);
     },
     handler53 = () => {
       if (
@@ -1923,7 +1923,7 @@ export function createReplacementStudioWorkspace({
         ![2, 3]['includes'](initialProject2['workspace']['step']) ||
         selectedIds['isOpen']
       )
-        return ![];
+        return false;
       const mode = initialProject2['workspace']['step'] === 3,
         isBatchGenerating2 = getShotRenderState();
       syncPersonReplacementPromptModeControl(
@@ -1977,17 +1977,17 @@ export function createReplacementStudioWorkspace({
         typeof el30['replaceWith'] !== 'function' ||
         typeof enabled8['replaceWith'] !== 'function'
       )
-        return ![];
+        return false;
       const run7 = handler68(currentList);
       if (!reconcilePersonReplacementShotCardList({ currentList: currentList, nextList: nextList }))
-        return (run7(), ![]);
+        return (run7(), false);
       (reconcileElementTree(el30, el31, {
-        preserveChildNodes: !![],
+        preserveChildNodes: true,
         preserveSelector: '[data-person-replacement-shot-timeline-scroll]',
       }),
-        reconcileElementTree(enabled8, enabled9, { preserveChildNodes: !![] }));
+        reconcileElementTree(enabled8, enabled9, { preserveChildNodes: true }));
       if (!mode) syncPersonReplacementImageGenerationLoading(floatingMenuHost, presentation);
-      return (run7(), ctx?.['refresh'](), !![]);
+      return (run7(), ctx?.['refresh'](), true);
     },
     handler70 = () => {
       if (
@@ -1995,7 +1995,7 @@ export function createReplacementStudioWorkspace({
         initialProject2['workspace']['step'] !== 5 ||
         selectedIds['isOpen']
       )
-        return ![];
+        return false;
       const el32 = floatingMenuHost?.['querySelector']?.('.person-replacement-preview-shot-rail'),
         el33 = handler59(
           personReplacementCompositePreviewPresentation['renderRail'](
@@ -2016,14 +2016,14 @@ export function createReplacementStudioWorkspace({
         typeof el32['replaceWith'] !== 'function' ||
         typeof enabled10['replaceWith'] !== 'function'
       )
-        return ![];
+        return false;
       const value183 = currentList2 && nextList2 ? handler68(currentList2) : null;
       if (currentList2 && nextList2) {
         if (!reconcilePersonReplacementShotCardList({ currentList: currentList2, nextList: nextList2 }))
-          return (value183?.(), ![]);
+          return (value183?.(), false);
         nextList2['replaceWith'](currentList2);
       }
-      return (el32['replaceWith'](el33), enabled10['replaceWith'](enabled11), value183?.(), !![]);
+      return (el32['replaceWith'](el33), enabled10['replaceWith'](enabled11), value183?.(), true);
     },
     handler71 = () => {
       if (
@@ -2031,7 +2031,7 @@ export function createReplacementStudioWorkspace({
         initialProject2['workspace']['step'] !== 5 ||
         selectedIds['isOpen']
       )
-        return ![];
+        return false;
       const el34 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-composite-preview]'),
         el35 = handler59(renderCompositePreview(initialProject2, handler22())),
         currentList3 = el34?.['querySelector']?.('.person-replacement-preview-shot-list'),
@@ -2044,10 +2044,10 @@ export function createReplacementStudioWorkspace({
         typeof el34['replaceWith'] !== 'function' ||
         typeof nextList3['replaceWith'] !== 'function'
       )
-        return ![];
+        return false;
       const run8 = handler68(currentList3);
       if (!reconcilePersonReplacementShotCardList({ currentList: currentList3, nextList: nextList3 }))
-        return (run8(), ![]);
+        return (run8(), false);
       return (
         nextList3['replaceWith'](currentList3),
         hide(),
@@ -2056,11 +2056,11 @@ export function createReplacementStudioWorkspace({
         el34['replaceWith'](el35),
         run8(),
         handler9(),
-        !![]
+        true
       );
     },
     handler43 = ({
-      refreshTimelineCard: refreshTimelineCard = ![],
+      refreshTimelineCard: refreshTimelineCard = false,
       timelineShotId: timelineShotId = initialProject2['workspace']['selectedShotId'],
     } = {}) => {
       if (
@@ -2068,7 +2068,7 @@ export function createReplacementStudioWorkspace({
         ![2, 3]['includes'](initialProject2['workspace']['step']) ||
         selectedIds['isOpen']
       )
-        return ![];
+        return false;
       const currentPage = floatingMenuHost?.['querySelector']?.('.person-replacement-production-page'),
         value184 = initialProject2['workspace']['step'] === 3,
         args20 = handler22(),
@@ -2077,7 +2077,7 @@ export function createReplacementStudioWorkspace({
             ? personReplacementVideoPresentation['render'](initialProject2, args20)
             : personReplacementImagePresentation['render'](initialProject2, {
                 ...args20,
-                omitShotTimeline: !![],
+                omitShotTimeline: true,
               }),
         ),
         value185 = handler64(),
@@ -2087,19 +2087,19 @@ export function createReplacementStudioWorkspace({
         enabled14 = nextPage?.['querySelector']?.('.person-replacement-middle-layout'),
         enabled15 = el36?.['querySelector']?.('[data-person-replacement-shot-timeline-stage]');
       if (value184) {
-        if (!currentPage || !nextPage || !enabled12 || !enabled13) return ![];
+        if (!currentPage || !nextPage || !enabled12 || !enabled13) return false;
         const run9 = handler68(enabled12);
         if (!reconcilePersonReplacementVideoShotSelection({ currentPage: currentPage, nextPage: nextPage }))
-          return ![];
-        return (handler66(), run9(), handler67(), handler55(), handler52(), handler(), !![]);
+          return false;
+        return (handler66(), run9(), handler67(), handler55(), handler52(), handler(), true);
       }
-      if (!enabled12 || !el36 || !enabled14 || !enabled15) return ![];
-      if (refreshTimelineCard && !handler69(enabled12, timelineShotId)) return ![];
+      if (!enabled12 || !el36 || !enabled14 || !enabled15) return false;
+      if (refreshTimelineCard && !handler69(enabled12, timelineShotId)) return false;
       if (!refreshTimelineCard) handler65(enabled12);
       (hide(), value47?.(), (value47 = null));
       if (!reconcilePersonReplacementImageShotSelection({ currentPage: currentPage, nextPage: nextPage }))
-        return ![];
-      return (handler67(), handler55(), handler56(), !![]);
+        return false;
+      return (handler67(), handler55(), handler56(), true);
     },
     handler42 = () => {
       if (
@@ -2108,7 +2108,7 @@ export function createReplacementStudioWorkspace({
         selectedIds['isOpen'] ||
         personReplacementVideoPlaybackController['isClipActive']()
       )
-        return ![];
+        return false;
       const el37 = floatingMenuHost?.['querySelector']?.('.person-replacement-production-page'),
         el38 = handler59(personReplacementVideoPresentation['render'](initialProject2, handler22())),
         value186 = el37?.['querySelector']?.('[data-person-replacement-video-playback-stage="source"]'),
@@ -2169,18 +2169,18 @@ export function createReplacementStudioWorkspace({
             !enabled22 || !enabled23 || typeof enabled22['replaceWith'] !== 'function',
         )
       )
-        return ![];
+        return false;
       const run10 = handler68(currentList4);
       if (!reconcilePersonReplacementShotCardList({ currentList: currentList4, nextList: nextList4 }))
-        return (run10(), ![]);
-      (hide(), reconcileElementTree(enabled16, enabled17, { preserveChildNodes: !![] }));
+        return (run10(), false);
+      (hide(), reconcileElementTree(enabled16, enabled17, { preserveChildNodes: true }));
       if (!shouldReusePersonReplacementVideoPlaybackStage3)
         personReplacementVideoPlaybackController['destroyRole']('result');
       if (!shouldReusePersonReplacementVideoPlaybackStage2)
         personReplacementVideoPlaybackController['destroyRole']('source');
       (list7['forEach'](([value192, value193]) => {
         reconcileElementTree(value192, value193, {
-          preserveChildNodes: !![],
+          preserveChildNodes: true,
           preserveSelector:
             '[data-person-replacement-result-history-menu], .person-replacement-shot-timeline-scroll, [data-aigen-video-model-selector], .person-replacement-prompt-input-wrapper' +
             (shouldReusePersonReplacementVideoPlaybackStage3
@@ -2199,9 +2199,9 @@ export function createReplacementStudioWorkspace({
             personReplacementVideoPresentation['build'](initialProject2)['slotState']['referenceCounts'],
         }));
       if (shouldReusePersonReplacementVideoPlaybackStage3) handler2();
-      else handler({ roles: ['result'], reset: ![] });
-      if (!shouldReusePersonReplacementVideoPlaybackStage2) handler({ roles: ['source'], reset: ![] });
-      return !![];
+      else handler({ roles: ['result'], reset: false });
+      if (!shouldReusePersonReplacementVideoPlaybackStage2) handler({ roles: ['source'], reset: false });
+      return true;
     };
   handler14 = (
     value194,
@@ -2234,9 +2234,9 @@ export function createReplacementStudioWorkspace({
         floatingMenuHost,
         personReplacementImagePresentation['render'](initialProject2, {
           ...handler22(),
-          omitShotTimeline: !![],
+          omitShotTimeline: true,
         }),
-        { targetRail: !![] },
+        { targetRail: true },
       );
     if (
       initialProject2['workspace']['step'] === 2 &&
@@ -2264,13 +2264,13 @@ export function createReplacementStudioWorkspace({
       (text11 === 'replacement-image-result' || text11 === 'delete-replacement-image-result') &&
       initialProject2['workspace']['step'] === 2
     )
-      return handler43({ refreshTimelineCard: !![], timelineShotId: timelineShotId });
+      return handler43({ refreshTimelineCard: true, timelineShotId: timelineShotId });
     if (text11 === 'shot-select')
       return initialProject2['workspace']['step'] === 5 ? handler71() : handler43();
     if (text11 === 'replacement-image-reference' && initialProject2['workspace']['step'] === 2)
-      return handler43({ refreshTimelineCard: !![] });
+      return handler43({ refreshTimelineCard: true });
     if (text11 === 'composite-full-video-select') return handler71();
-    return ![];
+    return false;
   };
   let run = () => {
     if (!floatingMenuHost || value43) return;
@@ -2283,7 +2283,7 @@ export function createReplacementStudioWorkspace({
       clearPreviewMetadata(),
       cancelFrameWait(),
       (selectedIds['pendingPreviewSeek'] = null),
-      (selectedIds['hoverPreviewActive'] = ![]),
+      (selectedIds['hoverPreviewActive'] = false),
       (selectedIds['hoverPreviewTimeSec'] = null),
       cancelHoverPreview(),
       list3['forEach']((value195) => value195?.['destroy']?.()),
@@ -2317,7 +2317,7 @@ export function createReplacementStudioWorkspace({
       if (step !== initialProject2['workspace']['step'] && !personReplacementStepGate['allowed'])
         return (handler24(personReplacementStepGate['reason'], step), cloneJson(initialProject2));
       return (
-        close2({ animate: ![], renderWorkspace: ![] }),
+        close2({ animate: false, renderWorkspace: false }),
         updateProject(
           { ...initialProject2, workspace: { ...initialProject2['workspace'], step: step } },
           'step-change',
@@ -2359,7 +2359,7 @@ export function createReplacementStudioWorkspace({
             : initialProject2['workspace']['selectedCharacterId']),
         el43 = floatingMenuHost?.['querySelector']?.('.story-asset-detail .story-asset-preview-slide')?.[
           'cloneNode'
-        ]?.(!![]);
+        ]?.(true);
       updateProject(
         {
           ...initialProject2,
@@ -2386,7 +2386,7 @@ export function createReplacementStudioWorkspace({
           el43['querySelector']?.('.img-loading-overlay')?.['remove']?.(),
           enabled25['after']?.(el43));
         const value205 = () => el43['remove']?.();
-        (el43['addEventListener']?.('animationend', value205, { once: !![] }),
+        (el43['addEventListener']?.('animationend', value205, { once: true }),
           windowObject?.['setTimeout']?.(value205, 460));
       }
       (void el44['offsetWidth'], el44['classList']['add']('is-sliding-' + value204));
@@ -2445,13 +2445,13 @@ export function createReplacementStudioWorkspace({
         '.person-replacement-image-generation-panel ' +
           '.person-replacement-image-preview-slide:not(' +
           '.person-replacement-image-preview-slide--outgoing)',
-      )?.['cloneNode']?.(!![]) || null,
+      )?.['cloneNode']?.(true) || null,
     captureMiddlePreviewSlide = () =>
       floatingMenuHost?.['querySelector']?.(
         '.person-replacement-middle-layout ' +
           '> .person-replacement-middle-preview-slide:not(' +
           '.person-replacement-middle-preview-slide--outgoing)',
-      )?.['cloneNode']?.(!![]) || null,
+      )?.['cloneNode']?.(true) || null,
     handler75 = (el46) => {
       return (
         el46?.['querySelectorAll']?.(
@@ -2478,7 +2478,7 @@ export function createReplacementStudioWorkspace({
           '.person-replacement-middle-preview-slide:not(' +
             '.person-replacement-middle-preview-slide--outgoing)',
         );
-      if (!el48 || !incomingSlide || incomingSlide === outgoingSlide) return ![];
+      if (!el48 || !incomingSlide || incomingSlide === outgoingSlide) return false;
       (el48['querySelectorAll']?.('.person-replacement-middle-preview-slide--outgoing')?.['forEach']?.(
         (el49) => el49['remove']?.(),
       ),
@@ -2494,7 +2494,7 @@ export function createReplacementStudioWorkspace({
           outgoingSlide['removeAttribute']?.('aria-busy'),
           outgoingSlide['setAttribute']?.('aria-hidden', 'true'));
         try {
-          outgoingSlide['inert'] = !![];
+          outgoingSlide['inert'] = true;
         } catch {}
         (outgoingSlide['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.[
           'remove'
@@ -2507,17 +2507,17 @@ export function createReplacementStudioWorkspace({
         outgoingSlide: outgoingSlide,
         direction: direction2,
       });
-      let value217 = ![];
+      let value217 = false;
       const value218 = () => {
         if (value217) return;
-        ((value217 = !![]),
+        ((value217 = true),
           cancelPersonReplacementSlideTransition(startPersonReplacementSlideTransition2),
           outgoingSlide?.['remove']?.());
       };
       return (
         startPersonReplacementSlideTransition2['finished']['then'](value218),
         windowObject?.['setTimeout']?.(value218, startPersonReplacementSlideTransition2['duration'] + 80),
-        !![]
+        true
       );
     },
     playImagePreviewTransition = (value219, outgoingSlide2) => {
@@ -2529,7 +2529,7 @@ export function createReplacementStudioWorkspace({
           '.person-replacement-image-preview-slide:not(' +
             '.person-replacement-image-preview-slide--outgoing)',
         );
-      if (!el50 || !incomingSlide2) return ![];
+      if (!el50 || !incomingSlide2) return false;
       (el50['querySelectorAll']?.('.person-replacement-image-preview-slide--outgoing')?.['forEach']?.(
         (el51) => el51['remove']?.(),
       ),
@@ -2549,17 +2549,17 @@ export function createReplacementStudioWorkspace({
         outgoingSlide: outgoingSlide2,
         direction: direction3,
       });
-      let value220 = ![];
+      let value220 = false;
       const value221 = () => {
         if (value220) return;
-        ((value220 = !![]),
+        ((value220 = true),
           cancelPersonReplacementSlideTransition(startPersonReplacementSlideTransition3),
           outgoingSlide2?.['remove']?.());
       };
       return (
         startPersonReplacementSlideTransition3['finished']['then'](value221),
         windowObject?.['setTimeout']?.(value221, startPersonReplacementSlideTransition3['duration'] + 80),
-        !![]
+        true
       );
     },
     playVideoResultTransition = (value222, outgoingSlide3) => {
@@ -2570,7 +2570,7 @@ export function createReplacementStudioWorkspace({
         incomingSlide3 = el52?.['querySelector']?.(
           '.person-replacement-video-result-slide:not(' + '.person-replacement-video-result-slide--outgoing)',
         );
-      if (!el52 || !incomingSlide3 || incomingSlide3 === outgoingSlide3) return ![];
+      if (!el52 || !incomingSlide3 || incomingSlide3 === outgoingSlide3) return false;
       (el52['querySelectorAll']?.('.person-replacement-video-result-slide--outgoing')?.['forEach']?.((el53) =>
         el53['remove']?.(),
       ),
@@ -2585,7 +2585,7 @@ export function createReplacementStudioWorkspace({
           outgoingSlide3['removeAttribute']?.('aria-busy'),
           outgoingSlide3['setAttribute']?.('aria-hidden', 'true'));
         try {
-          outgoingSlide3['inert'] = !![];
+          outgoingSlide3['inert'] = true;
         } catch {}
         (outgoingSlide3['querySelector']?.('.story-asset-loading-overlay, .img-loading-overlay')?.[
           'remove'
@@ -2598,41 +2598,41 @@ export function createReplacementStudioWorkspace({
         outgoingSlide: outgoingSlide3,
         direction: direction4,
       });
-      let value223 = ![];
+      let value223 = false;
       const value224 = () => {
         if (value223) return;
-        ((value223 = !![]),
+        ((value223 = true),
           cancelPersonReplacementSlideTransition(startPersonReplacementSlideTransition4),
           outgoingSlide3?.['remove']?.());
       };
       return (
         startPersonReplacementSlideTransition4['finished']['then'](value224),
         windowObject?.['setTimeout']?.(value224, startPersonReplacementSlideTransition4['duration'] + 80),
-        !![]
+        true
       );
     },
     handler76 = (value225) => {
       if (initialProject2['workspace']['view'] !== 'project' || initialProject2['workspace']['step'] !== 5)
-        return ![];
+        return false;
       const el54 = floatingMenuHost?.['querySelector']?.('.person-replacement-compare-grid');
-      if (!el54) return ![];
+      if (!el54) return false;
       const value226 = value225 === 'previous' ? 'previous' : 'next';
       return (
         el54['classList']?.['remove']?.('is-sliding-next'),
         el54['classList']?.['remove']?.('is-sliding-previous'),
         void el54['offsetWidth'],
         el54['classList']?.['add']?.('is-sliding-' + value226),
-        !![]
+        true
       );
     },
-    handler51 = (value227, { direction: direction = '', ensureVisible: ensureVisible = ![] } = {}) => {
+    handler51 = (value227, { direction: direction = '', ensureVisible: ensureVisible = false } = {}) => {
       const selectedShotId = normalizeText(value227),
         enabled26 = initialProject2['shots']['find']((value228) => value228['id'] === selectedShotId),
         enabled27 =
           initialProject2['workspace']['step'] === 5 &&
           buildPersonReplacementCompositePreviewSnapshot(initialProject2)['previewMode'] === 'full';
       if (!enabled26 || (selectedShotId === initialProject2['workspace']['selectedShotId'] && !enabled27))
-        return ![];
+        return false;
       const value229 = direction || getShotSwitchDirection(selectedShotId),
         value230 = captureImagePreviewSlide(),
         value231 = captureMiddlePreviewSlide(),
@@ -2653,7 +2653,7 @@ export function createReplacementStudioWorkspace({
         playVideoResultTransition(value229 || 'next', value232),
         handler76(value229 || 'next'));
       if (ensureVisible) scrollShotCardIntoView(selectedShotId);
-      return !![];
+      return true;
     },
     handler45 = (el55) => {
       el55?.['setAttribute']?.(
@@ -2665,17 +2665,17 @@ export function createReplacementStudioWorkspace({
     },
     handler77 = (value233) => {
       const list9 = Array['isArray'](initialProject2['shots']) ? initialProject2['shots'] : [];
-      if (list9['length'] < 2) return ![];
+      if (list9['length'] < 2) return false;
       const value234 = Math['max'](
           0,
           list9['findIndex']((value235) => value235['id'] === initialProject2['workspace']['selectedShotId']),
         ),
         value236 = (value234 + Math['sign'](Number(value233) || 0) + list9['length']) % list9['length'],
         enabled28 = list9[value236];
-      if (!enabled28 || enabled28['id'] === initialProject2['workspace']['selectedShotId']) return ![];
+      if (!enabled28 || enabled28['id'] === initialProject2['workspace']['selectedShotId']) return false;
       return handler51(enabled28['id'], {
         direction: Math['sign'](Number(value233) || 0) < 0 ? 'previous' : 'next',
-        ensureVisible: !![],
+        ensureVisible: true,
       });
     },
     personReplacementResultSelectionController = createPersonReplacementResultSelectionController({
@@ -2714,7 +2714,7 @@ export function createReplacementStudioWorkspace({
         initialProject2['workspace']['view'] !== 'project' ||
         initialProject2['workspace']['step'] !== 3
       )
-        return ![];
+        return false;
       event['preventDefault']();
       const sourceShotId = normalizeText(
           currentResultIndex['dataset']['personReplacementVideoReferenceSourceShotId'],
@@ -2732,7 +2732,7 @@ export function createReplacementStudioWorkspace({
             currentResultIndex: currentResultIndex['dataset']['personReplacementVideoReferenceResultIndex'],
             delta: delta,
           }),
-        !![]
+        true
       );
     },
     handler79 = (value238, value239) => {
@@ -2741,7 +2741,7 @@ export function createReplacementStudioWorkspace({
         ),
         list10 = getWorkspaceAssetAppearances(enabled29),
         list11 = list10['filter']((value241) => value241['imageUrl']);
-      if (!enabled29 || list11['length'] < 2) return ![];
+      if (!enabled29 || list11['length'] < 2) return false;
       const value242 = Math['max'](
           0,
           Math['min'](
@@ -2757,7 +2757,7 @@ export function createReplacementStudioWorkspace({
           list11['findIndex']((value245) => value245['id'] === value243),
         ),
         value246 = (value244 + Math['sign'](Number(value239) || 0) + list11['length']) % list11['length'];
-      if (value246 === value244) return ![];
+      if (value246 === value244) return false;
       const value247 = list11[value246]?.['id'],
         value248 = list10['findIndex']((value249) => value249['id'] === value247),
         value250 = {
@@ -2770,7 +2770,7 @@ export function createReplacementStudioWorkspace({
             },
           },
         };
-      return (updateProject(value250, 'target-appearance-preview-change'), !![]);
+      return (updateProject(value250, 'target-appearance-preview-change'), true);
     },
     handler80 = (event2) => {
       const el56 = event2['target']?.['closest']?.(
@@ -2781,7 +2781,7 @@ export function createReplacementStudioWorkspace({
         initialProject2['workspace']['view'] !== 'project' ||
         initialProject2['workspace']['step'] !== 2
       )
-        return ![];
+        return false;
       event2['preventDefault']();
       const text12 = normalizeText(el56['dataset']['personReplacementTargetCharacterId']),
         value251 = map3['get'](text12) || { accumulator: 0, lockedUntil: 0 };
@@ -2791,7 +2791,7 @@ export function createReplacementStudioWorkspace({
         lockDuration: 160,
       });
       if (consumeWorkspaceWheelDirection2) handler79(text12, consumeWorkspaceWheelDirection2);
-      return !![];
+      return true;
     },
     handler81 = (event3) => {
       const boundaryRoot = event3['target']?.['closest']?.(
@@ -2803,13 +2803,13 @@ export function createReplacementStudioWorkspace({
         initialProject2['workspace']['step'] !== 1 ||
         initialProject2['workspace']['characterAssetTab'] === 'library'
       )
-        return ![];
-      if (shouldPreserveWorkspaceNestedWheel(event3['target'], { boundaryRoot: boundaryRoot })) return ![];
+        return false;
+      if (shouldPreserveWorkspaceNestedWheel(event3['target'], { boundaryRoot: boundaryRoot })) return false;
       event3['preventDefault']();
       const consumeWorkspaceWheelDirection3 = consumeWorkspaceWheelDirection(event3, value70);
       if (consumeWorkspaceWheelDirection3)
         handler73(consumeWorkspaceWheelDirection3, boundaryRoot['dataset']['storyCardAppearanceWheel']);
-      return !![];
+      return true;
     },
     handler82 = (event4) => {
       const enabled30 = event4['target']?.['closest']?.('[data-person-replacement-audio-bound-wheel="true"]');
@@ -2819,11 +2819,11 @@ export function createReplacementStudioWorkspace({
         initialProject2['workspace']['step'] !== 1 ||
         initialProject2['workspace']['characterAssetTab'] !== 'audio'
       )
-        return ![];
+        return false;
       event4['preventDefault']();
       const consumeWorkspaceWheelDirection4 = consumeWorkspaceWheelDirection(event4, value71);
       if (consumeWorkspaceWheelDirection4) handler74(consumeWorkspaceWheelDirection4);
-      return !![];
+      return true;
     },
     handler83 = (event5) => {
       const enabled31 = event5['target']?.['closest']?.('[data-person-replacement-shot-wheel="true"]');
@@ -2833,11 +2833,11 @@ export function createReplacementStudioWorkspace({
         ![2, 3, 5]['includes'](initialProject2['workspace']['step']) ||
         (initialProject2['workspace']['step'] === 2 && selectedIds['isOpen'])
       )
-        return ![];
+        return false;
       event5['preventDefault']();
       const consumeWorkspaceWheelDirection5 = consumeWorkspaceWheelDirection(event5, value72);
       if (consumeWorkspaceWheelDirection5) handler77(consumeWorkspaceWheelDirection5);
-      return !![];
+      return true;
     },
     handler84 = (event6) => {
       const value252 = event6['target']?.['closest']?.(
@@ -2851,7 +2851,7 @@ export function createReplacementStudioWorkspace({
         event6['preventDefault']();
         const consumeWorkspaceWheelDirection6 = consumeWorkspaceWheelDirection(event6, value74);
         if (consumeWorkspaceWheelDirection6) switchVideoResult(consumeWorkspaceWheelDirection6);
-        return !![];
+        return true;
       }
       const enabled32 = event6['target']?.['closest']?.(
         '[data-person-replacement-image-result-wheel="true"]',
@@ -2861,56 +2861,56 @@ export function createReplacementStudioWorkspace({
         initialProject2['workspace']['view'] !== 'project' ||
         initialProject2['workspace']['step'] !== 2
       )
-        return ![];
+        return false;
       event6['preventDefault']();
       const consumeWorkspaceWheelDirection7 = consumeWorkspaceWheelDirection(event6, value73);
       if (consumeWorkspaceWheelDirection7) switchImageResult(consumeWorkspaceWheelDirection7);
-      return !![];
+      return true;
     },
     handler85 = (clientX2) => {
       const el57 = clientX2['target']?.['closest']?.('[data-person-replacement-shot-timeline-scroll]'),
         enabled33 = clientX2['target']?.['closest']?.('[data-person-replacement-shot-cut-timeline]');
       if (!selectedIds['isOpen'] || !el57 || !enabled33 || !floatingMenuHost?.['contains']?.(el57))
-        return ![];
+        return false;
       const value253 = Number(clientX2['deltaX']) || 0,
         value254 = Number(clientX2['deltaY']) || 0,
         enabled34 = Math['abs'](value253) > Math['abs'](value254) ? value253 : value254;
-      if (!enabled34) return ![];
+      if (!enabled34) return false;
       if (clientX2['ctrlKey'] || clientX2['metaKey'])
         return (
           clientX2['preventDefault']?.(),
           clientX2['stopPropagation']?.(),
           applyTimelineZoom(enabled34 > 0 ? 'out' : 'in', { clientX: clientX2['clientX'] }),
-          !![]
+          true
         );
       const count7 = Math['max'](0, Number(el57['scrollWidth']) - Number(el57['clientWidth']));
-      if (!(count7 > 0)) return ![];
+      if (!(count7 > 0)) return false;
       const clamp2 = clamp(
         Number(el57['scrollLeft']) + enabled34,
         0,
         count7,
         Number(el57['scrollLeft']) || 0,
       );
-      if (clamp2 === Number(el57['scrollLeft'])) return ![];
+      if (clamp2 === Number(el57['scrollLeft'])) return false;
       return (
         clientX2['preventDefault']?.(),
         clientX2['stopPropagation']?.(),
         (el57['scrollLeft'] = clamp2),
-        !![]
+        true
       );
     },
     handler86 = (value255) => {
       return scrollClosestElementHorizontallyWithWheel(
         value255,
         '[data-person-replacement-shot-timeline-scroll]',
-        { boundaryRoot: floatingMenuHost, preserveNestedScrollable: !![] },
+        { boundaryRoot: floatingMenuHost, preserveNestedScrollable: true },
       );
     },
     handler87 = (value256) => {
       return scrollClosestElementHorizontallyWithWheel(value256, '.person-replacement-video-model-selector', {
         boundaryRoot: floatingMenuHost,
-        preserveNestedScrollable: !![],
-        stopPropagation: !![],
+        preserveNestedScrollable: true,
+        stopPropagation: true,
       });
     },
     value257 = (cancelled2) => {
@@ -2971,7 +2971,7 @@ export function createReplacementStudioWorkspace({
         if (el61) {
           (cancelled2['preventDefault'](), cancelled2['stopPropagation']());
           const el62 = el61['querySelector']?.('[data-story-action="toggle-character-voice-menu"]');
-          (handler37(el61, ![]), el62?.['focus']?.());
+          (handler37(el61, false), el62?.['focus']?.());
           return;
         }
         const el63 = floatingMenuHost?.['querySelector']?.(
@@ -2982,12 +2982,12 @@ export function createReplacementStudioWorkspace({
           const el64 = el63['querySelector']?.(
             '[data-person-replacement-action="toggle-library-add-targets"]',
           );
-          (handler35(el63, ![]), el64?.['focus']?.());
+          (handler35(el63, false), el64?.['focus']?.());
           return;
         }
       }
       if (cancelled2['key'] === 'Escape' && value66) {
-        (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), handler88({ restoreFocus: !![] }));
+        (cancelled2['preventDefault'](), cancelled2['stopPropagation'](), handler88({ restoreFocus: true }));
         return;
       }
       const el65 = cancelled2['target']?.['closest']?.('[data-person-replacement-person-custom-label]');
@@ -3044,7 +3044,7 @@ export function createReplacementStudioWorkspace({
         const el69 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-shot-cut-editor]');
         if (el69 && cancelled2['target'] !== el69)
           try {
-            el69['focus']?.({ preventScroll: !![] });
+            el69['focus']?.({ preventScroll: true });
           } catch {
             el69['focus']?.();
           }
@@ -3145,12 +3145,12 @@ export function createReplacementStudioWorkspace({
         if (selectedIds['isSmartDetectOpen'] && !selectedIds['isSmartDetecting']) {
           (cancelled2['preventDefault'](),
             cancelled2['stopPropagation'](),
-            (selectedIds['isSmartDetectOpen'] = ![]),
+            (selectedIds['isSmartDetectOpen'] = false),
             run());
           return;
         }
         if (selectedIds['isOpen'] && !isDraftMutationBusy()) {
-          (cancelled2['preventDefault'](), close2({ animate: !![], renderWorkspace: !![] }));
+          (cancelled2['preventDefault'](), close2({ animate: true, renderWorkspace: true }));
           return;
         }
         (workspaceMarqueeSelectionController?.['cancel']?.(),
@@ -3160,7 +3160,7 @@ export function createReplacementStudioWorkspace({
             updateProject(
               {
                 ...initialProject2,
-                workspace: { ...initialProject2['workspace'], shotSelectionMode: ![], selectedShotIds: [] },
+                workspace: { ...initialProject2['workspace'], shotSelectionMode: false, selectedShotIds: [] },
               },
               'shot-selection-cancel',
             ),
@@ -3169,7 +3169,7 @@ export function createReplacementStudioWorkspace({
             updateProject(
               {
                 ...initialProject2,
-                workspace: { ...initialProject2['workspace'], assetSelectionMode: ![], selectedAssetIds: [] },
+                workspace: { ...initialProject2['workspace'], assetSelectionMode: false, selectedAssetIds: [] },
               },
               'asset-selection-cancel',
             ));
@@ -3263,13 +3263,13 @@ export function createReplacementStudioWorkspace({
       );
     },
     handler93 = () => {
-      if (initialProject2['workspace']['view'] !== 'home') return ![];
+      if (initialProject2['workspace']['view'] !== 'home') return false;
       const el72 = floatingMenuHost?.['querySelector']?.('[data-person-replacement-smart-clip-settings]'),
         el73 = el72?.['querySelector']?.('[data-person-replacement-action="toggle-smart-clip-settings"]');
-      if (!el72 || !el73) return ![];
-      const enabled38 = initialProject2['workspace']['smartClipSettingsOpen'] === !![],
+      if (!el72 || !el73) return false;
+      const enabled38 = initialProject2['workspace']['smartClipSettingsOpen'] === true,
         el74 = el72['querySelector']?.('.person-replacement-smart-clip-settings-panel');
-      if (enabled38 && !el74 && typeof el72['insertAdjacentHTML'] !== 'function') return ![];
+      if (enabled38 && !el74 && typeof el72['insertAdjacentHTML'] !== 'function') return false;
       (el73['classList']?.['toggle']?.('is-active', enabled38),
         el73['setAttribute']?.('aria-expanded', String(enabled38)));
       if (enabled38 && !el74)
@@ -3291,12 +3291,12 @@ export function createReplacementStudioWorkspace({
           (el76['classList']?.['toggle']?.('is-active', value271),
             el76['setAttribute']?.('aria-pressed', String(value271)));
         }),
-        !![]
+        true
       );
     },
     handler12 = (
       { workspace: workspace = {}, settings: settings = {} } = {},
-      { notify: notify = ![] } = {},
+      { notify: notify = false } = {},
     ) => {
       initialProject2 = normalizePersonReplacementWorkspaceProject({
         ...initialProject2,
@@ -3328,8 +3328,8 @@ export function createReplacementStudioWorkspace({
     handler95 = (el81) => {
       const el82 = el81?.['querySelector']?.('[data-person-replacement-detection-picker-menu]'),
         selectedValue = el81?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]');
-      if (!el82 || !selectedValue) return ![];
-      if (el82['dataset']?.['personReplacementPickerOptionsReady'] === 'true') return !![];
+      if (!el82 || !selectedValue) return false;
+      if (el82['dataset']?.['personReplacementPickerOptionsReady'] === 'true') return true;
       const text14 = normalizeText(el81['dataset']?.['personReplacementDetectionPicker']);
       let options4 = [];
       if (text14 === 'orientation') options4 = getPersonOrientationOptions();
@@ -3367,13 +3367,13 @@ export function createReplacementStudioWorkspace({
           selectedValue: selectedValue['value'],
         })),
         el82['dataset'] && (el82['dataset']['personReplacementPickerOptionsReady'] = 'true'),
-        !![]
+        true
       );
     },
     handler96 = (el84, enabled40) => {
       const el85 = el84?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]'),
         el86 = el84?.['querySelector']?.('[data-person-replacement-detection-picker-menu]');
-      if (enabled40 && !handler95(el84)) return ![];
+      if (enabled40 && !handler95(el84)) return false;
       return (
         el84?.['classList']?.['toggle']?.('is-open', enabled40),
         el84?.['closest']?.('.person-replacement-detection-box')?.['classList']?.['toggle']?.(
@@ -3386,28 +3386,28 @@ export function createReplacementStudioWorkspace({
           el86?.['dataset']?.['personReplacementPickerOptionsLazy'] === 'true' &&
           ((el86['innerHTML'] = ''),
           el86['dataset'] && delete el86['dataset']['personReplacementPickerOptionsReady']),
-        !![]
+        true
       );
     },
     handler90 = (value277 = null) => {
-      let value278 = ![];
+      let value278 = false;
       return (
         floatingMenuHost?.['querySelectorAll']?.('[data-person-replacement-detection-picker].is-open')?.[
           'forEach'
         ]?.((value279) => {
           if (value279 === value277) return;
-          (handler96(value279, ![]), (value278 = !![]));
+          (handler96(value279, false), (value278 = true));
         }),
         value278
       );
     },
-    handler89 = (el87, { cancelled: cancelled = ![] } = {}) => {
-      if (!el87 || el87['hidden']) return ![];
+    handler89 = (el87, { cancelled: cancelled = false } = {}) => {
+      if (!el87 || el87['hidden']) return false;
       const el88 = el87['closest']?.('[data-person-replacement-detection-picker]'),
         detectionBox2 = el87['closest']?.('.person-replacement-detection-box'),
         sourceCharacterId3 = el88?.['querySelector']?.('[data-person-replacement-detection-picker-trigger]'),
         el89 = sourceCharacterId3?.['querySelector']?.('[data-person-replacement-detection-picker-value]');
-      if (!el88 || !sourceCharacterId3 || !el89) return ![];
+      if (!el88 || !sourceCharacterId3 || !el89) return false;
       const text16 = normalizeText(el88['dataset']['personReplacementPreviousValue']),
         text17 = normalizeText(el88['dataset']['personReplacementPreviousLabel'], text16),
         text18 = normalizeText(el88['dataset']['personReplacementPreviousSourceCharacterId']),
@@ -3428,11 +3428,11 @@ export function createReplacementStudioWorkspace({
                   (value282) => value282['id'] === normalizeText(detectionBox2?.['dataset']?.['personId']),
                 )?.['sourceCharacterId'],
             )),
-        (sourceCharacterId3['hidden'] = ![]),
+        (sourceCharacterId3['hidden'] = false),
         sourceCharacterId3['setAttribute']('aria-label', '人物名称：' + label3),
         (el89['textContent'] = label3),
         (el87['value'] = label3),
-        (el87['hidden'] = !![]),
+        (el87['hidden'] = true),
         el88['querySelectorAll']?.('[data-person-replacement-detection-picker-option]')?.['forEach']?.(
           (el90) => {
             const text20 =
@@ -3472,7 +3472,7 @@ export function createReplacementStudioWorkspace({
         (!enabled42 && !enabled43) ||
         (value284 && !enabled44)
       )
-        return ![];
+        return false;
       return (
         workspaceMarqueeSelectionController?.['cancel']?.(),
         updateProject(
@@ -3481,13 +3481,13 @@ export function createReplacementStudioWorkspace({
             workspace: {
               ...initialProject2['workspace'],
               ...(enabled43
-                ? { shotSelectionMode: ![], selectedShotIds: [] }
-                : { assetSelectionMode: ![], selectedAssetIds: [] }),
+                ? { shotSelectionMode: false, selectedShotIds: [] }
+                : { assetSelectionMode: false, selectedAssetIds: [] }),
             },
           },
           enabled43 ? 'shot-selection-cancel' : 'asset-selection-cancel',
         ),
-        !![]
+        true
       );
     },
     handler98 = (value285) => {
@@ -3611,7 +3611,7 @@ export function createReplacementStudioWorkspace({
                                         ...initialProject2,
                                         workspace: {
                                           ...initialProject2['workspace'],
-                                          assetSelectionMode: ![],
+                                          assetSelectionMode: false,
                                           selectedAssetIds: [],
                                         },
                                       },
@@ -4089,7 +4089,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                 ] ||
                                                                                                                 '',
                                                                                                               assetSelectionMode:
-                                                                                                                ![],
+                                                                                                                false,
                                                                                                               selectedAssetIds:
                                                                                                                 [],
                                                                                                             },
@@ -4317,7 +4317,7 @@ export function createReplacementStudioWorkspace({
                                                                                                               windowObject?.[
                                                                                                                 'DEV_MODE'
                                                                                                               ] !==
-                                                                                                              !![]
+                                                                                                              true
                                                                                                             )
                                                                                                               return;
                                                                                                             const kind =
@@ -4412,7 +4412,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                           {},
                                                                                                                           {
                                                                                                                             applyCallbackResult:
-                                                                                                                              ![],
+                                                                                                                              false,
                                                                                                                           },
                                                                                                                         )),
                                                                                                                         notes:
@@ -4600,8 +4600,8 @@ export function createReplacementStudioWorkspace({
       }
     },
     handler100 = (enabled49) => {
-      if (!enabled49?.['project']) return ![];
-      return (hide(), updateProject(enabled49['project'], enabled49['reason']), !![]);
+      if (!enabled49?.['project']) return false;
+      return (hide(), updateProject(enabled49['project'], enabled49['reason']), true);
     },
     handler101 = (value299, reason5 = 'scene-reference-change') =>
       handler100(applyPersonReplacementShotSceneReference(initialProject2, value299, { reason: reason5 })),
@@ -4609,7 +4609,7 @@ export function createReplacementStudioWorkspace({
       handler100(clearPersonReplacementShotPersonMappings(initialProject2, value300, { reason: reason6 })),
     handler103 = (value301) =>
       handler100(assignPersonReplacementShotPersonMapping(initialProject2, value301)),
-    handler88 = ({ restoreFocus: restoreFocus = ![] } = {}) => {
+    handler88 = ({ restoreFocus: restoreFocus = false } = {}) => {
       const el97 = value66?.['focusTarget'];
       ((value66 = null),
         floatingMenuHost?.['querySelector']?.('[data-person-replacement-mapping-scope-menu]')?.[
@@ -4626,7 +4626,7 @@ export function createReplacementStudioWorkspace({
       clientX: clientX3,
       clientY: clientY2,
     } = {}) => {
-      if (!floatingMenuHost || !personBox || !mapping) return ![];
+      if (!floatingMenuHost || !personBox || !mapping) return false;
       (handler88(),
         (value66 = { mapping: mapping, focusTarget: personBox }),
         floatingMenuHost['insertAdjacentHTML']?.(
@@ -4638,7 +4638,7 @@ export function createReplacementStudioWorkspace({
           }),
         ));
       const el98 = floatingMenuHost['querySelector']?.('[data-person-replacement-mapping-scope-menu]');
-      if (!el98) return ((value66 = null), ![]);
+      if (!el98) return ((value66 = null), false);
       const box3 = floatingMenuHost['getBoundingClientRect']?.(),
         box4 = personBox['getBoundingClientRect']?.(),
         box5 = el98['getBoundingClientRect']?.();
@@ -4658,7 +4658,7 @@ export function createReplacementStudioWorkspace({
       }
       return (
         el98['querySelector']?.('[data-person-replacement-mapping-scope=\'current\']')?.['focus']?.(),
-        !![]
+        true
       );
     },
     handler105 = (selectedAssetIds2, targetKind) =>
@@ -4767,7 +4767,7 @@ export function createReplacementStudioWorkspace({
               modelId: initialProject2['settings']['replacementModelId'],
             },
             {},
-            { applyCallbackResult: ![] },
+            { applyCallbackResult: false },
           ));
         return;
       }
@@ -4797,7 +4797,7 @@ export function createReplacementStudioWorkspace({
             itemId: itemId,
             activeItemId: initialProject2['workspace']['selectedShotId'],
             selectionMode: initialProject2['workspace']['shotSelectionMode'],
-            shiftKey: shiftKey['shiftKey'] === !![],
+            shiftKey: shiftKey['shiftKey'] === true,
             toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
             orderedIds: initialProject2['shots']['map']((value313) => value313['id']),
           });
@@ -4874,7 +4874,7 @@ export function createReplacementStudioWorkspace({
                     ),
                     toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
                     selectionMode: initialProject2['workspace']['assetSelectionMode'],
-                    shiftKey: shiftKey['shiftKey'] === !![],
+                    shiftKey: shiftKey['shiftKey'] === true,
                   });
                   updateProject(
                     {
@@ -4907,7 +4907,7 @@ export function createReplacementStudioWorkspace({
                         ),
                         toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
                         selectionMode: initialProject2['workspace']['assetSelectionMode'],
-                        shiftKey: shiftKey['shiftKey'] === !![],
+                        shiftKey: shiftKey['shiftKey'] === true,
                         enabled: Boolean(
                           (normalizeText(value316?.['mediaKind'])['toLowerCase']() === 'image' &&
                             normalizeText(value316?.['sourceUrl'] || value316?.['imageUrl'])) ||
@@ -4941,7 +4941,7 @@ export function createReplacementStudioWorkspace({
                       ),
                       toggleKey: shiftKey['ctrlKey'] || shiftKey['metaKey'],
                       selectionMode: initialProject2['workspace']['assetSelectionMode'],
-                      shiftKey: shiftKey['shiftKey'] === !![],
+                      shiftKey: shiftKey['shiftKey'] === true,
                     });
                     updateProject(
                       {
@@ -4984,7 +4984,7 @@ export function createReplacementStudioWorkspace({
       }
       initialProject2['workspace']['view'] === 'home' &&
         !shiftKey['target']?.['closest']?.('[data-story-project-sort-wrap]') &&
-        handler94(![]);
+        handler94(false);
       initialProject2['workspace']['view'] === 'home' &&
         initialProject2['workspace']['openProjectMenuId'] &&
         !shiftKey['target']?.['closest']?.('[data-story-project-menu-wrap]') &&
@@ -4999,7 +4999,7 @@ export function createReplacementStudioWorkspace({
               el110 = el108['querySelector']?.('[data-story-project-menu]');
             (el109?.['setAttribute']?.('aria-expanded', 'false'),
               el110?.['setAttribute']?.('aria-hidden', 'true'));
-            if (el110) el110['hidden'] = !![];
+            if (el110) el110['hidden'] = true;
           },
         ));
       if (shiftKey['target']?.['closest']?.('[data-person-replacement-cut-boundary-index]')) return;
@@ -5039,7 +5039,7 @@ export function createReplacementStudioWorkspace({
                           modelId: initialProject2['settings']['replacementModelId'],
                           inputMode: inputMode,
                           generationParams: initialProject2['settings']['replacementVideoGenerationParams'],
-                          resetModeDefaults: !![],
+                          resetModeDefaults: true,
                         });
                       updateProject(
                         {
@@ -5056,7 +5056,7 @@ export function createReplacementStudioWorkspace({
                       if (value319)
                         floatingMenuHost['querySelector'](
                           '[data-person-replacement-action="set-video-input-mode"]',
-                        )?.['focus']?.({ preventScroll: !![] });
+                        )?.['focus']?.({ preventScroll: true });
                     } else {
                       if (mode2 === 'select-voice-source') selectSource(sourceId['dataset']['sourceId']);
                       else {
@@ -5065,7 +5065,7 @@ export function createReplacementStudioWorkspace({
                             downloadImageIntent['EXTRACT_VOICE'],
                             sourceId['dataset']['sourceId'],
                             {},
-                            { applyCallbackResult: ![] },
+                            { applyCallbackResult: false },
                           );
                         else {
                           if (mode2 === 'cancel-voice-separation')
@@ -5073,7 +5073,7 @@ export function createReplacementStudioWorkspace({
                               downloadImageIntent['CANCEL_VOICE_EXTRACTION'],
                               sourceId['dataset']['sourceId'],
                               {},
-                              { applyCallbackResult: ![] },
+                              { applyCallbackResult: false },
                             );
                           else {
                             if (mode2 === 'select-voice-asset')
@@ -5116,7 +5116,7 @@ export function createReplacementStudioWorkspace({
                                                   selectedCharacterId:
                                                     selectedCharacterId2 ||
                                                     initialProject2['workspace']['selectedCharacterId'],
-                                                  assetSelectionMode: ![],
+                                                  assetSelectionMode: false,
                                                   selectedAssetIds: [],
                                                 },
                                               },
@@ -5201,7 +5201,7 @@ export function createReplacementStudioWorkspace({
                                                           ...initialProject2['workspace'],
                                                           characterAssetTab: 'character',
                                                           selectedCharacterId: selectedCharacterId3,
-                                                          assetSelectionMode: ![],
+                                                          assetSelectionMode: false,
                                                           selectedAssetIds: [],
                                                         },
                                                       },
@@ -5244,7 +5244,7 @@ export function createReplacementStudioWorkspace({
                                                     sourceId['closest']?.(
                                                       '.person-replacement-library-add-menu-wrap',
                                                     ),
-                                                    ![],
+                                                    false,
                                                   );
                                                   const value326 = initialProject2['workspace'][
                                                     'assetSelectionMode'
@@ -5296,7 +5296,7 @@ export function createReplacementStudioWorkspace({
                                                           ...args26['workspace'],
                                                           characterAssetTab: characterAssetTab,
                                                           selectedAudioAssetId: selectedAudioAssetId2,
-                                                          assetSelectionMode: ![],
+                                                          assetSelectionMode: false,
                                                           selectedAssetIds: [],
                                                         },
                                                       },
@@ -5321,7 +5321,7 @@ export function createReplacementStudioWorkspace({
                                                                 sourceId['dataset']['smartClipMode'],
                                                             },
                                                           },
-                                                          { notify: !![] },
+                                                          { notify: true },
                                                         );
                                                       else {
                                                         if (mode2 === 'set-smart-clip-fps')
@@ -5333,7 +5333,7 @@ export function createReplacementStudioWorkspace({
                                                                 ),
                                                               },
                                                             },
-                                                            { notify: !![] },
+                                                            { notify: true },
                                                           );
                                                         else {
                                                           if (mode2 === 'process-sources')
@@ -5353,8 +5353,8 @@ export function createReplacementStudioWorkspace({
                                                             } else {
                                                               if (mode2 === 'select-shot')
                                                                 (close2({
-                                                                  animate: ![],
-                                                                  renderWorkspace: ![],
+                                                                  animate: false,
+                                                                  renderWorkspace: false,
                                                                 }),
                                                                   handler51(sourceId['dataset']['shotId']));
                                                               else {
@@ -5539,7 +5539,7 @@ export function createReplacementStudioWorkspace({
                                                                                 ((el118['value'] = ''),
                                                                                 el118['focus']?.()));
                                                                           }
-                                                                          handler96(el114, ![]);
+                                                                          handler96(el114, false);
                                                                           const detectionBox3 = el114?.[
                                                                             'closest'
                                                                           ]?.(
@@ -5858,7 +5858,7 @@ export function createReplacementStudioWorkspace({
                                                                                         {},
                                                                                         {
                                                                                           applyCallbackResult:
-                                                                                            ![],
+                                                                                            false,
                                                                                         },
                                                                                       );
                                                                                     } else {
@@ -5916,7 +5916,7 @@ export function createReplacementStudioWorkspace({
                                                                                             {},
                                                                                             {
                                                                                               applyCallbackResult:
-                                                                                                ![],
+                                                                                                false,
                                                                                             },
                                                                                           );
                                                                                           return;
@@ -5935,7 +5935,7 @@ export function createReplacementStudioWorkspace({
                                                                                           {},
                                                                                           {
                                                                                             applyCallbackResult:
-                                                                                              ![],
+                                                                                              false,
                                                                                           },
                                                                                         );
                                                                                       } else {
@@ -5991,7 +5991,7 @@ export function createReplacementStudioWorkspace({
                                                                                                     {},
                                                                                                     {
                                                                                                       applyCallbackResult:
-                                                                                                        ![],
+                                                                                                        false,
                                                                                                     },
                                                                                                   );
                                                                                                 else {
@@ -6025,7 +6025,7 @@ export function createReplacementStudioWorkspace({
                                                                                                           {},
                                                                                                           {
                                                                                                             applyCallbackResult:
-                                                                                                              ![],
+                                                                                                              false,
                                                                                                           },
                                                                                                         ));
                                                                                                     else {
@@ -6051,7 +6051,7 @@ export function createReplacementStudioWorkspace({
                                                                                                             {},
                                                                                                             {
                                                                                                               applyCallbackResult:
-                                                                                                                ![],
+                                                                                                                false,
                                                                                                             },
                                                                                                           ));
                                                                                                       else
@@ -6087,7 +6087,7 @@ export function createReplacementStudioWorkspace({
                                                                                                             {},
                                                                                                             {
                                                                                                               applyCallbackResult:
-                                                                                                                ![],
+                                                                                                                false,
                                                                                                             },
                                                                                                           ));
                                                                                                     }
@@ -6264,7 +6264,7 @@ export function createReplacementStudioWorkspace({
                 else {
                   if (value341 === 'replacement-image' && list17[0])
                     runIntent(downloadImageIntent['SELECT_REPLACEMENT_IMAGE'], list17[0], value45 || {}, {
-                      applyCallbackResult: ![],
+                      applyCallbackResult: false,
                     });
                   else {
                     if (value341 === 'replacement-video-result' && list17[0]) {
@@ -6277,7 +6277,7 @@ export function createReplacementStudioWorkspace({
                             list17[0],
                             value343,
                             {
-                              applyCallbackResult: ![],
+                              applyCallbackResult: false,
                             },
                           ),
                         ),
@@ -6288,7 +6288,7 @@ export function createReplacementStudioWorkspace({
                           downloadImageIntent['SELECT_REPLACEMENT_VIDEO_INPUT'],
                           list17[0],
                           value45 || {},
-                          { applyCallbackResult: ![] },
+                          { applyCallbackResult: false },
                         );
                       else {
                         if (value341 === 'character-voice' && list17[0])
@@ -6356,7 +6356,7 @@ export function createReplacementStudioWorkspace({
       const value345 = event9['target']?.['closest']?.('[data-person-replacement-person-custom-label]');
       if (value345) handler89(value345);
       const enabled57 = event9['target']?.['closest']?.('[data-person-replacement-detection-picker]');
-      enabled57 && !enabled57['contains']?.(event9['relatedTarget']) && handler96(enabled57, ![]);
+      enabled57 && !enabled57['contains']?.(event9['relatedTarget']) && handler96(enabled57, false);
       const value346 = event9['target']?.['closest']?.('[data-story-asset-name-id][contenteditable="true"]');
       if (value346) handler49(value346);
     },
@@ -6404,7 +6404,7 @@ export function createReplacementStudioWorkspace({
         event10['preventDefault']?.();
         return;
       }
-      ((enabled2 = !![]),
+      ((enabled2 = true),
         (event10['dataTransfer']['effectAllowed'] = 'copy'),
         sceneId2
           ? event10['dataTransfer']['setData'](
@@ -6439,7 +6439,7 @@ export function createReplacementStudioWorkspace({
         (el125['style']['height'] = Math['round'](value351) + 'px'),
         (value352['src'] = text31),
         (value352['alt'] = ''),
-        (value352['draggable'] = ![]),
+        (value352['draggable'] = false),
         el125['appendChild'](value352),
         documentObject['body']?.['appendChild']?.(el125),
         el125
@@ -6507,7 +6507,7 @@ export function createReplacementStudioWorkspace({
         !normalizeText(target2?.['characterId']) ||
         !normalizeText(target2?.['appearanceId'])
       )
-        return ![];
+        return false;
       const mapping2 = {
           shotId: personBox2['dataset']['shotId'],
           personId: personBox2['dataset']['personId'],
@@ -6520,7 +6520,7 @@ export function createReplacementStudioWorkspace({
         enabled58 = value365?.['people']?.['find'](
           (value367) => value367['id'] === normalizeText(mapping2['personId']),
         );
-      if (!enabled58) return ![];
+      if (!enabled58) return false;
       const text32 = normalizeText(enabled58['sourceCharacterId']),
         value368 = initialProject2['mappings']['find'](
           (value369) => normalizeText(value369['sourceCharacterId']) === text32,
@@ -6548,7 +6548,7 @@ export function createReplacementStudioWorkspace({
           personId: normalizeText(mapping2['personId']),
         }),
         hide(),
-        !![]
+        true
       );
     },
     handler113 = () => {
@@ -6573,7 +6573,7 @@ export function createReplacementStudioWorkspace({
         pointerId['button'] !== 0 ||
         pointerId['target']?.['closest']?.('.story-appearance-arrow, .at-mention-variant-arrow')
       )
-        return ![];
+        return false;
       const kind3 = normalizeText(element['dataset']?.['personReplacementTargetSceneId']),
         characterId8 = normalizeText(element['dataset']?.['personReplacementTargetCharacterId']),
         appearanceId5 = normalizeText(
@@ -6581,7 +6581,7 @@ export function createReplacementStudioWorkspace({
             ? element['dataset']?.['personReplacementTargetSceneAppearanceId']
             : element['dataset']?.['personReplacementTargetAppearanceId'],
         );
-      if ((!kind3 && !characterId8) || !appearanceId5) return ![];
+      if ((!kind3 && !characterId8) || !appearanceId5) return false;
       return (
         (value48 = {
           kind: kind3 ? 'scene' : 'character',
@@ -6593,23 +6593,23 @@ export function createReplacementStudioWorkspace({
           startX: Number(pointerId['clientX']) || 0,
           startY: Number(pointerId['clientY']) || 0,
           originalDraggable: element['getAttribute']?.('draggable'),
-          active: ![],
+          active: false,
           preview: null,
         }),
         element['setAttribute']?.('draggable', 'false'),
         element['setPointerCapture']?.(pointerId['pointerId']),
-        !![]
+        true
       );
     },
     handler115 = (event15) => {
       const event16 = value48;
-      if (!event16 || event16['pointerId'] !== event15['pointerId']) return ![];
+      if (!event16 || event16['pointerId'] !== event15['pointerId']) return false;
       if (!event16['active']) {
         const value372 = (Number(event15['clientX']) || 0) - event16['startX'],
           value373 = (Number(event15['clientY']) || 0) - event16['startY'];
-        if (Math['hypot'](value372, value373) < 8) return ![];
-        ((event16['active'] = !![]),
-          (enabled2 = !![]),
+        if (Math['hypot'](value372, value373) < 8) return false;
+        ((event16['active'] = true),
+          (enabled2 = true),
           event16['element']['classList']?.['add']?.('is-story-asset-dragging'),
           documentObject['body']?.['classList']?.['add']?.('person-replacement-target-asset-dragging'),
           hide(),
@@ -6619,12 +6619,12 @@ export function createReplacementStudioWorkspace({
         handler108(event16['preview'], event15),
         event16['kind'] === 'scene' && handler111(handler110(event15)),
         event15['preventDefault']?.(),
-        !![]
+        true
       );
     },
-    handler116 = (clientX4, { cancelled: cancelled = ![] } = {}) => {
+    handler116 = (clientX4, { cancelled: cancelled = false } = {}) => {
       const characterId9 = value48;
-      if (!characterId9 || characterId9['pointerId'] !== clientX4['pointerId']) return ![];
+      if (!characterId9 || characterId9['pointerId'] !== clientX4['pointerId']) return false;
       const shotId6 =
           characterId9['kind'] === 'scene' && !cancelled && characterId9['active']
             ? handler110(clientX4)
@@ -6637,9 +6637,9 @@ export function createReplacementStudioWorkspace({
         target3 = { characterId: characterId9['characterId'], appearanceId: characterId9['appearanceId'] };
       (handler113(),
         handler111(null),
-        (enabled2 = ![]),
+        (enabled2 = false),
         characterId9['element']['classList']?.['remove']?.('is-story-asset-dragging'));
-      if (!enabled59) return ![];
+      if (!enabled59) return false;
       ((value49 = characterId9['element']), clientX4['preventDefault']?.(), clientX4['stopPropagation']?.());
       if (shotId6)
         handler101({
@@ -6655,7 +6655,7 @@ export function createReplacementStudioWorkspace({
             clientX: clientX4['clientX'],
             clientY: clientX4['clientY'],
           });
-      return !![];
+      return true;
     },
     handler117 = () => {
       (el2?.['classList']?.['remove']?.('is-dragover'),
@@ -6665,7 +6665,7 @@ export function createReplacementStudioWorkspace({
     value374 = (event17) => {
       if (
         promptEnhancementModel(downloadImageIntent['HAS_PROJECT_PACKAGE_DRAG'], event17['dataTransfer']) ===
-        !![]
+        true
       ) {
         (event17['preventDefault']?.(), event17['stopPropagation']?.());
         if (event17['dataTransfer']) event17['dataTransfer']['dropEffect'] = 'copy';
@@ -6715,7 +6715,7 @@ export function createReplacementStudioWorkspace({
       }
     },
     handler118 = () => {
-      ((enabled2 = ![]),
+      ((enabled2 = false),
         handler113(),
         handler111(null),
         floatingMenuHost?.['querySelectorAll']?.(
@@ -6741,7 +6741,7 @@ export function createReplacementStudioWorkspace({
       (clearDropTarget(), resetDropEligibility(), handler117(), handler111(null));
     },
     value382 = (clientX5) => {
-      if (promptEnhancementModel(downloadImageIntent['DROP_PROJECT_PACKAGE'], clientX5) === !![]) return;
+      if (promptEnhancementModel(downloadImageIntent['DROP_PROJECT_PACKAGE'], clientX5) === true) return;
       const el131 = clientX5['target']?.['closest']?.('[data-audio-voice-action="audio-param"]'),
         value383 = clientX5['dataTransfer']?.['getData']?.(PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE),
         value384 = clientX5['dataTransfer']?.['getData']?.(PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE),
@@ -6809,7 +6809,7 @@ export function createReplacementStudioWorkspace({
     };
   let workspaceMarqueeSelectionController = null;
   const run13 = (value386) =>
-      value386?.['ctrlKey'] === !![] || value386?.['getModifierState']?.('Control') === !![] || enabled3,
+      value386?.['ctrlKey'] === true || value386?.['getModifierState']?.('Control') === true || enabled3,
     value387 = (event19) => {
       ((value49 = null), event19['stopPropagation'](), hide());
       !event19['target']?.['closest']?.('[data-person-replacement-mapping-scope-menu]') && handler88();
@@ -6835,7 +6835,7 @@ export function createReplacementStudioWorkspace({
       )
         return;
       const enabled65 = Boolean(el132?.['classList']?.['contains']?.('is-batch-selected'));
-      if (enabled65 && !enabled64 && beginBoxEdit(event19, el132, { batch: !![] })) return;
+      if (enabled65 && !enabled64 && beginBoxEdit(event19, el132, { batch: true })) return;
       !run13(event19) && (!el132 || !enabled65) && clearBatchSelection();
       const value389 = el132?.['matches']?.('.person-replacement-detection-box[data-person-id]')
         ? el132
@@ -6975,7 +6975,7 @@ export function createReplacementStudioWorkspace({
       handler116(value404);
     },
     value405 = (value406) => {
-      handler116(value406, { cancelled: !![] });
+      handler116(value406, { cancelled: true });
     },
     value407 = (value408) => {
       (personReplacementExportSubmenuController['handlePointerOut'](value408),
@@ -6988,7 +6988,7 @@ export function createReplacementStudioWorkspace({
       if (!el133 || !selectedIds['isOpen']) return;
       ((el133['preload'] = 'auto'), (el133['muted'] = !selectedIds['soundEnabled']));
       if (selectedIds['boundPreviewVideos']['has'](el133)) {
-        if (el133['paused'] === ![]) cutEditorPlaybackController['startNative'](el133);
+        if (el133['paused'] === false) cutEditorPlaybackController['startNative'](el133);
         return;
       }
       (selectedIds['boundPreviewVideos']['add'](el133),
@@ -7003,7 +7003,7 @@ export function createReplacementStudioWorkspace({
             return;
           }
           const value409 = Number(enabled67['token']);
-          enabled67['seeked'] = !![];
+          enabled67['seeked'] = true;
           if (typeof el133['requestVideoFrameCallback'] !== 'function')
             enabled67['presentedSourceSec'] = Number(el133['currentTime']);
           else
@@ -7024,7 +7024,7 @@ export function createReplacementStudioWorkspace({
             (selectedIds['pendingPreviewSeek'] = null),
             windowObject?.['showToast']?.('裁剪预览视频加载失败，请稍后重试。', 'warn'));
         }));
-      if (el133['paused'] === ![]) cutEditorPlaybackController['startNative'](el133);
+      if (el133['paused'] === false) cutEditorPlaybackController['startNative'](el133);
     },
     resolveItems = (event20) => {
       const value410 = initialProject2['id'],
@@ -7096,7 +7096,7 @@ export function createReplacementStudioWorkspace({
             handler92({ openProjectMenuId: '' });
           },
         })),
-        floatingMenuHost['addEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
+        floatingMenuHost['addEventListener']('error', handleWorkspaceAssetLibraryImageError, true),
         floatingMenuHost['addEventListener']('pointerdown', value387),
         floatingMenuHost['addEventListener']('pointerup', value403),
         floatingMenuHost['addEventListener']('pointercancel', value405),
@@ -7106,15 +7106,15 @@ export function createReplacementStudioWorkspace({
         floatingMenuHost['addEventListener']('dblclick', value269));
       const run14 = (event21) => {
         const el135 = event21['target']?.['closest']?.('.person-replacement-production-page');
-        if (!el135 || !floatingMenuHost['contains'](el135)) return ![];
+        if (!el135 || !floatingMenuHost['contains'](el135)) return false;
         const value423 =
           el135['ownerDocument']?.['defaultView']?.['getComputedStyle']?.(el135)?.['overflowY'];
-        if (!['auto', 'scroll', 'overlay']['includes'](value423)) return ![];
+        if (!['auto', 'scroll', 'overlay']['includes'](value423)) return false;
         const count8 = Number(event21['deltaY']) || 0,
           value424 = Math['max'](0, el135['scrollHeight'] - el135['clientHeight']);
         if (count8 < 0) return el135['scrollTop'] > 0;
         if (count8 > 0) return el135['scrollTop'] < value424;
-        return ![];
+        return false;
       };
       (floatingMenuHost['addEventListener'](
         'wheel',
@@ -7158,10 +7158,10 @@ export function createReplacementStudioWorkspace({
           if (handler83(event22) || handler80(event22)) return;
           handler82(event22);
         },
-        { passive: ![] },
+        { passive: false },
       ),
-        floatingMenuHost['addEventListener']('keydown', value257, !![]),
-        windowObject?.['addEventListener']?.('keydown', handler72, !![]),
+        floatingMenuHost['addEventListener']('keydown', value257, true),
+        windowObject?.['addEventListener']?.('keydown', handler72, true),
         windowObject?.['addEventListener']?.('resize', value171));
       const value425 = (event23) => {
           (event23?.['key'] === 'Control' ||
@@ -7170,16 +7170,16 @@ export function createReplacementStudioWorkspace({
             (enabled3 = event23['type'] === 'keydown');
         },
         handler124 = () => {
-          ((enabled3 = ![]), handler118());
+          ((enabled3 = false), handler118());
         };
       return (
-        windowObject?.['addEventListener']?.('keydown', value425, !![]),
-        windowObject?.['addEventListener']?.('keyup', value425, !![]),
-        windowObject?.['addEventListener']?.('blur', handler124, !![]),
+        windowObject?.['addEventListener']?.('keydown', value425, true),
+        windowObject?.['addEventListener']?.('keyup', value425, true),
+        windowObject?.['addEventListener']?.('blur', handler124, true),
         (value65 = () => {
-          (windowObject?.['removeEventListener']?.('keydown', value425, !![]),
-            windowObject?.['removeEventListener']?.('keyup', value425, !![]),
-            windowObject?.['removeEventListener']?.('blur', handler124, !![]),
+          (windowObject?.['removeEventListener']?.('keydown', value425, true),
+            windowObject?.['removeEventListener']?.('keyup', value425, true),
+            windowObject?.['removeEventListener']?.('blur', handler124, true),
             handler124());
         }),
         (workspaceMarqueeSelectionController = createWorkspaceMarqueeSelectionController({
@@ -7217,9 +7217,9 @@ export function createReplacementStudioWorkspace({
               !selectedIds['isOpen']
             )
               return {
-                enabled: !![],
+                enabled: true,
                 canBegin: (value427) => run13(value427),
-                additive: ![],
+                additive: false,
                 selectedIds: [],
                 itemSelector: '[data-person-replacement-person-drop]',
                 hitClassName: 'is-batch-selection-hit',
@@ -7237,7 +7237,7 @@ export function createReplacementStudioWorkspace({
               !selectedIds['isOpen']
             )
               return {
-                enabled: !![],
+                enabled: true,
                 selectedIds: initialProject2['workspace']['selectedShotIds'],
                 commit: (selectedShotIds2) => {
                   updateProject(
@@ -7245,7 +7245,7 @@ export function createReplacementStudioWorkspace({
                       ...initialProject2,
                       workspace: {
                         ...initialProject2['workspace'],
-                        shotSelectionMode: !![],
+                        shotSelectionMode: true,
                         selectedShotIds: selectedShotIds2,
                       },
                     },
@@ -7338,7 +7338,7 @@ export function createReplacementStudioWorkspace({
     ((value67 = 'none'), (value68 = 'page'));
     if (deferRenderIfSettling(value431)) return;
     const focusKey = captureFocus2();
-    (preserveBufferedVideo(), stop2({ renderPending: ![] }));
+    (preserveBufferedVideo(), stop2({ renderPending: false }));
     const value435 = floatingMenuHost['querySelector']?.('.person-replacement-project-body'),
       el139 = ['forward', 'backward']['includes'](value431) ? value435?.['firstElementChild'] || null : null,
       currentToolbar = el139 ? floatingMenuHost['querySelector']?.('.story-workspace-toolbar') : null;
@@ -7391,19 +7391,19 @@ export function createReplacementStudioWorkspace({
       return (workspacePresentationLifecycle['activate'](), run(), floatingMenuHost);
     },
     close() {
-      if (!floatingMenuHost || value43) return ![];
+      if (!floatingMenuHost || value43) return false;
       (stop(),
         cancelManualSelection(),
         workspaceMarqueeSelectionController?.['cancel']?.(),
         clearBatchSelection());
-      let enabled70 = !![];
+      let enabled70 = true;
       try {
         enabled70 =
-          promptEnhancementModel(downloadImageIntent['CAN_CLOSE'], cloneJson(initialProject2)) !== ![];
+          promptEnhancementModel(downloadImageIntent['CAN_CLOSE'], cloneJson(initialProject2)) !== false;
       } catch {
-        enabled70 = !![];
+        enabled70 = true;
       }
-      if (!enabled70) return (handler24('close'), ![]);
+      if (!enabled70) return (handler24('close'), false);
       return (
         closeDebugRequestWindow(documentObject),
         reset(),
@@ -7418,7 +7418,7 @@ export function createReplacementStudioWorkspace({
         (voiceLibraryTargetCharacterId = ''),
         unmount(),
         promptEnhancementModel(downloadImageIntent['CLOSE'], { project: cloneJson(initialProject2) }),
-        !![]
+        true
       );
     },
     setProject(value438) {
@@ -7450,7 +7450,7 @@ export function createReplacementStudioWorkspace({
         cloneJson(initialProject2)
       );
     },
-    syncProjectState(value445, { returnSnapshot: returnSnapshot = !![] } = {}) {
+    syncProjectState(value445, { returnSnapshot: returnSnapshot = true } = {}) {
       if (value43) return null;
       const value446 = initialProject2,
         personReplacementWorkspaceProject3 = normalizePersonReplacementWorkspaceProject(value445);
@@ -7496,7 +7496,7 @@ export function createReplacementStudioWorkspace({
       if (session['syncProject'](initialProject2)) reset();
       if (!workspacePresentationLifecycle['isActive']())
         return returnSnapshot ? cloneJson(initialProject2) : null;
-      if (value450 === 'selected-shot') handler43({ refreshTimelineCard: !![] });
+      if (value450 === 'selected-shot') handler43({ refreshTimelineCard: true });
       else {
         if (value450 === 'timeline') handler53();
         else {
@@ -7532,7 +7532,7 @@ export function createReplacementStudioWorkspace({
     setOutputCanvasSyncState(options6 = {}) {
       if (value43) return null;
       const enabled71 = canvasSyncPending;
-      ((canvasSyncPending = options6?.['pending'] === !![]),
+      ((canvasSyncPending = options6?.['pending'] === true),
         (canvasSyncScope = canvasSyncPending ? normalizeText(options6?.['scope']) : ''),
         handler15());
       const value452 = floatingMenuHost?.['querySelector']?.('.person-replacement-toolbar-actions'),
@@ -7551,7 +7551,7 @@ export function createReplacementStudioWorkspace({
     setComposeOutputState(options7 = {}) {
       if (value43) return null;
       const value454 = composeOutputPending2;
-      composeOutputPending2 = options7?.['pending'] === !![];
+      composeOutputPending2 = options7?.['pending'] === true;
       const value455 = floatingMenuHost?.['querySelector']?.(
           '[data-person-replacement-action="compose-output"]',
         ),
@@ -7562,13 +7562,13 @@ export function createReplacementStudioWorkspace({
           typeof value455['replaceWith'] === 'function' &&
           value455['replaceWith'](value456),
         handler60(),
-        value454 && !composeOutputPending2 && handler5({ composeOnly: !![] }),
+        value454 && !composeOutputPending2 && handler5({ composeOnly: true }),
         { pending: composeOutputPending2 }
       );
     },
     setExportOutputState(options8 = {}) {
       if (value43) return null;
-      ((exportOutputPending = options8?.['pending'] === !![]), handler15());
+      ((exportOutputPending = options8?.['pending'] === true), handler15());
       const value457 = floatingMenuHost?.['querySelector']?.('.person-replacement-toolbar-actions'),
         value458 = handler59(
           personReplacementShellPresentation['renderToolbarActions'](initialProject2, handler22()),
@@ -7582,7 +7582,7 @@ export function createReplacementStudioWorkspace({
       );
     },
     prewarmCompositeOriginalVideo(value459 = '') {
-      if (value43) return ![];
+      if (value43) return false;
       return handler6(value459);
     },
     getProject() {
@@ -7606,10 +7606,10 @@ export function createReplacementStudioWorkspace({
         handler88(),
         handler120(),
         destroy3(),
-        handler62({ restoreFocus: ![] }),
+        handler62({ restoreFocus: false }),
         workspacePresentationLifecycle['dispose'](),
         workspacePersistencePresentation['destroy'](),
-        (value43 = !![]),
+        (value43 = true),
         list3['forEach']((value460) => value460?.['destroy']?.()),
         ctx?.['destroy']?.(),
         (ctx = null),
@@ -7618,12 +7618,12 @@ export function createReplacementStudioWorkspace({
         value50?.(),
         (value50 = null),
         typeof floatingMenuHost?.['removeEventListener'] === 'function' &&
-          floatingMenuHost['removeEventListener']('error', handleWorkspaceAssetLibraryImageError, !![]),
+          floatingMenuHost['removeEventListener']('error', handleWorkspaceAssetLibraryImageError, true),
         bindWorkspaceEntityContextMenu2?.(),
         (bindWorkspaceEntityContextMenu2 = null),
         value65?.(),
         (value65 = null),
-        windowObject?.['removeEventListener']?.('keydown', handler72, !![]),
+        windowObject?.['removeEventListener']?.('keydown', handler72, true),
         windowObject?.['removeEventListener']?.('resize', value171),
         workspaceMarqueeSelectionController?.['destroy']?.(),
         personReplacementAssetHoverPreviewController['destroy'](),

@@ -11,7 +11,7 @@ export function createRunningHubDefaultSiteSettings({
 } = {}) {
   const list = Array['from'](root?.['querySelectorAll']?.(DEFAULT_SITE_BUTTON_SELECTOR) || []);
   let runningHubModelApiProfileId = RUNNINGHUB_DOMESTIC_PROFILE_ID,
-    value = ![];
+    value = false;
   const map = new Map(),
     handler = () => {
       list['forEach']((el) => {
@@ -34,7 +34,7 @@ export function createRunningHubDefaultSiteSettings({
       (list['forEach']((el2) => {
         if (map['has'](el2)) return;
         const index = () => {
-          value = !![];
+          value = true;
           const result = setSelectedProfileId(el2?.['dataset']?.['runninghubDefaultSite']);
           onSelectionChange?.(result);
         };

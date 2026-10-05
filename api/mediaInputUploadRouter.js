@@ -22,7 +22,7 @@ function isPrivateIpv4Host(item) {
   const list = String(item || '')
     ['split']('.')
     ['map']((key) => Number(key));
-  if (list['length'] !== 4 || list['some']((index) => !Number['isInteger'](index))) return ![];
+  if (list['length'] !== 4 || list['some']((index) => !Number['isInteger'](index))) return false;
   const [count, count2] = list;
   return (
     count === 10 ||
@@ -35,10 +35,10 @@ function isPrivateIpv4Host(item) {
 }
 export function isPublicHttpMediaUrl(result) {
   const mediaUrl = normalizeMediaUrl(result);
-  if (!mediaUrl) return ![];
+  if (!mediaUrl) return false;
   try {
     const uRL = new URL(mediaUrl);
-    if (uRL['protocol'] !== 'http:' && uRL['protocol'] !== 'https:') return ![];
+    if (uRL['protocol'] !== 'http:' && uRL['protocol'] !== 'https:') return false;
     const data = uRL['hostname']['toLowerCase']();
     if (
       data === 'localhost' ||
@@ -48,10 +48,10 @@ export function isPublicHttpMediaUrl(result) {
       data['endsWith']('.local') ||
       isPrivateIpv4Host(data)
     )
-      return ![];
-    return !![];
+      return false;
+    return true;
   } catch {
-    return ![];
+    return false;
   }
 }
 function isReusableProviderMediaUrl(options) {
@@ -59,17 +59,17 @@ function isReusableProviderMediaUrl(options) {
 }
 function isProviderUploadRequired(options2 = {}) {
   return (
-    options2['forceProviderUpload'] === !![] || options2['uploadOptions']?.['forceProviderUpload'] === !![]
+    options2['forceProviderUpload'] === true || options2['uploadOptions']?.['forceProviderUpload'] === true
   );
 }
 export function isReusableModelApiMediaUrl(target) {
   return isPublicHttpMediaUrl(target) || isReusableProviderMediaUrl(target);
 }
 function shouldReuseMediaUrl(source, next, current = {}) {
-  if (isReusableProviderMediaUrl(source)) return !![];
-  if (!isPublicHttpMediaUrl(source)) return ![];
-  if (!isProviderUploadRequired(current) && isConfiguredObjectStoragePublicUrl(source)) return !![];
-  if (next?.['provider'] === USER_MEDIA_STORAGE_PROVIDERS['OBJECT_STORAGE']) return ![];
+  if (isReusableProviderMediaUrl(source)) return true;
+  if (!isPublicHttpMediaUrl(source)) return false;
+  if (!isProviderUploadRequired(current) && isConfiguredObjectStoragePublicUrl(source)) return true;
+  if (next?.['provider'] === USER_MEDIA_STORAGE_PROVIDERS['OBJECT_STORAGE']) return false;
   if (typeof current['reusePublicUrls'] === 'boolean') return current['reusePublicUrls'];
   return next?.['provider'] === USER_MEDIA_STORAGE_PROVIDERS['RUNNINGHUB'];
 }
@@ -131,7 +131,7 @@ async function uploadViaTarget(value3, value4, apiUrl, value5, strictUpload = {}
     ...(strictUpload['uploadOptions'] || {}),
     ...(apiUrl?.['uploadOptions'] || {}),
     provider: provider3,
-    strictUpload: strictUpload['strictUpload'] !== ![],
+    strictUpload: strictUpload['strictUpload'] !== false,
     ...(apiUrl?.['apiUrl'] || strictUpload['apiUrl']
       ? { apiUrl: apiUrl?.['apiUrl'] || strictUpload['apiUrl'] }
       : {}),
@@ -169,7 +169,7 @@ export async function uploadModelApiMediaInputs(value7, list2, value8, value9 = 
     list4[value13] = String(uploadViaTarget2?.[value14] || '')['trim']();
   });
   const list7 = list4['filter'](Boolean);
-  if (value9['strictUpload'] !== ![] && list7['length'] !== list3['length']) {
+  if (value9['strictUpload'] !== false && list7['length'] !== list3['length']) {
     const list8 = list4['flatMap']((value15, value16) => (value15 ? [] : [value16 + 1]));
     throw new Error(
       userMediaStorageUploadTarget['provider'] +

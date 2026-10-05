@@ -110,12 +110,12 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
     allowDeleteAssetCard = buildPersonReplacementAssetViewState(next);
   showVoiceLibraryConfirm &&
     ((allowDeleteAssetCard['selectedAssetIds'] = [allowDeleteAssetCard['selectedAssetId']]),
-    (allowDeleteAssetCard['assetSelectionMode'] = ![]));
-  allowDeleteAssetCard['isBatchGenerating'] = footerHtml['assetBatchGenerationActive'] === !![];
+    (allowDeleteAssetCard['assetSelectionMode'] = false));
+  allowDeleteAssetCard['isBatchGenerating'] = footerHtml['assetBatchGenerationActive'] === true;
   const entry =
     allowDeleteAssetCard['assetSelectionMode'] && allowDeleteAssetCard['selectedAssetIds']['length'] > 1;
   ((allowDeleteAssetCard['batchGenerationLabel'] = normalizeText(footerHtml['assetBatchGenerationLabel'])),
-    (allowDeleteAssetCard['batchCancelRequested'] = footerHtml['assetBatchCancelRequested'] === !![]),
+    (allowDeleteAssetCard['batchCancelRequested'] = footerHtml['assetBatchCancelRequested'] === true),
     (allowDeleteAssetCard['batchGeneratingAssetIds'] = Array['isArray'](
       footerHtml['assetBatchGeneratingCharacterIds'],
     )
@@ -242,7 +242,7 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
             primaryActionHtml: primaryActionHtml('audio', '音频', 'choose-new-audio-files'),
           })
       : renderWorkspaceAssetSelectionActions({
-          compactTrigger: ![],
+          compactTrigger: false,
           selectionMode: allowDeleteAssetCard['assetSelectionMode'],
           selectedCount: allowDeleteAssetCard['selectedAssetIds']['length'],
           allSelected: allSelected,
@@ -260,8 +260,8 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
         });
   return renderWorkspaceAssetSettingsShell({
     className: 'person-replacement-assets-page',
-    calloutInHeading: !![],
-    headingInListColumn: !![],
+    calloutInHeading: true,
+    headingInListColumn: true,
     calloutStatus: allowDeleteAssetCard['assetSelectionMode']
       ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项'
       : '',

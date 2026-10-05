@@ -48,8 +48,8 @@ function createClipNode(state2, targetNode, key, localPath) {
     localPath: localPath['localPath'],
     originalLocalPath: localPath['localPath'],
     videoDuration: localPath['durationSec'],
-    needsAutoResize: ![],
-    fixedSize: !![],
+    needsAutoResize: false,
+    fixedSize: true,
   });
 }
 export function bindSegmentRetakeInput({

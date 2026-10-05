@@ -47,7 +47,7 @@ export async function prepareAudioVoicePlaybackElement(
       attachSource2
     );
   }
-  if (typeof shouldAssign === 'function' && shouldAssign() !== !![]) return '';
+  if (typeof shouldAssign === 'function' && shouldAssign() !== true) return '';
   return ((enabled['src'] = audioUrl2), enabled['load']?.(), audioUrl2);
 }
 export function isAudioVoicePreviewControlTarget(el) {
@@ -80,7 +80,7 @@ export function createAudioVoicePlaybackSession({
     enabled3 = null,
     entry = 0,
     record = 0,
-    enabled4 = ![];
+    enabled4 = false;
   const registerPlaybackClient2 = registerPlaybackClient(ownerId, { stopForExternalPlayback: () => clear() });
   function run2(enabled5) {
     if (!enabled5) return;
@@ -143,7 +143,7 @@ export function createAudioVoicePlaybackSession({
   }
   function run5() {
     if (!enabled3) return;
-    (documentObject?.['removeEventListener']?.('pointerdown', enabled3, !![]), (enabled3 = null));
+    (documentObject?.['removeEventListener']?.('pointerdown', enabled3, true), (enabled3 = null));
   }
   function run9() {
     const enabled7 = el2;
@@ -162,7 +162,7 @@ export function createAudioVoicePlaybackSession({
       if (isPreviewControlTarget(event['target'])) return;
       stop();
     }),
-      documentObject?.['addEventListener']?.('pointerdown', enabled3, !![]));
+      documentObject?.['addEventListener']?.('pointerdown', enabled3, true));
   }
   async function warm(value2) {
     const status = normalizeAudioUrl(value2),
@@ -238,7 +238,7 @@ export function createAudioVoicePlaybackSession({
   }
   function destroy() {
     if (enabled4) return;
-    (clear(), registerPlaybackClient2?.(), (enabled4 = !![]));
+    (clear(), registerPlaybackClient2?.(), (enabled4 = true));
   }
   return {
     clear: clear,

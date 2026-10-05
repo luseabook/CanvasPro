@@ -117,7 +117,7 @@ export function syncStoryReplicationPromptReferences(value29, value30 = {}, valu
   )
     return value29;
   const storyPromptMode =
-      normalizeStoryPromptMode(value30['promptMode'], { allowDeveloperModes: !![] }) === 'seedance-2.0',
+      normalizeStoryPromptMode(value30['promptMode'], { allowDeveloperModes: true }) === 'seedance-2.0',
     protectStoryPromptPills2 = protectStoryPromptPills(value29);
   let args2 = protectStoryPromptPills2['source'];
   const value32 = [],

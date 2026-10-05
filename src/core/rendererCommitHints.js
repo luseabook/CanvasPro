@@ -10,9 +10,9 @@ export function markRendererNodeDragCommitHint(value = DEFAULT_HINT_TTL_MS) {
   nodeDragCommitHintUntil = nowMs() + item;
 }
 export function consumeRendererNodeDragCommitHint() {
-  if (nodeDragCommitHintUntil <= 0) return ![];
-  if (nowMs() > nodeDragCommitHintUntil) return ((nodeDragCommitHintUntil = 0), ![]);
-  return ((nodeDragCommitHintUntil = 0), !![]);
+  if (nodeDragCommitHintUntil <= 0) return false;
+  if (nowMs() > nodeDragCommitHintUntil) return ((nodeDragCommitHintUntil = 0), false);
+  return ((nodeDragCommitHintUntil = 0), true);
 }
 export function clearRendererCommitHints() {
   nodeDragCommitHintUntil = 0;

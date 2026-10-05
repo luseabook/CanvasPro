@@ -26,7 +26,7 @@ export function createPersonReplacementShotCutEditorController({
   getProject: getProject = () => ({}),
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis,
-  isDestroyed: isDestroyed = () => ![],
+  isDestroyed: isDestroyed = () => false,
   requestRender: requestRender = () => {},
   onShotKeyframeSelected: onShotKeyframeSelected = () => {},
   onShotReverseRequested: onShotReverseRequested = () => {},
@@ -40,13 +40,13 @@ export function createPersonReplacementShotCutEditorController({
   const timelineSec = session['workspaceState'],
     key = session['playback'],
     reset = () => {
-      session['close']({ releaseBuffer: ![] });
+      session['close']({ releaseBuffer: false });
     },
     requestReverseChange = (index, isReversed, args = {}) => {
       const onShotReverseRequested2 = onShotReverseRequested({
         ...args,
         shotId: normalizeText(index),
-        isReversed: isReversed === !![],
+        isReversed: isReversed === true,
       });
       return (onShotReverseRequested2?.['completion']?.['catch']?.(() => {}), onShotReverseRequested2);
     },
@@ -59,20 +59,20 @@ export function createPersonReplacementShotCutEditorController({
             project['shots']['find']((data) => data['id'] === text) ||
             project['shots']['find']((options) => options['id'] === text2);
         if (!enabled || Boolean(enabled['isReversed']) === Boolean(result?.['isReversed'])) continue;
-        requestReverseChange(enabled['id'], result?.['isReversed'] === !![]);
+        requestReverseChange(enabled['id'], result?.['isReversed'] === true);
       }
     },
     toggleReverse = () => {
-      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return ![];
+      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return false;
       const target = { draft: clone(timelineSec['draft']), undoStack: clone(timelineSec['undoStack']) },
         source = timelineSec['playheadSec'],
         root = getRoot()?.['querySelector']?.('[data-person-replacement-shot-cut-video]'),
-        autoplay = key['isReverseActive']() || root?.['paused'] === ![],
+        autoplay = key['isReverseActive']() || root?.['paused'] === false,
         error = togglePersonReplacementShotReverseAtTimelineSec(
           timelineSec['draft'],
           timelineSec['playheadSec'],
         );
-      if (!error || !viewportController['commitDraft'](error['draft'])) return ![];
+      if (!error || !viewportController['commitDraft'](error['draft'])) return false;
       timelineSec['previewShotId'] = error['position']['shotId'];
       try {
         requestReverseChange(error['position']['shotId'], error['isReversed']);
@@ -83,20 +83,20 @@ export function createPersonReplacementShotCutEditorController({
           requestRender(),
           previewController['seekTimeline'](source),
           windowObject?.['showToast']?.(error2?.['message'] || '视频倒放失败，请重试。', 'error'),
-          ![]
+          false
         );
       }
       return (
         requestRender(),
         previewController['seekTimeline'](source, { autoplay: autoplay }),
         windowObject?.['showToast']?.(error['message'], 'success'),
-        !![]
+        true
       );
     },
     splitAtPlayhead = () => {
-      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return ![];
+      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return false;
       if (!session['splitAtPlayhead']())
-        return (windowObject?.['showToast']?.('请把播放头放在片段中间再裁剪。', 'warn'), ![]);
+        return (windowObject?.['showToast']?.('请把播放头放在片段中间再裁剪。', 'warn'), false);
       const personReplacementShotCutPositionAtTimelineSec = getPersonReplacementShotCutPositionAtTimelineSec(
         timelineSec['draft'],
         timelineSec['playheadSec'],
@@ -111,12 +111,12 @@ export function createPersonReplacementShotCutEditorController({
             timelineSec: timelineSec['playheadSec'],
           },
         ),
-        !![]
+        true
       );
     },
     mergeSelected = () => {
-      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return ![];
-      if (!session['mergeSelectedRanges']()) return ![];
+      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return false;
+      if (!session['mergeSelectedRanges']()) return false;
       const next = timelineSec['draft']['find'](
         (current) => normalizeText(current?.['shotId']) === normalizeText(timelineSec['previewShotId']),
       );
@@ -126,12 +126,12 @@ export function createPersonReplacementShotCutEditorController({
           previewController['preview'](next['shotId'], next['startSec'], {
             timelineSec: timelineSec['playheadSec'],
           }),
-        !![]
+        true
       );
     },
     captureKeyframeAtPlayhead = async () => {
       if (!timelineSec['isOpen'] || viewportController['isBusy']() || timelineSec['isKeyframeCapturing'])
-        return ![];
+        return false;
       const sourceTimeSec = getPersonReplacementShotCutPositionAtTimelineSec(
           timelineSec['draft'],
           timelineSec['playheadSec'],
@@ -139,7 +139,7 @@ export function createPersonReplacementShotCutEditorController({
         enabled2 = timelineSec['draft'][sourceTimeSec['shotIndex']],
         el = getRoot(),
         video = el?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
-      if (!enabled2 || !video) return (windowObject?.['showToast']?.('当前片段画面不可用。', 'warn'), ![]);
+      if (!enabled2 || !video) return (windowObject?.['showToast']?.('当前片段画面不可用。', 'warn'), false);
       const project2 = getProject(),
         shotId = {
           projectId: normalizeText(project2['id']),
@@ -154,11 +154,11 @@ export function createPersonReplacementShotCutEditorController({
       if (
         timelineSec['pendingPreviewSeek'] ||
         timelineSec['previewFrameReadyToken'] !== shotId['seekToken'] ||
-        video['seeking'] === !![] ||
+        video['seeking'] === true ||
         Math['abs'](Number(video['currentTime']) - shotId['sourceTimeSec']) > 0.04
       )
-        return (windowObject?.['showToast']?.('当前画面仍在定位，请稍后再获取关键帧。', 'info'), ![]);
-      timelineSec['isKeyframeCapturing'] = !![];
+        return (windowObject?.['showToast']?.('当前画面仍在定位，请稍后再获取关键帧。', 'info'), false);
+      timelineSec['isKeyframeCapturing'] = true;
       const list =
         el?.['querySelectorAll']?.(
           [
@@ -190,7 +190,7 @@ export function createPersonReplacementShotCutEditorController({
           });
         else
           try {
-            Object['defineProperty'](entry, 'name', { configurable: !![], value: type['fileName'] });
+            Object['defineProperty'](entry, 'name', { configurable: true, value: type['fileName'] });
           } catch {}
         const response = await onShotKeyframeSelected(entry, {
             shotId: shotId['rangeId'],
@@ -211,11 +211,11 @@ export function createPersonReplacementShotCutEditorController({
           normalizeText(getProject()['id']) !== shotId['projectId'] ||
           getRoot()?.['querySelector']?.('[data-person-replacement-shot-cut-video]') !== shotId['video']
         )
-          return ![];
+          return false;
         const enabled3 = timelineSec['draft']['find'](
           (record) => normalizeText(record?.['shotId']) === shotId['rangeId'],
         );
-        if (!enabled3 || normalizeText(enabled3['sourceId']) !== shotId['sourceId']) return ![];
+        if (!enabled3 || normalizeText(enabled3['sourceId']) !== shotId['sourceId']) return false;
         return (
           viewportController['commitDraft'](
             timelineSec['draft']['map']((args2) =>
@@ -224,7 +224,7 @@ export function createPersonReplacementShotCutEditorController({
                     ...args2,
                     keyframeRef: keyframeRef,
                     keyframeTimeSec: shotId['sourceTimeSec'],
-                    keyframeManuallySelected: !![],
+                    keyframeManuallySelected: true,
                     frame: { width: type['width'], height: type['height'] },
                   }
                 : args2,
@@ -232,21 +232,21 @@ export function createPersonReplacementShotCutEditorController({
           ),
           (timelineSec['previewShotId'] = shotId['rangeId']),
           (timelineSec['playheadSec'] = shotId['timelineSec']),
-          (timelineSec['isKeyframeCapturing'] = ![]),
+          (timelineSec['isKeyframeCapturing'] = false),
           windowObject?.['showToast']?.('已将当前关键帧设为该片段的替换帧，应用切口后生效。', 'success'),
           requestRender(),
           previewController['preview'](shotId['rangeId'], shotId['sourceTimeSec'], {
             timelineSec: shotId['timelineSec'],
           }),
-          !![]
+          true
         );
       } catch (error3) {
         return (
           windowObject?.['showToast']?.(error3?.['message'] || '获取关键帧失败，请重试。', 'error'),
-          ![]
+          false
         );
       } finally {
-        timelineSec['isKeyframeCapturing'] && ((timelineSec['isKeyframeCapturing'] = ![]), requestRender());
+        timelineSec['isKeyframeCapturing'] && ((timelineSec['isKeyframeCapturing'] = false), requestRender());
       }
     },
     handler2 = () => session['clearMotionTimer'](),
@@ -265,7 +265,7 @@ export function createPersonReplacementShotCutEditorController({
       const project3 = getProject();
       return (
         session['open'](project3, list2),
-        (timelineSec['isOpen'] = !![]),
+        (timelineSec['isOpen'] = true),
         (timelineSec['motion'] = 'to-editor'),
         (timelineSec['draft'] = list2),
         (timelineSec['initialDraft'] = clone(list2)),
@@ -299,14 +299,14 @@ export function createPersonReplacementShotCutEditorController({
               );
           }
         }),
-        !![]
+        true
       );
     },
     handler7 = (enabled4) =>
       Boolean(
         enabled4 &&
         !enabled4['error'] &&
-        enabled4['seeking'] !== !![] &&
+        enabled4['seeking'] !== true &&
         Number(enabled4['readyState']) >= 2 &&
         normalizeText(enabled4['currentSrc'] || enabled4['getAttribute']?.('src') || enabled4['src']),
       ),
@@ -317,22 +317,22 @@ export function createPersonReplacementShotCutEditorController({
         !list3['length'] ||
         (!countEditablePersonReplacementShotCuts(list3) && !hasSplittablePersonReplacementShotCut(list3))
       )
-        return (windowObject?.['showToast']?.('当前时间轴没有可调整或新增的切口。', 'warn'), ![]);
-      if (timelineSec['isOpening']) return ![];
+        return (windowObject?.['showToast']?.('当前时间轴没有可调整或新增的切口。', 'warn'), false);
+      if (timelineSec['isOpening']) return false;
       const enabled5 = Boolean(documentObject?.['defaultView']?.['HTMLVideoElement']),
         enabled6 = mediaController['preparePreviewVideo']();
       if (!enabled5) return handler6(list3);
       if (!enabled6 || !timelineSec['bufferedVideo'])
-        return (windowObject?.['showToast']?.('当前视频片段尚未准备完成。', 'warn'), ![]);
+        return (windowObject?.['showToast']?.('当前视频片段尚未准备完成。', 'warn'), false);
       if (handler7(timelineSec['bufferedVideo'])) return handler6(list3);
-      return ((timelineSec['isOpening'] = !![]), requestRender(), ![]);
+      return ((timelineSec['isOpening'] = true), requestRender(), false);
     },
     watchOpeningVideo = () => {
       (timelineSec['openingCleanup']?.(), (timelineSec['openingCleanup'] = null));
-      if (!timelineSec['isOpening']) return ![];
+      if (!timelineSec['isOpening']) return false;
       mediaController['preparePreviewVideo']();
       const el6 = timelineSec['bufferedVideo'];
-      if (!el6) return ![];
+      if (!el6) return false;
       const list4 = ['loadeddata', 'canplay', 'canplaythrough', 'seeked', 'progress'];
       let state = 0;
       const run = () => {
@@ -347,7 +347,7 @@ export function createPersonReplacementShotCutEditorController({
           if (!timelineSec['isOpening'] || el6 !== timelineSec['bufferedVideo'] || !handler7(el6)) return;
           (run(),
             (timelineSec['openingCleanup'] = null),
-            (timelineSec['isOpening'] = ![]),
+            (timelineSec['isOpening'] = false),
             Promise['resolve']()['then'](() => {
               if (!isDestroyed() && !timelineSec['isOpen']) open();
             }));
@@ -356,7 +356,7 @@ export function createPersonReplacementShotCutEditorController({
           if (!timelineSec['isOpening'] || el6 !== timelineSec['bufferedVideo']) return;
           (run(),
             (timelineSec['openingCleanup'] = null),
-            (timelineSec['isOpening'] = ![]),
+            (timelineSec['isOpening'] = false),
             mediaController['releaseBufferedVideo'](),
             requestRender(),
             windowObject?.['showToast']?.('裁剪预览视频加载失败，请稍后重试。', 'warn'));
@@ -370,21 +370,21 @@ export function createPersonReplacementShotCutEditorController({
         (state = windowObject?.['setTimeout']?.(scope, PREVIEW_READY_TIMEOUT_MS) || 0),
         (timelineSec['openingCleanup'] = run),
         handler8(),
-        !![]
+        true
       );
     },
-    close = ({ animate: animate = !![], renderWorkspace: renderWorkspace = !![] } = {}) => {
+    close = ({ animate: animate = true, renderWorkspace: renderWorkspace = true } = {}) => {
       if (timelineSec['isOpening']) {
         reset();
         if (renderWorkspace) requestRender();
-        return !![];
+        return true;
       }
-      if (!timelineSec['isOpen'] && !timelineSec['motion']) return ![];
+      if (!timelineSec['isOpen'] && !timelineSec['motion']) return false;
       (handler3(), handler2());
       if (!animate) {
         (reset(), hideResultHistoryMenu());
         if (renderWorkspace) requestRender();
-        return !![];
+        return true;
       }
       timelineSec['motion'] = 'to-timeline';
       if (renderWorkspace) requestRender();
@@ -394,7 +394,7 @@ export function createPersonReplacementShotCutEditorController({
             renderWorkspace &&
               (requestRender(), scrollShotCardIntoView(getProject()['workspace']['selectedShotId'])));
         }),
-        !![]
+        true
       );
     };
   return Object['freeze']({

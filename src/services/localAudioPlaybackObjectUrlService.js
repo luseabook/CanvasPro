@@ -86,12 +86,12 @@ export function releaseLocalAudioPlaybackObjectUrl(target, source) {
   const canonicalLocalSource = resolveCanonicalLocalSource(target),
     enabled5 = String(source || '')['trim'](),
     enabled6 = canonicalLocalSource ? entriesBySource['get'](canonicalLocalSource) : null;
-  if (!enabled6 || !enabled5 || !enabled6['ownerRefs']['has'](enabled5)) return ![];
+  if (!enabled6 || !enabled5 || !enabled6['ownerRefs']['has'](enabled5)) return false;
   return (
     enabled6['ownerRefs']['delete'](enabled5),
     countOwnerRefs(enabled6) === 0 &&
       (entriesBySource['delete'](canonicalLocalSource), disposeEntry(enabled6)),
-    !![]
+    true
   );
 }
 export const __localAudioPlaybackObjectUrlServiceForTest = {

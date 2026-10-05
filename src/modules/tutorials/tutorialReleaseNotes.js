@@ -10,10 +10,10 @@ export function createTutorialReleaseNotes({ storage: storage, external: externa
     list = normalizeTutorialReleases(JSON['parse'](storage?.['getItem'](CACHE_KEY) || '[]'));
   } catch {}
   let enabled = null,
-    enabled2 = ![],
+    enabled2 = false,
     value = list['length'] ? '正在显示缓存的更新说明' : '',
     el = null,
-    enabled3 = ![];
+    enabled3 = false;
   const map = new Set(list['slice'](0, 1)['map']((item) => item['tag_name']));
   function run() {
     if (!el?.['isConnected'] || enabled3) return;
@@ -61,7 +61,7 @@ export function createTutorialReleaseNotes({ storage: storage, external: externa
       if (enabled3 || enabled !== signal) return;
       if (!list['length'] && list2['length']) map['add'](list2[0]['tag_name']);
       ((list = list2),
-        (enabled2 = !![]),
+        (enabled2 = true),
         (value = list['length'] ? '来自 GitHub 正式发布记录' : '暂无正式发布记录'));
       try {
         storage?.['setItem'](CACHE_KEY, JSON['stringify'](list));
@@ -85,7 +85,7 @@ export function createTutorialReleaseNotes({ storage: storage, external: externa
     },
     reload: reload,
     close() {
-      ((enabled3 = !![]), (el = null), enabled?.['abort']());
+      ((enabled3 = true), (el = null), enabled?.['abort']());
     },
   };
 }

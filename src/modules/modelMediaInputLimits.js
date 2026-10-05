@@ -101,7 +101,7 @@ export function validateModelMediaInputLimits({
       actual = handle[kind]['count'];
     if (max !== null && actual > max)
       return Object['freeze']({
-        ok: ![],
+        ok: false,
         code: 'max' + kind[0]['toUpperCase']() + kind['slice'](1) + 's',
         kind: kind,
         max: max,
@@ -128,7 +128,7 @@ export function validateModelMediaInputLimits({
     for (const actual2 of handle[kind2]['entries']) {
       if (Number['isFinite'](min) && min > 0 && actual2['duration'] > 0 && actual2['duration'] < min)
         return Object['freeze']({
-          ok: ![],
+          ok: false,
           code: 'min' + capitalizeKind(kind2) + 'Seconds',
           kind: kind2,
           min: min,
@@ -137,7 +137,7 @@ export function validateModelMediaInputLimits({
         });
       if (Number['isFinite'](max2) && max2 > 0 && actual2['duration'] > max2)
         return Object['freeze']({
-          ok: ![],
+          ok: false,
           code: 'max' + capitalizeKind(kind2) + 'Seconds',
           kind: kind2,
           max: max2,
@@ -147,7 +147,7 @@ export function validateModelMediaInputLimits({
       const actual3 = getMediaExtension(actual2['url']);
       if (map2['size'] > 0 && actual3 && !map2['has'](actual3))
         return Object['freeze']({
-          ok: ![],
+          ok: false,
           code: 'invalid' + capitalizeKind(kind2) + 'Extension',
           kind: kind2,
           actual: actual3,
@@ -156,7 +156,7 @@ export function validateModelMediaInputLimits({
         });
       if (Number['isFinite'](max3) && max3 > 0 && actual2['sizeBytes'] > max3)
         return Object['freeze']({
-          ok: ![],
+          ok: false,
           code: 'max' + capitalizeKind(kind2) + 'Megabytes',
           kind: kind2,
           max: max3 / (1024 * 1024),
@@ -171,7 +171,7 @@ export function validateModelMediaInputLimits({
       actual4 = handle[kind3]['totalDurationSeconds'];
     if (max4 !== null && actual4 > max4)
       return Object['freeze']({
-        ok: ![],
+        ok: false,
         code: 'maxTotal' + kind3[0]['toUpperCase']() + kind3['slice'](1) + 'Seconds',
         kind: kind3,
         max: max4,
@@ -183,11 +183,11 @@ export function validateModelMediaInputLimits({
     actual5 = handle['video']['totalDurationSeconds'] + Math['max'](0, count5 || 0);
   if (max5 > 0 && count5 > 0 && actual5 > max5)
     return Object['freeze']({
-      ok: ![],
+      ok: false,
       code: 'maxVideoInputAndOutputSeconds',
       kind: 'video',
       max: max5,
       actual: actual5,
     });
-  return Object['freeze']({ ok: !![], statsByKind: Object['freeze'](handle) });
+  return Object['freeze']({ ok: true, statsByKind: Object['freeze'](handle) });
 }

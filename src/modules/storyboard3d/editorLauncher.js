@@ -14,16 +14,16 @@ export function persistStoryboard3DProjectChange({
   storeInstance: storeInstance = appStore,
   windowObject: windowObject = globalThis['window'],
 } = {}) {
-  if (typeof storeInstance?.['upsertStoryboard3DProject'] !== 'function') return ![];
+  if (typeof storeInstance?.['upsertStoryboard3DProject'] !== 'function') return false;
   storeInstance['upsertStoryboard3DProject'](project);
   const value = windowObject?.['_triggerLocalCacheSave'];
-  if (typeof value !== 'function') return !![];
+  if (typeof value !== 'function') return true;
   const promise = value['call'](windowObject);
-  return promise && typeof promise['then'] === 'function' ? promise['then'](() => !![]) : !![];
+  return promise && typeof promise['then'] === 'function' ? promise['then'](() => true) : true;
 }
-export function closeActiveStoryboard3DEditor({ persist: persist = !![] } = {}) {
-  if (!activeSession?.['workspace']) return ![];
-  return (activeSession['workspace']['close']({ persist: persist }), !![]);
+export function closeActiveStoryboard3DEditor({ persist: persist = true } = {}) {
+  if (!activeSession?.['workspace']) return false;
+  return (activeSession['workspace']['close']({ persist: persist }), true);
 }
 export function openStoryboard3DProjectEditor({
   projectId: projectId,

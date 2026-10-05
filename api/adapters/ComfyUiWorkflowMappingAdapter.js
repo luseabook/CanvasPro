@@ -2,10 +2,10 @@ function hasOwnManifestValue(value, item) {
   return Object['prototype']['hasOwnProperty']['call'](value || {}, item);
 }
 function isPresentManifestValue(list) {
-  if (list === undefined || list === null) return ![];
+  if (list === undefined || list === null) return false;
   if (typeof list === 'string') return list['trim']() !== '';
   if (Array['isArray'](list)) return list['length'] > 0;
-  return !![];
+  return true;
 }
 export function getComfyUiPayloadPathValue(options = {}, key = '') {
   const enabled = String(key || '')['trim']();
@@ -19,7 +19,7 @@ function resolveManifestPayloadValue(
   data,
   target = [],
   source = undefined,
-  { allowEmpty: allowEmpty = ![] } = {},
+  { allowEmpty: allowEmpty = false } = {},
 ) {
   const list2 = Array['isArray'](target) ? target : [target];
   for (const next of list2['filter'](Boolean)) {
@@ -46,31 +46,31 @@ function manifestValuesEqual(state, config) {
   return String(state ?? '')['trim']() === String(config ?? '')['trim']();
 }
 function evaluateManifestWhenRule(enabled2, input) {
-  if (!enabled2 || typeof enabled2 !== 'object') return !![];
+  if (!enabled2 || typeof enabled2 !== 'object') return true;
   const output = enabled2['field'] ? getComfyUiPayloadPathValue(input, enabled2['field']) : undefined,
     isPresentManifestValue2 = isPresentManifestValue(output);
   if (hasOwnManifestValue(enabled2, 'exists') && Boolean(enabled2['exists']) !== isPresentManifestValue2)
-    return ![];
-  if (enabled2['truthy'] === !![] && !Boolean(output)) return ![];
-  if (enabled2['falsy'] === !![] && Boolean(output)) return ![];
-  if (hasOwnManifestValue(enabled2, 'equals') && !manifestValuesEqual(output, enabled2['equals'])) return ![];
+    return false;
+  if (enabled2['truthy'] === true && !Boolean(output)) return false;
+  if (enabled2['falsy'] === true && Boolean(output)) return false;
+  if (hasOwnManifestValue(enabled2, 'equals') && !manifestValuesEqual(output, enabled2['equals'])) return false;
   if (hasOwnManifestValue(enabled2, 'notEquals') && manifestValuesEqual(output, enabled2['notEquals']))
-    return ![];
+    return false;
   if (
     Array['isArray'](enabled2['in']) &&
     !enabled2['in']['some']((value2) => manifestValuesEqual(output, value2))
   )
-    return ![];
+    return false;
   if (
     Array['isArray'](enabled2['notIn']) &&
     enabled2['notIn']['some']((value3) => manifestValuesEqual(output, value3))
   )
-    return ![];
-  return !![];
+    return false;
+  return true;
 }
 function shouldUseManifestInputMapping(value4, value5) {
   const list4 = value4?.['when'];
-  if (list4 === undefined || list4 === null) return !![];
+  if (list4 === undefined || list4 === null) return true;
   if (Array['isArray'](list4)) return list4['every']((value6) => evaluateManifestWhenRule(value6, value5));
   return evaluateManifestWhenRule(list4, value5);
 }
@@ -108,7 +108,7 @@ function applyManifestInputTransform(value14, value15 = {}, value16 = {}) {
       return String(value14 ?? '');
     case 'boolean':
       return (
-        value14 === !![] ||
+        value14 === true ||
         ['true', '1', 'yes', 'on']['includes'](
           String(value14 ?? '')
             ['trim']()
@@ -116,7 +116,7 @@ function applyManifestInputTransform(value14, value15 = {}, value16 = {}) {
         )
       );
     case 'booleanString':
-      return value14 === !![] ||
+      return value14 === true ||
         ['true', '1', 'yes', 'on']['includes'](
           String(value14 ?? '')
             ['trim']()
@@ -159,25 +159,25 @@ async function resolveComfyUiManifestInputValue({
       normalizeManifestFieldList(item2),
       '',
       {
-        allowEmpty: item2?.['allowEmpty'] === !![],
+        allowEmpty: item2?.['allowEmpty'] === true,
       },
     );
-    return isPresentManifestValue(manifestPayloadValue) || item2?.['allowEmpty'] === !![]
+    return isPresentManifestValue(manifestPayloadValue) || item2?.['allowEmpty'] === true
       ? manifestPayloadValue
       : finalPrompt2;
   }
   if (value23 === 'param') {
     const list5 = normalizeManifestFieldList(item2),
       manifestPayloadValue2 = resolveManifestPayloadValue(payload2, list5, undefined, {
-        allowEmpty: item2?.['allowEmpty'] === !![],
+        allowEmpty: item2?.['allowEmpty'] === true,
       });
-    if (isPresentManifestValue(manifestPayloadValue2) || item2?.['allowEmpty'] === !![])
+    if (isPresentManifestValue(manifestPayloadValue2) || item2?.['allowEmpty'] === true)
       return manifestPayloadValue2;
     const value24 = list5['filter']((enabled3) => !enabled3['startsWith']('generationParams.'))['map'](
       (value25) => 'generationParams.' + value25,
     );
     return resolveManifestPayloadValue(payload2, value24, undefined, {
-      allowEmpty: item2?.['allowEmpty'] === !![],
+      allowEmpty: item2?.['allowEmpty'] === true,
     });
   }
   const run = sourceResolvers[value23];
@@ -192,18 +192,18 @@ function cloneWorkflowGraph(enabled4) {
 function setComfyUiNodeInput(value26, value27, value28) {
   const enabled5 = String(value27?.['nodeId'] || '')['trim'](),
     enabled6 = String(value27?.['inputName'] || value27?.['fieldName'] || '')['trim']();
-  if (!enabled5 || !enabled6) return ![];
+  if (!enabled5 || !enabled6) return false;
   const enabled7 = value26[enabled5];
   if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) {
     if (value27?.['required'])
       throw new Error(value27['missingMessage'] || 'Missing ComfyUI workflow node: ' + enabled5);
-    return ![];
+    return false;
   }
   return (
     (!enabled7['inputs'] || typeof enabled7['inputs'] !== 'object' || Array['isArray'](enabled7['inputs'])) &&
       (enabled7['inputs'] = {}),
     (enabled7['inputs'][enabled6] = value28),
-    !![]
+    true
   );
 }
 export async function buildComfyUiPromptFromManifest({
@@ -228,8 +228,8 @@ export async function buildComfyUiPromptFromManifest({
         finalPrompt: finalPrompt,
         sourceResolvers: sourceResolvers,
       }),
-      value30 = item3?.['allowEmpty'] === !![],
-      enabled8 = item3?.['includeEmpty'] === !![] || value30,
+      value30 = item3?.['allowEmpty'] === true,
+      enabled8 = item3?.['includeEmpty'] === true || value30,
       hasOwnManifestValue2 = hasOwnManifestValue(item3, 'defaultValue');
     let manifestInputValueMap = comfyUiManifestInputValue;
     !isPresentManifestValue(manifestInputValueMap) &&

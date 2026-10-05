@@ -1,11 +1,11 @@
 function getEnabledOptions(el, value) {
   return Array['from'](el?.['querySelectorAll']?.(value) || [])['filter'](
-    (el2) => el2?.['disabled'] !== !![] && el2?.['getAttribute']?.('aria-disabled') !== 'true',
+    (el2) => el2?.['disabled'] !== true && el2?.['getAttribute']?.('aria-disabled') !== 'true',
   );
 }
 function focusMenuOption(el3) {
   try {
-    el3?.['focus']?.({ preventScroll: !![] });
+    el3?.['focus']?.({ preventScroll: true });
   } catch {
     el3?.['focus']?.();
   }
@@ -13,7 +13,7 @@ function focusMenuOption(el3) {
   const item = el3['ownerDocument']['defaultView'],
     handler = () => {
       try {
-        el3?.['focus']?.({ preventScroll: !![] });
+        el3?.['focus']?.({ preventScroll: true });
       } catch {
         el3?.['focus']?.();
       }
@@ -50,19 +50,19 @@ export function createWorkspaceMenuController({
     },
     open = (el6, el7 = el6?.['querySelector']?.(triggerSelector)) => {
       const el8 = el6?.['querySelector']?.(menuSelector);
-      if (!el6 || !el7 || !el8 || el7['disabled'] === !![]) return ![];
+      if (!el6 || !el7 || !el8 || el7['disabled'] === true) return false;
       return (
         close(el6),
         el6['classList']?.['add']?.(openClass),
         el7['setAttribute']?.('aria-expanded', 'true'),
         el8['setAttribute']?.('aria-hidden', 'false'),
-        !![]
+        true
       );
     },
     toggle = (el9) => {
       const el10 = el9?.['closest']?.(wrapperSelector);
-      if (!el10 || el9?.['disabled'] === !![]) return ![];
-      if (el10['classList']?.['contains']?.(openClass)) return (close(), ![]);
+      if (!el10 || el9?.['disabled'] === true) return false;
+      if (el10['classList']?.['contains']?.(openClass)) return (close(), false);
       return open(el10, el9);
     },
     handleKeyDown = (event) => {
@@ -71,29 +71,29 @@ export function createWorkspaceMenuController({
       if (el11 && ['ArrowDown', 'ArrowUp']['includes'](event['key'])) {
         const key = el11['closest']?.(wrapperSelector),
           list = getEnabledOptions(key, optionSelector);
-        if (!open(key, el11)) return ![];
+        if (!open(key, el11)) return false;
         return (
           event['preventDefault']?.(),
           event['stopPropagation']?.(),
           focusMenuOption(list[event['key'] === 'ArrowUp' ? list['length'] - 1 : 0]),
-          !![]
+          true
         );
       }
       const el13 = el12?.['closest']?.(wrapperSelector) || el11?.['closest']?.(wrapperSelector);
       if (el11 && event['key'] === 'Escape' && el13?.['classList']?.['contains']?.(openClass))
-        return (event['preventDefault']?.(), event['stopPropagation']?.(), close(), el11['focus']?.(), !![]);
-      if (!el12 || !el13) return ![];
+        return (event['preventDefault']?.(), event['stopPropagation']?.(), close(), el11['focus']?.(), true);
+      if (!el12 || !el13) return false;
       if (event['key'] === 'Escape')
         return (
           event['preventDefault']?.(),
           event['stopPropagation']?.(),
           close(),
           el13['querySelector']?.(triggerSelector)?.['focus']?.(),
-          !![]
+          true
         );
       const list2 = getEnabledOptions(el13, optionSelector),
         count2 = list2['indexOf'](el12);
-      if (count2 < 0 || !list2['length']) return ![];
+      if (count2 < 0 || !list2['length']) return false;
       let index = count2;
       if (event['key'] === 'ArrowDown') index = (count2 + 1) % list2['length'];
       else {
@@ -102,11 +102,11 @@ export function createWorkspaceMenuController({
           if (event['key'] === 'Home') index = 0;
           else {
             if (event['key'] === 'End') index = list2['length'] - 1;
-            else return ![];
+            else return false;
           }
         }
       }
-      return (event['preventDefault']?.(), event['stopPropagation']?.(), focusMenuOption(list2[index]), !![]);
+      return (event['preventDefault']?.(), event['stopPropagation']?.(), focusMenuOption(list2[index]), true);
     };
   return Object['freeze']({ close: close, open: open, toggle: toggle, handleKeyDown: handleKeyDown });
 }

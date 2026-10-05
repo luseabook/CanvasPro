@@ -31,7 +31,7 @@ export function createWorkspaceVideoProgressLoop({
 } = {}) {
   if (!videoEl || typeof onFrame !== 'function')
     throw new Error('workspace video progress loop requires videoEl and onFrame');
-  let data = ![],
+  let data = false,
     requestFrame2 = null;
   const stop = () => {
       if (requestFrame2 == null) return;
@@ -52,7 +52,7 @@ export function createWorkspaceVideoProgressLoop({
     stop: stop,
     destroy() {
       if (data) return;
-      ((data = !![]), stop());
+      ((data = true), stop());
     },
   };
 }
@@ -65,8 +65,8 @@ export function createWorkspaceVideoPlayback({
   attachSource: attachSource = attachMediaElementPlaybackSource,
   attachRecovery: attachRecovery = attachVideoPlaybackRecovery,
   playWithRecovery: playWithRecovery = playVideoWithRecovery,
-  allowConcurrentPlayback: allowConcurrentPlayback = ![],
-  preferStreamingSource: preferStreamingSource = ![],
+  allowConcurrentPlayback: allowConcurrentPlayback = false,
+  preferStreamingSource: preferStreamingSource = false,
   acquirePlaybackOptions: acquirePlaybackOptions = undefined,
   diagnosticsLabel: diagnosticsLabel = '',
 } = {}) {
@@ -75,29 +75,29 @@ export function createWorkspaceVideoPlayback({
     text2 = normalizeText(ownerId);
   if (!text || !text2) throw new Error('workspace video playback requires sourceUrl and ownerId');
   const label = normalizeText(diagnosticsLabel) || 'workspace-video:' + text2;
-  let enabled = ![],
+  let enabled = false,
     target = null;
   const run = () => {
-    let allowConcurrent = ![];
+    let allowConcurrent = false;
     try {
       allowConcurrent =
         typeof allowConcurrentPlayback === 'function'
-          ? allowConcurrentPlayback() === !![]
-          : allowConcurrentPlayback === !![];
+          ? allowConcurrentPlayback() === true
+          : allowConcurrentPlayback === true;
     } catch {}
     return {
       label: label,
-      ensureSrc: () => run2({ load: !![] }),
+      ensureSrc: () => run2({ load: true }),
       shouldContinue: () => !enabled,
-      shouldRecover: () => !enabled && videoEl2['isConnected'] !== ![] && videoEl2['paused'] === ![],
+      shouldRecover: () => !enabled && videoEl2['isConnected'] !== false && videoEl2['paused'] === false,
       allowConcurrent: allowConcurrent,
     };
   };
-  async function run2({ load: load = ![] } = {}) {
-    if (enabled) return ![];
+  async function run2({ load: load = false } = {}) {
+    if (enabled) return false;
     if (normalizeText(videoEl2['getAttribute']?.('src') || videoEl2['src']))
-      return ((videoEl2['preload'] = 'auto'), !![]);
-    if (preferStreamingSource === !![]) {
+      return ((videoEl2['preload'] = 'auto'), true);
+    if (preferStreamingSource === true) {
       if (target) return target;
       target = (async () => {
         return (
@@ -119,7 +119,7 @@ export function createWorkspaceVideoPlayback({
       try {
         playbackUrl = normalizeText(await acquirePlaybackUrl(text, text2, acquirePlaybackOptions));
       } catch {}
-      if (enabled) return ![];
+      if (enabled) return false;
       return (
         await attachSource(videoEl2, text, {
           ...(playbackUrl ? { playbackUrl: playbackUrl } : {}),
@@ -136,10 +136,10 @@ export function createWorkspaceVideoPlayback({
   }
   return {
     warm() {
-      return run2({ load: !![] });
+      return run2({ load: true });
     },
     play() {
-      if (enabled) return Promise['resolve'](![]);
+      if (enabled) return Promise['resolve'](false);
       const source = run(),
         text3 = normalizeText(videoEl2['getAttribute']?.('src') || videoEl2['src']);
       if (!text3) return playWithRecovery(videoEl2, source);
@@ -149,8 +149,8 @@ export function createWorkspaceVideoPlayback({
         return Promise['resolve'](next)['then'](
           () =>
             playWithRecovery(videoEl2, source)['then'](
-              () => !![],
-              () => !![],
+              () => true,
+              () => true,
             ),
           () => playWithRecovery(videoEl2, source),
         );
@@ -160,7 +160,7 @@ export function createWorkspaceVideoPlayback({
     },
     destroy() {
       if (enabled) return;
-      enabled = !![];
+      enabled = true;
       try {
         videoEl2['pause']?.();
       } catch {}

@@ -88,10 +88,10 @@ export function createWorkspaceMediaHistoryMenuController({
       (windowObject?.['clearTimeout']?.(enabled2), (enabled2 = 0));
     },
     position = (el = value2) => {
-      if (!el || !menuElement?.['classList']?.['contains']?.('is-visible')) return ![];
+      if (!el || !menuElement?.['classList']?.['contains']?.('is-visible')) return false;
       const box = el['getBoundingClientRect']?.(),
         box2 = menuElement['getBoundingClientRect']?.();
-      if (!box || !box2) return ![];
+      if (!box || !box2) return false;
       const value3 = windowObject?.['innerWidth'] || 1024,
         value4 = windowObject?.['innerHeight'] || 768,
         value5 = 10,
@@ -108,10 +108,10 @@ export function createWorkspaceMediaHistoryMenuController({
         (menuElement['style']['left'] = Math['round'](value8) + 'px'),
         (menuElement['style']['top'] = Math['round'](value11) + 'px'),
         menuElement['classList']['toggle']('opens-downward', value9 < value5),
-        !![]
+        true
       );
     },
-    hide = ({ delayed: delayed = ![] } = {}) => {
+    hide = ({ delayed: delayed = false } = {}) => {
       clearHideTimer();
       if (delayed) {
         enabled2 =
@@ -128,9 +128,9 @@ export function createWorkspaceMediaHistoryMenuController({
         menuElement?.['setAttribute']?.('aria-hidden', 'true'));
     },
     show = (enabled3, value12 = {}) => {
-      if (!menuElement || !enabled3 || value12?.['event']?.['pointerType'] === 'touch') return ![];
+      if (!menuElement || !enabled3 || value12?.['event']?.['pointerType'] === 'touch') return false;
       const markup = getMarkup(enabled3, value12);
-      if (!markup) return (hide(), ![]);
+      if (!markup) return (hide(), false);
       return (
         clearHideTimer(),
         (value2 = enabled3),
@@ -138,7 +138,7 @@ export function createWorkspaceMediaHistoryMenuController({
         menuElement['classList']['add']('is-visible'),
         menuElement['setAttribute']('aria-hidden', 'false'),
         position(enabled3),
-        !![]
+        true
       );
     },
     refresh = ({
@@ -154,7 +154,7 @@ export function createWorkspaceMediaHistoryMenuController({
         value17 = Boolean(value16 && menuElement?.['contains']?.(value16));
       if (!show(anchor, context)) {
         if (value17) fallbackFocus?.['focus']?.();
-        return ![];
+        return false;
       }
       const run = () => {
         if (value2 !== anchor || !menuElement?.['classList']?.['contains']?.('is-visible')) return;
@@ -164,28 +164,28 @@ export function createWorkspaceMediaHistoryMenuController({
           (value18['scrollTop'] = Math['max'](0, value15))),
           value17 && focusSelector && menuElement?.['querySelector']?.(focusSelector)?.['focus']?.());
       };
-      return (run(), windowObject?.['requestAnimationFrame']?.(run), !![]);
+      return (run(), windowObject?.['requestAnimationFrame']?.(run), true);
     },
     value19 = () => clearHideTimer(),
-    value20 = () => hide({ delayed: !![] }),
+    value20 = () => hide({ delayed: true }),
     value21 = (event) => {
       const el2 = event['target']?.['closest']?.('.story-media-history-list, .story-clip-video-history-list');
-      if (!el2 || !menuElement?.['contains']?.(el2)) return ![];
+      if (!el2 || !menuElement?.['contains']?.(el2)) return false;
       const count = Math['max'](0, Number(el2['scrollWidth']) - Number(el2['clientWidth']));
-      if (!(count > 0)) return ![];
+      if (!(count > 0)) return false;
       const value22 = Number(event['deltaX']) || 0,
         value23 = Number(event['deltaY']) || 0,
         enabled4 = Math['abs'](value22) > Math['abs'](value23) ? value22 : value23;
-      if (!enabled4) return ![];
+      if (!enabled4) return false;
       const value24 = Math['max'](0, Number(el2['scrollLeft']) || 0),
         value25 = Math['max'](0, Math['min'](count, value24 + enabled4));
-      if (value25 === value24) return ![];
-      return (event['preventDefault']?.(), event['stopPropagation']?.(), (el2['scrollLeft'] = value25), !![]);
+      if (value25 === value24) return false;
+      return (event['preventDefault']?.(), event['stopPropagation']?.(), (el2['scrollLeft'] = value25), true);
     };
   return (
     menuElement?.['addEventListener']?.('pointerenter', value19),
     menuElement?.['addEventListener']?.('pointerleave', value20),
-    menuElement?.['addEventListener']?.('wheel', value21, { passive: ![] }),
+    menuElement?.['addEventListener']?.('wheel', value21, { passive: false }),
     Object['freeze']({
       show: show,
       refresh: refresh,

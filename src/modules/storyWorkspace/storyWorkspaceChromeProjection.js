@@ -64,7 +64,7 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
         label: id2['label'],
         active: activeStep === id2['id'],
         disabled:
-          (id2['id'] === 0 && entry['developerModeAvailable'] !== !![]) ||
+          (id2['id'] === 0 && entry['developerModeAvailable'] !== true) ||
           isStoryWorkspaceStepNavigationDisabled(entry['data'], id2['id']),
       })),
     };
@@ -78,8 +78,8 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
         kind: 'episode',
         projectLabel: projectLabel['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目',
         steps: steps2(projectLabel, 'episode'),
-        episodeSwitcher: projectEpisodeSwitcher(projectLabel, payload, !![]),
-        canvasSyncPending: projectLabel['canvasSyncPending'] === !![],
+        episodeSwitcher: projectEpisodeSwitcher(projectLabel, payload, true),
+        canvasSyncPending: projectLabel['canvasSyncPending'] === true,
       };
     }
     const list5 = getStoryEpisodeToolbarOptions(projectLabel['data']?.['episodes']),
@@ -92,12 +92,12 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
     return {
       kind: 'project',
       collaborationAvailable:
-        projectLabel['developerModeAvailable'] === !![] &&
+        projectLabel['developerModeAvailable'] === true &&
         projectLabel['workspaceSurface'] !== 'replication' &&
         isStoryCollaborationProject(projectLabel['data']),
       projectLabel: projectLabel['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目',
       steps: steps2(projectLabel),
-      episodeSwitcher: episodeSwitcher ? projectEpisodeSwitcher(projectLabel, episodeSwitcher, ![]) : null,
+      episodeSwitcher: episodeSwitcher ? projectEpisodeSwitcher(projectLabel, episodeSwitcher, false) : null,
     };
   }
   function run2(
@@ -105,12 +105,12 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
     {
       nextLabel: nextLabel,
       nextAction: nextAction = '',
-      isLast: isLast = ![],
+      isLast: isLast = false,
       title: title = '',
       hint: hint = '',
       actionsMarkup: actionsMarkup = '',
       leadingActionsMarkup: leadingActionsMarkup = '',
-      useDefaultCopy: useDefaultCopy = !![],
+      useDefaultCopy: useDefaultCopy = true,
     } = {},
   ) {
     const nextAction2 =
@@ -150,7 +150,7 @@ export function createStoryWorkspaceChromeProjection({ steps: steps = [] } = {})
       leadingActionsMarkup: leadingActionsMarkup,
       showPrevious:
         showPrevious['step'] >
-        (showPrevious['developerModeAvailable'] === !![] && isStoryCollaborationProject(showPrevious['data'])
+        (showPrevious['developerModeAvailable'] === true && isStoryCollaborationProject(showPrevious['data'])
           ? 0
           : 1),
       nextAction: nextAction2,

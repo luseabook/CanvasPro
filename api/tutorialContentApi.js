@@ -3,7 +3,7 @@ export async function fetchTutorialContent({ signal: signal, timeout: timeout = 
   const signal2 = new AbortController(),
     handler = () => signal2['abort']();
   if (signal?.['aborted']) handler();
-  signal?.['addEventListener']('abort', handler, { once: !![] });
+  signal?.['addEventListener']('abort', handler, { once: true });
   const setTimeout2 = setTimeout(handler, timeout);
   try {
     const response = await fetch(CONTENT_ORIGIN + '/api/subscription/canvas-content', {

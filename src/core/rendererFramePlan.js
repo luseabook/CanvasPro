@@ -35,10 +35,10 @@ export function createRendererFramePlan({
   const nodeCount2 = resolveNodeCount(snapshot, nodes, nodeCount),
     geometryRev2 = resolveGeometryRev(snapshot, nodeCount2, geometryRev),
     containerWidth = normalizeContainerRect(containerRect);
-  let enabled = ![],
+  let enabled = false,
     args = null,
-    enabled2 = ![],
-    hasRendererPriorityMediaWork2 = ![];
+    enabled2 = false,
+    hasRendererPriorityMediaWork2 = false;
   function getSpatialIndex() {
     if (!enabled) {
       args = getCachedRendererSpatialIndex(nodes, {
@@ -47,7 +47,7 @@ export function createRendererFramePlan({
         denseNodeCount: RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'],
       });
       if (args) args = { ...args, frameQueryCache: new Map() };
-      enabled = !![];
+      enabled = true;
     }
     return args;
   }
@@ -64,8 +64,8 @@ export function createRendererFramePlan({
       }),
     );
   }
-  function hasPriorityMediaWork({ needed: needed = !![] } = {}) {
-    if (!needed) return ![];
+  function hasPriorityMediaWork({ needed: needed = true } = {}) {
+    if (!needed) return false;
     return (
       !enabled2 &&
         ((hasRendererPriorityMediaWork2 = hasRendererPriorityMediaWork({
@@ -79,7 +79,7 @@ export function createRendererFramePlan({
           viewportPadding: PRIORITY_MEDIA_VIEWPORT_PADDING,
           candidateNodeIds: candidateNodeIds(),
         })),
-        (enabled2 = !![])),
+        (enabled2 = true)),
       hasRendererPriorityMediaWork2
     );
   }

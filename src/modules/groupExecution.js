@@ -173,13 +173,13 @@ let activeSelectedGenerateBatch = null;
 
 export function hasRunningGroupGenerateNodes(value6, value7) {
   return collectGroupExecutableNodeIds(value6, value7)['some'](
-    (value8) => value6?.[value8]?.['isGenerating'] === !![],
+    (value8) => value6?.[value8]?.['isGenerating'] === true,
   );
 }
 
 export function hasRunningSelectedGenerateNodes(value9, value10 = []) {
   return collectSelectedExecutableNodeIds(value9, value10)['some'](
-    (value11) => value9?.[value11]?.['isGenerating'] === !![],
+    (value11) => value9?.[value11]?.['isGenerating'] === true,
   );
 }
 
@@ -191,7 +191,7 @@ export function cancelGroupGenerateButtons({
 } = {}) {
   const value12 = state?.['nodes'] || {},
     groupExecutableNodeIds = collectGroupExecutableNodeIds(value12, groupId2)['filter'](
-      (value13) => value12?.[value13]?.['isGenerating'] === !![],
+      (value13) => value12?.[value13]?.['isGenerating'] === true,
     );
   let count3 = 0;
   for (const value14 of groupExecutableNodeIds) {
@@ -226,14 +226,14 @@ export function hasActiveSelectedGenerateBatch() {
 
 function cancelActiveSelectedGenerateQueue() {
   const enabled8 = activeSelectedGenerateBatch;
-  if (!enabled8) return ![];
+  if (!enabled8) return false;
   return (
     (activeSelectedGenerateBatch = null),
-    (enabled8['cancelled'] = !![]),
+    (enabled8['cancelled'] = true),
     enabled8['timeoutIds']['forEach']((value17) => enabled8['clearScheduledTimeout']?.(value17)),
     enabled8['timeoutIds']['clear'](),
-    enabled8['onStateChange']?.(![]),
-    !![]
+    enabled8['onStateChange']?.(false),
+    true
   );
 }
 
@@ -246,7 +246,7 @@ export function cancelSelectedGenerateButtons({
   const cancelActiveSelectedGenerateQueue2 = cancelActiveSelectedGenerateQueue(),
     value18 = state?.['nodes'] || {},
     selectedExecutableNodeIds = collectSelectedExecutableNodeIds(value18, selectedIds)['filter'](
-      (value19) => value18?.[value19]?.['isGenerating'] === !![],
+      (value19) => value18?.[value19]?.['isGenerating'] === true,
     );
   let count6 = 0;
   for (const value20 of selectedExecutableNodeIds) {

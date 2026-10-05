@@ -6,7 +6,7 @@ export function createPromptExpansionMotion(el) {
     const item = value2;
     ((value2 = null), item?.['cancel'](), value3?.['cancel'](), (value3 = null));
   }
-  function play(box, key, { overlay: overlay, closing: closing = ![], onFinish: onFinish } = {}) {
+  function play(box, key, { overlay: overlay, closing: closing = false, onFinish: onFinish } = {}) {
     const index = overlay ? value['getComputedStyle'](overlay)['opacity'] : '1';
     cancel();
     if (value['matchMedia']('(prefers-reduced-motion: reduce)')['matches']) {

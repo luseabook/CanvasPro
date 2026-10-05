@@ -38,14 +38,14 @@ function resolveCanonicalLocalSource(value) {
 }
 function isWarmupBypassed(key) {
   const index = Number(warmupBypassUntilBySource['get'](key) || 0);
-  if (!(index > Date['now']())) return (warmupBypassUntilBySource['delete'](key), ![]);
-  return !![];
+  if (!(index > Date['now']())) return (warmupBypassUntilBySource['delete'](key), false);
+  return true;
 }
 function hasReferences(result) {
   return (
     result['ownerRefs']['size'] > 0 ||
     result['warmupRefs']['size'] > 0 ||
-    result['handoffRetained'] === !![]
+    result['handoffRetained'] === true
   );
 }
 function clearWarmupExpiry(data) {
@@ -69,7 +69,7 @@ function expireWarmupEntry(enabled5) {
     if (map?.['size'] === 0) sourcesByWarmupScope['delete'](target);
   }
   (enabled5['warmupRefs']['clear'](),
-    (enabled5['handoffRetained'] = ![]),
+    (enabled5['handoffRetained'] = false),
     removeEntryIfUnreferenced(enabled5));
 }
 function scheduleWarmupExpiry(enabled6) {
@@ -80,7 +80,7 @@ function scheduleWarmupExpiry(enabled6) {
 }
 function evictWarmupBlobsForBudget(source, next = null) {
   let warmupBlobBytes = getWarmupBlobBytes(next);
-  if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
+  if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return true;
   const current = Array['from'](entriesBySource['values']())
     ['filter']((entry) => entry !== next && entry['blob'] && entry['ownerRefs']['size'] === 0)
     ['sort'](
@@ -89,13 +89,13 @@ function evictWarmupBlobsForBudget(source, next = null) {
   for (const handle of current) {
     const state = Number(handle['blob']?.['size'] || 0);
     (expireWarmupEntry(handle), (warmupBlobBytes = Math['max'](0, warmupBlobBytes - state)));
-    if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return !![];
+    if (warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES) return true;
   }
   return warmupBlobBytes + source <= LOCAL_VIDEO_WARMUP_TOTAL_BYTES;
 }
 function settleEntry(config, input = '') {
   if (config['settled']) return;
-  ((config['settled'] = !![]), config['resolvePromise'](input));
+  ((config['settled'] = true), config['resolvePromise'](input));
 }
 function createPlaybackResult(output, value3 = '', value4 = 0) {
   return {
@@ -106,10 +106,10 @@ function createPlaybackResult(output, value3 = '', value4 = 0) {
 }
 function disposeEntry(enabled7) {
   if (!enabled7 || enabled7['disposed']) return;
-  ((enabled7['disposed'] = !![]),
+  ((enabled7['disposed'] = true),
     clearWarmupExpiry(enabled7),
     enabled7['controller']['abort'](),
-    (enabled7['queued'] = ![]),
+    (enabled7['queued'] = false),
     enabled7['objectUrl'] &&
       (revokeTrackedMediaObjectUrl(enabled7['objectUrl']), (enabled7['objectUrl'] = '')),
     (enabled7['blob'] = null),
@@ -128,7 +128,7 @@ function syncEntryObjectUrl(ownerId) {
     return (scheduleWarmupExpiry(ownerId), '');
   }
   return (
-    (ownerId['handoffRetained'] = ![]),
+    (ownerId['handoffRetained'] = false),
     clearWarmupExpiry(ownerId),
     !ownerId['objectUrl'] &&
       ownerId['blob'] &&
@@ -141,12 +141,12 @@ function syncEntryObjectUrl(ownerId) {
   );
 }
 function removeEntryIfUnreferenced(enabled8) {
-  if (!enabled8 || hasReferences(enabled8)) return ![];
+  if (!enabled8 || hasReferences(enabled8)) return false;
   return (
     entriesBySource['get'](enabled8['sourceUrl']) === enabled8 &&
       entriesBySource['delete'](enabled8['sourceUrl']),
     disposeEntry(enabled8),
-    !![]
+    true
   );
 }
 function createEntry(sourceUrl, value5 = '') {
@@ -161,7 +161,7 @@ function createEntry(sourceUrl, value5 = '') {
       playbackTimeoutMs: LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS,
       ownerRefs: new Set(),
       warmupRefs: new Set(),
-      handoffRetained: ![],
+      handoffRetained: false,
       controller: new AbortController(),
       blob: null,
       blobReadyAt: 0,
@@ -170,11 +170,11 @@ function createEntry(sourceUrl, value5 = '') {
       httpStatus: 0,
       promise: promise,
       resolvePromise: resolvePromise,
-      settled: ![],
-      disposed: ![],
-      queued: ![],
-      active: ![],
-      bypassConcurrencyLimitRequested: ![],
+      settled: false,
+      disposed: false,
+      queued: false,
+      active: false,
+      bypassConcurrencyLimitRequested: false,
       warmupExpiryTimer: null,
     };
   return (entriesBySource['set'](sourceUrl, value7), value7);
@@ -185,21 +185,21 @@ function getOrCreateEntry(value8, value9 = '') {
 function removeOwnerReference(value10) {
   const enabled9 = String(value10 || '')['trim'](),
     enabled10 = sourceByOwner['get'](enabled9);
-  if (!enabled9 || !enabled10) return ![];
+  if (!enabled9 || !enabled10) return false;
   sourceByOwner['delete'](enabled9);
   const enabled11 = entriesBySource['get'](enabled10);
-  if (!enabled11) return ![];
+  if (!enabled11) return false;
   return (
     enabled11['ownerRefs']['delete'](enabled9),
     syncEntryObjectUrl(enabled11),
     removeEntryIfUnreferenced(enabled11),
-    !![]
+    true
   );
 }
 async function startEntryFetch(signal2) {
-  ((signal2['active'] = !![]), (activeFetchCount += 1));
+  ((signal2['active'] = true), (activeFetchCount += 1));
   const timeout2 = signal2['ownerRefs']['size'] === 0;
-  let value11 = ![];
+  let value11 = false;
   const run = () =>
     timeout2 &&
     signal2['ownerRefs']['size'] > 0 &&
@@ -234,7 +234,7 @@ async function startEntryFetch(signal2) {
       !hasReferences(signal2)
     ) {
       if (run()) {
-        value11 = !![];
+        value11 = true;
         return;
       }
       timeout2 &&
@@ -261,18 +261,18 @@ async function startEntryFetch(signal2) {
   } catch {
     ((signal2['status'] = signal2['controller']['signal']['aborted'] ? 'aborted' : 'failed'),
       (signal2['httpStatus'] = 0));
-    if (run()) value11 = !![];
+    if (run()) value11 = true;
     else settleEntry(signal2, '');
   } finally {
     ((signal2['reservedBytes'] = 0),
-      (signal2['active'] = ![]),
+      (signal2['active'] = false),
       (activeFetchCount = Math['max'](0, activeFetchCount - 1)));
     if (value11)
       ((signal2['controller'] = new AbortController()),
         (signal2['status'] = 'pending'),
         (signal2['httpStatus'] = 0),
         enqueueEntry(signal2, {
-          urgent: !![],
+          urgent: true,
           bypassConcurrencyLimit: signal2['bypassConcurrencyLimitRequested'],
         }));
     else {
@@ -295,7 +295,7 @@ function drainQueue() {
   while (activeFetchCount < LOCAL_VIDEO_PLAYBACK_CONCURRENCY && queuedEntries['length'] > 0) {
     const enabled13 = queuedEntries['shift']();
     if (!enabled13) continue;
-    enabled13['queued'] = ![];
+    enabled13['queued'] = false;
     if (
       enabled13['disposed'] ||
       enabled13['active'] ||
@@ -309,7 +309,7 @@ function drainQueue() {
 }
 function enqueueEntry(
   enabled14,
-  { urgent: urgent = ![], bypassConcurrencyLimit: bypassConcurrencyLimit = ![] } = {},
+  { urgent: urgent = false, bypassConcurrencyLimit: bypassConcurrencyLimit = false } = {},
 ) {
   if (
     !enabled14 ||
@@ -322,7 +322,7 @@ function enqueueEntry(
   if (bypassConcurrencyLimit) {
     enabled14['queued'] &&
       ((queuedEntries = queuedEntries['filter']((value17) => value17 !== enabled14)),
-      (enabled14['queued'] = ![]));
+      (enabled14['queued'] = false));
     void startEntryFetch(enabled14);
     return;
   }
@@ -330,7 +330,7 @@ function enqueueEntry(
     urgent && (queuedEntries = [enabled14, ...queuedEntries['filter']((value18) => value18 !== enabled14)]);
     return;
   }
-  enabled14['queued'] = !![];
+  enabled14['queued'] = true;
   if (urgent) queuedEntries['unshift'](enabled14);
   else queuedEntries['push'](enabled14);
   drainQueue();
@@ -338,7 +338,7 @@ function enqueueEntry(
 function removeOwnerReferenceForSource(value19, value20) {
   const enabled15 = String(value19 || '')['trim'](),
     enabled16 = String(value20 || '')['trim']();
-  if (!enabled15 || !enabled16 || sourceByOwner['get'](enabled15) !== enabled16) return ![];
+  if (!enabled15 || !enabled16 || sourceByOwner['get'](enabled15) !== enabled16) return false;
   return removeOwnerReference(enabled15);
 }
 function waitForPlaybackEntry(value21, value22, value23, { signal: signal3, timeout: timeout3 } = {}) {
@@ -347,12 +347,12 @@ function waitForPlaybackEntry(value21, value22, value23, { signal: signal3, time
     ? Math['max'](0, Number(timeout3))
     : LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS;
   return new Promise((handler) => {
-    let value24 = ![],
+    let value24 = false,
       timer = null,
       value25 = null;
     const run2 = (value26) => {
       if (value24) return;
-      value24 = !![];
+      value24 = true;
       if (timer !== null) clearTimeout(timer);
       if (signal3 && value25) signal3['removeEventListener']?.('abort', value25);
       handler(value26);
@@ -362,7 +362,7 @@ function waitForPlaybackEntry(value21, value22, value23, { signal: signal3, time
       return;
     }
     (signal3 &&
-      ((value25 = () => run2('aborted')), signal3['addEventListener']?.('abort', value25, { once: !![] })),
+      ((value25 = () => run2('aborted')), signal3['addEventListener']?.('abort', value25, { once: true })),
       count > 0 && ((timer = setTimeout(() => run2('timeout'), count)), timer?.['unref']?.()),
       value21['promise']['then'](
         () => run2('settled'),
@@ -376,7 +376,7 @@ export async function acquireLocalVideoPlaybackObjectUrlResult(
   value28,
   value29,
   {
-    bypassConcurrencyLimit: bypassConcurrencyLimit = ![],
+    bypassConcurrencyLimit: bypassConcurrencyLimit = false,
     maxBytes: maxBytes = LOCAL_VIDEO_PLAYBACK_MAX_BYTES,
     timeout: timeout = LOCAL_VIDEO_PLAYBACK_TIMEOUT_MS,
     signal: signal = null,
@@ -411,10 +411,10 @@ export async function acquireLocalVideoPlaybackObjectUrlResult(
   (!response2['firstOwnerId'] || response2['firstOwnerId']['startsWith']('warmup:')) &&
     (response2['firstOwnerId'] = enabled17);
   (response2['ownerRefs']['add'](enabled17), sourceByOwner['set'](enabled17, canonicalLocalSource));
-  if (bypassConcurrencyLimit) response2['bypassConcurrencyLimitRequested'] = !![];
+  if (bypassConcurrencyLimit) response2['bypassConcurrencyLimitRequested'] = true;
   const syncEntryObjectUrl3 = syncEntryObjectUrl(response2);
   if (syncEntryObjectUrl3) return createPlaybackResult('ready', syncEntryObjectUrl3);
-  enqueueEntry(response2, { urgent: !![], bypassConcurrencyLimit: bypassConcurrencyLimit });
+  enqueueEntry(response2, { urgent: true, bypassConcurrencyLimit: bypassConcurrencyLimit });
   const waitForPlaybackEntry2 = await waitForPlaybackEntry(response2, enabled17, canonicalLocalSource, {
     signal: signal,
     timeout: timeout,
@@ -476,7 +476,7 @@ export function syncLocalVideoPlaybackWarmupSources(
       value42['ownerRefs']['size'] === 0 &&
       value42['warmupRefs']['size'] === 0 &&
       (value42['blob'] || value42['active'] || value42['queued'])
-        ? ((value42['handoffRetained'] = !![]), scheduleWarmupExpiry(value42))
+        ? ((value42['handoffRetained'] = true), scheduleWarmupExpiry(value42))
         : removeEntryIfUnreferenced(value42));
   }
   if (map3['size'] > 0) sourcesByWarmupScope['set'](enabled20, map3);
@@ -484,7 +484,7 @@ export function syncLocalVideoPlaybackWarmupSources(
   for (const value43 of sources) {
     if (isWarmupBypassed(value43)) continue;
     const orCreateEntry = getOrCreateEntry(value43, 'warmup:' + enabled20);
-    ((orCreateEntry['handoffRetained'] = ![]),
+    ((orCreateEntry['handoffRetained'] = false),
       orCreateEntry['warmupRefs']['add'](enabled20),
       scheduleWarmupExpiry(orCreateEntry),
       enqueueEntry(orCreateEntry));
@@ -520,7 +520,7 @@ export const __localVideoPlaybackObjectUrlServiceForTest = {
         httpStatus: sourceUrl2['httpStatus'],
         ownerRefs: Array['from'](sourceUrl2['ownerRefs']),
         warmupRefs: Array['from'](sourceUrl2['warmupRefs']),
-        handoffRetained: sourceUrl2['handoffRetained'] === !![],
+        handoffRetained: sourceUrl2['handoffRetained'] === true,
         queued: sourceUrl2['queued'],
         active: sourceUrl2['active'],
         aborted: sourceUrl2['controller']['signal']['aborted'],

@@ -112,7 +112,7 @@ function renderSmartClipSettingsPanel(scope) {
   );
 }
 function renderSmartClipSettings(value2) {
-  const value3 = value2['workspace']['smartClipSettingsOpen'] === !![];
+  const value3 = value2['workspace']['smartClipSettingsOpen'] === true;
   return (
     '<div class="person-replacement-smart-clip-settings" data-person-replacement-smart-clip-settings>\n    <button type="button" class="story-secondary-button person-replacement-settings-trigger ' +
     (value3 ? 'is-active' : '') +
@@ -233,8 +233,8 @@ function getCurrentCanvasSyncMenuCopy(value17) {
 function renderProjectToolbarActions(value20, value21 = {}) {
   const value22 = value20['workspace']['step'] === 5,
     currentCanvasSyncMenuCopy = getCurrentCanvasSyncMenuCopy(value20['workspace']['step']),
-    value23 = value21['canvasSyncPending'] === !![],
-    value24 = value21['exportOutputPending'] === !![],
+    value23 = value21['canvasSyncPending'] === true,
+    value24 = value21['exportOutputPending'] === true,
     value25 =
       '<div class="story-canvas-sync-menu-wrap' +
       (value23 ? ' is-loading' : '') +
@@ -308,7 +308,7 @@ function renderProjectToolbarActions(value20, value21 = {}) {
 function renderHeader(value27, value28 = {}) {
   return (
     '<header class="story-workspace-toolbar"' +
-    (value28['canvasSyncPending'] === !![] ? ' aria-hidden="true" inert' : '') +
+    (value28['canvasSyncPending'] === true ? ' aria-hidden="true" inert' : '') +
     '>\n    <div class="story-project-toolbar person-replacement-story-toolbar">\n      <button type="button" class="story-toolbar-back" data-person-replacement-action="back-home" aria-label="返回人物替换项目"><span class="story-toolbar-back-icon" aria-hidden="true"></span><span>人物替换项目</span></button>\n      ' +
     renderStepNavigation(value27) +
     '\n      <div class="person-replacement-toolbar-side">' +
@@ -398,7 +398,7 @@ function getPersonProjectCoverImageUrls(options2 = {}) {
 function getHomeProjectPresentation(query) {
   const list4 = Array['isArray'](query['libraryProjects']) ? query['libraryProjects'] : [],
     projectEntries = list4['map'](buildPersonProjectHomeEntry)['filter']((value38) => value38['id']),
-    showArchived = query['workspace']['showArchivedProjects'] === !![],
+    showArchived = query['workspace']['showArchivedProjects'] === true,
     archivedProjectCount = projectEntries['filter']((value39) => value39['archivedAt'] > 0)['length'],
     visibleProjects = getWorkspaceProjectHomeEntries(projectEntries, {
       query: query['workspace']['projectSearchQuery'],
@@ -503,17 +503,17 @@ function syncHome(el, value45) {
     !el2 ||
     el2['dataset']['personReplacementHomeProject'] !== String(value45['id'])
   )
-    return ![];
+    return false;
   const el3 = el2['ownerDocument']['createElement']('template');
   return (
     (el3['innerHTML'] = renderHome(value45)),
-    reconcileElementTree(el2, el3['content']['firstElementChild'], { preserveChildNodes: !![] })
+    reconcileElementTree(el2, el3['content']['firstElementChild'], { preserveChildNodes: true })
   );
 }
 function renderStepFooter(
   value46,
   value47,
-  { nextLabel: nextLabel = '下一步', hidePrevious: hidePrevious = ![] } = {},
+  { nextLabel: nextLabel = '下一步', hidePrevious: hidePrevious = false } = {},
 ) {
   const error2 = getPersonReplacementStepGate(value46, value46['workspace']['step'] + 1),
     value48 = value46['workspace']['step'] < PERSON_REPLACEMENT_STEPS['length'] && !error2['allowed'],
@@ -551,7 +551,7 @@ function renderStepFooter(
   );
 }
 function renderCanvasSyncLoadingOverlay(options3 = {}) {
-  if (options3['canvasSyncPending'] !== !![]) return '';
+  if (options3['canvasSyncPending'] !== true) return '';
   return '<div class="person-replacement-canvas-sync-loading storyboard-script-loading-overlay" data-person-replacement-canvas-sync-loading role="status" aria-live="polite" aria-label="正在加入画布" tabindex="-1">\n    <span class="storyboard-script-loading-spinner person-replacement-canvas-sync-spinner person-replacement-canvas-sync-overlay-spinner" aria-hidden="true"></span>\n    <strong class="storyboard-script-loading-label">正在加入画布</strong>\n    <small>同步完成后将自动跳转到画布</small>\n  </div>';
 }
 function createProjectTaskStatusElement(

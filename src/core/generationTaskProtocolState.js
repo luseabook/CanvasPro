@@ -48,16 +48,16 @@ function buildTaskMetaPatch(options3 = {}) {
     taskAdapterType: String(options3['adapterType'] || ''),
     taskModelId: String(options3['modelId'] || ''),
     taskExecutionId: String(options3['executionId'] || ''),
-    taskCancellable: options3['cancellable'] === !![],
-    taskResumable: options3['resumable'] === !![],
+    taskCancellable: options3['cancellable'] === true,
+    taskResumable: options3['resumable'] === true,
   };
 }
 export function buildRunningHubTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
-  useOpenapiQuery: useOpenapiQuery = ![],
+  recovering: recovering = false,
+  useOpenapiQuery: useOpenapiQuery = false,
 } = {}) {
   return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['WORKFLOW'], {
     taskId: taskId,
@@ -73,7 +73,7 @@ export function buildAsyncTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
+  recovering: recovering = false,
 } = {}) {
   return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'], {
     provider: provider,
@@ -91,7 +91,7 @@ export function buildDreaminaTaskPatch({
   label: label = '',
   startedAt: startedAt = 0,
   lastCheckedAt: lastCheckedAt = Date['now'](),
-  recovering: recovering = ![],
+  recovering: recovering = false,
   raw: raw = {},
   defaultLabel: defaultLabel = '',
 } = {}) {
@@ -117,7 +117,7 @@ export function buildImageGenerationDreaminaTaskPatch({
   label: label = DEFAULT_IMAGE_DREAMINA_TASK_LABEL,
   startedAt: startedAt = 0,
   lastCheckedAt: lastCheckedAt = Date['now'](),
-  recovering: recovering = ![],
+  recovering: recovering = false,
   raw: raw = {},
 } = {}) {
   return buildDreaminaTaskPatch({
@@ -138,7 +138,7 @@ export function buildImageGenerationAsyncTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
+  recovering: recovering = false,
 } = {}) {
   return buildAsyncTaskPatch({
     provider: provider,
@@ -153,8 +153,8 @@ export function buildRunningHubOpenapiTaskPatch({
   taskId: taskId = '',
   status: status = 'pending',
   startedAt: startedAt = 0,
-  recovering: recovering = ![],
-  useOpenapiQuery: useOpenapiQuery = !![],
+  recovering: recovering = false,
+  useOpenapiQuery: useOpenapiQuery = true,
 } = {}) {
   return buildRunningHubTaskPatch({
     taskId: taskId,
@@ -173,8 +173,8 @@ export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } =
       taskId: '',
       status: 'idle',
       startedAt: 0,
-      recovering: ![],
-      useOpenapiQuery: ![],
+      recovering: false,
+      useOpenapiQuery: false,
     }),
     ...buildDreaminaTaskPatch({
       submitId: '',
@@ -183,7 +183,7 @@ export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } =
       label: '',
       startedAt: 0,
       lastCheckedAt: 0,
-      recovering: ![],
+      recovering: false,
       raw: {},
     }),
     ...buildAsyncTaskPatch({
@@ -192,7 +192,7 @@ export function buildIdleGenerationProtocolPatch({ kind: kind = 'generation' } =
       taskId: '',
       status: 'idle',
       startedAt: 0,
-      recovering: ![],
+      recovering: false,
     }),
   };
 }
@@ -210,8 +210,8 @@ export function buildGenerationProtocolStartPatch(options6 = {}, source = 0) {
         taskId: '',
         status: 'pending',
         startedAt: source,
-        recovering: ![],
-        useOpenapiQuery: ![],
+        recovering: false,
+        useOpenapiQuery: false,
       }),
       rhSourceNodeId: String(options6['sourceNodeId'] || ''),
       rhToolbarTaskType: String(options6['taskType'] || ''),
@@ -223,7 +223,7 @@ export function buildGenerationProtocolStartPatch(options6 = {}, source = 0) {
       asyncTaskId: '',
       asyncTaskStatus: 'pending',
       asyncTaskStartedAt: normalizeNumber(source),
-      asyncTaskRecovering: ![],
+      asyncTaskRecovering: false,
     };
   return { ...args2, ...args3 };
 }
@@ -235,15 +235,15 @@ export function buildGenerationProtocolTaskIdPatch(options7 = {}, next = '', cur
       taskId: enabled,
       status: 'running',
       startedAt: current,
-      recovering: ![],
-      useOpenapiQuery: ![],
+      recovering: false,
+      useOpenapiQuery: false,
     });
   if (isAsyncModelApiProtocolSpec(options7))
     return {
       asyncTaskId: enabled,
       asyncTaskStatus: 'running',
       asyncTaskStartedAt: normalizeNumber(current),
-      asyncTaskRecovering: ![],
+      asyncTaskRecovering: false,
     };
   return {};
 }
@@ -255,7 +255,7 @@ export function buildGenerationProtocolTerminalPatch(options8 = {}, entry = 'idl
       generationQueueIndex: -1,
       generationQueueLength: 0,
       rhTaskStatus: status2,
-      rhTaskRecovering: ![],
+      rhTaskRecovering: false,
     };
   if (isAsyncModelApiProtocolSpec(options8))
     return {
@@ -263,7 +263,7 @@ export function buildGenerationProtocolTerminalPatch(options8 = {}, entry = 'idl
       generationQueueIndex: -1,
       generationQueueLength: 0,
       asyncTaskStatus: status2,
-      asyncTaskRecovering: ![],
+      asyncTaskRecovering: false,
     };
   return { generationQueueStatus: 'idle', generationQueueIndex: -1, generationQueueLength: 0 };
 }
@@ -271,7 +271,7 @@ export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, 
   const args4 = String(record?.['taskId'] || '')['trim'](),
     args5 = String(payload || '')['trim'](),
     args6 = {
-      isGenerating: !![],
+      isGenerating: true,
       jobStatus: 'running',
       jobError: null,
       generationDuration: null,
@@ -283,7 +283,7 @@ export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, 
       ...(args4
         ? buildGenerationProtocolTaskIdPatch(options9, args4, record['startedAt'])
         : { rhTaskStatus: 'pending' }),
-      rhTaskRecovering: ![],
+      rhTaskRecovering: false,
       ...(args5 ? { rhStatusMessage: args5 } : {}),
     };
   if (isAsyncModelApiProtocolSpec(options9))
@@ -292,7 +292,7 @@ export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, 
       ...(args4
         ? buildGenerationProtocolTaskIdPatch(options9, args4, record['startedAt'])
         : { asyncTaskStatus: 'pending' }),
-      asyncTaskRecovering: ![],
+      asyncTaskRecovering: false,
     };
   return args6;
 }

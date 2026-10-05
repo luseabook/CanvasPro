@@ -84,7 +84,7 @@ export async function exportDirectorProjectPackage(state, config) {
     throw new Error('项目清单超过 32 MB，请拆分项目后打包。');
   return (
     uint8Array['set'](new TextEncoder()['encode'](MAGIC)),
-    new DataView(arrayBuffer)['setUint32'](8, textEncoder['byteLength'], !![]),
+    new DataView(arrayBuffer)['setUint32'](8, textEncoder['byteLength'], true),
     new Blob([arrayBuffer, textEncoder, ...args3], { type: 'application/octet-stream' })
   );
 }
@@ -94,7 +94,7 @@ export async function importDirectorProjectPackage(value8, el2) {
   const value9 = await value8['slice'](0, 12)['arrayBuffer']();
   if (new TextDecoder()['decode'](new Uint8Array(value9, 0, 8)) !== MAGIC)
     throw new Error('请选择有效的 .aic3d 项目包。');
-  const dataView = new DataView(value9)['getUint32'](8, !![]);
+  const dataView = new DataView(value9)['getUint32'](8, true);
   if (dataView > 32 * 1024 * 1024 || dataView + 12 > value8['size']) throw new Error('项目包清单无效。');
   const enabled4 = JSON['parse'](await value8['slice'](12, 12 + dataView)['text']());
   if (

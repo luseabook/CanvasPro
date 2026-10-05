@@ -13,12 +13,12 @@ function normalizeAudioFormat(data) {
 }
 function hasReferenceMention(target, count) {
   const enabled = String(target || '');
-  if (!enabled || count <= 0) return ![];
+  if (!enabled || count <= 0) return false;
   for (let source = 1; source <= count; source += 1) {
     const regExp = new RegExp('@(音频|audio)\\s*' + source + '\\b', 'i');
-    if (regExp['test'](enabled)) return !![];
+    if (regExp['test'](enabled)) return true;
   }
-  return ![];
+  return false;
 }
 function normalizeReferenceMentionsForApi(next) {
   return String(next || '')

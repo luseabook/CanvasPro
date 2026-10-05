@@ -38,7 +38,7 @@ export const runningHubDoubaoAudioEntries = Object['freeze']([
       audioSlider('bitRate', 'MP3 码率', 64000, 160000, 128000, 1000, {
         showWhen: { field: 'format', value: 'mp3' },
       }),
-      audioToggle('filterParentheses', '过滤括号内容', !![]),
+      audioToggle('filterParentheses', '过滤括号内容', true),
       audioSlider('silenceDuration', '末尾静音（毫秒）', 0, 30000, 0, 100),
       audioToggle('filterMarkdown', '过滤 Markdown 标记'),
       audioToggle('filterEmoji', '过滤 Emoji'),
@@ -104,7 +104,7 @@ export const runningHubDoubaoAudioEntries = Object['freeze']([
       audioSlot('audio1', '参考音频1'),
       audioSlot('audio2', '参考音频2'),
       audioSlot('audio3', '参考音频3'),
-      { id: 'referenceImage', label: '参考图片', kind: 'image', required: ![] },
+      { id: 'referenceImage', label: '参考图片', kind: 'image', required: false },
     ],
     fields: [
       audioText('speaker', '音色 ID', '可选。音色 ID、参考音频、参考图片只能选一种。'),
@@ -116,8 +116,8 @@ export const runningHubDoubaoAudioEntries = Object['freeze']([
     ],
     mapping: [
       paramMapping('speaker'),
-      { path: 'audio_url', from: 'inputAudios', omitWhenEmpty: !![] },
-      { path: 'image_url', from: 'inputImages', transform: 'first', omitWhenEmpty: !![] },
+      { path: 'audio_url', from: 'inputAudios', omitWhenEmpty: true },
+      { path: 'image_url', from: 'inputImages', transform: 'first', omitWhenEmpty: true },
       paramMapping('format'),
       paramMapping('sample_rate', 'sampleRate'),
       paramMapping('speech_rate', 'speechRate'),

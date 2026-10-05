@@ -79,7 +79,7 @@ function requireMediaTool(config, tool, scope) {
   return mediaTools;
 }
 function assertToolResult(error, input, output = 'Media tool did not return a result.') {
-  if (!error || error['ok'] === ![])
+  if (!error || error['ok'] === false)
     throw createCanvasCommandError(
       'MEDIA_TOOL_NO_RESULT',
       error?.['message'] || error?.['reason'] || output,
@@ -246,12 +246,12 @@ function registerSingleRunnerCommand(
     id: id,
     description: description,
     riskLevel: 'confirm',
-    argsSchema: { required: ['nodeId'], properties: { nodeId: { type: 'string' } }, selectionFallback: !![] },
+    argsSchema: { required: ['nodeId'], properties: { nodeId: { type: 'string' } }, selectionFallback: true },
     capabilitySchema: {
       reads: ['nodes'],
       writes: writes,
-      selectionFallback: !![],
-      requiresMountedRuntime: ![],
+      selectionFallback: true,
+      requiresMountedRuntime: false,
     },
     returnSchema: { aliasFields: ['nodeId', 'nodeIds', 'value'] },
     validate(options4 = {}, value26 = {}) {
@@ -291,13 +291,13 @@ export function registerMediaToolCommands(value29) {
         required: ['nodeId'],
         properties: { nodeId: { type: 'string' }, options: { type: 'object' } },
         defaults: { options: {} },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes'],
         writes: ['nodes'],
-        selectionFallback: !![],
-        requiresMountedRuntime: ![],
+        selectionFallback: true,
+        requiresMountedRuntime: false,
       },
       returnSchema: { aliasFields: ['nodeId', 'nodeIds', 'value'] },
       validate(options5 = {}, value31 = {}) {
@@ -381,13 +381,13 @@ export function registerMediaToolCommands(value29) {
         required: ['nodeId'],
         properties: { nodeId: { type: 'string' }, cols: { type: 'number' }, rows: { type: 'number' } },
         defaults: { cols: 2, rows: 2 },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes'],
         writes: ['nodes'],
-        selectionFallback: !![],
-        requiresMountedRuntime: ![],
+        selectionFallback: true,
+        requiresMountedRuntime: false,
       },
       returnSchema: { aliasFields: ['nodeId', 'nodeIds', 'cols', 'rows', 'value'] },
       validate(options6 = {}, value37 = {}) {
@@ -436,13 +436,13 @@ export function registerMediaToolCommands(value29) {
       riskLevel: 'safe',
       argsSchema: {
         properties: { nodeId: { type: 'string' }, ids: { type: 'array' } },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes', 'selection'],
         writes: ['nodes'],
-        selectionFallback: !![],
-        requiresMountedRuntime: ![],
+        selectionFallback: true,
+        requiresMountedRuntime: false,
       },
       returnSchema: { aliasFields: ['nodeIds', 'sizes'] },
       validate(options7 = {}, value41 = {}) {
@@ -461,7 +461,7 @@ export function registerMediaToolCommands(value29) {
                 store2['updateNodeData'](value42, {
                   width: width2,
                   height: height2,
-                  needsAutoResize: ![],
+                  needsAutoResize: false,
                 }));
             });
           };

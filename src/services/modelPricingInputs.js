@@ -28,9 +28,9 @@ export function resolveModelPricingInputs(value, item = [], key = {}) {
   }
   const map = new Set();
   return list['filter']((response) => {
-    if (!['image', 'video', 'audio']['includes'](response['type']) || !response['url']) return ![];
+    if (!['image', 'video', 'audio']['includes'](response['type']) || !response['url']) return false;
     const current = response['type'] + '|' + (response['refSlot'] || '') + '|' + response['url'];
-    if (map['has'](current)) return ![];
-    return (map['add'](current), !![]);
+    if (map['has'](current)) return false;
+    return (map['add'](current), true);
   });
 }

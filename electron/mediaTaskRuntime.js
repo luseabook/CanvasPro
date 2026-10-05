@@ -42,15 +42,15 @@ export function buildMediaTaskStatePatch(update = {}) {
       mediaTaskError: update?.['error'] || '',
     };
   if (status === 'waiting' || status === 'processing')
-    ((patch['isGenerating'] = !![]), (patch['jobStatus'] = 'running'));
+    ((patch['isGenerating'] = true), (patch['jobStatus'] = 'running'));
   else {
-    if (status === 'complete') ((patch['isGenerating'] = ![]), (patch['jobStatus'] = 'success'));
+    if (status === 'complete') ((patch['isGenerating'] = false), (patch['jobStatus'] = 'success'));
     else {
       if (status === 'failed')
-        ((patch['isGenerating'] = ![]),
+        ((patch['isGenerating'] = false),
           (patch['jobStatus'] = 'error'),
           (patch['jobError'] = patch['mediaTaskError'] || 'Media task failed'));
-      else status === 'cancelled' && ((patch['isGenerating'] = ![]), (patch['jobStatus'] = null));
+      else status === 'cancelled' && ((patch['isGenerating'] = false), (patch['jobStatus'] = null));
     }
   }
   return patch;
@@ -208,7 +208,7 @@ export function createMediaTaskRuntime({
       );
       return result['stdout']['toString']('utf8')['toLowerCase']()['includes']('audio');
     } catch {
-      return ![];
+      return false;
     }
   }
   async function ffprobeVideoPlaybackInfo(queue, task, sourcePath) {
@@ -286,12 +286,12 @@ export function createMediaTaskRuntime({
       proxyAbs: proxyAbs,
       proxyLocalPath: proxyLocalPath,
     } = getVideoProxyPaths(assetId);
-    mkdirSync(derivedDir, { recursive: !![] });
-    let proxyReady = ![];
+    mkdirSync(derivedDir, { recursive: true });
+    let proxyReady = false;
     try {
       proxyReady = existsSync(proxyAbs) && statSync(proxyAbs)['size'] > 0;
     } catch {
-      proxyReady = ![];
+      proxyReady = false;
     }
     if (!proxyReady) {
       const tempPath = proxyAbs + '.' + process['pid'] + '.' + Date['now']() + '.tmp.mp4';

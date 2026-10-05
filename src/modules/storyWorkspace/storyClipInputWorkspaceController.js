@@ -44,19 +44,19 @@ export function createStoryClipInputWorkspaceController({
     );
   const syncVideoDurationInPlace = (item) => {
       const text = normalizeText(item?.['id']);
-      if (!text) return ![];
+      if (!text) return false;
       const formatStoryClipVideoGenerationDuration2 = formatStoryClipVideoGenerationDuration(
         item,
         state['models']['video'],
         state['videoGenerationParams'],
       );
-      let key = ![];
+      let key = false;
       return (
         root['querySelectorAll']('[data-story-clip-duration]')['forEach']((el) => {
           if (normalizeText(el['dataset']?.['storyClipDuration']) !== text) return;
           if (el['textContent'] !== formatStoryClipVideoGenerationDuration2)
             el['textContent'] = formatStoryClipVideoGenerationDuration2;
-          key = !![];
+          key = true;
         }),
         key
       );
@@ -81,7 +81,7 @@ export function createStoryClipInputWorkspaceController({
     reconcileSelectedInputsForModel = () => {
       const enabled = getSelectedEpisode(state),
         inputs = getSelectedClip(state, enabled);
-      if (!enabled || !inputs) return ![];
+      if (!enabled || !inputs) return false;
       try {
         const storyClipInputSlotViewModel = buildStoryClipInputSlotViewModel({
             modelId: state['models']['video'],
@@ -98,15 +98,15 @@ export function createStoryClipInputWorkspaceController({
           replaceClip(enabled['id'], inputs['id'], { ...inputs, inputs: inputs2 })
         );
       } catch {
-        return ![];
+        return false;
       }
     },
     prepareVideoSettings = (
       clip,
       {
         episode: episode = null,
-        enteringEpisode: enteringEpisode = ![],
-        switchingEpisode: switchingEpisode = ![],
+        enteringEpisode: enteringEpisode = false,
+        switchingEpisode: switchingEpisode = false,
       } = {},
     ) => {
       const options =
@@ -121,7 +121,7 @@ export function createStoryClipInputWorkspaceController({
     updateSelectedInput = ({ kind: kind, slotId: slotId2, value: value2 }) => {
       const enabled2 = getSelectedEpisode(state),
         enabled3 = getSelectedClip(state, enabled2);
-      if (!enabled2 || !enabled3) return ![];
+      if (!enabled2 || !enabled3) return false;
       const updateStoryClipInput2 = updateStoryClipInput(enabled3, {
         kind: kind,
         slotId: slotId2,
@@ -129,14 +129,14 @@ export function createStoryClipInputWorkspaceController({
       });
       return (
         replaceClip(enabled2['id'], enabled3['id'], updateStoryClipInput2),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         render(),
-        !![]
+        true
       );
     },
     uploadSelectedInput = async (name) => {
       const enabled4 = takePendingInputContext();
-      if (!name || !enabled4) return ![];
+      if (!name || !enabled4) return false;
       const modelId = enabled4['projectToken'] || createProjectToken(state),
         enabled5 =
           modelId['data']?.['episodes']?.['find'](
@@ -172,7 +172,7 @@ export function createStoryClipInputWorkspaceController({
               );
         if (!slotId3) throw new Error('当前视频模型没有可用的对应入参槽');
         const response = await uploadFile(name, modelId['projectId']);
-        if (!isProjectTaskLive(modelId)) return ![];
+        if (!isProjectTaskLive(modelId)) return false;
         const url = normalizeText(
           response?.['displayUrl'] ||
             response?.['url'] ||
@@ -188,19 +188,19 @@ export function createStoryClipInputWorkspaceController({
         return (
           replaceClip(enabled5['id'], inputs3['id'], updateStoryClipInput3, modelId['data']),
           syncProjectEntry(modelId),
-          schedulePersistence({ immediate: !![] }),
+          schedulePersistence({ immediate: true }),
           isProjectTaskCurrent(modelId) &&
             (render(),
             showToast?.(
               (kind2 === 'image' ? '图片' : kind2 === 'audio' ? '音频' : '视频') + '入参已接入。',
               'success',
             )),
-          !![]
+          true
         );
       } catch (error) {
         return (
           isProjectTaskCurrent(modelId) && showToast?.(error?.['message'] || '片段入参上传失败。', 'error'),
-          ![]
+          false
         );
       }
     };

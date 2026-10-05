@@ -183,8 +183,8 @@ export function buildRendererScenePlan({
   keepAliveNodeIds: keepAliveNodeIds,
   mountedNodeIds: mountedNodeIds,
   fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds,
-  includeParkIds: includeParkIds = !![],
-  deferInitialPlanning: deferInitialPlanning = ![],
+  includeParkIds: includeParkIds = true,
+  deferInitialPlanning: deferInitialPlanning = false,
 } = {}) {
   const { width: width2, height: height2 } = getContainerSize(containerRect),
     nodeById2 = createNodeMap(nodes, spatialIndex),
@@ -232,7 +232,7 @@ export function buildRendererScenePlan({
   const exactVisibleGenerationBusyIds = new Set(list2),
     map8 = collectLiveIds(nodeById2, mountCandidateIds);
   for (const value34 of liveIds) fullSurfaceIds['add'](value34);
-  if (deferInitialPlanning === !![] && includeParkIds === ![] && fullSurfaceBudget === 0) {
+  if (deferInitialPlanning === true && includeParkIds === false && fullSurfaceBudget === 0) {
     const liveIds2 = collectLiveIds(nodeById2, previewCandidateIds, mountCandidateIds, exactVisibleIds);
     for (const value35 of liveIds2) {
       if (!fullSurfaceIds['has'](value35)) proxySurfaceIds['add'](value35);
@@ -255,7 +255,7 @@ export function buildRendererScenePlan({
       fullSurfaceReleaseIds: fullSurfaceReleaseIds,
       presentationSurfaceIds: presentationSurfaceIds,
       plannedFullEligibleVisibleImageNodeIds: plannedFullEligibleVisibleImageNodeIds,
-      deferredInitialPlanning: !![],
+      deferredInitialPlanning: true,
       surfaceSignature: buildSurfaceSignature(fullSurfaceIds, proxySurfaceIds, exactVisibleGenerationBusyIds),
     };
   }
@@ -317,7 +317,7 @@ export function buildRendererScenePlan({
     if (!fullSurfaceIds['has'](value47)) proxySurfaceIds['add'](value47);
   }
   let parkIds = new Set();
-  if (includeParkIds !== ![]) {
+  if (includeParkIds !== false) {
     const map10 = collectLiveIds(nodeById2, parkCandidateIds),
       map11 = collectViewportRangeIds({
         nodeById: nodeById2,

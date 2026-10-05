@@ -116,7 +116,7 @@ export function projectStoryboard3DTopViewFootprint(value6, value7) {
 export function unprojectStoryboard3DMiniMapToWorld(
   box14,
   box15,
-  { y: y = 0, clampToBounds: clampToBounds = !![] } = {},
+  { y: y = 0, clampToBounds: clampToBounds = true } = {},
 ) {
   const box16 = {
       x: (finite(box14?.['x']) - box15['originX']) / box15['scale'],
@@ -146,7 +146,7 @@ export function hitTestStoryboard3DMiniMapObjects(box19, value12, value13, { rad
   const value14 = Math['max'](1, finite(radius, 8));
   let enabled = null;
   for (const x8 of value12 || []) {
-    if (x8?.['visible'] === ![]) continue;
+    if (x8?.['visible'] === false) continue;
     const point = projectStoryboard3DWorldToMiniMap(
         {
           x: x8?.['transform']?.['position']?.[0] ?? x8?.['position']?.['x'],
@@ -180,7 +180,7 @@ export function moveStoryboard3DMiniMapWindow(value17, box21, box22 = {}) {
 }
 export function normalizeStoryboard3DMiniMapState(collapsed = {}) {
   return {
-    collapsed: collapsed['collapsed'] === !![],
+    collapsed: collapsed['collapsed'] === true,
     windowPosition: {
       x: finite(collapsed['windowPosition']?.['x'], 16),
       y: finite(collapsed['windowPosition']?.['y'], 16),
@@ -192,7 +192,7 @@ export function normalizeStoryboard3DMiniMapState(collapsed = {}) {
   };
 }
 export function setStoryboard3DMiniMapExpanded(value20, collapsed2) {
-  return { ...normalizeStoryboard3DMiniMapState(value20), collapsed: collapsed2 !== !![] };
+  return { ...normalizeStoryboard3DMiniMapState(value20), collapsed: collapsed2 !== true };
 }
 export function zoomStoryboard3DMiniMapState(value21, value22) {
   const box24 = normalizeStoryboard3DMiniMapState(value21);

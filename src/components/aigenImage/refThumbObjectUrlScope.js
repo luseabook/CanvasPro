@@ -36,10 +36,10 @@ export function scheduleCurrentRefThumbObjectUrl(
     ownerId: 'ai-image:' + objectUrls['nodeId'] + ':ref-thumb',
     isCurrent: () => {
       if (
-        objectUrls['_imageObjectUrlsDisposed'] === !![] ||
+        objectUrls['_imageObjectUrlsDisposed'] === true ||
         (Number(objectUrls['_imageObjectUrlLifecycleEpoch']) || 0) !== payload
       )
-        return ![];
+        return false;
       const handle = objectUrls['_getStoreStateForRead']();
       return collectCurrentRefThumbIds(
         store['getIncomingEdges'](objectUrls['nodeId']),

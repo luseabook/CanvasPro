@@ -36,8 +36,8 @@ export function createStoryAssetGenerationController({
   state: state,
   activeRecoveries: activeRecoveries,
   activeExecutions: activeExecutions,
-  isWorkspaceDestroyed: isWorkspaceDestroyed = () => ![],
-  hasImageGenerator: hasImageGenerator = () => ![],
+  isWorkspaceDestroyed: isWorkspaceDestroyed = () => false,
+  hasImageGenerator: hasImageGenerator = () => false,
   generateImage: generateImage,
   createProjectToken: createProjectToken,
   createProjectTokenForData: createProjectTokenForData,
@@ -53,7 +53,7 @@ export function createStoryAssetGenerationController({
   findAsset: findAsset,
   getSelectedAppearance: getSelectedAppearance,
   showToast: showToast = () => {},
-  showTaskApiKeyError: showTaskApiKeyError = () => ![],
+  showTaskApiKeyError: showTaskApiKeyError = () => false,
   showTaskResultToast: showTaskResultToast = () => {},
   notifyTaskResult: notifyTaskResult = () => {},
   showNavigableTaskResultToast: showNavigableTaskResultToast = () => {},
@@ -127,7 +127,7 @@ export function createStoryAssetGenerationController({
         source = options['execution']?.['executionManifest'];
       return Boolean(
         source?.['adapterType'] === 'workflow' ||
-        target?.['async'] === !![] ||
+        target?.['async'] === true ||
         source?.['extensions']?.['taskPolling'],
       );
     },
@@ -140,7 +140,7 @@ export function createStoryAssetGenerationController({
           projectToken: projectToken,
           isLive: isProjectTaskLive,
           applyResult: applyResult,
-          onLocalized: () => schedulePersistence({ immediate: !![] }),
+          onLocalized: () => schedulePersistence({ immediate: true }),
         }),
         id = buildStoryBackgroundTaskId('asset-image', {
           assetId: asset?.['id'],
@@ -177,12 +177,12 @@ export function createStoryAssetGenerationController({
             onTaskId: onTaskId,
             onTaskMeta: ({ taskId: taskId } = {}) => onTaskId(taskId),
           });
-        if (!isProjectTaskLive(projectToken)) return ![];
+        if (!isProjectTaskLive(projectToken)) return false;
         return (
           applyResult(asset, appearance, current),
           args3['commitRemote'](),
           finishBackgroundTask(projectToken, id, { status: 'succeeded', message: '素材图片生成完成' }),
-          !![]
+          true
         );
       } catch (error) {
         isProjectTaskLive(projectToken) &&
@@ -198,14 +198,14 @@ export function createStoryAssetGenerationController({
     resumeImageTask = async (modelId3, projectToken2 = createProjectToken()) => {
       const entry = projectToken2['projectId'] + ':' + modelId3['id'];
       if (activeRecoveries['has'](entry) || activeExecutions['has'](entry) || isWorkspaceDestroyed())
-        return ![];
+        return false;
       (activeRecoveries['add'](entry), activeExecutions['add'](entry), registerProjectData(projectToken2));
       if (isProjectTaskCurrent(projectToken2)) {
         setStoryAssetAppearanceGenerating(
           state,
           modelId3['scope']?.['assetId'],
           modelId3['scope']?.['appearanceId'],
-          !![],
+          true,
         );
         if (state['view'] === 'project' && state['step'] === 2) render();
       }
@@ -214,7 +214,7 @@ export function createStoryAssetGenerationController({
           modelId: modelId3['modelId'],
           provider: modelId3['provider'],
         });
-        if (!isProjectTaskLive(projectToken2) || isWorkspaceDestroyed()) return ![];
+        if (!isProjectTaskLive(projectToken2) || isWorkspaceDestroyed()) return false;
         if (!enabled)
           throw new Error('图片模型缺少 manifest 或 execution manifest：' + modelId3['modelId']);
         const asset2 = projectToken2['data']?.['assets']?.['find'](
@@ -230,7 +230,7 @@ export function createStoryAssetGenerationController({
             projectToken: projectToken2,
             isLive: isProjectTaskLive,
             applyResult: applyResult,
-            onLocalized: () => schedulePersistence({ immediate: !![] }),
+            onLocalized: () => schedulePersistence({ immediate: true }),
           }),
           config = {
             ...(modelId3['resumePayload'] && typeof modelId3['resumePayload'] === 'object'
@@ -260,7 +260,7 @@ export function createStoryAssetGenerationController({
                 config,
                 storyAssetImageLocalization['options'],
               ));
-        if (!isProjectTaskLive(projectToken2)) return ![];
+        if (!isProjectTaskLive(projectToken2)) return false;
         return (
           applyResult(asset2, appearance2, resumeDreaminaImageTask2),
           storyAssetImageLocalization['commitRemote'](),
@@ -268,7 +268,7 @@ export function createStoryAssetGenerationController({
             status: 'succeeded',
             message: '素材图片任务已恢复并生成完成',
           }),
-          schedulePersistence({ immediate: !![] }),
+          schedulePersistence({ immediate: true }),
           isProjectTaskCurrent(projectToken2) &&
             state['view'] === 'project' &&
             state['step'] === 2 &&
@@ -277,10 +277,10 @@ export function createStoryAssetGenerationController({
             step: 2,
             assetId: modelId3['scope']?.['assetId'],
           }),
-          !![]
+          true
         );
       } catch (error2) {
-        if (!isProjectTaskLive(projectToken2)) return ![];
+        if (!isProjectTaskLive(projectToken2)) return false;
         return (
           finishBackgroundTask(projectToken2, modelId3['id'], {
             status: 'failed',
@@ -288,7 +288,7 @@ export function createStoryAssetGenerationController({
             error: error2?.['message'] || '素材图片任务恢复失败。',
           }),
           showTaskResultToast(error2?.['message'] || '素材图片任务恢复失败。', 'error', error2),
-          ![]
+          false
         );
       } finally {
         (activeRecoveries['delete'](entry), activeExecutions['delete'](entry));
@@ -297,7 +297,7 @@ export function createStoryAssetGenerationController({
             state,
             modelId3['scope']?.['assetId'],
             modelId3['scope']?.['appearanceId'],
-            ![],
+            false,
           );
           if (state['view'] === 'project' && state['step'] === 2) render();
         }
@@ -306,10 +306,10 @@ export function createStoryAssetGenerationController({
     resumeVoiceTask = async (modelId4, scope = createProjectToken()) => {
       const input = scope['projectId'] + ':' + modelId4['id'];
       if (activeRecoveries['has'](input) || activeExecutions['has'](input) || isWorkspaceDestroyed())
-        return ![];
+        return false;
       (activeRecoveries['add'](input), activeExecutions['add'](input), registerProjectData(scope));
       if (isProjectTaskCurrent(scope)) {
-        setStoryAssetVoiceGenerating(state, modelId4['scope']?.['assetId'], !![]);
+        setStoryAssetVoiceGenerating(state, modelId4['scope']?.['assetId'], true);
         if (state['view'] === 'project' && state['step'] === 2) render();
       }
       try {
@@ -317,7 +317,7 @@ export function createStoryAssetGenerationController({
           modelId: modelId4['modelId'],
           provider: modelId4['provider'],
         });
-        if (!isProjectTaskLive(scope) || isWorkspaceDestroyed()) return ![];
+        if (!isProjectTaskLive(scope) || isWorkspaceDestroyed()) return false;
         if (!enabled2)
           throw new Error('声音模型缺少 manifest 或 execution manifest：' + modelId4['modelId']);
         const asset3 = scope['data']?.['assets']?.['find'](
@@ -329,23 +329,23 @@ export function createStoryAssetGenerationController({
           taskId: modelId4['remoteTaskId'],
           payload: modelId4['resumePayload'] || {},
         });
-        if (!resumeStoryCharacterVoice2 || !isProjectTaskLive(scope)) return ![];
+        if (!resumeStoryCharacterVoice2 || !isProjectTaskLive(scope)) return false;
         return (
           replaceStoryCharacterVoiceReference(asset3, resumeStoryCharacterVoice2),
           finishBackgroundTask(scope, modelId4['id'], {
             status: 'succeeded',
             message: '角色声音任务已恢复并生成完成',
           }),
-          schedulePersistence({ immediate: !![] }),
+          schedulePersistence({ immediate: true }),
           isProjectTaskCurrent(scope) && state['view'] === 'project' && state['step'] === 2 && render(),
           showNavigableTaskResultToast('角色声音任务已恢复并生成完成。', 'success', scope, {
             step: 2,
             assetId: modelId4['scope']?.['assetId'],
           }),
-          !![]
+          true
         );
       } catch (error3) {
-        if (!isProjectTaskLive(scope)) return ![];
+        if (!isProjectTaskLive(scope)) return false;
         return (
           finishBackgroundTask(scope, modelId4['id'], {
             status: 'failed',
@@ -353,15 +353,15 @@ export function createStoryAssetGenerationController({
             error: error3?.['message'] || '角色声音任务恢复失败。',
           }),
           showTaskResultToast(error3?.['message'] || '角色声音任务恢复失败。', 'error', error3),
-          ![]
+          false
         );
       } finally {
         (activeRecoveries['delete'](input), activeExecutions['delete'](input));
         if (isProjectTaskCurrent(scope)) {
-          setStoryAssetVoiceGenerating(state, modelId4['scope']?.['assetId'], ![]);
+          setStoryAssetVoiceGenerating(state, modelId4['scope']?.['assetId'], false);
           normalizeText(state['characterVoiceEditor']?.['assetId']) ===
             normalizeText(modelId4['scope']?.['assetId']) &&
-            (state['characterVoiceEditor']['isGenerating'] = ![]);
+            (state['characterVoiceEditor']['isGenerating'] = false);
           if (state['view'] === 'project' && state['step'] === 2) render();
         }
       }
@@ -384,7 +384,7 @@ export function createStoryAssetGenerationController({
         list2['length']
       );
     },
-    showGenerationError = (details, { showFallbackToast: showFallbackToast = !![] } = {}) => {
+    showGenerationError = (details, { showFallbackToast: showFallbackToast = true } = {}) => {
       const providerId = details?.['storyAssetGenerationContext'] || {},
         showTaskApiKeyError2 = showTaskApiKeyError(details, {
           providerId: providerId['payload']?.['provider'] || state['imageProvider'],
@@ -430,30 +430,30 @@ export function createStoryAssetGenerationController({
         return;
       }
       const projectToken3 = createProjectToken();
-      (setStoryAssetAppearanceGenerating(state, assetId['id'], enabled3['id'], !![]),
+      (setStoryAssetAppearanceGenerating(state, assetId['id'], enabled3['id'], true),
         (enabled3['error'] = ''),
         render());
       try {
         await requestAppearanceImage(assetId, enabled3, { projectToken: projectToken3 });
-        if (!isProjectTaskLive(projectToken3)) return ![];
+        if (!isProjectTaskLive(projectToken3)) return false;
         return (
           showNavigableTaskResultToast('当前形象已生成。', 'success', projectToken3, {
             step: 2,
             assetId: assetId['id'],
           }),
-          schedulePersistence({ immediate: !![] }),
-          !![]
+          schedulePersistence({ immediate: true }),
+          true
         );
       } catch (error4) {
-        if (!isProjectTaskLive(projectToken3)) return ![];
+        if (!isProjectTaskLive(projectToken3)) return false;
         return (
           (enabled3['error'] = error4?.['getUserMessage']?.() || error4?.['message'] || '生成失败'),
           showGenerationError(error4),
-          ![]
+          false
         );
       } finally {
         isProjectTaskCurrent(projectToken3) &&
-          (setStoryAssetAppearanceGenerating(state, assetId['id'], enabled3['id'], ![]), render());
+          (setStoryAssetAppearanceGenerating(state, assetId['id'], enabled3['id'], false), render());
       }
     };
   return Object['freeze']({

@@ -108,10 +108,10 @@ export function createStoryClipProductionPresentation({
         sceneCount: sceneCount = 0,
         propCount: propCount = 0,
         clipCount: clipCount = 0,
-        isChecked: isChecked = ![],
-        isSelectionMode: isSelectionMode = ![],
-        isSplitting: isSplitting = ![],
-        disabled: disabled = ![],
+        isChecked: isChecked = false,
+        isSelectionMode: isSelectionMode = false,
+        isSplitting: isSplitting = false,
+        disabled: disabled = false,
         actionKind: actionKind = 'generate',
         actionLabel: actionLabel = '',
         experimentalActionMarkup: experimentalActionMarkup = '',
@@ -141,7 +141,7 @@ export function createStoryClipProductionPresentation({
             isSplitting +
             '">' +
             (isSplitting
-              ? renderStoryGenerationSpinner({ button: !![] })
+              ? renderStoryGenerationSpinner({ button: true })
               : renderEpisodeCardActionIcon(actionKind)) +
             '<span class="story-episode-enter-label">' +
             escapeHtml(isSplitting ? '生成中' : actionLabel) +
@@ -167,7 +167,7 @@ export function createStoryClipProductionPresentation({
             isSplitting +
             '">' +
             (isSplitting
-              ? renderStoryGenerationSpinner({ button: !![] })
+              ? renderStoryGenerationSpinner({ button: true })
               : renderEpisodeCardActionIcon('regenerate')) +
             '<span class="story-episode-enter-label">' +
             (isSplitting ? '重新生成中' : '重新生成') +
@@ -264,7 +264,7 @@ export function createStoryClipProductionPresentation({
         ? '<button type="button" class="story-primary-button story-main-action-button" data-story-action="cancel-episode-split-batch" ' +
           (el['cancelRequested'] ? 'disabled' : '') +
           ' aria-busy="true">' +
-          renderStoryGenerationSpinner({ button: !![] }) +
+          renderStoryGenerationSpinner({ button: true }) +
           escapeHtml(el['cancelRequested'] ? '正在停止' : '停止批量拆分') +
           '</button>'
         : '';
@@ -497,7 +497,7 @@ export function createStoryClipProductionPresentation({
                   ' ' +
                   escapeHtml(imageUrl3['name']) +
                   '，仅可拖入提示词" aria-busy="' +
-                  (imageUrl3['captureSavePending'] === !![]) +
+                  (imageUrl3['captureSavePending'] === true) +
                   '">\n                ' +
                   value28 +
                   '\n                <span>' +
@@ -507,7 +507,7 @@ export function createStoryClipProductionPresentation({
                   '" aria-label="' +
                   escapeHtml(value27) +
                   '" ' +
-                  (imageUrl3['captureSavePending'] === !![] ? 'disabled' : '') +
+                  (imageUrl3['captureSavePending'] === true ? 'disabled' : '') +
                   '>' +
                   renderDeleteIcon() +
                   '</button>\n            </div>'

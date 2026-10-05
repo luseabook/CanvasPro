@@ -1,8 +1,8 @@
 const KEY = 'v2-collaboration-offscreen-members',
   ATTENTION_KEY = 'v2-collaboration-host-attention',
   listeners = new Set();
-let memoryValue = !![],
-  attentionValue = !![];
+let memoryValue = true,
+  attentionValue = true;
 export function readHostAttention() {
   try {
     if (globalThis['localStorage'])

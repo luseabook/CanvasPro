@@ -1,5 +1,5 @@
 import { getModelManifest } from '../../manifests/index.js';
-export function getAudioWorkflowSlots(value = '', { includeImages: includeImages = ![] } = {}) {
+export function getAudioWorkflowSlots(value = '', { includeImages: includeImages = false } = {}) {
   const modelManifest = getModelManifest(value),
     item = modelManifest?.['inputSlots'],
     list = item?.['fixedSlots'],
@@ -10,14 +10,14 @@ export function getAudioWorkflowSlots(value = '', { includeImages: includeImages
       slot: String(label?.['id'] || '')['trim'](),
       kind: String(label?.['kind'] || '')['trim'](),
       label: label?.['label'] || label?.['id'] || '音频参考',
-      required: label?.['required'] === !![],
+      required: label?.['required'] === true,
     }))['filter'](
       (enabled) =>
         enabled['slot'] &&
         (!enabled['kind'] || enabled['kind'] === 'audio' || (includeImages && enabled['kind'] === 'image')),
     );
   if (Number['isFinite'](count) && count <= 0) return [];
-  return [{ slot: 'audioRef', kind: 'audio', label: '音频参考', required: !![] }];
+  return [{ slot: 'audioRef', kind: 'audio', label: '音频参考', required: true }];
 }
 export function getAudioWorkflowInputLimit(key = '') {
   return getAudioWorkflowSlots(key)['length'] || 1;

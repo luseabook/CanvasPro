@@ -17,7 +17,7 @@ export function buildStoryAssetGenerationPayload({
   provider: provider = '',
   generationParams: generationParams = {},
   referenceImageUrls: referenceImageUrls = [],
-  mapReferenceImageToImage2: mapReferenceImageToImage2 = ![],
+  mapReferenceImageToImage2: mapReferenceImageToImage2 = false,
 } = {}) {
   const sanitizeStoryAssetPublicPromptText2 = sanitizeStoryAssetPublicPromptText(asset?.['prompt']),
     characterAssetImageGenerationPayload = buildCharacterAssetImageGenerationPayload({
@@ -44,15 +44,15 @@ export function normalizeStoryImageGenerationParams(item, key = {}) {
 }
 export function isStoryAssetBatchLoading(index, result) {
   return (
-    index?.['isBatchGenerating'] === !![] &&
+    index?.['isBatchGenerating'] === true &&
     Array['isArray'](index?.['batchGeneratingAssetIds']) &&
     index['batchGeneratingAssetIds']['includes'](result)
   );
 }
-export function setStoryAssetAppearanceGenerating(enabled, data, options, target = !![]) {
-  if (!enabled || typeof enabled !== 'object') return ![];
+export function setStoryAssetAppearanceGenerating(enabled, data, options, target = true) {
+  if (!enabled || typeof enabled !== 'object') return false;
   const storyAssetAppearanceGenerationKey = getStoryAssetAppearanceGenerationKey(data, options);
-  if (!storyAssetAppearanceGenerationKey) return ![];
+  if (!storyAssetAppearanceGenerationKey) return false;
   const list = Array['isArray'](enabled['generatingAppearanceKeys'])
       ? enabled['generatingAppearanceKeys']
       : [],
@@ -61,10 +61,10 @@ export function setStoryAssetAppearanceGenerating(enabled, data, options, target
       : list['filter']((source) => source !== storyAssetAppearanceGenerationKey);
   return ((enabled['generatingAppearanceKeys'] = list2), list2['length'] !== list['length']);
 }
-export function setStoryAssetVoiceGenerating(enabled2, next, current = !![]) {
-  if (!enabled2 || typeof enabled2 !== 'object') return ![];
+export function setStoryAssetVoiceGenerating(enabled2, next, current = true) {
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
   const text = normalizeText(next);
-  if (!text) return ![];
+  if (!text) return false;
   const list3 = Array['isArray'](enabled2['generatingVoiceAssetIds'])
       ? enabled2['generatingVoiceAssetIds']
       : [],
@@ -75,11 +75,11 @@ export function setStoryAssetVoiceGenerating(enabled2, next, current = !![]) {
 }
 export function isStoryAssetVoiceLoading(record, payload) {
   const text2 = normalizeText(payload);
-  if (!text2) return ![];
+  if (!text2) return false;
   return (
     (Array['isArray'](record?.['generatingVoiceAssetIds']) &&
       record['generatingVoiceAssetIds']['some']((handle) => normalizeText(handle) === text2)) ||
-    (record?.['isBatchGenerating'] === !![] &&
+    (record?.['isBatchGenerating'] === true &&
       Array['isArray'](record?.['batchGeneratingVoiceAssetIds']) &&
       record['batchGeneratingVoiceAssetIds']['some']((state) => normalizeText(state) === text2))
   );
@@ -95,11 +95,11 @@ export function isStoryAssetCardLoading(config, scope) {
 }
 export function isStoryAssetAppearanceLoading(output, value2, value3) {
   const storyAssetAppearanceGenerationKey2 = getStoryAssetAppearanceGenerationKey(value2, value3);
-  if (!storyAssetAppearanceGenerationKey2) return ![];
+  if (!storyAssetAppearanceGenerationKey2) return false;
   return (
     (Array['isArray'](output?.['generatingAppearanceKeys']) &&
       output['generatingAppearanceKeys']['includes'](storyAssetAppearanceGenerationKey2)) ||
-    (output?.['isBatchGenerating'] === !![] &&
+    (output?.['isBatchGenerating'] === true &&
       Array['isArray'](output?.['batchGeneratingAppearanceKeys']) &&
       output['batchGeneratingAppearanceKeys']['includes'](storyAssetAppearanceGenerationKey2))
   );
@@ -110,16 +110,16 @@ export function getStoryAssetGenerationControlState(value4, value5, value6) {
     value7 = text4 === '生成资产图' ? '生成素材图' : text4 || '生成素材图';
   return { isGenerating: isGenerating, disabled: isGenerating, label: isGenerating ? '生成中' : value7 };
 }
-export function settleStoryAssetBatchLoading(value8, value9, list5 = [], { failed: failed = ![] } = {}) {
+export function settleStoryAssetBatchLoading(value8, value9, list5 = [], { failed: failed = false } = {}) {
   const text5 = normalizeText(value9?.['id']);
-  if (!text5 || !Array['isArray'](value8?.['batchGeneratingAssetIds'])) return ![];
+  if (!text5 || !Array['isArray'](value8?.['batchGeneratingAssetIds'])) return false;
   const value10 = list5['some']((value11) => normalizeText(value11?.['asset']?.['id']) === text5);
-  if (!failed && value10) return ![];
+  if (!failed && value10) return false;
   return (
     (value8['batchGeneratingAssetIds'] = value8['batchGeneratingAssetIds']['filter'](
       (value12) => normalizeText(value12) !== text5,
     )),
-    !![]
+    true
   );
 }
 export function normalizeStoryAssetBatchGenerationMode(value13) {
@@ -161,7 +161,7 @@ export function buildStoryAssetBatchGenerationPlan(list6 = [], value18 = 'all') 
       (enabled3) => enabled3 && !enabled3['isLibraryAsset'],
     ),
     imageTasks =
-      mode === 'voice' ? [] : buildStoryAssetAppearanceGenerationTasks(list7, { includeExisting: !![] }),
+      mode === 'voice' ? [] : buildStoryAssetAppearanceGenerationTasks(list7, { includeExisting: true }),
     voiceAssets = mode === 'image' ? [] : list7['filter']((value19) => value19['kind'] === 'character');
   return {
     mode: mode,

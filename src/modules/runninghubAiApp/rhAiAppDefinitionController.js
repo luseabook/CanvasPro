@@ -64,13 +64,13 @@ export function createRhAiAppDefinitionController(
         const options = {};
         return (
           (value2 = options),
-          (sourceType['workflowInputCollapsed'] = ![]),
+          (sourceType['workflowInputCollapsed'] = false),
           sourceType['_syncWorkflowInputCollapsed'](),
-          run(!![]),
+          run(true),
           {
             isCurrent: () => value2 === options,
             finish() {
-              value2 === options && ((value2 = null), run(![]));
+              value2 === options && ((value2 = null), run(false));
             },
           }
         );
@@ -118,7 +118,7 @@ export function createRhAiAppDefinitionController(
             () => {
               if (value2) index['cancel']();
             },
-            !![],
+            true,
           ),
           el2['addEventListener']('click', () => void index['load']()),
           index['sync']());
@@ -130,9 +130,9 @@ export function createRhAiAppDefinitionController(
           (reference['value'] = sourceType['definitionReference'] || ''));
       },
       cancel() {
-        ((value2 = null), run(![]));
+        ((value2 = null), run(false));
         const current = value;
-        ((value = null), current?.['abort'](), handler(![]));
+        ((value = null), current?.['abort'](), handler(false));
       },
       async load() {
         if (value || !isRunningHubSource(sourceType['sourceType'])) return;
@@ -147,7 +147,7 @@ export function createRhAiAppDefinitionController(
             reference: reference['value']['trim'](),
           },
           entry = sourceType['_getInputText']();
-        (handler(!![]), sourceType['_setError'](''));
+        (handler(true), sourceType['_setError'](''));
         try {
           const error = await fetchDefinition({
             ...args,
@@ -178,7 +178,7 @@ export function createRhAiAppDefinitionController(
           (sourceType['_setError'](error2?.['message'] || '获取配置失败，请重试'),
             sourceType['_saveKindState']());
         } finally {
-          value === signal && ((value = null), handler(![]));
+          value === signal && ((value = null), handler(false));
         }
       },
     };

@@ -51,10 +51,10 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
       ),
       getProject()['id'] === id &&
         replaceProject(index, {
-          persist: ![],
+          persist: false,
           presentation: 'none',
           reason: 'update-library-project',
-          touchUpdatedAt: ![],
+          touchUpdatedAt: false,
         }),
       syncWorkspace(),
       schedulePersistence(),
@@ -145,7 +145,7 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
         }),
       ),
       syncWorkspace(),
-      schedulePersistence({ immediate: !![] }),
+      schedulePersistence({ immediate: true }),
       openProject(currentProjectId3['id']),
       cloneJson(currentProjectId3)
     );
@@ -169,10 +169,10 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
       releaseAllSourcePreviews(text),
       getProject()['id'] === text &&
         replaceProject(createInitialProject(), {
-          persist: ![],
+          persist: false,
           presentation: 'none',
           reason: 'delete-project',
-          touchUpdatedAt: ![],
+          touchUpdatedAt: false,
         }),
       syncWorkspace(),
       schedulePersistence(),

@@ -64,8 +64,8 @@ export function resolveReadyModelProviderProfileId(config, scope, handler) {
     modelProviderProfileId = normalizeModelProviderProfileId(config, scope);
   if (!modelProviderProfileId || typeof handler !== 'function') return modelProviderProfileId;
   const input = handler(modelProviderProfileId);
-  if (input !== ![]) return modelProviderProfileId;
-  return list4['find']((output) => handler(output) === !![]) || modelProviderProfileId;
+  if (input !== false) return modelProviderProfileId;
+  return list4['find']((output) => handler(output) === true) || modelProviderProfileId;
 }
 export function sanitizeModelProviderProfileMemory(value2) {
   if (!isPlainObject(value2)) return {};

@@ -148,7 +148,7 @@ export function createStoryboard3DShotAnimation({
       MAX_DURATION_SECONDS,
     ),
     fps: clamp(Math['round'](finiteNumber(fps, DEFAULT_FPS)), MIN_FPS, MAX_FPS),
-    loop: ![],
+    loop: false,
     cameraKeyframes: [
       {
         id: createKeyframeId('camera-keyframe', idFactory),
@@ -216,7 +216,7 @@ export function normalizeStoryboard3DShotAnimation(
       MAX_DURATION_SECONDS,
     ),
     fps: clamp(Math['round'](finiteNumber(options4?.['fps'], DEFAULT_FPS)), MIN_FPS, MAX_FPS),
-    loop: options4?.['loop'] === !![],
+    loop: options4?.['loop'] === true,
     cameraKeyframes: args2,
     cameraPath: normalizeDirectorCameraPath(options4?.['cameraPath'], args2),
     objectPaths: Object['fromEntries'](
@@ -377,7 +377,7 @@ function interpolateAngle(value57, value58, value59) {
     Math['PI'];
   return value57 + value60 * value59;
 }
-function interpolateVector(value61, value62, value63, { angles: angles = ![] } = {}) {
+function interpolateVector(value61, value62, value63, { angles: angles = false } = {}) {
   return value61['map']((value64, value65) =>
     angles
       ? interpolateAngle(value64, value62[value65], value63)
@@ -441,7 +441,7 @@ export function sampleStoryboard3DShotAnimation(
   storyboard3DShotAnimation4['objectTracks']['forEach']((value79) => {
     const args11 = normalizeTransform(objectTransforms[value79['objectId']]),
       value80 = { ...args11 };
-    let value81 = ![];
+    let value81 = false;
     STORYBOARD_3D_OBJECT_ANIMATION_PROPERTIES['forEach']((value82) => {
       const directorClipSample = resolveDirectorClipSample(
           storyboard3DShotAnimation4['motionClips'],
@@ -456,7 +456,7 @@ export function sampleStoryboard3DShotAnimation(
               ? sampleSpatialCurve(value83, el, value84)
               : interpolateVector(value83['value'], el['value'], value84, { angles: value82 === 'rotation' }),
         );
-      sampleKeyframes3 && ((value80[value82] = sampleKeyframes3['value']), (value81 = !![]));
+      sampleKeyframes3 && ((value80[value82] = sampleKeyframes3['value']), (value81 = true));
     });
     if (value81) value78[value79['objectId']] = value80;
   });

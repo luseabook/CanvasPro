@@ -19,7 +19,7 @@ export function applyDirectorCameraMotion(
     preset: preset,
     duration: duration = 3,
     amount: amount = 3,
-    append: append = ![],
+    append: append = false,
     start: start2,
   } = {},
 ) {
@@ -85,7 +85,7 @@ export function applyDirectorObjectPath(
     points: points,
     start: start = 0,
     duration: duration = 3,
-    orient: orient = !![],
+    orient: orient = true,
   } = {},
 ) {
   if (!object || object['locked']) throw new Error('请先选择一个未锁定的角色或物体。');

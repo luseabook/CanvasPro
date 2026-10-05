@@ -7,8 +7,8 @@ export function createViewportScreenFrame() {
   return {
     set(key, index) {
       const box = { x: toFiniteNumber(key), y: toFiniteNumber(index) };
-      if (_screenOriginX['x'] === box['x'] && _screenOriginX['y'] === box['y']) return ![];
-      return ((_screenOriginX = box), !![]);
+      if (_screenOriginX['x'] === box['x'] && _screenOriginX['y'] === box['y']) return false;
+      return ((_screenOriginX = box), true);
     },
     attach(result) {
       return {

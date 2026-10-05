@@ -6,7 +6,7 @@ export function createCollaborationChangeFeed({
 }) {
   let enabled = null,
     setTimeout2,
-    enabled2 = ![];
+    enabled2 = false;
   async function start() {
     if (enabled2 || signal['aborted']) return;
     let value = 0;
@@ -25,7 +25,7 @@ export function createCollaborationChangeFeed({
   return {
     start: start,
     stop() {
-      ((enabled2 = !![]), clearTimeout(setTimeout2));
+      ((enabled2 = true), clearTimeout(setTimeout2));
     },
   };
 }

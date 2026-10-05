@@ -51,7 +51,7 @@ export function createStoryboard3DImagePoseEstimator({
   let enabled = null,
     handler = () => {},
     handler2 = () => {},
-    target = ![];
+    target = false;
   const map = new Map(),
     handler3 = (source, handler4, next) => {
       const enabled2 = map['get'](source);
@@ -63,7 +63,7 @@ export function createStoryboard3DImagePoseEstimator({
         (map['delete'](entry), promise['removeAbort'](), promise['clearTimer'](), promise['reject'](current));
       }
     },
-    handler6 = ({ terminate: terminate = !![] } = {}) => {
+    handler6 = ({ terminate: terminate = true } = {}) => {
       (handler(), handler2(), (handler = () => {}), (handler2 = () => {}));
       if (terminate) enabled?.['terminate']?.();
       enabled = null;
@@ -125,7 +125,7 @@ export function createStoryboard3DImagePoseEstimator({
         };
         if (signal?.['addEventListener']) {
           const output = () => handler3(requestId, reject, abortError(signal['reason']));
-          (signal['addEventListener']('abort', output, { once: !![] }),
+          (signal['addEventListener']('abort', output, { once: true }),
             (removeAbort = () => signal['removeEventListener']?.('abort', output)));
         }
         map['set'](requestId, {
@@ -153,12 +153,12 @@ export function createStoryboard3DImagePoseEstimator({
       });
     },
     cancel = (value3) => {
-      if (!map['size']) return ![];
-      return (handler5(abortError(value3)), !![]);
+      if (!map['size']) return false;
+      return (handler5(abortError(value3)), true);
     },
     dispose = () => {
       if (target) return;
-      ((target = !![]), handler5(abortError('编辑器已关闭。')), handler6());
+      ((target = true), handler5(abortError('编辑器已关闭。')), handler6());
     };
   return {
     analyze: analyze,

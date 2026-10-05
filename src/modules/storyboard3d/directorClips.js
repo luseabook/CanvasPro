@@ -82,7 +82,7 @@ export function createDirectorClip(input, output, name = '运动片段') {
     structuredClone2
   );
 }
-export function editDirectorClip(value5, { kind: kind, id: id, start: start3, end: end, move: move = ![] }) {
+export function editDirectorClip(value5, { kind: kind, id: id, start: start3, end: end, move: move = false }) {
   const structuredClone3 = structuredClone(value5),
     enabled2 = (kind === 'action' ? structuredClone3['actionClips'] : structuredClone3['motionClips'])?.[
       'find'

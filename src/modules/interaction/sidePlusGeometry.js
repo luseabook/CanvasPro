@@ -45,7 +45,7 @@ export function findClosestNodeWithGeometryOverrides({
   overrideNodeIds: overrideNodeIds = [],
   viewport: viewport,
   spatialIndex: spatialIndex,
-  ignoreGroup: ignoreGroup = ![],
+  ignoreGroup: ignoreGroup = false,
 } = {}) {
   const list2 = Array['isArray'](overrideNodeIds)
     ? overrideNodeIds['filter']((output) => !!geometryNodes?.[output])['sort'](

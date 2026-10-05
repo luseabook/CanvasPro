@@ -306,7 +306,7 @@ export function buildVideoModelApiModelSelectionPatch(
     generationParamsByModel = getPlainGenerationParams(nodeData?.['generationParamsByModel']);
   value25 &&
     (generationParamsByModel[value25] = sanitizeVideoModelApiParams(value25, nodeData?.['generationParams'], {
-      includeDefaults: ![],
+      includeDefaults: false,
     }));
   const list6 = getUiSchemaFieldIds(modelId),
     args = buildModelUiSchemaDefaultParams(modelId),
@@ -321,7 +321,7 @@ export function buildVideoModelApiModelSelectionPatch(
     value30 = Object['fromEntries'](
       Object['entries'](value29)['filter'](([value31]) => list6['has'](value31)),
     ),
-    generationParams2 = sanitizeVideoModelApiParams(modelId, value30, { includeDefaults: !![] }),
+    generationParams2 = sanitizeVideoModelApiParams(modelId, value30, { includeDefaults: true }),
     args5 = buildGenerationModelSelectionDisplayPatch({
       nodeData: nodeData,
       fallbackNodeData: nodeData,
@@ -356,7 +356,7 @@ export function buildRhWorkflowFieldPatch(value33, value34, value35, value36 = {
     return { ...buildSchemaParamsPatch(value33, args9, value36), ...args9 };
   }
   if (RH_WORKFLOW_BOOLEAN_FIELD_IDS['has'](value37)) {
-    const value39 = value35 === !![] || String(value35) === 'true',
+    const value39 = value35 === true || String(value35) === 'true',
       args10 = { [value37]: value39 };
     return { ...buildSchemaParamsPatch(value33, args10, value36), ...args10 };
   }
@@ -378,7 +378,7 @@ export function buildRhWorkflowFieldPatch(value33, value34, value35, value36 = {
     return {
       ...buildSchemaParamsPatch(value33, value40, value36),
       rhMaskExpand: rhMaskExpand,
-      rhMaskExpandTouched: !![],
+      rhMaskExpandTouched: true,
     };
   }
   if (value37 === 'rhBreastJiggle') {

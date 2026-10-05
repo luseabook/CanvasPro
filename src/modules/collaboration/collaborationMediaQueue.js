@@ -29,7 +29,7 @@ export function createCollaborationMediaQueue({
     map2 = new Map(),
     list2 = [],
     map3 = new Set();
-  let enabled = ![],
+  let enabled = false,
     setTimeout2 = null,
     result = 0,
     value2 = null,
@@ -215,15 +215,15 @@ export function createCollaborationMediaQueue({
       if (value30 !== null && value30 === value4) return [...args4];
       const list7 = [];
       for (const [id2, value31] of Object['entries'](project(value29)['nodes'])) {
-        let value32 = ![],
-          failed = ![],
-          retry2 = ![],
-          owned = ![],
+        let value32 = false,
+          failed = false,
+          retry2 = false,
+          owned = false,
           message = '';
         walk(value31, (value33) => {
           const value34 = value33['match'](PENDING);
           if (value34) {
-            ((value32 = !![]),
+            ((value32 = true),
               (failed ||= value34[1] === 'failed'),
               (owned ||= map2['has'](value34[2])),
               (retry2 ||= map2['has'](value34[2]) && value34[1] === 'failed'));
@@ -267,7 +267,7 @@ export function createCollaborationMediaQueue({
       }
     },
     dispose() {
-      ((enabled = !![]),
+      ((enabled = true),
         clearTimeout(setTimeout2),
         (list2['length'] = 0),
         (args3 = null),

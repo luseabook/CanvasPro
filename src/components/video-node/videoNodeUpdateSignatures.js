@@ -122,7 +122,7 @@ export function buildVideoNodeVideoViewSig(options4 = {}) {
       posterUrl: String(mediaUnavailable?.['posterUrl'] || ''),
       posterLocalPath: String(mediaUnavailable?.['posterLocalPath'] || ''),
       error: String(mediaUnavailable?.['error'] || ''),
-      mediaUnavailable: mediaUnavailable?.['mediaUnavailable'] === !![],
+      mediaUnavailable: mediaUnavailable?.['mediaUnavailable'] === true,
       mediaUnavailableSource: String(mediaUnavailable?.['mediaUnavailableSource'] || ''),
     })),
     videoUrl: String(isGenerating['videoUrl'] || ''),
@@ -138,7 +138,7 @@ export function buildVideoNodeVideoViewSig(options4 = {}) {
     posterLocalPath: String(isGenerating['posterLocalPath'] || ''),
     mainVideoIndex: Number(isGenerating['mainVideoIndex'] || 0),
     isVideosExpanded: !!isGenerating['isVideosExpanded'],
-    isGenerating: isGenerating['isGenerating'] === !![],
+    isGenerating: isGenerating['isGenerating'] === true,
     jobStatus: String(isGenerating['jobStatus'] || ''),
     jobError: String(isGenerating['jobError'] || ''),
     error: String(isGenerating['error'] || ''),
@@ -173,7 +173,7 @@ export function buildVideoNodeFooterControlSig(options5 = {}, next = '') {
 export function buildVideoNodeSubmitButtonSig(options6 = {}, current = '', entry = {}) {
   return [
     current,
-    entry['rhCancelInFlight'] === !![] ? 'cancel:1' : 'cancel:0',
+    entry['rhCancelInFlight'] === true ? 'cancel:1' : 'cancel:0',
     buildVideoNodePrimitiveDataSig(options6),
   ]['join']('\n');
 }

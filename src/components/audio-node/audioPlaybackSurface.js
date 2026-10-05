@@ -33,7 +33,7 @@ function renderDataAttributes(options = {}) {
   return Object['entries'](options)
     ['filter'](([data]) => /^data-[a-z0-9_.:-]+$/['test'](data))
     ['map'](([target, source]) =>
-      source === ![] || source === null || source === undefined
+      source === false || source === null || source === undefined
         ? ''
         : source === ''
           ? target
@@ -42,7 +42,7 @@ function renderDataAttributes(options = {}) {
     ['filter'](Boolean)
     ['join'](' ');
 }
-function renderWaveform(enabled = ![]) {
+function renderWaveform(enabled = false) {
   return (
     '<div class="waveform ' +
     (enabled ? 'waveform-unplayed' : 'waveform-bg') +
@@ -57,8 +57,8 @@ export function renderAudioPlaybackSurface({
   className: className = '',
   playLabel: playLabel = '播放音频',
   pauseLabel: pauseLabel = '暂停音频',
-  disabled: disabled = ![],
-  ariaBusy: ariaBusy = ![],
+  disabled: disabled = false,
+  ariaBusy: ariaBusy = false,
   dataAttributes: dataAttributes = {},
   trailingHtml: trailingHtml = '',
 } = {}) {
@@ -80,9 +80,9 @@ export function renderAudioPlaybackSurface({
     '"' +
     (renderDataAttributes2 ? ' ' + renderDataAttributes2 : '') +
     '>\n    ' +
-    renderWaveform(![]) +
+    renderWaveform(false) +
     '\n    ' +
-    renderWaveform(!![]) +
+    renderWaveform(true) +
     '\n    <div class="media-progress-line" data-audio-playback-progress-line></div>\n    <div class="media-progress-bar" data-audio-playback-progress-bar></div>\n    <div class="audio-controls">\n      <button type="button" class="audio-play-btn" data-audio-playback-toggle aria-label="' +
     escapeHtml(playLabel) +
     '" ' +
@@ -112,7 +112,7 @@ export function createAudioPlaybackSurfaceController(
     waveformUrl3 = normalizeWaveformUrl(waveformUrl || wavePlayedEl['dataset']?.['audioPlaybackWaveformUrl']),
     text4 = normalizeText(wavePlayedEl['dataset']?.['audioPlaybackPlayLabel']) || '播放音频',
     text5 = normalizeText(wavePlayedEl['dataset']?.['audioPlaybackPauseLabel']) || '暂停音频';
-  let enabled2 = ![],
+  let enabled2 = false,
     next = null;
   const audioPlaybackProgressController = createAudioPlaybackProgressController({
       audioEl: audioEl,
@@ -124,7 +124,7 @@ export function createAudioPlaybackSurfaceController(
     ready = text3
       ? attachMediaElementPlaybackSource(audioEl, text3, {
           preload: preload,
-          shouldAssign: () => !enabled2 && audioEl['isConnected'] !== ![],
+          shouldAssign: () => !enabled2 && audioEl['isConnected'] !== false,
         })['catch'](() => '')
       : Promise['resolve'](''),
     list = Array['from'](wavePlayedEl['querySelectorAll']?.('[data-audio-playback-wave-path]') || []);
@@ -136,19 +136,19 @@ export function createAudioPlaybackSurfaceController(
     !waveformBarsPathFromPersistedUrl &&
       text3 &&
       (waveformBarsPathFromPersistedUrl = await getWaveformBarsPathFromUrl(text3, current));
-    if (enabled2 || !waveformBarsPathFromPersistedUrl || wavePlayedEl['isConnected'] === ![]) return;
+    if (enabled2 || !waveformBarsPathFromPersistedUrl || wavePlayedEl['isConnected'] === false) return;
     list['forEach']((el2) => {
       el2['setAttribute']?.('d', waveformBarsPathFromPersistedUrl);
     });
   })();
   const run = () => {
-      const entry = audioEl['paused'] === ![] && audioEl['ended'] !== !![];
+      const entry = audioEl['paused'] === false && audioEl['ended'] !== true;
       (el['classList']?.['toggle']?.('is-playing', entry),
         el['setAttribute']?.('aria-label', entry ? text5 : text4));
     },
     record = (event) => {
       (event['preventDefault']?.(), event['stopPropagation']?.());
-      if (audioEl['paused'] === ![]) {
+      if (audioEl['paused'] === false) {
         audioEl['pause']?.();
         return;
       }
@@ -181,8 +181,8 @@ export function createAudioPlaybackSurfaceController(
         audioPlaybackProgressController['sync']({
           currentTime: currentTime,
           duration: duration,
-          force: !![],
-          showLine: !![],
+          force: true,
+          showLine: true,
         }));
     };
   return (
@@ -196,7 +196,7 @@ export function createAudioPlaybackSurfaceController(
       audioEl: audioEl,
       ready: ready,
       destroy() {
-        ((enabled2 = !![]),
+        ((enabled2 = true),
           audioEl['pause']?.(),
           audioPlaybackProgressController['destroy'](),
           clearDesktopMediaPlaybackSourceMetadata(audioEl),

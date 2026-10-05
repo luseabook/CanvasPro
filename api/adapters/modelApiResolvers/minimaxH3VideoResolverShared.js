@@ -68,7 +68,7 @@ export function resolveMinimaxH3Request({
   finalUrlsBySlot: finalUrlsBySlot = {},
   modeFieldId: modeFieldId,
   providerLabel: providerLabel,
-  allowStandaloneAudioReference: allowStandaloneAudioReference = ![],
+  allowStandaloneAudioReference: allowStandaloneAudioReference = false,
 }) {
   const record = { ...currentBody },
     prompt = translateMinimaxH3EditorAssetMentions(
@@ -82,7 +82,7 @@ export function resolveMinimaxH3Request({
     ),
     resolution = normalizeResolution(record['resolution']),
     duration = normalizeDuration(record['duration']),
-    watermark = Boolean(record['aigc_watermark'] ?? record['watermark'] ?? ![]),
+    watermark = Boolean(record['aigc_watermark'] ?? record['watermark'] ?? false),
     referenceVideos = normalizeInputList(inputVideos),
     referenceAudios = normalizeInputList(inputAudios);
   if (mode === 'reference') {
@@ -121,7 +121,7 @@ export function resolveMinimaxH3Request({
           record['aspect_ratio'] ||
           payload?.['generationParams']?.['aspectRatio'] ||
           payload?.['aspectRatio'],
-        { allowAdaptive: !![] },
+        { allowAdaptive: true },
       ),
       referenceImages: images3,
       referenceVideos: referenceVideos,
@@ -150,7 +150,7 @@ export function resolveMinimaxH3Request({
               record['aspect_ratio'] ||
               payload?.['generationParams']?.['aspectRatio'] ||
               payload?.['aspectRatio'],
-            { allowAdaptive: ![] },
+            { allowAdaptive: false },
           ),
     firstFrameImage: ratio['firstFrameImage'],
     lastFrameImage: ratio['lastFrameImage'],

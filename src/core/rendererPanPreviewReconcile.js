@@ -94,7 +94,7 @@ function collectActiveDragNodeIds({
   parentToChildren: parentToChildren,
 } = {}) {
   const value2 = new Set();
-  if (!dragContext?.['isDragging'] || dragContext['isCommittingDrag'] === !![]) return value2;
+  if (!dragContext?.['isDragging'] || dragContext['isCommittingDrag'] === true) return value2;
   const value3 = dragContext['targetNodeId'] || null,
     list = Array['isArray'](selectedNodeIds) ? selectedNodeIds : [],
     value4 = value3 && list['includes'](value3) ? list : value3 ? [value3] : [];
@@ -136,13 +136,13 @@ export function createRendererPanPreviewReconciler({
   function run() {
     (requestFrame2 !== null && (cancelFrame(requestFrame2), (requestFrame2 = null)), (value10 = null));
   }
-  function run2(snapshot, viewport, { allowIdleViewportOnly: allowIdleViewportOnly = ![] } = {}) {
+  function run2(snapshot, viewport, { allowIdleViewportOnly: allowIdleViewportOnly = false } = {}) {
     if (!snapshot || !viewport) return null;
     const interactionState = getInteractionRenderState(),
       viewportInteractionState = readViewportInteractionState({ interactionState: interactionState }),
       enabled3 = viewportInteractionState['isViewportBusy']
         ? viewportInteractionState
-        : readViewportInteractionState({ interactionState: interactionState, panPreviewActive: !![] });
+        : readViewportInteractionState({ interactionState: interactionState, panPreviewActive: true });
     if (
       !allowIdleViewportOnly &&
       !enabled3['isPanning'] &&
@@ -158,7 +158,7 @@ export function createRendererPanPreviewReconciler({
       enabled4 = enabled3['isZooming'] && !enabled3['isPanning'] && !enabled3['isViewportAnimating'],
       value16 = enabled3['isPanning'] && !mode,
       bucketKey = value16 ? getDensePanPreviewBucket(viewport, nodeCount) : null;
-    let enabled5 = ![];
+    let enabled5 = false;
     if (bucketKey && value13) {
       if (
         (viewport['zoom'] <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] ||
@@ -176,9 +176,9 @@ export function createRendererPanPreviewReconciler({
               nodeCount: nodeCount,
               viewport: { ...viewport },
             }),
-          { skipped: !![], hasPendingStructuralOps: ![], priorityMediaWork: ![], nodeCount: nodeCount }
+          { skipped: true, hasPendingStructuralOps: false, priorityMediaWork: false, nodeCount: nodeCount }
         );
-      ((value13 = null), (enabled5 = !![]));
+      ((value13 = null), (enabled5 = true));
     } else !bucketKey && (value13 = null);
     if (bucketKey) {
       const now2 = now();
@@ -194,11 +194,11 @@ export function createRendererPanPreviewReconciler({
               nodeCount: nodeCount,
               bucketKey: bucketKey['key'],
             }),
-          { skipped: !![], hasPendingStructuralOps: ![], nodeCount: nodeCount }
+          { skipped: true, hasPendingStructuralOps: false, nodeCount: nodeCount }
         );
       ((value11 = bucketKey['key']), (value12 = now2));
     } else ((value11 = ''), (value12 = 0));
-    (markBusy?.(), renderViewport?.(canvasEl, viewport, snapshot['ui']?.['titleFollowsCanvasZoom'] === !![]));
+    (markBusy?.(), renderViewport?.(canvasEl, viewport, snapshot['ui']?.['titleFollowsCanvasZoom'] === true));
     if (svgWrapper?.['style']?.['display'] === 'none') svgWrapper['style']['display'] = '';
     const value17 = typeof now === 'function' ? now() : nowMs(),
       elapsedMs = value17 - value15;
@@ -221,11 +221,11 @@ export function createRendererPanPreviewReconciler({
             elapsedMs: elapsedMs,
             viewport: { ...viewport },
           }),
-        { skipped: !![], hasPendingStructuralOps: ![], priorityMediaWork: ![], nodeCount: nodeCount }
+        { skipped: true, hasPendingStructuralOps: false, priorityMediaWork: false, nodeCount: nodeCount }
       );
     !enabled4 && ((value14 = null), (value15 = 0));
     const value18 =
-        snapshot['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+        snapshot['ui']?.['selectionRelatedHighlightEnabled'] === false
           ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
           : buildSelectionRelatedSets?.(snapshot['selectedNodeIds'], snapshot['edges']) || {
               relatedNodeIds: new Set(),
@@ -238,9 +238,9 @@ export function createRendererPanPreviewReconciler({
         parentToChildren: snapshot['_parentToChildren'],
       }),
       omitNodeIds2 = omitNodeIds(snapshot['nodes'], activeDragNodeIds),
-      priorityMediaWork = ![],
-      viewportPriorityMediaOnly = ![],
-      previewOnly = !![],
+      priorityMediaWork = false,
+      viewportPriorityMediaOnly = false,
+      previewOnly = true,
       value20 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0,
       value21 = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0,
       value22 = renderNodes?.(
@@ -256,10 +256,10 @@ export function createRendererPanPreviewReconciler({
         snapshot['_parentToChildren'],
         snapshot['ui'] && typeof snapshot['ui']['showVideoMeta'] === 'boolean'
           ? snapshot['ui']['showVideoMeta']
-          : ![],
+          : false,
         snapshot,
         {
-          deferParking: !![],
+          deferParking: true,
           previewOnly: previewOnly,
           mode: mode ? 'zoom-lod-preview' : 'pan-preview',
           lockRasterParticipation: !mode,
@@ -281,7 +281,7 @@ export function createRendererPanPreviewReconciler({
         viewport: { ...viewport },
       });
     }
-    const hasPendingStructuralOps = value22?.['hasPendingStructuralOps'] === !![];
+    const hasPendingStructuralOps = value22?.['hasPendingStructuralOps'] === true;
     return {
       hasPendingStructuralOps: hasPendingStructuralOps,
       priorityMediaWork: priorityMediaWork,
@@ -308,10 +308,10 @@ export function createRendererPanPreviewReconciler({
       if (hasPriorityMediaWork?.['hasPendingStructuralOps']) run3(viewport2);
       else
         hasPriorityMediaWork &&
-          hasPriorityMediaWork['skipped'] !== !![] &&
+          hasPriorityMediaWork['skipped'] !== true &&
           scheduleDeferredReconcile?.(
             resolveViewportInteractionReconcileDelay({
-              hasPriorityMediaWork: hasPriorityMediaWork['priorityMediaWork'] === !![],
+              hasPriorityMediaWork: hasPriorityMediaWork['priorityMediaWork'] === true,
               fallbackDelayMs: getRendererStructuralReconcileDelayMs(hasPriorityMediaWork['nodeCount']),
             }),
           );
@@ -332,10 +332,10 @@ export function createRendererPanPreviewReconciler({
     if (hasPriorityMediaWork2?.['hasPendingStructuralOps']) run3(viewport3);
     else
       hasPriorityMediaWork2 &&
-        hasPriorityMediaWork2['skipped'] !== !![] &&
+        hasPriorityMediaWork2['skipped'] !== true &&
         scheduleDeferredReconcile?.(
           resolveViewportInteractionReconcileDelay({
-            hasPriorityMediaWork: hasPriorityMediaWork2['priorityMediaWork'] === !![],
+            hasPriorityMediaWork: hasPriorityMediaWork2['priorityMediaWork'] === true,
             fallbackDelayMs: getRendererStructuralReconcileDelayMs(hasPriorityMediaWork2['nodeCount']),
           }),
         );
@@ -344,7 +344,7 @@ export function createRendererPanPreviewReconciler({
     el?.['addEventListener']?.(VIEWPORT_PAN_PREVIEW_FRAME_EVENT, value25),
     {
       reconcileViewportOnly(value27, value28) {
-        return run2(value27, value28, { allowIdleViewportOnly: !![] });
+        return run2(value27, value28, { allowIdleViewportOnly: true });
       },
       dispose() {
         (run(),

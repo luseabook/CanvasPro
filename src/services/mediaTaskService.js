@@ -8,7 +8,7 @@ import {
 } from './canvasMediaLocalService.js';
 import { logDiagnosticEvent } from './diagnosticsService.js';
 import { desktopBridge } from './desktopBridge.js';
-let installed = ![],
+let installed = false,
   pendingUpdateTimer = null,
   lastPendingUpdateFlushAt = 0;
 const pendingUpdates = new Map(),
@@ -99,7 +99,7 @@ export function createMediaTaskListCache({
         return next['promise'];
       const current = {
         createdAt: createdAt,
-        pending: !![],
+        pending: true,
         taskIds: new Set(enabled5 ? [enabled5] : []),
         promise: null,
       };
@@ -125,7 +125,7 @@ export function createMediaTaskListCache({
             throw handle;
           })
           ['finally'](() => {
-            current['pending'] = ![];
+            current['pending'] = false;
           })),
         (next = current),
         current['promise']
@@ -149,13 +149,13 @@ function buildStatusPatch(nodeId = {}) {
       mediaTaskError: String(nodeId['error'] || ''),
     };
   if (mediaTaskStatus === 'waiting' || mediaTaskStatus === 'processing')
-    ((message['isGenerating'] = !![]), (message['jobStatus'] = 'running'), (message['jobError'] = null));
+    ((message['isGenerating'] = true), (message['jobStatus'] = 'running'), (message['jobError'] = null));
   else {
     if (mediaTaskStatus === 'complete')
-      ((message['isGenerating'] = ![]), (message['jobStatus'] = 'success'), (message['jobError'] = null));
+      ((message['isGenerating'] = false), (message['jobStatus'] = 'success'), (message['jobError'] = null));
     else {
       if (mediaTaskStatus === 'failed')
-        ((message['isGenerating'] = ![]),
+        ((message['isGenerating'] = false),
           (message['jobStatus'] = 'error'),
           (message['jobError'] = message['mediaTaskError'] || 'Media task failed'),
           void logDiagnosticEvent({
@@ -172,7 +172,7 @@ function buildStatusPatch(nodeId = {}) {
           }));
       else
         mediaTaskStatus === 'cancelled' &&
-          ((message['isGenerating'] = ![]), (message['jobStatus'] = null), (message['jobError'] = null));
+          ((message['isGenerating'] = false), (message['jobStatus'] = null), (message['jobError'] = null));
     }
   }
   return message;
@@ -200,7 +200,7 @@ export function subscribeVideoProxyMigrationUpdates(scope) {
 }
 export function shouldApplyMediaTaskEventToNode(options4 = {}, input = {}) {
   const enabled6 = String(input?.['taskId'] || input?.['id'] || '')['trim']();
-  if (!enabled6) return !![];
+  if (!enabled6) return true;
   const enabled7 = String(
     isVideoProxyMigrationEvent(input) ? options4?.['videoProxyMigrationTaskId'] : options4?.['mediaTaskId'],
   )['trim']();
@@ -218,7 +218,7 @@ function shouldClearVideoCapturePreview(args = {}, args2 = {}) {
   const output = String(args2['videoProxyStatus'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (output !== 'generated' && output !== 'not_required') return ![];
+  if (output !== 'generated' && output !== 'not_required') return false;
   return !!resolveCanvasVideoUrl({ ...args, ...args2 });
 }
 function buildResultPatch(options5 = {}, value2 = {}) {
@@ -454,7 +454,7 @@ export function getVisibleVideoProxyMigration(options10 = {}) {
     nodeId: nodeId3,
     assetId: assetId2,
     sourceLocalPath: sourceLocalPath2,
-    hasDisplayLocalPath: ![],
+    hasDisplayLocalPath: false,
     targetVersion: VIDEO_PROXY_VERSION_V2_1280,
     key: assetId2 + '|' + sourceLocalPath2 + '|' + VIDEO_PROXY_VERSION_V2_1280,
   };
@@ -464,7 +464,7 @@ export function isMediaTaskActiveInList(options11 = {}, value28 = []) {
     value29 = String(options11?.['mediaTaskStatus'] || '')
       ['trim']()
       ['toLowerCase']();
-  if (!enabled9 || !ACTIVE_TASK_STATUSES['has'](value29)) return ![];
+  if (!enabled9 || !ACTIVE_TASK_STATUSES['has'](value29)) return false;
   return (Array['isArray'](value28) ? value28 : [])['some']((response8) => {
     const value30 = String(response8?.['taskId'] || response8?.['id'] || '')['trim'](),
       value31 = String(response8?.['status'] || '')
@@ -552,8 +552,8 @@ async function cancelVideoProxyMigrationTaskWithDeps(
   { cancel: cancel = (value41) => desktopBridge['mediaTask']['cancel'](value41) } = {},
 ) {
   const taskId = String(value40 || '')['trim']();
-  if (!taskId) return { ok: ![], error: 'Missing media task id' };
-  return cancel({ taskId: taskId, onlyIfWaiting: !![] });
+  if (!taskId) return { ok: false, error: 'Missing media task id' };
+  return cancel({ taskId: taskId, onlyIfWaiting: true });
 }
 export function cancelVideoProxyMigrationTask(value42) {
   return cancelVideoProxyMigrationTaskWithDeps(value42);
@@ -569,7 +569,7 @@ export function __resolveMatchingMediaTaskNodeIdsForTest(value47, value48) {
 }
 export function installMediaTaskUpdateListener() {
   if (installed) return;
-  installed = !![];
+  installed = true;
   const run2 = desktopBridge['mediaTask']['onUpdate'];
   typeof run2 === 'function' &&
     run2((value49) => {

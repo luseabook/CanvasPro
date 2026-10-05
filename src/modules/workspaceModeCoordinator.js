@@ -31,9 +31,9 @@ export function shouldBypassCanvasModeViewTransition({
   nextMode: nextMode,
   canvasPresentationContext: canvasPresentationContext = null,
 } = {}) {
-  if (currentMode !== CANVAS_MODE_ID && nextMode !== CANVAS_MODE_ID) return ![];
+  if (currentMode !== CANVAS_MODE_ID && nextMode !== CANVAS_MODE_ID) return false;
   const item = Number(canvasPresentationContext?.['viewport']?.['zoom']);
-  if (!Number['isFinite'](item) || item > CANVAS_MODE_VIEW_TRANSITION_BYPASS_MAX_ZOOM) return ![];
+  if (!Number['isFinite'](item) || item > CANVAS_MODE_VIEW_TRANSITION_BYPASS_MAX_ZOOM) return false;
   return (
     resolveRendererVirtualizationTier({
       viewport: canvasPresentationContext?.['viewport'],
@@ -42,7 +42,7 @@ export function shouldBypassCanvasModeViewTransition({
   );
 }
 export function isStoryboard3DWorkspaceAvailable(key = globalThis['window']) {
-  return key?.['AI_CANVAS_IS_DEV_BUILD'] === !![] && key?.['DEV_MODE'] === !![];
+  return key?.['AI_CANVAS_IS_DEV_BUILD'] === true && key?.['DEV_MODE'] === true;
 }
 function renderWorkspaceModeIcon(index) {
   if (index === REPLICATION_MODE_ID)
@@ -58,9 +58,9 @@ function renderWorkspaceModeIcon(index) {
 export function renderWorkspaceModeSwitcher(
   result,
   {
-    storyboard3DAvailable: storyboard3DAvailable = ![],
-    replicationAvailable: replicationAvailable = ![],
-    menuOpen: menuOpen = ![],
+    storyboard3DAvailable: storyboard3DAvailable = false,
+    replicationAvailable: replicationAvailable = false,
+    menuOpen: menuOpen = false,
   } = {},
 ) {
   const workspaceMode = normalizeWorkspaceMode(result),
@@ -158,18 +158,18 @@ export function createWorkspaceModeCoordinator({
     mode = (record) => {
       if (
         record === REPLICATION_MODE_ID &&
-        (windowObject?.['AI_CANVAS_IS_DEV_BUILD'] !== !![] || windowObject?.['DEV_MODE'] !== !![])
+        (windowObject?.['AI_CANVAS_IS_DEV_BUILD'] !== true || windowObject?.['DEV_MODE'] !== true)
       )
-        return ![];
+        return false;
       const payload = entry[record];
       if (typeof payload?.['isAvailable'] === 'function')
         try {
-          return payload['isAvailable']() !== ![];
+          return payload['isAvailable']() !== false;
         } catch {
-          return ![];
+          return false;
         }
       if (record === STORYBOARD_3D_MODE_ID) return isStoryboard3DWorkspaceAvailable(windowObject);
-      return !![];
+      return true;
     },
     workspaceMode2 = normalizeWorkspaceMode(initialMode),
     storyboard3DAvailable2 = {
@@ -177,12 +177,12 @@ export function createWorkspaceModeCoordinator({
       storyboard3DAvailable: mode(STORYBOARD_3D_MODE_ID),
       replicationAvailable: mode(REPLICATION_MODE_ID),
     };
-  let handle = ![],
+  let handle = false,
     state = 0,
     config = storyboard3DAvailable2['mode'],
-    enabled = ![],
-    enabled2 = ![],
-    menuOpen2 = ![];
+    enabled = false,
+    enabled2 = false,
+    menuOpen2 = false;
   const el3 = documentObject['createElement']('div');
   ((el3['className'] = 'workspace-mode-switcher-wrap'), el2['appendChild'](el3));
   const run = () => {
@@ -240,64 +240,64 @@ export function createWorkspaceModeCoordinator({
         new run2(WORKSPACE_MODE_CHANGED_EVENT, { detail: { mode: mode2, previousMode: previousMode } }),
       );
     },
-    handler5 = (value2, { activate: activate = !![] } = {}, value3) => {
-      if (handle) return ![];
+    handler5 = (value2, { activate: activate = true } = {}, value3) => {
+      if (handle) return false;
       const nextMode2 = normalizeWorkspaceMode(value2);
-      if (!mode(nextMode2)) return ![];
+      if (!mode(nextMode2)) return false;
       const value4 = entry[nextMode2];
-      let enabled4 = !![];
+      let enabled4 = true;
       try {
-        enabled4 = value4?.['canActivate']?.() !== ![];
+        enabled4 = value4?.['canActivate']?.() !== false;
       } catch {
-        enabled4 = ![];
+        enabled4 = false;
       }
       if (!enabled4)
         return (
           value4?.['requestActivation']?.({
             retry: () => {
-              if (handle || value3 !== state || config !== nextMode2) return ![];
+              if (handle || value3 !== state || config !== nextMode2) return false;
               return handler5(nextMode2, { activate: activate }, value3);
             },
           }),
-          ![]
+          false
         );
       const previousMode2 = storyboard3DAvailable2['mode'],
         value5 = entry[previousMode2];
       if (previousMode2 !== nextMode2) {
-        let enabled5 = !![];
+        let enabled5 = true;
         try {
-          enabled5 = value5?.['canDeactivate']?.({ nextMode: nextMode2 }) !== ![];
+          enabled5 = value5?.['canDeactivate']?.({ nextMode: nextMode2 }) !== false;
         } catch {
-          enabled5 = !![];
+          enabled5 = true;
         }
-        if (!enabled5) return (value5?.['onNavigationBlocked']?.({ nextMode: nextMode2 }), ![]);
+        if (!enabled5) return (value5?.['onNavigationBlocked']?.({ nextMode: nextMode2 }), false);
       }
       if (previousMode2 === nextMode2) {
         if (activate && [STORYBOARD_3D_MODE_ID, REPLACEMENT_STUDIO_MODE_ID]['includes'](nextMode2)) {
-          const enabled6 = value4?.['activate']?.({ previousMode: previousMode2, reactivating: !![] });
-          if (!enabled6) return ![];
-          value4?.['onActivated']?.({ previousMode: previousMode2, reactivating: !![] });
+          const enabled6 = value4?.['activate']?.({ previousMode: previousMode2, reactivating: true });
+          if (!enabled6) return false;
+          value4?.['onActivated']?.({ previousMode: previousMode2, reactivating: true });
         }
-        return !![];
+        return true;
       }
-      let enabled7 = !![];
+      let enabled7 = true;
       if (activate && nextMode2 !== CANVAS_MODE_ID) {
         enabled7 = value4?.['activate']?.({ previousMode: previousMode2 });
-        if (!enabled7) return ![];
+        if (!enabled7) return false;
       }
       ((storyboard3DAvailable2['mode'] = nextMode2), handler());
       const value6 = value5?.['deactivate']?.({ nextMode: nextMode2 });
-      if (value6 === ![])
+      if (value6 === false)
         return (
           (storyboard3DAvailable2['mode'] = previousMode2),
           handler(),
-          value4?.['deactivate']?.({ nextMode: previousMode2, rollback: !![] }),
+          value4?.['deactivate']?.({ nextMode: previousMode2, rollback: true }),
           value5?.['onNavigationBlocked']?.({ nextMode: nextMode2 }),
-          ![]
+          false
         );
       handler4(nextMode2, previousMode2);
       if (activate && enabled7) value4?.['onActivated']?.({ previousMode: previousMode2 });
-      return !![];
+      return true;
     },
     setMode = (value7, value8 = {}) => {
       const workspaceMode3 = normalizeWorkspaceMode(value7);
@@ -305,37 +305,37 @@ export function createWorkspaceModeCoordinator({
     },
     resumePendingMode = (value9) => {
       const workspaceMode4 = normalizeWorkspaceMode(value9);
-      if (handle || config !== workspaceMode4) return ![];
+      if (handle || config !== workspaceMode4) return false;
       return handler5(workspaceMode4, {}, state);
     },
     refreshAvailability = () => {
-      if (handle) return ![];
+      if (handle) return false;
       const value10 = mode(STORYBOARD_3D_MODE_ID),
         value11 = mode(REPLICATION_MODE_ID),
         enabled8 =
           storyboard3DAvailable2['storyboard3DAvailable'] !== value10 ||
           storyboard3DAvailable2['replicationAvailable'] !== value11;
-      if (!enabled8) return ![];
+      if (!enabled8) return false;
       return (
         (storyboard3DAvailable2['storyboard3DAvailable'] = value10),
         (storyboard3DAvailable2['replicationAvailable'] = value11),
         !mode(storyboard3DAvailable2['mode']) ? setMode(CANVAS_MODE_ID) : run(),
-        !![]
+        true
       );
     },
     value12 = () => {
-      ((enabled = !![]), handler2());
+      ((enabled = true), handler2());
     },
     value13 = () => {
-      ((enabled = ![]), handler2());
+      ((enabled = false), handler2());
     },
     value14 = (event) => {
       if (el3['contains'](event['target'])) {
-        event['target']['matches']?.(':focus-visible') && ((enabled2 = !![]), handler2());
+        event['target']['matches']?.(':focus-visible') && ((enabled2 = true), handler2());
         return;
       }
       if (!enabled2) return;
-      ((enabled2 = ![]), handler2());
+      ((enabled2 = false), handler2());
     },
     value15 = (focus2) => {
       const value16 = focus2['target']['closest']?.('.workspace-mode-current'),
@@ -343,14 +343,14 @@ export function createWorkspaceModeCoordinator({
       if (focus2['key'] === 'Escape' && menuOpen2) {
         (focus2['preventDefault'](),
           el3['querySelector']('.workspace-mode-current')?.['focus']?.(),
-          (enabled2 = ![]),
-          (enabled = ![]),
+          (enabled2 = false),
+          (enabled = false),
           handler2());
         return;
       }
       if (value16 && (focus2['key'] === 'ArrowDown' || focus2['key'] === 'ArrowUp')) {
         (focus2['preventDefault'](),
-          (enabled2 = !![]),
+          (enabled2 = true),
           handler2({ focus: focus2['key'] === 'ArrowUp' ? 'last' : 'first' }));
         return;
       }
@@ -384,14 +384,14 @@ export function createWorkspaceModeCoordinator({
       }
       const nextMode3 = el8['dataset']['storyWorkspaceMode'];
       if (nextMode3 === storyboard3DAvailable2['mode'] && nextMode3 !== STORYBOARD_3D_MODE_ID) {
-        ((enabled = ![]), (enabled2 = ![]), handler2(), setMode(nextMode3));
-        el3.querySelector('.workspace-mode-current')?.focus?.({ preventScroll: !![] });
+        ((enabled = false), (enabled2 = false), handler2(), setMode(nextMode3));
+        el3.querySelector('.workspace-mode-current')?.focus?.({ preventScroll: true });
         return;
       }
       const sourceElement = el3['querySelector']('.workspace-mode-current'),
         apply = () => {
-          ((enabled = ![]), (enabled2 = ![]), handler2(), setMode(nextMode3));
-          el3.querySelector('.workspace-mode-current')?.focus?.({ preventScroll: !![] });
+          ((enabled = false), (enabled2 = false), handler2(), setMode(nextMode3));
+          el3.querySelector('.workspace-mode-current')?.focus?.({ preventScroll: true });
         };
       let canvasPresentationContext2 = null;
       try {
@@ -425,7 +425,7 @@ export function createWorkspaceModeCoordinator({
       refreshAvailability: refreshAvailability,
       destroy() {
         if (handle) return;
-        ((handle = !![]),
+        ((handle = true),
           el3['removeEventListener']('click', value20),
           el3['removeEventListener']('pointerenter', value12),
           el3['removeEventListener']('pointerleave', value13),

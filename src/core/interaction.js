@@ -119,7 +119,7 @@ const graphStore = appStore?.['graphStore'] || graphStore_2 || appStore,
   EDGE_INTERACTION_LITE_MIN_EDGES = 3,
   PAN_ACTIVATION_DISTANCE_PX = 3;
 function isDevModeOn() {
-  return window['DEV_MODE'] === !![] || document['body']?.['classList']?.['contains']('dev-mode');
+  return window['DEV_MODE'] === true || document['body']?.['classList']?.['contains']('dev-mode');
 }
 function openCanvasUploadAt(clientX, clientY) {
   return openAppCanvasFilePicker({
@@ -184,15 +184,15 @@ function releaseViewportInteractionBusyForRenderer() {
 }
 const VIEWPORT_MEDIA_PRELOAD_HOLD_MS = 900,
   VIEWPORT_MEDIA_PRELOAD_RESUME_AFTER_PAN_MS = 220;
-let viewportMediaPreloadPauseHeld = ![];
+let viewportMediaPreloadPauseHeld = false;
 function holdViewportMediaPreloadsForPan() {
-  ((viewportMediaPreloadPauseHeld = !![]),
-    syncRendererViewportMediaPreloadPause(!![], { autoResumeMs: VIEWPORT_MEDIA_PRELOAD_HOLD_MS }));
+  ((viewportMediaPreloadPauseHeld = true),
+    syncRendererViewportMediaPreloadPause(true, { autoResumeMs: VIEWPORT_MEDIA_PRELOAD_HOLD_MS }));
 }
 function releaseViewportMediaPreloadsAfterPan() {
   if (!viewportMediaPreloadPauseHeld) return;
-  ((viewportMediaPreloadPauseHeld = ![]),
-    syncRendererViewportMediaPreloadPause(!![], {
+  ((viewportMediaPreloadPauseHeld = false),
+    syncRendererViewportMediaPreloadPause(true, {
       autoResumeMs: VIEWPORT_MEDIA_PRELOAD_RESUME_AFTER_PAN_MS,
     }));
 }
@@ -207,21 +207,21 @@ const edgeCuttingController = createEdgeCuttingController({
 edgeCuttingController['install'](typeof window !== 'undefined' ? window : null);
 function _createIdleDragContext() {
   return {
-    isDragging: ![],
+    isDragging: false,
     targetNodeId: null,
     lastWorldX: 0,
     lastWorldY: 0,
     pendingDx: 0,
     pendingDy: 0,
-    hasMoved: ![],
-    wasSelectedOnDown: ![],
+    hasMoved: false,
+    wasSelectedOnDown: false,
     dragSource: null,
     titleDragPendingSelectNodeId: null,
-    titleDragActivated: ![],
+    titleDragActivated: false,
     titleDragStartScreenX: 0,
     titleDragStartScreenY: 0,
-    isPanning: ![],
-    panActivated: ![],
+    isPanning: false,
+    panActivated: false,
     panStartX: 0,
     panStartY: 0,
     panStartViewportX: 0,
@@ -230,14 +230,14 @@ function _createIdleDragContext() {
     panStartPerf: 0,
     panMoveCount: 0,
     panMinimapPreviewCount: 0,
-    assistPanActive: ![],
+    assistPanActive: false,
     assistPanViewport: null,
-    isConnecting: ![],
+    isConnecting: false,
     connectSourceId: null,
-    isBoxSelecting: ![],
+    isBoxSelecting: false,
     boxStartX: 0,
     boxStartY: 0,
-    isDraggingCell: ![],
+    isDraggingCell: false,
     sourceCellIndex: -1,
     draggedCellData: null,
     ghostEl: null,
@@ -397,7 +397,7 @@ function _commitAssistPanPreview() {
   releaseViewportMediaPreloadsAfterPan();
   const box3 = flushViewportPanPreview();
   (cancelAssistPanStoreMirror(),
-    (dragContext['assistPanActive'] = ![]),
+    (dragContext['assistPanActive'] = false),
     (dragContext['assistPanViewport'] = null),
     cancelPendingViewportUpdate(),
     window['_v2FlushMinimapViewportPreview']?.(box3));
@@ -481,7 +481,7 @@ function checkAutoPan(entry, record) {
       !autoPanReqId && (autoPanReqId = requestAnimationFrame(autoPanLoop)))
     : stopAutoPan();
 }
-export function handlePointerDown(state, config, enabled3 = ![], scope = ![], event = null) {
+export function handlePointerDown(state, config, enabled3 = false, scope = false, event = null) {
   (zoomController['settleWheelZoom'](), (lastMouseScreenX = state), (lastMouseScreenY = config));
   const stateRaw3 = getStateRaw(),
     { viewport: viewport2 } = stateRaw3,
@@ -505,8 +505,8 @@ export function handlePointerDown(state, config, enabled3 = ![], scope = ![], ev
   )
     return;
   if (enabled3) {
-    ((dragContext['isPanning'] = !![]),
-      (dragContext['panActivated'] = ![]),
+    ((dragContext['isPanning'] = true),
+      (dragContext['panActivated'] = false),
       (dragContext['panStartX'] = state),
       (dragContext['panStartY'] = config),
       (dragContext['panStartViewportX'] = viewport2['x']),
@@ -537,31 +537,31 @@ export function handlePointerDown(state, config, enabled3 = ![], scope = ![], ev
   }
 }
 function _activateCanvasPanIfNeeded(value2, value3) {
-  if (!dragContext['isPanning']) return ![];
-  if (dragContext['panActivated']) return !![];
+  if (!dragContext['isPanning']) return false;
+  if (dragContext['panActivated']) return true;
   const value4 = value2 - dragContext['panStartX'],
     value5 = value3 - dragContext['panStartY'];
-  if (Math['hypot'](value4, value5) < PAN_ACTIVATION_DISTANCE_PX) return ![];
+  if (Math['hypot'](value4, value5) < PAN_ACTIVATION_DISTANCE_PX) return false;
   const value6 = {
     x: dragContext['panStartViewportX'],
     y: dragContext['panStartViewportY'],
     zoom: dragContext['panStartZoom'],
   };
   return (
-    (dragContext['panActivated'] = !![]),
+    (dragContext['panActivated'] = true),
     (dragContext['panStartPerf'] = nowMs()),
     (dragContext['panMinimapPreviewCount'] = Number(window['_v2GetMinimapPreviewFlushCount']?.()) || 0),
     markViewportInteractionBusyForRenderer(),
     holdViewportMediaPreloadsForPan(),
     beginPanFpsSession('canvas-pan'),
     beginViewportPanPreview(value6),
-    window['_v2ScheduleMinimapViewportPreview']?.(value6, { force: !![] }),
+    window['_v2ScheduleMinimapViewportPreview']?.(value6, { force: true }),
     document['body']['classList']['add']('is-panning'),
     _setEdgeInteractionLite(_shouldUseEdgeInteractionLite(getStateRaw())),
-    !![]
+    true
   );
 }
-function _handlePointerMoveImpl(value7, value8, enabled4 = ![], e = null) {
+function _handlePointerMoveImpl(value7, value8, enabled4 = false, e = null) {
   const value9 = lastMouseScreenX,
     value10 = lastMouseScreenY;
   ((lastMouseScreenX = value7), (lastMouseScreenY = value8));
@@ -589,11 +589,11 @@ function _handlePointerMoveImpl(value7, value8, enabled4 = ![], e = null) {
         (args3 = getStateRaw()),
         ({ viewport: viewport3, nodes: nodes2 } = args3));
       const value13 = { ...viewport3 };
-      ((dragContext['assistPanActive'] = !![]),
+      ((dragContext['assistPanActive'] = true),
         (dragContext['assistPanViewport'] = value13),
         holdViewportMediaPreloadsForPan(),
         beginViewportPanPreview(value13),
-        window['_v2ScheduleMinimapViewportPreview']?.(value13, { force: !![] }));
+        window['_v2ScheduleMinimapViewportPreview']?.(value13, { force: true }));
     }
     const value14 = value7 - value9,
       value15 = value8 - value10,
@@ -676,7 +676,7 @@ function _handlePointerMoveImpl(value7, value8, enabled4 = ![], e = null) {
 }
 const _sampledPointerMove = rafSampleLatest(_handlePointerMoveImpl);
 export function handlePointerMove(value19, value20, value21 = null) {
-  const enabled5 = value21?.['__aiCanvasLeftDragHeld'] === !![];
+  const enabled5 = value21?.['__aiCanvasLeftDragHeld'] === true;
   if (value21 && value21['buttons'] === 0 && !enabled5) {
     if (
       dragContext['isDragging'] ||
@@ -690,16 +690,16 @@ export function handlePointerMove(value19, value20, value21 = null) {
     }
   }
   if (enabled5 && dragContext['assistPanActive']) {
-    (_sampledPointerMove['cancel']?.(), _handlePointerMoveImpl(value19, value20, ![], value21));
+    (_sampledPointerMove['cancel']?.(), _handlePointerMoveImpl(value19, value20, false, value21));
     return;
   }
   const value22 = !!(value21 && (value21['buttons'] & 4) !== 0),
     value23 =
       (dragContext['isDragging'] || dragContext['isConnecting']) &&
-      (value22 || window['_spaceHeld'] === !![]);
+      (value22 || window['_spaceHeld'] === true);
   _sampledPointerMove(value19, value20, value23, value21);
 }
-export function handlePointerUp(value24 = 0, value25 = 0, value26 = ![]) {
+export function handlePointerUp(value24 = 0, value25 = 0, value26 = false) {
   if (
     !dragContext['isDragging'] &&
     !dragContext['isPanning'] &&
@@ -710,10 +710,10 @@ export function handlePointerUp(value24 = 0, value25 = 0, value26 = ![]) {
     edgeCuttingController['hasActiveSession']() && edgeCuttingController['finishSession']();
     return;
   }
-  let value27 = ![];
+  let value27 = false;
   const value28 = !!dragContext['isPanning'],
     value29 = !!dragContext['isDragging'],
-    value30 = value28 && dragContext['panActivated'] === !![],
+    value30 = value28 && dragContext['panActivated'] === true,
     value31 = dragContext['panStartPerf'] || nowMs(),
     moveCount = dragContext['panMoveCount'] || 0,
     value32 = dragContext['panMinimapPreviewCount'] || 0;
@@ -775,7 +775,7 @@ export function handlePointerUp(value24 = 0, value25 = 0, value26 = ![]) {
   (window['_clearSnapGuideLines']?.(), _resetDragContext());
   if (value29) {
     const stateRaw4 = getStateRaw()?.['selectedNodeIds'] || [];
-    window['v2Renderer']?.['flushSelection']?.(stateRaw4, { settleInteraction: !![] });
+    window['v2Renderer']?.['flushSelection']?.(stateRaw4, { settleInteraction: true });
   }
   value30 &&
     (releaseViewportInteractionBusyForRenderer(),
@@ -802,8 +802,8 @@ export function getInteractionRenderState() {
   return {
     isDragging: !!dragContext['isDragging'],
     isDraggingCell: !!dragContext['isDraggingCell'],
-    isCommittingDrag: dragContext['isCommittingDrag'] === !![],
-    isPanning: !!dragContext['isPanning'] && dragContext['panActivated'] === !![],
+    isCommittingDrag: dragContext['isCommittingDrag'] === true,
+    isPanning: !!dragContext['isPanning'] && dragContext['panActivated'] === true,
     assistPanActive: !!dragContext['assistPanActive'],
     targetNodeId: dragContext['targetNodeId'] || null,
     pendingDx: Number['isFinite'](dragContext['pendingDx']) ? dragContext['pendingDx'] : 0,
@@ -862,9 +862,9 @@ export function initCanvasContextMenu(el3) {
     'contextmenu',
     (event2) => {
       if (!isEditableTextTargetInGroupedNode(event2['target'], getStateRaw()['nodes'])) return;
-      event2['__aiCanvasGroupedEditableContextMenu'] = !![];
+      event2['__aiCanvasGroupedEditableContextMenu'] = true;
     },
-    { capture: !![] },
+    { capture: true },
   );
   function run4(value57) {
     if (
@@ -882,7 +882,7 @@ export function initCanvasContextMenu(el3) {
     const width = run4(type['type']),
       extra =
         type['type'] === 'source-image' || type['type'] === 'source-video'
-          ? { needsAutoResize: !![] }
+          ? { needsAutoResize: true }
           : {};
     executeCommand('create_node', {
       type: type['type'],
@@ -894,7 +894,7 @@ export function initCanvasContextMenu(el3) {
       extra: extra,
     });
   }
-  function run6(value58, value59, value60 = ![]) {
+  function run6(value58, value59, value60 = false) {
     (document['querySelector']('#v2PickerOverlay')?.['remove'](), removeContextMenus());
     const { viewport: viewport6 } = getStateRaw();
     let value61, value62;
@@ -940,7 +940,7 @@ export function initCanvasContextMenu(el3) {
         el8['className'] = 'v2-menu-row' + (value69['desc'] ? ' has-desc' : '');
         const el9 = document['createElement']('div');
         ((el9['className'] = 'v2-menu-ico'), el9['replaceChildren']());
-        if (value69['iconEl']) el9['appendChild'](value69['iconEl']['cloneNode'](!![]));
+        if (value69['iconEl']) el9['appendChild'](value69['iconEl']['cloneNode'](true));
         el8['appendChild'](el9);
         const el10 = document['createElement']('div');
         el10['className'] = 'v2-menu-txt-wrap';
@@ -1299,14 +1299,14 @@ export function initCanvasContextMenu(el3) {
           enabled7['removeAllRanges']();
         } catch {}
       const value86 = enabled7 ? enabled7['toString']()['trim']() : '';
-      let value87 = ![];
+      let value87 = false;
       if (enabled7 && value86 && enabled7['rangeCount'] > 0 && !enabled7['isCollapsed']) {
         const value88 = screenX2['target'];
         for (let value89 = 0; value89 < enabled7['rangeCount']; value89++) {
           const value90 = enabled7['getRangeAt'](value89);
           try {
             if (value90['intersectsNode'](value88)) {
-              value87 = !![];
+              value87 = true;
               break;
             }
           } catch {}

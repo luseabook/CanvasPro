@@ -153,12 +153,12 @@ function closeResource(value4) {
 }
 export function releaseStoryboard3DTexturePolicyResource(el) {
   const enabled2 = ownedTextureResources['get'](el);
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   return (
     ownedTextureResources['delete'](el),
     el?.['removeEventListener']?.('dispose', enabled2['onDispose']),
     closeResource(enabled2['resource']),
-    !![]
+    true
   );
 }
 function ownTextureResource(el2, resource) {
@@ -220,7 +220,7 @@ async function createDownsampledSource(
           });
     if (!source3) throw new Error('Canvas creation is unavailable');
     ((source3['width'] = resizeWidth), (source3['height'] = resizeHeight));
-    const ctx = source3['getContext']?.('2d', { alpha: !![] });
+    const ctx = source3['getContext']?.('2d', { alpha: true });
     if (!ctx?.['drawImage']) throw new Error('A drawable 2D canvas context is unavailable');
     (ctx['drawImage'](value7, 0, 0, resizeWidth, resizeHeight), throwIfAborted(signal));
     if (typeof source3['transferToImageBitmap'] === 'function') {
@@ -273,7 +273,7 @@ export async function downsampleStoryboard3DTexture(
     ((colorSpace['image'] = method['source']),
       (colorSpace['colorSpace'] = value8['colorSpace']),
       (colorSpace['flipY'] = value8['flipY']),
-      (colorSpace['needsUpdate'] = !![]));
+      (colorSpace['needsUpdate'] = true));
   } catch (value9) {
     try {
       ((colorSpace['image'] = textureSource3),
@@ -413,7 +413,7 @@ export async function preflightStoryboard3DImageFile(
     limits2 = resolveStoryboard3DTextureLimits({ renderer: renderer, ...args3 });
   if (!errors['ok'])
     return {
-      ok: ![],
+      ok: false,
       action: 'reject',
       errors: errors['errors'],
       warnings: [],
@@ -435,7 +435,7 @@ export async function preflightStoryboard3DImageFile(
     const targetWidth2 = computeTargetSize(width6, height4, limits2),
       action2 = targetWidth2['width'] !== width6 || targetWidth2['height'] !== height4;
     return {
-      ok: !![],
+      ok: true,
       action: action2 ? 'downsample' : 'accept',
       errors: [],
       warnings: action2
@@ -464,7 +464,7 @@ export async function preflightStoryboard3DImageFile(
   } catch (code3) {
     if (code3?.['name'] === 'AbortError') throw code3;
     return {
-      ok: !![],
+      ok: true,
       action: 'accept-with-warning',
       errors: [],
       warnings: [

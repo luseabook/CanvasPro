@@ -173,7 +173,7 @@ export function initDevEntries({ isDevBuild: isDevBuild } = {}) {
 }
 
 export function toggleDevMode() {
-  if (window['LOCAL_DEV_BUILD'] !== !![]) return null;
+  if (window['LOCAL_DEV_BUILD'] !== true) return null;
   const value3 = !Boolean(window['DEV_MODE']);
   return (
     setDevMode(value3, document['getElementById']('devEntryModeBtn')),

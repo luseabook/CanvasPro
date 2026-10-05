@@ -157,19 +157,19 @@ export class SourceVideoNode {
       (this['_playbackSourcePromiseSource'] = ''),
       (this['_playbackSourceToken'] = 0),
       (this['_pendingPlaybackSource'] = ''),
-      (this['_hasPendingPlaybackSource'] = ![]),
+      (this['_hasPendingPlaybackSource'] = false),
       (this['_playbackResumeGeneration'] = 0),
       (this['_pendingPlaybackResume'] = null),
       (this['_isMuted'] = resolveVideoMutedPreference(value, {
         videoAudioDefaultEnabled: readVideoAudioDefaultEnabledFromStore(appStore),
       })),
-      (this['_isManualControl'] = ![]),
-      (this['_isHovered'] = ![]),
-      (this['_hoverManualPause'] = ![]),
-      (this['_isManualLoopPlayback'] = ![]),
+      (this['_isManualControl'] = false),
+      (this['_isHovered'] = false),
+      (this['_hoverManualPause'] = false),
+      (this['_isManualLoopPlayback'] = false),
       (this['_autoPlayToken'] = 0),
       (this['_seekToken'] = 0),
-      (this['_isSeeking'] = ![]),
+      (this['_isSeeking'] = false),
       (this['_progressDragSession'] = null),
       (this['_clickTimer'] = null),
       (this['_clip'] = null),
@@ -178,7 +178,7 @@ export class SourceVideoNode {
       (this['_canonicalAssetImportSource'] = ''),
       (this['_canonicalAssetImportPromise'] = null),
       (this['_canonicalAssetImportRetryGeneration'] = 0),
-      (this['_canonicalAssetImportDisposed'] = ![]),
+      (this['_canonicalAssetImportDisposed'] = false),
       (this['_canonicalAssetImportFailedAt'] = 0),
       (this['_thumbFetchToken'] = 0),
       (this['_activeCapturePreviewUrl'] = ''),
@@ -191,27 +191,27 @@ export class SourceVideoNode {
       (this['_asyncResumePromise'] = null),
       (this['_idleVideoThumbCancel'] = null),
       (this['_deferredVideoMetaCancel'] = null),
-      (this['_isUploading'] = ![]),
+      (this['_isUploading'] = false),
       (this['_unsubscribeLocale'] = null),
       (this['_rendererMediaDeferred'] = shouldDeferRendererMediaOnMount(value)),
       (this['_rendererDetailsDeferred'] = shouldDeferRendererDetailsOnMount(value)),
       (this['_rendererRuntimePrebuiltOffscreen'] = shouldPrebuildRendererRuntimeOffscreen(value)),
-      (this['_videoEventsBound'] = ![]),
+      (this['_videoEventsBound'] = false),
       (this['_progressRaf'] = 0),
       (this['_toolbarEl'] = null),
-      (this['_videoToolbarBound'] = ![]),
+      (this['_videoToolbarBound'] = false),
       (this['_videoToolbarCleanup'] = null),
       (this['_removeDeferredToolbarActivator'] = null),
-      (this['_videoInteractionBound'] = ![]),
+      (this['_videoInteractionBound'] = false),
       (this['_removeDeferredInteractionActivator'] = null),
-      (this['_rendererEagerVideoPreview'] = ![]),
-      (this['_rendererPlaybackPinned'] = ![]),
+      (this['_rendererEagerVideoPreview'] = false),
+      (this['_rendererPlaybackPinned'] = false),
       (this['_hoverPlaybackLifecycle'] = createHoverVideoPlaybackLifecycle({
         releaseMedia: () => this['_releaseIdleHoverPlaybackMedia'](),
       })));
   }
   ['_ensureVideoToolbarBound']() {
-    if (this['_videoToolbarBound'] === !![]) return;
+    if (this['_videoToolbarBound'] === true) return;
     const enabled = this['_toolbarEl'] || this['el']?.['querySelector']?.('.node-floating-toolbar') || null;
     if (!enabled) return;
     (this['_removeDeferredToolbarActivator']?.(),
@@ -219,7 +219,7 @@ export class SourceVideoNode {
       this['_videoToolbarCleanup']?.(),
       (this['_videoToolbarCleanup'] = bindVideoToolbarEvents(enabled, this['_data'])),
       (this['_toolbarEl'] = enabled),
-      (this['_videoToolbarBound'] = !![]));
+      (this['_videoToolbarBound'] = true));
   }
   ['_armDeferredVideoToolbarBinding']() {
     if (!this['_toolbarEl'] || this['_removeDeferredToolbarActivator']) return;
@@ -229,11 +229,11 @@ export class SourceVideoNode {
       key = () => {
         this['_ensureVideoToolbarBound']();
       };
-    (this['_toolbarEl']['addEventListener']?.('pointerdown', item, !![]),
-      this['_toolbarEl']['addEventListener']?.('focusin', key, !![]),
+    (this['_toolbarEl']['addEventListener']?.('pointerdown', item, true),
+      this['_toolbarEl']['addEventListener']?.('focusin', key, true),
       (this['_removeDeferredToolbarActivator'] = () => {
-        (this['_toolbarEl']?.['removeEventListener']?.('pointerdown', item, !![]),
-          this['_toolbarEl']?.['removeEventListener']?.('focusin', key, !![]));
+        (this['_toolbarEl']?.['removeEventListener']?.('pointerdown', item, true),
+          this['_toolbarEl']?.['removeEventListener']?.('focusin', key, true));
       }));
   }
   ['_ensureVideoInputElement']() {
@@ -259,19 +259,19 @@ export class SourceVideoNode {
         if (!shouldActivateSourceVideoHoverPlayback(appStore, this['id'])) return;
         (this['hydrateDeferredMedia'](), this['_activateHoverPlayback']());
       };
-    (this['el']['addEventListener']?.('pointerdown', index, !![]),
-      this['el']['addEventListener']?.('focusin', index, !![]),
-      el2?.['addEventListener']?.('mouseenter', result, !![]),
+    (this['el']['addEventListener']?.('pointerdown', index, true),
+      this['el']['addEventListener']?.('focusin', index, true),
+      el2?.['addEventListener']?.('mouseenter', result, true),
       (this['_removeDeferredInteractionActivator'] = () => {
-        (this['el']?.['removeEventListener']?.('pointerdown', index, !![]),
-          this['el']?.['removeEventListener']?.('focusin', index, !![]),
-          el2?.['removeEventListener']?.('mouseenter', result, !![]));
+        (this['el']?.['removeEventListener']?.('pointerdown', index, true),
+          this['el']?.['removeEventListener']?.('focusin', index, true),
+          el2?.['removeEventListener']?.('mouseenter', result, true));
       }));
   }
   ['_bindVideoInteractionHandlers']() {
-    if (this['_videoInteractionBound'] === !![]) return;
+    if (this['_videoInteractionBound'] === true) return;
     if (!this['el'] || typeof this['_card']?.['addEventListener'] !== 'function') return;
-    ((this['_videoInteractionBound'] = !![]),
+    ((this['_videoInteractionBound'] = true),
       this['_removeDeferredInteractionActivator']?.(),
       (this['_removeDeferredInteractionActivator'] = null),
       this['_card']['addEventListener']('dblclick', (event2) => {
@@ -307,7 +307,7 @@ export class SourceVideoNode {
     });
     this['_resizer'] &&
       this['_resizer']['addEventListener']('pointerdown', (event5) => {
-        const options = appStore['getStateRaw']()['ui']?.['imageVideoNodeResizeEnabled'] === !![],
+        const options = appStore['getStateRaw']()['ui']?.['imageVideoNodeResizeEnabled'] === true,
           target = document['getElementById']('v2-wrap')?.['classList']['contains'](
             'v2-media-node-resize-enabled',
           );
@@ -327,7 +327,7 @@ export class SourceVideoNode {
             return { width: width, height: height };
           },
           buildFinalPatch: ({ startNode: startNode }) =>
-            startNode?.['needsAutoResize'] ? { needsAutoResize: ![] } : {},
+            startNode?.['needsAutoResize'] ? { needsAutoResize: false } : {},
           applyPatch: (record) => appStore['updateNodeData'](this['id'], record),
           commit: commit,
         });
@@ -340,14 +340,14 @@ export class SourceVideoNode {
       this['_muteBtn']?.['addEventListener']?.('click', (event7) => {
         event7['stopPropagation']();
         if (VideoKeyingController['isActiveFor'](this['_data']?.['id'])) return;
-        this['_setMuted'](!this['_isMuted'], { persist: !![] });
+        this['_setMuted'](!this['_isMuted'], { persist: true });
       }),
       this['_playBtn']?.['addEventListener']?.('click', (loop2) => {
         loop2['stopPropagation']();
         if (VideoKeyingController['isActiveFor'](this['_data']?.['id'])) return;
         if (!this['_currentSrc']) return;
         this['_toggleManualPlayback']({
-          loop: loop2['shiftKey'] === !![],
+          loop: loop2['shiftKey'] === true,
           forcePlay: this['_shouldKeepHoverPlaybackOnManualClick'](),
         });
       }));
@@ -390,12 +390,12 @@ export class SourceVideoNode {
           if (!Number['isFinite'](value3)) return;
           const el5 = this['_ensureVideoElement']();
           if (!el5) return;
-          this['_isSeeking'] = !![];
+          this['_isSeeking'] = true;
           const value4 = ++this['_seekToken'];
           el5['currentTime'] = value3;
           const value5 = () => {
             if (value4 !== this['_seekToken']) return;
-            this['_isSeeking'] = ![];
+            this['_isSeeking'] = false;
             const value6 = this['_getBaseDuration'](),
               value7 = this['_getClipRange'](value6),
               value8 = value7['active']
@@ -411,7 +411,7 @@ export class SourceVideoNode {
                 (this['_timeTotal']['textContent'] = this['_fmt'](value8)));
             }
           };
-          (el5['addEventListener']('seeked', value5, { once: !![] }),
+          (el5['addEventListener']('seeked', value5, { once: true }),
             window['setTimeout'](value5, 300));
         },
         onMove = (event9) => {
@@ -423,23 +423,23 @@ export class SourceVideoNode {
         handler2 = ({ commitSeek: commitSeek }) => {
           ((this['_bar']['dataset']['dragging'] = 'false'), (this['_progressDragSession'] = null));
           if (commitSeek) handler(payload);
-          this['_isSeeking'] = ![];
+          this['_isSeeking'] = false;
           if (!commitSeek) this['_syncVideoProgressUi']();
           this['_syncRendererPlaybackPin']();
         };
       this['_bar']['addEventListener']?.('pointerdown', (pointerId) => {
         (pointerId['stopPropagation'](), pointerId['preventDefault']());
-        if (pointerId['button'] !== 0 || pointerId['isPrimary'] === ![]) return;
+        if (pointerId['button'] !== 0 || pointerId['isPrimary'] === false) return;
         this['_progressDragSession']?.['cancel']?.();
         if (VideoKeyingController['isActiveFor'](this['_data']?.['id'])) return;
         if (!this['_currentSrc']) return;
-        ((this['_isManualControl'] = !![]),
-          this['_setManualLoopPlayback'](![]),
+        ((this['_isManualControl'] = true),
+          this['_setManualLoopPlayback'](false),
           this['_syncPlaybackChromeVisibility'](),
           this['_autoPlayToken']++,
-          (this['_hoverManualPause'] = !![]),
+          (this['_hoverManualPause'] = true),
           this['_ensureVideoElement']()?.['pause']?.(),
-          (this['_isSeeking'] = !![]),
+          (this['_isSeeking'] = true),
           this['_syncRendererPlaybackPin'](),
           (this['_bar']['dataset']['dragging'] = 'true'),
           (payload = run(pointerId)),
@@ -449,8 +449,8 @@ export class SourceVideoNode {
             target: window,
             pointerId: pointerId['pointerId'],
             onMove: onMove,
-            onEnd: () => handler2({ commitSeek: !![] }),
-            onCancel: () => handler2({ commitSeek: ![] }),
+            onEnd: () => handler2({ commitSeek: true }),
+            onCancel: () => handler2({ commitSeek: false }),
           })));
       });
     }
@@ -469,23 +469,23 @@ export class SourceVideoNode {
       this['_muteBtn']?.['addEventListener']?.('pointerdown', (event12) => event12['stopPropagation']()));
   }
   ['_activateHoverPlayback']() {
-    if (!shouldActivateSourceVideoHoverPlayback(appStore, this['id'])) return ![];
+    if (!shouldActivateSourceVideoHoverPlayback(appStore, this['id'])) return false;
     const value12 = appStore['getStateRaw']()['videoClip'];
-    if (value12 && value12['active'] && value12['nodeId'] === this['_data']?.['id']) return ![];
+    if (value12 && value12['active'] && value12['nodeId'] === this['_data']?.['id']) return false;
     this['_hoverPlaybackLifecycle']?.['activate']?.();
-    if (!this['_currentSrc'] || this['_rendererMediaDeferred'] === !![]) return ![];
+    if (!this['_currentSrc'] || this['_rendererMediaDeferred'] === true) return false;
     const enabled6 = this['_ensureVideoElement']();
-    if (!enabled6) return ![];
-    ((this['_isHovered'] = !![]),
+    if (!enabled6) return false;
+    ((this['_isHovered'] = true),
       this['_syncPlaybackChromeVisibility'](),
       this['_syncRendererPlaybackPin']());
-    if (VideoKeyingController['isActiveFor'](this['_data']?.['id'])) return (enabled6['pause'](), ![]);
+    if (VideoKeyingController['isActiveFor'](this['_data']?.['id'])) return (enabled6['pause'](), false);
     if (
       isExternallyOwnedVideoPlayback(enabled6) ||
       shouldKeepManualPlaybackPresentationActive(this, enabled6)
     )
-      return !![];
-    if (this['_hoverManualPause'] || this['_isManualLoopPlayback']) return ![];
+      return true;
+    if (this['_hoverManualPause'] || this['_isManualLoopPlayback']) return false;
     const value13 = this['_getBaseDuration'](),
       enabled7 = this['_getClipRange'](value13);
     enabled6['loop'] = !enabled7['active'];
@@ -500,9 +500,9 @@ export class SourceVideoNode {
       void this['_playVideoWithRecovery'](
         'hover',
         () =>
-          this['_autoPlayToken'] === value15 && this['_isHovered'] === !![] && !this['_hoverManualPause'],
+          this['_autoPlayToken'] === value15 && this['_isHovered'] === true && !this['_hoverManualPause'],
       ),
-      !![]
+      true
     );
   }
   ['_ensureVideoElement']() {
@@ -532,7 +532,7 @@ export class SourceVideoNode {
         : this['_card']['appendChild'](el6);
     return ((this['_video'] = el6), this['_bindVideoElementEvents'](), el6);
   }
-  ['_syncPlaybackChromeVisibility']({ forceHidden: forceHidden = ![] } = {}) {
+  ['_syncPlaybackChromeVisibility']({ forceHidden: forceHidden = false } = {}) {
     return syncSourceVideoPlaybackChromeVisibility(this, { forceHidden: forceHidden });
   }
   ['_deactivateHoverPlayback']() {
@@ -542,14 +542,14 @@ export class SourceVideoNode {
     return releaseIdleSourceVideoHoverPlaybackMedia(this);
   }
   ['_syncLoadedVideoMetadata'](enabled8 = this['_video']) {
-    if (!enabled8 || enabled8 !== this['_video']) return ![];
+    if (!enabled8 || enabled8 !== this['_video']) return false;
     const args = appStore['getState']()['nodes']?.[this['id']];
-    if (!args) return ![];
+    if (!args) return false;
     const value16 = String(this['_resolveVideoSrc'](args) || '')['trim'](),
       value17 = String(this['_currentSrc'] || '')['trim']();
-    if (value16 && value17 && value16 !== value17) return ![];
+    if (value16 && value17 && value16 !== value17) return false;
     const value18 = value17 || value16;
-    if (value18 && !isMediaElementPlaybackSource(enabled8, value18)) return ![];
+    if (value18 && !isMediaElementPlaybackSource(enabled8, value18)) return false;
     (this['_syncVideoDurationUi'](), this['_syncVideoProgressUi']());
     const count = Number(enabled8['duration'] || 0),
       count2 = Number(enabled8['videoWidth'] || 0),
@@ -566,29 +566,29 @@ export class SourceVideoNode {
       Number(args['videoHeight'] || 0) !== count3 &&
       (box2['videoHeight'] = count3);
     if (
-      args['fixedSize'] !== !![] &&
-      args['needsAutoResize'] === !![] &&
+      args['fixedSize'] !== true &&
+      args['needsAutoResize'] === true &&
       count2 > 0 &&
       count3 > 0
     ) {
       const box3 = getAutoMediaSizeByShortSide(count2, count3);
       ((box2['width'] = box3['width']),
         (box2['height'] = box3['height']),
-        (box2['needsAutoResize'] = ![]));
+        (box2['needsAutoResize'] = false));
     }
     return (
       Object['keys'](box2)['length'] > 0 &&
         (appStore['updateNodeData'](this['id'], box2), (this['_data'] = { ...args, ...box2 })),
-      !![]
+      true
     );
   }
   ['_bindVideoElementEvents']() {
-    if (!this['_video'] || this['_videoEventsBound'] === !![]) return;
-    ((this['_videoEventsBound'] = !![]),
+    if (!this['_video'] || this['_videoEventsBound'] === true) return;
+    ((this['_videoEventsBound'] = true),
       this['_video']['addEventListener']('play', () => {
         (this['_syncRendererPlaybackPin'](),
           this['_syncPosterFrameVisibility'](),
-          this['_updatePlayIcon'](![]),
+          this['_updatePlayIcon'](false),
           this['_syncPlaybackChromeVisibility'](),
           this['_hideCenterIndicator'](),
           this['_startProgressLoop']());
@@ -597,7 +597,7 @@ export class SourceVideoNode {
         (this['_cancelProgressLoop'](),
           this['_syncVideoProgressUi'](),
           this['_syncPosterFrameVisibility'](),
-          this['_updatePlayIcon'](!![]),
+          this['_updatePlayIcon'](true),
           this['_syncPlaybackChromeVisibility'](),
           this['_syncRendererPlaybackPin'](),
           this['_applyPendingPlaybackSourceAtBoundary']());
@@ -655,24 +655,24 @@ export class SourceVideoNode {
       (this['_indicatorInner'] = el8['querySelector']('.indicator-inner')),
       (this['_centerIndicatorTimer'] = null),
       (this['_resizer'] = el8['querySelector']('.node-resizer')),
-      this['_syncPlaybackChromeVisibility']({ forceHidden: !![] }),
+      this['_syncPlaybackChromeVisibility']({ forceHidden: true }),
       this['_syncLocaleTexts']());
-    this['_rendererDetailsDeferred'] !== !![] &&
+    this['_rendererDetailsDeferred'] !== true &&
       (this['_unsubscribeLocale'] = onLocaleChange(() => this['_syncLocaleTexts']()));
     if (this['_data']?.['isGenerating'] && !this['_resolveVideoSrc'](this['_data'])) {
       startLoading(this['_card'], { variant: 'full' });
       if (this['_hint']) this['_hint']['style']['display'] = 'none';
-      if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = !![];
+      if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = true;
     }
-    this['_rendererMediaDeferred'] === !![] || this['_rendererDetailsDeferred'] === !![]
+    this['_rendererMediaDeferred'] === true || this['_rendererDetailsDeferred'] === true
       ? this['_armDeferredVideoInteractionBinding']()
       : this['_bindVideoInteractionHandlers']();
     const value21 =
-        this['_rendererMediaDeferred'] === !![]
+        this['_rendererMediaDeferred'] === true
           ? this['_data']
           : this['_promotePendingProxyAtMediaSegmentBoundary'](this['_data']),
       value22 = this['_resolveVideoSrc'](value21);
-    if (this['_rendererMediaDeferred'] === !![])
+    if (this['_rendererMediaDeferred'] === true)
       ((this['_currentSrc'] = value22 || ''),
         this['_syncPosterFrameVisibility']({ force: !!this['_lastPosterSrc'] }));
     else {
@@ -681,17 +681,17 @@ export class SourceVideoNode {
       else this['_loadVideo']('');
     }
     return (
-      this['_rendererDetailsDeferred'] !== !![] && this['_clearResolvedVideoTimer'](this['_data'], value22),
-      this['_rendererMediaDeferred'] !== !![] &&
-        this['_rendererDetailsDeferred'] !== !![] &&
+      this['_rendererDetailsDeferred'] !== true && this['_clearResolvedVideoTimer'](this['_data'], value22),
+      this['_rendererMediaDeferred'] !== true &&
+        this['_rendererDetailsDeferred'] !== true &&
         this['_maybeFetchVideoMeta'](this['_data']),
-      this['_rendererDetailsDeferred'] !== !![] &&
+      this['_rendererDetailsDeferred'] !== true &&
         (this['_syncRunningHubVideoTaskState'](this['_data']),
         this['_maybeResumeRunningHubTask'](),
         this['_maybeResumeAsyncTask']()),
       this['_syncGenerationFailureUi'](appStore['getStateRaw']()['nodes']?.[this['id']] || this['_data']),
       (this['_toolbarEl'] = el8['querySelector']('.node-floating-toolbar')),
-      this['_rendererMediaDeferred'] === !![] || this['_rendererDetailsDeferred'] === !![]
+      this['_rendererMediaDeferred'] === true || this['_rendererDetailsDeferred'] === true
         ? this['_armDeferredVideoToolbarBinding']()
         : this['_ensureVideoToolbarBound'](),
       el8
@@ -704,35 +704,35 @@ export class SourceVideoNode {
         this['_generationErrorOverlay']?.['remove']?.(),
         (this['_generationErrorOverlay'] = null),
         (this['_generationErrorMessage'] = ''),
-        ![]
+        false
       );
     if (
       !this['_card'] ||
       typeof this['_card']['appendChild'] !== 'function' ||
       typeof globalThis['document']?.['createElement'] !== 'function'
     )
-      return ![];
+      return false;
     stopLoading(this['_card']);
-    let value24 = ![];
+    let value24 = false;
     !this['_generationErrorOverlay'] &&
       ((this['_generationErrorOverlay'] = document['createElement']('div')),
       (this['_generationErrorOverlay']['className'] =
         'dreamina-status-overlay source-video-generation-error-overlay'),
       this['_card']?.['appendChild']?.(this['_generationErrorOverlay']),
-      (value24 = !![]));
+      (value24 = true));
     (value24 || this['_generationErrorMessage'] !== sourceVideoGenerationFailureMessage) &&
       ((this['_generationErrorOverlay']['innerHTML'] = ''),
       this['_generationErrorOverlay']['appendChild'](createVideoGenerationErrorCard(sourceVideoGenerationFailureMessage)),
       (this['_generationErrorMessage'] = sourceVideoGenerationFailureMessage));
-    this['_setPosterFrameVisible'](![]);
+    this['_setPosterFrameVisible'](false);
     if (this['_hint']) this['_hint']['style']['display'] = 'none';
-    this['_syncPlaybackChromeVisibility']({ forceHidden: !![] });
-    if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = ![];
-    return !![];
+    this['_syncPlaybackChromeVisibility']({ forceHidden: true });
+    if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = false;
+    return true;
   }
   ['hydrateDeferredDetails']() {
-    if (this['_rendererDetailsDeferred'] !== !![]) return ![];
-    ((this['_rendererDetailsDeferred'] = ![]), this['_syncLocaleTexts']());
+    if (this['_rendererDetailsDeferred'] !== true) return false;
+    ((this['_rendererDetailsDeferred'] = false), this['_syncLocaleTexts']());
     !this['_unsubscribeLocale'] &&
       (this['_unsubscribeLocale'] = onLocaleChange(() => this['_syncLocaleTexts']()));
     (this['_bindVideoInteractionHandlers'](), this['_ensureVideoToolbarBound']());
@@ -745,7 +745,7 @@ export class SourceVideoNode {
       this['_syncRunningHubVideoTaskState'](value25),
       this['_maybeResumeRunningHubTask'](),
       this['_maybeResumeAsyncTask'](),
-      !![]
+      true
     );
   }
   ['_waitForUploadPaint']() {
@@ -762,7 +762,7 @@ export class SourceVideoNode {
       ((this['_snapBtn']['dataset']['tooltip'] = sourceVideoText3),
         this['_snapBtn']['setAttribute']?.('aria-label', sourceVideoText3));
     }
-    this['_updatePlayIcon'](this['_video']?.['paused'] !== ![]);
+    this['_updatePlayIcon'](this['_video']?.['paused'] !== false);
     if (this['_uploadBtn'] && !this['_isUploading']) {
       const el9 = this['_uploadBtn']['querySelector']?.('.source-upload-label');
       el9
@@ -785,7 +785,7 @@ export class SourceVideoNode {
     })),
       this['_applyMutedState']());
   }
-  ['_setMuted'](enabled9, { persist: persist = ![] } = {}) {
+  ['_setMuted'](enabled9, { persist: persist = false } = {}) {
     ((this['_isMuted'] = !!enabled9), this['_applyMutedState']());
     if (!persist) return;
     const args2 = appStore['getState']()['nodes']?.[this['id']] || this['_data'] || {},
@@ -809,14 +809,14 @@ export class SourceVideoNode {
         'error',
       );
       if (this['_input']) this['_input']['value'] = '';
-      return ![];
+      return false;
     }
-    ((this['_isUploading'] = !![]), startLoading(this['_card'], { variant: 'static' }));
+    ((this['_isUploading'] = true), startLoading(this['_card'], { variant: 'static' }));
     const el10 = this['_ensureVideoElement']();
     if (el10) el10['style']['display'] = 'none';
-    this['_syncPlaybackChromeVisibility']({ forceHidden: !![] });
+    this['_syncPlaybackChromeVisibility']({ forceHidden: true });
     const list = Array['from'](this['_uploadBtn']['childNodes'])['map']((value31) =>
-      value31['cloneNode'](!![]),
+      value31['cloneNode'](true),
     );
     ((this['_uploadBtn']['textContent'] = sourceVideoText('upload.uploading')),
       (this['_uploadBtn']['style']['pointerEvents'] = 'none'));
@@ -832,7 +832,7 @@ export class SourceVideoNode {
         ['catch'](() => null);
       void promise['then']((value34) => {
         const args4 = buildSourceVideoUploadSizePatch(value34);
-        if (args4['needsAutoResize'] !== ![]) return;
+        if (args4['needsAutoResize'] !== false) return;
         const args5 = appStore['getState']()['nodes']?.[this['id']];
         if (!args5) return;
         (appStore['updateNodeData'](this['id'], args4), (this['_data'] = { ...args5, ...args4 }));
@@ -883,7 +883,7 @@ export class SourceVideoNode {
         fileSize: Number(width2['size'] || file?.['size'] || 0) || 0,
         fileName: width2['filename'] || file['name'],
         stagedUploadId: width2['stagedUploadId'] || '',
-        canonicalImportPending: width2['canonicalImportPending'] === !![],
+        canonicalImportPending: width2['canonicalImportPending'] === true,
         canonicalImportStatus: width2['canonicalImportStatus'] || '',
         canonicalImportError: width2['canonicalImportError'] || '',
         capturePreviewUrl: capturePreviewUrl2 ? capturePreviewUrl : '',
@@ -904,9 +904,9 @@ export class SourceVideoNode {
         this['_syncPlaybackChromeVisibility']();
       }
     } finally {
-      ((this['_isUploading'] = ![]),
+      ((this['_isUploading'] = false),
         this['_uploadBtn']['replaceChildren'](
-          ...list['map']((value38) => value38['cloneNode'](!![])),
+          ...list['map']((value38) => value38['cloneNode'](true)),
         ),
         this['_syncLocaleTexts'](),
         (this['_uploadBtn']['style']['pointerEvents'] = 'auto'));
@@ -917,7 +917,7 @@ export class SourceVideoNode {
     const sourceVideoPosterSrc = resolveSourceVideoPosterSrc(value39),
       value41 =
         !!sourceVideoPosterSrc &&
-        (value40?.['restoreNativePoster'] === !![] ||
+        (value40?.['restoreNativePoster'] === true ||
           !hasPresentedVideoFrame(this['_video'], this['_currentSrc']));
     if (sourceVideoPosterSrc)
       (this['_video'] &&
@@ -937,7 +937,7 @@ export class SourceVideoNode {
       }
     }
     return (
-      value41 ? this['_syncPosterFrameVisibility']({ force: !![] }) : this['_syncPosterFrameVisibility'](),
+      value41 ? this['_syncPosterFrameVisibility']({ force: true }) : this['_syncPosterFrameVisibility'](),
       sourceVideoPosterSrc
     );
   }
@@ -957,10 +957,10 @@ export class SourceVideoNode {
     if (!this['_posterFrame'] || !enabled10) return;
     const enabled11 = this['_getPosterFrameSrc']();
     if (enabled11 === enabled10) return;
-    const run3 = ({ requireConnected: requireConnected = ![] } = {}) => {
+    const run3 = ({ requireConnected: requireConnected = false } = {}) => {
       if (
         !this['_posterFrame'] ||
-        (requireConnected && this['_posterFrame']['isConnected'] === ![]) ||
+        (requireConnected && this['_posterFrame']['isConnected'] === false) ||
         this['_lastPosterSrc'] !== enabled10
       )
         return;
@@ -979,10 +979,10 @@ export class SourceVideoNode {
       preloadCanvasImage(enabled10, {
         priority: SOURCE_VIDEO_POSTER_PRELOAD_PRIORITY,
         fetchPriority: 'auto',
-        deferWhenPaused: !![],
+        deferWhenPaused: true,
       })['then'](
         () => {
-          if (this['_posterFramePreloadToken'] === value43) run3({ requireConnected: !![] });
+          if (this['_posterFramePreloadToken'] === value43) run3({ requireConnected: true });
         },
         () => {},
       ));
@@ -997,11 +997,11 @@ export class SourceVideoNode {
       this['_isManualControl'] ||
       this['_isManualLoopPlayback'] ||
       this['_isSeeking'] ||
-      this['_video']?.['paused'] === ![]
+      this['_video']?.['paused'] === false
     );
   }
   ['_setRendererPlaybackPin'](value44) {
-    const value45 = value44 === !![];
+    const value45 = value44 === true;
     if (this['_rendererPlaybackPinned'] === value45) return;
     this['_rendererPlaybackPinned'] = value45;
     const value46 = globalThis['window']?.['v2Renderer'];
@@ -1016,7 +1016,7 @@ export class SourceVideoNode {
     const sourceKey = String(value47 || '')['trim'](),
       sourceEpoch = globalThis['window']?.['v2Renderer']?.['prepareMediaSlotSource']?.(this['id'], sourceKey, {
         slotIndex: 0,
-        rebind: rebind?.['rebind'] === !![],
+        rebind: rebind?.['rebind'] === true,
       });
     if (
       !sourceEpoch ||
@@ -1033,13 +1033,13 @@ export class SourceVideoNode {
   ) {
     const sourceKey2 = String(value49 || '')['trim'](),
       el12 = this['_video'];
-    if (!el12 || !sourceKey2) return ![];
+    if (!el12 || !sourceKey2) return false;
     if (
       this['_isCurrentRendererMediaSlotToken'](sourceKey2, mediaSlotToken) &&
       hasReportedSourceVideoMediaSlotFrame(this, { sourceKey: sourceKey2, mediaSlotToken: mediaSlotToken }) &&
       hasPresentedVideoFrame(el12, sourceKey2)
     )
-      return !![];
+      return true;
     if (!el12['style']) el12['style'] = {};
     return (
       (el12['style']['display'] = 'block'),
@@ -1051,7 +1051,7 @@ export class SourceVideoNode {
     );
   }
   ['_isCurrentRendererMediaSlotToken'](value50, enabled13) {
-    if (!enabled13) return !![];
+    if (!enabled13) return true;
     const value51 = this['_rendererMediaSlotToken'];
     return !!(
       value51 &&
@@ -1074,40 +1074,40 @@ export class SourceVideoNode {
       this['_currentSrc'] !== enabled14 ||
       !this['_isCurrentRendererMediaSlotToken'](enabled14, value53)
     )
-      return ![];
+      return false;
     const value55 = value54 || this['_getRendererVideoPresentationFacts']();
     if (
-      value55['domConnected'] !== !![] ||
+      value55['domConnected'] !== true ||
       value55['readyState'] < 2 ||
       value55['videoWidth'] <= 0 ||
       value55['videoHeight'] <= 0 ||
       value55['error'] ||
-      value55['rvfcObserved'] !== !![] ||
-      value55['cssDisplayVisible'] !== !![] ||
-      value55['cssVisibilityVisible'] !== !![] ||
-      value55['cssOpacityVisible'] !== !![] ||
-      value55['overlayClear'] !== !![]
+      value55['rvfcObserved'] !== true ||
+      value55['cssDisplayVisible'] !== true ||
+      value55['cssVisibilityVisible'] !== true ||
+      value55['cssOpacityVisible'] !== true ||
+      value55['overlayClear'] !== true
     )
-      return ![];
+      return false;
     return (enabled15['removeAttribute']?.('poster'), !enabled15['poster']);
   }
   ['_restorePausedFirstFrameNudge'](value56 = this['_currentSrc']) {
     const enabled16 = this['_pausedFirstFrameNudge'];
-    if (!enabled16 || enabled16['sourceKey'] !== String(value56 || '')['trim']()) return ![];
+    if (!enabled16 || enabled16['sourceKey'] !== String(value56 || '')['trim']()) return false;
     this['_pausedFirstFrameNudge'] = null;
     if (enabled16['timer']) clearTimeout(enabled16['timer']);
     const enabled17 = this['_video'];
     if (
       !enabled17 ||
       this['_currentSrc'] !== enabled16['sourceKey'] ||
-      enabled17['paused'] !== !![] ||
+      enabled17['paused'] !== true ||
       Math['abs'](Number(enabled17['currentTime'] || 0) - enabled16['nudgedTime']) > 0.0005
     )
-      return ![];
+      return false;
     try {
-      return ((enabled17['currentTime'] = enabled16['originalTime']), !![]);
+      return ((enabled17['currentTime'] = enabled16['originalTime']), true);
     } catch {
-      return ![];
+      return false;
     }
   }
   ['_nudgePausedVideoForFirstFrame'](value57 = this['_currentSrc']) {
@@ -1117,14 +1117,14 @@ export class SourceVideoNode {
       !enabled18 ||
       !sourceKey3 ||
       this['_currentSrc'] !== sourceKey3 ||
-      enabled18['paused'] !== !![] ||
+      enabled18['paused'] !== true ||
       Number(enabled18['readyState'] || 0) < 2 ||
       Number(enabled18['videoWidth'] || 0) <= 0 ||
       Number(enabled18['videoHeight'] || 0) <= 0 ||
       hasPresentedVideoFrame(enabled18, sourceKey3) ||
       this['_pausedFirstFrameNudge']?.['sourceKey'] === sourceKey3
     )
-      return ![];
+      return false;
     const originalTime = Number(enabled18['currentTime'] || 0),
       value58 = Number(enabled18['duration'] || 0),
       value59 = 0.001,
@@ -1132,16 +1132,16 @@ export class SourceVideoNode {
         Number['isFinite'](value58) && value58 > value59 && originalTime + value59 >= value58
           ? Math['max'](0, originalTime - value59)
           : originalTime + value59;
-    if (nudgedTime === originalTime) return ![];
+    if (nudgedTime === originalTime) return false;
     const value60 = { sourceKey: sourceKey3, originalTime: originalTime, nudgedTime: nudgedTime, timer: null };
     ((this['_pausedFirstFrameNudge'] = value60),
       (value60['timer'] = setTimeout(() => {
         this['_restorePausedFirstFrameNudge'](sourceKey3);
       }, 250)));
     try {
-      return ((enabled18['currentTime'] = nudgedTime), !![]);
+      return ((enabled18['currentTime'] = nudgedTime), true);
     } catch {
-      return (this['_restorePausedFirstFrameNudge'](sourceKey3), ![]);
+      return (this['_restorePausedFirstFrameNudge'](sourceKey3), false);
     }
   }
   ['_releaseFastPreviewForPlaybackIfReady'](mediaSlotToken2 = this['_rendererMediaSlotToken'], presentationFacts = null) {
@@ -1152,7 +1152,7 @@ export class SourceVideoNode {
       !Number['isInteger'](mediaSlotToken2?.['sourceEpoch']) ||
       !this['_isVideoFrameReadyToShow']()
     )
-      return ![];
+      return false;
     return reportSourceVideoMediaSlotFrameOnce(this, {
       sourceKey: sourceKey4,
       mediaSlotToken: mediaSlotToken2,
@@ -1164,7 +1164,7 @@ export class SourceVideoNode {
   }
   ['getRendererMediaState']() {
     return {
-      deferred: this['_rendererMediaDeferred'] === !![],
+      deferred: this['_rendererMediaDeferred'] === true,
       interactionActive: !!(
         this['_isHovered'] ||
         this['_isManualControl'] ||
@@ -1179,7 +1179,7 @@ export class SourceVideoNode {
   ['_getRendererVideoPresentationFacts']() {
     const domConnected = this['_video'],
       handler3 = (el13) => {
-        if (!el13 || el13['isConnected'] === ![]) return ![];
+        if (!el13 || el13['isConnected'] === false) return false;
         let el14 = el13;
         while (el14 && el14 !== globalThis['document']) {
           const value61 =
@@ -1191,12 +1191,12 @@ export class SourceVideoNode {
             value61?.['visibility'] === 'hidden' ||
             Number['parseFloat'](value61?.['opacity'] ?? '1') === 0
           )
-            return ![];
+            return false;
           el14 = el14['parentElement'] || el14['parentNode'];
         }
-        return !![];
+        return true;
       },
-      enabled19 = this['_posterFrame']?.['classList']?.['contains']?.('is-visible') === !![],
+      enabled19 = this['_posterFrame']?.['classList']?.['contains']?.('is-visible') === true,
       enabled20 = !!(
         this['_card']?.['classList']?.['contains']?.('img-preview-loading') ||
         this['_card']?.['querySelector']?.('.img-loading-overlay')
@@ -1204,7 +1204,7 @@ export class SourceVideoNode {
       cssDisplayVisible = domConnected?.['style'] || {},
       value62 = handler3(domConnected);
     return {
-      domConnected: domConnected?.['isConnected'] === !![],
+      domConnected: domConnected?.['isConnected'] === true,
       readyState: Number(domConnected?.['readyState'] || 0),
       videoWidth: Number(domConnected?.['videoWidth'] || 0),
       videoHeight: Number(domConnected?.['videoHeight'] || 0),
@@ -1217,13 +1217,13 @@ export class SourceVideoNode {
     };
   }
   ['_isPosterFrameReadyToShow']() {
-    if (!this['_posterFrame'] || !this['_getPosterFrameSrc']()) return ![];
-    if (typeof this['_posterFrame']['complete'] !== 'boolean') return !![];
+    if (!this['_posterFrame'] || !this['_getPosterFrameSrc']()) return false;
+    if (typeof this['_posterFrame']['complete'] !== 'boolean') return true;
     return (
-      this['_posterFrame']['complete'] === !![] && Number(this['_posterFrame']['naturalWidth'] || 0) > 0
+      this['_posterFrame']['complete'] === true && Number(this['_posterFrame']['naturalWidth'] || 0) > 0
     );
   }
-  ['_syncVideoElementFrameVisibility']({ forceHidden: forceHidden = ![] } = {}) {
+  ['_syncVideoElementFrameVisibility']({ forceHidden: forceHidden = false } = {}) {
     if (!this['_video']) return;
     if (!this['_video']['style']) this['_video']['style'] = {};
     const enabled21 = !!getVideoCurrentSource(this['_video']);
@@ -1253,30 +1253,30 @@ export class SourceVideoNode {
     if (!this['_posterFrame']) return;
     const enabled24 = String(this['_lastPosterSrc'] || '')['trim']();
     if (!enabled24) {
-      this['_setPosterFrameVisible'](![]);
+      this['_setPosterFrameVisible'](false);
       return;
     }
     if (Object['prototype']['hasOwnProperty']['call'](enabled23, 'force')) {
       this['_setPosterFrameVisible'](!!enabled23['force']);
-      enabled23['force'] === !![] && this['_syncVideoElementFrameVisibility']({ forceHidden: !![] });
+      enabled23['force'] === true && this['_syncVideoElementFrameVisibility']({ forceHidden: true });
       return;
     }
     if (this['_isVideoFrameReadyToShow']()) {
-      this['_setPosterFrameVisible'](![]);
+      this['_setPosterFrameVisible'](false);
       return;
     }
-    this['_setPosterFrameVisible'](!![]);
+    this['_setPosterFrameVisible'](true);
   }
   ['_clearVideoElementSource']({
-    load: load = !![],
-    invalidateRendererSlot: invalidateRendererSlot = !![],
+    load: load = true,
+    invalidateRendererSlot: invalidateRendererSlot = true,
   } = {}) {
     if (!this['_video']) return;
     if (invalidateRendererSlot) {
       const value65 = String(this['_rendererMediaSlotToken']?.['sourceKey'] || this['_currentSrc'] || '')[
         'trim'
       ]();
-      (this['_prepareRendererMediaSlotSource'](value65, { rebind: !![] }),
+      (this['_prepareRendererMediaSlotSource'](value65, { rebind: true }),
         (this['_rendererMediaSlotToken'] = null));
     }
     this['_cancelProgressLoop']();
@@ -1287,7 +1287,7 @@ export class SourceVideoNode {
       clearDesktopMediaPlaybackSourceMetadata(this['_video']),
       this['_video']['removeAttribute']?.('src'),
       this['_releasePlaybackObjectUrl']());
-    if (load !== ![])
+    if (load !== false)
       try {
         this['_video']['load']?.();
       } catch {}
@@ -1381,7 +1381,7 @@ export class SourceVideoNode {
     stopLoading(this['_card']);
     this['_video'] &&
       ((this['_video']['style']['opacity'] = '0'), (this['_video']['style']['visibility'] = 'hidden'));
-    this['_setPosterFrameVisible'](!![]);
+    this['_setPosterFrameVisible'](true);
     const args7 =
         appStore['getStateRaw']?.()['nodes']?.[this['id']] ||
         appStore['getState']()['nodes']?.[this['id']] ||
@@ -1395,10 +1395,10 @@ export class SourceVideoNode {
         (mediaUnavailableSource === String(value71 || '')['trim']() || (!!localPath2 && localPath2 === localPath3));
     if (
       value73 &&
-      (args7['mediaUnavailable'] !== !![] ||
+      (args7['mediaUnavailable'] !== true ||
         String(args7['mediaUnavailableSource'] || '')['trim']() !== mediaUnavailableSource)
     ) {
-      const args8 = { mediaUnavailable: !![], mediaUnavailableSource: mediaUnavailableSource };
+      const args8 = { mediaUnavailable: true, mediaUnavailableSource: mediaUnavailableSource };
       (appStore['updateNodeData'](this['id'], args8), (this['_data'] = { ...args7, ...args8 }));
     }
     globalThis['window']?.['__runtimeCompareMark']?.('source-video-playback:hard-missing', {
@@ -1410,8 +1410,8 @@ export class SourceVideoNode {
   ['_isHardMissingPlaybackSource'](value74) {
     const enabled28 = String(this['_hardMissingPlaybackSource'] || '')['trim'](),
       enabled29 = String(value74 || '')['trim']();
-    if (!enabled28 || !enabled29) return ![];
-    if (enabled29 === enabled28) return !![];
+    if (!enabled28 || !enabled29) return false;
+    if (enabled29 === enabled28) return true;
     try {
       return (
         new URL(enabled29, globalThis['location']?.['href'] || globalThis['window']?.['location']?.['href'])[
@@ -1419,7 +1419,7 @@ export class SourceVideoNode {
         ] === enabled28
       );
     } catch {
-      return ![];
+      return false;
     }
   }
   ['_resolveVideoSrc'](value75) {
@@ -1428,9 +1428,9 @@ export class SourceVideoNode {
   ['_shouldDeferActivePlaybackSourceChange'](value76) {
     const value77 = String(value76 || '')['trim'](),
       value78 = String(this['_currentSrc'] || '')['trim']();
-    if (value77 === value78) return ![];
+    if (value77 === value78) return false;
     const el15 = this['_video'];
-    if (!el15 || el15['isConnected'] === ![] || el15['paused'] !== ![]) return ![];
+    if (!el15 || el15['isConnected'] === false || el15['paused'] !== false) return false;
     return !!(
       getVideoCurrentSource(el15) ||
       el15['dataset']?.['desktopMediaSourceUrl'] ||
@@ -1440,10 +1440,10 @@ export class SourceVideoNode {
   ['_setPendingPlaybackSource'](value79) {
     (this['_invalidatePendingPlaybackResume'](),
       (this['_pendingPlaybackSource'] = String(value79 || '')['trim']()),
-      (this['_hasPendingPlaybackSource'] = !![]));
+      (this['_hasPendingPlaybackSource'] = true));
   }
   ['_clearPendingPlaybackSource']() {
-    ((this['_pendingPlaybackSource'] = ''), (this['_hasPendingPlaybackSource'] = ![]));
+    ((this['_pendingPlaybackSource'] = ''), (this['_hasPendingPlaybackSource'] = false));
   }
   ['_invalidatePendingPlaybackResume']() {
     ((this['_playbackResumeGeneration'] = Number(this['_playbackResumeGeneration'] || 0) + 1),
@@ -1453,70 +1453,70 @@ export class SourceVideoNode {
     this['_invalidatePendingPlaybackResume']();
     const source2 = String(value80 || '')['trim'](),
       time = Number(value81);
-    if (!source2 || !Number['isFinite'](time) || time <= 0) return ![];
+    if (!source2 || !Number['isFinite'](time) || time <= 0) return false;
     return (
       (this['_pendingPlaybackResume'] = {
         generation: this['_playbackResumeGeneration'],
         source: source2,
         time: time,
       }),
-      !![]
+      true
     );
   }
   ['_applyPendingPlaybackResume'](enabled30 = this['_video']) {
     const enabled31 = this['_pendingPlaybackResume'];
-    if (!enabled31 || !enabled30 || enabled30 !== this['_video']) return ![];
+    if (!enabled31 || !enabled30 || enabled30 !== this['_video']) return false;
     if (enabled31['generation'] !== this['_playbackResumeGeneration'])
-      return ((this['_pendingPlaybackResume'] = null), ![]);
+      return ((this['_pendingPlaybackResume'] = null), false);
     const value82 = String(enabled31['source'] || '')['trim']();
     if (value82 !== String(this['_currentSrc'] || '')['trim']())
-      return (this['_invalidatePendingPlaybackResume'](), ![]);
+      return (this['_invalidatePendingPlaybackResume'](), false);
     if (Number(enabled30['readyState'] || 0) < 1 || !isMediaElementPlaybackSource(enabled30, value82))
-      return ![];
+      return false;
     const count4 = Number(enabled30['duration']);
-    if (!Number['isFinite'](count4) || count4 <= 0) return ![];
+    if (!Number['isFinite'](count4) || count4 <= 0) return false;
     const value83 = Number(enabled31['time']),
       value84 = Math['min'](Math['max'](0, value83), Math['max'](0, count4 - 0.05));
     try {
       enabled30['currentTime'] = value84;
     } catch {
-      return ![];
+      return false;
     }
     return (
       this['_pendingPlaybackResume'] === enabled31 &&
         enabled31['generation'] === this['_playbackResumeGeneration'] &&
         (this['_pendingPlaybackResume'] = null),
-      !![]
+      true
     );
   }
   ['_applyPendingPlaybackSourceAtBoundary']() {
     if (
-      this['_hasPendingPlaybackSource'] !== !![] ||
-      this['_rendererMediaDeferred'] === !![] ||
-      this['_video']?.['paused'] === ![]
+      this['_hasPendingPlaybackSource'] !== true ||
+      this['_rendererMediaDeferred'] === true ||
+      this['_video']?.['paused'] === false
     )
-      return ![];
+      return false;
     const value85 = appStore['getStateRaw']()['nodes']?.[this['id']] || this['_data'],
       value86 = String(this['_resolveVideoSrc'](value85) || '')['trim'](),
       value87 = Number(this['_video']?.['currentTime']),
       count5 = Number(this['_video']?.['duration']),
       enabled32 =
-        this['_video']?.['ended'] === !![] ||
+        this['_video']?.['ended'] === true ||
         (Number['isFinite'](value87) &&
           Number['isFinite'](count5) &&
           count5 > 0 &&
           value87 >= Math['max'](0, count5 - 0.05)),
       resumePlaybackTime2 = !enabled32 && this['_shouldKeepReadyCapturePreview'](value86) ? value87 : 0;
     this['_clearPendingPlaybackSource']();
-    if (value86 === String(this['_currentSrc'] || '')['trim']()) return ![];
+    if (value86 === String(this['_currentSrc'] || '')['trim']()) return false;
     return (
       (this['_data'] = value85),
       this['_loadVideo'](value86, {
-        forceCapturePreviewPromotion: !![],
+        forceCapturePreviewPromotion: true,
         ...(Number['isFinite'](resumePlaybackTime2) && resumePlaybackTime2 > 0 ? { resumePlaybackTime: resumePlaybackTime2 } : {}),
       }),
       this['_clearStoredCapturePreviewAfterSourcePromotion'](value86),
-      !![]
+      true
     );
   }
   ['_promotePendingProxyAtMediaSegmentBoundary'](value88 = null) {
@@ -1557,10 +1557,10 @@ export class SourceVideoNode {
   }
   ['_scheduleCanonicalAssetImportRetry'](value96, value97 = SOURCE_VIDEO_CANONICAL_IMPORT_RETRY_MS) {
     const enabled33 = String(value96 || '')['trim']();
-    if (!enabled33 || this['_canonicalAssetImportDisposed'] === !![]) return ![];
+    if (!enabled33 || this['_canonicalAssetImportDisposed'] === true) return false;
     this['_clearCanonicalAssetImportRetry']();
     const run4 = globalThis['window']?.['setTimeout'] || globalThis['setTimeout'];
-    if (typeof run4 !== 'function') return ![];
+    if (typeof run4 !== 'function') return false;
     const value98 = Number(this['_canonicalAssetImportRetryGeneration'] || 0) + 1;
     this['_canonicalAssetImportRetryGeneration'] = value98;
     const value99 = run4(
@@ -1568,7 +1568,7 @@ export class SourceVideoNode {
         this['_canonicalAssetImportRetryTimer'] === value99 &&
           (this['_canonicalAssetImportRetryTimer'] = null);
         if (
-          this['_canonicalAssetImportDisposed'] === !![] ||
+          this['_canonicalAssetImportDisposed'] === true ||
           Number(this['_canonicalAssetImportRetryGeneration'] || 0) !== value98
         )
           return;
@@ -1578,7 +1578,7 @@ export class SourceVideoNode {
       },
       Math['max'](0, Number(value97) || 0),
     );
-    return ((this['_canonicalAssetImportRetryTimer'] = value99), !![]);
+    return ((this['_canonicalAssetImportRetryTimer'] = value99), true);
   }
   ['_requestCanonicalAssetImport'](name2 = this['_data']) {
     if (!desktopBridge['isChromeShell']) return null;
@@ -1659,7 +1659,7 @@ export class SourceVideoNode {
             fileSize: Number(assetId['size'] || args11['fileSize'] || 0) || 0,
             fileName: assetId['filename'] || args11['fileName'] || name2['fileName'] || '',
             stagedUploadId: '',
-            canonicalImportPending: ![],
+            canonicalImportPending: false,
             canonicalImportStatus: 'succeeded',
             canonicalImportError: '',
           };
@@ -1678,7 +1678,7 @@ export class SourceVideoNode {
       ['catch']((error2) => {
         const args13 = appStore['getStateRaw']()['nodes']?.[this['id']];
         if (
-          this['_canonicalAssetImportDisposed'] === !![] ||
+          this['_canonicalAssetImportDisposed'] === true ||
           !args13 ||
           args13['assetId'] ||
           resolveSourceVideoMediaTaskSrc(args13) !== sourceVideoMediaTaskSrc
@@ -1686,7 +1686,7 @@ export class SourceVideoNode {
           return null;
         this['_canonicalAssetImportFailedAt'] = Date['now']();
         const args14 = {
-          canonicalImportPending: !![],
+          canonicalImportPending: true,
           canonicalImportStatus: 'failed',
           canonicalImportError: String(error2?.['message'] || error2 || ''),
         };
@@ -1718,9 +1718,9 @@ export class SourceVideoNode {
       !!String(enabled35['rhTaskId'] || enabled35['asyncTaskId'] || enabled35['dreaminaSubmitId'] || '')[
         'trim'
       ]() ||
-      enabled35['rhTaskRecovering'] === !![] ||
-      enabled35['asyncTaskRecovering'] === !![] ||
-      enabled35['dreaminaTaskRecovering'] === !![];
+      enabled35['rhTaskRecovering'] === true ||
+      enabled35['asyncTaskRecovering'] === true ||
+      enabled35['dreaminaTaskRecovering'] === true;
     if (value105) return;
     if (!enabled35['generationStartTime'] && enabled35['generationDuration'] == null) return;
     const enabled37 = appStore['getState']()['nodes']?.[this['id']];
@@ -1728,12 +1728,12 @@ export class SourceVideoNode {
     const value106 = {};
     if (enabled37['generationStartTime']) value106['generationStartTime'] = null;
     if (enabled37['generationDuration'] != null) value106['generationDuration'] = null;
-    if (enabled37['isGenerating'] === !![]) value106['isGenerating'] = ![];
+    if (enabled37['isGenerating'] === true) value106['isGenerating'] = false;
     Object['keys'](value106)['length'] > 0 && appStore['updateNodeData'](this['id'], value106);
   }
   ['_clearMediaUnavailableAfterPlayback'](value107) {
     const response2 = appStore['getState']()['nodes']?.[this['id']] || this['_data'] || null;
-    if (!response2 || response2['mediaUnavailable'] !== !![]) return;
+    if (!response2 || response2['mediaUnavailable'] !== true) return;
     const enabled38 = String(response2['mediaUnavailableSource'] || '')['trim']();
     if (!enabled38) return;
     const map = new Set(),
@@ -1759,7 +1759,7 @@ export class SourceVideoNode {
       value107,
     ]['forEach'](value108);
     if (!map['has'](enabled38)) return;
-    appStore['updateNodeData'](this['id'], { mediaUnavailable: ![], mediaUnavailableSource: '' });
+    appStore['updateNodeData'](this['id'], { mediaUnavailable: false, mediaUnavailableSource: '' });
   }
   ['_getCapturePreviewUrl'](value110 = this['_data']) {
     const value111 = String(value110?.['capturePreviewUrl'] || '')['trim']();
@@ -1789,25 +1789,25 @@ export class SourceVideoNode {
   ['_clearStoredCapturePreviewAfterSourcePromotion'](value117) {
     const enabled41 = String(value117 || '')['trim'](),
       enabled42 = this['_getCapturePreviewUrl'](this['_data']);
-    if (!enabled41 || !enabled42 || enabled41 === enabled42) return ![];
+    if (!enabled41 || !enabled42 || enabled41 === enabled42) return false;
     const args15 = appStore['getStateRaw']()['nodes']?.[this['id']];
-    if (!args15 || this['_getCapturePreviewUrl'](args15) !== enabled42) return ![];
+    if (!args15 || this['_getCapturePreviewUrl'](args15) !== enabled42) return false;
     return (
       appStore['updateNodeData'](this['id'], { capturePreviewUrl: '' }),
       (this['_data'] = { ...args15, capturePreviewUrl: '' }),
-      !![]
+      true
     );
   }
   ['_shouldKeepReadyCapturePreview'](value118) {
     const enabled43 = String(this['_activeCapturePreviewUrl'] || '')['trim'](),
       enabled44 = String(value118 || '')['trim']();
-    if (!enabled43 || !this['_video'] || Number(this['_video']['readyState'] || 0) < 2) return ![];
+    if (!enabled43 || !this['_video'] || Number(this['_video']['readyState'] || 0) < 2) return false;
     const videoCurrentSource = getVideoCurrentSource(this['_video']),
       enabled45 = this['_currentSrc'] === enabled43 || videoCurrentSource === enabled43;
-    if (!enabled45) return ![];
-    if (!enabled44) return this['_isUploading'] === !![];
-    if (enabled44 === enabled43 || /^(?:blob:|aic-local-preview:)/i['test'](enabled44)) return ![];
-    return !![];
+    if (!enabled45) return false;
+    if (!enabled44) return this['_isUploading'] === true;
+    if (enabled44 === enabled43 || /^(?:blob:|aic-local-preview:)/i['test'](enabled44)) return false;
+    return true;
   }
   ['_resolveVideoMetaSrc'](enabled46) {
     if (!enabled46) return '';
@@ -1882,7 +1882,7 @@ export class SourceVideoNode {
         try {
           const box4 = await fetchVideoMetaFromServer(videoMetaSrc);
           if (value127 !== this['_metaFetchToken']) return;
-          if (!box4 || box4['success'] !== !![]) return;
+          if (!box4 || box4['success'] !== true) return;
           const count6 = Number(box4['fps']),
             count7 = Number(box4['frameCount']),
             count8 = Number(box4['duration']),
@@ -1950,7 +1950,7 @@ export class SourceVideoNode {
         assetId: String(enabled52['assetId'] || ''),
       });
       if (value133 !== this['_thumbFetchToken']) return;
-      if (!response3 || response3['success'] === ![]) return;
+      if (!response3 || response3['success'] === false) return;
       const thumbUrl = String(response3['thumbUrl'] || response3['url'] || '')['trim']();
       if (!thumbUrl) return;
       const enabled54 = appStore['getState']()['nodes'][this['id']];
@@ -1975,15 +1975,15 @@ export class SourceVideoNode {
   }
   ['_getClipRange'](value135) {
     const end = Number(value135);
-    if (!Number['isFinite'](end) || end <= 0) return { active: ![], start: 0, end: 0 };
+    if (!Number['isFinite'](end) || end <= 0) return { active: false, start: 0, end: 0 };
     const value136 = Number(this['_data']?.['clipStart']),
       value137 = Number(this['_data']?.['clipEnd']);
     if (!Number['isFinite'](value136) || !Number['isFinite'](value137) || !(value137 > value136))
-      return { active: ![], start: 0, end: end };
+      return { active: false, start: 0, end: end };
     const start = Math['max'](0, Math['min'](end, value136)),
       end2 = Math['max'](0, Math['min'](end, value137));
-    if (!(end2 > start)) return { active: ![], start: 0, end: end };
-    return { active: !![], start: start, end: end2 };
+    if (!(end2 > start)) return { active: false, start: 0, end: end };
+    return { active: true, start: start, end: end2 };
   }
   ['_requestProgressFrame'](value138) {
     const value139 = globalThis['window']?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
@@ -2043,7 +2043,7 @@ export class SourceVideoNode {
   ['_shouldKeepHoverPlaybackOnManualClick']() {
     return shouldTakeOverActiveHoverPlayback(this, this['_video']);
   }
-  ['_toggleManualPlayback']({ loop: loop = ![], forcePlay: forcePlay = ![] } = {}) {
+  ['_toggleManualPlayback']({ loop: loop = false, forcePlay: forcePlay = false } = {}) {
     toggleSourceVideoManualPlayback(this, { loop: loop, forcePlay: forcePlay });
   }
   ['_getPlaybackLabel'](value149 = 'preview') {
@@ -2063,22 +2063,22 @@ export class SourceVideoNode {
       previewPlaybackUrl: getVideoCurrentSource(this['_video']),
       currentTime: Number(this['_video']?.['currentTime'] || 0),
       muted: !!this['_isMuted'],
-      loop: this['_isManualLoopPlayback'] === !![],
+      loop: this['_isManualLoopPlayback'] === true,
     });
   }
   async ['_ensurePlaybackVideoSrc']({
-    forPlayback: forPlayback = ![],
+    forPlayback: forPlayback = false,
     preload: preload = forPlayback ? 'auto' : SOURCE_VIDEO_POSTER_PRELOAD,
   } = {}) {
     const enabled58 = this['_ensureVideoElement']();
-    if (!enabled58) return ![];
+    if (!enabled58) return false;
     this['_applyPendingPlaybackSourceAtBoundary']();
     const sourceUrl2 = String(this['_currentSrc'] || this['_resolveVideoSrc'](this['_data']) || '')['trim']();
-    if (!sourceUrl2) return ![];
+    if (!sourceUrl2) return false;
     if (isMediaElementPlaybackSource(enabled58, sourceUrl2))
-      return (forPlayback && enabled58['preload'] !== preload && (enabled58['preload'] = preload), !![]);
+      return (forPlayback && enabled58['preload'] !== preload && (enabled58['preload'] = preload), true);
     if (this['_isHardMissingPlaybackSource'](sourceUrl2))
-      return (this['_applyHardMissingPlaybackState'](sourceUrl2, this['_hardMissingPlaybackStatus']), ![]);
+      return (this['_applyHardMissingPlaybackState'](sourceUrl2, this['_hardMissingPlaybackStatus']), false);
     if (this['_playbackSourcePromise'] && this['_playbackSourcePromiseSource'] === sourceUrl2)
       return this['_playbackSourcePromise'];
     const value150 = Number(this['_playbackSourceToken'] || 0),
@@ -2096,39 +2096,39 @@ export class SourceVideoNode {
               : String(response4?.['status'] || 'fallback');
         if (
           this['_currentSrc'] !== sourceUrl2 ||
-          this['_rendererMediaDeferred'] === !![] ||
+          this['_rendererMediaDeferred'] === true ||
           Number(this['_playbackSourceToken'] || 0) !== value150
         )
-          return ![];
+          return false;
         if (value152 === 'hard-missing')
-          return (this['_applyHardMissingPlaybackState'](sourceUrl2, response4?.['httpStatus']), ![]);
-        if (value152 === 'aborted') return ![];
+          return (this['_applyHardMissingPlaybackState'](sourceUrl2, response4?.['httpStatus']), false);
+        if (value152 === 'aborted') return false;
         globalThis['window']?.['__runtimeCompareMark']?.('source-video-playback:attach', {
           nodeId: this['id'],
           sourceUrl: sourceUrl2,
           playbackUrl: playbackUrl2,
         });
         const value153 = this['_rendererMediaSlotToken'];
-        let enabled59 = ![];
+        let enabled59 = false;
         const onSourceAssigned = () => {
             enabled59 = this['_armFirstVideoFramePresentation'](sourceUrl2, value153) || enabled59;
           },
           shouldAssign = () =>
             this['_video'] === enabled58 &&
             this['_currentSrc'] === sourceUrl2 &&
-            this['_rendererMediaDeferred'] !== !![] &&
+            this['_rendererMediaDeferred'] !== true &&
             Number(this['_playbackSourceToken'] || 0) === value150,
           attachMediaElementPlaybackSource2 = await attachMediaElementPlaybackSource(enabled58, sourceUrl2, {
             playbackUrl: playbackUrl2,
             preload: preload,
-            warmRanges: ![],
+            warmRanges: false,
             load: forPlayback || (!forPlayback && !isDesktopRenderer()),
             onSourceAssigned: onSourceAssigned,
             shouldAssign: shouldAssign,
           });
-        if (!attachMediaElementPlaybackSource2 || !shouldAssign()) return ![];
+        if (!attachMediaElementPlaybackSource2 || !shouldAssign()) return false;
         if (!enabled59) onSourceAssigned();
-        return !![];
+        return true;
       })();
     ((this['_playbackSourcePromise'] = value151), (this['_playbackSourcePromiseSource'] = sourceUrl2));
     try {
@@ -2145,7 +2145,7 @@ export class SourceVideoNode {
       label: this['_getPlaybackLabel'](preload2),
       ensureSrc: () =>
         this['_ensurePlaybackVideoSrc']({
-          forPlayback: !![],
+          forPlayback: true,
           preload: preload2 === 'hover' ? 'metadata' : 'auto',
         }),
       minBufferAhead: minBufferAhead ? 0.5 : undefined,
@@ -2153,7 +2153,7 @@ export class SourceVideoNode {
       recoveryDebounceMs: minBufferAhead ? 150 : undefined,
       recoveryCooldownMs: minBufferAhead ? 500 : undefined,
       shouldRecover: () =>
-        this['_video']?.['isConnected'] !== ![] &&
+        this['_video']?.['isConnected'] !== false &&
         (this['_isHovered'] || this['_isManualControl'] || !this['_video']?.['paused']),
     });
   }
@@ -2163,7 +2163,7 @@ export class SourceVideoNode {
   ['_loadVideo'](
     value156,
     {
-      forceCapturePreviewPromotion: forceCapturePreviewPromotion = ![],
+      forceCapturePreviewPromotion: forceCapturePreviewPromotion = false,
       resumePlaybackTime: resumePlaybackTime = null,
     } = {},
   ) {
@@ -2174,31 +2174,31 @@ export class SourceVideoNode {
       (clearSourceVideoPlaybackFeedback(this),
       (this['_playbackSourceToken'] = Number(this['_playbackSourceToken'] || 0) + 1));
     const enabled61 =
-      forceCapturePreviewPromotion === !![] ||
+      forceCapturePreviewPromotion === true ||
       (resolveGenerationUiState(this['_data']) === 'success' &&
-        this['_card']?.['classList']?.['contains']?.('img-preview-loading') === !![]);
-    if (forceCapturePreviewPromotion !== !![] && this['_shouldKeepReadyCapturePreview'](enabled60)) {
+        this['_card']?.['classList']?.['contains']?.('img-preview-loading') === true);
+    if (forceCapturePreviewPromotion !== true && this['_shouldKeepReadyCapturePreview'](enabled60)) {
       (this['_prepareRendererMediaSlotSource'](enabled60),
         this['_applyVideoPoster'](this['_data']),
         stopLoading(this['_card']),
         this['_syncVideoElementFrameVisibility']());
       return;
     }
-    if (this['_rendererMediaDeferred'] === !![]) {
+    if (this['_rendererMediaDeferred'] === true) {
       const value158 = enabled60 !== String(this['_currentSrc'] || '')['trim']();
       ((this['_currentSrc'] = enabled60),
         this['_prepareRendererMediaSlotSource'](enabled60),
         this['_applyVideoPoster'](this['_data'], { restoreNativePoster: !!enabled60 && value158 }));
       return;
     }
-    this['_setManualLoopPlayback'](![]);
+    this['_setManualLoopPlayback'](false);
     const value159 = enabled60 !== String(this['_currentSrc'] || '')['trim'](),
       enabled62 = this['_applyVideoPoster'](this['_data'], { restoreNativePoster: !!enabled60 && value159 });
     if (!enabled60) {
       ((this['_currentSrc'] = ''),
         this['_prepareRendererMediaSlotSource'](''),
-        this['_setRendererPlaybackPin'](![]));
-      const shouldShowGenerationResultLoadingUi2 = shouldShowGenerationResultLoadingUi(this['_data'], { hasResult: ![] });
+        this['_setRendererPlaybackPin'](false));
+      const shouldShowGenerationResultLoadingUi2 = shouldShowGenerationResultLoadingUi(this['_data'], { hasResult: false });
       this['_idleVideoThumbCancel'] &&
         (this['_idleVideoThumbCancel'](), (this['_idleVideoThumbCancel'] = null));
       ((this['_loadVideoToken'] = null), this['_releaseActiveCapturePreviewUrl']());
@@ -2206,12 +2206,12 @@ export class SourceVideoNode {
         ((this['_video']['onloadeddata'] = null),
         (this['_video']['onerror'] = null),
         (this['_video']['preload'] = 'none'),
-        this['_clearVideoElementSource']({ invalidateRendererSlot: ![] }),
+        this['_clearVideoElementSource']({ invalidateRendererSlot: false }),
         (this['_video']['style']['display'] = 'none'));
       this['_setPosterFrameVisible'](shouldShowGenerationResultLoadingUi2 && !!enabled62);
       shouldShowGenerationResultLoadingUi2 ? startLoading(this['_card'], { variant: 'full' }) : stopLoading(this['_card']);
       if (this['_hint']) this['_hint']['style']['display'] = shouldShowGenerationResultLoadingUi2 ? 'none' : 'block';
-      this['_syncPlaybackChromeVisibility']({ forceHidden: !![] });
+      this['_syncPlaybackChromeVisibility']({ forceHidden: true });
       if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = shouldShowGenerationResultLoadingUi2;
       return;
     }
@@ -2230,22 +2230,22 @@ export class SourceVideoNode {
         const videoCurrentSource2 = getVideoCurrentSource(this['_video']);
         (videoCurrentSource2 &&
           !isMediaElementPlaybackSource(this['_video'], enabled60) &&
-          this['_clearVideoElementSource']({ load: ![], invalidateRendererSlot: ![] }),
+          this['_clearVideoElementSource']({ load: false, invalidateRendererSlot: false }),
           (this['_video']['preload'] = 'none'),
           this['_syncVideoElementFrameVisibility']({ forceHidden: !enabled63 }));
       }
       this['_syncVideoDurationUi']();
-      if (!enabled61 || this['_card']?.['classList']?.['contains']?.('img-preview-loading') !== !![])
+      if (!enabled61 || this['_card']?.['classList']?.['contains']?.('img-preview-loading') !== true)
         stopLoading(this['_card']);
-      (this['_syncPosterFrameVisibility'](enabled63 ? {} : { force: !![] }),
+      (this['_syncPosterFrameVisibility'](enabled63 ? {} : { force: true }),
         this['_syncPlaybackChromeVisibility']());
       if (this['_hint']) this['_hint']['style']['display'] = 'block';
       if (!enabled61) return;
     }
-    let value161 = ![];
+    let value161 = false;
     const run5 = () => {
       if (value161 || this['_currentSrc'] !== enabled60) return;
-      ((value161 = !![]), this['_clearMediaUnavailableAfterPlayback'](enabled60));
+      ((value161 = true), this['_clearMediaUnavailableAfterPlayback'](enabled60));
       this['_activeCapturePreviewUrl'] &&
         this['_activeCapturePreviewUrl'] !== enabled60 &&
         this['_releaseActiveCapturePreviewUrl']();
@@ -2290,8 +2290,8 @@ export class SourceVideoNode {
       (el16['style']['display'] = 'block'),
       this['_syncVideoElementFrameVisibility']());
     enabled62
-      ? (this['_syncPosterFrameVisibility']({ force: !![] }), this['_syncPlaybackChromeVisibility']())
-      : (this['_setPosterFrameVisible'](![]), this['_syncPlaybackChromeVisibility']({ forceHidden: !![] }));
+      ? (this['_syncPosterFrameVisibility']({ force: true }), this['_syncPlaybackChromeVisibility']())
+      : (this['_setPosterFrameVisible'](false), this['_syncPlaybackChromeVisibility']({ forceHidden: true }));
     const value163 = {};
     this['_loadVideoToken'] = value163;
     const run6 = () => {
@@ -2309,7 +2309,7 @@ export class SourceVideoNode {
       }
       if (!enabled62) {
         const value164 = this['_rendererMediaSlotToken'];
-        let enabled64 = ![];
+        let enabled64 = false;
         const onSourceAssigned2 = () => {
             enabled64 = this['_armFirstVideoFramePresentation'](enabled60, value164) || enabled64;
           },
@@ -2319,12 +2319,12 @@ export class SourceVideoNode {
             this['_video'] === value166 &&
             this['_loadVideoToken'] === value163 &&
             this['_currentSrc'] === enabled60 &&
-            this['_rendererMediaDeferred'] !== !![] &&
+            this['_rendererMediaDeferred'] !== true &&
             Number(this['_playbackSourceToken'] || 0) === value165;
         void attachMediaElementPlaybackSource(value166, enabled60, {
           preload: 'auto',
-          warmRanges: ![],
-          load: !![],
+          warmRanges: false,
+          load: true,
           onSourceAssigned: onSourceAssigned2,
           shouldAssign: shouldAssign2,
         })
@@ -2342,7 +2342,7 @@ export class SourceVideoNode {
           });
         return;
       }
-      void this['_ensurePlaybackVideoSrc']({ forPlayback: !![] })
+      void this['_ensurePlaybackVideoSrc']({ forPlayback: true })
         ['then'](() => {
           this['_video'] &&
             this['_loadVideoToken'] === value163 &&
@@ -2490,45 +2490,45 @@ export class SourceVideoNode {
     return Math['max'](0, Date['now']() - count16);
   }
   ['_isRunningHubRecoverableTask'](enabled71 = this['_data']) {
-    if (!enabled71 || typeof enabled71 !== 'object') return ![];
+    if (!enabled71 || typeof enabled71 !== 'object') return false;
     const enabled72 = String(enabled71['rhTaskId'] || '')['trim']();
-    if (!enabled72) return ![];
+    if (!enabled72) return false;
     const value175 = String(enabled71['rhTaskStatus'] || '')
       ['trim']()
       ['toLowerCase']();
-    if (['success', 'failed', 'idle', 'cancelled']['includes'](value175)) return ![];
+    if (['success', 'failed', 'idle', 'cancelled']['includes'](value175)) return false;
     return isRunningHubVideoTask(enabled71);
   }
   ['_syncRunningHubVideoTaskState'](enabled73 = this['_data']) {
-    if (!enabled73 || typeof enabled73 !== 'object') return ![];
+    if (!enabled73 || typeof enabled73 !== 'object') return false;
     const runningHubVideoTerminalStatePatch = buildRunningHubVideoTerminalStatePatch(
       enabled73,
       enabled73['rhTaskStatus'],
       this['_computeGenerationDuration'](enabled73),
     );
-    if (!runningHubVideoTerminalStatePatch) return ![];
-    return (appStore['updateNodeData'](this['id'], runningHubVideoTerminalStatePatch), !![]);
+    if (!runningHubVideoTerminalStatePatch) return false;
+    return (appStore['updateNodeData'](this['id'], runningHubVideoTerminalStatePatch), true);
   }
   ['_isAsyncRecoverableTask'](enabled74 = this['_data']) {
-    if (!enabled74 || typeof enabled74 !== 'object') return ![];
+    if (!enabled74 || typeof enabled74 !== 'object') return false;
     const enabled75 = String(enabled74['asyncTaskId'] || '')['trim']();
-    if (!enabled75) return ![];
+    if (!enabled75) return false;
     const enabled76 = String(enabled74['asyncTaskProvider'] || enabled74['provider'] || '')
       ['trim']()
       ['toLowerCase']();
     if (!enabled76 || enabled76 === 'runninghubwf' || enabled76 === 'runninghub' || enabled76 === 'dreamina')
-      return ![];
+      return false;
     const value176 = String(enabled74['asyncTaskKind'] || '')
       ['trim']()
       ['toLowerCase']();
-    if (value176 && value176 !== 'video') return ![];
+    if (value176 && value176 !== 'video') return false;
     const value177 = String(enabled74['asyncTaskStatus'] || '')
       ['trim']()
       ['toLowerCase']();
-    if (['success', 'failed', 'idle', 'cancelled']['includes'](value177)) return ![];
-    return !![];
+    if (['success', 'failed', 'idle', 'cancelled']['includes'](value177)) return false;
+    return true;
   }
-  ['_stopRunningHubRecovery'](enabled77 = !![]) {
+  ['_stopRunningHubRecovery'](enabled77 = true) {
     try {
       this['_rhResumeAbortController']?.['abort']?.();
     } catch {}
@@ -2537,10 +2537,10 @@ export class SourceVideoNode {
       (this['_rhResumeTaskId'] = ''));
     if (!enabled77) return;
     const enabled78 = appStore['getStateRaw']()['nodes']?.[this['id']];
-    if (!enabled78 || enabled78['rhTaskRecovering'] !== !![]) return;
-    appStore['updateNodeData'](this['id'], { rhTaskRecovering: ![] });
+    if (!enabled78 || enabled78['rhTaskRecovering'] !== true) return;
+    appStore['updateNodeData'](this['id'], { rhTaskRecovering: false });
   }
-  ['_stopAsyncRecovery'](enabled79 = !![]) {
+  ['_stopAsyncRecovery'](enabled79 = true) {
     try {
       this['_asyncResumeAbortController']?.['abort']?.();
     } catch {}
@@ -2549,8 +2549,8 @@ export class SourceVideoNode {
       (this['_asyncResumeTaskId'] = ''));
     if (!enabled79) return;
     const enabled80 = appStore['getStateRaw']()['nodes']?.[this['id']];
-    if (!enabled80 || enabled80['asyncTaskRecovering'] !== !![]) return;
-    appStore['updateNodeData'](this['id'], { asyncTaskRecovering: ![] });
+    if (!enabled80 || enabled80['asyncTaskRecovering'] !== true) return;
+    appStore['updateNodeData'](this['id'], { asyncTaskRecovering: false });
   }
   ['_extractFirstVideoUrl'](value178) {
     const map2 = new Set(),
@@ -2659,7 +2659,7 @@ export class SourceVideoNode {
   ['_maybeResumeRunningHubTask']() {
     const value192 = appStore['getStateRaw']()['nodes']?.[this['id']] || this['_data'];
     if (!this['_isRunningHubRecoverableTask'](value192)) {
-      this['_stopRunningHubRecovery'](!![]);
+      this['_stopRunningHubRecovery'](true);
       return;
     }
     const taskId = String(value192?.['rhTaskId'] || '')['trim']();
@@ -2670,7 +2670,7 @@ export class SourceVideoNode {
       value193 = String(value192?.['model'] || '')
         ['trim']()
         ['toLowerCase'](),
-      rhTaskUseOpenapiQuery = value192?.['rhTaskUseOpenapiQuery'] === !![],
+      rhTaskUseOpenapiQuery = value192?.['rhTaskUseOpenapiQuery'] === true,
       videoMattingModelId = getVideoMattingModelId(),
       provider = value193 === videoMattingModelId,
       providerProfileId = String(
@@ -2707,9 +2707,9 @@ export class SourceVideoNode {
               'runninghub.source-video.' + (provider2['model'] || value192?.['model'] || 'workflow'),
             payload: provider2,
             taskId: taskId,
-            cancellable: ![],
-            resumable: !![],
-            pauseOnAbort: !![],
+            cancellable: false,
+            resumable: true,
+            pauseOnAbort: true,
             startBuilder: () => ({
               rhTaskStatus:
                 String(value192?.['rhTaskStatus'] || '')
@@ -2810,11 +2810,11 @@ export class SourceVideoNode {
             duration: duration2['generationDuration'] ?? this['_computeGenerationDuration'](enabled82),
           }),
           ...duration2,
-          isGenerating: ![],
+          isGenerating: false,
           generationDuration:
             duration2['generationDuration'] ?? this['_computeGenerationDuration'](enabled82),
           rhTaskStatus: 'failed',
-          rhTaskRecovering: ![],
+          rhTaskRecovering: false,
         });
       } finally {
         (this['_rhResumeAbortController'] === signal3 && (this['_rhResumeAbortController'] = null),
@@ -2827,7 +2827,7 @@ export class SourceVideoNode {
   ['_maybeResumeAsyncTask']() {
     const value197 = appStore['getStateRaw']()['nodes']?.[this['id']] || this['_data'];
     if (!this['_isAsyncRecoverableTask'](value197)) {
-      this['_stopAsyncRecovery'](!![]);
+      this['_stopAsyncRecovery'](true);
       return;
     }
     const taskId2 = String(value197?.['asyncTaskId'] || '')['trim']();
@@ -2862,10 +2862,10 @@ export class SourceVideoNode {
             executionId: (provider3 || modelId['provider'] || 'model') + '.source-video.async',
             payload: modelId,
             taskId: taskId2,
-            async: !![],
-            cancellable: ![],
-            resumable: !![],
-            pauseOnAbort: !![],
+            async: true,
+            cancellable: false,
+            resumable: true,
+            pauseOnAbort: true,
             startBuilder: () => ({
               asyncTaskProvider: provider3,
               asyncTaskKind: 'video',
@@ -2926,9 +2926,9 @@ export class SourceVideoNode {
             startedAt: startedAt3,
             duration: this['_computeGenerationDuration'](enabled83),
           }),
-          isGenerating: ![],
+          isGenerating: false,
           asyncTaskStatus: 'failed',
-          asyncTaskRecovering: ![],
+          asyncTaskRecovering: false,
         });
       } finally {
         (this['_asyncResumeAbortController'] === signal4 && (this['_asyncResumeAbortController'] = null),
@@ -2953,27 +2953,27 @@ export class SourceVideoNode {
     if (shouldShowGenerationResultLoadingUi3) {
       startLoading(this['_card'], { variant: 'full' });
       if (this['_hint']) this['_hint']['style']['display'] = 'none';
-      if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = !![];
+      if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = true;
     } else {
       if (isTaskTerminal(error15)) {
         if (!enabled84) stopLoading(this['_card']);
-        if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = ![];
+        if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = false;
       } else {
-        if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = ![];
+        if (this['_uploadBtn']) this['_uploadBtn']['disabled'] = false;
         if (!enabled84) stopLoading(this['_card']);
       }
     }
     videoNodeUpdatePerf?.['mark']('loading-ui');
     const sourceVideoPosterSrc2 = resolveSourceVideoPosterSrc(error15),
       value201 = sourceVideoPosterSrc2 !== this['_lastPosterSrc'];
-    if (this['_rendererMediaDeferred'] === !![]) {
+    if (this['_rendererMediaDeferred'] === true) {
       this['_currentSrc'] = enabled84 || '';
       this['_video'] &&
-        ((this['_video']['preload'] = 'none'), this['_clearVideoElementSource']({ load: ![] }));
+        ((this['_video']['preload'] = 'none'), this['_clearVideoElementSource']({ load: false }));
       if (value201 || sourceVideoPosterSrc2) this['_applyVideoPoster'](error15);
-      else this['_setPosterFrameVisible'](![]);
+      else this['_setPosterFrameVisible'](false);
       videoNodeUpdatePerf?.['mark']('deferred-poster');
-      this['_rendererDetailsDeferred'] !== !![] &&
+      this['_rendererDetailsDeferred'] !== true &&
         hasSourceVideoRecoveryWork(error15) &&
         (this['_maybeResumeRunningHubTask'](), this['_maybeResumeAsyncTask']());
       videoNodeUpdatePerf?.['mark']('deferred-task-resume');
@@ -2993,7 +2993,7 @@ export class SourceVideoNode {
         enabled85 &&
         (this['_shouldDeferActivePlaybackSourceChange'](enabled84) ||
           this['_shouldKeepReadyCapturePreview'](enabled84));
-    !enabled85 && this['_hasPendingPlaybackSource'] === !![] && this['_clearPendingPlaybackSource']();
+    !enabled85 && this['_hasPendingPlaybackSource'] === true && this['_clearPendingPlaybackSource']();
     if (value202) this['_setPendingPlaybackSource'](enabled84);
     else {
       if (enabled85) (this['_clearPendingPlaybackSource'](), this['_loadVideo'](enabled84 || ''));
@@ -3026,18 +3026,18 @@ export class SourceVideoNode {
   }
   ['unmount']() {
     (clearSourceVideoPlaybackFeedback(this),
-      (this['_canonicalAssetImportDisposed'] = !![]),
+      (this['_canonicalAssetImportDisposed'] = true),
       this['_progressDragSession']?.['dispose']?.(),
       (this['_progressDragSession'] = null));
     if (this['_bar']?.['dataset']) this['_bar']['dataset']['dragging'] = 'false';
-    ((this['_isSeeking'] = ![]),
+    ((this['_isSeeking'] = false),
       (this['_seekToken'] = Number(this['_seekToken'] || 0) + 1),
       this['_invalidateCanonicalAssetImportRetry'](),
       this['_clearPendingPlaybackSource'](),
       this['_invalidatePendingPlaybackResume'](),
       (this['_metaFetchToken'] = Number(this['_metaFetchToken'] || 0) + 1),
       (this['_playbackSourceToken'] = Number(this['_playbackSourceToken'] || 0) + 1),
-      this['_setRendererPlaybackPin'](![]),
+      this['_setRendererPlaybackPin'](false),
       this['_hoverPlaybackLifecycle']?.['dispose']?.(),
       this['_unsubscribeLocale']?.(),
       (this['_unsubscribeLocale'] = null),
@@ -3053,40 +3053,40 @@ export class SourceVideoNode {
         (this['_idleVideoThumbCancel'](), (this['_idleVideoThumbCancel'] = null)),
       this['_cancelDeferredVideoMetaFetch'](),
       this['_releaseActiveCapturePreviewUrl'](),
-      this['_stopRunningHubRecovery'](![]),
-      this['_stopAsyncRecovery'](![]),
+      this['_stopRunningHubRecovery'](false),
+      this['_stopAsyncRecovery'](false),
       this['_centerIndicatorTimer'] &&
         (clearTimeout(this['_centerIndicatorTimer']), (this['_centerIndicatorTimer'] = null)),
       this['_video'] &&
-        (this['_setManualLoopPlayback'](![]),
+        (this['_setManualLoopPlayback'](false),
         detachVideoPlaybackRecovery(this['_video']),
         this['_video']['pause'](),
         (this['_video']['src'] = '')),
       this['_releasePlaybackObjectUrl']());
   }
   ['prepareRendererVisibleVideoPreview']() {
-    return ((this['_rendererEagerVideoPreview'] = ![]), this['_rendererMediaDeferred'] === !![]);
+    return ((this['_rendererEagerVideoPreview'] = false), this['_rendererMediaDeferred'] === true);
   }
   ['prepareRendererMediaFallbackForSuspend']() {
     const enabled86 = String(this['_lastPosterSrc'] || '')['trim']();
-    if (!enabled86 || !this['_posterFrame']) return ![];
+    if (!enabled86 || !this['_posterFrame']) return false;
     this['_posterFrame']['loading'] = 'eager';
     try {
       this['_posterFrame']['fetchPriority'] = 'high';
     } catch {}
     this['_applyPosterFrameSource'](enabled86);
     const value203 =
-      this['_posterFrame']['isConnected'] !== ![] &&
-      this['_posterFrame']['complete'] === !![] &&
+      this['_posterFrame']['isConnected'] !== false &&
+      this['_posterFrame']['complete'] === true &&
       Number(this['_posterFrame']['naturalWidth'] || 0) > 0;
-    if (value203) this['_setPosterFrameVisible'](!![]);
+    if (value203) this['_setPosterFrameVisible'](true);
     return value203;
   }
   ['suspendRendererMedia']() {
     (clearSourceVideoPlaybackFeedback(this),
-      this['_setRendererPlaybackPin'](![]),
-      (this['_rendererMediaDeferred'] = !![]),
-      (this['_rendererEagerVideoPreview'] = ![]),
+      this['_setRendererPlaybackPin'](false),
+      (this['_rendererMediaDeferred'] = true),
+      (this['_rendererEagerVideoPreview'] = false),
       (this['_playbackSourceToken'] = Number(this['_playbackSourceToken'] || 0) + 1),
       (this['_playbackSourcePromise'] = null),
       this['_clearPendingPlaybackSource'](),
@@ -3094,9 +3094,9 @@ export class SourceVideoNode {
       (this['_playbackSourcePromiseSource'] = ''),
       (this['_loadVideoToken'] = null),
       (this['_currentSrc'] = null),
-      (this['_isHovered'] = ![]),
-      (this['_isManualControl'] = ![]),
-      (this['_hoverManualPause'] = ![]),
+      (this['_isHovered'] = false),
+      (this['_isManualControl'] = false),
+      (this['_hoverManualPause'] = false),
       (this['_autoPlayToken'] += 1));
     if (this['_video']) {
       ((this['_video']['onloadeddata'] = null),
@@ -3107,12 +3107,12 @@ export class SourceVideoNode {
       } catch {}
       (this['_clearVideoElementSource'](), this['_syncPosterFrameVisibility']());
     } else this['_releasePlaybackObjectUrl']();
-    this['_syncPlaybackChromeVisibility']({ forceHidden: !![] });
+    this['_syncPlaybackChromeVisibility']({ forceHidden: true });
   }
   ['hydrateDeferredMedia']() {
-    if (this['_rendererMediaDeferred'] !== !![]) return;
-    ((this['_rendererMediaDeferred'] = ![]),
-      (this['_rendererEagerVideoPreview'] = ![]),
+    if (this['_rendererMediaDeferred'] !== true) return;
+    ((this['_rendererMediaDeferred'] = false),
+      (this['_rendererEagerVideoPreview'] = false),
       this['_bindVideoInteractionHandlers'](),
       this['_ensureVideoToolbarBound']());
     const value204 = this['_promotePendingProxyAtMediaSegmentBoundary'](

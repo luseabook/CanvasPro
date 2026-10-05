@@ -49,18 +49,18 @@ export async function runStoryAssetExtractionToCompletion({
   execute: execute,
   initialResumeDraft: initialResumeDraft = null,
   onContinuation: onContinuation = null,
-  isActive: isActive = () => !![],
+  isActive: isActive = () => true,
 } = {}) {
   if (typeof execute !== 'function') throw new TypeError('素材提取自动续跑缺少 execute 函数。');
   let target = initialResumeDraft,
     storyAssetExtractionProgressKey = createStoryAssetExtractionProgressKey(target);
-  while (!![]) {
+  while (true) {
     if (!isActive())
       throw createExtractionRunnerError('ASSET_EXTRACTION_ABORTED', '素材提取所属项目已切换或任务已结束。');
     try {
       return await execute(target);
     } catch (source) {
-      if (source?.['type'] !== 'ASSET_EXTRACTION_CONTINUE_REQUIRED' || source?.['isContinuation'] !== !![])
+      if (source?.['type'] !== 'ASSET_EXTRACTION_CONTINUE_REQUIRED' || source?.['isContinuation'] !== true)
         throw source;
       const next = source?.['assetExtractionDraft'],
         storyAssetExtractionProgressKey2 = createStoryAssetExtractionProgressKey(next);

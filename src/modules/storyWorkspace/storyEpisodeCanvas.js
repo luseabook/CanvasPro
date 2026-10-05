@@ -49,7 +49,7 @@ export function buildStoryClipCanvasNodeData({
     storyWorkspaceInputs: { ...asObject(clip['inputs']) },
     videos: items,
     mainVideoIndex: activeIndex,
-    isVideosExpanded: ![],
+    isVideosExpanded: false,
     videoUrl: normalizeText(key['videoUrl']),
     localPath: normalizeText(key['localPath']),
     displayLocalPath: normalizeText(key['displayLocalPath']),
@@ -72,22 +72,22 @@ export function clearDeletedStoryCanvasBindings(
   enabled = {},
   { canvasId: canvasId = '', nodes: nodes = [] } = {},
 ) {
-  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled)) return ![];
+  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled)) return false;
   const map = new Set(
     (Array['isArray'](nodes) ? nodes : [])
       ['map']((index) => normalizeText(index?.['id'] || index))
       ['filter'](Boolean),
   );
-  if (!map['size']) return ![];
+  if (!map['size']) return false;
   const text = normalizeText(canvasId),
     handler = (result) => !text || !normalizeText(result) || normalizeText(result) === text;
-  let data = ![];
+  let data = false;
   const args = asObject(enabled['project']?.['canvasBinding']);
   if (handler(args['canvasId']) && args['nodes']) {
     const nodes2 = { ...asObject(args['nodes']) };
     for (const [target, source] of Object['entries'](nodes2)) {
       if (!map['has'](normalizeText(source))) continue;
-      (delete nodes2[target], (data = !![]));
+      (delete nodes2[target], (data = true));
     }
     if (data) enabled['project']['canvasBinding'] = { ...args, nodes: nodes2 };
   }
@@ -97,14 +97,14 @@ export function clearDeletedStoryCanvasBindings(
     for (const current of Array['isArray'](next?.['clips']) ? next['clips'] : []) {
       const asObject3 = asObject(current?.['canvasBinding']);
       if (!map['has'](normalizeText(asObject3['nodeId']))) continue;
-      (delete current['canvasBinding'], (data = !![]));
+      (delete current['canvasBinding'], (data = true));
     }
   }
   if (Array['isArray'](enabled['clipFrames'])) {
     const list = enabled['clipFrames']['filter'](
       (entry) => !map['has'](normalizeText(entry?.['canvasNodeId'])) || !handler(entry?.['canvasId']),
     );
-    list['length'] !== enabled['clipFrames']['length'] && ((enabled['clipFrames'] = list), (data = !![]));
+    list['length'] !== enabled['clipFrames']['length'] && ((enabled['clipFrames'] = list), (data = true));
   }
   return data;
 }
@@ -132,7 +132,7 @@ export function createStoryEpisodeCanvasAdapter({
   return {
     canvasExists(payload) {
       const text3 = normalizeText(payload);
-      if (!text3) return ![];
+      if (!text3) return false;
       const handle = canvasTabManager['getMultiDataSnapshot']?.() || {};
       return Array['isArray'](handle['canvases'])
         ? handle['canvases']['some']((state) => normalizeText(state?.['id']) === text3)
@@ -140,10 +140,10 @@ export function createStoryEpisodeCanvasAdapter({
     },
     async switchCanvas(config) {
       const text4 = normalizeText(config);
-      if (!text4) return ![];
-      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text4) return !![];
-      if (typeof canvasTabManager['switchTo'] !== 'function') return ![];
-      return (await canvasTabManager['switchTo'](text4)) !== ![];
+      if (!text4) return false;
+      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text4) return true;
+      if (typeof canvasTabManager['switchTo'] !== 'function') return false;
+      return (await canvasTabManager['switchTo'](text4)) !== false;
     },
     async createCanvas(scope) {
       await canvasTabManager['addCanvas']();
@@ -164,7 +164,7 @@ export function createStoryEpisodeCanvasAdapter({
           Number(box['width'] || 1024),
           Number(box['height'] || 576),
           error['name'],
-          { placement: 'viewport-center-sequence', sequenceKey: sequenceKey, skipCommit: !![] },
+          { placement: 'viewport-center-sequence', sequenceKey: sequenceKey, skipCommit: true },
         );
       if (!type2?.['id']) throw new Error('创建分集视频节点失败');
       const { type: type3, ...args2 } = error;
@@ -180,30 +180,30 @@ export function createStoryEpisodeCanvasAdapter({
       return (updateNodeData(id2, args3), run(id2) || { id: id2, type: type4 || 'ai-video', ...args3 });
     },
     deleteNodes(list2 = []) {
-      if (typeof deleteNodes2 !== 'function') return ![];
+      if (typeof deleteNodes2 !== 'function') return false;
       const list3 = (Array['isArray'](list2) ? list2 : [])
         ['map'](normalizeText)
         ['filter']((value5) => value5 && run(value5));
-      if (!list3['length']) return !![];
-      return (deleteNodes2([...new Set(list3)]), !![]);
+      if (!list3['length']) return true;
+      return (deleteNodes2([...new Set(list3)]), true);
     },
     createMutationSnapshot() {
       if (typeof getGraphSnapshot !== 'function') return null;
       return getGraphSnapshot();
     },
     restoreMutationSnapshot(enabled2) {
-      if (!enabled2 || typeof restoreGraphSnapshot !== 'function') return ![];
-      return restoreGraphSnapshot(enabled2) !== ![];
+      if (!enabled2 || typeof restoreGraphSnapshot !== 'function') return false;
+      return restoreGraphSnapshot(enabled2) !== false;
     },
     async deleteCanvas(value6) {
       const text6 = normalizeText(value6);
-      if (!text6 || typeof canvasTabManager?.['deleteCanvas'] !== 'function') return ![];
-      return (await canvasTabManager['deleteCanvas'](text6, { skipDirtyConfirm: !![] })) !== ![];
+      if (!text6 || typeof canvasTabManager?.['deleteCanvas'] !== 'function') return false;
+      return (await canvasTabManager['deleteCanvas'](text6, { skipDirtyConfirm: true })) !== false;
     },
     focusNodes(list4, value7 = {}) {
-      if (typeof focusNodes2 !== 'function') return ![];
+      if (typeof focusNodes2 !== 'function') return false;
       const list5 = Array['isArray'](list4) ? list4['map'](normalizeText)['filter'](Boolean) : [];
-      if (!list5['length']) return ![];
+      if (!list5['length']) return false;
       return focusNodes2(list5, value7['padding'], value7['durationMs'], value7);
     },
     commit: commit,
@@ -212,18 +212,18 @@ export function createStoryEpisodeCanvasAdapter({
 async function rollbackStoryEpisodeCanvasMutation({
   adapter: adapter,
   canvasId: canvasId = '',
-  reused: reused = ![],
+  reused: reused = false,
   mutationSnapshot: mutationSnapshot,
 } = {}) {
   if (!reused && typeof adapter?.['deleteCanvas'] === 'function')
     try {
-      if ((await adapter['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] })) !== ![]) return !![];
+      if ((await adapter['deleteCanvas'](canvasId, { skipDirtyConfirm: true })) !== false) return true;
     } catch {}
   if (mutationSnapshot && typeof adapter?.['restoreMutationSnapshot'] === 'function')
     try {
-      return (await adapter['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== ![];
+      return (await adapter['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== false;
     } catch {}
-  return ![];
+  return false;
 }
 export async function createStoryEpisodeCanvas({
   project: project = {},
@@ -286,7 +286,7 @@ export async function createStoryEpisodeCanvas({
   let canvasId2 = '';
   if (value10) {
     const value11 = await adapter2['switchCanvas']?.(text7);
-    if (value11 === ![]) throw new Error('无法切换到已绑定的项目画布：' + text7);
+    if (value11 === false) throw new Error('无法切换到已绑定的项目画布：' + text7);
     canvasId2 = text7;
   } else canvasId2 = await adapter2['createCanvas'](canvasName);
   const sequenceKey2 =
@@ -322,7 +322,7 @@ export async function createStoryEpisodeCanvas({
         if (typeof adapter2['deleteNodes'] !== 'function')
           throw new Error('剧本分集画布适配器缺少旧节点清理能力');
         const list12 = [...new Set(list11)];
-        if ((await adapter2['deleteNodes'](list12, { canvasId: canvasId2 })) === ![])
+        if ((await adapter2['deleteNodes'](list12, { canvasId: canvasId2 })) === false)
           throw new Error('清理已失效的剧本分集画布节点失败');
         deletedCount = list12['length'];
       }

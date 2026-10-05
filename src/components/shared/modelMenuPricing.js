@@ -26,7 +26,7 @@ export function syncModelMenuPrices(
         el['classList']['add']('node-menu-priced-title'),
         el['replaceChildren'](el3, el2));
     }
-    const run = (index, result = ![]) => {
+    const run = (index, result = false) => {
         ((el2['textContent'] = index
           ? formatBinghuoUnitPrice(index['data'], event)
           : priceText(result ? 'unavailable' : 'loading')),
@@ -48,7 +48,7 @@ export function syncModelMenuPrices(
         if (run2()) run(options, cache['stale'](options));
       })
       ['catch'](() => {
-        if (run2()) run(data, !![]);
+        if (run2()) run(data, true);
       });
   }
 }

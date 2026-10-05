@@ -94,12 +94,12 @@ function normalizeVolcengineSeedance2Ratio(current, entry = {}) {
 }
 function normalizeVolcengineSeedance2Duration(record, handle = {}) {
   const state = Number(record);
-  if (state === -1 && handle['allowAutoDuration'] !== ![]) return -1;
+  if (state === -1 && handle['allowAutoDuration'] !== false) return -1;
   const positiveInteger5 = normalizePositiveInteger(handle['minDuration'], 4),
     positiveInteger6 = normalizePositiveInteger(handle['maxDuration'], 15);
   if (!Number['isFinite'](state)) {
     const config = Number(handle['defaultDuration']);
-    return config === -1 && handle['allowAutoDuration'] !== ![]
+    return config === -1 && handle['allowAutoDuration'] !== false
       ? -1
       : Number['isFinite'](config)
         ? Math['max'](positiveInteger5, Math['min'](positiveInteger6, Math['trunc'](config)))
@@ -107,14 +107,14 @@ function normalizeVolcengineSeedance2Duration(record, handle = {}) {
   }
   return Math['max'](positiveInteger5, Math['min'](positiveInteger6, Math['trunc'](state)));
 }
-function normalizeVolcengineBoolean(scope, input = ![]) {
-  if (scope === !![] || scope === ![]) return scope;
+function normalizeVolcengineBoolean(scope, input = false) {
+  if (scope === true || scope === false) return scope;
   if (scope === undefined || scope === null || String(scope)['trim']() === '') return input;
   const output = String(scope ?? '')
     ['trim']()
     ['toLowerCase']();
-  if (['true', '1', 'yes', 'on']['includes'](output)) return !![];
-  if (['false', '0', 'no', 'off']['includes'](output)) return ![];
+  if (['true', '1', 'yes', 'on']['includes'](output)) return true;
+  if (['false', '0', 'no', 'off']['includes'](output)) return false;
   return input;
 }
 function normalizeVolcengineSeedance2Priority(value2) {
@@ -250,7 +250,7 @@ export function volcengineSeedance2Video({
             volcengineSeedance2Policy['maxAudioReferenceCount'],
             3,
           ),
-          value19 = volcengineSeedance2Policy['allowAudioOnlyReferences'] === !![];
+          value19 = volcengineSeedance2Policy['allowAudioOnlyReferences'] === true;
         if (
           referenceImageCount2['length'] + videoCount2['length'] <= 0 &&
           !(value19 && audioCount2['length'] > 0)
@@ -289,7 +289,7 @@ export function volcengineSeedance2Video({
     throw new Error('Volcengine Seedance edit mode requires a reference video');
   const model = modelToken || value18['model'] || stripPrefix(payload['model'], 'volcengine/'),
     value23 =
-      volcengineSeedance2Policy['roleImagesRequireAdaptiveRatio'] === !![] &&
+      volcengineSeedance2Policy['roleImagesRequireAdaptiveRatio'] === true &&
       (volcengineSeedance2TaskType === 'image2video' || volcengineSeedance2TaskType === 'frames2video')
         ? 'adaptive'
         : normalizeVolcengineSeedance2Ratio(value18['ratio'], volcengineSeedance2Policy),
@@ -306,16 +306,16 @@ export function volcengineSeedance2Video({
       duration: ratio
         ? -1
         : normalizeVolcengineSeedance2Duration(value18['duration'], volcengineSeedance2Policy),
-      generate_audio: normalizeVolcengineBoolean(value18['generate_audio'], !![]),
-      watermark: normalizeVolcengineBoolean(value18['watermark'], ![]),
+      generate_audio: normalizeVolcengineBoolean(value18['generate_audio'], true),
+      watermark: normalizeVolcengineBoolean(value18['watermark'], false),
     };
-  volcengineSeedance2Policy['supportsOutputFormatParam'] === !![] &&
+  volcengineSeedance2Policy['supportsOutputFormatParam'] === true &&
     (value24['output_format'] = normalizeVolcengineSeedance2OutputFormat(value18['output_format']));
-  normalizeVolcengineBoolean(value18['webSearch'], ![]) && (value24['tools'] = [{ type: 'web_search' }]);
+  normalizeVolcengineBoolean(value18['webSearch'], false) && (value24['tools'] = [{ type: 'web_search' }]);
   const volcengineSeedance2Priority = normalizeVolcengineSeedance2Priority(value18['priority']);
   if (volcengineSeedance2Priority !== null && volcengineSeedance2Priority > 0)
     value24['priority'] = volcengineSeedance2Priority;
-  if (volcengineSeedance2Policy['supportsSeedParam'] === !![]) {
+  if (volcengineSeedance2Policy['supportsSeedParam'] === true) {
     const optionalIntegerInRange = normalizeOptionalIntegerInRange(value18['seed'], {
       min: -1,
       max: 0x7fffffff,

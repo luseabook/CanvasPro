@@ -118,7 +118,7 @@ export function parseNetworkError(provider, raw, record) {
           (record ? Math['round'](record / 1000) + '秒' : '未知') +
           '），请稍后重试；若持续超时，请重启应用后再试',
         raw: raw,
-        retryable: !![],
+        retryable: true,
       });
     return ApiError['timeout'](provider, record);
   }
@@ -132,7 +132,7 @@ export function parseNetworkError(provider, raw, record) {
       provider: provider,
       message: '无法解析服务器地址，请检查网络配置',
       raw: raw,
-      retryable: !![],
+      retryable: true,
     });
   if (
     list['includes']('Failed to fetch') ||
@@ -148,7 +148,7 @@ export function parseNetworkError(provider, raw, record) {
           ? '无法连接本地服务，请稍后重试；若持续失败，请重启应用后再试'
           : '网络连接失败，请检查网络或代理设置',
       raw: raw,
-      retryable: !![],
+      retryable: true,
     });
   return ApiError['networkError'](provider, raw);
 }
@@ -202,10 +202,10 @@ export function applyManifestErrorRules(code, list2, payload = {}) {
         code: code['code'],
         status: status ?? code['status'],
         message: message,
-        retryable: retryable['retryable'] === !![],
+        retryable: retryable['retryable'] === true,
         raw: code['raw'] ?? code,
       });
-    return ((apiError['hint'] = value2), (apiError['manifestRuleMatched'] = !![]), apiError);
+    return ((apiError['hint'] = value2), (apiError['manifestRuleMatched'] = true), apiError);
   }
   return code;
 }

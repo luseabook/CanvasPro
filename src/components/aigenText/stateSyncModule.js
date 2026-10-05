@@ -88,9 +88,9 @@ export function createAIGenTextNodeStateSyncModule(value) {
         jobStatus = this['_getStoreStateForRead']()['nodes']?.[this['nodeId']] || this['_data'] || {},
         disabled = resolveGenerationButtonMode(
           this['_isGenerating'] && jobStatus?.['jobStatus'] !== 'error'
-            ? { ...jobStatus, isGenerating: !![], jobStatus: jobStatus['jobStatus'] || 'running' }
+            ? { ...jobStatus, isGenerating: true, jobStatus: jobStatus['jobStatus'] || 'running' }
             : jobStatus,
-          { cancellable: jobStatus?.['taskCancellable'] === !![] },
+          { cancellable: jobStatus?.['taskCancellable'] === true },
         );
       if (disabled['busy']) {
         (setGenerateButtonLoadingUi(this['btnEl'], {
@@ -105,9 +105,9 @@ export function createAIGenTextNodeStateSyncModule(value) {
       (resetGenerateButtonIdleUi(this['btnEl'], t('aigenText.generate')),
         resetModelCredentialButtonState(this['btnEl']),
         !enabled
-          ? ((this['btnEl']['disabled'] = !![]),
+          ? ((this['btnEl']['disabled'] = true),
             (this['btnEl']['style']['cursor'] = 'var(--unavailable-cursor)'))
-          : ((this['btnEl']['disabled'] = ![]),
+          : ((this['btnEl']['disabled'] = false),
             (this['btnEl']['style']['cursor'] = ''),
             applyModelCredentialButtonState(this['btnEl'], {
               modelId: jobStatus?.['model'],
@@ -118,14 +118,14 @@ export function createAIGenTextNodeStateSyncModule(value) {
     ['update'](key) {
       this['_data'] = key;
       if (shouldShowGenerationBusyUi(key))
-        ((this['_isGenerating'] = !![]),
+        ((this['_isGenerating'] = true),
           this['previewEl'] && typeof startLoading === 'function' && startLoading(this['previewEl']));
       else
         isTaskTerminal(key) &&
-          ((this['_isGenerating'] = ![]),
+          ((this['_isGenerating'] = false),
           this['previewEl'] && typeof stopLoading === 'function' && stopLoading(this['previewEl']));
-      const enabled2 = this['outputEl']?.['classList']?.['contains']?.('is-text-selection-active') === !![],
-        enabled3 = this['_outputScrollTopDirty'] === !![],
+      const enabled2 = this['outputEl']?.['classList']?.['contains']?.('is-text-selection-active') === true,
+        enabled3 = this['_outputScrollTopDirty'] === true,
         index = String(key['outputText'] || ''),
         result =
           index !== this['_lastRenderedOutputText'] ||

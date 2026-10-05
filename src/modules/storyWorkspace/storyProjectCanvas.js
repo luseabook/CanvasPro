@@ -301,7 +301,7 @@ export function buildStoryAssetCanvasNodeData({
     generationParams: { ...asObject(generationParams), ...asObject(appearance['generationParams']) },
     images: images2,
     mainImageIndex: mainImageIndex,
-    isImagesExpanded: ![],
+    isImagesExpanded: false,
     imageUrl: normalizeText(activeImage2['imageUrl'] || activeImage2['url'] || imageUrl),
     sourceUrl: normalizeText(activeImage2['sourceUrl']),
     thumbUrl: normalizeText(activeImage2['thumbUrl']),
@@ -1063,7 +1063,7 @@ function storyProjectLayoutsMatch(options4 = {}, value53 = {}) {
     list25['length'] !== list26['length'] ||
     list25['some']((value54, value55) => value54 !== list26[value55])
   )
-    return ![];
+    return false;
   return list26['every']((value56) => {
     const box18 = asObject(asObject2[value56]),
       box19 = asObject(asObject3[value56]);
@@ -1085,18 +1085,18 @@ function shouldReflowStoryProjectCanvas(value57, value58) {
 async function rollbackStoryProjectCanvasMutation({
   adapter: adapter,
   canvasId: canvasId = '',
-  reused: reused = ![],
+  reused: reused = false,
   mutationSnapshot: mutationSnapshot,
 } = {}) {
   if (!reused && typeof adapter?.['deleteCanvas'] === 'function')
     try {
-      if ((await adapter['deleteCanvas'](canvasId, { skipDirtyConfirm: !![] })) !== ![]) return !![];
+      if ((await adapter['deleteCanvas'](canvasId, { skipDirtyConfirm: true })) !== false) return true;
     } catch {}
   if (mutationSnapshot && typeof adapter?.['restoreMutationSnapshot'] === 'function')
     try {
-      return (await adapter['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== ![];
+      return (await adapter['restoreMutationSnapshot'](mutationSnapshot, { canvasId: canvasId })) !== false;
     } catch {}
-  return ![];
+  return false;
 }
 export async function syncStoryProjectCanvas({
   project: project = {},
@@ -1147,7 +1147,7 @@ export async function syncStoryProjectCanvas({
   let canvasId2 = '';
   if (reused2) {
     const value62 = await adapter2['switchCanvas'](text16);
-    if (value62 === ![]) throw new Error('无法切换到已绑定的项目画布：' + text16);
+    if (value62 === false) throw new Error('无法切换到已绑定的项目画布：' + text16);
     canvasId2 = text16;
   } else {
     canvasId2 = normalizeText(await adapter2['createCanvas'](canvasName));
@@ -1155,7 +1155,7 @@ export async function syncStoryProjectCanvas({
   }
   const asObject5 = asObject(asObject4['nodes']),
     layout = buildStoryProjectPlanLayout(list28),
-    reflowed = reused2 ? shouldReflowStoryProjectCanvas(asObject4, layout) : ![],
+    reflowed = reused2 ? shouldReflowStoryProjectCanvas(asObject4, layout) : false,
     nodes2 = {},
     nodes3 = [];
   let createdCount = 0,
@@ -1175,7 +1175,7 @@ export async function syncStoryProjectCanvas({
         if (typeof adapter2['deleteNodes'] !== 'function')
           throw new Error('剧本项目画布适配器缺少旧节点清理能力');
         const list30 = [...new Set(list29)];
-        if ((await adapter2['deleteNodes'](list30, { canvasId: canvasId2 })) === ![])
+        if ((await adapter2['deleteNodes'](list30, { canvasId: canvasId2 })) === false)
           throw new Error('清理已失效的剧本项目画布节点失败');
         deletedCount = list30['length'];
       }
@@ -1213,7 +1213,7 @@ export async function syncStoryProjectCanvas({
       const text19 = normalizeText(nodes2[event4['key']]),
         text20 = normalizeText(nodes2[event4['parentKey']]);
       if (!text19 || !text20) throw new Error('剧本项目画布分组缺少节点：' + event4['key']);
-      if ((await adapter2['setNodeParent'](text19, text20, { canvasId: canvasId2 })) === ![])
+      if ((await adapter2['setNodeParent'](text19, text20, { canvasId: canvasId2 })) === false)
         throw new Error('剧本项目画布节点分组失败：' + event4['key']);
     }
     for (const event5 of list28) {
@@ -1226,7 +1226,7 @@ export async function syncStoryProjectCanvas({
           (await adapter2['connectNodes'](text22, text21, {
             canvasId: canvasId2,
             preferredRefSlot: normalizeText(event6?.['preferredRefSlot']),
-          })) === ![]
+          })) === false
         )
           throw new Error('剧本项目画布节点连线失败：' + event6?.['key'] + ' → ' + event5['key']);
       }

@@ -10,7 +10,7 @@ export function createCollaborationEditing({
   const editId = crypto['randomUUID'](),
     map = new Map();
   let promise = Promise['resolve'](),
-    enabled = ![];
+    enabled = false;
   const run = (value) => {
     const promise2 = promise['then'](value);
     return ((promise = promise2['catch'](() => {})), promise2);
@@ -62,10 +62,10 @@ export function createCollaborationEditing({
       }
     },
     begin(entry) {
-      let enabled5 = ![];
+      let enabled5 = false;
       const enabled6 = {
-          ready: ![],
-          pending: !![],
+          ready: false,
+          pending: true,
           allowed: () =>
             !enabled5 &&
             !enabled &&
@@ -83,7 +83,7 @@ export function createCollaborationEditing({
           wait: null,
           finish() {
             if (enabled5) return;
-            enabled5 = !![];
+            enabled5 = true;
             for (const payload of list3) payload['refs']--;
             return run2(list3);
           },
@@ -92,8 +92,8 @@ export function createCollaborationEditing({
       if (!current() || !canEdit(entry))
         return (
           notify('节点正在被其他成员编辑，或当前画布不可编辑'),
-          (enabled6['pending'] = ![]),
-          (enabled6['wait'] = Promise['resolve'](![])),
+          (enabled6['pending'] = false),
+          (enabled6['wait'] = Promise['resolve'](false)),
           enabled6
         );
       const nodeIds2 = [];
@@ -102,7 +102,7 @@ export function createCollaborationEditing({
         ((!enabled8 ||
           enabled8['failed'] ||
           (enabled8['acquired'] && enabled8['expiresAt'] <= Date['now']())) &&
-          ((enabled8 = { id: id, refs: 0, acquired: ![], failed: ![], wait: null }),
+          ((enabled8 = { id: id, refs: 0, acquired: false, failed: false, wait: null }),
           map['set'](id, enabled8),
           nodeIds2['push'](enabled8)),
           enabled8['refs']++,
@@ -110,22 +110,22 @@ export function createCollaborationEditing({
       }
       if (nodeIds2['length']) {
         const handle = run(async () => {
-          if (!current() || enabled) return ![];
+          if (!current() || enabled) return false;
           await flush();
-          if (!current() || enabled || !nodeIds2['some']((state) => state['refs'])) return ![];
+          if (!current() || enabled || !nodeIds2['some']((state) => state['refs'])) return false;
           const config = await rpc({
             action: 'beginEdit',
             nodeIds: nodeIds2['map']((scope) => scope['id']),
             editId: editId,
           });
-          if (!current() || enabled) return ![];
+          if (!current() || enabled) return false;
           await update(config);
-          if (!current() || enabled) return ![];
-          for (const input of nodeIds2) input['acquired'] = !![];
-          return (onChange(), !![]);
+          if (!current() || enabled) return false;
+          for (const input of nodeIds2) input['acquired'] = true;
+          return (onChange(), true);
         })['catch']((error3) => {
-          for (const output of nodeIds2) output['failed'] = !![];
-          return (current() && !enabled && (notify(error3['message']), onChange()), ![]);
+          for (const output of nodeIds2) output['failed'] = true;
+          return (current() && !enabled && (notify(error3['message']), onChange()), false);
         });
         for (const value2 of nodeIds2) value2['wait'] = handle;
       }
@@ -134,7 +134,7 @@ export function createCollaborationEditing({
         (enabled6['pending'] = !enabled6['ready']),
         (enabled6['wait'] = Promise['all'](list3['map']((value4) => value4['wait']))['then']((list4) => {
           return (
-            (enabled6['pending'] = ![]),
+            (enabled6['pending'] = false),
             (enabled6['ready'] = !enabled5 && list4['every'](Boolean) && current() && !enabled),
             enabled6['ready']
           );
@@ -144,7 +144,7 @@ export function createCollaborationEditing({
       );
     },
     dispose() {
-      ((enabled = !![]), map['clear']());
+      ((enabled = true), map['clear']());
     },
   };
 }

@@ -6,7 +6,7 @@ import {
 export async function transcribeReplicationSource({
   videoRef: videoRef,
   provider: provider = 'volcengine-speech',
-  isActive: isActive = () => !![],
+  isActive: isActive = () => true,
 } = {}) {
   if (!isActive()) throw new Error('视频分析所属项目已失效。');
   const enqueueElectronMediaTask2 = await enqueueElectronMediaTask({

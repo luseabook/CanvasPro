@@ -177,16 +177,16 @@ function isRecoverableInterruptedDreaminaStyleTask(options = {}) {
       resolveModelExecution(index, { providerHint: providerHint }) || resolveModelExecution(index);
   if (
     modelExecution?.['modelManifest']?.['extensions']?.['dreaminaStyleVideo'] == null ||
-    modelExecution?.['modelManifest']?.['cancellable'] !== ![]
+    modelExecution?.['modelManifest']?.['cancellable'] !== false
   )
-    return ![];
+    return false;
   return [options?.['jobStatus'], options?.['dreaminaTaskPhase'], options?.['dreaminaTaskStatus']]
     ['map'](normalizeTaskStatus)
     ['every']((result) => CANCELLED_TASK_STATUSES['has'](result));
 }
 function isRecoverableCustomProviderLocalTimeout(options2 = {}) {
   const data = String(options2?.['asyncTaskProvider'] || options2?.['provider'] || '')['trim']();
-  if (!/^custom_[a-z0-9_-]+$/i['test'](data)) return ![];
+  if (!/^custom_[a-z0-9_-]+$/i['test'](data)) return false;
   const args = Array['isArray'](options2?.['videos'])
     ? options2['videos']['map']((target) => String(target?.['error'] || '')['trim']())
     : [];
@@ -235,7 +235,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       getImage: getImage,
       startLoading: startLoading,
       stopLoading: stopLoading,
-      checkLocalMediaExists: checkLocalMediaExists = async () => !![],
+      checkLocalMediaExists: checkLocalMediaExists = async () => true,
       ensureConfig: ensureConfig,
       getProviderConfig: getProviderConfig,
       isVideoVipModel: isVideoVipModel,
@@ -251,7 +251,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       input?.['getTaskNode']?.() || store['getState']()['nodes']?.[output] || {},
     handler3 = (value2, value3, value4) => {
       if (typeof value2?.['updateTaskNode'] === 'function') return value2['updateTaskNode'](value4);
-      return (store['updateNodeData'](value3, value4), !![]);
+      return (store['updateNodeData'](value3, value4), true);
     };
   class value5 {
     ['_getGenerationTaskRecoveryOwner']() {
@@ -271,7 +271,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       );
     }
     async ['_preflightConnectedLocalVideoInputs'](value8 = null) {
-      if (typeof checkLocalMediaExists !== 'function') return !![];
+      if (typeof checkLocalMediaExists !== 'function') return true;
       const value9 = handler(),
         value10 = value9?.['nodes'] || {},
         value11 =
@@ -280,12 +280,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             : [],
         map = new Set(),
         handler4 = async (value12) => {
-          if (map['has'](value12)) return !![];
+          if (map['has'](value12)) return true;
           map['add'](value12);
           try {
-            return (await checkLocalMediaExists(value12)) === !![];
+            return (await checkLocalMediaExists(value12)) === true;
           } catch {
-            return ![];
+            return false;
           }
         },
         handler5 = (path) => {
@@ -318,16 +318,16 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         if (count3 >= 0 && Array['isArray'](value19['videos'])) {
           const videos = value19['videos']['map']((args2, value20) =>
             value20 === count3
-              ? { ...args2, mediaUnavailable: !![], mediaUnavailableSource: mediaUnavailableSource }
+              ? { ...args2, mediaUnavailable: true, mediaUnavailableSource: mediaUnavailableSource }
               : args2,
           );
           store['updateNodeData'](value14, { videos: videos });
         } else
           store['updateNodeData'](value14, {
-            mediaUnavailable: !![],
+            mediaUnavailable: true,
             mediaUnavailableSource: mediaUnavailableSource,
           });
-        return (handler5(localPath), ![]);
+        return (handler5(localPath), false);
       }
       const value21 = [
         ...(Array['isArray'](value8?.['videos']) ? value8['videos'] : []),
@@ -338,19 +338,19 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       for (const value22 of value21) {
         const localPath2 = normalizeLocalPath(value22);
         if (!localPath2 || (await handler4(localPath2))) continue;
-        return (handler5(localPath2), ![]);
+        return (handler5(localPath2), false);
       }
-      return !![];
+      return true;
     }
     ['_isDreaminaPollTimeoutError'](error) {
       const value23 = String(error?.['code'] || '')
         ['trim']()
         ['toUpperCase']();
-      if (value23 === config || value23 === 'TIMEOUT') return !![];
+      if (value23 === config || value23 === 'TIMEOUT') return true;
       const value24 = String(error?.['type'] || '')
         ['trim']()
         ['toUpperCase']();
-      if (value24 === 'TIMEOUT' || value24 === 'TASK_TIMEOUT') return !![];
+      if (value24 === 'TIMEOUT' || value24 === 'TASK_TIMEOUT') return true;
       const list2 = String(error?.['message'] || '')
         ['trim']()
         ['toLowerCase']();
@@ -374,7 +374,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     }
     ['_hasResolvedVideoResult'](value27 = this['_data']) {
       const list3 = Array['isArray'](value27?.['videos']) ? value27['videos'] : [];
-      if (list3['length'] > 0) return !![];
+      if (list3['length'] > 0) return true;
       return (
         !!String(value27?.['videoUrl'] || '')['trim']() ||
         !!String(value27?.['localPath'] || '')['trim']()
@@ -405,42 +405,42 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       return String(options4?.['dreaminaSubmitId'] || '')['trim']();
     }
     ['_isDreaminaRecoverableRunningTask'](value30 = this['_data']) {
-      if (!this['_isDreaminaVideoNode'](value30)) return ![];
+      if (!this['_isDreaminaVideoNode'](value30)) return false;
       const enabled3 = String(value30?.['dreaminaSubmitId'] || '')['trim']();
-      if (!enabled3) return ![];
+      if (!enabled3) return false;
       const taskStatus = normalizeTaskStatus(value30?.['jobStatus']),
         taskStatus2 = normalizeTaskStatus(value30?.['dreaminaTaskPhase']),
         taskStatus3 = normalizeTaskStatus(value30?.['dreaminaTaskStatus']);
       if (!isRecoverableInterruptedDreaminaStyleTask(value30)) {
-        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus)) return ![];
-        if (DREAMINA_NON_RECOVERABLE_PHASES['has'](taskStatus2)) return ![];
-        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus3)) return ![];
+        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus)) return false;
+        if (DREAMINA_NON_RECOVERABLE_PHASES['has'](taskStatus2)) return false;
+        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus3)) return false;
       }
-      return !![];
+      return true;
     }
     ['_isStaleActiveDreaminaTask'](value31 = this['_data']) {
-      if (!this['_isGenerating']) return ![];
-      if (value31?.['dreaminaTaskRecovering'] === !![]) return ![];
-      if (this['_dreaminaResumePromise']) return ![];
+      if (!this['_isGenerating']) return false;
+      if (value31?.['dreaminaTaskRecovering'] === true) return false;
+      if (this['_dreaminaResumePromise']) return false;
       const count4 = Number(
         value31?.['dreaminaTaskLastCheckedAt'] ||
           value31?.['dreaminaTaskStartedAt'] ||
           value31?.['generationStartTime'] ||
           0,
       );
-      if (!Number['isFinite'](count4) || count4 <= 0) return ![];
+      if (!Number['isFinite'](count4) || count4 <= 0) return false;
       return Date['now']() - count4 >= DREAMINA_STALE_ACTIVE_RESUME_MS;
     }
     ['_shouldProbeStaleDreaminaRecovery'](value32 = this['_data']) {
-      if (!this['_isDreaminaRecoverableRunningTask'](value32)) return ![];
-      if (getActiveGenerationTask(this['nodeId'])) return ![];
+      if (!this['_isDreaminaRecoverableRunningTask'](value32)) return false;
+      if (getActiveGenerationTask(this['nodeId'])) return false;
       const count5 = Number(
         value32?.['dreaminaTaskLastCheckedAt'] ||
           value32?.['dreaminaTaskStartedAt'] ||
           value32?.['generationStartTime'] ||
           0,
       );
-      if (!Number['isFinite'](count5) || count5 <= 0) return ![];
+      if (!Number['isFinite'](count5) || count5 <= 0) return false;
       return Date['now']() - count5 >= DREAMINA_COLD_RECOVERY_STALE_AFTER_MS;
     }
     ['_isUncertainStaleDreaminaRecoveryError'](value33) {
@@ -452,28 +452,28 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     ['_shouldKeepDreaminaLoading'](
       value34 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
     ) {
-      if (!this['_isDreaminaVideoNode'](value34)) return ![];
+      if (!this['_isDreaminaVideoNode'](value34)) return false;
       const taskStatus6 = normalizeTaskStatus(value34?.['jobStatus']),
         taskStatus7 = normalizeTaskStatus(value34?.['dreaminaTaskPhase']),
         taskStatus8 = normalizeTaskStatus(value34?.['dreaminaTaskStatus']);
       if (!isRecoverableInterruptedDreaminaStyleTask(value34)) {
-        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus6)) return ![];
-        if (DREAMINA_NON_RECOVERABLE_PHASES['has'](taskStatus7)) return ![];
-        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus8)) return ![];
+        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus6)) return false;
+        if (DREAMINA_NON_RECOVERABLE_PHASES['has'](taskStatus7)) return false;
+        if (DREAMINA_NON_RECOVERABLE_STATUSES['has'](taskStatus8)) return false;
       }
-      if (value34?.['isGenerating'] === !![]) return !![];
+      if (value34?.['isGenerating'] === true) return true;
       if (
         String(value34?.['jobStatus'] || '')
           ['trim']()
           ['toLowerCase']() === 'running'
       )
-        return !![];
-      if (value34?.['dreaminaTaskRecovering'] === !![]) return !![];
-      if (this['_dreaminaResumePromise']) return !![];
+        return true;
+      if (value34?.['dreaminaTaskRecovering'] === true) return true;
+      if (this['_dreaminaResumePromise']) return true;
       return this['_isDreaminaRecoverableRunningTask'](value34);
     }
     ['_inferAsyncProviderFromModel'](value35, value36 = '') {
-      const modelProvider = resolveModelProvider(value35, '', { allowProviderHint: ![] });
+      const modelProvider = resolveModelProvider(value35, '', { allowProviderHint: false });
       if (modelProvider) return modelProvider;
       const value37 = String(value36 || '')
         ['trim']()
@@ -484,9 +484,9 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       return '';
     }
     ['_isRunningHubRecoverableRunningTask'](value38 = this['_data']) {
-      if (!this['_isRunninghubWorkflowModel'](value38?.['model'], value38?.['provider'])) return ![];
+      if (!this['_isRunninghubWorkflowModel'](value38?.['model'], value38?.['provider'])) return false;
       const enabled4 = String(value38?.['rhTaskId'] || '')['trim']();
-      if (!enabled4) return ![];
+      if (!enabled4) return false;
       const value39 = String(value38?.['rhTaskStatus'] || '')
         ['trim']()
         ['toLowerCase']();
@@ -496,12 +496,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         value39 === 'idle' ||
         value39 === 'cancelled'
       )
-        return ![];
-      return !![];
+        return false;
+      return true;
     }
     ['_isAsyncRecoverableRunningTask'](value40 = this['_data']) {
       const enabled5 = String(value40?.['asyncTaskId'] || '')['trim']();
-      if (!enabled5) return ![];
+      if (!enabled5) return false;
       const enabled6 = this['_inferAsyncProviderFromModel'](
         value40?.['model'],
         value40?.['asyncTaskProvider'] || value40?.['provider'] || '',
@@ -512,11 +512,11 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         enabled6 === 'runninghub' ||
         enabled6 === 'dreamina'
       )
-        return ![];
+        return false;
       const value41 = String(value40?.['asyncTaskKind'] || '')
         ['trim']()
         ['toLowerCase']();
-      if (value41 && value41 !== 'video') return ![];
+      if (value41 && value41 !== 'video') return false;
       const value42 = String(value40?.['asyncTaskStatus'] || '')
           ['trim']()
           ['toLowerCase'](),
@@ -527,15 +527,15 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         value42 === 'idle' ||
         value42 === 'cancelled'
       )
-        return ![];
-      return !![];
+        return false;
+      return true;
     }
     ['_buildRunningHubTaskPatch']({
       taskId: taskId = '',
       status: status = 'pending',
       startedAt: startedAt = 0,
-      recovering: recovering = ![],
-      useOpenapiQuery: useOpenapiQuery = ![],
+      recovering: recovering = false,
+      useOpenapiQuery: useOpenapiQuery = false,
     } = {}) {
       return buildRunningHubTaskPatch({
         taskId: taskId,
@@ -551,7 +551,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       taskId: taskId = '',
       status: status = 'pending',
       startedAt: startedAt = 0,
-      recovering: recovering = ![],
+      recovering: recovering = false,
     } = {}) {
       return buildAsyncTaskPatch({
         provider: provider,
@@ -623,7 +623,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                 : '',
             result:
               result2['result'] && typeof result2['result'] === 'object' ? result2['result'] : null,
-            cancellable: !![],
+            cancellable: true,
             createdAt: Number(
               result2['createdAt'] ||
                 store['getState']()['nodes']?.[this['nodeId']]?.['dreaminaTaskStartedAt'] ||
@@ -646,7 +646,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         phase: submitId3?.['phase'] || 'generating',
         label: submitId3?.['label'] || '',
         lastCheckedAt: submitId3?.['lastCheckedAt'] || Date['now'](),
-        recovering: recovering2['recovering'] === !![],
+        recovering: recovering2['recovering'] === true,
         raw: submitId3?.['raw'] || {},
         defaultLabel: videoTaskText('task.generating'),
       });
@@ -659,7 +659,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     ['_applyDreaminaTaskSnapshot'](value49, recovering3 = {}) {
       const value50 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
         startedAt2 = this['_buildDreaminaTaskPatch'](value49, {
-          recovering: recovering3['recovering'] === !![],
+          recovering: recovering3['recovering'] === true,
           startedAt:
             recovering3['startedAt'] != null ? recovering3['startedAt'] : value50?.['dreaminaTaskStartedAt'],
         });
@@ -671,14 +671,14 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         startedAt2
       );
     }
-    ['_stopDreaminaRecovery'](resetRecovering = ![]) {
+    ['_stopDreaminaRecovery'](resetRecovering = false) {
       (this['_getGenerationTaskRecoveryOwner']()['stop']('dreamina', { resetRecovering: resetRecovering }),
         (this['_dreaminaActiveSubmitId'] = ''));
     }
-    ['_stopRunningHubRecovery'](resetRecovering2 = ![]) {
+    ['_stopRunningHubRecovery'](resetRecovering2 = false) {
       this['_getGenerationTaskRecoveryOwner']()['stop']('workflow', { resetRecovering: resetRecovering2 });
     }
-    ['_stopAsyncRecovery'](resetRecovering3 = ![]) {
+    ['_stopAsyncRecovery'](resetRecovering3 = false) {
       this['_getGenerationTaskRecoveryOwner']()['stop']('asyncModelApi', { resetRecovering: resetRecovering3 });
     }
     ['_buildDreaminaPendingSnapshot']({
@@ -698,8 +698,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         outputs: [],
         failReason: '',
         raw: raw && typeof raw === 'object' && !Array['isArray'](raw) ? raw : {},
-        isTerminal: ![],
-        hasOutputs: ![],
+        isTerminal: false,
+        hasOutputs: false,
         lastCheckedAt: Date['now'](),
       };
     }
@@ -715,8 +715,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         outputs: [],
         failReason: String(value52 || '')['trim'](),
         raw: raw2 && typeof raw2 === 'object' && !Array['isArray'](raw2) ? raw2 : {},
-        isTerminal: !![],
-        hasOutputs: ![],
+        isTerminal: true,
+        hasOutputs: false,
         lastCheckedAt: Date['now'](),
       };
     }
@@ -724,7 +724,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       value53,
       startedAt3,
       value54 = null,
-      { writeStore: writeStore = !![], returnPatch: returnPatch = ![] } = {},
+      { writeStore: writeStore = true, returnPatch: returnPatch = false } = {},
     ) {
       const normalizedResult = normalizeVideoGenerationResult(value53),
         result3 = normalizedResult['items'],
@@ -736,9 +736,9 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           String(store['getState']()['nodes']?.[this['nodeId']]?.['dreaminaSubmitId'] || '')['trim'](),
         args3 = value55
           ? value54
-            ? this['_buildDreaminaTaskPatch'](value54, { recovering: ![], startedAt: startedAt3 })
+            ? this['_buildDreaminaTaskPatch'](value54, { recovering: false, startedAt: startedAt3 })
             : {
-                isGenerating: ![],
+                isGenerating: false,
                 jobStatus: 'success',
                 dreaminaSubmitId: dreaminaSubmitId,
                 dreaminaTaskStatus: 'success',
@@ -747,7 +747,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                 dreaminaTaskStartedAt: startedAt3,
                 dreaminaTaskLastCheckedAt: Date['now'](),
                 dreaminaTaskLastRaw: {},
-                dreaminaTaskRecovering: ![],
+                dreaminaTaskRecovering: false,
               }
           : {},
         args4 = buildVideoGenerationResultPatch(normalizedResult, { startedAt: startedAt3 });
@@ -872,7 +872,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               box = null;
             }
             if (value68 !== this['_resultMetaEnrichmentToken']) return;
-            if (!box || box['success'] !== !![]) continue;
+            if (!box || box['success'] !== true) continue;
             const videoWidth = Math['round'](Number(box['width']) || 0),
               videoHeight = Math['round'](Number(box['height']) || 0),
               count6 = Number(box['duration']);
@@ -926,13 +926,13 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     }
     ['_finalizeDreaminaSuccessResult'](value79, value80, value81 = null, writeStore2 = {}) {
       const value82 = this['_applyDreaminaSuccessResult'](value79, value80, value81, {
-          writeStore: writeStore2['writeStore'] !== ![],
-          returnPatch: writeStore2['returnPatch'] === !![],
+          writeStore: writeStore2['writeStore'] !== false,
+          returnPatch: writeStore2['returnPatch'] === true,
         }),
         videos4 = Array['isArray'](value82) ? value82 : value82?.['videos'] || [];
       return (
         this['_finalizeVideoSuccessSideEffects'](videos4, value80),
-        writeStore2['returnPatch'] === !![]
+        writeStore2['returnPatch'] === true
           ? { ...(value82 && !Array['isArray'](value82) ? value82 : {}), videos: videos4 }
           : videos4
       );
@@ -962,32 +962,32 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       } catch {}
     }
     async ['_maybeResumeDreaminaTaskImpl']() {
-      if (this['_videoSubmitInFlight'] === !![]) return;
+      if (this['_videoSubmitInFlight'] === true) return;
       const node = handler()['nodes']?.[this['nodeId']] || this['_data'] || {};
       if (!this['_isDreaminaVideoNode'](node)) {
-        this['_stopDreaminaRecovery'](![]);
+        this['_stopDreaminaRecovery'](false);
         return;
       }
       if (!this['_isDreaminaRecoverableRunningTask'](node)) {
-        this['_stopDreaminaRecovery'](![]);
+        this['_stopDreaminaRecovery'](false);
         return;
       }
       const submitId4 = this['_resolveDreaminaResumeSubmitId'](node);
       if (!submitId4) {
-        this['_stopDreaminaRecovery'](![]);
+        this['_stopDreaminaRecovery'](false);
         return;
       }
       const value83 = String(this['_dreaminaActiveSubmitId'] || '')['trim']();
       if (
         this['_isGenerating'] &&
-        node?.['dreaminaTaskRecovering'] !== !![] &&
+        node?.['dreaminaTaskRecovering'] !== true &&
         value83 &&
         value83 === submitId4 &&
         !this['_isStaleActiveDreaminaTask'](node)
       )
         return;
       if (this['_dreaminaResumeSubmitId'] === submitId4) return;
-      this['_stopDreaminaRecovery'](![]);
+      this['_stopDreaminaRecovery'](false);
       const startedAt5 = Number(
           node?.['dreaminaTaskStartedAt'] || node?.['generationStartTime'] || Date['now'](),
         ),
@@ -999,8 +999,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         try {
           ((signal = new AbortController()),
             (this['_dreaminaResumeAbortController'] = signal),
-            (this['_isGenerating'] = !![]),
-            this['_setGenerateButtonBusyUi']({ cancellable: ![] }),
+            (this['_isGenerating'] = true),
+            this['_setGenerateButtonBusyUi']({ cancellable: false }),
             startLoading(this['previewEl']));
           const response4 = await resumeTask(
             createGenerationResumePlanFromNode({
@@ -1021,9 +1021,9 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                     ? node?.['model'] || APIMART_DREAMINA_VIDEO_DEFAULT_MODEL
                     : node?.['model'] || '',
               },
-              cancellable: ![],
-              resumable: !![],
-              pauseOnAbort: !![],
+              cancellable: false,
+              resumable: true,
+              pauseOnAbort: true,
               startBuilder: () => ({
                 ...this['_buildDreaminaTaskPatch'](
                   this['_buildDreaminaPendingSnapshot']({
@@ -1034,7 +1034,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                       videoTaskText('task.generating'),
                     raw: node?.['dreaminaTaskLastRaw'] || {},
                   }),
-                  { recovering: !![], startedAt: startedAt5 },
+                  { recovering: true, startedAt: startedAt5 },
                 ),
               }),
               onTaskStart: () => {
@@ -1053,12 +1053,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                         value85,
                         this['nodeId'],
                         this['_buildDreaminaTaskPatch'](enabled16, {
-                          recovering: !![],
+                          recovering: true,
                           startedAt: startedAt5,
                         }),
                       )
                     : this['_applyDreaminaTaskSnapshot'](enabled16, {
-                        recovering: !![],
+                        recovering: true,
                         startedAt: startedAt5,
                       });
                 };
@@ -1069,7 +1069,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                     signal: signal['signal'],
                   });
                   await onProgress(value87?.['dreaminaSnapshot']);
-                  if (value87?.['pending'] !== !![]) return value87;
+                  if (value87?.['pending'] !== true) return value87;
                 }
                 return api['resumeDreaminaVideoTask'](submitId4, {
                   signal: signal['signal'],
@@ -1084,7 +1084,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                     value88,
                     value89['startedAt'],
                     value90,
-                    { writeStore: ![], returnPatch: !![] },
+                    { writeStore: false, returnPatch: true },
                   );
                 return value91?.['patch'] || {};
               },
@@ -1102,7 +1102,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   return Object['assign'](
                     buildVideoGenerationFailurePatch({ error: label2, startedAt: startedAt6['startedAt'] }),
                     this['_buildDreaminaTaskPatch'](value92, {
-                      recovering: ![],
+                      recovering: false,
                       startedAt: startedAt6['startedAt'],
                     }),
                   );
@@ -1111,13 +1111,13 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   const value93 = this['_buildDreaminaBackgroundPendingSnapshot'](submitId4);
                   return Object['assign'](
                     {
-                      isGenerating: !![],
+                      isGenerating: true,
                       jobStatus: 'running',
                       jobError: null,
                       generationDuration: Date['now']() - startedAt6['startedAt'],
                     },
                     this['_buildDreaminaTaskPatch'](value93, {
-                      recovering: ![],
+                      recovering: false,
                       startedAt: startedAt6['startedAt'],
                     }),
                   );
@@ -1132,12 +1132,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   buildVideoGenerationFailurePatch({ error: error3, startedAt: startedAt6['startedAt'] }),
                   value94
                     ? this['_buildDreaminaTaskPatch'](value94, {
-                        recovering: ![],
+                        recovering: false,
                         startedAt: startedAt6['startedAt'],
                       })
                     : this['_buildDreaminaTaskPatch'](
                         this['_buildDreaminaFailedSnapshot'](submitId4, error3),
-                        { recovering: ![], startedAt: startedAt6['startedAt'] },
+                        { recovering: false, startedAt: startedAt6['startedAt'] },
                       ),
                 );
               },
@@ -1153,7 +1153,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                         videoTaskText('task.generating'),
                       raw: node?.['dreaminaTaskLastRaw'] || {},
                     }),
-                    { recovering: ![], startedAt: startedAt7['startedAt'] },
+                    { recovering: false, startedAt: startedAt7['startedAt'] },
                   ),
                 ),
               parseError: (value95) =>
@@ -1181,7 +1181,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             this['nodeId'],
             Object['assign'](
               buildVideoGenerationFailurePatch({ error: error5, startedAt: startedAt5 }),
-              this['_buildDreaminaTaskPatch'](value96, { recovering: ![], startedAt: startedAt5 }),
+              this['_buildDreaminaTaskPatch'](value96, { recovering: false, startedAt: startedAt5 }),
             ),
           ),
             this['_persistDreaminaResumeCache']());
@@ -1198,7 +1198,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             !shouldShowGenerationBusyUi2 && (this['_dreaminaActiveSubmitId'] = ''),
             shouldShowGenerationBusyUi2
               ? this['_updateSubmitButtonState']?.()
-              : (this['_resetGenerateButtonIdleUi']({ cancellable: ![] }),
+              : (this['_resetGenerateButtonIdleUi']({ cancellable: false }),
                 stopLoading(this['previewEl']),
                 this['_updateSubmitButtonState']?.()));
         }
@@ -1208,24 +1208,24 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     async ['_maybeResumeRunningHubTaskImpl']() {
       const node2 = handler()['nodes']?.[this['nodeId']] || this['_data'] || {};
       if (!this['_isRunninghubWorkflowModel'](node2?.['model'], node2?.['provider'])) {
-        this['_stopRunningHubRecovery'](![]);
+        this['_stopRunningHubRecovery'](false);
         return;
       }
       if (!this['_isRunningHubRecoverableRunningTask'](node2)) {
-        this['_stopRunningHubRecovery'](![]);
+        this['_stopRunningHubRecovery'](false);
         return;
       }
       const taskId3 = String(node2?.['rhTaskId'] || '')['trim']();
       if (!taskId3) {
-        this['_stopRunningHubRecovery'](![]);
+        this['_stopRunningHubRecovery'](false);
         return;
       }
       if (this['_rhResumeTaskId'] === taskId3 && this['_rhResumePromise']) return;
-      this['_stopRunningHubRecovery'](![]);
+      this['_stopRunningHubRecovery'](false);
       const startedAt8 = Number(
           node2?.['rhTaskStartedAt'] || node2?.['generationStartTime'] || Date['now'](),
         ),
-        rhTaskUseOpenapiQuery = node2?.['rhTaskUseOpenapiQuery'] === !![];
+        rhTaskUseOpenapiQuery = node2?.['rhTaskUseOpenapiQuery'] === true;
       this['_rhResumeTaskId'] = taskId3;
       const value98 = (async () => {
         let signal2 = null,
@@ -1239,10 +1239,10 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             (this['_rhAbortController'] = signal2),
             (this['_rhTaskId'] = taskId3),
             (this['_rhApiKey'] = String(payload2?.['apiKey'] || '')['trim']() || this['_rhApiKey'] || null),
-            (this['_rhCancelRequested'] = ![]),
-            (this['_rhRemoteCancelSent'] = ![]),
-            (this['_isGenerating'] = !![]),
-            this['_setGenerateButtonBusyUi']({ cancellable: !![] }),
+            (this['_rhCancelRequested'] = false),
+            (this['_rhRemoteCancelSent'] = false),
+            (this['_isGenerating'] = true),
+            this['_setGenerateButtonBusyUi']({ cancellable: true }),
             startLoading(this['previewEl']));
           const response5 = await resumeTask(
             createGenerationResumePlanFromNode({
@@ -1254,9 +1254,9 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               trigger: 'node',
               taskType: 'video-generation',
               payload: payload2,
-              cancellable: !![],
-              resumable: !![],
-              pauseOnAbort: !![],
+              cancellable: true,
+              resumable: true,
+              pauseOnAbort: true,
               startBuilder: () => ({
                 rhStatusMessage: null,
                 rhStatusCode: null,
@@ -1275,7 +1275,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   value100,
                   startedAt9['startedAt'],
                   null,
-                  { writeStore: ![], returnPatch: !![] },
+                  { writeStore: false, returnPatch: true },
                 );
                 return {
                   ...(value101?.['patch'] || {}),
@@ -1285,7 +1285,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                     taskId: taskId3,
                     status: 'success',
                     startedAt: startedAt9['startedAt'],
-                    recovering: ![],
+                    recovering: false,
                     useOpenapiQuery: rhTaskUseOpenapiQuery,
                   }),
                 };
@@ -1304,7 +1304,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   taskId: taskId3,
                   status: 'failed',
                   startedAt: startedAt10['startedAt'],
-                  recovering: ![],
+                  recovering: false,
                   useOpenapiQuery: rhTaskUseOpenapiQuery,
                 }),
               }),
@@ -1319,7 +1319,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   taskId: taskId3,
                   status: 'cancelled',
                   startedAt: startedAt11['startedAt'],
-                  recovering: ![],
+                  recovering: false,
                   useOpenapiQuery: rhTaskUseOpenapiQuery,
                 }),
               }),
@@ -1347,7 +1347,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               taskId: taskId3,
               status: 'failed',
               startedAt: startedAt8,
-              recovering: ![],
+              recovering: false,
               useOpenapiQuery: rhTaskUseOpenapiQuery,
             }),
           }),
@@ -1366,7 +1366,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           else {
             this['_rhTaskId'] = null;
             if (!this['_rhCancelRequested']) this['_rhApiKey'] = null;
-            (this['_resetGenerateButtonIdleUi']({ cancellable: !![] }), stopLoading(this['previewEl']));
+            (this['_resetGenerateButtonIdleUi']({ cancellable: true }), stopLoading(this['previewEl']));
           }
           this['_updateSubmitButtonState']();
         }
@@ -1375,14 +1375,14 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     }
     async ['_maybeResumeAsyncTaskImpl']() {
       const node3 = handler()['nodes']?.[this['nodeId']] || this['_data'] || {};
-      if (this['_isGenerating'] && node3?.['asyncTaskRecovering'] !== !![]) return;
+      if (this['_isGenerating'] && node3?.['asyncTaskRecovering'] !== true) return;
       if (!this['_isAsyncRecoverableRunningTask'](node3)) {
-        this['_stopAsyncRecovery'](![]);
+        this['_stopAsyncRecovery'](false);
         return;
       }
       const taskId4 = String(node3?.['asyncTaskId'] || '')['trim']();
       if (!taskId4) {
-        this['_stopAsyncRecovery'](![]);
+        this['_stopAsyncRecovery'](false);
         return;
       }
       const value104 = this['_getGenerationTaskRecoveryOwner'](),
@@ -1400,8 +1400,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           try {
             const payload3 = await this['_buildResumePayload'](node3, { providerHint: providerHint2 });
             if (!payload3) return;
-            ((this['_isGenerating'] = !![]),
-              this['_setGenerateButtonBusyUi']({ cancellable: ![] }),
+            ((this['_isGenerating'] = true),
+              this['_setGenerateButtonBusyUi']({ cancellable: false }),
               startLoading(this['previewEl']));
             const response6 = await resumeTask(
               createGenerationResumePlanFromNode({
@@ -1413,7 +1413,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                 trigger: 'node',
                 taskType: 'video-generation',
                 payload: payload3,
-                pauseOnAbort: !![],
+                pauseOnAbort: true,
                 persistTaskState: () => this['_persistAsyncResumeCache'](),
                 poll: async () =>
                   api['resumeAsyncVideoTask'](taskId4, payload3, { signal: signal3['signal'] }),
@@ -1422,7 +1422,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                     value106,
                     value107['startedAt'],
                     null,
-                    { writeStore: ![], returnPatch: !![] },
+                    { writeStore: false, returnPatch: true },
                   );
                   return value108?.['patch'] || {};
                 },
@@ -1450,7 +1450,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                 taskId: taskId4,
                 status: 'failed',
                 startedAt: startedAt12,
-                recovering: ![],
+                recovering: false,
               }),
             }),
               this['_persistAsyncResumeCache']());
@@ -1460,7 +1460,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               enabled18 = value104['isBusy'](value110);
             ((this['_isGenerating'] = enabled18),
               !enabled18 &&
-                (this['_resetGenerateButtonIdleUi']({ cancellable: ![] }), stopLoading(this['previewEl'])),
+                (this['_resetGenerateButtonIdleUi']({ cancellable: false }), stopLoading(this['previewEl'])),
               this['_updateSubmitButtonState']());
           }
         })();
@@ -1469,12 +1469,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     async ['_handleGenerateOrCancelImpl'](value111 = null) {
       const value112 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
         cancellable2 = this['_isRunninghubWorkflowModel'](value112?.['model'], value112?.['provider']);
-      !cancellable2 && this['_dreaminaResumePromise'] && this['_stopDreaminaRecovery'](!![]);
-      !cancellable2 && this['_asyncResumePromise'] && this['_stopAsyncRecovery'](!![]);
+      !cancellable2 && this['_dreaminaResumePromise'] && this['_stopDreaminaRecovery'](true);
+      !cancellable2 && this['_asyncResumePromise'] && this['_stopAsyncRecovery'](true);
       if (
         shouldAllowCancel(value112, {
           cancellable: cancellable2,
-          cancelInFlight: this['_rhCancelInFlight'] === !![],
+          cancelInFlight: this['_rhCancelInFlight'] === true,
         })
       ) {
         await this['_cancelRunningHubWorkflowTask']();
@@ -1495,7 +1495,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             : Number['isFinite'](count9) && count9 > 0
               ? Math['max'](0, value113 - count9)
               : 0;
-      this['_rhCancelRequested'] = !![];
+      this['_rhCancelRequested'] = true;
       this['_rhAbortController'] &&
         !this['_rhAbortController']['signal']['aborted'] &&
         this['_rhAbortController']['abort']();
@@ -1532,15 +1532,15 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               startedAt: Number(
                 startedAt13 || useOpenapiQuery2?.['rhTaskStartedAt'] || useOpenapiQuery2?.['generationStartTime'] || 0,
               ),
-              recovering: ![],
-              useOpenapiQuery: useOpenapiQuery2?.['rhTaskUseOpenapiQuery'] === !![],
+              recovering: false,
+              useOpenapiQuery: useOpenapiQuery2?.['rhTaskUseOpenapiQuery'] === true,
             }),
           };
         };
         (await cancelTask(this['nodeId'], {
           store: store,
           taskId: taskId5,
-          cancellable: !![],
+          cancellable: true,
           cancel: ({ taskId: taskId6 }) => {
             if (!apiKey2) throw new Error(videoTaskText('cancel.missingApiKey'));
             return api['cancelRunningHubWorkflowTask']({
@@ -1559,25 +1559,25 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             trigger: 'node',
             taskType: 'video-generation',
             payload: useOpenapiQuery2,
-            cancellable: !![],
-            resumable: !![],
+            cancellable: true,
+            resumable: true,
             cancelledBuilder: cancelledBuilder,
           }),
         }),
           this['_persistRunningHubResumeCache']());
       } finally {
-        ((this['_isGenerating'] = ![]),
+        ((this['_isGenerating'] = false),
           (this['_rhAbortController'] = null),
           (this['_rhTaskId'] = null),
           (this['_rhApiKey'] = null),
-          (this['_rhRemoteCancelSent'] = ![]),
-          this['_stopRunningHubRecovery'](!![]),
-          this['_resetGenerateButtonIdleUi']({ cancellable: !![] }),
+          (this['_rhRemoteCancelSent'] = false),
+          this['_stopRunningHubRecovery'](true),
+          this['_resetGenerateButtonIdleUi']({ cancellable: true }),
           stopLoading(this['previewEl']),
           this['_updateSubmitButtonState']());
       }
     }
-    ['_setGenerateButtonBusyUi']({ cancellable: cancellable = ![] } = {}) {
+    ['_setGenerateButtonBusyUi']({ cancellable: cancellable = false } = {}) {
       if (!this['btnEl']) return;
       if (cancellable) {
         const title = getVideoCancelTooltip();
@@ -1586,14 +1586,14 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           tooltip: title,
           ariaLabel: videoTaskText('controls.cancelGenerateAria'),
           color: 'var(--red)',
-          busy: !![],
+          busy: true,
         });
         return;
       }
       const title2 = getVideoGenerateTitle();
-      setGenerateButtonLoadingUi(this['btnEl'], { title: title2, disabled: !![], ariaLabel: title2 });
+      setGenerateButtonLoadingUi(this['btnEl'], { title: title2, disabled: true, ariaLabel: title2 });
     }
-    ['_resetGenerateButtonIdleUi']({ cancellable: cancellable = ![] } = {}) {
+    ['_resetGenerateButtonIdleUi']({ cancellable: cancellable = false } = {}) {
       if (!this['btnEl']) return;
       const videoGenerateTitle = getVideoGenerateTitle();
       resetGenerateButtonIdleUi(this['btnEl'], videoGenerateTitle);
@@ -1609,7 +1609,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
     }
     async ['_onGenerateImpl'](template = null, value115 = {}) {
       if (this['_isGenerating']) return;
-      if (value115?.['insertPrompt'] === !![]) {
+      if (value115?.['insertPrompt'] === true) {
         (insertPresetPromptIntoEditor({
           storeApi: store,
           nodeId: this['nodeId'],
@@ -1646,13 +1646,13 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           );
         return;
       }
-      if (this['_videoSubmitInFlight'] === !![]) return;
+      if (this['_videoSubmitInFlight'] === true) return;
       const nodeData4 = store['getState']()['nodes']?.[this['nodeId']] || this['_data'] || {},
         value116 =
           typeof this['_shouldKeepDreaminaLoading'] === 'function' &&
           typeof this['_isDreaminaVideoNode'] === 'function'
             ? this['_shouldKeepDreaminaLoading'](nodeData4)
-            : ![];
+            : false;
       if (shouldShowGenerationBusyUi(nodeData4) || value116) return;
       const promise = createSegmentRetakeGenerationLifecycle(this, {
         nodeData: nodeData4,
@@ -1661,7 +1661,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
         stopLoading: stopLoading,
       });
       if (promise['reject']()) return;
-      this['_videoSubmitInFlight'] = !![];
+      this['_videoSubmitInFlight'] = true;
       let value117 = null;
       try {
         promise['begin']();
@@ -1679,7 +1679,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           try {
             await window['ensureSubscriptionInstallId']();
           } catch {}
-        const providerId = await this['_buildPayload'](template, { randomizeSubmitParams: !![] });
+        const providerId = await this['_buildPayload'](template, { randomizeSubmitParams: true });
         value117 = providerId;
         if (!providerId) return;
         if (!(await this['_preflightConnectedLocalVideoInputs'](providerId))) return;
@@ -1706,17 +1706,17 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             ['trim']()
             ['toLowerCase'](),
           async2 = !cancellable3 && !resumable;
-        resumable && this['_stopDreaminaRecovery'](!![]);
-        cancellable3 && this['_stopRunningHubRecovery'](!![]);
-        async2 && this['_stopAsyncRecovery'](!![]);
+        resumable && this['_stopDreaminaRecovery'](true);
+        cancellable3 && this['_stopRunningHubRecovery'](true);
+        async2 && this['_stopAsyncRecovery'](true);
         this['_rhGenToken'] = (this['_rhGenToken'] || 0) + 1;
         const value119 = this['_rhGenToken'];
-        ((this['_rhCancelRequested'] = ![]),
-          (this['_rhRemoteCancelSent'] = ![]),
+        ((this['_rhCancelRequested'] = false),
+          (this['_rhRemoteCancelSent'] = false),
           (this['_rhApiKey'] = cancellable3 ? providerId['apiKey'] : null),
           (this['_rhTaskId'] = null),
           (this['_rhAbortController'] = resumable || cancellable3 || async2 ? new AbortController() : null),
-          (this['_isGenerating'] = !![]),
+          (this['_isGenerating'] = true),
           this['_setGenerateButtonBusyUi']({ cancellable: cancellable3 }));
         if (!promise['hasStartedPresentation']()) startLoading(this['previewEl']);
         const startedAt14 = Date['now'](),
@@ -1741,15 +1741,15 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             dreaminaTaskStartedAt: startedAt14,
             dreaminaTaskLastCheckedAt: null,
             dreaminaTaskLastRaw: {},
-            dreaminaTaskRecovering: ![],
+            dreaminaTaskRecovering: false,
           }),
           Object['assign'](value120, {
             ...this['_buildRunningHubTaskPatch']({
               taskId: '',
               status: 'idle',
               startedAt: 0,
-              recovering: ![],
-              useOpenapiQuery: ![],
+              recovering: false,
+              useOpenapiQuery: false,
             }),
             ...this['_buildAsyncTaskPatch']({
               provider: '',
@@ -1757,7 +1757,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               taskId: '',
               status: 'idle',
               startedAt: 0,
-              recovering: ![],
+              recovering: false,
             }),
           }));
         cancellable3 &&
@@ -1765,8 +1765,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             rhTaskId: '',
             rhTaskStatus: 'pending',
             rhTaskStartedAt: startedAt14,
-            rhTaskRecovering: ![],
-            rhTaskUseOpenapiQuery: ![],
+            rhTaskRecovering: false,
+            rhTaskUseOpenapiQuery: false,
           }),
           Object['assign'](value120, {
             dreaminaSubmitId: '',
@@ -1776,14 +1776,14 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             dreaminaTaskStartedAt: 0,
             dreaminaTaskLastCheckedAt: null,
             dreaminaTaskLastRaw: {},
-            dreaminaTaskRecovering: ![],
+            dreaminaTaskRecovering: false,
             ...this['_buildAsyncTaskPatch']({
               provider: '',
               kind: 'video',
               taskId: '',
               status: 'idle',
               startedAt: 0,
-              recovering: ![],
+              recovering: false,
             }),
           }));
         async2 &&
@@ -1795,7 +1795,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               taskId: '',
               status: 'pending',
               startedAt: startedAt14,
-              recovering: ![],
+              recovering: false,
             }),
           ),
           Object['assign'](value120, {
@@ -1803,8 +1803,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               taskId: '',
               status: 'idle',
               startedAt: 0,
-              recovering: ![],
-              useOpenapiQuery: ![],
+              recovering: false,
+              useOpenapiQuery: false,
             }),
             dreaminaSubmitId: '',
             dreaminaTaskStatus: 'idle',
@@ -1813,7 +1813,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             dreaminaTaskStartedAt: 0,
             dreaminaTaskLastCheckedAt: null,
             dreaminaTaskLastRaw: {},
-            dreaminaTaskRecovering: ![],
+            dreaminaTaskRecovering: false,
           }));
         try {
           const response7 = await submitTask(
@@ -1829,7 +1829,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               payload: providerId,
               cancellable: cancellable3,
               resumable: resumable || cancellable3 || async2,
-              pauseOnAbort: resumable || cancellable3 || async2 ? 'afterTaskId' : ![],
+              pauseOnAbort: resumable || cancellable3 || async2 ? 'afterTaskId' : false,
               async: async2,
               startBuilder: () => value120,
               onTaskStart: () => {
@@ -1853,7 +1853,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                         handler3(signal4, this['nodeId'], {
                           rhStatusMessage: null,
                           rhStatusCode: null,
-                          rhTaskUseOpenapiQuery: useOpenapiQuery3 === !![],
+                          rhTaskUseOpenapiQuery: useOpenapiQuery3 === true,
                         }));
                       !signal4['isBackgroundTask']?.() &&
                         (this['_syncLocalTaskNodeData'](), this['_persistRunningHubResumeCache']());
@@ -1871,12 +1871,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                             signal4,
                             this['nodeId'],
                             this['_buildDreaminaTaskPatch'](value122, {
-                              recovering: ![],
+                              recovering: false,
                               startedAt: startedAt14,
                             }),
                           )
                         : this['_applyDreaminaTaskSnapshot'](value122, {
-                            recovering: ![],
+                            recovering: false,
                             startedAt: startedAt14,
                           });
                       signal4['onTaskId']?.(submitId5);
@@ -1909,12 +1909,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                             signal4,
                             this['nodeId'],
                             this['_buildDreaminaTaskPatch'](value124, {
-                              recovering: ![],
+                              recovering: false,
                               startedAt: startedAt14,
                             }),
                           )
                         : this['_applyDreaminaTaskSnapshot'](value124, {
-                            recovering: ![],
+                            recovering: false,
                             startedAt: startedAt14,
                           });
                       signal4['onTaskId']?.(submitId6);
@@ -1926,7 +1926,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                       handler3(signal4, this['nodeId'], {
                         rhStatusMessage: null,
                         rhStatusCode: null,
-                        rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery2?.['rhTaskUseOpenapiQuery'] === !![],
+                        rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery2?.['rhTaskUseOpenapiQuery'] === true,
                       });
                       !signal4['isBackgroundTask']?.() &&
                         (this['_syncLocalTaskNodeData'](), this['_persistRunningHubResumeCache']());
@@ -1935,7 +1935,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                         !this['_rhRemoteCancelSent'] &&
                         apiKey3 &&
                         submitId6 &&
-                        ((this['_rhRemoteCancelSent'] = !![]),
+                        ((this['_rhRemoteCancelSent'] = true),
                         (async () => {
                           if (value119 !== this['_rhGenToken']) return;
                           const cancelledBuilder2 = ({ remoteResult: remoteResult2, remoteError: remoteError2 }) => {
@@ -1957,18 +1957,18 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                                 taskId: submitId6,
                                 status: 'cancelled',
                                 startedAt: startedAt14,
-                                recovering: ![],
+                                recovering: false,
                                 useOpenapiQuery:
                                   store['getState']()['nodes']?.[this['nodeId']]?.[
                                     'rhTaskUseOpenapiQuery'
-                                  ] === !![],
+                                  ] === true,
                               }),
                             };
                           };
                           await cancelTask(this['nodeId'], {
                             store: store,
                             taskId: submitId6,
-                            cancellable: !![],
+                            cancellable: true,
                             cancel: ({ taskId: taskId8 }) =>
                               api['cancelRunningHubWorkflowTask']({
                                 apiKey: apiKey3,
@@ -1989,8 +1989,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                               taskType: 'video-generation',
                               payload: providerId,
                               taskId: submitId6,
-                              cancellable: !![],
-                              resumable: !![],
+                              cancellable: true,
+                              resumable: true,
                               cancelledBuilder: cancelledBuilder2,
                             }),
                           });
@@ -2025,12 +2025,12 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                               signal4,
                               this['nodeId'],
                               this['_buildDreaminaTaskPatch'](value126, {
-                                recovering: ![],
+                                recovering: false,
                                 startedAt: startedAt14,
                               }),
                             )
                           : this['_applyDreaminaTaskSnapshot'](value126, {
-                              recovering: ![],
+                              recovering: false,
                               startedAt: startedAt14,
                             });
                       }
@@ -2054,7 +2054,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                     value127,
                     startedAt15['startedAt'],
                     null,
-                    { writeStore: ![], returnPatch: !![] },
+                    { writeStore: false, returnPatch: true },
                   ),
                   value129 = { ...(value128?.['patch'] || {}) };
                 if (cancellable3) {
@@ -2068,8 +2068,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                         String(useOpenapiQuery4?.['rhTaskId'] || '')['trim'](),
                       status: 'success',
                       startedAt: startedAt15['startedAt'],
-                      recovering: ![],
-                      useOpenapiQuery: useOpenapiQuery4?.['rhTaskUseOpenapiQuery'] === !![],
+                      recovering: false,
+                      useOpenapiQuery: useOpenapiQuery4?.['rhTaskUseOpenapiQuery'] === true,
                     }),
                   );
                 } else {
@@ -2083,7 +2083,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                         taskId: String(value130?.['asyncTaskId'] || '')['trim'](),
                         status: 'success',
                         startedAt: startedAt15['startedAt'],
-                        recovering: ![],
+                        recovering: false,
                       }),
                     );
                   }
@@ -2098,13 +2098,13 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                     value133 = this['_buildDreaminaBackgroundPendingSnapshot'](value132);
                   return Object['assign'](
                     {
-                      isGenerating: !![],
+                      isGenerating: true,
                       jobStatus: 'running',
                       jobError: null,
                       generationDuration: Date['now']() - startedAt16['startedAt'],
                     },
                     this['_buildDreaminaTaskPatch'](value133, {
-                      recovering: ![],
+                      recovering: false,
                       startedAt: Number(
                         value131?.['dreaminaTaskStartedAt'] ||
                           value131?.['generationStartTime'] ||
@@ -2130,7 +2130,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   (Object['assign'](
                     value134,
                     this['_buildDreaminaTaskPatch'](value136, {
-                      recovering: ![],
+                      recovering: false,
                       startedAt: startedAt16['startedAt'],
                     }),
                   ),
@@ -2156,8 +2156,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                         String(useOpenapiQuery5?.['rhTaskId'] || '')['trim'](),
                       status: 'failed',
                       startedAt: startedAt16['startedAt'],
-                      recovering: ![],
-                      useOpenapiQuery: useOpenapiQuery5?.['rhTaskUseOpenapiQuery'] === !![],
+                      recovering: false,
+                      useOpenapiQuery: useOpenapiQuery5?.['rhTaskUseOpenapiQuery'] === true,
                     }),
                   );
                 }
@@ -2171,7 +2171,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                       taskId: String(value137?.['asyncTaskId'] || '')['trim'](),
                       status: 'failed',
                       startedAt: startedAt16['startedAt'],
-                      recovering: ![],
+                      recovering: false,
                     }),
                   );
                 }
@@ -2194,8 +2194,8 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                             String(useOpenapiQuery6?.['rhTaskId'] || '')['trim'](),
                           status: 'cancelled',
                           startedAt: startedAt17['startedAt'],
-                          recovering: ![],
-                          useOpenapiQuery: useOpenapiQuery6?.['rhTaskUseOpenapiQuery'] === !![],
+                          recovering: false,
+                          useOpenapiQuery: useOpenapiQuery6?.['rhTaskUseOpenapiQuery'] === true,
                         }),
                       }
                     : {}),
@@ -2319,13 +2319,13 @@ export function createVideoNodeTaskOrchestrationModule(state) {
               this['nodeId'],
               Object['assign'](
                 {
-                  isGenerating: !![],
+                  isGenerating: true,
                   jobStatus: 'running',
                   jobError: null,
                   generationDuration: Date['now']() - startedAt14,
                 },
                 this['_buildDreaminaTaskPatch'](value143, {
-                  recovering: ![],
+                  recovering: false,
                   startedAt: Number(
                     value141?.['dreaminaTaskStartedAt'] || value141?.['generationStartTime'] || startedAt14,
                   ),
@@ -2383,7 +2383,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   store['getState']()['nodes']?.[this['nodeId']]?.['dreaminaSubmitId'] || '',
                   error11?.['message'] || videoTaskText('task.generationFailed'),
                 ),
-                { recovering: ![], startedAt: startedAt14 },
+                { recovering: false, startedAt: startedAt14 },
               ),
             );
           cancellable3 &&
@@ -2401,9 +2401,9 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                   String(store['getState']()['nodes']?.[this['nodeId']]?.['rhTaskId'] || '')['trim'](),
                 status: 'failed',
                 startedAt: startedAt14,
-                recovering: ![],
+                recovering: false,
                 useOpenapiQuery:
-                  store['getState']()['nodes']?.[this['nodeId']]?.['rhTaskUseOpenapiQuery'] === !![],
+                  store['getState']()['nodes']?.[this['nodeId']]?.['rhTaskUseOpenapiQuery'] === true,
               }),
             );
           if (async2) {
@@ -2416,7 +2416,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
                 taskId: String(value144?.['asyncTaskId'] || '')['trim'](),
                 status: 'failed',
                 startedAt: startedAt14,
-                recovering: ![],
+                recovering: false,
               }),
             );
           }
@@ -2457,7 +2457,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
       } finally {
         (promise['restoreBeforeTaskStart'](),
           releasePayloadObjectUrlLease(value117),
-          (this['_videoSubmitInFlight'] = ![]));
+          (this['_videoSubmitInFlight'] = false));
       }
     }
     async ['_buildPayloadImpl'](template2 = null, value147 = {}) {
@@ -2528,7 +2528,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             assetInputRefs: assetInputRefs,
             assetMediaCounts: assetMediaCounts['mediaCounts'],
             assetDedupeState: assetMediaCounts['dedupeState'],
-            dedupeAssetMentions: !![],
+            dedupeAssetMentions: true,
             allowedAssetTypes: ['text', 'image', 'video', 'audio'],
           }),
           model2 = this['_data']['model'] || getDefaultRunningHubVideoWorkflowModelId(),
@@ -2572,7 +2572,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           model: model2,
           provider: provider9,
           promptText: prompt,
-          hasInput: ![],
+          hasInput: false,
         });
         if (!response11['ok']) return null;
         const value162 = this['_data']['resolution'] || '1080p',
@@ -2622,7 +2622,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
             rhInstanceType: rhInstanceType,
             installId: String(window['__aicInstallId'] || '')['trim'](),
           };
-        if (value147?.['randomizeSubmitParams'] === !![] && value160) {
+        if (value147?.['randomizeSubmitParams'] === true && value160) {
           const args8 = buildSubmitRandomizedSeedPatch({
             modelManifest: modelManifest?.['modelManifest'] || null,
             nodeData: this['_data'],
@@ -2658,7 +2658,7 @@ export function createVideoNodeTaskOrchestrationModule(state) {
           let model3 = this['_data'];
           typeof this['_normalizeDreaminaNodeData'] === 'function' &&
             ((model3 =
-              this['_normalizeDreaminaNodeData'](this['_data'], { syncStore: !![] }) || this['_data']),
+              this['_normalizeDreaminaNodeData'](this['_data'], { syncStore: true }) || this['_data']),
             (this['_data'] = model3));
           const args9 = getPlainObject(model3?.['generationParams']),
             handler8 = (value168, value169) => {

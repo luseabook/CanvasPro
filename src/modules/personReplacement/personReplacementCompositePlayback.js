@@ -65,7 +65,7 @@ export function createPersonReplacementCompositePlaybackBinding({
           ),
         }
       : entry;
-  let enabled = ![];
+  let enabled = false;
   const map = new Map();
   list2['forEach']((videoEl, config) => {
     const text3 =
@@ -95,32 +95,32 @@ export function createPersonReplacementCompositePlaybackBinding({
             'composite',
             text3,
           ]['join'](':'),
-          allowConcurrentPlayback: !![],
-          preferStreamingSource: ![],
+          allowConcurrentPlayback: true,
+          preferStreamingSource: false,
           ...(record
             ? {
                 acquirePlaybackOptions: {
-                  bypassConcurrencyLimit: !![],
+                  bypassConcurrencyLimit: true,
                   maxBytes: PERSON_REPLACEMENT_COMPOSITE_PREWARM_MAX_BYTES,
                   timeout: PERSON_REPLACEMENT_COMPOSITE_PREWARM_TIMEOUT_MS,
                 },
               }
             : {}),
         });
-    (map['set'](videoEl, input), void Promise['resolve'](input['warm']?.())['catch'](() => ![]));
+    (map['set'](videoEl, input), void Promise['resolve'](input['warm']?.())['catch'](() => false));
   });
   const output =
       el3 && text2
         ? attachMediaElementPlaybackSource(el3, text2, {
             preload: 'auto',
-            shouldAssign: () => !enabled && el3['isConnected'] !== ![],
+            shouldAssign: () => !enabled && el3['isConnected'] !== false,
           })['catch'](() => '')
         : Promise['resolve'](''),
     value2 =
       el2 && text
         ? attachMediaElementPlaybackSource(el2, text, {
             preload: 'auto',
-            shouldAssign: () => !enabled && el2['isConnected'] !== ![],
+            shouldAssign: () => !enabled && el2['isConnected'] !== false,
           })['catch'](() => '')
         : Promise['resolve'](''),
     value3 = Math['max'](0, Number(payload?.['startTimeSec']) || 0);
@@ -128,7 +128,7 @@ export function createPersonReplacementCompositePlaybackBinding({
     value5 = 0,
     value6 = null,
     value7 = 0,
-    enabled2 = ![],
+    enabled2 = false,
     clamp2 = clamp(
       Number(el3?.['volume'] ?? replacementVideo?.['volume'] ?? originalVideo?.['volume']),
       0,
@@ -177,7 +177,7 @@ export function createPersonReplacementCompositePlaybackBinding({
         ? Math['min'](value13, Math['max'](0, count5 - 0.04))
         : value13;
     },
-    handler6 = ({ force: force = ![] } = {}) => {
+    handler6 = ({ force: force = false } = {}) => {
       const value14 = handler2();
       list2['forEach']((value15) => {
         if (value15 === el10) return;
@@ -211,8 +211,8 @@ export function createPersonReplacementCompositePlaybackBinding({
       if (el3) el3['muted'] = value18 !== 'replacement';
       el['dataset']['previewTrack'] = value18;
     },
-    handler8 = () => el10['paused'] === ![] && el10['ended'] !== !![],
-    value19 = (value20) => value20?.['paused'] === ![] && value20?.['ended'] !== !![],
+    handler8 = () => el10['paused'] === false && el10['ended'] !== true,
+    value19 = (value20) => value20?.['paused'] === false && value20?.['ended'] !== true,
     handler9 = () => {
       const enabled3 = handler8(),
         value21 = enabled2 && !enabled3;
@@ -247,9 +247,9 @@ export function createPersonReplacementCompositePlaybackBinding({
         ? (value4 = windowObject['requestAnimationFrame'](value22))
         : (value5 = windowObject?.['setTimeout']?.(value22, 32) || 0);
     },
-    handler12 = ({ cancelPending: cancelPending = !![] } = {}) => {
+    handler12 = ({ cancelPending: cancelPending = true } = {}) => {
       if (cancelPending) value7 += 1;
-      ((enabled2 = ![]),
+      ((enabled2 = false),
         list2['forEach']((value23) => value23['pause']?.()),
         el2?.['pause']?.(),
         el3?.['pause']?.(),
@@ -258,10 +258,10 @@ export function createPersonReplacementCompositePlaybackBinding({
     },
     handler13 = async () => {
       const value24 = value7 + 1;
-      ((value7 = value24), (enabled2 = !![]), handler9());
+      ((value7 = value24), (enabled2 = true), handler9());
       const count9 = handler();
       (el10['ended'] || (count9 > 0 && handler2() >= count9 - 0.04)) && (el10['currentTime'] = 0);
-      (handler6({ force: !![] }), handler7());
+      (handler6({ force: true }), handler7());
       const list3 = [...list2],
         value25 = run(),
         value26 = value25 === 'original' ? el2 : el3,
@@ -283,7 +283,7 @@ export function createPersonReplacementCompositePlaybackBinding({
         list3['includes'](value26) &&
         void promise['then']((enabled4) => {
           if (!enabled4) throw new Error('Selected audio source unavailable');
-          if (enabled || value24 !== value7) return ![];
+          if (enabled || value24 !== value7) return false;
           return value26['play']?.();
         })
           ['then'](() => {
@@ -291,42 +291,42 @@ export function createPersonReplacementCompositePlaybackBinding({
               value26['pause']?.();
               return;
             }
-            handler6({ force: !![] });
+            handler6({ force: true });
           })
           ['catch'](() => {
             if (enabled || value24 !== value7) return;
             value26['pause']?.();
             const value31 = value25 === 'original' ? originalVideo : replacementVideo;
-            if (value31) value31['muted'] = ![];
+            if (value31) value31['muted'] = false;
             handler4();
           });
       const list4 = await value27;
-      if (enabled || value24 !== value7) return (list3['forEach']((value32) => value32['pause']?.()), ![]);
-      enabled2 = ![];
+      if (enabled || value24 !== value7) return (list3['forEach']((value32) => value32['pause']?.()), false);
+      enabled2 = false;
       const value33 =
-        list4['some']((el12) => el12['status'] === 'rejected' || el12['value'] === ![]) ||
+        list4['some']((el12) => el12['status'] === 'rejected' || el12['value'] === false) ||
         !list2['every'](value19);
       if (value33)
         return (
-          handler12({ cancelPending: ![] }),
+          handler12({ cancelPending: false }),
           windowObject?.['showToast']?.('同步播放失败，请确认视频文件仍然可用。', 'warn'),
-          ![]
+          false
         );
-      return (handler6({ force: !![] }), handler9(), handler11(), !![]);
+      return (handler6({ force: true }), handler9(), handler11(), true);
     },
     togglePlayback = () => {
-      if (handler8() || enabled2) return (handler12(), ![]);
-      return (void handler13(), !![]);
+      if (handler8() || enabled2) return (handler12(), false);
+      return (void handler13(), true);
     },
     handler14 = (value34) => {
       const count10 = handler();
-      if (!(count10 > 0)) return ![];
+      if (!(count10 > 0)) return false;
       const clamp3 = clamp(Number(value34), 0, 1, 0);
-      return ((el10['currentTime'] = clamp3 * count10), handler6({ force: !![] }), handler3(), !![]);
+      return ((el10['currentTime'] = clamp3 * count10), handler6({ force: true }), handler3(), true);
     },
     handler15 = (value35) => {
       const box = el4?.['getBoundingClientRect']?.();
-      if (!(Number(box?.['width']) > 0)) return ![];
+      if (!(Number(box?.['width']) > 0)) return false;
       return handler14((Number(value35) - Number(box['left'] || 0)) / Number(box['width']));
     },
     handler16 = () => {
@@ -419,7 +419,7 @@ export function createPersonReplacementCompositePlaybackBinding({
     handler9());
   const run2 = ({ retainVideos: retainVideos = [] } = {}) => {
     if (enabled) return new Map();
-    ((enabled = !![]), handler12());
+    ((enabled = true), handler12());
     const map2 = new Map();
     return (
       (Array['isArray'](retainVideos) ? retainVideos : [])['forEach']((value50) => {
@@ -454,17 +454,17 @@ export function createPersonReplacementCompositePlaybackBinding({
   return Object['freeze']({
     togglePlayback: togglePlayback,
     setTrack(value54) {
-      (handler7(value54), handler6({ force: !![] }));
+      (handler7(value54), handler6({ force: true }));
       const value55 = value54 === 'original' ? el2 : el3,
         promise2 = value54 === 'original' ? value2 : output;
       value55 &&
         handler8() &&
         void promise2['then']((enabled6) => {
-          if (!enabled6 || enabled || !handler8()) return ![];
+          if (!enabled6 || enabled || !handler8()) return false;
           return value55['play']?.();
         })['catch'](() => {
           const value56 = value54 === 'original' ? originalVideo : replacementVideo;
-          if (!enabled && value56) value56['muted'] = ![];
+          if (!enabled && value56) value56['muted'] = false;
         });
       if (value55 !== el2) el2?.['pause']?.();
       if (value55 !== el3) el3?.['pause']?.();
@@ -474,17 +474,17 @@ export function createPersonReplacementCompositePlaybackBinding({
       const text4 = normalizeText(value57),
         text5 = normalizeText(originalVideo?.['dataset']?.['personReplacementCompareVideoUrl']),
         enabled7 = originalVideo ? map['get'](originalVideo) : null;
-      if (enabled || !enabled7 || !text4 || text4 !== text5) return Promise['resolve'](![]);
+      if (enabled || !enabled7 || !text4 || text4 !== text5) return Promise['resolve'](false);
       try {
         return Promise['resolve'](enabled7['play']?.())['then'](
           (value58) => {
             if (!enabled) originalVideo['pause']?.();
-            return value58 !== ![];
+            return value58 !== false;
           },
-          () => ![],
+          () => false,
         );
       } catch {
-        return Promise['resolve'](![]);
+        return Promise['resolve'](false);
       }
     },
     retainOriginalPlayback(value59 = '') {

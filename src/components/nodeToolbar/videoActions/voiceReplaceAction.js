@@ -24,8 +24,8 @@ export function bindVideoVoiceReplaceAction(item) {
       window['showToast']?.(videoToolbarText('exitClipMode'), 'info');
       return;
     }
-    (VideoClipController['exit']({ silent: !![] }),
-      VideoKeyingController['exit']({ silent: !![] }),
+    (VideoClipController['exit']({ silent: true }),
+      VideoKeyingController['exit']({ silent: true }),
       window['dispatchEvent'](
         new CustomEvent(AUDIO_VOICE_PANEL_OPEN_EVENT, { detail: { sourceNodeId: nodeData?.['id'] || '' } }),
       ));

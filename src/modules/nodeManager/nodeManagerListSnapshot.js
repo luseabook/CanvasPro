@@ -34,7 +34,7 @@ export function createNodeManagerListSnapshot() {
             presentation: presentation ? enabled['presentation'] : index,
           };
         }
-        if (list2[item] !== list[item] || key['presentation'] !== enabled?.['presentation']) changed = !![];
+        if (list2[item] !== list[item] || key['presentation'] !== enabled?.['presentation']) changed = true;
         map2['set'](value, key);
       }),
         (map = map2),

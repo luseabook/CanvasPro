@@ -61,7 +61,7 @@ function resolveStoredTaskMode(error) {
     return 'keying';
   return '';
 }
-function toPublicTask(enabled, { fromStore: fromStore = ![] } = {}) {
+function toPublicTask(enabled, { fromStore: fromStore = false } = {}) {
   if (!enabled) return null;
   return {
     sourceNodeId: String(enabled['sourceNodeId'] || ''),
@@ -89,7 +89,7 @@ function findStoredTask(next, current = '') {
     entry = Object['values'](stateSnapshot)
       ['map']((node) => ({ node: node, mode: resolveStoredTaskMode(node) }))
       ['filter'](({ node: node2, mode: mode }) => {
-        if (!mode || (current && mode !== current)) return ![];
+        if (!mode || (current && mode !== current)) return false;
         return String(node2['id'] || '') === enabled4 || String(node2['rhSourceNodeId'] || '') === enabled4;
       })
       ['sort']((record, payload) => {
@@ -109,7 +109,7 @@ function findStoredTask(next, current = '') {
       taskId: sourceNodeId['node']['rhTaskId'],
       mode: sourceNodeId['mode'],
     },
-    { fromStore: !![] },
+    { fromStore: true },
   );
 }
 export function getRunningVideoKeyingTaskForNode(config, { mode: mode2 } = {}) {
@@ -122,9 +122,9 @@ export function hasRunningVideoKeyingTaskForNode(scope, input = {}) {
 function buildCancelledTaskPatch(output) {
   return {
     ...(output === 'remove' ? { name: videoKeyingText('output.removeResultName') } : {}),
-    isGenerating: ![],
+    isGenerating: false,
     rhTaskStatus: 'cancelled',
-    rhTaskRecovering: ![],
+    rhTaskRecovering: false,
     outputText: buildVideoKeyingOutputText(output, 'cancelled'),
   };
 }
@@ -144,9 +144,9 @@ function buildFailedTaskPatch({ mode: mode3, outId: outId, startedAt: startedAt2
       duration: computeGenerationDuration(outId),
     }),
     ...(mode3 === 'remove' ? { name: videoKeyingText('output.removeFailedName') } : {}),
-    isGenerating: ![],
+    isGenerating: false,
     rhTaskStatus: 'failed',
-    rhTaskRecovering: ![],
+    rhTaskRecovering: false,
     outputText: buildVideoKeyingOutputText(mode3, 'failed', { reason: error4 }),
   };
 }
@@ -178,7 +178,7 @@ export async function runVideoKeyingTask({
     throw new Error('[videoKeyingTaskRuntime] sourceNodeId and outId are required');
   const apiKey = {
     id: Date['now']() + '_' + Math['random']()['toString'](36)['slice'](2),
-    running: !![],
+    running: true,
     taskId: '',
     sourceNodeId: sourceNodeId3,
     outId: outId4,
@@ -201,8 +201,8 @@ export async function runVideoKeyingTask({
         modelId: getVideoKeyingModelId(),
         executionId: getVideoKeyingExecutionId(mode6),
         payload: payload2,
-        cancellable: !![],
-        resumable: !![],
+        cancellable: true,
+        resumable: true,
         parseError: (error6) =>
           typeof error6?.['getUserMessage'] === 'function' ? error6['getUserMessage']() : error6?.['message'],
         cancel: async ({ taskId: taskId }) => {
@@ -225,13 +225,13 @@ export async function runVideoKeyingTask({
               const enabled5 = signal['getTaskNode']?.() || getNode(outId4);
               if (!enabled5) return;
               const value6 = {
-                rhTaskUseOpenapiQuery: ![],
+                rhTaskUseOpenapiQuery: false,
                 outputText: buildVideoKeyingOutputText(mode6, 'processing', {
                   taskId: String(value4 || ''),
                 }),
               };
               typeof signal['updateTaskNode'] === 'function'
-                ? signal['updateTaskNode'](value6, { allowMissing: !![] })
+                ? signal['updateTaskNode'](value6, { allowMissing: true })
                 : appStore['updateNodeData'](outId4, value6);
             },
           }),
@@ -256,7 +256,7 @@ export async function runVideoKeyingTask({
         ));
     else {
       if (error5['status'] !== 'cancelled') {
-        error5['blocked'] === !![] &&
+        error5['blocked'] === true &&
           getNode(outId4) &&
           appStore['updateNodeData'](
             outId4,
@@ -297,16 +297,16 @@ export async function runVideoKeyingTask({
         }),
         'error',
       ),
-      { ok: ![], status: 'failed', targetNodeId: outId4, error: error9 }
+      { ok: false, status: 'failed', targetNodeId: outId4, error: error9 }
     );
   } finally {
     const value7 = taskContexts['get'](sourceNodeId3);
     value7?.['id'] === apiKey['id'] && (taskContexts['delete'](sourceNodeId3), notifyTaskChange(value7));
   }
 }
-export async function cancelVideoKeyingTaskForNode(value8, { mode: mode7, notify: notify = ![] } = {}) {
+export async function cancelVideoKeyingTaskForNode(value8, { mode: mode7, notify: notify = false } = {}) {
   const taskId2 = getRunningVideoKeyingTaskForNode(value8, { mode: mode7 });
-  if (!taskId2?.['outId']) return ![];
+  if (!taskId2?.['outId']) return false;
   const value9 = taskContexts['get'](taskId2['sourceNodeId']);
   value9?.['outId'] === taskId2['outId'] &&
     (taskContexts['delete'](taskId2['sourceNodeId']), notifyTaskChange(value9));
@@ -329,7 +329,7 @@ export async function cancelVideoKeyingTaskForNode(value8, { mode: mode7, notify
   return (
     await cancelTask(taskId2['outId'], {
       store: appStore,
-      cancellable: !![],
+      cancellable: true,
       taskId: taskId2['taskId'],
       spec: {
         sourceNodeId: taskId2['sourceNodeId'],
@@ -356,7 +356,7 @@ export async function cancelVideoKeyingTaskForNode(value8, { mode: mode7, notify
         videoKeyingText('toasts.' + (taskId2['mode'] === 'remove' ? 'remove' : 'keying') + 'Cancelled'),
         'info',
       ),
-    !![]
+    true
   );
 }
 export function __resetVideoKeyingTaskRuntimeForTest() {

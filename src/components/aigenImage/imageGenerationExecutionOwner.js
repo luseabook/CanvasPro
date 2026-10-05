@@ -4,7 +4,7 @@ import { submitTask, resumeTask, cancelTask } from '../../core/generationTaskRun
 import { getGenerationRatioMediaSize } from '../../modules/generationRatioSource.js';
 const readState = (store) => store['getStateRaw']?.() || store['getState'](),
   cancelled = (targetNodeId) => ({
-    ok: ![],
+    ok: false,
     status: 'cancelled',
     reason: 'target-changed',
     targetNodeId: targetNodeId,
@@ -17,12 +17,12 @@ export function createImageGenerationExecutionOwner({
   if (!store2 || typeof getScopeId !== 'function')
     throw new TypeError('Image execution requires a Store and canvas scope reader');
   const map = new Map();
-  let enabled = ![];
+  let enabled = false;
   function run(nodeId, taskScopeId) {
     let enabled2 = null,
-      enabled3 = ![],
+      enabled3 = false,
       value = null,
-      submitting = ![];
+      submitting = false;
     const isTargetCurrent = () =>
         !enabled &&
         !enabled3 &&
@@ -30,7 +30,7 @@ export function createImageGenerationExecutionOwner({
         readState(store2)['nodes']?.[nodeId]?.['type'] === 'ai-image',
       store3 = () => enabled2?.['store'] || store2,
       handler = () =>
-        (enabled2?.['background'] === !![] || isTargetCurrent()) && !!readState(store3())['nodes']?.[nodeId],
+        (enabled2?.['background'] === true || isTargetCurrent()) && !!readState(store3())['nodes']?.[nodeId],
       store4 = {
         getState: () => (handler() ? readState(store3()) : { nodes: {}, edges: {} }),
         getStateRaw: () => store4['getState'](),
@@ -80,12 +80,12 @@ export function createImageGenerationExecutionOwner({
       }),
       handler4 = async (record, payload) => {
         if (!isTargetCurrent()) return cancelled(nodeId);
-        if (submitting) return { ok: ![], status: 'running', targetNodeId: nodeId };
-        (value?.['flushPrompt']?.(), (enabled2 = null), (submitting = !![]), startLoading());
+        if (submitting) return { ok: false, status: 'running', targetNodeId: nodeId };
+        (value?.['flushPrompt']?.(), (enabled2 = null), (submitting = true), startLoading());
         try {
           return await record['apply'](args5, payload);
         } finally {
-          ((submitting = ![]), startLoading());
+          ((submitting = false), startLoading());
         }
       },
       args = {
@@ -107,16 +107,16 @@ export function createImageGenerationExecutionOwner({
             return (
               value?.['onStateChange']?.({
                 ...args['getGenerationStatus'](),
-                isGenerating: ![],
-                submitting: ![],
+                isGenerating: false,
+                submitting: false,
                 jobStatus: 'cancelled',
               }),
-              (enabled3 = !![]),
-              { ok: !![], status: 'cancelled', reason: 'user-cancelled', targetNodeId: nodeId }
+              (enabled3 = true),
+              { ok: true, status: 'cancelled', reason: 'user-cancelled', targetNodeId: nodeId }
             );
           if (args5['_isRunninghubWorkflowModel'](args5['_data']?.['model'], args5['_data']?.['provider']))
             return args5['cancelGeneration']();
-          return cancelTask(nodeId, { store: store3(), abortLocal: !![] });
+          return cancelTask(nodeId, { store: store3(), abortLocal: true });
         },
         resumeGeneration: () => {
           const scope = store4['getState']()['nodes']?.[nodeId] || {};
@@ -158,17 +158,17 @@ export function createImageGenerationExecutionOwner({
         },
         reconcile() {
           if (!isTargetCurrent()) value = null;
-          if (enabled2?.['background'] === !![]) return;
+          if (enabled2?.['background'] === true) return;
           if (!isTargetCurrent()) {
-            enabled3 = !![];
-            if (enabled2 && submitting) void cancelTask(nodeId, { store: store3(), abortLocal: !![] });
+            enabled3 = true;
+            if (enabled2 && submitting) void cancelTask(nodeId, { store: store3(), abortLocal: true });
           }
         },
         isReusable: () => !enabled3,
         isPending: () => submitting,
         dispose() {
-          ((enabled3 = !![]), (value = null));
-          if (enabled2 && submitting) void cancelTask(nodeId, { store: store3(), abortLocal: !![] });
+          ((enabled3 = true), (value = null));
+          if (enabled2 && submitting) void cancelTask(nodeId, { store: store3(), abortLocal: true });
         },
       };
     return args;
@@ -201,12 +201,12 @@ export function createImageGenerationExecutionOwner({
     }
     if (value4) run2();
   });
-  let value7 = ![];
+  let value7 = false;
   function run2() {
     if (enabled || value7) return;
-    ((value7 = !![]),
+    ((value7 = true),
       queueMicrotask(() => {
-        value7 = ![];
+        value7 = false;
         if (enabled) return;
         for (const value8 of Object['values'](readState(store2)['nodes'] || {})) {
           value8['type'] === 'ai-image' &&
@@ -238,7 +238,7 @@ export function createImageGenerationExecutionOwner({
       );
     },
     dispose() {
-      ((enabled = !![]), value2?.());
+      ((enabled = true), value2?.());
       for (const map4 of map['values']()) for (const value13 of map4['values']()) value13['dispose']();
       map['clear']();
     },

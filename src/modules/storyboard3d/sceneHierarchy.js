@@ -198,8 +198,8 @@ export function createStoryboard3DSceneGroup(
       id: value26,
       type: 'group',
       name: normalizeName(name) || 'Group',
-      visible: !![],
-      locked: ![],
+      visible: true,
+      locked: false,
       transform: normalizeTransform(transform),
       ...(normalizeId(parentId) ? { parentId: normalizeId(parentId) } : {}),
     }));
@@ -246,12 +246,12 @@ export function renameStoryboard3DSceneGroup(value38, value39, value40) {
   return cloneScene5;
 }
 export function ungroupStoryboard3DSceneGroup(value41, value42) {
-  return deleteStoryboard3DSceneGroup(value41, value42, { deleteChildren: ![] });
+  return deleteStoryboard3DSceneGroup(value41, value42, { deleteChildren: false });
 }
 export function deleteStoryboard3DSceneGroup(
   value43,
   value44,
-  { deleteChildren: deleteChildren = ![] } = {},
+  { deleteChildren: deleteChildren = false } = {},
 ) {
   const cloneScene6 = cloneScene(value43),
     requireGroup3 = requireGroup(cloneScene6, value44),
@@ -330,7 +330,7 @@ export function applyStoryboard3DHierarchyOperation(
                 cloneStoryboard3DProject2['scenes'][count2] = deleteStoryboard3DSceneGroup(
                   value52,
                   args2['groupId'],
-                  { deleteChildren: args2['deleteChildren'] === !![] },
+                  { deleteChildren: args2['deleteChildren'] === true },
                 );
               else throw new Error('Unsupported storyboard hierarchy operation: ' + id11);
             }

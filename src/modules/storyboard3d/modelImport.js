@@ -70,26 +70,26 @@ export function validateStoryboard3DModelSource(
   );
 }
 function ascii(list2, result = 0, data = list2['length']) {
-  return new TextDecoder('utf-8', { fatal: ![] })['decode'](list2['subarray'](result, data));
+  return new TextDecoder('utf-8', { fatal: false })['decode'](list2['subarray'](result, data));
 }
 function inspectGlb(options) {
-  if (options['byteLength'] < 20) return ![];
+  if (options['byteLength'] < 20) return false;
   const dataView = new DataView(options['buffer'], options['byteOffset'], options['byteLength']),
-    target = dataView['getUint32'](8, !![]),
-    source = dataView['getUint32'](12, !![]);
+    target = dataView['getUint32'](8, true),
+    source = dataView['getUint32'](12, true);
   if (
-    dataView['getUint32'](0, !![]) !== 0x46546c67 ||
-    dataView['getUint32'](4, !![]) !== 2 ||
+    dataView['getUint32'](0, true) !== 0x46546c67 ||
+    dataView['getUint32'](4, true) !== 2 ||
     target !== options['byteLength'] ||
-    dataView['getUint32'](16, !![]) !== 0x4e4f534a ||
+    dataView['getUint32'](16, true) !== 0x4e4f534a ||
     20 + source > options['byteLength']
   )
-    return ![];
+    return false;
   try {
     const next = JSON['parse'](ascii(options, 20, 20 + source)['trim']());
     return String(next?.['asset']?.['version'] || '')['startsWith']('2');
   } catch {
-    return ![];
+    return false;
   }
 }
 function inspectGltf(current) {
@@ -97,7 +97,7 @@ function inspectGltf(current) {
     const entry = JSON['parse'](ascii(current));
     return String(entry?.['asset']?.['version'] || '')['startsWith']('2');
   } catch {
-    return ![];
+    return false;
   }
 }
 function inspectObj(list3) {
@@ -111,8 +111,8 @@ function inspectFbx(list4) {
 function inspectStl(list6) {
   if (list6['byteLength'] >= 84) {
     const dataView2 = new DataView(list6['buffer'], list6['byteOffset'], list6['byteLength']),
-      record = dataView2['getUint32'](80, !![]);
-    if (84 + record * 50 === list6['byteLength']) return !![];
+      record = dataView2['getUint32'](80, true);
+    if (84 + record * 50 === list6['byteLength']) return true;
   }
   const ascii3 = ascii(list6, 0, Math['min'](list6['length'], 4096));
   return /^\s*solid\b/i['test'](ascii3) && /\bfacet\s+normal\b/i['test'](ascii3);
@@ -125,7 +125,7 @@ export async function inspectStoryboard3DModelFile(payload, handle = {}) {
     enabled2 = state[format2['format']](byteLength);
   if (!enabled2)
     return {
-      ok: ![],
+      ok: false,
       format: format2['format'],
       errors: [
         {
@@ -135,7 +135,7 @@ export async function inspectStoryboard3DModelFile(payload, handle = {}) {
       ],
     };
   return {
-    ok: !![],
+    ok: true,
     format: format2['format'],
     byteLength: byteLength['byteLength'],
     parserId: MODEL_FORMATS[format2['format']]['parserId'],
@@ -275,18 +275,18 @@ export function createStoryboard3DModelResourceMap(list7 = []) {
 }
 export function pickStoryboard3DModelFiles({
   documentObject: documentObject = globalThis['document'],
-  multiple: multiple = ![],
+  multiple: multiple = false,
 } = {}) {
   if (!documentObject?.['createElement']) return Promise['reject'](new Error('File picker is unavailable.'));
   return new Promise((handler) => {
     const el = documentObject['createElement']('input');
     ((el['type'] = 'file'),
       (el['accept'] = STORYBOARD_3D_MODEL_ACCEPT),
-      (el['multiple'] = multiple === !![]),
+      (el['multiple'] = multiple === true),
       el['addEventListener']('change', () => handler([...(el['files'] || [])]), {
-        once: !![],
+        once: true,
       }),
-      el['addEventListener']('cancel', () => handler([]), { once: !![] }),
+      el['addEventListener']('cancel', () => handler([]), { once: true }),
       el['click']());
   });
 }

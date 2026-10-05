@@ -40,7 +40,7 @@ export function removeStoryAddedAssetAppearance(options2 = {}, item = '') {
     removedAppearance = list[removedIndex] || null;
   if (list['length'] <= 1 || removedIndex < 0 || !isStoryAddedAssetAppearance(removedAppearance))
     return {
-      removed: ![],
+      removed: false,
       removedAppearance: null,
       removedIndex: -1,
       nextIndex: Math['max'](0, Math['min'](list['length'] - 1, removedIndex)),
@@ -50,7 +50,7 @@ export function removeStoryAddedAssetAppearance(options2 = {}, item = '') {
     normalizeText(options2['baseAppearanceId']) === text &&
       ((options2['baseAppearanceId'] = ''), ensureStoryAssetBaseAppearance(options2)),
     {
-      removed: !![],
+      removed: true,
       removedAppearance: removedAppearance,
       removedIndex: removedIndex,
       nextIndex: Math['max'](0, Math['min'](options2['appearances']['length'] - 1, removedIndex)),
@@ -62,14 +62,14 @@ export function clearStoryAssetAppearanceImage(options3 = {}, data = '') {
   const list2 = getStoryAssetAppearances(options3),
     nextIndex = list2['findIndex']((target) => target['id'] === data),
     enabled = list2[nextIndex];
-  if (!enabled || !normalizeText(enabled['imageUrl'])) return { removed: ![] };
+  if (!enabled || !normalizeText(enabled['imageUrl'])) return { removed: false };
   return (
     (enabled['imageUrl'] = ''),
     (enabled['generatedImage'] = null),
     (enabled['generatedImages'] = []),
     (enabled['activeIndex'] = 0),
     (enabled['error'] = ''),
-    { removed: !![], nextIndex: nextIndex }
+    { removed: true, nextIndex: nextIndex }
   );
 }
 export function getMissingStoryAssetImages(list3 = []) {
@@ -157,7 +157,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
         previewAppearance: previewAppearance = null,
         statusText: statusText = '',
         cardStatusHtml: cardStatusHtml = '',
-        draggable: draggable = ![],
+        draggable: draggable = false,
         cardClassName: cardClassName = '',
         cardAttributes: cardAttributes = '',
         shellClassName: shellClassName = '',
@@ -165,7 +165,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
         cardMetaHtml: cardMetaHtml = '',
         cardMediaHtml: cardMediaHtml = renderStoryReplicationAssetComparison(value11, value12),
         fallbackImageUrl: fallbackImageUrl = '',
-        workspaceAssetLibraryImage: workspaceAssetLibraryImage = ![],
+        workspaceAssetLibraryImage: workspaceAssetLibraryImage = false,
       } = {},
     ) =>
       presentation['renderAssetSurface']({
@@ -187,7 +187,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
       }),
     renderAppearanceArrow = (direction) =>
       presentation['renderAssetSurface']({ kind: 'appearance-arrow', direction: direction }),
-    renderAssetReferenceInput = (referenceImageUrl = {}, { disabled: disabled = ![] } = {}) =>
+    renderAssetReferenceInput = (referenceImageUrl = {}, { disabled: disabled = false } = {}) =>
       presentation['renderAssetSurface']({
         kind: 'reference-input',
         reference: { referenceImageUrl: referenceImageUrl['referenceImageUrl'], disabled: disabled },
@@ -232,7 +232,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
     renderLibraryAddToProjectControl = ({
       selectedCount: selectedCount = 0,
       projectAssets: projectAssets = [],
-      showCount: showCount = !![],
+      showCount: showCount = true,
     } = {}) => {
       const args = projection['projectAssetControl']('library-selection', {
         selectionMode: showCount,
@@ -246,9 +246,9 @@ export function createStoryAssetSettingsWorkspacePresentation({
       });
     },
     renderLibrarySelectionActions = ({
-      selectionMode: selectionMode = ![],
+      selectionMode: selectionMode = false,
       selectedCount: selectedCount = 0,
-      allSelected: allSelected = ![],
+      allSelected: allSelected = false,
       projectAssets: projectAssets = [],
     } = {}) =>
       presentation['renderAssetControls']({
@@ -262,15 +262,15 @@ export function createStoryAssetSettingsWorkspacePresentation({
         }),
       }),
     syncCharacterVoiceCapsuleState = (el, value15 = {}) => {
-      if (typeof el?.['classList']?.['toggle'] !== 'function') return ![];
+      if (typeof el?.['classList']?.['toggle'] !== 'function') return false;
       const hasStoryCharacterVoiceReference2 = hasStoryCharacterVoiceReference(value15);
       return (
         el['classList']['toggle']('has-reference', hasStoryCharacterVoiceReference2),
         el['classList']['toggle']('is-missing', !hasStoryCharacterVoiceReference2),
-        !![]
+        true
       );
     },
-    renderVoiceIcon = (hasVoice = ![]) =>
+    renderVoiceIcon = (hasVoice = false) =>
       presentation['renderAssetSurface']({ kind: 'voice-icon', hasVoice: hasVoice }),
     handler = (asset2) =>
       presentation['renderAssetSurface']({
@@ -279,18 +279,18 @@ export function createStoryAssetSettingsWorkspacePresentation({
       }),
     syncCharacterVoicePlayerState = (el2, value16 = {}) => {
       const el3 = el2?.['querySelector']?.('.story-asset-caption-title');
-      if (!el3) return ![];
+      if (!el3) return false;
       el3['querySelector']?.('[data-story-character-voice-player]')?.['remove']?.();
       const value17 = handler(value16);
       if (value17) el3['insertAdjacentHTML']('beforeend', value17);
-      return !![];
+      return true;
     },
     renderAssetPreviewActions = ({
       state: state = {},
       asset: asset = {},
       appearance: appearance = {},
       generationControl: generationControl = {},
-      readOnly: readOnly = ![],
+      readOnly: readOnly = false,
     } = {}) =>
       presentation['renderAssetSurface']({
         kind: 'preview-actions',
@@ -305,7 +305,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
     renderAssetDetail = (
       value18,
       value19,
-      { showEmptyDescription: showEmptyDescription = !![], readOnly: readOnly = ![] } = {},
+      { showEmptyDescription: showEmptyDescription = true, readOnly: readOnly = false } = {},
     ) =>
       presentation['renderAssetSurface']({
         kind: 'detail',
@@ -348,7 +348,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
           isStoryAudioAsset(imageUrl)
             ? renderAssetCard(
                 cardMediaHtml2,
-                { ...imageUrl, isLibraryAsset: !![], imageUrl: '', role: '音频素材' },
+                { ...imageUrl, isLibraryAsset: true, imageUrl: '', role: '音频素材' },
                 {
                   cardMediaHtml: renderStoryAudioArtwork(),
                   statusText:
@@ -378,7 +378,7 @@ export function createStoryAssetSettingsWorkspacePresentation({
                 },
               )
             : assets['map'](renderAsset)['join'](''),
-        calloutInHeading = !![],
+        calloutInHeading = true,
         primaryActionHtml = renderStoryAudioActions(
           cardMediaHtml2,
           assets,

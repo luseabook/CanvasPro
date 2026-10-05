@@ -19,11 +19,11 @@ function getWindowObject() {
 }
 function getElectronApi() {
   const windowObject = getWindowObject()?.['electronAPI'] || null;
-  return windowObject?.['__aicDesktopHttpShim'] === !![] ? null : windowObject;
+  return windowObject?.['__aicDesktopHttpShim'] === true ? null : windowObject;
 }
 function getDesktopApi() {
   const windowObject2 = getWindowObject()?.['aiCanvasDesktop'] || null;
-  return windowObject2?.['__aicDesktopHttpShim'] === !![] ? null : windowObject2;
+  return windowObject2?.['__aicDesktopHttpShim'] === true ? null : windowObject2;
 }
 function isFunction(value) {
   return typeof value === 'function';
@@ -31,20 +31,20 @@ function isFunction(value) {
 function isLoopbackAppOrigin() {
   try {
     const enabled = globalThis['location'];
-    if (!enabled || !/^https?:$/i['test'](String(enabled['protocol'] || ''))) return ![];
+    if (!enabled || !/^https?:$/i['test'](String(enabled['protocol'] || ''))) return false;
     return LOOPBACK_HOSTS['has'](String(enabled['hostname'] || '')['toLowerCase']());
   } catch {
-    return ![];
+    return false;
   }
 }
 function hasChromeShellRuntimeHint() {
   const windowObject3 = getWindowObject();
-  if (windowObject3?.['__AIC_CHROME_SHELL__'] || windowObject3?.['__AIC_DESKTOP_HTTP_BRIDGE__']) return !![];
+  if (windowObject3?.['__AIC_CHROME_SHELL__'] || windowObject3?.['__AIC_DESKTOP_HTTP_BRIDGE__']) return true;
   try {
     const map = new URLSearchParams(globalThis['location']?.['search'] || '');
     return String(map['get']('aicRuntime') || '')['toLowerCase']() === 'chrome-shell';
   } catch {
-    return ![];
+    return false;
   }
 }
 function normalizeHttpBridgeResult(response) {
@@ -52,8 +52,8 @@ function normalizeHttpBridgeResult(response) {
   const error = response['data'];
   if (!error || typeof error !== 'object' || !Object['prototype']['hasOwnProperty']['call'](error, 'success'))
     return error;
-  if (error['success'] === ![] && error['canceled'] === !![]) return error;
-  if (error['success'] === ![])
+  if (error['success'] === false && error['canceled'] === true) return error;
+  if (error['success'] === false)
     throw new Error(error['error'] || error['message'] || 'Desktop bridge request failed');
   if (Object['prototype']['hasOwnProperty']['call'](error, 'data')) return error['data'];
   return error;
@@ -97,7 +97,7 @@ function chromeShellPostOperationResult(record, payload = {}) {
     const response2 = await post(record, handle, resolveDesktopBridgeRequestTimeout(record, handle));
     if (!response2?.['success']) throw new Error(response2?.['error'] || 'Desktop bridge request failed');
     const response3 = response2['data'];
-    if (response3?.['success'] === ![])
+    if (response3?.['success'] === false)
       throw new Error(response3?.['error'] || 'Desktop bridge request failed');
     return response3 && Object['prototype']['hasOwnProperty']['call'](response3, 'data')
       ? response3['data']
@@ -119,7 +119,7 @@ function createLatestOnlyChromeShellPoster(state) {
         const config = value2;
         ((value2 = null), await chromeShellPost(state, config));
       }
-      return { ok: !![] };
+      return { ok: true };
     } finally {
       enabled2 = null;
     }
@@ -151,7 +151,7 @@ function subscribeByPolling(
   } = {},
 ) {
   if (!desktopBridge['isChromeShell'] || typeof handler2 !== 'function') return () => {};
-  let enabled3 = ![];
+  let enabled3 = false;
   const map2 = new Map(),
     async2 = async () => {
       if (enabled3) return;
@@ -180,13 +180,13 @@ function subscribeByPolling(
   return (
     setTimeout(async2, 0),
     () => {
-      enabled3 = !![];
+      enabled3 = true;
     }
   );
 }
 function subscribeToConsumedBatch(handler3, handler4, { intervalMs: intervalMs = 500 } = {}) {
   if (!desktopBridge['isChromeShell'] || typeof handler4 !== 'function') return () => {};
-  let enabled4 = ![];
+  let enabled4 = false;
   const async3 = async () => {
     if (enabled4) return;
     try {
@@ -199,7 +199,7 @@ function subscribeToConsumedBatch(handler3, handler4, { intervalMs: intervalMs =
   return (
     setTimeout(async3, 0),
     () => {
-      enabled4 = !![];
+      enabled4 = true;
     }
   );
 }
@@ -240,7 +240,7 @@ function subscribeToUpdaterState(value8, handler5, handler6 = subscribeByPolling
 }
 function subscribeByLongPolling(handler7, handler8) {
   if (!desktopBridge['isChromeShell'] || typeof handler8 !== 'function') return () => {};
-  let enabled5 = ![];
+  let enabled5 = false;
   const run3 = (value10) => new Promise((value11) => setTimeout(value11, value10)),
     handler9 = async () => {
       while (!enabled5) {
@@ -260,7 +260,7 @@ function subscribeByLongPolling(handler7, handler8) {
   return (
     void handler9(),
     () => {
-      enabled5 = !![];
+      enabled5 = true;
     }
   );
 }
@@ -280,8 +280,8 @@ export const desktopBridge = {
   get usesHttpCompat() {
     const windowObject4 = getWindowObject();
     return (
-      windowObject4?.['electronAPI']?.['__aicDesktopHttpShim'] === !![] ||
-      windowObject4?.['aiCanvasDesktop']?.['__aicDesktopHttpShim'] === !![] ||
+      windowObject4?.['electronAPI']?.['__aicDesktopHttpShim'] === true ||
+      windowObject4?.['aiCanvasDesktop']?.['__aicDesktopHttpShim'] === true ||
       desktopBridge['isChromeShell']
     );
   },
@@ -442,9 +442,9 @@ export const desktopBridge = {
       if (typeof globalThis['open'] === 'function')
         return (
           globalThis['open'](String(url || ''), '_blank', 'noopener,noreferrer'),
-          Promise['resolve']({ ok: !![], fallback: 'browser' })
+          Promise['resolve']({ ok: true, fallback: 'browser' })
         );
-      return Promise['resolve']({ ok: ![], error: 'openExternal unavailable' });
+      return Promise['resolve']({ ok: false, error: 'openExternal unavailable' });
     },
   },
   mediaPreview: {
@@ -750,7 +750,7 @@ export const desktopBridge = {
     showGenerationComplete: (...args51) =>
       desktopBridge['notification']['api']?.['showGenerationComplete']?.(...args51) ??
       chromeShellPost('/api/v2/desktop/notification/show-generation-complete', args51[0]) ??
-      Promise['resolve']({ success: !![], shown: ![], reason: 'unavailable' }),
+      Promise['resolve']({ success: true, shown: false, reason: 'unavailable' }),
     onGenerationCompleteClick: (value35) =>
       desktopBridge['notification']['api']?.['onGenerationCompleteClick']?.(value35) ||
       subscribeByPolling(
@@ -914,12 +914,12 @@ export function installDesktopBridgeCompat() {
     windowObject5['electronAPI'] ||
     windowObject5['aiCanvasDesktop']
   )
-    return ![];
+    return false;
   return (
-    (windowObject5['__AIC_CHROME_SHELL__'] = !![]),
+    (windowObject5['__AIC_CHROME_SHELL__'] = true),
     (windowObject5['aiCanvasDesktop'] = {
-      __aicDesktopHttpShim: !![],
-      isElectron: ![],
+      __aicDesktopHttpShim: true,
+      isElectron: false,
       getAppVersion: (value46) => chromeShellPost('/api/v2/desktop/app/get-version', value46),
       getDeviceId: (value47) => chromeShellPost('/api/v2/desktop/app/get-device-id', value47),
       checkForUpdates: (value48) => chromeShellPost('/api/v2/desktop/app/check-for-updates', value48),
@@ -937,7 +937,7 @@ export function installDesktopBridgeCompat() {
         subscribeToUpdaterState(() => chromeShellPost('/api/v2/desktop/app/update-state', {}), value53),
     }),
     (windowObject5['electronAPI'] = {
-      __aicDesktopHttpShim: !![],
+      __aicDesktopHttpShim: true,
       project: {
         open: (value54) => chromeShellPost('/api/v2/desktop/project/open', value54),
         save: (value55) => chromeShellPost('/api/v2/desktop/project/save', value55),
@@ -1129,7 +1129,7 @@ export function installDesktopBridgeCompat() {
           context: { label: label, ...(value129 || {}) },
         }),
     }),
-    !![]
+    true
   );
 }
 export function getDesktopBridge() {

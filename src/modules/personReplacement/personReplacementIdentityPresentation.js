@@ -210,10 +210,10 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
         scenes: characters ? list5 : args3['scenes'],
         workspace: { ...args3['workspace'], characterAssetTab: characterAssetTab },
       }),
-      allowDeleteAssetCard: ![],
-      allowAssetRename: ![],
+      allowDeleteAssetCard: false,
+      allowAssetRename: false,
       assetSelectionStyle: 'single',
-      assetSelectionMode: ![],
+      assetSelectionMode: false,
       selectedAssetIds: [],
     },
     list6 = list5['map']((asset) => {
@@ -249,7 +249,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
           return renderPersonReplacementAssetCard(value4, asset2, {
             previewAppearance: appearance,
             statusText: '场景图 ' + (selectedIndex2 + 1) + '/' + appearances2['length'],
-            draggable: !![],
+            draggable: true,
             cardClassName: 'person-replacement-target-asset person-replacement-scene-reference-asset',
             cardAttributes:
               'data-person-replacement-replacement-asset-kind="scene" data-person-replacement-target-scene-id="' +
@@ -285,7 +285,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
           previewAppearance: appearance,
           statusText: '形象 ' + (selectedIndex2 + 1) + '/' + appearances2['length'],
           cardMetaHtml: renderPersonReplacementVoiceReferenceStatus(asset2),
-          draggable: !![],
+          draggable: true,
           cardClassName:
             'person-replacement-target-asset' +
             (hasTargetAssetBinding2 ? ' has-person-replacement-input' : ''),
@@ -551,7 +551,7 @@ function renderDetectionBox(
     error = value43['characters']['find']((value46) => value46['id'] === value41['targetCharacterId']),
     error2 = error ? getCharacterAppearance(error, value41['targetAppearanceId']) : null,
     value47 =
-      value41['identityReviewStatus'] === 'needs_review' || value41['identityReviewRequired'] === !![],
+      value41['identityReviewStatus'] === 'needs_review' || value41['identityReviewRequired'] === true,
     value48 = Object['keys'](value45)['length'] > 0,
     text10 = normalizeText(value45['orientation'], normalizeText(value41['orientation'])),
     formatPersonOrientation2 = formatPersonOrientation(text10),
@@ -711,7 +711,7 @@ function renderVideoReplacementReferenceInputs(value65) {
     fixedInputConfig: fixedInputConfig,
     inputsBySlot: inputsBySlot,
     readOnlyFixedInputSlots: readOnlyFixedInputSlots['readOnlySlots'],
-    showItemTitles: ![],
+    showItemTitles: false,
     attachmentButtonHtml: '',
   });
 }
@@ -765,7 +765,7 @@ function renderPromptReferenceInputs(shotId, value67) {
     '<div class="person-replacement-prompt-reference-inputs" aria-label="图像生成入参">' +
     renderVideoReferenceBarMarkup({
       readOnlyInputs: readOnlyInputs,
-      showItemTitles: ![],
+      showItemTitles: false,
       attachmentButtonHtml: '',
     }) +
     '</div>'

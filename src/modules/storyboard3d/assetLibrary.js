@@ -164,9 +164,9 @@ export function searchStoryboard3DAssets(
     record = Math['max'](0, Math['floor'](Number(offset) || 0)),
     payload = Math['max'](1, Math['min'](1600, Math['floor'](Number(limit) || 80)));
   return list2['filter']((args2) => {
-    if (text7 === 'recent' && !map2['has'](args2['id'])) return ![];
-    if (text7 !== 'all' && text7 !== 'recent' && args2['category'] !== text7) return ![];
-    if (!text6) return !![];
+    if (text7 === 'recent' && !map2['has'](args2['id'])) return false;
+    if (text7 !== 'all' && text7 !== 'recent' && args2['category'] !== text7) return false;
+    if (!text6) return true;
     return [args2['id'], args2['name'], args2['category'], ...args2['tags']]
       ['join'](' ')
       ['toLocaleLowerCase']()
@@ -242,10 +242,10 @@ export function createStoryboard3DAssetLibrary({
       },
       markUsed(value5) {
         const text8 = normalizeText(value5);
-        if (!map3['has'](text8)) return ![];
+        if (!map3['has'](text8)) return false;
         return (
           (args3 = [text8, ...args3['filter']((value6) => value6 !== text8)]['slice'](0, config)),
-          !![]
+          true
         );
       },
       getRecentAssetIds() {

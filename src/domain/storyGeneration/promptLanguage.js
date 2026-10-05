@@ -38,7 +38,7 @@ export function prependStoryDialogueLanguageConstraint(
   const index = '全片人物对白仅使用' + el3['label']['replace'](/文$/u, '语') + '。';
   return enabled['startsWith'](index) ? enabled : index + '\n' + enabled;
 }
-export function buildStoryPromptLanguageRule(result, { translateOnly: translateOnly = ![] } = {}) {
+export function buildStoryPromptLanguageRule(result, { translateOnly: translateOnly = false } = {}) {
   const el5 = STORY_PROMPT_LANGUAGES['find']((el6) => el6['value'] === result);
   if (!el5) return '';
   return (

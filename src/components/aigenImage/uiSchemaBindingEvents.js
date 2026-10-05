@@ -43,12 +43,12 @@ export function bindUiSchemaBindingEvents(
         !enabled2 &&
         invalidatePendingMenuRestore();
     };
-  (el['addEventListener']('click', handleClick, !![]),
-    el['addEventListener']('mousedown', handleMouseDown, !![]),
+  (el['addEventListener']('click', handleClick, true),
+    el['addEventListener']('mousedown', handleMouseDown, true),
     el['addEventListener']('input', handleInput),
     el['addEventListener']('change', handleInput),
     el['addEventListener']('ui-schema-portaled-interaction', item),
-    el2?.['addEventListener']?.('click', result, !![]));
+    el2?.['addEventListener']?.('click', result, true));
   const run = bindRunningHubInstanceDevMode(el, {
     commitValue: commitValue,
     getNodeData: getNodeData,
@@ -56,11 +56,11 @@ export function bindUiSchemaBindingEvents(
   });
   return () => {
     (run(),
-      el['removeEventListener']('click', handleClick, !![]),
-      el['removeEventListener']('mousedown', handleMouseDown, !![]),
+      el['removeEventListener']('click', handleClick, true),
+      el['removeEventListener']('mousedown', handleMouseDown, true),
       el['removeEventListener']('input', handleInput),
       el['removeEventListener']('change', handleInput),
       el['removeEventListener']('ui-schema-portaled-interaction', item),
-      el2?.['removeEventListener']?.('click', result, !![]));
+      el2?.['removeEventListener']?.('click', result, true));
   };
 }

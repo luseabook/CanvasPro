@@ -20,7 +20,7 @@ export function renderStoryVideoReplicationEpisodeRail(list = [], key = '') {
       meta: String(args?.['clips']?.['length'] || 0),
     })),
     selectedId: key,
-    listData: { 'data-story-replication-episode-rail-list': !![] },
+    listData: { 'data-story-replication-episode-rail-list': true },
     getButtonData: (index) => ({ 'data-story-open-episode': index['id'] }),
   });
 }
@@ -37,7 +37,7 @@ function getEvidenceSummary(result) {
     getVideoReplicationDialogueSummary(enabled)['label']
   );
 }
-function syncStoryReplicationCardSelection(el, enabled2, enabled3, target = ![]) {
+function syncStoryReplicationCardSelection(el, enabled2, enabled3, target = false) {
   const enabled4 = ['pending', 'failed']['includes'](enabled2['replication']?.['status']),
     source = Boolean(enabled3 && enabled4 && enabled2['replication']?.['selectedForAnalysis']);
   (el['classList']['toggle']('is-selection-mode', enabled3), el['classList']['toggle']('is-checked', source));
@@ -64,7 +64,7 @@ function syncStoryReplicationCardSelection(el, enabled2, enabled3, target = ![])
 }
 export function syncStoryReplicationSelection(current, entry) {
   const record = entry['data']['episodes'],
-    enabled6 = entry['replicationSelectionMode'] === !![],
+    enabled6 = entry['replicationSelectionMode'] === true,
     list2 = record['filter']((payload) =>
       ['pending', 'failed']['includes'](payload['replication']?.['status']),
     ),
@@ -90,12 +90,12 @@ export function syncStoryReplicationSelection(current, entry) {
 }
 function getStatusView(options2 = {}) {
   const value5 = options2?.['replication']?.['status'] || 'queued';
-  if (value5 === 'uploading') return { label: '上传中', busy: !![] };
-  if (value5 === 'analyzing') return { label: '解析中', busy: !![] };
-  if (value5 === 'ready') return { label: '解析完成', busy: ![] };
-  if (value5 === 'failed') return { label: '解析失败', busy: ![] };
-  if (value5 === 'pending') return { label: '待分析', busy: ![] };
-  return { label: '等待解析', busy: !![] };
+  if (value5 === 'uploading') return { label: '上传中', busy: true };
+  if (value5 === 'analyzing') return { label: '解析中', busy: true };
+  if (value5 === 'ready') return { label: '解析完成', busy: false };
+  if (value5 === 'failed') return { label: '解析失败', busy: false };
+  if (value5 === 'pending') return { label: '待分析', busy: false };
+  return { label: '等待解析', busy: true };
 }
 function getLoadingLabel(value6, value7) {
   const value8 = value6['replication']?.['status'];
@@ -105,7 +105,7 @@ function getLoadingLabel(value6, value7) {
     (value7 + 1)
   );
 }
-function renderVideoCard(options3 = {}, value9 = 0, enabled7 = ![]) {
+function renderVideoCard(options3 = {}, value9 = 0, enabled7 = false) {
   const enabled8 = options3['sourceVideo'] || {},
     statusView = getStatusView(options3),
     value10 = String(enabled8['posterUrl'] || options3['coverUrl'] || '')['trim'](),
@@ -185,7 +185,7 @@ export function renderStoryVideoReplicationPage({
   episodes: episodes = [],
   targetLabel: targetLabel = '原语言',
   styleLabel: styleLabel = '',
-  selectionMode: selectionMode = ![],
+  selectionMode: selectionMode = false,
   footerMarkup: footerMarkup = '',
 } = {}) {
   const value13 = episodes['some']((value14) => getStatusView(value14)['busy']),
@@ -218,7 +218,7 @@ export function renderStoryVideoReplicationPage({
   );
 }
 export function syncStoryVideoReplicationCardElement(el4, enabled12 = {}, value19 = 0) {
-  if (!el4 || !enabled12) return ![];
+  if (!el4 || !enabled12) return false;
   const value20 = enabled12['sourceVideo'] || {},
     statusView2 = getStatusView(enabled12),
     value21 = enabled12?.['replication']?.['status'] || 'queued';
@@ -267,5 +267,5 @@ export function syncStoryVideoReplicationCardElement(el4, enabled12 = {}, value1
   }
   if (value28) value28['hidden'] = Boolean(enabled13);
   const el9 = el4['querySelector']?.('[data-story-replication-drag-handle]');
-  return (el9 && el9['setAttribute']('aria-label', '拖动调整第 ' + (value19 + 1) + ' 条视频顺序'), !![]);
+  return (el9 && el9['setAttribute']('aria-label', '拖动调整第 ' + (value19 + 1) + ' 条视频顺序'), true);
 }

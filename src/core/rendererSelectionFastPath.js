@@ -17,7 +17,7 @@ export function createRendererSelectionFastPath({
 } = {}) {
   let enabled = '',
     value2 = null,
-    hasNodeRevision2 = ![],
+    hasNodeRevision2 = false,
     value3 = null;
   function run(state = {}) {
     const box = state['viewport'] || {},
@@ -49,48 +49,48 @@ export function createRendererSelectionFastPath({
         srcId: srcId['srcId'] || '',
         hoverId: srcId['hoverId'] || '',
         side: srcId['side'] || '',
-        active: srcId['active'] === !![],
+        active: srcId['active'] === true,
         invalidNodeIds: Array['isArray'](srcId['invalidNodeIds'])
           ? srcId['invalidNodeIds']['map']((key) => String(key))
           : [],
       },
       pickConnectMode: {
-        active: active2['active'] === !![],
+        active: active2['active'] === true,
         sourceNodeId: active2['sourceNodeId'] || '',
         hoverNodeId: active2['hoverNodeId'] || '',
         handleDirection: active2['handleDirection'] || '',
       },
       selectionBox: {
-        active: active['active'] === !![],
+        active: active['active'] === true,
         x1: normalizeNumber(active['x1']),
         y1: normalizeNumber(active['y1']),
         x2: normalizeNumber(active['x2']),
         y2: normalizeNumber(active['y2']),
       },
       picker: {
-        visible: visible['visible'] === !![],
+        visible: visible['visible'] === true,
         x: normalizeNumber(visible['x']),
         y: normalizeNumber(visible['y']),
         screenX: normalizeNumber(visible['screenX']),
         screenY: normalizeNumber(visible['screenY']),
       },
       contextMenu: {
-        visible: visible2['visible'] === !![],
+        visible: visible2['visible'] === true,
         x: normalizeNumber(visible2['x']),
         y: normalizeNumber(visible2['y']),
         itemCount: Array['isArray'](visible2['items']) ? visible2['items']['length'] : 0,
       },
       ui: {
-        connectionLinesVisible: connectionLinesVisible['connectionLinesVisible'] !== ![],
+        connectionLinesVisible: connectionLinesVisible['connectionLinesVisible'] !== false,
         connectionLineStyle: connectionLinesVisible['connectionLineStyle'] || 'curve',
-        imageVideoNodeResizeEnabled: connectionLinesVisible['imageVideoNodeResizeEnabled'] === !![],
-        selectionRelatedHighlightEnabled: connectionLinesVisible['selectionRelatedHighlightEnabled'] !== ![],
+        imageVideoNodeResizeEnabled: connectionLinesVisible['imageVideoNodeResizeEnabled'] === true,
+        selectionRelatedHighlightEnabled: connectionLinesVisible['selectionRelatedHighlightEnabled'] !== false,
         selectionRelatedHighlightColor: connectionLinesVisible['selectionRelatedHighlightColor'] || '',
-        showVideoMeta: connectionLinesVisible['showVideoMeta'] === !![],
-        titleFollowsCanvasZoom: connectionLinesVisible['titleFollowsCanvasZoom'] === !![],
-        alignFeatureEnabled: connectionLinesVisible['alignFeatureEnabled'] !== ![],
+        showVideoMeta: connectionLinesVisible['showVideoMeta'] === true,
+        titleFollowsCanvasZoom: connectionLinesVisible['titleFollowsCanvasZoom'] === true,
+        alignFeatureEnabled: connectionLinesVisible['alignFeatureEnabled'] !== false,
         alignFeatureTriggerMode: connectionLinesVisible['alignFeatureTriggerMode'] || 'click',
-        alignPanelVisible: connectionLinesVisible['alignPanelVisible'] === !![],
+        alignPanelVisible: connectionLinesVisible['alignPanelVisible'] === true,
         alignPanelAnchorWorld: connectionLinesVisible['alignPanelAnchorWorld']
           ? {
               x: normalizeNumber(connectionLinesVisible['alignPanelAnchorWorld']['x']),
@@ -109,7 +109,7 @@ export function createRendererSelectionFastPath({
       data = typeof state2['_edgesRev'] === 'number' ? state2['_edgesRev'] : 0;
     ensureEdgeIndex?.(result, data);
     const relatedNodeIds =
-      state2['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+      state2['ui']?.['selectionRelatedHighlightEnabled'] === false
         ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
         : buildSelectionRelatedSets?.(index, result) || {};
     return {
@@ -126,22 +126,22 @@ export function createRendererSelectionFastPath({
       (value3 = source?.['nodes'] || null));
   }
   function reset() {
-    ((enabled = ''), (value2 = null), (hasNodeRevision2 = ![]), (value3 = null));
+    ((enabled = ''), (value2 = null), (hasNodeRevision2 = false), (value3 = null));
   }
   function flushSelectionOnlySnapshot(enabled2, next = {}) {
-    if (!enabled2 || !enabled) return ![];
+    if (!enabled2 || !enabled) return false;
     if ((!hasNodeRevision2 || !hasNodeRevision(enabled2)) && (enabled2['nodes'] || null) !== value3)
-      return ![];
-    const current = hasPendingRender?.() === !![];
-    if (current && next?.['allowPendingRaf'] !== !![]) return ![];
+      return false;
+    const current = hasPendingRender?.() === true;
+    if (current && next?.['allowPendingRaf'] !== true) return false;
     const entry = run(enabled2);
-    if (entry !== enabled) return ![];
+    if (entry !== enabled) return false;
     const state3 = run2(enabled2),
       enabled3 = value2;
-    if (!enabled3) return ![];
+    if (!enabled3) return false;
     if (state3['signature'] === enabled3['signature'])
-      return (setCurrentSnapshot?.(enabled2), (value2 = state3), !![]);
-    current && next?.['cancelPendingRaf'] === !![] && cancelPendingRender?.();
+      return (setCurrentSnapshot?.(enabled2), (value2 = state3), true);
+    current && next?.['cancelPendingRaf'] === true && cancelPendingRender?.();
     const args = new Set([
       ...(enabled3['selectedNodeIds'] || []),
       ...(state3['selectedNodeIds'] || []),
@@ -149,14 +149,14 @@ export function createRendererSelectionFastPath({
       ...(state3['relatedNodeIds'] || []),
     ]);
     (setCurrentSnapshot?.(enabled2), consumeViewport?.(enabled2['viewport']));
-    const record = flushSelectionUpdate?.([...args], { skipInstanceUpdate: !![] });
-    if (record === ![]) return ![];
+    const record = flushSelectionUpdate?.([...args], { skipInstanceUpdate: true });
+    if (record === false) return false;
     const payload = new Set([...(enabled3['relatedEdgeIds'] || []), ...(state3['relatedEdgeIds'] || [])]);
     return (
       renderAffectedEdges?.(payload, enabled2, state3['relatedEdgeIds']),
       renderSelectionOverlays?.(enabled2),
       (value2 = state3),
-      !![]
+      true
     );
   }
   return {

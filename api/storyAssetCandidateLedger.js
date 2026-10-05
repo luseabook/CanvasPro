@@ -22,7 +22,7 @@ function normalizeSourceSceneRefs(result) {
 function sourceSceneRefsOverlap(list = [], data = []) {
   const list2 = normalizeSourceSceneRefs(list),
     list3 = normalizeSourceSceneRefs(data);
-  if (!list2['length'] || !list3['length']) return !![];
+  if (!list2['length'] || !list3['length']) return true;
   const map = new Set(list3);
   return list2['some']((options) => map['has'](options));
 }
@@ -128,11 +128,11 @@ function normalizeSceneSearchText(config) {
     ['replace'](/[\s_\-—·•:：/\\|（）()\[\]【】]+/gu, '');
 }
 function sceneHeadingSupportsCandidate(scope, input) {
-  if (normalizeText(scope?.['source']) === 'upload-fallback') return ![];
+  if (normalizeText(scope?.['source']) === 'upload-fallback') return false;
   const list7 = normalizeSceneSearchText(scope?.['assetHeading'] || scope?.['heading']),
     list8 = normalizeSceneSearchText(input);
-  if (!list7 || !list8) return ![];
-  if (list7['includes'](list8) || list8['includes'](list7)) return !![];
+  if (!list7 || !list8) return false;
+  if (list7['includes'](list8) || list8['includes'](list7)) return true;
   return normalizeName(input)
     ['split'](/[\s_\-—·•:：/\\|（）()\[\]【】]+/u)
     ['map'](normalizeSceneSearchText)
@@ -170,8 +170,8 @@ function getSupportedInventoryKinds({
             value6['kind'] === value5 && (value6['authoritative'] || value6['origin'] === 'local-extractor'),
         )
       )
-        return !![];
-      if (value5 === 'prop') return !![];
+        return true;
+      if (value5 === 'prop') return true;
       const list12 = normalizeSourceSceneRefs(sourceSceneRefs3)
         ['map']((value7) => sourceSceneByRef['get'](value7))
         ['filter'](Boolean);
@@ -180,7 +180,7 @@ function getSupportedInventoryKinds({
           list12['some']((value8) => sceneHeadingSupportsCandidate(value8, name7)) ||
           list12['some']((value9) => sceneBodySupportsCandidate(value9, name7))
         );
-      return ![];
+      return false;
     }),
   );
 }
@@ -264,8 +264,8 @@ export function createStoryAssetCandidateLedger({
       name: kind5?.['name'],
       origin: 'structured-source',
       sourceSceneRefs: kind5?.['sourceSceneRefs'],
-      authoritative: !![],
-      explicitAsset: !![],
+      authoritative: true,
+      explicitAsset: true,
       assetRef: kind5?.['ref'],
     });
   }),
@@ -276,7 +276,7 @@ export function createStoryAssetCandidateLedger({
         name: kind6?.['name'],
         origin: 'inventory-asset',
         sourceSceneRefs: kind6?.['sourceSceneRefs'],
-        explicitAsset: !![],
+        explicitAsset: true,
         assetRef: kind6?.['ref'],
       });
     }),

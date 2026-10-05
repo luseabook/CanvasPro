@@ -19,42 +19,42 @@ const TRUE_RE = /^(1|true|yes|on)$/i,
 function envFlag(source, key) {
   const raw = String(source?.[key] || '')['trim']();
   if (!raw) return null;
-  if (TRUE_RE['test'](raw)) return !![];
-  if (FALSE_RE['test'](raw)) return ![];
+  if (TRUE_RE['test'](raw)) return true;
+  if (FALSE_RE['test'](raw)) return false;
   return null;
 }
 export function shouldUseChromeShellRuntime(
   env = process['env'],
-  { appIsPackaged: appIsPackaged = ![], platform: platform = process['platform'] } = {},
+  { appIsPackaged: appIsPackaged = false, platform: platform = process['platform'] } = {},
 ) {
   const runtime = String(env?.['AIC_CANVAS_RUNTIME'] || '')
     ['trim']()
     ['toLowerCase']();
   if (
-    envFlag(env, 'AIC_USE_ELECTRON_CANVAS') === !![] &&
+    envFlag(env, 'AIC_USE_ELECTRON_CANVAS') === true &&
     !(appIsPackaged && (platform === 'win32' || platform === 'darwin'))
   )
-    return ![];
-  if (runtime === 'electron' || runtime === 'browser-window') return ![];
-  if (runtime === 'chrome-shell' || runtime === 'edge-shell') return !![];
-  if (envFlag(env, 'AIC_USE_CHROME_SHELL') === !![]) return !![];
-  return !![];
+    return false;
+  if (runtime === 'electron' || runtime === 'browser-window') return false;
+  if (runtime === 'chrome-shell' || runtime === 'edge-shell') return true;
+  if (envFlag(env, 'AIC_USE_CHROME_SHELL') === true) return true;
+  return true;
 }
 export function shouldQuitWhenAllElectronWindowsClosed({
   platform: platform = process['platform'],
-  useChromeShellRuntime: useChromeShellRuntime = ![],
+  useChromeShellRuntime: useChromeShellRuntime = false,
 } = {}) {
-  if (useChromeShellRuntime) return ![];
+  if (useChromeShellRuntime) return false;
   return platform !== 'darwin';
 }
 export function isChromeShellLaunchActive(launch) {
   const childProcess = launch?.['process'];
-  if (!childProcess) return ![];
+  if (!childProcess) return false;
   return (
-    childProcess['exitCode'] == null && childProcess['signalCode'] == null && childProcess['killed'] !== !![]
+    childProcess['exitCode'] == null && childProcess['signalCode'] == null && childProcess['killed'] !== true
   );
 }
-export function buildChromeShellAppUrl(appUrl, { appIsPackaged: appIsPackaged = ![] } = {}) {
+export function buildChromeShellAppUrl(appUrl, { appIsPackaged: appIsPackaged = false } = {}) {
   const url = new URL(String(appUrl || 'http://127.0.0.1:8777/'));
   return (
     url['searchParams']['set']('aicRuntime', 'chrome-shell'),
@@ -117,7 +117,7 @@ export function resolveChromeShellBrowserExecutable({
       ? String(preferredBrowser)['toLowerCase']()
       : 'auto',
     matchesPreferred = (candidate) => {
-      if (preferred === 'auto') return !![];
+      if (preferred === 'auto') return true;
       const base = path['basename'](String(candidate || ''))['toLowerCase']();
       return preferred === 'chrome'
         ? ['chrome.exe', 'chrome', 'google chrome', 'google-chrome', 'google-chrome-stable']['includes'](
@@ -187,15 +187,15 @@ function shouldActivateChromeShellWindow({
   env: env = process['env'],
   platform: platform = process['platform'],
 } = {}) {
-  if (platform !== 'win32' && platform !== 'darwin') return ![];
-  return envFlag(env, 'AIC_CHROME_SHELL_ACTIVATE_WINDOW') !== ![];
+  if (platform !== 'win32' && platform !== 'darwin') return false;
+  return envFlag(env, 'AIC_CHROME_SHELL_ACTIVATE_WINDOW') !== false;
 }
 function resolveBackgroundResponsivenessArgs(env = process['env']) {
-  if (envFlag(env, 'AIC_CHROME_SHELL_PREVENT_BACKGROUND_THROTTLING') === ![]) return [];
+  if (envFlag(env, 'AIC_CHROME_SHELL_PREVENT_BACKGROUND_THROTTLING') === false) return [];
   return [...BACKGROUND_RESPONSIVENESS_ARGS];
 }
 function resolveBackgroundModeArgs(env = process['env']) {
-  if (envFlag(env, 'AIC_CHROME_SHELL_DISABLE_BACKGROUND_MODE') === ![]) return [];
+  if (envFlag(env, 'AIC_CHROME_SHELL_DISABLE_BACKGROUND_MODE') === false) return [];
   return ['--disable-background-mode'];
 }
 function isPlainObject(value) {
@@ -215,13 +215,13 @@ function readChromePreferences(filePath, readFile = readFileSync) {
 }
 export function writeChromeShellPreferences({
   profileDir: profileDir,
-  disableDevTools: disableDevTools = ![],
+  disableDevTools: disableDevTools = false,
   mkdir: mkdir = mkdirSync,
   readFile: readFile = readFileSync,
   writeFile: writeFile = writeFileSync,
 } = {}) {
   const defaultDir = path['join'](String(profileDir || ''), 'Default');
-  mkdir(defaultDir, { recursive: !![] });
+  mkdir(defaultDir, { recursive: true });
   const preferencesPath = path['join'](defaultDir, 'Preferences'),
     existing = readChromePreferences(preferencesPath, readFile),
     devtools = isPlainObject(existing['devtools']) ? existing['devtools'] : {},
@@ -229,15 +229,15 @@ export function writeChromeShellPreferences({
   delete devtoolsWithoutAvailability['availability'];
   const preferences = {
     ...existing,
-    credentials_enable_service: ![],
+    credentials_enable_service: false,
     autofill: {
       ...(existing['autofill'] && typeof existing['autofill'] === 'object' ? existing['autofill'] : {}),
-      credit_card_enabled: ![],
-      profile_enabled: ![],
+      credit_card_enabled: false,
+      profile_enabled: false,
     },
     profile: {
       ...(existing['profile'] && typeof existing['profile'] === 'object' ? existing['profile'] : {}),
-      password_manager_enabled: ![],
+      password_manager_enabled: false,
     },
     devtools: disableDevTools ? { ...devtools, availability: 2 } : devtoolsWithoutAvailability,
   };
@@ -322,7 +322,7 @@ export function activateChromeShellWindowSoon({
       platform === 'darwin'
         ? spawnProcess('osascript', ['-l', 'JavaScript', '-e', buildMacActivationScript(targetPid)], {
             stdio: 'ignore',
-            detached: !![],
+            detached: true,
           })
         : spawnProcess(
             'powershell.exe',
@@ -334,7 +334,7 @@ export function activateChromeShellWindowSoon({
               '-Command',
               buildWindowsActivationScript(targetPid),
             ],
-            { stdio: 'ignore', windowsHide: !![], detached: !![] },
+            { stdio: 'ignore', windowsHide: true, detached: true },
           );
     return (helper?.['unref']?.(), helper || null);
   } catch {
@@ -352,7 +352,7 @@ function encodePowerShellCommand(script) {
   return Buffer['from'](String(script || ''), 'utf16le')['toString']('base64');
 }
 function resolveChromeShellFocusTarget(launch) {
-  const detached = launch?.['detached'] === !![],
+  const detached = launch?.['detached'] === true,
     browserPath = String(launch?.['browserPath'] || '')['trim'](),
     profileDir = String(launch?.['profileDir'] || '')['trim'](),
     appIdentity = resolveChromeShellAppIdentity(launch?.['appUrl']);
@@ -387,13 +387,13 @@ export async function controlChromeShellLaunchWindow({
   setTimeoutFn: setTimeoutFn = setTimeout,
   clearTimeoutFn: clearTimeoutFn = clearTimeout,
 } = {}) {
-  if (platform !== 'win32') return ![];
+  if (platform !== 'win32') return false;
   const normalizedAction = String(action || '')
     ['trim']()
     ['toLowerCase']();
-  if (normalizedAction !== 'focus' && normalizedAction !== 'close') return ![];
+  if (normalizedAction !== 'focus' && normalizedAction !== 'close') return false;
   const target = resolveChromeShellFocusTarget(launch);
-  if (!target) return ![];
+  if (!target) return false;
   const resolvedTimeoutMs = Math['max'](
     100,
     Math['min'](10000, readNonNegativeInteger(timeoutMs, WINDOWS_ACTIVATION_TIMEOUT_MS)),
@@ -413,7 +413,7 @@ export async function controlChromeShellLaunchWindow({
       ],
       {
         stdio: 'ignore',
-        windowsHide: !![],
+        windowsHide: true,
         env: {
           ...env,
           AIC_CHROME_SHELL_FOCUS_MODE: target['mode'],
@@ -427,25 +427,25 @@ export async function controlChromeShellLaunchWindow({
       },
     );
   } catch {
-    return ![];
+    return false;
   }
-  if (typeof helper?.['once'] !== 'function') return ![];
+  if (typeof helper?.['once'] !== 'function') return false;
   return new Promise((resolve) => {
-    let settled = ![],
+    let settled = false,
       timer = null;
     const finish = (succeeded) => {
       if (settled) return;
-      settled = !![];
+      settled = true;
       if (timer !== null) clearTimeoutFn(timer);
-      resolve(succeeded === !![]);
+      resolve(succeeded === true);
     };
-    (helper['once']('error', () => finish(![])),
+    (helper['once']('error', () => finish(false)),
       helper['once']('exit', (exitCode) => finish(exitCode === 0)),
       (timer = setTimeoutFn(() => {
         try {
           helper['kill']?.();
         } catch {}
-        finish(![]);
+        finish(false);
       }, resolvedTimeoutMs + 1000)));
   });
 }
@@ -461,18 +461,18 @@ function waitForChromeShellProcessExit({
   const hasExited = () =>
     (child?.['exitCode'] !== null && child?.['exitCode'] !== undefined) ||
     (child?.['signalCode'] !== null && child?.['signalCode'] !== undefined);
-  if (hasExited()) return Promise['resolve'](!![]);
+  if (hasExited()) return Promise['resolve'](true);
   return new Promise((resolve) => {
-    let settled = ![],
+    let settled = false,
       timer = null,
       onExit = null;
     const finish = (exited) => {
       if (settled) return;
-      settled = !![];
+      settled = true;
       if (timer !== null) clearTimeoutFn(timer);
-      (child?.['off']?.('exit', onExit), resolve(exited === !![]));
+      (child?.['off']?.('exit', onExit), resolve(exited === true));
     };
-    ((onExit = () => finish(!![])), child?.['once']?.('exit', onExit));
+    ((onExit = () => finish(true)), child?.['once']?.('exit', onExit));
     const timeoutTimer = setTimeoutFn(() => finish(hasExited()), Math['max'](0, Number(timeoutMs) || 0));
     if (settled) clearTimeoutFn(timeoutTimer);
     else timer = timeoutTimer;
@@ -488,34 +488,34 @@ function runWindowsTaskkill({
 }) {
   return new Promise((resolve) => {
     let helper = null,
-      settled = ![],
+      settled = false,
       timer = null;
     const finish = (succeeded) => {
         if (settled) return;
-        settled = !![];
+        settled = true;
         if (timer !== null) clearTimeoutFn(timer);
-        resolve(succeeded === !![]);
+        resolve(succeeded === true);
       },
       args = ['/PID', String(pid), '/T'];
     if (force) args['push']('/F');
     try {
-      helper = spawnProcess('taskkill.exe', args, { windowsHide: !![], stdio: 'ignore' });
+      helper = spawnProcess('taskkill.exe', args, { windowsHide: true, stdio: 'ignore' });
     } catch {
-      finish(![]);
+      finish(false);
       return;
     }
     if (typeof helper?.['once'] !== 'function') {
-      finish(![]);
+      finish(false);
       return;
     }
-    (helper['once']('error', () => finish(![])),
+    (helper['once']('error', () => finish(false)),
       helper['once']('exit', (exitCode) => finish(exitCode === 0)));
     const timeoutTimer = setTimeoutFn(
       () => {
         try {
           helper['kill']?.();
         } catch {}
-        finish(![]);
+        finish(false);
       },
       Math['max'](100, Number(timeoutMs) || 0),
     );
@@ -534,8 +534,8 @@ export async function closeChromeShellLaunchForUpdate({
   gracefulTimeoutMs: gracefulTimeoutMs = TRACKED_CLOSE_GRACE_MS,
   forceTimeoutMs: forceTimeoutMs = TRACKED_CLOSE_FORCE_MS,
 } = {}) {
-  if (!launch) return !![];
-  if (launch['detached'] === !![])
+  if (!launch) return true;
+  if (launch['detached'] === true)
     return controlWindow({
       launch: launch,
       action: 'close',
@@ -551,11 +551,11 @@ export async function closeChromeShellLaunchForUpdate({
     (child['exitCode'] !== null && child['exitCode'] !== undefined) ||
     (child['signalCode'] !== null && child['signalCode'] !== undefined)
   )
-    return !![];
+    return true;
   if (platform === 'win32' && readPositiveInteger(child['pid'])) {
     await runWindowsTaskkill({
       pid: child['pid'],
-      force: ![],
+      force: false,
       spawnProcess: spawnProcess,
       timeoutMs: gracefulTimeoutMs,
       setTimeoutFn: setTimeoutFn,
@@ -569,11 +569,11 @@ export async function closeChromeShellLaunchForUpdate({
         clearTimeoutFn: clearTimeoutFn,
       })
     )
-      return !![];
+      return true;
     return (
       await runWindowsTaskkill({
         pid: child['pid'],
-        force: !![],
+        force: true,
         spawnProcess: spawnProcess,
         timeoutMs: forceTimeoutMs,
         setTimeoutFn: setTimeoutFn,
@@ -605,14 +605,14 @@ export async function closeChromeShellLaunchForUpdate({
 function normalizeWindowMode(record = {}) {
   const state = String(record['show_state'] || record['state'] || '')['toLowerCase'](),
     fullscreen =
-      record['fullscreen'] === !![] ||
-      record['isFullscreen'] === !![] ||
-      record['is_fullscreen'] === !![] ||
+      record['fullscreen'] === true ||
+      record['isFullscreen'] === true ||
+      record['is_fullscreen'] === true ||
       state['includes']('fullscreen'),
     maximized =
-      record['maximized'] === !![] ||
-      record['isMaximized'] === !![] ||
-      record['is_maximized'] === !![] ||
+      record['maximized'] === true ||
+      record['isMaximized'] === true ||
+      record['is_maximized'] === true ||
       state['includes']('maximized');
   return { fullscreen: fullscreen, maximized: maximized };
 }
@@ -788,8 +788,8 @@ export async function launchChromeShell({
   const browserPath = resolveChromeShellBrowserExecutable({ env: env, platform: platform, exists: exists });
   if (!browserPath) throw new Error('Chrome or Edge executable not found');
   const profileDir = resolveChromeShellProfileDir({ app: app, env: env, browserPath: browserPath });
-  mkdir(profileDir, { recursive: !![] });
-  const appIsPackaged = app?.['isPackaged'] === !![];
+  mkdir(profileDir, { recursive: true });
+  const appIsPackaged = app?.['isPackaged'] === true;
   writeChromeShellPreferences({
     profileDir: profileDir,
     disableDevTools: appIsPackaged,
@@ -832,7 +832,7 @@ export async function launchChromeShell({
     ((spawnedAt = now()),
       (child = spawnProcess(browserPath, args, {
         stdio: ['ignore', 'ignore', 'pipe'],
-        windowsHide: ![],
+        windowsHide: false,
       })));
   } catch (spawnError) {
     taskbarIdentity?.['cancel']?.();
@@ -845,7 +845,7 @@ export async function launchChromeShell({
     appUrl: resolvedAppUrl,
     process: child,
     spawnedAt: spawnedAt,
-    detached: ![],
+    detached: false,
     spawnError: null,
   };
   return (
@@ -868,7 +868,7 @@ export async function launchChromeShell({
   );
 }
 function shouldQuitWhenChromeShellExits(env = process['env']) {
-  return envFlag(env, 'AIC_CHROME_SHELL_KEEP_LAUNCHER') !== !![];
+  return envFlag(env, 'AIC_CHROME_SHELL_KEEP_LAUNCHER') !== true;
 }
 export async function launchChromeShellWithLifecycle({
   app: app,
@@ -910,7 +910,7 @@ export async function launchChromeShellWithLifecycle({
         const runtimeMs = Math['max'](0, now() - spawnedAt),
           context = { code: code, signal: signal, runtimeMs: runtimeMs };
         if (isCleanEarlyChromeShellExit({ ...context, graceMs: earlyExitGraceMs })) {
-          if (launch) launch['detached'] = !![];
+          if (launch) launch['detached'] = true;
           (logEvent?.({
             type: 'chrome_shell.early_exit_ignored',
             level: 'warn',
@@ -923,10 +923,10 @@ export async function launchChromeShellWithLifecycle({
               appUrl: launch?.['appUrl'] || '',
             },
           }),
-            onClosed?.({ ...context, detached: !![] }));
+            onClosed?.({ ...context, detached: true }));
           return;
         }
-        if (launch) launch['detached'] = ![];
+        if (launch) launch['detached'] = false;
         logEvent?.({
           type: 'chrome_shell.exited',
           level: 'info',
@@ -934,7 +934,7 @@ export async function launchChromeShellWithLifecycle({
           message: 'Chrome shell process exited',
           context: context,
         });
-        const keepOpen = onClosed?.({ ...context, detached: ![] }) !== ![];
+        const keepOpen = onClosed?.({ ...context, detached: false }) !== false;
         keepOpen && shouldQuitWhenChromeShellExits(env) && app?.['quit']?.();
       },
       onError: (error) => {

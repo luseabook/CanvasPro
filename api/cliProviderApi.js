@@ -66,7 +66,7 @@ export function getCachedCliProviderModels(options) {
 export function _resetCliProviderModelsCacheForTests() {
   (cliProviderModelsCache['clear'](), cliProviderModelsRequests['clear']());
 }
-export async function fetchCliProviderModels(target, { force: force = ![] } = {}) {
+export async function fetchCliProviderModels(target, { force: force = false } = {}) {
   const decodeURIComponent2 = decodeURIComponent(normalizeCliProvider(target)),
     source = cliProviderModelsRequests['get'](decodeURIComponent2);
   if (source) return source;
@@ -105,7 +105,7 @@ export async function generateTextWithCliProvider(payload) {
   const { onText: onText, signal: signal, ...args2 } = payload || {},
     count = Number(payload?.['timeoutMs']),
     timeoutMs =
-      payload?.['disableRequestTimeout'] === !![]
+      payload?.['disableRequestTimeout'] === true
         ? null
         : Number['isFinite'](count) && count > 0
           ? Math['max'](30000, Math['trunc'](count) + 5000)

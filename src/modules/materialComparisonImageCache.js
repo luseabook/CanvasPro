@@ -72,9 +72,9 @@ export function createComparisonImageCache({
         bytes > maxBytes ||
         maxEntries < 1
       )
-        return ![];
+        return false;
       run2();
-      if (map['get'](enabled)?.['image'] === image) return !![];
+      if (map['get'](enabled)?.['image'] === image) return true;
       const response2 = map['get'](enabled),
         revokeUrlOnClose =
           args['revokeUrlOnClose'] || (response2?.['url'] === url && response2['revokeUrlOnClose']);
@@ -92,7 +92,7 @@ export function createComparisonImageCache({
         }),
         (index += bytes),
         run3(),
-        !![]
+        true
       );
     },
   };

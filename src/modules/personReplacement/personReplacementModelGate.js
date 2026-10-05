@@ -26,7 +26,7 @@ function isModelPackReady(key) {
         ),
       );
   return (
-    key?.['installed'] === !![] &&
+    key?.['installed'] === true &&
     Boolean(key?.['model']) &&
     index &&
     (!PERSON_REPLACEMENT_ORIENTATION_ENABLED || data)
@@ -142,30 +142,30 @@ export class ReplacementStudioModelGate {
       (this['pollIntervalMs'] = Math['max'](100, Number(pollIntervalMs) || 350)),
       (this['status'] = {
         state: 'idle',
-        installed: ![],
+        installed: false,
         downloadBytes: 0,
         installProgress: {},
         error: '',
       }),
-      (this['dialogOpen'] = ![]),
-      (this['pendingOpen'] = ![]),
-      (this['destroyed'] = ![]),
+      (this['dialogOpen'] = false),
+      (this['pendingOpen'] = false),
+      (this['destroyed'] = false),
       (this['root'] = null),
       (this['checkPromise'] = null),
       (this['installPromise'] = null),
       (this['pollTimer'] = 0),
-      (this['pollInFlight'] = ![]),
+      (this['pollInFlight'] = false),
       (this['returnFocusElement'] = null),
       (this['_handleClick'] = this['_handleClick']['bind'](this)),
       (this['_handleKeyDown'] = this['_handleKeyDown']['bind'](this)));
   }
   ['requestOpen'](handler) {
     if (this['destroyed']) return null;
-    if (this['status']['installed'] === !![]) return typeof handler === 'function' ? handler() : null;
+    if (this['status']['installed'] === true) return typeof handler === 'function' ? handler() : null;
     if (!this['dialogOpen']) this['_captureReturnFocus']();
     return (
-      (this['pendingOpen'] = !![]),
-      (this['dialogOpen'] = !![]),
+      (this['pendingOpen'] = true),
+      (this['dialogOpen'] = true),
       this['_ensureRoot'](),
       this['status']['state'] === 'missing' || this['status']['state'] === 'error'
         ? this['render']()
@@ -181,7 +181,7 @@ export class ReplacementStudioModelGate {
         (this['status'] = {
           ...this['status'],
           state: 'error',
-          installed: ![],
+          installed: false,
           error: '人物识别模型服务尚未初始化。',
         }),
         this['render'](),
@@ -197,7 +197,7 @@ export class ReplacementStudioModelGate {
                 ...this['status'],
                 ...args,
                 state: 'missing',
-                installed: ![],
+                installed: false,
                 error: '',
               }),
               this['render']()),
@@ -209,7 +209,7 @@ export class ReplacementStudioModelGate {
           (this['status'] = {
             ...this['status'],
             state: 'error',
-            installed: ![],
+            installed: false,
             error: normalizeText(error2?.['message']) || '无法检测人物识别模型状态。',
           }),
           this['render'](),
@@ -232,7 +232,7 @@ export class ReplacementStudioModelGate {
     ((this['status'] = {
       ...this['status'],
       state: 'installing',
-      installed: ![],
+      installed: false,
       error: '',
       installProgress: {
         state: 'downloading',
@@ -242,7 +242,7 @@ export class ReplacementStudioModelGate {
         message: '正在连接模型下载源',
       },
     }),
-      (this['dialogOpen'] = !![]),
+      (this['dialogOpen'] = true),
       this['render']());
     const config = Promise['resolve'](this['modelPackApi']['install']())
       ['then']((scope) => {
@@ -268,7 +268,7 @@ export class ReplacementStudioModelGate {
           (this['status'] = {
             ...this['status'],
             state: 'error',
-            installed: ![],
+            installed: false,
             error: normalizeText(error3?.['message']) || '人物识别模型下载失败。',
           }),
           this['render'](),
@@ -281,16 +281,16 @@ export class ReplacementStudioModelGate {
     return ((this['installPromise'] = config), this['_pollProgress'](), config);
   }
   ['dismiss']() {
-    if (this['status']['state'] === 'installing') return ![];
-    return ((this['pendingOpen'] = ![]), (this['dialogOpen'] = ![]), this['render'](), !![]);
+    if (this['status']['state'] === 'installing') return false;
+    return ((this['pendingOpen'] = false), (this['dialogOpen'] = false), this['render'](), true);
   }
   ['_unlock'](args2) {
     (this['_stopPolling'](),
-      (this['status'] = { ...this['status'], ...args2, state: 'installed', installed: !![], error: '' }),
-      (this['dialogOpen'] = ![]),
-      this['render']({ restoreFocus: ![] }));
+      (this['status'] = { ...this['status'], ...args2, state: 'installed', installed: true, error: '' }),
+      (this['dialogOpen'] = false),
+      this['render']({ restoreFocus: false }));
     const output = this['pendingOpen'];
-    (output && ((this['pendingOpen'] = ![]), this['onReady']?.()), this['_restoreFocus']());
+    (output && ((this['pendingOpen'] = false), this['onReady']?.()), this['_restoreFocus']());
   }
   ['_pollProgress']() {
     if (
@@ -300,7 +300,7 @@ export class ReplacementStudioModelGate {
       typeof this['modelPackApi']?.['getStatus'] !== 'function'
     )
       return;
-    ((this['pollInFlight'] = !![]),
+    ((this['pollInFlight'] = true),
       Promise['resolve'](this['modelPackApi']['getStatus']())
         ['then']((installProgress2) => {
           if (isModelPackReady(installProgress2)) {
@@ -317,7 +317,7 @@ export class ReplacementStudioModelGate {
         })
         ['catch'](() => {})
         ['finally'](() => {
-          ((this['pollInFlight'] = ![]),
+          ((this['pollInFlight'] = false),
             !this['destroyed'] &&
               this['status']['state'] === 'installing' &&
               (this['pollTimer'] =
@@ -361,7 +361,7 @@ export class ReplacementStudioModelGate {
     const list2 = this['_getFocusableElements'](),
       el2 = this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
     if (!list2['length']) {
-      (event2['preventDefault']?.(), el2?.['focus']?.({ preventScroll: !![] }));
+      (event2['preventDefault']?.(), el2?.['focus']?.({ preventScroll: true }));
       return;
     }
     const count = list2['indexOf'](this['document']?.['activeElement']),
@@ -370,7 +370,7 @@ export class ReplacementStudioModelGate {
     if (!enabled2 && !enabled3) return;
     event2['preventDefault']?.();
     const el3 = enabled2 ? list2['at'](-1) : list2[0];
-    el3?.['focus']?.({ preventScroll: !![] });
+    el3?.['focus']?.({ preventScroll: true });
   }
   ['_getFocusableElements']() {
     const el4 = this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
@@ -379,7 +379,7 @@ export class ReplacementStudioModelGate {
       el4['querySelectorAll']?.(
         'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
       ) || [],
-    )['filter']((el5) => el5['hidden'] !== !![] && el5['getAttribute']?.('aria-hidden') !== 'true');
+    )['filter']((el5) => el5['hidden'] !== true && el5['getAttribute']?.('aria-hidden') !== 'true');
   }
   ['_captureReturnFocus']() {
     const value3 = this['document']?.['activeElement'];
@@ -399,14 +399,14 @@ export class ReplacementStudioModelGate {
         this['_getFocusableElements']()[0] ||
         this['root']?.['querySelector']?.('.person-replacement-model-gate-dialog');
     try {
-      el6?.['focus']?.({ preventScroll: !![] });
+      el6?.['focus']?.({ preventScroll: true });
     } catch {
       el6?.['focus']?.();
     }
   }
   ['_restoreFocus']() {
     const value6 =
-        this['returnFocusElement']?.['isConnected'] !== ![] &&
+        this['returnFocusElement']?.['isConnected'] !== false &&
         (typeof this['returnFocusElement']?.['getClientRects'] !== 'function' ||
           this['returnFocusElement']['getClientRects']()['length'] > 0)
           ? this['returnFocusElement']
@@ -415,15 +415,15 @@ export class ReplacementStudioModelGate {
       value8 = this['document']?.['querySelector']?.('[data-story-workspace-mode="person-replacement"]'),
       el8 = value6 || value7 || value8;
     this['returnFocusElement'] = null;
-    if (!el8 || el8['isConnected'] === ![]) return ![];
+    if (!el8 || el8['isConnected'] === false) return false;
     try {
-      el8['focus']?.({ preventScroll: !![] });
+      el8['focus']?.({ preventScroll: true });
     } catch {
       el8['focus']?.();
     }
     return this['document']?.['activeElement'] === el8;
   }
-  ['render']({ restoreFocus: restoreFocus = !![] } = {}) {
+  ['render']({ restoreFocus: restoreFocus = true } = {}) {
     if (!this['root'] && this['dialogOpen']) this['_ensureRoot']();
     if (!this['root']) return;
     const value9 = this['root']['contains']?.(this['document']?.['activeElement'])
@@ -440,8 +440,8 @@ export class ReplacementStudioModelGate {
   }
   ['destroy']() {
     if (this['destroyed']) return;
-    ((this['destroyed'] = !![]),
-      (this['pendingOpen'] = ![]),
+    ((this['destroyed'] = true),
+      (this['pendingOpen'] = false),
       this['_stopPolling'](),
       this['root']?.['removeEventListener']?.('click', this['_handleClick']),
       this['root']?.['removeEventListener']?.('keydown', this['_handleKeyDown']),

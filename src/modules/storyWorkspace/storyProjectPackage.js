@@ -52,7 +52,7 @@ export function createImportedStoryProjectEntry(
     (duplicateStoryProjectEntry2['createdAt'] = Number(now) || Date['now']()),
     (duplicateStoryProjectEntry2['updatedAt'] = Number(now) || Date['now']()),
     (duplicateStoryProjectEntry2['archivedAt'] = 0),
-    (duplicateStoryProjectEntry2['projectTitleEdited'] = !![]),
+    (duplicateStoryProjectEntry2['projectTitleEdited'] = true),
     duplicateStoryProjectEntry2
   );
 }

@@ -23,20 +23,20 @@ export function inferRunningHubFieldMetadata(options = {}) {
   if (componentKind)
     return {
       componentKind: componentKind,
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: [componentKind],
       controlType: 'text',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: [],
     };
   const list2 = getRunningHubFieldOptions(options);
   if (list2['length'])
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'select',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: ['select'],
     };
   return null;

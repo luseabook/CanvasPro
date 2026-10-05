@@ -38,7 +38,7 @@ let sharedCanvasImageElements = new WeakSet(),
   imagePreloadPeakActive = 0,
   imagePreloadCanceled = 0,
   imagePreloadResolvedCachePrimes = 0,
-  imagePreloadPaused = ![],
+  imagePreloadPaused = false,
   imagePreloadPausedBypassPriority = DEFAULT_PAUSED_BYPASS_PRIORITY;
 const imagePreloadPauseSources = new Set();
 function normalizeUrl(item) {
@@ -82,19 +82,19 @@ function getImagePreloadConcurrency() {
   return DEFAULT_IMAGE_PRELOAD_CONCURRENCY;
 }
 function isImagePreloadJobEligible(next) {
-  if (!imagePreloadPaused) return !![];
-  if (next?.['allowWhenPaused'] === !![]) return !![];
-  if (next?.['deferWhenPaused'] === !![]) return ![];
+  if (!imagePreloadPaused) return true;
+  if (next?.['allowWhenPaused'] === true) return true;
+  if (next?.['deferWhenPaused'] === true) return false;
   return normalizePriority(next?.['priority']) >= imagePreloadPausedBypassPriority;
 }
 function isImagePreloadOverflowEligible(current) {
   return (
-    current?.['allowWhenPaused'] === !![] &&
-    current?.['deferWhenPaused'] !== !![] &&
+    current?.['allowWhenPaused'] === true &&
+    current?.['deferWhenPaused'] !== true &&
     normalizePriority(current?.['priority']) >= HIGH_PRIORITY_OVERFLOW_THRESHOLD
   );
 }
-function pickNextImagePreloadJob({ overflowOnly: overflowOnly = ![] } = {}) {
+function pickNextImagePreloadJob({ overflowOnly: overflowOnly = false } = {}) {
   let count2 = -1,
     enabled2 = null;
   for (let entry = 0; entry < imagePreloadQueue['length']; entry += 1) {
@@ -124,15 +124,15 @@ function summarizeImagePreloadJob(allowWhenPaused) {
     scope: String(allowWhenPaused['scope'] || ''),
     priority: normalizePriority(allowWhenPaused['priority']),
     fetchPriority: String(allowWhenPaused['fetchPriority'] || 'auto'),
-    allowWhenPaused: allowWhenPaused['allowWhenPaused'] === !![],
-    deferWhenPaused: allowWhenPaused['deferWhenPaused'] === !![],
-    decode: allowWhenPaused['decode'] === !![],
+    allowWhenPaused: allowWhenPaused['allowWhenPaused'] === true,
+    deferWhenPaused: allowWhenPaused['deferWhenPaused'] === true,
+    decode: allowWhenPaused['decode'] === true,
     sequence: Number(allowWhenPaused['sequence'] || 0),
   };
 }
 function cancelQueuedImagePreloadJob(promise, payload = 'canceled') {
   const jobCacheKey2 = jobCacheKey(promise);
-  if (!promise || !imagePreloadQueuedJobs['has'](jobCacheKey2)) return ![];
+  if (!promise || !imagePreloadQueuedJobs['has'](jobCacheKey2)) return false;
   imagePreloadQueuedJobs['delete'](jobCacheKey2);
   imagePreloadInflight['get'](jobCacheKey2) === promise['promise'] &&
     imagePreloadInflight['delete'](jobCacheKey2);
@@ -140,22 +140,22 @@ function cancelQueuedImagePreloadJob(promise, payload = 'canceled') {
   try {
     promise['reject'](new Error('Image preload ' + payload));
   } catch {}
-  return !![];
+  return true;
 }
 function shouldCancelImagePreloadJob(
   enabled3,
   { scope: scope2, hasPriorityLimit: hasPriorityLimit, priorityLimit: priorityLimit },
 ) {
-  if (!enabled3) return ![];
-  if (scope2 && enabled3['scope'] !== scope2) return ![];
-  if (hasPriorityLimit && normalizePriority(enabled3['priority']) >= priorityLimit) return ![];
-  return !![];
+  if (!enabled3) return false;
+  if (scope2 && enabled3['scope'] !== scope2) return false;
+  if (hasPriorityLimit && normalizePriority(enabled3['priority']) >= priorityLimit) return false;
+  return true;
 }
 export function cancelQueuedCanvasImagePreloads({
   scope: scope = '',
   belowPriority: belowPriority = null,
   reason: reason = 'canceled',
-  includeActive: includeActive = ![],
+  includeActive: includeActive = false,
 } = {}) {
   const scope3 = String(scope || '')['trim'](),
     priorityLimit2 = Number(belowPriority),
@@ -175,7 +175,7 @@ export function cancelQueuedCanvasImagePreloads({
     imagePreloadQueue['splice'](count3, 1);
     if (cancelQueuedImagePreloadJob(state, reason)) handle += 1;
   }
-  if (includeActive === !![]) {
+  if (includeActive === true) {
     const config = Array['from'](imagePreloadActiveJobs['values']());
     for (const input of config) {
       if (
@@ -192,7 +192,7 @@ export function cancelQueuedCanvasImagePreloads({
   return handle;
 }
 export function setCanvasMediaSchedulerPaused(output, value2 = {}) {
-  const value3 = output === !![],
+  const value3 = output === true,
     value4 = String(value2['source'] || 'default')['trim']() || 'default';
   value3 ? imagePreloadPauseSources['add'](value4) : imagePreloadPauseSources['delete'](value4);
   imagePreloadPaused = imagePreloadPauseSources['size'] > 0;
@@ -202,13 +202,13 @@ export function setCanvasMediaSchedulerPaused(output, value2 = {}) {
 }
 function promoteQueuedImagePreloadJob(value5, value6 = {}) {
   const enabled4 = imagePreloadQueuedJobs['get'](normalizeImagePreloadKey(value5));
-  if (!enabled4) return ![];
+  if (!enabled4) return false;
   const priority = normalizePriority(value6['priority']);
-  let value7 = ![];
-  priority > enabled4['priority'] && ((enabled4['priority'] = priority), (value7 = !![]));
+  let value7 = false;
+  priority > enabled4['priority'] && ((enabled4['priority'] = priority), (value7 = true));
   value6['fetchPriority'] === 'high' &&
     enabled4['fetchPriority'] !== 'high' &&
-    ((enabled4['fetchPriority'] = 'high'), (value7 = !![]));
+    ((enabled4['fetchPriority'] = 'high'), (value7 = true));
   if (value7) imagePreloadPromoted += 1;
   return value7;
 }
@@ -329,7 +329,7 @@ function pumpImagePreloadQueue() {
       (imagePreloadPeakActive = Math['max'](imagePreloadPeakActive, imagePreloadActive)));
     const jobCacheKey3 = jobCacheKey(fetchPriority2);
     imagePreloadActiveJobs['set'](jobCacheKey3, fetchPriority2);
-    let value24 = ![],
+    let value24 = false,
       setTimeout2 = null;
     const run = () => {
         if (setTimeout2 === null || typeof clearTimeout !== 'function') return;
@@ -337,7 +337,7 @@ function pumpImagePreloadQueue() {
       },
       handler = (handler2, value25) => {
         if (value24) return;
-        ((value24 = !![]),
+        ((value24 = true),
           run(),
           imagePreloadActiveJobs['get'](jobCacheKey3) === fetchPriority2 &&
             imagePreloadActiveJobs['delete'](jobCacheKey3),
@@ -370,30 +370,30 @@ function pumpImagePreloadQueue() {
         }, DEFAULT_IMAGE_PRELOAD_TIMEOUT_MS)),
         configureImage(image, { fetchPriority: fetchPriority2['fetchPriority'] }),
         (fetchPriority2['cancelActive'] = (value28 = 'canceled') => {
-          if (value24) return ![];
+          if (value24) return false;
           return (
             (imagePreloadCanceled += 1),
             handler5(),
             imagePreloadInflight['get'](jobCacheKey3) === fetchPriority2['promise'] &&
               imagePreloadInflight['delete'](jobCacheKey3),
             handler(fetchPriority2['reject'], new Error('Image preload ' + value28)),
-            !![]
+            true
           );
         }),
         (image['onload'] = () => {
-          if (fetchPriority2['decode'] === !![] && typeof image['decode'] === 'function') return;
+          if (fetchPriority2['decode'] === true && typeof image['decode'] === 'function') return;
           handler3({
             image: image,
             naturalWidth: image['naturalWidth'] || 0,
             naturalHeight: image['naturalHeight'] || 0,
-            decoded: ![],
+            decoded: false,
           });
         }),
         (image['onerror'] = () => {
           handler4(new Error('Image preload failed'));
         }),
         (image['src'] = fetchPriority2['url']),
-        fetchPriority2['decode'] === !![] &&
+        fetchPriority2['decode'] === true &&
           typeof image['decode'] === 'function' &&
           image['decode']()['then'](
             () => {
@@ -401,7 +401,7 @@ function pumpImagePreloadQueue() {
                 image: image,
                 naturalWidth: image['naturalWidth'] || 0,
                 naturalHeight: image['naturalHeight'] || 0,
-                decoded: !![],
+                decoded: true,
               });
             },
             (value29) => {
@@ -418,16 +418,16 @@ export function preloadCanvasImage(value31, ttlMs = {}) {
   if (!url2) return Promise['reject'](new Error('Image source is empty'));
   if (isLikelyNonImageMediaUrl(url2))
     return Promise['reject'](new Error('Image preload skipped non-image media source'));
-  if (ttlMs['revalidate'] !== !![]) {
+  if (ttlMs['revalidate'] !== true) {
     const args = getResolvedImagePreloadCacheHit(url2, { ttlMs: ttlMs['cacheTtlMs'] });
-    if (args && (ttlMs['requireImage'] !== !![] || args['image'])) {
-      if (ttlMs['decode'] !== !![] || args['decoded'] === !![])
+    if (args && (ttlMs['requireImage'] !== true || args['image'])) {
+      if (ttlMs['decode'] !== true || args['decoded'] === true)
         return ((imagePreloadCacheHits += 1), Promise['resolve'](args));
       if (typeof args['image']?.['decode'] === 'function')
         return (
           (imagePreloadCacheHits += 1),
           args['image']['decode']()['then'](() => {
-            const value32 = { ...args, decoded: !![] };
+            const value32 = { ...args, decoded: true };
             return (rememberResolvedImagePreload(url2, value32, ttlMs), value32);
           })
         );
@@ -444,16 +444,16 @@ export function preloadCanvasImage(value31, ttlMs = {}) {
   if (promise2) {
     imagePreloadDeduped += 1;
     promoteQueuedImagePreloadJob(url2, ttlMs) && pumpImagePreloadQueue();
-    if (ttlMs['decode'] === !![])
+    if (ttlMs['decode'] === true)
       return promise2['then']((args2) => {
-        if (args2?.['decoded'] === !![]) return args2;
+        if (args2?.['decoded'] === true) return args2;
         if (typeof args2?.['image']?.['decode'] === 'function')
           return args2['image']['decode']()['then'](() => {
-            const value33 = { ...args2, decoded: !![] };
+            const value33 = { ...args2, decoded: true };
             return (rememberResolvedImagePreload(url2, value33, ttlMs), value33);
           });
         if (args2?.['image']) return args2;
-        return preloadCanvasImage(url2, { ...ttlMs, revalidate: !![] });
+        return preloadCanvasImage(url2, { ...ttlMs, revalidate: true });
       });
     return promise2;
   }
@@ -468,15 +468,15 @@ export function preloadCanvasImage(value31, ttlMs = {}) {
         priority: normalizePriority(ttlMs['priority']),
         fetchPriority: ttlMs['fetchPriority'] === 'high' ? 'high' : 'auto',
         scope: String(ttlMs['scope'] || '')['trim'](),
-        allowWhenPaused: ttlMs['allowWhenPaused'] === !![],
-        deferWhenPaused: ttlMs['deferWhenPaused'] === !![],
+        allowWhenPaused: ttlMs['allowWhenPaused'] === true,
+        deferWhenPaused: ttlMs['deferWhenPaused'] === true,
         cacheTtlMs: Number['isFinite'](Number(ttlMs['cacheTtlMs']))
           ? Number(ttlMs['cacheTtlMs'])
           : DEFAULT_IMAGE_PRELOAD_CACHE_TTL_MS,
         rejectTtlMs: Number['isFinite'](Number(ttlMs['rejectTtlMs']))
           ? Number(ttlMs['rejectTtlMs'])
           : DEFAULT_IMAGE_PRELOAD_REJECT_TTL_MS,
-        decode: ttlMs['decode'] === !![],
+        decode: ttlMs['decode'] === true,
         sequence: imagePreloadSequence++,
       };
     }),
@@ -494,8 +494,8 @@ export function preloadCanvasImage(value31, ttlMs = {}) {
 }
 export function rememberCanvasImagePreloadResolved(value36, decoded = {}, value37 = {}) {
   const url3 = normalizeUrl(value36);
-  if (!url3 || isLikelyNonImageMediaUrl(url3)) return ![];
-  const image2 = value37['retainImage'] === !![] ? decoded?.['image'] || null : null;
+  if (!url3 || isLikelyNonImageMediaUrl(url3)) return false;
+  const image2 = value37['retainImage'] === true ? decoded?.['image'] || null : null;
   if (image2) sharedCanvasImageElements['add'](image2);
   const naturalWidth = Math['max'](
       0,
@@ -516,30 +516,30 @@ export function rememberCanvasImagePreloadResolved(value36, decoded = {}, value3
         image: image2,
         naturalWidth: naturalWidth,
         naturalHeight: naturalHeight,
-        decoded: decoded?.['decoded'] === !![] || value37['decoded'] === !![],
+        decoded: decoded?.['decoded'] === true || value37['decoded'] === true,
       },
       value37,
     ),
     (imagePreloadResolvedCachePrimes += 1),
-    !![]
+    true
   );
 }
 function finishTrackedCanvasImageDisplayLoad(el4) {
   const enabled10 = imageDisplayLoadByElement['get'](el4);
-  if (!enabled10) return ![];
+  if (!enabled10) return false;
   (imageDisplayLoadByElement['delete'](el4), enabled10['images']['delete'](el4));
   if (enabled10['images']['size'] === 0) imageDisplayLoadsByKey['delete'](enabled10['cacheKey']);
   return (
     el4['removeEventListener']?.('load', enabled10['onLoad']),
     el4['removeEventListener']?.('error', enabled10['onError']),
-    !![]
+    true
   );
 }
 export function trackCanvasImageDisplayLoad(value38, el5) {
   const cacheKey2 = normalizeImagePreloadKey(value38);
-  if (!cacheKey2 || !el5) return ![];
+  if (!cacheKey2 || !el5) return false;
   const value39 = imageDisplayLoadByElement['get'](el5);
-  if (value39?.['cacheKey'] === cacheKey2) return !![];
+  if (value39?.['cacheKey'] === cacheKey2) return true;
   if (value39) finishTrackedCanvasImageDisplayLoad(el5);
   let images = imageDisplayLoadsByKey['get'](cacheKey2);
   !images && ((images = new Set()), imageDisplayLoadsByKey['set'](cacheKey2, images));
@@ -552,9 +552,9 @@ export function trackCanvasImageDisplayLoad(value38, el5) {
   return (
     images['add'](el5),
     imageDisplayLoadByElement['set'](el5, value40),
-    el5['addEventListener']?.('load', value40['onLoad'], { once: !![] }),
-    el5['addEventListener']?.('error', value40['onError'], { once: !![] }),
-    !![]
+    el5['addEventListener']?.('load', value40['onLoad'], { once: true }),
+    el5['addEventListener']?.('error', value40['onError'], { once: true }),
+    true
   );
 }
 export function forgetCanvasImageDisplayLoad(value41) {
@@ -574,12 +574,12 @@ export function isCanvasImagePreloadRecentlyResolved(value43, value44 = {}) {
   const resolvedImagePreloadCacheHit = getResolvedImagePreloadCacheHit(value43, value44);
   return (
     !!resolvedImagePreloadCacheHit &&
-    (value44['requireImage'] !== !![] || !!resolvedImagePreloadCacheHit['image'])
+    (value44['requireImage'] !== true || !!resolvedImagePreloadCacheHit['image'])
   );
 }
 export function isCanvasImagePreloadPending(value45) {
   const imagePreloadKey6 = normalizeImagePreloadKey(value45);
-  if (!imagePreloadKey6) return ![];
+  if (!imagePreloadKey6) return false;
   return imagePreloadActiveJobs['has'](imagePreloadKey6) || imagePreloadQueuedJobs['has'](imagePreloadKey6);
 }
 export function isCanvasImagePreloadCoolingDown(value46, rejectTtlMs = {}) {
@@ -650,7 +650,7 @@ export function resetCanvasMediaSchedulerForTests() {
     (imagePreloadPeakActive = 0),
     (imagePreloadCanceled = 0),
     (imagePreloadResolvedCachePrimes = 0),
-    (imagePreloadPaused = ![]),
+    (imagePreloadPaused = false),
     imagePreloadPauseSources['clear'](),
     (imagePreloadPausedBypassPriority = DEFAULT_PAUSED_BYPASS_PRIORITY));
 }

@@ -5,20 +5,20 @@ export function createCollaborationReviewState({
   onChange: onChange,
   onComment: onComment = () => {},
 }) {
-  let args = { revision: -1, summaries: [], activities: [], loading: ![], error: '' },
+  let args = { revision: -1, summaries: [], activities: [], loading: false, error: '' },
     value = null,
     item = -1,
     count = Number['isInteger'](initialRevision) ? initialRevision : -1;
   const run = (args2) => {
     current() && ((args = { ...args, ...args2 }), onChange(args));
   };
-  function refresh(key = item, enabled = ![]) {
+  function refresh(key = item, enabled = false) {
     if (!current() || !Number['isInteger'](key)) return Promise['resolve']();
     item = Math['max'](item, key);
     if (value) return value;
     if (!enabled && args['revision'] >= item && !args['error']) return Promise['resolve']();
     return (
-      run({ loading: !![], error: '' }),
+      run({ loading: true, error: '' }),
       (value = (async () => {
         try {
           do {
@@ -45,7 +45,7 @@ export function createCollaborationReviewState({
         } catch (error) {
           run({ error: error['name'] === 'AbortError' ? '' : error['message'] });
         } finally {
-          ((value = null), run({ loading: ![] }));
+          ((value = null), run({ loading: false }));
         }
       })()),
       value

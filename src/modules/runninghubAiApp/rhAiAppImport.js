@@ -87,25 +87,25 @@ function extractFirstJsonObject(value3) {
     count = list3['indexOf']('{');
   if (count < 0) return '';
   let count2 = 0,
-    enabled3 = ![],
+    enabled3 = false,
     value4 = '',
-    value5 = ![];
+    value5 = false;
   for (let value6 = count; value6 < list3['length']; value6 += 1) {
     const value7 = list3[value6];
     if (enabled3) {
       if (value5) {
-        value5 = ![];
+        value5 = false;
         continue;
       }
       if (value7 === '\\') {
-        value5 = !![];
+        value5 = true;
         continue;
       }
-      value7 === value4 && ((enabled3 = ![]), (value4 = ''));
+      value7 === value4 && ((enabled3 = false), (value4 = ''));
       continue;
     }
     if (value7 === '"' || value7 === '\'') {
-      ((enabled3 = !![]), (value4 = value7));
+      ((enabled3 = true), (value4 = value7));
       continue;
     }
     if (value7 === '{') count2 += 1;
@@ -203,7 +203,7 @@ function looksLikeLongEnglishText(value27) {
 }
 function looksLikeStructuredText(value29) {
   const list7 = String(value29 ?? '')['trim']();
-  if (!list7) return !![];
+  if (!list7) return true;
   return (
     containsCjkText(list7) ||
     looksLikeLongEnglishText(list7) ||
@@ -231,52 +231,52 @@ function inferComponentConfig(value37, value38, value39, value40 = {}) {
   if (componentKind)
     return {
       componentKind: componentKind,
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: [componentKind],
       controlType: 'text',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: [],
     };
   if (value41 === 'prompt')
     return {
       componentKind: 'prompt',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['prompt'],
       controlType: 'prompt',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: [],
     };
   if (value41 === 'index')
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'stepper',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: ['stepper'],
     };
   if (isBooleanLiteral(value37))
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'toggle',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: ['toggle'],
     };
   if (isDecimalLiteral(value37))
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'float',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: ['float'],
     };
   if (isIntegerLiteral(value37))
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'stepper',
       controlTypeLocked: !isAmbiguousZeroLiteral(value37),
@@ -286,10 +286,10 @@ function inferComponentConfig(value37, value38, value39, value40 = {}) {
     };
   return {
     componentKind: 'param',
-    componentKindLocked: ![],
+    componentKindLocked: false,
     componentKindOptions: TEXT_COMPONENT_KIND_OPTIONS['slice'](),
     controlType: inferTextControlType(value37, value38, value39),
-    controlTypeLocked: ![],
+    controlTypeLocked: false,
     controlTypeOptions: TEXT_CONTROL_OPTIONS['slice'](),
   };
 }
@@ -312,7 +312,7 @@ function normalizeBooleanDefault(value48) {
   const value49 = String(value48 ?? '')
     ['trim']()
     ['toLowerCase']();
-  return value48 === !![] || value49 === 'true' || value49 === '1' || value49 === 'yes' || value49 === 'on';
+  return value48 === true || value49 === 'true' || value49 === '1' || value49 === 'yes' || value49 === 'on';
 }
 function normalizeIntegerDefault(value50) {
   const value51 = Number(value50);
@@ -465,10 +465,10 @@ export function createRunningHubAiAppComponentDrafts(value77, { appId: appId = '
             description: index3['description'],
             label: label,
             componentKind: componentKind2,
-            componentKindLocked: componentKindLocked['componentKindLocked'] === !![],
+            componentKindLocked: componentKindLocked['componentKindLocked'] === true,
             componentKindOptions: componentKindLocked['componentKindOptions'] || [defaultComponentKind],
             controlType: componentKindLocked['controlType'],
-            controlTypeLocked: componentKindLocked['controlTypeLocked'] === !![],
+            controlTypeLocked: componentKindLocked['controlTypeLocked'] === true,
             controlTypeOptions: componentKindLocked['controlTypeOptions'] || [],
             defaultValue: String(index3['fieldValue'] ?? ''),
             options: getRunningHubFieldOptions(index3),
@@ -488,7 +488,7 @@ function normalizeOptionList(list9 = [], map = null) {
       ['trim']()
       ['toLowerCase'](),
   )['filter']((enabled6, value80, list10) => {
-    if (!enabled6 || list10['indexOf'](enabled6) !== value80) return ![];
+    if (!enabled6 || list10['indexOf'](enabled6) !== value80) return false;
     return !map || map['has'](enabled6);
   });
 }
@@ -514,7 +514,7 @@ function normalizeComponentOverride(value84, value85, value86) {
       componentKindLocked2['componentKind'] || defaultComponentKind2,
     );
   let componentKind4 =
-    componentKindLocked2['componentKindLocked'] === !![]
+    componentKindLocked2['componentKindLocked'] === true
       ? componentKindLocked2['componentKind']
       : pickAllowedValue(
           componentKind3,
@@ -525,7 +525,7 @@ function normalizeComponentOverride(value84, value85, value86) {
   let controlType6 =
     componentKind4 === 'prompt'
       ? 'prompt'
-      : componentKindLocked2['controlTypeLocked'] === !![]
+      : componentKindLocked2['controlTypeLocked'] === true
         ? controlType4
         : pickAllowedValue(
             controlType5,
@@ -541,10 +541,10 @@ function normalizeComponentOverride(value84, value85, value86) {
       label: normalizeText(value84?.['label'], value86),
       description: normalizeText(value84?.['description'], value85['description'] || value86),
       componentKind: componentKind4,
-      componentKindLocked: componentKindLocked2['componentKindLocked'] === !![],
+      componentKindLocked: componentKindLocked2['componentKindLocked'] === true,
       componentKindOptions: componentKindOptions['length'] ? componentKindOptions : [componentKind4],
       controlType: controlType6,
-      controlTypeLocked: componentKindLocked2['controlTypeLocked'] === !![],
+      controlTypeLocked: componentKindLocked2['controlTypeLocked'] === true,
       controlTypeOptions: controlTypeOptions,
       inputOrder: normalizeOrderValue(value84?.['inputOrder'], value85['index']),
       homeParamOrder: normalizeOrderValue(value84?.['homeParamOrder'], value85['index']),
@@ -576,7 +576,7 @@ function buildManifestParts(dom, outputType, value88 = [], value89 = {}) {
   const list13 = [],
     list14 = [{ ...INSTANCE_FIELD, defaultValue: normalizeInstanceType(dom['body']?.['instanceType']) }],
     nodeInfoList = [];
-  let visible = ![],
+  let visible = false,
     text3 = '';
   const map3 = buildComponentOverrideMap(value88),
     list15 = dom['nodeInfoList']
@@ -611,7 +611,7 @@ function buildManifestParts(dom, outputType, value88 = [], value89 = {}) {
         kind: kind3,
         label: label2,
         description: description2,
-        required: !![],
+        required: true,
         displayOrder: component2['inputOrder'],
         customAiAppComponentIndex: item4['index'],
         rhAiAppComponentIndex: item4['index'],
@@ -623,14 +623,14 @@ function buildManifestParts(dom, outputType, value88 = [], value89 = {}) {
           field: id,
           slot: id,
           urlField: id,
-          required: !![],
+          required: true,
           missingMessage: '请接入' + label2,
           description: description2,
         }));
       return;
     }
     if (kind3 === 'prompt') {
-      visible = !![];
+      visible = true;
       !text3 && (text3 = normalizeText(map3['get'](item4['index'])?.['description'] || item4['description']));
       nodeInfoList['push']({
         nodeId: item4['nodeId'],
@@ -769,7 +769,7 @@ export function buildRunningHubAiAppManifestBundle({
     displayName: displayName2,
     description: description3,
     icon: 'images/RH.png',
-    vip: !![],
+    vip: true,
     appId: appId5['appId'],
     submitMode: 'openapi-v2-ai-app',
     queryMode: 'openapi-v2-query',
@@ -809,7 +809,7 @@ export function summarizeRunningHubAiAppBundle(value96) {
       id: id3['id'],
       kind: id3['kind'],
       label: id3['label'] || id3['id'],
-      required: id3['required'] === !![],
+      required: id3['required'] === true,
     })),
     params: paramCount['filter']((value98) => value98?.['id'] !== 'rhInstanceType')['map']((id4) => ({
       id: id4['id'],

@@ -25,9 +25,9 @@ export function formatCliProviderStatus(enabled) {
     return Object['freeze']({
       statusText: '未检测',
       message: '尚未获取 CLI 状态',
-      installed: ![],
-      loggedIn: ![],
-      busy: ![],
+      installed: false,
+      loggedIn: false,
+      busy: false,
     });
   const installed = !!enabled['installed'],
     loggedIn = !!enabled['loggedIn'],
@@ -58,7 +58,7 @@ export function formatCliProviderStatus(enabled) {
       statusText: '未安装',
       message: pickStatusMessage(enabled, '未检测到本地 CLI'),
       installed: installed,
-      loggedIn: ![],
+      loggedIn: false,
       busy: busy,
     });
   if (loggedIn) {
@@ -124,7 +124,7 @@ export async function initCliProviderSettings({
     list2['push'](() => initCliComponentSettings2['destroy']());
   }
   const map = new Map();
-  let enabled3 = ![];
+  let enabled3 = false;
   function run(data) {
     const options = map['get'](data);
     if (options !== undefined) clearTimeoutFn?.(options);
@@ -202,16 +202,16 @@ export async function initCliProviderSettings({
     const enabled4 = list['find']((input) => input['provider'] === state);
     if (!enabled4 || enabled3) return;
     const { loginButtonEl: loginButtonEl2, logoutButtonEl: logoutButtonEl2 } = enabled4['elements'];
-    if (loginButtonEl2) loginButtonEl2['disabled'] = !![];
-    if (logoutButtonEl2) logoutButtonEl2['disabled'] = !![];
-    let enabled5 = ![];
+    if (loginButtonEl2) loginButtonEl2['disabled'] = true;
+    if (logoutButtonEl2) logoutButtonEl2['disabled'] = true;
+    let enabled5 = false;
     try {
       const enabled6 = await handler(state);
       ((enabled5 = !!enabled6?.['started']),
         enabled5 &&
           (run2(state, {
-            installed: !![],
-            busy: !![],
+            installed: true,
+            busy: true,
             message: String(enabled6?.['instructions'] || '正在等待官方授权完成'),
           }),
           run3(state)),
@@ -244,7 +244,7 @@ export async function initCliProviderSettings({
       refresh: refresh,
       destroy() {
         if (enabled3) return;
-        ((enabled3 = !![]),
+        ((enabled3 = true),
           [...map['keys']()]['forEach'](run),
           list2['splice'](0)['forEach']((handler2) => handler2()));
       },

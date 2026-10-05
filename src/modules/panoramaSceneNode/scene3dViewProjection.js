@@ -13,7 +13,7 @@ export function createScene3DViewProjectionState(index) {
       near: positive(index?.['near'], 0.1),
       far: positive(index?.['far'], 250, 1),
       axis: null,
-      top: ![],
+      top: false,
       center: null,
     },
     perspective: {
@@ -63,7 +63,7 @@ export function switchScene3DViewProjection(source, next, type, args = {}) {
       type2 === 'orthographic'
         ? ['top', 'front', 'right']['includes'](center['axis'])
           ? center['axis']
-          : center['top'] === !![]
+          : center['top'] === true
             ? 'top'
             : null
         : null;
@@ -108,7 +108,7 @@ export function resolveScene3DOrthographicPose(payload, event, handle) {
   if (payload?.['view']?.['type'] !== 'orthographic') return null;
   const axis2 = ['top', 'front', 'right']['includes'](payload['view']['axis'])
     ? payload['view']['axis']
-    : payload['view']['top'] === !![]
+    : payload['view']['top'] === true
       ? 'top'
       : null;
   if (!axis2) return null;
@@ -191,8 +191,8 @@ export function applyBridgeCameraProjection(camera, pose, fallbackFov) {
             axis3 === 'front' ? target3['z'] + distance : target3['z'],
           )),
       camera['camera']['lookAt'](target3['x'], target3['y'], target3['z']),
-      !![]
+      true
     );
   }
-  return (camera['camera']['up']['set'](0, 1, 0), ![]);
+  return (camera['camera']['up']['set'](0, 1, 0), false);
 }

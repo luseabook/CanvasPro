@@ -42,7 +42,7 @@ export function reportReplacementTaskCenter(projectId = {}) {
         createdAt: Number(modelId['startedAt']) || 0,
         startedAt: Number(modelId['startedAt']) || 0,
         finishedAt: Number(modelId['finishedAt']) || 0,
-        cancellable: ![],
+        cancellable: false,
         thumbnail: status2 === 'complete' ? resolveTaskCenterThumbnail(item, kind['split'](':')[0]) : null,
         navigation: { source: 'replacement-studio', projectId: projectId['id'], ...args },
       });

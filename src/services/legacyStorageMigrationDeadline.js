@@ -14,7 +14,7 @@ export function createMigrationDeadline(value = LEGACY_STORAGE_MIGRATION_TIMEOUT
         signal['throwIfAborted'](),
         new Promise((key, handler2) => {
           const index = () => handler2(signal['reason']);
-          (signal['addEventListener']('abort', index, { once: !![] }),
+          (signal['addEventListener']('abort', index, { once: true }),
             Promise['resolve']()
               ['then'](() => {
                 return (signal['throwIfAborted'](), handler());

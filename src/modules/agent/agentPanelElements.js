@@ -7,7 +7,7 @@ export function createAgentElement(value, item = '', key = '') {
 export function createAgentButton(
   index,
   result,
-  { title: title = '', icon: icon = '', disabled: disabled = ![] } = {},
+  { title: title = '', icon: icon = '', disabled: disabled = false } = {},
 ) {
   const el2 = createAgentElement('button', index);
   el2['type'] = 'button';

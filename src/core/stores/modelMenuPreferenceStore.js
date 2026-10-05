@@ -1,7 +1,7 @@
 export const MODEL_MENU_PREFERENCE_STORAGE_KEY = 'aicanvas.modelMenuPreference';
 export const MODEL_MENU_PREFERENCE_CHANGED_EVENT = 'aicanvas:model-menu-preference-changed';
 export function createModelMenuPreferenceStore({ getWindow: getWindow = () => globalThis['window'] } = {}) {
-  let args = Object['freeze']({ version: '', hideUnconfigured: ![] });
+  let args = Object['freeze']({ version: '', hideUnconfigured: false });
   const list = new Set();
   function run(value) {
     ((args = Object['freeze'](value)), list['forEach']((handler) => handler(args)));
@@ -38,12 +38,12 @@ export function createModelMenuPreferenceStore({ getWindow: getWindow = () => gl
       return run2({
         version: version,
         hideUnconfigured:
-          hideUnconfigured?.['version'] === version && hideUnconfigured?.['hideUnconfigured'] === !![],
+          hideUnconfigured?.['version'] === version && hideUnconfigured?.['hideUnconfigured'] === true,
       });
     },
     setHideUnconfigured(index) {
       if (!args['version']) return args;
-      const hideUnconfigured2 = index === !![];
+      const hideUnconfigured2 = index === true;
       if (hideUnconfigured2 === args['hideUnconfigured']) return args;
       return run2({ ...args, hideUnconfigured: hideUnconfigured2 });
     },

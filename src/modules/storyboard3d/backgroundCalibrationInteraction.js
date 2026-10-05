@@ -108,10 +108,10 @@ export function createStoryboard3DBackgroundCalibrationInteraction({
   let mode2 = null;
   const run = () => {
       if (!mode2) return;
-      (windowObject?.['removeEventListener']?.('pointermove', config, !![]),
-        windowObject?.['removeEventListener']?.('pointerup', scope, !![]),
-        windowObject?.['removeEventListener']?.('pointercancel', input, !![]),
-        windowObject?.['removeEventListener']?.('keydown', output, !![]),
+      (windowObject?.['removeEventListener']?.('pointermove', config, true),
+        windowObject?.['removeEventListener']?.('pointerup', scope, true),
+        windowObject?.['removeEventListener']?.('pointercancel', input, true),
+        windowObject?.['removeEventListener']?.('keydown', output, true),
         mode2['guide']?.['classList']?.['remove']?.('is-adjusting'));
       try {
         mode2['handle']?.['releasePointerCapture']?.(mode2['pointerId']);
@@ -127,7 +127,7 @@ export function createStoryboard3DBackgroundCalibrationInteraction({
             (Number(event2['clientY']) || 0) - mode2['startClientY'],
           ) >= 1;
       if (!enabled && !mode2['moved']) return;
-      ((mode2['moved'] = !![]),
+      ((mode2['moved'] = true),
         (mode2['latest'] = computeStoryboard3DBackgroundCalibrationDrag({
           mode: mode2['mode'],
           background: mode2['initial'],
@@ -188,16 +188,16 @@ export function createStoryboard3DBackgroundCalibrationInteraction({
           pointerId: pointerId['pointerId'],
           handle: handle2,
           guide: handle2['closest']?.('.storyboard-3d-background-calibration-guide'),
-          moved: ![],
+          moved: false,
         }),
         mode2['guide']?.['classList']?.['add']?.('is-adjusting'));
       try {
         handle2['setPointerCapture']?.(pointerId['pointerId']);
       } catch {}
-      (windowObject?.['addEventListener']?.('pointermove', config, !![]),
-        windowObject?.['addEventListener']?.('pointerup', scope, !![]),
-        windowObject?.['addEventListener']?.('pointercancel', input, !![]),
-        windowObject?.['addEventListener']?.('keydown', output, !![]));
+      (windowObject?.['addEventListener']?.('pointermove', config, true),
+        windowObject?.['addEventListener']?.('pointerup', scope, true),
+        windowObject?.['addEventListener']?.('pointercancel', input, true),
+        windowObject?.['addEventListener']?.('keydown', output, true));
     };
   return (
     root?.['addEventListener']?.('pointerdown', value3),

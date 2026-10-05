@@ -32,7 +32,7 @@ export async function saveWorkspaceVideoDownload({
 }
 export function renderWorkspaceVideoDownloadButton({
   action: action = 'download-replacement-video',
-  enabled: enabled = ![],
+  enabled: enabled = false,
   className: className = '',
   label: label = '下载替换视频',
 } = {}) {

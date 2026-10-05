@@ -48,7 +48,7 @@ function getVideoThumbnailUrl(source) {
 }
 export function resolveReferenceVideoItemByEdge(options2 = {}, next = null) {
   const item2 = Array['isArray'](options2?.['videos']) ? options2['videos'] : [];
-  if (!item2['length']) return { item: null, index: -1, matchedByKey: ![] };
+  if (!item2['length']) return { item: null, index: -1, matchedByKey: false };
   const videoMediaKey = normalizeVideoMediaKey(next?.['sourceMediaKey']);
   let index2 = videoMediaKey
     ? item2['findIndex']((current) => getVideoItemMediaKey(current) === videoMediaKey)
@@ -77,7 +77,7 @@ export function resolveReferenceVideoThumbnail(options3 = {}, payload = null) {
   if (thumbUrl2 && !selected['matchedByKey'])
     return {
       thumbUrl: thumbUrl2,
-      selected: { item: item3[index3] || null, index: index3, matchedByKey: ![] },
+      selected: { item: item3[index3] || null, index: index3, matchedByKey: false },
     };
   const thumbUrl3 = getVideoThumbnailUrl(options3);
   if (thumbUrl3 && (!selected['matchedByKey'] || selected['index'] === index3))

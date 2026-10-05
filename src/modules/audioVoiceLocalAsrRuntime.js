@@ -48,7 +48,7 @@ export function createAudioVoiceTaskProgressTracker({
 export async function ensureAudioVoiceLocalAsrRuntime({
   engine: engine = 'cpu',
   enqueueTask: enqueueTask = enqueueElectronMediaTask,
-  forceRepair: forceRepair = ![],
+  forceRepair: forceRepair = false,
   nodeId: nodeId = '',
   onTaskStarted: onTaskStarted = () => {},
   timeout: timeout = AUDIO_VOICE_ASR_RUNTIME_INSTALL_TIMEOUT_MS,
@@ -56,7 +56,7 @@ export async function ensureAudioVoiceLocalAsrRuntime({
 } = {}) {
   const engine2 = normalizeEngine(engine),
     args = { engine: engine2 };
-  if (forceRepair === !![]) args['forceRepair'] = !![];
+  if (forceRepair === true) args['forceRepair'] = true;
   const enqueueTask2 = await enqueueTask({ kind: 'asrRuntimeInstall', nodeId: nodeId, args: args }),
     enabled2 = String(enqueueTask2?.['taskId'] || '')['trim']();
   if (!enabled2) throw new Error('Subtitle recognition runtime task did not return a task ID');
@@ -82,7 +82,7 @@ export async function repairAudioVoiceLocalAsrRuntime({
     engine3 = normalizeEngine(fetchSettings2?.['subtitleRecognition']?.['engine']);
   return await ensureRuntime({
     engine: engine3,
-    forceRepair: !![],
+    forceRepair: true,
     nodeId: nodeId,
     onTaskStarted: onTaskStarted,
   });
@@ -97,6 +97,6 @@ export async function prepareAudioVoiceLocalAsr({
     engine4 = normalizeEngine(fetchSettings3?.['subtitleRecognition']?.['engine']);
   return (
     await ensureRuntime({ engine: engine4, nodeId: nodeId, onTaskStarted: onTaskStarted }),
-    { diarizationProvider: 'sortformer', downloadModelIfMissing: !![], engine: engine4 }
+    { diarizationProvider: 'sortformer', downloadModelIfMissing: true, engine: engine4 }
   );
 }

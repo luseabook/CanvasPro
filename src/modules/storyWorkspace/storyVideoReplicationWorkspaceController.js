@@ -130,7 +130,7 @@ export function createStoryVideoReplicationWorkspaceController({
       state['step'] !== 1 ||
       state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
-      return ![];
+      return false;
     const el = viewport['querySelector']('.story-page.is-current'),
       storyReplicationEpisode = findStoryReplicationEpisode(state['data'], episodeId2),
       enabled2 = [...(el?.['querySelectorAll']('[data-story-replication-episode-id]') || [])]['find'](
@@ -138,7 +138,7 @@ export function createStoryVideoReplicationWorkspaceController({
           el2['matches']?.('article') &&
           normalizeText(el2['dataset']['storyReplicationEpisodeId']) === normalizeText(episodeId2),
       );
-    if (!el || !storyReplicationEpisode || !enabled2) return ![];
+    if (!el || !storyReplicationEpisode || !enabled2) return false;
     const options = state['data']['episodes']['indexOf'](storyReplicationEpisode);
     return (
       el['dispatchEvent']?.(
@@ -153,16 +153,16 @@ export function createStoryVideoReplicationWorkspaceController({
       state['step'] !== 1 ||
       state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
-      return ![];
+      return false;
     const el3 = viewport['querySelector']('.story-page.is-current'),
       enabled3 = el3?.['querySelector']('.story-page-footer');
     if (el3) syncStoryReplicationSelection(el3, state);
-    if (!enabled3) return ![];
+    if (!enabled3) return false;
     const el4 = documentObject['createElement']('template');
     el4['innerHTML'] = renderFooter(state)['trim']();
     const enabled4 = el4['content']['firstElementChild'];
-    if (!enabled4) return ![];
-    return (enabled3['replaceWith'](enabled4), !![]);
+    if (!enabled4) return false;
+    return (enabled3['replaceWith'](enabled4), true);
   }
   function run(target, source) {
     if (
@@ -171,7 +171,7 @@ export function createStoryVideoReplicationWorkspaceController({
       state['step'] !== 1 ||
       state['data']?.['project']?.['sourceMode'] !== 'video-replication'
     )
-      return ![];
+      return false;
     const next = refreshEpisode(source),
       current = refreshFooter();
     return next && current;
@@ -180,10 +180,10 @@ export function createStoryVideoReplicationWorkspaceController({
     projectId,
     file,
     episodeId3,
-    { uploadOnly: uploadOnly = ![], force: force = ![] } = {},
+    { uploadOnly: uploadOnly = false, force: force = false } = {},
   ) {
     const status2 = findStoryReplicationEpisode(projectId['data'], episodeId3);
-    if (!status2 || !isProjectTaskLive(projectId)) return ![];
+    if (!status2 || !isProjectTaskLive(projectId)) return false;
     const response = force ? { replication: { ...status2['replication'] }, status: status2['status'] } : null;
     let entry = null;
     const id = buildStoryBackgroundTaskId('video-replication-analysis', { episodeId: episodeId3 });
@@ -196,7 +196,7 @@ export function createStoryVideoReplicationWorkspaceController({
         label: '解析第 ' + status2['number'] + ' 集视频',
         message: '正在上传原视频',
       },
-      { refreshHome: ![] },
+      { refreshHome: false },
     );
     if (!force) invalidateStoryVideoReplicationAssetLocalization(projectId['data']);
     ((status2['replication'] = {
@@ -217,9 +217,9 @@ export function createStoryVideoReplicationWorkspaceController({
         if (!file) throw new Error('原视频尚未上传，请使用卡片上的“重新上传该视频”。');
         const videoFileNaturalSize = readVideoFileNaturalSize(file)['catch'](() => null),
           args2 = await uploadFile(file, projectId['projectId']);
-        if (!isProjectTaskLive(projectId)) return ![];
+        if (!isProjectTaskLive(projectId)) return false;
         const durationSec = await videoFileNaturalSize;
-        if (!isProjectTaskLive(projectId)) return ![];
+        if (!isProjectTaskLive(projectId)) return false;
         const localPath = resolveStoryReplicationUploadedVideo(args2);
         videoUrl = localPath['videoRef'];
         let posterUrl = {
@@ -235,7 +235,7 @@ export function createStoryVideoReplicationWorkspaceController({
             record,
           );
         }
-        if (!isProjectTaskLive(projectId)) return ![];
+        if (!isProjectTaskLive(projectId)) return false;
         applyStoryVideoReplicationUpload(status2, {
           file: file,
           videoRef: videoUrl,
@@ -260,19 +260,19 @@ export function createStoryVideoReplicationWorkspaceController({
             projectId,
             id,
             { status: 'succeeded', message: '视频已导入，等待选择分析' },
-            { refreshHome: ![] },
+            { refreshHome: false },
           ),
           syncStoryVideoReplicationProject(projectId['data']),
           syncProjectEntry(projectId),
-          schedulePersistence({ immediate: !![] }),
+          schedulePersistence({ immediate: true }),
           run(projectId, episodeId3),
-          !![]
+          true
         );
       (updateBackgroundTask(
         projectId,
         id,
         { status: 'running', message: '正在理解剧情、台词与镜头' },
-        { refreshHome: ![] },
+        { refreshHome: false },
       ),
         run(projectId, episodeId3));
       const modelId = normalizeText(projectId['modelSettings']['models']?.['text']);
@@ -289,7 +289,7 @@ export function createStoryVideoReplicationWorkspaceController({
         projectId,
         id,
         { modelId: modelId, provider: provider, providerProfileId: providerProfileId },
-        { refreshHome: ![] },
+        { refreshHome: false },
       );
       (force || !status2['replication']['sourceAnalysis']) &&
         (entry = {
@@ -308,19 +308,19 @@ export function createStoryVideoReplicationWorkspaceController({
           projectId,
           id,
           { message: '正在识别原片音轨，保留台词与时间' },
-          { refreshHome: ![] },
+          { refreshHome: false },
         ),
           (speechEvidence = await transcribeSource({
             videoRef: videoUrl,
             provider: projectId['data']['project']['replication']?.['asrProvider'] || 'volcengine-speech',
             isActive: () => isProjectTaskLive(projectId),
           })));
-        if (!isProjectTaskLive(projectId)) return ![];
+        if (!isProjectTaskLive(projectId)) return false;
         if (response) response['replication']['speechEvidence'] = speechEvidence;
         !force &&
           ((status2['replication']['speechEvidence'] = speechEvidence),
           syncProjectEntry(projectId),
-          schedulePersistence({ immediate: !![] }));
+          schedulePersistence({ immediate: true }));
       }
       const sourceAnalysis = await analyzeSourceVideo({
         videoRef: videoUrl,
@@ -335,17 +335,17 @@ export function createStoryVideoReplicationWorkspaceController({
         onProgress: (message) => {
           if (!isProjectTaskLive(projectId)) return;
           ((status2['replication']['message'] = message),
-            updateBackgroundTask(projectId, id, { message: message }, { refreshHome: ![] }),
+            updateBackgroundTask(projectId, id, { message: message }, { refreshHome: false }),
             run(projectId, episodeId3));
         },
         onSourceAnalysis: async (payload) => {
           if (!isProjectTaskLive(projectId) || force) return;
           ((status2['replication']['sourceAnalysis'] = payload),
             syncProjectEntry(projectId),
-            schedulePersistence({ immediate: !![] }));
+            schedulePersistence({ immediate: true }));
         },
       });
-      if (!isProjectTaskLive(projectId)) return ![];
+      if (!isProjectTaskLive(projectId)) return false;
       if (sourceAnalysis['sourceAnalysis']) {
         const episode = {
           ...status2,
@@ -360,14 +360,14 @@ export function createStoryVideoReplicationWorkspaceController({
           },
         });
       }
-      if (!isProjectTaskLive(projectId)) return ![];
+      if (!isProjectTaskLive(projectId)) return false;
       if (force && !sourceAnalysis['sourceAnalysis']) throw new Error('未返回原片分析，已保留现有内容。');
       applyStoryVideoReplicationAnalysis(status2, sourceAnalysis);
       if (speechEvidence) status2['replication']['speechEvidence'] = speechEvidence;
       finishAnalysisAttempt(status2, entry);
       if (force) {
         invalidateStoryVideoReplicationAssetLocalization(projectId['data']);
-        if (status2['clips']?.['length']) status2['replication']['promptsStale'] = !![];
+        if (status2['clips']?.['length']) status2['replication']['promptsStale'] = true;
         else {
           const config = projectId['data']['project']['replication']['characterBindings'] || {};
           for (const scope of Object['keys'](config))
@@ -381,15 +381,15 @@ export function createStoryVideoReplicationWorkspaceController({
           projectId,
           id,
           { status: 'succeeded', message: '第 ' + status2['number'] + ' 集视频解析完成' },
-          { refreshHome: ![] },
+          { refreshHome: false },
         ),
         syncProjectEntry(projectId),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         run(projectId, episodeId3),
-        !![]
+        true
       );
     } catch (error) {
-      if (!isProjectTaskLive(projectId)) return ![];
+      if (!isProjectTaskLive(projectId)) return false;
       if (response)
         ((status2['replication'] = {
           ...response['replication'],
@@ -408,12 +408,12 @@ export function createStoryVideoReplicationWorkspaceController({
             message: '第 ' + status2['number'] + ' 集视频解析失败',
             error: error?.['message'] || '视频解析失败。',
           },
-          { refreshHome: ![] },
+          { refreshHome: false },
         ),
         syncProjectEntry(projectId),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         run(projectId, episodeId3),
-        ![]
+        false
       );
     }
   }
@@ -428,7 +428,7 @@ export function createStoryVideoReplicationWorkspaceController({
           if (!isProjectTaskLive(input)) break;
           if (!(await analyzeEpisode(input, value3['file'], value3['episodeId'], value3))) enabled5 += 1;
         }
-        if (!isProjectTaskLive(input)) return ![];
+        if (!isProjectTaskLive(input)) return false;
         const storyVideoReplicationSummary = getStoryVideoReplicationSummary(input['data']);
         if (
           !enabled5 &&
@@ -472,18 +472,18 @@ export function createStoryVideoReplicationWorkspaceController({
     return (analysisPromises['set'](text2, value2), value2);
   }
   async function startFromHome() {
-    if (state['isGeneratingStory']) return ![];
-    if (resolveStoryVideoReplicationHomeTab(state, 'replication') !== 'replication') return ![];
+    if (state['isGeneratingStory']) return false;
+    if (resolveStoryVideoReplicationHomeTab(state, 'replication') !== 'replication') return false;
     if (typeof analyzeSourceVideo !== 'function')
-      return (showToast('视频理解 Agent 尚未初始化。', 'error'), ![]);
+      return (showToast('视频理解 Agent 尚未初始化。', 'error'), false);
     const files = [...state['replicationSourceFiles']];
-    if (!files['length']) return (showToast('请先上传至少一条视频。', 'warn'), ![]);
+    if (!files['length']) return (showToast('请先上传至少一条视频。', 'warn'), false);
     const modelId2 = resolveStoryVideoInputTextModelId(state['models']['text']);
-    if (!modelId2) return (showToast('当前没有支持视频输入的文本模型。', 'error'), ![]);
+    if (!modelId2) return (showToast('当前没有支持视频输入的文本模型。', 'error'), false);
     const value5 = files['map']((value6) => validateStoryReplicationVideoSize(value6, modelId2))['find'](
       (response3) => !response3['ok'],
     );
-    if (value5) return (showToast(value5['error'], 'warn'), ![]);
+    if (value5) return (showToast(value5['error'], 'warn'), false);
     (syncCurrentProjectEntry(), beginProjectSession(), (state['models']['text'] = modelId2));
     const storyWorkspaceModelChoice = getStoryWorkspaceModelChoice('text', modelId2);
     ((state['textProvider'] = storyWorkspaceModelChoice?.['provider'] || state['textProvider']),
@@ -503,22 +503,22 @@ export function createStoryVideoReplicationWorkspaceController({
       promptMode: state['data']['project']?.['planning']?.['promptMode'],
       aspectRatio: state['data']['project']?.['aspectRatio'] || '9:16',
     })),
-      (state['projectTitleEdited'] = ![]),
-      (state['hasCreatedProject'] = !![]),
-      (state['assetSelectionMode'] = ![]),
+      (state['projectTitleEdited'] = false),
+      (state['hasCreatedProject'] = true),
+      (state['assetSelectionMode'] = false),
       (state['selectedAssetIds'] = []),
       (state['selectedEpisodeId'] = state['data']['episodes'][0]?.['id'] || ''),
       (state['selectedClipId'] = ''),
       releaseSourcePreviewUrls(),
       (state['replicationSourceFiles'] = []),
-      openProject({ resetStep: !![] }),
+      openProject({ resetStep: true }),
       syncCurrentProjectEntry(),
-      schedulePersistence({ immediate: !![] }));
+      schedulePersistence({ immediate: true }));
     const value7 = createProjectToken(),
       list2 = files['map']((file2, value8) => ({
         file: file2,
         episodeId: state['data']['episodes'][value8]?.['id'],
-        uploadOnly: !![],
+        uploadOnly: true,
       }))['filter']((value9) => value9['file'] && value9['episodeId']);
     return (
       list2['forEach']((value10) => {
@@ -528,23 +528,23 @@ export function createStoryVideoReplicationWorkspaceController({
     );
   }
   async function retryFailedAnalysis() {
-    if (state['data']?.['project']?.['sourceMode'] !== 'video-replication') return ![];
+    if (state['data']?.['project']?.['sourceMode'] !== 'video-replication') return false;
     const value11 = createProjectToken(),
       text3 = normalizeText(value11['projectId']);
-    if (analysisPromises['has'](text3)) return ![];
+    if (analysisPromises['has'](text3)) return false;
     const list3 = state['data']['episodes']
       ['filter']((value12) => value12?.['replication']?.['status'] === 'failed')
       ['map']((episodeId4) => ({
         episodeId: episodeId4['id'],
         file: sourceFileByEpisodeKey['get'](text3 + ':' + episodeId4['id']) || null,
       }));
-    if (!list3['length']) return ![];
+    if (!list3['length']) return false;
     return runAnalysis(value11, list3);
   }
-  async function analyzeSelected({ all: all = ![], episodeId: episodeId = '' } = {}) {
-    if (state['data']?.['project']?.['sourceMode'] !== 'video-replication') return ![];
+  async function analyzeSelected({ all: all = false, episodeId: episodeId = '' } = {}) {
+    if (state['data']?.['project']?.['sourceMode'] !== 'video-replication') return false;
     const value13 = createProjectToken();
-    if (analysisPromises['has'](value13['projectId'])) return ![];
+    if (analysisPromises['has'](value13['projectId'])) return false;
     const list4 = value13['data']['episodes']
       ['filter'](
         (value14) =>
@@ -555,7 +555,7 @@ export function createStoryVideoReplicationWorkspaceController({
         episodeId: episodeId5['id'],
         file: sourceFileByEpisodeKey['get'](value13['projectId'] + ':' + episodeId5['id']) || null,
       }));
-    if (!list4['length']) return (showToast('请先选择待分析的视频。', 'warn'), ![]);
+    if (!list4['length']) return (showToast('请先选择待分析的视频。', 'warn'), false);
     for (const value15 of list4) {
       const storyReplicationEpisode2 = findStoryReplicationEpisode(value13['data'], value15['episodeId']);
       ((storyReplicationEpisode2['replication']['status'] = 'queued'),
@@ -567,10 +567,10 @@ export function createStoryVideoReplicationWorkspaceController({
     reanalyzeEpisode: (episodeId6) => {
       const value16 = createProjectToken(),
         storyReplicationEpisode3 = findStoryReplicationEpisode(value16['data'], episodeId6);
-      if (!storyReplicationEpisode3?.['replication']['sourceAnalysis']) return ![];
+      if (!storyReplicationEpisode3?.['replication']['sourceAnalysis']) return false;
       if (analysisPromises['has'](value16['projectId']))
-        return (showToast('已有视频正在分析，请等待完成后再重新识别。', 'warn'), ![]);
-      return runAnalysis(value16, [{ episodeId: episodeId6, force: !![] }]);
+        return (showToast('已有视频正在分析，请等待完成后再重新识别。', 'warn'), false);
+      return runAnalysis(value16, [{ episodeId: episodeId6, force: true }]);
     },
     analyzeEpisode: analyzeEpisode,
     analyzeSelected: analyzeSelected,

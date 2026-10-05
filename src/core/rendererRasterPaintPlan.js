@@ -8,17 +8,17 @@ function sameRecord(enabled, enabled2) {
   );
 }
 export function canReuseRasterPaint(enabled3, enabled4) {
-  if (!enabled3 || !enabled4 || enabled3['paintScaleKey'] !== enabled4['paintScaleKey']) return ![];
+  if (!enabled3 || !enabled4 || enabled3['paintScaleKey'] !== enabled4['paintScaleKey']) return false;
   if (
     !sameRecord(enabled3['worldBounds'], enabled4['worldBounds']) ||
     !sameRecord(enabled3['palette'], enabled4['palette'])
   )
-    return ![];
-  if (enabled3['admittedSources']['size'] !== enabled4['admittedSources']['size']) return ![];
+    return false;
+  if (enabled3['admittedSources']['size'] !== enabled4['admittedSources']['size']) return false;
   for (const item of enabled3['admittedSources']) {
-    if (!enabled4['admittedSources']['has'](item)) return ![];
+    if (!enabled4['admittedSources']['has'](item)) return false;
   }
-  if (enabled3['items']['length'] !== enabled4['items']['length']) return ![];
+  if (enabled3['items']['length'] !== enabled4['items']['length']) return false;
   return enabled3['items']['every']((key, index) => {
     const result = enabled4['items'][index];
     return (

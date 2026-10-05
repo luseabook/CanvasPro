@@ -45,7 +45,7 @@ export function bindWorkspaceSelects(root) {
             (el6['src'] = el4['dataset']['thumbnailUrl']),
             (el6['alt'] = ''),
             (el6['loading'] = 'lazy'),
-            el6['addEventListener']('error', () => el6['remove'](), { once: !![] }),
+            el6['addEventListener']('error', () => el6['remove'](), { once: true }),
             el5['classList']['add']('has-character-thumbnail'),
             el5['append'](el6));
         }
@@ -54,7 +54,7 @@ export function bindWorkspaceSelects(root) {
       const hidden = select['hidden'];
       return (
         select['before'](root2),
-        (select['hidden'] = !![]),
+        (select['hidden'] = true),
         root2['append'](select, trigger, menu),
         {
           select: select,
@@ -75,14 +75,14 @@ export function bindWorkspaceSelects(root) {
     });
   let enabled = null,
     index = 0;
-  function close(enabled2 = ![]) {
+  function close(enabled2 = false) {
     const result = enabled;
     ((enabled = null),
       value['cancelAnimationFrame'](index),
       workspaceMenuController['close'](),
       result?.['menu']['hidePopover'](),
-      el['removeEventListener']('pointerdown', run, !![]));
-    if (enabled2 && result?.['trigger']['isConnected']) result['trigger']['focus']({ preventScroll: !![] });
+      el['removeEventListener']('pointerdown', run, true));
+    if (enabled2 && result?.['trigger']['isConnected']) result['trigger']['focus']({ preventScroll: true });
   }
   function run(event) {
     if (!enabled?.['root']['contains'](event['target'])) close();
@@ -120,26 +120,26 @@ export function bindWorkspaceSelects(root) {
   }
   function run3(next) {
     (close(), sync());
-    if (!workspaceMenuController['open'](next['root'], next['trigger'])) return ![];
+    if (!workspaceMenuController['open'](next['root'], next['trigger'])) return false;
     return (
       (enabled = next),
       next['menu']['showPopover'](),
       run2(),
-      el['addEventListener']('pointerdown', run, !![]),
-      !![]
+      el['addEventListener']('pointerdown', run, true),
+      true
     );
   }
   function run4(event2) {
     const enabled3 = list['find']((current) => current['root']['contains'](event2['target']));
     if (!enabled3 || enabled3['select']['matches'](':disabled')) return;
     if (event2['target']['closest']('.story-replication-select-trigger')) {
-      if (enabled === enabled3) close(!![]);
+      if (enabled === enabled3) close(true);
       else {
         if (run3(enabled3)) {
           const el8 =
             enabled3['menu']['querySelector']('[aria-selected="true"]:not(:disabled)') ||
             enabled3['menu']['querySelector']('button:not(:disabled)');
-          (el8?.['focus']({ preventScroll: !![] }), el8?.['scrollIntoView']({ block: 'nearest' }));
+          (el8?.['focus']({ preventScroll: true }), el8?.['scrollIntoView']({ block: 'nearest' }));
         }
       }
     }
@@ -147,8 +147,8 @@ export function bindWorkspaceSelects(root) {
     if (!el9 || el9['disabled']) return;
     ((enabled3['select']['value'] = el9['dataset']['value']),
       sync(),
-      close(!![]),
-      enabled3['select']['dispatchEvent'](new value['Event']('change', { bubbles: !![] })));
+      close(true),
+      enabled3['select']['dispatchEvent'](new value['Event']('change', { bubbles: true })));
   }
   function run5(event3) {
     const enabled4 = list['find']((entry) => entry['root']['contains'](event3['target']));
@@ -161,7 +161,7 @@ export function bindWorkspaceSelects(root) {
       if (!run3(enabled4)) return;
     }
     if (event3['key'] === 'Tab' && enabled) {
-      close(!![]);
+      close(true);
       return;
     }
     if (workspaceMenuController['handleKeyDown'](event3)) {

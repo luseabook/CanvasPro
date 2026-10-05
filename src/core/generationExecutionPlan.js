@@ -85,7 +85,7 @@ export function resolveGenerationTaskIdentity(options2 = {}) {
       firstTrimmed(taskId, node['rhTaskId'], node['asyncTaskId'], node['dreaminaSubmitId'], node['taskId']),
     startedAt:
       taskId2?.['readStartedAt'](node, startedAt) || Number(startedAt || node['generationStartTime'] || 0),
-    async: taskId2?.['async'] === !![],
+    async: taskId2?.['async'] === true,
   };
 }
 export function buildGenerationExecutionId({
@@ -121,7 +121,7 @@ export function createGenerationExecutionPlan(options3 = {}) {
     } = options3 || {},
     adapterType4 = normalizeGenerationAdapterType(adapterType),
     target = adapterType4 === 'workflow',
-    async2 = async === !![] && adapterType4 === 'modelApi',
+    async2 = async === true && adapterType4 === 'modelApi',
     provider4 = compactIdPart(provider || payload2?.['provider'], adapterType4),
     protocol3 =
       inferGenerationTaskProtocol({
@@ -150,13 +150,13 @@ export function createGenerationExecutionPlan(options3 = {}) {
         modelId: modelId4,
       }),
     payload: payload2,
-    cancellable: cancellable === undefined ? target : cancellable === !![],
-    resumable: resumable === undefined ? target || async2 : resumable === !![],
+    cancellable: cancellable === undefined ? target : cancellable === true,
+    resumable: resumable === undefined ? target || async2 : resumable === true,
     async: async2,
     capabilities: {
       async: async2,
-      cancellable: cancellable === undefined ? target : cancellable === !![],
-      resumable: resumable === undefined ? target || async2 : resumable === !![],
+      cancellable: cancellable === undefined ? target : cancellable === true,
+      resumable: resumable === undefined ? target || async2 : resumable === true,
     },
   };
 }
@@ -168,10 +168,10 @@ export function createGenerationSubmitPlan(options4 = {}) {
   return createGenerationLifecyclePlan('submit', options4);
 }
 export function createGenerationResumePlan(args4 = {}) {
-  return createGenerationLifecyclePlan('resume', { resumable: !![], ...args4 });
+  return createGenerationLifecyclePlan('resume', { resumable: true, ...args4 });
 }
 export function createGenerationCancelPlan(args5 = {}) {
-  return createGenerationLifecyclePlan('cancel', { cancellable: !![], ...args5 });
+  return createGenerationLifecyclePlan('cancel', { cancellable: true, ...args5 });
 }
 function createGenerationPlanFromNode(current, entry = {}) {
   const {

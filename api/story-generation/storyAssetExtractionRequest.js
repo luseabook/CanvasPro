@@ -37,7 +37,7 @@ export function createStoryAssetContractClientKey({
     '' + data + hashStoryAssetClientKeyText([text, result, storyAssetClientKeyText, ...args]['join']('\x00'))
   );
 }
-function createStoryAssetNames(options, target, source = null, next = ![]) {
+function createStoryAssetNames(options, target, source = null, next = false) {
   return normalizeStringArray(options)['flatMap']((kind2) => {
     const list2 = Array['isArray'](source?.[kind2]) ? source[kind2] : [];
     return normalizeStringArray(target?.[kind2])['map']((name2) => {
@@ -64,7 +64,7 @@ function createStoryAssetNames(options, target, source = null, next = ![]) {
     });
   });
 }
-function createStoryAssetCandidates(entry, record, payload = ![]) {
+function createStoryAssetCandidates(entry, record, payload = false) {
   return normalizeStringArray(entry)['flatMap']((kind3) => {
     const list3 = Array['isArray'](record?.[kind3]) ? record[kind3] : [],
       map = new Map();
@@ -107,7 +107,7 @@ export function createStoryAssetPromptContracts(
   state = null,
   config = null,
   scope = null,
-  { includeClientKeys: includeClientKeys = ![] } = {},
+  { includeClientKeys: includeClientKeys = false } = {},
 ) {
   const candidateAssets = createStoryAssetCandidates(list4, config, includeClientKeys),
     requiredAssets = createStoryAssetNames(list4, state, scope, includeClientKeys);
@@ -143,7 +143,7 @@ export function createStoryAssetExtractionStructuredOutput({
           STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION
         : 'story_asset_' + (list6['join']('_') || 'all') + '_detailed_v2',
     schema: schema,
-    strict: !![],
+    strict: true,
     fallback: fallback === 'none' ? 'none' : 'prompt',
   };
 }

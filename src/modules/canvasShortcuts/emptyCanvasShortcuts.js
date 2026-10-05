@@ -29,7 +29,7 @@ export function initEmptyCanvasShortcuts({
     catalogStore['subscribe'](handler),
     handler(),
     catalogStore['load']()['catch']((error) => console['warn']('Canvas shortcuts:', error['message'])));
-  let enabled = ![];
+  let enabled = false;
   (el['addEventListener']('dblclick', (event) => event['stopPropagation']()),
     el['addEventListener']('click', (event2) => {
       event2['stopPropagation']();
@@ -40,7 +40,7 @@ export function initEmptyCanvasShortcuts({
     }));
   async function onActivate(type, el2) {
     if (enabled) return;
-    ((enabled = !![]), (el2['disabled'] = !![]));
+    ((enabled = true), (el2['disabled'] = true));
     try {
       const key = store['getState']()['viewport'],
         box = getViewportScreenCenter(key, window['innerWidth'], window['innerHeight']),
@@ -64,10 +64,10 @@ export function initEmptyCanvasShortcuts({
     } catch (error2) {
       window['showToast']?.(error2['message'] || '模板添加失败', 'error');
     } finally {
-      ((enabled = ![]), (el2['disabled'] = ![]));
+      ((enabled = false), (el2['disabled'] = false));
     }
   }
-  let enabled3 = ![];
+  let enabled3 = false;
   (window['addEventListener']('v2:canvas-node-menu-items', (index) => {
     const { nodeIds: nodeIds, items: items } = index['detail'] || {};
     if (!canManageCanvasShortcuts() || !nodeIds?.['length'] || !Array['isArray'](items)) return;
@@ -84,10 +84,10 @@ export function initEmptyCanvasShortcuts({
     window['addEventListener']('canvas-shortcuts:manage', async (result) => {
       if (!canManageCanvasShortcuts() || enabled3 || document['getElementById']('canvasShortcutsManager'))
         return;
-      enabled3 = !![];
+      enabled3 = true;
       const el3 = document['getElementById']('devEntryShortcutsBtn');
       el3?.['setAttribute']('aria-busy', 'true');
-      if (el3) el3['disabled'] = !![];
+      if (el3) el3['disabled'] = true;
       try {
         const initialGraph = Array['isArray'](result['detail']?.['nodeIds'])
           ? captureShortcutGraph(store, result['detail']['nodeIds'])
@@ -104,8 +104,8 @@ export function initEmptyCanvasShortcuts({
       } catch (error3) {
         window['showToast']?.(error3['message'] || '快捷方式加载失败', 'error');
       } finally {
-        ((enabled3 = ![]), el3?.['removeAttribute']('aria-busy'));
-        if (el3) el3['disabled'] = ![];
+        ((enabled3 = false), el3?.['removeAttribute']('aria-busy'));
+        if (el3) el3['disabled'] = false;
       }
     }));
 }

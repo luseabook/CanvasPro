@@ -54,7 +54,7 @@ export function buildStoryEpisodeSplitPartialRepairPrompt({
   dialogueSpeakerGuidance: dialogueSpeakerGuidance = '',
   groupingGuidance: groupingGuidance = '',
   timelineRequirements: timelineRequirements = [],
-  continuousTimeline: continuousTimeline = ![],
+  continuousTimeline: continuousTimeline = false,
 } = {}) {
   const handle = (Array['isArray'](draft?.['items']) ? draft['items'] : [])['filter'](
       (state) => state?.['status'] !== 'valid',

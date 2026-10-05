@@ -93,16 +93,16 @@ function readCanvasState(options = {}) {
   return store?.['getStateRaw']?.() ?? store?.['getState']?.() ?? null;
 }
 function valuesEqual(list2, list3) {
-  if (Object['is'](list2, list3)) return !![];
-  if (!list2 || !list3 || typeof list2 !== 'object' || typeof list3 !== 'object') return ![];
+  if (Object['is'](list2, list3)) return true;
+  if (!list2 || !list3 || typeof list2 !== 'object' || typeof list3 !== 'object') return false;
   if (Array['isArray'](list2) || Array['isArray'](list3)) {
     if (!Array['isArray'](list2) || !Array['isArray'](list3) || list2['length'] !== list3['length'])
-      return ![];
+      return false;
     return list2['every']((key, index) => valuesEqual(key, list3[index]));
   }
   const list4 = Object['keys'](list2)['sort'](),
     result = Object['keys'](list3)['sort']();
-  if (!valuesEqual(list4, result)) return ![];
+  if (!valuesEqual(list4, result)) return false;
   return list4['every']((data) => valuesEqual(list2[data], list3[data]));
 }
 function sameIds(list5 = [], target = []) {
@@ -111,7 +111,7 @@ function sameIds(list5 = [], target = []) {
   return valuesEqual(uniqueIds2, uniqueIds3);
 }
 function createVerificationFailure(commandId, reason, details = {}) {
-  return { ok: ![], commandId: commandId, reason: reason, details: details };
+  return { ok: false, commandId: commandId, reason: reason, details: details };
 }
 function verifyNodeIds(source, enabled, next, args2 = {}) {
   const nodeIds = uniqueIds(next);
@@ -123,7 +123,7 @@ function verifyNodeIds(source, enabled, next, args2 = {}) {
       nodeIds: nodeIds,
       missingNodeIds: missingNodeIds,
     });
-  return { ok: !![], nodeIds: nodeIds };
+  return { ok: true, nodeIds: nodeIds };
 }
 function verifyEdge(entry, record, expected = {}) {
   const edgeId = normalizeId(expected['id'] || expected['edgeId']),
@@ -143,7 +143,7 @@ function verifyEdge(entry, record, expected = {}) {
         actual: actual[field],
       });
   }
-  return { ok: !![], edgeId: edgeId };
+  return { ok: true, edgeId: edgeId };
 }
 function verifyNodeCreation(payload, handle, id3, state, config) {
   const actualCount = uniqueIds([
@@ -179,7 +179,7 @@ function verifyNodeCreation(payload, handle, id3, state, config) {
     };
     return verifyEdge(payload, config, scope);
   }
-  return { ok: !![], nodeIds: actualCount };
+  return { ok: true, nodeIds: actualCount };
 }
 function verifySelection(input, output, value2) {
   const expectedIds = uniqueIds(output['ids'] || output['nodeIds'] || []);
@@ -188,7 +188,7 @@ function verifySelection(input, output, value2) {
       expectedIds: expectedIds,
       actualIds: uniqueIds(value2 || []),
     });
-  return { ok: !![], nodeIds: expectedIds };
+  return { ok: true, nodeIds: expectedIds };
 }
 function verifyGroup(value3, value4, enabled2, value5) {
   const groupId = normalizeId(value4['groupId'] || value4['nodeId']),
@@ -209,7 +209,7 @@ function verifyGroup(value3, value4, enabled2, value5) {
       expectedIds: [groupId],
       actualIds: uniqueIds(value5 || []),
     });
-  return { ok: !![], nodeIds: [groupId, ...childIds] };
+  return { ok: true, nodeIds: [groupId, ...childIds] };
 }
 function verifyUngroup(value7, value8, enabled3) {
   const groupIds = uniqueIds(value8['groupIds'] || []),
@@ -225,7 +225,7 @@ function verifyUngroup(value7, value8, enabled3) {
       remainingGroupIds: remainingGroupIds,
       attachedChildIds: attachedChildIds,
     });
-  return { ok: !![], nodeIds: childIds2 };
+  return { ok: true, nodeIds: childIds2 };
 }
 function verifyPastedGraph(value11, value12, value13, enabled4, value14) {
   const expectedIds2 = uniqueIds(value12['nodeIds'] || value12['ids'] || []),
@@ -243,20 +243,20 @@ function verifyPastedGraph(value11, value12, value13, enabled4, value14) {
       expectedIds: expectedIds2,
       actualIds: uniqueIds(value14 || []),
     });
-  return { ok: !![], nodeIds: expectedIds2, edgeIds: edgeIds };
+  return { ok: true, nodeIds: expectedIds2, edgeIds: edgeIds };
 }
 function verifyResultContract(value16, response5) {
   if (['viewport.focusNodes', 'viewport.fitAll', 'task.focusResult']['includes'](value16)) {
     const nodeIds2 = uniqueIds(response5['ids'] || response5['nodeIds'] || []);
-    return response5['focused'] === !![] && nodeIds2['length'] > 0
-      ? { ok: !![], nodeIds: nodeIds2 }
+    return response5['focused'] === true && nodeIds2['length'] > 0
+      ? { ok: true, nodeIds: nodeIds2 }
       : createVerificationFailure(value16, 'viewport_effect_not_acknowledged', { ids: nodeIds2 });
   }
   if (value16 === 'clipboard.copy') {
     const nodeIds3 = uniqueIds(response5['ids'] || []),
       nodeCount = Math['max'](0, Math['trunc'](Number(response5['nodeCount']) || 0));
     return nodeIds3['length'] > 0 && nodeCount === nodeIds3['length']
-      ? { ok: !![], nodeIds: nodeIds3 }
+      ? { ok: true, nodeIds: nodeIds3 }
       : createVerificationFailure(value16, 'clipboard_result_mismatch', {
           ids: nodeIds3,
           nodeCount: nodeCount,
@@ -265,8 +265,8 @@ function verifyResultContract(value16, response5) {
   if (value16 === 'node.exportSelected') {
     const exportedCount = Math['max'](0, Math['trunc'](Number(response5['exportedCount']) || 0)),
       path = normalizeId(response5['path'] || response5['outputPath']);
-    return response5['success'] === !![] && exportedCount > 0 && path
-      ? { ok: !![], path: path, exportedCount: exportedCount }
+    return response5['success'] === true && exportedCount > 0 && path
+      ? { ok: true, path: path, exportedCount: exportedCount }
       : createVerificationFailure(value16, 'export_result_unverified', {
           exportedCount: exportedCount,
           hasPath: Boolean(path),
@@ -280,7 +280,7 @@ function verifyPrompt(value17, value18, value19) {
   if (!response6['ok']) return response6;
   if (String(value19[nodeId]['prompt'] || '') !== String(value18['prompt'] || ''))
     return createVerificationFailure(value17, 'prompt_state_mismatch', { nodeId: nodeId });
-  return { ok: !![], nodeIds: [nodeId] };
+  return { ok: true, nodeIds: [nodeId] };
 }
 function verifyModel(value20, value21, value22) {
   const nodeId2 = normalizeId(value21['nodeId']),
@@ -296,7 +296,7 @@ function verifyModel(value20, value21, value22) {
     return createVerificationFailure(value20, 'provider_state_mismatch', { nodeId: nodeId2 });
   if (value21['params'] && !valuesEqual(value23['generationParams'] || {}, value21['params']))
     return createVerificationFailure(value20, 'model_params_state_mismatch', { nodeId: nodeId2 });
-  return { ok: !![], nodeIds: [nodeId2] };
+  return { ok: true, nodeIds: [nodeId2] };
 }
 function verifyParams(value24, value25, value26) {
   const nodeId3 = normalizeId(value25['nodeId']),
@@ -307,7 +307,7 @@ function verifyParams(value24, value25, value26) {
     list6 = Object['keys'](value28)['filter']((value29) => !valuesEqual(value27[value29], value28[value29]));
   if (list6['length'] > 0)
     return createVerificationFailure(value24, 'params_state_mismatch', { nodeId: nodeId3 });
-  return { ok: !![], nodeIds: [nodeId3] };
+  return { ok: true, nodeIds: [nodeId3] };
 }
 function verifyLayout(value30, value31, value32) {
   const nodeIds4 = uniqueIds(value31['ids'] || value31['movedIds'] || []),
@@ -315,7 +315,7 @@ function verifyLayout(value30, value31, value32) {
   if (!response9['ok']) return response9;
   const enabled5 =
     value31['positions'] && typeof value31['positions'] === 'object' ? value31['positions'] : null;
-  if (!enabled5) return { ok: !![], nodeIds: nodeIds4, status: 'legacy_contract' };
+  if (!enabled5) return { ok: true, nodeIds: nodeIds4, status: 'legacy_contract' };
   for (const [nodeId4, expected2] of Object['entries'](enabled5)) {
     const actual2 = value32[nodeId4];
     if (
@@ -329,14 +329,14 @@ function verifyLayout(value30, value31, value32) {
         actual: actual2 ? { x: actual2['x'], y: actual2['y'] } : null,
       });
   }
-  return { ok: !![], nodeIds: nodeIds4 };
+  return { ok: true, nodeIds: nodeIds4 };
 }
 function verifyGenerationEntry(value33, response10, value34) {
   const status = String(response10['status'] || '')
       ['trim']()
       ['toLowerCase'](),
     id4 = normalizeId(response10['taskId']);
-  if (!status && !id4) return { ok: !![], status: 'legacy_contract', nodeIds: [] };
+  if (!status && !id4) return { ok: true, status: 'legacy_contract', nodeIds: [] };
   const nodeId5 = normalizeId(response10['targetNodeId'] || response10['nodeId']),
     response11 = verifyNodeIds(value33, value34, [nodeId5]);
   if (!response11['ok']) return response11;
@@ -350,7 +350,7 @@ function verifyGenerationEntry(value33, response10, value34) {
       nodeId: nodeId5,
       status: status,
     });
-  return { ok: !![], nodeIds: [nodeId5] };
+  return { ok: true, nodeIds: [nodeId5] };
 }
 function verifyGeneration(value35, value36, value37) {
   const list7 =
@@ -365,7 +365,7 @@ function verifyGeneration(value35, value36, value37) {
     if (!response12['ok']) return response12;
   }
   return {
-    ok: !![],
+    ok: true,
     nodeIds: uniqueIds(list7['map']((value39) => value39?.['targetNodeId'] || value39?.['nodeId'])),
   };
 }
@@ -376,7 +376,7 @@ export function verifyAgentActionPostcondition({
   commandContext: commandContext = {},
 } = {}) {
   const commandId3 = normalizeId(commandId2 || response['commandId']);
-  if (response['ok'] !== !![]) return { ok: !![], commandId: commandId3, status: 'not_run' };
+  if (response['ok'] !== true) return { ok: true, commandId: commandId3, status: 'not_run' };
   const agentActionPostconditionPolicy = getAgentActionPostconditionPolicy(commandId3),
     id5 = response['result'] && typeof response['result'] === 'object' ? response['result'] : {};
   if (agentActionPostconditionPolicy === 'result') {
@@ -393,7 +393,7 @@ export function verifyAgentActionPostcondition({
           commandId: commandId3,
           status: 'failed',
         }
-      : { ok: !![], commandId: commandId3, status: 'not_applicable' };
+      : { ok: true, commandId: commandId3, status: 'not_applicable' };
   const enabled6 = canvasState['nodes'] || {},
     value40 = canvasState['edges'] || {},
     value41 = Array['isArray'](canvasState['selectedNodeIds']) ? canvasState['selectedNodeIds'] : [];
@@ -449,7 +449,7 @@ export function verifyAgentActionPostcondition({
                             remainingEdgeIds = edgeIds2['filter']((value42) => value40[value42]);
                           status2 =
                             remainingEdgeIds['length'] === 0
-                              ? { ok: !![], edgeIds: edgeIds2 }
+                              ? { ok: true, edgeIds: edgeIds2 }
                               : createVerificationFailure(commandId3, 'edges_not_removed', {
                                   remainingEdgeIds: remainingEdgeIds,
                                 });
@@ -459,7 +459,7 @@ export function verifyAgentActionPostcondition({
                               remainingNodeIds = nodeIds5['filter']((value43) => enabled6[value43]);
                             status2 =
                               nodeIds5['length'] > 0 && remainingNodeIds['length'] === 0
-                                ? { ok: !![], nodeIds: nodeIds5 }
+                                ? { ok: true, nodeIds: nodeIds5 }
                                 : createVerificationFailure(commandId3, 'nodes_not_removed', {
                                     nodeIds: nodeIds5,
                                     remainingNodeIds: remainingNodeIds,
@@ -485,7 +485,7 @@ export function verifyAgentActionPostcondition({
                                     nodeId: nodeId7['nodeId'],
                                   })
                                 : {
-                                    ok: !![],
+                                    ok: true,
                                     nodeIds: uniqueIds(list8['map']((value45) => value45['nodeId'])),
                                   };
                             } else {
@@ -525,7 +525,7 @@ export function verifyAgentActionPostcondition({
                                               ? createVerificationFailure(commandId3, 'node_size_mismatch', {
                                                   nodeId: nodeId8,
                                                 })
-                                              : { ok: !![], nodeIds: nodeIds6 };
+                                              : { ok: true, nodeIds: nodeIds6 };
                                         } else
                                           status2 =
                                             agentActionPostconditionPolicy === 'store'
@@ -533,7 +533,7 @@ export function verifyAgentActionPostcondition({
                                                   commandId3,
                                                   'postcondition_policy_missing',
                                                 )
-                                              : { ok: !![], commandId: commandId3, status: 'not_applicable' };
+                                              : { ok: true, commandId: commandId3, status: 'not_applicable' };
                                       }
                                     }
                                   }
@@ -559,7 +559,7 @@ export function verifyAgentActionPostcondition({
 }
 function buildPostconditionFailure(commandId4, reason2, repairAttempted = null) {
   return {
-    ok: ![],
+    ok: false,
     commandId: commandId4,
     errorCode: 'AGENT_POSTCONDITION_FAILED',
     message: commandId4 + ' returned success, but its canvas result could not be verified.',
@@ -587,7 +587,7 @@ export function createAgentActionPostconditionHandler({
   shouldContinue: shouldContinue = null,
 } = {}) {
   return async ({ commandId: commandId5, args: args3, response: response15, context: context }) => {
-    if (response15?.['ok'] !== !![]) return response15;
+    if (response15?.['ok'] !== true) return response15;
     const commandContext2 = context || commandContext,
       status3 = verifyAgentActionPostcondition({
         commandId: commandId5,
@@ -599,11 +599,11 @@ export function createAgentActionPostconditionHandler({
     if (
       !AUTO_REPAIRABLE_COMMANDS['has'](commandId5) ||
       (typeof shouldContinue === 'function' &&
-        shouldContinue({ phase: 'postcondition_repair', commandId: commandId5 }) === ![])
+        shouldContinue({ phase: 'postcondition_repair', commandId: commandId5 }) === false)
     )
       return buildPostconditionFailure(commandId5, status3);
     const response16 = await executeCommand(commandId5, args3, commandContext2);
-    if (response16?.['ok'] !== !![]) return buildPostconditionFailure(commandId5, status3, response16 || {});
+    if (response16?.['ok'] !== true) return buildPostconditionFailure(commandId5, status3, response16 || {});
     const response17 = verifyAgentActionPostcondition({
       commandId: commandId5,
       args: args3,

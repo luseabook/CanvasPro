@@ -19,8 +19,8 @@ export function normalizeStoryWorkspaceStep(count) {
 }
 export function canReuseStoryStepNavigation({
   view: view = '',
-  hasNavigation: hasNavigation = ![],
-  isEpisodeToolbar: isEpisodeToolbar = ![],
+  hasNavigation: hasNavigation = false,
+  isEpisodeToolbar: isEpisodeToolbar = false,
 } = {}) {
   return view === 'project' && Boolean(hasNavigation) && !isEpisodeToolbar;
 }
@@ -138,9 +138,9 @@ export function createStoryWorkspaceNavigationTransaction({
   if (typeof renderAdapter['render'] !== 'function')
     throw new Error('[storyWorkspaceNavigation] renderAdapter.render is required');
   let value4 = 0,
-    value5 = ![],
+    value5 = false,
     value6 = null;
-  function run({ restore: restore = !![] } = {}) {
+  function run({ restore: restore = true } = {}) {
     const enabled = value6;
     if (!enabled) return;
     enabled['cancelWait']?.();
@@ -168,7 +168,7 @@ export function createStoryWorkspaceNavigationTransaction({
         hasNavigation: Boolean(el),
         isEpisodeToolbar: Boolean(el2?.['classList']?.['contains']('story-project-toolbar--episode')),
       });
-    if (!canReuseStoryStepNavigation2) return ![];
+    if (!canReuseStoryStepNavigation2) return false;
     return (
       (el['dataset']['activeStep'] = String(state2['step'])),
       el['querySelectorAll']('[data-story-step]')['forEach']((el3) => {
@@ -178,23 +178,23 @@ export function createStoryWorkspaceNavigationTransaction({
           el3['setAttribute']('aria-current', value8 ? 'step' : 'false'),
           (el3['disabled'] = isStoryWorkspaceStepNavigationDisabled(state2['data'], storyWorkspaceStep5)));
       }),
-      !![]
+      true
     );
   }
   function run6(value9) {
     const el4 = toolbarEl?.['querySelector']?.('.story-project-toolbar--episode'),
       el5 = el4?.['querySelector']('.story-episode-toolbar-current'),
       el6 = el4?.['querySelector']('[data-story-step="' + normalizeStoryWorkspaceStep(value9) + '"]');
-    if (!el4 || !el5 || !el6) return ![];
+    if (!el4 || !el5 || !el6) return false;
     const box = el5['getBoundingClientRect']?.(),
       box2 = el6['getBoundingClientRect']?.();
-    if (!box?.['width'] || !box2?.['width']) return ![];
+    if (!box?.['width'] || !box2?.['width']) return false;
     return (
       el5['style']['setProperty']('--story-episode-exit-x', box2['left'] - box['left'] + 'px'),
       el5['style']['setProperty']('--story-episode-exit-width', box2['width'] + 'px'),
       el6['classList']['add']('is-episode-exit-target'),
       el4['classList']['add']('is-switching-from-episode'),
-      !![]
+      true
     );
   }
   function run7() {
@@ -203,10 +203,10 @@ export function createStoryWorkspaceNavigationTransaction({
       el9 = el7?.['querySelector'](
         '[data-story-step="' + normalizeStoryWorkspaceStep(state2['step']) + '"]',
       );
-    if (!el7 || !el8 || !el9) return ![];
+    if (!el7 || !el8 || !el9) return false;
     const box3 = el8['getBoundingClientRect']?.(),
       box4 = el9['getBoundingClientRect']?.();
-    if (!box3?.['width'] || !box4?.['width']) return ![];
+    if (!box3?.['width'] || !box4?.['width']) return false;
     return (
       el8['style']['setProperty']('--story-episode-enter-x', box4['left'] - box3['left'] + 'px'),
       el8['style']['setProperty']('--story-episode-enter-width', box4['width'] + 'px'),
@@ -216,7 +216,7 @@ export function createStoryWorkspaceNavigationTransaction({
         if (!el7['isConnected'] || !el7['classList']['contains']('is-switching-to-episode')) return;
         el7['classList']['add']('is-switching-to-episode-ready');
       }),
-      !![]
+      true
     );
   }
   function run2() {
@@ -247,10 +247,10 @@ export function createStoryWorkspaceNavigationTransaction({
       }
       let value11 = 0,
         value12 = 0,
-        value13 = ![];
+        value13 = false;
       const run9 = () => {
           if (value13) return;
-          value13 = !![];
+          value13 = true;
           if (enabled2['cancelWait'] === value14) enabled2['cancelWait'] = null;
           handler();
         },
@@ -277,7 +277,7 @@ export function createStoryWorkspaceNavigationTransaction({
     error: error,
     message: message,
   }) {
-    if (value5 || token2 !== value4) return ![];
+    if (value5 || token2 !== value4) return false;
     restoreNavigationSnapshot(state2, snapshot2);
     if (value6?.['token'] === token2) value6 = null;
     (run2(), logger?.['error']?.('[storyWorkspace][' + operation + '] 导航失败', error));
@@ -287,11 +287,11 @@ export function createStoryWorkspaceNavigationTransaction({
       logger?.['error']?.('[storyWorkspace][' + operation + '] 工具栏恢复失败', value15);
     }
     try {
-      renderAdapter['render']({ direction: 'none', updateToolbar: ![], capturePageState: ![] });
+      renderAdapter['render']({ direction: 'none', updateToolbar: false, capturePageState: false });
     } catch (value16) {
       logger?.['error']?.('[storyWorkspace][' + operation + '] 页面恢复失败', value16);
     }
-    return (notify(message, 'error'), ![]);
+    return (notify(message, 'error'), false);
   }
   function run11(value17, value18) {
     if (value5 || value17 !== value4) return;
@@ -306,10 +306,10 @@ export function createStoryWorkspaceNavigationTransaction({
     }
   }
   async function run12(options5 = {}) {
-    if (value5) return ![];
+    if (value5) return false;
     const storyWorkspaceStep6 = normalizeStoryWorkspaceStep(options5['step']),
       storyWorkspaceStepBlockMessage = getStoryWorkspaceStepBlockMessage(state2['data'], storyWorkspaceStep6);
-    if (storyWorkspaceStepBlockMessage) return (notify(storyWorkspaceStepBlockMessage, 'warn'), ![]);
+    if (storyWorkspaceStepBlockMessage) return (notify(storyWorkspaceStepBlockMessage, 'warn'), false);
     const { token: token3, snapshot: snapshot3 } = run3();
     try {
       const onTransitionComplete = state2['view'] === 'episode',
@@ -320,9 +320,9 @@ export function createStoryWorkspaceNavigationTransaction({
         );
       if (onTransitionComplete) run6(storyWorkspaceStep6);
       storyWorkspaceStep6 !== state2['step'] &&
-        ((state2['episodeSelectionMode'] = ![]),
+        ((state2['episodeSelectionMode'] = false),
         (state2['selectedEpisodeIds'] = []),
-        (state2['clipSelectionMode'] = ![]),
+        (state2['clipSelectionMode'] = false),
         (state2['selectedClipGenerationIds'] = []),
         (state2['characterVoicePanelMotion'] = ''),
         (state2['pendingCharacterVoiceAssetId'] = ''));
@@ -340,8 +340,8 @@ export function createStoryWorkspaceNavigationTransaction({
         const text3 = normalizeText(options5['outlineSectionId']);
         state2['outlineSectionOpenState'] = {
           ...(state2['outlineSectionOpenState'] || {}),
-          ...(text3['startsWith']('episode-') ? { episodes: !![] } : {}),
-          [text3]: !![],
+          ...(text3['startsWith']('episode-') ? { episodes: true } : {}),
+          [text3]: true,
         };
       }
       if (storyWorkspaceStep6 === 2) {
@@ -356,9 +356,9 @@ export function createStoryWorkspaceNavigationTransaction({
           );
           state2['selectedAssetId'] = value21?.['id'] || '';
         }
-        ((state2['assetSelectionMode'] = ![]), (state2['selectedAssetIds'] = []));
+        ((state2['assetSelectionMode'] = false), (state2['selectedAssetIds'] = []));
       }
-      const enabled4 = onTransitionComplete ? ![] : run5(),
+      const enabled4 = onTransitionComplete ? false : run5(),
         value23 = await Promise['resolve'](
           renderAdapter['render']({
             direction: direction,
@@ -366,9 +366,9 @@ export function createStoryWorkspaceNavigationTransaction({
             onTransitionComplete: onTransitionComplete ? () => run11(token3, 'go-to-step') : null,
           }),
         );
-      if (value5 || token3 !== value4) return ![];
-      if (value23 !== !![]) throw new Error('story workspace page transition was interrupted');
-      return (onCommit(), run4(token3), !![]);
+      if (value5 || token3 !== value4) return false;
+      if (value23 !== true) throw new Error('story workspace page transition was interrupted');
+      return (onCommit(), run4(token3), true);
     } catch (error2) {
       return run10({
         token: token3,
@@ -380,32 +380,32 @@ export function createStoryWorkspaceNavigationTransaction({
     }
   }
   async function run13(value24, value25 = '') {
-    if (value5) return ![];
+    if (value5) return false;
     const storyWorkspaceStepBlockMessage2 = getStoryWorkspaceStepBlockMessage(state2['data'], 3);
-    if (storyWorkspaceStepBlockMessage2) return (notify(storyWorkspaceStepBlockMessage2, 'warn'), ![]);
+    if (storyWorkspaceStepBlockMessage2) return (notify(storyWorkspaceStepBlockMessage2, 'warn'), false);
     const episode = (state2['data']?.['episodes'] || [])['find'](
       (value26) => normalizeText(value26?.['id']) === normalizeText(value24),
     );
-    if (!episode) return ![];
-    if (getStoryEpisodeGenerationControlState(state2, episode['id'])['disabled']) return ![];
-    if (!Array['isArray'](episode['clips']) || !episode['clips']['length']) return ![];
+    if (!episode) return false;
+    if (getStoryEpisodeGenerationControlState(state2, episode['id'])['disabled']) return false;
+    if (!Array['isArray'](episode['clips']) || !episode['clips']['length']) return false;
     const { token: token4, snapshot: snapshot4 } = run3();
     try {
       const enteringEpisode = state2['view'] !== 'episode',
         switchingEpisode = state2['view'] === 'episode' && state2['selectedEpisodeId'] !== episode['id'];
       (renderAdapter['capturePageState']?.(),
-        (state2['clipAdjustmentOpen'] = ![]),
+        (state2['clipAdjustmentOpen'] = false),
         (state2['clipAdjustmentInstruction'] = ''),
         (state2['clipAdjustmentLanguage'] = ''),
-        (state2['clipAdjustmentLanguageOpen'] = ![]),
-        (state2['clipPromptHistoryOpen'] = ![]),
+        (state2['clipAdjustmentLanguageOpen'] = false),
+        (state2['clipPromptHistoryOpen'] = false),
         (state2['selectedEpisodeId'] = episode['id']));
       const value27 =
         episode['clips']['find']((value28) => normalizeText(value28?.['id']) === normalizeText(value25)) ||
         episode['clips'][0];
       ((state2['selectedClipId'] = value27?.['id'] || ''),
         (state2['pendingDeleteClipId'] = ''),
-        (state2['clipSelectionMode'] = ![]),
+        (state2['clipSelectionMode'] = false),
         (state2['selectedClipGenerationIds'] = []),
         onClipSelected(value27, {
           episode: episode,
@@ -414,24 +414,24 @@ export function createStoryWorkspaceNavigationTransaction({
         }));
       if (switchingEpisode) {
         (renderAdapter['renderToolbar']?.(), await run8(token4));
-        if (token4 !== value4) return ![];
+        if (token4 !== value4) return false;
         if (state2['view'] !== 'episode' || state2['selectedEpisodeId'] !== episode['id'])
           throw new Error('story episode navigation was superseded');
       }
-      let onTransitionComplete2 = ![];
+      let onTransitionComplete2 = false;
       enteringEpisode && (renderAdapter['renderToolbar']?.(), (onTransitionComplete2 = run7()));
       state2['view'] = 'episode';
       const value29 = await Promise['resolve'](
         renderAdapter['render']({
           direction: 'forward',
           updateToolbar: !onTransitionComplete2 && !switchingEpisode,
-          capturePageState: ![],
+          capturePageState: false,
           onTransitionComplete: onTransitionComplete2 ? () => run11(token4, 'open-episode') : null,
         }),
       );
-      if (value5 || token4 !== value4) return ![];
-      if (value29 !== !![]) throw new Error('story workspace page transition was interrupted');
-      return (onCommit(), run4(token4), !![]);
+      if (value5 || token4 !== value4) return false;
+      if (value29 !== true) throw new Error('story workspace page transition was interrupted');
+      return (onCommit(), run4(token4), true);
     } catch (error3) {
       return run10({
         token: token4,
@@ -446,10 +446,10 @@ export function createStoryWorkspaceNavigationTransaction({
     if (normalizeText(options6['view']) === 'episode')
       return run13(options6['episodeId'], options6['clipId']);
     if (normalizeText(options6['view']) === 'project') return run12(options6);
-    return Promise['resolve'](![]);
+    return Promise['resolve'](false);
   }
   function destroy() {
-    (run(), (value5 = !![]), (value4 += 1), run2());
+    (run(), (value5 = true), (value4 += 1), run2());
   }
   return { navigate: navigate, destroy: destroy };
 }

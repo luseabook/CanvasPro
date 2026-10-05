@@ -67,7 +67,7 @@ function resolveMediaUrl(options) {
   return mediaRef ? localPathToUrl(mediaRef) || mediaRef : '';
 }
 function resolveDirectOriginalTimelineRef(options2 = {}, target = []) {
-  if ((Array['isArray'](target) ? target : [])['some']((source) => source?.['isReversed'] === !![]))
+  if ((Array['isArray'](target) ? target : [])['some']((source) => source?.['isReversed'] === true))
     return '';
   const list = Array['isArray'](options2['sources']) ? options2['sources'] : [],
     map2 = new Map(list['map']((next) => [normalizeText(next['id']), next])),
@@ -106,7 +106,7 @@ export function createPersonReplacementOutputCoordinator({
   windowObject: windowObject = globalThis['window'],
   projectSession: projectSession,
   getWorkspace: getWorkspace = () => null,
-  prepareVideoReplacementShots: prepareVideoReplacementShots = async () => ({ ok: ![] }),
+  prepareVideoReplacementShots: prepareVideoReplacementShots = async () => ({ ok: false }),
   createVoicePanel: createVoicePanel,
   enqueueMediaTask: enqueueMediaTask,
   playCompletion: playCompletion = () => {},
@@ -145,7 +145,7 @@ export function createPersonReplacementOutputCoordinator({
     pending = new Set(),
     handler3 = (
       scope,
-      { persist: persist = !![], sync: sync = !![], renderWorkspace: renderWorkspace = !![] } = {},
+      { persist: persist = true, sync: sync = true, renderWorkspace: renderWorkspace = true } = {},
     ) =>
       projectSession['replace'](scope, {
         persist: persist,
@@ -163,7 +163,7 @@ export function createPersonReplacementOutputCoordinator({
             clips: src['clips'],
           },
         },
-        { wait: !![], timeout: 600000 },
+        { wait: true, timeout: 600000 },
       ),
       localPath = resolveMediaRef(data2);
     if (!data2?.['success'] || !localPath)
@@ -241,14 +241,14 @@ export function createPersonReplacementOutputCoordinator({
         setSelectedNodes() {},
       },
       fabBtnEl = documentObject['createElement']('button');
-    ((fabBtnEl['type'] = 'button'), (fabBtnEl['hidden'] = !![]), root['appendChild'](fabBtnEl));
+    ((fabBtnEl['type'] = 'button'), (fabBtnEl['hidden'] = true), root['appendChild'](fabBtnEl));
     const projectId2 = projectId['id'],
       value7 = createVoicePanel({
         store: store,
         fabBtnEl: fabBtnEl,
         root: root,
         windowObject: windowObject,
-        embedded: !![],
+        embedded: true,
         showCompletionNotification: (args9) =>
           showCompletionNotification({
             ...args9,
@@ -278,7 +278,7 @@ export function createPersonReplacementOutputCoordinator({
                 composeStatus: 'succeeded',
               },
             },
-            { renderWorkspace: ![] },
+            { renderWorkspace: false },
           ),
             showToast('声音时间线已合成并加入预览。', 'success'));
         },
@@ -289,22 +289,22 @@ export function createPersonReplacementOutputCoordinator({
         selectSource(value10) {
           const sourceId2 = normalizeText(value10),
             value11 = 'person-replacement-voice-' + sourceId2;
-          if (!map3['has'](value11)) return { selected: ![], reason: 'invalid-source', sourceId: sourceId2 };
+          if (!map3['has'](value11)) return { selected: false, reason: 'invalid-source', sourceId: sourceId2 };
           return (
             (sourceNodeId = value11),
-            value7?.['open']?.({ sourceNodeId: sourceNodeId, skipSubscriptionGate: !![] }),
-            { selected: !![], reason: '', sourceId: sourceId2 }
+            value7?.['open']?.({ sourceNodeId: sourceNodeId, skipSubscriptionGate: true }),
+            { selected: true, reason: '', sourceId: sourceId2 }
           );
         },
         canSelectVoiceAsset({ segmentId: segmentId = '' } = {}) {
-          return value7?.['canSelectAudioReference']?.({ segmentId: segmentId }) === !![];
+          return value7?.['canSelectAudioReference']?.({ segmentId: segmentId }) === true;
         },
         selectVoiceAsset(value12, { segmentId: segmentId = '' } = {}) {
           const name = projectId['characters']['find']((value13) => value13['id'] === normalizeText(value12)),
             fileName = name?.['voiceReference'] || {},
             localPath2 = normalizeLocalPath(fileName['localPath'] || name?.['voiceRef']),
             audioUrl = resolveMediaUrl(localPath2 || fileName['audioUrl'] || name?.['voiceRef']);
-          if (!name || !audioUrl) return { applied: ![], reason: 'invalid', appliedIds: [] };
+          if (!name || !audioUrl) return { applied: false, reason: 'invalid', appliedIds: [] };
           return (
             value7?.['selectAudioReference']?.(
               {
@@ -317,7 +317,7 @@ export function createPersonReplacementOutputCoordinator({
                 imageUrl: resolveMediaUrl(getPersonReplacementCharacterBaseImageRef(name)),
               },
               { segmentId: segmentId },
-            ) || { applied: ![], reason: 'unsupported', appliedIds: [] }
+            ) || { applied: false, reason: 'unsupported', appliedIds: [] }
           );
         },
         destroy() {
@@ -333,7 +333,7 @@ export function createPersonReplacementOutputCoordinator({
     try {
       let path = resolveDirectOriginalTimelineRef(projectId, list5);
       (workspacePresentationAdapter?.['prewarmCompositeOriginalVideo']?.(path),
-        workspacePresentationAdapter?.['setComposeOutputState']?.({ pending: !![] }));
+        workspacePresentationAdapter?.['setComposeOutputState']?.({ pending: true }));
       const shotIds = list5['filter'](
         (value15) =>
           !normalizeLocalPath(value15['videoRef']) &&
@@ -342,7 +342,7 @@ export function createPersonReplacementOutputCoordinator({
         ['map']((value16) => normalizeText(value16['id']))
         ['filter'](Boolean);
       if (shotIds['length']) {
-        const response2 = await prepareVideoReplacementShots({ shotIds: shotIds, notify: ![] });
+        const response2 = await prepareVideoReplacementShots({ shotIds: shotIds, notify: false });
         if (!response2?.['ok']) throw new Error('部分原视频片段尚未准备完成');
         const map4 = new Map(projectId['shots']['map']((value17) => [normalizeText(value17['id']), value17]));
         ((list5 = list5['map']((value18) => map4['get'](normalizeText(value18['id'])) || value18)),
@@ -356,9 +356,9 @@ export function createPersonReplacementOutputCoordinator({
         (value21, value22) => normalizeLocalPath(value21['resultVideoRef']) || list6[value22],
       );
       if (list7['some']((enabled5) => !enabled5)) throw new Error('合成所需的替换视频片段不完整');
-      const run3 = (path2, { includeAudio: includeAudio = !![] } = {}) =>
+      const run3 = (path2, { includeAudio: includeAudio = true } = {}) =>
           path2['length'] === 1 && includeAudio
-            ? Promise['resolve']({ success: !![], path: path2[0] })
+            ? Promise['resolve']({ success: true, path: path2[0] })
             : enqueueMediaTask(
                 {
                   kind: 'videoCompose',
@@ -366,11 +366,11 @@ export function createPersonReplacementOutputCoordinator({
                   srcs: path2,
                   args: { includeAudio: includeAudio },
                 },
-                { wait: !![], timeout: 600000 },
+                { wait: true, timeout: 600000 },
               ),
         [value23, value24] = await Promise['all']([
-          run3(list7, { includeAudio: ![] }),
-          path ? Promise['resolve']({ success: !![], path: path }) : run3(list6),
+          run3(list7, { includeAudio: false }),
+          path ? Promise['resolve']({ success: true, path: path }) : run3(list6),
         ]),
         visualMasterRef = resolveMediaRef(value23),
         originalMasterRef = resolveMediaRef(value24);
@@ -404,7 +404,7 @@ export function createPersonReplacementOutputCoordinator({
     } catch (error) {
       return (showToast(error?.['message'] || '视频合成失败', 'error'), null);
     } finally {
-      workspacePresentationAdapter?.['setComposeOutputState']?.({ pending: ![] });
+      workspacePresentationAdapter?.['setComposeOutputState']?.({ pending: false });
     }
   }
   async function downloadImage(imageRef = {}) {
@@ -415,12 +415,12 @@ export function createPersonReplacementOutputCoordinator({
         title: imageRef['title'],
         saveMedia: saveMedia,
       });
-      if (error2?.['canceled']) return ![];
-      if (error2?.['success'] === ![])
+      if (error2?.['canceled']) return false;
+      if (error2?.['success'] === false)
         throw new Error(error2?.['error'] || error2?.['message'] || '图片下载失败');
       return (showToast('图片已保存。', 'success'), error2);
     } catch (error3) {
-      return (showToast(error3?.['message'] || '图片下载失败，请稍后重试。', 'error'), ![]);
+      return (showToast(error3?.['message'] || '图片下载失败，请稍后重试。', 'error'), false);
     }
   }
   async function downloadVideo(videoRef = {}) {
@@ -431,12 +431,12 @@ export function createPersonReplacementOutputCoordinator({
         title: videoRef['title'],
         saveMedia: saveMedia,
       });
-      if (error4?.['canceled']) return ![];
-      if (error4?.['success'] === ![])
+      if (error4?.['canceled']) return false;
+      if (error4?.['success'] === false)
         throw new Error(error4?.['error'] || error4?.['message'] || '视频下载失败');
       return (showToast('视频已保存。', 'success'), error4);
     } catch (error5) {
-      return (showToast(error5?.['message'] || '视频下载失败，请稍后重试。', 'error'), ![]);
+      return (showToast(error5?.['message'] || '视频下载失败，请稍后重试。', 'error'), false);
     }
   }
   async function run4(options3 = {}) {
@@ -446,12 +446,12 @@ export function createPersonReplacementOutputCoordinator({
       !isPersonReplacementTimelineMode(mode) &&
       (typeof saveMedia !== 'function' || typeof saveMediaFiles !== 'function')
     )
-      return (showToast('当前环境无法导出素材。', 'error'), ![]);
-    workspacePresentationAdapter?.['setExportOutputState']?.({ pending: !![] });
+      return (showToast('当前环境无法导出素材。', 'error'), false);
+    workspacePresentationAdapter?.['setExportOutputState']?.({ pending: true });
     try {
       if (isPersonReplacementTimelineMode(mode)) {
         let response4 = await exportTimeline({ project: cloneJson(value25), mode: mode });
-        if (response4?.['canceled']) return ![];
+        if (response4?.['canceled']) return false;
         if (!response4?.['success']) throw new Error(response4?.['error'] || '剪辑工程导出失败');
         !enabled6 &&
           projectId['id'] === value25['id'] &&
@@ -485,7 +485,7 @@ export function createPersonReplacementOutputCoordinator({
               src: src2,
               args: { audioSrc: audioSrc },
             },
-            { wait: !![], timeout: 600000 },
+            { wait: true, timeout: 600000 },
           ),
           finalVideoRef = resolveMediaRef(error7);
         if (!error7?.['success'] || !finalVideoRef)
@@ -504,8 +504,8 @@ export function createPersonReplacementOutputCoordinator({
         saveMedia: saveMedia,
         saveMediaFiles: saveMediaFiles,
       });
-      if (error8?.['canceled']) return ![];
-      if (error8?.['success'] === ![])
+      if (error8?.['canceled']) return false;
+      if (error8?.['success'] === false)
         throw new Error(error8?.['error'] || error8?.['message'] || '素材导出失败');
       const value26 = Math['max'](0, Number(error8?.['exportedCount']) || 0),
         value27 = Math['max'](0, Number(error8?.['skippedCount']) || 0);
@@ -524,9 +524,9 @@ export function createPersonReplacementOutputCoordinator({
       );
     } catch (error9) {
       if (!enabled6) showToast(error9?.['message'] || '素材导出失败', 'error');
-      return ![];
+      return false;
     } finally {
-      if (!enabled6) workspacePresentationAdapter?.['setExportOutputState']?.({ pending: ![] });
+      if (!enabled6) workspacePresentationAdapter?.['setExportOutputState']?.({ pending: false });
     }
   }
   async function run5(options4 = {}) {
@@ -540,9 +540,9 @@ export function createPersonReplacementOutputCoordinator({
         Math['min'](5, Math['trunc'](Number(value28['workspace']?.['step']) || 1)),
       ),
       value30 = ['', '素材设定', '图像替换', '视频替换', '声音克隆', '替换片段'][value29];
-    if (typeof createOutputCanvas !== 'function') return (showToast('当前环境无法加入画布。', 'error'), ![]);
+    if (typeof createOutputCanvas !== 'function') return (showToast('当前环境无法加入画布。', 'error'), false);
     (pending['add'](scope2),
-      workspacePresentationAdapter?.['setOutputCanvasSyncState']?.({ pending: !![], scope: scope2 }));
+      workspacePresentationAdapter?.['setOutputCanvasSyncState']?.({ pending: true, scope: scope2 }));
     try {
       const args10 = await createOutputCanvas({ project: cloneJson(value28), scope: scope2 }),
         args11 = args10?.['binding']?.['nodes'];
@@ -581,7 +581,7 @@ export function createPersonReplacementOutputCoordinator({
         args10
       );
     } catch (error10) {
-      return (showToast(error10?.['message'] || '人物替换项目加入画布失败', 'error'), ![]);
+      return (showToast(error10?.['message'] || '人物替换项目加入画布失败', 'error'), false);
     } finally {
       (pending['delete'](scope2),
         workspacePresentationAdapter?.['setOutputCanvasSyncState']?.({
@@ -593,7 +593,7 @@ export function createPersonReplacementOutputCoordinator({
   const composeOutput = createCoalescedAsyncAction(run2),
     exportOutput = createCoalescedAsyncAction(run4),
     addOutputToCanvas = createKeyedCoalescedAsyncAction(run5, (value31) => value31?.['scope']);
-  let enabled6 = ![];
+  let enabled6 = false;
   return Object['freeze']({
     mountVoiceStudio: mountVoiceStudio,
     composeOutput: composeOutput,
@@ -603,7 +603,7 @@ export function createPersonReplacementOutputCoordinator({
     addOutputToCanvas: addOutputToCanvas,
     destroy() {
       if (enabled6) return;
-      ((enabled6 = !![]), personReplacementTimelineExportPrompt['destroy'](), state?.());
+      ((enabled6 = true), personReplacementTimelineExportPrompt['destroy'](), state?.());
     },
   });
 }

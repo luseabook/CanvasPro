@@ -20,12 +20,12 @@ export function createStoryCollaboration({
     map = new Set();
   let item = '',
     selection = null,
-    destroyed = ![],
+    destroyed = false,
     value2 = null;
   const trigger = el['createElement']('button');
   ((trigger['type'] = 'button'),
     (trigger['className'] = 'story-collaboration-trigger'),
-    (trigger['hidden'] = !![]),
+    (trigger['hidden'] = true),
     (trigger['textContent'] = 'AI 协作'),
     trigger['setAttribute']('aria-label', '打开剧本 AI 协作'),
     root['appendChild'](trigger));
@@ -55,7 +55,7 @@ export function createStoryCollaboration({
       active:
         !destroyed &&
         isStoryCollaborationProject(state['data']) &&
-        state['developerModeAvailable'] === !![] &&
+        state['developerModeAvailable'] === true &&
         isActive() &&
         state['workspaceSurface'] !== 'replication' &&
         state['view'] !== 'home',
@@ -74,7 +74,7 @@ export function createStoryCollaboration({
   function sync() {
     if (destroyed) return;
     if (!isStoryCollaborationProject(state['data']) && state['step'] === 0) state['step'] = 1;
-    if (state['developerModeAvailable'] !== !![]) {
+    if (state['developerModeAvailable'] !== true) {
       if (state['homeTab'] === 'collaborate') state['homeTab'] = 'generate';
       if (state['view'] === 'project' && state['step'] === 0) {
         if (state['data']['project']['collaboration']?.['stage'] === 'writing') state['view'] = 'home';
@@ -106,7 +106,7 @@ export function createStoryCollaboration({
     run5();
   }
   function start(current = state['idea']) {
-    if (state['developerModeAvailable'] !== !![]) return;
+    if (state['developerModeAvailable'] !== true) return;
     const idea = String(current || '')['trim']();
     if (!idea || state['isGeneratingStory']) return;
     const aspectRatio = state['data']['project'],
@@ -142,8 +142,8 @@ export function createStoryCollaboration({
         conversations: null,
       }),
       projectData['replaceCurrent'](generatedStoryProjectData),
-      (state['hasCreatedProject'] = !![]),
-      (state['projectTitleEdited'] = ![]),
+      (state['hasCreatedProject'] = true),
+      (state['projectTitleEdited'] = false),
       (state['view'] = 'project'),
       (state['step'] = 0),
       (value2 = { projectId: projectId(), text: idea, settings: settings }),
@@ -151,7 +151,7 @@ export function createStoryCollaboration({
       render(),
       sync());
   }
-  function apply(entry, { projectId: projectId2, selectedOnly: selectedOnly = ![] } = {}) {
+  function apply(entry, { projectId: projectId2, selectedOnly: selectedOnly = false } = {}) {
     if (!snapshot()['active'] || projectId2 !== projectId() || !run2(projectId2))
       throw new Error('项目已切换，请回到原剧本后采用');
     const record = run3(),
@@ -210,7 +210,7 @@ export function createStoryCollaboration({
       projectData['syncCurrentEntry'](),
       beginProjectSession(),
       projectData['replaceCurrent'](uploadedStoryProjectData),
-      (state['hasCreatedProject'] = !![]),
+      (state['hasCreatedProject'] = true),
       (state['view'] = 'project'),
       (state['step'] = 1),
       run4(),
@@ -219,7 +219,7 @@ export function createStoryCollaboration({
       showToast('正文已确认，可以继续角色、场景与分镜制作。', 'success'));
   }
   function run7(event) {
-    if (state['developerModeAvailable'] !== !![] || !isStoryCollaborationProject(state['data'])) return;
+    if (state['developerModeAvailable'] !== true || !isStoryCollaborationProject(state['data'])) return;
     const el5 = event['target'];
     if (!el5['closest']?.('.story-conception-page')) return;
     const enabled2 = run3();
@@ -231,7 +231,7 @@ export function createStoryCollaboration({
         if (el5['matches']('[data-collaboration-idea]')) enabled2['idea'] = el5['value'];
         else {
           if (el5['matches']('[data-collaboration-title]'))
-            ((state['data']['project']['title'] = el5['value']), (state['projectTitleEdited'] = !![]));
+            ((state['data']['project']['title'] = el5['value']), (state['projectTitleEdited'] = true));
           else return;
         }
       }
@@ -252,7 +252,7 @@ export function createStoryCollaboration({
     else selection = null;
   }
   function run9(event3) {
-    if (state['developerModeAvailable'] !== !![]) return;
+    if (state['developerModeAvailable'] !== true) return;
     if (event3['target']['closest']?.('[data-collaboration-start]')) return start();
     if (!isStoryCollaborationProject(state['data'])) return;
     if (event3['target']['closest']?.('[data-collaboration-toggle]')) {
@@ -275,7 +275,7 @@ export function createStoryCollaboration({
       sync());
   }
   (root['addEventListener']('click', run9), root['addEventListener']('input', run7));
-  for (const config of ['select', 'keyup', 'mouseup']) root['addEventListener'](config, run8, !![]);
+  for (const config of ['select', 'keyup', 'mouseup']) root['addEventListener'](config, run8, true);
   return {
     sync: sync,
     start: start,
@@ -324,12 +324,12 @@ export function createStoryCollaboration({
       ((run3(enabled3)['conversations'] = clone(value6)), save());
     },
     destroy() {
-      ((destroyed = !![]),
+      ((destroyed = true),
         run5(),
         map['clear'](),
         root['removeEventListener']('click', run9),
         root['removeEventListener']('input', run7));
-      for (const value7 of ['select', 'keyup', 'mouseup']) root['removeEventListener'](value7, run8, !![]);
+      for (const value7 of ['select', 'keyup', 'mouseup']) root['removeEventListener'](value7, run8, true);
       (trigger['remove'](), host['remove']());
     },
   };

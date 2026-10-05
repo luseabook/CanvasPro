@@ -27,10 +27,10 @@ export function createAgentAssistantConversationRuntime({
     getPendingChoice = () => getAgentPendingAssistantChoice(run()),
     conversationId = () => String(sessionStore['getActiveConversation']?.()?.['id'] || ''),
     handler = (item) => sessionStore['emitAssistantStream']?.(item),
-    handler2 = () => ({ ...createStoppedReply(), assistantHandled: !![], stale: !![] }),
+    handler2 = () => ({ ...createStoppedReply(), assistantHandled: true, stale: true }),
     handler3 = (notice) =>
       createFailedReply(notice?.['message'] || String(notice), {
-        assistantHandled: !![],
+        assistantHandled: true,
         notice: notice?.['message'] || String(notice),
         responseChannel: 'assistant.message',
         ...(getPendingChoice() || {}),
@@ -89,7 +89,7 @@ export function createAgentAssistantConversationRuntime({
   }
   function stop() {
     const content2 = value;
-    if (!content2) return ![];
+    if (!content2) return false;
     const error = run2(
       content2,
       history(content2) && (content2['prose'] || !content2['revision'])
@@ -120,7 +120,7 @@ export function createAgentAssistantConversationRuntime({
           revision: revision,
           history: history2,
           conversationHistory: history2,
-          assistantChoice: !![],
+          assistantChoice: true,
           selectedSkillIds: revision['assistant']['assistantContext']['skillIds'] || [],
         },
         startRun(),
@@ -137,7 +137,7 @@ export function createAgentAssistantConversationRuntime({
           })
         )
           return createFailedReply(text('noPendingClarification'));
-        return { ok: !![], status: 'chat', assistantHandled: !![], ...(getPendingChoice() || {}) };
+        return { ok: true, status: 'chat', assistantHandled: true, ...(getPendingChoice() || {}) };
       } catch (target) {
         return handler3(target);
       }
@@ -147,7 +147,7 @@ export function createAgentAssistantConversationRuntime({
         enabled = next?.['options']['find']((current) => current['id'] === source);
       if (!enabled || next['questionId'] !== questionId)
         return createFailedReply(text('noPendingClarification'));
-      return handleUserMessage(enabled['label'], { assistantChoice: !![] });
+      return handleUserMessage(enabled['label'], { assistantChoice: true });
     },
     async handle(message2, revision2, runId) {
       const signal = getSignal(),
@@ -198,15 +198,15 @@ export function createAgentAssistantConversationRuntime({
         });
         if (payload)
           return (
-            sessionStore['setCurrentRun']?.({ id: runId, status: 'failed', stopped: ![] }),
+            sessionStore['setCurrentRun']?.({ id: runId, status: 'failed', stopped: false }),
             handler3(payload)
           );
         return (
-          sessionStore['setCurrentRun']?.({ id: runId, status: 'chat', stopped: ![] }),
+          sessionStore['setCurrentRun']?.({ id: runId, status: 'chat', stopped: false }),
           {
-            ok: !![],
+            ok: true,
             ...content4,
-            assistantHandled: !![],
+            assistantHandled: true,
             responseChannel: 'assistant.message',
             ...(getPendingChoice() || {}),
           }
@@ -227,7 +227,7 @@ export function createAgentAssistantConversationRuntime({
               : null,
           );
         return (
-          sessionStore['setCurrentRun']?.({ id: runId, status: 'failed', stopped: ![] }),
+          sessionStore['setCurrentRun']?.({ id: runId, status: 'failed', stopped: false }),
           handler3(config || state)
         );
       }

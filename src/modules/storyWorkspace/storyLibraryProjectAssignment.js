@@ -91,7 +91,7 @@ export function addStoryLibraryAssetsToProject(
   record = [],
   payload = [],
   handle = '',
-  { targetAppearanceId: targetAppearanceId = '', createAppearance: createAppearance = ![] } = {},
+  { targetAppearanceId: targetAppearanceId = '', createAppearance: createAppearance = false } = {},
 ) {
   const assets2 = Array['isArray'](list) ? list : [],
     targetAssetId2 = normalizeText(handle),

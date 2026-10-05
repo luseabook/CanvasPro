@@ -50,27 +50,27 @@ export function createGenerationTaskRecoveryOwner({
         promise?.['catch']?.(() => {});
       } catch {}
     },
-    stop = (data, { resetRecovering: resetRecovering = ![] } = {}) => {
+    stop = (data, { resetRecovering: resetRecovering = false } = {}) => {
       const { adapter: adapter2, lane: lane2 } = handler(data);
-      lane2['abortController']?.['signal']?.['aborted'] !== !![] && lane2['abortController']?.['abort']?.();
+      lane2['abortController']?.['signal']?.['aborted'] !== true && lane2['abortController']?.['abort']?.();
       ((lane2['abortController'] = null), (lane2['taskId'] = ''), (lane2['promise'] = null));
-      if (resetRecovering && readTaskNode()?.[adapter2['recoveringField']] === !![]) {
-        const patch = { [adapter2['recoveringField']]: ![] };
+      if (resetRecovering && readTaskNode()?.[adapter2['recoveringField']] === true) {
+        const patch = { [adapter2['recoveringField']]: false };
         (updateTaskNode(patch), handler2(adapter2['id'], { type: 'recovering-reset', patch: patch }));
       }
       publishUiState();
     },
-    claim = (options, target, { abortPrevious: abortPrevious = !![] } = {}) => {
+    claim = (options, target, { abortPrevious: abortPrevious = true } = {}) => {
       const { adapter: adapter3, lane: lane3 } = handler(options),
         taskId2 = normalizeTaskId(target);
       if (taskId2 && lane3['taskId'] === taskId2 && lane3['promise'])
-        return { claimed: ![], controller: lane3['abortController'], promise: lane3['promise'] };
+        return { claimed: false, controller: lane3['abortController'], promise: lane3['promise'] };
       if (abortPrevious) stop(adapter3['id']);
       return (
         (lane3['taskId'] = taskId2),
         (lane3['abortController'] = createAbortController()),
         publishUiState(),
-        { claimed: !![], controller: lane3['abortController'], promise: null }
+        { claimed: true, controller: lane3['abortController'], promise: null }
       );
     },
     setPromise = (source, next) => {
@@ -85,15 +85,15 @@ export function createGenerationTaskRecoveryOwner({
     finish = (current, { taskId: taskId = '', controller: controller = null } = {}) => {
       const { adapter: adapter5, lane: lane5 } = handler(current),
         taskId3 = normalizeTaskId(taskId);
-      if (controller && lane5['abortController'] && lane5['abortController'] !== controller) return ![];
-      if (taskId3 && lane5['taskId'] && lane5['taskId'] !== taskId3) return ![];
+      if (controller && lane5['abortController'] && lane5['abortController'] !== controller) return false;
+      if (taskId3 && lane5['taskId'] && lane5['taskId'] !== taskId3) return false;
       return (
         (lane5['abortController'] = null),
         (lane5['taskId'] = ''),
         (lane5['promise'] = null),
         handler2(adapter5['id'], { type: 'recovery-finish', taskId: taskId3 }),
         publishUiState(),
-        !![]
+        true
       );
     },
     bindLegacyState = (enabled, entry = LEGACY_RECOVERY_FIELDS) => {
@@ -103,11 +103,11 @@ export function createGenerationTaskRecoveryOwner({
           const { lane: lane6 } = handler(record);
           Object['entries'](payload)['forEach'](([handle, config]) => {
             const el = Object['getOwnPropertyDescriptor'](enabled, config);
-            if (el && el['configurable'] === ![]) return;
+            if (el && el['configurable'] === false) return;
             if (el && 'value' in el) lane6[handle] = el['value'];
             Object['defineProperty'](enabled, config, {
-              configurable: !![],
-              enumerable: ![],
+              configurable: true,
+              enumerable: false,
               get: () => lane6[handle],
               set: (scope) => {
                 lane6[handle] = handle === 'taskId' ? normalizeTaskId(scope) : scope;

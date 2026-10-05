@@ -132,7 +132,7 @@ export function readUiPrefsFromStorage() {
       ? Math['max'](0, Math['min'](200, Math['round'](record)))
       : 40;
   return {
-    showVideoMeta: ![],
+    showVideoMeta: false,
     showSelectionMediaProperties: String(safeStorageGet2) !== '0',
     titleFollowsCanvasZoom: String(safeStorageGet3) === '1',
     promptBoxResizeEnabled: String(safeStorageGet4) !== '0',
@@ -159,23 +159,23 @@ export function readUiPrefsFromStorage() {
   };
 }
 export function persistUiPrefsToStorage(payload) {
-  const handle = payload?.['showSelectionMediaProperties'] !== ![],
-    state = payload?.['titleFollowsCanvasZoom'] === !![],
-    config = payload?.['promptBoxResizeEnabled'] !== ![],
+  const handle = payload?.['showSelectionMediaProperties'] !== false,
+    state = payload?.['titleFollowsCanvasZoom'] === true,
+    config = payload?.['promptBoxResizeEnabled'] !== false,
     promptEnterBehavior = normalizePromptEnterBehavior(payload?.['promptEnterBehavior']),
-    scope = payload?.['promptAttachmentButtonHidden'] === !![],
-    input = payload?.['promptPresetButtonHidden'] === !![],
-    output = payload?.['videoAudioDefaultEnabled'] === !![],
+    scope = payload?.['promptAttachmentButtonHidden'] === true,
+    input = payload?.['promptPresetButtonHidden'] === true,
+    output = payload?.['videoAudioDefaultEnabled'] === true,
     canvasToolbarPlacement = normalizeCanvasToolbarPlacement(payload?.['canvasToolbarPlacement']),
     nodeManagerPlacement = normalizeNodeManagerPlacement(payload?.['nodeManagerPlacement']),
-    value2 = payload?.['leftSidebarAutoHideEnabled'] === !![],
-    value3 = payload?.['bottomLeftBarAutoHideEnabled'] === !![],
-    value4 = payload?.['imageVideoNodeResizeEnabled'] === !![],
-    value5 = payload?.['selectionRelatedHighlightEnabled'] !== ![],
+    value2 = payload?.['leftSidebarAutoHideEnabled'] === true,
+    value3 = payload?.['bottomLeftBarAutoHideEnabled'] === true,
+    value4 = payload?.['imageVideoNodeResizeEnabled'] === true,
+    value5 = payload?.['selectionRelatedHighlightEnabled'] !== false,
     selectionRelatedHighlightColor = normalizeSelectionRelatedHighlightColor(
       payload?.['selectionRelatedHighlightColor'],
     ),
-    value6 = payload?.['connectionLinesVisible'] !== ![],
+    value6 = payload?.['connectionLinesVisible'] !== false,
     connectionLineStyle = normalizeConnectionLineStyle(payload?.['connectionLineStyle']),
     imageToolbarLayout = normalizeImageToolbarLayout(payload?.['imageToolbarLayout']),
     videoToolbarLayout = normalizeVideoToolbarLayout(payload?.['videoToolbarLayout']),
@@ -184,13 +184,13 @@ export function persistUiPrefsToStorage(payload) {
       payload?.['alignFeatureTriggerMode'] === 'click' ||
       payload?.['alignFeatureTriggerMode'] === 'off'
         ? payload['alignFeatureTriggerMode']
-        : payload?.['alignFeatureEnabled'] === ![]
+        : payload?.['alignFeatureEnabled'] === false
           ? 'off'
           : 'click',
     value8 = value7 !== 'off',
     value9 = Number(payload?.['alignDistributeGap']),
     value10 = Number['isFinite'](value9) ? Math['max'](0, Math['min'](200, Math['round'](value9))) : 40,
-    value11 = payload?.['snapGuidesEnabled'] !== ![],
+    value11 = payload?.['snapGuidesEnabled'] !== false,
     sanitizeFeatureSelectionsRecord2 = sanitizeFeatureSelectionsRecord(payload?.['featureSelections'] || {});
   (safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, '0'),
     safeStorageSet(SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY, handle ? '1' : '0'),
@@ -251,19 +251,19 @@ export function initStoreRuntimeEffects(value12) {
   );
   safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, '0');
   const value16 = uiStore3['subscribeSelector'](
-      (value17) => value17['ui']?.['showSelectionMediaProperties'] !== ![],
+      (value17) => value17['ui']?.['showSelectionMediaProperties'] !== false,
       (value18) => {
         safeStorageSet(SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY, value18 ? '1' : '0');
       },
     ),
     value19 = uiStore3['subscribeSelector'](
-      (value20) => value20['ui']?.['titleFollowsCanvasZoom'] === !![],
+      (value20) => value20['ui']?.['titleFollowsCanvasZoom'] === true,
       (value21) => {
         safeStorageSet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, value21 ? '1' : '0');
       },
     ),
     value22 = uiStore3['subscribeSelector'](
-      (value23) => value23['ui']?.['promptBoxResizeEnabled'] !== ![],
+      (value23) => value23['ui']?.['promptBoxResizeEnabled'] !== false,
       (value24) => {
         safeStorageSet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, value24 ? '1' : '0');
       },
@@ -275,19 +275,19 @@ export function initStoreRuntimeEffects(value12) {
       },
     ),
     value28 = uiStore3['subscribeSelector'](
-      (value29) => value29['ui']?.['promptAttachmentButtonHidden'] === !![],
+      (value29) => value29['ui']?.['promptAttachmentButtonHidden'] === true,
       (value30) => {
         safeStorageSet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, value30 ? '1' : '0');
       },
     ),
     value31 = uiStore3['subscribeSelector'](
-      (value32) => value32['ui']?.['promptPresetButtonHidden'] === !![],
+      (value32) => value32['ui']?.['promptPresetButtonHidden'] === true,
       (value33) => {
         safeStorageSet(PROMPT_PRESET_BUTTON_HIDDEN_STORAGE_KEY, value33 ? '1' : '0');
       },
     ),
     value34 = uiStore3['subscribeSelector'](
-      (value35) => value35['ui']?.['videoAudioDefaultEnabled'] === !![],
+      (value35) => value35['ui']?.['videoAudioDefaultEnabled'] === true,
       (value36) => {
         safeStorageSet(VIDEO_AUDIO_DEFAULT_ENABLED_STORAGE_KEY, value36 ? '1' : '0');
       },
@@ -305,25 +305,25 @@ export function initStoreRuntimeEffects(value12) {
       },
     ),
     value43 = uiStore3['subscribeSelector'](
-      (value44) => value44['ui']?.['leftSidebarAutoHideEnabled'] === !![],
+      (value44) => value44['ui']?.['leftSidebarAutoHideEnabled'] === true,
       (value45) => {
         safeStorageSet(LEFT_SIDEBAR_AUTO_HIDE_STORAGE_KEY, value45 ? '1' : '0');
       },
     ),
     value46 = uiStore3['subscribeSelector'](
-      (value47) => value47['ui']?.['bottomLeftBarAutoHideEnabled'] === !![],
+      (value47) => value47['ui']?.['bottomLeftBarAutoHideEnabled'] === true,
       (value48) => {
         safeStorageSet(BOTTOM_LEFT_BAR_AUTO_HIDE_STORAGE_KEY, value48 ? '1' : '0');
       },
     ),
     value49 = uiStore3['subscribeSelector'](
-      (value50) => value50['ui']?.['imageVideoNodeResizeEnabled'] === !![],
+      (value50) => value50['ui']?.['imageVideoNodeResizeEnabled'] === true,
       (value51) => {
         safeStorageSet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, value51 ? '1' : '0');
       },
     ),
     value52 = uiStore3['subscribeSelector'](
-      (value53) => value53['ui']?.['selectionRelatedHighlightEnabled'] !== ![],
+      (value53) => value53['ui']?.['selectionRelatedHighlightEnabled'] !== false,
       (value54) => {
         safeStorageSet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, value54 ? '1' : '0');
       },
@@ -335,7 +335,7 @@ export function initStoreRuntimeEffects(value12) {
       },
     ),
     value58 = uiStore3['subscribeSelector'](
-      (value59) => value59['ui']?.['connectionLinesVisible'] !== ![],
+      (value59) => value59['ui']?.['connectionLinesVisible'] !== false,
       (value60) => {
         safeStorageSet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, value60 ? '1' : '0');
       },
@@ -359,7 +359,7 @@ export function initStoreRuntimeEffects(value12) {
       },
     ),
     value70 = uiStore3['subscribeSelector'](
-      (value71) => value71['ui']?.['alignFeatureEnabled'] !== ![],
+      (value71) => value71['ui']?.['alignFeatureEnabled'] !== false,
       (value72) => {
         safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, value72 ? '1' : '0');
       },
@@ -386,7 +386,7 @@ export function initStoreRuntimeEffects(value12) {
       },
     ),
     value81 = uiStore3['subscribeSelector'](
-      (value82) => value82['ui']?.['snapGuidesEnabled'] !== ![],
+      (value82) => value82['ui']?.['snapGuidesEnabled'] !== false,
       (value83) => {
         safeStorageSet(SNAP_GUIDES_ENABLED_STORAGE_KEY, value83 ? '1' : '0');
       },
@@ -432,6 +432,6 @@ export function initStoreRuntimeEffects(value12) {
       value77?.(),
       value81?.(),
       value84?.(),
-      graphStore['setViewportPersistPolicy'](() => !![]));
+      graphStore['setViewportPersistPolicy'](() => true));
   };
 }

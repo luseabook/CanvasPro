@@ -15,11 +15,11 @@ function createTextureFromImageBitmap(box) {
     count2 = Number(box?.['height']) || 0;
   if (count <= 0 || count2 <= 0) return (box?.['close']?.(), null);
   const el = new threeRuntime['Texture'](box);
-  el['flipY'] = ![];
-  let item = ![];
+  el['flipY'] = false;
+  let item = false;
   const key = () => {
     if (item) return;
-    ((item = !![]), el['removeEventListener']?.('dispose', key), box?.['close']?.());
+    ((item = true), el['removeEventListener']?.('dispose', key), box?.['close']?.());
   };
   return (el['addEventListener']?.('dispose', key), el);
 }
@@ -28,23 +28,23 @@ function loadTextureWithTextureLoader(index, enabled, el2) {
     return Promise['reject'](new Error('Panorama texture loader is unavailable'));
   if (el2?.['aborted']) return Promise['reject'](createAbortError());
   return new Promise((handler, handler2) => {
-    let result = ![];
+    let result = false;
     const run = () => el2?.['removeEventListener']?.('abort', data),
       options = (target) => {
         if (result) {
           target?.['dispose']?.();
           return;
         }
-        ((result = !![]), run(), handler(target));
+        ((result = true), run(), handler(target));
       },
       handler3 = (source) => {
         if (result) return;
-        ((result = !![]),
+        ((result = true),
           run(),
           handler2(source instanceof Error ? source : new Error('Panorama texture load failed')));
       },
       data = () => handler3(createAbortError());
-    el2?.['addEventListener']?.('abort', data, { once: !![] });
+    el2?.['addEventListener']?.('abort', data, { once: true });
     try {
       enabled['load'](index, options, undefined, handler3);
     } catch (next) {
@@ -89,7 +89,7 @@ export async function loadPanoramaTextureSource(
     throw entry || payload;
   }
 }
-export function configureInsideSpherePanoramaTexture(enabled3, handle, { isPreview: isPreview = ![] } = {}) {
+export function configureInsideSpherePanoramaTexture(enabled3, handle, { isPreview: isPreview = false } = {}) {
   if (!enabled3) return;
   ((enabled3['colorSpace'] = threeRuntime['SRGBColorSpace']),
     (enabled3['minFilter'] = isPreview
@@ -102,5 +102,5 @@ export function configureInsideSpherePanoramaTexture(enabled3, handle, { isPrevi
       : Math['min'](8, handle?.['capabilities']?.['getMaxAnisotropy']?.() || 1)),
     enabled3['repeat']['set'](-1, 1),
     enabled3['offset']['set'](1, 0),
-    (enabled3['needsUpdate'] = !![]));
+    (enabled3['needsUpdate'] = true));
 }

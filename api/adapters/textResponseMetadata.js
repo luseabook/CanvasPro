@@ -1,7 +1,7 @@
 import { normalizeTextResultSources, normalizeTextToolUsage } from '../../src/utils/textResultMetadata.js';
 import { normalizeTextResultImages, parseTextResultImages } from '../../src/utils/textResultImages.js';
 export function extractTextResponseMetadata(value, images) {
-  if (images['responseMapping']?.['includeSources'] !== !![]) return {};
+  if (images['responseMapping']?.['includeSources'] !== true) return {};
   const item = Array['isArray'](value?.['output']) ? value : value?.['data'] || value,
     key = (Array['isArray'](item?.['output']) ? item['output'] : [])
       ['filter'](
@@ -17,7 +17,7 @@ export function extractTextResponseMetadata(value, images) {
     imageSearchRequested =
       images['body']?.['tools']?.['some']((source) =>
         ['web_search_image', 'image_search']['includes'](source['type']),
-      ) === !![],
+      ) === true,
     next =
       (key?.['content'] || [])
         ['filter']((current) => current['type'] === 'output_text')
@@ -34,6 +34,6 @@ export function extractTextResponseMetadata(value, images) {
     sources: normalizeTextResultSources(result),
     toolUsage: normalizeTextToolUsage(item?.['usage']?.['x_tools']),
     webSearchRequested:
-      images['body']?.['tools']?.['some']((entry) => entry['type'] === 'web_search') === !![],
+      images['body']?.['tools']?.['some']((entry) => entry['type'] === 'web_search') === true,
   };
 }

@@ -12,7 +12,7 @@ export function finalizeReplicationFlow(
     acceptancePolicy: 'usable-output',
     source: item,
     clips: [],
-    notes: notes['map']((args) => ({ ...args, blocking: ![] })),
+    notes: notes['map']((args) => ({ ...args, blocking: false })),
   };
   try {
     (requireFlow(Number['isFinite'](durationSec) && durationSec > 0, '原片时长无效'),
@@ -36,7 +36,7 @@ export function finalizeReplicationFlow(
       (response['status'] = response['notes']['length'] ? 'passed-with-notes' : 'passed'));
   } catch (index) {
     ((response['clips'] = []),
-      response['notes']['push']({ code: 'output-invalid', blocking: !![], detail: index['message'] }));
+      response['notes']['push']({ code: 'output-invalid', blocking: true, detail: index['message'] }));
   }
   return response;
 }
@@ -94,14 +94,14 @@ export function compileReplicationFlow(args3, maxSeconds2, { promptMode: promptM
       value11['push']({
         code: 'unlocated-speech',
         detail: '画面记录提及人声，但本段没有原话记录',
-        blocking: ![],
+        blocking: false,
       });
     for (const value13 of value2) {
       if (value13['estimated'])
         value11['push']({
           code: 'speech-timing-estimated',
           sourceId: value13['sourceId'],
-          blocking: ![],
+          blocking: false,
           detail: '人声跨越片段边界，按原文顺序拆分并近似分配时间，原话未删改',
         });
       if (
@@ -112,7 +112,7 @@ export function compileReplicationFlow(args3, maxSeconds2, { promptMode: promptM
         value11['push']({
           code: 'uncertain-speech',
           sourceId: value13['sourceId'],
-          blocking: ![],
+          blocking: false,
           detail: '人声证据仍不确定',
         });
     }

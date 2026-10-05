@@ -64,7 +64,7 @@ export function renderAIGenTextModelSelectorMarkup({
   modelId: modelId = DEFAULT_AIGEN_TEXT_MODEL_ID,
   provider: provider = '',
   providerProfileId: providerProfileId = '',
-  includeRunningHubInternational: includeRunningHubInternational = ![],
+  includeRunningHubInternational: includeRunningHubInternational = false,
   getDisplayModelName: getDisplayModelName,
   className: className = '',
   allowedModelIds: allowedModelIds2,

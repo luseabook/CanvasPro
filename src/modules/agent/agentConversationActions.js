@@ -31,7 +31,7 @@ export function createAgentConversationActions({
   }
   async function run2(itemId, message) {
     if (getBusy()) return;
-    (destroy(), setNotice(''), setBusy2(!![], { stoppable: !![] }));
+    (destroy(), setNotice(''), setBusy2(true, { stoppable: true }));
     const el3 = getPresentation()['appendWaiting']();
     try {
       const response = await runtime['reviseAssistantTurn']({
@@ -39,13 +39,13 @@ export function createAgentConversationActions({
         ...(message === undefined ? {} : { message: message }),
       });
       onResult(response);
-      if (response?.['ok'] === ![] && !response['stale']) setNotice(response['reply']);
+      if (response?.['ok'] === false && !response['stale']) setNotice(response['reply']);
     } catch (error) {
       setNotice(error['message']);
     } finally {
       const index = Boolean(el3['parentNode']);
       getPresentation()['removeWaiting'](el3);
-      if (index) setBusy2(![]);
+      if (index) setBusy2(false);
     }
   }
   function run3(result, data) {

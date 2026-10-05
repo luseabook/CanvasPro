@@ -183,7 +183,7 @@ export function createWhiteboardLayerTransformSession({
     ),
     startAngle: Math['atan2'](start['y'] - args3['center']['y'], start['x'] - args3['center']['x']),
     base: cloneCommand(command),
-    moved: ![],
+    moved: false,
   };
 }
 const transformPoint = (
@@ -207,7 +207,7 @@ const transformPoint = (
       (value9['y2'] = box9['y']));
   };
 export function applyWhiteboardLayerTransform(box10, center, box11) {
-  if (!box10 || !center?.['base'] || box10['type'] !== center['base']['type']) return ![];
+  if (!box10 || !center?.['base'] || box10['type'] !== center['base']['type']) return false;
   const box12 = { x: finiteNumberOr(box11?.['x']), y: finiteNumberOr(box11?.['y']) };
   let scale2 = 1,
     rotation3 = 0,
@@ -228,7 +228,7 @@ export function applyWhiteboardLayerTransform(box10, center, box11) {
         rotation3 =
           Math['atan2'](box12['y'] - center['center']['y'], box12['x'] - center['center']['x']) -
           center['startAngle'];
-      else return ![];
+      else return false;
     }
   }
   const value11 =

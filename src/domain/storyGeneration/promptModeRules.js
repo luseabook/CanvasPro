@@ -7,7 +7,7 @@ import {
   normalizeStoryPromptMode,
 } from './promptModes.js';
 export function getStoryEpisodeClipGroupingRequirements(value = '') {
-  if (normalizeStoryPromptMode(value, { allowDeveloperModes: !![] }) !== 'seedance-2.0') return [];
+  if (normalizeStoryPromptMode(value, { allowDeveloperModes: true }) !== 'seedance-2.0') return [];
   return [
     'Seedance 2.0 的 15 秒是单片上限，不是目标时长；用户设置更短上限时遵从该上限。连续剧情、同一轮对白和对应动作或反应组织在同一个 clip 内，换说话人、换景别或切镜头只增加 shot，不单独新建 clip。仅在继续内容会超过上限，或确有换场、时间跳跃、独立叙事阶段时拆段；自然结束的短片段保留，不拉长表演、不补空镜、不增删台词凑秒数。',
   ];
@@ -72,7 +72,7 @@ export function isStoryEpisodeTimelineGuidance(key = '') {
 export function appendStoryEpisodePromptModeSystemPrompt(
   index = '',
   result = '',
-  { announceTimelineContract: announceTimelineContract = ![] } = {},
+  { announceTimelineContract: announceTimelineContract = false } = {},
 ) {
   const list = getStoryEpisodePromptModePlanningRequirements(result);
   if (!list['length']) return index;
@@ -104,7 +104,7 @@ export const getStoryEpisodeTimelinePlanningRequirements = getStoryEpisodePrompt
 export function resolveStoryPromptModeClipMaxSeconds(data = '', options = 15) {
   return isStoryMinimaxH3PromptMode(data) ? 15 : options;
 }
-export function getStorySpatialContinuityPromptLines({ sourceEvidence: sourceEvidence = ![] } = {}) {
+export function getStorySpatialContinuityPromptLines({ sourceEvidence: sourceEvidence = false } = {}) {
   const target = sourceEvidence ? '原片场景' : '场景参考图',
     source = sourceEvidence ? '原片人物形象' : '已选参考形象';
   return [
@@ -118,7 +118,7 @@ export function getStorySpatialContinuityPromptLines({ sourceEvidence: sourceEvi
 }
 export function getStoryClipPromptModeRewriteRequirements(
   next = '',
-  { hasAssetRefs: hasAssetRefs = ![] } = {},
+  { hasAssetRefs: hasAssetRefs = false } = {},
 ) {
   if (isStoryMinimaxH3PromptMode(next))
     return hasAssetRefs

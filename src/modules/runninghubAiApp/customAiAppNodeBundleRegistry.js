@@ -11,38 +11,38 @@ export function getCustomAiAppBundleKey(item) {
 }
 function canReuseRegisteredBundle(key) {
   const customAiAppBundleModelId = getCustomAiAppBundleModelId(key);
-  if (!customAiAppBundleModelId) return ![];
+  if (!customAiAppBundleModelId) return false;
   return Boolean(resolveModelExecution(customAiAppBundleModelId));
 }
-export function registerCustomAiAppBundle(index, map, { replace: replace = ![] } = {}) {
+export function registerCustomAiAppBundle(index, map, { replace: replace = false } = {}) {
   const customAiAppBundleKey = getCustomAiAppBundleKey(index);
-  if (!customAiAppBundleKey) return !![];
-  if (!replace && map['has'](customAiAppBundleKey)) return !![];
+  if (!customAiAppBundleKey) return true;
+  if (!replace && map['has'](customAiAppBundleKey)) return true;
   if (replace) unregisterCustomAiAppBundle(index, map);
   try {
-    return (registerManifestBundle(index), map['add'](customAiAppBundleKey), !![]);
+    return (registerManifestBundle(index), map['add'](customAiAppBundleKey), true);
   } catch (error) {
     if (
       String(error?.['message'] || '')['includes']('duplicate key') &&
       !replace &&
       canReuseRegisteredBundle(index)
     )
-      return (map['add'](customAiAppBundleKey), !![]);
+      return (map['add'](customAiAppBundleKey), true);
     throw error;
   }
 }
 export function unregisterCustomAiAppBundle(result, map2) {
   const customAiAppBundleKey2 = getCustomAiAppBundleKey(result);
-  if (!customAiAppBundleKey2) return !![];
+  if (!customAiAppBundleKey2) return true;
   try {
-    return (unregisterManifestBundle(result), map2['delete'](customAiAppBundleKey2), !![]);
+    return (unregisterManifestBundle(result), map2['delete'](customAiAppBundleKey2), true);
   } catch (data) {
-    return (console['warn']('[Custom AI App] unregister manifest failed:', data), ![]);
+    return (console['warn']('[Custom AI App] unregister manifest failed:', data), false);
   }
 }
 export function projectCustomAiAppBundleForNodeRuntime(args) {
   const list = Array['isArray'](args?.['models']) ? args['models'] : [];
-  let options = ![];
+  let options = false;
   const models = list['map']((args2) => {
     const args3 = args2?.['extensions'];
     if (!args3 || typeof args3 !== 'object') return args2;
@@ -52,7 +52,7 @@ export function projectCustomAiAppBundleForNodeRuntime(args) {
         const args4 = args3[target];
         if (!args4 || typeof args4 !== 'object') return;
         if (extensions === args3) extensions = { ...args3 };
-        ((extensions[target] = { ...args4, appKey: '', isSavedApp: ![] }), (options = !![]));
+        ((extensions[target] = { ...args4, appKey: '', isSavedApp: false }), (options = true));
       }),
       extensions === args3 ? args2 : { ...args2, extensions: extensions }
     );
@@ -62,7 +62,7 @@ export function projectCustomAiAppBundleForNodeRuntime(args) {
 export function createCustomAiAppNodeBundleRegistry({
   registerBundle: registerBundle,
   unregisterBundle: unregisterBundle,
-  isBundleRegistered: isBundleRegistered = () => ![],
+  isBundleRegistered: isBundleRegistered = () => false,
   onWarning: onWarning = (...args5) => console['warn'](...args5),
 } = {}) {
   const map3 = new Map();
@@ -88,7 +88,7 @@ export function createCustomAiAppNodeBundleRegistry({
           if (map5['has'](current)) return;
           try {
             const entry = unregisterBundle?.(next);
-            if (entry === ![]) return;
+            if (entry === false) return;
           } catch (record) {
             onWarning('[Custom AI App] unregister stale node manifest failed:', record);
             return;

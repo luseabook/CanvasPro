@@ -22,7 +22,7 @@ function assertHttpUrl(value, item) {
     throw new Error(item + '格式无效');
   }
 }
-export function validateObjectStorageConfig(options2 = {}, { requireEnabled: requireEnabled = !![] } = {}) {
+export function validateObjectStorageConfig(options2 = {}, { requireEnabled: requireEnabled = true } = {}) {
   const objectStorageConfig = normalizeObjectStorageConfig(options2);
   if (requireEnabled && !objectStorageConfig['enabled']) throw new Error('请先启用自定义对象存储');
   if (
@@ -41,20 +41,20 @@ export function validateObjectStorageConfig(options2 = {}, { requireEnabled: req
   return objectStorageConfig;
 }
 export function isConfiguredObjectStorageEnabled() {
-  return normalizeObjectStorageConfig(getObjectStorageConfig())['enabled'] === !![];
+  return normalizeObjectStorageConfig(getObjectStorageConfig())['enabled'] === true;
 }
 export function isConfiguredObjectStoragePublicUrl(key, objectStorageConfig2 = getObjectStorageConfig()) {
   const objectStorageConfig3 = normalizeObjectStorageConfig(objectStorageConfig2);
-  if (!objectStorageConfig3['enabled'] || !objectStorageConfig3['publicBaseUrl']) return ![];
+  if (!objectStorageConfig3['enabled'] || !objectStorageConfig3['publicBaseUrl']) return false;
   try {
     const uRL2 = new URL(String(key || '')['trim']()),
       uRL3 = new URL(objectStorageConfig3['publicBaseUrl']);
-    if (!['http:', 'https:']['includes'](uRL2['protocol']) || uRL2['origin'] !== uRL3['origin']) return ![];
+    if (!['http:', 'https:']['includes'](uRL2['protocol']) || uRL2['origin'] !== uRL3['origin']) return false;
     const enabled = uRL3['pathname']['replace'](/\/+$/, '');
     if (!enabled || enabled === '/') return uRL2['pathname']['startsWith']('/');
     return uRL2['pathname'] === enabled || uRL2['pathname']['startsWith'](enabled + '/');
   } catch {
-    return ![];
+    return false;
   }
 }
 function inferObjectStorageMediaKind(index, result = {}) {
@@ -102,12 +102,12 @@ export async function uploadPublicMediaToConfiguredObjectStorage(mediaKind, hand
   return await uploadToConfiguredObjectStorage(handle, { ...args, mediaKind: mediaKind });
 }
 export async function testObjectStorageConnection(options3 = {}) {
-  const config = validateObjectStorageConfig(options3, { requireEnabled: ![] }),
+  const config = validateObjectStorageConfig(options3, { requireEnabled: false }),
     response2 = await post(
       OBJECT_STORAGE_TEST_PATH,
       { config: config },
       { provider: OBJECT_STORAGE_UPLOAD_PROVIDER, timeout: 120000, responseType: 'auto' },
     );
-  if (response2?.['success'] !== !![]) throw new Error(response2?.['error'] || '对象存储连接测试失败');
+  if (response2?.['success'] !== true) throw new Error(response2?.['error'] || '对象存储连接测试失败');
   return response2;
 }

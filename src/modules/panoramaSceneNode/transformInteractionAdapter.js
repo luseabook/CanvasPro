@@ -65,10 +65,10 @@ export function normalizeTransformInteractionOptions(uniformScale = {}) {
     mode: normalizeMode(uniformScale['mode']),
     space: normalizeSpace(uniformScale['space']),
     constraint: normalizeConstraint(uniformScale['constraint']),
-    uniformScale: uniformScale['uniformScale'] !== ![],
-    groundLock: uniformScale['groundLock'] !== ![],
+    uniformScale: uniformScale['uniformScale'] !== false,
+    groundLock: uniformScale['groundLock'] !== false,
     snap: {
-      enabled: uniformScale?.['snap']?.['enabled'] === !![],
+      enabled: uniformScale?.['snap']?.['enabled'] === true,
       translation: positiveNumber(uniformScale?.['snap']?.['translation'], 0.25),
       rotation: positiveNumber(uniformScale?.['snap']?.['rotation'], Math['PI'] / 12),
       scale: positiveNumber(uniformScale?.['snap']?.['scale'], 0.1),
@@ -138,7 +138,7 @@ export class TransformInteractionAdapter {
     );
   }
   ['begin']({ objectType: objectType, objectId: objectId, pose: pose, constraint: constraint } = {}) {
-    if (!objectType || !objectId) return ![];
+    if (!objectType || !objectId) return false;
     if (this['drag']) this['cancel']();
     this['drag'] = {
       objectType: String(objectType),
@@ -147,7 +147,7 @@ export class TransformInteractionAdapter {
       previewPose: normalizePose(pose),
     };
     if (constraint) this['configure']({ constraint: constraint });
-    return (this['setOrbitEnabled']?.(![]), !![]);
+    return (this['setOrbitEnabled']?.(false), true);
   }
   ['preview'](output) {
     if (!this['drag']) return null;
@@ -170,7 +170,7 @@ export class TransformInteractionAdapter {
       objectId: this['drag']['objectId'],
       pose: this['drag']['previewPose'],
     };
-    return ((this['drag'] = null), this['setOrbitEnabled']?.(!![]), this['onCommit']?.(value2), value2);
+    return ((this['drag'] = null), this['setOrbitEnabled']?.(true), this['onCommit']?.(value2), value2);
   }
   ['cancel']() {
     if (!this['drag']) return null;
@@ -181,7 +181,7 @@ export class TransformInteractionAdapter {
     };
     return (
       (this['drag'] = null),
-      this['setOrbitEnabled']?.(!![]),
+      this['setOrbitEnabled']?.(true),
       this['onPreview']?.(value3),
       this['onCancel']?.(value3),
       value3

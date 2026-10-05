@@ -5,13 +5,13 @@ export function resetStoryEpisodeSplitBatchState(options = {}) {
   ((options['episodeBatchSplitOperation'] = ''),
     (options['episodeBatchSplitStatus'] = ''),
     (options['episodeBatchSplitId'] = ''),
-    (options['episodeBatchSplitCancelRequested'] = ![]));
+    (options['episodeBatchSplitCancelRequested'] = false));
 }
 export async function runStoryEpisodeSplitBatchQueue({
   targets: targets = [],
   batchId: batchId = '',
-  isLive: isLive = () => !![],
-  isCancellationRequested: isCancellationRequested = () => ![],
+  isLive: isLive = () => true,
+  isCancellationRequested: isCancellationRequested = () => false,
   resolveTarget: resolveTarget = (item) => item,
   createMissingTargetError: createMissingTargetError = () => new Error('分集不存在，无法拆分。'),
   runTarget: runTarget,
@@ -75,17 +75,17 @@ export async function runStoryEpisodeSplitBatchQueue({
 export function cancelStoryEpisodeSplitBatch({
   state: state = {},
   tasks: tasks = [],
-  isTaskActive: isTaskActive = () => ![],
-  requestCancellation: requestCancellation = () => ![],
+  isTaskActive: isTaskActive = () => false,
+  requestCancellation: requestCancellation = () => false,
   updateBatch: updateBatch = () => {},
   setEpisodeRunning: setEpisodeRunning = () => {},
   showToast: showToast = () => {},
   render: render = () => {},
 } = {}) {
   const text = normalizeText(state['episodeBatchSplitId']);
-  if (!text || !state['episodeBatchSplitOperation']) return ![];
+  if (!text || !state['episodeBatchSplitOperation']) return false;
   const enabled2 = tasks['find']((key) => isTaskActive(key) && key['batch']?.['id'] === text);
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   const pendingEpisodeIds = normalizeText(enabled2['scope']?.['episodeId']),
     cancelledEpisodeIds = (
       Array['isArray'](enabled2['batch']?.['pendingEpisodeIds']) ? enabled2['batch']['pendingEpisodeIds'] : []
@@ -93,29 +93,29 @@ export function cancelStoryEpisodeSplitBatch({
       ['map'](normalizeText)
       ['filter']((result) => result && result !== pendingEpisodeIds);
   if (!cancelledEpisodeIds['length'])
-    return (showToast('当前集正在拆分，暂无可取消的排队分集。', 'info'), ![]);
-  if (!requestCancellation(text)) return ![];
+    return (showToast('当前集正在拆分，暂无可取消的排队分集。', 'info'), false);
+  if (!requestCancellation(text)) return false;
   const label = '已取消后续 ' + cancelledEpisodeIds['length'] + ' 集排队，正在完成当前集';
   return (
     updateBatch(text, {
-      cancelRequested: !![],
+      cancelRequested: true,
       cancelledEpisodeIds: cancelledEpisodeIds,
       pendingEpisodeIds: pendingEpisodeIds ? [pendingEpisodeIds] : [],
       label: label,
     }),
-    cancelledEpisodeIds['forEach']((data) => setEpisodeRunning(data, ![])),
-    (state['episodeBatchSplitCancelRequested'] = !![]),
+    cancelledEpisodeIds['forEach']((data) => setEpisodeRunning(data, false)),
+    (state['episodeBatchSplitCancelRequested'] = true),
     (state['episodeBatchSplitStatus'] = label),
     render(),
-    !![]
+    true
   );
 }
 export function finalizeStoryEpisodeSplitBatch({
   result: result2,
   batch: batch,
   projectToken: projectToken,
-  experimental: experimental = ![],
-  selectionMode: selectionMode = ![],
+  experimental: experimental = false,
+  selectionMode: selectionMode = false,
   syncBatch: syncBatch = () => {},
   persist: persist = () => {},
   showToast: showToast = () => {},
@@ -129,14 +129,14 @@ export function finalizeStoryEpisodeSplitBatch({
     return (
       syncBatch({
         completed: result2['completed'],
-        cancelRequested: !![],
+        cancelRequested: true,
         pendingEpisodeIds: [],
         cancelledEpisodeIds: result2['pendingTargets'],
         label: '已停止批量拆分 · 完成 ' + result2['completed'] + '/' + source,
       }),
       persist(),
       showToast('已停止后续 ' + result2['cancelled'] + ' 集拆分。', 'info'),
-      !![]
+      true
     );
   persist();
   if (result2?.['failures']?.['length']) {
@@ -162,7 +162,7 @@ export function finalizeStoryEpisodeSplitBatch({
           details: details['error'],
         },
       ),
-      ![]
+      false
     );
   }
   return (
@@ -176,6 +176,6 @@ export function finalizeStoryEpisodeSplitBatch({
           : '全部 ' + result2['completed'] + ' 集分镜脚本生成完成。',
       },
     ),
-    !![]
+    true
   );
 }

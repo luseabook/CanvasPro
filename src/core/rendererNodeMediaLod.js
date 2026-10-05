@@ -32,9 +32,9 @@ export function collectFullEligibleVisibleImageNodeIds({
   candidateNodeIds: candidateNodeIds,
   viewport: viewport,
   devicePixelRatio: devicePixelRatio,
-  isVisible: isVisible = () => !![],
+  isVisible: isVisible = () => true,
   getPreviousMode: getPreviousMode = () => '',
-  interactionBusy: interactionBusy = ![],
+  interactionBusy: interactionBusy = false,
 } = {}) {
   const target = nodes && typeof nodes === 'object' ? nodes : {},
     source = candidateNodeIds instanceof Set ? candidateNodeIds : new Set(candidateNodeIds || []),

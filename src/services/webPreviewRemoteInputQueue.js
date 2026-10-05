@@ -16,11 +16,11 @@ function mergePendingInput(event, event2) {
 export function createWebPreviewRemoteInputQueue({ send: send } = {}) {
   if (typeof send !== 'function') throw new TypeError('Web preview remote input sender is required');
   const list = [];
-  let key = ![],
-    enabled = ![];
+  let key = false,
+    enabled = false;
   const run = async () => {
     if (key || enabled) return;
-    key = !![];
+    key = true;
     try {
       while (!enabled && list['length'] > 0) {
         const index = list['shift']();
@@ -29,22 +29,22 @@ export function createWebPreviewRemoteInputQueue({ send: send } = {}) {
         } catch {}
       }
     } finally {
-      key = ![];
+      key = false;
       if (!enabled && list['length'] > 0) void run();
     }
   };
   return {
     enqueue(args = {}) {
-      if (enabled || !args || typeof args !== 'object') return ![];
+      if (enabled || !args || typeof args !== 'object') return false;
       const result = { ...args },
         count = list['length'] - 1,
         data = count >= 0 ? mergePendingInput(list[count], result) : null;
       if (data) list[count] = data;
       else list['push'](result);
-      return (void run(), !![]);
+      return (void run(), true);
     },
     dispose() {
-      ((enabled = !![]), (list['length'] = 0));
+      ((enabled = true), (list['length'] = 0));
     },
   };
 }

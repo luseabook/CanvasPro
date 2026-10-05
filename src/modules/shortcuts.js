@@ -128,7 +128,7 @@ export const DEFAULT_SHORTCUTS = {
   'open-files': { label: '打开文件管理', keys: [], group: '侧边栏' },
   'open-task-center': { label: '打开任务进程', keys: [], group: '侧边栏' },
   'open-custom-ai-app': { label: '打开自定义AI应用', keys: [], group: '侧边栏' },
-  'escape-all': { label: '取消/关闭所有菜单弹窗', keys: ['Escape'], group: '通用', hidden: !![] },
+  'escape-all': { label: '取消/关闭所有菜单弹窗', keys: ['Escape'], group: '通用', hidden: true },
   'editor-tool-brush': { label: '画笔（切换模式）', keys: ['B'], group: '画笔功能' },
   'editor-tool-rect': { label: '矩形', keys: [], group: '画笔功能' },
   'editor-tool-eraser': { label: '橡皮擦', keys: ['E'], group: '画笔功能' },
@@ -319,7 +319,7 @@ function _isCreateNodeShortcut(input) {
 }
 function _isGlobalShortcut(output) {
   const enabled = String(output || '')['trim']();
-  if (!enabled) return ![];
+  if (!enabled) return false;
   return (
     !isContextMenuShortcut(enabled) &&
     !_isEditorShortcut(enabled) &&
@@ -333,7 +333,7 @@ function _isPanoramaSceneNodeType(value2) {
 }
 function _isPanoramaSceneEditingContext(value3) {
   return (
-    _isPanoramaSceneNodeType(value3?.['selectedNodeType']) && value3?.['panoramaSceneEditing'] === !![]
+    _isPanoramaSceneNodeType(value3?.['selectedNodeType']) && value3?.['panoramaSceneEditing'] === true
   );
 }
 function _filterShortcutMatchesByContext(args, value4 = {}) {
@@ -343,9 +343,9 @@ function _filterShortcutMatchesByContext(args, value4 = {}) {
       (list = list['filter']((value5) => value5 !== 'ms-sync-video-play')),
     value4['featureModeActive'] &&
       (list = list['filter']((value6) => !_isNodeToolbarAction(value6))),
-    value4['alignFeatureEnabled'] === ![] &&
+    value4['alignFeatureEnabled'] === false &&
       (list = list['filter']((value7) => value7 !== 'align-feature')),
-    value4['mediaClipExpandedEditing'] === !![] &&
+    value4['mediaClipExpandedEditing'] === true &&
       (list = list['filter']((value8) => value8 !== 'pan-canvas')),
     _isPanoramaSceneEditingContext(value4) &&
       (list = list['filter'](
@@ -378,7 +378,7 @@ function _resolveShortcutMatch(list3, value12 = {}) {
   return null;
 }
 function _getShortcutBindingStrings(value21, el) {
-  if (el?.['disabled'] === !![]) return [];
+  if (el?.['disabled'] === true) return [];
   const list4 = [];
   Array['isArray'](el?.['keys']) &&
     el['keys']['length'] > 0 &&
@@ -447,7 +447,7 @@ function _isContextualShortcutConflictExempt(value31, value32, value33) {
     return map['has']('toggle-connection-lines') && map['has']('editor-tool-brush');
   if (value33 === 'G')
     return map['has']('ms-sync-video-play') && map['has']('editor-tool-bucket');
-  return ![];
+  return false;
 }
 function _resolveSavedShortcutKeys(value34, value35, value36, value37 = {}) {
   const value38 = Array['isArray'](value35),
@@ -561,10 +561,10 @@ async function _loadFromServer() {
         (_currentPreset = _inferPresetName(_shortcuts, savedPresetName)));
       if (_shortcuts['matting-auto']) _shortcuts['matting-auto']['keys'] = [];
       (_updatePresetSelect(), _render(), _syncShortcutsToGlobal(), _emitShortcutsUpdated());
-    } else (_applyPreset(ASHUO_PRESET_NAME, ![]), _syncShortcutsToGlobal());
+    } else (_applyPreset(ASHUO_PRESET_NAME, false), _syncShortcutsToGlobal());
   } catch {
     if (value58 !== _saveRevision) return;
-    (_applyPreset(ASHUO_PRESET_NAME, ![]), _syncShortcutsToGlobal());
+    (_applyPreset(ASHUO_PRESET_NAME, false), _syncShortcutsToGlobal());
   }
 }
 function _createShortcutSavePayload() {
@@ -588,7 +588,7 @@ function _saveToServer() {
   if (_saveLoopPromise) return _saveLoopPromise;
   return (
     (_saveLoopPromise = (async () => {
-      while (!![]) {
+      while (true) {
         const value62 = _saveRevision,
           _createShortcutSavePayload2 = _createShortcutSavePayload();
         try {
@@ -665,7 +665,7 @@ function _syncGlobalTextCaptureShortcutsToElectron() {
     }
   });
 }
-function _applyPreset(value73, value74 = !![]) {
+function _applyPreset(value73, value74 = true) {
   const _normalizePresetName3 = _normalizePresetName(value73);
   if (!BUILTIN_PRESET_NAMES['has'](_normalizePresetName3)) return;
   ((_currentPreset = _normalizePresetName3),
@@ -704,7 +704,7 @@ function _getPresetLabel(value75) {
 }
 function _setPresetMenuOpen(
   enabled3,
-  { focusOption: focusOption = ![], focusTrigger: focusTrigger = ![] } = {},
+  { focusOption: focusOption = false, focusTrigger: focusTrigger = false } = {},
 ) {
   const {
     control: control2,
@@ -730,13 +730,13 @@ function _isPresetMenuOpen() {
 }
 function _selectPresetFromUi(value78) {
   if (_normalizePresetName(value78) === CUSTOM_PRESET_NAME) {
-    (_updatePresetSelect(), _setPresetMenuOpen(![], { focusTrigger: !![] }));
+    (_updatePresetSelect(), _setPresetMenuOpen(false, { focusTrigger: true }));
     return;
   }
   const _normalizePresetName4 = _normalizePresetName(value78);
-  (_applyPreset(_normalizePresetName4, !![]),
+  (_applyPreset(_normalizePresetName4, true),
     _updatePresetSelect(),
-    _setPresetMenuOpen(![], { focusTrigger: !![] }),
+    _setPresetMenuOpen(false, { focusTrigger: true }),
     window['showToast']?.(
       _tShortcut('presetSwitched', '已切换预设：' + _normalizePresetName4, { preset: _getPresetLabel(_normalizePresetName4) }),
     ));
@@ -776,11 +776,11 @@ function _initPresetSelect() {
   }
   ((trigger3['dataset']['presetSelectBound'] = 'true'),
     trigger3['addEventListener']('click', () => {
-      _setPresetMenuOpen(!_isPresetMenuOpen(), { focusOption: !![] });
+      _setPresetMenuOpen(!_isPresetMenuOpen(), { focusOption: true });
     }),
     trigger3['addEventListener']('keydown', (event3) => {
       (event3['key'] === 'ArrowDown' || event3['key'] === 'Enter' || event3['key'] === ' ') &&
-        (event3['preventDefault'](), _setPresetMenuOpen(!![], { focusOption: !![] }));
+        (event3['preventDefault'](), _setPresetMenuOpen(true, { focusOption: true }));
     }),
     menu3['addEventListener']('click', (event4) => {
       const el11 = event4['target']?.['closest']?.('.settings-preset-option');
@@ -789,7 +789,7 @@ function _initPresetSelect() {
     }),
     menu3['addEventListener']('keydown', (event5) => {
       if (event5['key'] === 'Escape')
-        (event5['preventDefault'](), _setPresetMenuOpen(![], { focusTrigger: !![] }));
+        (event5['preventDefault'](), _setPresetMenuOpen(false, { focusTrigger: true }));
       else {
         if (event5['key'] === 'ArrowDown') (event5['preventDefault'](), _movePresetOptionFocus(1));
         else {
@@ -807,7 +807,7 @@ function _initPresetSelect() {
     document['addEventListener']('pointerdown', (event6) => {
       if (!_isPresetMenuOpen()) return;
       if (typeof control4['contains'] === 'function' && control4['contains'](event6['target'])) return;
-      _setPresetMenuOpen(![]);
+      _setPresetMenuOpen(false);
     }),
     _updatePresetSelect());
 }
@@ -818,7 +818,7 @@ function _normalizeShortcutSearchText(value83) {
 }
 function _matchesShortcutSearch(value84, value85, value86, value87) {
   const _normalizeShortcutSearchText2 = _normalizeShortcutSearchText(value87);
-  if (!_normalizeShortcutSearchText2) return !![];
+  if (!_normalizeShortcutSearchText2) return true;
   const list16 = _getShortcutBindingStrings(value84, value85),
     args3 =
       list16['length'] > 0
@@ -977,7 +977,7 @@ function _stopRecording(list19) {
   (_setRecordingAction(null), _render());
 }
 function _reset() {
-  (_applyPreset(DEFAULT_PRESET_NAME, !![]),
+  (_applyPreset(DEFAULT_PRESET_NAME, true),
     _updatePresetSelect(),
     window['showToast']?.(_tShortcut('restored', '已恢复默认快捷键')));
 }
@@ -1032,13 +1032,13 @@ export function handleShortcutKeydown(ctrlKey, value102 = {}) {
   }
   list21 = _filterShortcutMatchesByContext(list21, value102);
   if (list21['length'] === 0) {
-    if (ctrlKey?.['shiftKey'] === !![] && value102?.['featureModeActive'] !== !![]) {
+    if (ctrlKey?.['shiftKey'] === true && value102?.['featureModeActive'] !== true) {
       const value105 = _shortcuts['ms-sync-video-play'],
         _toShortcutBindingString5 = _toShortcutBindingString(
           _buildShortcutKeysFromEvent({
             ctrlKey: ctrlKey?.['ctrlKey'],
             metaKey: ctrlKey?.['metaKey'],
-            shiftKey: ![],
+            shiftKey: false,
             altKey: ctrlKey?.['altKey'],
             key: ctrlKey?.['key'],
             code: ctrlKey?.['code'],
@@ -1076,11 +1076,11 @@ if (typeof document !== 'undefined' && document?.['addEventListener']) {
   });
   const recordingEventTarget =
     typeof window !== 'undefined' && window?.['addEventListener'] ? window : document;
-  let suppressRecordedPointerClick = ![];
-  (recordingEventTarget['addEventListener']('keydown', trackPhysicalShortcutKey, !![]),
-    recordingEventTarget['addEventListener']('keyup', releasePhysicalShortcutKey, !![]),
+  let suppressRecordedPointerClick = false;
+  (recordingEventTarget['addEventListener']('keydown', trackPhysicalShortcutKey, true),
+    recordingEventTarget['addEventListener']('keyup', releasePhysicalShortcutKey, true),
     recordingEventTarget['addEventListener']('blur', clearPhysicalShortcutKeys),
-    recordingEventTarget['addEventListener']('keydown', _handleRecordingKeydown, !![]),
+    recordingEventTarget['addEventListener']('keydown', _handleRecordingKeydown, true),
     recordingEventTarget['addEventListener'](
       'pointerdown',
       (event10) => {
@@ -1092,20 +1092,20 @@ if (typeof document !== 'undefined' && document?.['addEventListener']) {
           return;
         (event10['preventDefault'](),
           event10['stopImmediatePropagation'](),
-          (suppressRecordedPointerClick = !![]),
+          (suppressRecordedPointerClick = true),
           _stopRecording(_buildShortcutKeysFromEvent(event10)));
       },
-      !![],
+      true,
     ),
     recordingEventTarget['addEventListener'](
       'click',
       (event11) => {
         if (!suppressRecordedPointerClick) return;
-        ((suppressRecordedPointerClick = ![]),
+        ((suppressRecordedPointerClick = false),
           event11['preventDefault'](),
           event11['stopImmediatePropagation']());
       },
-      !![],
+      true,
     ),
     typeof window !== 'undefined' &&
       window?.['addEventListener'] &&

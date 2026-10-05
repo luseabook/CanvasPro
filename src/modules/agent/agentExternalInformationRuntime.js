@@ -45,7 +45,7 @@ export function createAgentExternalInformationRuntime({
           type: 'external_tool.completed',
           status: 'failed',
           toolId: toolId2,
-          ok: ![],
+          ok: false,
           errorCode: errorCode['code'],
           message: errorCode['message'],
         }));
@@ -56,7 +56,7 @@ export function createAgentExternalInformationRuntime({
           toolRegistry['execute']({ toolId: toolId3['toolId'], args: toolId3['args'], signal: signal }),
         ),
       ),
-      status = list['find']((response) => response['ok'] !== !![]);
+      status = list['find']((response) => response['ok'] !== true);
     if (status) {
       const errorCode2 = new Error(status['message'] || '外部信息读取失败。');
       ((errorCode2['code'] = status['errorCode'] || 'EXTERNAL_INFORMATION_READ_FAILED'),
@@ -64,7 +64,7 @@ export function createAgentExternalInformationRuntime({
           type: 'external_tool.completed',
           status: status['status'] || 'failed',
           toolId: status['toolId'] || toolId,
-          ok: ![],
+          ok: false,
           errorCode: errorCode2['code'],
           message: errorCode2['message'],
         }));
@@ -92,7 +92,7 @@ export function createAgentExternalInformationRuntime({
         status: 'success',
         toolId: toolId,
         toolIds: toolIds,
-        ok: !![],
+        ok: true,
         sourceCount: sourceCount2['sources']['length'],
       }),
       sourceCount2

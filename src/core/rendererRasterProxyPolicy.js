@@ -85,7 +85,7 @@ function collectDomRequiredIds({
     addId(value2, connOverlay?.['srcId']),
     addId(value2, connOverlay?.['hoverId']),
     addIds(value2, connOverlay?.['activeNodeIds']),
-    pickConnectMode?.['active'] === !![] &&
+    pickConnectMode?.['active'] === true &&
       (addId(value2, pickConnectMode['sourceNodeId']),
       addId(value2, pickConnectMode['srcId']),
       addId(value2, pickConnectMode['hoverNodeId']),
@@ -95,7 +95,7 @@ function collectDomRequiredIds({
   );
 }
 function isRasterSupported(value4, value5, map3, map4) {
-  if (map3['has'](value4)) return !![];
+  if (map3['has'](value4)) return true;
   const enabled2 = String(value5?.['type'] || '')
     ['trim']()
     ['toLowerCase']();

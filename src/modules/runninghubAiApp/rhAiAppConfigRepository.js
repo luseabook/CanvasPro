@@ -204,8 +204,8 @@ function normalizeCustomAiAppStoragePayload(ok = {}) {
     ? ok['savedApps']['map'](normalizeSavedAppRecord)['filter'](Boolean)
     : [];
   return {
-    ok: ok?.['ok'] !== ![],
-    hasData: ok?.['hasData'] === !![],
+    ok: ok?.['ok'] !== false,
+    hasData: ok?.['hasData'] === true,
     storageRoot: String(ok?.['storageRoot'] || ''),
     savedApps: savedApps2,
     panelDraft: normalizePanelDraftPayload(ok?.['panelDraft']),
@@ -223,7 +223,7 @@ function buildCustomAiAppStoragePayload({
   };
 }
 function getCustomAiAppStorageBridge(value13) {
-  return value13?.['isAvailable']?.() === !![] ? value13 : null;
+  return value13?.['isAvailable']?.() === true ? value13 : null;
 }
 async function readCustomAiAppsFromFileStorage(value14) {
   const customAiAppStorageBridge = getCustomAiAppStorageBridge(value14);
@@ -239,9 +239,9 @@ export function createRhAiAppConfigRepository({
   applyExternalSnapshot: applyExternalSnapshot = () => {},
   onWarning: onWarning = (...args2) => console['warn'](...args2),
 } = {}) {
-  let enabled4 = ![],
-    enabled5 = ![],
-    enabled6 = ![],
+  let enabled4 = false,
+    enabled5 = false,
+    enabled6 = false,
     enabled7 = 0;
   const run = createRhAiAppPersistence({
       externalBridge: externalBridge,
@@ -269,9 +269,9 @@ export function createRhAiAppConfigRepository({
         handler5();
         const savedApps4 = structuredClone(list5['map'](serializeSavedAppRecord));
         return (
-          (enabled6 = !![]),
+          (enabled6 = true),
           run(() => buildCustomAiAppStoragePayload({ ...getSnapshot(), savedApps: savedApps4 }), {
-            saveApps: !![],
+            saveApps: true,
             onCommitted: onCommitted,
           })
         );
@@ -293,18 +293,18 @@ export function createRhAiAppConfigRepository({
           updatedAt: updatedAt,
         });
       },
-      async hydrateExternalStorage({ hasLocalSeed: hasLocalSeed = ![] } = {}) {
+      async hydrateExternalStorage({ hasLocalSeed: hasLocalSeed = false } = {}) {
         try {
           const customAiAppsFromFileStorage = await readCustomAiAppsFromFileStorage(externalBridge);
           if (!customAiAppsFromFileStorage) return null;
-          enabled4 = !![];
+          enabled4 = true;
           if (enabled6) return (await value16['flushExternalPersist'](), customAiAppsFromFileStorage);
           if (customAiAppsFromFileStorage['hasData']) {
-            enabled5 = !![];
+            enabled5 = true;
             try {
               await applyExternalSnapshot(customAiAppsFromFileStorage);
             } finally {
-              ((enabled5 = ![]), (enabled6 = ![]));
+              ((enabled5 = false), (enabled6 = false));
             }
             return customAiAppsFromFileStorage;
           }
@@ -314,16 +314,16 @@ export function createRhAiAppConfigRepository({
         }
       },
       scheduleExternalPersist() {
-        if (enabled5 || !getCustomAiAppStorageBridge(externalBridge)) return ![];
-        if (!enabled4) return ((enabled6 = !![]), ![]);
+        if (enabled5 || !getCustomAiAppStorageBridge(externalBridge)) return false;
+        if (!enabled4) return ((enabled6 = true), false);
         return (
-          (enabled6 = ![]),
+          (enabled6 = false),
           handler5(),
           (enabled7 = windowObject?.['setTimeout']?.(
             () => void value16['flushExternalPersist'](),
             CUSTOM_AI_APP_STORAGE_SAVE_DELAY_MS,
           )),
-          !![]
+          true
         );
       },
       async flushExternalPersist() {
@@ -331,7 +331,7 @@ export function createRhAiAppConfigRepository({
         handler5();
         try {
           const value18 = await run(() => buildCustomAiAppStoragePayload(getSnapshot()));
-          return ((enabled6 = ![]), value18);
+          return ((enabled6 = false), value18);
         } catch (value19) {
           return (onWarning('[RH AI App] persist file storage failed:', value19), null);
         }

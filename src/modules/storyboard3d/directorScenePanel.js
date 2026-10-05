@@ -16,8 +16,8 @@ export class DirectorScenePanel {
   constructor(item) {
     ((this['panel'] = item),
       (this['transform'] = { x: 0, y: 0, z: 0, yaw: 0, scale: 1 }),
-      (this['loading'] = ![]),
-      (this['disposed'] = ![]));
+      (this['loading'] = false),
+      (this['disposed'] = false));
   }
   ['render']() {
     const { scene: scene } = this['panel']['context']();
@@ -143,10 +143,10 @@ export class DirectorScenePanel {
       const config = el['files']?.[0];
       el['value'] = '';
       if (config) void this['importPanorama'](config);
-      return !![];
+      return true;
     }
     if (el['matches']?.('[data-director-scene-transform]'))
-      return ((this['transform'][el['dataset']['directorSceneTransform']] = Number(el['value'])), !![]);
+      return ((this['transform'][el['dataset']['directorSceneTransform']] = Number(el['value'])), true);
     if (el['matches']?.('[data-director-scene]'))
       return (
         this['mutate']('调整场景显示', (scope) => {
@@ -157,7 +157,7 @@ export class DirectorScenePanel {
                 ? Number(el['value'])
                 : el['value'];
         }),
-        !![]
+        true
       );
     if (el['matches']?.('[data-director-panorama]'))
       return (
@@ -174,15 +174,15 @@ export class DirectorScenePanel {
                   ? Number(el['value'])
                   : el['value'];
         }),
-        !![]
+        true
       );
-    return ![];
+    return false;
   }
   ['click'](enabled, value3) {
-    if (!enabled['startsWith']('timeline-scene-')) return ![];
+    if (!enabled['startsWith']('timeline-scene-')) return false;
     const enabled2 = this['panel']['timeline']['getRuntime']?.(),
       { object: object, scene: scene3 } = this['panel']['context']();
-    if (!enabled2) return !![];
+    if (!enabled2) return true;
     if (enabled === 'timeline-scene-view') {
       const value4 = DIRECTOR_AXIS_VIEWS['find'](([value5]) => value5 === value3['dataset']['view']),
         args = enabled2['getSceneView']();
@@ -216,7 +216,7 @@ export class DirectorScenePanel {
       if (!enabled3 || enabled3['locked'] || value12['length'] < 2)
         return (
           this['panel']['timeline']['setMessage']?.('请先选择已解锁物体的路线，至少设置两个控制点。'),
-          !![]
+          true
         );
       try {
         const value15 =
@@ -241,14 +241,14 @@ export class DirectorScenePanel {
             points: sampleDirectorGroundRoute2,
             start: value19[0]['time'],
             duration: value19['at'](-1)['time'] - value19[0]['time'],
-            smooth: ![],
+            smooth: false,
           }),
         );
       } catch (value21) {
         this['panel']['timeline']['setMessage']?.(value21['message']);
       }
     }
-    return !![];
+    return true;
   }
   async ['importPanorama'](error) {
     if (this['loading']) return;
@@ -259,7 +259,7 @@ export class DirectorScenePanel {
     }
     const { project: project2, scene: scene4 } = this['panel']['context'](),
       value22 = 'panorama-' + globalThis['crypto']['randomUUID']();
-    ((this['loading'] = !![]), this['panel']['timeline']['requestRender']?.());
+    ((this['loading'] = true), this['panel']['timeline']['requestRender']?.());
     try {
       await this['panel']['timeline']
         ['getBinaryAssetRepository']()
@@ -282,7 +282,7 @@ export class DirectorScenePanel {
             (args2['directorSettings'] = normalizeDirectorSceneSettings(args2['directorSettings'])),
             Object['assign'](args2['directorSettings']['panorama'], {
               assetId: value22,
-              enabled: !![],
+              enabled: true,
               history: [
                 ...args2['directorSettings']['panorama']['history'],
                 { assetId: value22, name: error['name'] },
@@ -295,11 +295,11 @@ export class DirectorScenePanel {
     } catch (value25) {
       if (!this['disposed']) this['panel']['timeline']['setMessage']?.('全景导入失败：' + value25['message']);
     } finally {
-      this['loading'] = ![];
+      this['loading'] = false;
       if (!this['disposed']) this['panel']['timeline']['requestRender']?.();
     }
   }
   ['destroy']() {
-    this['disposed'] = !![];
+    this['disposed'] = true;
   }
 }

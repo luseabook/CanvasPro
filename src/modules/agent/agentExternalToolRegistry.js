@@ -23,7 +23,7 @@ function normalizeToolDefinition(inputSchema = {}) {
     inputSchema:
       inputSchema['inputSchema'] && typeof inputSchema['inputSchema'] === 'object'
         ? structuredClone(inputSchema['inputSchema'])
-        : { type: 'object', properties: {}, additionalProperties: ![] },
+        : { type: 'object', properties: {}, additionalProperties: false },
     riskLevel: 'read_only',
     trust: String(inputSchema['trust'] || 'untrusted_external')['trim'](),
     execute: inputSchema['execute'],
@@ -43,7 +43,7 @@ function executeWithSignal(handler, item, signal2) {
       const error2 = new Error('External tool request was cancelled.');
       ((error2['code'] = 'EXTERNAL_TOOL_ABORTED'), handler3(error2));
     };
-    (signal2['addEventListener']('abort', key, { once: !![] }),
+    (signal2['addEventListener']('abort', key, { once: true }),
       Promise['resolve']()
         ['then'](() => handler(item, { signal: signal2 }))
         ['then'](
@@ -101,7 +101,7 @@ export function createAgentExternalToolRegistry({ tools: tools = [] } = {}) {
       );
       if (!toolId2)
         return {
-          ok: ![],
+          ok: false,
           status: 'failed',
           toolId: String(toolId || ''),
           errorCode: 'EXTERNAL_TOOL_NOT_FOUND',
@@ -109,7 +109,7 @@ export function createAgentExternalToolRegistry({ tools: tools = [] } = {}) {
         };
       if (signal?.['aborted'])
         return {
-          ok: ![],
+          ok: false,
           status: 'cancelled',
           toolId: toolId2['id'],
           errorCode: 'EXTERNAL_TOOL_ABORTED',
@@ -117,27 +117,27 @@ export function createAgentExternalToolRegistry({ tools: tools = [] } = {}) {
         };
       try {
         const error3 = toolId2['validate']?.(args);
-        if (error3 === ![] || error3?.['ok'] === ![])
+        if (error3 === false || error3?.['ok'] === false)
           return {
-            ok: ![],
+            ok: false,
             status: 'failed',
             toolId: toolId2['id'],
             errorCode: String(error3?.['errorCode'] || 'INVALID_EXTERNAL_TOOL_INPUT'),
             message: String(error3?.['message'] || 'External tool input is invalid.'),
           };
         const result2 = await executeWithSignal(toolId2['execute'], args, signal);
-        if (result2?.['success'] === ![] || result2?.['ok'] === ![])
+        if (result2?.['success'] === false || result2?.['ok'] === false)
           return {
-            ok: ![],
+            ok: false,
             status: 'failed',
             toolId: toolId2['id'],
             errorCode: String(result2['errorCode'] || 'EXTERNAL_TOOL_FAILED'),
             message: String(result2['message'] || result2['error'] || 'External tool failed.'),
           };
-        return { ok: !![], status: 'success', toolId: toolId2['id'], result: result2 };
+        return { ok: true, status: 'success', toolId: toolId2['id'], result: result2 };
       } catch (next) {
         return {
-          ok: ![],
+          ok: false,
           status: signal?.['aborted'] ? 'cancelled' : 'failed',
           toolId: toolId2['id'],
           ...normalizeToolError(next, signal?.['aborted'] ? 'EXTERNAL_TOOL_ABORTED' : 'EXTERNAL_TOOL_FAILED'),
@@ -162,17 +162,17 @@ export function createDefaultAgentExternalToolRegistry({
           type: 'object',
           properties: { url: { type: 'string', format: 'uri' } },
           required: ['url'],
-          additionalProperties: ![],
+          additionalProperties: false,
         },
         validate(response = {}) {
           return String(response['url'] || '')['trim']()
-            ? !![]
-            : { ok: ![], errorCode: 'URL_REQUIRED', message: 'URL is required.' };
+            ? true
+            : { ok: false, errorCode: 'URL_REQUIRED', message: 'URL is required.' };
         },
         execute(url) {
           if (typeof readUrl !== 'function')
             return {
-              success: ![],
+              success: false,
               errorCode: 'URL_READER_UNAVAILABLE',
               message: 'URL reading is unavailable in this runtime.',
             };
@@ -189,23 +189,23 @@ export function createDefaultAgentExternalToolRegistry({
           type: 'object',
           properties: { file: { type: 'object' } },
           required: ['file'],
-          additionalProperties: ![],
+          additionalProperties: false,
         },
         validate(options2 = {}) {
           const message = validateAgentDocumentFile(options2['file'], validateDocument);
           return message['ok']
-            ? !![]
-            : { ok: ![], errorCode: 'DOCUMENT_FILE_INVALID', message: message['error'] };
+            ? true
+            : { ok: false, errorCode: 'DOCUMENT_FILE_INVALID', message: message['error'] };
         },
         async execute(current, { signal: signal3 } = {}) {
           if (typeof readDocument !== 'function')
             return {
-              success: ![],
+              success: false,
               errorCode: 'DOCUMENT_READER_UNAVAILABLE',
               message: '文档读取在当前运行环境中不可用。',
             };
           const entry = await readDocument(current['file'], { signal: signal3 });
-          return { success: !![], source: createAgentDocumentSource(entry, current['file']) };
+          return { success: true, source: createAgentDocumentSource(entry, current['file']) };
         },
       },
     ],

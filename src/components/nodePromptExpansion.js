@@ -12,8 +12,8 @@ export function attachNodePromptExpansion(promptEl, { panel: panel }) {
   promptEl['_promptExpansion']?.['remove']();
   let enabled = null,
     value = null,
-    enabled2 = ![],
-    enabled3 = ![],
+    enabled2 = false,
+    enabled3 = false,
     mutationObserver = null;
   const el = promptEl['_root'],
     handler = () => appStore['getStateRaw'](),
@@ -38,14 +38,14 @@ export function attachNodePromptExpansion(promptEl, { panel: panel }) {
         (_closeMentionMenu(), closeSlashMenu(), closeNodeFooterMenus(panel));
       },
       consumeEscape: (item) => {
-        if (_handleMentionMenuKeyboard(item) || handleSlashKeyboardNavigation(item)) return !![];
+        if (_handleMentionMenuKeyboard(item) || handleSlashKeyboardNavigation(item)) return true;
         if (
           panel['querySelector'](
             '.floating-menu.show, .img-model-menu.show, .node-model-menu.show, .ui-schema-floating-menu.show, .rh-adv-panel.show:not(.is-rh-ai-app-persistent), .rh-vram-adv-panel.show:not(.is-rh-ai-app-persistent)',
           )
         )
-          return (closeNodeFooterMenus(panel), !![]);
-        return ![];
+          return (closeNodeFooterMenus(panel), true);
+        return false;
       },
       onOpen: () => {
         value = handler()['nodes'];
@@ -54,16 +54,16 @@ export function attachNodePromptExpansion(promptEl, { panel: panel }) {
           mutationObserver = new MutationObserver(() => {
             open['expanded'] &&
               (!el['getClientRects']()['length'] || !promptEl['promptEl']['isContentEditable']) &&
-              open['close']({ restoreFocus: ![] });
+              open['close']({ restoreFocus: false });
           });
           for (let key = el; key; key = key['parentElement']) {
             mutationObserver['observe'](key, {
-              attributes: !![],
+              attributes: true,
               attributeFilter: ['hidden', 'aria-hidden', 'class', 'style'],
             });
           }
           mutationObserver['observe'](promptEl['promptEl'], {
-            attributes: !![],
+            attributes: true,
             attributeFilter: ['contenteditable'],
           });
         }
@@ -77,8 +77,8 @@ export function attachNodePromptExpansion(promptEl, { panel: panel }) {
     const enabled4 = handler();
     if (enabled4['nodes'] !== value || !enabled4['nodes'][promptEl['nodeId']] || !el['isConnected']) {
       (cancelPromptHtmlCommit(promptEl),
-        (enabled2 = ![]),
-        open['close']({ commit: ![], restoreFocus: ![] }),
+        (enabled2 = false),
+        open['close']({ commit: false, restoreFocus: false }),
         handler2());
       return;
     }
@@ -86,11 +86,11 @@ export function attachNodePromptExpansion(promptEl, { panel: panel }) {
       enabled4['pickConnectMode']?.['active'] &&
       enabled4['pickConnectMode']['sourceNodeId'] === promptEl['nodeId']
     ) {
-      ((enabled2 = !![]), open['close']({ restoreFocus: ![] }));
+      ((enabled2 = true), open['close']({ restoreFocus: false }));
       return;
     }
     if (enabled2 && !enabled4['pickConnectMode']?.['active'])
-      ((enabled2 = ![]),
+      ((enabled2 = false),
         queueMicrotask(() => {
           if (
             !enabled3 &&
@@ -103,13 +103,13 @@ export function attachNodePromptExpansion(promptEl, { panel: panel }) {
         }));
     else
       !enabled4['selectedNodeIds']?.['includes'](promptEl['nodeId'])
-        ? open['close']({ restoreFocus: ![] })
+        ? open['close']({ restoreFocus: false })
         : open['sync']();
   }
   promptEl['_promptExpansion'] = {
     open: open['open'],
     remove() {
-      ((enabled3 = !![]), (enabled2 = ![]), handler2(), open['remove']());
+      ((enabled3 = true), (enabled2 = false), handler2(), open['remove']());
     },
   };
 }

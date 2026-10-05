@@ -144,7 +144,7 @@ function resolveDreaminaSelectorLayout(entry, record) {
       args2['resolution'] || args2['videoSize'],
       provider2,
     ),
-    aspectRatio = normalizeDreaminaVideoAspectRatio(args2['aspectRatio'], { preserveAdaptive: !![] }),
+    aspectRatio = normalizeDreaminaVideoAspectRatio(args2['aspectRatio'], { preserveAdaptive: true }),
     duration = normalizeDreaminaStyleVideoDuration(taskType, model, args2['duration'], provider2),
     generationParams2 = {
       ...getPlainObject(args2['generationParams']),
@@ -258,14 +258,14 @@ export function resolveVideoSelectorSchemaLayout(
     controlsHtml2 = [];
   if (kind) {
     const run2 = (config) =>
-      hasRunningHubVideoWorkflowUiPlacement(model3, config, { includeToolbarOnly: !![] });
+      hasRunningHubVideoWorkflowUiPlacement(model3, config, { includeToolbarOnly: true });
     (run2('mode') && controlsHtml2['push'](wrapSchemaPlacement('ui-schema-mode-slot', run('mode'))),
       run2('videoParams') &&
         controlsHtml2['push'](
           wrapSchemaPlacement(
             'ui-schema-video-params-slot',
             run('videoParams', {
-              unwrap: !![],
+              unwrap: true,
               rhVideoFpsOptions: getRunningHubVideoWorkflowFpsOptions(model3, {
                 v54FpsOptions: getRhV54FpsOptions(),
               }),
@@ -322,7 +322,7 @@ export function renderAIGenVideoModelSelectorMarkup({
   providerProfileId: providerProfileId = '',
   providerProfileIdByModel: providerProfileIdByModel = {},
   referenceCounts: referenceCounts = {},
-  showSchemaControls: showSchemaControls = !![],
+  showSchemaControls: showSchemaControls = true,
   allowedModelIds: allowedModelIds = [],
   runningHubWorkflowAllowedModelIds: runningHubWorkflowAllowedModelIds = [],
 } = {}) {
@@ -450,13 +450,13 @@ function createSchemaPopupViewportPositioner({
     };
   return (
     selector['addEventListener']?.('ui-schema-menu-before-open', value16),
-    documentObject3?.['addEventListener']?.('scroll', handler2, !![]),
+    documentObject3?.['addEventListener']?.('scroll', handler2, true),
     windowObject3?.['addEventListener']?.('resize', handler2),
     {
       destroy() {
         (value5 && (windowObject3?.['cancelAnimationFrame']?.(value5), (value5 = 0)),
           selector['removeEventListener']?.('ui-schema-menu-before-open', value16),
-          documentObject3?.['removeEventListener']?.('scroll', handler2, !![]),
+          documentObject3?.['removeEventListener']?.('scroll', handler2, true),
           windowObject3?.['removeEventListener']?.('resize', handler2),
           (el = null),
           (el2 = null));
@@ -475,7 +475,7 @@ export function bindAIGenVideoModelSelector(
     providerProfileId: providerProfileId = '',
     providerProfileIdByModel: providerProfileIdByModel = {},
     referenceCounts: referenceCounts = {},
-    showSchemaControls: showSchemaControls = !![],
+    showSchemaControls: showSchemaControls = true,
     allowedModelIds: allowedModelIds = [],
     runningHubWorkflowAllowedModelIds: runningHubWorkflowAllowedModelIds = [],
     onChange: onChange,
@@ -678,7 +678,7 @@ export function bindAIGenVideoModelSelector(
                     else
                       value22 === 'aspectRatio' &&
                         (dreaminaStyleVideoResolution = normalizeDreaminaVideoAspectRatio(value20, {
-                          preserveAdaptive: !![],
+                          preserveAdaptive: true,
                         }));
                   }
                   value23 = ['resolution', 'duration', 'aspectRatio']['includes'](value22)
@@ -701,7 +701,7 @@ export function bindAIGenVideoModelSelector(
       const el11 = selector2['querySelector']('.rh-vram-adv-panel');
       selector2['querySelector']('.rh-adv2-btn')?.['setAttribute'](
         'aria-expanded',
-        String(el11?.['classList']['contains']('show') === !![]),
+        String(el11?.['classList']['contains']('show') === true),
       );
     },
     value29 = (event2) => {
@@ -764,7 +764,7 @@ export function bindAIGenVideoModelSelector(
           : buildVideoModelApiModelSelectionPatch(nodeData2, enabled5, provider6);
       const modelId2 = [enabled5, model8['model'] || enabled5]['find'](
         (value32) =>
-          getModelManifest(value32)?.['vip'] === !![] &&
+          getModelManifest(value32)?.['vip'] === true &&
           typeof windowObject?.['isModelAllowedBySubscription'] === 'function' &&
           !windowObject['isModelAllowedBySubscription'](value32, provider6),
       );
@@ -803,7 +803,7 @@ export function bindAIGenVideoModelSelector(
       if (!modelId3) return;
       const provider7 = resolveDreaminaStyleVideoProvider(modelId3, el14['dataset']['provider'] || provider4);
       if (
-        getModelManifest(modelId3)?.['vip'] === !![] &&
+        getModelManifest(modelId3)?.['vip'] === true &&
         typeof windowObject?.['isModelAllowedBySubscription'] === 'function' &&
         !windowObject['isModelAllowedBySubscription'](modelId3, provider7)
       ) {
@@ -905,7 +905,7 @@ export function bindAIGenVideoModelSelector(
             documentObject: documentObject,
             getProviderProfileId: () => String(nodeData2['providerProfileId'] || '')['trim'](),
           }),
-          !![]
+          true
         );
       },
       destroy() {

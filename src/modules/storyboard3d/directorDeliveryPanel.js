@@ -16,7 +16,7 @@ const escape = (value) =>
     ['replaceAll']('<', '&lt;');
 export class DirectorDeliveryPanel {
   constructor(item) {
-    ((this['panel'] = item), (this['busy'] = ''), (this['selected'] = new Set()), (this['disposed'] = ![]));
+    ((this['panel'] = item), (this['busy'] = ''), (this['selected'] = new Set()), (this['disposed'] = false));
   }
   ['render']() {
     const { project: project, scene: scene } = this['panel']['context'](),
@@ -103,14 +103,14 @@ export class DirectorDeliveryPanel {
           );
           if (!this['disposed']) this['panel']['timeline']['importProject'](importDirectorProjectPackage2);
         });
-      return !![];
+      return true;
     }
     if (el['matches']?.('[data-director-screenshot]')) {
       if (el['checked']) this['selected']['add'](el['dataset']['directorScreenshot']);
       else this['selected']['delete'](el['dataset']['directorScreenshot']);
-      return (this['panel']['timeline']['requestRender']?.(), !![]);
+      return (this['panel']['timeline']['requestRender']?.(), true);
     }
-    return ![];
+    return false;
   }
   async ['run'](target, handler) {
     if (this['busy'] || this['disposed']) return;
@@ -125,7 +125,7 @@ export class DirectorDeliveryPanel {
     }
   }
   ['click'](enabled, el2) {
-    if (!enabled['startsWith']('timeline-delivery-')) return ![];
+    if (!enabled['startsWith']('timeline-delivery-')) return false;
     const importedModelResolver = this['panel']['timeline'],
       { project: project2, scene: scene2, shot: shot } = this['panel']['context']();
     enabled === 'timeline-delivery-close-preview' &&
@@ -254,7 +254,7 @@ export class DirectorDeliveryPanel {
         if (!this['disposed'])
           importedModelResolver['sendResults']({
             project: project2,
-            options: { mode: 'sequence-png', returnToCanvas: !![], destination: 'canvas' },
+            options: { mode: 'sequence-png', returnToCanvas: true, destination: 'canvas' },
             results: results['map']((blob2, config) => ({
               blob: blob2['primaryFile']['blob'],
               width: width[config]['width'],
@@ -262,13 +262,13 @@ export class DirectorDeliveryPanel {
             })),
           });
       });
-    return !![];
+    return true;
   }
   ['clearPreview']() {
     if (this['preview']) revokeTrackedMediaObjectUrl(this['preview']['url']);
     this['preview'] = null;
   }
   ['destroy']() {
-    ((this['disposed'] = !![]), this['clearPreview']());
+    ((this['disposed'] = true), this['clearPreview']());
   }
 }

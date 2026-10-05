@@ -22,17 +22,17 @@ export function createWheelPanController({
   let data = 0,
     scheduleTimer2 = 0,
     options,
-    enabled = ![],
+    enabled = false,
     target = 0,
-    enabled2 = ![];
+    enabled2 = false;
   function run() {
     (scheduleTimer2 && (clearScheduledTimer(scheduleTimer2), (scheduleTimer2 = 0)),
-      setCanvasMediaSchedulerPaused(!![], { bypassPriority: 1000, source: WHEEL_PAN_MEDIA_PAUSE_SOURCE }));
+      setCanvasMediaSchedulerPaused(true, { bypassPriority: 1000, source: WHEEL_PAN_MEDIA_PAUSE_SOURCE }));
   }
   function run2() {
     if (scheduleTimer2) clearScheduledTimer(scheduleTimer2);
     scheduleTimer2 = scheduleTimer(() => {
-      ((scheduleTimer2 = 0), setCanvasMediaSchedulerPaused(![], { source: WHEEL_PAN_MEDIA_PAUSE_SOURCE }));
+      ((scheduleTimer2 = 0), setCanvasMediaSchedulerPaused(false, { source: WHEEL_PAN_MEDIA_PAUSE_SOURCE }));
     }, WHEEL_PAN_MEDIA_RESUME_DELAY_MS);
   }
   function run3() {
@@ -56,16 +56,16 @@ export function createWheelPanController({
   }
   function run5() {
     target && (cancelFrame(target), (target = 0));
-    if (!enabled) return ![];
+    if (!enabled) return false;
     const entry = options;
-    return ((options = undefined), (enabled = ![]), run4(entry), !![]);
+    return ((options = undefined), (enabled = false), run4(entry), true);
   }
   function run6() {
     if (target) cancelFrame(target);
-    ((target = 0), (options = undefined), (enabled = ![]));
+    ((target = 0), (options = undefined), (enabled = false));
   }
   function run7(record) {
-    ((options = record), (enabled = !![]));
+    ((options = record), (enabled = true));
     if (target) return;
     const requestFrame2 = requestFrame(() => {
       if (target !== requestFrame2) return;
@@ -75,7 +75,7 @@ export function createWheelPanController({
   }
   function settleWheelPan() {
     if (!enabled2) return null;
-    enabled2 = ![];
+    enabled2 = false;
     data && (clearScheduledTimer(data), (data = 0));
     const payload = typeof window !== 'undefined' ? window : null,
       box = viewportPreview['commit'](WHEEL_PAN_PREVIEW_OWNER);
@@ -96,13 +96,13 @@ export function createWheelPanController({
       input = Number(state),
       count = Number['isFinite'](scope) ? scope : 0,
       count2 = Number['isFinite'](input) ? input : 0;
-    if (count === 0 && count2 === 0) return ![];
+    if (count === 0 && count2 === 0) return false;
     const output =
         (typeof store?.['getStateRaw'] === 'function' && store['getStateRaw']()) ||
         (typeof store?.['getState'] === 'function' && store['getState']()) ||
         {},
       enabled3 = viewportPreview['acquire'](WHEEL_PAN_PREVIEW_OWNER, output['viewport']);
-    if (!enabled3) return ![];
+    if (!enabled3) return false;
     const value2 = typeof window !== 'undefined' ? window : null;
     (value2?.['v2Renderer']?.['markViewportInteractionBusy']?.(), run());
     const x = enabled3,
@@ -115,10 +115,10 @@ export function createWheelPanController({
     return (
       viewportPreview['update'](WHEEL_PAN_PREVIEW_OWNER, value3),
       value2?.['_v2ScheduleMinimapViewportPreview']?.(value3),
-      (enabled2 = !![]),
+      (enabled2 = true),
       run3(),
       run7(config),
-      !![]
+      true
     );
   }
   return { handleWheelPan: handleWheelPan, settleWheelPan: settleWheelPan };

@@ -44,7 +44,7 @@ export function getPersonReplacementStepCompletion(options = {}) {
           const text = normalizeText(state?.['targetCharacterId']),
             config =
               text ||
-              (state?.['projectMappingDisabled'] === !![]
+              (state?.['projectMappingDisabled'] === true
                 ? ''
                 : map2['get'](normalizeText(state?.['sourceCharacterId']))) ||
               '';
@@ -65,21 +65,21 @@ export function getPersonReplacementStepGate(
   personReplacementStepCompletion = getPersonReplacementStepCompletion(output),
 ) {
   const count = Math['trunc'](clamp(value2, 1, 5, 1));
-  if (count <= 1) return { allowed: !![], reason: '', message: '' };
+  if (count <= 1) return { allowed: true, reason: '', message: '' };
   if (!personReplacementStepCompletion['assetSettingsComplete'])
     return {
-      allowed: ![],
+      allowed: false,
       reason: PERSON_REPLACEMENT_STEP_GATE_REASONS['ASSET_SETTINGS_INCOMPLETE'],
       message: '请先在素材设定上传至少一张人物或场景图片',
     };
-  if (count <= 3) return { allowed: !![], reason: '', message: '' };
+  if (count <= 3) return { allowed: true, reason: '', message: '' };
   if (!personReplacementStepCompletion['imageReplacementComplete'])
     return {
-      allowed: ![],
+      allowed: false,
       reason: PERSON_REPLACEMENT_STEP_GATE_REASONS['IMAGE_REPLACEMENT_INCOMPLETE'],
       message: '请先在图像替换中绑定人物或场景',
     };
-  return { allowed: !![], reason: '', message: '' };
+  return { allowed: true, reason: '', message: '' };
 }
 export function getPersonReplacementAccessibleStep(value3, value4) {
   const value5 = Math['trunc'](clamp(value4, 1, 5, 1)),

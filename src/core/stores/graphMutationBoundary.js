@@ -28,10 +28,10 @@ export function withGraphMutationBoundary(args) {
             ? describeGraphMutation(index, args2, args['getStateRaw']())
             : null;
       if (REPLACEMENTS['has'](index)) {
-        if (result?.['beforeReplace']?.(index, args2) === ![])
+        if (result?.['beforeReplace']?.(index, args2) === false)
           throw new Error('请先完成协作同步或结束当前生成任务');
       } else {
-        if (result?.['before']?.(data) === ![])
+        if (result?.['before']?.(data) === false)
           throw new Error('当前协作画布不可编辑，或节点正在被其他成员编辑');
       }
       const options = args[index](...args2);

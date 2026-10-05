@@ -4,7 +4,7 @@ export function bindRunningHubInstanceDevMode(
 ) {
   const enabled = el?.['ownerDocument']?.['defaultView'] || globalThis['window'],
     handler = (value) => {
-      const item = value?.['detail']?.['enabled'] === !![];
+      const item = value?.['detail']?.['enabled'] === true;
       el?.['querySelectorAll']?.('.ui-schema-instance-toggle[data-ui-schema-developer-values]')?.[
         'forEach'
       ]?.((el2) => {
@@ -28,7 +28,7 @@ export function bindRunningHubInstanceDevMode(
     };
   return (
     enabled?.['addEventListener']?.('dev-mode-changed', handler),
-    handler({ detail: { enabled: enabled?.['DEV_MODE'] === !![] } }),
+    handler({ detail: { enabled: enabled?.['DEV_MODE'] === true } }),
     () => {
       enabled?.['removeEventListener']?.('dev-mode-changed', handler);
     }

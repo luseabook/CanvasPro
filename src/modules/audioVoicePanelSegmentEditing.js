@@ -23,7 +23,7 @@ export function buildAudioVoicePendingSegmentMerge(args = {}, value = {}) {
       convertedAudioLocalPath: '',
       convertedAudioUrl: '',
       convertedAudioDuration: 0,
-      convertedAudioReady: ![],
+      convertedAudioReady: false,
       activeAudio: 'source',
       status: 'edited',
       error: '',
@@ -56,10 +56,10 @@ export function isAudioVoicePendingSegmentMergeCurrent(options2 = {}, source = [
     count = list4['findIndex'](
       (next) => String(next?.['id'] || '') === String(options2['currentSegmentId'] || ''),
     );
-  if (count < 0) return ![];
+  if (count < 0) return false;
   const current = list4[count],
     enabled = list4[count + 1];
-  if (!enabled || String(enabled['id'] || '') !== String(options2['nextSegmentId'] || '')) return ![];
+  if (!enabled || String(enabled['id'] || '') !== String(options2['nextSegmentId'] || '')) return false;
   return (
     buildAudioVoiceSegmentFingerprint(current) === String(options2['currentFingerprint'] || '') &&
     buildAudioVoiceSegmentFingerprint(enabled) === String(options2['nextFingerprint'] || '')
@@ -112,7 +112,7 @@ export function buildAudioVoiceTextEditPatch(options4 = {}, payload = '') {
     convertedAudioLocalPath: '',
     convertedAudioUrl: '',
     convertedAudioDuration: 0,
-    convertedAudioReady: ![],
+    convertedAudioReady: false,
     activeAudio: 'source',
     status: targetText ? 'edited' : options4['sourceAudioReady'] ? 'detected' : 'edited',
     error: '',
@@ -190,12 +190,12 @@ export function buildAudioVoiceApplySourceClipPatch(options5 = {}, value2 = {}) 
     convertedAudioLocalPath: '',
     convertedAudioUrl: '',
     convertedAudioDuration: 0,
-    convertedAudioReady: ![],
+    convertedAudioReady: false,
     activeAudio: 'source',
     status: 'edited',
     error: '',
     rhTaskId: '',
-    needsSourceAudioRecut: ![],
+    needsSourceAudioRecut: false,
   };
 }
 function hasAudioVoiceSourceClipBase(options6 = {}) {
@@ -257,16 +257,16 @@ export function buildAudioVoiceSplitSourceSegmentDraft(args4 = {}, value12 = {})
   const args5 = {
       sourceAudioLocalPath: '',
       sourceAudioUrl: '',
-      sourceAudioReady: ![],
+      sourceAudioReady: false,
       convertedAudioLocalPath: '',
       convertedAudioUrl: '',
       convertedAudioDuration: 0,
-      convertedAudioReady: ![],
+      convertedAudioReady: false,
       activeAudio: 'source',
       status: 'edited',
       error: '',
       rhTaskId: '',
-      needsSourceAudioRecut: !![],
+      needsSourceAudioRecut: true,
     },
     value13 = endMs5 > startMs5 ? (endMs6 - startMs5) / (endMs5 - startMs5) : 0.5,
     [sourceText, sourceText2] = splitAudioVoiceTextAtRatio(args4['sourceText'], value13),
@@ -314,16 +314,16 @@ function buildAudioVoiceRangeSourceSegmentDraft(args6 = {}, value18 = {}) {
   const args7 = {
       sourceAudioLocalPath: '',
       sourceAudioUrl: '',
-      sourceAudioReady: ![],
+      sourceAudioReady: false,
       convertedAudioLocalPath: '',
       convertedAudioUrl: '',
       convertedAudioDuration: 0,
-      convertedAudioReady: ![],
+      convertedAudioReady: false,
       activeAudio: 'source',
       status: 'edited',
       error: '',
       rhTaskId: '',
-      needsSourceAudioRecut: !![],
+      needsSourceAudioRecut: true,
     },
     count3 = list9['reduce'](
       (value19, value20) => value19 + Math['max'](0, value20['endMs'] - value20['startMs']),

@@ -8,7 +8,7 @@ function createUploadSizeError(message, raw) {
     provider: 'local',
     status: 413,
     code: 'UPLOAD_TOO_LARGE',
-    retryable: ![],
+    retryable: false,
     raw: raw,
   });
 }
@@ -24,24 +24,24 @@ export function parseLocalAssetUploadError(item, key, index) {
   if (/\bENOSPC\b|\[Errno 28\]|\[WinError 112\]|No space left on device/i['test'](result))
     ((error['message'] = '文件上传失败：保存目录所在磁盘空间不足，请清理空间后重新上传。'),
       (error['code'] = 'UPLOAD_DISK_FULL'),
-      (error['retryable'] = ![]));
+      (error['retryable'] = false));
   else {
     if (
       /\bEACCES\b|\bEPERM\b|\[Errno 13\]|\[WinError 5\]|Permission denied|Access is denied/i['test'](result)
     )
       ((error['message'] = '文件上传失败：保存目录没有写入权限，请检查目录权限或更换保存目录后重新上传。'),
         (error['code'] = 'UPLOAD_PERMISSION_DENIED'),
-        (error['retryable'] = ![]));
+        (error['retryable'] = false));
     else {
       if (result === 'Upload is incomplete')
         ((error['message'] = '文件未传输完整，请重新上传。'),
           (error['code'] = 'UPLOAD_INCOMPLETE'),
-          (error['retryable'] = !![]));
+          (error['retryable'] = true));
       else
         result === 'Unable to allocate staged upload' &&
           ((error['message'] = '无法创建上传临时文件，请检查保存目录的可用空间和写入权限后重新上传。'),
           (error['code'] = 'UPLOAD_STAGING_FAILED'),
-          (error['retryable'] = ![]));
+          (error['retryable'] = false));
     }
   }
   return error;

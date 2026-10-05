@@ -75,7 +75,7 @@ export function createSceneAssetBrowser({ onSelect: onSelect } = {}) {
   const el17 = document['createElement']('div');
   return (
     (el17['className'] = 'panorama-asset-browser__empty'),
-    (el17['hidden'] = !![]),
+    (el17['hidden'] = true),
     el12['append'](key, el15, el16, el17),
     el15['addEventListener']('input', () => renderResults(el12)),
     el13['addEventListener']('change', () => renderResults(el12)),

@@ -24,7 +24,7 @@ function adoptCompositeMediaElement(el, item, { role: role, sourceUrl: sourceUrl
     (el['dataset']['personReplacementCompareVideo'] = role),
     (el['dataset']['personReplacementCompareVideoUrl'] = sourceUrl),
     (el['preload'] = 'auto'),
-    (el['muted'] = !![]),
+    (el['muted'] = true),
     el['removeAttribute']?.('aria-hidden'),
     el['removeAttribute']?.('tabindex'),
     el['setAttribute']?.('playsinline', ''),
@@ -40,13 +40,13 @@ export function createPersonReplacementCompositeMediaResidency({
   releaseMedia: releaseMedia = releaseCompositeMediaElement,
 } = {}) {
   let text = normalizeText(projectId),
-    result = ![];
+    result = false;
   const map = new Map(),
     map2 = new Map(),
     map3 = new WeakSet(),
     map4 = new WeakSet(),
     handler = (enabled2) => {
-      if (!enabled2) return ![];
+      if (!enabled2) return false;
       const data = enabled2['controller'];
       if (data && typeof data === 'object' && !map3['has'](data)) {
         map3['add'](data);
@@ -61,17 +61,17 @@ export function createPersonReplacementCompositeMediaResidency({
           releaseMedia(enabled2);
         } catch {}
       }
-      return !![];
+      return true;
     },
     evict = (target) => {
       const text2 = normalizeText(target),
         enabled3 = map['get'](text2);
-      if (!enabled3) return ![];
+      if (!enabled3) return false;
       return (map['delete'](text2), handler(enabled3));
     };
   return Object['freeze']({
     retain(args = {}) {
-      if (result) return ![];
+      if (result) return false;
       const role2 = normalizeText(args['role']),
         sourceUrl2 = normalizeText(args['sourceUrl']),
         projectId2 = normalizeText(args['projectId']) || text;
@@ -79,10 +79,10 @@ export function createPersonReplacementCompositeMediaResidency({
         !role2 ||
         !sourceUrl2 ||
         !args['videoEl'] ||
-        (!args['controller'] && args['preserveVisibleElement'] !== !![]) ||
+        (!args['controller'] && args['preserveVisibleElement'] !== true) ||
         projectId2 !== text
       )
-        return ![];
+        return false;
       const source = map['get'](role2);
       if (
         source &&
@@ -91,7 +91,7 @@ export function createPersonReplacementCompositeMediaResidency({
         source['videoEl'] === args['videoEl'] &&
         source['controller'] === args['controller']
       )
-        return !![];
+        return true;
       if (source) evict(role2);
       return (
         map['set'](role2, {
@@ -100,7 +100,7 @@ export function createPersonReplacementCompositeMediaResidency({
           role: role2,
           sourceUrl: sourceUrl2,
         }),
-        !![]
+        true
       );
     },
     has(next) {
@@ -111,15 +111,15 @@ export function createPersonReplacementCompositeMediaResidency({
     },
     forget(entry) {
       const text3 = normalizeText(entry);
-      if (!map['has'](text3)) return ![];
-      return (map['delete'](text3), !![]);
+      if (!map['has'](text3)) return false;
+      return (map['delete'](text3), true);
     },
     handoff(record, { videoEl: videoEl = null, controller: controller = null } = {}) {
-      if (result || !videoEl || !controller) return ![];
+      if (result || !videoEl || !controller) return false;
       const text4 = normalizeText(record),
         args2 = map['get'](text4);
-      if (!args2 || args2['videoEl'] !== videoEl) return ![];
-      return (map['set'](text4, { ...args2, videoEl: videoEl, controller: controller }), !![]);
+      if (!args2 || args2['videoEl'] !== videoEl) return false;
+      return (map['set'](text4, { ...args2, videoEl: videoEl, controller: controller }), true);
     },
     nextSequence(payload) {
       const text5 = normalizeText(payload),
@@ -150,14 +150,14 @@ export function createPersonReplacementCompositeMediaResidency({
     },
     evict: evict,
     switchProject(state = '') {
-      if (result) return ![];
+      if (result) return false;
       const text9 = normalizeText(state);
-      if (!text9 || text9 === text) return ![];
-      return (Array['from'](map['keys']())['forEach'](evict), (text = text9), !![]);
+      if (!text9 || text9 === text) return false;
+      return (Array['from'](map['keys']())['forEach'](evict), (text = text9), true);
     },
     dispose() {
       if (result) return;
-      ((result = !![]), Array['from'](map['keys']())['forEach'](evict), (text = ''));
+      ((result = true), Array['from'](map['keys']())['forEach'](evict), (text = ''));
     },
   });
 }

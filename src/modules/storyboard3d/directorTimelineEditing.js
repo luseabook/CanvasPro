@@ -27,7 +27,7 @@ export class DirectorTimelineEditing {
       (this['clipboard'] = []),
       (this['zoom'] = 1),
       (this['unit'] = 'seconds'),
-      (this['snap'] = !![]),
+      (this['snap'] = true),
       (this['numeric'] = new DirectorNumericDrag(index)),
       (this['onDown'] = (result) => this['pointerDown'](result)),
       (this['onWheel'] = (event) => {
@@ -99,7 +99,7 @@ export class DirectorTimelineEditing {
   }
   ['mutate'](entry, handler) {
     try {
-      (this['timeline']['stopPlayback']({ render: ![] }),
+      (this['timeline']['stopPlayback']({ render: false }),
         this['timeline']['_mutateAnimation']('timeline-edit', entry, (record) =>
           normalizeStoryboard3DShotAnimation(handler(record)),
         ),
@@ -114,16 +114,16 @@ export class DirectorTimelineEditing {
       if (handle?.['shiftKey'] || handle?.['ctrlKey'] || handle?.['metaKey']) {
         if (this['selected']['has'](state)) this['selected']['delete'](state);
         else this['selected']['add'](state);
-        return (this['sync'](), !![]);
+        return (this['sync'](), true);
       }
       return (
         !this['selected']['has'](state) && (this['selected']['clear'](), this['selected']['add'](state)),
-        ![]
+        false
       );
     }
-    if (!enabled2['startsWith']('timeline-edit-')) return ![];
+    if (!enabled2['startsWith']('timeline-edit-')) return false;
     const { shot: shot } = this['context']();
-    if (!shot) return !![];
+    if (!shot) return true;
     const storyboard3DShotAnimation = normalizeStoryboard3DShotAnimation(shot['animation']),
       config = this['timeline']['_timeForShot'](shot);
     switch (enabled2['slice'](14)) {
@@ -157,13 +157,13 @@ export class DirectorTimelineEditing {
         this['mutate']('删除选中关键帧', (input) => deleteDirectorKeys(input, this['selected']));
         break;
     }
-    return (this['timeline']['requestRender']?.(), !![]);
+    return (this['timeline']['requestRender']?.(), true);
   }
   ['handleChange'](output) {
     const el2 = output['target'];
     if (el2['matches']?.('[data-director-camera-key], [data-director-camera-key-easing]')) {
       const value2 = this['timeline']['selectedKeyframe'];
-      if (value2?.['type'] !== 'camera') return !![];
+      if (value2?.['type'] !== 'camera') return true;
       return (
         this['mutate']('编辑摄像机关键帧', (value3) => {
           const enabled3 = value3['cameraKeyframes']['find'](
@@ -182,24 +182,24 @@ export class DirectorTimelineEditing {
           }
           return value3;
         }),
-        !![]
+        true
       );
     }
     if (el2['matches']?.('[data-timeline-rate]'))
       return (
-        this['timeline']['stopPlayback']({ render: ![] }),
+        this['timeline']['stopPlayback']({ render: false }),
         (this['timeline']['playbackRate'] = Number(el2['value'])),
-        !![]
+        true
       );
     if (el2['matches']?.('[data-timeline-unit]'))
-      return ((this['unit'] = el2['value']), this['sync'](), !![]);
-    if (el2['matches']?.('[data-timeline-snap]')) return ((this['snap'] = el2['checked']), !![]);
+      return ((this['unit'] = el2['value']), this['sync'](), true);
+    if (el2['matches']?.('[data-timeline-snap]')) return ((this['snap'] = el2['checked']), true);
     if (el2['matches']?.('[data-timeline-shift]'))
       return (
         this['mutate']('批量移动关键帧', (value8) =>
           shiftDirectorKeys(value8, this['selected'], Number(el2['value'])),
         ),
-        !![]
+        true
       );
     if (el2['matches']?.('[data-timeline-batch-target]') && el2['value'] !== '') {
       const value9 = this['context']()['scene']['objects']['filter'](
@@ -230,9 +230,9 @@ export class DirectorTimelineEditing {
             value11
           );
         });
-      return !![];
+      return true;
     }
-    return ![];
+    return false;
   }
   ['handleKey'](event2) {
     if (event2['key'] === 'Escape' && this['numeric']['cancel'])
@@ -240,33 +240,33 @@ export class DirectorTimelineEditing {
         this['numeric']['cancel'](),
         event2['preventDefault'](),
         event2['stopImmediatePropagation'](),
-        !![]
+        true
       );
     if (event2['key'] === 'Escape' && this['timeline']['multiView']['layer']) {
       if (this['timeline']['multiView']['cancel']) this['timeline']['multiView']['cancel']();
       else this['timeline']['multiView']['destroy']();
-      return (event2['preventDefault'](), event2['stopImmediatePropagation'](), !![]);
+      return (event2['preventDefault'](), event2['stopImmediatePropagation'](), true);
     }
     if (event2['key'] === 'Escape' && this['timeline']['clips']['cancel'])
       return (
         this['timeline']['clips']['cancel'](),
         event2['preventDefault'](),
         event2['stopImmediatePropagation'](),
-        !![]
+        true
       );
-    if (this['timeline']['clips']['handleKey'](event2)) return !![];
+    if (this['timeline']['clips']['handleKey'](event2)) return true;
     if (event2['key'] === 'Escape' && this['cancelMarquee'])
       return (
         this['cancelMarquee'](),
         event2['preventDefault'](),
         event2['stopImmediatePropagation'](),
-        !![]
+        true
       );
     if (
       !this['timeline']['isDrawerOpen']() ||
       event2['target']?.['closest']?.('input,textarea,select,[contenteditable=true]')
     )
-      return ![];
+      return false;
     const value16 = event2['key']['toLowerCase'](),
       value17 = event2['ctrlKey'] || event2['metaKey'];
     if (
@@ -281,7 +281,7 @@ export class DirectorTimelineEditing {
         event2['target']['closest']?.('[data-storyboard-3d-shot-timeline]')
       ) {
         const { shot: shot2 } = this['context']();
-        if (!shot2) return ![];
+        if (!shot2) return false;
         const args = normalizeStoryboard3DShotAnimation(shot2['animation']),
           value18 = this['timeline']['_timeForShot'](shot2),
           list2 = [
@@ -304,7 +304,7 @@ export class DirectorTimelineEditing {
                     : value18 +
                       ((value16 === 'arrowleft' ? -1 : 1) * (event2['shiftKey'] ? 10 : 1)) /
                         args['fps'];
-        (this['timeline']['stopPlayback']({ render: ![] }), this['timeline']['_sampleAt'](value22));
+        (this['timeline']['stopPlayback']({ render: false }), this['timeline']['_sampleAt'](value22));
       } else {
         if (
           (value16 === 'delete' || value16 === 'backspace') &&
@@ -312,10 +312,10 @@ export class DirectorTimelineEditing {
           event2['target']['closest']?.('[data-storyboard-3d-shot-timeline]')
         )
           this['handleClick']('timeline-edit-delete');
-        else return ![];
+        else return false;
       }
     }
-    return (event2['preventDefault'](), event2['stopImmediatePropagation'](), !![]);
+    return (event2['preventDefault'](), event2['stopImmediatePropagation'](), true);
   }
   ['snapTime'](value25, value26, value27, enabled4, value28 = []) {
     return directorSnapTime(
@@ -334,11 +334,11 @@ export class DirectorTimelineEditing {
     if (!enabled5) return;
     this['numeric']['bind'](enabled5);
     enabled5 !== this['root'] &&
-      (this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
-      this['root']?.['removeEventListener']('wheel', this['onWheel'], !![]),
+      (this['root']?.['removeEventListener']('pointerdown', this['onDown'], true),
+      this['root']?.['removeEventListener']('wheel', this['onWheel'], true),
       (this['root'] = enabled5),
-      enabled5['addEventListener']('pointerdown', this['onDown'], !![]),
-      enabled5['addEventListener']('wheel', this['onWheel'], { capture: !![], passive: ![] }));
+      enabled5['addEventListener']('pointerdown', this['onDown'], true),
+      enabled5['addEventListener']('wheel', this['onWheel'], { capture: true, passive: false }));
     const { shot: shot3 } = this['context']();
     if (!shot3) return;
     const value30 = new Set(collectDirectorKeys(shot3['animation'])['map'](directorKeyIdentity));
@@ -417,17 +417,17 @@ export class DirectorTimelineEditing {
         this['sync']());
     };
     (el4['addEventListener']('pointermove', value40, { signal: value39['signal'] }),
-      el4['addEventListener']('pointerup', run, { once: !![], signal: value39['signal'] }),
+      el4['addEventListener']('pointerup', run, { once: true, signal: value39['signal'] }),
       el4['addEventListener']('pointercancel', () => this['cancelMarquee']?.(), {
-        once: !![],
+        once: true,
         signal: value39['signal'],
       }));
   }
   ['destroy']() {
     (this['cancelMarquee']?.(),
       this['numeric']['destroy'](),
-      this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
-      this['root']?.['removeEventListener']('wheel', this['onWheel'], !![]),
+      this['root']?.['removeEventListener']('pointerdown', this['onDown'], true),
+      this['root']?.['removeEventListener']('wheel', this['onWheel'], true),
       (this['root'] = null));
   }
 }

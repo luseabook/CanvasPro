@@ -65,7 +65,7 @@ export async function buildRunningHubCatalogRequest(args2, enabled2, payload, ha
     config = args2['generationParams'] || {};
   validateRunningHubAudioParameters(modelManifest, enabled3, enabled2, config, refs, refs2);
   const sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(modelManifest['modelId'], config, {
-      includeDefaults: !![],
+      includeDefaults: true,
     }),
     scope = {
       getProviderConfig: handle['getProviderConfig'],
@@ -76,7 +76,7 @@ export async function buildRunningHubCatalogRequest(args2, enabled2, payload, ha
       apiKey: enabled4,
       providerProfileId: runningHubModelApiProfileId,
       apiUrl: resolveRunningHubModelApiBaseUrl(runningHubModelApiProfileId),
-      strictUpload: !![],
+      strictUpload: true,
       uploadOptions: { signal: args2['signal'] },
     },
     output = refs['length']
@@ -125,7 +125,7 @@ export async function buildRunningHubCatalogRequest(args2, enabled2, payload, ha
   if (enabled3['rules']?.['controlMode'] === 'murekaBgm' && !enabled2) delete args3['prompt'];
   const value8 = [];
   for (const args4 of enabled3['preparations'] || []) {
-    if (args4['toggle'] && sanitizeModelUiSchemaParams2[args4['toggle']] !== !![]) continue;
+    if (args4['toggle'] && sanitizeModelUiSchemaParams2[args4['toggle']] !== true) continue;
     if (args3[args4['targetField']]) continue;
     const enabled7 = value5[args4['slot']];
     if (!enabled7) continue;
@@ -151,7 +151,7 @@ export async function buildRunningHubCatalogRequest(args2, enabled2, payload, ha
       ...args3,
     },
     responseMapping: executionManifest['responseMapping'],
-    isProxy: !![],
+    isProxy: true,
     adapterTrace: {
       source: 'manifest',
       modelId: modelManifest['modelId'],
@@ -165,7 +165,7 @@ export async function buildRunningHubCatalogRequest(args2, enabled2, payload, ha
       providerProfileId: runningHubModelApiProfileId,
       rhProviderProfileId: runningHubModelApiProfileId,
       apiUrl: resolveRunningHubModelApiBaseUrl(runningHubModelApiProfileId),
-      isRunningHubAudioModelApi: !![],
+      isRunningHubAudioModelApi: true,
       audioWorkflowKey: modelManifest['modelId'],
       audioWorkflowLabel: modelManifest['displayName'],
       nodeId: String(args2['nodeId'] || ''),

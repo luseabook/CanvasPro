@@ -5,22 +5,22 @@ function extractBalancedJsonContainer(list, item) {
   const key = list[item];
   if (key !== '{' && key !== '[') return '';
   const list2 = [key];
-  let index = ![],
-    result = ![];
+  let index = false,
+    result = false;
   for (let data = item + 1; data < list['length']; data += 1) {
     const options = list[data];
     if (index) {
-      if (result) result = ![];
+      if (result) result = false;
       else {
-        if (options === '\\') result = !![];
+        if (options === '\\') result = true;
         else {
-          if (options === '"') index = ![];
+          if (options === '"') index = false;
         }
       }
       continue;
     }
     if (options === '"') {
-      index = !![];
+      index = true;
       continue;
     }
     if (options === '{' || options === '[') {

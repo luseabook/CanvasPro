@@ -8,14 +8,14 @@ export function bindRotationDrag(el, { read: read, preview: preview, commit: com
     target = el2['defaultView'];
   let box = null,
     startMediaProgressDragSession2 = null,
-    enabled = ![];
-  const run = (enabled2 = ![]) => {
+    enabled = false;
+  const run = (enabled2 = false) => {
       if (!box) return;
       const result = box;
       ((box = null),
         startMediaProgressDragSession2?.['dispose'](),
         (startMediaProgressDragSession2 = null),
-        el2['removeEventListener']('keydown', data, !![]));
+        el2['removeEventListener']('keydown', data, true));
       if (el['hasPointerCapture']?.(result['id'])) el['releasePointerCapture'](result['id']);
       (el['classList']['remove']('is-dragging'), (enabled = result['dragged']));
       if (enabled2) cancel();
@@ -28,7 +28,7 @@ export function bindRotationDrag(el, { read: read, preview: preview, commit: com
       if (!box || event['pointerId'] !== box['id']) return;
       const options = event['clientX'] - box['x'];
       if (Math['abs'](options) < 2 && !box['dragged']) return;
-      (event['preventDefault'](), (box['dragged'] = !![]), el['classList']['add']('is-dragging'));
+      (event['preventDefault'](), (box['dragged'] = true), el['classList']['add']('is-dragging'));
       const source = event['ctrlKey'] ? 'fine' : event['shiftKey'] ? 'snap' : 'normal';
       source !== box['modifier'] &&
         ((box['base'] = box['last']), (box['x'] = event['clientX']), (box['modifier'] = source));
@@ -36,21 +36,21 @@ export function bindRotationDrag(el, { read: read, preview: preview, commit: com
       if (rotationDragValue === box['last']) return;
       ((box['last'] = rotationDragValue), preview(rotationDragValue));
     },
-    onCancel = () => run(!![]),
+    onCancel = () => run(true),
     data = (event2) => {
       if (event2['key'] !== 'Escape') return;
-      (event2['preventDefault'](), event2['stopImmediatePropagation'](), run(!![]));
+      (event2['preventDefault'](), event2['stopImmediatePropagation'](), run(true));
     },
     next = (id) => {
       if (id['button'] !== 0 || el['disabled']) return;
-      (id['preventDefault'](), id['stopPropagation'](), run(!![]), (enabled = ![]));
+      (id['preventDefault'](), id['stopPropagation'](), run(true), (enabled = false));
       const base = read();
       ((box = {
         id: id['pointerId'],
         x: id['clientX'],
         base: base,
         last: base,
-        dragged: ![],
+        dragged: false,
         modifier: id['ctrlKey'] ? 'fine' : id['shiftKey'] ? 'snap' : 'normal',
       }),
         el['setPointerCapture']?.(id['pointerId']),
@@ -61,19 +61,19 @@ export function bindRotationDrag(el, { read: read, preview: preview, commit: com
           onEnd: () => run(),
           onCancel: onCancel,
         })),
-        el2['addEventListener']('keydown', data, !![]));
+        el2['addEventListener']('keydown', data, true));
     },
     current = (event3) => {
       if (!enabled) return;
-      ((enabled = ![]), event3['preventDefault'](), event3['stopImmediatePropagation']());
+      ((enabled = false), event3['preventDefault'](), event3['stopImmediatePropagation']());
     };
   return (
     el['addEventListener']('pointerdown', next),
-    el['addEventListener']('click', current, !![]),
+    el['addEventListener']('click', current, true),
     () => {
-      (run(!![]),
+      (run(true),
         el['removeEventListener']('pointerdown', next),
-        el['removeEventListener']('click', current, !![]));
+        el['removeEventListener']('click', current, true));
     }
   );
 }

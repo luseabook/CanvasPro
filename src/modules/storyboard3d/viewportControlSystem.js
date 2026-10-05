@@ -153,9 +153,9 @@ export function normalizeStoryboard3DViewportSettings(transformSpace = {}) {
     transformSpace['snap'] && typeof transformSpace['snap'] === 'object' ? transformSpace['snap'] : {};
   return {
     transformSpace: transformSpace['transformSpace'] === 'local' ? 'local' : 'world',
-    groundLock: transformSpace['groundLock'] === !![],
-    uniformScale: transformSpace['uniformScale'] === !![],
-    snapEnabled: transformSpace['snapEnabled'] === !![] || box3['enabled'] === !![],
+    groundLock: transformSpace['groundLock'] === true,
+    uniformScale: transformSpace['uniformScale'] === true,
+    snapEnabled: transformSpace['snapEnabled'] === true || box3['enabled'] === true,
     translationSnap: positive(transformSpace['translationSnap'] ?? box3['translation'], 0.25, 0.01, 10),
     rotationSnap: positive(
       transformSpace['rotationSnap'] ?? box3['rotation'],
@@ -214,7 +214,7 @@ export class Storyboard3DWebGLContextController {
       (this['restore'] = restore),
       (this['state'] = 'ready'),
       (this['lossCount'] = 0),
-      (this['destroyed'] = ![]),
+      (this['destroyed'] = false),
       (this['restoreRevision'] = 0),
       (this['_onContextLost'] = (event2) => {
         if (this['destroyed']) return;
@@ -239,8 +239,8 @@ export class Storyboard3DWebGLContextController {
           ((this['state'] = 'error'), this['_notify']('context-restore-failed', config));
         }
       }),
-      canvas['addEventListener']('webglcontextlost', this['_onContextLost'], ![]),
-      canvas['addEventListener']('webglcontextrestored', this['_onContextRestored'], ![]));
+      canvas['addEventListener']('webglcontextlost', this['_onContextLost'], false),
+      canvas['addEventListener']('webglcontextrestored', this['_onContextRestored'], false));
   }
   ['_notify'](reason, error = null) {
     this['onStateChange']?.(this['getSnapshot'](), { reason: reason, error: error });
@@ -250,10 +250,10 @@ export class Storyboard3DWebGLContextController {
   }
   ['destroy']() {
     if (this['destroyed']) return;
-    ((this['destroyed'] = !![]),
+    ((this['destroyed'] = true),
       (this['restoreRevision'] += 1),
-      this['canvas']['removeEventListener']('webglcontextlost', this['_onContextLost'], ![]),
-      this['canvas']['removeEventListener']('webglcontextrestored', this['_onContextRestored'], ![]),
+      this['canvas']['removeEventListener']('webglcontextlost', this['_onContextLost'], false),
+      this['canvas']['removeEventListener']('webglcontextrestored', this['_onContextRestored'], false),
       (this['state'] = 'destroyed'));
   }
 }
@@ -308,7 +308,7 @@ export class Storyboard3DViewportControlSystem {
         : this['runtime']?.['bridge']?.['setDraftView']?.({
             kind: 'scene-default',
             sceneView: this['sceneView'],
-            disableSmoothing: !![],
+            disableSmoothing: true,
           }),
       this['onChange']?.(this['getSnapshot'](), { reason: reason2 }),
       type

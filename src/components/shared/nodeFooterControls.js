@@ -32,7 +32,7 @@ function syncAdvancedButtonState(el4, item, key) {
         el5['closest']?.('.prompt-panel-footer, .aigen-image-model-selector, .aigen-video-model-selector') ||
         el4,
       el7 = el6['querySelector']?.(key) || el4['querySelector']?.(key);
-    el5['setAttribute']?.('aria-expanded', String(el7?.['classList']?.['contains']?.('show') === !![]));
+    el5['setAttribute']?.('aria-expanded', String(el7?.['classList']?.['contains']?.('show') === true));
   });
 }
 export function syncNodeFooterAdvancedButtonState(enabled) {
@@ -152,14 +152,14 @@ export function createFloatingModelMenuPortal({
 } = {}) {
   if (!menu || !trigger || !host?.['appendChild'])
     return {
-      isOpen: () => menu?.['classList']?.['contains']?.('show') === !![],
+      isOpen: () => menu?.['classList']?.['contains']?.('show') === true,
       open() {
         (menu?.['classList']?.['add']?.('show'), trigger?.['setAttribute']?.('aria-expanded', 'true'));
       },
       close() {
         (menu?.['classList']?.['remove']?.('show'), trigger?.['setAttribute']?.('aria-expanded', 'false'));
       },
-      contains: (value20) => menu?.['contains']?.(value20) === !![],
+      contains: (value20) => menu?.['contains']?.(value20) === true,
       destroy() {},
     };
   const list = [
@@ -180,7 +180,7 @@ export function createFloatingModelMenuPortal({
     map2 = new Map();
   let el15 = null,
     el16 = null,
-    enabled3 = ![];
+    enabled3 = false;
   const value22 = (value23) => {
       const value24 = map['get'](value23);
       if (value24) menu['style']?.['setProperty']?.(value23, value24);
@@ -263,7 +263,7 @@ export function createFloatingModelMenuPortal({
         const value41 = el16?.['parentNode'] === el15 ? el16 : null;
         el15['insertBefore'](menu, value41);
       }
-      ((el15 = null), (el16 = null), (enabled3 = ![]));
+      ((el15 = null), (el16 = null), (enabled3 = false));
     },
     close2 = () => {
       (closeNodeFooterMenus(menu),
@@ -275,7 +275,7 @@ export function createFloatingModelMenuPortal({
       if (!enabled3) {
         ((el15 = menu['parentNode']), (el16 = menu['nextSibling']), host['appendChild'](menu));
         if (portalClass) menu['classList']['add'](portalClass);
-        enabled3 = !![];
+        enabled3 = true;
       }
       (menu['style']?.['setProperty']?.('animation', 'none'),
         menu['style']?.['setProperty']?.('transform', 'none'),
@@ -285,16 +285,16 @@ export function createFloatingModelMenuPortal({
         handler4());
     };
   return (
-    documentObject?.['addEventListener']?.('scroll', handler4, !![]),
+    documentObject?.['addEventListener']?.('scroll', handler4, true),
     windowObject?.['addEventListener']?.('resize', handler4),
     {
       isOpen: () => menu['classList']['contains']('show'),
       open: open2,
       close: close2,
-      contains: (value42) => menu['contains']?.(value42) === !![],
+      contains: (value42) => menu['contains']?.(value42) === true,
       destroy() {
         (close2(),
-          documentObject?.['removeEventListener']?.('scroll', handler4, !![]),
+          documentObject?.['removeEventListener']?.('scroll', handler4, true),
           windowObject?.['removeEventListener']?.('resize', handler4));
       },
     }
@@ -311,7 +311,7 @@ export function createFloatingUiSchemaPopupPortal({
   contextClass: contextClass = '',
 } = {}) {
   if (!selector || placement !== 'portal-auto-up' || !host2?.['appendChild'])
-    return { close() {}, contains: () => ![], destroy() {} };
+    return { close() {}, contains: () => false, destroy() {} };
   const list3 = [
       'animation',
       'transition',
@@ -435,7 +435,7 @@ export function createFloatingUiSchemaPopupPortal({
         ownerProxy: ownerProxy,
       } = fieldEl;
       (list4['forEach']((value59) => {
-        popup['removeEventListener']?.(value59, value57, !![]);
+        popup['removeEventListener']?.(value59, value57, true);
       }),
         popup['removeEventListener']?.('wheel', value58),
         popup['classList']?.['remove']?.(portalClass));
@@ -503,9 +503,9 @@ export function createFloatingUiSchemaPopupPortal({
         popup2['style']?.['setProperty']?.('transition', 'none'),
         popup2['style']?.['setProperty']?.('transform', 'none'),
         list4['forEach']((value64) => {
-          popup2['addEventListener']?.(value64, value57, !![]);
+          popup2['addEventListener']?.(value64, value57, true);
         }),
-        popup2['addEventListener']?.('wheel', value58, { passive: !![] }),
+        popup2['addEventListener']?.('wheel', value58, { passive: true }),
         handler8());
     },
     value65 = (enabled5) => {
@@ -533,17 +533,17 @@ export function createFloatingUiSchemaPopupPortal({
     selector['addEventListener']?.('ui-schema-menu-before-open', value65),
     selector['addEventListener']?.('ui-schema-menu-after-open', value66),
     selector['addEventListener']?.('ui-schema-portaled-close-request', value68),
-    documentObject?.['addEventListener']?.('scroll', handler8, !![]),
+    documentObject?.['addEventListener']?.('scroll', handler8, true),
     windowObject?.['addEventListener']?.('resize', handler8),
     {
       close: close3,
-      contains: (value69) => fieldEl?.['popup']?.['contains']?.(value69) === !![],
+      contains: (value69) => fieldEl?.['popup']?.['contains']?.(value69) === true,
       destroy() {
         (close3(),
           selector['removeEventListener']?.('ui-schema-menu-before-open', value65),
           selector['removeEventListener']?.('ui-schema-menu-after-open', value66),
           selector['removeEventListener']?.('ui-schema-portaled-close-request', value68),
-          documentObject?.['removeEventListener']?.('scroll', handler8, !![]),
+          documentObject?.['removeEventListener']?.('scroll', handler8, true),
           windowObject?.['removeEventListener']?.('resize', handler8));
       },
     }
@@ -578,7 +578,7 @@ export function bindNodeModelMenuPrewarm({
   const prepareNow = () => null;
   if (!trigger4?.['addEventListener'] || typeof prepare !== 'function')
     return { prepareNow: prepareNow, schedule: prepareNow, destroy: prepareNow };
-  let value72 = ![],
+  let value72 = false,
     value73 = null,
     value74 = null;
   const run4 = windowObject?.['requestIdleCallback']?.['bind'](windowObject),
@@ -591,7 +591,7 @@ export function bindNodeModelMenuPrewarm({
     },
     value78 = () => {
       ((value73 = null), (value74 = null));
-      if (value72 || trigger4['isConnected'] === ![]) return null;
+      if (value72 || trigger4['isConnected'] === false) return null;
       return prepare();
     },
     schedule = () => {
@@ -614,7 +614,7 @@ export function bindNodeModelMenuPrewarm({
       schedule: schedule,
       destroy() {
         if (value72) return;
-        ((value72 = !![]),
+        ((value72 = true),
           handler11(),
           trigger4['removeEventListener']?.('pointerenter', schedule),
           trigger4['removeEventListener']?.('focus', schedule),
@@ -676,7 +676,7 @@ export function bindNodeFooterController(el27, value82 = {}) {
     const value86 = event3['target']?.['closest']?.('.ui-schema-floating-menu, .floating-menu');
     value86 && el27['contains'](value86) && event3['stopPropagation']();
   };
-  (el27['addEventListener']('wheel', value85, { passive: !![] }),
+  (el27['addEventListener']('wheel', value85, { passive: true }),
     list8['push'](() => el27['removeEventListener']('wheel', value85)));
   const value87 = (event4) => {
     const isInsideRoot = el27['contains'](event4['target']);

@@ -16,9 +16,9 @@ export function getStoryReplicationPromptInputKey(project, episode) {
 }
 export function isStoryReplicationPromptStale(value, enabled) {
   if (value?.['project']?.['sourceMode'] !== 'video-replication' || !enabled?.['clips']?.['length'])
-    return ![];
+    return false;
   return (
-    enabled['replication']?.['promptsStale'] === !![] ||
+    enabled['replication']?.['promptsStale'] === true ||
     Boolean(
       enabled['replication']?.['promptInputKey'] &&
       enabled['replication']['promptInputKey'] !== getStoryReplicationPromptInputKey(value, enabled),
@@ -28,6 +28,6 @@ export function isStoryReplicationPromptStale(value, enabled) {
 export function markStoryReplicationPromptsStale(item, enabled2 = '') {
   for (const key of item['episodes'] || []) {
     if (key['clips']?.['length'] && (!enabled2 || key['id'] === enabled2))
-      key['replication']['promptsStale'] = !![];
+      key['replication']['promptsStale'] = true;
   }
 }

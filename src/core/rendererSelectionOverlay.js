@@ -43,8 +43,8 @@ function createIconButton(key, index, result) {
   );
 }
 function syncVideoPlaybackButtonPresentation(el5, data = {}) {
-  if (!el5) return ![];
-  const options = data?.['active'] === !![],
+  if (!el5) return false;
+  const options = data?.['active'] === true,
     t2 = t(
       options
         ? 'coreUi.renderer.multiSelect.syncVideoPause'
@@ -87,7 +87,7 @@ function createMultiSelectBoxEl() {
   }
   ((el13['style']['display'] = 'none'),
     el12['appendChild'](el13),
-    syncVideoPlaybackButtonPresentation(el12, { active: ![] }),
+    syncVideoPlaybackButtonPresentation(el12, { active: false }),
     (el12['style']['display'] = 'none'));
   const svg = createSvg('2');
   [
@@ -263,7 +263,7 @@ export function createRendererSelectionOverlay({
     el43 = null,
     value2 = null,
     subscribeNodeBatchExportPending2 = null,
-    hasBatchExportableSelection2 = ![];
+    hasBatchExportableSelection2 = false;
   const run = () => {
     const el44 = el42?.['querySelector']?.('[data-ui-action="ms-batch-download"]');
     if (!el44) return;
@@ -273,11 +273,11 @@ export function createRendererSelectionOverlay({
       el44['classList']['toggle']('is-loading', isNodeBatchExportPending2),
       el44['setAttribute']('aria-busy', String(isNodeBatchExportPending2)));
   };
-  let input = getSyncPlaybackState?.() || { active: ![], loop: ![] },
+  let input = getSyncPlaybackState?.() || { active: false, loop: false },
     output = new Set();
   const value3 = { geometrySig: '', resetBtnVisible: null, composeBtnVisible: null, composeBtnKind: '' },
     value4 = { centerSig: '', buttonStateSig: '' },
-    handler = (enabled, { mountedOnly: mountedOnly = ![] } = {}) => {
+    handler = (enabled, { mountedOnly: mountedOnly = false } = {}) => {
       if (!enabled) return null;
       if (mountedOnly && !isMounted(enabled)) return null;
       return getWrapper(enabled) || null;
@@ -306,7 +306,7 @@ export function createRendererSelectionOverlay({
           restoreNodeOverlays(handler(value9));
         }
         for (const value10 of map) {
-          const enabled3 = handler(value10, { mountedOnly: !![] });
+          const enabled3 = handler(value10, { mountedOnly: true });
           if (!enabled3) continue;
           (hideNodeOverlays(enabled3), value8['add'](value10));
         }
@@ -340,7 +340,7 @@ export function createRendererSelectionOverlay({
             list['some'](
               (value12) =>
                 isNodeType(value6[value12], ['ai-text', 'ai-image', 'ai-video', 'ai-audio']) &&
-                value6[value12]?.['isGenerating'] === !![],
+                value6[value12]?.['isGenerating'] === true,
             ),
           value13 = enabled5
             ? t('groupExecution.stopSelected')
@@ -433,12 +433,12 @@ export function createRendererSelectionOverlay({
     handler5 = (value35, value36, value37 = {}) => {
       if (!el43) return;
       const value38 = String(value37?.['alignFeatureTriggerMode'] || 'click'),
-        value39 = value37?.['alignFeatureEnabled'] !== ![] && value38 !== 'off',
+        value39 = value37?.['alignFeatureEnabled'] !== false && value38 !== 'off',
         list2 = Array['isArray'](value35) ? value35 : [],
         list3 = getAlignableSelectionNodes(value36 || {}, list2),
         enabled6 =
           value39 &&
-          value37?.['alignPanelVisible'] === !![] &&
+          value37?.['alignPanelVisible'] === true &&
           list2['length'] >= 2 &&
           list3['length'] >= 2;
       if (!enabled6) {
@@ -472,7 +472,7 @@ export function createRendererSelectionOverlay({
         for (const el52 of value44) {
           const value45 = el52['dataset']['uiAction'],
             value46 = value45 === 'ms-distribute-h' || value45 === 'ms-distribute-v',
-            value47 = value46 ? !enabled9 : ![];
+            value47 = value46 ? !enabled9 : false;
           ((el52['disabled'] = value47), el52['classList']['toggle']('is-disabled', value47));
         }
       }
@@ -481,7 +481,7 @@ export function createRendererSelectionOverlay({
       (subscribeNodeBatchExportPending2?.(),
         value2?.(),
         (value2 = null),
-        reset({ restoreNodeChrome: !![] }),
+        reset({ restoreNodeChrome: true }),
         el42?.['remove']?.(),
         el43?.['remove']?.(),
         (el42 = createMultiSelectBoxEl()),
@@ -490,7 +490,7 @@ export function createRendererSelectionOverlay({
         el53['appendChild'](el43),
         (subscribeNodeBatchExportPending2 = subscribeNodeBatchExportPending(run)),
         (value2 = subscribeSyncPlaybackState?.((value48) => {
-          ((input = value48 || { active: ![], loop: ![] }),
+          ((input = value48 || { active: false, loop: false }),
             syncVideoPlaybackButtonPresentation(
               el42?.['querySelector']?.('.v2-multi-select-tab button[data-ui-action="ms-sync-video-play"]'),
               input,
@@ -501,11 +501,11 @@ export function createRendererSelectionOverlay({
       (handler4(
         state2['selectedNodeIds'],
         state2['nodes'] || {},
-        state2['ui']?.['imageVideoNodeResizeEnabled'] === !![],
+        state2['ui']?.['imageVideoNodeResizeEnabled'] === true,
       ),
         handler5(state2['selectedNodeIds'], state2['nodes'] || {}, state2['ui']));
     },
-    reset = ({ restoreNodeChrome: restoreNodeChrome = ![] } = {}) => {
+    reset = ({ restoreNodeChrome: restoreNodeChrome = false } = {}) => {
       if (restoreNodeChrome) handler3();
       else output = new Set();
       handler2();
@@ -517,7 +517,7 @@ export function createRendererSelectionOverlay({
         (subscribeNodeBatchExportPending2 = null),
         value2?.(),
         (value2 = null),
-        reset({ restoreNodeChrome: !![] }),
+        reset({ restoreNodeChrome: true }),
         el42?.['remove']?.(),
         el43?.['remove']?.(),
         (el42 = null),

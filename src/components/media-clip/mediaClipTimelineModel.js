@@ -203,7 +203,7 @@ export function buildMediaClipTimelineRulerMarks(value35, value36 = 0, value37 =
     return Array['from']({ length: length + 1 }, (value41, sec2) => ({
       sec: sec2 / count4,
       frameIndex: sec2,
-      isFrame: !![],
+      isFrame: true,
       isMajor: sec2 % count4 === 0,
       isMid: sec2 > 0 && count5 > 0 && sec2 % count5 === 0 && sec2 % count4 !== 0,
     }));
@@ -231,7 +231,7 @@ export function buildMediaClipTimelineRulerMarks(value35, value36 = 0, value37 =
     list3['push']({
       sec: sec3,
       frameIndex: -1,
-      isFrame: ![],
+      isFrame: false,
       isMajor: isMajor,
       isMid: !isMajor && count6 >= value43 && Math['abs'](value48 - Math['round'](value48)) < 0.0001,
     });

@@ -233,7 +233,7 @@ function formatRuntimeText(index, result = {}, locale3 = getLocale()) {
   );
 }
 function createFailedReply(reply, args = {}) {
-  return { ok: ![], status: 'failed', reply: reply, message: reply, ...args };
+  return { ok: false, status: 'failed', reply: reply, message: reply, ...args };
 }
 function summarizeExecution(error2, locale4 = getLocale()) {
   if (error2['ok']) return runtimeText('done', locale4);
@@ -244,15 +244,15 @@ function isSafeAction(options2 = {}) {
 }
 function createChatReply(target, args2 = {}) {
   const reply2 = String(target || '');
-  return { ok: !![], status: 'chat', reply: reply2, message: reply2, ...args2 };
+  return { ok: true, status: 'chat', reply: reply2, message: reply2, ...args2 };
 }
 function hasExplicitCanvasActionIntent(source = '', next = {}) {
   return hasAgentCanvasActionIntent(source, next);
 }
 function shouldHoldCanvasActionsForChat(response = {}, current = '', entry = {}) {
-  if (response['status'] !== 'ready' && response['status'] !== 'need_confirmation') return ![];
+  if (response['status'] !== 'ready' && response['status'] !== 'need_confirmation') return false;
   if (!Array['isArray'](response['plan']?.['actions']) || response['plan']['actions']['length'] === 0)
-    return ![];
+    return false;
   return !hasExplicitCanvasActionIntent(current, entry);
 }
 function getState({ store: store, commandContext: commandContext } = {}) {
@@ -308,7 +308,7 @@ export function createAgentRuntime({
   saveSkill: saveSkill = null,
   deleteSkill: deleteSkill = null,
   setSkillEnabled: setSkillEnabled = null,
-  loopMode: loopMode = ![],
+  loopMode: loopMode = false,
   maxLoopSteps: maxLoopSteps = DEFAULT_MAX_LOOP_STEPS,
 } = {}) {
   registerAgentDiscoveryCommands(commandRegistry);
@@ -378,7 +378,7 @@ export function createAgentRuntime({
         run();
         const id = 'agent-run-' + ++handle;
         return (
-          sessionStore['setCurrentRun']?.({ id: id, status: 'planning', stopped: ![] }),
+          sessionStore['setCurrentRun']?.({ id: id, status: 'planning', stopped: false }),
           id
         );
       },
@@ -418,9 +418,9 @@ export function createAgentRuntime({
   }
   function isActiveRun(value9 = '') {
     const enabled = String(value9 || '')['trim']();
-    if (!enabled) return !![];
+    if (!enabled) return true;
     const value10 = sessionStore['getCurrentRun']?.();
-    return value10?.['id'] === enabled && value10['stopped'] !== !![];
+    return value10?.['id'] === enabled && value10['stopped'] !== true;
   }
   function createStoppedReply() {
     return createFailedReply(runtimeText('runStopped', localeProvider2()), { status: 'stopped' });
@@ -491,16 +491,16 @@ export function createAgentRuntime({
             ? deriveAgentRuntimeProvenance({
                 action: action,
                 execution: {
-                  ok: ok['ok'] === !![],
-                  status: ok['ok'] === !![] ? 'success' : 'failed',
+                  ok: ok['ok'] === true,
+                  status: ok['ok'] === true ? 'success' : 'failed',
                   results: [ok],
                 },
               })
             : { createdNodeIds: [], createdEdgeIds: [] };
         sessionStore['upsertOperation']?.({
           ...args5,
-          status: ok ? (ok['ok'] === !![] ? 'success' : 'failed') : 'skipped',
-          ok: ok ? ok['ok'] === !![] : null,
+          status: ok ? (ok['ok'] === true ? 'success' : 'failed') : 'skipped',
+          ok: ok ? ok['ok'] === true : null,
           errorCode: String(ok?.['errorCode'] || ''),
           verificationStatus: String(ok?.['verification']?.['status'] || ''),
           repairAttempts: Math['max'](
@@ -536,7 +536,7 @@ export function createAgentRuntime({
       sessionStore['setCurrentRun']?.({
         id: id3['runId'],
         status: 'waiting_tasks',
-        stopped: ![],
+        stopped: false,
         step: id3['step'],
       }),
       sessionStore['recordRunEvent']?.({
@@ -549,7 +549,7 @@ export function createAgentRuntime({
     const content = runtimeText('taskWaiting', localeProvider2());
     return (
       sessionStore['pushHistory']?.({ role: 'assistant', status: 'waiting_tasks', content: content }),
-      { ok: !![], status: 'waiting_tasks', reply: content, taskMessages: taskMessages }
+      { ok: true, status: 'waiting_tasks', reply: content, taskMessages: taskMessages }
     );
   }
   function onBindingsChanged() {
@@ -578,11 +578,11 @@ export function createAgentRuntime({
                 { ...args6['loopState'], runId: runId4['runId'] },
                 args6['action'],
                 {
-                  ok: ![],
+                  ok: false,
                   status: 'failed',
                   errorCode: 'ASYNC_TASK_FAILED',
                   message: message,
-                  results: [{ ok: ![], errorCode: 'ASYNC_TASK_FAILED', message: message }],
+                  results: [{ ok: false, errorCode: 'ASYNC_TASK_FAILED', message: message }],
                   raw: { result: { failedIndex: 0 } },
                 },
               );
@@ -601,7 +601,7 @@ export function createAgentRuntime({
                   step: runId4['step'],
                   commandId: 'generation.run',
                   status: 'tasks_completed',
-                  ok: !![],
+                  ok: true,
                   message: runtimeText('taskResumed', localeProvider2()),
                 },
               ]['slice'](-4),
@@ -635,7 +635,7 @@ export function createAgentRuntime({
     (sessionStore['setCurrentRun']?.({
       id: id4['runId'],
       status: 'waiting_tasks',
-      stopped: ![],
+      stopped: false,
       step: id4['step'],
     }),
     agentTaskBindingRuntime['sync'](getState({ store: store2, commandContext: commandContext2 })));
@@ -715,7 +715,7 @@ export function createAgentRuntime({
   function loopState(runtimeProvenance = {}) {
     const precreatedNode = normalizeAgentPrecreatedNode(runtimeProvenance['precreatedNode']);
     return {
-      enabled: !![],
+      enabled: true,
       step: Number(runtimeProvenance['step'] || 0),
       maxSteps: Math['max'](1, Number(maxLoopSteps || DEFAULT_MAX_LOOP_STEPS)),
       toolResults: Array['isArray'](runtimeProvenance['toolResults']) ? runtimeProvenance['toolResults'] : [],
@@ -742,7 +742,7 @@ export function createAgentRuntime({
       run10(),
       sessionStore['pushHistory']?.({ role: 'assistant', status: 'failed', content: content2 }),
       isActiveRun(id5['runId']) &&
-        sessionStore['setCurrentRun']?.({ id: id5['runId'], status: 'failed', stopped: ![] }),
+        sessionStore['setCurrentRun']?.({ id: id5['runId'], status: 'failed', stopped: false }),
       createFailedReply(content2, value28)
     );
   }
@@ -780,7 +780,7 @@ export function createAgentRuntime({
         sessionStore['setCurrentRun']?.({
           id: loopState2['runId'],
           status: 'failed',
-          stopped: ![],
+          stopped: false,
           step: loopState2['step'],
         }),
       sessionStore['recordRunEvent']?.({
@@ -791,18 +791,18 @@ export function createAgentRuntime({
         errorCode: plannerDiagnostic['errorCode'],
         message: plannerFailureMessage,
       }),
-      createFailedReply(plannerFailureMessage, { retryable: !![], diagnostic: plannerDiagnostic, recovery: recovery })
+      createFailedReply(plannerFailureMessage, { retryable: true, diagnostic: plannerDiagnostic, recovery: recovery })
     );
   }
   function run7(step3, loopAction, execution2) {
     const reply3 = String(execution2?.['message'] || runtimeText('actionExecutionFailed', localeProvider2())),
-      value31 = { status: 'ready', reply: reply3, actions: [loopAction], requiresConfirmation: ![] },
+      value31 = { status: 'ready', reply: reply3, actions: [loopAction], requiresConfirmation: false },
       { recovery: recovery2, retryPlan: retryPlan } = agentPlanLifecycle['recover'](execution2, value31),
       diagnostic = buildAgentExecutionDiagnostic({
         execution: execution2,
         recovery: recovery2,
         step: step3['step'],
-        completedSteps: (step3['toolResults'] || [])['filter']((response2) => response2?.['ok'] === !![])[
+        completedSteps: (step3['toolResults'] || [])['filter']((response2) => response2?.['ok'] === true)[
           'length'
         ],
         locale: localeProvider2(),
@@ -832,7 +832,7 @@ export function createAgentRuntime({
         sessionStore['setCurrentRun']?.({
           id: step3['runId'],
           status: 'failed',
-          stopped: ![],
+          stopped: false,
           step: step3['step'],
         }),
       sessionStore['recordRunEvent']?.({
@@ -851,7 +851,7 @@ export function createAgentRuntime({
       })
     );
   }
-  function run16(turnId3, action3, execution3, { confirmed: confirmed = ![] } = {}) {
+  function run16(turnId3, action3, execution3, { confirmed: confirmed = false } = {}) {
     const taskMessages2 = agentTaskBindingRuntime['registerExecution'](execution3, { turnId: turnId3['runId'] }),
       fingerprintAgentAction2 = fingerprintAgentAction(action3),
       agentToolResult = buildAgentToolResult({ step: turnId3['step'], action: action3, execution: execution3 });
@@ -860,7 +860,7 @@ export function createAgentRuntime({
       pendingKind: '',
       pendingValidatedPlan: null,
       precreatedNode:
-        execution3['ok'] === !![] && doesActionConsumePrecreatedNode(action3, turnId3['precreatedNode'])
+        execution3['ok'] === true && doesActionConsumePrecreatedNode(action3, turnId3['precreatedNode'])
           ? null
           : turnId3['precreatedNode'] || null,
       step: turnId3['step'] + 1,
@@ -891,10 +891,10 @@ export function createAgentRuntime({
         type: 'agent_loop_tool_result',
         step: step4['step'],
         commandId: action3['type'],
-        ok: execution3['ok'] === !![],
-        ...(confirmed ? { confirmed: !![] } : {}),
+        ok: execution3['ok'] === true,
+        ...(confirmed ? { confirmed: true } : {}),
       }),
-      execution3['ok'] === !![] &&
+      execution3['ok'] === true &&
         (sessionStore['setPendingLoopRun']?.({ ...step4, pendingKind: 'interrupted' }),
         markUnfinishedOperation(step4['originalMessage'])),
       {
@@ -919,7 +919,7 @@ export function createAgentRuntime({
     return (
       run(),
       sessionStore['clearPendingLoopRun']?.(),
-      sessionStore['setCurrentRun']?.({ id: id6, status: 'planning', stopped: ![] }),
+      sessionStore['setCurrentRun']?.({ id: id6, status: 'planning', stopped: false }),
       displayMessage && sessionStore['pushHistory']?.({ role: 'user', content: displayMessage }),
       run9({
         ...args7,
@@ -948,7 +948,7 @@ export function createAgentRuntime({
       sessionStore['setCurrentRun']?.({
         id: id7,
         status: 'planning',
-        stopped: ![],
+        stopped: false,
         step: checkpoint2['step'],
       }),
       displayMessage && sessionStore['pushHistory']?.({ role: 'user', content: displayMessage }),
@@ -980,7 +980,7 @@ export function createAgentRuntime({
       !enabled5 &&
       !enabled6 &&
       !enabled7 &&
-      value33?.['hasUnfinishedOperation'] !== !![]
+      value33?.['hasUnfinishedOperation'] !== true
     )
       return createFailedReply(runtimeText('noInterruptedRun', localeProvider2()));
     run11('discarded');
@@ -993,7 +993,7 @@ export function createAgentRuntime({
     const content3 = runtimeText('runDiscarded', localeProvider2());
     return (
       sessionStore['pushHistory']?.({ role: 'assistant', status: 'discarded', content: content3 }),
-      { ok: !![], status: 'discarded', reply: content3, run: run18 }
+      { ok: true, status: 'discarded', reply: content3, run: run18 }
     );
   }
   function undoLastAgentRun() {
@@ -1014,7 +1014,7 @@ export function createAgentRuntime({
     const errorCode = commandContext2?.['history']?.['undoToCheckpoint']?.(expectedHead['start'], {
       expectedHead: expectedHead['end'],
     });
-    if (errorCode?.['ok'] !== !![])
+    if (errorCode?.['ok'] !== true)
       return createFailedReply(runtimeText('noUndoableRun', localeProvider2()), {
         errorCode: errorCode?.['errorCode'] || 'AGENT_UNDO_UNAVAILABLE',
       });
@@ -1036,7 +1036,7 @@ export function createAgentRuntime({
       }),
       (runId = null),
       {
-        ok: !![],
+        ok: true,
         status: 'undone',
         reply: runtimeText('runUndone', localeProvider2()),
         undone: errorCode['undone'],
@@ -1050,7 +1050,7 @@ export function createAgentRuntime({
     if (value34) {
       const error4 = [...(toolResults['toolResults'] || [])]
         ['reverse']()
-        ['find']((response4) => response4?.['ok'] === ![]);
+        ['find']((response4) => response4?.['ok'] === false);
       return run8(
         toolResults,
         String(error4?.['message'] || runtimeText('actionExecutionFailed', localeProvider2())),
@@ -1067,9 +1067,9 @@ export function createAgentRuntime({
       run10(),
       sessionStore['pushHistory']?.({ role: 'assistant', status: status, content: content4 }),
       isActiveRun(toolResults['runId']) &&
-        sessionStore['setCurrentRun']?.({ id: toolResults['runId'], status: status, stopped: ![] }),
+        sessionStore['setCurrentRun']?.({ id: toolResults['runId'], status: status, stopped: false }),
       {
-        ok: !![],
+        ok: true,
         status: status,
         reply: content4,
         message: content4,
@@ -1086,7 +1086,7 @@ export function createAgentRuntime({
       sessionStore['setCurrentRun']?.({
         id: id8['runId'],
         status: 'planning',
-        stopped: ![],
+        stopped: false,
         step: id8['step'],
       });
       let status2;
@@ -1131,7 +1131,7 @@ export function createAgentRuntime({
             runtimeProvenance: id8['runtimeProvenance'],
             canvasState: getState({ store: store2, commandContext: commandContext2 }),
           });
-        if (hasActionIntent && errorCode2['ok'] === ![]) {
+        if (hasActionIntent && errorCode2['ok'] === false) {
           const value39 = 'completion:' + (errorCode2['requestedNodeType'] || 'unknown'),
             retryCount = Number(id8['validationFailureCounts']?.[value39] || 0) + 1,
             message3 = runtimeText('loopCompletionEvidenceCorrection', localeProvider2());
@@ -1146,7 +1146,7 @@ export function createAgentRuntime({
                   step: id8['step'],
                   commandId: 'agent.plan',
                   status: 'validation_failed',
-                  ok: ![],
+                  ok: false,
                   errorCode: errorCode2['errorCode'],
                   message: message3,
                   details: errorCode2,
@@ -1249,7 +1249,7 @@ export function createAgentRuntime({
                   step: id8['step'],
                   commandId: commandId2,
                   status: 'validation_failed',
-                  ok: ![],
+                  ok: false,
                   errorCode: validation2['errorCode'],
                   message: validation2['message'],
                 },
@@ -1302,7 +1302,7 @@ export function createAgentRuntime({
                   step: id8['step'],
                   commandId: 'agent.plan',
                   status: 'validation_failed',
-                  ok: ![],
+                  ok: false,
                   errorCode: 'UNNECESSARY_CLARIFICATION',
                   message: id8['clarificationAnswer'],
                 },
@@ -1332,7 +1332,7 @@ export function createAgentRuntime({
             content: validation2['plan']['question'],
           }),
           {
-            ok: !![],
+            ok: true,
             status: 'need_clarification',
             reply: validation2['plan']['reply'] || validation2['plan']['question'],
             question: validation2['plan']['question'],
@@ -1358,7 +1358,7 @@ export function createAgentRuntime({
                 step: id8['step'],
                 commandId: commandId3['type'],
                 status: 'validation_failed',
-                ok: ![],
+                ok: false,
                 errorCode: 'ACTION_ALREADY_COMPLETED',
                 message: message4,
               },
@@ -1388,7 +1388,7 @@ export function createAgentRuntime({
               step: id8['step'],
               commandId: commandId3['type'],
               status: 'validation_failed',
-              ok: ![],
+              ok: false,
               errorCode: errorCode3['errorCode'],
               message: message5,
               details: errorCode3,
@@ -1418,7 +1418,7 @@ export function createAgentRuntime({
             content: pendingValidatedPlan['reply'],
           }),
           {
-            ok: !![],
+            ok: true,
             status: 'need_confirmation',
             reply: pendingValidatedPlan['reply'] || runtimeText('confirmFallback', localeProvider2()),
             riskLevel: validation2['riskLevel'],
@@ -1429,7 +1429,7 @@ export function createAgentRuntime({
       sessionStore['setCurrentRun']?.({
         id: id8['runId'],
         status: 'executing',
-        stopped: ![],
+        stopped: false,
         step: id8['step'],
       });
       const execution4 = await executeActions2([commandId3], {
@@ -1456,7 +1456,7 @@ export function createAgentRuntime({
           execution4,
         )),
         (id8 = run14(id8, commandId3, execution4)));
-      execution4['ok'] === !![] &&
+      execution4['ok'] === true &&
         doesActionConsumePrecreatedNode(commandId3, id8['precreatedNode']) &&
         (id8['precreatedNode'] = null);
       if (execution4['ok']) {
@@ -1478,9 +1478,9 @@ export function createAgentRuntime({
           type: 'agent_loop_tool_result',
           step: id8['step'],
           commandId: commandId3['type'],
-          ok: execution4['ok'] === !![],
+          ok: execution4['ok'] === true,
         }));
-      execution4['ok'] === !![] &&
+      execution4['ok'] === true &&
         (sessionStore['setPendingLoopRun']?.({ ...id8, pendingKind: 'interrupted' }),
         markUnfinishedOperation(id8['originalMessage']));
       const value53 = run5(id8, { taskMessages: taskMessages3 });
@@ -1518,7 +1518,7 @@ export function createAgentRuntime({
           (value57) => value57['modelId'],
         ),
         estimatedChars: Number(namespaces['contextBudget']?.['estimatedChars'] || 0),
-        schemaIntegrity: namespaces['contextBudget']?.['schemaIntegrity'] !== ![],
+        schemaIntegrity: namespaces['contextBudget']?.['schemaIntegrity'] !== false,
       }),
       planner({
         message: message6,
@@ -1546,7 +1546,7 @@ export function createAgentRuntime({
     });
     ((agentContext2 = context2), intent2['onSkillsSelected']?.(context2['skills'] || []));
     const channel2 =
-      intent2['assistantChoice'] === !![]
+      intent2['assistantChoice'] === true
         ? { channel: 'assistant.message', reason: 'conversation-choice' }
         : routeAgentTurn({
             message: userMessage4,
@@ -1634,7 +1634,7 @@ export function createAgentRuntime({
   async function run22(plan2, { turnId: turnId = '' } = {}) {
     if (!isActiveRun(turnId)) return createStoppedReply();
     const { prefix: prefix, pending: pending } = agentPlanLifecycle['partition'](plan2['plan']);
-    if (prefix['length'] === 0) return { ok: !![], plan: plan2['plan'], preExecution: null };
+    if (prefix['length'] === 0) return { ok: true, plan: plan2['plan'], preExecution: null };
     const execution6 = await executeActions2(prefix, { commandContext: commandContext2, ...buildExecutionOptions(turnId) });
     if (!isActiveRun(turnId)) return { ...createStoppedReply(), execution: execution6 };
     if (!execution6['ok'])
@@ -1646,7 +1646,7 @@ export function createAgentRuntime({
           execution: execution6,
         }),
         {
-          ok: ![],
+          ok: false,
           status: 'failed',
           reply: execution6['message'] || runtimeText('preActionsFailed', localeProvider2()),
           message: execution6['message'] || runtimeText('preActionsFailed', localeProvider2()),
@@ -1654,7 +1654,7 @@ export function createAgentRuntime({
         }
       );
     return {
-      ok: !![],
+      ok: true,
       preExecution: execution6,
       plan: {
         ...plan2['plan'],
@@ -1708,7 +1708,7 @@ export function createAgentRuntime({
         }),
         sessionStore['pushHistory']?.({ role: 'assistant', status: 'chat', content: content8 }),
         createChatReply(content8, {
-          plan: { ...content6['plan'], status: 'chat', actions: [], requiresConfirmation: ![] },
+          plan: { ...content6['plan'], status: 'chat', actions: [], requiresConfirmation: false },
           heldActions: content6['plan']['actions'],
         })
       );
@@ -1722,7 +1722,7 @@ export function createAgentRuntime({
           content: content6['plan']['question'],
         }),
         {
-          ok: !![],
+          ok: true,
           status: 'need_clarification',
           reply: content6['plan']['reply'] || content6['plan']['question'],
           question: content6['plan']['question'],
@@ -1745,7 +1745,7 @@ export function createAgentRuntime({
           content: plan3['plan']['reply'],
         }),
         {
-          ok: !![],
+          ok: true,
           status: 'need_confirmation',
           reply: plan3['plan']['reply'] || runtimeText('confirmFallback', localeProvider2()),
           riskLevel: content6['riskLevel'],
@@ -1760,7 +1760,7 @@ export function createAgentRuntime({
     const displayMessage2 = String(value65 || '')['trim']();
     if (!displayMessage2) return createFailedReply(runtimeText('emptyMessage', localeProvider2()));
     selectedSkillIds = { ...selectedSkillIds, conversationHistory: sessionStore['getHistory']?.() || [] };
-    (!hasExplicitCanvasActionIntent(displayMessage2, selectedSkillIds) || selectedSkillIds['assistantChoice'] === !![]) &&
+    (!hasExplicitCanvasActionIntent(displayMessage2, selectedSkillIds) || selectedSkillIds['assistantChoice'] === true) &&
       (selectedSkillIds = {
         ...selectedSkillIds,
         selectedSkillIds: selectedSkillIds['selectedSkillIds']?.['length']
@@ -1768,7 +1768,7 @@ export function createAgentRuntime({
           : getAgentContinuationSkillIds(displayMessage2, sessionStore['getHistory']?.() || []),
       });
     const pendingSkillConversation = prepareExternalInformation['getPendingSkillConversation'](),
-      value66 = loopMode === !![] ? sessionStore['getPendingLoopRun']?.() : null;
+      value66 = loopMode === true ? sessionStore['getPendingLoopRun']?.() : null;
     if (
       value66 &&
       !['clarification', 'task_wait']['includes'](String(value66['pendingKind'] || '')) &&
@@ -1783,7 +1783,7 @@ export function createAgentRuntime({
       !selectedSkillIds['clarificationAnswer']
     )
       return answerClarification(displayMessage2, { ...selectedSkillIds, displayAnswer: displayMessage2 });
-    const checkpoint3 = loopMode === !![] ? sessionStore['getPendingLoopRun']?.() : null;
+    const checkpoint3 = loopMode === true ? sessionStore['getPendingLoopRun']?.() : null;
     if (
       checkpoint3?.['pendingKind'] === 'planner_retry' &&
       isAgentLoopRetryMessage(displayMessage2) &&
@@ -1803,7 +1803,7 @@ export function createAgentRuntime({
       sessionStore['clearPendingClarification']?.(),
       sessionStore['clearPendingLoopRun']?.(),
       run10(),
-      sessionStore['setCurrentRun']?.({ id: id9, status: 'planning', stopped: ![] }));
+      sessionStore['setCurrentRun']?.({ id: id9, status: 'planning', stopped: false }));
     const value67 =
       Array['isArray'](selectedSkillIds['documentFiles']) && selectedSkillIds['documentFiles']['length'] > 0;
     sessionStore['pushHistory']?.({
@@ -1816,7 +1816,7 @@ export function createAgentRuntime({
           : [],
     });
     const value68 =
-      selectedSkillIds['assistantChoice'] === !![]
+      selectedSkillIds['assistantChoice'] === true
         ? null
         : await prepareExternalInformation['handleCommand']({
             message: displayMessage2,
@@ -1826,18 +1826,18 @@ export function createAgentRuntime({
           });
     if (value68) return value68;
     const value69 =
-      value67 || selectedSkillIds['assistantChoice'] === !![]
+      value67 || selectedSkillIds['assistantChoice'] === true
         ? null
         : await agentConversationCanvasTransferRuntime['handle'](displayMessage2, id9);
     if (value69) return value69;
     if (
       typeof assistant === 'function' &&
       (value67 ||
-        selectedSkillIds['assistantChoice'] === !![] ||
+        selectedSkillIds['assistantChoice'] === true ||
         !hasExplicitCanvasActionIntent(displayMessage2, selectedSkillIds))
     )
       return selectAssistantVersion['handle'](displayMessage2, selectedSkillIds, id9);
-    if (loopMode === !![]) {
+    if (loopMode === true) {
       let value70 = run13({ runId: id9, message: displayMessage2, plannerExtra: selectedSkillIds });
       value70 = await agentPrecreatedNodeRuntime['reserve'](value70);
       if (!isActiveRun(id9)) return createStoppedReply();
@@ -1851,7 +1851,7 @@ export function createAgentRuntime({
       const content9 = error6?.['message'] || runtimeText('plannerFailed', localeProvider2());
       return (
         sessionStore['pushHistory']?.({ role: 'assistant', status: 'failed', content: content9 }),
-        sessionStore['setCurrentRun']?.({ id: id9, status: 'failed', stopped: ![] }),
+        sessionStore['setCurrentRun']?.({ id: id9, status: 'failed', stopped: false }),
         createFailedReply(content9)
       );
     }
@@ -1863,21 +1863,21 @@ export function createAgentRuntime({
     });
     return (
       isActiveRun(id9) &&
-        sessionStore['setCurrentRun']?.({ id: id9, status: status3['status'], stopped: ![] }),
+        sessionStore['setCurrentRun']?.({ id: id9, status: status3['status'], stopped: false }),
       status3
     );
   }
   async function answerClarification(clarificationAnswer, args8 = {}) {
     const pendingPlan = sessionStore['getPendingClarification']?.();
     if (!pendingPlan) return createFailedReply(runtimeText('noPendingClarification', localeProvider2()));
-    const args9 = loopMode === !![] ? sessionStore['getPendingLoopRun']?.() : null;
+    const args9 = loopMode === true ? sessionStore['getPendingLoopRun']?.() : null;
     sessionStore['clearPendingClarification']?.();
     const content10 = String(args8['displayAnswer'] || clarificationAnswer || '')['trim']();
     if (args9?.['pendingKind'] === 'clarification') {
       const id10 = 'agent-run-' + ++handle;
       (run(),
         sessionStore['clearPendingLoopRun']?.(),
-        sessionStore['setCurrentRun']?.({ id: id10, status: 'planning', stopped: ![] }));
+        sessionStore['setCurrentRun']?.({ id: id10, status: 'planning', stopped: false }));
       if (content10) sessionStore['pushHistory']?.({ role: 'user', content: content10 });
       return run9({
         ...args9,
@@ -1892,9 +1892,9 @@ export function createAgentRuntime({
         },
       });
     }
-    if (loopMode === !![] && pendingPlan['originalMessage']) {
+    if (loopMode === true && pendingPlan['originalMessage']) {
       const id11 = 'agent-run-' + ++handle;
-      (run(), sessionStore['setCurrentRun']?.({ id: id11, status: 'planning', stopped: ![] }));
+      (run(), sessionStore['setCurrentRun']?.({ id: id11, status: 'planning', stopped: false }));
       if (content10) sessionStore['pushHistory']?.({ role: 'user', content: content10 });
       const args10 = run13({
         runId: id11,
@@ -1935,7 +1935,7 @@ export function createAgentRuntime({
       { commandContext: commandContext2 },
     );
     if (conversationId() !== value73 || sessionStore['getPendingPlan']?.() !== enabled11)
-      return { ...createStoppedReply(), stale: !![] };
+      return { ...createStoppedReply(), stale: true };
     if (!execution7['ok'])
       return createFailedReply(execution7['message'] || runtimeText('actionExecutionFailed', localeProvider2()), {
         execution: execution7,
@@ -1947,7 +1947,7 @@ export function createAgentRuntime({
       sessionStore['setPendingPlan']?.(plan4),
       markUnfinishedOperation(agentPlanLifecycle['describe']({ plan: plan4 })),
       {
-        ok: !![],
+        ok: true,
         status: 'need_confirmation',
         reply: plan4['reply'] || runtimeText('confirmFallback', localeProvider2()),
         plan: plan4,
@@ -1966,7 +1966,7 @@ export function createAgentRuntime({
     updatePendingGenerationParams: updatePendingGenerationParams,
     async confirmPendingPlan(options7 = {}) {
       if (config) return config;
-      const id12 = loopMode === !![] ? sessionStore['getPendingLoopRun']?.() : null;
+      const id12 = loopMode === true ? sessionStore['getPendingLoopRun']?.() : null;
       if (id12?.['pendingKind'] === 'confirmation') {
         const value76 = id12['pendingValidatedPlan'],
           commandId4 = value76?.['actions']?.[0];
@@ -1983,7 +1983,7 @@ export function createAgentRuntime({
           sessionStore['setCurrentRun']?.({
             id: id12['runId'],
             status: 'executing',
-            stopped: ![],
+            stopped: false,
             step: id12['step'],
           }),
           (config = (async () => {
@@ -2004,7 +2004,7 @@ export function createAgentRuntime({
               nextLoop: nextLoop,
               taskMessages: taskMessages5,
               recoveryCheckpoint: recoveryCheckpoint2,
-            } = run16(id12, commandId4, execution8, { confirmed: !![] });
+            } = run16(id12, commandId4, execution8, { confirmed: true });
             if (!execution8['ok']) return run7(id12, commandId4, execution8);
             const value77 = run5(nextLoop, { taskMessages: taskMessages5, recoveryCheckpoint: recoveryCheckpoint2 });
             if (value77) return value77;
@@ -2028,7 +2028,7 @@ export function createAgentRuntime({
         commandId: commandId5['actions']?.[0]?.['type'],
       }),
         (config = run21(
-          { ok: !![], status: 'ready', plan: { ...commandId5, status: 'ready', requiresConfirmation: ![] } },
+          { ok: true, status: 'ready', plan: { ...commandId5, status: 'ready', requiresConfirmation: false } },
           { turnId: turnId2('agent-confirm') },
         )));
       try {
@@ -2060,7 +2060,7 @@ export function createAgentRuntime({
           sessionStore['setCurrentRun']?.({
             id: runId6,
             status: 'executing',
-            stopped: ![],
+            stopped: false,
             step: step5['step'],
           }));
         const execution9 = await executeActions2([value78], {
@@ -2082,9 +2082,9 @@ export function createAgentRuntime({
       }
       return run21(
         {
-          ok: !![],
+          ok: true,
           status: 'ready',
-          plan: { ...initialScope2['plan'], status: 'ready', requiresConfirmation: ![] },
+          plan: { ...initialScope2['plan'], status: 'ready', requiresConfirmation: false },
         },
         { turnId: turnId2('agent-retry') },
       );
@@ -2113,7 +2113,7 @@ export function createAgentRuntime({
       const content13 = runtimeText('recoveryKept', localeProvider2());
       return (
         sessionStore['pushHistory']?.({ role: 'assistant', status: 'recovery_kept', content: content13 }),
-        { ok: !![], status: 'recovery_kept', reply: content13 }
+        { ok: true, status: 'recovery_kept', reply: content13 }
       );
     },
     cancelPendingPlan() {
@@ -2133,7 +2133,7 @@ export function createAgentRuntime({
       const content14 = runtimeText('planCancelled', localeProvider2());
       return (
         sessionStore['pushHistory']?.({ role: 'assistant', status: 'cancelled', content: content14 }),
-        { ok: !![], status: 'cancelled', reply: content14 }
+        { ok: true, status: 'cancelled', reply: content14 }
       );
     },
     stop() {
@@ -2150,7 +2150,7 @@ export function createAgentRuntime({
           !notice &&
           sessionStore['pushHistory']?.({ role: 'assistant', status: 'stopped', content: content15 }),
         {
-          ok: !![],
+          ok: true,
           status: 'stopped',
           reply: content15,
           run: run23,
@@ -2163,7 +2163,7 @@ export function createAgentRuntime({
         run11('reset'),
         sessionStore['reset']?.(),
         run10(),
-        { ok: !![], status: 'reset', reply: runtimeText('reset', localeProvider2()) }
+        { ok: true, status: 'reset', reply: runtimeText('reset', localeProvider2()) }
       );
     },
     startNewConversation() {

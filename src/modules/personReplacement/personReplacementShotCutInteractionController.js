@@ -28,7 +28,7 @@ export function createPersonReplacementShotCutInteractionController({
   getProject: getProject = () => ({}),
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis,
-  isDestroyed: isDestroyed = () => ![],
+  isDestroyed: isDestroyed = () => false,
   requestRender: requestRender = () => {},
   onShotCutDetectionRequested: onShotCutDetectionRequested = null,
   onShotCutRangesRequested: onShotCutRangesRequested = null,
@@ -78,7 +78,7 @@ export function createPersonReplacementShotCutInteractionController({
           if (timelineSec2['shotIndex'] < 0) return;
           previewController['preview'](timelineSec2['shotId'], timelineSec2['sourceTimeSec'], {
             timelineSec: timelineSec2['timelineSec'],
-            hover: !![],
+            hover: true,
           });
         },
         handler2 = windowObject?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
@@ -92,19 +92,19 @@ export function createPersonReplacementShotCutInteractionController({
         el3 = el2?.['querySelector']?.('[data-person-replacement-shot-cut-hover-playhead]');
       if (timelineSec['boundaryDrag'] || timelineSec['isKeyframeCapturing'])
         return (
-          (timelineSec['hoverPreviewActive'] = ![]),
+          (timelineSec['hoverPreviewActive'] = false),
           (timelineSec['hoverPreviewTimeSec'] = null),
           previewController['cancelHoverPreview'](),
-          el3 && ((el3['hidden'] = !![]), el3['classList']?.['remove']?.('is-visible')),
-          ![]
+          el3 && ((el3['hidden'] = true), el3['classList']?.['remove']?.('is-visible')),
+          false
         );
       if (!timelineSec['isOpen'] || !enabled || !el3)
-        return (el3 && ((el3['hidden'] = !![]), el3['classList']?.['remove']?.('is-visible')), ![]);
+        return (el3 && ((el3['hidden'] = true), el3['classList']?.['remove']?.('is-visible')), false);
       const payload = getTimelineSecFromPointer(event2, enabled),
         personReplacementShotCutDisplayDuration2 = getPersonReplacementShotCutDisplayDuration(
           timelineSec['draft'],
         );
-      ((el3['hidden'] = ![]),
+      ((el3['hidden'] = false),
         el3['style']?.['setProperty']?.(
           'left',
           (personReplacementShotCutDisplayDuration2 > 0
@@ -112,35 +112,35 @@ export function createPersonReplacementShotCutInteractionController({
             : 0) + '%',
         ),
         el3['classList']?.['add']?.('is-visible'),
-        (timelineSec['hoverPreviewActive'] = !![]),
+        (timelineSec['hoverPreviewActive'] = true),
         (timelineSec['hoverPreviewTimeSec'] = payload));
       const handle = el2?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
       return (
         !previewController['isPlaybackActive'](handle) &&
           ((timelineSec['hoverPreviewRequest'] = payload), handler()),
-        !![]
+        true
       );
     },
     hideHoverPlayhead = (event3) => {
       const el4 = getRoot(),
         state = event3?.['target']?.['closest']?.('[data-person-replacement-shot-cut-timeline]');
-      if (state && event3?.['relatedTarget'] && state['contains']?.(event3['relatedTarget'])) return ![];
+      if (state && event3?.['relatedTarget'] && state['contains']?.(event3['relatedTarget'])) return false;
       const el5 = el4?.['querySelector']?.('[data-person-replacement-shot-cut-hover-playhead]');
       if (timelineSec['boundaryDrag'])
         return (
-          (timelineSec['hoverPreviewActive'] = ![]),
+          (timelineSec['hoverPreviewActive'] = false),
           (timelineSec['hoverPreviewTimeSec'] = null),
           previewController['cancelHoverPreview'](),
-          el5 && ((el5['hidden'] = !![]), el5['classList']?.['remove']?.('is-visible')),
-          ![]
+          el5 && ((el5['hidden'] = true), el5['classList']?.['remove']?.('is-visible')),
+          false
         );
       const config = timelineSec['hoverPreviewActive'];
-      ((timelineSec['hoverPreviewActive'] = ![]),
+      ((timelineSec['hoverPreviewActive'] = false),
         (timelineSec['hoverPreviewTimeSec'] = null),
         previewController['cancelHoverPreview']());
-      el5 && ((el5['hidden'] = !![]), el5['classList']?.['remove']?.('is-visible'));
+      el5 && ((el5['hidden'] = true), el5['classList']?.['remove']?.('is-visible'));
       const scope = el4?.['querySelector']?.('[data-person-replacement-shot-cut-video]');
-      if (config && scope?.['paused'] !== ![]) {
+      if (config && scope?.['paused'] !== false) {
         const personReplacementShotCutPositionAtTimelineSec =
           getPersonReplacementShotCutPositionAtTimelineSec(timelineSec['draft'], timelineSec['playheadSec']);
         personReplacementShotCutPositionAtTimelineSec['shotIndex'] >= 0 &&
@@ -187,24 +187,24 @@ export function createPersonReplacementShotCutInteractionController({
       value4,
       value5,
       {
-        preview: preview = !![],
+        preview: preview = true,
         active: active = null,
-        recordHistory: recordHistory = !![],
-        preservePlayhead: preservePlayhead = ![],
+        recordHistory: recordHistory = true,
+        preservePlayhead: preservePlayhead = false,
       } = {},
     ) => {
       const value6 = Math['trunc'](Number(value4)),
         value7 = timelineSec['draft'][value6]?.['startSec'],
         enabled3 = session['moveBoundary'](value6, value5, { recordHistory: recordHistory }),
         enabled4 = timelineSec['draft'][value6];
-      if (!enabled3 || !enabled4 || enabled4['startSec'] === value7) return (syncEditorDom(active), ![]);
+      if (!enabled3 || !enabled4 || enabled4['startSec'] === value7) return (syncEditorDom(active), false);
       return (
         syncEditorDom(active),
         preview &&
           previewController['preview'](enabled4['shotId'], enabled4['startSec'], {
             preservePlayhead: preservePlayhead,
           }),
-        !![]
+        true
       );
     },
     handler3 = (event4, value8, el10) => {
@@ -230,22 +230,22 @@ export function createPersonReplacementShotCutInteractionController({
       return value13 + clamp3 * personReplacementShotCutDisplayDuration3 - value10;
     },
     beginBoundaryDrag = (event5, el11) => {
-      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']() || !el11) return ![];
+      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']() || !el11) return false;
       const active2 = Math['trunc'](Number(el11['dataset']?.['personReplacementCutBoundaryIndex'])),
         enabled5 = el11['closest']?.('[data-person-replacement-shot-cut-track]');
-      if (!(active2 > 0) || !enabled5) return ![];
+      if (!(active2 > 0) || !enabled5) return false;
       event5['preventDefault']?.();
       try {
-        el11['focus']?.({ preventScroll: !![] });
+        el11['focus']?.({ preventScroll: true });
       } catch {
         el11['focus']?.();
       }
       (session['stopBoundaryDrag'](),
-        (timelineSec['hoverPreviewActive'] = ![]),
+        (timelineSec['hoverPreviewActive'] = false),
         (timelineSec['hoverPreviewTimeSec'] = null),
         previewController['cancelHoverPreview']());
       const el12 = getRoot()?.['querySelector']?.('[data-person-replacement-shot-cut-hover-playhead]');
-      el12 && ((el12['hidden'] = !![]), el12['classList']?.['remove']?.('is-visible'));
+      el12 && ((el12['hidden'] = true), el12['classList']?.['remove']?.('is-visible'));
       (el11['classList']?.['add']?.('is-dragging'),
         documentObject?.['body']?.['classList']?.['add']?.('person-replacement-cut-resizing'));
       try {
@@ -256,40 +256,40 @@ export function createPersonReplacementShotCutInteractionController({
           const value14 = applyBoundaryTime(active2, handler3(event6, active2, enabled5), {
             active: active2,
             recordHistory: !timelineSec['boundaryDrag']?.['historyCaptured'],
-            preservePlayhead: !![],
+            preservePlayhead: true,
           });
-          if (value14 && timelineSec['boundaryDrag']) timelineSec['boundaryDrag']['historyCaptured'] = !![];
+          if (value14 && timelineSec['boundaryDrag']) timelineSec['boundaryDrag']['historyCaptured'] = true;
         },
         value15 = (event7) => {
           (event7?.['preventDefault']?.(), session['stopBoundaryDrag'](), syncEditorDom());
         },
         cleanup = () => {
-          (windowObject?.['removeEventListener']?.('pointermove', run, !![]),
-            windowObject?.['removeEventListener']?.('pointerup', value15, !![]),
-            windowObject?.['removeEventListener']?.('pointercancel', value15, !![]));
+          (windowObject?.['removeEventListener']?.('pointermove', run, true),
+            windowObject?.['removeEventListener']?.('pointerup', value15, true),
+            windowObject?.['removeEventListener']?.('pointercancel', value15, true));
           try {
             el11['releasePointerCapture']?.(event5['pointerId']);
           } catch {}
           el11['classList']?.['remove']?.('is-dragging');
         };
       return (
-        (timelineSec['boundaryDrag'] = { boundaryIndex: active2, cleanup: cleanup, historyCaptured: ![] }),
-        windowObject?.['addEventListener']?.('pointermove', run, !![]),
-        windowObject?.['addEventListener']?.('pointerup', value15, !![]),
-        windowObject?.['addEventListener']?.('pointercancel', value15, !![]),
+        (timelineSec['boundaryDrag'] = { boundaryIndex: active2, cleanup: cleanup, historyCaptured: false }),
+        windowObject?.['addEventListener']?.('pointermove', run, true),
+        windowObject?.['addEventListener']?.('pointerup', value15, true),
+        windowObject?.['addEventListener']?.('pointercancel', value15, true),
         run(event5),
-        !![]
+        true
       );
     },
     resetDraft = () => {
-      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return ![];
-      if (!session['resetDraft']()) return ![];
+      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return false;
+      if (!session['resetDraft']()) return false;
       try {
         editorController['syncReverseDraftToProject']();
       } catch (error) {
         return (
           windowObject?.['showToast']?.(error?.['message'] || '重置倒放状态失败，请重试。', 'error'),
-          ![]
+          false
         );
       }
       const project = getProject();
@@ -303,18 +303,18 @@ export function createPersonReplacementShotCutInteractionController({
             'startSec'
           ],
         ),
-        !![]
+        true
       );
     },
     undoDraft = () => {
-      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return ![];
-      if (!session['undo']()) return ![];
+      if (!timelineSec['isOpen'] || viewportController['isDraftMutationBusy']()) return false;
+      if (!session['undo']()) return false;
       try {
         editorController['syncReverseDraftToProject']();
       } catch (error2) {
         return (
           windowObject?.['showToast']?.(error2?.['message'] || '撤回倒放状态失败，请重试。', 'error'),
-          ![]
+          false
         );
       }
       const personReplacementShotCutTotalDuration = getPersonReplacementShotCutTotalDuration(
@@ -338,7 +338,7 @@ export function createPersonReplacementShotCutInteractionController({
           previewController['preview'](timelineSec3['shotId'], timelineSec3['sourceTimeSec'], {
             timelineSec: timelineSec3['timelineSec'],
           }),
-        !![]
+        true
       );
     },
     runSmartDetection = () => {
@@ -347,8 +347,8 @@ export function createPersonReplacementShotCutInteractionController({
         viewportController['isDraftMutationBusy']() ||
         typeof onShotCutDetectionRequested !== 'function'
       )
-        return ![];
-      ((timelineSec['isSmartDetectOpen'] = ![]), (timelineSec['isSmartDetecting'] = !![]));
+        return false;
+      ((timelineSec['isSmartDetectOpen'] = false), (timelineSec['isSmartDetecting'] = true));
       const value17 = ++timelineSec['smartDetectionToken'],
         text = normalizeText(getProject()['id']),
         handler4 = () =>
@@ -374,7 +374,7 @@ export function createPersonReplacementShotCutInteractionController({
             const list = Array['isArray'](value19?.['ranges']) ? value19['ranges'] : [];
             if (!list['length']) throw new Error('智能检测未返回可用切口');
             const enabled6 = viewportController['commitDraft'](list);
-            ((timelineSec['isSmartDetecting'] = ![]), (timelineSec['isSmartDetectOpen'] = ![]));
+            ((timelineSec['isSmartDetecting'] = false), (timelineSec['isSmartDetectOpen'] = false));
             if (!enabled6) {
               (requestRender(), windowObject?.['showToast']?.('智能检测结果与当前切口一致。', 'info'));
               return;
@@ -396,8 +396,8 @@ export function createPersonReplacementShotCutInteractionController({
           })
           ['catch']((error3) => {
             if (!handler4()) return;
-            ((timelineSec['isSmartDetecting'] = ![]),
-              (timelineSec['isSmartDetectOpen'] = !![]),
+            ((timelineSec['isSmartDetecting'] = false),
+              (timelineSec['isSmartDetectOpen'] = true),
               requestRender(),
               previewController['preview'](
                 timelineSec['previewShotId'],
@@ -407,12 +407,12 @@ export function createPersonReplacementShotCutInteractionController({
               ),
               windowObject?.['showToast']?.(error3?.['message'] || '智能检测失败，请重试。', 'error'));
           }),
-        !![]
+        true
       );
     },
     submitDraft = ({
       submissionKind: submissionKind = 'cuts',
-      closeOnSuccess: closeOnSuccess = !![],
+      closeOnSuccess: closeOnSuccess = true,
       rollback: rollback = null,
       successMessage: successMessage = '',
       errorMessage: errorMessage = '镜头切口更新失败，请重试。',
@@ -430,9 +430,9 @@ export function createPersonReplacementShotCutInteractionController({
       return (
         Promise['resolve'](runRequest2)
           ['then'](() => {
-            ((timelineSec['isSubmitting'] = ![]),
+            ((timelineSec['isSubmitting'] = false),
               closeOnSuccess
-                ? editorController['close']({ animate: !![], renderWorkspace: !![] })
+                ? editorController['close']({ animate: true, renderWorkspace: true })
                 : ((timelineSec['initialDraft'] = clone(timelineSec['draft'])),
                   (timelineSec['undoStack'] = []),
                   requestRender(),
@@ -440,7 +440,7 @@ export function createPersonReplacementShotCutInteractionController({
                   successMessage && windowObject?.['showToast']?.(successMessage, 'success')));
           })
           ['catch']((error4) => {
-            ((timelineSec['isSubmitting'] = ![]),
+            ((timelineSec['isSubmitting'] = false),
               rollback &&
                 ((timelineSec['draft'] = rollback['draft']),
                 (timelineSec['undoStack'] = rollback['undoStack'])),
@@ -448,7 +448,7 @@ export function createPersonReplacementShotCutInteractionController({
               previewController['seekTimeline'](timelineSec['playheadSec']),
               windowObject?.['showToast']?.(error4?.['message'] || errorMessage, 'error'));
           }),
-        !![]
+        true
       );
     },
     confirmDraft = () => {
@@ -458,7 +458,7 @@ export function createPersonReplacementShotCutInteractionController({
         viewportController['isDraftMutationBusy']() ||
         !hasPersonReplacementShotCutUpdateChanges(project3['shots'], timelineSec['draft'])
       )
-        return ![];
+        return false;
       return submitDraft();
     };
   return (
@@ -474,7 +474,7 @@ export function createPersonReplacementShotCutInteractionController({
       setSmartDetectMode: ({ target: target2 }) =>
         updateSmartClipSettings(
           { settings: { smartClipMode: target2['dataset']['smartClipMode'] } },
-          { notify: !![] },
+          { notify: true },
         ),
       confirmSmartDetect: () => runSmartDetection(),
       toggleSound: ({ target: target3 }) => viewportController['toggleSound'](target3),
@@ -484,7 +484,7 @@ export function createPersonReplacementShotCutInteractionController({
       },
       undo: () => undoDraft(),
       reset: () => resetDraft(),
-      cancel: () => editorController['close']({ animate: !![], renderWorkspace: !![] }),
+      cancel: () => editorController['close']({ animate: true, renderWorkspace: true }),
       confirm: () => confirmDraft(),
       togglePlayback: () => previewController['togglePlayback'](),
       step: ({ target: target4 }) =>

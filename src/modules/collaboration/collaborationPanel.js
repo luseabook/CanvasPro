@@ -17,7 +17,7 @@ export function createCollaborationPanel({
   actions: actions,
   getState: getState,
   anchor: anchor = null,
-  keepOpenOnOutside: keepOpenOnOutside = () => ![],
+  keepOpenOnOutside: keepOpenOnOutside = () => false,
 }) {
   const root = element('dialog', 'collaboration-dialog');
   root['setAttribute']('aria-labelledby', 'collaboration-title');
@@ -36,18 +36,18 @@ export function createCollaborationPanel({
   const element3 = element('div', 'collaboration-body'),
     enabled = {};
   let run = () => {},
-    enabled2 = ![];
+    enabled2 = false;
   function run2() {
     !enabled2 &&
-      ((enabled2 = !![]),
+      ((enabled2 = true),
       (run = beginModalInteraction({
         root: root,
         onClose: onClose,
         returnFocus: anchor || undefined,
       })));
   }
-  let enabled3 = ![],
-    enabled4 = ![],
+  let enabled3 = false,
+    enabled4 = false,
     index = '',
     result = '',
     data = '';
@@ -60,11 +60,11 @@ export function createCollaborationPanel({
     return (
       (el4['type'] = 'button'),
       el4['addEventListener']('click', () => {
-        if (next !== ![]) return run4(el4, handler, next);
+        if (next !== false) return run4(el4, handler, next);
         try {
           handler();
         } catch (error) {
-          ((enabled4 = !![]), (el3['hidden'] = ![]), (el3['textContent'] = error['message']));
+          ((enabled4 = true), (el3['hidden'] = false), (el3['textContent'] = error['message']));
         }
       }),
       source['append'](el4),
@@ -84,13 +84,13 @@ export function createCollaborationPanel({
     );
   }
   async function run4(el5, handler2, record = '正在处理…') {
-    if (enabled3) return ![];
-    ((enabled3 = !![]),
-      (enabled4 = ![]),
-      (el5['disabled'] = !![]),
+    if (enabled3) return false;
+    ((enabled3 = true),
+      (enabled4 = false),
+      (el5['disabled'] = true),
       el5['setAttribute']('aria-busy', 'true'),
-      collaborationInvitation['setBusy'](!![]),
-      (el3['hidden'] = ![]),
+      collaborationInvitation['setBusy'](true),
+      (el3['hidden'] = false),
       el3['classList']['add']('is-pending'),
       (el3['textContent'] = record));
     try {
@@ -98,18 +98,18 @@ export function createCollaborationPanel({
       if (el3['textContent'] === record)
         el3['textContent'] = getState()['session']?.['message'] || '操作完成';
     } catch (error2) {
-      ((enabled4 = !![]),
+      ((enabled4 = true),
         (el3['textContent'] =
           error2['name'] === 'AbortError' ? '操作已取消' : error2['message'] || '操作失败，请重试'));
     } finally {
-      ((enabled3 = ![]),
-        (el5['disabled'] = ![]),
-        collaborationInvitation['setBusy'](![]),
+      ((enabled3 = false),
+        (el5['disabled'] = false),
+        collaborationInvitation['setBusy'](false),
         el5['removeAttribute']('aria-busy'),
         el3['classList']['remove']('is-pending'),
         render());
     }
-    return !![];
+    return true;
   }
   const payload = run3('auth');
   payload['append'](element('p', '', '自动使用当前设备已激活的画布授权，无需再次填写激活码。'));
@@ -149,20 +149,20 @@ export function createCollaborationPanel({
   const el12 = element('button', 'collaboration-button', '结束本次联机');
   el12['type'] = 'button';
   const el13 = element('div', 'collaboration-disconnect-confirm');
-  ((el13['hidden'] = !![]),
+  ((el13['hidden'] = true),
     el13['setAttribute']('role', 'group'),
     el13['setAttribute']('aria-label', '确定结束本次联机'),
     element9['append'](el12, el13));
   let enabled5 = '',
     signal = null;
-  function run6(enabled6 = ![]) {
+  function run6(enabled6 = false) {
     ((enabled5 = ''),
-      (el12['hidden'] = ![]),
-      (el13['hidden'] = !![]),
+      (el12['hidden'] = false),
+      (el13['hidden'] = true),
       el11['classList']['remove']('is-confirming'));
     if (enabled6 && root['open'] && getState()['session']) el12['focus']();
   }
-  async function run7(enabled7 = ![]) {
+  async function run7(enabled7 = false) {
     if (!enabled5 || getState()['session']?.['roomId'] !== enabled5) {
       run6();
       return;
@@ -170,32 +170,32 @@ export function createCollaborationPanel({
     signal = new AbortController();
     try {
       if (enabled7)
-        (run({ restoreFocus: ![] }),
-          (enabled2 = ![]),
+        (run({ restoreFocus: false }),
+          (enabled2 = false),
           await actions['saveAndDisconnect']({ signal: signal['signal'] }));
-      else await actions['disconnect']({ signal: signal['signal'], preserveDraft: !![] });
+      else await actions['disconnect']({ signal: signal['signal'], preserveDraft: true });
     } finally {
-      ((signal = null), run6(!![]));
+      ((signal = null), run6(true));
     }
   }
   const el14 = button('确定', () => run7(), el13, '正在结束联机…');
   el14['classList']['add']('collaboration-danger');
-  const el15 = button('保存并确定', () => run7(!![]), el13, '正在保存项目并结束联机…');
+  const el15 = button('保存并确定', () => run7(true), el13, '正在保存项目并结束联机…');
   el15['classList']['add']('collaboration-primary');
   const el16 = element('button', 'collaboration-button', '取消');
   ((el16['type'] = 'button'),
     el16['addEventListener']('click', () => {
       if (signal) signal['abort']();
       else {
-        if (!enabled3) run6(!![]);
+        if (!enabled3) run6(true);
       }
     }),
     el13['prepend'](el16),
     el12['addEventListener']('click', () => {
       if (enabled3 || !getState()['session']) return;
       ((enabled5 = getState()['session']['roomId']),
-        (el12['hidden'] = !![]),
-        (el13['hidden'] = ![]),
+        (el12['hidden'] = true),
+        (el13['hidden'] = false),
         el16['focus'](),
         el11['classList']['add']('is-confirming'));
     }),
@@ -204,7 +204,7 @@ export function createCollaborationPanel({
         (event['preventDefault'](), event['stopPropagation']());
         if (signal) signal['abort']();
         else {
-          if (!enabled3) run6(!![]);
+          if (!enabled3) run6(true);
         }
       }
     }));
@@ -281,21 +281,21 @@ export function createCollaborationPanel({
     button(
       '使用房主版本',
       () =>
-        confirmAction('放弃这些冲突节点的本机修改，使用房主版本？', () => actions['resolveConflicts'](![])),
+        confirmAction('放弃这些冲突节点的本机修改，使用房主版本？', () => actions['resolveConflicts'](false)),
       el23,
     ),
     button(
       '提交本机版本',
       () =>
         confirmAction('用本机内容重新提交这些冲突节点？房主会再次检查权限和节点占用。', () =>
-          actions['resolveConflicts'](!![]),
+          actions['resolveConflicts'](true),
         ),
       el23,
     ));
   const el25 = element('p', 'collaboration-subtle');
   (root3['append'](el25), collaborationLobby['mountSessionControls'](element11, el11));
   const el26 = run3('confirmation');
-  el26['hidden'] = !![];
+  el26['hidden'] = true;
   const el27 = element('p');
   el26['append'](el27);
   let value2 = null,
@@ -304,7 +304,7 @@ export function createCollaborationPanel({
     '确认',
     async () => {
       const config = value2;
-      ((value2 = null), (el26['hidden'] = !![]));
+      ((value2 = null), (el26['hidden'] = true));
       if (getState()['session']?.['roomId'] === state) await config?.();
     },
     el26,
@@ -312,7 +312,7 @@ export function createCollaborationPanel({
     button(
       '取消',
       () => {
-        ((value2 = null), (el26['hidden'] = !![]));
+        ((value2 = null), (el26['hidden'] = true));
       },
       el26,
     ));
@@ -320,22 +320,22 @@ export function createCollaborationPanel({
     ((state = getState()['session']?.['roomId']),
       (el27['textContent'] = scope),
       (value2 = output),
-      (el26['hidden'] = ![]),
+      (el26['hidden'] = false),
       el26['querySelector']('button')['focus']());
   }
   (root['append'](head, element3), document['body']['append'](root));
   let requestAnimationFrame2 = 0,
     value3 = '';
-  function run5(restoreFocus = !![]) {
+  function run5(restoreFocus = true) {
     (cancelAnimationFrame(requestAnimationFrame2),
       collaborationInvitation['close'](),
       collaborationMembers['close'](),
       collaborationLobby['resetHostChoice'](),
       run6(),
       (value2 = null),
-      (el26['hidden'] = !![]),
+      (el26['hidden'] = true),
       run({ restoreFocus: restoreFocus }),
-      (enabled2 = ![]),
+      (enabled2 = false),
       root['close'](),
       anchor?.['setAttribute']('aria-expanded', 'false'));
   }
@@ -356,11 +356,11 @@ export function createCollaborationPanel({
     if (keepOpenOnOutside(event3['target']))
       (collaborationInvitation['close'](),
         collaborationMembers['close'](),
-        run({ restoreFocus: ![] }),
-        (enabled2 = ![]));
-    else run5(![]);
+        run({ restoreFocus: false }),
+        (enabled2 = false));
+    else run5(false);
   };
-  document['addEventListener']('pointerdown', value4, !![]);
+  document['addEventListener']('pointerdown', value4, true);
   function run8() {
     const box = anchor?.['getBoundingClientRect'](),
       value5 = Math['min'](box?.['bottom'] || 48, window['innerHeight'] / 3) + 10,
@@ -382,9 +382,9 @@ export function createCollaborationPanel({
     const enabled8 = getState();
     el15['hidden'] = !enabled8['session']?.['hosting'];
     const value8 = enabled8['session']?.['roomId'] || '';
-    value8 !== index && ((index = value8), (enabled4 = ![]));
+    value8 !== index && ((index = value8), (enabled4 = false));
     if (enabled5 && enabled8['session']?.['roomId'] !== enabled5) run6();
-    state && enabled8['session']?.['roomId'] !== state && ((value2 = null), (el26['hidden'] = !![]));
+    state && enabled8['session']?.['roomId'] !== state && ((value2 = null), (el26['hidden'] = true));
     ((enabled['auth']['hidden'] = !!enabled8['authenticated'] && !enabled8['authenticating']),
       (enabled['lobby']['hidden'] =
         (!enabled8['authenticated'] || !!enabled8['authenticating']) && !enabled8['session']),
@@ -414,7 +414,7 @@ export function createCollaborationPanel({
     ((result = value11),
       (el3['hidden'] =
         !enabled3 && !enabled8['authenticating'] && QUIET_SYNC_MESSAGES['has'](el3['textContent'])));
-    !enabled8['session'] && ((el26['hidden'] = !![]), (value2 = null));
+    !enabled8['session'] && ((el26['hidden'] = true), (value2 = null));
     if (enabled8['session']) {
       ((el8['textContent'] = enabled8['session']['name']),
         (el9['textContent'] = ROLE_NAMES[enabled8['session']['role']]),
@@ -489,14 +489,14 @@ export function createCollaborationPanel({
       }
     },
     feedback(value19) {
-      !enabled3 && !enabled4 && ((el3['hidden'] = ![]), (el3['textContent'] = value19));
+      !enabled3 && !enabled4 && ((el3['hidden'] = false), (el3['textContent'] = value19));
     },
     destroy() {
       (cancelAnimationFrame(requestAnimationFrame2),
         collaborationInvitation['close'](),
         collaborationMembers['destroy'](),
         run(),
-        document['removeEventListener']('pointerdown', value4, !![]),
+        document['removeEventListener']('pointerdown', value4, true),
         root['remove']());
     },
   };

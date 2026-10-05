@@ -59,7 +59,7 @@ function validateSceneNode(args, entry) {
     return { args: { ...args, nodeId: resolveSceneNodeId(args, entry) } };
   } catch (errorCode) {
     return {
-      ok: ![],
+      ok: false,
       errorCode: errorCode['errorCode'] || 'PANORAMA_SCENE_NOT_FOUND',
       message: errorCode['message'],
       details: errorCode['details'],
@@ -372,16 +372,16 @@ export function registerPanoramaSceneCommands(value14) {
             },
           },
         },
-        defaults: { replaceExisting: ![] },
+        defaults: { replaceExisting: false },
       },
       capabilitySchema: {
         reads: ['nodes', 'selection', 'sceneAssetCatalog', 'mannequinPoseCatalog'],
         writes: ['nodes', 'selection', 'history'],
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       validate(args3 = {}, value16 = {}) {
         const response = validateSceneNode(args3, value16);
-        if (response['ok'] === ![]) return response;
+        if (response['ok'] === false) return response;
         const list7 = Array['isArray'](args3['assets']) ? args3['assets'] : [],
           assets2 = [];
         for (let value17 = 0; value17 < list7['length']; value17 += 1) {
@@ -393,7 +393,7 @@ export function registerPanoramaSceneCommands(value14) {
                 ? value18
                 : value18?.['assetId'] || value18?.['id'] || value18?.['query'] || value18?.['assetQuery'];
             return {
-              ok: ![],
+              ok: false,
               errorCode: 'SCENE_ASSET_NOT_FOUND',
               message: 'Unknown scene asset: ' + String(value19 || '(empty)'),
             };
@@ -412,7 +412,7 @@ export function registerPanoramaSceneCommands(value14) {
                 ? value21
                 : value21?.['poseId'] || value21?.['poseQuery'] || value21?.['activity'];
             return {
-              ok: ![],
+              ok: false,
               errorCode: 'MANNEQUIN_POSE_NOT_FOUND',
               message: 'Unknown mannequin pose: ' + String(value22 || '(empty)'),
             };
@@ -454,9 +454,9 @@ export function registerPanoramaSceneCommands(value14) {
       capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes', 'history'] },
       validate(args5 = {}, value24 = {}) {
         const response2 = validateSceneNode(args5, value24);
-        if (response2['ok'] === ![]) return response2;
+        if (response2['ok'] === false) return response2;
         if (!String(args5['mannequinId'] || '')['trim']())
-          return { ok: ![], errorCode: 'MANNEQUIN_ID_REQUIRED', message: 'mannequinId is required.' };
+          return { ok: false, errorCode: 'MANNEQUIN_ID_REQUIRED', message: 'mannequinId is required.' };
         return { args: { ...args5, ...response2['args'] } };
       },
       execute(nodeId, value25) {

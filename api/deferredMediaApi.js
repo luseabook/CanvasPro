@@ -41,7 +41,7 @@ export function withDeferredMediaFiles(
   run(item);
   if (!args['size']) return handler();
   return handler2([...args])['then']((error) => {
-    if (error?.['success'] === ![]) throw new Error(error['message'] || '读取所选素材失败，请确认房主仍在线');
+    if (error?.['success'] === false) throw new Error(error['message'] || '读取所选素材失败，请确认房主仍在线');
     return handler();
   });
 }

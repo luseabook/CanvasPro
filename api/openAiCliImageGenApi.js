@@ -91,7 +91,7 @@ export async function runOpenAiCliImageGeneration(timeoutMs = {}, entry = {}) {
       list6['push'](...normalizeImageResults(generateImageWithCliProvider2));
     } catch (error) {
       if (count === 1) throw error;
-      ((payload ??= error), list6['push']({ error: error['message'], status: 'failed', retryable: ![] }));
+      ((payload ??= error), list6['push']({ error: error['message'], status: 'failed', retryable: false }));
     }
   }
   if (list6['every']((response2) => response2['status'] === 'failed'))

@@ -25,7 +25,7 @@ export function createTextResponseDeadline(
   if (firstChunkTimeoutMs != null)
     setTimeout3 = setTimeout(() => handler('首次响应'), Math['max'](1, firstChunkTimeoutMs));
   const run2 = () => run(new DOMException('Request aborted', 'AbortError'));
-  signal?.['addEventListener']('abort', run2, { once: !![] });
+  signal?.['addEventListener']('abort', run2, { once: true });
   if (signal?.['aborted']) run2();
   return {
     activity() {
@@ -51,11 +51,11 @@ export async function readTextResponseBody(dom, result = {}) {
     textDecoder = new TextDecoder();
   let data = '';
   try {
-    while (!![]) {
+    while (true) {
       const { value: value2, done: done } = await enabled['read']();
       textResponseDeadline['check']();
       if (done) return data + textDecoder['decode']();
-      (textResponseDeadline['activity'](), (data += textDecoder['decode'](value2, { stream: !![] })));
+      (textResponseDeadline['activity'](), (data += textDecoder['decode'](value2, { stream: true })));
     }
   } catch (options) {
     options['partialText'] = data;

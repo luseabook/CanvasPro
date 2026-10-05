@@ -1,7 +1,7 @@
 import { setCanvasMediaSchedulerPaused } from '../modules/canvasMediaScheduler.js';
 const DEFAULT_RENDERER_VIEWPORT_MEDIA_PRELOAD_AUTO_RESUME_MS = 900,
   ACTIVE_VIEWPORT_RECHECK_MS = 180;
-let rendererViewportMediaPreloadsPaused = ![],
+let rendererViewportMediaPreloadsPaused = false,
   rendererViewportMediaPreloadResumeTimer = 0;
 function clearRendererViewportMediaPreloadResumeTimer() {
   if (!rendererViewportMediaPreloadResumeTimer) return;
@@ -26,11 +26,11 @@ function scheduleRendererViewportMediaPreloadResume(item) {
       scheduleRendererViewportMediaPreloadResume(ACTIVE_VIEWPORT_RECHECK_MS);
       return;
     }
-    syncRendererViewportMediaPreloadPause(![]);
+    syncRendererViewportMediaPreloadPause(false);
   }, key);
 }
 export function syncRendererViewportMediaPreloadPause(index, result = {}) {
-  const data = index === !![];
+  const data = index === true;
   data
     ? scheduleRendererViewportMediaPreloadResume(result['autoResumeMs'])
     : clearRendererViewportMediaPreloadResumeTimer();
@@ -39,5 +39,5 @@ export function syncRendererViewportMediaPreloadPause(index, result = {}) {
     setCanvasMediaSchedulerPaused(data, { bypassPriority: 1000, source: 'renderer-viewport' }));
 }
 export function clearRendererViewportMediaPreloadPause() {
-  (clearRendererViewportMediaPreloadResumeTimer(), syncRendererViewportMediaPreloadPause(![]));
+  (clearRendererViewportMediaPreloadResumeTimer(), syncRendererViewportMediaPreloadPause(false));
 }

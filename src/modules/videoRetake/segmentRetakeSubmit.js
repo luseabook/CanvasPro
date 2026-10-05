@@ -22,10 +22,10 @@ export function getSegmentRetakeSubmitErrorKey(value) {
 }
 export function validateSegmentRetakeSubmitNode(options = {}) {
   const enabled = options?.['segmentRetake'];
-  if (!enabled) return { ok: !![], reason: '', isSegmentRetake: ![] };
+  if (!enabled) return { ok: true, reason: '', isSegmentRetake: false };
   if (!isSegmentRetakeModelSupported(options?.['model']))
-    return { ok: ![], reason: 'unsupported-model', isSegmentRetake: !![] };
-  return { ...getSegmentRetakeValidation(enabled), isSegmentRetake: !![] };
+    return { ok: false, reason: 'unsupported-model', isSegmentRetake: true };
+  return { ...getSegmentRetakeValidation(enabled), isSegmentRetake: true };
 }
 function buildClipSignature(options2 = {}) {
   return [
@@ -60,7 +60,7 @@ export async function prepareSegmentRetakeSubmit({
   getLatestNodeData: getLatestNodeData,
 } = {}) {
   const startSec = nodeData?.['segmentRetake'];
-  if (!startSec) return { ok: !![], inputMaterials: inputMaterials, nodePatch: null, payloadPatch: null };
+  if (!startSec) return { ok: true, inputMaterials: inputMaterials, nodePatch: null, payloadPatch: null };
   const response = validateSegmentRetakeSubmitNode(nodeData);
   if (!response['ok'])
     return { ...response, inputMaterials: inputMaterials, nodePatch: null, payloadPatch: null };
@@ -97,7 +97,7 @@ export async function prepareSegmentRetakeSubmit({
     (!enabled3?.['segmentRetake'] || buildClipSignature(enabled3['segmentRetake']) !== signature)
   )
     return {
-      ok: ![],
+      ok: false,
       reason: 'range-changed',
       inputMaterials: inputMaterials,
       nodePatch: null,
@@ -106,7 +106,7 @@ export async function prepareSegmentRetakeSubmit({
   const enabled4 = fullLength ? src : localPathToUrl(localPath);
   if (!enabled4)
     return {
-      ok: ![],
+      ok: false,
       reason: 'clip-unavailable',
       inputMaterials: inputMaterials,
       nodePatch: null,
@@ -117,7 +117,7 @@ export async function prepareSegmentRetakeSubmit({
     replaceVideoInputs(inputMaterials?.['modelApi'], enabled4, index),
     replaceVideoInputs(inputMaterials?.['dreamina'], enabled4, index),
     {
-      ok: !![],
+      ok: true,
       fullLength: fullLength,
       inputMaterials: inputMaterials,
       nodePatch: {
@@ -173,12 +173,12 @@ export async function applySegmentRetakeTaskPayload(
   nodePatch['nodePatch'] &&
     (!enabled5 ||
       buildClipSignature(enabled5) !== buildClipSignature(nodePatch['nodePatch']['segmentRetake'])) &&
-    ((nodePatch['ok'] = ![]), (nodePatch['reason'] = 'range-changed'));
+    ((nodePatch['ok'] = false), (nodePatch['reason'] = 'range-changed'));
   if (!nodePatch['ok']) {
     const segmentRetakeSubmitErrorKey = getSegmentRetakeSubmitErrorKey(nodePatch['reason']);
     return (
       globalThis['window']?.['showToast']?.(t('segmentRetake.errors.' + segmentRetakeSubmitErrorKey), 'warn'),
-      ![]
+      false
     );
   }
   if (nodePatch['nodePatch']) {
@@ -195,6 +195,6 @@ export async function applySegmentRetakeTaskPayload(
     Object['assign'](payload, nodePatch['payloadPatch'] || {}),
     (nodeData2['_data'] = decorateSegmentRetakeParameterNodeData(nodeData2['_data'] || {})),
     applySegmentRetakeSubmitParameterPolicy(nodeData2['_data'], payload),
-    !![]
+    true
   );
 }

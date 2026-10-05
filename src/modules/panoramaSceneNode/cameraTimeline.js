@@ -56,9 +56,9 @@ export function createDefaultCameraTimeline() {
   return {
     duration: DEFAULT_DURATION_SECONDS,
     fps: DEFAULT_FPS,
-    loop: ![],
+    loop: false,
     currentTime: 0,
-    isPlaying: ![],
+    isPlaying: false,
     keyframes: [],
   };
 }
@@ -78,9 +78,9 @@ export function normalizeCameraTimeline(loop = {}) {
   return {
     duration: duration,
     fps: clamp(Math['round'](finiteNumber(loop?.['fps'], defaultCameraTimeline['fps'])), 1, 120),
-    loop: loop?.['loop'] === !![],
+    loop: loop?.['loop'] === true,
     currentTime: clamp(finiteNumber(loop?.['currentTime'], 0), 0, duration),
-    isPlaying: loop?.['isPlaying'] === !![],
+    isPlaying: loop?.['isPlaying'] === true,
     keyframes: keyframes['map']((args) => ({
       ...args,
       time: clamp(args['time'], 0, duration),

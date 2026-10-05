@@ -74,7 +74,7 @@ function selectFairCompactCandidatesWithinSerializedBudget(
         { [current]: fairStoryAssetCandidateSubset },
         null,
         {
-          includeClientKeys: !![],
+          includeClientKeys: true,
         },
       )['payload'];
     if (JSON['stringify'](storyAssetPromptContracts['candidateAssets'] || [])['length'] <= state)
@@ -124,8 +124,8 @@ export function createBudgetedStoryAssetEvidenceProject(
   value11 = [],
   {
     requirementEvidence: requirementEvidence = null,
-    includeAllSceneHeadings: includeAllSceneHeadings = ![],
-    includeAllSceneCharacters: includeAllSceneCharacters = ![],
+    includeAllSceneHeadings: includeAllSceneHeadings = false,
+    includeAllSceneCharacters: includeAllSceneCharacters = false,
     bodyCharacterBudget: bodyCharacterBudget = STORY_ASSET_EVIDENCE_BODY_MAX_CHARACTERS,
   } = {},
 ) {
@@ -265,8 +265,8 @@ export function resolveStoryAssetFocusedOutputMode({
             Array['isArray'](candidateAssetsByKind?.[value26]) ? candidateAssetsByKind[value26] : []
           )['filter']((error) => {
             const enabled4 = run(error && typeof error === 'object' ? error['name'] : error);
-            if (!enabled4 || map5['has'](enabled4) || map6['has'](enabled4)) return ![];
-            return (map6['add'](enabled4), !![]);
+            if (!enabled4 || map5['has'](enabled4) || map6['has'](enabled4)) return false;
+            return (map6['add'](enabled4), true);
           });
         return [value26, value28];
       }),

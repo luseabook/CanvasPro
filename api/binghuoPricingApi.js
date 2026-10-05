@@ -22,13 +22,13 @@ export function resolveBinghuoPricingContext(args, kind, generationParams, handl
     kind: kind['modelManifest']['kind'],
     label: kind['modelManifest']['displayName'],
     params: params,
-    persist: ![],
+    persist: false,
     key: 'binghuo|' + catalogKey + '|' + model,
   };
 }
 export function parseBinghuoPriceCatalog(response) {
   if (
-    response?.['ok'] !== !![] ||
+    response?.['ok'] !== true ||
     typeof response['catalog_version'] !== 'string' ||
     !response['catalog_version']['trim']() ||
     !Array['isArray'](response['models']) ||

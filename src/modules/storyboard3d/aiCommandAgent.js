@@ -68,7 +68,7 @@ function requiredId(next, current) {
 function optionalText(entry, record = 500) {
   return normalizeText(entry)['slice'](0, record);
 }
-function normalizeTransformArgs(payload, { partial: partial = ![] } = {}) {
+function normalizeTransformArgs(payload, { partial: partial = false } = {}) {
   const box = {};
   return (
     (!partial || payload['position'] != null) &&
@@ -127,7 +127,7 @@ function normalizeCommandArgs(config, scope = {}) {
         name: optionalText(error['name'], 120),
         visible: typeof error['visible'] === 'boolean' ? error['visible'] : undefined,
         locked: typeof error['locked'] === 'boolean' ? error['locked'] : undefined,
-        ...normalizeTransformArgs(error, { partial: !![] }),
+        ...normalizeTransformArgs(error, { partial: true }),
       };
     case 'deleteObject':
       return { objectId: requiredId(error['objectId'], 'args.objectId') };

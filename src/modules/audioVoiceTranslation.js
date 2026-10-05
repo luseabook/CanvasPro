@@ -91,11 +91,11 @@ export function createAudioVoiceTranslationStructuredOutput(list5 = []) {
   if (!minItems['length']) throw new Error('没有可用于结构化输出的句子 ID。');
   return {
     name: 'audio_voice_translation',
-    strict: !![],
+    strict: true,
     fallback: 'prompt',
     schema: {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['translations'],
       properties: {
         translations: {
@@ -104,7 +104,7 @@ export function createAudioVoiceTranslationStructuredOutput(list5 = []) {
           maxItems: minItems['length'],
           items: {
             type: 'object',
-            additionalProperties: ![],
+            additionalProperties: false,
             required: ['id', 'targetText'],
             properties: {
               id: { type: 'string', enum: minItems },

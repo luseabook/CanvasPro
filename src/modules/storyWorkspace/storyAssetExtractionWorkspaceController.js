@@ -56,25 +56,25 @@ export function getStoryAssetBreakdownEpisodes(options = {}) {
   }));
 }
 export function isStoryAssetExperimentalExtractionAvailable(data = globalThis['window']) {
-  return data?.['DEV_MODE'] === !![];
+  return data?.['DEV_MODE'] === true;
 }
 export function shouldUseStoryAssetBatchedExtraction(
   options2 = {},
   {
-    batchedAgentAvailable: batchedAgentAvailable = ![],
-    forceSingleRequest: forceSingleRequest = ![],
-    explicitExperimental: explicitExperimental = ![],
+    batchedAgentAvailable: batchedAgentAvailable = false,
+    forceSingleRequest: forceSingleRequest = false,
+    explicitExperimental: explicitExperimental = false,
   } = {},
 ) {
-  if (forceSingleRequest) return ![];
-  if (!explicitExperimental) return ![];
-  if (!batchedAgentAvailable) return ![];
+  if (forceSingleRequest) return false;
+  if (!explicitExperimental) return false;
+  if (!batchedAgentAvailable) return false;
   return Array['isArray'](options2?.['episodes']);
 }
 export function shouldUseStoryAssetParallelExtraction({
-  parallelAgentAvailable: parallelAgentAvailable = ![],
-  forceSingleRequest: forceSingleRequest = ![],
-  explicitExperimental: explicitExperimental = ![],
+  parallelAgentAvailable: parallelAgentAvailable = false,
+  forceSingleRequest: forceSingleRequest = false,
+  explicitExperimental: explicitExperimental = false,
 } = {}) {
   return parallelAgentAvailable && !forceSingleRequest && !explicitExperimental;
 }
@@ -145,8 +145,8 @@ export function createStoryAssetExtractionWorkspaceController({
       fallbackValue: 'preserve',
       choices: [
         { label: '取消', value: null },
-        { label: '保留已有媒体', value: 'preserve', autofocus: !![] },
-        { label: '全部重建', value: 'rebuild', primary: !![] },
+        { label: '保留已有媒体', value: 'preserve', autofocus: true },
+        { label: '全部重建', value: 'rebuild', primary: true },
       ],
     });
   }
@@ -157,7 +157,7 @@ export function createStoryAssetExtractionWorkspaceController({
         '当前仅按已完成的正文提取素材。补齐正文后需再次提取并核对素材关联，已有图片将保留。是否继续进入人设？',
       choices: [
         { label: '取消', value: null },
-        { label: '继续拆解', value: 'continue', primary: !![], autofocus: !![] },
+        { label: '继续拆解', value: 'continue', primary: true, autofocus: true },
       ],
     });
   }
@@ -179,11 +179,11 @@ export function createStoryAssetExtractionWorkspaceController({
             list['length'] +
             ' 条视频仍使用修改前的分段提示词。已有视频结果保留，更新提示词将调用文本模型。',
           choices: [
-            { label: '返回修改', value: null, autofocus: !![] },
-            { label: '前往更新分段提示词', value: 'update', primary: !![] },
+            { label: '返回修改', value: null, autofocus: true },
+            { label: '前往更新分段提示词', value: 'update', primary: true },
           ],
         });
-      if (record !== 'update' || state['data'] !== entry) return ![];
+      if (record !== 'update' || state['data'] !== entry) return false;
       return goToStep(3);
     }
     const list2 = confirmMissingImages ? getMissingStoryAssetImages(state['data']['assets']) : [];
@@ -192,15 +192,15 @@ export function createStoryAssetExtractionWorkspaceController({
         title: '部分素材图片尚未生成',
         message: buildMissingStoryAssetImageWarning(list2),
         choices: [
-          { label: '返回补图', value: null, autofocus: !![] },
-          { label: '跳过并继续', value: 'skip', primary: !![] },
+          { label: '返回补图', value: null, autofocus: true },
+          { label: '跳过并继续', value: 'skip', primary: true },
         ],
       });
-      if (payload !== 'skip' || state['data'] !== next) return ![];
+      if (payload !== 'skip' || state['data'] !== next) return false;
     }
     return goToStep(3);
   }
-  function stopStoryAssetBreakdownProgress({ clearState: clearState = ![] } = {}) {
+  function stopStoryAssetBreakdownProgress({ clearState: clearState = false } = {}) {
     (value2 && (windowObject['clearTimeout'](value2), (value2 = null)),
       clearState && ((state['assetBreakdownEpisodes'] = []), (state['assetBreakdownVisibleCount'] = 0)));
   }
@@ -220,13 +220,13 @@ export function createStoryAssetExtractionWorkspaceController({
         storyAssetBreakdownEpisodes,
         Math['max'](1, state['assetBreakdownVisibleCount'] + 1),
       )),
-        state['view'] === 'project' && state['step'] === 1 && render({ updateToolbar: ![] }),
+        state['view'] === 'project' && state['step'] === 1 && render({ updateToolbar: false }),
         run2());
     }, 1600);
   }
   function restoreStoryAssetBreakdownProgress() {
-    if (state['data']?.['project']?.['sourceMode'] === 'video-replication') return ![];
-    if (!isStoryAssetExtractionOperation(state['storyPlanningOperation'])) return ![];
+    if (state['data']?.['project']?.['sourceMode'] === 'video-replication') return false;
+    if (!isStoryAssetExtractionOperation(state['storyPlanningOperation'])) return false;
     state['assetBreakdownEpisodes'] = cloneData(state['data']['episodes'] || []);
     const handle = state['assetBreakdownEpisodes']['length'];
     return (
@@ -234,7 +234,7 @@ export function createStoryAssetExtractionWorkspaceController({
         ? Math['min'](handle, Math['max'](1, Number(state['assetBreakdownVisibleCount']) || 1))
         : 0),
       run2(),
-      !![]
+      true
     );
   }
   function setStoryPlanningOperation(config = '', scope = '') {
@@ -248,8 +248,8 @@ export function createStoryAssetExtractionWorkspaceController({
   }
   function run3({
     projectData: projectData = state['data'],
-    singleRequest: singleRequest = ![],
-    experimental: experimental = ![],
+    singleRequest: singleRequest = false,
+    experimental: experimental = false,
   } = {}) {
     const shouldUseStoryVideoReplicationUnifiedAssetLocalization2 =
         shouldUseStoryVideoReplicationUnifiedAssetLocalization(projectData),
@@ -307,19 +307,19 @@ export function createStoryAssetExtractionWorkspaceController({
     );
   }
   async function extractProjectAssets({
-    advance: advance = !![],
-    allowIncompleteScripts: allowIncompleteScripts = ![],
-    experimental: experimental = ![],
-    singleRequest: singleRequest = ![],
+    advance: advance = true,
+    allowIncompleteScripts: allowIncompleteScripts = false,
+    experimental: experimental = false,
+    singleRequest: singleRequest = false,
   } = {}) {
     const text = normalizeText(state['data']?.['project']?.['id']) || 'current-project';
-    if (state['storyPlanningOperation'] || map['has'](text)) return ![];
-    if (experimental && !isStoryAssetExperimentalExtractionAvailable(windowObject)) return ![];
+    if (state['storyPlanningOperation'] || map['has'](text)) return false;
+    if (experimental && !isStoryAssetExperimentalExtractionAvailable(windowObject)) return false;
     const episodes = state['data']['project']?.['sourceMode'] === 'video-replication';
     if (state['data']['episodes']['length']) {
       const enabled = syncCompiledEpisodeScripts();
       if (!enabled['complete'] && !allowIncompleteScripts && !episodes)
-        return (showToast('请先按顺序生成所有分集剧本。', 'warn'), ![]);
+        return (showToast('请先按顺序生成所有分集剧本。', 'warn'), false);
     }
     const {
         useParallelExtraction: useParallelExtraction2,
@@ -342,7 +342,7 @@ export function createStoryAssetExtractionWorkspaceController({
             : '单次超长提取角色、场景与道具'
           : '正在按剧本长度选择三类专用 API 或 PP-UIE + API，并生成最终视觉素材';
     if (typeof extractionAgent2 !== 'function')
-      return (showToast((experimental ? '混合开发测试' : '素材') + '提取尚未初始化。', 'error'), ![]);
+      return (showToast((experimental ? '混合开发测试' : '素材') + '提取尚未初始化。', 'error'), false);
     const value3 = state['data']['project']?.['sourceMode'] === 'upload-original',
       message2 = value3 || episodes,
       draftKey = experimental ? 'experimentalAssetExtractionDraft' : 'assetExtractionDraft',
@@ -354,7 +354,7 @@ export function createStoryAssetExtractionWorkspaceController({
       authorizedKinds = getStoryAssetModelChangeRerunKinds(draft);
     let paidRerunAuthorization = null;
     if (authorizedKinds['length'] && !list4['length'] && list3['length'] === authorizedKinds['length'])
-      paidRerunAuthorization = { confirmed: !![], authorizedKinds: authorizedKinds };
+      paidRerunAuthorization = { confirmed: true, authorizedKinds: authorizedKinds };
     else {
       if (enabled2) {
         const value5 = await handler({
@@ -366,7 +366,7 @@ export function createStoryAssetExtractionWorkspaceController({
           !['local-revalidate', 'paid-rerun']['includes'](value5['action']) ||
           state['storyPlanningOperation']
         )
-          return ![];
+          return false;
         paidRerunAuthorization = value5['paidRerunAuthorization'];
       }
     }
@@ -390,9 +390,9 @@ export function createStoryAssetExtractionWorkspaceController({
       } finally {
         map['delete'](text);
       }
-      if (!enabled3 || state['data'] !== value4) return ![];
+      if (!enabled3 || state['data'] !== value4) return false;
     }
-    stopStoryAssetBreakdownProgress({ clearState: !![] });
+    stopStoryAssetBreakdownProgress({ clearState: true });
     !episodes &&
       ((state['assetBreakdownEpisodes'] = cloneData(state['data']['episodes'])),
       (state['assetBreakdownVisibleCount'] = state['assetBreakdownEpisodes']['length'] ? 1 : 0));
@@ -451,7 +451,7 @@ export function createStoryAssetExtractionWorkspaceController({
                     if (!isProjectTaskLive(projectId)) return;
                     ((initialResumeDraft[draftKey] = cloneData(value8)),
                       updateStoryProjectBackgroundTask(projectId, id, {
-                        resumable: !![],
+                        resumable: true,
                         modelId: project2['model'],
                         provider: project2['provider'],
                         resumePayload: { kind: 'story-asset-extraction-run', draftKey: draftKey },
@@ -462,12 +462,12 @@ export function createStoryAssetExtractionWorkspaceController({
                 }
               : useSingleRequest2
                 ? {
-                    allowOversizedPrompt: !![],
+                    allowOversizedPrompt: true,
                     ...(episodes
                       ? {
                           maxOutputTokens: STORY_VIDEO_REPLICATION_UNIFIED_ASSET_MAX_OUTPUT_TOKENS,
                           structuredOutputFallback: 'prompt',
-                          automaticRecovery: !![],
+                          automaticRecovery: true,
                           assetKinds: ['scene', 'prop'],
                         }
                       : {}),
@@ -509,7 +509,7 @@ export function createStoryAssetExtractionWorkspaceController({
                 },
               })
             : await handler2();
-      if (!isProjectTaskLive(projectId)) return ![];
+      if (!isProjectTaskLive(projectId)) return false;
       const assets = Array['isArray'](value9?.['assets']) ? value9['assets'] : [],
         value12 = assets['filter']((value13) => value13?.['designStatus'] === 'baseline')['length'],
         enabled4 = !episodes || assets['some']((value14) => value14?.['kind'] === 'scene');
@@ -537,7 +537,7 @@ export function createStoryAssetExtractionWorkspaceController({
                 ((state['storyPlanningStatus'] = message6), syncStoryPlanningLoading()));
           },
         });
-        if (!isProjectTaskLive(projectId)) return ![];
+        if (!isProjectTaskLive(projectId)) return false;
         if (!storyReplicationAssetFrames) throw new Error('原视频分析在截帧期间发生变化，请重新提取素材。');
       }
       let assetId = initialResumeDraft;
@@ -580,9 +580,9 @@ export function createStoryAssetExtractionWorkspaceController({
       (finishStoryProjectBackgroundTask(projectId, id, {
         status: 'succeeded',
         message: message7 + '已提取 ' + assetId['assets']['length'] + ' 个素材' + value15,
-        resumable: ![],
+        resumable: false,
       }),
-        scheduleWorkspacePersistence({ immediate: !![] }),
+        scheduleWorkspacePersistence({ immediate: true }),
         notifyNavigableTextTaskComplete(
           message7 + '已提取 ' + assetId['assets']['length'] + ' 个角色、场景与道具素材' + value15 + '。',
           projectId,
@@ -592,15 +592,15 @@ export function createStoryAssetExtractionWorkspaceController({
       if (isProjectTaskCurrent(projectId)) {
         ((state['selectedAssetId'] = assetId['assets'][0]?.['id'] || ''),
           (state['assetFilter'] = assetId['assets'][0]?.['kind'] || 'character'),
-          stopStoryAssetBreakdownProgress({ clearState: !![] }),
+          stopStoryAssetBreakdownProgress({ clearState: true }),
           (state['storyPlanningOperation'] = ''),
           (state['storyPlanningStatus'] = ''));
         if (advance && state['view'] === 'project' && state['step'] === value6) goToStep(2);
         else render();
       }
-      return !![];
+      return true;
     } catch (error3) {
-      if (!isProjectTaskLive(projectId)) return ![];
+      if (!isProjectTaskLive(projectId)) return false;
       return (
         reportStoryWorkspaceApiError(
           useSingleRequest2
@@ -626,28 +626,28 @@ export function createStoryAssetExtractionWorkspaceController({
           error: error3?.['message'] || label + '失败。',
         }),
         showTaskResultToast(error3?.['message'] || label + '失败。', 'error', error3),
-        ![]
+        false
       );
     } finally {
       isProjectTaskCurrent(projectId) &&
-        (stopStoryAssetBreakdownProgress({ clearState: !![] }),
+        (stopStoryAssetBreakdownProgress({ clearState: true }),
         state['storyPlanningOperation'] === output && setStoryPlanningOperation());
     }
   }
   async function continueToProjectAssets() {
-    if (state['storyPlanningOperation']) return ![];
+    if (state['storyPlanningOperation']) return false;
     const allowIncompleteScripts2 =
       state['data']['episodes']['length'] > 0 &&
       !compileStoryEpisodeScripts(state['data']['episodes'])['complete'];
     if (allowIncompleteScripts2) {
       const value16 = await run();
-      if (value16 !== 'continue') return ![];
+      if (value16 !== 'continue') return false;
     }
-    return extractProjectAssets({ advance: !![], allowIncompleteScripts: allowIncompleteScripts2 });
+    return extractProjectAssets({ advance: true, allowIncompleteScripts: allowIncompleteScripts2 });
   }
   return Object['freeze']({
     preview: async (request) => {
-      if (windowObject?.['DEV_MODE'] !== !![]) throw new Error('仅开发者模式可调试请求');
+      if (windowObject?.['DEV_MODE'] !== true) throw new Error('仅开发者模式可调试请求');
       const projectData2 = cloneData(state['data']),
         {
           useParallelExtraction: useParallelExtraction3,
@@ -669,19 +669,19 @@ export function createStoryAssetExtractionWorkspaceController({
           : {}),
         ...(useSingleRequest3
           ? {
-              allowOversizedPrompt: !![],
+              allowOversizedPrompt: true,
               ...(project4
                 ? {
                     maxOutputTokens: STORY_VIDEO_REPLICATION_UNIFIED_ASSET_MAX_OUTPUT_TOKENS,
                     structuredOutputFallback: 'prompt',
-                    automaticRecovery: !![],
+                    automaticRecovery: true,
                     assetKinds: ['scene', 'prop'],
                   }
                 : {}),
             }
           : {}),
         request: request,
-        preferLocal: ![],
+        preferLocal: false,
       });
     },
     continueToProjectAssets: continueToProjectAssets,

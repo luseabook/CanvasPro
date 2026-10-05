@@ -7,7 +7,7 @@ export function buildRunningHubAudioBody({
   let value = {};
   if (modelType === 'suno-single') {
     const make_instrumental =
-        params?.['make_instrumental'] === !![] || params?.['make_instrumental'] === 'true',
+        params?.['make_instrumental'] === true || params?.['make_instrumental'] === 'true',
       title = String(params?.['title'] || '')['trim']();
     value = {
       description: prompt || '',
@@ -29,8 +29,8 @@ export function buildRunningHubAudioBody({
           volume: Number(params?.['volume']) || 1,
           pitch: Number['isInteger'](Number(params?.['pitch'])) ? Number(params['pitch']) : 0,
           emotion: String(params?.['emotion'] || 'happy')['trim'](),
-          enable_base64_output: ![],
-          english_normalization: ![],
+          enable_base64_output: false,
+          english_normalization: false,
           ...(Array['isArray'](params?.['pronunciation_dict']) && params['pronunciation_dict']['length'] > 0
             ? { pronunciation_dict: params['pronunciation_dict'] }
             : {}),
@@ -39,7 +39,7 @@ export function buildRunningHubAudioBody({
         if (modelType === 'minimax-music-instrumental')
           value = {
             prompt: prompt || '',
-            is_instrumental: !![],
+            is_instrumental: true,
             sampleRate: String(params?.['sampleRate'] || '44100')['trim'](),
             bitrate: String(params?.['bitrate'] || '256000')['trim'](),
             format: String(params?.['format'] || 'mp3')['trim'](),
@@ -49,11 +49,11 @@ export function buildRunningHubAudioBody({
             const item = String(params?.['prompt'] || '')['trim'](),
               prompt2 = item && item !== '-' ? item : prompt || '',
               lyricsOptimizer =
-                params?.['lyricsOptimizer'] === !![] || params?.['lyricsOptimizer'] === 'true';
+                params?.['lyricsOptimizer'] === true || params?.['lyricsOptimizer'] === 'true';
             value = {
               lyrics: prompt || '',
               prompt: prompt2,
-              is_instrumental: ![],
+              is_instrumental: false,
               lyricsOptimizer: lyricsOptimizer,
               sampleRate: String(params?.['sampleRate'] || '44100')['trim'](),
               bitrate: String(params?.['bitrate'] || '256000')['trim'](),

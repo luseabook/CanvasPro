@@ -41,7 +41,7 @@ export function createTrackedMediaObjectUrl(
 }
 export function revokeTrackedMediaObjectUrl(index) {
   const url4 = String(index || '')['trim']();
-  if (!url4) return ![];
+  if (!url4) return false;
   const result = activeObjectUrls['get'](url4) || {
     url: url4,
     kind: 'unknown',
@@ -53,7 +53,7 @@ export function revokeTrackedMediaObjectUrl(index) {
   try {
     globalThis['URL']?.['revokeObjectURL']?.(url4);
   } catch {}
-  return (exposeSnapshotReader(), markLifecycle('revoked', result), !![]);
+  return (exposeSnapshotReader(), markLifecycle('revoked', result), true);
 }
 export function getMediaObjectUrlRegistrySnapshot() {
   const activeCount = Array['from'](activeObjectUrls['values']())['map']((args) => ({ ...args }));

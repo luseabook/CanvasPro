@@ -48,8 +48,8 @@ export class DirectorViewportRuntime {
       (this['disposeMonitor'](),
       (this['monitor'] = new threeRuntime['WebGLRenderer']({
         canvas: canvas,
-        antialias: !![],
-        alpha: !![],
+        antialias: true,
+        alpha: true,
       })),
       (this['monitor']['outputColorSpace'] = this['bridge']['renderer']['outputColorSpace']),
       (this['monitor']['toneMapping'] = this['bridge']['renderer']['toneMapping']),
@@ -64,7 +64,7 @@ export class DirectorViewportRuntime {
       aspect = entry[0] > 0 && entry[1] > 0 ? entry[0] / entry[1] : 16 / 9,
       record = Math['max'](1, Math['round'](current / aspect));
     if (canvas['width'] !== current || canvas['height'] !== record)
-      this['monitor']['setSize'](current, record, ![]);
+      this['monitor']['setSize'](current, record, false);
     const payload = this['monitorCamera'];
     return (
       Object['assign'](payload, {

@@ -22,7 +22,7 @@ export function createStoryAssetHoverPreviewController({
     index = 0,
     el = null,
     result = '',
-    data = ![];
+    data = false;
   const run = () => {
       item = 0;
       if (!previewElement?.['classList']['contains']('is-visible')) return;
@@ -80,11 +80,11 @@ export function createStoryAssetHoverPreviewController({
           handler2(el3);
           return;
         }
-        el3['addEventListener']('load', () => handler2(el3), { once: !![] });
+        el3['addEventListener']('load', () => handler2(el3), { once: true });
       });
     },
     handler4 = (enabled, appearanceId = '') => {
-      if (!previewElement || !enabled || enabled['mediaKind'] === 'audio') return ![];
+      if (!previewElement || !enabled || enabled['mediaKind'] === 'audio') return false;
       const selectedAssetId = getState(),
         selectedAppearanceId = getSelectedAppearance(selectedAssetId, enabled),
         enabled2 = buildContent(enabled, {
@@ -97,7 +97,7 @@ export function createStoryAssetHoverPreviewController({
           (previewElement['innerHTML'] = ''),
           (previewElement['dataset']['assetId'] = ''),
           (previewElement['dataset']['signature'] = ''),
-          ![]
+          false
         );
       const output = [
         normalizeText(appearanceId) + ':' + (selectedAppearanceId?.['id'] || ''),
@@ -110,14 +110,14 @@ export function createStoryAssetHoverPreviewController({
         previewElement['dataset']['assetId'] === String(enabled['id']) &&
         previewElement['dataset']['signature'] === output
       )
-        return !![];
+        return true;
       return (
         (previewElement['dataset']['assetId'] = String(enabled['id'])),
         (previewElement['dataset']['signature'] = output),
         previewElement['style']['setProperty']('--story-asset-hover-columns', String(enabled2['columns'])),
         (previewElement['innerHTML'] = enabled2['html']),
         handler3(),
-        !![]
+        true
       );
     },
     hide = () => {
@@ -128,15 +128,15 @@ export function createStoryAssetHoverPreviewController({
     };
   return Object['freeze']({
     show(el4, value3, enabled3, value4 = '') {
-      if (data || !previewElement || value3?.['pointerType'] === 'touch') return ![];
-      if (!enabled3) return (hide(), ![]);
+      if (data || !previewElement || value3?.['pointerType'] === 'touch') return false;
+      if (!enabled3) return (hide(), false);
       ((el = el4?.['closest']?.('.at-mention-menu') || null), (result = String(enabled3['id'])));
-      if (!handler4(enabled3, value4)) return (hide(), ![]);
+      if (!handler4(enabled3, value4)) return (hide(), false);
       return (
         previewElement['classList']['add']('is-visible'),
         previewElement['setAttribute']('aria-hidden', 'false'),
         handler(value3),
-        !![]
+        true
       );
     },
     hide: hide,
@@ -148,7 +148,7 @@ export function createStoryAssetHoverPreviewController({
           typeof windowObject['cancelAnimationFrame'] === 'function' &&
           windowObject['cancelAnimationFrame'](item),
         (item = 0),
-        (data = !![]));
+        (data = true));
     },
   });
 }

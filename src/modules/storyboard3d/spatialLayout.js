@@ -36,7 +36,7 @@ function searchableAssetText(error = {}) {
 function includesAny(list, list2) {
   return list2['some']((target) => {
     const dText = normalizedText(target);
-    if (!dText) return ![];
+    if (!dText) return false;
     if (/^[a-z0-9]+$/['test'](dText))
       return new RegExp('(^|[^a-z0-9])' + dText + '(?=$|[^a-z0-9])')['test'](list);
     return list['includes'](dText);
@@ -264,8 +264,8 @@ function createGeneratedProp(assetId, name) {
     name: name || assetId['name'],
     assetId: assetId['id'],
     transform: { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
-    castShadow: !![],
-    receiveShadow: !![],
+    castShadow: true,
+    receiveShadow: true,
   };
 }
 function firstAssetByRole(value4, value5) {
@@ -297,7 +297,7 @@ export function applyStoryboard3DDiningLayout(
       ((generatedProp = createGeneratedProp(assetByRole, 'Dining table')), objects['push'](generatedProp));
   }
   if (!generatedProp || participantCount4 === 0)
-    return { objects: objects, applied: ![], participantCount: participantCount4 };
+    return { objects: objects, applied: false, participantCount: participantCount4 };
   while (participantCount3['length'] < participantCount4) {
     const generatedCharacter = createGeneratedCharacter(participantCount3['length']);
     (objects['push'](generatedCharacter), participantCount3['push'](generatedCharacter));
@@ -337,7 +337,7 @@ export function applyStoryboard3DDiningLayout(
     ]),
       (value25['transform']['rotation'][1] = faceTowards2),
       (value25['actionId'] = 'seated'),
-      (value25['actionPlaying'] = ![]));
+      (value25['actionPlaying'] = false));
   }
   const list6 = objects['filter']((value26) =>
     hasSpatialRole(assetForObject(value26, value11), 'tabletop-item'),
@@ -361,6 +361,6 @@ export function applyStoryboard3DDiningLayout(
         value18[2] + Math['sin'](angleForSlot3) * value29,
       ];
     }),
-    { objects: objects, applied: !![], participantCount: participantCount3['length'] }
+    { objects: objects, applied: true, participantCount: participantCount3['length'] }
   );
 }

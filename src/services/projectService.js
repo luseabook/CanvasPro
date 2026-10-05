@@ -210,12 +210,12 @@ export function resolveCanvasData(canvases) {
   };
   return _migrateCanvasDataInPlace({ canvases: [value10], activeCanvasId: 'canvas_1' });
 }
-export async function loadProject(value11, { allowMissing: allowMissing = ![] } = {}) {
+export async function loadProject(value11, { allowMissing: allowMissing = false } = {}) {
   try {
     return await loadProjectStrict(value11);
   } catch (value12) {
     console['error']('[projectService] 加载项目异常:', value12);
-    if (allowMissing === !![] && value12?.['code'] === 'PROJECT_NOT_FOUND') return resolveCanvasData({});
+    if (allowMissing === true && value12?.['code'] === 'PROJECT_NOT_FOUND') return resolveCanvasData({});
     throw value12;
   }
 }
@@ -311,7 +311,7 @@ export async function deleteProject(value26) {
   try {
     return await deleteV2ProjectFromServer(value26);
   } catch (value27) {
-    return (console['error']('[projectService] 删除项目失败:', value27), ![]);
+    return (console['error']('[projectService] 删除项目失败:', value27), false);
   }
 }
 function _getElectronImportAsset() {
@@ -417,9 +417,9 @@ async function _importStagedChromeShellAsset(name2, projectId4) {
       throw error3;
     return {
       ...cause2,
-      success: !![],
+      success: true,
       stagedUploadId: cause2['stageId'] || '',
-      canonicalImportPending: !![],
+      canonicalImportPending: true,
       canonicalImportStatus: 'failed',
       canonicalImportError: String(error3?.['message'] || error3 || ''),
     };

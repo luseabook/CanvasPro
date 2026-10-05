@@ -1429,7 +1429,7 @@ export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {
   const assetUpdatedAt = normalizeAssetUpdatedAt(value111?.['assetUpdatedAt'] || value111?.['updatedAt']),
     assetUpdatedAt2 = normalizeAssetUpdatedAt(options2?.['assetUpdatedAt']),
     value112 = assetUpdatedAt !== '' && assetUpdatedAt2 !== '';
-  if (value112 && assetUpdatedAt < assetUpdatedAt2) return ![];
+  if (value112 && assetUpdatedAt < assetUpdatedAt2) return false;
   const value113 = {
     taskId: value111?.['mediaTaskId'] || '',
     kind: value111?.['mediaTaskKind'] || '',
@@ -1451,9 +1451,9 @@ export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {
               ['trim']()
               ['toLowerCase'](),
           ) || 0;
-      if (value114 < value115) return ![];
+      if (value114 < value115) return false;
     }
-    return !![];
+    return true;
   }
   return value112 && assetUpdatedAt > assetUpdatedAt2;
 }
@@ -1539,7 +1539,7 @@ export function applyElectronAssetUpdate(options3 = {}, store3 = appStore) {
 
 export async function resolveImageImportThumbnailData({
   suppliedThumbnail: suppliedThumbnail,
-  canUseLocalImport: canUseLocalImport = ![],
+  canUseLocalImport: canUseLocalImport = false,
   generateThumbnailData: generateThumbnailData,
 } = {}) {
   if (suppliedThumbnail != null)

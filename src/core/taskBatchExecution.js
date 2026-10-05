@@ -4,11 +4,11 @@ function normalizeConcurrency(value, item) {
   return Math['max'](1, Math['min'](count, Math['max'](1, item)));
 }
 export function createTaskBatchCancellationController() {
-  let key = ![];
+  let key = false;
   return Object['freeze']({
     request() {
-      if (key) return ![];
-      return ((key = !![]), !![]);
+      if (key) return false;
+      return ((key = true), true);
     },
     isRequested: () => key,
   });
@@ -16,7 +16,7 @@ export function createTaskBatchCancellationController() {
 export async function runTaskBatchQueue({
   targets: targets = [],
   concurrency: concurrency = 1,
-  shouldStop: shouldStop = () => ![],
+  shouldStop: shouldStop = () => false,
   runTarget: runTarget,
   onTargetStart: onTargetStart = () => {},
   onTargetSettled: onTargetSettled = () => {},

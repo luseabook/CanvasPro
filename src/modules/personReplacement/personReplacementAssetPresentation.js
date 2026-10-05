@@ -69,7 +69,7 @@ export function buildPersonReplacementAssetViewState(selectedAssetIds) {
     assetSplitRatio: selectedAssetIds['workspace']['assetSplitRatio'],
     assetDetailSplitRatio: selectedAssetIds['workspace']['assetDetailSplitRatio'],
     generatingAppearanceKeys: selectedAssetIds['workspace']['generatingAppearanceKeys'],
-    isBatchGenerating: ![],
+    isBatchGenerating: false,
     batchGeneratingAssetIds: [],
     batchGeneratingAppearanceKeys: [],
     characterVoiceEditor: null,
@@ -88,9 +88,9 @@ export function buildPersonReplacementAssetViewState(selectedAssetIds) {
     allowDeleteAssetAppearance: !enabled2 && !enabled3,
     allowDeleteAssetCard: !enabled,
     allowAssetRename: !enabled && !enabled2 && !enabled3,
-    allowAssetStyleReference: ![],
-    hideAssetRoleTag: !![],
-    hideAssetNameTooltip: !![],
+    allowAssetStyleReference: false,
+    hideAssetRoleTag: true,
+    hideAssetNameTooltip: true,
     assetGenerateLabel: '生成素材图',
     assetPromptPresetId: selectedAssetIds['workspace']['assetPromptPresetId'],
     assetPromptPresets: PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS,
@@ -106,7 +106,7 @@ export function readPersonReplacementAssetPromptText(enabled4 = null) {
     handler = (data) => {
       if (data) list['push'](String(data));
     },
-    handler2 = (el, { root: root = ![] } = {}) => {
+    handler2 = (el, { root: root = false } = {}) => {
       const count = Number(el?.['nodeType']);
       if (count === 3) {
         handler(el['textContent'] || '');
@@ -124,7 +124,7 @@ export function readPersonReplacementAssetPromptText(enabled4 = null) {
       if (target && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
     };
   return (
-    handler2(enabled4, { root: !![] }),
+    handler2(enabled4, { root: true }),
     list['join']('')
       ['replace'](/\u00a0/g, ' ')
       ['replace'](/\n{3,}/g, '\n\n')
@@ -147,23 +147,23 @@ function getSelectedAppearance(options3 = {}, entry = {}) {
   );
 }
 function isAppearanceGenerating(options4 = {}, record = {}, payload = {}) {
-  if (normalizeText(payload?.['error']) || normalizeText(payload?.['imageUrl'])) return ![];
+  if (normalizeText(payload?.['error']) || normalizeText(payload?.['imageUrl'])) return false;
   const text = normalizeText(record?.['id']) + ':' + normalizeText(payload?.['id']);
   return Boolean(
     text !== ':' &&
     (options4?.['generatingAppearanceKeys']?.['includes']?.(text) ||
-      (options4?.['isBatchGenerating'] === !![] &&
+      (options4?.['isBatchGenerating'] === true &&
         options4?.['batchGeneratingAppearanceKeys']?.['includes']?.(text))),
   );
 }
 function isAssetGenerating(options5 = {}, handle = {}) {
   const list3 = normalizeText(handle?.['id']);
-  if (!list3) return ![];
+  if (!list3) return false;
   if (
-    options5?.['isBatchGenerating'] === !![] &&
+    options5?.['isBatchGenerating'] === true &&
     options5?.['batchGeneratingAssetIds']?.['includes']?.(list3)
   )
-    return !![];
+    return true;
   const map = new Map(
     getWorkspaceAssetAppearances(handle)['map']((config) => [normalizeText(config?.['id']), config]),
   );
@@ -171,7 +171,7 @@ function isAssetGenerating(options5 = {}, handle = {}) {
     Array['isArray'](options5?.['generatingAppearanceKeys']) ? options5['generatingAppearanceKeys'] : []
   )['some']((scope) => {
     const list4 = normalizeText(scope);
-    if (!list4['startsWith'](list3 + ':')) return ![];
+    if (!list4['startsWith'](list3 + ':')) return false;
     const input = map['get'](list4['slice'](list3['length'] + 1));
     return input && !normalizeText(input['error']);
   });
@@ -187,7 +187,7 @@ function hasVoiceReference(options6 = {}) {
 }
 export function renderPersonReplacementVoicePreviewPlayer(
   error = {},
-  { className: className = '', showWaveform: showWaveform = !![] } = {},
+  { className: className = '', showWaveform: showWaveform = true } = {},
 ) {
   if (error?.['kind'] !== 'character' || error?.['isLibraryAsset'] || !hasVoiceReference(error)) return '';
   const text2 = normalizeText(className);
@@ -263,9 +263,9 @@ function renderPreviewActions({
   state: state = {},
   asset: asset = {},
   appearance: appearance = {},
-  readOnly: readOnly = ![],
-  generating: generating = ![],
-  canDeleteAppearance: canDeleteAppearance = ![],
+  readOnly: readOnly = false,
+  generating: generating = false,
+  canDeleteAppearance: canDeleteAppearance = false,
 } = {}) {
   const renderWorkspaceImageDownloadButton2 = renderWorkspaceImageDownloadButton({
     action: 'download-asset-image',
@@ -315,17 +315,17 @@ export function renderPersonReplacementAssetCard(
     previewAppearance: previewAppearance = null,
     statusText: statusText = '',
     cardStatusHtml: cardStatusHtml = '',
-    draggable: draggable = ![],
+    draggable: draggable = false,
     cardClassName: cardClassName = '',
     cardAttributes: cardAttributes = '',
     shellClassName: shellClassName = '',
-    preserveShell: preserveShell = ![],
+    preserveShell: preserveShell = false,
     accessoryHtml: accessoryHtml = '',
     cardMetaHtml: cardMetaHtml = '',
     headingAccessoryHtml: headingAccessoryHtml = '',
     cardMediaHtml: cardMediaHtml = '',
     fallbackImageUrl: fallbackImageUrl = '',
-    workspaceAssetLibraryImage: workspaceAssetLibraryImage = ![],
+    workspaceAssetLibraryImage: workspaceAssetLibraryImage = false,
   } = {},
 ) {
   const appearances = generated['isLibraryAsset'] ? [generated] : getWorkspaceAssetAppearances(generated),
@@ -344,7 +344,7 @@ export function renderPersonReplacementAssetCard(
       appearances[0] ||
       generated,
     disabled = isAssetGenerating(selected, generated),
-    value9 = selected?.['allowAssetRename'] === !![] && !generated['isLibraryAsset'],
+    value9 = selected?.['allowAssetRename'] === true && !generated['isLibraryAsset'],
     nameAttributes = value9
       ? 'data-story-asset-name-id="' +
         escapeHtml(generated['id']) +
@@ -353,7 +353,7 @@ export function renderPersonReplacementAssetCard(
         '"'
       : '',
     roleHtml =
-      selected?.['hideAssetRoleTag'] !== !![] &&
+      selected?.['hideAssetRoleTag'] !== true &&
       !['scene', 'prop']['includes'](normalizeText(generated?.['kind']))
         ? '<small>' + escapeHtml(generated['role'] || '素材') + '</small>'
         : '',
@@ -380,11 +380,11 @@ export function renderPersonReplacementAssetCard(
     stats: stats,
     selected:
       selected?.['assetSelectionStyle'] === 'border'
-        ? selected?.['selectedAssetIds']?.['includes']?.(generated['id']) === !![]
+        ? selected?.['selectedAssetIds']?.['includes']?.(generated['id']) === true
         : generated['id'] === selected?.['selectedAssetId'],
-    showSelectionIndicator: ![],
-    selectionMode: selected?.['assetSelectionMode'] === !![],
-    checked: selected?.['selectedAssetIds']?.['includes']?.(generated['id']) === !![],
+    showSelectionIndicator: false,
+    selectionMode: selected?.['assetSelectionMode'] === true,
+    checked: selected?.['selectedAssetIds']?.['includes']?.(generated['id']) === true,
     loading: disabled,
     draggable: draggable,
     promptPreview: previewAppearance2?.['prompt'] || generated?.['prompt'] || '',
@@ -401,7 +401,7 @@ export function renderPersonReplacementAssetCard(
         ? ' workspace-card-with-image-actions'
         : ''),
     preserveShell:
-      preserveShell || (selected?.['allowDeleteAssetCard'] === !![] && !generated['isLibraryAsset']),
+      preserveShell || (selected?.['allowDeleteAssetCard'] === true && !generated['isLibraryAsset']),
     accessoryHtml:
       accessoryHtml +
       (!generated['isLibraryAsset'] &&
@@ -429,7 +429,7 @@ export function renderPersonReplacementAssetCard(
     deleteControlHtml: deleteControlHtml,
   });
 }
-function renderAudioArtwork({ compact: compact = ![] } = {}) {
+function renderAudioArtwork({ compact: compact = false } = {}) {
   return (
     '<span class="' +
     (compact ? 'story-asset-card-image ' : '') +
@@ -455,7 +455,7 @@ function getAudioAssetDisplayName(options9 = {}) {
 export function renderPersonReplacementAudioAssetCard(
   value12,
   args,
-  { boundCharacters: boundCharacters = [], showVoiceLibraryConfirm: showVoiceLibraryConfirm = ![] } = {},
+  { boundCharacters: boundCharacters = [], showVoiceLibraryConfirm: showVoiceLibraryConfirm = false } = {},
 ) {
   const value13 = Array['isArray'](boundCharacters) ? boundCharacters['length'] : 0,
     name = getAudioAssetDisplayName(args),
@@ -474,7 +474,7 @@ export function renderPersonReplacementAudioAssetCard(
       cardAttributes: 'data-person-replacement-audio-library-asset="true"',
       shellClassName: showVoiceLibraryConfirm ? 'person-replacement-audio-asset-shell' : '',
       accessoryHtml: accessoryHtml2,
-      cardMediaHtml: renderAudioArtwork({ compact: !![] }),
+      cardMediaHtml: renderAudioArtwork({ compact: true }),
       cardStatusHtml: '<span>' + (value13 ? '已绑定 ' + value13 + ' 个人设' : '未绑定人设') + '</span>',
     },
   );
@@ -484,7 +484,7 @@ export function renderPersonReplacementAudioAssetDetail(
   {
     boundCharacters: boundCharacters = [],
     characters: characters = [],
-    isLibrary: isLibrary = ![],
+    isLibrary: isLibrary = false,
     selectedCharacterId: selectedCharacterId = '',
   } = {},
 ) {
@@ -513,8 +513,8 @@ export function renderPersonReplacementAssetDetail(
   modelId,
   asset2,
   {
-    showEmptyDescription: showEmptyDescription = !![],
-    readOnly: readOnly = ![],
+    showEmptyDescription: showEmptyDescription = true,
+    readOnly: readOnly = false,
     voiceLibrarySelection: voiceLibrarySelection = null,
     detailSplitRatio: detailSplitRatio = 50,
     detailSplitterHtml: detailSplitterHtml = '',
@@ -552,7 +552,7 @@ export function renderPersonReplacementAssetDetail(
         escapeHtml(asset2['name'] + '待生成') +
         '"><span>待生成</span></div>',
     value17 =
-      modelId?.['allowAssetRename'] === !![] && !asset2['isLibraryAsset']
+      modelId?.['allowAssetRename'] === true && !asset2['isLibraryAsset']
         ? ' data-story-asset-name-id="' +
           escapeHtml(asset2['id']) +
           '" aria-label="重命名' +
@@ -602,7 +602,7 @@ export function renderPersonReplacementAssetDetail(
               generationParams: modelId?.['imageGenerationParams'],
               providerProfileId: modelId?.['imageProviderProfileId'],
               providerProfileIdByModel: modelId?.['imageProviderProfileIdByModel'],
-              showSchemaControls: !![],
+              showSchemaControls: true,
               className: 'story-asset-image-model-selector',
             }) +
             '\n          <div class="story-asset-generation-actions">\n            ' +
@@ -701,8 +701,8 @@ export function renderPersonReplacementBatchGenerationControl(options10 = {}) {
   const enabled7 = Array['isArray'](options10?.['selectedAssetIds'])
       ? options10['selectedAssetIds']['length']
       : 0,
-    value23 = options10?.['isBatchGenerating'] === !![],
-    value24 = options10?.['batchCancelRequested'] === !![],
+    value23 = options10?.['isBatchGenerating'] === true,
+    value24 = options10?.['batchCancelRequested'] === true,
     value25 = value23 ? value24 : !enabled7,
     value26 = enabled7 ? ' (' + enabled7 + ')' : '',
     text7 = normalizeText(options10?.['batchGenerationActionLabel']) || '批量生成',
@@ -739,7 +739,7 @@ export function syncPersonReplacementVoicePreviewUi(
     value31 = Number(audioEl?.['currentTime']),
     value32 =
       Number['isFinite'](count2) && count2 > 0 ? Math['max'](0, Math['min'](1, value31 / count2)) : 0,
-    value33 = Boolean(audioEl && audioEl['paused'] === ![] && audioEl['ended'] !== !![]);
+    value33 = Boolean(audioEl && audioEl['paused'] === false && audioEl['ended'] !== true);
   return (
     el2?.['querySelectorAll']?.('[data-story-character-voice-player]')?.['forEach']?.((el3) => {
       const text8 = normalizeText(el3['dataset']?.['storyCharacterVoicePlayer']) === normalizeText(assetId),
@@ -758,6 +758,6 @@ export function syncPersonReplacementVoicePreviewUi(
         });
       }
     }),
-    !![]
+    true
   );
 }

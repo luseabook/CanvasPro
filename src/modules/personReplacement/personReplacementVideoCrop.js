@@ -19,11 +19,11 @@ function resolveCropReverseState(options2 = {}) {
   const isReversed = Boolean(options2['videoIterationReferenceRef']);
   return {
     isReversed: isReversed
-      ? options2['videoIterationInputIsReversed'] === !![]
-      : options2['isReversed'] === !![],
+      ? options2['videoIterationInputIsReversed'] === true
+      : options2['isReversed'] === true,
     materializedIsReversed: isReversed
-      ? options2['videoIterationInputIsReversed'] === !![]
-      : options2['materializedIsReversed'] === !![],
+      ? options2['videoIterationInputIsReversed'] === true
+      : options2['materializedIsReversed'] === true,
   };
 }
 export function isPersonReplacementVideoCropReverseRunning(enabled = {}) {
@@ -82,19 +82,19 @@ function createReverseControl({
         enabled2 = promise?.['then'] ? await promise : promise;
       if (!enabled2) throw new Error('视频倒放服务不可用');
       const ok = enabled2['completion'] ? await enabled2['completion'] : enabled2,
-        enabled3 = ok?.['stale'] === !![],
+        enabled3 = ok?.['stale'] === true,
         next = ok?.['project'] || enabled2['project'] || getProject2(),
         current = enabled3 ? getProject2() : acceptProject2(next),
         shot2 = findShot(current, selectedShot['id']);
       if (!shot2) throw new Error('倒放完成后未找到当前片段');
       return {
-        ok: ok?.['ok'] !== ![] && !enabled3,
+        ok: ok?.['ok'] !== false && !enabled3,
         ...resolveCropReverseState(shot2),
         sourceLocalPath: resolvePersonReplacementVideoSourceRef(shot2),
         sourceUrl: normalizeMediaUrl(resolvePersonReplacementVideoSourceRef(shot2)),
         posterUrl: normalizeMediaUrl(shot2['keyframeRef']),
         error: ok?.['error'] || shot2['error'] || '',
-        suppressToast: !![],
+        suppressToast: true,
       };
     },
   };
@@ -131,7 +131,7 @@ export function createPersonReplacementVideoCropOptions({
     videoHeight: Number(videoEl?.['videoHeight']) || Number(selectedShot2?.['frame']?.['height']) || 0,
     initialStartSec: 0,
     initialEndSec: durationSec,
-    dimMode: ![],
+    dimMode: false,
     reverseControl: createReverseControl({
       selectedShot: selectedShot2,
       getProject: getProject,

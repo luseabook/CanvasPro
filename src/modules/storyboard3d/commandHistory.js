@@ -58,7 +58,7 @@ export class CommandHistory {
       (this['undoStack'] = []),
       (this['redoStack'] = []),
       (this['transaction'] = null),
-      (this['busy'] = ![]));
+      (this['busy'] = false));
   }
   ['_notify'](entry, record = null) {
     this['onChange']?.(this['getSnapshot'](), { reason: entry, command: record });
@@ -74,7 +74,7 @@ export class CommandHistory {
         handle['mergeKey'] &&
         handle['mergeKey'] === payload['mergeKey'] &&
         typeof handle['mergeWith'] === 'function' &&
-        handle['mergeWith'](payload) === !![];
+        handle['mergeWith'](payload) === true;
     if (!enabled) this['undoStack']['push'](payload);
     if (this['undoStack']['length'] > this['limit'])
       this['undoStack']['splice'](0, this['undoStack']['length'] - this['limit']);
@@ -91,14 +91,14 @@ export class CommandHistory {
     }
     if (!isPromise(invoke4)) return (scope?.(invoke4), invoke4);
     return (
-      (this['busy'] = !![]),
+      (this['busy'] = true),
       this['_notify']('busy', state),
       Promise['resolve'](invoke4)['then'](
         (value2) => {
-          return ((this['busy'] = ![]), scope?.(value2), value2);
+          return ((this['busy'] = false), scope?.(value2), value2);
         },
         (value3) => {
-          ((this['busy'] = ![]), input?.(value3), this['_notify']('error', state));
+          ((this['busy'] = false), input?.(value3), this['_notify']('error', state));
           throw value3;
         },
       )
@@ -107,12 +107,12 @@ export class CommandHistory {
   ['execute'](enabled2) {
     if (!enabled2 || typeof enabled2 !== 'object') throw new TypeError('A command is required');
     return this['_run'](enabled2, 'execute', (value4) => {
-      if (value4 !== ![]) this['_record'](enabled2);
+      if (value4 !== false) this['_record'](enabled2);
     });
   }
   ['undo']() {
     if (this['transaction']) throw new Error('Cannot undo during a transaction');
-    if (this['busy'] || this['undoStack']['length'] === 0) return ![];
+    if (this['busy'] || this['undoStack']['length'] === 0) return false;
     const value5 = this['undoStack']['pop']();
     return this['_run'](
       value5,
@@ -125,7 +125,7 @@ export class CommandHistory {
   }
   ['redo']() {
     if (this['transaction']) throw new Error('Cannot redo during a transaction');
-    if (this['busy'] || this['redoStack']['length'] === 0) return ![];
+    if (this['busy'] || this['redoStack']['length'] === 0) return false;
     const value6 = this['redoStack']['pop']();
     return this['_run'](
       value6,
@@ -143,10 +143,10 @@ export class CommandHistory {
       this['_notify']('begin-transaction'));
   }
   ['commitTransaction']() {
-    if (!this['transaction']) return ![];
+    if (!this['transaction']) return false;
     const value8 = this['transaction'];
     this['transaction'] = null;
-    if (value8['commands']['length'] === 0) return (this['_notify']('empty-transaction'), ![]);
+    if (value8['commands']['length'] === 0) return (this['_notify']('empty-transaction'), false);
     const compositeCommand = createCompositeCommand(value8['label'], value8['commands']);
     this['undoStack']['push'](compositeCommand);
     if (this['undoStack']['length'] > this['limit'])
@@ -158,12 +158,12 @@ export class CommandHistory {
     );
   }
   ['cancelTransaction']() {
-    if (!this['transaction']) return ![];
+    if (!this['transaction']) return false;
     const value9 = this['transaction'];
     this['transaction'] = null;
     const compositeCommand2 = createCompositeCommand(value9['label'], value9['commands']);
     if (value9['commands']['length'] === 0)
-      return (this['_notify']('cancel-transaction', compositeCommand2), !![]);
+      return (this['_notify']('cancel-transaction', compositeCommand2), true);
     return this['_run'](compositeCommand2, 'undo', () =>
       this['_notify']('cancel-transaction', compositeCommand2),
     );
@@ -234,7 +234,7 @@ function getScene(value24, value25) {
 }
 export function applyStoryboard3DObjectTransforms(
   value27,
-  { sceneId: sceneId, transforms: transforms, respectLocks: respectLocks = !![] } = {},
+  { sceneId: sceneId, transforms: transforms, respectLocks: respectLocks = true } = {},
 ) {
   const value28 = transforms && typeof transforms === 'object' ? transforms : {},
     cloneStoryboard3DProject2 = cloneStoryboard3DProject(value27),
@@ -243,7 +243,7 @@ export function applyStoryboard3DObjectTransforms(
   const value29 = [];
   scene['objects']['forEach']((value30) => {
     if (!Object['prototype']['hasOwnProperty']['call'](value28, value30['id'])) return;
-    if (respectLocks && value30['locked'] === !![]) return;
+    if (respectLocks && value30['locked'] === true) return;
     const transform = normalizeTransform(value28[value30['id']], value30['transform']);
     if (JSON['stringify'](transform) === JSON['stringify'](value30['transform'])) return;
     const cloneStoryboard3DProject3 = cloneStoryboard3DProject(value30['transform']);
@@ -283,7 +283,7 @@ export function createStoryboard3DTransformCommand({
     value39 = {
       type: 'transform-objects',
       label: label,
-      mergeKey: mergeKey === ![] ? null : String(mergeKey || 'transform:' + value38),
+      mergeKey: mergeKey === false ? null : String(mergeKey || 'transform:' + value38),
       execute(value40) {
         const value41 = value40['getProject']();
         if (!transforms3) transforms3 = readTransforms(value41, sceneId2, value37);
@@ -291,17 +291,17 @@ export function createStoryboard3DTransformCommand({
           sceneId: sceneId2,
           transforms: cloneStoryboard3DProject5,
         });
-        if (storyboard3DObjectTransforms['changedObjectIds']['length'] === 0) return ![];
+        if (storyboard3DObjectTransforms['changedObjectIds']['length'] === 0) return false;
         return value40['replaceProject'](storyboard3DObjectTransforms['project'], {
           reason: 'transform-objects',
         });
       },
       undo(value42) {
-        if (!transforms3) return ![];
+        if (!transforms3) return false;
         const storyboard3DObjectTransforms2 = applyStoryboard3DObjectTransforms(value42['getProject'](), {
           sceneId: sceneId2,
           transforms: transforms3,
-          respectLocks: ![],
+          respectLocks: false,
         });
         return value42['replaceProject'](storyboard3DObjectTransforms2['project'], {
           reason: 'undo-transform-objects',
@@ -311,16 +311,16 @@ export function createStoryboard3DTransformCommand({
         const storyboard3DObjectTransforms3 = applyStoryboard3DObjectTransforms(value43['getProject'](), {
           sceneId: sceneId2,
           transforms: cloneStoryboard3DProject5,
-          respectLocks: ![],
+          respectLocks: false,
         });
         return value43['replaceProject'](storyboard3DObjectTransforms3['project'], {
           reason: 'redo-transform-objects',
         });
       },
       mergeWith(value44) {
-        if (value44?.['type'] !== 'transform-objects') return ![];
-        if (value44['_signature'] !== value38) return ![];
-        return ((cloneStoryboard3DProject5 = cloneStoryboard3DProject(value44['_afterTransforms'])), !![]);
+        if (value44?.['type'] !== 'transform-objects') return false;
+        if (value44['_signature'] !== value38) return false;
+        return ((cloneStoryboard3DProject5 = cloneStoryboard3DProject(value44['_afterTransforms'])), true);
       },
       _signature: value38,
       _afterTransforms: cloneStoryboard3DProject5,
@@ -349,17 +349,17 @@ export function createStoryboard3DProjectMutationCommand({
         label,
       );
       if (JSON['stringify'](cloneStoryboard3DProject6) === JSON['stringify'](recordDirectorDeletions2))
-        return ![];
+        return false;
       return value45['replaceProject'](recordDirectorDeletions2, { reason: type });
     },
     undo(value47) {
-      if (!cloneStoryboard3DProject6) return ![];
+      if (!cloneStoryboard3DProject6) return false;
       return value47['replaceProject'](cloneStoryboard3DProject(cloneStoryboard3DProject6), {
         reason: 'undo-' + type,
       });
     },
     redo(value48) {
-      if (!recordDirectorDeletions2) return ![];
+      if (!recordDirectorDeletions2) return false;
       return value48['replaceProject'](cloneStoryboard3DProject(recordDirectorDeletions2), {
         reason: 'redo-' + type,
       });

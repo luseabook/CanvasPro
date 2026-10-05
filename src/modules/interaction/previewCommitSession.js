@@ -7,8 +7,8 @@ function cancelFrame(handle) {
   typeof cancelAnimationFrame === 'function' && cancelAnimationFrame(handle);
 }
 export function createPreviewCommitSession({ applyPreview: applyPreview } = {}) {
-  let active = ![],
-    updated = ![],
+  let active = false,
+    updated = false,
     frameHandle = 0,
     pending = null,
     latest = null;
@@ -27,16 +27,16 @@ export function createPreviewCommitSession({ applyPreview: applyPreview } = {}) 
       frameHandle = requestFrame(flushPending);
     },
     reset = () => {
-      (cancelPendingFrame(), (active = ![]), (updated = ![]), (pending = null), (latest = null));
+      (cancelPendingFrame(), (active = false), (updated = false), (pending = null), (latest = null));
     },
     startSession = (value) => {
-      ((active = !![]), (updated = ![]), (pending = null), (latest = value));
+      ((active = true), (updated = false), (pending = null), (latest = value));
     };
   return {
     begin: startSession,
     update(value) {
       (!active && startSession(value),
-        (updated = !![]),
+        (updated = true),
         (latest = value),
         (pending = value),
         scheduleFlush());

@@ -112,7 +112,7 @@ function normalizeLibraryAssetForProjectSession(error2 = {}, next = 0) {
     audioUrl: mediaKind === 'audio' ? sourceUrl : '',
     thumbnailUrl: thumbnailUrl,
     sourceUrl: sourceUrl || thumbnailUrl,
-    isLibraryAsset: !![],
+    isLibraryAsset: true,
   };
 }
 function getActiveCharacterAppearanceKeys(options2 = {}) {
@@ -330,7 +330,7 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
             ['map'](normalizeText)
             ['filter']((value26) => args['shots']['some']((value27) => value27['id'] === value26))
         : [],
-      shotSelectionMode: view['shotSelectionMode'] === !![],
+      shotSelectionMode: view['shotSelectionMode'] === true,
       selectedCharacterId: selectedCharacterId,
       selectedSceneId: selectedSceneId,
       selectedAudioAssetId: selectedAudioAssetId,
@@ -345,7 +345,7 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
       selectedAssetIds: Array['isArray'](view['selectedAssetIds'])
         ? view['selectedAssetIds']['map'](normalizeText)['filter'](Boolean)
         : [],
-      assetSelectionMode: view['assetSelectionMode'] === !![],
+      assetSelectionMode: view['assetSelectionMode'] === true,
       assetAppearanceIndexes:
         view['assetAppearanceIndexes'] && typeof view['assetAppearanceIndexes'] === 'object'
           ? { ...view['assetAppearanceIndexes'] }
@@ -378,7 +378,7 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
       videoGenerationsByShotId: videoGenerationsByShotId,
       videoPreparation: view['videoPreparation'] || { status: 'idle', progress: 0, error: '' },
       sourceAnalysis: view['sourceAnalysis'] || { status: 'idle', progress: 0 },
-      smartClipSettingsOpen: view['smartClipSettingsOpen'] === !![],
+      smartClipSettingsOpen: view['smartClipSettingsOpen'] === true,
       identityAnalysis: view['identityAnalysis'] || {
         status: 'idle',
         modelId: '',
@@ -410,7 +410,7 @@ export function normalizePersonReplacementWorkspaceProject(options8 = {}) {
       },
       projectSearchQuery: normalizeText(view['projectSearchQuery']),
       projectSortOrder: normalizeWorkspaceProjectSortOrder(view['projectSortOrder']),
-      showArchivedProjects: view['showArchivedProjects'] === !![],
+      showArchivedProjects: view['showArchivedProjects'] === true,
       openProjectMenuId: normalizeText(view['openProjectMenuId']),
       pendingDeleteProjectId: normalizeText(view['pendingDeleteProjectId']),
     },
@@ -517,7 +517,7 @@ function applyEditedShotMappings(options11 = {}) {
           text17 = normalizeText(value42['targetCharacterId']);
         text16 &&
           text17 &&
-          value42['projectMappingDisabled'] !== !![] &&
+          value42['projectMappingDisabled'] !== true &&
           !map2['has'](text16) &&
           !map3['has'](text16) &&
           map3['set'](text16, text17);
@@ -530,7 +530,7 @@ function applyEditedShotMappings(options11 = {}) {
           ...args8,
           targetCharacterId:
             normalizeText(args8['targetCharacterId']) ||
-            (args8['projectMappingDisabled'] === !![]
+            (args8['projectMappingDisabled'] === true
               ? ''
               : map3['get'](normalizeText(args8['sourceCharacterId']))) ||
             '',
@@ -576,7 +576,7 @@ function settleInterruptedCharacterAppearanceGenerations(options12 = {}) {
   let enabled4 = map4['size'] > 0;
   const characters = (Array['isArray'](project['characters']) ? project['characters'] : [])['map'](
     (args10) => {
-      let enabled5 = ![];
+      let enabled5 = false;
       const appearances = (Array['isArray'](args10?.['appearances']) ? args10['appearances'] : [])['map'](
         (args11) => {
           const text18 = normalizeText(args10?.['id']) + ':' + normalizeText(args11?.['id']),
@@ -594,7 +594,7 @@ function settleInterruptedCharacterAppearanceGenerations(options12 = {}) {
           }
           if (!enabled7 && ['failed', 'cancelled']['includes'](text19)) return args11;
           return (
-            (enabled5 = !![]),
+            (enabled5 = true),
             {
               ...args11,
               generationStatus: 'failed',
@@ -604,23 +604,23 @@ function settleInterruptedCharacterAppearanceGenerations(options12 = {}) {
         },
       );
       if (!enabled5) return args10;
-      return ((enabled4 = !![]), { ...args10, appearances: appearances });
+      return ((enabled4 = true), { ...args10, appearances: appearances });
     },
   );
-  if (!enabled4) return { project: project, changed: ![] };
+  if (!enabled4) return { project: project, changed: false };
   return {
     project: {
       ...project,
       characters: characters,
       workspace: { ...project['workspace'], generatingAppearanceKeys: [] },
     },
-    changed: !![],
+    changed: true,
   };
 }
 export function settleInterruptedReplacementStudioProjectTasks(
   options13 = {},
   {
-    preserveRecoverableTasks: preserveRecoverableTasks = !![],
+    preserveRecoverableTasks: preserveRecoverableTasks = true,
     message: message = INTERRUPTED_PROJECT_TASK_ERROR,
   } = {},
 ) {
@@ -647,7 +647,7 @@ export function settleInterruptedReplacementStudioProjectTasks(
       status: 'failed',
       error: normalizeText(workspace2['sourceAnalysis']?.['error']) || message,
     }),
-    (enabled8 = !![]));
+    (enabled8 = true));
   const text21 = normalizeText(workspace2['identityAnalysis']?.['status'])['toLowerCase']();
   ACTIVE_RUNTIME_TASK_STATUSES['has'](text21) &&
     ((workspace2['identityAnalysis'] = {
@@ -655,18 +655,18 @@ export function settleInterruptedReplacementStudioProjectTasks(
       status: 'failed',
       error: normalizeText(workspace2['identityAnalysis']?.['error']) || message,
     }),
-    (enabled8 = !![]));
+    (enabled8 = true));
   normalizeText(workspace2['videoPreparation']?.['status'])['toLowerCase']() === 'running' &&
     ((workspace2['videoPreparation'] = {
       ...workspace2['videoPreparation'],
       status: 'failed',
       error: normalizeText(workspace2['videoPreparation']?.['error']) || message,
     }),
-    (enabled8 = !![]));
+    (enabled8 = true));
   const sources = (Array['isArray'](project2['sources']) ? project2['sources'] : [])['map']((args13) => {
       const text22 = normalizeText(args13?.['processingStatus'])['toLowerCase']();
       if (!ACTIVE_SOURCE_ANALYSIS_STATUSES['has'](text22)) return args13;
-      enabled8 = !![];
+      enabled8 = true;
       if (text22 === 'uploading' && normalizeText(args13?.['videoRef']))
         return { ...args13, processingStatus: 'ready-to-start', error: '' };
       return {
@@ -677,9 +677,9 @@ export function settleInterruptedReplacementStudioProjectTasks(
     }),
     shots4 = (Array['isArray'](project2['shots']) ? project2['shots'] : [])['map']((value49) => {
       let args14 = value49,
-        enabled9 = ![];
+        enabled9 = false;
       normalizeText(value49?.['analysisStatus'])['toLowerCase']() === 'running' &&
-        ((args14 = { ...args14, analysisStatus: 'failed', reviewRequired: !![] }), (enabled9 = !![]));
+        ((args14 = { ...args14, analysisStatus: 'failed', reviewRequired: true }), (enabled9 = true));
       normalizeText(value49?.['materializationStatus'])['toLowerCase']() === 'running' &&
         ((args14 = {
           ...args14,
@@ -707,7 +707,7 @@ export function settleInterruptedReplacementStudioProjectTasks(
         (enabled9 = enabled9 || !normalizeText(value49?.['resultVideoRef'])));
       if (!enabled9 && args14 === value49) return value49;
       return (
-        (enabled8 = !![]),
+        (enabled8 = true),
         { ...args14, ...(enabled9 ? { error: normalizeText(value49?.['error']) || message } : {}) }
       );
     }),
@@ -719,7 +719,7 @@ export function settleInterruptedReplacementStudioProjectTasks(
         value51 = shots4['find']((value52) => normalizeText(value52?.['id']) === text24),
         status3 = Boolean(normalizeText(value51?.[value50]));
       return (
-        (enabled8 = !![]),
+        (enabled8 = true),
         {
           ...response5,
           status: status3 ? 'succeeded' : 'failed',
@@ -745,10 +745,10 @@ export function settleInterruptedReplacementStudioProjectTasks(
       });
       Object['assign'](workspace2, updatePersonReplacementVideoGenerationState(workspace2, value54));
     }));
-  if (!enabled8) return { project: project2, changed: ![] };
+  if (!enabled8) return { project: project2, changed: false };
   return {
     project: { ...project2, sources: sources, shots: shots4, workspace: workspace2 },
-    changed: !![],
+    changed: true,
   };
 }
 export function createReplacementStudioProjectSession({
@@ -756,7 +756,7 @@ export function createReplacementStudioProjectSession({
   now: now = () => new Date()['toISOString'](),
 } = {}) {
   let replacementStudioApplicationProject = normalizeReplacementStudioApplicationProject(initialProject, {}),
-    value55 = ![],
+    value55 = false,
     value56 = { rememberProject: null, presentProject: null, schedulePersistence: null };
   const map6 = new Set(),
     handler3 = () => {
@@ -797,11 +797,11 @@ export function createReplacementStudioProjectSession({
     replace = (
       value59,
       {
-        persist: persist = !![],
+        persist: persist = true,
         presentation: presentation = 'render',
         reason: reason = 'application-change',
         source: source = 'application',
-        touchUpdatedAt: touchUpdatedAt = !![],
+        touchUpdatedAt: touchUpdatedAt = true,
       } = {},
     ) => {
       handler3();
@@ -823,7 +823,7 @@ export function createReplacementStudioProjectSession({
           reason: normalizeText(reason),
           source: normalizeText(source) || 'application',
           presentation: presentation,
-          persist: persist === !![],
+          persist: persist === true,
         }),
         getProject()
       );
@@ -851,7 +851,7 @@ export function createReplacementStudioProjectSession({
             value60 && typeof value60 === 'object' ? value60 : {},
             normalizeText(reason),
           ),
-          { persist: !![], presentation: 'none', reason: reason, source: 'workspace' },
+          { persist: true, presentation: 'none', reason: reason, source: 'workspace' },
         )
       );
     },
@@ -862,7 +862,7 @@ export function createReplacementStudioProjectSession({
     },
     destroy() {
       if (value55) return;
-      ((value55 = !![]),
+      ((value55 = true),
         map6['clear'](),
         (value56 = { rememberProject: null, presentProject: null, schedulePersistence: null }));
     },

@@ -11,7 +11,7 @@ export function installStoryboard3DExportCanvasBridge({
   if (!windowObject?.['addEventListener'] || typeof createMediaNodeFromBlob !== 'function') return () => {};
   const async2 = async (index) => {
     const result = index?.['detail'] || {};
-    if (result['options']?.['returnToCanvas'] === ![]) return;
+    if (result['options']?.['returnToCanvas'] === false) return;
     const name = normalizeResults(result['results']);
     if (name['length'] === 0) return;
     let count = 0;

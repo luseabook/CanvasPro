@@ -39,7 +39,7 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
     minByKind: { video: 1 },
     maxByKind: { image: 0, video: 1, audio: 0 },
     fixedSlots: Object['freeze']([
-      Object['freeze']({ id: 'sourceVideo', kind: 'video', label: '源视频', required: !![] }),
+      Object['freeze']({ id: 'sourceVideo', kind: 'video', label: '源视频', required: true }),
     ]),
   },
   uiFields: [
@@ -63,7 +63,7 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
       placement: 'resolution',
       defaultValue: 1024,
       tooltip: '视频最长边的分辨率',
-      showInfoTip: !![],
+      showInfoTip: true,
       options: Object['freeze']([
         Object['freeze']({ value: 768, label: '768' }),
         Object['freeze']({ value: 1024, label: '1024' }),
@@ -90,7 +90,7 @@ export const rhVideoDepthExecutionManifest = createRunningHubVideoExecutionManif
         fieldName: 'video',
         source: 'videoInput',
         field: 'videoUrl',
-        required: !![],
+        required: true,
         missingMessage: '请提供待转换的源视频',
         uploadFailedMessage: '源视频上传到 RunningHub 失败',
         description: '上传视频',

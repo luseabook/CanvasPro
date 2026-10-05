@@ -8,7 +8,7 @@ const TRANSIENT_TASK_ID_FIELDS = new Set(['requestId', 'taskId', 'remoteTaskId']
 function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
-function cloneForPackage(item, { stripTaskIds: stripTaskIds = ![] } = {}) {
+function cloneForPackage(item, { stripTaskIds: stripTaskIds = false } = {}) {
   return JSON['parse'](
     JSON['stringify'](item, (key, index) => {
       if (typeof index === 'string' && index['startsWith']('blob:')) return '';
@@ -30,7 +30,7 @@ export function createPersonReplacementProjectPackagePayload(options2 = {}) {
     payloadVersion: PERSON_REPLACEMENT_PROJECT_PACKAGE_PAYLOAD_VERSION,
     feature: 'person-replacement',
     project: cloneForPackage(normalizeReplacementStudioApplicationProject(options2, options2), {
-      stripTaskIds: !![],
+      stripTaskIds: true,
     }),
   };
 }
@@ -45,7 +45,7 @@ export function createImportedPersonReplacementProject(
   )
     throw new Error('无效的人物替换项目包内容。');
   const args = normalizeReplacementStudioApplicationProject(
-      cloneForPackage(enabled['project'], { stripTaskIds: !![] }),
+      cloneForPackage(enabled['project'], { stripTaskIds: true }),
       {},
     ),
     id = normalizeText(projectId);
@@ -72,9 +72,9 @@ export function createImportedPersonReplacementProject(
     settleInterruptedReplacementStudioProjectTasks2 = settleInterruptedReplacementStudioProjectTasks(
       replacementStudioApplicationProject,
       {
-        preserveRecoverableTasks: ![],
+        preserveRecoverableTasks: false,
         message: '导入项目不会继续原项目中的任务，请重试。',
       },
     )['project'];
-  return cloneForPackage(settleInterruptedReplacementStudioProjectTasks2, { stripTaskIds: !![] });
+  return cloneForPackage(settleInterruptedReplacementStudioProjectTasks2, { stripTaskIds: true });
 }

@@ -46,7 +46,7 @@ export function selectPersonReplacementVideoReference(
   const text2 = normalizeText(targetShotId),
     sourceShotId2 = normalizeText(sourceShotId),
     shot = getShot(project, text2);
-  if (!shot) return { changed: ![], project: project };
+  if (!shot) return { changed: false, project: project };
   if (referenceKind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE) {
     const list =
         resolvePersonReplacementVideoImageInput(project, shot, 'character-reference')['referenceOptions']?.[
@@ -57,14 +57,14 @@ export function selectPersonReplacementVideoReference(
         list['find']((target) => normalizeText(target?.['reference']?.['personId']) === text3) ||
         (!text3 ? list[0] : null),
       replacementVideoReferencePersonId = normalizeText(enabled?.['reference']?.['personId']);
-    if (!enabled || !replacementVideoReferencePersonId) return { changed: ![], project: project };
+    if (!enabled || !replacementVideoReferencePersonId) return { changed: false, project: project };
     if (
       shot['replacementVideoReferenceKind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
       normalizeText(shot['replacementVideoReferencePersonId']) === replacementVideoReferencePersonId
     )
-      return { changed: ![], project: project };
+      return { changed: false, project: project };
     return {
-      changed: !![],
+      changed: true,
       project: {
         ...project,
         shots: project['shots']['map']((args2) =>
@@ -83,18 +83,18 @@ export function selectPersonReplacementVideoReference(
     list2 = getPersonReplacementImageResults(shot2),
     resultIndex2 = Math['trunc'](Number(resultIndex));
   if (!shot2 || !Number['isInteger'](resultIndex2) || resultIndex2 < 0 || resultIndex2 >= list2['length'])
-    return { changed: ![], project: project };
+    return { changed: false, project: project };
   const updateSourceImageResult2 = updateSourceImageResult(shot2, list2, resultIndex2),
     imageRef = normalizeText(updateSourceImageResult2?.['replacementImageRef']);
-  if (!updateSourceImageResult2 || !imageRef) return { changed: ![], project: project };
+  if (!updateSourceImageResult2 || !imageRef) return { changed: false, project: project };
   const source =
     shot['replacementVideoReferenceKind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE &&
     normalizeText(shot['replacementVideoReferenceSourceShotId']) === sourceShotId2 &&
     normalizeText(shot['replacementVideoReferenceImageRef']) === imageRef &&
     getPersonReplacementActiveImageResultIndex(shot2, list2) === resultIndex2;
-  if (source) return { changed: ![], project: project };
+  if (source) return { changed: false, project: project };
   return {
-    changed: !![],
+    changed: true,
     sourceShotId: sourceShotId2,
     resultIndex: resultIndex2,
     imageRef: imageRef,
@@ -131,14 +131,14 @@ export function switchPersonReplacementVideoReferenceResult(
     shot3 = getShot(project2, targetShotId3),
     shot4 = getShot(project2, sourceShotId4),
     list3 = getPersonReplacementImageResults(shot4);
-  if (!shot3 || !shot4 || list3['length'] < 2) return { changed: ![], project: project2 };
+  if (!shot3 || !shot4 || list3['length'] < 2) return { changed: false, project: project2 };
   const count = Math['trunc'](Number(currentResultIndex)),
     entry =
       Number['isInteger'](count) && count >= 0 && count < list3['length']
         ? count
         : getPersonReplacementActiveImageResultIndex(shot4, list3),
     enabled2 = Math['sign'](Number(delta) || 0);
-  if (!enabled2) return { changed: ![], project: project2 };
+  if (!enabled2) return { changed: false, project: project2 };
   const resultIndex3 = (entry + enabled2 + list3['length']) % list3['length'],
     personReplacementVideoImageInput = resolvePersonReplacementVideoImageInput(
       project2,
@@ -159,9 +159,9 @@ export function switchPersonReplacementVideoReferenceResult(
       resultIndex: resultIndex3,
     });
   const imageRef2 = updateSourceImageResult(shot4, list3, resultIndex3);
-  if (!imageRef2) return { changed: ![], project: project2 };
+  if (!imageRef2) return { changed: false, project: project2 };
   return {
-    changed: !![],
+    changed: true,
     sourceShotId: sourceShotId4,
     resultIndex: resultIndex3,
     imageRef: imageRef2['replacementImageRef'],

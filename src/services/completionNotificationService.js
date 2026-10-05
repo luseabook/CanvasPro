@@ -10,9 +10,9 @@ let unsubscribeDesktopClicks = null,
 function createNotificationReceipt(value) {
   const notificationId = value ? 'renderer-' + Date['now']() + '-' + ++notificationSequence : '';
   let enabled,
-    item = ![];
+    item = false;
   function acknowledge() {
-    item = !![];
+    item = true;
     if (!notificationId || !enabled) return;
     void Promise['resolve'](enabled)
       ['then'](() => getNotificationApi()?.['acknowledge']?.({ notificationId: notificationId }))
@@ -165,12 +165,12 @@ export function showGenerationCompleteNotification(args4 = {}) {
   showCompletionToast(args4, notificationId3);
   const notificationApi = getNotificationApi(),
     handler = notificationApi?.['showGenerationComplete'];
-  if (notificationApi?.['isAvailable']?.() === ![] || typeof handler !== 'function')
-    return Promise['resolve']({ success: !![], shown: ![], reason: 'unavailable' });
+  if (notificationApi?.['isAvailable']?.() === false || typeof handler !== 'function')
+    return Promise['resolve']({ success: true, shown: false, reason: 'unavailable' });
   const promise = (async () => {
     const completionSoundSettings = await loadCompletionSoundSettings();
-    if (completionSoundSettings['notificationEnabled'] === ![])
-      return { success: !![], shown: ![], reason: 'disabled' };
+    if (completionSoundSettings['notificationEnabled'] === false)
+      return { success: true, shown: false, reason: 'disabled' };
     const generationCompleteNotificationRequest = await buildGenerationCompleteNotificationRequest({
       ...args4,
       notificationId: notificationId3['notificationId'],
@@ -209,16 +209,16 @@ export async function showTaskStatusNotification({
   );
   const completionSoundSettings2 = await loadCompletionSoundSettings(),
     list3 = [];
-  completionSoundSettings2['enabled'] !== ![] &&
+  completionSoundSettings2['enabled'] !== false &&
     completionSoundSettings2['volume'] > 0 &&
     desktopBridge['notificationSound']['isAvailable']() &&
     list3['push'](
-      Promise['resolve']()['then'](() => desktopBridge['notificationSound']['play']({ system: !![] })),
+      Promise['resolve']()['then'](() => desktopBridge['notificationSound']['play']({ system: true })),
     );
   const notificationApi2 = getNotificationApi();
   if (
-    completionSoundSettings2['notificationEnabled'] !== ![] &&
-    notificationApi2?.['isAvailable']?.() !== ![]
+    completionSoundSettings2['notificationEnabled'] !== false &&
+    notificationApi2?.['isAvailable']?.() !== false
   ) {
     const value3 = Promise['resolve']()['then'](() =>
       notificationApi2?.['showGenerationComplete']?.({

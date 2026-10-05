@@ -180,24 +180,24 @@ export function customProviderGeminiImageEndpoint({
   return new URL(config, uRL2['origin'])['toString']();
 }
 const APIMART_MIDJOURNEY_MODEL_OPTIONS = Object['freeze']({
-  'v8.2': Object['freeze']({ version: '8.2', niji: ![] }),
-  8.2: Object['freeze']({ version: '8.2', niji: ![] }),
-  'v8.1': Object['freeze']({ version: '8.1', niji: ![] }),
-  8.1: Object['freeze']({ version: '8.1', niji: ![] }),
-  v7: Object['freeze']({ version: '7', niji: ![] }),
-  7: Object['freeze']({ version: '7', niji: ![] }),
-  'v6.1': Object['freeze']({ version: '6.1', niji: ![] }),
-  6.1: Object['freeze']({ version: '6.1', niji: ![] }),
-  'v5.2': Object['freeze']({ version: '5.2', niji: ![] }),
-  5.2: Object['freeze']({ version: '5.2', niji: ![] }),
-  'v5.1': Object['freeze']({ version: '5.1', niji: ![] }),
-  5.1: Object['freeze']({ version: '5.1', niji: ![] }),
-  niji7: Object['freeze']({ version: '7', niji: !![] }),
-  'niji-7': Object['freeze']({ version: '7', niji: !![] }),
-  'niji 7': Object['freeze']({ version: '7', niji: !![] }),
-  niji6: Object['freeze']({ version: '6', niji: !![] }),
-  'niji-6': Object['freeze']({ version: '6', niji: !![] }),
-  'niji 6': Object['freeze']({ version: '6', niji: !![] }),
+  'v8.2': Object['freeze']({ version: '8.2', niji: false }),
+  8.2: Object['freeze']({ version: '8.2', niji: false }),
+  'v8.1': Object['freeze']({ version: '8.1', niji: false }),
+  8.1: Object['freeze']({ version: '8.1', niji: false }),
+  v7: Object['freeze']({ version: '7', niji: false }),
+  7: Object['freeze']({ version: '7', niji: false }),
+  'v6.1': Object['freeze']({ version: '6.1', niji: false }),
+  6.1: Object['freeze']({ version: '6.1', niji: false }),
+  'v5.2': Object['freeze']({ version: '5.2', niji: false }),
+  5.2: Object['freeze']({ version: '5.2', niji: false }),
+  'v5.1': Object['freeze']({ version: '5.1', niji: false }),
+  5.1: Object['freeze']({ version: '5.1', niji: false }),
+  niji7: Object['freeze']({ version: '7', niji: true }),
+  'niji-7': Object['freeze']({ version: '7', niji: true }),
+  'niji 7': Object['freeze']({ version: '7', niji: true }),
+  niji6: Object['freeze']({ version: '6', niji: true }),
+  'niji-6': Object['freeze']({ version: '6', niji: true }),
+  'niji 6': Object['freeze']({ version: '6', niji: true }),
 });
 function resolveApimartMidjourneyModel(options2 = {}) {
   const scope =
@@ -211,7 +211,7 @@ function resolveApimartMidjourneyModel(options2 = {}) {
       ['toLowerCase']();
   return APIMART_MIDJOURNEY_MODEL_OPTIONS[input] || APIMART_MIDJOURNEY_MODEL_OPTIONS['v8.2'];
 }
-function normalizeApimartMidjourneyNumber(output, { integer: integer = ![] } = {}) {
+function normalizeApimartMidjourneyNumber(output, { integer: integer = false } = {}) {
   const enabled2 = String(output ?? '')['trim']();
   if (!enabled2 || enabled2['toLowerCase']() === 'auto' || enabled2['toLowerCase']() === 'none')
     return undefined;
@@ -220,11 +220,11 @@ function normalizeApimartMidjourneyNumber(output, { integer: integer = ![] } = {
   return integer ? Math['trunc'](value2) : value2;
 }
 function normalizeApimartMidjourneyBoolean(value3) {
-  if (value3 === !![] || value3 === ![]) return value3;
+  if (value3 === true || value3 === false) return value3;
   const enabled3 = String(value3 ?? '')
     ['trim']()
     ['toLowerCase']();
-  if (!enabled3) return ![];
+  if (!enabled3) return false;
   return enabled3 === 'true' || enabled3 === '1' || enabled3 === 'yes';
 }
 function omitApimartMidjourneyAdaptiveSize(value4) {
@@ -239,7 +239,7 @@ function assignApimartMidjourneyNumber(value6, value7, value8, value9 = {}) {
   if (apimartMidjourneyNumber !== undefined) value6[value7] = apimartMidjourneyNumber;
 }
 function assignApimartMidjourneyBoolean(value10, value11, value12) {
-  if (normalizeApimartMidjourneyBoolean(value12)) value10[value11] = !![];
+  if (normalizeApimartMidjourneyBoolean(value12)) value10[value11] = true;
 }
 export function apimartMidjourneyImage({
   currentBody: currentBody = {},
@@ -264,7 +264,7 @@ export function apimartMidjourneyImage({
   const value15 = {
     prompt: finalPrompt2 || currentBody['prompt'] || '',
     version: version['version'],
-    ...(version['niji'] ? { niji: !![] } : {}),
+    ...(version['niji'] ? { niji: true } : {}),
   };
   !omitApimartMidjourneyAdaptiveSize(currentBody['size']) && (value15['size'] = currentBody['size']);
   const value16 = String(currentBody['speed'] || payload['speed'] || '')
@@ -277,23 +277,23 @@ export function apimartMidjourneyImage({
   if (inputUrlsBySlot['cref']) value15['cref'] = inputUrlsBySlot['cref'];
   if (inputUrlsBySlot['sref']) value15['sref'] = inputUrlsBySlot['sref'];
   if (inputUrlsBySlot['dref']) value15['dref'] = inputUrlsBySlot['dref'];
-  assignApimartMidjourneyNumber(value15, 'seed', currentBody['seed'], { integer: !![] });
+  assignApimartMidjourneyNumber(value15, 'seed', currentBody['seed'], { integer: true });
   currentBody['negative_prompt'] &&
     (value15['negative_prompt'] = String(currentBody['negative_prompt'])['trim']());
-  (assignApimartMidjourneyNumber(value15, 'stylize', currentBody['stylize'], { integer: !![] }),
-    assignApimartMidjourneyNumber(value15, 'chaos', currentBody['chaos'], { integer: !![] }),
-    assignApimartMidjourneyNumber(value15, 'weird', currentBody['weird'], { integer: !![] }));
+  (assignApimartMidjourneyNumber(value15, 'stylize', currentBody['stylize'], { integer: true }),
+    assignApimartMidjourneyNumber(value15, 'chaos', currentBody['chaos'], { integer: true }),
+    assignApimartMidjourneyNumber(value15, 'weird', currentBody['weird'], { integer: true }));
   list2['length'] > 0 && assignApimartMidjourneyNumber(value15, 'iw', currentBody['iw']);
   inputUrlsBySlot['cref'] &&
-    assignApimartMidjourneyNumber(value15, 'cw', currentBody['cw'], { integer: !![] });
+    assignApimartMidjourneyNumber(value15, 'cw', currentBody['cw'], { integer: true });
   inputUrlsBySlot['sref'] &&
-    assignApimartMidjourneyNumber(value15, 'sw', currentBody['sw'], { integer: !![] });
+    assignApimartMidjourneyNumber(value15, 'sw', currentBody['sw'], { integer: true });
   inputUrlsBySlot['dref'] && assignApimartMidjourneyNumber(value15, 'dw', currentBody['dw']);
   const value18 =
     (!version['niji'] &&
       (version['version'] === '6.1' || version['version'] === '5.2' || version['version'] === '5.1')) ||
     (version['niji'] && version['version'] === '6');
-  value18 && assignApimartMidjourneyNumber(value15, 'stop', currentBody['stop'], { integer: !![] });
+  value18 && assignApimartMidjourneyNumber(value15, 'stop', currentBody['stop'], { integer: true });
   (assignApimartMidjourneyBoolean(value15, 'tile', currentBody['tile']),
     assignApimartMidjourneyBoolean(value15, 'raw', currentBody['raw']));
   (version['version'] === '8.2' || version['version'] === '8.1' || version['version'] === '7') &&
@@ -662,12 +662,12 @@ function normalizeRunningHubBodyParamValue(value104, value105) {
     ['trim']()
     ['toLowerCase']();
   if (value106 === 'boolean') {
-    if (value104 === !![] || value104 === ![]) return value104;
+    if (value104 === true || value104 === false) return value104;
     const value107 = String(value104 ?? '')
       ['trim']()
       ['toLowerCase']();
-    if (['true', '1', 'yes', 'on']['includes'](value107)) return !![];
-    if (['false', '0', 'no', 'off', '']['includes'](value107)) return ![];
+    if (['true', '1', 'yes', 'on']['includes'](value107)) return true;
+    if (['false', '0', 'no', 'off', '']['includes'](value107)) return false;
     return Boolean(value104);
   }
   if (value106 === 'integer') {
@@ -745,7 +745,7 @@ function shouldIncludeRunningHubPolicyParam(value136, value137, enabled11) {
         ? value137['conditionalParams']
         : {},
     enabled12 = String(value138[value136] || '')['trim']();
-  if (!enabled12) return !![];
+  if (!enabled12) return true;
   return !!enabled11?.[enabled12];
 }
 function shouldIncludeRunningHubParamForInputMode(value139, value140, enabled13) {
@@ -758,17 +758,17 @@ function shouldIncludeRunningHubParamForInputMode(value139, value140, enabled13)
     enabled14 = String(value141[value139] || '')
       ['trim']()
       ['toLowerCase']();
-  if (!enabled14) return !![];
+  if (!enabled14) return true;
   if (enabled14 === 'textonly' || enabled14 === 'text-only') return !enabled13;
   if (enabled14 === 'inputonly' || enabled14 === 'input-only') return enabled13;
-  return !![];
+  return true;
 }
 function assignRunningHubPolicyParams(
   value142,
   value143,
   value144,
   value145,
-  { hasInputImages: hasInputImages = ![] } = {},
+  { hasInputImages: hasInputImages = false } = {},
 ) {
   const value146 =
     value144?.['constantParams'] &&
@@ -855,10 +855,10 @@ function resolveRunningHubModelDimensions(value165, value166) {
 }
 function isAdaptiveRatioInput(value175) {
   const enabled16 = String(value175 || '')['trim']();
-  if (!enabled16) return !![];
+  if (!enabled16) return true;
   const list6 = normalizeRatioLabelText(enabled16),
     value176 = list6['toLowerCase']();
-  if (/^\d+x\d+$/i['test'](list6)) return ![];
+  if (/^\d+x\d+$/i['test'](list6)) return false;
   return (
     value176 === 'auto' ||
     value176 === 'default' ||
@@ -886,7 +886,7 @@ export function runninghubImage({
     ),
     model4 = modelManifest4?.['modelId'] || 'runninghub-model/' + runningHubModelId,
     enabled17 =
-      quality['omitResolution'] === !![] || isRunningHubModelWithoutImageSizeParam(payload7['model']),
+      quality['omitResolution'] === true || isRunningHubModelWithoutImageSizeParam(payload7['model']),
     imageSize3 =
       normalizeImageSizeForProviderModel({
         model: model4,
@@ -922,8 +922,8 @@ export function runninghubImage({
       : null,
     enabled18 =
       value181 ||
-      quality['omitAspectRatio'] === !![] ||
-      (quality['omitAspectRatioWhenInput'] === !![] && finalUrls5['length'] > 0) ||
+      quality['omitAspectRatio'] === true ||
+      (quality['omitAspectRatioWhenInput'] === true && finalUrls5['length'] > 0) ||
       payload7['suppressAspectRatio'] ||
       isAdaptiveRatioInput(value179) ||
       !aspectRatio4 ||

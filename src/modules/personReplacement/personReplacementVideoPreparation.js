@@ -11,7 +11,7 @@ export function createPersonReplacementVideoPreparationRunner({
   getProjectById: getProjectById = null,
   setProject: setProject,
   setProjectById: setProjectById = null,
-  isDestroyed: isDestroyed = () => ![],
+  isDestroyed: isDestroyed = () => false,
   waitForActiveReverse: waitForActiveReverse,
   fetchVideoMeta: fetchVideoMeta,
   resolveDurationSec: resolveDurationSec,
@@ -22,8 +22,8 @@ export function createPersonReplacementVideoPreparationRunner({
   return async function run({
     projectId: projectId = '',
     shotIds: shotIds = null,
-    notify: notify = !![],
-    renderWorkspace: renderWorkspace = !![],
+    notify: notify = true,
+    renderWorkspace: renderWorkspace = true,
   } = {}) {
     const shotIds2 =
         Array['isArray'](shotIds) && shotIds['length']
@@ -41,7 +41,7 @@ export function createPersonReplacementVideoPreparationRunner({
     await waitForActiveReverse({ projectId: projectId2, shotIds: shotIds2 });
     let shots = handler();
     if (isDestroyed() || normalizeText(shots['id']) !== projectId2)
-      return { ok: ![], stale: !![], failures: [], project: cloneJson(shots) };
+      return { ok: false, stale: true, failures: [], project: cloneJson(shots) };
     const list = shots['shots']['filter'](
       (enabled) =>
         (!shotIds2 || shotIds2['has'](enabled['id'])) &&
@@ -64,7 +64,7 @@ export function createPersonReplacementVideoPreparationRunner({
             },
             { renderWorkspace: renderWorkspace },
           )),
-        { ok: !![], project: cloneJson(shots) }
+        { ok: true, project: cloneJson(shots) }
       );
     shots = handler2(
       {
@@ -109,13 +109,13 @@ export function createPersonReplacementVideoPreparationRunner({
             sourceId: shotId2['sourceId'],
             startSec: shotId2['startTimeSec'],
             endSec: endSec,
-            ...(shotId2['isReversed'] === !![] ? { isReversed: !![] } : {}),
+            ...(shotId2['isReversed'] === true ? { isReversed: true } : {}),
           },
           { videoRef: videoRef, videoRefIsCropped: videoRefIsCropped } =
             await materializePersonReplacementShotPlayback({
               currentShot: { ...shotId2, endTimeSec: endSec },
               range: range,
-              isNewShot: ![],
+              isNewShot: false,
               sourceVideoRef: sourceVideoRef,
               outputFps: outputFps,
               epsilonSec: PERSON_REPLACEMENT_CUT_EPSILON_SEC,
@@ -125,7 +125,7 @@ export function createPersonReplacementVideoPreparationRunner({
           shots2 = handler(),
           enabled2 = shots2['shots']['find']((current) => current['id'] === shotId);
         if (isDestroyed() || normalizeText(shots2['id']) !== projectId2)
-          return { ok: ![], stale: !![], failures: failures, project: cloneJson(shots2) };
+          return { ok: false, stale: true, failures: failures, project: cloneJson(shots2) };
         if (!enabled2 || Boolean(enabled2['isReversed']) !== Boolean(shotId2['isReversed'])) {
           shots = shots2;
           continue;
@@ -144,7 +144,7 @@ export function createPersonReplacementVideoPreparationRunner({
                     videoRef: videoRef,
                     videoRefIsCropped: videoRefIsCropped,
                     outputFps: outputFps,
-                    materializedIsReversed: shotId2['isReversed'] === !![],
+                    materializedIsReversed: shotId2['isReversed'] === true,
                     materializationStatus: 'succeeded',
                     materializationProgress: 100,
                     error: error2['analysisStatus'] === 'failed' ? error2['error'] : '',
@@ -156,7 +156,7 @@ export function createPersonReplacementVideoPreparationRunner({
               videoPreparation: { status: 'running', progress: progress, error: '' },
             },
           },
-          { renderWorkspace: ![] },
+          { renderWorkspace: false },
         );
       } catch (error3) {
         const message = error3?.['message'] || '镜头切片失败';
@@ -187,7 +187,7 @@ export function createPersonReplacementVideoPreparationRunner({
               },
             },
           },
-          { renderWorkspace: ![] },
+          { renderWorkspace: false },
         );
       }
     }

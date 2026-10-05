@@ -58,8 +58,8 @@ export const rhImageDepthModelManifest = Object['freeze']({
       RH_IMAGE_INSTANCE_FIELD,
     ],
   },
-  async: !![],
-  cancellable: !![],
+  async: true,
+  cancellable: true,
   outputType: 'image',
 });
 export const rhImageDepthExecutionManifest = Object['freeze']({

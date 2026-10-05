@@ -66,7 +66,7 @@ export function createPersonReplacementAssetHoverPreviewController({
   getRoot: getRoot = () => null,
   getProject: getProject = () => ({}),
   getSelectedAppearance: getSelectedAppearance = () => null,
-  isTargetAssetDragActive: isTargetAssetDragActive = () => ![],
+  isTargetAssetDragActive: isTargetAssetDragActive = () => false,
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis,
 } = {}) {
@@ -76,7 +76,7 @@ export function createPersonReplacementAssetHoverPreviewController({
     el = null,
     payload = '',
     enabled = null,
-    handle = ![];
+    handle = false;
   const run = () => getRoot()?.['querySelector']?.('[data-story-asset-hover-preview]'),
     handler = (el2) => {
       const state = el2?.['closest']?.('.person-replacement-prompt-reference-inputs'),
@@ -109,7 +109,7 @@ export function createPersonReplacementAssetHoverPreviewController({
       handler(scope)?.['id'] ||
       '',
     handler4 = (el4) => {
-      if (!el4 || !enabled) return ![];
+      if (!el4 || !enabled) return false;
       return (
         handler3(el4) === enabled['assetId'] &&
         normalizeText(el4['dataset']?.['shotId']) === enabled['shotId'] &&
@@ -176,7 +176,7 @@ export function createPersonReplacementAssetHoverPreviewController({
             handler5());
         };
         if (el8['complete'] && Number(el8['naturalWidth']) > 0) run2();
-        else el8['addEventListener']?.('load', run2, { once: !![] });
+        else el8['addEventListener']?.('load', run2, { once: true });
       });
     },
     show = (el9, value9) => {
@@ -191,7 +191,7 @@ export function createPersonReplacementAssetHoverPreviewController({
         el10?.['classList']?.['contains']?.('is-marquee-selecting') ||
         isTargetAssetDragActive()
       )
-        return (hide(), ![]);
+        return (hide(), false);
       const name = handler(el9),
         enabled2 = el9['dataset']?.['personReplacementAudioLibraryAsset'] === 'true',
         id =
@@ -202,7 +202,7 @@ export function createPersonReplacementAssetHoverPreviewController({
           ) ||
           name?.['id'] ||
           '';
-      if (handler4(el9)) return (hide(), ![]);
+      if (handler4(el9)) return (hide(), false);
       const text2 = normalizeText(el9['dataset']?.['storyAssetHoverAppearanceId']),
         value10 =
           project['workspace']['step'] === 2 &&
@@ -393,7 +393,7 @@ export function createPersonReplacementAssetHoverPreviewController({
           value14 ||
           enabled7 ||
           list5['find']((value28) => normalizeText(value28?.['id']) === id);
-      if (value24 && !enabled7) return (hide(), ![]);
+      if (value24 && !enabled7) return (hide(), false);
       const el11 = run(),
         selectedAppearanceId = selectedAssetId
           ? value22?.['appearances']?.[0]
@@ -439,7 +439,7 @@ export function createPersonReplacementAssetHoverPreviewController({
           getAppearances: getWorkspaceAssetAppearances,
           hasVoiceReference: (value30) => Boolean(getCharacterVoiceUrl(value30)),
         });
-      if (!el11 || !workspaceAssetHoverPreviewContent) return (hide(), ![]);
+      if (!el11 || !workspaceAssetHoverPreviewContent) return (hide(), false);
       const value31 =
         id +
         ':' +
@@ -464,7 +464,7 @@ export function createPersonReplacementAssetHoverPreviewController({
         el11['classList']['add']('is-visible'),
         el11['setAttribute']('aria-hidden', 'false'),
         handler6(value9, { anchor: selectedAssetId ? el9 : null }),
-        !![]
+        true
       );
     },
     handlePointerOver = (event2) => {
@@ -511,7 +511,7 @@ export function createPersonReplacementAssetHoverPreviewController({
     },
     destroy() {
       if (handle) return;
-      ((handle = !![]),
+      ((handle = true),
         current &&
           typeof windowObject?.['cancelAnimationFrame'] === 'function' &&
           windowObject['cancelAnimationFrame'](current),

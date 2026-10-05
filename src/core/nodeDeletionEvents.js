@@ -5,7 +5,7 @@ export function subscribeNodeDeletions(value) {
 }
 export function emitNodeDeletions(list = []) {
   const list2 = Array['isArray'](list) ? list : [];
-  if (!list2['length']) return ![];
+  if (!list2['length']) return false;
   for (const run of listeners) {
     try {
       run(list2);
@@ -13,5 +13,5 @@ export function emitNodeDeletions(list = []) {
       console['error']('[nodeDeletionEvents] listener failed', item);
     }
   }
-  return !![];
+  return true;
 }

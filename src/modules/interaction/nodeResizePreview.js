@@ -77,7 +77,7 @@ export function startNodeResizePreview({
   commit: commit,
   label: label = 'node-resize',
 } = {}) {
-  if (!event || !nodeId2 || typeof resolveSize !== 'function') return ![];
+  if (!event || !nodeId2 || typeof resolveSize !== 'function') return false;
   (event['preventDefault']?.(), event['stopPropagation']?.());
   const startNode = (typeof getNode === 'function' && getNode()) || {},
     toFiniteNumber2 = toFiniteNumber(event['clientX'], 0),
@@ -92,7 +92,7 @@ export function startNodeResizePreview({
     toFiniteNumber4 = toFiniteNumber2,
     toFiniteNumber5 = toFiniteNumber3,
     requestFrame2 = 0,
-    next = ![];
+    next = false;
   const beginNodeEditInteraction2 = beginNodeEditInteraction(store, [nodeId2]),
     handler2 = () => {
       requestFrame2 = 0;
@@ -128,11 +128,11 @@ export function startNodeResizePreview({
           {},
         entry = Object['keys'](args)['length'] > 0,
         record = !sizesEqual(finalSize, startSize);
-      let didApply = ![];
+      let didApply = false;
       (record || entry) &&
         typeof applyPatch === 'function' &&
         (applyPatch({ width: finalSize['width'], height: finalSize['height'], ...args }),
-        (didApply = !![]));
+        (didApply = true));
       syncPreviewGeometry(nodeId2, finalSize, toFiniteNumber4, toFiniteNumber5);
       const payload =
         typeof afterApply === 'function' &&
@@ -141,7 +141,7 @@ export function startNodeResizePreview({
           startSize: startSize,
           finalSize: finalSize,
           didApply: didApply,
-        }) === !![];
+        }) === true;
       (didApply || payload) && typeof commit === 'function' && commit();
     };
   function run2(event2) {
@@ -169,7 +169,7 @@ export function startNodeResizePreview({
   }
   function run3(handle) {
     if (next) return;
-    ((next = !![]), handler4(), window['removeEventListener']('blur', run3));
+    ((next = true), handler4(), window['removeEventListener']('blur', run3));
     const enabled4 = handle?.['type'] === 'pointercancel' || handle?.['type'] === 'blur';
     if (
       !enabled4 &&
@@ -186,9 +186,9 @@ export function startNodeResizePreview({
     run4(!enabled4);
   }
   function run4(config) {
-    let enabled5 = ![];
+    let enabled5 = false;
     try {
-      config && beginNodeEditInteraction2['allowed']() && (handler5(), (enabled5 = !![]));
+      config && beginNodeEditInteraction2['allowed']() && (handler5(), (enabled5 = true));
     } catch (error) {
       window['showToast']?.(error['message'] || '节点暂时无法编辑', 'warning');
     } finally {
@@ -205,7 +205,7 @@ export function startNodeResizePreview({
   if (!beginNodeEditInteraction2['ready'])
     void beginNodeEditInteraction2['wait']['then']((enabled6) => {
       if (next) return;
-      if (!enabled6) ((next = !![]), handler4(), run4(![]));
+      if (!enabled6) ((next = true), handler4(), run4(false));
       else {
         if (enabled3) handler3(enabled3);
       }
@@ -218,6 +218,6 @@ export function startNodeResizePreview({
     window['addEventListener']('pointerup', run3),
     window['addEventListener']('pointercancel', run3),
     window['addEventListener']('blur', run3),
-    !![]
+    true
   );
 }

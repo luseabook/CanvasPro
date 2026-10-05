@@ -72,11 +72,11 @@ export function createPersonReplacementLayoutResizeController({
       (value2?.(), (value2 = null));
     },
     begin = (event, el3) => {
-      if (!event || !el3) return ![];
-      if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0))
-        return ![];
+      if (!event || !el3) return false;
+      if (event['isPrimary'] === false || (Number['isFinite'](event['button']) && event['button'] !== 0))
+        return false;
       const text = normalizeText(el3['dataset']?.['personReplacementLayoutSplitter']);
-      if (!['left', 'center', 'right', 'asset-detail']['includes'](text)) return ![];
+      if (!['left', 'center', 'right', 'asset-detail']['includes'](text)) return false;
       const record = text === 'asset-detail',
         payload = text === 'center',
         handle = payload || record,
@@ -89,7 +89,7 @@ export function createPersonReplacementLayoutResizeController({
         el5 = el3['closest']?.('[data-person-replacement-layout]'),
         box = el4?.['getBoundingClientRect']?.(),
         count = handle ? Number(box?.['height']) : Number(box?.['width']);
-      if (!(count > 0)) return ![];
+      if (!(count > 0)) return false;
       (event['preventDefault']?.(), event['stopPropagation']?.(), destroy());
       const state = event['pointerId'];
       try {
@@ -183,18 +183,18 @@ export function createPersonReplacementLayoutResizeController({
           try {
             el3['releasePointerCapture']?.(state);
           } catch {}
-          (windowObject?.['removeEventListener']?.('pointermove', handler2, !![]),
-            windowObject?.['removeEventListener']?.('pointerup', value7, !![]),
-            windowObject?.['removeEventListener']?.('pointercancel', value7, !![]));
+          (windowObject?.['removeEventListener']?.('pointermove', handler2, true),
+            windowObject?.['removeEventListener']?.('pointerup', value7, true),
+            windowObject?.['removeEventListener']?.('pointercancel', value7, true));
           if (value2 === value9) value2 = null;
         };
       return (
         (value2 = value9),
-        windowObject?.['addEventListener']?.('pointermove', handler2, !![]),
-        windowObject?.['addEventListener']?.('pointerup', value7, !![]),
-        windowObject?.['addEventListener']?.('pointercancel', value7, !![]),
+        windowObject?.['addEventListener']?.('pointermove', handler2, true),
+        windowObject?.['addEventListener']?.('pointerup', value7, true),
+        windowObject?.['addEventListener']?.('pointercancel', value7, true),
         handler2(event),
-        !![]
+        true
       );
     };
   return Object['freeze']({ begin: begin, destroy: destroy, stop: destroy });

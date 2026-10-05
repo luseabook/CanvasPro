@@ -194,7 +194,7 @@ export function buildPersonReplacementSourceCharacters(value18, value19 = []) {
               '原人物' + (map8['size'] + 1),
             imageRefs: [],
             confidenceValues: [],
-            reviewRequired: ![],
+            reviewRequired: false,
             identityReviewStatus: 'auto',
             memberCount: 0,
             exemplarShotId: normalizeText(error2['exemplarShotId']) || value22['id'],
@@ -210,8 +210,8 @@ export function buildPersonReplacementSourceCharacters(value18, value19 = []) {
           (value23['ambiguousIdentityIds'] || [])['forEach']((value24) => {
             if (value24) enabled2['ambiguousIdentityIds']['add'](value24);
           }));
-        if (value23['identityReviewStatus'] === 'needs_review' || value23['identityReviewRequired'] === !![])
-          ((enabled2['reviewRequired'] = !![]), (enabled2['identityReviewStatus'] = 'needs_review'));
+        if (value23['identityReviewStatus'] === 'needs_review' || value23['identityReviewRequired'] === true)
+          ((enabled2['reviewRequired'] = true), (enabled2['identityReviewStatus'] = 'needs_review'));
         else
           enabled2['identityReviewStatus'] !== 'needs_review' &&
             (value23['identityReviewStatus'] === 'confirmed' ||

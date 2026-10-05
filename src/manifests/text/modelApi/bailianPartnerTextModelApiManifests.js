@@ -1,10 +1,10 @@
 import { BAILIAN_TEXT_OUTPUT_TOKENS_FIELD } from './bailianTextModelApiManifests.js';
 const MODELS = [
     { model: 'deepseek-v4-pro', title: 'DeepSeek V4 Pro' },
-    { model: 'deepseek-v4-pro-0813', title: 'DeepSeek V4 Pro 0813', lowEffort: !![] },
+    { model: 'deepseek-v4-pro-0813', title: 'DeepSeek V4 Pro 0813', lowEffort: true },
     { model: 'deepseek-v4-flash', title: 'DeepSeek V4 Flash' },
-    { model: 'deepseek-v4-flash-0731', title: 'DeepSeek V4 Flash 0731', lowEffort: !![] },
-    { model: 'kimi-k3', title: 'Kimi K3', image: !![] },
+    { model: 'deepseek-v4-flash-0731', title: 'DeepSeek V4 Flash 0731', lowEffort: true },
+    { model: 'kimi-k3', title: 'Kimi K3', image: true },
   ],
   executionId = (value) => 'bailian.model-api.text.' + value + '.v1',
   responseMapping = { resultPaths: ['choices[].message.content'] };
@@ -54,8 +54,8 @@ export const bailianPartnerTextModelManifests = Object['freeze'](
         icon: image ? 'moonshot' : 'deepseek',
       },
     },
-    async: ![],
-    cancellable: ![],
+    async: false,
+    cancellable: false,
     outputType: 'text',
   })),
 );
@@ -76,11 +76,11 @@ export const bailianPartnerTextExecutionManifests = Object['freeze'](
     result: { textFields: responseMapping['resultPaths'] },
     extensions: {
       chatCompletionInputPolicy: image2 ? 'image-only' : 'text-only',
-      strictUpload: !![],
-      streaming: !![],
+      strictUpload: true,
+      streaming: true,
       structuredOutputMode: 'json_object',
       chatCompletionBodyMapping: [
-        { path: 'enable_thinking', from: 'constant', value: !![] },
+        { path: 'enable_thinking', from: 'constant', value: true },
         ...(!image2
           ? [{ path: 'reasoning_effort', from: 'param', field: 'generationParams.reasoningEffort' }]
           : []),

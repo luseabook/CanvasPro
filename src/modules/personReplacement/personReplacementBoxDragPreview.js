@@ -32,7 +32,7 @@ export function createPersonReplacementBoxDragPreview({
       const enabled = getSession();
       if (!enabled) return;
       ((value2 = { clientX: clientX['clientX'], clientY: clientX['clientY'] }), (value3 = enabled));
-      getPersonReplacementBoxDragDistance(clientX, enabled) >= threshold && (enabled['hasDragged'] = !![]);
+      getPersonReplacementBoxDragDistance(clientX, enabled) >= threshold && (enabled['hasDragged'] = true);
       if (index) return;
       typeof windowObject?.['requestAnimationFrame'] === 'function'
         ? (index = windowObject['requestAnimationFrame'](run))

@@ -6,7 +6,7 @@ function defaultRequestFrame(handler) {
   return (handler(), null);
 }
 function defaultPrefersReducedMotion() {
-  return globalThis['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![];
+  return globalThis['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === true;
 }
 export function bindIconButtonMotion(
   item,
@@ -24,7 +24,7 @@ export function bindIconButtonMotion(
     key = new Set(item ? Array['from'](item) : []);
   for (const el of key) {
     if (!el?.['addEventListener'] || !el?.['classList']) continue;
-    let index = ![],
+    let index = false,
       result = 0,
       setTimer2 = null;
     const run = () => {
@@ -54,7 +54,7 @@ export function bindIconButtonMotion(
     (el['addEventListener']('click', data),
       el['addEventListener']('animationend', target),
       list['push'](() => {
-        ((index = !![]),
+        ((index = true),
           run(),
           el['removeEventListener']?.('click', data),
           el['removeEventListener']?.('animationend', target));

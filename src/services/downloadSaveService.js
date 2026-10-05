@@ -46,8 +46,8 @@ function getDependency(result, data, options) {
 }
 function canUseCapability(target, source, next) {
   const enabled = target?.['nodeExport'];
-  if (!enabled) return ![];
-  if (typeof enabled[source] === 'function') return enabled[source]() === !![];
+  if (!enabled) return false;
+  if (typeof enabled[source] === 'function') return enabled[source]() === true;
   return typeof enabled[next] === 'function';
 }
 function triggerHrefDownload({
@@ -60,7 +60,7 @@ function triggerHrefDownload({
   ((el['href'] = url),
     (el['download'] = filename2 || 'download'),
     (el['rel'] = 'noopener'),
-    (el['hidden'] = !![]),
+    (el['hidden'] = true),
     documentRef['body']?.['appendChild']?.(el),
     el['click'](),
     el['remove']?.());
@@ -92,11 +92,11 @@ async function persistBlobAsLocalMedia({ blob: blob3, filename: filename4, kind:
     }),
     localPath = pickResultLocalPath(entry);
   if (!localPath) throw new Error('暂存媒体文件后未返回本地路径');
-  return { localPath: localPath, url: localPathToUrl(localPath), staged: !![] };
+  return { localPath: localPath, url: localPathToUrl(localPath), staged: true };
 }
 async function cleanupStagedMedia(record, payload) {
   const localPaths = (Array['isArray'](record) ? record : [record])
-    ['filter']((handle) => handle?.['staged'] === !![] && handle?.['localPath'])
+    ['filter']((handle) => handle?.['staged'] === true && handle?.['localPath'])
     ['map']((state) => state['localPath']);
   if (localPaths['length'] === 0) return;
   const run2 = getDependency(payload, 'deleteOutputFilesFromServer', deleteOutputFilesFromServer);
@@ -111,7 +111,7 @@ async function resolveDesktopMediaSource(filename5, scope) {
   const kind3 = normalizeKind(filename5?.['kind']),
     url3 = normalizeExternalUrl(filename5?.['url']),
     localPath2 = normalizeLocalPath(filename5?.['localPath'] || url3);
-  if (localPath2) return { kind: kind3, localPath: localPath2, url: localPathToUrl(localPath2), staged: ![] };
+  if (localPath2) return { kind: kind3, localPath: localPath2, url: localPathToUrl(localPath2), staged: false };
   let blob4 = filename5?.['blob'] || null;
   if (!blob4 && /^(?:blob:|data:)/i['test'](url3)) {
     const run3 = getDependency(scope, 'fetchRemoteBlob', fetchRemoteBlob);
@@ -126,7 +126,7 @@ async function resolveDesktopMediaSource(filename5, scope) {
         scope,
       )),
     };
-  if (/^https?:/i['test'](url3)) return { kind: kind3, localPath: '', url: url3, staged: ![] };
+  if (/^https?:/i['test'](url3)) return { kind: kind3, localPath: '', url: url3, staged: false };
   throw new Error('没有可保存的媒体文件');
 }
 function browserMediaUrl(response) {
@@ -156,7 +156,7 @@ export async function saveTextDownload(options2 = {}, input = {}) {
       urlApi: getDependency(input, 'urlApi', globalThis['URL']),
       schedule: getDependency(input, 'schedule', globalThis['setTimeout']),
     }),
-    { success: !![], canceled: ![], mode: 'browser' }
+    { success: true, canceled: false, mode: 'browser' }
   );
 }
 export async function saveMediaDownload(blob6 = {}, output = {}) {
@@ -186,7 +186,7 @@ export async function saveMediaDownload(blob6 = {}, output = {}) {
           filename: trimText(blob6?.['filename']),
           documentRef: getDependency(output, 'documentRef', globalThis['document']),
         }),
-    { success: !![], canceled: ![], mode: 'browser' }
+    { success: true, canceled: false, mode: 'browser' }
   );
 }
 export async function saveMediaFilesDownload(options3 = {}, args = {}) {
@@ -215,7 +215,7 @@ export async function saveMediaFilesDownload(options3 = {}, args = {}) {
   for (const value5 of count) {
     await saveMediaDownload(value5, { ...args, desktopBridge: null });
   }
-  return { success: !![], canceled: ![], count: count['length'], mode: 'browser' };
+  return { success: true, canceled: false, count: count['length'], mode: 'browser' };
 }
 export const __downloadSaveServiceForTest = Object['freeze']({
   cleanupStagedMedia: cleanupStagedMedia,

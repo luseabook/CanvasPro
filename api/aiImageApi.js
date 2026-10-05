@@ -1726,7 +1726,7 @@ function cloneRecordMetadata(args12) {
 
 function firstApimartMidjourneySourceValue(...args13) {
   for (const value203 of args13) {
-    if (value203 === !![] || value203 === ![]) return value203;
+    if (value203 === true || value203 === false) return value203;
     const value204 = String(value203 ?? '')['trim']();
     if (value204) return value204;
   }
@@ -1734,11 +1734,11 @@ function firstApimartMidjourneySourceValue(...args13) {
 }
 
 function normalizeApimartMidjourneySourceBoolean(value205) {
-  if (value205 === !![] || value205 === ![]) return value205;
+  if (value205 === true || value205 === false) return value205;
   const enabled25 = String(value205 ?? '')
     ['trim']()
     ['toLowerCase']();
-  if (!enabled25) return ![];
+  if (!enabled25) return false;
   return enabled25 === 'true' || enabled25 === '1' || enabled25 === 'yes';
 }
 
@@ -2125,7 +2125,7 @@ export async function resumeApimartMidjourneyUpscaleTask(value241, args30 = {}, 
       throw new Error(processTaskResult2[0]['error'] || 'Midjourney 二次操作恢复失败');
     return processTaskResult2['length'] === 1
       ? processTaskResult2[0]
-      : { isBatch: !![], images: processTaskResult2 };
+      : { isBatch: true, images: processTaskResult2 };
   });
 }
 
@@ -2182,7 +2182,7 @@ async function generateImageUnqueued(value246, value247) {
       batchSize: imageGenerationBatchSize2,
       executionManifest: imageExecution3,
     });
-    return list34['length'] === 1 ? list34[0] : { isBatch: !![], images: list34 };
+    return list34['length'] === 1 ? list34[0] : { isBatch: true, images: list34 };
   }
   if (imageGenerationBatchSize2 <= 1 || shouldSubmitProviderBatchOnce3)
     try {
@@ -2190,7 +2190,7 @@ async function generateImageUnqueued(value246, value247) {
         value248 = Array['isArray'](doGenerateOnce3) ? doGenerateOnce3 : [doGenerateOnce3];
       if (value248['length'] === 1 && value248[0]['error'])
         throw new Error(value248[0]['error'], { cause: value248[0]['cause'] });
-      return value248['length'] === 1 ? value248[0] : { isBatch: !![], images: value248 };
+      return value248['length'] === 1 ? value248[0] : { isBatch: true, images: value248 };
     } catch (value249) {
       if (value249 instanceof ApiError) throw new Error(value249['getUserMessage'](), { cause: value249 });
       throw value249;
@@ -2212,10 +2212,10 @@ async function generateImageUnqueued(value246, value247) {
             status: 'failed',
             retryable: value251['retryable'],
           })
-        : list35['push']({ error: value251['message'] || '未知错误', status: 'failed', retryable: ![] });
+        : list35['push']({ error: value251['message'] || '未知错误', status: 'failed', retryable: false });
     }
   }
   if (list35['length'] === 0) throw new Error('批量生成全部失败');
   if (list35['length'] === 1) return list35[0];
-  return { isBatch: !![], images: list35 };
+  return { isBatch: true, images: list35 };
 }

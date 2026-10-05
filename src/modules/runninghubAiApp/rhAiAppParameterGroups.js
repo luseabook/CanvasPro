@@ -28,7 +28,7 @@ export function renderGroupedPreviewParams(value, item, handler) {
               '<div class="rh-ai-app-group-member" data-group-member="' +
               source['index'] +
               '">' +
-              renderUiSchemaFields([{ ...args, variant: 'groupRow' }], index, { unwrap: !![] }) +
+              renderUiSchemaFields([{ ...args, variant: 'groupRow' }], index, { unwrap: true }) +
               '</div>'
             );
           })
@@ -138,7 +138,7 @@ export function createParameterGroupInteraction(current) {
       );
       if (!enabled5) return;
       const value14 = enabled5['querySelector']('.rh-ai-app-group-panel');
-      ((value14['hidden'] = ![]),
+      ((value14['hidden'] = false),
         enabled5['querySelector']('[data-param-group-action="open"]')['setAttribute'](
           'aria-expanded',
           'true',
@@ -147,9 +147,9 @@ export function createParameterGroupInteraction(current) {
         (value14['scrollTop'] = enabled4['scrollTop']));
     },
     move(value15, value16) {
-      if (!['param', 'advanced-param', 'group-param']['includes'](value15['dragKind'])) return ![];
+      if (!['param', 'advanced-param', 'group-param']['includes'](value15['dragKind'])) return false;
       const enabled6 = handler3(value15);
-      if (!enabled6) return ![];
+      if (!enabled6) return false;
       const el3 = Array['from'](current['panel']['querySelectorAll']('.rh-ai-app-group-panel:not([hidden])'))[
         'find'
       ]((el4) => {
@@ -167,8 +167,8 @@ export function createParameterGroupInteraction(current) {
         el3['closest']('[data-param-group]')['dataset']['paramGroup'] === enabled6['footerGroupId']
       ) {
         (handler4(),
-          current['_clearPreviewAdvancedParamDropPlaceholder'](value15, { animate: !![] }),
-          current['_clearPreviewHomeParamDropPlaceholder'](value15, { animate: !![] }));
+          current['_clearPreviewAdvancedParamDropPlaceholder'](value15, { animate: true }),
+          current['_clearPreviewHomeParamDropPlaceholder'](value15, { animate: true }));
         const value18 = Array['from'](el3['querySelectorAll']('[data-group-member]'))['filter'](
             (value19) => Number(value19['dataset']['groupMember']) !== enabled6['index'],
           ),
@@ -192,7 +192,7 @@ export function createParameterGroupInteraction(current) {
           (animatePreviewOrder(value25, () => el3['insertBefore'](value24, value18[value21] || null)),
             (el3['scrollTop'] = value26));
         }
-        return ((value15['groupLayoutHandled'] = !![]), !![]);
+        return ((value15['groupLayoutHandled'] = true), true);
       }
       (entry?.['element']?.['removeAttribute']('data-group-insert'), (entry = null));
       const value27 = Array['from'](current['_getPreviewZoneElement']('params')?.['children'] || []),
@@ -207,7 +207,7 @@ export function createParameterGroupInteraction(current) {
               enabled7 === enabled6 ||
               (enabled6['footerGroupId'] && enabled7['footerGroupId'] === enabled6['footerGroupId'])
             )
-              return ![];
+              return false;
             const box = el6['getBoundingClientRect']();
             return (
               value15['currentClientX'] > box['left'] + box['width'] * 0.25 &&
@@ -219,11 +219,11 @@ export function createParameterGroupInteraction(current) {
       el5 !== enabled2?.['element'] &&
         (handler4(),
         el5 &&
-          ((enabled2 = { element: el5, index: Number(el5['dataset']['previewComponentIndex']), ready: ![] }),
+          ((enabled2 = { element: el5, index: Number(el5['dataset']['previewComponentIndex']), ready: false }),
           el5['classList']['add']('is-group-drop-pending'),
           (setTimeout2 = setTimeout(() => {
             if (!enabled2 || enabled2['element'] !== el5) return;
-            ((enabled2['ready'] = !![]),
+            ((enabled2['ready'] = true),
               el5['classList']['add']('is-group-drop-ready'),
               (el5['dataset']['groupDropLabel'] = el5['dataset']['paramGroup']
                 ? '松开加入分组'
@@ -231,9 +231,9 @@ export function createParameterGroupInteraction(current) {
           }, 450))));
       const enabled8 = handler2()['some']((value29) => value29['id']);
       if (!enabled2 && value16 === 'advanced') current['_reorderPreviewAdvancedParamsDuringDrag'](value15);
-      else current['_clearPreviewAdvancedParamDropPlaceholder'](value15, { animate: !![] });
+      else current['_clearPreviewAdvancedParamDropPlaceholder'](value15, { animate: true });
       if (!enabled2 && !enabled8 && value15['dragKind'] !== 'group-param' && value16 !== 'params')
-        return ((value15['groupLayoutHandled'] = ![]), ![]);
+        return ((value15['groupLayoutHandled'] = false), false);
       !enabled2 &&
         !enabled8 &&
         value16 === 'params' &&
@@ -261,19 +261,19 @@ export function createParameterGroupInteraction(current) {
         }
       } else {
         if (enabled2 || value16 !== 'params')
-          current['_clearPreviewHomeParamDropPlaceholder'](value15, { animate: !![] });
+          current['_clearPreviewHomeParamDropPlaceholder'](value15, { animate: true });
       }
       return (
         current['_getPreviewZoneElement']('params')?.['classList']['toggle'](
           'is-param-drop-target',
           value16 === 'params',
         ),
-        (value15['groupLayoutHandled'] = !![]),
-        !![]
+        (value15['groupLayoutHandled'] = true),
+        true
       );
     },
     end(enabled9, value40, value41) {
-      if (!enabled9['groupLayoutHandled']) return (handler4(), ![]);
+      if (!enabled9['groupLayoutHandled']) return (handler4(), false);
       const value42 = current['panel']['querySelector']('.rh-ai-app-group-panel:not([hidden])');
       record = value42
         ? {
@@ -283,10 +283,10 @@ export function createParameterGroupInteraction(current) {
         : null;
       if (value40['type'] !== 'pointerup') {
         if (enabled9['layoutSnapshot']) current['_restorePreviewLayoutSnapshot'](enabled9['layoutSnapshot']);
-        return (handler4(), !![]);
+        return (handler4(), true);
       }
       const enabled10 = handler3(enabled9);
-      if (!enabled10) return (handler4(), !![]);
+      if (!enabled10) return (handler4(), true);
       const enabled11 = handler2()['find']((value43) => value43['members']['includes'](enabled10)),
         enabled12 = enabled9['dragKind'] === 'param' && !!enabled11?.['id'],
         value44 = enabled12 ? enabled11['members'] : [enabled10];
@@ -333,7 +333,7 @@ export function createParameterGroupInteraction(current) {
           }
         }
       }
-      return (handler4(), !![]);
+      return (handler4(), true);
     },
     bind(el7) {
       const value57 = (value58) => {
@@ -347,7 +347,7 @@ export function createParameterGroupInteraction(current) {
           if (value61 === 'description') {
             const el8 = value59['querySelector']('[data-param-group-description]');
             el8['hidden'] = !el8['hidden'];
-            if (!el8['hidden']) el8['focus']({ preventScroll: !![] });
+            if (!el8['hidden']) el8['focus']({ preventScroll: true });
             handler5(value59);
             return;
           }
@@ -355,7 +355,7 @@ export function createParameterGroupInteraction(current) {
             const value62 = value59['querySelector']('.rh-ai-app-group-panel'),
               value63 = enabled14['getAttribute']('aria-expanded') !== 'true';
             (el7['querySelectorAll']('.rh-ai-app-group-panel')['forEach']((enabled16) => {
-              if (enabled16 !== value62 && !enabled16['hidden']) showGroupPanel(enabled16, ![]);
+              if (enabled16 !== value62 && !enabled16['hidden']) showGroupPanel(enabled16, false);
             }),
               el7['querySelectorAll']('[data-param-group-action="open"]')['forEach']((value64) =>
                 value64['setAttribute']('aria-expanded', 'false'),
@@ -379,7 +379,7 @@ export function createParameterGroupInteraction(current) {
                 ['closest']('[data-param-group]')
                 ['querySelector']('[data-param-group-action="description"]')['dataset']['tooltip'] =
                 value67 || '编辑参数组说明'),
-              current['_refreshBundleFromComponents']({ renderPreview: ![] }));
+              current['_refreshBundleFromComponents']({ renderPreview: false }));
             return;
           }
           const enabled17 = event['target']['dataset']?.['paramGroupName'];
@@ -394,7 +394,7 @@ export function createParameterGroupInteraction(current) {
             (event['target']
               ['closest']('[data-param-group]')
               ['querySelector']('[data-param-group-action="open"]')['textContent'] = value70),
-            current['_refreshBundleFromComponents']({ renderPreview: ![] }));
+            current['_refreshBundleFromComponents']({ renderPreview: false }));
         },
         value73 = (event2) => {
           if (event2['type'] === 'keydown' && event2['key'] !== 'Escape') return;
@@ -404,7 +404,7 @@ export function createParameterGroupInteraction(current) {
             el7['querySelectorAll']('.rh-ai-app-group-panel:not([hidden])')['forEach']((value74) => {
               const value75 = value74['closest']('[data-param-group]');
               if (event2['type'] !== 'keydown' && value75['contains'](event2['target'])) return;
-              (showGroupPanel(value74, ![]),
+              (showGroupPanel(value74, false),
                 value75['querySelector']('[data-param-group-action="open"]')['setAttribute'](
                   'aria-expanded',
                   'false',
@@ -429,17 +429,17 @@ export function createParameterGroupInteraction(current) {
         el7['addEventListener']('click', value57),
         el7['addEventListener']('change', value65),
         el7['ownerDocument']['addEventListener']('pointerdown', value73),
-        el7['ownerDocument']['addEventListener']('keydown', value73, !![]),
+        el7['ownerDocument']['addEventListener']('keydown', value73, true),
         el7['ownerDocument']['defaultView']['addEventListener']('resize', value76),
-        el7['addEventListener']('scroll', value76, !![]),
+        el7['addEventListener']('scroll', value76, true),
         () => {
           (el7['removeEventListener']('keydown', value78),
             el7['removeEventListener']('click', value57),
             el7['removeEventListener']('change', value65),
             el7['ownerDocument']['removeEventListener']('pointerdown', value73),
-            el7['ownerDocument']['removeEventListener']('keydown', value73, !![]),
+            el7['ownerDocument']['removeEventListener']('keydown', value73, true),
             el7['ownerDocument']['defaultView']['removeEventListener']('resize', value76),
-            el7['removeEventListener']('scroll', value76, !![]),
+            el7['removeEventListener']('scroll', value76, true),
             handler4());
         }
       );

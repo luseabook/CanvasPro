@@ -37,23 +37,23 @@ export function createStoryClipFrameProductionController({
   getSelection: getSelection = () => ({ episode: null, clip: null }),
   projectTasks: projectTasks = {},
   schedulePersistence: schedulePersistence = () => {},
-  syncFrameToCanvas: syncFrameToCanvas = () => Promise['resolve'](![]),
-  syncFrameRail: syncFrameRail = () => ![],
-  settleFrameCard: settleFrameCard = () => ![],
+  syncFrameToCanvas: syncFrameToCanvas = () => Promise['resolve'](false),
+  syncFrameRail: syncFrameRail = () => false,
+  settleFrameCard: settleFrameCard = () => false,
   render: render = () => {},
   showToast: showToast = () => {},
 } = {}) {
   const map = new Set(),
     handler = projectTasks['createToken'] || (() => null),
-    handler2 = projectTasks['isLive'] || (() => ![]),
-    handler3 = projectTasks['isCurrent'] || (() => ![]),
-    handler4 = projectTasks['syncEntry'] || (() => ![]);
+    handler2 = projectTasks['isLive'] || (() => false),
+    handler3 = projectTasks['isCurrent'] || (() => false),
+    handler4 = projectTasks['syncEntry'] || (() => false);
   function trimSelected(el) {
     const el2 = el?.['closest']?.('.story-video-result[data-story-video-result-index]'),
       wrapperEl = el2?.['querySelector']?.('.story-video-stage'),
       videoEl = el2?.['querySelector']?.('[data-story-video-player]'),
       { episode: episode, clip: clip } = getSelection();
-    if (!wrapperEl || !videoEl || !episode || !clip) return (showToast('当前片段视频不可用。', 'warn'), ![]);
+    if (!wrapperEl || !videoEl || !episode || !clip) return (showToast('当前片段视频不可用。', 'warn'), false);
     const videoResultIndex = Math['max'](
         0,
         Math['trunc'](Number(el?.['dataset']?.['storyVideoResultIndex']) || 0),
@@ -76,7 +76,7 @@ export function createStoryClipFrameProductionController({
         ]
           ['map'](normalizeText)
           ['find'](Boolean) || '';
-    if (!sourceUrl) return (showToast('当前片段视频源不可用。', 'warn'), ![]);
+    if (!sourceUrl) return (showToast('当前片段视频源不可用。', 'warn'), false);
     const sourceKey = normalizeText(sourceData['taskId'] || sourceData['id'] || sourceLocalPath || sourceUrl),
       fromRect = videoEl['getBoundingClientRect']?.(),
       target = handler(),
@@ -97,7 +97,7 @@ export function createStoryClipFrameProductionController({
       durationSec: Number(videoEl['duration']) || Number(sourceData['videoDuration']) || 0,
       videoWidth: Number(videoEl['videoWidth']) || Number(sourceData['videoWidth']) || 0,
       videoHeight: Number(videoEl['videoHeight']) || Number(sourceData['videoHeight']) || 0,
-      dimMode: ![],
+      dimMode: false,
       onConfirm: ({
         startSec: startSec,
         endSec: endSec,
@@ -139,15 +139,15 @@ export function createStoryClipFrameProductionController({
         });
         ((target['data']['clipFrames'] = upsertStoryClipFrame(target['data']['clipFrames'], assetId)),
           handler4(target),
-          schedulePersistence({ immediate: !![] }),
+          schedulePersistence({ immediate: true }),
           void syncFrameToCanvas(target, assetId));
         if (handler3(target)) {
           state['episodeAssetRailTab'] = 'frames';
-          if (!syncFrameRail({ refreshContent: !![] })) render();
+          if (!syncFrameRail({ refreshContent: true })) render();
           const contentElement = documentObject['createElement']('video');
           ((contentElement['src'] = videoUrl),
-            (contentElement['muted'] = !![]),
-            (contentElement['playsInline'] = !![]));
+            (contentElement['muted'] = true),
+            (contentElement['playsInline'] = true));
           if (posterUrl) contentElement['poster'] = posterUrl;
           const toElement = viewportEl?.['querySelector']?.('[data-story-episode-asset-tab="frames"]');
           playAssetCreateFly({
@@ -174,12 +174,12 @@ export function createStoryClipFrameProductionController({
               thumbLocalPath: thumbLocalPath,
             })),
               handler4(target),
-              schedulePersistence({ immediate: !![] }));
+              schedulePersistence({ immediate: true }));
             const storyClipFrames = normalizeStoryClipFrames(target['data']['clipFrames'])['find'](
               (next) => next['id'] === assetId['id'],
             );
             if (storyClipFrames) void syncFrameToCanvas(target, storyClipFrames);
-            handler3(target) && syncFrameRail({ refreshContent: !![] });
+            handler3(target) && syncFrameRail({ refreshContent: true });
           })
           ['catch'](() => {});
       },
@@ -189,7 +189,7 @@ export function createStoryClipFrameProductionController({
     const el4 = el3?.['closest']?.('.story-video-result[data-story-video-result-index]'),
       videoEl2 = el4?.['querySelector']?.('[data-story-video-player]'),
       { episode: episode3, clip: clip3 } = getSelection();
-    if (!videoEl2 || !episode3 || !clip3) return (showToast('当前片段视频不可用。', 'warn'), ![]);
+    if (!videoEl2 || !episode3 || !clip3) return (showToast('当前片段视频不可用。', 'warn'), false);
     const videoResultIndex2 = Math['max'](
         0,
         Math['trunc'](Number(el3?.['dataset']?.['storyVideoResultIndex']) || 0),
@@ -201,10 +201,10 @@ export function createStoryClipFrameProductionController({
         videoResultIndex2,
         Math['round'](currentTimeSec * 1000),
       ]['join'](':');
-    if (map['has'](current)) return ![];
-    (map['add'](current), (el3['disabled'] = !![]), syncStoryAsyncButton(el3, !![], { spinnerOnly: !![] }));
+    if (map['has'](current)) return false;
+    (map['add'](current), (el3['disabled'] = true), syncStoryAsyncButton(el3, true, { spinnerOnly: true }));
     const fromRect2 = videoEl2['getBoundingClientRect']?.();
-    let enabled = ![];
+    let enabled = false;
     const entry = handler(),
       sourceResult = Array['isArray'](clip3?.['video']?.['results'])
         ? clip3['video']['results'][videoResultIndex2] || {}
@@ -229,10 +229,10 @@ export function createStoryClipFrameProductionController({
         documentObject: documentObject,
         fileNamePrefix: 'story_clip_frame',
       });
-      if (!handler2(entry)) return ![];
+      if (!handler2(entry)) return false;
       const episode4 = findEpisode(entry['data'], episode3['id']),
         clip4 = findClip(episode4, clip3['id']);
-      if (!episode4 || !clip4) return ![];
+      if (!episode4 || !clip4) return false;
       const record = Array['isArray'](clip4?.['video']?.['results'])
         ? clip4['video']['results'][videoResultIndex2]
         : null;
@@ -242,7 +242,7 @@ export function createStoryClipFrameProductionController({
         (record['originalLocalPath'] = localizedVideo['originalLocalPath']),
         (record['displayLocalPath'] = localizedVideo['displayLocalPath']));
       let payload = null,
-        handle = ![];
+        handle = false;
       const { savePromise: savePromise, previewUrl: previewUrl } = startVideoFrameSnapshotPersistence(
         snapshot,
         saveOutputBlob,
@@ -263,9 +263,9 @@ export function createStoryClipFrameProductionController({
                 sourceKey: sourceKey2,
                 sourceUrl: sourceUrl2,
               }),
-              captureSavePending: !![],
+              captureSavePending: true,
               captureSaveError: '',
-              isTransient: !![],
+              isTransient: true,
             };
             const storyClipFrames2 = normalizeStoryClipFrames(entry['data']['clipFrames'])['find'](
               (config) => config['id'] === payload['id'],
@@ -273,10 +273,10 @@ export function createStoryClipFrameProductionController({
             !storyClipFrames2 &&
               payload['imageUrl'] &&
               ((entry['data']['clipFrames'] = upsertStoryClipFrame(entry['data']['clipFrames'], payload)),
-              (handle = !![]));
+              (handle = true));
             if (handler3(entry)) {
               state['episodeAssetRailTab'] = 'frames';
-              if (!syncFrameRail({ refreshContent: !![] })) render();
+              if (!syncFrameRail({ refreshContent: true })) render();
               const contentElement2 = documentObject['createElement']('img');
               ((contentElement2['src'] = previewUrl2), (contentElement2['alt'] = ''));
               const toElement2 = viewportEl?.['querySelector']?.('[data-story-episode-asset-tab="frames"]');
@@ -293,7 +293,7 @@ export function createStoryClipFrameProductionController({
         },
       );
       return (
-        (enabled = !![]),
+        (enabled = true),
         void savePromise['then']((saved) => {
           if (!handler2(entry)) {
             previewUrl && (windowObject?.['URL'] || globalThis['URL'])?.['revokeObjectURL']?.(previewUrl);
@@ -313,10 +313,10 @@ export function createStoryClipFrameProductionController({
             storyClipFrameRecord,
           )),
             handler4(entry),
-            schedulePersistence({ immediate: !![] }),
+            schedulePersistence({ immediate: true }),
             void syncFrameToCanvas(entry, storyClipFrameRecord));
           if (handler3(entry)) {
-            if (!settleFrameCard(storyClipFrameRecord['id'])) syncFrameRail({ refreshContent: !![] });
+            if (!settleFrameCard(storyClipFrameRecord['id'])) syncFrameRail({ refreshContent: true });
           }
           previewUrl && (windowObject?.['URL'] || globalThis['URL'])?.['revokeObjectURL']?.(previewUrl);
         })
@@ -328,16 +328,16 @@ export function createStoryClipFrameProductionController({
                   args2['id'] === payload?.['id']
                     ? {
                         ...args2,
-                        captureSavePending: ![],
+                        captureSavePending: false,
                         captureSaveError: String(error?.['message'] || '当前帧本地保存失败'),
-                        isTransient: !![],
+                        isTransient: true,
                       }
                     : args2,
               );
               if (handler3(entry)) {
                 const errorMessage = String(error?.['message'] || '当前帧本地保存失败');
                 (!settleFrameCard(payload?.['id'], { errorMessage: errorMessage }) &&
-                  syncFrameRail({ refreshContent: !![] }),
+                  syncFrameRail({ refreshContent: true }),
                   showToast('当前帧已显示，但本地保存失败。', 'warning'));
               }
             } else
@@ -347,17 +347,17 @@ export function createStoryClipFrameProductionController({
           ['finally'](() => {
             map['delete'](current);
           }),
-        !![]
+        true
       );
     } catch (error2) {
       return (
         console['warn']('[storyWorkspace] capture clip frame failed', error2),
         showToast(error2?.['message'] || '截取当前帧失败，请重试。', 'error'),
-        ![]
+        false
       );
     } finally {
       if (!enabled) map['delete'](current);
-      el3?.['isConnected'] !== ![] && ((el3['disabled'] = ![]), syncStoryAsyncButton(el3, ![]));
+      el3?.['isConnected'] !== false && ((el3['disabled'] = false), syncStoryAsyncButton(el3, false));
     }
   }
   return Object['freeze']({ captureSelected: captureSelected, trimSelected: trimSelected });

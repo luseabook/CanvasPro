@@ -12,7 +12,7 @@ export function bindGenerationPriceControl(
   const el2 = el['ownerDocument'],
     el3 = el2['defaultView'],
     el4 = el2['createElement']('button');
-  ((el4['type'] = 'button'), (el4['className'] = 'generation-model-price'), (el4['hidden'] = !![]));
+  ((el4['type'] = 'button'), (el4['className'] = 'generation-model-price'), (el4['hidden'] = true));
   const el5 = el2['createElement']('span');
   el5['className'] = 'generation-model-price-label';
   const el6 = el2['createElement']('span');
@@ -25,13 +25,13 @@ export function bindGenerationPriceControl(
     el['before'](el4));
   let title = null,
     value = null,
-    enabled = ![],
+    enabled = false,
     item = '',
-    enabled2 = ![],
-    enabled3 = ![],
-    enabled4 = ![],
+    enabled2 = false,
+    enabled3 = false,
+    enabled4 = false,
     key = 0,
-    enabled5 = ![],
+    enabled5 = false,
     setTimeout2,
     bindModelPriceDetails2;
   const run = () => ({
@@ -73,7 +73,7 @@ export function bindGenerationPriceControl(
         handler();
         return;
       }
-      ((enabled2 = !![]), handler());
+      ((enabled2 = true), handler());
       const index = key;
       cache['ensure'](title)
         ['then']((result) => {
@@ -81,10 +81,10 @@ export function bindGenerationPriceControl(
           ((value = result), (enabled = cache['stale'](result)));
         })
         ['catch']((error) => {
-          !enabled3 && index === key && ((enabled = !![]), (item = error['message'] || ''));
+          !enabled3 && index === key && ((enabled = true), (item = error['message'] || ''));
         })
         ['finally'](() => {
-          !enabled3 && index === key && ((enabled2 = ![]), handler());
+          !enabled3 && index === key && ((enabled2 = false), handler());
         });
     },
     handler3 = () => {
@@ -92,8 +92,8 @@ export function bindGenerationPriceControl(
       const event = getContext();
       (event?.['key'] !== title?.['key'] &&
         ((key += 1),
-        (enabled2 = ![]),
-        (enabled = ![]),
+        (enabled2 = false),
+        (enabled = false),
         (item = ''),
         bindModelPriceDetails2?.['close'](),
         (value = event ? cache['peek'](event) : null)),
@@ -104,13 +104,13 @@ export function bindGenerationPriceControl(
     },
     sync2 = () => {
       if (enabled5) return;
-      ((enabled5 = !![]),
+      ((enabled5 = true),
         queueMicrotask(() => {
-          ((enabled5 = ![]), handler3());
+          ((enabled5 = false), handler3());
         }));
     };
   bindModelPriceDetails2 = bindModelPriceDetails(el4, run, () => {
-    ((enabled4 = !![]), handler2());
+    ((enabled4 = true), handler2());
   });
   const data = el3['IntersectionObserver']
     ? new el3['IntersectionObserver'](([options]) => {
@@ -128,7 +128,7 @@ export function bindGenerationPriceControl(
     {
       sync: sync2,
       destroy() {
-        ((enabled3 = !![]),
+        ((enabled3 = true),
           (key += 1),
           clearTimeout(setTimeout2),
           data?.['disconnect'](),

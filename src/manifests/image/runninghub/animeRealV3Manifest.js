@@ -23,9 +23,9 @@ export const animeRealV3ModelManifest = Object['freeze']({
   extensions: Object['freeze']({
     imageMenu: Object['freeze']({ group: 'runninghubWorkflow', order: 35 }),
     imageNodeUi: Object['freeze']({
-      alwaysShowRefBar: !![],
+      alwaysShowRefBar: true,
       rootClass: 'rh-anime-real-node',
-      workflowBusyButton: !![],
+      workflowBusyButton: true,
       inputGate: Object['freeze']({
         kind: 'image',
         max: 1,
@@ -69,8 +69,8 @@ export const animeRealV3ModelManifest = Object['freeze']({
       RH_IMAGE_INSTANCE_FIELD,
     ]),
   }),
-  async: !![],
-  cancellable: !![],
+  async: true,
+  cancellable: true,
   outputType: 'image',
 });
 export const animeRealV3ExecutionManifest = Object['freeze']({

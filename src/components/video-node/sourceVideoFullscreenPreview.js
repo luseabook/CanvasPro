@@ -54,7 +54,7 @@ function setPlaybackTime(data, target) {
   } catch {}
 }
 function requestExclusivePlayback(el, label) {
-  if (!el) return ![];
+  if (!el) return false;
   if (
     !claimVideoPlaybackOwnership(el, {
       label: label,
@@ -62,23 +62,23 @@ function requestExclusivePlayback(el, label) {
       readyTimeoutMs: 350,
       recoveryDebounceMs: 150,
       recoveryCooldownMs: 500,
-      shouldRecover: () => el['isConnected'] !== ![] && !el['paused'],
+      shouldRecover: () => el['isConnected'] !== false && !el['paused'],
     })
   )
-    return ![];
+    return false;
   try {
     const promise = el['play']?.();
     promise?.['catch']?.(() => {});
   } catch {}
-  return !![];
+  return true;
 }
 export function openSourceVideoFullscreenPreview({
   nodeData: nodeData = {},
   previewUrl: previewUrl = '',
   previewPlaybackUrl: previewPlaybackUrl = '',
   currentTime: currentTime = 0,
-  muted: muted = !![],
-  loop: loop = ![],
+  muted: muted = true,
+  loop: loop = false,
   documentObject: documentObject = globalThis['document'],
   attachSource: attachSource = attachMediaElementPlaybackSource,
   watchFrame: watchFrame = watchVideoFramePresentation,
@@ -89,15 +89,15 @@ export function openSourceVideoFullscreenPreview({
   if (!sources['previewUrl'] || !documentObject?.['body']) return null;
   const overlay = documentObject['createElement']('div');
   overlay['classList']['add']('source-video-fullscreen-overlay', 'is-loading');
-  let enabled2 = ![];
+  let enabled2 = false;
   const stage = documentObject['createElement']('div');
   stage['classList']['add']('source-video-fullscreen-stage');
   const previewVideo = documentObject['createElement']('video');
   (previewVideo['classList']['add']('source-video-fullscreen-media', 'is-active'),
-    (previewVideo['controls'] = !![]),
-    (previewVideo['loop'] = loop === !![]),
+    (previewVideo['controls'] = true),
+    (previewVideo['loop'] = loop === true),
     (previewVideo['muted'] = !!muted),
-    (previewVideo['playsInline'] = !![]),
+    (previewVideo['playsInline'] = true),
     (previewVideo['preload'] = 'auto'),
     setPlaybackTime(previewVideo, currentTime),
     previewVideo['addEventListener']?.('loadedmetadata', () => {
@@ -112,10 +112,10 @@ export function openSourceVideoFullscreenPreview({
       (overlay['classList']['remove']('is-loading'), overlay['classList']['add']('is-error'));
     },
     current = () => run();
-  let enabled3 = ![];
+  let enabled3 = false;
   const entry = () => {
     if (!enabled2 && !enabled3 && normalizeSource(previewPlaybackUrl)) {
-      ((enabled3 = !![]),
+      ((enabled3 = true),
         overlay['classList']['add']('is-loading'),
         overlay['classList']['remove']('is-error'),
         run2(previewVideo),
@@ -132,10 +132,10 @@ export function openSourceVideoFullscreenPreview({
   sources['highResolutionUrl'] &&
     ((highResolutionVideo = documentObject['createElement']('video')),
     highResolutionVideo['classList']['add']('source-video-fullscreen-media'),
-    (highResolutionVideo['controls'] = ![]),
-    (highResolutionVideo['loop'] = loop === !![]),
+    (highResolutionVideo['controls'] = false),
+    (highResolutionVideo['loop'] = loop === true),
     (highResolutionVideo['muted'] = !!muted),
-    (highResolutionVideo['playsInline'] = !![]),
+    (highResolutionVideo['playsInline'] = true),
     (highResolutionVideo['preload'] = 'auto'),
     setPlaybackTime(highResolutionVideo, currentTime),
     stage['appendChild'](highResolutionVideo));
@@ -151,7 +151,7 @@ export function openSourceVideoFullscreenPreview({
     },
     close = () => {
       if (enabled2) return;
-      enabled2 = !![];
+      enabled2 = true;
       try {
         previewVideo['pause']?.();
       } catch {}
@@ -167,7 +167,7 @@ export function openSourceVideoFullscreenPreview({
         previewVideo['removeEventListener']?.('error', entry),
         run2(previewVideo),
         run2(highResolutionVideo),
-        documentObject['removeEventListener']?.('keydown', record, !![]),
+        documentObject['removeEventListener']?.('keydown', record, true),
         overlay['remove']?.());
     },
     record = (event) => {
@@ -177,36 +177,36 @@ export function openSourceVideoFullscreenPreview({
   (overlay['addEventListener']('click', (event2) => {
     if (event2['target'] === overlay) close();
   }),
-    documentObject['addEventListener']?.('keydown', record, !![]));
+    documentObject['addEventListener']?.('keydown', record, true));
   function run3(payload = '') {
     const playbackUrl = normalizeSource(payload);
     return Promise['resolve'](
       attachSource(previewVideo, sources['previewUrl'], {
         ...(playbackUrl ? { playbackUrl: playbackUrl } : {}),
         preload: 'auto',
-        load: !![],
+        load: true,
         shouldAssign: () => !enabled2,
       }),
     )['then'](() => {
-      if (enabled2) return ![];
+      if (enabled2) return false;
       return (
         setPlaybackTime(previewVideo, currentTime),
         requestExclusivePlayback(previewVideo, 'source-video:fullscreen:preview'),
-        !![]
+        true
       );
     });
   }
   void run3(previewPlaybackUrl)['catch'](() => {
     if (enabled2) return;
     if (!enabled3 && normalizeSource(previewPlaybackUrl)) {
-      ((enabled3 = !![]), run2(previewVideo), void run3('')['catch'](handler));
+      ((enabled3 = true), run2(previewVideo), void run3('')['catch'](handler));
       return;
     }
     handler();
   });
   if (highResolutionVideo) {
     const el2 = highResolutionVideo;
-    let watchFrame2 = ![];
+    let watchFrame2 = false;
     const handle = () => {
         if (enabled2 || !hasPresentedFrame(el2, sources['highResolutionUrl'])) return;
         const state = Number(previewVideo['currentTime'] || 0),
@@ -215,8 +215,8 @@ export function openSourceVideoFullscreenPreview({
           (resetFrame(el2), setPlaybackTime(el2, state), watchFrame(el2, handle));
           return;
         }
-        const scope = previewVideo['paused'] === ![];
-        ((el2['controls'] = !![]),
+        const scope = previewVideo['paused'] === false;
+        ((el2['controls'] = true),
           (el2['muted'] = previewVideo['muted']),
           el2['classList']['add']('is-active'),
           previewVideo['classList']['remove']('is-active'));
@@ -234,7 +234,7 @@ export function openSourceVideoFullscreenPreview({
       void Promise['resolve'](
         attachSource(el2, sources['highResolutionUrl'], {
           preload: 'auto',
-          load: !![],
+          load: true,
           onSourceAssigned: onSourceAssigned,
           shouldAssign: () => !enabled2,
         }),

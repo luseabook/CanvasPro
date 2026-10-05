@@ -25,7 +25,7 @@ function cancellationError(cause, stage2) {
     {
       code: 'MODEL_IMPORT_CANCELLED',
       stage: stage2,
-      cancelled: !![],
+      cancelled: true,
       cause: cause instanceof Error ? cause : undefined,
     },
   );
@@ -36,7 +36,7 @@ export class Storyboard3DModelImportJobError extends Error {
     {
       code: code = 'MODEL_IMPORT_FAILED',
       stage: stage = 'queued',
-      cancelled: cancelled = ![],
+      cancelled: cancelled = false,
       cause: cause2,
     } = {},
   ) {
@@ -145,7 +145,7 @@ export class Storyboard3DModelImportJob {
       (this['result'] = null),
       (this['error'] = null),
       (this['cancelReason'] = null),
-      (this['started'] = ![]),
+      (this['started'] = false),
       (this['runPromise'] = null),
       (this['_externalAbortHandler'] = null));
   }
@@ -179,8 +179,8 @@ export class Storyboard3DModelImportJob {
     return (
       this['status'] === 'cancelled' ||
       this['cancelReason'] !== null ||
-      this['externalSignal']?.['aborted'] === !![] ||
-      this['abortController']?.['signal']?.['aborted'] === !![]
+      this['externalSignal']?.['aborted'] === true ||
+      this['abortController']?.['signal']?.['aborted'] === true
     );
   }
   ['_throwIfCancelled'](config) {
@@ -191,19 +191,19 @@ export class Storyboard3DModelImportJob {
     );
   }
   ['cancel'](scope = 'Model import was cancelled') {
-    if (TERMINAL_STATUSES['has'](this['status'])) return ![];
+    if (TERMINAL_STATUSES['has'](this['status'])) return false;
     return (
       (this['cancelReason'] = scope),
       this['abortController']?.['abort']?.(scope),
       (this['error'] = cancellationError(scope, this['status'])),
       this['_transition']('cancelled', this['progress'], { error: this['error'] }),
-      !![]
+      true
     );
   }
   ['_bindExternalAbort']() {
     if (!this['externalSignal']?.['addEventListener']) return;
     ((this['_externalAbortHandler'] = () => this['cancel'](this['externalSignal']['reason'])),
-      this['externalSignal']['addEventListener']('abort', this['_externalAbortHandler'], { once: !![] }));
+      this['externalSignal']['addEventListener']('abort', this['_externalAbortHandler'], { once: true }));
   }
   ['_unbindExternalAbort']() {
     if (!this['_externalAbortHandler']) return;
@@ -267,7 +267,7 @@ export class Storyboard3DModelImportJob {
   }
   ['start']() {
     if (this['runPromise']) return this['runPromise'];
-    ((this['started'] = !![]), this['_bindExternalAbort']());
+    ((this['started'] = true), this['_bindExternalAbort']());
     if (this['externalSignal']?.['aborted']) this['cancel'](this['externalSignal']['reason']);
     return ((this['runPromise'] = this['_run']()), this['runPromise']);
   }

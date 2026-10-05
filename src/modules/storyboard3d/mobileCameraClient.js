@@ -5,22 +5,22 @@ const token = location['hash']['slice'](1),
 let translation = [0, 0, 0],
   rotation = [0, 0, 0],
   origin = null,
-  dirty = !![],
+  dirty = true,
   sequence = Date['now'](),
-  sending = ![];
+  sending = false;
 const radians = (value) => ((Number(value) || 0) * Math['PI']) / 180,
   wrapped = (item) => Math['atan2'](Math['sin'](item), Math['cos'](item));
 (document['querySelectorAll']('[data-move]')['forEach']((el) =>
   el['addEventListener']('click', () => {
     const [key, index] = el['dataset']['move']['split'](',')['map'](Number);
-    ((translation[key] = Math['max'](-100, Math['min'](100, translation[key] + index))), (dirty = !![]));
+    ((translation[key] = Math['max'](-100, Math['min'](100, translation[key] + index))), (dirty = true));
   }),
 ),
   document['querySelector']('#reset')['addEventListener']('click', () => {
-    ((origin = null), (translation = [0, 0, 0]), (rotation = [0, 0, 0]), (dirty = !![]));
+    ((origin = null), (translation = [0, 0, 0]), (rotation = [0, 0, 0]), (dirty = true));
   }));
 let gesture = null,
-  gyroEnabled = ![];
+  gyroEnabled = false;
 (look['addEventListener']('keydown', (event) => {
   if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown']['includes'](event['key'])) return;
   (event['preventDefault'](),
@@ -31,7 +31,7 @@ let gesture = null,
       ? 0.03
       : -0.03),
     (rotation = rotation['map'](wrapped)),
-    (dirty = !![]));
+    (dirty = true));
 }),
   look['addEventListener']('pointerdown', (x) => {
     ((gesture = { x: x['clientX'], y: x['clientY'], rotation: [...rotation] }),
@@ -47,7 +47,7 @@ let gesture = null,
       wrapped(gesture['rotation'][1] - (event2['clientX'] - gesture['x']) * 0.005),
       gesture['rotation'][2],
     ]),
-      (dirty = !![]));
+      (dirty = true));
   }));
 for (const name of ['pointerup', 'pointercancel', 'lostpointercapture'])
   look['addEventListener'](name, () => {
@@ -72,9 +72,9 @@ document['querySelector']('#gyro')['addEventListener']('click', async () => {
       const list = [radians(result['beta']), radians(result['alpha']), radians(result['gamma'])];
       ((origin ||= list),
         (rotation = list['map']((data, options) => wrapped(data - origin[options]))),
-        (dirty = !![]));
+        (dirty = true));
     }),
-      (gyroEnabled = !![]),
+      (gyroEnabled = true),
       (status['textContent'] = '陀螺仪已开启，可重新校准零位。'));
   } catch (error) {
     status['textContent'] = error['message'];
@@ -82,13 +82,13 @@ document['querySelector']('#gyro')['addEventListener']('click', async () => {
 });
 const timer = setInterval(async () => {
   if (!dirty || sending || !token) return;
-  ((sending = !![]), (dirty = ![]));
+  ((sending = true), (dirty = false));
   try {
     await publishDirectorMobilePose(token, { translation: translation, rotation: rotation, seq: ++sequence });
   } catch (error2) {
     status['textContent'] = error2['message'];
   } finally {
-    sending = ![];
+    sending = false;
   }
 }, 80);
-window['addEventListener']('pagehide', () => clearInterval(timer), { once: !![] });
+window['addEventListener']('pagehide', () => clearInterval(timer), { once: true });

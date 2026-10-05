@@ -4,7 +4,7 @@ export const STORYBOARD_3D_RESOURCE_BASE_URL = 'storyboard3d-resource:///';
 export const STORYBOARD_3D_MODEL_IMPORT_CAPABILITIES = Object['freeze']({
   glb: Object['freeze']({
     format: 'glb',
-    inspection: !![],
+    inspection: true,
     parsing: 'available',
     parserId: 'gltf',
     limitations: Object['freeze']([
@@ -15,7 +15,7 @@ export const STORYBOARD_3D_MODEL_IMPORT_CAPABILITIES = Object['freeze']({
   }),
   gltf: Object['freeze']({
     format: 'gltf',
-    inspection: !![],
+    inspection: true,
     parsing: 'available',
     parserId: 'gltf',
     limitations: Object['freeze']([
@@ -25,7 +25,7 @@ export const STORYBOARD_3D_MODEL_IMPORT_CAPABILITIES = Object['freeze']({
   }),
   fbx: Object['freeze']({
     format: 'fbx',
-    inspection: !![],
+    inspection: true,
     parsing: 'available',
     parserId: 'fbx',
     reason: '使用官方 Three r180 FBXLoader。',
@@ -33,7 +33,7 @@ export const STORYBOARD_3D_MODEL_IMPORT_CAPABILITIES = Object['freeze']({
   }),
   obj: Object['freeze']({
     format: 'obj',
-    inspection: !![],
+    inspection: true,
     parsing: 'available',
     parserId: 'obj',
     reason: '使用官方 Three r180 OBJLoader。',
@@ -43,7 +43,7 @@ export const STORYBOARD_3D_MODEL_IMPORT_CAPABILITIES = Object['freeze']({
   }),
   stl: Object['freeze']({
     format: 'stl',
-    inspection: !![],
+    inspection: true,
     parsing: 'available',
     parserId: 'stl',
     reason: '使用官方 Three r180 STLLoader。',
@@ -90,7 +90,7 @@ export function createStoryboard3DResourceUrlScope(index, result) {
 }
 export function measureStoryboard3DImportedSceneBounds(enabled) {
   if (!enabled) return null;
-  enabled['updateMatrixWorld']?.(!![]);
+  enabled['updateMatrixWorld']?.(true);
   const x = new threeRuntime['Box3']()['setFromObject'](enabled),
     list2 = [x['min']['x'], x['min']['y'], x['min']['z'], x['max']['x'], x['max']['y'], x['max']['z']];
   if (!list2['every'](Number['isFinite']) || x['isEmpty']()) return null;

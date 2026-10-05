@@ -8,10 +8,10 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
     type: 'toggle',
     placement: 'advanced',
     label: '纯音乐',
-    defaultValue: ![],
+    defaultValue: false,
     description:
       '开启后生成无人声的纯演奏音乐；关闭则生成带人声演唱的完整歌曲。适合制作BGM、背景音乐等场景。',
-    showInfoTip: !![],
+    showInfoTip: true,
   }),
   SUNO_TITLE_OPTIONAL_FIELD = Object['freeze']({
     id: 'title',
@@ -22,7 +22,7 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
     placeholder: '留空自动生成',
     description:
       '为生成的歌曲命名。例如：「夏日回忆」「夜的钢琴曲」。留空时AI会根据音乐风格自动生成一个标题。',
-    showInfoTip: !![],
+    showInfoTip: true,
   }),
   SUNO_TITLE_REQUIRED_FIELD = Object['freeze']({
     id: 'title',
@@ -33,7 +33,7 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
     placeholder: '歌曲名称',
     description:
       '自定义模式必填，为你的歌曲命名。例如：「我的故事」「追梦人」。标题会影响歌曲的整体风格走向。',
-    showInfoTip: !![],
+    showInfoTip: true,
   }),
   SUNO_TAGS_FIELD = Object['freeze']({
     id: 'tags',
@@ -44,7 +44,7 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
     placeholder: '例：流行,民谣,女声',
     description:
       '必填，用英文逗号分隔描述音乐风格。例如：「流行,民谣,女声,温暖」「电子,舞曲,夜店,节奏感强」「古风,古筝,笛子,山水意境」。标签越具体，生成效果越好。',
-    showInfoTip: !![],
+    showInfoTip: true,
   });
 export const MINIMAX_VOICE_ID_FIELD = Object['freeze']({
   id: 'voice_id',
@@ -55,7 +55,7 @@ export const MINIMAX_VOICE_ID_FIELD = Object['freeze']({
   defaultValue: 'Wise_Woman',
   description:
     '选择朗读的人声角色。不同音色适合不同场景：睿智女性适合知识讲解，低沉男声适合有声书旁白，元气少女/活泼女孩适合娱乐内容，可爱女孩适合儿童内容。',
-  showInfoTip: !![],
+  showInfoTip: true,
   options: Object['freeze']([
     Object['freeze']({ value: 'Wise_Woman', label: '睿智女性', selectedLabel: '睿智女性' }),
     Object['freeze']({ value: 'Friendly_Person', label: '友善亲和', selectedLabel: '友善亲和' }),
@@ -82,10 +82,10 @@ export const MINIMAX_CUSTOM_VOICE_FIELD = Object['freeze']({
   placement: 'advanced',
   label: '克隆音色 ID',
   defaultValue: '',
-  allowEmpty: !![],
+  allowEmpty: true,
   maxLength: 256,
   description: '填写 MiniMax 声音克隆时设置的音色 ID，留空使用预设音色。',
-  showInfoTip: !![],
+  showInfoTip: true,
 });
 export const MINIMAX_SPEED_FIELD = Object['freeze']({
   id: 'speed',
@@ -98,7 +98,7 @@ export const MINIMAX_SPEED_FIELD = Object['freeze']({
   step: 0.1,
   description:
     '控制朗读速度，默认1.0倍速。0.5为慢速（适合教学、冥想内容），2.0为快速（适合资讯速读）。有声书建议0.9-1.1，广告配音建议1.1-1.3。',
-  showInfoTip: !![],
+  showInfoTip: true,
 });
 export const MINIMAX_VOLUME_FIELD = Object['freeze']({
   id: 'volume',
@@ -110,7 +110,7 @@ export const MINIMAX_VOLUME_FIELD = Object['freeze']({
   max: 10,
   step: 0.1,
   description: '控制输出音量大小，默认1.0为标准音量。增大音量适合嘈杂环境播放，减小音量适合作为背景音使用。',
-  showInfoTip: !![],
+  showInfoTip: true,
 });
 export const MINIMAX_PITCH_FIELD = Object['freeze']({
   id: 'pitch',
@@ -123,7 +123,7 @@ export const MINIMAX_PITCH_FIELD = Object['freeze']({
   step: 1,
   description:
     '调整音调高低，单位为半音。默认0为原调。正值使声音更高亢明亮（+3适合活泼角色），负值使声音更低沉厚重（-3适合成熟角色）。范围-12到+12（一个八度）。',
-  showInfoTip: !![],
+  showInfoTip: true,
 });
 export const MINIMAX_EMOTION_FIELD = Object['freeze']({
   id: 'emotion',
@@ -134,7 +134,7 @@ export const MINIMAX_EMOTION_FIELD = Object['freeze']({
   defaultValue: 'happy',
   description:
     '选择朗读时的情感色彩。开心适合欢快内容，悲伤适合悼词/抒情散文，愤怒适合慷慨陈词，恐惧适合悬疑/恐怖故事，惊讶适合新闻播报，中性适合说明文/知识讲解。',
-  showInfoTip: !![],
+  showInfoTip: true,
   options: Object['freeze']([
     Object['freeze']({ value: 'happy', label: '开心', selectedLabel: '开心' }),
     Object['freeze']({ value: 'neutral', label: '中性', selectedLabel: '中性' }),
@@ -154,17 +154,17 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
     placeholder: '描述音乐风格、情绪、场景，例：流行音乐，伤感，适合雨夜',
     description:
       '描述你想要的音乐风格、情绪和场景。例如「流行,民谣,女声,温暖治愈」「电子,舞曲,夜店,节奏感强」「古风,古筝,山水意境」。填"-"时会使用歌词内容作为基础描述。',
-    showInfoTip: !![],
+    showInfoTip: true,
   }),
   MINIMAX_MUSIC_LYRICS_OPTIMIZER_FIELD = Object['freeze']({
     id: 'lyricsOptimizer',
     type: 'toggle',
     placement: 'advanced',
     label: '自动优化歌词',
-    defaultValue: ![],
+    defaultValue: false,
     description:
       '开启后AI会根据风格描述自动优化你输入的歌词，让歌词与旋律更匹配。适合歌词较粗糙、需要AI润色的场景。',
-    showInfoTip: !![],
+    showInfoTip: true,
   }),
   MINIMAX_MUSIC_HIDDEN_OUTPUT_PARAM_CONDITION = Object['freeze']({
     field: '__minimax_music_output_params_hidden',
@@ -287,8 +287,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         audioMenu: Object['freeze']({ group: 'runninghubModel', order: 100 }),
       }),
       fields: [SUNO_INSTRUMENTAL_FIELD, SUNO_TITLE_OPTIONAL_FIELD],
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
     Object['freeze']({
       modelId: 'runninghub/suno-custom-v5.5',
@@ -303,8 +303,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         audioMenu: Object['freeze']({ group: 'runninghubModel', order: 101 }),
       }),
       fields: [SUNO_TITLE_REQUIRED_FIELD, SUNO_TAGS_FIELD],
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
     Object['freeze']({
       modelId: 'runninghub/suno-single-v5',
@@ -319,8 +319,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         audioMenu: Object['freeze']({ group: 'runninghubModel', order: 0x66 }),
       }),
       fields: [SUNO_INSTRUMENTAL_FIELD, SUNO_TITLE_OPTIONAL_FIELD],
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
     Object['freeze']({
       modelId: 'runninghub/suno-custom-v5',
@@ -335,8 +335,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         audioMenu: Object['freeze']({ group: 'runninghubModel', order: 103 }),
       }),
       fields: [SUNO_TITLE_REQUIRED_FIELD, SUNO_TAGS_FIELD],
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
     Object['freeze']({
       modelId: 'runninghub/minimax/speech-2.8-hd',
@@ -358,8 +358,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         MINIMAX_PITCH_FIELD,
         MINIMAX_EMOTION_FIELD,
       ],
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
     Object['freeze']({
       modelId: 'runninghub/minimax/speech-2.8-turbo',
@@ -381,8 +381,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         MINIMAX_PITCH_FIELD,
         MINIMAX_EMOTION_FIELD,
       ],
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
     Object['freeze']({
       modelId: 'runninghub/minimax/music-2.6-instrumental',
@@ -397,8 +397,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         audioMenu: Object['freeze']({ group: 'runninghubModel', order: 115 }),
       }),
       fields: MINIMAX_MUSIC_OUTPUT_FIELDS,
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
     Object['freeze']({
       modelId: 'runninghub/minimax/music-2.6',
@@ -417,8 +417,8 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
         MINIMAX_MUSIC_LYRICS_OPTIMIZER_FIELD,
         ...MINIMAX_MUSIC_OUTPUT_FIELDS,
       ],
-      async: !![],
-      cancellable: !![],
+      async: true,
+      cancellable: true,
     }),
   ]);
 export const runningHubAudioModelApiModelManifests = Object['freeze'](
@@ -437,8 +437,8 @@ export const runningHubAudioModelApiModelManifests = Object['freeze'](
       }),
       inputSlots: modelId['inputSlots'],
       help: modelId['help'],
-      async: modelId['async'] !== ![],
-      cancellable: modelId['cancellable'] !== ![],
+      async: modelId['async'] !== false,
+      cancellable: modelId['cancellable'] !== false,
       modelType: modelId['modelType'],
     }),
   ),

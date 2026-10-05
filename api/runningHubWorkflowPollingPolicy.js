@@ -24,6 +24,6 @@ export function hasRunningHubWorkflowPollingTimedOut(startedAt, timeoutMs, nowMs
   const started = Number(startedAt),
     timeout = normalizePositiveInteger(timeoutMs, RUNNINGHUB_WORKFLOW_POLL_TIMEOUT_MS),
     now = Number(nowMs);
-  if (!Number['isFinite'](started) || !Number['isFinite'](now)) return ![];
+  if (!Number['isFinite'](started) || !Number['isFinite'](now)) return false;
   return now - started >= timeout;
 }

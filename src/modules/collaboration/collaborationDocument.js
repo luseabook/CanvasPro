@@ -95,7 +95,7 @@ export function graphChangesConflict(list6, list7, state3) {
       ),
     );
   return list7['some']((value7) => {
-    if (map['has'](value7['kind'] + ':' + value7['id'])) return !![];
+    if (map['has'](value7['kind'] + ':' + value7['id'])) return true;
     if (value7['kind'] === 'edges')
       return [value7['after']?.['sourceId'], value7['after']?.['targetId']]['some']((value8) =>
         map2['has'](value8),
@@ -103,9 +103,9 @@ export function graphChangesConflict(list6, list7, state3) {
     let value9 = value7['after']?.['parentId'];
     const map3 = new Set();
     while (value9 && !map3['has'](value9)) {
-      if (map2['has'](value9)) return !![];
+      if (map2['has'](value9)) return true;
       (map3['add'](value9), (value9 = state3['nodes'][value9]?.['parentId']));
     }
-    return ![];
+    return false;
   });
 }

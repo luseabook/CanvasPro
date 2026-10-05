@@ -46,34 +46,34 @@ export function createInteractionCommandAdapter({
       switch (String(index || '')) {
         case 'delete_edge':
           executeCanvasCommandSync('graph.disconnect', { edgeId: edgeId['edgeId'] || edgeId['id'] }, value);
-          return !![];
+          return true;
         case 'delete_nodes':
           executeCanvasCommandSync('node.delete', { ids: edgeId['ids'] }, value);
-          return !![];
+          return true;
         case 'rename_node':
-          if (!edgeId['id'] || typeof edgeId['name'] !== 'string') return !![];
+          if (!edgeId['id'] || typeof edgeId['name'] !== 'string') return true;
           executeCanvasCommandSync('node.rename', { nodeId: edgeId['id'], name: edgeId['name'] }, value);
-          return !![];
+          return true;
         case 'create_node':
           executeCanvasCommandSync(
             'node.create',
             { ...edgeId, name: edgeId['name'] || edgeId['label'] || '' },
             value,
           );
-          return !![];
+          return true;
         case 'group':
         case 'create_group':
           executeCanvasCommandSync('node.group', { ids: edgeId['ids'], name: edgeId['name'] }, value);
-          return !![];
+          return true;
         case 'ungroup':
           executeCanvasCommandSync('node.ungroup', { ids: edgeId['ids'] }, value);
-          return !![];
+          return true;
         case 'copy':
           executeCanvasCommandSync('clipboard.copy', { ids: edgeId['ids'] }, value);
-          return !![];
+          return true;
         case 'paste':
           executeCanvasCommandSync('clipboard.paste', { x: edgeId['x'], y: edgeId['y'] }, value);
-          return !![];
+          return true;
         case 'create_collage_from_selection': {
           const error = executeCanvasCommandSync(
             'collage.createFromSelection',
@@ -84,16 +84,16 @@ export function createInteractionCommandAdapter({
             !error['ok'] &&
               error['errorCode'] === 'NO_COLLAGE_IMAGES' &&
               showToast?.(error['message'], 'warning'),
-            !![]
+            true
           );
         }
         case 'reset_source_media_size':
         case 'reset_source_image_size':
           executeCanvasCommandSync('media.resetSize', { ids: edgeId['ids'] }, value);
-          return !![];
+          return true;
         case 'hide_picker':
           (uiStore || store)?.['hidePicker']?.();
-          return !![];
+          return true;
         case 'set_pick_connect_mode':
           (uiStore || store)?.['setPickConnectMode']?.({
             active: !!edgeId['active'],
@@ -101,14 +101,14 @@ export function createInteractionCommandAdapter({
             handleDirection: edgeId['handleDirection'] !== undefined ? edgeId['handleDirection'] : null,
             hoverNodeId: edgeId['hoverNodeId'] !== undefined ? edgeId['hoverNodeId'] : null,
           });
-          return !![];
+          return true;
         case 'select_all': {
           const ids2 = Object['keys'](ids['nodes'] || {});
-          if (ids2['length'] === 0) return ((graphStore || store)?.['setSelectedNodes']?.([]), !![]);
-          return (executeCanvasCommandSync('node.select', { ids: ids2 }, value), !![]);
+          if (ids2['length'] === 0) return ((graphStore || store)?.['setSelectedNodes']?.([]), true);
+          return (executeCanvasCommandSync('node.select', { ids: ids2 }, value), true);
         }
         case 'align_nodes': {
-          if (ids['ui']?.['alignFeatureEnabled'] === ![]) return !![];
+          if (ids['ui']?.['alignFeatureEnabled'] === false) return true;
           const axis = String(edgeId['mode'] || '')['trim']();
           if (axis === 'arrange-grid') {
             const count = Number(ids['ui']?.['alignDistributeGap']),
@@ -124,7 +124,7 @@ export function createInteractionCommandAdapter({
                 },
                 value,
               ),
-              !![]
+              true
             );
           }
           if (axis === 'distribute-h' || axis === 'distribute-v')
@@ -137,7 +137,7 @@ export function createInteractionCommandAdapter({
                 },
                 value,
               ),
-              !![]
+              true
             );
           return (
             executeCanvasCommandSync(
@@ -145,11 +145,11 @@ export function createInteractionCommandAdapter({
               { ids: ids['selectedNodeIds'] || [], mode: axis },
               value,
             ),
-            !![]
+            true
           );
         }
         default:
-          return ![];
+          return false;
       }
     },
   };

@@ -45,7 +45,7 @@ function getPillDatasetValue(el, data, target = '') {
   return '';
 }
 function isRefPillNode(el2) {
-  if (!el2) return ![];
+  if (!el2) return false;
   if (typeof el2['classList']?.['contains'] === 'function') return el2['classList']['contains']('ref-pill');
   return String(el2['className'] || '')
     ['split'](/\s+/)
@@ -85,17 +85,17 @@ function appendResolvedAssetInputRefFromRecord(
         : record?.['assetIndex'],
     handle = Number(payload),
     type2 = resolveEffectiveInputKind(record) || normalizePromptMentionType(record?.['type']);
-  if (!assetId3 || !Number['isFinite'](handle) || !type2 || (allowed && !allowed['has'](type2))) return ![];
+  if (!assetId3 || !Number['isFinite'](handle) || !type2 || (allowed && !allowed['has'](type2))) return false;
   const itemIndex2 = Math['max'](0, Math['trunc'](handle)),
     response = resolveAssetMentionRef({ assetId: assetId3, itemIndex: itemIndex2 });
-  if (!response) return ![];
+  if (!response) return false;
   const effectiveInputKind =
     resolveEffectiveInputKind(response) || normalizePromptMentionType(response['type'] || type2);
-  if (!effectiveInputKind || effectiveInputKind !== type2) return ![];
+  if (!effectiveInputKind || effectiveInputKind !== type2) return false;
   if (type2 === 'text') {
-    if (!String(response['content'] || '')['trim']()) return ![];
+    if (!String(response['content'] || '')['trim']()) return false;
   } else {
-    if (!String(response['url'] || '')['trim']()) return ![];
+    if (!String(response['url'] || '')['trim']()) return false;
   }
   const state = assetId3 + ':' + itemIndex2 + ':' + type2,
     assetMentionOccurrence = map['get'](state) || 0;
@@ -110,7 +110,7 @@ function appendResolvedAssetInputRefFromRecord(
     Number['isFinite'](Number(promptAssetRefIndex)) &&
       (config['promptAssetRefIndex'] = Math['max'](0, Math['trunc'](Number(promptAssetRefIndex)))),
     list3['push'](config),
-    !![]
+    true
   );
 }
 export function getAssetInputRefsFromPrompt(el3 = null, { allowedTypes: allowedTypes = null } = {}) {
@@ -214,7 +214,7 @@ export function getAssetInputRefsFromNodeData(options3 = {}, { allowedTypes: all
 }
 export function getAssetInputRefsFromPromptAndNode(
   value16 = null,
-  { nodeData: nodeData = null, allowedTypes: allowedTypes = null, dedupe: dedupe = ![] } = {},
+  { nodeData: nodeData = null, allowedTypes: allowedTypes = null, dedupe: dedupe = false } = {},
 ) {
   const value17 = [
     ...getAssetInputRefsFromPrompt(value16, { allowedTypes: allowedTypes }),

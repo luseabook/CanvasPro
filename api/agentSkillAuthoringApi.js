@@ -17,11 +17,11 @@ export const AGENT_SKILL_AUTHORING_SYSTEM_PROMPT = [
 ]['join']('\n');
 const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object['freeze']({
   name: 'agent_skill_draft',
-  strict: ![],
+  strict: false,
   fallback: 'prompt',
   schema: Object['freeze']({
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['status', 'reply', 'question', 'definition'],
     properties: {
       status: { type: 'string', enum: ['ready', 'need_clarification', 'failed'] },
@@ -29,7 +29,7 @@ const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object['freeze']({
       question: { type: 'string' },
       definition: {
         type: 'object',
-        additionalProperties: ![],
+        additionalProperties: false,
         required: ['id', 'title', 'description', 'triggers', 'instructions'],
         properties: {
           id: { type: 'string' },
@@ -115,7 +115,7 @@ function buildPrompt({
     ...(retryReason || repairReason
       ? {
           retry: {
-            previousAttemptRejected: !![],
+            previousAttemptRejected: true,
             reason: truncateText(retryReason || repairReason, 200),
             instruction: 'Return the corrected JSON object only.',
           },

@@ -404,9 +404,9 @@ export function retargetMediaPipePoseToStoryboard3D(
   value80,
   {
     minVisibility: minVisibility = DEFAULT_IMAGE_POSE_MIN_VISIBILITY,
-    mirrorX: mirrorX = !![],
-    invertY: invertY = !![],
-    invertZ: invertZ = !![],
+    mirrorX: mirrorX = true,
+    invertY: invertY = true,
+    invertZ: invertZ = true,
   } = {},
 ) {
   const unwrapLandmarks2 = unwrapLandmarks(value80);
@@ -420,9 +420,9 @@ export function retargetMediaPipePoseToStoryboard3D(
       ],
     };
   const landmarks = normalizeLandmarks(unwrapLandmarks2, {
-    mirrorX: mirrorX !== ![],
-    invertY: invertY !== ![],
-    invertZ: invertZ !== ![],
+    mirrorX: mirrorX !== false,
+    invertY: invertY !== false,
+    invertZ: invertZ !== false,
   });
   if (!landmarks)
     return {

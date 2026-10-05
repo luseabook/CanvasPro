@@ -38,7 +38,7 @@ function summarizeWorkflowsFromModels(list = []) {
 }
 function markCanvasCatalogTruncated(enabled = {}) {
   if (!enabled['modelCatalog']) enabled['modelCatalog'] = {};
-  ((enabled['modelCatalog']['truncated'] = !![]),
+  ((enabled['modelCatalog']['truncated'] = true),
     (enabled['modelCatalog']['includedModels'] = Array['isArray'](enabled['availableModels'])
       ? enabled['availableModels']['length']
       : 0));
@@ -81,7 +81,7 @@ function normalizeAgentInputRefs(list4 = []) {
     ['filter'](Boolean)
     ['slice'](0, AGENT_INPUT_REF_CONTEXT_LIMIT);
 }
-function updateBudgetMetadata(canvas, maxChars, truncated = ![]) {
+function updateBudgetMetadata(canvas, maxChars, truncated = false) {
   const commandSchemasRetained = Array['isArray'](canvas['commands'])
     ? canvas['commands']['every'](
         (options) =>
@@ -90,17 +90,17 @@ function updateBudgetMetadata(canvas, maxChars, truncated = ![]) {
           options['argsSchema']['properties'] &&
           typeof options['argsSchema']['properties'] === 'object',
       )
-    : !![];
+    : true;
   canvas['contextBudget'] = {
     maxChars: maxChars,
     estimatedChars: 0,
-    truncated: truncated === !![] || canvas['canvas']?.['modelCatalog']?.['truncated'] === !![],
+    truncated: truncated === true || canvas['canvas']?.['modelCatalog']?.['truncated'] === true,
     availableModels: Array['isArray'](canvas['canvas']?.['availableModels'])
       ? canvas['canvas']['availableModels']['length']
       : 0,
     commandSchemasRetained: commandSchemasRetained,
     schemaIntegrity: commandSchemasRetained,
-    budgetExceeded: ![],
+    budgetExceeded: false,
   };
   for (let count5 = 0; count5 < 3; count5 += 1) {
     canvas['contextBudget']['estimatedChars'] = estimateJsonChars(canvas);
@@ -188,7 +188,7 @@ function pruneCanvasGraph(state2 = {}, input = 30) {
       includedNodes['length'] < list5['length'] ||
       includedEdges['length'] < list6['length'] ||
       includedSelectedNodeDetails['length'] < totalSelected['length'];
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   return (
     (state2['nodes'] = includedNodes),
     (state2['edges'] = includedEdges),
@@ -200,7 +200,7 @@ function pruneCanvasGraph(state2 = {}, input = 30) {
         selectedNodeIdsRetained: Array['isArray'](state2['selectedNodeIds'])
           ? state2['selectedNodeIds']['length']
           : 0,
-        truncated: !![],
+        truncated: true,
       }),
     (state2['graphCatalog'] = {
       totalNodes: totalNodes,
@@ -208,9 +208,9 @@ function pruneCanvasGraph(state2 = {}, input = 30) {
       includedNodes: includedNodes['length'],
       includedEdges: includedEdges['length'],
       pinnedNodes: pinnedNodes['length'],
-      truncated: !![],
+      truncated: true,
     }),
-    !![]
+    true
   );
 }
 function enforceContextBudget(canvas2, value7) {
@@ -220,7 +220,7 @@ function enforceContextBudget(canvas2, value7) {
   for (const value9 of [60, 30, 12]) {
     if (updateBudgetMetadata2 <= value7) break;
     if (!pruneCanvasGraph(state3, value9)) continue;
-    ((value8 = !![]), (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
+    ((value8 = true), (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
   for (const value10 of [14, 10, 6]) {
     if (updateBudgetMetadata2 <= value7) break;
@@ -232,7 +232,7 @@ function enforceContextBudget(canvas2, value7) {
     ((state3['availableModels'] = state3['availableModels']['slice'](0, value10)),
       (state3['availableWorkflows'] = summarizeWorkflowsFromModels(state3['availableModels'])),
       markCanvasCatalogTruncated(state3),
-      (value8 = !![]),
+      (value8 = true),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
   for (const value11 of [10, 5, 0]) {
@@ -240,7 +240,7 @@ function enforceContextBudget(canvas2, value7) {
     if (!Array['isArray'](state3['recentCommands']) || state3['recentCommands']['length'] <= value11)
       continue;
     ((state3['recentCommands'] = state3['recentCommands']['slice'](-value11)),
-      (value8 = !![]),
+      (value8 = true),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
   for (const value12 of [240, 120, 60]) {
@@ -251,7 +251,7 @@ function enforceContextBudget(canvas2, value7) {
       promptPreview: truncatePreviewText(args2['promptPreview'], value12),
       contentPreview: truncatePreviewText(args2['contentPreview'], value12),
     }))),
-      (value8 = !![]),
+      (value8 = true),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
   for (const [value13, value14] of [
@@ -264,13 +264,13 @@ function enforceContextBudget(canvas2, value7) {
     ((canvas2['skills'] = canvas2['skills']['map']((value15) =>
       compactSelectedSkill(value15, value13, value14),
     )),
-      (value8 = !![]),
+      (value8 = true),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
   updateBudgetMetadata2 > value7 &&
     Array['isArray'](canvas2['commands']) &&
     ((canvas2['commands'] = canvas2['commands']['map'](compactCommandDescription)),
-    (value8 = !![]),
+    (value8 = true),
     (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   for (const value16 of [3, 1, 0]) {
     if (updateBudgetMetadata2 <= value7) break;
@@ -282,7 +282,7 @@ function enforceContextBudget(canvas2, value7) {
     ((state3['availableModels'] = state3['availableModels']['slice'](0, value16)),
       (state3['availableWorkflows'] = summarizeWorkflowsFromModels(state3['availableModels'])),
       markCanvasCatalogTruncated(state3),
-      (value8 = !![]),
+      (value8 = true),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8)));
   }
   return (
@@ -291,7 +291,7 @@ function enforceContextBudget(canvas2, value7) {
       ((canvas2['skillCatalog']['available'] = canvas2['skillCatalog']['available']['map'](
         (id2) => ({ id: id2['id'], title: id2['title'], category: id2['category'] }),
       )),
-      (value8 = !![]),
+      (value8 = true),
       (updateBudgetMetadata2 = updateBudgetMetadata(canvas2, value7, value8))),
     updateBudgetMetadata(canvas2, value7, value8),
     canvas2
@@ -390,14 +390,14 @@ export function buildAgentContext({
           : 0,
       },
       policies: {
-        actionPlanOnly: !![],
-        skillsProduceActionPlansOnly: !![],
-        progressiveCapabilityDisclosure: !![],
-        commandSchemasProtected: !![],
-        noDomAccess: !![],
-        noArbitraryStoreWrites: !![],
-        noDirectNetwork: !![],
-        noElectronAccess: !![],
+        actionPlanOnly: true,
+        skillsProduceActionPlansOnly: true,
+        progressiveCapabilityDisclosure: true,
+        commandSchemasProtected: true,
+        noDomAccess: true,
+        noArbitraryStoreWrites: true,
+        noDirectNetwork: true,
+        noElectronAccess: true,
         batchConfirmThreshold: 5,
       },
     };

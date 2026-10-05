@@ -114,8 +114,8 @@ export const createPendingAnnotateExportNode = ({
       src: '',
       outputText: imageAnnotateActionText('saving'),
       ...buildGenerationStartPatch({ startedAt: startedAt }),
-      fixedSize: !![],
-      needsAutoResize: ![],
+      fixedSize: true,
+      needsAutoResize: false,
     });
   return (
     addToolbarPendingResultNodes({ nodes: [sourceMediaNodePayload] }),
@@ -144,7 +144,7 @@ function buildSavedAnnotateResultPatch({
         thumbUrl: saveResult?.['thumbUrl'],
         fileName: fileName2,
       },
-      { includeSrc: !![] },
+      { includeSrc: true },
     ),
     scope =
       args['src'] ||
@@ -172,8 +172,8 @@ function buildSavedAnnotateResultPatch({
     localPath: args['localPath'] || resultLocalPath,
     fileName: fileName2,
     outputText: '',
-    fixedSize: !![],
-    needsAutoResize: ![],
+    fixedSize: true,
+    needsAutoResize: false,
   };
 }
 
@@ -183,7 +183,7 @@ export const markAnnotateExportNodeFailed = ({
   startedAt: startedAt = 0,
 } = {}) => {
   const enabled = String(targetNodeId || '')['trim']();
-  if (!enabled) return ![];
+  if (!enabled) return false;
   const updateToolbarResultNode2 = updateToolbarResultNode(
     enabled,
     buildImageGenerationFailurePatch({

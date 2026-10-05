@@ -30,7 +30,7 @@ export async function prepareImageGenerationMedia(args, { ensure: ensure = ensur
             '派生图生成服务未返回原因，请重试',
           );
         }
-        if (response?.['success'] === ![])
+        if (response?.['success'] === false)
           throw createOperationError(
             '图片已保存，但显示图和缩略图准备失败',
             response,

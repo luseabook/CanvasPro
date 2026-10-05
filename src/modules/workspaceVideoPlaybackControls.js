@@ -8,9 +8,9 @@ function escapeHtml(value) {
 }
 function renderAttributes(options = {}) {
   return Object['entries'](options || {})
-    ['filter'](([, item]) => item !== ![] && item != null)
+    ['filter'](([, item]) => item !== false && item != null)
     ['map'](([key, index]) =>
-      index === !![] ? escapeHtml(key) : escapeHtml(key) + '="' + escapeHtml(index) + '"',
+      index === true ? escapeHtml(key) : escapeHtml(key) + '="' + escapeHtml(index) + '"',
     )
     ['join'](' ');
 }
@@ -39,9 +39,9 @@ export function bindWorkspaceVideoVolumeControls({
   getToggleLabel: getToggleLabel,
   onChange: onChange,
 } = {}) {
-  let current = ![];
+  let current = false;
   const list = resolveVolumeMediaElements(getMediaElements),
-    entry = list['find']((record) => record['muted'] !== !![] && clampVolume(record['volume']) > 0),
+    entry = list['find']((record) => record['muted'] !== true && clampVolume(record['volume']) > 0),
     payload = list['find']((handle) => clampVolume(handle['volume']) > 0),
     clampVolume2 = clampVolume(Number(volumeSlider?.['value']) / 100);
   let clampVolume3 =
@@ -51,7 +51,7 @@ export function bindWorkspaceVideoVolumeControls({
   const run = () => {
       const mediaElements = resolveVolumeMediaElements(getMediaElements),
         volume = mediaElements['find'](
-          (state) => state['muted'] !== !![] && clampVolume(state['volume']) > 0,
+          (state) => state['muted'] !== true && clampVolume(state['volume']) > 0,
         );
       return { mediaElements: mediaElements, volume: volume ? clampVolume(volume['volume']) : 0 };
     },
@@ -77,27 +77,27 @@ export function bindWorkspaceVideoVolumeControls({
       (sync(), onChange?.());
     },
     setVolumePercent = (output) => {
-      if (current) return ![];
+      if (current) return false;
       const clampVolume4 = clampVolume(Number(output) / 100);
       if (clampVolume4 > 0) clampVolume3 = clampVolume4;
       for (const value2 of resolveVolumeMediaElements(getMediaElements)) {
-        ((value2['volume'] = clampVolume4), (value2['muted'] = ![]));
+        ((value2['volume'] = clampVolume4), (value2['muted'] = false));
       }
-      return (handler2(), !![]);
+      return (handler2(), true);
     },
     toggleMuted = () => {
-      if (current) return ![];
+      if (current) return false;
       const value3 = run();
       if (value3['volume'] > 0) {
         clampVolume3 = value3['volume'];
-        for (const value4 of value3['mediaElements']) value4['muted'] = !![];
+        for (const value4 of value3['mediaElements']) value4['muted'] = true;
       } else {
         const value5 = clampVolume3 || 1;
         for (const value6 of value3['mediaElements']) {
-          ((value6['volume'] = value5), (value6['muted'] = ![]));
+          ((value6['volume'] = value5), (value6['muted'] = false));
         }
       }
-      return (handler2(), !![]);
+      return (handler2(), true);
     },
     value7 = (event) => {
       (event?.['stopPropagation']?.(),
@@ -116,7 +116,7 @@ export function bindWorkspaceVideoVolumeControls({
       toggleMuted: toggleMuted,
       dispose() {
         if (current) return;
-        ((current = !![]),
+        ((current = true),
           volumeSlider?.['removeEventListener']?.('input', value7),
           volumeToggle?.['removeEventListener']?.('click', value8));
       },
@@ -125,12 +125,12 @@ export function bindWorkspaceVideoVolumeControls({
 }
 function applyElementAttributes(el, value9 = {}) {
   for (const [value10, value11] of Object['entries'](value9 || {})) {
-    if (value11 === ![] || value11 == null) continue;
-    el['setAttribute'](value10, value11 === !![] ? '' : String(value11));
+    if (value11 === false || value11 == null) continue;
+    el['setAttribute'](value10, value11 === true ? '' : String(value11));
   }
 }
 function setDisabled(el2, value12) {
-  el2['disabled'] = value12 === !![];
+  el2['disabled'] = value12 === true;
   if (value12) el2['setAttribute']('disabled', '');
 }
 function appendElementSlot(el3, value13) {
@@ -143,7 +143,7 @@ function appendElementSlot(el3, value13) {
 export function renderWorkspaceVideoPlaybackControls({
   className: className = '',
   label: label = '视频',
-  disabled: disabled = ![],
+  disabled: disabled = false,
   controlsAttributes: controlsAttributes = {},
   playAttributes: playAttributes = {},
   currentTimeAttributes: currentTimeAttributes = {},
@@ -229,7 +229,7 @@ export function createWorkspaceVideoPlaybackControls(
   {
     className: className = '',
     label: label = '视频',
-    disabled: disabled = ![],
+    disabled: disabled = false,
     controlsAttributes: controlsAttributes = {},
     playAttributes: playAttributes = {},
     currentTimeAttributes: currentTimeAttributes = {},
@@ -266,7 +266,7 @@ export function createWorkspaceVideoPlaybackControls(
   const progress = el4['createElement']('div');
   ((progress['className'] = 'media-progress-bar'),
     progress['setAttribute']('role', 'slider'),
-    progress['setAttribute']('aria-disabled', String(disabled === !![])),
+    progress['setAttribute']('aria-disabled', String(disabled === true)),
     progress['setAttribute']('tabindex', disabled ? '-1' : '0'),
     progress['setAttribute']('aria-label', progressLabel),
     progress['setAttribute']('aria-valuemin', '0'),

@@ -151,7 +151,7 @@ export function createPersonReplacementImagePromptRequestResolver({
               promptPackage: promptPackage,
               shot: shot,
             }),
-          dedupeAssetMentions: !![],
+          dedupeAssetMentions: true,
         }))),
       {
         savedPrompt: text2,
@@ -256,7 +256,7 @@ export function applyPersonReplacementCharacterAssetPromptPreset(value10 = '', v
     text4 = normalizeText(value10);
   if (!PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['some']((value12) => value12['id'] === text4))
     return text3;
-  return applyWorkspaceCharacterAssetPromptPreset(text4, text3, { hasImageInput: !![] });
+  return applyWorkspaceCharacterAssetPromptPreset(text4, text3, { hasImageInput: true });
 }
 export function resolveGeneratedPersonReplacementAppearanceName(value13 = '', value14 = 1) {
   const value15 = PERSON_REPLACEMENT_CHARACTER_ASSET_PROMPT_PRESETS['find'](

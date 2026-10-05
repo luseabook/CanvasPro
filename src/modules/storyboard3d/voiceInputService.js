@@ -25,8 +25,8 @@ export class Storyboard3DVoiceInputService {
   constructor({
     windowObject: windowObject = globalThis['window'],
     lang: lang = 'zh-CN',
-    continuous: continuous = ![],
-    interimResults: interimResults = !![],
+    continuous: continuous = false,
+    interimResults: interimResults = true,
     onStateChange: onStateChange,
     onTranscript: onTranscript,
     onError: onError,
@@ -41,7 +41,7 @@ export class Storyboard3DVoiceInputService {
       (this['recognition'] = null),
       (this['state'] = 'idle'),
       (this['finalTranscript'] = ''),
-      (this['_stopping'] = ![]));
+      (this['_stopping'] = false));
   }
   ['isSupported']() {
     return isStoryboard3DVoiceInputSupported(this['window']);
@@ -56,7 +56,7 @@ export class Storyboard3DVoiceInputService {
       (options['interimResults'] = this['interimResults']),
       (options['maxAlternatives'] = 1),
       (options['onstart'] = () => {
-        ((this['_stopping'] = ![]), this['_setState']('listening'));
+        ((this['_stopping'] = false), this['_setState']('listening'));
       }),
       (options['onspeechstart'] = () => this['_setState']('transcribing')),
       (options['onresult'] = (target) => {
@@ -85,10 +85,10 @@ export class Storyboard3DVoiceInputService {
       (options['onend'] = () => {
         ((this['recognition'] = null),
           this['_setState']('idle', { transcript: this['finalTranscript'], stopped: this['_stopping'] }),
-          (this['_stopping'] = ![]));
+          (this['_stopping'] = false));
       }));
   }
-  ['start']({ resetTranscript: resetTranscript = !![] } = {}) {
+  ['start']({ resetTranscript: resetTranscript = true } = {}) {
     if (!this['isSupported']()) {
       const error3 = new Error('当前运行环境不支持语音转文字。');
       ((error3['code'] = 'speech-recognition-unsupported'),
@@ -96,13 +96,13 @@ export class Storyboard3DVoiceInputService {
         this['onError']?.({ error: error3['code'], message: error3['message'] }));
       throw error3;
     }
-    if (this['recognition']) return ![];
+    if (this['recognition']) return false;
     if (resetTranscript) this['finalTranscript'] = '';
     const run = getRecognitionConstructor(this['window']),
       source = new run();
     ((this['recognition'] = source), this['_bindRecognition'](source), this['_setState']('starting'));
     try {
-      return (source['start'](), !![]);
+      return (source['start'](), true);
     } catch (message) {
       ((this['recognition'] = null),
         this['_setState']('error', { error: 'start-failed' }),
@@ -111,12 +111,12 @@ export class Storyboard3DVoiceInputService {
     }
   }
   ['stop']() {
-    if (!this['recognition']) return ![];
-    return ((this['_stopping'] = !![]), this['_setState']('stopping'), this['recognition']['stop']?.(), !![]);
+    if (!this['recognition']) return false;
+    return ((this['_stopping'] = true), this['_setState']('stopping'), this['recognition']['stop']?.(), true);
   }
   ['abort']() {
-    if (!this['recognition']) return ![];
-    return ((this['_stopping'] = !![]), this['recognition']['abort']?.(), !![]);
+    if (!this['recognition']) return false;
+    return ((this['_stopping'] = true), this['recognition']['abort']?.(), true);
   }
   ['destroy']() {
     const next = this['recognition'];

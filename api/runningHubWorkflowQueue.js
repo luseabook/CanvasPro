@@ -148,14 +148,14 @@ function normalizeQueueStatus(config, scope = 1) {
 }
 function applyRemoteQueueStatus(input, output) {
   const queueStatus = normalizeQueueStatus(output, input['concurrentLimit']);
-  if (!queueStatus) return ![];
+  if (!queueStatus) return false;
   return (
     (input['concurrentLimit'] = queueStatus['concurrentLimit']),
     input['active'] === 0 &&
       ((input['remoteRunningCount'] = queueStatus['runningCount']),
       (input['remoteQueuedCount'] = queueStatus['queuedCount']),
       (input['remoteOccupiedCount'] = queueStatus['totalCurrentTasks'])),
-    !![]
+    true
   );
 }
 async function probeRunningHubWorkflowQueueStatus({
@@ -174,7 +174,7 @@ async function probeRunningHubWorkflowQueueStatus({
 }
 async function ensureSessionQueueStatus(concurrentLimit2, value3 = {}) {
   const text4 = normalizeText(value3['apiKey']);
-  if (!text4 || value3['autoProbeConcurrency'] === ![])
+  if (!text4 || value3['autoProbeConcurrency'] === false)
     return {
       concurrentLimit: concurrentLimit2['concurrentLimit'],
       runningCount: 0,
@@ -224,8 +224,8 @@ function emitWaiting(value8, args2 = {}) {
 }
 function removeWaitingItem(value10, value11) {
   const count5 = value10['waiting']['indexOf'](value11);
-  if (count5 >= 0) return (value10['waiting']['splice'](count5, 1), emitWaiting(value10), !![]);
-  return ![];
+  if (count5 >= 0) return (value10['waiting']['splice'](count5, 1), emitWaiting(value10), true);
+  return false;
 }
 function resolveQueuePollIntervalMs(value12) {
   const count6 = Number(value12);
@@ -248,7 +248,7 @@ function getRunningHubErrorCode(response) {
   return null;
 }
 function isRunningHubQueueMaxedError(error2) {
-  if (getRunningHubErrorCode(error2) === 421) return !![];
+  if (getRunningHubErrorCode(error2) === 421) return true;
   const list = [
     error2?.['message'],
     error2?.['raw']?.['message'],
@@ -275,7 +275,7 @@ function scheduleQueueProbe(value16) {
   ((value16['probeTimer'] = setTimeout(async () => {
     value16['probeTimer'] = null;
     if (value16['waiting']['length'] === 0) return;
-    if (value17['autoProbeConcurrency'] !== ![] && normalizeText(value17['apiKey']))
+    if (value17['autoProbeConcurrency'] !== false && normalizeText(value17['apiKey']))
       try {
         const probeRunningHubWorkflowQueueStatus2 = await probeRunningHubWorkflowQueueStatus(value17);
         !applyRemoteQueueStatus(value16, probeRunningHubWorkflowQueueStatus2) &&
@@ -305,10 +305,10 @@ function pumpQueue(queueKey2) {
     const itemId = queueKey2['waiting']['shift']();
     if (!itemId || itemId['settled']) continue;
     if (itemId['signal']?.['aborted']) {
-      ((itemId['settled'] = !![]), itemId['reject'](createAbortError()));
+      ((itemId['settled'] = true), itemId['reject'](createAbortError()));
       continue;
     }
-    ((queueKey2['active'] += 1), (itemId['started'] = !![]));
+    ((queueKey2['active'] += 1), (itemId['started'] = true));
     const value18 = { provider: PROVIDER_KEY, queueKey: queueKey2['queueKey'], itemId: itemId['id'] };
     (itemId['onQueueChange']?.(buildQueueDetail(queueKey2, { status: 'running', queueIndex: -1 })),
       Promise['resolve']()
@@ -316,7 +316,7 @@ function pumpQueue(queueKey2) {
         ['then'](
           (value19) => {
             ((queueKey2['active'] = Math['max'](0, queueKey2['active'] - 1)),
-              (itemId['settled'] = !![]),
+              (itemId['settled'] = true),
               itemId['resolve'](value19),
               pumpQueue(queueKey2),
               emitWaiting(queueKey2));
@@ -324,7 +324,7 @@ function pumpQueue(queueKey2) {
           (value20) => {
             queueKey2['active'] = Math['max'](0, queueKey2['active'] - 1);
             if (isRunningHubQueueMaxedError(value20) && !itemId['signal']?.['aborted']) {
-              ((itemId['started'] = ![]),
+              ((itemId['started'] = false),
                 (queueKey2['remoteOccupiedCount'] = Math['max'](1, queueKey2['concurrentLimit'])),
                 (queueKey2['remoteRunningCount'] = Math['max'](
                   queueKey2['remoteRunningCount'],
@@ -335,7 +335,7 @@ function pumpQueue(queueKey2) {
                 scheduleQueueProbe(queueKey2));
               return;
             }
-            ((itemId['settled'] = !![]),
+            ((itemId['settled'] = true),
               itemId['reject'](value20),
               pumpQueue(queueKey2),
               emitWaiting(queueKey2));
@@ -353,7 +353,7 @@ export async function runWithRunningHubWorkflowQueue(
     signal: signal = null,
     lease: lease = null,
     onQueueChange: onQueueChange = null,
-    autoProbeConcurrency: autoProbeConcurrency = !![],
+    autoProbeConcurrency: autoProbeConcurrency = true,
     concurrencyProbe: concurrencyProbe = null,
     queuePollIntervalMs: queuePollIntervalMs = DEFAULT_RUNNINGHUB_WORKFLOW_QUEUE_POLL_INTERVAL_MS,
   } = {},
@@ -375,7 +375,7 @@ export async function runWithRunningHubWorkflowQueue(
       concurrencyProbe: concurrencyProbe,
       queuePollIntervalMs: queuePollIntervalMs,
     }));
-  if (autoProbeConcurrency !== ![] && normalizeText(apiKey))
+  if (autoProbeConcurrency !== false && normalizeText(apiKey))
     try {
       await ensureSessionQueueStatus(queue, {
         apiKey: apiKey,
@@ -398,15 +398,15 @@ export async function runWithRunningHubWorkflowQueue(
         reject: reject,
         signal: signal,
         onQueueChange: typeof onQueueChange === 'function' ? onQueueChange : null,
-        started: ![],
-        settled: ![],
+        started: false,
+        settled: false,
       },
       value21 = () => {
         if (promise2['started'] || promise2['settled']) return;
-        ((promise2['settled'] = !![]), removeWaitingItem(queue, promise2), reject(createAbortError()));
+        ((promise2['settled'] = true), removeWaitingItem(queue, promise2), reject(createAbortError()));
       };
     if (signal && typeof signal['addEventListener'] === 'function') {
-      signal['addEventListener']('abort', value21, { once: !![] });
+      signal['addEventListener']('abort', value21, { once: true });
       const run2 = () => signal['removeEventListener']?.('abort', value21),
         handler = promise2['resolve'],
         handler2 = promise2['reject'];

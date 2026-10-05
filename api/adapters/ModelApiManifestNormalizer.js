@@ -1633,7 +1633,7 @@ function mergeUiSchemaDefaultsIntoPayload(args11 = {}, value273 = null) {
       (value275[enabled19] = args11[enabled19]);
   });
   const sanitizeModelUiSchemaParams3 = sanitizeModelUiSchemaParams(value273['modelId'], value275, {
-      includeDefaults: !![],
+      includeDefaults: true,
     }),
     value277 = { ...args11, generationParams: sanitizeModelUiSchemaParams3 };
   return (
@@ -1825,13 +1825,13 @@ function getCustomProviderAssetUploadOptions(args15, value320) {
     multipartField: String(args15['multipartField'] || 'file')['trim']() || 'file',
     responsePath: String(args15['responsePath'] || 'url')['trim']() || 'url',
     ...(args15['formFields'] ? { formFields: args15['formFields'] } : {}),
-    forceProviderUpload: args15['forceProviderUpload'] === !![],
+    forceProviderUpload: args15['forceProviderUpload'] === true,
     allowedExtensions: Array['isArray'](args15['allowedExtensions']) ? args15['allowedExtensions'] : [],
     maxBytes: args15['maxBytes'],
     uploadTimeout: args15['uploadTimeout'],
-    compress: args15['compress'] === !![],
-    applyInputQualityProfile: args15['applyInputQualityProfile'] === !![],
-    strictUpload: args15['strictUpload'] !== ![],
+    compress: args15['compress'] === true,
+    applyInputQualityProfile: args15['applyInputQualityProfile'] === true,
+    strictUpload: args15['strictUpload'] !== false,
   };
 }
 
@@ -1846,7 +1846,7 @@ function assertNoUnsupportedApimartAssetUrls(value322, value323, value324 = {}, 
       ['toLowerCase']() !== 'apimart'
   )
     return;
-  if (value324['executionManifest']?.['extensions']?.['allowApimartAssetUrls'] === !![]) return;
+  if (value324['executionManifest']?.['extensions']?.['allowApimartAssetUrls'] === true) return;
   const inputList = normalizeInputList(value323)['find'](isApimartPrivateAssetUrl);
   if (!inputList) return;
   const value326 = value325 === 'video' ? '视频' : value325 === 'audio' ? '音频' : '图片';
@@ -1860,7 +1860,7 @@ function assertNoUnsupportedApimartAssetUrls(value322, value323, value324 = {}, 
 }
 
 function validateStrictVideoInputCounts(value327, value328, value329) {
-  if (value329?.['extensions']?.['strictInputCounts'] !== !![]) return;
+  if (value329?.['extensions']?.['strictInputCounts'] !== true) return;
   const value330 = {
       image: Array['from'](
         new Set([...collectRawImageInputUrls(value327, value328), ...collectVideoImageInputUrls(value327)]),
@@ -1906,10 +1906,10 @@ function readExplicitUiSchemaValue(value339, value340) {
       ? value339['generationParams']
       : {};
   if (Object['prototype']['hasOwnProperty']['call'](value341, value340))
-    return { provided: !![], value: value341[value340] };
+    return { provided: true, value: value341[value340] };
   if (Object['prototype']['hasOwnProperty']['call'](value339 || {}, value340))
-    return { provided: !![], value: value339[value340] };
-  return { provided: ![], value: undefined };
+    return { provided: true, value: value339[value340] };
+  return { provided: false, value: undefined };
 }
 
 function isSameStrictUiSchemaOption(value342, value343) {
@@ -1933,7 +1933,7 @@ function isSameStrictUiSchemaOption(value342, value343) {
 }
 
 function validateStrictModelUiSchemaParams(value346, value347, value348) {
-  if (value348?.['extensions']?.['strictUiSchemaParams'] !== !![]) return;
+  if (value348?.['extensions']?.['strictUiSchemaParams'] !== true) return;
   const value349 = Array['isArray'](value347?.['uiSchema']?.['fields']) ? value347['uiSchema']['fields'] : [],
     value350 = String(value347?.['displayName'] || value347?.['modelId'] || '当前模型')['trim']();
   for (const value351 of value349) {
@@ -1973,8 +1973,8 @@ function validateStrictModelUiSchemaParams(value346, value347, value348) {
     if (value354 === 'toggle') {
       const value355 = String(el2['value'])['trim']()['toLowerCase']();
       if (
-        el2['value'] !== !![] &&
-        el2['value'] !== ![] &&
+        el2['value'] !== true &&
+        el2['value'] !== false &&
         !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](value355)
       )
         throw new Error('便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '只能开启或关闭');
@@ -2006,7 +2006,7 @@ function validateStrictModelUiSchemaParams(value346, value347, value348) {
 }
 
 function validateStrictImageInputCounts(value359, value360, value361) {
-  if (value361?.['extensions']?.['strictInputCounts'] !== !![]) return;
+  if (value361?.['extensions']?.['strictInputCounts'] !== true) return;
   const manifestMaxInputCount9 = getManifestMaxInputCount(value360, 'image');
   if (manifestMaxInputCount9 === null) return;
   const list38 = Array['from'](
@@ -2300,7 +2300,7 @@ export function resolveManifestErrorRules(options15 = {}) {
 function doesResolverOwnInputResolution(value409) {
   const value410 = value409?.['extensions'] || {};
   return (
-    value410['resolverOwnsInputs'] === !![] ||
+    value410['resolverOwnsInputs'] === true ||
     String(value410['inputResolutionMode'] || '')['trim']() === 'resolverOwned'
   );
 }
@@ -2469,7 +2469,7 @@ export async function buildAudioRequestFromManifest(value437, value438, value439
         audioWorkflowLabel: modelManifest5['displayName'] || modelManifest5['modelId'],
         model: modelManifest5['modelId'],
         executionId: executionManifest6['id'],
-        isManifestAudioModelApi: !![],
+        isManifestAudioModelApi: true,
       },
     };
   return {
@@ -2490,7 +2490,7 @@ export async function buildAudioRequestFromManifest(value437, value438, value439
       audioWorkflowLabel: modelManifest5['displayName'] || modelManifest5['modelId'],
       model: modelManifest5['modelId'],
       executionId: executionManifest6['id'],
-      isManifestAudioModelApi: !![],
+      isManifestAudioModelApi: true,
     },
   };
 }
@@ -2518,14 +2518,14 @@ function buildGeminiNativeThinkingConfig(value452, value453) {
     ['toLowerCase']();
   if (value454 !== 'disabled') return {};
   const value455 = value453?.['thinkingControl'];
-  if (value455?.['disabledUnsupported'] === !![])
+  if (value455?.['disabledUnsupported'] === true)
     throw new Error('当前 Gemini 模型不支持关闭思考，请改用支持无思考模式的模型');
   const count14 = Number(value455?.['disabledBudget']);
   if (!Number['isFinite'](count14) || count14 < 0) return {};
   return {
     thinkingConfig: {
       thinkingBudget: Math['trunc'](count14),
-      includeThoughts: value455?.['includeThoughts'] === !![],
+      includeThoughts: value455?.['includeThoughts'] === true,
     },
   };
 }

@@ -70,8 +70,8 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
         generationParams: generationParams,
         ...generationParams,
       },
-      cancellable: !![],
-      resumable: !![],
+      cancellable: true,
+      resumable: true,
       pauseOnAbort: 'afterTaskId',
       onTaskChange: notifyImageToolbarTaskChange,
       createTargetNode: ({ startPatch: startPatch, protocolPatch: protocolPatch }) =>
@@ -85,7 +85,7 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
           localPath: '',
           provider: modelManifest['provider'],
           model: modelManifest['modelId'],
-          rhTaskUseOpenapiQuery: !![],
+          rhTaskUseOpenapiQuery: true,
           ...startPatch,
           ...protocolPatch,
         }),
@@ -111,7 +111,7 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
       resultBuilder: (data, startedAt) => ({
         ...buildImageGenerationResultPatch(data, { startedAt: startedAt['startedAt'] }),
         name: imageDepthText('result'),
-        needsAutoResize: !![],
+        needsAutoResize: true,
       }),
       failureBuilder: (error, startedAt2) => ({
         ...buildImageGenerationFailurePatch({

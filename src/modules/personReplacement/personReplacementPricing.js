@@ -33,11 +33,11 @@ export function bindPersonReplacementPricing(value, handler) {
   return bindWorkspacePrices(value, [
     {
       selector: '.story-asset-generation-actions [data-story-action="generate-asset"]',
-      getData: () => run(!![]),
+      getData: () => run(true),
     },
     {
       selector: '[data-person-replacement-action="generate-replacement-image"]',
-      getData: () => run(![]),
+      getData: () => run(false),
     },
     {
       selector: '[data-person-replacement-action="generate-replacement-video"]',
@@ -52,7 +52,7 @@ export function bindPersonReplacementPricing(value, handler) {
           model: modelId['replacementModelId'],
           providerProfileId: modelId['replacementVideoProviderProfileId'],
           generationParams: generationParams['generationParams'],
-          hasReferences: !![],
+          hasReferences: true,
         };
       },
     },

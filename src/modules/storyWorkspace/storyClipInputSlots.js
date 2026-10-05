@@ -94,7 +94,7 @@ export function buildStoryClipInputSlotViewModel({
             index: index2,
             label: normalizeText(required?.['label']) || KIND_LABELS[kind2] + ' ' + (index2 + 1),
             required:
-              required?.['required'] === !![] || index2 < Number(asObject3?.['minByKind']?.[kind2] || 0),
+              required?.['required'] === true || index2 < Number(asObject3?.['minByKind']?.[kind2] || 0),
             fixed: Boolean(required),
           };
         });

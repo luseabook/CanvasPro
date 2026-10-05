@@ -136,7 +136,7 @@ function omitLargeMedia(list2, count2 = 0) {
 function normalizeNodeIds(
   options2 = {},
   value2 = {},
-  { min: min = 1, allowSelection: allowSelection = !![] } = {},
+  { min: min = 1, allowSelection: allowSelection = true } = {},
 ) {
   const nodes = getNodes(value2),
     state2 = getState(value2),
@@ -220,7 +220,7 @@ function normalizeRenameNodeIds(options3 = {}, value20 = {}) {
     enabled4 = Array['isArray'](list6) && list6['length'] > 0;
   if (!enabled2 && !enabled3 && !enabled4)
     throw createCanvasCommandError('MISSING_NODE_ID', 'node.rename requires nodeId or ids.');
-  return normalizeNodeIds(options3, value20, { min: 1, allowSelection: !![] });
+  return normalizeNodeIds(options3, value20, { min: 1, allowSelection: true });
 }
 function getNodeKindFromType(value21 = '') {
   const list7 = String(value21 || '');
@@ -274,7 +274,7 @@ function hasRenameNameInput(options5 = {}) {
     hasOwn(options5, 'nameTemplate') ||
     hasOwn(options5, 'template') ||
     hasOwn(options5, 'pattern') ||
-    options5['numbered'] === !![] ||
+    options5['numbered'] === true ||
     hasOwn(options5, 'startIndex') ||
     hasOwn(options5, 'start')
   );
@@ -303,7 +303,7 @@ function resolveRenameNames(names = {}, ids = [], value34 = {}) {
     );
   }
   const value37 =
-    names['numbered'] === !![] ||
+    names['numbered'] === true ||
     hasOwn(names, 'startIndex') ||
     hasOwn(names, 'start') ||
     hasOwn(names, 'separator');
@@ -337,11 +337,11 @@ function findEdgesByEndpoints(
   { sourceId: sourceId, targetId: targetId, refSlot: refSlot = '' },
 ) {
   return Object['values'](getEdges(value44))['filter']((enabled5) => {
-    if (!enabled5) return ![];
-    if (sourceId && enabled5['sourceId'] !== sourceId) return ![];
-    if (targetId && enabled5['targetId'] !== targetId) return ![];
-    if (refSlot && String(enabled5['refSlot'] || '') !== refSlot) return ![];
-    return !![];
+    if (!enabled5) return false;
+    if (sourceId && enabled5['sourceId'] !== sourceId) return false;
+    if (targetId && enabled5['targetId'] !== targetId) return false;
+    if (refSlot && String(enabled5['refSlot'] || '') !== refSlot) return false;
+    return true;
   });
 }
 function resolveCreateSize(value45, box = {}, value46 = {}) {
@@ -397,7 +397,7 @@ function buildConnectedNodeData(type2 = {}, value48 = {}) {
   (type2['type'] === 'ai-image' || type2['type'] === 'ai-video') &&
     !Object['prototype']['hasOwnProperty']['call'](args, 'aspectRatio') &&
     (args['aspectRatio'] = '自适应');
-  if (type2['inheritSource'] !== ![] && box5?.['type'] === type2['type']) {
+  if (type2['inheritSource'] !== false && box5?.['type'] === type2['type']) {
     const box8 = clonePlain(box5);
     (delete box8['id'],
       delete box8['x'],
@@ -443,7 +443,7 @@ function manifestAllowsImageInput(options8 = {}) {
   const value55 =
       options8?.['inputSlots'] && typeof options8['inputSlots'] === 'object' ? options8['inputSlots'] : {},
     list10 = Array['isArray'](value55['allowedKinds']) ? value55['allowedKinds'] : [];
-  if (list10['includes']('image')) return !![];
+  if (list10['includes']('image')) return true;
   const count4 = Number(value55['maxByKind']?.['image']);
   return Number['isFinite'](count4) && count4 > 0;
 }
@@ -453,16 +453,16 @@ function manifestAllowsTextInput(options9 = {}) {
     list11 = Array['isArray'](value56['allowedKinds']) ? value56['allowedKinds'] : [];
   return list11['length'] === 0 || list11['includes']('text');
 }
-function manifestRequiresMissingMedia(options10 = {}, { hasImageInput: hasImageInput = ![] } = {}) {
+function manifestRequiresMissingMedia(options10 = {}, { hasImageInput: hasImageInput = false } = {}) {
   const value57 =
       options10?.['inputSlots'] && typeof options10['inputSlots'] === 'object' ? options10['inputSlots'] : {},
     value58 = value57['minByKind'] || {};
-  if (!hasImageInput && Number(value58['image']) > 0) return !![];
-  if (Number(value58['video']) > 0) return !![];
-  if (Number(value58['audio']) > 0) return !![];
+  if (!hasImageInput && Number(value58['image']) > 0) return true;
+  if (Number(value58['video']) > 0) return true;
+  if (Number(value58['audio']) > 0) return true;
   const list12 = Array['isArray'](value57['fixedSlots']) ? value57['fixedSlots'] : [];
   return list12['some']((value59) => {
-    if (value59?.['required'] !== !![]) return ![];
+    if (value59?.['required'] !== true) return false;
     const value60 = String(value59?.['kind'] || '');
     if (value60 === 'image') return !hasImageInput;
     return value60 === 'video' || value60 === 'audio';
@@ -488,22 +488,22 @@ function findAutoCreateModel(options12 = {}, value62 = '', value63 = {}) {
     enabled8 = hasImageInput2 && hasSelectedImageInput(value63),
     listModelManifests2 = listModelManifests()
       ['filter']((enabled9) => {
-        if (enabled9?.['kind'] !== value64 || !enabled9?.['modelId']) return ![];
+        if (enabled9?.['kind'] !== value64 || !enabled9?.['modelId']) return false;
         const enabled10 = hasImageInput2
           ? enabled8
             ? manifestAllowsImageInput(enabled9)
             : manifestAllowsTextInput(enabled9)
           : manifestAllowsTextInput(enabled9);
-        if (!enabled10) return ![];
-        if (manifestRequiresMissingMedia(enabled9, { hasImageInput: hasImageInput2 ? enabled8 : ![] }))
-          return ![];
-        if (!enabled7) return !![];
+        if (!enabled10) return false;
+        if (manifestRequiresMissingMedia(enabled9, { hasImageInput: hasImageInput2 ? enabled8 : false }))
+          return false;
+        if (!enabled7) return true;
         const map3 = getManifestFieldIds(enabled9);
         return list13['every']((value65) => map3['has'](value65));
       })
       ['map']((manifest) => {
         const map4 = getManifestFieldIds(manifest);
-        let score = manifest['vip'] === !![] ? 0 : 10;
+        let score = manifest['vip'] === true ? 0 : 10;
         hasImageInput2 && !enabled8 && !manifestAllowsImageInput(manifest) && (score += 8);
         for (const value66 of list13) {
           if (map4['has'](value66)) score += 20;
@@ -547,7 +547,7 @@ function validateCreateModelArgs(options13 = {}, value71 = '', value72 = {}) {
       Object['keys'](options13['params'])['length'] > 0;
     if (CREATE_TYPE_MODEL_KINDS[value71] && value74)
       return {
-        ok: ![],
+        ok: false,
         errorCode: 'MODEL_REQUIRED_FOR_PARAMS',
         message: 'node.create requires a resolvable model when params are provided.',
       };
@@ -558,14 +558,14 @@ function validateCreateModelArgs(options13 = {}, value71 = '', value72 = {}) {
     model2 = modelExecution?.['modelManifest'];
   if (!model2)
     return {
-      ok: ![],
+      ok: false,
       errorCode: 'MODEL_MANIFEST_NOT_FOUND',
       message: 'Model manifest not found: ' + value73,
     };
   const value75 = CREATE_TYPE_MODEL_KINDS[value71] || '';
   if (value75 && String(model2['kind'] || '') !== value75)
     return {
-      ok: ![],
+      ok: false,
       errorCode: 'MODEL_KIND_MISMATCH',
       message:
         'Model ' +
@@ -601,7 +601,7 @@ function applyInitialNodeModel(nodeData, value76, store2) {
       ? sanitizeModelUiSchemaParams(
           value77['modelId'],
           { ...args4, ...args5 },
-          { includeDefaults: !![] },
+          { includeDefaults: true },
         )
       : {},
     store3 = getStore(store2),
@@ -615,8 +615,8 @@ function applyInitialNodeModel(nodeData, value76, store2) {
         nodeData: nodeData,
         modelId: model3,
         generationParams: generationParams,
-        force: !![],
-        respectManualDisplaySize: ![],
+        force: true,
+        respectManualDisplaySize: false,
       }),
     };
   return (
@@ -625,7 +625,7 @@ function applyInitialNodeModel(nodeData, value76, store2) {
     getNode(store2, nodeId5) || { ...nodeData, ...args6 }
   );
 }
-function buildNodeSummary(value78, value79, { includeData: includeData = ![] } = {}) {
+function buildNodeSummary(value78, value79, { includeData: includeData = false } = {}) {
   const providerHint2 = getNode(value78, value79);
   if (!providerHint2) return null;
   const modelExecution3 = resolveModelExecution(providerHint2['model'], { providerHint: providerHint2['provider'] }),
@@ -685,7 +685,7 @@ function validateNodeIds(args8, value84, value85) {
     return { args: { ...args8, ids: normalizeNodeIds(args8, value84, value85) } };
   } catch (errorCode) {
     return {
-      ok: ![],
+      ok: false,
       errorCode: errorCode['errorCode'] || 'INVALID_NODE_IDS',
       message: errorCode['message'],
       details: errorCode['details'],
@@ -694,7 +694,7 @@ function validateNodeIds(args8, value84, value85) {
 }
 function validateDeleteNodeIds(args9 = {}, value86 = {}) {
   if (String(args9['nodeId'] || '')['trim']())
-    return validateNodeIds(args9, value86, { min: 1, allowSelection: !![] });
+    return validateNodeIds(args9, value86, { min: 1, allowSelection: true });
   const state4 = getState(value86),
     value87 =
       Array['isArray'](args9['ids']) && args9['ids']['length'] > 0
@@ -709,7 +709,7 @@ function validateDeleteNodeIds(args9 = {}, value86 = {}) {
   }
   if (ids2['length'] === 0)
     return {
-      ok: ![],
+      ok: false,
       errorCode: 'INSUFFICIENT_NODES',
       message: 'node.delete requires at least one existing node.',
     };
@@ -747,7 +747,7 @@ export function registerGraphCommands(value89) {
       const type3 = normalizeNodeType(args10['type']);
       if (!SUPPORTED_CREATE_TYPES['has'](type3))
         return {
-          ok: ![],
+          ok: false,
           errorCode: 'UNSUPPORTED_NODE_TYPE',
           message: 'Unsupported node.create type: ' + (type3 || '(empty)'),
         };
@@ -755,12 +755,12 @@ export function registerGraphCommands(value89) {
         hasExplicitCreatePosition(args10) && typeof value90['buildNodeData'] === 'function';
       if (!hasExplicitCreatePosition2 && typeof value90['createNodeAtCursor'] !== 'function')
         return {
-          ok: ![],
+          ok: false,
           errorCode: 'NODE_CREATE_UNAVAILABLE',
           message: 'Canvas node creation flow is unavailable.',
         };
       const response2 = validateCreateModelArgs(args10, type3, value90);
-      if (response2['ok'] === ![]) return response2;
+      if (response2['ok'] === false) return response2;
       return { args: { ...args10, ...response2['args'], type: type3 } };
     },
     execute(type4, store4) {
@@ -770,7 +770,7 @@ export function registerGraphCommands(value89) {
           store4,
         ),
         name2 = String(type4['name'] || type4['label'] || ''),
-        value91 = type4['agentReservation'] === !![],
+        value91 = type4['agentReservation'] === true,
         value92 = value91
           ? [
               ...(Array['isArray'](getState(store4)['selectedNodeIds'])
@@ -794,7 +794,7 @@ export function registerGraphCommands(value89) {
         return (
           store5?.['setSelectedNodes']?.([nodeId6]),
           store4['commit']?.(),
-          { nodeId: nodeId6, node: getNode(store4, nodeId6) || initialNodeText || value93, reused: !![] }
+          { nodeId: nodeId6, node: getNode(store4, nodeId6) || initialNodeText || value93, reused: true }
         );
       }
       if (hasExplicitCreatePosition(type4) && typeof store4['buildNodeData'] === 'function') {
@@ -851,7 +851,7 @@ export function registerGraphCommands(value89) {
           height: { type: 'number' },
           inheritSource: { type: 'boolean' },
         },
-        defaults: { inheritSource: !![], placement: 'right-of-source' },
+        defaults: { inheritSource: true, placement: 'right-of-source' },
       },
       capabilitySchema: { reads: ['nodes', 'edges'], writes: ['nodes', 'edges', 'selection'] },
       returnSchema: { aliasFields: ['nodeId', 'node', 'edgeId', 'sourceId'] },
@@ -860,15 +860,15 @@ export function registerGraphCommands(value89) {
           type5 = normalizeNodeType(args11['type']);
         if (!sourceId2)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MISSING_SOURCE_NODE_ID',
             message: 'node.createConnected requires sourceId.',
           };
         if (!getNode(value97, sourceId2))
-          return { ok: ![], errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + sourceId2 };
+          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + sourceId2 };
         if (!CONNECTED_CREATE_TYPES['has'](type5))
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'UNSUPPORTED_NODE_TYPE',
             message: 'Unsupported node.createConnected type: ' + (type5 || '(empty)'),
           };
@@ -882,7 +882,7 @@ export function registerGraphCommands(value89) {
         const value98 =
           typeof store6['connectNodes'] === 'function'
             ? store6['connectNodes']({ sourceId: sourceId3['sourceId'], targetId: targetId2['id'] })
-            : ![];
+            : false;
         let edgeId = '';
         if (value98)
           edgeId =
@@ -909,12 +909,12 @@ export function registerGraphCommands(value89) {
       riskLevel: 'danger',
       argsSchema: {
         properties: { nodeId: { type: 'string' }, ids: { type: 'array', items: { type: 'string' } } },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes', 'selection'],
         writes: ['nodes', 'edges', 'selection'],
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       returnSchema: { aliasFields: ['ids'] },
       validate(options14 = {}, value101 = {}) {
@@ -954,10 +954,10 @@ export function registerGraphCommands(value89) {
           orderBy: { type: 'string' },
           order: { type: 'string' },
         },
-        defaults: { selectionFallback: !![], orderBy: 'selection', startIndex: 1 },
-        selectionFallback: !![],
+        defaults: { selectionFallback: true, orderBy: 'selection', startIndex: 1 },
+        selectionFallback: true,
       },
-      capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: !![] },
+      capabilitySchema: { reads: ['nodes', 'selection'], writes: ['nodes'], selectionFallback: true },
       returnSchema: { aliasFields: ['nodeId', 'name', 'ids', 'names', 'renamed'] },
       validate(args12 = {}, value102 = {}) {
         try {
@@ -975,7 +975,7 @@ export function registerGraphCommands(value89) {
           };
         } catch (errorCode2) {
           return {
-            ok: ![],
+            ok: false,
             errorCode: errorCode2['errorCode'] || 'INVALID_RENAME_ARGS',
             message: errorCode2['message'] || 'Invalid node.rename args.',
             details: errorCode2['details'],
@@ -1022,21 +1022,21 @@ export function registerGraphCommands(value89) {
           edgePolicy: { type: 'string', enum: ['internal', 'all-touching'] },
         },
         defaults: { copies: 1, dx: 40, dy: 40, placement: 'offset', edgePolicy: 'internal' },
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       capabilitySchema: {
         reads: ['nodes', 'edges', 'selection'],
         writes: ['nodes', 'edges', 'selection'],
-        selectionFallback: !![],
+        selectionFallback: true,
       },
       returnSchema: { aliasFields: ['ids', 'sourceIds'] },
       validate(placement2 = {}, value105 = {}) {
-        const response3 = validateNodeIds(placement2, value105, { min: 1, allowSelection: !![] });
-        if (response3['ok'] === ![]) return response3;
+        const response3 = validateNodeIds(placement2, value105, { min: 1, allowSelection: true });
+        if (response3['ok'] === false) return response3;
         const copies = Number(placement2['copies'] ?? 1);
         if (!Number['isInteger'](copies) || copies < 1 || copies > 12)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'INVALID_DUPLICATE_COPIES',
             message: 'node.duplicate copies must be an integer between 1 and 12.',
           };
@@ -1136,17 +1136,17 @@ export function registerGraphCommands(value89) {
       argsSchema: {
         required: ['nodeId'],
         properties: { nodeId: { type: 'string' }, includeData: { type: 'boolean' } },
-        defaults: { includeData: ![] },
+        defaults: { includeData: false },
       },
       capabilitySchema: { reads: ['nodes'], writes: [] },
       returnSchema: { aliasFields: ['id', 'type', 'name', 'model', 'provider'] },
       validate(includeData2 = {}, value118 = {}) {
         const nodeId11 = String(includeData2['nodeId'] || '')['trim']();
         if (!nodeId11)
-          return { ok: ![], errorCode: 'MISSING_NODE_ID', message: 'node.getSummary requires nodeId.' };
+          return { ok: false, errorCode: 'MISSING_NODE_ID', message: 'node.getSummary requires nodeId.' };
         if (!getNode(value118, nodeId11))
-          return { ok: ![], errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId11 };
-        return { args: { nodeId: nodeId11, includeData: includeData2['includeData'] === !![] } };
+          return { ok: false, errorCode: 'NODE_NOT_FOUND', message: 'Canvas node not found: ' + nodeId11 };
+        return { args: { nodeId: nodeId11, includeData: includeData2['includeData'] === true } };
       },
       execute(includeData3, value119) {
         return buildNodeSummary(value119, includeData3['nodeId'], { includeData: includeData3['includeData'] });
@@ -1172,25 +1172,25 @@ export function registerGraphCommands(value89) {
         const edgeId2 = normalizeEdgeArgs(type6);
         if (!edgeId2['sourceId'] || !edgeId2['targetId'])
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MISSING_EDGE_ENDPOINTS',
             message: 'graph.connect requires sourceId and targetId.',
           };
         if (edgeId2['sourceId'] === edgeId2['targetId'])
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'INVALID_EDGE_ENDPOINTS',
             message: 'graph.connect cannot connect a node to itself.',
           };
         if (!getNode(value120, edgeId2['sourceId']))
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'NODE_NOT_FOUND',
             message: 'Canvas node not found: ' + edgeId2['sourceId'],
           };
         if (!getNode(value120, edgeId2['targetId']))
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'NODE_NOT_FOUND',
             message: 'Canvas node not found: ' + edgeId2['targetId'],
           };
@@ -1204,7 +1204,7 @@ export function registerGraphCommands(value89) {
       },
       execute(id4, store14) {
         const edgeId3 = findEdgesByEndpoints(store14, id4)[0];
-        if (edgeId3) return { edgeId: edgeId3['id'], edge: edgeId3, reused: !![] };
+        if (edgeId3) return { edgeId: edgeId3['id'], edge: edgeId3, reused: true };
         const edgeId4 = {
           id: id4['edgeId'],
           sourceId: id4['sourceId'],
@@ -1215,7 +1215,7 @@ export function registerGraphCommands(value89) {
         return (
           getStore(store14)?.['addEdge']?.(edgeId4),
           store14['commit']?.(),
-          { edgeId: edgeId4['id'], edge: edgeId4, reused: ![] }
+          { edgeId: edgeId4['id'], edge: edgeId4, reused: false }
         );
       },
     }),
@@ -1244,7 +1244,7 @@ export function registerGraphCommands(value89) {
             Object['prototype']['hasOwnProperty']['call'](options15, 'inputSlot');
         if (!enabled15)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MISSING_REF_SLOT',
             message: 'node.setInputSlot requires refSlot, slot, or inputSlot.',
           };
@@ -1256,21 +1256,21 @@ export function registerGraphCommands(value89) {
           edges2 = getEdges(value121)[edgeArgs['edgeId']] || null;
           if (!edges2)
             return {
-              ok: ![],
+              ok: false,
               errorCode: 'EDGE_NOT_FOUND',
               message: 'Canvas edge not found: ' + edgeArgs['edgeId'],
             };
         } else {
           if (!edgeArgs['sourceId'] || !edgeArgs['targetId'])
             return {
-              ok: ![],
+              ok: false,
               errorCode: 'MISSING_EDGE_SELECTOR',
               message: 'node.setInputSlot requires edgeId or sourceId/targetId.',
             };
           edges2 = findEdgesByEndpoints(value121, edgeArgs)[0] || null;
           if (!edges2)
             return {
-              ok: ![],
+              ok: false,
               errorCode: 'EDGE_NOT_FOUND',
               message: 'No canvas edge matched node.setInputSlot.',
             };
@@ -1316,7 +1316,7 @@ export function registerGraphCommands(value89) {
           const edges3 = getEdges(value122)[edgeArgs2['edgeId']];
           if (!edges3)
             return {
-              ok: ![],
+              ok: false,
               errorCode: 'EDGE_NOT_FOUND',
               message: 'Canvas edge not found: ' + edgeArgs2['edgeId'],
             };
@@ -1324,14 +1324,14 @@ export function registerGraphCommands(value89) {
         }
         if (!edgeArgs2['sourceId'] && !edgeArgs2['targetId'])
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'MISSING_EDGE_SELECTOR',
             message: 'graph.disconnect requires edgeId or endpoint selectors.',
           };
         const edgeIds2 = findEdgesByEndpoints(value122, edgeArgs2);
         if (edgeIds2['length'] === 0)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'EDGE_NOT_FOUND',
             message: 'No canvas edge matched graph.disconnect.',
           };

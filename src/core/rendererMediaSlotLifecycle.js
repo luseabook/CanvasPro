@@ -47,16 +47,16 @@ function hasCurrentSourceToken(result, data) {
 }
 function hasStrictPresentedFrameFacts(enabled2 = {}) {
   return !!(
-    enabled2['domConnected'] === !![] &&
+    enabled2['domConnected'] === true &&
     Number(enabled2['readyState'] || 0) >= 2 &&
     Number(enabled2['videoWidth'] || 0) > 0 &&
     Number(enabled2['videoHeight'] || 0) > 0 &&
     !enabled2['error'] &&
-    enabled2['rvfcObserved'] === !![] &&
-    enabled2['cssDisplayVisible'] === !![] &&
-    enabled2['cssVisibilityVisible'] === !![] &&
-    enabled2['cssOpacityVisible'] === !![] &&
-    enabled2['overlayClear'] === !![]
+    enabled2['rvfcObserved'] === true &&
+    enabled2['cssDisplayVisible'] === true &&
+    enabled2['cssVisibilityVisible'] === true &&
+    enabled2['cssOpacityVisible'] === true &&
+    enabled2['overlayClear'] === true
   );
 }
 function freezeIntent(options) {
@@ -64,7 +64,7 @@ function freezeIntent(options) {
 }
 function buildResult(
   target,
-  { accepted: accepted = !![], changed: changed = ![], intents: intents = [], reason: reason = '' } = {},
+  { accepted: accepted = true, changed: changed = false, intents: intents = [], reason: reason = '' } = {},
 ) {
   return Object['freeze']({
     accepted: accepted,
@@ -82,7 +82,7 @@ export function createRendererMediaSlotLifecycle() {
     return (!state && ((state = createInitialState()), map['set'](key2, state)), { key: key2, state: state });
   }
   function run2(next) {
-    return buildResult(next, { accepted: ![], reason: 'stale-source-token' });
+    return buildResult(next, { accepted: false, reason: 'stale-source-token' });
   }
   function transition(current, entry = {}) {
     const { key: key3, state: state2 } = run(current);
@@ -103,7 +103,7 @@ export function createRendererMediaSlotLifecycle() {
               sourceKey: state2['sourceKey'],
               sourceEpoch: state2['sourceEpoch'],
             }),
-          buildResult(state2, { changed: !![], intents: intents2 })
+          buildResult(state2, { changed: true, intents: intents2 })
         );
       }
       case 'residency': {
@@ -112,16 +112,16 @@ export function createRendererMediaSlotLifecycle() {
           throw new TypeError('invalid renderer media residency: ' + payload);
         if (state2['residency'] === payload) return buildResult(state2);
         if (payload !== 'mounted' && isActivePresentedSurface(state2))
-          return buildResult(state2, { accepted: ![], reason: 'active-presented-slot-cannot-park' });
+          return buildResult(state2, { accepted: false, reason: 'active-presented-slot-cannot-park' });
         return (
           (state2['residency'] = payload),
           payload !== 'mounted' && ((state2['readiness'] = 'idle'), (state2['surface'] = 'poster')),
-          buildResult(state2, { changed: !![] })
+          buildResult(state2, { changed: true })
         );
       }
       case 'source-intent': {
         const sourceKey = normalizeSourceKey(entry['sourceKey']),
-          enabled3 = entry['rebind'] === !![];
+          enabled3 = entry['rebind'] === true;
         if (state2['sourceKey'] === sourceKey && !enabled3) return buildResult(state2);
         return (
           (state2['sourceKey'] = sourceKey),
@@ -129,7 +129,7 @@ export function createRendererMediaSlotLifecycle() {
           (state2['readiness'] = 'idle'),
           (state2['surface'] = 'poster'),
           buildResult(state2, {
-            changed: !![],
+            changed: true,
             intents: [
               {
                 type: 'bind-source',
@@ -153,9 +153,9 @@ export function createRendererMediaSlotLifecycle() {
       case 'frame-observed': {
         if (!hasCurrentSourceToken(state2, entry)) return run2(state2);
         if (state2['residency'] !== 'mounted')
-          return buildResult(state2, { accepted: ![], reason: 'slot-not-mounted' });
+          return buildResult(state2, { accepted: false, reason: 'slot-not-mounted' });
         if (!hasStrictPresentedFrameFacts(entry['facts']))
-          return buildResult(state2, { accepted: ![], reason: 'presentation-facts-incomplete' });
+          return buildResult(state2, { accepted: false, reason: 'presentation-facts-incomplete' });
         const changed3 = !isStableState(state2);
         return (
           (state2['readiness'] = 'frameReady'),
@@ -175,11 +175,11 @@ export function createRendererMediaSlotLifecycle() {
       case 'poster-requested': {
         if (isActivePresentedSurface(state2))
           return buildResult(state2, {
-            accepted: ![],
+            accepted: false,
             reason: 'active-presented-slot-cannot-return-to-poster',
           });
         if (state2['surface'] === 'poster') return buildResult(state2);
-        return ((state2['surface'] = 'poster'), buildResult(state2, { changed: !![] }));
+        return ((state2['surface'] = 'poster'), buildResult(state2, { changed: true }));
       }
       default:
         throw new TypeError('unknown renderer media slot event: ' + (entry['type'] || ''));

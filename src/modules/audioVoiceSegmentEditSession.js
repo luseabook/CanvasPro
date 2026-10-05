@@ -18,10 +18,10 @@ function normalizeSegmentIds(options = {}) {
   return [...new Set(item)];
 }
 function operationsOverlap(options2 = {}, key = {}) {
-  if (options2['sourceNodeId'] !== key['sourceNodeId']) return ![];
+  if (options2['sourceNodeId'] !== key['sourceNodeId']) return false;
   const list = options2['segmentIds'] || [],
     list2 = key['segmentIds'] || [];
-  if (list['includes']('all') || list2['includes']('all')) return !![];
+  if (list['includes']('all') || list2['includes']('all')) return true;
   const map = new Set(list);
   return list2['some']((index) => map['has'](index));
 }
@@ -39,7 +39,7 @@ export function createAudioVoiceSegmentEditSession() {
       segmentId: normalizeText(payload['segmentId']),
       segmentIds: normalizeSegmentIds(payload),
       payload: payload['payload'] ?? null,
-      invalidated: ![],
+      invalidated: false,
     };
     if ([...map2['values']()]['some']((target) => operationsOverlap(target, data))) return null;
     const source = data;
@@ -48,18 +48,18 @@ export function createAudioVoiceSegmentEditSession() {
   function isCurrent(event, next = event?.['sourceNodeId']) {
     return (
       !!event &&
-      event['invalidated'] !== !![] &&
+      event['invalidated'] !== true &&
       map2['get'](event['key']) === event &&
       event['sourceNodeId'] === normalizeText(next)
     );
   }
   function finish(event2) {
-    if (!isCurrent(event2)) return ![];
-    return (map2['delete'](event2['key']), (event2['invalidated'] = !![]), !![]);
+    if (!isCurrent(event2)) return false;
+    return (map2['delete'](event2['key']), (event2['invalidated'] = true), true);
   }
   function invalidateAll() {
     (map2['forEach']((current) => {
-      current['invalidated'] = !![];
+      current['invalidated'] = true;
     }),
       map2['clear']());
   }
@@ -68,7 +68,7 @@ export function createAudioVoiceSegmentEditSession() {
       text2 = normalizeText(options3['sourceNodeId']);
     return [...map2['values']()]['filter'](
       (entry) =>
-        entry['invalidated'] !== !![] &&
+        entry['invalidated'] !== true &&
         (!text || entry['kind'] === text) &&
         (!text2 || entry['sourceNodeId'] === text2),
     );
@@ -76,7 +76,7 @@ export function createAudioVoiceSegmentEditSession() {
   function isSegmentReserved(record, handle) {
     const sourceNodeId2 = normalizeText(record),
       text3 = normalizeText(handle);
-    if (!sourceNodeId2 || !text3) return ![];
+    if (!sourceNodeId2 || !text3) return false;
     return listActive({ sourceNodeId: sourceNodeId2 })['some'](
       (state) => state['segmentIds']['includes']('all') || state['segmentIds']['includes'](text3),
     );

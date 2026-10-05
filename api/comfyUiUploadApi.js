@@ -60,11 +60,11 @@ function getAllowedExtensions(options) {
 }
 function isComfyUiFileReference(target, source = 'image') {
   const text = normalizeText(target);
-  if (!text) return ![];
-  if (/^[a-z][a-z0-9+.-]*:/i['test'](text)) return ![];
-  if (text['startsWith']('/') || /[\\?#]/['test'](text)) return ![];
-  if (text['split']('/')['some']((next) => next === '.' || next === '..')) return ![];
-  if (isCanvasLocalMediaReference(text)) return ![];
+  if (!text) return false;
+  if (/^[a-z][a-z0-9+.-]*:/i['test'](text)) return false;
+  if (text['startsWith']('/') || /[\\?#]/['test'](text)) return false;
+  if (text['split']('/')['some']((next) => next === '.' || next === '..')) return false;
+  if (isCanvasLocalMediaReference(text)) return false;
   const current = text['split']('.')['pop']()?.['toLowerCase']() || '';
   return getAllowedExtensions(source)['has'](current);
 }
@@ -143,7 +143,7 @@ export async function uploadMediaInputToComfyUi(value3, { baseUrl: baseUrl2, kin
   const fetchUrl = normalizeFetchUrl(text6),
     get2 = await get(fetchUrl, {
       provider: 'remote',
-      buildUrl: ![],
+      buildUrl: false,
       responseType: 'blob',
       timeout: 60000,
     }),

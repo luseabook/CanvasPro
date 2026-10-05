@@ -74,7 +74,7 @@ function isNearEquirectangularRatio(box) {
     count <= 0 ||
     count2 <= 0
   )
-    return !![];
+    return true;
   const data = count / count2;
   return Math['abs'](data - EQUIRECTANGULAR_RATIO) <= EQUIRECTANGULAR_RATIO_TOLERANCE;
 }
@@ -565,7 +565,7 @@ function resolveNodeSpawnSpacing() {
   return Number['isFinite'](value110) ? Math['max'](0, value110) : DEFAULT_NODE_SPAWN_SPACING;
 }
 function shouldAvoidNodeOverlap() {
-  return globalThis?.['window']?.['v2NodeAvoidOverlap'] !== ![];
+  return globalThis?.['window']?.['v2NodeAvoidOverlap'] !== false;
 }
 function isPanorama360IncomingImageSourceType(value111) {
   return PANORAMA_360_IMAGE_SOURCE_TYPES['has'](String(value111 || '')['trim']());
@@ -655,7 +655,7 @@ function buildPanoramaSourceSignature(enabled6) {
 }
 function hasPersistentPanoramaLocalPath(value121) {
   const enabled7 = String(value121 || '')['trim']();
-  if (!enabled7) return ![];
+  if (!enabled7) return false;
   return !/^(blob:|data:|https?:)/i['test'](enabled7);
 }
 function bumpPanorama360SyncVersion(value122) {
@@ -811,7 +811,7 @@ export function setPanoramaSceneInteractionOptions({
       Object['prototype']['hasOwnProperty']['call'](patch, 'transformSpace') &&
         (cloneSceneState8['ui']['transformSpace'] = patch['transformSpace'] === 'local' ? 'local' : 'world'),
       Object['prototype']['hasOwnProperty']['call'](patch, 'snapEnabled') &&
-        (cloneSceneState8['ui']['snapEnabled'] = patch['snapEnabled'] === !![]),
+        (cloneSceneState8['ui']['snapEnabled'] = patch['snapEnabled'] === true),
       Number['isFinite'](Number(patch['translationSnap'])) &&
         (cloneSceneState8['ui']['translationSnap'] = Number(patch['translationSnap'])),
       Number['isFinite'](Number(patch['rotationSnap'])) &&
@@ -819,15 +819,15 @@ export function setPanoramaSceneInteractionOptions({
       Number['isFinite'](Number(patch['scaleSnap'])) &&
         (cloneSceneState8['ui']['scaleSnap'] = Number(patch['scaleSnap'])),
       Object['prototype']['hasOwnProperty']['call'](patch, 'groundLock') &&
-        (cloneSceneState8['ui']['groundLock'] = patch['groundLock'] === !![]),
+        (cloneSceneState8['ui']['groundLock'] = patch['groundLock'] === true),
       Object['prototype']['hasOwnProperty']['call'](patch, 'uniformScale') &&
-        (cloneSceneState8['ui']['uniformScale'] = patch['uniformScale'] === !![]),
+        (cloneSceneState8['ui']['uniformScale'] = patch['uniformScale'] === true),
       Object['prototype']['hasOwnProperty']['call'](patch, 'navigationMode') &&
         (cloneSceneState8['ui']['navigationMode'] = patch['navigationMode'] === 'fly' ? 'fly' : 'orbit'),
       Number['isFinite'](Number(patch['flySpeed'])) &&
         (cloneSceneState8['ui']['flySpeed'] = Math['max'](0.25, Math['min'](40, Number(patch['flySpeed'])))),
       Object['prototype']['hasOwnProperty']['call'](patch, 'showTimeline') &&
-        (cloneSceneState8['ui']['showTimeline'] = patch['showTimeline'] === !![]),
+        (cloneSceneState8['ui']['showTimeline'] = patch['showTimeline'] === true),
       cloneSceneState8
     );
   });
@@ -840,8 +840,8 @@ export function setPanoramaSceneEditing({
   writeSceneState(storeInstance, nodeId8, (value143) => {
     const cloneSceneState9 = cloneSceneState(value143);
     return (
-      (cloneSceneState9['ui']['isEditing'] = isEditing === !![]),
-      !cloneSceneState9['ui']['isEditing'] && (cloneSceneState9['ui']['showCameraList'] = ![]),
+      (cloneSceneState9['ui']['isEditing'] = isEditing === true),
+      !cloneSceneState9['ui']['isEditing'] && (cloneSceneState9['ui']['showCameraList'] = false),
       cloneSceneState9
     );
   });
@@ -963,7 +963,7 @@ export function setPanoramaSceneCameraListVisible({
 }) {
   writeSceneState(storeInstance, nodeId13, (value149) => {
     const cloneSceneState13 = cloneSceneState(value149);
-    return ((cloneSceneState13['ui']['showCameraList'] = visible === !![]), cloneSceneState13);
+    return ((cloneSceneState13['ui']['showCameraList'] = visible === true), cloneSceneState13);
   });
 }
 export function setPanoramaSceneGridPlacement({
@@ -1043,7 +1043,7 @@ export function activatePanoramaSceneCamera({
 export function setPanoramaSceneCaptureMode({
   nodeId: nodeId18,
   mode: mode2,
-  showSafeFrame: showSafeFrame = !![],
+  showSafeFrame: showSafeFrame = true,
   storeInstance: storeInstance = appStore,
 }) {
   writeSceneState(storeInstance, nodeId18, (value155) => {
@@ -1051,7 +1051,7 @@ export function setPanoramaSceneCaptureMode({
       value156 = mode2 === '9:16' || mode2 === '2.35:1' ? mode2 : 'adaptive';
     return (
       (cloneSceneState16['capture']['mode'] = value156),
-      (cloneSceneState16['capture']['showSafeFrame'] = value156 === 'adaptive' ? ![] : showSafeFrame === !![]),
+      (cloneSceneState16['capture']['showSafeFrame'] = value156 === 'adaptive' ? false : showSafeFrame === true),
       normalizePanoramaSceneState(cloneSceneState16)
     );
   });
@@ -1064,7 +1064,7 @@ export function setPanoramaSceneSafeFrameVisible({
   writeSceneState(storeInstance, nodeId19, (value157) => {
     const cloneSceneState17 = cloneSceneState(value157);
     return (
-      (cloneSceneState17['capture']['showSafeFrame'] = visible2 === !![]),
+      (cloneSceneState17['capture']['showSafeFrame'] = visible2 === true),
       normalizePanoramaSceneState(cloneSceneState17)
     );
   });
@@ -1102,7 +1102,7 @@ export function upsertPanoramaSceneCameraAtSlot({
     position2 = sanitizeCameraPose(viewPose2),
     cameraBySlot = resolveCameraBySlot(sceneState2['cameras'], slot5);
   let value158 = cameraBySlot?.['camera']?.['id'] || null,
-    enabled9 = ![];
+    enabled9 = false;
   writeSceneState(storeInstance, nodeId21, (value159) => {
     const cloneSceneState18 = cloneSceneState(value159),
       cameraBySlot2 = resolveCameraBySlot(cloneSceneState18['cameras'], slot5);
@@ -1128,7 +1128,7 @@ export function upsertPanoramaSceneCameraAtSlot({
         cloneSceneState18['mode'] === 'panorama' &&
           ((cloneSceneState18['viewport']['activeCameraId'] = value160),
           (cloneSceneState18['viewport']['activeView'] = 'camera')),
-        (enabled9 = !![]),
+        (enabled9 = true),
         cloneSceneState18
       );
     }
@@ -1148,7 +1148,7 @@ export function upsertPanoramaSceneCameraAtSlot({
       cloneSceneState18['mode'] === 'panorama' &&
         ((cloneSceneState18['viewport']['activeCameraId'] = id),
         (cloneSceneState18['viewport']['activeView'] = 'camera')),
-      (enabled9 = !![]),
+      (enabled9 = true),
       cloneSceneState18
     );
   });
@@ -1227,7 +1227,7 @@ export async function uploadPanoramaSceneImage({
             previewImageUrl: imageUrl3,
             fileName: String(file['name'] || '')['trim']() || null,
             sourceSignature: null,
-            isLoaded: ![],
+            isLoaded: false,
             error: null,
           }),
           cloneSceneState19
@@ -1282,7 +1282,7 @@ export async function uploadPanoramaSceneImage({
                 ) || null,
               fileName: fileName3,
               sourceSignature: null,
-              isLoaded: ![],
+              isLoaded: false,
               error: null,
             }),
             cloneSceneState20
@@ -1314,7 +1314,7 @@ export async function uploadPanoramaSceneImage({
         const cloneSceneState21 = cloneSceneState(value164);
         return (
           (cloneSceneState21['panorama']['error'] = error3),
-          (cloneSceneState21['panorama']['isLoaded'] = ![]),
+          (cloneSceneState21['panorama']['isLoaded'] = false),
           cloneSceneState21
         );
       }),
@@ -1363,12 +1363,12 @@ export function syncPanorama360FromIncomingImageEdge({
         previewImageUrl: previewImageUrl2 || null,
         fileName: String(isLoaded['fileName'] || '')['trim']() || sourceNodeId['payload']['fileName'],
         sourceSignature: sourceSignature,
-        isLoaded: isLoaded['isLoaded'] === !![],
+        isLoaded: isLoaded['isLoaded'] === true,
         error: null,
       },
       value171 = String(isLoaded['previewImageUrl'] || '') === String(previewImageUrl2 || '');
     if (!isLoaded['error'] && value171)
-      return { ...args7, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: ![] };
+      return { ...args7, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: false };
     return (
       writeSceneState(storeInstance, value165, (value172) => {
         const cloneSceneState22 = cloneSceneState(value172);
@@ -1380,7 +1380,7 @@ export function syncPanorama360FromIncomingImageEdge({
           cloneSceneState22
         );
       }),
-      { ...args7, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: !![] }
+      { ...args7, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: true }
     );
   }
   const value173 = _panorama360SyncInflightByNodeId['get'](value165);
@@ -1403,7 +1403,7 @@ export function syncPanorama360FromIncomingImageEdge({
         previewImageUrl: imageUrl5 || null,
         fileName: sourceNodeId['payload']['fileName'],
         sourceSignature: sourceSignature,
-        isLoaded: ![],
+        isLoaded: false,
         error: null,
       }),
       cloneSceneState23
@@ -1418,7 +1418,7 @@ export function syncPanorama360FromIncomingImageEdge({
         sourceSignature: sourceSignature,
       });
       if (!isPanorama360SyncCurrent(value165, version))
-        return { ...localPath4, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: ![], stale: !![] };
+        return { ...localPath4, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: false, stale: true };
       const storeNode7 = getStoreNode(storeInstance, value165);
       if (!storeNode7 || !isPanorama360NodeType(storeNode7['type'])) return null;
       const sceneState5 = getSceneState(storeInstance, value165),
@@ -1429,7 +1429,7 @@ export function syncPanorama360FromIncomingImageEdge({
           previewImageUrl: imageUrl5 || null,
           fileName: localPath4['fileName'],
           sourceSignature: sourceSignature,
-          isLoaded: ![],
+          isLoaded: false,
           error: null,
         },
         value175 =
@@ -1437,9 +1437,9 @@ export function syncPanorama360FromIncomingImageEdge({
           String(enabled10['imageUrl'] || '') === String(args8['imageUrl'] || '') &&
           String(enabled10['fileName'] || '') === String(args8['fileName'] || '') &&
           String(enabled10['sourceSignature'] || '') === sourceSignature,
-        value176 = enabled10['isLoaded'] === ![] && !enabled10['error'];
+        value176 = enabled10['isLoaded'] === false && !enabled10['error'];
       if (value175 && value176)
-        return { ...args8, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: ![] };
+        return { ...args8, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: false };
       return (
         writeSceneState(storeInstance, value165, (value177) => {
           const cloneSceneState24 = cloneSceneState(value177);
@@ -1451,17 +1451,17 @@ export function syncPanorama360FromIncomingImageEdge({
             cloneSceneState24
           );
         }),
-        { ...args8, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: !![] }
+        { ...args8, sourceNodeId: sourceNodeId['sourceNode']['id'], updated: true }
       );
     } catch (error4) {
       if (!isPanorama360SyncCurrent(value165, version))
         return {
-          updated: ![],
-          stale: !![],
+          updated: false,
+          stale: true,
           error: String(error4?.['message'] || error4 || panoramaSceneText('errors.unknown')),
         };
       const error5 = String(error4?.['message'] || panoramaSceneText('errors.pngNormalizeFailed'));
-      return (showError(error5), { updated: ![], error: error5 });
+      return (showError(error5), { updated: false, error: error5 });
     } finally {
       const value178 = _panorama360SyncInflightByNodeId['get'](value165);
       value178?.['promise'] === promise && _panorama360SyncInflightByNodeId['delete'](value165);
@@ -1485,7 +1485,7 @@ export function updatePanoramaSceneLoadState({
   writeSceneState(storeInstance, nodeId25, (value179) => {
     const cloneSceneState25 = cloneSceneState(value179);
     return (
-      (cloneSceneState25['panorama']['isLoaded'] = isLoaded2 === !![]),
+      (cloneSceneState25['panorama']['isLoaded'] = isLoaded2 === true),
       (cloneSceneState25['panorama']['error'] = error ? String(error) : null),
       cloneSceneState25
     );
@@ -1858,7 +1858,7 @@ export function composePanoramaScene({
   mannequins: mannequins = [],
   cameraTimeline: cameraTimeline = null,
   environmentMode: environmentMode = null,
-  replaceExisting: replaceExisting = ![],
+  replaceExisting: replaceExisting = false,
   storeInstance: storeInstance = appStore,
 }) {
   const storeNode10 = getStoreNode(storeInstance, nodeId35);
@@ -2160,7 +2160,7 @@ function buildSavedCapturePatch(fileName4, box19 = {}) {
       displayLocalPath: normalizeLocalPath(fileName4?.['displayLocalPath']),
       thumbLocalPath: normalizeLocalPath(fileName4?.['thumbLocalPath']),
       fileName: fileName4?.['filename'] || box19['fileName'] || '',
-      captureSavePending: ![],
+      captureSavePending: false,
       captureSaveError: null,
     },
     count7 = Number(
@@ -2191,7 +2191,7 @@ export async function capturePanoramaSceneViewport({
   if (sceneState10['capture']['pending']) return (showWarning(panoramaSceneText('capture.pending')), null);
   writeSceneState(nodeActionContext['storeInstance'], nodeId39, (value228) => {
     const cloneSceneState38 = cloneSceneState(value228);
-    return ((cloneSceneState38['capture']['pending'] = !![]), (cloneSceneState38['capture']['error'] = null), cloneSceneState38);
+    return ((cloneSceneState38['capture']['pending'] = true), (cloneSceneState38['capture']['error'] = null), cloneSceneState38);
   });
   try {
     const enabled16 = await run2();
@@ -2219,7 +2219,7 @@ export async function capturePanoramaSceneViewport({
         (writeSceneState(nodeActionContext['storeInstance'], nodeId39, (value229) => {
           const cloneSceneState39 = cloneSceneState(value229);
           return (
-            (cloneSceneState39['capture']['pending'] = ![]),
+            (cloneSceneState39['capture']['pending'] = false),
             (cloneSceneState39['capture']['error'] = null),
             (cloneSceneState39['capture']['lastCaptureAt'] = Date['now']()),
             cloneSceneState39
@@ -2234,7 +2234,7 @@ export async function capturePanoramaSceneViewport({
               name: panoramaSceneText('capture.nodeName'),
               fileName: fileName5,
               capturePreviewUrl: capturePreviewUrl,
-              captureSavePending: !![],
+              captureSavePending: true,
               captureSaveError: null,
             }),
           ));
@@ -2259,7 +2259,7 @@ export async function capturePanoramaSceneViewport({
           (console['warn']('[PanoramaScene] save capture failed:', error7),
             nodeActionContext['storeInstance']['getStateRaw']()['nodes']?.[id11] &&
               nodeActionContext['storeInstance']['updateNodeData'](id11, {
-                captureSavePending: ![],
+                captureSavePending: false,
                 captureSaveError: captureSaveError,
               }),
             showWarning(panoramaSceneText('capture.localSaveWarning')));
@@ -2272,7 +2272,7 @@ export async function capturePanoramaSceneViewport({
       writeSceneState(nodeActionContext['storeInstance'], nodeId39, (value231) => {
         const cloneSceneState40 = cloneSceneState(value231);
         return (
-          (cloneSceneState40['capture']['pending'] = ![]),
+          (cloneSceneState40['capture']['pending'] = false),
           (cloneSceneState40['capture']['error'] = error9),
           cloneSceneState40
         );
@@ -2309,14 +2309,14 @@ export function renamePanoramaSceneCamera({
 export function setPanoramaSceneCollapsed({
   nodeId: nodeId41,
   isCollapsed: isCollapsed,
-  enterEditingOnExpand: enterEditingOnExpand = ![],
+  enterEditingOnExpand: enterEditingOnExpand = false,
   storeInstance: storeInstance = appStore,
 }) {
   const box20 = getStoreNode(storeInstance, nodeId41);
   if (!box20) return;
-  const isCollapsed2 = typeof isCollapsed === 'boolean' ? isCollapsed : box20['isCollapsed'] !== !![];
-  if (isCollapsed2 === (box20['isCollapsed'] === !![])) return;
-  const value233 = enterEditingOnExpand === !![] && isCollapsed2 === ![],
+  const isCollapsed2 = typeof isCollapsed === 'boolean' ? isCollapsed : box20['isCollapsed'] !== true;
+  if (isCollapsed2 === (box20['isCollapsed'] === true)) return;
+  const value233 = enterEditingOnExpand === true && isCollapsed2 === false,
     _originalWidth =
       Number(box20['_originalWidth']) ||
       Number(box20['width']) ||
@@ -2331,7 +2331,7 @@ export function setPanoramaSceneCollapsed({
       const cloneSceneState42 = cloneSceneState(value234);
       return (
         (cloneSceneState42['ui']['isEditing'] = value233),
-        (cloneSceneState42['ui']['showCameraList'] = ![]),
+        (cloneSceneState42['ui']['showCameraList'] = false),
         cloneSceneState42
       );
     }),
@@ -2352,7 +2352,7 @@ export function focusPanoramaSceneSelection({
 }) {
   const args11 = getSceneState(storeInstance, nodeId42),
     cameraId5 = getSelectedObject(args11);
-  if (!cameraId5) return ![];
+  if (!cameraId5) return false;
   if (cameraId5['objectType'] === 'camera')
     return (
       activatePanoramaSceneCamera({
@@ -2360,7 +2360,7 @@ export function focusPanoramaSceneSelection({
         cameraId: cameraId5['item']['id'],
         storeInstance: storeInstance,
       }),
-      !![]
+      true
     );
   const value235 = cameraId5['item'],
     sceneObjectHeightOffset = getSceneObjectHeightOffset(cameraId5['objectType']),
@@ -2396,7 +2396,7 @@ export function focusPanoramaSceneSelection({
         activeCameraId: null,
         storeInstance: storeInstance,
       }),
-      !![]
+      true
     );
   }
   return (
@@ -2420,6 +2420,6 @@ export function focusPanoramaSceneSelection({
       activeCameraId: null,
       storeInstance: storeInstance,
     }),
-    !![]
+    true
   );
 }

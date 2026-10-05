@@ -12,7 +12,7 @@ export function requestPersonReplacementLibraryAssignment({
   runIntent: runIntent,
 }) {
   const list = project['libraryAssets']['filter']((value) => {
-    if (!selectedAssetIds['includes'](value['id'])) return ![];
+    if (!selectedAssetIds['includes'](value['id'])) return false;
     if (targetKind === 'audio')
       return (
         normalizeText(value?.['mediaKind'])['toLowerCase']() === 'audio' &&
@@ -108,9 +108,9 @@ export function playPersonReplacementLibraryAssetsIntoProjectTab(
   windowObject2 = globalThis['window'],
 ) {
   const enabled2 = Math['min'](list4['length'], Math['max'](0, Math['trunc'](Number(current) || 0)));
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   const toElement = el7?.['querySelector']?.('[data-asset-tab="' + entry + '"]');
-  if (!toElement) return ![];
+  if (!toElement) return false;
   const record = Array['from'](el7?.['querySelectorAll']?.('[data-story-asset-id]') || []);
   return (
     list4['slice'](0, enabled2)['forEach']((payload) => {
@@ -123,7 +123,7 @@ export function playPersonReplacementLibraryAssetsIntoProjectTab(
         windowObject: windowObject2,
       });
     }),
-    !![]
+    true
   );
 }
 export async function addPersonReplacementAppearanceToLibraryWithFly(

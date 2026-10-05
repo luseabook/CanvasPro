@@ -44,7 +44,7 @@ function normalizeSegment(data, sourcePosition) {
       personDetection['personDetection'] && typeof personDetection['personDetection'] === 'object'
         ? personDetection['personDetection']
         : null,
-    personFound: personDetection['personFound'] === !![],
+    personFound: personDetection['personFound'] === true,
     keyframeSelectionPolicy: String(personDetection['keyframeSelectionPolicy'] || ''),
     ref: ref,
     url: localPathToUrl(ref),
@@ -76,7 +76,7 @@ export function normalizePersonReplacementSmartClipSegments(options) {
   });
 }
 function timelineDiffers(enabled, enabled2) {
-  if (!enabled || !enabled2) return ![];
+  if (!enabled || !enabled2) return false;
   return (
     Math['abs'](enabled['start'] - enabled2['start']) > TIMELINE_MATCH_TOLERANCE_SEC ||
     Math['abs'](enabled['end'] - enabled2['end']) > TIMELINE_MATCH_TOLERANCE_SEC
@@ -89,7 +89,7 @@ export function buildPersonReplacementShotBundles({
   clipSegments: clipSegments,
   keyframeSegments: keyframeSegments,
   stageErrors: stageErrors = {},
-  requireClip: requireClip = !![],
+  requireClip: requireClip = true,
 } = {}) {
   const list2 = normalizePersonReplacementSmartClipSegments(clipSegments),
     list3 = normalizePersonReplacementSmartClipSegments(keyframeSegments),
@@ -136,7 +136,7 @@ export function buildPersonReplacementShotBundles({
       keyframeIndex: fps?.['keyframeIndex'] || 0,
       keyframeTimeSec: fps?.['keyframeTimeSec'] || start3['start'],
       personDetection: fps?.['personDetection'] || null,
-      personFound: fps?.['personFound'] === !![],
+      personFound: fps?.['personFound'] === true,
       keyframeSelectionPolicy: fps?.['keyframeSelectionPolicy'] || '',
       clipRef: clipRef?.['ref'] || '',
       keyframeRef: fps?.['ref'] || '',
@@ -222,12 +222,12 @@ export async function runPersonReplacementSmartClip({
   const mode = normalizeSmartClipRunOptions(options3),
     options4 = {
       mode: mode['mode'],
-      ...(mode['unlimitedSegments'] === !![]
-        ? { unlimitedSegments: !![] }
+      ...(mode['unlimitedSegments'] === true
+        ? { unlimitedSegments: true }
         : { maxSegments: mode['maxSegments'] }),
       fps: mode['fps'],
       keyframeSelectionPolicy: 'person',
-      ...(mode['preserveWholeVideo'] === !![] ? { preserveWholeVideo: !![] } : {}),
+      ...(mode['preserveWholeVideo'] === true ? { preserveWholeVideo: true } : {}),
     },
     keyframes = await runStage({
       phase: SMART_CLIP_OUTPUT_MODE_KEYFRAMES,
@@ -242,7 +242,7 @@ export async function runPersonReplacementSmartClip({
     shotBundles = buildPersonReplacementShotBundles({
       keyframeSegments: keyframes['result']['segments'],
       stageErrors: stageErrors2,
-      requireClip: ![],
+      requireClip: false,
     }),
     value8 = keyframes['stage']['status'] !== 'complete',
     value9 = shotBundles['some']((response) => response['status'] !== 'ready'),

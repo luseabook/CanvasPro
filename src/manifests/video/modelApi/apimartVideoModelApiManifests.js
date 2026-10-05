@@ -306,7 +306,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     ...VIDEO_AUDIO_FIELD,
     id: 'generateAudio',
     label: '生成同步音频',
-    defaultValue: !![],
+    defaultValue: true,
   }),
   APIMART_SEEDANCE_2_5_OUTPUT_FORMAT_FIELD = Object['freeze']({
     id: 'outputFormat',
@@ -326,7 +326,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     placement: 'advanced',
     variant: 'advancedRow',
     label: '联网搜索',
-    defaultValue: ![],
+    defaultValue: false,
   }),
   APIMART_SEEDANCE_2_5_FIELDS = Object['freeze']([
     createResolutionField({ defaultValue: '720p', options: ['480p', '720p'] }),
@@ -382,31 +382,31 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
   APIMART_SEEDANCE_2_5_VIDEO_POLICY = Object['freeze']({
     ratioField: 'size',
     defaultRatio: 'adaptive',
-    preserveAdaptiveRatio: !![],
+    preserveAdaptiveRatio: true,
     defaultResolution: '720p',
     allowedResolutions: Object['freeze'](['480p', '720p']),
     defaultDuration: 5,
     minDuration: 4,
     maxDuration: 30,
-    allowAutoDuration: !![],
-    supportsVideoReferences: !![],
-    supportsAudioReferences: !![],
+    allowAutoDuration: true,
+    supportsVideoReferences: true,
+    supportsAudioReferences: true,
     maxRoleImageCount: 2,
     maxImageCount: 30,
     maxVideoReferenceCount: 10,
     maxAudioReferenceCount: 10,
-    combineRoleAndReferenceImages: !![],
-    allowRoleImagesWithMedia: !![],
-    roleImagesRequireAdaptiveRatio: !![],
-    supportsGenerateAudioParam: !![],
+    combineRoleAndReferenceImages: true,
+    allowRoleImagesWithMedia: true,
+    roleImagesRequireAdaptiveRatio: true,
+    supportsGenerateAudioParam: true,
     generateAudioField: 'generate_audio',
-    generateAudioDefault: !![],
-    emitGenerateAudioBoolean: !![],
-    supportsWatermarkParam: !![],
-    supportsOutputFormatParam: !![],
-    supportsWebSearchParam: !![],
+    generateAudioDefault: true,
+    emitGenerateAudioBoolean: true,
+    supportsWatermarkParam: true,
+    supportsOutputFormatParam: true,
+    supportsWebSearchParam: true,
     privateAvatarAssets: Object['freeze']({
-      enabled: !![],
+      enabled: true,
       provider: 'apimart',
       capability: 'seedance2PrivateAvatar',
       models: Object['freeze'](['doubao-seedance-2.5']),
@@ -436,7 +436,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
   APIMART_FLUX_3_AUDIO_FIELD = Object['freeze']({
     ...VIDEO_AUDIO_FIELD,
     label: '生成同步音频',
-    defaultValue: !![],
+    defaultValue: true,
   }),
   APIMART_FLUX_3_SAFETY_TOLERANCE_FIELD = Object['freeze']({
     id: 'safety_tolerance',
@@ -464,7 +464,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     }),
     APIMART_VIDEO_ASPECT_RATIO_ENTRY,
     APIMART_VIDEO_IMAGE_URLS_ENTRY,
-    Object['freeze']({ path: 'video_url', from: 'inputVideos', transform: 'first', omitWhenEmpty: !![] }),
+    Object['freeze']({ path: 'video_url', from: 'inputVideos', transform: 'first', omitWhenEmpty: true }),
     APIMART_VIDEO_AUDIO_TRUE_ENTRY,
     Object['freeze']({
       path: 'safety_tolerance',
@@ -495,7 +495,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     variant: 'advancedRow',
     label: '提交前内容审核',
     description: '开启后会在提交任务前审核提示词和输入图片，并增加审核成本与等待时间。',
-    defaultValue: ![],
+    defaultValue: false,
   }),
   APIMART_OMNI_FLASH_INPUT_SLOTS = createVideoInputSlots({
     image: 3,
@@ -535,7 +535,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
   APIMART_WAN_3_AUDIO_FIELD = Object['freeze']({
     ...VIDEO_AUDIO_FIELD,
     label: '生成同步音频',
-    defaultValue: !![],
+    defaultValue: true,
   }),
   APIMART_WAN_3_FIXED_INPUT_SLOTS = Object['freeze']([
     Object['freeze']({
@@ -584,7 +584,7 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     video: 5,
     audio: 5,
     fixedSlots: APIMART_WAN_3_FIXED_INPUT_SLOTS,
-    cycleFixedInputWhenFull: !![],
+    cycleFixedInputWhenFull: true,
     policyVariants: Object['freeze']([
       Object['freeze']({
         when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
@@ -618,8 +618,8 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     APIMART_VIDEO_SIZE_ENTRY,
     APIMART_VIDEO_DURATION_ENTRY,
     APIMART_VIDEO_IMAGE_URLS_ENTRY,
-    Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: !![] }),
-    Object['freeze']({ path: 'audio_urls', from: 'inputAudios', omitWhenEmpty: !![] }),
+    Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
+    Object['freeze']({ path: 'audio_urls', from: 'inputAudios', omitWhenEmpty: true }),
     APIMART_VIDEO_AUDIO_TRUE_ENTRY,
     APIMART_VIDEO_WATERMARK_ENTRY,
     APIMART_VIDEO_SEED_ENTRY,
@@ -660,8 +660,8 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
         defaultValue: '720p',
         options: [
           '720p',
-          { value: '1080p', label: '1080p', disableWhen: { field: 'enable_gif', value: !![] } },
-          { value: '4k', label: '4K', disableWhen: { field: 'enable_gif', value: !![] } },
+          { value: '1080p', label: '1080p', disableWhen: { field: 'enable_gif', value: true } },
+          { value: '4k', label: '4K', disableWhen: { field: 'enable_gif', value: true } },
         ],
       }),
       Object['freeze']({
@@ -790,7 +790,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
           ],
         }),
         description: 'HD 为标准清晰度；FHD 清晰度更高、画面细节更多。默认使用 HD。',
-        showInfoTip: !![],
+        showInfoTip: true,
       }),
       createAspectRatioField({ options: ['21:9', '2:1', '16:9', '4:3', '1:1', '3:4', '9:16'] }),
       createFooterDurationField({ defaultValue: 5, min: 5, max: 20 }),
@@ -798,7 +798,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       APIMART_FLUX_3_SAFETY_TOLERANCE_FIELD,
     ]),
     inputSlots: createVideoInputSlots({ image: 10, video: 1, audio: 0 }),
-    ratioPolicy: Object['freeze']({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: !![] }),
+    ratioPolicy: Object['freeze']({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
     bodyMapping: APIMART_FLUX_3_VIDEO_BODY_MAPPING,
     prompt: Object['freeze']({ placeholder: '描述画面、动作、镜头运动与音效；也可接入关键帧或待续写视频' }),
     help: Object['freeze']({
@@ -820,9 +820,9 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     bodyMapping: APIMART_MINIMAX_H3_BODY_MAPPING,
     executionExtensions: Object['freeze']({
       bodyResolver: 'apimartMinimaxH3Video',
-      mergeGenericInputImagesWithSlots: !![],
+      mergeGenericInputImagesWithSlots: true,
     }),
-    ratioPolicy: Object['freeze']({ capability: 'size', preserveAdaptive: !![] }),
+    ratioPolicy: Object['freeze']({ capability: 'size', preserveAdaptive: true }),
     prompt: createMinimaxH3Prompt(APIMART_MINIMAX_H3_MODE_FIELD_ID),
     help: Object['freeze']({ tooltip: MINIMAX_H3_HELP_TOOLTIP }),
     extensions: Object['freeze']({
@@ -896,8 +896,8 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       video: 1,
       audio: 0,
       fixedSlots: HAPPYHORSE_FIXED_INPUT_SLOTS,
-      cycleFixedInputWhenFull: !![],
-      preserveHiddenInputsByKind: !![],
+      cycleFixedInputWhenFull: true,
+      preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING,
     executionExtensions: Object['freeze']({
@@ -973,14 +973,14 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       video: 0,
       audio: 0,
       fixedSlots: HAPPYHORSE_11_FIXED_INPUT_SLOTS,
-      cycleFixedInputWhenFull: !![],
-      preserveHiddenInputsByKind: !![],
+      cycleFixedInputWhenFull: true,
+      preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING,
     executionExtensions: Object['freeze']({
       bodyResolver: 'apimartHappyHorseVideo',
       videoFamily: 'happyHorse',
-      happyHorse: Object['freeze']({ versionLabel: 'HappyHorse 1.1', supportsEdit: ![] }),
+      happyHorse: Object['freeze']({ versionLabel: 'HappyHorse 1.1', supportsEdit: false }),
     }),
     prompt: Object['freeze']({
       placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
@@ -1045,7 +1045,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       video: 5,
       audio: 1,
       fixedSlots: WAN27_FIXED_INPUT_SLOTS,
-      preserveHiddenInputsByKind: !![],
+      preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_WAN27_BODY_MAPPING,
     executionExtensions: Object['freeze']({ bodyResolver: 'apimartWan27Video', videoFamily: 'wan27' }),
@@ -1093,7 +1093,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     }),
     extensions: createVideoMenuExtension(40, '文生 / 图生 / 参考 / 续写 / 编辑'),
   }),
-  ...[![], !![]]['map']((modelId) =>
+  ...[false, true]['map']((modelId) =>
     Object['freeze']({
       modelId: modelId ? 'apimart/wan3.0-video-prime' : 'apimart/wan3.0',
       executionId: modelId ? 'apimart.model-api.video.wan3-0-prime.v1' : 'apimart.model-api.video.wan3-0.v1',
@@ -1119,7 +1119,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       ]),
       inputSlots: APIMART_WAN_3_INPUT_SLOTS,
       bodyMapping: APIMART_WAN_3_BODY_MAPPING,
-      ratioPolicy: Object['freeze']({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: !![] }),
+      ratioPolicy: Object['freeze']({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
       prompt: Object['freeze']({
         placeholder: APIMART_WAN_3_FRAME_PROMPT_PLACEHOLDER,
         variants: Object['freeze']([
@@ -1149,7 +1149,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       extensions: Object['freeze']({
         storyWorkspace: Object['freeze']({ promptMode: 'wan-3.0' }),
         ...createVideoMenuExtension(modelId ? 42 : 41, '文生 / 首尾帧 / 多模态参考'),
-        videoInputSurface: Object['freeze']({ hideFixedInputSlots: !![] }),
+        videoInputSurface: Object['freeze']({ hideFixedInputSlots: true }),
       }),
     }),
   ),
@@ -1217,7 +1217,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       video: 1,
       audio: 0,
       fixedSlots: KLING_V3_OMNI_FIXED_INPUT_SLOTS,
-      preserveHiddenInputsByKind: !![],
+      preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_KLING_V3_BODY_MAPPING,
     executionExtensions: Object['freeze']({ bodyResolver: 'apimartKlingV3OmniVideo' }),
@@ -1362,15 +1362,15 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     endpointMode: 'seedance-video-generation',
     ratioPolicy: Object['freeze']({
       ...SEEDANCE_VIDEO_RATIO_POLICY,
-      preserveAdaptive: !![],
-      preserveAdaptiveAtSubmit: !![],
+      preserveAdaptive: true,
+      preserveAdaptiveAtSubmit: true,
     }),
     fields: APIMART_SEEDANCE_2_5_FIELDS,
     inputSlots: APIMART_SEEDANCE_2_5_VIDEO_INPUT_SLOTS,
     executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_5_VIDEO_POLICY),
     extensions: Object['freeze']({
       segmentRetake: Object['freeze']({
-        supported: !![],
+        supported: true,
         parameterPolicy: Object['freeze']({
           mode: Object['freeze']({ fieldId: 'dreaminaRouteMode', value: 'multimodal2video' }),
           duration: Object['freeze']({ fieldId: 'duration', value: -1 }),

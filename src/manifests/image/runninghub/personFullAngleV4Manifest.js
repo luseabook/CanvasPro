@@ -48,7 +48,7 @@ export const personFullAngleV4ModelManifest = Object['freeze']({
   displayName: '人物全角度V4',
   icon: 'images/RH.png',
   description: '单图生成人物全角度参考图，支持角色类型、尺寸比例和背景提示词',
-  vip: !![],
+  vip: true,
   subscriptionAliases: PERSON_FULL_ANGLE_V4_SUBSCRIPTION_ALIASES,
   help: Object['freeze']({ tooltip: PERSON_FULL_ANGLE_V4_HELP_TOOLTIP }),
   prompt: Object['freeze']({
@@ -76,7 +76,7 @@ export const personFullAngleV4ModelManifest = Object['freeze']({
       fallbackIndex: 0,
     }),
     fixedSlots: Object['freeze']([
-      Object['freeze']({ id: 'personReference', kind: 'image', label: '人物参考', required: !![] }),
+      Object['freeze']({ id: 'personReference', kind: 'image', label: '人物参考', required: true }),
     ]),
   }),
   uiSchema: Object['freeze']({
@@ -102,7 +102,7 @@ export const personFullAngleV4ModelManifest = Object['freeze']({
         type: 'toggle',
         placement: 'advanced',
         label: '新模型切换',
-        defaultValue: ![],
+        defaultValue: false,
       }),
       Object['freeze']({
         id: 'rhPersonFullAngleBackgroundPrompt',
@@ -115,8 +115,8 @@ export const personFullAngleV4ModelManifest = Object['freeze']({
       RH_IMAGE_INSTANCE_FIELD,
     ]),
   }),
-  async: !![],
-  cancellable: !![],
+  async: true,
+  cancellable: true,
   outputType: 'image',
 });
 export const personFullAngleV4ExecutionManifest = Object['freeze']({
@@ -168,7 +168,7 @@ export const personFullAngleV4ExecutionManifest = Object['freeze']({
         nodeId: '1319',
         fieldName: 'value',
         field: 'rhPersonFullAngleNewModel',
-        defaultValue: ![],
+        defaultValue: false,
         description: '新模型切换',
       }),
       Object['freeze']({

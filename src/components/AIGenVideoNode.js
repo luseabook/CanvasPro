@@ -132,7 +132,7 @@ const VIDEO_VIP_MODEL_ID_SET = new Set(VIDEO_VIP_MODEL_IDS),
   VIDEO_VIP_MODEL_NAME_MAP = VIDEO_VIP_MODEL_IDS['reduce']((value, item) => {
     return ((value[item] = getVipModelDisplayName(item)), value);
   }, {});
-let _vipSessionRecheckDone = ![];
+let _vipSessionRecheckDone = false;
 const AI_VIDEO_MIN_SIZE = 150,
   api = {
     buildGenerateVideoRequest: buildGenerateVideoRequest,
@@ -175,7 +175,7 @@ function getVideoVipModelName(next, current = '') {
 async function ensureVipSessionRecheck(entry, record = '') {
   if (!isVideoVipModel(entry, record)) return;
   if (_vipSessionRecheckDone) return;
-  _vipSessionRecheckDone = !![];
+  _vipSessionRecheckDone = true;
   if (typeof window['refreshSubscriptionState'] === 'function')
     try {
       await window['refreshSubscriptionState']();
@@ -241,7 +241,7 @@ export class AIGenVideoNode {
       (this['_promptPanel'] = null),
       (this['_promptInputWrap'] = null),
       (this['_promptResizeHandle'] = null),
-      (this['_isPromptBoxResizing'] = ![]),
+      (this['_isPromptBoxResizing'] = false),
       (this['_promptResizeCleanup'] = null),
       (this['_qualityBtns'] = []),
       (this['_attachBtnIcon'] = null),
@@ -266,13 +266,13 @@ export class AIGenVideoNode {
       (this['_lastSpecialModeSig'] = ''),
       (this['_lastSubtractSubjectSig'] = ''),
       (this['_renderRefBarLock'] = null),
-      (this['_renderRefBarPending'] = ![]),
+      (this['_renderRefBarPending'] = false),
       (this['_ratioAnimTimer'] = null),
       (this['_ratioFlipAnim'] = null),
       (this['_rhAbortController'] = null),
       (this['_rhTaskId'] = null),
       (this['_rhApiKey'] = null),
-      (this['_rhCancelRequested'] = ![]),
+      (this['_rhCancelRequested'] = false),
       (this['_rhResumeAbortController'] = null),
       (this['_rhResumeTaskId'] = ''),
       (this['_rhResumePromise'] = null),
@@ -284,14 +284,14 @@ export class AIGenVideoNode {
       (this['_lastVideoViewSig'] = null),
       (this['_lastHasInputConnections'] = null),
       initializeVideoNodeMediaRuntimeState(this, payload, appStore),
-      (this['_vipSelectionRetryInProgress'] = ![]),
+      (this['_vipSelectionRetryInProgress'] = false),
       (this['_assetMentionRegistryUnsubscribe'] = null),
-      (this['_assetMentionRegistryRefreshPending'] = ![]),
+      (this['_assetMentionRegistryRefreshPending'] = false),
       (this['_generationNodeHelpTip'] = null),
       (this['_modelProviderProfileControl'] = null),
       (this['_uiSchemaCleanup'] = null),
       (this['_footerControllerCleanup'] = null),
-      (this['_videoSubmitInFlight'] = ![]),
+      (this['_videoSubmitInFlight'] = false),
       (this['_unsubscribeLocale'] = null),
       (this['_videoToolbarCleanup'] = null));
   }
@@ -313,21 +313,21 @@ export class AIGenVideoNode {
       this['_syncPreviewControlLocaleTexts']?.());
   }
   ['_deferVideoMediaRefresh']() {
-    this['_deferredVideoViewRefreshPending'] = !![];
-    const enabled2 = this['_showDeferredVideoPosterPreview']?.() === !![];
+    this['_deferredVideoViewRefreshPending'] = true;
+    const enabled2 = this['_showDeferredVideoPosterPreview']?.() === true;
     (!enabled2 && this['_placeholderEl'] && (this['_placeholderEl']['style']['display'] = 'flex'),
-      this['_setVideoOverlaysVisible']?.(![]));
+      this['_setVideoOverlaysVisible']?.(false));
   }
   ['_loadVideoWhenMediaReady']() {
     const handle =
-      this['_rendererMediaDeferred'] === !![] && !this['_mustRenderTerminalVideoState']?.(this['_data']);
+      this['_rendererMediaDeferred'] === true && !this['_mustRenderTerminalVideoState']?.(this['_data']);
     if (handle) return this['_deferVideoMediaRefresh']();
     this['_loadAndDisplayVideo']();
   }
   ['_schedulePreviewVideoOverlays']() {
     const state = () => {
-      this['_rendererMediaDeferred'] !== !![] &&
-        this['previewEl']?.['isConnected'] !== ![] &&
+      this['_rendererMediaDeferred'] !== true &&
+        this['previewEl']?.['isConnected'] !== false &&
         this['_ensurePreviewVideoOverlays']();
     };
     typeof globalThis['requestIdleCallback'] === 'function'
@@ -335,20 +335,20 @@ export class AIGenVideoNode {
       : (globalThis['requestAnimationFrame'] || globalThis['setTimeout'])(state);
   }
   ['_renderRefBarWhenMediaReady']() {
-    if (this['_rendererMediaDeferred'] === !![] || this['_rendererDetailsDeferred'] === !![])
-      this['_renderRefBarPendingWhenVisible'] = !![];
+    if (this['_rendererMediaDeferred'] === true || this['_rendererDetailsDeferred'] === true)
+      this['_renderRefBarPendingWhenVisible'] = true;
     else this['_renderRefBar']();
   }
   ['mount']() {
     (this['_videoToolbarCleanup']?.(), (this['_videoToolbarCleanup'] = null));
     typeof this['_normalizeDreaminaNodeData'] === 'function' &&
       (this['_data'] =
-        this['_normalizeDreaminaNodeData'](this['_data'], { syncStore: !![] }) || this['_data']);
+        this['_normalizeDreaminaNodeData'](this['_data'], { syncStore: true }) || this['_data']);
     const root = document['createElement']('div');
     if (this['isNoResult']) root['classList']['add']('no-result');
     ((this['_root'] = root), root['classList']['add']('aigen-node-root', 'aigen-video-root'));
-    this['_rendererThinVideoHydration'] === !![]
-      ? (this['_deferredToolbarMarkupPending'] = !![])
+    this['_rendererThinVideoHydration'] === true
+      ? (this['_deferredToolbarMarkupPending'] = true)
       : (root['innerHTML'] = VIDEO_TOOLBAR_HTML);
     ((this['previewEl'] = document['createElement']('div')),
       (this['previewEl']['className'] = 'img-node-preview aigen-node-preview-fill aigen-video-preview'));
@@ -372,8 +372,8 @@ export class AIGenVideoNode {
         this['previewEl'],
         this['_getPreviewGenerateButtonLoadingOptions']?.(),
       ));
-    if (this['_rendererMediaDeferred'] !== !![]) {
-      if (this['_rendererThinVideoHydration'] !== !![]) this['_ensurePreviewVideoOverlays']();
+    if (this['_rendererMediaDeferred'] !== true) {
+      if (this['_rendererThinVideoHydration'] !== true) this['_ensurePreviewVideoOverlays']();
     }
     root['appendChild'](this['previewEl']);
     const el2 = document['createElement']('div');
@@ -423,9 +423,9 @@ export class AIGenVideoNode {
         (event3['stopPropagation'](), event3['preventDefault']());
         const input = appStore['getState']()['pickConnectMode'];
         input?.['active'] && input['sourceNodeId'] === this['nodeId']
-          ? appStore['setPickConnectMode']({ active: ![] })
+          ? appStore['setPickConnectMode']({ active: false })
           : appStore['setPickConnectMode']({
-              active: !![],
+              active: true,
               sourceNodeId: this['nodeId'],
               handleDirection: 'left',
             });
@@ -553,7 +553,7 @@ export class AIGenVideoNode {
                 mediaTaskError: assetId['mediaTaskError'] || '',
                 fileName: assetId['filename'] || error['name'] || '',
                 thumbUrl: assetId['posterUrl'] || assetId['thumbUrl'] || null,
-                ...(!sourceKind ? buildCanvasLocalImageFields(assetId, { includeSrc: !![] }) : {}),
+                ...(!sourceKind ? buildCanvasLocalImageFields(assetId, { includeSrc: true }) : {}),
               };
             if (sourceKind)
               error2['name'] =
@@ -702,7 +702,7 @@ export class AIGenVideoNode {
                 fileName: assetId2['filename'] || error4['name'] || '',
               };
             if (!sourceKind2 && !enabled8)
-              Object['assign'](error5, buildCanvasLocalImageFields(assetId2, { includeSrc: !![] }));
+              Object['assign'](error5, buildCanvasLocalImageFields(assetId2, { includeSrc: true }));
             (sourceKind2 &&
               (error5['name'] = error4['name'] || aigenVideoNodeText('inputNames.sourceAudio')),
               enabled8 &&
@@ -818,7 +818,7 @@ export class AIGenVideoNode {
           nodeId: this['nodeId'],
           nodeData: this['_data'],
           promptEl: this['promptEl'],
-          syncStore: ![],
+          syncStore: false,
         })['nodeData'] || this['_data']));
     const value42 = document['createElement']('div');
     ((value42['className'] = 'prompt-panel-footer'),
@@ -834,9 +834,9 @@ export class AIGenVideoNode {
     (this['_assetMentionRegistryUnsubscribe']?.(),
       (this['_assetMentionRegistryUnsubscribe'] = subscribeAssetMentionRegistry(() => {
         if (this['_assetMentionRegistryRefreshPending']) return;
-        ((this['_assetMentionRegistryRefreshPending'] = !![]),
+        ((this['_assetMentionRegistryRefreshPending'] = true),
           queueMicrotask(() => {
-            this['_assetMentionRegistryRefreshPending'] = ![];
+            this['_assetMentionRegistryRefreshPending'] = false;
             if (!appStore['getState']()['nodes']?.[this['nodeId']]) return;
             if (this['_rendererDetailsDeferred']) return;
             (_rehydratePromptPills(this), this['_renderRefBar'](), this['_updateSubmitButtonState']());
@@ -847,7 +847,7 @@ export class AIGenVideoNode {
     else this['_videoToolbarCleanup'] = bindVideoToolbarEvents(value43, this['_data']);
     el2 &&
       el2['addEventListener']('pointerdown', (event8) => {
-        const value44 = appStore['getStateRaw']()['ui']?.['imageVideoNodeResizeEnabled'] === !![],
+        const value44 = appStore['getStateRaw']()['ui']?.['imageVideoNodeResizeEnabled'] === true,
           value45 = document['getElementById']('v2-wrap')?.['classList']['contains'](
             'v2-media-node-resize-enabled',
           );
@@ -874,8 +874,8 @@ export class AIGenVideoNode {
               Math['round'](Number(startSize?.['height']) || 0) !==
                 Math['round'](Number(finalSize?.['height']) || 0);
             return {
-              ...(startNode?.['needsAutoResize'] ? { needsAutoResize: ![] } : {}),
-              ...(value50 ? { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: !![] } : {}),
+              ...(startNode?.['needsAutoResize'] ? { needsAutoResize: false } : {}),
+              ...(value50 ? { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: true } : {}),
             };
           },
           applyPatch: (value51) => appStore['updateNodeData'](this['nodeId'], value51),
@@ -900,7 +900,7 @@ export class AIGenVideoNode {
     });
   }
   ['_syncPromptInputVisibility'](value53 = this['_data']) {
-    if (!this['_promptInputWrap']) return !![];
+    if (!this['_promptInputWrap']) return true;
     const value54 =
         typeof this['_resolveModelExecution'] === 'function'
           ? this['_resolveModelExecution'](value53?.['model'], value53?.['provider'])
@@ -943,12 +943,12 @@ export class AIGenVideoNode {
     );
   }
   ['refreshModelRegistryUi']() {
-    if (this['_rendererDetailsDeferred'] === !![] || !this['footerEl']) return ![];
+    if (this['_rendererDetailsDeferred'] === true || !this['footerEl']) return false;
     return (
       this['_renderFooter'](this['footerEl']),
       (this['_lastFooterSig'] = this['_buildFooterSig'](this['_data'])),
       this['_updateSubmitButtonState'](),
-      !![]
+      true
     );
   }
   ['_buildRefBarSignatures'](value59 = this['_data'], value60 = null) {
@@ -989,7 +989,7 @@ export class AIGenVideoNode {
         nodeId: this['nodeId'],
         nodeData: nodeData || {},
         promptEl: this['promptEl'],
-        syncStore: ![],
+        syncStore: false,
       }),
       value66 = syncVideoNodeFixedInputSummary2['nodeData'] || nodeData || {},
       value67 = syncVideoNodeFixedInputSummary2['fixedInputConfig'],
@@ -1019,7 +1019,7 @@ export class AIGenVideoNode {
     const run = () => readStoreState()?.['nodes']?.[this['nodeId']] || nodeData2;
     nodeData2 = run() || nodeData2;
     typeof this['_normalizeDreaminaNodeData'] === 'function'
-      ? (this['_data'] = this['_normalizeDreaminaNodeData'](nodeData2, { syncStore: !![] }) || nodeData2)
+      ? (this['_data'] = this['_normalizeDreaminaNodeData'](nodeData2, { syncStore: true }) || nodeData2)
       : (this['_data'] = nodeData2);
     ((nodeData2 = run() || this['_data']), (this['_data'] = nodeData2), (nodeData2 = this['_data']));
     const videoNodeUpdatePerf = createVideoNodeUpdatePerf();
@@ -1027,11 +1027,11 @@ export class AIGenVideoNode {
       this['_syncMutedStateFromNodeData'](nodeData2);
     this['_syncNoResultClass']();
     if (shouldShowGenerationBusyUi(nodeData2)) {
-      this['_isGenerating'] = !![];
+      this['_isGenerating'] = true;
       if (this['previewEl']) startLoading(this['previewEl']);
     } else {
       if (isTerminalGenerationUiState(nodeData2)) {
-        ((this['_isGenerating'] = ![]), stopPreviewNodeLoading(this['nodeId']));
+        ((this['_isGenerating'] = false), stopPreviewNodeLoading(this['nodeId']));
         if (this['previewEl']) stopLoading(this['previewEl']);
       }
     }
@@ -1040,7 +1040,7 @@ export class AIGenVideoNode {
       nodeId: this['nodeId'],
       nodeData: nodeData2,
       promptEl: this['promptEl'],
-      syncStore: !![],
+      syncStore: true,
     });
     ((nodeData2 = syncVideoNodeFixedInputSummary3['nodeData'] || nodeData2), (this['_data'] = nodeData2));
     const value71 = syncVideoNodeFixedInputSummary3['fixedInputConfig'],
@@ -1062,7 +1062,7 @@ export class AIGenVideoNode {
     const storeState3 = readStoreState()['nodes'] || {},
       value76 = list['map']((value77) => {
         const value78 = storeState3?.[value77?.['sourceId']] || null,
-          box3 = getGenerationRatioMediaSize(value78, value77, { includeNodeFrame: !![] });
+          box3 = getGenerationRatioMediaSize(value78, value77, { includeNodeFrame: true });
         return [
           value77?.['id'],
           value77?.['sourceId'],
@@ -1113,8 +1113,8 @@ export class AIGenVideoNode {
       (this['_data'] = nodeData2));
     const value85 = this['_buildFooterSig'](nodeData2),
       value86 = this['_lastFooterSig'];
-    let value87 = ![];
-    this['_rendererDetailsDeferred'] !== !![] &&
+    let value87 = false;
+    this['_rendererDetailsDeferred'] !== true &&
       this['footerEl'] &&
       value85 !== value86 &&
       (videoNodeUpdatePerf?.['detail']('footerSigFrom', value86),
@@ -1123,7 +1123,7 @@ export class AIGenVideoNode {
       this['_renderFooter'](this['footerEl']),
       (nodeData2 = run() || this['_data'] || nodeData2),
       (this['_data'] = nodeData2),
-      (value87 = !![]));
+      (value87 = true));
     if (value87) {
       const storeState4 = readStoreState()['nodes']?.[this['nodeId']] || this['_data'] || {};
       handler4(handler5(storeState4)) &&
@@ -1143,7 +1143,7 @@ export class AIGenVideoNode {
       }
     }
     if (
-      this['_rendererDetailsDeferred'] !== !![] &&
+      this['_rendererDetailsDeferred'] !== true &&
       document['activeElement'] !== this['promptEl'] &&
       nodeData2['prompt'] !== undefined &&
       String(nodeData2['prompt'] || '') !== this['_lastPromptContentSig']
@@ -1160,18 +1160,18 @@ export class AIGenVideoNode {
       (videoNodeUpdatePerf?.['detail']('promptUiSigFrom', this['_lastPromptUiSig']),
       videoNodeUpdatePerf?.['detail']('promptUiSigTo', videoNodePromptUiSig),
       (this['_lastPromptUiSig'] = videoNodePromptUiSig),
-      this['_rendererDetailsDeferred'] !== !![] &&
+      this['_rendererDetailsDeferred'] !== true &&
         (typeof this['_syncDreaminaPromptPlaceholder'] === 'function' &&
           this['_syncDreaminaPromptPlaceholder'](nodeData2),
         this['_syncPromptInputVisibility'](nodeData2),
         this['_syncGenerationNodeHelpTip']()));
-    this['_rendererDetailsDeferred'] !== !![] && this['_syncModelProviderProfileControl']();
+    this['_rendererDetailsDeferred'] !== true && this['_syncModelProviderProfileControl']();
     const videoNodePromptBoxSizeSig = buildVideoNodePromptBoxSizeSig(nodeData2);
     videoNodePromptBoxSizeSig !== this['_lastPromptBoxSizeSig'] &&
       (videoNodeUpdatePerf?.['detail']('promptBoxSizeSigFrom', this['_lastPromptBoxSizeSig']),
       videoNodeUpdatePerf?.['detail']('promptBoxSizeSigTo', videoNodePromptBoxSizeSig),
       (this['_lastPromptBoxSizeSig'] = videoNodePromptBoxSizeSig),
-      this['_rendererDetailsDeferred'] !== !![] && this['_syncPromptBoxSizeFromData'](nodeData2));
+      this['_rendererDetailsDeferred'] !== true && this['_syncPromptBoxSizeFromData'](nodeData2));
     videoNodeUpdatePerf?.['mark']('prompt-ui');
     const value88 = this['_buildRefBarSignatures'](nodeData2, value71);
     list = value88['inEdges'];
@@ -1207,7 +1207,7 @@ export class AIGenVideoNode {
     });
     (videoNodeSubmitButtonSig !== this['_lastSubmitButtonSig'] || value87) &&
       ((this['_lastSubmitButtonSig'] = videoNodeSubmitButtonSig), this['_updateSubmitButtonState']());
-    const value90 = !!this['footerEl'] && this['_rendererDetailsDeferred'] !== !![],
+    const value90 = !!this['footerEl'] && this['_rendererDetailsDeferred'] !== true,
       decorateSegmentRetakeParameterNodeData2 = decorateSegmentRetakeParameterNodeData(
         value90 && typeof this['_getRhVideoAdvancedSchemaNodeData'] === 'function'
           ? this['_getRhVideoAdvancedSchemaNodeData'](nodeData2)
@@ -1228,9 +1228,9 @@ export class AIGenVideoNode {
         enabled13 =
           typeof this['_hasVisibleVideoAdvancedControls'] === 'function'
             ? this['_hasVisibleVideoAdvancedControls'](nodeData2)
-            : ![];
+            : false;
       if (hasRunningHubVideoWorkflowUiField(value92, 'rhMaskExpand')) {
-        const enabled14 = nodeData2?.['rhMaskExpandTouched'] === !![],
+        const enabled14 = nodeData2?.['rhMaskExpandTouched'] === true,
           count = Number(nodeData2?.['rhMaskExpand']);
         Number['isFinite'](count) &&
           count === 0 &&
@@ -1347,11 +1347,11 @@ export class AIGenVideoNode {
     this['_ensureModelProviderProfileControl']()?.['sync']();
   }
   ['prepareRendererVisibleVideoPreview']() {
-    return ((this['_rendererEagerVideoPreview'] = ![]), ![]);
+    return ((this['_rendererEagerVideoPreview'] = false), false);
   }
   ['getRendererMediaState']() {
     return {
-      deferred: this['_rendererMediaDeferred'] === !![],
+      deferred: this['_rendererMediaDeferred'] === true,
       interactionActive: !!(
         this['_isHovered'] ||
         this['_isManualControl'] ||
@@ -1361,26 +1361,26 @@ export class AIGenVideoNode {
     };
   }
   ['hydrateDeferredMedia']() {
-    if (this['_rendererMediaDeferred'] !== !![]) return;
-    ((this['_rendererMediaDeferred'] = ![]),
-      (this['_rendererEagerVideoPreview'] = ![]),
+    if (this['_rendererMediaDeferred'] !== true) return;
+    ((this['_rendererMediaDeferred'] = false),
+      (this['_rendererEagerVideoPreview'] = false),
       (this['_data'] = readStoreState()?.['nodes']?.[this['nodeId']] || this['_data']),
-      (this['_deferredVideoViewRefreshPending'] = ![]),
+      (this['_deferredVideoViewRefreshPending'] = false),
       this['_loadAndDisplayVideo'](),
       this['_schedulePreviewVideoOverlays'](),
       this['_renderRefBarPendingWhenVisible'] &&
-        this['_rendererDetailsDeferred'] !== !![] &&
-        ((this['_renderRefBarPendingWhenVisible'] = ![]), this['_renderRefBar']()),
+        this['_rendererDetailsDeferred'] !== true &&
+        ((this['_renderRefBarPendingWhenVisible'] = false), this['_renderRefBar']()),
       this['_updateSubmitButtonState']());
   }
   ['_hydrateDeferredToolbarEvents']() {
     return (
       !this['_deferredToolbarEl'] &&
-        this['_deferredToolbarMarkupPending'] === !![] &&
+        this['_deferredToolbarMarkupPending'] === true &&
         this['_root']?.['insertAdjacentHTML'] &&
         (this['_root']['insertAdjacentHTML']('afterbegin', VIDEO_TOOLBAR_HTML),
         (this['_deferredToolbarEl'] = this['_root']['querySelector']?.('.node-floating-toolbar')),
-        (this['_deferredToolbarMarkupPending'] = ![])),
+        (this['_deferredToolbarMarkupPending'] = false)),
       hydrateDeferredVideoNodeToolbar(this, bindVideoToolbarEvents)
     );
   }
@@ -1398,8 +1398,8 @@ export class AIGenVideoNode {
       (this['_autoPlayToken'] += 1),
       (this['_fullscreenOpenEpoch'] = Number(this['_fullscreenOpenEpoch'] || 0) + 1),
       (this['_pendingFullscreenResultIdentity'] = ''),
-      (this['_isHovered'] = ![]),
-      (this['_previewHoverActivationPending'] = ![]),
+      (this['_isHovered'] = false),
+      (this['_previewHoverActivationPending'] = false),
       this['_cancelPreviewHoverRetryTimers']?.(),
       this['_hoverPlaybackLifecycle']?.['dispose']?.(),
       (this['_hoverPlaybackResumeState'] = null),
@@ -1407,7 +1407,7 @@ export class AIGenVideoNode {
       this['_videoToolbarCleanup']?.(),
       (this['_videoToolbarCleanup'] = null),
       (this['_deferredToolbarEl'] = null),
-      (this['_deferredToolbarMarkupPending'] = ![]));
+      (this['_deferredToolbarMarkupPending'] = false));
     try {
       this['_activeFullscreenCleanup']?.();
     } catch {}
@@ -1422,12 +1422,12 @@ export class AIGenVideoNode {
       (this['_unsubscribeLocale'] = null),
       this['_assetMentionRegistryUnsubscribe']?.(),
       (this['_assetMentionRegistryUnsubscribe'] = null),
-      (this['_assetMentionRegistryRefreshPending'] = ![]));
-    !shouldPreserveGenerationTaskOnUnmount2 && typeof this['_stopDreaminaRecovery'] === 'function' && this['_stopDreaminaRecovery'](![]);
+      (this['_assetMentionRegistryRefreshPending'] = false));
+    !shouldPreserveGenerationTaskOnUnmount2 && typeof this['_stopDreaminaRecovery'] === 'function' && this['_stopDreaminaRecovery'](false);
     !shouldPreserveGenerationTaskOnUnmount2 &&
       typeof this['_stopRunningHubRecovery'] === 'function' &&
-      this['_stopRunningHubRecovery'](![]);
-    !shouldPreserveGenerationTaskOnUnmount2 && typeof this['_stopAsyncRecovery'] === 'function' && this['_stopAsyncRecovery'](![]);
+      this['_stopRunningHubRecovery'](false);
+    !shouldPreserveGenerationTaskOnUnmount2 && typeof this['_stopAsyncRecovery'] === 'function' && this['_stopAsyncRecovery'](false);
     typeof this['_promptResizeCleanup'] === 'function' &&
       (this['_promptResizeCleanup'](), (this['_promptResizeCleanup'] = null));
     (disposeVideoNodePromptDetails(this),
@@ -1435,12 +1435,12 @@ export class AIGenVideoNode {
       (this['_uiSchemaCleanup'] = null),
       this['_footerControllerCleanup']?.(),
       (this['_footerControllerCleanup'] = null),
-      (this['_isPromptBoxResizing'] = ![]));
+      (this['_isPromptBoxResizing'] = false));
     this['_videoClickTimer'] && (clearTimeout(this['_videoClickTimer']), (this['_videoClickTimer'] = null));
     this['_centerIndicatorTimer'] &&
       (clearTimeout(this['_centerIndicatorTimer']), (this['_centerIndicatorTimer'] = null));
     (this['_cancelVideoProgressLoop']?.(),
-      this['_setManualLoopPlayback']?.(![], this['_getActivePreviewVideoEl']?.()));
+      this['_setManualLoopPlayback']?.(false, this['_getActivePreviewVideoEl']?.()));
     try {
       this['previewEl']?.['querySelectorAll']('video')['forEach']((value99) => {
         this['_detachPreviewVideoRecovery']?.(value99);

@@ -78,7 +78,7 @@ export function createChromeShellWebPreviewManager({
     eventQueue = [],
     waiters = new Set();
   let eventSequence = 0,
-    disposed = ![];
+    disposed = false;
   function drainEvents() {
     return eventQueue['splice'](0, eventQueue['length']);
   }
@@ -127,36 +127,36 @@ export function createChromeShellWebPreviewManager({
     });
   }
   async function createTarget() {
-    return client['send']('Target.createTarget', { url: 'about:blank', background: !![], focus: ![] });
+    return client['send']('Target.createTarget', { url: 'about:blank', background: true, focus: false });
   }
   async function applyViewport(entry, viewport) {
-    if (!entry?.['sessionId']) return ![];
+    if (!entry?.['sessionId']) return false;
     const sizeChanged =
       entry['viewportWidth'] !== viewport['width'] || entry['viewportHeight'] !== viewport['height'];
     ((entry['visualWidth'] = viewport['visualWidth']),
       (entry['visualHeight'] = viewport['visualHeight']),
       (entry['zoomFactor'] = viewport['zoomFactor']));
-    if (!sizeChanged) return ![];
+    if (!sizeChanged) return false;
     return (
       (entry['viewportWidth'] = viewport['width']),
       (entry['viewportHeight'] = viewport['height']),
       await client['send'](
         'Emulation.setDeviceMetricsOverride',
-        { width: viewport['width'], height: viewport['height'], deviceScaleFactor: 1, mobile: ![] },
+        { width: viewport['width'], height: viewport['height'], deviceScaleFactor: 1, mobile: false },
         entry['sessionId'],
       ),
-      !![]
+      true
     );
   }
   async function readNavigationState(entry) {
-    if (!entry?.['sessionId']) return { canGoBack: ![], canGoForward: ![] };
+    if (!entry?.['sessionId']) return { canGoBack: false, canGoForward: false };
     try {
       const history = await client['send']('Page.getNavigationHistory', {}, entry['sessionId']),
         entries = Array['isArray'](history?.['entries']) ? history['entries'] : [],
         currentIndex = Math['max'](0, Number(history?.['currentIndex']) || 0);
       return { canGoBack: currentIndex > 0, canGoForward: currentIndex < entries['length'] - 1 };
     } catch {
-      return { canGoBack: ![], canGoForward: ![] };
+      return { canGoBack: false, canGoForward: false };
     }
   }
   async function emitNavigationState(entry) {
@@ -169,34 +169,34 @@ export function createChromeShellWebPreviewManager({
       disposed ||
       entry?.['disposing'] ||
       !entry?.['sessionId'] ||
-      entry['active'] !== !![] ||
+      entry['active'] !== true ||
       entry['screencastActive'] ||
       entry['capturePending']
     ) {
-      if (entry?.['capturePending']) entry['captureQueued'] = !![];
-      return ![];
+      if (entry?.['capturePending']) entry['captureQueued'] = true;
+      return false;
     }
-    entry['capturePending'] = !![];
+    entry['capturePending'] = true;
     try {
       let screenshot,
         mimeType = 'image/webp';
       try {
         screenshot = await client['send'](
           'Page.captureScreenshot',
-          { format: 'webp', quality: SNAPSHOT_QUALITY, fromSurface: !![], optimizeForSpeed: !![] },
+          { format: 'webp', quality: SNAPSHOT_QUALITY, fromSurface: true, optimizeForSpeed: true },
           entry['sessionId'],
         );
       } catch {
         ((mimeType = 'image/jpeg'),
           (screenshot = await client['send'](
             'Page.captureScreenshot',
-            { format: 'jpeg', quality: SNAPSHOT_QUALITY, fromSurface: !![], optimizeForSpeed: !![] },
+            { format: 'jpeg', quality: SNAPSHOT_QUALITY, fromSurface: true, optimizeForSpeed: true },
             entry['sessionId'],
           )));
       }
       const data = String(screenshot?.['data'] || '')['trim']();
       if (!data || entry['disposing'] || entry['screencastActive'] || entries['get'](entry['key']) !== entry)
-        return ![];
+        return false;
       return (
         pushEvent(
           entry['nodeId'],
@@ -211,7 +211,7 @@ export function createChromeShellWebPreviewManager({
           },
           entry['tabId'],
         ),
-        !![]
+        true
       );
     } catch (error) {
       return (
@@ -221,11 +221,11 @@ export function createChromeShellWebPreviewManager({
           error,
           entry,
         ),
-        ![]
+        false
       );
     } finally {
-      ((entry['capturePending'] = ![]),
-        entry['captureQueued'] && ((entry['captureQueued'] = ![]), void captureSnapshot(entry)));
+      ((entry['capturePending'] = false),
+        entry['captureQueued'] && ((entry['captureQueued'] = false), void captureSnapshot(entry)));
     }
   }
   function scheduleSnapshot(entry, delayMs = 90) {
@@ -244,9 +244,9 @@ export function createChromeShellWebPreviewManager({
       entry &&
       !entry['disposing'] &&
       !entry['screencastUnavailable'] &&
-      entry['active'] === !![] &&
-      entry['visible'] === !![] &&
-      entry['selected'] === !![],
+      entry['active'] === true &&
+      entry['visible'] === true &&
+      entry['selected'] === true,
     );
   }
   function buildScreencastParams(entry) {
@@ -258,10 +258,10 @@ export function createChromeShellWebPreviewManager({
       everyNthFrame: 1,
     };
   }
-  async function reconcileScreencast(entry, { restart: restart = ![] } = {}) {
-    if (!entry || entry['disposing'] || !entry['sessionId']) return ![];
+  async function reconcileScreencast(entry, { restart: restart = false } = {}) {
+    if (!entry || entry['disposing'] || !entry['sessionId']) return false;
     entry['screencastDesired'] = shouldStream(entry);
-    if (restart && entry['screencastActive']) entry['screencastRestartRequested'] = !![];
+    if (restart && entry['screencastActive']) entry['screencastRestartRequested'] = true;
     if (entry['screencastReconcilePromise']) return entry['screencastReconcilePromise'];
     return (
       (entry['screencastReconcilePromise'] = (async () => {
@@ -269,7 +269,7 @@ export function createChromeShellWebPreviewManager({
           const desired = shouldStream(entry),
             shouldStop = entry['screencastActive'] && (!desired || entry['screencastRestartRequested']);
           if (shouldStop) {
-            entry['screencastRestartRequested'] = ![];
+            entry['screencastRestartRequested'] = false;
             if (entry['screencastFrameTimer']) clearTimeoutFn(entry['screencastFrameTimer']);
             ((entry['screencastFrameTimer'] = null), (entry['pendingScreencastFrame'] = null));
             try {
@@ -282,7 +282,7 @@ export function createChromeShellWebPreviewManager({
                 entry,
               );
             }
-            entry['screencastActive'] = ![];
+            entry['screencastActive'] = false;
             continue;
           }
           if (desired && !entry['screencastActive']) {
@@ -293,11 +293,11 @@ export function createChromeShellWebPreviewManager({
                   buildScreencastParams(entry),
                   entry['sessionId'],
                 ),
-                (entry['screencastActive'] = !![]),
+                (entry['screencastActive'] = true),
                 (entry['lastScreencastEmitAt'] = 0));
             } catch (error) {
-              ((entry['screencastUnavailable'] = !![]),
-                (entry['screencastDesired'] = ![]),
+              ((entry['screencastUnavailable'] = true),
+                (entry['screencastDesired'] = false),
                 logFailure(
                   'chrome_web_preview.screencast_start_failed',
                   'Chrome browser node live stream start failed; using snapshots',
@@ -318,7 +318,7 @@ export function createChromeShellWebPreviewManager({
   }
   function emitScreencastFrame(entry, data) {
     if (!data || !entry?.['screencastActive'] || !entry['active'] || !entry['visible'] || entry['disposing'])
-      return ![];
+      return false;
     return (
       (entry['lastScreencastEmitAt'] = now()),
       pushEvent(
@@ -326,7 +326,7 @@ export function createChromeShellWebPreviewManager({
         {
           type: 'snapshot',
           surfaceMode: 'remote-snapshot',
-          streaming: !![],
+          streaming: true,
           dataUrl: 'data:image/jpeg;base64,' + data,
           freezeToken: 'live',
           width: entry['visualWidth'] || entry['viewportWidth'] || 0,
@@ -335,7 +335,7 @@ export function createChromeShellWebPreviewManager({
         },
         entry['tabId'],
       ),
-      !![]
+      true
     );
   }
   function throttleScreencastFrame(entry, data) {
@@ -349,7 +349,7 @@ export function createChromeShellWebPreviewManager({
       );
     }
     entry['pendingScreencastFrame'] = data;
-    if (entry['screencastFrameTimer']) return ![];
+    if (entry['screencastFrameTimer']) return false;
     return (
       (entry['screencastFrameTimer'] = setTimeoutFn(
         () => {
@@ -359,14 +359,14 @@ export function createChromeShellWebPreviewManager({
         },
         Math['max'](0, SCREENCAST_MIN_FRAME_INTERVAL_MS - elapsed),
       )),
-      ![]
+      false
     );
   }
   async function navigate(entry, url) {
-    if (!entry?.['sessionId'] || !url || entry['url'] === url) return ![];
+    if (!entry?.['sessionId'] || !url || entry['url'] === url) return false;
     ((entry['url'] = url),
       (entry['requestedUrl'] = url),
-      pushEvent(entry['nodeId'], { type: 'loading', url: url, holdSnapshot: ![] }, entry['tabId']));
+      pushEvent(entry['nodeId'], { type: 'loading', url: url, holdSnapshot: false }, entry['tabId']));
     const result = await client['send']('Page.navigate', { url: url }, entry['sessionId']);
     if (result?.['errorText'])
       return (
@@ -375,9 +375,9 @@ export function createChromeShellWebPreviewManager({
           { type: 'failed', url: url, message: String(result['errorText']) },
           entry['tabId'],
         ),
-        ![]
+        false
       );
-    return !![];
+    return true;
   }
   async function attachTarget(entry, view) {
     const target = await createTarget();
@@ -385,7 +385,7 @@ export function createChromeShellWebPreviewManager({
     if (!entry['targetId']) throw new Error('Chrome did not create a browser target');
     const attached = await client['send']('Target.attachToTarget', {
       targetId: entry['targetId'],
-      flatten: !![],
+      flatten: true,
     });
     entry['sessionId'] = String(attached?.['sessionId'] || '');
     if (!entry['sessionId']) throw new Error('Chrome did not attach to the browser target');
@@ -393,7 +393,7 @@ export function createChromeShellWebPreviewManager({
       await client['send']('Page.enable', {}, entry['sessionId']),
       await client['send']('Runtime.enable', {}, entry['sessionId']),
       await applyViewport(entry, normalizeViewport(view)),
-      (entry['ready'] = !![]));
+      (entry['ready'] = true));
     if (entry['disposing']) return;
     await navigate(entry, normalizeHttpUrl(view?.['webUrl']));
   }
@@ -408,18 +408,18 @@ export function createChromeShellWebPreviewManager({
         sessionId: '',
         requestedUrl: '',
         url: '',
-        ready: ![],
-        disposing: ![],
-        active: view?.['active'] === !![],
-        visible: view?.['visible'] === !![],
-        selected: view?.['selected'] === !![],
-        capturePending: ![],
-        captureQueued: ![],
+        ready: false,
+        disposing: false,
+        active: view?.['active'] === true,
+        visible: view?.['visible'] === true,
+        selected: view?.['selected'] === true,
+        capturePending: false,
+        captureQueued: false,
         inputCaptureTimer: null,
-        screencastActive: ![],
-        screencastDesired: ![],
-        screencastUnavailable: ![],
-        screencastRestartRequested: ![],
+        screencastActive: false,
+        screencastDesired: false,
+        screencastUnavailable: false,
+        screencastRestartRequested: false,
         screencastReconcilePromise: null,
         lastScreencastEmitAt: 0,
         screencastFrameTimer: null,
@@ -457,11 +457,11 @@ export function createChromeShellWebPreviewManager({
       webUrl = normalizeHttpUrl(view?.['webUrl']);
     if (!nodeId || !webUrl) return null;
     const entry = entries['get'](key) || createEntry(view),
-      becameActive = entry['active'] !== !![] && view?.['active'] === !![],
-      becameSelected = entry['selected'] !== !![] && view?.['selected'] === !![];
-    ((entry['active'] = view?.['active'] === !![]),
-      (entry['visible'] = view?.['visible'] === !![]),
-      (entry['selected'] = view?.['selected'] === !![]));
+      becameActive = entry['active'] !== true && view?.['active'] === true,
+      becameSelected = entry['selected'] !== true && view?.['selected'] === true;
+    ((entry['active'] = view?.['active'] === true),
+      (entry['visible'] = view?.['visible'] === true),
+      (entry['selected'] = view?.['selected'] === true));
     try {
       await entry['readyPromise'];
       if (entry['disposing']) return null;
@@ -481,8 +481,8 @@ export function createChromeShellWebPreviewManager({
     }
   }
   async function disposeEntry(entry) {
-    if (!entry || entry['disposing']) return ![];
-    ((entry['disposing'] = !![]), entries['delete'](entry['key']));
+    if (!entry || entry['disposing']) return false;
+    ((entry['disposing'] = true), entries['delete'](entry['key']));
     if (entry['inputCaptureTimer']) clearTimeoutFn(entry['inputCaptureTimer']);
     entry['inputCaptureTimer'] = null;
     if (entry['screencastFrameTimer']) clearTimeoutFn(entry['screencastFrameTimer']);
@@ -495,14 +495,14 @@ export function createChromeShellWebPreviewManager({
       try {
         await client['send']('Page.stopScreencast', {}, entry['sessionId']);
       } catch {}
-      entry['screencastActive'] = ![];
+      entry['screencastActive'] = false;
     }
     if (entry['sessionId']) sessionEntries['delete'](entry['sessionId']);
     if (entry['targetId'])
       try {
         await client['send']('Target.closeTarget', { targetId: entry['targetId'] });
       } catch {}
-    return !![];
+    return true;
   }
   async function handleClientEvent(message = {}) {
     const entry = sessionEntries['get'](String(message?.['sessionId'] || ''));
@@ -512,7 +512,7 @@ export function createChromeShellWebPreviewManager({
       entry['requestedUrl'] &&
         pushEvent(
           entry['nodeId'],
-          { type: 'loading', url: entry['requestedUrl'], holdSnapshot: ![] },
+          { type: 'loading', url: entry['requestedUrl'], holdSnapshot: false },
           entry['tabId'],
         );
       return;
@@ -531,7 +531,7 @@ export function createChromeShellWebPreviewManager({
       (pushEvent(entry['nodeId'], { type: 'loaded' }, entry['tabId']),
         await Promise['all']([
           emitNavigationState(entry),
-          entry['screencastActive'] ? Promise['resolve'](!![]) : captureSnapshot(entry),
+          entry['screencastActive'] ? Promise['resolve'](true) : captureSnapshot(entry),
         ]));
       return;
     }
@@ -559,15 +559,15 @@ export function createChromeShellWebPreviewManager({
     const nodeId = normalizeNodeId(request?.['nodeId']),
       tabId = normalizeTabId(request?.['tabId']),
       action = String(request?.['action'] || '')['trim']();
-    if (!nodeId) return { ok: ![], error: 'missing-node' };
+    if (!nodeId) return { ok: false, error: 'missing-node' };
     const entry = entries['get'](toEntryKey(nodeId, tabId));
-    if (!entry) return { ok: ![], error: 'missing-view' };
+    if (!entry) return { ok: false, error: 'missing-view' };
     try {
       await entry['readyPromise'];
-      if (!entry['sessionId'] || entry['disposing']) return { ok: ![], error: 'missing-view' };
+      if (!entry['sessionId'] || entry['disposing']) return { ok: false, error: 'missing-view' };
       if (action === 'reload')
-        (pushEvent(nodeId, { type: 'loading', url: entry['url'], holdSnapshot: ![] }, tabId),
-          await client['send']('Page.reload', { ignoreCache: !![] }, entry['sessionId']));
+        (pushEvent(nodeId, { type: 'loading', url: entry['url'], holdSnapshot: false }, tabId),
+          await client['send']('Page.reload', { ignoreCache: true }, entry['sessionId']));
       else {
         if (action === 'back' || action === 'forward') {
           const history = await client['send']('Page.getNavigationHistory', {}, entry['sessionId']),
@@ -583,7 +583,7 @@ export function createChromeShellWebPreviewManager({
                 { type: 'blocked', message: action === 'back' ? '没有上一页' : '没有下一页' },
                 tabId,
               ),
-              { ok: ![], error: 'no-history', ...navigationState }
+              { ok: false, error: 'no-history', ...navigationState }
             );
           }
           await client['send'](
@@ -598,7 +598,7 @@ export function createChromeShellWebPreviewManager({
             if (input['kind'] === 'mouse') {
               const mouseType = String(input['type'] || '');
               if (!['mousePressed', 'mouseReleased', 'mouseMoved', 'mouseWheel']['includes'](mouseType))
-                return { ok: ![], error: 'unsupported-input' };
+                return { ok: false, error: 'unsupported-input' };
               const xRatio = Math['max'](0, Math['min'](1, Number(input['xRatio']) || 0)),
                 yRatio = Math['max'](0, Math['min'](1, Number(input['yRatio']) || 0));
               await client['send'](
@@ -635,7 +635,7 @@ export function createChromeShellWebPreviewManager({
                     unmodifiedText: keyType === 'keyDown' ? String(input['text'] || '') : '',
                     windowsVirtualKeyCode: Math['max'](0, Number(input['keyCode']) || 0),
                     nativeVirtualKeyCode: Math['max'](0, Number(input['keyCode']) || 0),
-                    autoRepeat: input['repeat'] === !![],
+                    autoRepeat: input['repeat'] === true,
                   },
                   entry['sessionId'],
                 );
@@ -648,10 +648,10 @@ export function createChromeShellWebPreviewManager({
                     entry['sessionId'],
                   ),
                     scheduleSnapshot(entry));
-                else return { ok: ![], error: 'unsupported-input' };
+                else return { ok: false, error: 'unsupported-input' };
               }
             }
-            return { ok: !![], action: action, tabId: tabId };
+            return { ok: true, action: action, tabId: tabId };
           } else {
             if (action === 'capture-reference') {
               const [referenceResult, screenshot, navigationState] = await Promise['all']([
@@ -659,21 +659,21 @@ export function createChromeShellWebPreviewManager({
                     'Runtime.evaluate',
                     {
                       expression: createReferenceSnapshotExpression(),
-                      returnByValue: !![],
-                      awaitPromise: !![],
+                      returnByValue: true,
+                      awaitPromise: true,
                     },
                     entry['sessionId'],
                   ),
                   client['send'](
                     'Page.captureScreenshot',
-                    { format: 'webp', quality: SNAPSHOT_QUALITY, fromSurface: !![], optimizeForSpeed: !![] },
+                    { format: 'webp', quality: SNAPSHOT_QUALITY, fromSurface: true, optimizeForSpeed: true },
                     entry['sessionId'],
                   ),
                   readNavigationState(entry),
                 ]),
                 reference = referenceResult?.['result']?.['value'] || {};
               return {
-                ok: !![],
+                ok: true,
                 action: action,
                 tabId: tabId,
                 pageUrl: String(reference?.['pageUrl'] || entry['url'] || entry['requestedUrl'] || ''),
@@ -683,21 +683,21 @@ export function createChromeShellWebPreviewManager({
                 capturedAt: new Date(now())['toISOString'](),
                 ...navigationState,
               };
-            } else return { ok: ![], error: 'unsupported-action' };
+            } else return { ok: false, error: 'unsupported-action' };
           }
         }
       }
-      return { ok: !![], action: action, tabId: tabId, ...(await emitNavigationState(entry)) };
+      return { ok: true, action: action, tabId: tabId, ...(await emitNavigationState(entry)) };
     } catch (error) {
       return (
         logFailure('chrome_web_preview.control_failed', 'Chrome browser node control failed', error, entry),
-        { ok: ![], error: String(error?.['message'] || error || 'control-failed') }
+        { ok: false, error: String(error?.['message'] || error || 'control-failed') }
       );
     }
   }
   return {
     async syncViews(payload = {}) {
-      if (disposed) return { ok: ![], error: 'disposed' };
+      if (disposed) return { ok: false, error: 'disposed' };
       const views = Array['isArray'](payload?.['views']) ? payload['views'] : [],
         activeKeys = new Set(),
         pending = [];
@@ -716,7 +716,7 @@ export function createChromeShellWebPreviewManager({
             ['map']((entry) => disposeEntry(entry)),
         ),
         {
-          ok: !![],
+          ok: true,
           count: entries['size'],
           visibleCount: [...entries['values']()]['filter']((entry) => entry['visible'])['length'],
         }
@@ -734,12 +734,12 @@ export function createChromeShellWebPreviewManager({
             : [],
         ),
         targets = [...entries['values']()]['filter']((entry) => {
-          if (nodeIds['size'] > 0 && !nodeIds['has'](entry['nodeId'])) return ![];
-          if (tabIds['size'] > 0 && !tabIds['has'](entry['tabId'])) return ![];
-          return nodeIds['size'] > 0 || tabIds['size'] > 0 || payload?.['all'] === !![];
+          if (nodeIds['size'] > 0 && !nodeIds['has'](entry['nodeId'])) return false;
+          if (tabIds['size'] > 0 && !tabIds['has'](entry['tabId'])) return false;
+          return nodeIds['size'] > 0 || tabIds['size'] > 0 || payload?.['all'] === true;
         }),
         disposedEntries = await Promise['all'](targets['map'](disposeEntry));
-      return { ok: !![], disposed: disposedEntries['filter'](Boolean)['length'] };
+      return { ok: true, disposed: disposedEntries['filter'](Boolean)['length'] };
     },
     controlView: controlView,
     consumeEvents() {
@@ -759,7 +759,7 @@ export function createChromeShellWebPreviewManager({
     },
     async dispose() {
       if (disposed) return;
-      ((disposed = !![]),
+      ((disposed = true),
         unsubscribe?.(),
         await Promise['all']([...entries['values']()]['map'](disposeEntry)),
         sessionEntries['clear'](),

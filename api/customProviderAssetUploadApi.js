@@ -106,12 +106,12 @@ export function isReusableCustomProviderAssetUrl(output, value2) {
       uRL2 = new URL(String(value2 || '')['trim']());
     return uRL['origin'] === uRL2['origin'] && /\/assets\/uploads\//i['test'](uRL['pathname']);
   } catch {
-    return ![];
+    return false;
   }
 }
 export async function uploadToCustomProviderAsset(enabled3, enabled4, value3 = {}) {
   if (!enabled3) throw new Error('中转站素材上传失败：文件不能为空');
-  if (isConfiguredObjectStorageEnabled() && value3['forceProviderUpload'] !== !![])
+  if (isConfiguredObjectStorageEnabled() && value3['forceProviderUpload'] !== true)
     return await uploadToConfiguredObjectStorage(enabled3, value3);
   if (!enabled4) throw new Error('中转站素材上传失败：API Key 未配置');
   const customProviderAssetOptions = resolveCustomProviderAssetOptions(value3);

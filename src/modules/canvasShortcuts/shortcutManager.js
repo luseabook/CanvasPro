@@ -11,7 +11,7 @@ function createDraftItem(name = null) {
     subtitle: '',
     badge: '',
     cover: '',
-    enabled: !![],
+    enabled: true,
     action: name ? { kind: 'graph', graph: structuredClone(name) } : { kind: 'node', nodeType: 'ai-image' },
   };
 }
@@ -30,8 +30,8 @@ export function openShortcutManager({
     const draftItem = createDraftItem(initialGraph);
     (args['items']['push'](draftItem), (item = draftItem['id']));
   }
-  let enabled = ![],
-    enabled2 = ![],
+  let enabled = false,
+    enabled2 = false,
     handler = () => {};
   const root = element('div', 'canvas-shortcuts-overlay');
   ((root['id'] = 'canvasShortcutsManager'),
@@ -49,20 +49,20 @@ export function openShortcutManager({
     },
     onClose = () => {
       if (enabled2) return;
-      ((enabled = !![]),
+      ((enabled = true),
         window['removeEventListener']('dev-mode-changed', options),
         window['removeEventListener']('aicanvas:runtime-info', options),
         handler(),
         root['remove']());
     },
     options = () => {
-      !canManageCanvasShortcuts() && ((enabled2 = ![]), onClose());
+      !canManageCanvasShortcuts() && ((enabled2 = false), onClose());
     },
     handler3 = () => {
       const enabled3 = run();
       if (!enabled3) return;
       root['querySelector']('.canvas-shortcuts-preview')['replaceChildren'](
-        createShortcutCard(enabled3, { preview: !![] }),
+        createShortcutCard(enabled3, { preview: true }),
       );
       const enabled4 = enabled3['action']['kind'] === 'graph';
       ((root['querySelector']('.canvas-shortcuts-graph')['hidden'] = !enabled4),
@@ -206,20 +206,20 @@ export function openShortcutManager({
                   } else {
                     if (enabled8 === 'save') {
                       if (!el['hidden'] && !el['reportValidity']()) return;
-                      ((enabled2 = !![]),
+                      ((enabled2 = true),
                         root['setAttribute']('aria-busy', 'true'),
                         el2['focus'](),
                         root['querySelectorAll']('button, input, select')['forEach']((el6) => {
-                          el6['disabled'] = !![];
+                          el6['disabled'] = true;
                         }),
                         handler2('正在保存…'));
                       try {
-                        (await catalogStore['save'](args, value['revision']), (enabled2 = ![]), onClose());
+                        (await catalogStore['save'](args, value['revision']), (enabled2 = false), onClose());
                       } finally {
-                        ((enabled2 = ![]),
+                        ((enabled2 = false),
                           root['removeAttribute']('aria-busy'),
                           root['querySelectorAll']('button, input, select')['forEach']((el7) => {
-                            el7['disabled'] = ![];
+                            el7['disabled'] = false;
                           }));
                         if (!enabled) root['querySelector']('[data-action="save"]')['focus']();
                       }

@@ -17,10 +17,10 @@ function resolveBrowserNodeMode(env = process['env']) {
 }
 function shouldKeepWebPreviewView(view = {}) {
   return (
-    view?.['visible'] === !![] ||
-    view?.['selected'] === !![] ||
-    view?.['fullscreen'] === !![] ||
-    view?.['pendingPopup'] === !![]
+    view?.['visible'] === true ||
+    view?.['selected'] === true ||
+    view?.['fullscreen'] === true ||
+    view?.['pendingPopup'] === true
   );
 }
 function createDeferredWebPreviewRuntime({
@@ -36,9 +36,9 @@ function createDeferredWebPreviewRuntime({
   let browserWorker = null,
     webPreviewManager = null,
     ensureRuntimePromise = null,
-    disposed = ![];
-  const createIdleSyncResult = () => ({ ok: !![], count: 0, visibleCount: 0 }),
-    createDisabledResult = () => ({ ok: ![], error: 'browser-node-disabled' });
+    disposed = false;
+  const createIdleSyncResult = () => ({ ok: true, count: 0, visibleCount: 0 }),
+    createDisabledResult = () => ({ ok: false, error: 'browser-node-disabled' });
   async function ensureRuntime() {
     if (disposed) return null;
     if (webPreviewManager) return webPreviewManager;
@@ -93,17 +93,17 @@ function createDeferredWebPreviewRuntime({
       if (keptViews['length'] === 0) return createIdleSyncResult();
       const runtime = await ensureRuntime();
       if (!runtime)
-        return mode === 'off' ? createDisabledResult() : { ok: ![], error: 'browser-node-unavailable' };
+        return mode === 'off' ? createDisabledResult() : { ok: false, error: 'browser-node-unavailable' };
       return runtime['syncViews'](nextPayload);
     },
     async disposeViews(payload = {}) {
-      if (!webPreviewManager) return { ok: !![], disposed: 0 };
+      if (!webPreviewManager) return { ok: true, disposed: 0 };
       return webPreviewManager['disposeViews'](payload);
     },
     async controlView(payload = {}) {
       const runtime = await ensureRuntime();
       if (!runtime)
-        return mode === 'off' ? createDisabledResult() : { ok: ![], error: 'browser-node-unavailable' };
+        return mode === 'off' ? createDisabledResult() : { ok: false, error: 'browser-node-unavailable' };
       return runtime['controlView'](payload);
     },
     consumeEvents() {
@@ -121,7 +121,7 @@ function createDeferredWebPreviewRuntime({
     },
     async dispose() {
       if (disposed) return;
-      disposed = !![];
+      disposed = true;
       try {
         await ensureRuntimePromise;
       } catch {}
@@ -169,12 +169,12 @@ export async function startChromeShellRuntime({
         })
       : null;
   let bridge = desktopHttpBridge,
-    ownsBridge = ![];
+    ownsBridge = false;
   if (!bridge) {
     if (typeof startHttpBridge !== 'function')
       throw new TypeError('Chrome shell desktop bridge factory is required');
     ((bridge = await startHttpBridge({ token: token, handlers: handlers, logEvent: logEvent })),
-      (ownsBridge = !![]),
+      (ownsBridge = true),
       (env['AIC_DESKTOP_BRIDGE_URL'] = bridge['url']),
       (env['AIC_DESKTOP_BRIDGE_TOKEN'] = bridge['token']));
   }
@@ -182,7 +182,7 @@ export async function startChromeShellRuntime({
     webPreviewRuntime = null,
     launch = null,
     rendererReadySettled = typeof waitForRendererReady !== 'function',
-    detached = ![],
+    detached = false,
     rejectRendererReady = null;
   const rendererReadyFailure = rendererReadySettled
     ? null
@@ -208,10 +208,10 @@ export async function startChromeShellRuntime({
         displayWorkAreas: displayWorkAreas,
         logEvent: logEvent,
         onClosed: (closeContext) => {
-          if (closeContext?.['detached'] === !![]) {
-            detached = !![];
-            if (launch) launch['detached'] = !![];
-            return ![];
+          if (closeContext?.['detached'] === true) {
+            detached = true;
+            if (launch) launch['detached'] = true;
+            return false;
           }
           (void webPreviewFacade?.['dispose']?.(), (webPreviewFacade = null));
           if (!rendererReadySettled) {
@@ -231,7 +231,7 @@ export async function startChromeShellRuntime({
                 context: closeContext,
               }),
               rejectRendererReady?.(startupError),
-              ![]
+              false
             );
           }
           return onClosed?.(closeContext);
@@ -240,10 +240,10 @@ export async function startChromeShellRuntime({
           const spawnError = normalizeChromeShellSpawnError(launchError);
           if (launch) launch['spawnError'] = spawnError;
           if (!rendererReadySettled) rejectRendererReady?.(spawnError);
-          return ![];
+          return false;
         },
       })));
-    if (detached) launch['detached'] = !![];
+    if (detached) launch['detached'] = true;
     if (launch?.['spawnError']) throw normalizeChromeShellSpawnError(launch['spawnError']);
     if (typeof waitForRendererReady === 'function') {
       stage = 'renderer-ready';
@@ -251,7 +251,7 @@ export async function startChromeShellRuntime({
         waitForRendererReady({ launch: launch }),
         rendererReadyFailure,
       ]);
-      ((rendererReadySettled = !![]),
+      ((rendererReadySettled = true),
         logEvent?.({
           type: 'chrome_shell.renderer_ready',
           level: 'info',
@@ -301,7 +301,7 @@ export async function startChromeShellRuntime({
         pid: launch?.['process']?.['pid'] ?? null,
         exitCode: launch?.['process']?.['exitCode'] ?? null,
         signalCode: launch?.['process']?.['signalCode'] ?? null,
-        detached: launch?.['detached'] === !![],
+        detached: launch?.['detached'] === true,
         browserPath: launch?.['browserPath'] || '',
         profileDir: launch?.['profileDir'] || '',
         ...launch?.['startupDiagnostics']?.['snapshot']?.(),
@@ -310,7 +310,7 @@ export async function startChromeShellRuntime({
       launch?.['startupDiagnostics']?.['stop']?.(),
       (await taskbarIdentityPreparation)?.['cancel']?.(),
       await webPreviewFacade?.['dispose']?.());
-    let launchClosed = ![];
+    let launchClosed = false;
     if (launch && typeof closeShellLaunch === 'function') {
       try {
         launchClosed = await closeShellLaunch({ launch: launch, env: env, platform: platform });
@@ -325,8 +325,8 @@ export async function startChromeShellRuntime({
         context: { closed: launchClosed },
       });
     }
-    if (!launchClosed && launch?.['detached'] === !![]) {
-      let windowClosed = ![];
+    if (!launchClosed && launch?.['detached'] === true) {
+      let windowClosed = false;
       try {
         windowClosed = await controlShellWindow({
           launch: launch,

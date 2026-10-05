@@ -214,7 +214,7 @@ function restoreStoryboard3DStoredFile(type2, key = globalThis['window']) {
       type2['relativePath'] &&
         type2['relativePath'] !== type2['name'] &&
         Object['defineProperty'](index, 'webkitRelativePath', {
-          configurable: !![],
+          configurable: true,
           value: type2['relativePath'],
         }),
       index
@@ -227,7 +227,7 @@ function restoreStoryboard3DStoredFile(type2, key = globalThis['window']) {
     webkitRelativePath: type2['relativePath'] || type2['name'],
   })) {
     try {
-      Object['defineProperty'](result, data, { configurable: !![], value: value2 });
+      Object['defineProperty'](result, data, { configurable: true, value: value2 });
     } catch {}
   }
   return result;
@@ -250,7 +250,7 @@ function renderObjectOutline(enabled3, list = [], { query: query = '', type: typ
       ['trim']()
       ['toLocaleLowerCase'](),
     list2 = enabled3['objects']['filter']((error) => {
-      if (type !== 'all' && error['type'] !== type) return ![];
+      if (type !== 'all' && error['type'] !== type) return false;
       return (
         !enabled4 || (error['name'] + ' ' + error['type'])['toLocaleLowerCase']()['includes'](enabled4)
       );
@@ -268,8 +268,8 @@ function renderObjectOutline(enabled3, list = [], { query: query = '', type: typ
       return count;
     };
   return list2['map']((error2) => {
-    const current = error2['visible'] !== ![],
-      entry = error2['locked'] === !![],
+    const current = error2['visible'] !== false,
+      entry = error2['locked'] === true,
       escapeHtml2 = escapeHtml(error2['name']);
     return (
       '<div draggable="true" class="storyboard-3d-object-row is-depth-' +
@@ -336,7 +336,7 @@ function renderObjectOutline(enabled3, list = [], { query: query = '', type: typ
     );
   })['join']('');
 }
-function renderShotStrip(enabled5, { timelineOpen: timelineOpen = ![] } = {}) {
+function renderShotStrip(enabled5, { timelineOpen: timelineOpen = false } = {}) {
   if (!enabled5) return '';
   const record =
       '<div class="storyboard-3d-shot-strip-heading">\n    <strong>' +
@@ -431,7 +431,7 @@ function renderStoryboard3DFocalControl(enabled6, value10) {
   if (!enabled6) return '';
   const storyboard3DFocalPresetIndex = resolveStoryboard3DFocalPresetIndex(value10),
     value11 = STORYBOARD_3D_FOCAL_LENGTH_PRESETS[storyboard3DFocalPresetIndex],
-    value12 = enabled6?.['background']?.['lockedCamera'] === !![],
+    value12 = enabled6?.['background']?.['lockedCamera'] === true,
     value13 = value12
       ? '背景机位已锁定，请先解除锁定再调整视口焦距'
       : '拖动调整视口焦距；添加摄像机时才会保存',
@@ -617,11 +617,11 @@ function renderPropControls(value32, value33) {
     '"></label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-prop-field="castShadow" data-object-id="' +
     escapeHtml(value32['id']) +
     '" ' +
-    (value32['castShadow'] !== ![] ? 'checked' : '') +
+    (value32['castShadow'] !== false ? 'checked' : '') +
     '>投射阴影</label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-prop-field="receiveShadow" data-object-id="' +
     escapeHtml(value32['id']) +
     '" ' +
-    (value32['receiveShadow'] !== ![] ? 'checked' : '') +
+    (value32['receiveShadow'] !== false ? 'checked' : '') +
     '>接收阴影</label>\n  </div>'
   );
 }
@@ -894,7 +894,7 @@ function renderLightControls(value73) {
     '"></label>\n    <label class="is-check"><input type="checkbox" data-storyboard-3d-light-field="castShadow" data-object-id="' +
     escapeHtml(value73['id']) +
     '" ' +
-    (value73['castShadow'] === !![] ? 'checked' : '') +
+    (value73['castShadow'] === true ? 'checked' : '') +
     '>投射阴影</label>\n  </div>'
   );
 }
@@ -938,7 +938,7 @@ function renderBackgroundCalibrationGuide(value75) {
     '%</span>\n  </div>'
   );
 }
-function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
+function renderSceneControls(error7, value79, value80 = {}, value81 = false) {
   const storyboard3DBackgroundCalibration2 = normalizeStoryboard3DBackgroundCalibration(
       error7?.['background'],
     ),
@@ -972,11 +972,11 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
       )
       ['join']('') +
     '\n      </select></label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="showGrid" ' +
-    (error7?.['environment']?.['showGrid'] !== ![] ? 'checked' : '') +
+    (error7?.['environment']?.['showGrid'] !== false ? 'checked' : '') +
     '>显示网格</label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="showOutline" ' +
-    (error7?.['environment']?.['showOutline'] !== ![] ? 'checked' : '') +
+    (error7?.['environment']?.['showOutline'] !== false ? 'checked' : '') +
     '>选择描边</label>\n      <label class="is-check"><input type="checkbox" data-storyboard-3d-scene-field="enableShadows" ' +
-    (error7?.['environment']?.['enableShadows'] !== ![] ? 'checked' : '') +
+    (error7?.['environment']?.['enableShadows'] !== false ? 'checked' : '') +
     '>启用阴影</label>\n      <label class="is-wide"><span>参考背景 URL</span><input type="url" value="' +
     escapeHtml(storyboard3DBackgroundCalibration2['imageUrl']) +
     '" placeholder="https://…" data-storyboard-3d-background-field="imageUrl"></label>\n      <label><span>水平 FOV</span><input type="number" min="10" max="170" step="1" value="' +
@@ -1036,7 +1036,7 @@ function renderSceneControls(error7, value79, value80 = {}, value81 = ![]) {
 }
 function renderNavigationSettings(
   value84,
-  { open: open = ![], viewportSettings: viewportSettings = {} } = {},
+  { open: open = false, viewportSettings: viewportSettings = {} } = {},
 ) {
   const value85 =
       STORYBOARD_3D_NAVIGATION_PRESETS[value84['preset']] || STORYBOARD_3D_NAVIGATION_PRESETS['unity'],
@@ -1164,11 +1164,11 @@ function renderStoryboard3DIconButton({
   dataShortcutTool: dataShortcutTool = '',
   dataSetting: dataSetting = '',
   className: className = '',
-  disabled: disabled = ![],
-  hidden: hidden = ![],
+  disabled: disabled = false,
+  hidden: hidden = false,
   title: title = '',
 }) {
-  const value92 = ['storyboard-3d-icon-button', className, active === !![] ? 'is-active' : '']
+  const value92 = ['storyboard-3d-icon-button', className, active === true ? 'is-active' : '']
       ['filter'](Boolean)
       ['join'](' '),
     value93 = dataTool ? ' data-tool="' + escapeHtml(dataTool) + '"' : '',
@@ -1230,7 +1230,7 @@ function renderStoryboard3DViewportSettingButton({
   icon: icon3,
   label: label3,
   active: active3,
-  hidden: hidden = ![],
+  hidden: hidden = false,
 }) {
   return renderStoryboard3DIconButton({
     action: 'toggle-viewport-setting',
@@ -1332,7 +1332,7 @@ function renderAIAssistant(error9 = {}) {
       allowedModelIds: getStoryboard3DTextModelIds(),
     }) +
     '\n        <div class="storyboard-3d-ai-actions">\n          <button type="button" data-storyboard-3d-action="toggle-ai-voice" ' +
-    (error9['voiceSupported'] === ![] ? 'disabled' : '') +
+    (error9['voiceSupported'] === false ? 'disabled' : '') +
     '>' +
     (['starting', 'listening', 'transcribing', 'stopping']['includes'](value105) ? '停止语音' : '语音输入') +
     '</button>\n          <button type="button" class="is-primary" data-storyboard-3d-action="run-ai-command" ' +
@@ -1529,7 +1529,7 @@ function renderAssetLibrarySidebar({
 }
 function renderAssetLibrary({
   assets: assets = [],
-  hasMore: hasMore = ![],
+  hasMore: hasMore = false,
   favoriteIds: favoriteIds = new Set(),
 } = {}) {
   return (
@@ -1624,7 +1624,7 @@ function renderMiniMap(
   value128,
   value129,
   {
-    expanded: expanded = ![],
+    expanded: expanded = false,
     zoom: zoom = 1,
     footprints: footprints = [],
     worldBounds: worldBounds = null,
@@ -1716,7 +1716,7 @@ function renderMiniMap(
 }
 function createMiniMapWorldBounds(value134, value135, value136 = []) {
   const list7 = Array['isArray'](value134?.['objects'])
-      ? value134['objects']['filter']((value137) => value137['visible'] !== ![])
+      ? value134['objects']['filter']((value137) => value137['visible'] !== false)
       : [],
     list8 = list7['map']((value138) => value138['transform']?.['position'] || [0, 0, 0]),
     map4 = new Set(list7['map']((value139) => value139['id'])),
@@ -1750,7 +1750,7 @@ function createMiniMapLayout(
   value151 = null,
 ) {
   const objects2 = Array['isArray'](value146?.['objects'])
-      ? value146['objects']['filter']((value152) => value152['visible'] !== ![])
+      ? value146['objects']['filter']((value152) => value152['visible'] !== false)
       : [],
     value153 = value150 || createMiniMapWorldBounds(value146, value147, value149),
     value154 = Math['max'](0.5, Math['min'](3, Number(value148) || 1)),
@@ -1866,7 +1866,7 @@ export class Storyboard3DEditorWorkspace {
       (this['onClose'] = onClose),
       (this['root'] = null),
       (this['_message'] = ''),
-      (this['_closed'] = ![]),
+      (this['_closed'] = false),
       (this['_serverAlertMutationObserver'] = null),
       (this['_serverAlertResizeObserver'] = null),
       (this['sceneRuntime'] = null),
@@ -1876,12 +1876,12 @@ export class Storyboard3DEditorWorkspace {
       (this['_selectionDrag'] = null),
       (this['_cameraDrag'] = null),
       (this['_flyKeys'] = new Set()),
-      (this['_flyBoost'] = ![]),
+      (this['_flyBoost'] = false),
       (this['_flyFrame'] = null),
       (this['_flyLastTime'] = 0),
       (this['_flySceneView'] = null),
       (this['_miniMapDrag'] = null),
-      (this['miniMapExpanded'] = ![]),
+      (this['miniMapExpanded'] = false),
       (this['miniMapZoom'] = 1),
       (this['miniMapWindowOffset'] = { x: 0, y: 0 }),
       (this['_miniMapFootprints'] = []),
@@ -1896,7 +1896,7 @@ export class Storyboard3DEditorWorkspace {
       (this['_rightSidebarResize'] = null),
       (this['timelineHeight'] = STORYBOARD_3D_TIMELINE_DEFAULT_HEIGHT),
       (this['_timelineResize'] = null),
-      (this['_suppressTimelineToggleClick'] = ![]),
+      (this['_suppressTimelineToggleClick'] = false),
       (this['_runtimeError'] = ''),
       (this['_runtimeFailureTitle'] = ''),
       (this['viewportControls'] = null),
@@ -1915,13 +1915,13 @@ export class Storyboard3DEditorWorkspace {
       (this['characterBoneSelection'] = new Map()),
       (this['outlineQuery'] = ''),
       (this['outlineType'] = 'all'),
-      (this['sceneEnvironmentOpen'] = ![]),
+      (this['sceneEnvironmentOpen'] = false),
       (this['importedModelScenes'] = new Map()),
       (this['modelPackApi'] = modelPackApi || {
         getStatus: getStoryboard3DModelPackStatus,
         fetchAssetFile: fetchStoryboard3DModelPackAssetFile,
       }),
-      (this['modelPackStatus'] = { loaded: ![], installed: ![], assets: [], error: '' }),
+      (this['modelPackStatus'] = { loaded: false, installed: false, assets: [], error: '' }),
       (this['_modelPackStatusPromise'] = null),
       (this['_packAssetLoads'] = new Map()),
       (this['binaryAssetRepository'] = binaryAssetRepository || createStoryboard3DBinaryAssetRepository()),
@@ -1940,7 +1940,7 @@ export class Storyboard3DEditorWorkspace {
       (this['modelImportJob'] = null),
       (this['modelImportState'] = null),
       (this['backgroundImageControllers'] = new Map()),
-      (this['exploreOpen'] = ![]),
+      (this['exploreOpen'] = false),
       (this['exploreFilter'] = 'all'),
       (this['exploreVariation'] = 0),
       (this['shotCandidates'] = []),
@@ -1950,7 +1950,7 @@ export class Storyboard3DEditorWorkspace {
     ((this['aiModelId'] = storyboard3DTextModelSelection['modelId']),
       (this['aiProvider'] = storyboard3DTextModelSelection['provider']),
       (this['_aiModelSelectorController'] = null),
-      (this['aiState'] = { status: 'idle', instruction: '', voiceSupported: ![] }),
+      (this['aiState'] = { status: 'idle', instruction: '', voiceSupported: false }),
       (this['exportController'] = createStoryboard3DExportController({
         documentObject: this['document'],
         windowObject: this['window'],
@@ -2008,7 +2008,7 @@ export class Storyboard3DEditorWorkspace {
       (this['_handleOutlineDragOver'] = this['_handleOutlineDragOver']['bind'](this)),
       (this['_handleOutlineDrop'] = this['_handleOutlineDrop']['bind'](this)),
       (this['_syncServerAlertOffset'] = this['_syncServerAlertOffset']['bind'](this)),
-      (this['editorStore'] = createStoryboard3DEditorStore({ inspectorOpen: ![] })),
+      (this['editorStore'] = createStoryboard3DEditorStore({ inspectorOpen: false })),
       (this['projectStore'] = createStoryboard3DProjectStore(project, {
         onPersist: (value165, value166) => this['_persistProject'](value165, value166),
       })),
@@ -2053,7 +2053,7 @@ export class Storyboard3DEditorWorkspace {
                 )),
                   (value176['actionId'] = 'standing'),
                   (value176['actionTime'] = 0),
-                  (value176['actionPlaying'] = ![]));
+                  (value176['actionPlaying'] = false));
                 break;
               }
               return value174;
@@ -2170,9 +2170,9 @@ export class Storyboard3DEditorWorkspace {
       root['addEventListener']('pointerdown', this['_handleTimelineResizePointerDown']),
       root['addEventListener']('pointerdown', this['_handleMiniMapPointerDown']),
       root['addEventListener']('wheel', (event7) => event7['stopPropagation'](), {
-        passive: !![],
+        passive: true,
       }),
-      root['addEventListener']('wheel', this['_handleMiniMapWheel'], { passive: ![] }),
+      root['addEventListener']('wheel', this['_handleMiniMapWheel'], { passive: false }),
       root['addEventListener']('click', this['_handleClick']),
       root['addEventListener']('input', this['_handleInput']),
       root['addEventListener']('change', this['_handleChange']),
@@ -2182,8 +2182,8 @@ export class Storyboard3DEditorWorkspace {
       (this['root'] = root),
       this['document']['body']['appendChild'](root),
       this['document']['body']['classList']['add']('storyboard-3d-editor-open'),
-      this['window']?.['addEventListener']?.('keydown', this['_handleWindowKeyDown'], !![]),
-      this['window']?.['addEventListener']?.('keyup', this['_handleWindowKeyUp'], !![]),
+      this['window']?.['addEventListener']?.('keydown', this['_handleWindowKeyDown'], true),
+      this['window']?.['addEventListener']?.('keyup', this['_handleWindowKeyUp'], true),
       this['window']?.['addEventListener']?.('blur', this['_handleWindowBlur']),
       this['window']?.['addEventListener']?.('resize', this['_syncServerAlertOffset']),
       this['_observeServerAlert'](),
@@ -2203,10 +2203,10 @@ export class Storyboard3DEditorWorkspace {
       typeof run3 === 'function' &&
       ((this['_serverAlertMutationObserver'] = new run3(this['_syncServerAlertOffset'])),
       this['_serverAlertMutationObserver']['observe'](value195, {
-        attributes: !![],
+        attributes: true,
         attributeFilter: ['style', 'class'],
-        childList: !![],
-        subtree: !![],
+        childList: true,
+        subtree: true,
       }));
     const run4 = this['window']?.['ResizeObserver'];
     if (typeof run4 === 'function') {
@@ -2251,18 +2251,18 @@ export class Storyboard3DEditorWorkspace {
       (this['_gizmoDrag'] = null),
       (this['_selectionDrag'] = null),
       (this['_cameraDrag'] = null),
-      this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]));
+      this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], true));
   }
-  ['_showRuntimeFailure'](value199, error12, { busy: busy = ![] } = {}) {
+  ['_showRuntimeFailure'](value199, error12, { busy: busy = false } = {}) {
     const el4 = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-status]');
     if (!el4) return;
     const value200 = String(error12?.['message'] || error12 || '')['trim']();
     !busy &&
       ((this['_runtimeFailureTitle'] = String(value199 || '3D 视口不可用')),
       (this['_runtimeError'] = value200 || this['_runtimeError'] || this['_runtimeFailureTitle']));
-    ((el4['hidden'] = ![]),
+    ((el4['hidden'] = false),
       (el4['dataset']['state'] = busy ? 'rebuilding' : 'error'),
       el4['replaceChildren']?.());
     if (typeof this['document']?.['createElement'] !== 'function') {
@@ -2286,26 +2286,26 @@ export class Storyboard3DEditorWorkspace {
   ['_hideRuntimeFailure']() {
     const el8 = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-status]');
     if (!el8) return;
-    ((el8['hidden'] = !![]),
+    ((el8['hidden'] = true),
       el8['removeAttribute']?.('data-state'),
       el8['replaceChildren']?.(),
       (this['_runtimeFailureTitle'] = ''));
   }
   ['_rebuildSceneRuntime']() {
-    if (this['_closed'] || !this['root']) return ![];
+    if (this['_closed'] || !this['root']) return false;
     const value201 = this['projectStore']['getSnapshot'](),
       value202 = this['editorStore']['getSnapshot']();
     (this['_disposeSceneRuntime'](),
       (this['_runtimeError'] = ''),
       (this['_runtimeFailureTitle'] = ''),
-      this['_showRuntimeFailure']('正在重建 3D 视口…', '', { busy: !![] }));
+      this['_showRuntimeFailure']('正在重建 3D 视口…', '', { busy: true }));
     const value203 = this['_mountSceneRuntime'](value201, value202);
     if (value203) this['_setMessage']('3D 视口已重建。');
     return value203;
   }
   ['_mountSceneRuntime'](project5, selectedObjectIds) {
     const container = this['root']?.['querySelector']?.('[data-storyboard-3d-runtime-host]');
-    if (!container) return ![];
+    if (!container) return false;
     let sceneRuntime = null;
     try {
       ((sceneRuntime = createStoryboard3DSceneRuntime({
@@ -2323,7 +2323,7 @@ export class Storyboard3DEditorWorkspace {
         container['addEventListener']('pointermove', this['_handleRuntimePointerHover']),
         container['addEventListener']('pointerleave', this['_handleRuntimePointerLeave']),
         container['addEventListener']('contextmenu', this['_handleRuntimeContextMenu']),
-        container['addEventListener']('wheel', this['_handleRuntimeWheel'], { passive: ![] }),
+        container['addEventListener']('wheel', this['_handleRuntimeWheel'], { passive: false }),
         (this['sceneRuntime'] = sceneRuntime),
         this['_scheduleMiniMapRefresh'](),
         (this['viewportControls'] = createStoryboard3DViewportControlSystem({
@@ -2380,14 +2380,14 @@ export class Storyboard3DEditorWorkspace {
           this['window']?.['setTimeout']?.(() => {
             if (!this['_closed']) void this['_generateMissingShotThumbnails'](activeStoryboard3DScene['id']);
           }, 0),
-        !![]
+        true
       );
     } catch (error13) {
       ((this['_runtimeError'] = error13?.['message'] || String(error13)),
         (this['_runtimeFailureTitle'] = '3D 视口初始化失败'));
       if (this['sceneRuntime'] === sceneRuntime) this['_disposeSceneRuntime']();
       else sceneRuntime?.['dispose']?.();
-      return (this['_showRuntimeFailure']('3D 视口初始化失败', this['_runtimeError']), ![]);
+      return (this['_showRuntimeFailure']('3D 视口初始化失败', this['_runtimeError']), false);
     }
   }
   async ['_renderShotCandidatePreviews'](project6, selectedObjectIds2) {
@@ -2411,7 +2411,7 @@ export class Storyboard3DEditorWorkspace {
         }),
         enabled12['renderNow']());
       try {
-        const value215 = await enabled12['captureBlob']({ includeEditorOverlays: ![] });
+        const value215 = await enabled12['captureBlob']({ includeEditorOverlays: false });
         if (value211 !== this['_candidateRenderToken']) return;
         if (value215 && typeof value212?.['createObjectURL'] === 'function') {
           value214['thumbnailUrl'] = value212['createObjectURL'](value215);
@@ -2462,35 +2462,35 @@ export class Storyboard3DEditorWorkspace {
   ['_generateShotThumbnail'](value218, value219) {
     return (
       (this['_shotThumbnailQueue'] = this['_shotThumbnailQueue']
-        ['catch'](() => ![])
+        ['catch'](() => false)
         ['then'](() => this['_generateShotThumbnailNow'](value218, value219))),
       this['_shotThumbnailQueue']
     );
   }
   async ['_generateShotThumbnailNow'](sceneId2, shotId) {
-    if (this['_closed'] || !this['sceneRuntime']) return ![];
+    if (this['_closed'] || !this['sceneRuntime']) return false;
     const value220 = this['projectStore']['getSnapshot'](),
       value221 = value220['scenes']['find']((value222) => value222['id'] === sceneId2),
       enabled13 = value221?.['shots']?.['find']((value223) => value223['id'] === shotId);
-    if (!enabled13) return ![];
+    if (!enabled13) return false;
     const storyboard3DShotThumbnailToken = createStoryboard3DShotThumbnailToken(sceneId2, enabled13);
     try {
       const value224 = await this['_renderShotFrame'](enabled13, { width: 320, height: 180 }),
         box9 = this['document']?.['createElement']?.('canvas');
-      if (!box9?.['getContext']) return ![];
+      if (!box9?.['getContext']) return false;
       ((box9['width'] = 320),
         (box9['height'] = 180),
         box9['getContext']('2d')?.['drawImage']?.(value224?.['image'] || value224, 0, 0, 320, 180));
       const previewUrl = box9['toDataURL']?.('image/jpeg', 0.78) || '';
       value224?.['close']?.();
-      if (!previewUrl) return ![];
+      if (!previewUrl) return false;
       const storyboard3DShotThumbnail = applyStoryboard3DShotThumbnail(
         this['projectStore']['getSnapshot'](),
         storyboard3DShotThumbnailToken,
         previewUrl,
         { now: Date['now']() },
       );
-      if (!storyboard3DShotThumbnail['applied']) return ![];
+      if (!storyboard3DShotThumbnail['applied']) return false;
       return (
         this['projectStore']['replaceProject'](storyboard3DShotThumbnail['project'], 'shot-thumbnail'),
         this['_render'](),
@@ -2500,10 +2500,10 @@ export class Storyboard3DEditorWorkspace {
           shotId: shotId,
           previewUrl: previewUrl,
         }),
-        !![]
+        true
       );
     } catch (error15) {
-      return (this['_setMessage'](error15?.['message'] || String(error15)), ![]);
+      return (this['_setMessage'](error15?.['message'] || String(error15)), false);
     }
   }
   async ['_generateMissingShotThumbnails'](value225) {
@@ -2583,8 +2583,8 @@ export class Storyboard3DEditorWorkspace {
   ['_restoreViewportFocalLength']() {
     const value235 = Number(this['viewportFocalLength']),
       enabled17 = this['_readCurrentCameraState']();
-    if (!Number['isFinite'](value235) || !enabled17) return ![];
-    return this['sceneRuntime']?.['setViewportFocalLength']?.(value235) === !![];
+    if (!Number['isFinite'](value235) || !enabled17) return false;
+    return this['sceneRuntime']?.['setViewportFocalLength']?.(value235) === true;
   }
   ['_previewShotTimelineSample'](enabled18) {
     if (!enabled18 || !this['sceneRuntime']) return;
@@ -2641,7 +2641,7 @@ export class Storyboard3DEditorWorkspace {
   ['_syncViewportSettingControls']() {
     for (const el21 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-viewport-setting]') || []) {
       const value237 = el21['getAttribute']('data-storyboard-3d-viewport-setting');
-      if (el21['type'] === 'checkbox') el21['checked'] = this['viewportSettings'][value237] === !![];
+      if (el21['type'] === 'checkbox') el21['checked'] = this['viewportSettings'][value237] === true;
       else {
         if (value237 === 'rotationSnapDegrees')
           el21['value'] = String(
@@ -2669,7 +2669,7 @@ export class Storyboard3DEditorWorkspace {
     for (const el23 of this['root']?.['querySelectorAll']?.('[data-storyboard-3d-navigation-setting]') ||
       []) {
       const value239 = el23['getAttribute']('data-storyboard-3d-navigation-setting');
-      if (el23['type'] === 'checkbox') el23['checked'] = this['navigationSettings'][value239] === !![];
+      if (el23['type'] === 'checkbox') el23['checked'] = this['navigationSettings'][value239] === true;
       else el23['value'] = String(this['navigationSettings'][value239]);
       const el24 = this['root']?.['querySelector']?.(
         '[data-storyboard-3d-navigation-output="' + value239 + '"]',
@@ -2816,7 +2816,7 @@ export class Storyboard3DEditorWorkspace {
           ['filter'](Boolean),
       ),
     ];
-    if (type4['length'] === 0) return ![];
+    if (type4['length'] === 0) return false;
     const value253 = this['projectStore']
         ['getSnapshot']()
         ['scenes']['find'](
@@ -2847,7 +2847,7 @@ export class Storyboard3DEditorWorkspace {
               return;
             }
             if (enabled23['type'] === 'group') {
-              objects3 = deleteStoryboard3DSceneGroup(objects3, value258, { deleteChildren: ![] });
+              objects3 = deleteStoryboard3DSceneGroup(objects3, value258, { deleteChildren: false });
               return;
             }
             objects3 = {
@@ -2862,7 +2862,7 @@ export class Storyboard3DEditorWorkspace {
     }),
       this['_setSelectedObjects']([]));
     if (value255) this['_setMessage'](value255);
-    return (this['_render'](), !![]);
+    return (this['_render'](), true);
   }
   ['_activateShotForCamera'](value264) {
     const value265 = this['projectStore']['getSnapshot'](),
@@ -2870,14 +2870,14 @@ export class Storyboard3DEditorWorkspace {
       enabled24 = activeStoryboard3DScene3?.['shots']?.['find'](
         (value266) => value266['cameraId'] === value264,
       );
-    if (!enabled24) return !![];
+    if (!enabled24) return true;
     const guardStoryboard3DBackgroundCameraChange3 = guardStoryboard3DBackgroundCameraChange(
       activeStoryboard3DScene3['background'],
       enabled24['camera'],
     );
     if (!guardStoryboard3DBackgroundCameraChange3['allowed'])
-      return (this['_setMessage'](guardStoryboard3DBackgroundCameraChange3['reason']), ![]);
-    return (this['projectStore']['selectShot'](enabled24['id']), !![]);
+      return (this['_setMessage'](guardStoryboard3DBackgroundCameraChange3['reason']), false);
+    return (this['projectStore']['selectShot'](enabled24['id']), true);
   }
   ['_focusCameraObject'](enabled25) {
     if (!enabled25) return;
@@ -2922,10 +2922,10 @@ export class Storyboard3DEditorWorkspace {
           sceneId: sceneId3,
           transforms: transforms,
           label: label5,
-          mergeKey: ![],
+          mergeKey: false,
         }),
       );
-      if (value275 !== ![]) this['_recordTransformedKeyframes'](transforms, activeTool);
+      if (value275 !== false) this['_recordTransformedKeyframes'](transforms, activeTool);
       return value275;
     };
     if (
@@ -2967,7 +2967,7 @@ export class Storyboard3DEditorWorkspace {
           setStoryboard3DShotInitialCamera(scene3, enabled26, storyboard3DBackgroundCamera2),
           (scene3['background'] = setStoryboard3DBackgroundCameraLock(
             updateStoryboard3DBackgroundCalibration3,
-            !![],
+            true,
             enabled26['camera'],
           )),
           value277
@@ -2975,13 +2975,13 @@ export class Storyboard3DEditorWorkspace {
       },
     });
     const value281 =
-      this['viewportControls']?.['updateSettings']?.({ groundLock: !![] }) ||
-      normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], groundLock: !![] });
+      this['viewportControls']?.['updateSettings']?.({ groundLock: true }) ||
+      normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], groundLock: true });
     (this['_saveTransformSettings'](value281),
       this['sceneRuntime']?.['setViewportUIPatch']?.(
         this['viewportControls']?.['getDirectorUIPatch']?.() || {},
       ),
-      (this['sceneEnvironmentOpen'] = !![]));
+      (this['sceneEnvironmentOpen'] = true));
   }
   async ['_reanalyzeActiveBackground']() {
     try {
@@ -3159,7 +3159,7 @@ export class Storyboard3DEditorWorkspace {
   async ['_loadModelPackStatus']() {
     try {
       const packId = await this['modelPackApi']['getStatus']();
-      this['modelPackStatus'] = { ...packId, loaded: !![], error: '' };
+      this['modelPackStatus'] = { ...packId, loaded: true, error: '' };
       if (this['_closed']) return this['modelPackStatus'];
       if (!packId['installed'])
         return (
@@ -3173,7 +3173,7 @@ export class Storyboard3DEditorWorkspace {
     } catch (error18) {
       const error19 = '无法读取 3D 模型包：' + (error18?.['message'] || String(error18));
       return (
-        (this['modelPackStatus'] = { loaded: !![], installed: ![], assets: [], error: error19 }),
+        (this['modelPackStatus'] = { loaded: true, installed: false, assets: [], error: error19 }),
         this['_setMessage'](error19),
         this['modelPackStatus']
       );
@@ -3389,9 +3389,9 @@ export class Storyboard3DEditorWorkspace {
       try {
         host?.['setPointerCapture']?.(startX['pointerId']);
       } catch {}
-      (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-        this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
-        this['window']?.['addEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]));
+      (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+        this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
+        this['window']?.['addEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], true));
       return;
     }
     if (startX['button'] !== 0) return;
@@ -3410,8 +3410,8 @@ export class Storyboard3DEditorWorkspace {
         flyMode['selectedObjectIds']['forEach']((value332) => {
           const value333 = sceneId4?.['objects']?.['find']((value334) => value334['id'] === value332);
           value333 &&
-            value333['visible'] !== ![] &&
-            value333['locked'] !== !![] &&
+            value333['visible'] !== false &&
+            value333['locked'] !== true &&
             canStoryboard3DObjectUseTransformTool(value333, flyMode['activeTool']) &&
             (initialTransforms[value332] = structuredClone(
               this['shotTimelineController']?.['getPreviewTransform']?.(value332) || value333['transform'],
@@ -3446,12 +3446,12 @@ export class Storyboard3DEditorWorkspace {
           try {
             startX['currentTarget']?.['setPointerCapture']?.(startX['pointerId']);
           } catch {}
-          (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-            this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
+          (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+            this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
             this['window']?.['addEventListener']?.(
               'pointercancel',
               this['_handleRuntimePointerCancel'],
-              !![],
+              true,
             ));
           return;
         }
@@ -3487,7 +3487,7 @@ export class Storyboard3DEditorWorkspace {
     const box10 = this['document']?.['createElement']?.('div') || null;
     box10 &&
       ((box10['className'] = 'storyboard-3d-selection-box'),
-      (box10['hidden'] = !![]),
+      (box10['hidden'] = true),
       host2['appendChild'](box10));
     ((this['_selectionDrag'] = {
       pointerId: pointerId['pointerId'],
@@ -3496,23 +3496,23 @@ export class Storyboard3DEditorWorkspace {
       start: { clientX: pointerId['clientX'], clientY: pointerId['clientY'] },
       initialObjectIds: [...args8],
       latestObjectIds: [...args8],
-      additive: pointerId['shiftKey'] === !![],
-      toggle: pointerId['ctrlKey'] === !![] || pointerId['metaKey'] === !![],
-      moved: ![],
+      additive: pointerId['shiftKey'] === true,
+      toggle: pointerId['ctrlKey'] === true || pointerId['metaKey'] === true,
+      moved: false,
     }),
       host2['classList']?.['add']?.('is-box-selecting'),
       this['sceneRuntime']?.['setGizmoHoverHandle']?.(null));
     try {
       host2['setPointerCapture']?.(pointerId['pointerId']);
     } catch {}
-    (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-      this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
-      this['window']?.['addEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]));
+    (this['window']?.['addEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+      this['window']?.['addEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
+      this['window']?.['addEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], true));
   }
   ['_cleanupRuntimeSelectionBox'](event10) {
-    (this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]),
+    (this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], true),
       event10?.['box']?.['remove']?.(),
       event10?.['host']?.['classList']?.['remove']?.('is-box-selecting'));
     try {
@@ -3521,8 +3521,8 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_finishRuntimeSelectionBox'](event11) {
     const event12 = this['_selectionDrag'];
-    if (!event12) return ![];
-    if (event12['pointerId'] != null && event11?.['pointerId'] !== event12['pointerId']) return ![];
+    if (!event12) return false;
+    if (event12['pointerId'] != null && event11?.['pointerId'] !== event12['pointerId']) return false;
     (event11?.['preventDefault']?.(),
       event11?.['stopImmediatePropagation']?.(),
       this['_cleanupRuntimeSelectionBox'](event12),
@@ -3532,19 +3532,19 @@ export class Storyboard3DEditorWorkspace {
       !event12['additive'] && !event12['toggle']
         ? (this['_setSelectedObjects']([]), this['_render']())
         : this['sceneRuntime']?.['setSelection']?.(event12['initialObjectIds']);
-    return !![];
+    return true;
   }
   ['_cancelRuntimeSelection'](event13) {
     const event14 = this['_selectionDrag'];
-    if (!event14) return ![];
-    if (event13 && event14['pointerId'] != null && event13['pointerId'] !== event14['pointerId']) return ![];
+    if (!event14) return false;
+    if (event13 && event14['pointerId'] != null && event13['pointerId'] !== event14['pointerId']) return false;
     return (
       event13?.['preventDefault']?.(),
       event13?.['stopImmediatePropagation']?.(),
       this['_cleanupRuntimeSelectionBox'](event14),
       (this['_selectionDrag'] = null),
       this['sceneRuntime']?.['setSelection']?.(event14['initialObjectIds']),
-      !![]
+      true
     );
   }
   ['_handleRuntimePointerHover'](event15) {
@@ -3654,8 +3654,8 @@ export class Storyboard3DEditorWorkspace {
     if (!enabled33) return;
     const value348 = this['sceneRuntime']['computeGizmoDragValue'](event18['dragState'], enabled33),
       updateStoryboard3DTransformSession2 = updateStoryboard3DTransformSession(event18, value348, {
-        precision: precision['shiftKey'] === !![],
-        toggleSnap: precision['ctrlKey'] === !![] || precision['metaKey'] === !![],
+        precision: precision['shiftKey'] === true,
+        toggleSnap: precision['ctrlKey'] === true || precision['metaKey'] === true,
       });
     this['sceneRuntime']['previewObjectTransforms']?.(updateStoryboard3DTransformSession2);
     if (event18['activeTool'] === 'move') {
@@ -3689,12 +3689,12 @@ export class Storyboard3DEditorWorkspace {
       if (event20['pointerId'] != null && event19?.['pointerId'] !== event20['pointerId']) return;
       (event19?.['preventDefault']?.(),
         event19?.['stopImmediatePropagation']?.(),
-        this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-        this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
+        this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+        this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
         this['window']?.['removeEventListener']?.(
           'pointercancel',
           this['_handleRuntimePointerCancel'],
-          !![],
+          true,
         ));
       try {
         event20['host']?.['releasePointerCapture']?.(event20['pointerId']);
@@ -3731,9 +3731,9 @@ export class Storyboard3DEditorWorkspace {
     if (sceneId5['pointerId'] != null && event19?.['pointerId'] !== sceneId5['pointerId']) return;
     (event19?.['preventDefault']?.(),
       event19?.['stopImmediatePropagation']?.(),
-      this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]),
+      this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], true),
       this['sceneRuntime']?.['clearPreviews']?.(),
       this['sceneRuntime']?.['clearGizmoState']?.(),
       sceneId5['host']?.['classList']?.['remove']?.('is-gizmo-dragging', 'is-gizmo-hovered'));
@@ -3750,20 +3750,20 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_cancelRuntimeTransform'](event21) {
     const event22 = this['_gizmoDrag'];
-    if (!event22) return ![];
-    if (event21 && event22['pointerId'] != null && event21['pointerId'] !== event22['pointerId']) return ![];
+    if (!event22) return false;
+    if (event21 && event22['pointerId'] != null && event21['pointerId'] !== event22['pointerId']) return false;
     (event21?.['preventDefault']?.(),
       event21?.['stopImmediatePropagation']?.(),
-      this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], !![]),
+      this['window']?.['removeEventListener']?.('pointermove', this['_handleRuntimePointerMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleRuntimePointerUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleRuntimePointerCancel'], true),
       this['sceneRuntime']?.['clearPreviews']?.(),
       this['sceneRuntime']?.['clearGizmoState']?.(),
       event22['host']?.['classList']?.['remove']?.('is-gizmo-dragging', 'is-gizmo-hovered'));
     try {
       event22['host']?.['releasePointerCapture']?.(event22['pointerId']);
     } catch {}
-    return ((this['_gizmoDrag'] = null), !![]);
+    return ((this['_gizmoDrag'] = null), true);
   }
   ['_handleRuntimePointerCancel'](value353) {
     if (this['_cancelRuntimeSelection'](value353)) return;
@@ -3812,9 +3812,9 @@ export class Storyboard3DEditorWorkspace {
           maxLeft: Math['max'](0, box15['width'] - box14['width'] - 28),
           maxDown: Math['max'](0, box15['height'] - box14['height'] - 28),
         }),
-        this['window']?.['addEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], !![]),
-        this['window']?.['addEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], !![]),
-        this['window']?.['addEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], !![]));
+        this['window']?.['addEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], true),
+        this['window']?.['addEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], true),
+        this['window']?.['addEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], true));
       return;
     }
     const el41 = startX2['target']?.['closest']?.('.storyboard-3d-mini-map-canvas [data-object-id]');
@@ -3847,9 +3847,9 @@ export class Storyboard3DEditorWorkspace {
       )['projection'],
       transform: structuredClone(objectId2['transform']),
     }),
-      this['window']?.['addEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], !![]),
-      this['window']?.['addEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], !![]),
-      this['window']?.['addEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], !![]));
+      this['window']?.['addEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], true),
+      this['window']?.['addEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], true),
+      this['window']?.['addEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], true));
   }
   ['_handleMiniMapPointerMove'](x5) {
     const x6 = this['_miniMapDrag'];
@@ -3917,7 +3917,7 @@ export class Storyboard3DEditorWorkspace {
   }
   ['_resolveMiniMapWorldBounds'](sceneId7, value360, value361 = []) {
     const list23 = (sceneId7?.['objects'] || [])
-        ['filter']((value362) => value362?.['visible'] !== ![])
+        ['filter']((value362) => value362?.['visible'] !== false)
         ['map']((value363) => String(value363['id'] || ''))
         ['filter'](Boolean)
         ['sort'](),
@@ -3944,9 +3944,9 @@ export class Storyboard3DEditorWorkspace {
     if (!sceneId8) return;
     (event24?.['preventDefault']?.(),
       event24?.['stopImmediatePropagation']?.(),
-      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], !![]),
+      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], true),
       this['sceneRuntime']?.['clearObjectTransformPreview']?.(sceneId8['objectId']),
       (this['_miniMapDrag'] = null),
       this['_commitObjectTransforms']({
@@ -3993,9 +3993,9 @@ export class Storyboard3DEditorWorkspace {
     (event27?.['preventDefault']?.(),
       event27?.['stopImmediatePropagation']?.(),
       (this['_miniMapWindowDrag'] = null),
-      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], !![]));
+      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], true));
   }
   ['_handleOutlineDragStart'](event28) {
     const el47 = event28['target']?.['closest']?.('.storyboard-3d-scene-item[data-scene-id]');
@@ -4113,14 +4113,14 @@ export class Storyboard3DEditorWorkspace {
     }
     this['_render']();
   }
-  ['_render']({ preserveAssetLibrary: preserveAssetLibrary = ![] } = {}) {
+  ['_render']({ preserveAssetLibrary: preserveAssetLibrary = false } = {}) {
     if (!this['root']) return;
     const captureTimelinePresentation2 = captureTimelinePresentation(this['root']),
       value377 = this['root']['querySelector']('.storyboard-3d-outline-list')?.['scrollTop'] || 0,
       el54 = this['root']['querySelector']('.storyboard-3d-object-properties-sidebar'),
       value378 = el54?.['dataset']['objectId'] || '',
       value379 = el54?.['querySelector']('.storyboard-3d-object-properties-content')?.['scrollTop'] || 0,
-      open2 = this['root']['querySelector']('.storyboard-3d-global-settings')?.['open'] === !![];
+      open2 = this['root']['querySelector']('.storyboard-3d-global-settings')?.['open'] === true;
     (this['_aiModelSelectorController']?.['destroy']?.(), (this['_aiModelSelectorController'] = null));
     const project8 = this['projectStore']['getSnapshot'](),
       active4 = this['editorStore']['getSnapshot'](),
@@ -4147,7 +4147,7 @@ export class Storyboard3DEditorWorkspace {
         : null;
     el55?.['remove']?.();
     const active6 = this['viewportControls']?.['getSnapshot']?.()['viewMode'] || 'perspective',
-      timelineOpen2 = this['shotTimelineController']?.['isDrawerOpen']?.() === !![],
+      timelineOpen2 = this['shotTimelineController']?.['isDrawerOpen']?.() === true,
       value382 =
         this['root']['getBoundingClientRect']?.()['height'] || this['window']?.['innerHeight'] || 900,
       storyboard3DTimelineHeight = normalizeStoryboard3DTimelineHeight(this['timelineHeight'], value382);
@@ -4492,7 +4492,7 @@ export class Storyboard3DEditorWorkspace {
     value387 && value378 && value378 === object2?.['id'] && (value387['scrollTop'] = value379);
     el55 &&
       (this['root']['querySelector']('.storyboard-3d-editor-main')?.['append']?.(el55),
-      el56?.['focus']?.({ preventScroll: !![] }));
+      el56?.['focus']?.({ preventScroll: true }));
     const value388 = this['root']['querySelector']('[data-storyboard-3d-runtime-host]');
     if (el57 && value388 && this['sceneRuntime']) {
       value388['replaceWith'](el57);
@@ -4559,7 +4559,7 @@ export class Storyboard3DEditorWorkspace {
     const splitter = event31['target']?.['closest']?.('[data-storyboard-3d-inspector-splitter]');
     if (
       !splitter ||
-      event31['isPrimary'] === ![] ||
+      event31['isPrimary'] === false ||
       (Number['isFinite'](event31['button']) && event31['button'] !== 0)
     )
       return;
@@ -4579,9 +4579,9 @@ export class Storyboard3DEditorWorkspace {
     }),
       this['document']?.['body']?.['classList']?.['add']?.('storyboard-3d-inspector-resizing'),
       this['_applyInspectorWidth'](bounds['right'] - Number(event31['clientX']), layout),
-      this['window']?.['addEventListener']?.('pointermove', this['_handleInspectorResizePointerMove'], !![]),
-      this['window']?.['addEventListener']?.('pointerup', this['_handleInspectorResizePointerUp'], !![]),
-      this['window']?.['addEventListener']?.('pointercancel', this['_handleInspectorResizePointerUp'], !![]));
+      this['window']?.['addEventListener']?.('pointermove', this['_handleInspectorResizePointerMove'], true),
+      this['window']?.['addEventListener']?.('pointerup', this['_handleInspectorResizePointerUp'], true),
+      this['window']?.['addEventListener']?.('pointercancel', this['_handleInspectorResizePointerUp'], true));
   }
   ['_handleInspectorResizePointerMove'](event32) {
     const event33 = this['_inspectorResize'];
@@ -4607,13 +4607,13 @@ export class Storyboard3DEditorWorkspace {
     (this['window']?.['removeEventListener']?.(
       'pointermove',
       this['_handleInspectorResizePointerMove'],
-      !![],
+      true,
     ),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleInspectorResizePointerUp'], !![]),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleInspectorResizePointerUp'], true),
       this['window']?.['removeEventListener']?.(
         'pointercancel',
         this['_handleInspectorResizePointerUp'],
-        !![],
+        true,
       ));
   }
   ['_applyRightSidebarWidth'](value394, value395 = null) {
@@ -4636,7 +4636,7 @@ export class Storyboard3DEditorWorkspace {
     const splitter2 = event36['target']?.['closest']?.('[data-storyboard-3d-right-sidebar-splitter]');
     if (
       !splitter2 ||
-      event36['isPrimary'] === ![] ||
+      event36['isPrimary'] === false ||
       (Number['isFinite'](event36['button']) && event36['button'] !== 0)
     )
       return;
@@ -4660,13 +4660,13 @@ export class Storyboard3DEditorWorkspace {
       this['window']?.['addEventListener']?.(
         'pointermove',
         this['_handleRightSidebarResizePointerMove'],
-        !![],
+        true,
       ),
-      this['window']?.['addEventListener']?.('pointerup', this['_handleRightSidebarResizePointerUp'], !![]),
+      this['window']?.['addEventListener']?.('pointerup', this['_handleRightSidebarResizePointerUp'], true),
       this['window']?.['addEventListener']?.(
         'pointercancel',
         this['_handleRightSidebarResizePointerUp'],
-        !![],
+        true,
       ));
   }
   ['_handleRightSidebarResizePointerMove'](event37) {
@@ -4690,17 +4690,17 @@ export class Storyboard3DEditorWorkspace {
     (this['window']?.['removeEventListener']?.(
       'pointermove',
       this['_handleRightSidebarResizePointerMove'],
-      !![],
+      true,
     ),
       this['window']?.['removeEventListener']?.(
         'pointerup',
         this['_handleRightSidebarResizePointerUp'],
-        !![],
+        true,
       ),
       this['window']?.['removeEventListener']?.(
         'pointercancel',
         this['_handleRightSidebarResizePointerUp'],
-        !![],
+        true,
       ));
   }
   ['_applyTimelineHeight'](value397, value398 = null) {
@@ -4724,7 +4724,7 @@ export class Storyboard3DEditorWorkspace {
     const handle2 = event41['target']?.['closest']?.('[data-storyboard-3d-timeline-resize-handle]');
     if (
       !handle2 ||
-      event41['isPrimary'] === ![] ||
+      event41['isPrimary'] === false ||
       (Number['isFinite'](event41['button']) && event41['button'] !== 0)
     )
       return;
@@ -4742,11 +4742,11 @@ export class Storyboard3DEditorWorkspace {
       column: column,
       startHeight: Number(value400) || this['timelineHeight'],
       startY: Number(event41['clientY']),
-      moved: ![],
+      moved: false,
     }),
-      this['window']?.['addEventListener']?.('pointermove', this['_handleTimelineResizePointerMove'], !![]),
-      this['window']?.['addEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], !![]),
-      this['window']?.['addEventListener']?.('pointercancel', this['_handleTimelineResizePointerUp'], !![]));
+      this['window']?.['addEventListener']?.('pointermove', this['_handleTimelineResizePointerMove'], true),
+      this['window']?.['addEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], true),
+      this['window']?.['addEventListener']?.('pointercancel', this['_handleTimelineResizePointerUp'], true));
   }
   ['_handleTimelineResizePointerMove'](event42) {
     const event43 = this['_timelineResize'];
@@ -4757,9 +4757,9 @@ export class Storyboard3DEditorWorkspace {
     (event42['preventDefault']?.(),
       event42['stopImmediatePropagation']?.(),
       !event43['moved'] &&
-        ((event43['moved'] = !![]),
-        (this['_suppressTimelineToggleClick'] = !![]),
-        this['shotTimelineController']?.['setDrawerOpen']?.(!![]),
+        ((event43['moved'] = true),
+        (this['_suppressTimelineToggleClick'] = true),
+        this['shotTimelineController']?.['setDrawerOpen']?.(true),
         this['document']?.['body']?.['classList']?.['add']?.('storyboard-3d-timeline-resizing')),
       this['_applyTimelineHeight'](event43['startHeight'] + event43['startY'] - value401, event43['column']));
   }
@@ -4773,16 +4773,16 @@ export class Storyboard3DEditorWorkspace {
       event45['handle']['hasPointerCapture']?.(event45['pointerId']) &&
         event45['handle']['releasePointerCapture']?.(event45['pointerId']);
     } catch {}
-    (this['window']?.['removeEventListener']?.('pointermove', this['_handleTimelineResizePointerMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], !![]),
+    (this['window']?.['removeEventListener']?.('pointermove', this['_handleTimelineResizePointerMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], true),
       this['window']?.['removeEventListener']?.(
         'pointercancel',
         this['_handleTimelineResizePointerUp'],
-        !![],
+        true,
       ));
     if (event45['moved']) {
       const value402 = () => {
-        this['_suppressTimelineToggleClick'] = ![];
+        this['_suppressTimelineToggleClick'] = false;
       };
       typeof this['window']?.['setTimeout'] === 'function'
         ? this['window']['setTimeout'](value402, 0)
@@ -4792,22 +4792,22 @@ export class Storyboard3DEditorWorkspace {
   ['_openAssetLibrary']() {
     ((this['assetVisibleLimit'] = Math['max'](32, this['assetVisibleLimit'])),
       (this['rightSidebarMode'] = 'assets'),
-      this['editorStore']['setAssetLibraryOpen'](!![]),
+      this['editorStore']['setAssetLibraryOpen'](true),
       this['_render'](),
       this['root']?.['querySelector']?.('[data-storyboard-3d-asset-query]')?.['focus']?.());
   }
   ['_openBackgroundPerspective']() {
     ((this['rightSidebarMode'] = 'perspective'),
-      this['editorStore']['setAssetLibraryOpen'](![]),
+      this['editorStore']['setAssetLibraryOpen'](false),
       this['_assetThumbnailObserver']?.['disconnect']?.(),
       (this['_assetThumbnailObserver'] = null),
       this['_render']());
   }
-  ['_setSelectedObjects'](value403, { openProperties: openProperties = !![] } = {}) {
+  ['_setSelectedObjects'](value403, { openProperties: openProperties = true } = {}) {
     const value404 = this['editorStore']['setSelectedObjects'](value403);
     if (openProperties && value404['selectedObjectIds']['length'] > 0) {
       this['rightSidebarMode'] = 'object';
-      if (value404['assetLibraryOpen']) this['editorStore']['setAssetLibraryOpen'](![]);
+      if (value404['assetLibraryOpen']) this['editorStore']['setAssetLibraryOpen'](false);
       (this['_assetThumbnailObserver']?.['disconnect']?.(), (this['_assetThumbnailObserver'] = null));
     } else
       value404['selectedObjectIds']['length'] === 0 &&
@@ -4818,7 +4818,7 @@ export class Storyboard3DEditorWorkspace {
   ['_toggleAIAssistant']() {
     const value405 = this['rightSidebarMode'] !== 'ai';
     ((this['rightSidebarMode'] = value405 ? 'ai' : null),
-      this['editorStore']['setAssetLibraryOpen'](![]),
+      this['editorStore']['setAssetLibraryOpen'](false),
       this['_assetThumbnailObserver']?.['disconnect']?.(),
       (this['_assetThumbnailObserver'] = null),
       this['_render']());
@@ -4933,22 +4933,22 @@ export class Storyboard3DEditorWorkspace {
     if (this['_flyFrame'] != null) value413?.(this['_flyFrame']);
     ((this['_flyFrame'] = null), (this['_flyLastTime'] = 0));
   }
-  ['_finishFlyMovement']({ clearKeys: clearKeys = ![] } = {}) {
+  ['_finishFlyMovement']({ clearKeys: clearKeys = false } = {}) {
     this['_stopFlyMovementFrame']();
     const value414 = this['_flySceneView'];
     if (value414) this['sceneRuntime']?.['commitSceneView']?.(value414);
     ((this['_flySceneView'] = null),
       (this['_miniMapPreviewSceneView'] = null),
       this['_scheduleMiniMapRefresh'](),
-      clearKeys && (this['_flyKeys']['clear'](), (this['_flyBoost'] = ![])),
+      clearKeys && (this['_flyKeys']['clear'](), (this['_flyBoost'] = false)),
       !this['_closed'] &&
         value414 &&
         this['shotTimelineController']?.['isAutoKeyEnabled']?.() &&
         this['shotTimelineController']['recordCameraKeyframe'](this['_readCurrentCameraState']()));
   }
   ['_setFlyMode'](value415) {
-    const enabled37 = value415 === !![];
-    if (!enabled37) this['_finishFlyMovement']({ clearKeys: !![] });
+    const enabled37 = value415 === true;
+    if (!enabled37) this['_finishFlyMovement']({ clearKeys: true });
     (enabled37 &&
       this['viewportControls']?.['getSnapshot']?.()['viewMode'] !== 'perspective' &&
       this['viewportControls']['showPerspectiveView']?.(),
@@ -4966,22 +4966,22 @@ export class Storyboard3DEditorWorkspace {
     if (!enabled38 && !enabled39) return;
     (event46['preventDefault']?.(), event46['stopImmediatePropagation']?.());
     if (enabled38) this['_flyKeys']['delete'](enabled38);
-    if (enabled39) this['_flyBoost'] = ![];
+    if (enabled39) this['_flyBoost'] = false;
     if (this['_flyKeys']['size'] === 0) {
       if (this['_cameraDrag']?.['mode'] === 'fly-look') this['_stopFlyMovementFrame']();
       else this['_finishFlyMovement']();
     }
   }
   ['_handleWindowBlur']() {
-    (this['_finishFlyMovement']({ clearKeys: !![] }),
+    (this['_finishFlyMovement']({ clearKeys: true }),
       this['_cancelRuntimeSelection'](),
       this['_cancelRuntimeTransform'](),
-      this['shotTimelineController']?.['stopPlayback']?.({ clear: !![] }));
+      this['shotTimelineController']?.['stopPlayback']?.({ clear: true }));
   }
   ['_toggleNavigationSettings']() {
     const enabled40 = this['root']?.['querySelector']?.('.storyboard-3d-global-settings');
-    if (!enabled40) return ![];
-    return ((enabled40['open'] = !enabled40['open']), !![]);
+    if (!enabled40) return false;
+    return ((enabled40['open'] = !enabled40['open']), true);
   }
   ['_handleWindowKeyDown'](event47) {
     if (!this['root']) return;
@@ -5015,7 +5015,7 @@ export class Storyboard3DEditorWorkspace {
     if (el68 && ['ArrowUp', 'ArrowDown']['includes'](event47['key'])) {
       (event47['preventDefault'](), event47['stopImmediatePropagation']());
       const value419 = event47['shiftKey'] ? 64 : 24;
-      (this['shotTimelineController']?.['setDrawerOpen']?.(!![]),
+      (this['shotTimelineController']?.['setDrawerOpen']?.(true),
         this['_applyTimelineHeight'](
           this['timelineHeight'] + (event47['key'] === 'ArrowUp' ? value419 : -value419),
           el68['closest']?.('.storyboard-3d-viewport-column'),
@@ -5075,7 +5075,7 @@ export class Storyboard3DEditorWorkspace {
       if (value423 || value424) {
         (event47['preventDefault'](), event47['stopImmediatePropagation']());
         if (value423) this['_flyKeys']['add'](value423);
-        if (value424 || event47['shiftKey']) this['_flyBoost'] = !![];
+        if (value424 || event47['shiftKey']) this['_flyBoost'] = true;
         this['_scheduleFlyMovement']();
         return;
       }
@@ -5093,7 +5093,7 @@ export class Storyboard3DEditorWorkspace {
       if (this['_cancelRuntimeSelection']()) return;
       if (this['_cancelRuntimeTransform']()) return;
       if (this['editorStore']['getSnapshot']()['flyMode']) {
-        this['_setFlyMode'](![]);
+        this['_setFlyMode'](false);
         return;
       }
       if (this['editorStore']['getSnapshot']()['selectedObjectIds']['length'] > 0) {
@@ -5152,7 +5152,7 @@ export class Storyboard3DEditorWorkspace {
     (this['_executeMutation']({
       type: 'add-object',
       label: 'Add asset',
-      renderOptions: { preserveAssetLibrary: !![] },
+      renderOptions: { preserveAssetLibrary: true },
       mutate: (value428) => {
         const enabled42 = value428['scenes']['find'](
           (value429) => value429['id'] === value428['activeSceneId'],
@@ -5166,14 +5166,14 @@ export class Storyboard3DEditorWorkspace {
             id: createLocalId(type5 ? 'character' : 'prop'),
             type: type5 ? 'character' : 'prop',
             name: name['name'],
-            visible: !![],
-            locked: ![],
+            visible: true,
+            locked: false,
             transform: { position: position3, rotation: [0, 0, 0], scale: [1, 1, 1] },
             ...(type5
               ? {
                   bodyPresetId: bodyPresetId || 'adult-male',
                   actionId: 'standing',
-                  actionPlaying: ![],
+                  actionPlaying: false,
                   leftHandPoseId: 'relaxed',
                   rightHandPoseId: 'relaxed',
                   boneOverrides: {},
@@ -5181,8 +5181,8 @@ export class Storyboard3DEditorWorkspace {
               : {
                   assetId: name['source']?.['assetId'] || name['id'],
                   ...(name['tint'] ? { tint: name['tint'] } : {}),
-                  castShadow: !![],
-                  receiveShadow: !![],
+                  castShadow: true,
+                  receiveShadow: true,
                 }),
           };
         return (enabled42['objects']['push'](value431), (value427 = value431['id']), value428);
@@ -5190,15 +5190,15 @@ export class Storyboard3DEditorWorkspace {
     }),
       this['assetLibrary']['markUsed'](name['id']),
       value427 &&
-        (this['_setSelectedObjects']([value427], { openProperties: ![] }),
-        this['_render']({ preserveAssetLibrary: !![] })));
+        (this['_setSelectedObjects']([value427], { openProperties: false }),
+        this['_render']({ preserveAssetLibrary: true })));
   }
   ['_handleClick'](event48) {
     const el69 = event48['target']?.['closest']?.('[data-storyboard-3d-action]');
     if (!el69 || el69['disabled']) return;
     const type6 = el69['getAttribute']('data-storyboard-3d-action');
     if (type6 === 'timeline-toggle-drawer' && this['_suppressTimelineToggleClick']) {
-      ((this['_suppressTimelineToggleClick'] = ![]),
+      ((this['_suppressTimelineToggleClick'] = false),
         event48['preventDefault']?.(),
         event48['stopImmediatePropagation']?.());
       return;
@@ -5270,7 +5270,7 @@ export class Storyboard3DEditorWorkspace {
       const args14 =
           value434 === 'transformSpace'
             ? { transformSpace: this['viewportSettings']['transformSpace'] === 'local' ? 'world' : 'local' }
-            : { [value434]: this['viewportSettings'][value434] !== !![] },
+            : { [value434]: this['viewportSettings'][value434] !== true },
         value435 =
           this['viewportControls']?.['updateSettings']?.(args14) ||
           normalizeStoryboard3DViewportSettings({ ...this['viewportSettings'], ...args14 });
@@ -5338,7 +5338,7 @@ export class Storyboard3DEditorWorkspace {
           return (
             value442 &&
               (value442[value438] =
-                value438 === 'visible' ? value442['visible'] === ![] : value442['locked'] !== !![]),
+                value438 === 'visible' ? value442['visible'] === false : value442['locked'] !== true),
             value439
           );
         },
@@ -5404,7 +5404,7 @@ export class Storyboard3DEditorWorkspace {
           count: 9,
           variation: 0,
         })),
-        (this['exploreOpen'] = !![]),
+        (this['exploreOpen'] = true),
         this['_render']());
       return;
     }
@@ -5429,7 +5429,7 @@ export class Storyboard3DEditorWorkspace {
       return;
     }
     if (type6 === 'close-explore') {
-      ((this['exploreOpen'] = ![]), this['_clearShotCandidates'](), this['_render']());
+      ((this['exploreOpen'] = false), this['_clearShotCandidates'](), this['_render']());
       return;
     }
     if (type6 === 'preview-candidate') {
@@ -5476,7 +5476,7 @@ export class Storyboard3DEditorWorkspace {
           );
         },
       }),
-        (this['exploreOpen'] = ![]),
+        (this['exploreOpen'] = false),
         this['_clearShotCandidates'](),
         this['_render']());
       const activeStoryboard3DScene13 = getActiveStoryboard3DScene(this['projectStore']['getSnapshot']()),
@@ -5861,10 +5861,10 @@ export class Storyboard3DEditorWorkspace {
               lightType: 'directional',
               color: '#ffffff',
               intensity: 1,
-              visible: !![],
-              locked: ![],
+              visible: true,
+              locked: false,
               transform: { position: [3, 5, 3], rotation: [0, 0, 0], scale: [1, 1, 1] },
-              castShadow: !![],
+              castShadow: true,
             }),
             value503
           );
@@ -6220,7 +6220,7 @@ export class Storyboard3DEditorWorkspace {
               (Math['max'](1, Math['min'](179, Number['isFinite'](value557) ? value557 : 30)) *
                 Math['PI']) /
               180);
-          if (value556 === 'castShadow') value561['castShadow'] = value557 === !![];
+          if (value556 === 'castShadow') value561['castShadow'] = value557 === true;
           if (value556 === 'color' && /^#[0-9a-f]{6}$/i['test'](value557)) value561['color'] = value557;
           return (
             value556 === 'lightType' &&
@@ -6249,7 +6249,7 @@ export class Storyboard3DEditorWorkspace {
             value569 = value567?.['objects']?.['find']((value570) => value570['id'] === value563);
           if (value569?.['type'] !== 'prop') return value566;
           if (value564 === 'tint' && /^#[0-9a-f]{6}$/i['test'](value565)) value569['tint'] = value565;
-          if (['castShadow', 'receiveShadow']['includes'](value564)) value569[value564] = value565 === !![];
+          if (['castShadow', 'receiveShadow']['includes'](value564)) value569[value564] = value565 === true;
           return value566;
         },
       });
@@ -6298,7 +6298,7 @@ export class Storyboard3DEditorWorkspace {
           );
           if (!showGrid) return value579;
           ['showGrid', 'showOutline', 'enableShadows']['includes'](value577) &&
-            (showGrid['environment'][value577] = value578 === !![]);
+            (showGrid['environment'][value577] = value578 === true);
           if (['empty', 'outdoor', 'indoor', 'studio']['includes'](value578))
             return applyStoryboard3DEnvironmentPreset(value579, showGrid['id'], value578, {
               overrides: {
@@ -6370,7 +6370,7 @@ export class Storyboard3DEditorWorkspace {
             (setStoryboard3DShotInitialCamera(enabled51, value585, storyboard3DBackgroundCamera3),
               (enabled51['background'] = setStoryboard3DBackgroundCameraLock(
                 updateStoryboard3DBackgroundCalibration4,
-                !![],
+                true,
                 value585['camera'],
               )));
           } else {
@@ -6384,7 +6384,7 @@ export class Storyboard3DEditorWorkspace {
       return;
     }
     if (event50['target']?.['matches']?.('[data-storyboard-3d-background-lock]')) {
-      const label6 = event50['target']['checked'] === !![];
+      const label6 = event50['target']['checked'] === true;
       this['_executeMutation']({
         type: 'set-background-camera-lock',
         label: label6 ? 'Lock background camera' : 'Unlock background camera',
@@ -6429,7 +6429,7 @@ export class Storyboard3DEditorWorkspace {
                 'includes'
               ](value594) &&
               ((value599[value594] = value595),
-              value594 === 'actionId' && ((value599['actionTime'] = 0), (value599['actionPlaying'] = ![]))),
+              value594 === 'actionId' && ((value599['actionTime'] = 0), (value599['actionPlaying'] = false))),
             value596
           );
         },
@@ -6652,18 +6652,18 @@ export class Storyboard3DEditorWorkspace {
                 type: 'prop',
                 name: assetDescriptor2['name'],
                 assetId: id2,
-                visible: !![],
-                locked: ![],
+                visible: true,
+                locked: false,
                 transform: { position: [0, 0, 0], rotation: [0, 0, 0], scale: [1, 1, 1] },
-                castShadow: !![],
-                receiveShadow: !![],
+                castShadow: true,
+                receiveShadow: true,
               }),
               value636
             );
           },
         }),
           this['assetLibrary']['markUsed'](id2));
-        if (id3) this['_setSelectedObjects']([id3], { openProperties: ![] });
+        if (id3) this['_setSelectedObjects']([id3], { openProperties: false });
         const value638 =
           storyboard3DTexturePolicy['optimized']['length'] > 0
             ? '，已优化 ' + storyboard3DTexturePolicy['optimized']['length'] + ' 张超限纹理'
@@ -6703,13 +6703,13 @@ export class Storyboard3DEditorWorkspace {
   async ['exportStoryboard']() {
     return this['exportController']['open']();
   }
-  ['close']({ persist: persist = !![] } = {}) {
+  ['close']({ persist: persist = true } = {}) {
     if (this['_closed']) return;
-    this['_closed'] = !![];
+    this['_closed'] = true;
     const projectId3 = persist ? this['projectStore']['save']() : this['projectStore']['getSnapshot'](),
       activeSceneId = getActiveStoryboard3DScene(projectId3),
       activeShotId = getActiveStoryboard3DShot(projectId3);
-    (this['_finishFlyMovement']({ clearKeys: !![] }),
+    (this['_finishFlyMovement']({ clearKeys: true }),
       this['exportController']['destroy'](),
       this['_aiModelSelectorController']?.['destroy']?.(),
       (this['_aiModelSelectorController'] = null),
@@ -6741,8 +6741,8 @@ export class Storyboard3DEditorWorkspace {
       this['backgroundImageControllers']['forEach']((value642) => value642['dispose']?.()),
       this['backgroundImageControllers']['clear'](),
       void this['binaryAssetRepository']['close'](),
-      this['window']?.['removeEventListener']?.('keydown', this['_handleWindowKeyDown'], !![]),
-      this['window']?.['removeEventListener']?.('keyup', this['_handleWindowKeyUp'], !![]),
+      this['window']?.['removeEventListener']?.('keydown', this['_handleWindowKeyDown'], true),
+      this['window']?.['removeEventListener']?.('keyup', this['_handleWindowKeyUp'], true),
       this['window']?.['removeEventListener']?.('blur', this['_handleWindowBlur']),
       this['window']?.['removeEventListener']?.('resize', this['_syncServerAlertOffset']),
       this['_serverAlertMutationObserver']?.['disconnect']?.(),
@@ -6761,48 +6761,48 @@ export class Storyboard3DEditorWorkspace {
       this['root']?.['removeEventListener']?.('pointerdown', this['_handleTimelineResizePointerDown']),
       this['root']?.['removeEventListener']?.('pointerdown', this['_handleMiniMapPointerDown']),
       this['root']?.['removeEventListener']?.('wheel', this['_handleMiniMapWheel']),
-      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], !![]),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], !![]),
-      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], !![]),
+      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapPointerMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapPointerUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapPointerUp'], true),
+      this['window']?.['removeEventListener']?.('pointermove', this['_handleMiniMapWindowMove'], true),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleMiniMapWindowUp'], true),
+      this['window']?.['removeEventListener']?.('pointercancel', this['_handleMiniMapWindowUp'], true),
       this['window']?.['removeEventListener']?.(
         'pointermove',
         this['_handleInspectorResizePointerMove'],
-        !![],
+        true,
       ),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleInspectorResizePointerUp'], !![]),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleInspectorResizePointerUp'], true),
       this['window']?.['removeEventListener']?.(
         'pointercancel',
         this['_handleInspectorResizePointerUp'],
-        !![],
+        true,
       ),
       this['window']?.['removeEventListener']?.(
         'pointermove',
         this['_handleRightSidebarResizePointerMove'],
-        !![],
+        true,
       ),
       this['window']?.['removeEventListener']?.(
         'pointerup',
         this['_handleRightSidebarResizePointerUp'],
-        !![],
+        true,
       ),
       this['window']?.['removeEventListener']?.(
         'pointercancel',
         this['_handleRightSidebarResizePointerUp'],
-        !![],
+        true,
       ),
       this['window']?.['removeEventListener']?.(
         'pointermove',
         this['_handleTimelineResizePointerMove'],
-        !![],
+        true,
       ),
-      this['window']?.['removeEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], !![]),
+      this['window']?.['removeEventListener']?.('pointerup', this['_handleTimelineResizePointerUp'], true),
       this['window']?.['removeEventListener']?.(
         'pointercancel',
         this['_handleTimelineResizePointerUp'],
-        !![],
+        true,
       ),
       this['root']?.['remove']?.(),
       (this['root'] = null),

@@ -43,8 +43,8 @@ export function hasSourceVideoRecoveryWork(options = {}) {
   return !!(
     String(options?.['rhTaskId'] || '')['trim']() ||
     String(options?.['asyncTaskId'] || '')['trim']() ||
-    options?.['rhTaskRecovering'] === !![] ||
-    options?.['asyncTaskRecovering'] === !![]
+    options?.['rhTaskRecovering'] === true ||
+    options?.['asyncTaskRecovering'] === true
   );
 }
 export function scheduleSourceVideoIdleTask(
@@ -52,7 +52,7 @@ export function scheduleSourceVideoIdleTask(
   { timeout: timeout = SOURCE_VIDEO_IDLE_MEDIA_TIMEOUT_MS } = {},
 ) {
   if (typeof handler !== 'function') return () => {};
-  let data = ![],
+  let data = false,
     handler2 = () => {};
   const sourceVideoSchedulerNow = getSourceVideoSchedulerNow(),
     handler3 = globalThis['window']?.['requestIdleCallback'] || globalThis['requestIdleCallback'],
@@ -77,15 +77,15 @@ export function scheduleSourceVideoIdleTask(
     };
   } else run(16);
   return () => {
-    ((data = !![]), handler2());
+    ((data = true), handler2());
   };
 }
 export function shouldFetchVideoMetaForNodeInfo() {
   try {
     const current =
       typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
-    return current?.['ui']?.['showVideoMeta'] === !![];
+    return current?.['ui']?.['showVideoMeta'] === true;
   } catch {
-    return ![];
+    return false;
   }
 }

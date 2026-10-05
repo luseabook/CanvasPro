@@ -7,19 +7,19 @@ export function createAgentTextConversationRuntime({
   let abortController = null,
     value = 0,
     id = '',
-    enabled = ![];
+    enabled = false;
   const createFailedReply = (item, args = {}) => ({
-      ok: ![],
+      ok: false,
       status: 'failed',
       reply: String(item),
       ...args,
     }),
-    createStoppedReply = () => ({ ok: !![], status: 'stopped', reply: '已停止生成' });
+    createStoppedReply = () => ({ ok: true, status: 'stopped', reply: '已停止生成' });
   function startRun() {
     return (
       (abortController = new AbortController()),
       (id = 'agent-text-' + ++value),
-      sessionStore['setCurrentRun']({ id: id, status: 'planning', stopped: ![] }),
+      sessionStore['setCurrentRun']({ id: id, status: 'planning', stopped: false }),
       id
     );
   }
@@ -93,7 +93,7 @@ export function createAgentTextConversationRuntime({
         stop();
       } catch {
       } finally {
-        (abortController?.['abort'](), (id = ''), (enabled = !![]));
+        (abortController?.['abort'](), (id = ''), (enabled = true));
       }
     },
   };

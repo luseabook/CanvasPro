@@ -9,7 +9,7 @@ export const audioText = (id, label, description2 = '', args = {}) => ({
   type: 'text',
   placement: 'advanced',
   defaultValue: '',
-  allowEmpty: !![],
+  allowEmpty: true,
   description: description2,
   showInfoTip: Boolean(description2),
   ...args,
@@ -41,7 +41,7 @@ export const audioSlider = (id3, label3, min, max, defaultValue2, step = 1, args
   defaultValue: defaultValue2,
   ...args4,
 });
-export const audioToggle = (id4, label4, defaultValue3 = ![], args5 = {}) => ({
+export const audioToggle = (id4, label4, defaultValue3 = false, args5 = {}) => ({
   id: id4,
   label: label4,
   type: 'toggle',
@@ -49,7 +49,7 @@ export const audioToggle = (id4, label4, defaultValue3 = ![], args5 = {}) => ({
   defaultValue: defaultValue3,
   ...args5,
 });
-export const audioSlot = (id5, label5, required = ![], args6 = {}) => ({
+export const audioSlot = (id5, label5, required = false, args6 = {}) => ({
   id: id5,
   label: label5,
   kind: 'audio',
@@ -61,7 +61,7 @@ export const paramMapping = (path2, index = path2, args7 = {}) => ({
   path: path2,
   from: 'param',
   field: 'generationParams.' + index,
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
   ...args7,
 });
 export const constantMapping = (path3, value3) => ({
@@ -73,7 +73,7 @@ export const slotMapping = (path4, slot) => ({
   path: path4,
   from: 'inputAudios',
   transform: { name: 'audioSlot', slot: slot },
-  omitWhenEmpty: !![],
+  omitWhenEmpty: true,
 });
 export const RH_AUDIO_RESPONSE_MAPPING = Object['freeze']({
   taskIdPath: 'taskId',
@@ -94,7 +94,7 @@ export function createRunningHubAudioCatalogEntry({
   fields: fields = [],
   slots: slots = [],
   promptField: promptField = 'text',
-  promptRequired: promptRequired = !![],
+  promptRequired: promptRequired = true,
   promptMaxLength: promptMaxLength,
   promptPlaceholder: promptPlaceholder = '输入要合成的文本',
   mapping: mapping = [],
@@ -114,8 +114,8 @@ export function createRunningHubAudioCatalogEntry({
       displayName: name,
       description: description || name,
       fields: fields,
-      async: !![],
-      cancellable: ![],
+      async: true,
+      cancellable: false,
       prompt: {
         emptyPolicy: promptRequired ? 'block' : 'allow',
         ...(promptMaxLength ? { maxLength: promptMaxLength } : {}),

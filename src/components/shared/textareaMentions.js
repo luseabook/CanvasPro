@@ -12,7 +12,7 @@ export function bindTextareaMentions({
     menu['setAttribute']('popover', 'manual'),
     (menu['id'] = 'textarea-mentions-' + ++nextMenuId),
     menu['setAttribute']('role', 'listbox'),
-    (menu['hidden'] = !![]),
+    (menu['hidden'] = true),
     trigger['setAttribute']('aria-controls', menu['id']),
     trigger['setAttribute']('aria-expanded', 'false'),
     input['setAttribute']('aria-controls', menu['id']),
@@ -32,7 +32,7 @@ export function bindTextareaMentions({
   function run2() {
     (cancelAnimationFrame(requestAnimationFrame2), (requestAnimationFrame2 = 0));
     if (menu['matches'](':popover-open')) menu['hidePopover']();
-    ((menu['hidden'] = !![]),
+    ((menu['hidden'] = true),
       (menu['style']['display'] = 'none'),
       trigger['setAttribute']('aria-expanded', 'false'),
       input['removeAttribute']('aria-activedescendant'));
@@ -88,7 +88,7 @@ export function bindTextareaMentions({
     if (!input['isConnected'] || input['disabled'] || !input['getClientRects']()['length']) return run2();
     (positionMentionMenu(menu, run3()), (requestAnimationFrame2 = requestAnimationFrame(run4)));
   }
-  function run5(next, current = ![]) {
+  function run5(next, current = false) {
     ((index = Math['max'](0, Math['min'](next, list2['length'] - 1))),
       list2['forEach']((entry, record) => {
         (entry['classList']['toggle']('active', record === index),
@@ -104,7 +104,7 @@ export function bindTextareaMentions({
     if (!list[payload] || input['disabled']) return;
     const handle = list[payload],
       state = { start: value ?? item, end: item, typed: value !== null };
-    (run2(), onSelect(handle, state), input['focus']({ preventScroll: !![] }));
+    (run2(), onSelect(handle, state), input['focus']({ preventScroll: true }));
   }
   function run7(config = '') {
     if (input['disabled']) return;
@@ -137,7 +137,7 @@ export function bindTextareaMentions({
         (value3['textContent'] = '没有匹配的结果'),
         menu['append'](value3));
     }
-    ((menu['hidden'] = ![]), (menu['style']['display'] = 'flex'));
+    ((menu['hidden'] = false), (menu['style']['display'] = 'flex'));
     if (!menu['matches'](':popover-open')) menu['showPopover']();
     (trigger['setAttribute']('aria-expanded', 'true'),
       run5(0),
@@ -165,7 +165,7 @@ export function bindTextareaMentions({
           run5(
             (index + (event['key'] === 'ArrowDown' ? 1 : -1) + list2['length']) %
               (list2['length'] || 1),
-            !![],
+            true,
           );
       }
     } else {
@@ -174,7 +174,7 @@ export function bindTextareaMentions({
   }
   function run10() {
     if (run()) return run2();
-    ((value = null), (item = input['selectionStart']), input['focus']({ preventScroll: !![] }), run7());
+    ((value = null), (item = input['selectionStart']), input['focus']({ preventScroll: true }), run7());
   }
   function run11(event2) {
     if (
@@ -187,10 +187,10 @@ export function bindTextareaMentions({
   return (
     input['addEventListener']('input', run8),
     input['addEventListener']('compositionend', run8),
-    input['addEventListener']('keydown', run9, !![]),
+    input['addEventListener']('keydown', run9, true),
     input['addEventListener']('click', run2),
     trigger['addEventListener']('click', run10),
-    document['addEventListener']('pointerdown', run11, !![]),
+    document['addEventListener']('pointerdown', run11, true),
     {
       close: run2,
       isOpen: run,
@@ -203,10 +203,10 @@ export function bindTextareaMentions({
           menu['remove'](),
           input['removeEventListener']('input', run8),
           input['removeEventListener']('compositionend', run8),
-          input['removeEventListener']('keydown', run9, !![]),
+          input['removeEventListener']('keydown', run9, true),
           input['removeEventListener']('click', run2),
           trigger['removeEventListener']('click', run10),
-          document['removeEventListener']('pointerdown', run11, !![]));
+          document['removeEventListener']('pointerdown', run11, true));
       },
     }
   );

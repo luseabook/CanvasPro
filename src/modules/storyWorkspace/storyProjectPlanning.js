@@ -44,7 +44,7 @@ export function normalizeStorySceneMaxSeconds(index) {
 }
 export function normalizeStoryProjectPlanning(
   options = {},
-  { allowDeveloperPromptModes: allowDeveloperPromptModes = ![] } = {},
+  { allowDeveloperPromptModes: allowDeveloperPromptModes = false } = {},
 ) {
   const data = options?.['planning'] && typeof options['planning'] === 'object' ? options['planning'] : {};
   return {
@@ -94,22 +94,22 @@ export function buildStoryHomeGenerationRequest({
   episodeCount: episodeCount = 3,
   sceneMaxSeconds: sceneMaxSeconds = 15,
   promptMode: promptMode = 'seedance-2.0',
-  allowDeveloperPromptModes: allowDeveloperPromptModes = ![],
+  allowDeveloperPromptModes: allowDeveloperPromptModes = false,
 } = {}) {
-  if (mode === 'collaborate') return { ok: ![], error: '请先在 AI 协作创作中确认正文，再进入制作。' };
+  if (mode === 'collaborate') return { ok: false, error: '请先在 AI 协作创作中确认正文，再进入制作。' };
   const args2 = mode === 'generate' || mode === 'rewrite' ? mode : 'upload',
     text2 = normalizeText(idea)['slice'](0, STORY_IDEA_MAX_CHARACTERS),
     text3 = normalizeText(rewriteInstruction)['slice'](0, STORY_IDEA_MAX_CHARACTERS),
     text4 = normalizeText(scriptFileName),
     record = String(scriptText || '')['slice'](0, STORY_SCRIPT_MAX_CHARACTERS);
-  if (args2 === 'upload' && !text4) return { ok: ![], error: '请先上传剧本或粘贴文本。' };
+  if (args2 === 'upload' && !text4) return { ok: false, error: '请先上传剧本或粘贴文本。' };
   if (args2 === 'upload' && !normalizeText(record))
-    return { ok: ![], error: '当前文件尚未解析出可用文本，请使用 TXT、DOCX、文本型 PDF 或粘贴文本。' };
-  if (args2 === 'generate' && !text2) return { ok: ![], error: '请先写下一段故事设定。' };
-  if (args2 === 'rewrite' && !text4) return { ok: ![], error: '请先上传参考剧本。' };
+    return { ok: false, error: '当前文件尚未解析出可用文本，请使用 TXT、DOCX、文本型 PDF 或粘贴文本。' };
+  if (args2 === 'generate' && !text2) return { ok: false, error: '请先写下一段故事设定。' };
+  if (args2 === 'rewrite' && !text4) return { ok: false, error: '请先上传参考剧本。' };
   if (args2 === 'rewrite' && !normalizeText(record))
-    return { ok: ![], error: '当前参考剧本尚未解析出可用文本，请使用 TXT、DOCX 或文本型 PDF。' };
-  if (args2 === 'rewrite' && !text3) return { ok: ![], error: '请先填写改写要求。' };
+    return { ok: false, error: '当前参考剧本尚未解析出可用文本，请使用 TXT、DOCX 或文本型 PDF。' };
+  if (args2 === 'rewrite' && !text3) return { ok: false, error: '请先填写改写要求。' };
   const storyStyleSelection = resolveStoryStyleSelection({
       styleId: styleId,
       stylePrompt: stylePrompt,
@@ -118,7 +118,7 @@ export function buildStoryHomeGenerationRequest({
     text5 = normalizeText(provider),
     args3 = resolveStoryTextProviderProfileId(text5, providerProfileId);
   return {
-    ok: !![],
+    ok: true,
     mode: args2,
     scriptMode: args2 !== 'upload' ? normalizeStoryScriptMode(scriptMode) : 'plot',
     prompt: STORY_HOME_GENERATION_PROMPTS[args2],
@@ -144,7 +144,7 @@ export function buildStorySummaryRegenerationRequest(
     modelId: modelId = '',
     provider: provider = '',
     providerProfileId: providerProfileId = '',
-    allowDeveloperPromptModes: allowDeveloperPromptModes = ![],
+    allowDeveloperPromptModes: allowDeveloperPromptModes = false,
   } = {},
 ) {
   const payload = String(options2?.['sourceDocument']?.['text'] || ''),
@@ -156,8 +156,8 @@ export function buildStorySummaryRegenerationRequest(
         : normalizeText(payload)
           ? 'upload'
           : 'generate';
-  if (handle === 'generate' && !text6) return { ok: ![], error: '当前项目没有可用于重新生成的原始创意。' };
-  if (handle === 'rewrite' && !text7) return { ok: ![], error: '当前项目没有可用于重新生成的改写要求。' };
+  if (handle === 'generate' && !text6) return { ok: false, error: '当前项目没有可用于重新生成的原始创意。' };
+  if (handle === 'rewrite' && !text7) return { ok: false, error: '当前项目没有可用于重新生成的改写要求。' };
   const storyStyleSelection2 = resolveStoryStyleSelection({
       styleId: options2?.['videoStyleId'],
       stylePrompt: options2?.['videoStylePrompt'],
@@ -169,7 +169,7 @@ export function buildStorySummaryRegenerationRequest(
     text8 = normalizeText(provider),
     args4 = resolveStoryTextProviderProfileId(text8, providerProfileId);
   return {
-    ok: !![],
+    ok: true,
     mode: handle,
     scriptMode: normalizeStoryScriptMode(options2?.['scriptMode']),
     idea: handle === 'generate' ? text6 : '',
@@ -191,7 +191,7 @@ export function buildStorySummaryRegenerationRequest(
 export function resolveGeneratedProjectTitle({
   currentTitle: currentTitle = '',
   generatedTitle: generatedTitle = '',
-  userEdited: userEdited = ![],
+  userEdited: userEdited = false,
 } = {}) {
   const text9 = normalizeText(currentTitle),
     text10 = normalizeText(generatedTitle);
@@ -242,7 +242,7 @@ export function applyGeneratedStoryResult(output, value2 = {}, value3 = {}) {
       title: resolveGeneratedProjectTitle({
         currentTitle: args5['project']?.['title'],
         generatedTitle: value2['title'],
-        userEdited: value3['projectTitleEdited'] === !![],
+        userEdited: value3['projectTitleEdited'] === true,
       }),
       storyType: normalizeText(value2['storyType']),
       targetAudience: normalizeText(value2['targetAudience']),
@@ -275,7 +275,7 @@ export function applyGeneratedStoryResult(output, value2 = {}, value3 = {}) {
 export function invalidateStoryPlanningDownstream(
   options4 = {},
   {
-    clearEpisodeOutlines: clearEpisodeOutlines = ![],
+    clearEpisodeOutlines: clearEpisodeOutlines = false,
     episodeScriptStartIndex: episodeScriptStartIndex = 0,
   } = {},
 ) {
@@ -318,7 +318,7 @@ export function invalidateStoryPlanningDownstream(
   };
 }
 export function markStorySummaryDownstreamStale(enabled = {}) {
-  if (!enabled?.['project'] || typeof enabled['project'] !== 'object') return ![];
+  if (!enabled?.['project'] || typeof enabled['project'] !== 'object') return false;
   const value11 = enabled['project'];
   value11['summaryRevision'] =
     Math['max'](0, Math['trunc'](Number(value11['summaryRevision']) || 0)) + 1;
@@ -327,15 +327,15 @@ export function markStorySummaryDownstreamStale(enabled = {}) {
     (Array['isArray'](enabled['assets']) && enabled['assets']['length'] > 0) ||
     normalizeText(value11['outlineStatus']) === 'completed';
   if (value12 && value11['outlineStatus'] !== 'generating')
-    return ((value11['outlineStatus'] = 'stale'), !![]);
-  return ![];
+    return ((value11['outlineStatus'] = 'stale'), true);
+  return false;
 }
 export function createGeneratedStoryProjectData(
   options5 = {},
   {
     projectId: projectId = 'story-' + Date['now'](),
     request: request = {},
-    allowDeveloperPromptModes: allowDeveloperPromptModes = ![],
+    allowDeveloperPromptModes: allowDeveloperPromptModes = false,
   } = {},
 ) {
   const storyStyleSelection3 = resolveStoryStyleSelection({
@@ -398,13 +398,13 @@ export function createGeneratedStoryProjectData(
     }),
     (args13['assets'] = []),
     (args13['episodes'] = []),
-    normalizeStoryWorkspaceAssetData(applyGeneratedStoryResult(args13, options5, { projectTitleEdited: ![] }))
+    normalizeStoryWorkspaceAssetData(applyGeneratedStoryResult(args13, options5, { projectTitleEdited: false }))
   );
 }
 export function createUploadedStoryProjectData({
   projectId: projectId = 'story-' + Date['now'](),
   request: request = {},
-  allowDeveloperPromptModes: allowDeveloperPromptModes = ![],
+  allowDeveloperPromptModes: allowDeveloperPromptModes = false,
 } = {}) {
   const uploadedStoryScript = parseUploadedStoryScript({
       sourceText: request['sourceText'],

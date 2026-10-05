@@ -84,7 +84,7 @@ export function applyVideoAdaptiveAspectRatio(payload2, nodeData2 = {}) {
   });
   if (!isAdaptiveRatioLabel(aspectRatio)) return payload2;
   const current = modelManifest2?.['extensions']?.['ratioPolicy'] || modelManifest2?.['ratioPolicy'] || {};
-  if (current?.['preserveAdaptiveAtSubmit'] === !![]) {
+  if (current?.['preserveAdaptiveAtSubmit'] === true) {
     const entry = String(videoAspectRatioField2?.['id'] || 'aspectRatio')['trim']();
     return (
       delete payload2['resolvedRatioLabel'],

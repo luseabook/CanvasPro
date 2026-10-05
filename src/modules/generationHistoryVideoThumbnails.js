@@ -26,10 +26,10 @@ function resolveMediaSrc(options2 = {}) {
 }
 function isUsablePosterCandidate(key, index) {
   const enabled = String(key || '')['trim']();
-  if (!enabled || enabled === index) return ![];
+  if (!enabled || enabled === index) return false;
   const localPath2 = urlToLocalPath(enabled),
     localPath3 = urlToLocalPath(index);
-  if (localPath2 && localPath2 === localPath3) return ![];
+  if (localPath2 && localPath2 === localPath3) return false;
   return !VIDEO_EXTENSION_RE['test'](enabled);
 }
 export function resolveGenerationHistoryVideoPresentation(options3 = {}) {

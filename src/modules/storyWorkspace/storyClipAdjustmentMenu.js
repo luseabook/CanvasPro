@@ -8,8 +8,8 @@ export function canGenerateStoryClipAdjustment(enabled, value, item) {
     String(enabled['clipAdjustmentInstruction'] || '')['trim']() ||
     normalizeStoryPromptLanguage(enabled['clipAdjustmentLanguage'])
   )
-    return !![];
-  if (!enabled['clipAdjustmentPromptMode']) return ![];
+    return true;
+  if (!enabled['clipAdjustmentPromptMode']) return false;
   const key = enabled['clipSelectionMode']
     ? (value?.['clips'] || [])['filter']((index) =>
         enabled['selectedClipGenerationIds']?.['includes'](index['id']),
@@ -21,7 +21,7 @@ export function canGenerateStoryClipAdjustment(enabled, value, item) {
         result?.['promptMode'] ||
           value?.['promptMode'] ||
           enabled['data']?.['project']?.['planning']?.['promptMode'],
-        { allowDeveloperModes: !![] },
+        { allowDeveloperModes: true },
       ) !== enabled['clipAdjustmentPromptMode'],
   );
 }
@@ -32,13 +32,13 @@ export function syncStoryClipAdjustmentMenu({
   clip: clip,
   kind: kind = 'mode',
   focus: focus = '',
-  updateSelection: updateSelection = ![],
+  updateSelection: updateSelection = false,
 }) {
   const el = root?.['querySelector']('[data-story-clip-adjustment-bar]'),
     data = el?.['querySelector']('[data-story-adjustment-kind="' + kind + '"]'),
     el2 = data?.['querySelector']('[data-story-action="toggle-clip-adjustment-mode"]'),
     enabled2 = data?.['querySelector']('[role="listbox"]');
-  if (!el || !el2 || !enabled2) return ![];
+  if (!el || !el2 || !enabled2) return false;
   const options = kind === 'language',
     enabled3 = options ? state['clipAdjustmentLanguageOpen'] : state['clipAdjustmentPromptModeOpen'];
   (el2['setAttribute']('aria-expanded', String(Boolean(enabled3))), (enabled2['hidden'] = !enabled3));
@@ -50,7 +50,7 @@ export function syncStoryClipAdjustmentMenu({
               clip?.['promptMode'] ||
               episode?.['promptMode'] ||
               state['data']?.['project']?.['planning']?.['promptMode'],
-            { allowDeveloperModes: !![] },
+            { allowDeveloperModes: true },
           ),
       source = data['querySelector']('[data-story-clip-adjustment-mode-label]');
     if (source)
@@ -65,12 +65,12 @@ export function syncStoryClipAdjustmentMenu({
   }
   const el4 = el['querySelector']('[data-story-action="generate-clip-adjustment"]');
   if (el4) el4['disabled'] = !canGenerateStoryClipAdjustment(state, episode, clip);
-  if (focus === 'trigger') el2['focus']({ preventScroll: !![] });
+  if (focus === 'trigger') el2['focus']({ preventScroll: true });
   if (focus === 'selected')
     (enabled2['querySelector']('[aria-selected="true"]') || enabled2['querySelector']('button'))?.['focus']({
-      preventScroll: !![],
+      preventScroll: true,
     });
   if (focus === 'instruction')
-    el['querySelector']('[data-story-clip-adjustment-instruction]')?.['focus']({ preventScroll: !![] });
-  return !![];
+    el['querySelector']('[data-story-clip-adjustment-instruction]')?.['focus']({ preventScroll: true });
+  return true;
 }

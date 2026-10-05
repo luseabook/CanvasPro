@@ -1,6 +1,6 @@
 import { createAgentButton, createAgentElement } from './agentPanelElements.js';
 const SKILL_ID_PATTERN = /^[a-z0-9][a-z0-9-]{0,63}$/;
-function createField({ className: className = '', multiline: multiline = ![] } = {}) {
+function createField({ className: className = '', multiline: multiline = false } = {}) {
   const field = createAgentElement(
       'label',
       ('agent-custom-field agent-skill-editor-field ' + className)['trim'](),
@@ -15,20 +15,20 @@ function createField({ className: className = '', multiline: multiline = ![] } =
 }
 export function createAgentSkillEditor({ text: text } = {}) {
   const element = createAgentElement('div', 'agent-skill-editor');
-  element['hidden'] = !![];
+  element['hidden'] = true;
   const el = createAgentElement('div', 'agent-skill-editor-heading'),
     focus = createField({ className: 'agent-skill-editor-name' }),
     field2 = createField({ className: 'agent-skill-editor-title' }),
-    field3 = createField({ multiline: !![], className: 'agent-skill-editor-description' }),
+    field3 = createField({ multiline: true, className: 'agent-skill-editor-description' }),
     field4 = createField({ className: 'agent-skill-editor-triggers' }),
-    field5 = createField({ multiline: !![], className: 'agent-skill-editor-instructions' });
+    field5 = createField({ multiline: true, className: 'agent-skill-editor-instructions' });
   ((focus['control']['maxLength'] = 64),
     (field2['control']['maxLength'] = 120),
     (field3['control']['maxLength'] = 600),
     (field4['control']['maxLength'] = 2000),
     (field5['control']['maxLength'] = 24 * 1024));
   const el2 = createAgentElement('div', 'agent-skill-editor-error');
-  (el2['setAttribute']('role', 'alert'), (el2['hidden'] = !![]));
+  (el2['setAttribute']('role', 'alert'), (el2['hidden'] = true));
   const agentElement = createAgentElement('div', 'agent-skill-editor-actions'),
     cancelButton = createAgentButton('agent-secondary-btn agent-skill-editor-cancel-btn', ''),
     saveButton = createAgentButton(
@@ -77,11 +77,11 @@ export function createAgentSkillEditor({ text: text } = {}) {
       (field5['control']['value'] = value?.['instructions'] || ''),
       setError(),
       refreshText(),
-      (element['hidden'] = ![]),
+      (element['hidden'] = false),
       (mode === 'update' ? field2['control'] : focus['control'])['focus']?.());
   }
   function close() {
-    ((element['hidden'] = !![]), setError());
+    ((element['hidden'] = true), setError());
   }
   function readDefinition() {
     const id = String(focus['control']['value'] || '')
@@ -99,14 +99,14 @@ export function createAgentSkillEditor({ text: text } = {}) {
         instructions: String(field5['control']['value'] || '')['trim'](),
       };
     if (!SKILL_ID_PATTERN['test'](id))
-      return { ok: ![], message: text('skillValidationName'), focus: focus['control'] };
+      return { ok: false, message: text('skillValidationName'), focus: focus['control'] };
     if (!focus2['description'] || !focus2['instructions'])
       return {
-        ok: ![],
+        ok: false,
         message: text('skillValidationRequired'),
         focus: focus2['description'] ? field5['control'] : field3['control'],
       };
-    return { ok: !![], definition: focus2 };
+    return { ok: true, definition: focus2 };
   }
   return (
     refreshText(),

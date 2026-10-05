@@ -14,16 +14,16 @@ export function syncStoryClipCardVideoInPlace({
   documentObject: documentObject,
   clipId: clipId,
   resultCount: resultCount,
-  refreshThumbnail: refreshThumbnail = ![],
+  refreshThumbnail: refreshThumbnail = false,
   thumbnailMarkup: thumbnailMarkup = '',
 } = {}) {
   const el3 = findStoryClipCardShell(root, clipId),
     el4 = el3?.['querySelector']('.story-clip-card');
-  if (!el3 || !el4) return ![];
+  if (!el3 || !el4) return false;
   el3['dataset']['storyVideoHistory'] = String(Number(resultCount) > 1);
-  if (!refreshThumbnail) return !![];
+  if (!refreshThumbnail) return true;
   let el5 = el4['querySelector']('.story-clip-card-media');
-  if (!thumbnailMarkup) return (el5?.['remove'](), el4['classList']['remove']('has-video-thumbnail'), !![]);
+  if (!thumbnailMarkup) return (el5?.['remove'](), el4['classList']['remove']('has-video-thumbnail'), true);
   return (
     !el5 &&
       ((el5 = documentObject['createElement']('span')),
@@ -32,12 +32,12 @@ export function syncStoryClipCardVideoInPlace({
       el4['querySelector']('.story-clip-card-copy')?.['before'](el5)),
     (el5['innerHTML'] = thumbnailMarkup),
     el4['classList']['add']('has-video-thumbnail'),
-    !![]
+    true
   );
 }
 export function syncSelectedClipVideoMetadataInPlace(el6, key, index) {
   const el7 = el6?.['querySelector']?.('.story-video-result[data-story-video-result-index]');
-  if (!el7) return ![];
+  if (!el7) return false;
   ((el7['dataset']['storyVideoResultIndex'] = String(key)),
     el7['querySelectorAll']('[data-story-video-result-index]')['forEach']((el8) => {
       el8['dataset']['storyVideoResultIndex'] = String(key);
@@ -50,6 +50,6 @@ export function syncSelectedClipVideoMetadataInPlace(el6, key, index) {
       el7['querySelectorAll']('.story-video-result-switch')['forEach']((el10) => {
         el10['remove']();
       }),
-    !![]
+    true
   );
 }

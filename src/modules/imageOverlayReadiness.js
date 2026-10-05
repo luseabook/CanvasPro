@@ -8,7 +8,7 @@ export function waitForImageElementReady({
   setTimeoutFn: setTimeoutFn = globalThis['setTimeout'],
   clearTimeoutFn: clearTimeoutFn = globalThis['clearTimeout'],
 } = {}) {
-  let value = ![],
+  let value = false,
     setTimeoutFn2 = null;
   const run = () => {
       (image?.['removeEventListener']?.('load', item),
@@ -17,7 +17,7 @@ export function waitForImageElementReady({
     },
     handler = (index) => {
       if (value) return;
-      ((value = !![]), run(), index?.());
+      ((value = true), run(), index?.());
     },
     item = () => handler(onReady),
     key = () => handler(onError);

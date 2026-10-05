@@ -37,7 +37,7 @@ export function createStoryAssetSettingsPresentation({
   renderUploadIcon: renderUploadIcon = emptyRenderer,
   renderVoiceFooter: renderVoiceFooter = emptyRenderer,
 } = {}) {
-  function run(error = {}, { canRename: canRename = ![] } = {}) {
+  function run(error = {}, { canRename: canRename = false } = {}) {
     const text = normalizeText(error['name']) || '未命名素材',
       index = canRename
         ? ' data-story-asset-name-id="' +
@@ -89,7 +89,7 @@ export function createStoryAssetSettingsPresentation({
             className: 'story-asset-card-image',
           })) +
         '\n      ' +
-        (imageUrl['isLoading'] ? renderLoadingOverlay({ compact: !![] }) : '') +
+        (imageUrl['isLoading'] ? renderLoadingOverlay({ compact: true }) : '') +
         '\n      ' +
         (!imageUrl['isLoading'] &&
         !normalizeText(imageUrl['preview']?.['imageUrl']) &&
@@ -298,7 +298,7 @@ export function createStoryAssetSettingsPresentation({
       '\n      </div>\n    </div>\n  </div>'
     );
   }
-  function run7(enabled4 = ![]) {
+  function run7(enabled4 = false) {
     if (enabled4)
       return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M8 6.5v11l9-5.5-9-5.5Z"/></svg>';
     return '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 4v16M8.5 7.5v9M15.5 8.5v7M5 10v4M19 10v4"/></svg>';
@@ -313,7 +313,7 @@ export function createStoryAssetSettingsPresentation({
         '<span class="story-voice-source-menu-wrap">\n        <button type="button" class="story-character-voice-capsule ' +
         (enabled5['hasReference'] ? 'has-reference' : 'is-missing') +
         '" data-story-character-voice-capsule data-story-audio-action="toggle-voice-menu" aria-haspopup="menu" aria-expanded="false">\n          <span class="story-character-voice-icon">' +
-        run7(![]) +
+        run7(false) +
         '</span><span>声音参考</span>\n        </button>\n        <span class="story-voice-source-menu" role="menu" aria-label="添加人物声音" hidden>\n          <button type="button" role="menuitem" data-story-action="upload-character-voice">上传声音</button>\n          <button type="button" role="menuitem" data-story-audio-action="choose-project-voice">从项目音频添加</button>\n          <button type="button" role="menuitem" data-story-action="open-character-voice">生成与管理声音</button>\n          ' +
         (enabled5['hasReference']
           ? '<button type="button" role="menuitem" data-story-action="remove-character-voice">删除音频参考</button>'
@@ -327,7 +327,7 @@ export function createStoryAssetSettingsPresentation({
         '" data-story-character-voice-capsule data-story-action="upload-character-voice" aria-label="' +
         escapeHtml(enabled5['uploadLabel']) +
         '">\n      <span class="story-character-voice-icon">' +
-        run7(![]) +
+        run7(false) +
         '</span>\n      <span>' +
         escapeHtml(enabled5['uploadLabel']) +
         '</span>\n    </button>'
@@ -346,7 +346,7 @@ export function createStoryAssetSettingsPresentation({
       '" aria-pressed="' +
       Boolean(enabled5['isOpen']) +
       '">\n    <span class="story-character-voice-icon">' +
-      (enabled5['isOpen'] ? run4() : run7(![])) +
+      (enabled5['isOpen'] ? run4() : run7(false)) +
       '</span>\n    <span>' +
       current +
       '</span>\n  </button>'
@@ -391,7 +391,7 @@ export function createStoryAssetSettingsPresentation({
         ' aria-busy="' +
         Boolean(el3['busy']) +
         '">' +
-        (el3['busy'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+        (el3['busy'] ? renderStoryGenerationSpinner({ button: true }) : '') +
         '<span class="story-asset-batch-trigger-label">' +
         escapeHtml(el3['label']) +
         '</span></button>';
@@ -418,7 +418,7 @@ export function createStoryAssetSettingsPresentation({
         ' aria-busy="' +
         Boolean(el4['busy']) +
         '">' +
-        (el4['busy'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+        (el4['busy'] ? renderStoryGenerationSpinner({ button: true }) : '') +
         '<span data-story-asset-generate-label>' +
         escapeHtml(el4['label'] || '生成素材图') +
         '</span></button>'
@@ -436,7 +436,7 @@ export function createStoryAssetSettingsPresentation({
       ' aria-busy="' +
       Boolean(el4['busy']) +
       '">' +
-      (el4['busy'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+      (el4['busy'] ? renderStoryGenerationSpinner({ button: true }) : '') +
       '<span class="story-asset-batch-trigger-label">' +
       escapeHtml(el4['label']) +
       '</span></button>'
@@ -461,7 +461,7 @@ export function createStoryAssetSettingsPresentation({
       '</small></span>\n  </button>'
     );
   }
-  function run15(alt = {}, imageUrl3 = {}, handle = ![]) {
+  function run15(alt = {}, imageUrl3 = {}, handle = false) {
     const text6 = normalizeText(imageUrl3['name']) || '未命名形象';
     return (
       '<button type="button" class="story-library-appearance-option" role="menuitem" data-story-library-target-asset-id="' +
@@ -575,7 +575,7 @@ export function createStoryAssetSettingsPresentation({
       Boolean(enabled6['isSavingToLibrary']) +
       '">' +
       (enabled6['isSavingToLibrary']
-        ? renderStoryGenerationSpinner({ button: !![] })
+        ? renderStoryGenerationSpinner({ button: true })
         : renderAddToLibraryIcon()) +
       '</button>\n    <button type="button" class="story-upload-replace story-character-voice-upload-button" data-story-action="upload-asset" aria-label="上传替换图片" title="上传替换图片" ' +
       (enabled6['canUpload'] ? '' : 'disabled') +
@@ -627,7 +627,7 @@ export function createStoryAssetSettingsPresentation({
           '>\n      <span class="story-character-voice-upload-icon">' +
           renderUploadIcon() +
           '</span>\n        <span class="story-character-voice-upload-copy">\n          <strong>上传或拖入声音参考</strong>\n          <small>支持 MP3 / WAV / M4A，建议 5–15 秒</small>\n        </span>\n        ' +
-          (workflow['isGenerating'] ? renderLoadingOverlay({ compact: !![] }) : '') +
+          (workflow['isGenerating'] ? renderLoadingOverlay({ compact: true }) : '') +
           '\n      </button>',
       value4 = list3['length']
         ? '<div class="story-character-voice-history-wrap">\n        <button type="button" class="story-character-voice-history-button" data-story-action="toggle-character-voice-history" aria-label="历史音频" aria-haspopup="true" aria-expanded="false" ' +
@@ -642,7 +642,7 @@ export function createStoryAssetSettingsPresentation({
               '" aria-label="试听历史音频 ' +
               (value6 + 1) +
               '">' +
-              run7(!![]) +
+              run7(true) +
               '</button>\n              <span><strong>' +
               escapeHtml(value5['label']) +
               '</strong><small>' +
@@ -678,7 +678,7 @@ export function createStoryAssetSettingsPresentation({
               'data-story-character-voice-audio-surface': '',
               'data-story-character-voice-drop': '',
             },
-            trailingHtml: workflow['isGenerating'] ? renderLoadingOverlay({ compact: !![] }) : '',
+            trailingHtml: workflow['isGenerating'] ? renderLoadingOverlay({ compact: true }) : '',
           })
         : '') +
       '\n        ' +
@@ -724,7 +724,7 @@ export function createStoryAssetSettingsPresentation({
       ' aria-busy="' +
       Boolean(workflow['isGenerating']) +
       '">' +
-      (workflow['isGenerating'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+      (workflow['isGenerating'] ? renderStoryGenerationSpinner({ button: true }) : '') +
       '<span>' +
       (workflow['isGenerating'] ? '生成中' : audioUrl ? '重新生成声音' : '生成声音') +
       '</span></button>\n      </div>\n  </div>'
@@ -831,7 +831,7 @@ export function createStoryAssetSettingsPresentation({
         : '<div class="story-asset-generation-bar prompt-panel-footer">\n            ' +
           renderImageModelSelector({
             ...canRename2['imageModel'],
-            showSchemaControls: !![],
+            showSchemaControls: true,
             className: 'story-asset-image-model-selector',
           }) +
           '\n            <div class="story-asset-generation-actions">\n              ' +
@@ -861,7 +861,7 @@ export function createStoryAssetSettingsPresentation({
     if (options4['kind'] === 'voice-capsule') return run9(options4['voiceCapsule']);
     if (options4['kind'] === 'voice-panel') return run19(options4['voicePanel']);
     if (options4['kind'] === 'voice-player') return run10(options4['voicePlayer']);
-    if (options4['kind'] === 'voice-icon') return run7(options4['hasVoice'] === !![]);
+    if (options4['kind'] === 'voice-icon') return run7(options4['hasVoice'] === true);
     return '';
   }
   return Object['freeze']({

@@ -16,9 +16,9 @@ export function bindVideoToGifAction(value) {
     (event['preventDefault'](),
       event['stopPropagation'](),
       closeToolbarMoreMenu?.(),
-      VideoClipController['exit']({ silent: !![] }),
-      VideoKeyingController['exit']({ silent: !![] }),
-      VideoGifController['exit']({ silent: !![] }),
+      VideoClipController['exit']({ silent: true }),
+      VideoKeyingController['exit']({ silent: true }),
+      VideoGifController['exit']({ silent: true }),
       VideoGifController['init']({
         nodeId: nodeData['id'],
         sourceUrl: _getCurrentVideoUrl(),

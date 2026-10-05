@@ -23,7 +23,7 @@ export function recordDirectorCanvas({
       key,
       index,
       result,
-      data = ![],
+      data = false,
       enabled = 0,
       options = null;
     const list = [],
@@ -35,7 +35,7 @@ export function recordDirectorCanvas({
       },
       handler4 = (next) => {
         if (data) return;
-        ((data = !![]), handler3());
+        ((data = true), handler3());
         if (next) handler2(next);
         else {
           if (!enabled) handler2(new Error('录制没有产生视频数据。'));
@@ -71,7 +71,7 @@ export function recordDirectorCanvas({
         }),
         (key['onerror'] = (entry) => handler5(entry['error'] || new Error('视频编码失败。'))),
         (key['onstop'] = () => handler4(options)),
-        signal?.['addEventListener']('abort', target, { once: !![] }));
+        signal?.['addEventListener']('abort', target, { once: true }));
       const run2 = (record) => {
         if (windowObject['requestAnimationFrame']) result = windowObject['requestAnimationFrame'](record);
         else index = windowObject['setTimeout'](record, 1000 / fps);
@@ -130,7 +130,7 @@ export async function renderStoryboard3DShotVideo({
   ((scenes['activeSceneId'] = sceneId['id']), (sceneId['activeShotId'] = shot['id']));
   const aspectRatio = resolveStoryboardExportDimensions(args);
   ((args2['camera']['aspectRatio'] = aspectRatio['aspectRatio']),
-    (args2['animation'] = normalizeStoryboard3DShotAnimation({ ...args2['animation'], loop: ![] })),
+    (args2['animation'] = normalizeStoryboard3DShotAnimation({ ...args2['animation'], loop: false })),
     args2['animation']['cameraKeyframes']['forEach']((value2) => {
       value2['camera']['aspectRatio'] = aspectRatio['aspectRatio'];
     }));
@@ -162,7 +162,7 @@ export async function renderStoryboard3DShotVideo({
       importedModelResolver: importedModelResolver,
     });
   try {
-    ((storyboard3DSceneRuntime['timelinePreviewActive'] = !![]),
+    ((storyboard3DSceneRuntime['timelinePreviewActive'] = true),
       storyboard3DSceneRuntime['sync']({
         project: scenes,
         sceneId: sceneId['id'],
@@ -217,7 +217,7 @@ async function recordDirectorSceneSequence({
         importedModelResolver: importedModelResolver2,
       });
       (map2['set'](sceneId2['scene']['id'], storyboard3DSceneRuntime2),
-        (storyboard3DSceneRuntime2['timelinePreviewActive'] = !![]),
+        (storyboard3DSceneRuntime2['timelinePreviewActive'] = true),
         storyboard3DSceneRuntime2['sync']({
           project: snapshot,
           sceneId: sceneId2['scene']['id'],

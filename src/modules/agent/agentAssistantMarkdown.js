@@ -1,6 +1,6 @@
 function removeUnpairedStrongMarkersFromLine(list = '') {
   const list2 = [];
-  let enabled = ![];
+  let enabled = false;
   for (let value = 0; value < list['length']; value += 1) {
     if (list[value] === '`' && list[value - 1] !== '\\') {
       enabled = !enabled;

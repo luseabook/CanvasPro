@@ -32,19 +32,19 @@ export function sanitizeMcpResult(list2, count = 0) {
     );
   return list2;
 }
-export function canExposeCanvasCommand(target, { allowGeneration: allowGeneration = ![] } = {}) {
+export function canExposeCanvasCommand(target, { allowGeneration: allowGeneration = false } = {}) {
   const source = target['capabilitySchema'] || {};
-  if (!Array['isArray'](source['writes']) || source['requiresSystemAccess']) return ![];
-  if (!['safe', 'confirm']['includes'](target['riskLevel'])) return ![];
-  if (PRIVATE_NAMESPACES['has'](target['id']['split']('.')[0])) return ![];
-  if (source['writes']['some']((next) => !CANVAS_WRITES['has'](next))) return ![];
+  if (!Array['isArray'](source['writes']) || source['requiresSystemAccess']) return false;
+  if (!['safe', 'confirm']['includes'](target['riskLevel'])) return false;
+  if (PRIVATE_NAMESPACES['has'](target['id']['split']('.')[0])) return false;
+  if (source['writes']['some']((next) => !CANVAS_WRITES['has'](next))) return false;
   if (
     source['writes']['includes']('generationTasks') &&
     target['id'] !== 'generation.cancel' &&
     !allowGeneration
   )
-    return ![];
-  return !![];
+    return false;
+  return true;
 }
 export function buildCanvasMcpTools(current, entry = {}) {
   const list3 = current['list']()['filter']((record) => canExposeCanvasCommand(record, entry)),
@@ -70,11 +70,11 @@ export function buildCanvasMcpTools(current, entry = {}) {
           },
         },
         required: [...description['argsSchema']['required'], 'requestKey'],
-        additionalProperties: ![],
+        additionalProperties: false,
       },
       annotations: {
         readOnlyHint: description['capabilitySchema']['writes']['length'] === 0,
-        destructiveHint: ![],
+        destructiveHint: false,
         openWorldHint: description['capabilitySchema']['writes']['includes']('generationTasks'),
       },
     }));
@@ -95,9 +95,9 @@ export function buildCanvasMcpTools(current, entry = {}) {
           requestKey: { type: 'string', minLength: 8, maxLength: 100 },
         },
         required: ['requestKey'],
-        additionalProperties: ![],
+        additionalProperties: false,
       },
-      annotations: { readOnlyHint: !![], destructiveHint: ![], openWorldHint: ![] },
+      annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
     }),
     {
       tools: tools,

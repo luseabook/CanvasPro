@@ -16,7 +16,7 @@ export function createProjectSaveQueue(handler) {
       const result = { snapshot: snapshot, resolve: resolve, reject: reject },
         data = map['get'](index);
       if (data) {
-        (data['pending']?.['resolve']({ success: ![], canceled: !![], superseded: !![] }),
+        (data['pending']?.['resolve']({ success: false, canceled: true, superseded: true }),
           (data['pending'] = result));
         return;
       }

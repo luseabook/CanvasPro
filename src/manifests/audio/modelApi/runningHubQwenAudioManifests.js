@@ -105,7 +105,7 @@ const VOICES = [
     'Auto',
   );
 export const runningHubQwenAudioEntries = Object['freeze']([
-  ...[![], !![]]['map']((docId) =>
+  ...[false, true]['map']((docId) =>
     createRunningHubAudioCatalogEntry({
       id: 'qwen3-tts-' + (docId ? 'instruct-flash' : 'flash'),
       name: '千问3 语音合成 ' + (docId ? 'Instruct-Flash' : 'Flash'),
@@ -128,7 +128,7 @@ export const runningHubQwenAudioEntries = Object['freeze']([
               audioTextarea('instructions', '声音指令', '用中文或英文描述语气、语速、情感和音色。', {
                 maxLength: 2000,
               }),
-              audioToggle('optimizeInstructions', '优化声音指令', ![], {
+              audioToggle('optimizeInstructions', '优化声音指令', false, {
                 hideWhen: { field: 'instructions', value: '' },
               }),
             ]
@@ -140,7 +140,7 @@ export const runningHubQwenAudioEntries = Object['freeze']([
         ...(docId ? [paramMapping('instructions'), paramMapping('optimizeInstructions')] : []),
       ],
       rules: {
-        weightedChinesePrompt: !![],
+        weightedChinesePrompt: true,
         ...(docId ? { dependencies: [{ field: 'optimizeInstructions', requires: 'instructions' }] } : {}),
       },
     }),
@@ -152,7 +152,7 @@ export const runningHubQwenAudioEntries = Object['freeze']([
     docId: 0x1e492f9b,
     order: 202,
     promptField: null,
-    promptRequired: ![],
+    promptRequired: false,
     promptPlaceholder: '输入台词；选择随机台词时可留空',
     description: '使用自然语言设计音色，可分别选择手写或随机生成音色、台词。',
     fields: [

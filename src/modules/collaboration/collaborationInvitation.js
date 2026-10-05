@@ -39,7 +39,7 @@ export function createCollaborationInvitation({
     data = element('div', 'collaboration-invitation-row');
   root['append'](data);
   const el4 = input('邀请信息', data, { placeholder: '获取后可反复分享' });
-  ((el4['readOnly'] = !![]),
+  ((el4['readOnly'] = true),
     root['append'](
       element(
         'p',
@@ -101,7 +101,7 @@ export function createCollaborationInvitation({
         const enabled = payload['session'];
         root['hidden'] = !enabled || !['owner', 'admin']['includes'](enabled['role']);
         const handle = enabled ? enabled['roomId'] + ':' + enabled['role'] : '';
-        options !== handle && ((options = handle), invalidate(), (el7['open'] = ![]));
+        options !== handle && ((options = handle), invalidate(), (el7['open'] = false));
         const list = enabled?.['hostAddresses'] || [],
           state = JSON['stringify'](list);
         if (state !== target) {

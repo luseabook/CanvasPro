@@ -23,8 +23,8 @@ export function buildCanvasProjectContext(isTemporary = {}, index = {}) {
     recentId: String(isTemporary['recentId'] || index['recentId'] || '')['trim'](),
     displayPath: String(isTemporary['displayPath'] || index['displayPath'] || '')['trim'](),
     lastModified: Number(isTemporary['lastModified'] || index['lastModified'] || 0) || 0,
-    isTemporary: isTemporary['isTemporary'] === !![],
-    workspaceProjectScoped: !![],
+    isTemporary: isTemporary['isTemporary'] === true,
+    workspaceProjectScoped: true,
   };
 }
 export function createCanvasProjectOperations({
@@ -35,7 +35,7 @@ export function createCanvasProjectOperations({
   listProjects: listProjects = fetchV2ProjectsFromServer,
   renameProject: renameProject = renameV2ProjectOnServer,
   projectWorkspaceSessions: projectWorkspaceSessions,
-  renameTemporaryProject: renameTemporaryProject = () => ![],
+  renameTemporaryProject: renameTemporaryProject = () => false,
   applySourceNames: applySourceNames,
   commit: commit = commit_2,
   onProjectHydrated: onProjectHydrated,
@@ -55,7 +55,7 @@ export function createCanvasProjectOperations({
   }
   async function run3(canvasName, activeCanvasId, args) {
     const data = canvasName['getActiveCanvasId']?.() || canvasName['_activeId'];
-    if (activeCanvasId !== data && (await canvasName['switchTo']?.(activeCanvasId)) === ![]) return ![];
+    if (activeCanvasId !== data && (await canvasName['switchTo']?.(activeCanvasId)) === false) return false;
     return (
       canvasName['setCanvasProjectContext']?.(activeCanvasId, {
         ...(canvasName['getCanvasProjectContext']?.(activeCanvasId) || {}),
@@ -68,12 +68,12 @@ export function createCanvasProjectOperations({
           args['projectName'] ||
           text('loadedPackageBase'),
         hydratedData: null,
-        alreadyOpen: !![],
+        alreadyOpen: true,
       }
     );
   }
-  async function run4(enabled2, { applySourceNames: applySourceNames2 = ![] } = {}) {
-    if (!enabled2 || enabled2['canceled']) return ![];
+  async function run4(enabled2, { applySourceNames: applySourceNames2 = false } = {}) {
+    if (!enabled2 || enabled2['canceled']) return false;
     const target = run2(),
       projectName = buildCanvasProjectContext(enabled2),
       source = target['findCanvasIdByProjectIdentity']?.(projectName);
@@ -92,9 +92,9 @@ export function createCanvasProjectOperations({
       ),
       current = { ...error, name: name };
     if (applySourceNames2) applySourceNames?.(current);
-    if ((await target['addCanvas']()) === ![]) return ![];
+    if ((await target['addCanvas']()) === false) return false;
     const activeCanvasId2 = target['getActiveCanvasId']?.() || target['_activeId'];
-    if (!activeCanvasId2) return ![];
+    if (!activeCanvasId2) return false;
     return (
       target['renameCanvas']?.(activeCanvasId2, name),
       target['hydrateActiveCanvasSnapshot'](current),
@@ -123,8 +123,8 @@ export function createCanvasProjectOperations({
           projectId: projectId,
           filename: filename2,
           projectName: projectName2 || projectId,
-          isTemporary: ![],
-          workspaceProjectScoped: !![],
+          isTemporary: false,
+          workspaceProjectScoped: true,
         },
         state = handle['findCanvasIdByProjectIdentity']?.(args2);
       if (state) return run3(handle, state, args2);
@@ -137,7 +137,7 @@ export function createCanvasProjectOperations({
       if (!multiData?.['canvases']?.['length']) throw new Error(text('loadFailed'));
       return (
         await onProgress?.('hydrating'),
-        run4({ ...args2, multiData: multiData }, { applySourceNames: !![] })
+        run4({ ...args2, multiData: multiData }, { applySourceNames: true })
       );
     })['finally'](() => map['delete'](record));
     return (map['set'](record, payload), payload);
@@ -176,7 +176,7 @@ export function createCanvasProjectOperations({
             recentId: '',
             displayPath: '',
             lastModified: 0,
-            isTemporary: ![],
+            isTemporary: false,
           }),
           output['renameCanvas']?.(value3, projectName3),
           output['renderTabs']?.()),
@@ -193,10 +193,10 @@ export function createCanvasProjectOperations({
   }
   function renameCurrentProject(value4) {
     const name2 = normalizeName(value4);
-    if (!name2) return Promise['resolve'](![]);
+    if (!name2) return Promise['resolve'](false);
     const name3 = getActiveProjectContext(),
       filename4 = String(name3?.['filename'] || name3?.['projectId'] || '')['trim']();
-    if (name3?.['isTemporary'] === !![] || !filename4)
+    if (name3?.['isTemporary'] === true || !filename4)
       return Promise['resolve'](renameTemporaryProject(name2));
     return renameProject2(
       { filename: filename4, name: name3['projectName'] || stripCanvasProjectFileExtension(filename4) },

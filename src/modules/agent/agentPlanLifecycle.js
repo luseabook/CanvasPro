@@ -26,13 +26,13 @@ function resolveScopedExpression(options, target = {}) {
       ['map']((next) => next['trim']())
       ['filter'](Boolean),
     enabled = source['shift']();
-  if (!enabled || !Object['prototype']['hasOwnProperty']['call'](target, enabled)) return { ok: ![] };
+  if (!enabled || !Object['prototype']['hasOwnProperty']['call'](target, enabled)) return { ok: false };
   let value2 = target[enabled];
   for (const current of source) {
     value2 = readPathSegment(value2, current);
-    if (value2 === undefined) return { ok: ![] };
+    if (value2 === undefined) return { ok: false };
   }
-  return { ok: !![], value: value2 };
+  return { ok: true, value: value2 };
 }
 function resolveScopedValue(list2, entry = {}) {
   if (typeof list2 === 'string') {
@@ -191,7 +191,7 @@ export function createAgentPlanLifecycle({
           value: value20,
           label: translateManifestText(value21, { locale: locale }),
           selectedLabel: translateManifestText(value22, { locale: locale }),
-          disabled: disabled?.['disabled'] === !![],
+          disabled: disabled?.['disabled'] === true,
         };
       })
       ['filter'](

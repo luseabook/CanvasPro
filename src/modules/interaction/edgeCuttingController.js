@@ -14,7 +14,7 @@ export function createEdgeCuttingController({
   getDocumentElement: getDocumentElement = () =>
     typeof document !== 'undefined' ? document['documentElement'] : null,
 } = {}) {
-  let enabled = ![],
+  let enabled = false,
     box = null;
   const map = new Set();
   let value = null;
@@ -67,11 +67,11 @@ export function createEdgeCuttingController({
   }
   function run6(list) {
     const list2 = list['filter']((options) => options && !map['has'](options));
-    if (list2['length'] === 0) return ![];
+    if (list2['length'] === 0) return false;
     return (
       graphStore['updateEdgesBatch'](list2, []),
       list2['forEach']((target) => map['add'](target)),
-      !![]
+      true
     );
   }
   function finishSession() {
@@ -104,9 +104,9 @@ export function createEdgeCuttingController({
         const list4 = run7(getStateRaw(), worldX, worldY);
         if (list4['length'] > 0) run6(list4);
       }
-      return ((box = { x: worldX, y: worldY }), !![]);
+      return ((box = { x: worldX, y: worldY }), true);
     }
-    return (finishSession(), ![]);
+    return (finishSession(), false);
   }
   function run8(config) {
     const list5 = String(config || '')['trim']();
@@ -143,13 +143,13 @@ export function createEdgeCuttingController({
       value4 = list10['includes']('Ctrl'),
       value5 = list10['includes']('Shift'),
       value6 = list10['includes']('Alt');
-    if (!!(value3?.['ctrlKey'] || value3?.['metaKey']) !== value4) return ![];
-    if ((value3?.['shiftKey'] === !![]) !== value5) return ![];
-    if ((value3?.['altKey'] === !![]) !== value6) return ![];
+    if (!!(value3?.['ctrlKey'] || value3?.['metaKey']) !== value4) return false;
+    if ((value3?.['shiftKey'] === true) !== value5) return false;
+    if ((value3?.['altKey'] === true) !== value6) return false;
     const list11 = list10['filter']((value7) => value7 !== 'Ctrl' && value7 !== 'Shift' && value7 !== 'Alt'),
       value8 = run10(value3);
     if (list11['length'] === 0) {
-      if (list10['length'] !== 1) return ![];
+      if (list10['length'] !== 1) return false;
       return value8 === list10[0];
     }
     return list11['length'] === 1 && value8 === list11[0];
@@ -157,7 +157,7 @@ export function createEdgeCuttingController({
   function run12(value9) {
     const list12 = run9(getCutEdgeKeys?.()),
       enabled5 = run10(value9);
-    if (!enabled5) return ![];
+    if (!enabled5) return false;
     if (list12['length'] === 1) return enabled5 === list12[0];
     const list13 = list12['filter'](
       (value10) => value10 !== 'Ctrl' && value10 !== 'Shift' && value10 !== 'Alt',
@@ -165,10 +165,10 @@ export function createEdgeCuttingController({
     return list13['length'] === 1 && enabled5 === list13[0];
   }
   function run13(value11) {
-    if (run11(value11)) run4(!![]);
+    if (run11(value11)) run4(true);
   }
   function run14() {
-    (run4(![]), finishSession());
+    (run4(false), finishSession());
   }
   function run15(value12) {
     if (!enabled || !run12(value12)) return;
@@ -184,7 +184,7 @@ export function createEdgeCuttingController({
         (el2['removeEventListener']?.('keydown', run13),
           el2['removeEventListener']?.('keyup', run15),
           el2['removeEventListener']?.('blur', run14),
-          run4(![]),
+          run4(false),
           run5());
       }
     );

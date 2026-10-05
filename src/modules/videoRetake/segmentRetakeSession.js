@@ -134,9 +134,9 @@ export function shouldDeleteManagedRetakeInputNode({
   ownerEdgeId: ownerEdgeId,
   edges: edges = [],
 } = {}) {
-  if (node?.['segmentRetakeManaged'] !== !![]) return ![];
+  if (node?.['segmentRetakeManaged'] !== true) return false;
   const enabled = String(nodeId || node?.['id'] || '')['trim']();
-  if (!enabled) return ![];
+  if (!enabled) return false;
   return !(Array['isArray'](edges) ? edges : [])['some'](
     (value17) => value17?.['sourceId'] === enabled && value17?.['id'] !== ownerEdgeId,
   );
@@ -154,18 +154,18 @@ export function getOrphanedSegmentRetakeAnnotationIds({
 export function getSegmentRetakeValidation(options2 = {}) {
   const value20 = options2['range'] || {},
     finiteNumber7 = finiteNumber(value20['endSec']) - finiteNumber(value20['startSec']);
-  if (finiteNumber7 < SEGMENT_RETAKE_MIN_DURATION_SECONDS) return { ok: ![], reason: 'range-too-short' };
-  if (finiteNumber7 > SEGMENT_RETAKE_MAX_DURATION_SECONDS) return { ok: ![], reason: 'range-too-long' };
+  if (finiteNumber7 < SEGMENT_RETAKE_MIN_DURATION_SECONDS) return { ok: false, reason: 'range-too-short' };
+  if (finiteNumber7 > SEGMENT_RETAKE_MAX_DURATION_SECONDS) return { ok: false, reason: 'range-too-long' };
   const invalidAnnotationIds = (Array['isArray'](options2['annotations']) ? options2['annotations'] : [])[
     'filter'
   ]((value21) => !isSegmentRetakeAnnotationInRange(value21, value20));
   if (invalidAnnotationIds['length'] > 0)
     return {
-      ok: ![],
+      ok: false,
       reason: 'annotation-outside-range',
       invalidAnnotationIds: invalidAnnotationIds['map']((value22) => value22['id']),
     };
-  return { ok: !![], reason: '' };
+  return { ok: true, reason: '' };
 }
 export function buildSegmentRetakePromptText(value23) {
   const value24 = String(value23 || '')['trim']();

@@ -18,16 +18,16 @@ export function shouldUseCreativeDefaults({
   agentContext: agentContext = {},
   toolResultCount: toolResultCount = 0,
 } = {}) {
-  if (plan?.['status'] !== 'need_clarification' || Number(toolResultCount || 0) > 0) return ![];
+  if (plan?.['status'] !== 'need_clarification' || Number(toolResultCount || 0) > 0) return false;
   const key = String(userMessage || '')['trim']();
-  if (!matchesAny(key, EXPLICIT_CREATIVE_CREATE_PATTERNS)) return ![];
+  if (!matchesAny(key, EXPLICIT_CREATIVE_CREATE_PATTERNS)) return false;
   const map = new Set(
     (Array['isArray'](agentContext?.['commands']) ? agentContext['commands'] : [])
       ['map']((index) => String(index?.['id'] || index || '')['trim']())
       ['filter'](Boolean),
   );
-  if (!map['has']('node.create')) return ![];
+  if (!map['has']('node.create')) return false;
   const result = String(plan?.['question'] || plan?.['reply'] || '')['trim']();
-  if (matchesAny(result, NON_INFERABLE_INPUT_PATTERNS)) return ![];
-  return !![];
+  if (matchesAny(result, NON_INFERABLE_INPUT_PATTERNS)) return false;
+  return true;
 }

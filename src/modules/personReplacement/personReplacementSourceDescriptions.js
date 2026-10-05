@@ -36,11 +36,11 @@ export function buildSourceDescriptionRequest(index, imageRefs) {
     ]['join']('\n'),
     structuredOutput: {
       name: 'person_replacement_source_descriptions',
-      strict: !![],
+      strict: true,
       fallback: 'prompt',
       schema: {
         type: 'object',
-        additionalProperties: ![],
+        additionalProperties: false,
         required: ['people'],
         properties: {
           people: {
@@ -49,7 +49,7 @@ export function buildSourceDescriptionRequest(index, imageRefs) {
             maxItems: minItems['length'],
             items: {
               type: 'object',
-              additionalProperties: ![],
+              additionalProperties: false,
               required: ['label', 'description', 'ambiguous'],
               properties: {
                 label: { type: 'string', enum: minItems },
@@ -73,7 +73,7 @@ export function parseSourceDescriptions(options, target) {
       description = text(current?.['description']);
     if (
       list2['length'] !== 1 ||
-      current['ambiguous'] !== ![] ||
+      current['ambiguous'] !== false ||
       !description ||
       description['length'] > 40 ||
       /[\r\n]|图\s*\d|替换|忽略|指令|→/u['test'](description)

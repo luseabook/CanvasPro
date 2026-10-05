@@ -24,7 +24,7 @@ function setThumbState(key, index) {
 }
 function setThumbBackground(el2, result, data = '') {
   const text = normalizeText(result);
-  if (!el2?.['style'] || !text) return ![];
+  if (!el2?.['style'] || !text) return false;
   const list = [text, normalizeText(data)]
     ['filter'](Boolean)
     ['filter']((options, target, list2) => list2['indexOf'](options) === target);
@@ -32,7 +32,7 @@ function setThumbBackground(el2, result, data = '') {
     (el2['style']['backgroundImage'] = list['map']((source) => 'url(' + JSON['stringify'](source) + ')')[
       'join'
     ](', ')),
-    !![]
+    true
   );
 }
 export function paintVideoTimelineThumbnailUrls(next, current, entry = 'ready') {
@@ -49,9 +49,9 @@ export function paintVideoTimelineThumbnailUrls(next, current, entry = 'ready') 
   return (setThumbState(list3, entry), list3['length']);
 }
 function waitForLoadedMetadata(el3, handle) {
-  if (Number(el3?.['readyState'] || 0) >= 1) return Promise['resolve'](!![]);
+  if (Number(el3?.['readyState'] || 0) >= 1) return Promise['resolve'](true);
   return new Promise((handler, handler2) => {
-    let state = ![],
+    let state = false,
       config = null;
     const run = () => {
         (el3['removeEventListener']?.('loadedmetadata', scope),
@@ -62,9 +62,9 @@ function waitForLoadedMetadata(el3, handle) {
       },
       handler3 = (output) => {
         if (state) return;
-        ((state = !![]), run());
+        ((state = true), run());
         if (output) handler2(output);
-        else handler(!![]);
+        else handler(true);
       },
       scope = () => handler3(),
       input = () => handler3(new Error('video thumbnail source failed to load'));
@@ -83,11 +83,11 @@ function seekVideo(el4, value2, value3) {
   if (
     Math['abs']((Number(el4?.['currentTime']) || 0) - value4) <= 0.02 &&
     Number(el4?.['readyState'] || 0) >= 2 &&
-    el4?.['seeking'] !== !![]
+    el4?.['seeking'] !== true
   )
-    return Promise['resolve'](!![]);
+    return Promise['resolve'](true);
   return new Promise((handler4, handler5) => {
-    let value5 = ![],
+    let value5 = false,
       value6 = null;
     const run2 = () => {
         (el4['removeEventListener']?.('seeked', value7),
@@ -98,12 +98,12 @@ function seekVideo(el4, value2, value3) {
       },
       handler6 = (value9) => {
         if (value5) return;
-        ((value5 = !![]), run2());
+        ((value5 = true), run2());
         if (value9) handler5(value9);
-        else handler4(!![]);
+        else handler4(true);
       },
       value7 = () => {
-        if (el4?.['seeking'] !== !![]) handler6();
+        if (el4?.['seeking'] !== true) handler6();
       },
       value8 = () => handler6(new Error('video thumbnail seek failed'));
     (el4['addEventListener']?.('seeked', value7),
@@ -125,7 +125,7 @@ export async function extractClientVideoTimelineFrameUrls({
   src: src,
   count: count,
   sampleTimes: sampleTimes,
-  isCurrent: isCurrent = () => !![],
+  isCurrent: isCurrent = () => true,
   documentRef: documentRef = globalThis['document'],
   attachMediaSource: attachMediaSource = attachMediaElementPlaybackSource,
   waitForFrame: waitForFrame = waitForVideoFrame,
@@ -136,8 +136,8 @@ export async function extractClientVideoTimelineFrameUrls({
     value11 = list5 ? list5['length'] : Math['max'](1, Math['trunc'](Number(count) || 0));
   if (!text2 || !documentRef?.['createElement']) return [];
   const el5 = documentRef['createElement']('video');
-  ((el5['muted'] = !![]),
-    (el5['playsInline'] = !![]),
+  ((el5['muted'] = true),
+    (el5['playsInline'] = true),
     (el5['preload'] = 'auto'),
     (el5['crossOrigin'] = 'anonymous'),
     el5['setAttribute']?.('aria-hidden', 'true'));
@@ -168,7 +168,7 @@ export async function extractClientVideoTimelineFrameUrls({
       value14 = 44,
       value15 = Math['max'](1, Math['min'](240, Math['round']((value12 / value13) * value14)));
     ((box = documentRef['createElement']('canvas')), (box['width'] = value15), (box['height'] = value14));
-    const ctx = box['getContext']?.('2d', { willReadFrequently: ![] });
+    const ctx = box['getContext']?.('2d', { willReadFrequently: false });
     if (!ctx) throw new Error('video thumbnail canvas is unavailable');
     const list6 = [];
     for (let value16 = 0; value16 < value11; value16 += 1) {
@@ -198,7 +198,7 @@ export async function renderVideoTimelineThumbnails({
   src: src2,
   posterUrl: posterUrl,
   thumbs: thumbs,
-  isCurrent: isCurrent = () => !![],
+  isCurrent: isCurrent = () => true,
   extractServerFrames: extractServerFrames = extractStoryboardVideoFramesFromServer,
   extractClientFrames: extractClientFrames = extractClientVideoTimelineFrameUrls,
   onDuration: onDuration2,
@@ -220,7 +220,7 @@ export async function renderVideoTimelineThumbnails({
   try {
     const extractServerFrames2 = await extractServerFrames(src3, {
       maxFrames: maxFrames['length'],
-      exactCount: !![],
+      exactCount: true,
     });
     if (!isCurrent()) return { source: 'cancelled', errors: errors };
     const list7 = (Array['isArray'](extractServerFrames2?.['frames']) ? extractServerFrames2['frames'] : [])

@@ -1,7 +1,7 @@
 import { resolveDebugImageSource } from '../utils/debugImagePreview.js';
 export function renderDebugRequestImages(value, list, item = [], el) {
   const el2 = value['ownerDocument'];
-  ((el['hidden'] = !![]), el['replaceChildren'](), value['replaceChildren']());
+  ((el['hidden'] = true), el['replaceChildren'](), value['replaceChildren']());
   let key = 0;
   (item['forEach']((index) => {
     const debugImageSource = resolveDebugImageSource(index['src']);
@@ -27,7 +27,7 @@ export function renderDebugRequestImages(value, list, item = [], el) {
       (data['loading'] = 'lazy'),
       (data['decoding'] = 'async'),
       (data['referrerPolicy'] = 'no-referrer'),
-      (data['draggable'] = ![]),
+      (data['draggable'] = false),
       data['addEventListener']('load', () => {
         el3['dataset']['state'] = 'ready';
       }),
@@ -43,10 +43,10 @@ export function renderDebugRequestImages(value, list, item = [], el) {
         (target['removeAttribute']('loading'),
           (target['alt'] = index['label']),
           el['replaceChildren'](target),
-          (el['hidden'] = ![]));
+          (el['hidden'] = false));
       },
       source = () => {
-        ((el['hidden'] = !![]), el['replaceChildren']());
+        ((el['hidden'] = true), el['replaceChildren']());
       };
     (el3['addEventListener']('mouseenter', options),
       el3['addEventListener']('mouseleave', source),

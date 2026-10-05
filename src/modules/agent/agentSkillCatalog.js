@@ -218,7 +218,7 @@ const sceneDirectorSkill = {
     'Should the Agent replace the current 3D Stage contents or add to them?',
   ],
   recommendedModelKind: '',
-  defaultParams: { replaceExisting: ![], environmentMode: 'night' },
+  defaultParams: { replaceExisting: false, environmentMode: 'night' },
   commands: [
     'node.create',
     'scene.catalog.search',
@@ -399,7 +399,7 @@ const mpCavemanSkill = {
   requiredInputs: [],
   missingInputQuestions: [],
   recommendedModelKind: '',
-  defaultParams: { persistent: !![] },
+  defaultParams: { persistent: true },
   commands: [],
 };
 const mpGrillMeSkill = {
@@ -617,10 +617,10 @@ function escapeSkillReference(key = '') {
   return String(key || '')['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function containsSkillReference(index, result, { prefixed: prefixed = ![] } = {}) {
+function containsSkillReference(index, result, { prefixed: prefixed = false } = {}) {
   const enabled = String(index || '')['trim'](),
     enabled2 = String(result || '')['trim']();
-  if (!enabled || !enabled2) return ![];
+  if (!enabled || !enabled2) return false;
   if (/[^\x00-\x7f]/u['test'](enabled2) && !prefixed)
     return enabled['toLowerCase']()['includes'](enabled2['toLowerCase']());
   const escapeSkillReference2 = escapeSkillReference(enabled2),
@@ -634,7 +634,7 @@ function isExplicitSkillRequest(options, target = {}) {
   const source = String(target['id'] || '')['trim'](),
     next = String(target['title'] || '')['trim']();
   return Boolean(
-    (source && containsSkillReference(options, source, { prefixed: !![] })) ||
+    (source && containsSkillReference(options, source, { prefixed: true })) ||
     (source && containsSkillReference(options, source)) ||
     (next && containsSkillReference(options, next)),
   );
@@ -719,7 +719,7 @@ export function selectAgentSkills({
       ),
     ],
     list = (registry['listSkills']?.() || [])
-      ['filter']((input) => input['enabled'] !== ![] && config['includes'](input['id']))
+      ['filter']((input) => input['enabled'] !== false && config['includes'](input['id']))
       ['sort']((output, value2) => config['indexOf'](output['id']) - config['indexOf'](value2['id']))
       ['slice'](0, state),
     enabled3 = new Set(list['map']((value3) => value3['id'])),

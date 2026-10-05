@@ -56,8 +56,8 @@ export function normalizeAudioVoiceAnalyzeSegments(options = {}, key = {}) {
       speaker: speaker,
       sourceAudioLocalPath: id?.['sourceAudioLocalPath'],
       sourceAudioUrl: id?.['sourceAudioUrl'],
-      sourceAudioReady: !![],
-      convertedAudioReady: ![],
+      sourceAudioReady: true,
+      convertedAudioReady: false,
       activeAudio: 'source',
       status: 'detected',
     });

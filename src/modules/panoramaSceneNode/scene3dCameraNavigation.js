@@ -72,8 +72,8 @@ export function readSceneObjectFrame({
           ? record?.['marker'] || record?.['group']
           : record?.['content'] || record?.['group'];
   if (!enabled) return null;
-  enabled['updateWorldMatrix']?.(!![], !![]);
-  const payload = new threeRuntime['Box3']()['setFromObject'](enabled, !![]);
+  enabled['updateWorldMatrix']?.(true, true);
+  const payload = new threeRuntime['Box3']()['setFromObject'](enabled, true);
   if (payload['isEmpty']()) return null;
   const x3 = payload['getBoundingSphere'](new threeRuntime['Sphere']());
   return {
@@ -130,7 +130,7 @@ export function resolvePointerDollyAnchor({
 } = {}) {
   if (!raycaster?.['ray']) return null;
   const list2 = Array['isArray'](pickRoots) ? pickRoots : [],
-    x5 = list2['length'] > 0 ? raycaster['intersectObjects'](list2, ![])[0] : null;
+    x5 = list2['length'] > 0 ? raycaster['intersectObjects'](list2, false)[0] : null;
   if (x5?.['point']) return { x: x5['point']['x'], y: x5['point']['y'], z: x5['point']['z'] };
   const input = PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene']['orbitDistance']['min'],
     output = PANORAMA_SCENE_CAMERA_CONSTRAINTS['scene']['orbitDistance']['max'],

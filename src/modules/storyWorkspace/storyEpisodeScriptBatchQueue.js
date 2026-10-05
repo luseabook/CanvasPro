@@ -2,8 +2,8 @@ export { createStoryTaskBatchCancellationRegistry as createStoryEpisodeScriptBat
 export async function runStoryEpisodeScriptBatchQueue({
   targets: targets = [],
   batchId: batchId = '',
-  isLive: isLive = () => !![],
-  isCancellationRequested: isCancellationRequested = () => ![],
+  isLive: isLive = () => true,
+  isCancellationRequested: isCancellationRequested = () => false,
   beforeTarget: beforeTarget = () => {},
   runTarget: runTarget,
   afterTarget: afterTarget = () => {},

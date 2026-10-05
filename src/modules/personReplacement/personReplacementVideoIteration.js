@@ -22,7 +22,7 @@ export function setPersonReplacementVideoResultAsReference(
     count >= personReplacementVideoResults['length'] ||
     !personReplacementVideoResultRef
   )
-    return { project: args, changed: ![] };
+    return { project: args, changed: false };
   const index = personReplacementVideoResultRef === args2['videoIterationReferenceRef'],
     result = {
       ...args2,
@@ -37,7 +37,7 @@ export function setPersonReplacementVideoResultAsReference(
   if (index) delete result['videoIterationReferenceRef'];
   else result['videoIterationReferenceRef'] = personReplacementVideoResultRef;
   return {
-    changed: !![],
+    changed: true,
     clearedReference: index,
     project: {
       ...args,
@@ -63,10 +63,10 @@ export function reversePersonReplacementVideoIteration({
   const target = (async () => {
     const response = await enqueueMediaTask(
         { kind: 'videoReverse', src: sourceRef },
-        { wait: !![], timeout: 600000 },
+        { wait: true, timeout: 600000 },
       ),
       personReplacementVideoResultRef2 = resolvePersonReplacementVideoResultRef(resolveMediaRef(response));
-    if (response?.['success'] === ![] || !personReplacementVideoResultRef2)
+    if (response?.['success'] === false || !personReplacementVideoResultRef2)
       throw new Error(response?.['error'] || '参考视频倒放失败。');
     const args3 = getProject(),
       source = args3['shots']['find']((next) => next['id'] === shot['id']);
@@ -76,7 +76,7 @@ export function reversePersonReplacementVideoIteration({
       source?.['videoIterationReferenceRef'] !== options ||
       resolvePersonReplacementVideoSourceRef(source) !== sourceRef
     )
-      return { ok: ![], stale: !![] };
+      return { ok: false, stale: true };
     const current = setProject(
       {
         ...args3,
@@ -85,14 +85,14 @@ export function reversePersonReplacementVideoIteration({
             ? {
                 ...args4,
                 videoIterationInputRef: personReplacementVideoResultRef2,
-                videoIterationInputIsReversed: isReversed === !![],
+                videoIterationInputIsReversed: isReversed === true,
               }
             : args4,
         ),
       },
-      { renderWorkspace: ![] },
+      { renderWorkspace: false },
     );
-    return { ok: !![], project: current };
+    return { ok: true, project: current };
   })();
   return { project: project, completion: target };
 }

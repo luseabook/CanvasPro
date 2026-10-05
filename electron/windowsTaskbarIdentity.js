@@ -14,8 +14,8 @@ export function configureWindowsTaskbarIdentity({
     typeof targetWindow?.['setIcon'] !== 'function' ||
     typeof targetWindow?.['setAppDetails'] !== 'function'
   )
-    return ![];
-  if (!appId || !iconPath || !executablePath || !displayName) return ![];
+    return false;
+  if (!appId || !iconPath || !executablePath || !displayName) return false;
   try {
     return (
       targetWindow['setIcon'](iconPath),
@@ -26,10 +26,10 @@ export function configureWindowsTaskbarIdentity({
         relaunchCommand: executablePath,
         relaunchDisplayName: displayName,
       }),
-      !![]
+      true
     );
   } catch {
-    return ![];
+    return false;
   }
 }
 export function installWindowsTaskbarIdentity(options = {}) {
@@ -40,9 +40,9 @@ export function installWindowsTaskbarIdentity(options = {}) {
     typeof targetWindow?.['setIcon'] !== 'function' ||
     typeof targetWindow?.['setAppDetails'] !== 'function'
   )
-    return ![];
+    return false;
   const applyIdentity = () => configureWindowsTaskbarIdentity({ ...options, platform: platform });
-  return (applyIdentity(), targetWindow['on']('show', applyIdentity), !![]);
+  return (applyIdentity(), targetWindow['on']('show', applyIdentity), true);
 }
 function encodePowerShellValue(value) {
   return Buffer['from'](String(value || ''), 'utf8')['toString']('base64');
@@ -117,11 +117,11 @@ function logTaskbarIdentityFailure(logEvent, type, message, extra = {}) {
 }
 function waitForTaskbarIdentityHelperReady(helper, timeoutMs = WINDOWS_CHROME_SHELL_IDENTITY_TIMEOUT_MS) {
   return new Promise((resolve) => {
-    let settled = ![],
+    let settled = false,
       output = '';
     const finish = (ready) => {
         if (settled) return;
-        ((settled = !![]),
+        ((settled = true),
           clearTimeout(timer),
           helper?.['stdout']?.['removeListener']?.('data', onData),
           helper?.['removeListener']?.('error', onError),
@@ -130,11 +130,11 @@ function waitForTaskbarIdentityHelperReady(helper, timeoutMs = WINDOWS_CHROME_SH
       },
       onData = (chunk) => {
         output += String(chunk || '');
-        if (/(^|\r?\n)READY\r?\n/['test'](output + '\n')) finish(!![]);
+        if (/(^|\r?\n)READY\r?\n/['test'](output + '\n')) finish(true);
       },
-      onError = () => finish(![]),
-      onExit = () => finish(![]),
-      timer = setTimeout(() => finish(![]), timeoutMs);
+      onError = () => finish(false),
+      onExit = () => finish(false),
+      timer = setTimeout(() => finish(false), timeoutMs);
     (timer['unref']?.(),
       helper?.['stdout']?.['on']?.('data', onData),
       helper?.['once']?.('error', onError),
@@ -160,7 +160,7 @@ export async function prepareWindowsChromeShellTaskbarIdentity({
     const helper = spawnProcess(
         'powershell.exe',
         ['-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', script],
-        { stdio: ['pipe', 'pipe', 'ignore'], windowsHide: !![], detached: ![] },
+        { stdio: ['pipe', 'pipe', 'ignore'], windowsHide: true, detached: false },
       ),
       ready = await waitForTaskbarIdentityHelperReady(helper);
     if (!ready)
@@ -190,13 +190,13 @@ export async function prepareWindowsChromeShellTaskbarIdentity({
         },
         attach(launch) {
           const pid = readPositiveInteger(launch?.['pid']);
-          if (!pid || typeof helper?.['stdin']?.['write'] !== 'function') return (this['cancel'](), ![]);
+          if (!pid || typeof helper?.['stdin']?.['write'] !== 'function') return (this['cancel'](), false);
           return (
             helper['stdin']['write'](pid + '\n'),
             helper['stdin']['end']?.(),
             helper['stdout']?.['destroy']?.(),
             helper['unref']?.(),
-            !![]
+            true
           );
         },
       }

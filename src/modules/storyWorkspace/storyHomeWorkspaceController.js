@@ -68,35 +68,35 @@ export function createStoryHomeWorkspaceController({
     typeof refreshTextModelSelector !== 'function'
   )
     throw new TypeError('Story home workspace requires project, persistence, and presentation adapters.');
-  function resetCreationState({ preserveCurrentProject: preserveCurrentProject = !![] } = {}) {
+  function resetCreationState({ preserveCurrentProject: preserveCurrentProject = true } = {}) {
     (state['hasCreatedProject'] && preserveCurrentProject && syncCurrentProjectEntry(),
       beginProjectSession(),
       (state['homeTab'] = state['workspaceSurface'] === 'replication' ? 'replication' : 'generate'),
       (state['scriptMode'] = 'plot'),
       (state['uploadInputMode'] = 'file'),
-      (state['projectTitleEdited'] = ![]),
+      (state['projectTitleEdited'] = false),
       (state['idea'] = ''),
       releaseReplicationSourcePreviewUrls(),
       (state['replicationSourceFiles'] = []),
       (state['scriptFileName'] = ''),
       (state['scriptText'] = ''),
       (state['scriptCharacterCount'] = null),
-      (state['hasCreatedProject'] = ![]),
+      (state['hasCreatedProject'] = false),
       (state['openProjectMenuId'] = ''),
       (state['pendingDeleteProjectId'] = ''),
       projectData['replaceCurrent'](normalizeStoryWorkspaceAssetData(createDemoStoryWorkspaceData())),
       (state['data']['project']['planning'] = normalizeStoryProjectPlanning(state['data']['project'], {
         allowDeveloperPromptModes: state['developerModeAvailable'],
       })),
-      (state['assetSelectionMode'] = ![]),
+      (state['assetSelectionMode'] = false),
       (state['selectedAssetIds'] = []),
-      (state['scriptSelectionMode'] = ![]),
+      (state['scriptSelectionMode'] = false),
       (state['selectedScriptEpisodeIds'] = []),
       (state['generatingEpisodeScriptId'] = ''),
-      (state['isBatchGeneratingScripts'] = ![]),
+      (state['isBatchGeneratingScripts'] = false),
       (state['episodeScriptBatchId'] = ''),
-      (state['episodeScriptBatchCancelRequested'] = ![]),
-      (state['scriptGenerationFocusMode'] = ![]),
+      (state['episodeScriptBatchCancelRequested'] = false),
+      (state['scriptGenerationFocusMode'] = false),
       (state['outlineSectionOpenState'] = {}),
       (state['episodeScriptGenerationStatus'] = ''),
       (state['assetAppearanceIndexes'] = {}),
@@ -105,7 +105,7 @@ export function createStoryHomeWorkspaceController({
       (state['pendingCharacterVoiceAssetId'] = ''),
       (state['pendingDeleteClipId'] = ''),
       (state['pendingDeleteAssetAppearanceKey'] = ''),
-      (state['clipSelectionMode'] = ![]),
+      (state['clipSelectionMode'] = false),
       (state['selectedClipGenerationIds'] = []),
       (state['clipBatchGenerationByEpisode'] = {}));
   }
@@ -141,51 +141,51 @@ export function createStoryHomeWorkspaceController({
       target = projectData['getEntry'](text2),
       duplicateStoryProjectEntry2 = duplicateStoryProjectEntry(target, { projectId: projectId() });
     if (!duplicateStoryProjectEntry2?.['data']?.['project'])
-      return (showToast('复制项目失败，请刷新后重试。', 'error'), ![]);
+      return (showToast('复制项目失败，请刷新后重试。', 'error'), false);
     return (
       projectData['addEntry'](duplicateStoryProjectEntry2),
       advanceProjectSession(state, duplicateStoryProjectEntry2['id']),
       (state['openProjectMenuId'] = ''),
       (state['pendingDeleteProjectId'] = ''),
-      schedulePersistence({ immediate: !![] }),
+      schedulePersistence({ immediate: true }),
       render(),
       showToast('已创建“' + duplicateStoryProjectEntry2['title'] + '”。', 'success'),
-      !![]
+      true
     );
   }
   function setProjectArchived(source, next) {
     syncCurrentProjectEntry();
     const text3 = normalizeText(source),
       enabled = projectData['getEntry'](text3);
-    if (!enabled) return (showToast('项目状态更新失败，请刷新后重试。', 'error'), ![]);
+    if (!enabled) return (showToast('项目状态更新失败，请刷新后重试。', 'error'), false);
     return (
       (enabled['archivedAt'] = next ? Date['now']() : 0),
       (enabled['updatedAt'] = Date['now']()),
       (state['openProjectMenuId'] = ''),
       (state['pendingDeleteProjectId'] = ''),
-      schedulePersistence({ immediate: !![] }),
+      schedulePersistence({ immediate: true }),
       render(),
       showToast(next ? '剧本项目已归档。' : '剧本项目已取消归档。', 'success'),
-      !![]
+      true
     );
   }
   function deleteProject(current) {
     const text4 = normalizeText(current);
-    if (!text4) return ![];
+    if (!text4) return false;
     if (!projectData['removeEntry'](text4))
-      return ((state['openProjectMenuId'] = ''), (state['pendingDeleteProjectId'] = ''), render(), ![]);
+      return ((state['openProjectMenuId'] = ''), (state['pendingDeleteProjectId'] = ''), render(), false);
     return (
       invalidateProjectRuntime(text4),
       normalizeText(state['data']?.['project']?.['id']) === text4
         ? (beginProjectSession(),
-          (state['hasCreatedProject'] = ![]),
-          resetCreationState({ preserveCurrentProject: ![] }),
+          (state['hasCreatedProject'] = false),
+          resetCreationState({ preserveCurrentProject: false }),
           (state['view'] = 'home'))
         : ((state['openProjectMenuId'] = ''), (state['pendingDeleteProjectId'] = '')),
-      schedulePersistence({ immediate: !![] }),
+      schedulePersistence({ immediate: true }),
       render(),
       showToast('剧本项目已删除。', 'success'),
-      !![]
+      true
     );
   }
   function syncGenerateState() {
@@ -224,7 +224,7 @@ export function createStoryHomeWorkspaceController({
     const el10 = el3?.['querySelector']('[data-story-planning-picker="episodeCount"]');
     if (el10) el10['hidden'] = !['generate', 'collaborate']['includes'](state['homeTab']);
     const el11 = el3?.['querySelector']('[data-story-planning-picker="promptMode"]');
-    if (el11) el11['hidden'] = ![];
+    if (el11) el11['hidden'] = false;
     const el12 = el3?.['querySelector']('[data-story-planning-picker="targetLocale"]');
     if (el12) el12['hidden'] = state['homeTab'] !== 'replication';
     const el13 = el3?.['querySelector']('.story-home-composer');
@@ -240,10 +240,10 @@ export function createStoryHomeWorkspaceController({
     el17 && (el17['textContent'] = state['scriptText']['length'] + ' / ' + STORY_SCRIPT_MAX_CHARACTERS);
   }
   function switchTab(payload) {
-    if (payload === 'collaborate' && state['developerModeAvailable'] !== !![]) return ![];
+    if (payload === 'collaborate' && state['developerModeAvailable'] !== true) return false;
     const storyVideoReplicationHomeTab = resolveStoryVideoReplicationHomeTab(state, payload);
-    if (payload === 'replication' && storyVideoReplicationHomeTab !== payload) return ![];
-    if (state['homeTab'] === storyVideoReplicationHomeTab) return ![];
+    if (payload === 'replication' && storyVideoReplicationHomeTab !== payload) return false;
+    if (state['homeTab'] === storyVideoReplicationHomeTab) return false;
     state['homeTab'] = storyVideoReplicationHomeTab;
     const el18 = viewport['querySelector']('.story-page.is-current'),
       el19 = el18?.['querySelector']('[data-story-home-tabs]'),
@@ -283,13 +283,13 @@ export function createStoryHomeWorkspaceController({
       config && scope && (config['replaceWith'](scope), refreshTextModelSelector(el18)),
       syncGenerateState(),
       schedulePersistence(),
-      !![]
+      true
     );
   }
   function selectScriptMode(input) {
     const storyScriptMode2 = normalizeStoryScriptMode(input);
-    if (state['scriptMode'] === storyScriptMode2) return ![];
-    return ((state['scriptMode'] = storyScriptMode2), syncGenerateState(), schedulePersistence(), !![]);
+    if (state['scriptMode'] === storyScriptMode2) return false;
+    return ((state['scriptMode'] = storyScriptMode2), syncGenerateState(), schedulePersistence(), true);
   }
   // A novel is adapted in batches, so parse it into chapters and pick the first batch instead
   // of handing the whole book to the rewrite pipeline.
@@ -304,14 +304,14 @@ export function createStoryHomeWorkspaceController({
     );
   }
   async function selectScriptFile(fileName) {
-    if (!fileName) return ![];
+    if (!fileName) return false;
     if (typeof extractDocumentText !== 'function')
-      return (showToast('剧本文档解析服务尚未初始化。', 'error'), ![]);
+      return (showToast('剧本文档解析服务尚未初始化。', 'error'), false);
     const value2 = state['data'];
-    ((state['isParsingDocument'] = !![]), render());
+    ((state['isParsingDocument'] = true), render());
     try {
       const response = await extractDocumentText(fileName);
-      if (state['data'] !== value2) return ![];
+      if (state['data'] !== value2) return false;
       // The parser used to slice the document to the limit without saying anything, so an
       // oversized novel silently lost everything past the cut. Report the loss explicitly.
       const list2 = String(response?.['text'] || ''),
@@ -331,7 +331,7 @@ export function createStoryHomeWorkspaceController({
             text: text5,
             characterCount: state['scriptCharacterCount'],
           }),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         count > 0 &&
           showTaskResultToast(
             '文档共 ' +
@@ -349,7 +349,7 @@ export function createStoryHomeWorkspaceController({
         state['scriptIntent'] === 'novel'
           ? (function () {
               const count2 = run(text5);
-              (schedulePersistence({ immediate: !![] }),
+              (schedulePersistence({ immediate: true }),
                 render(),
                 showTaskResultToast(
                   count2 > 1
@@ -359,12 +359,12 @@ export function createStoryHomeWorkspaceController({
                 ));
             })()
           : showTaskResultToast('剧本文档解析完成。', 'success'),
-        !![]
+        true
       );
     } catch (error) {
-      return (showTaskResultToast(error?.['message'] || '剧本文档解析失败。', 'error', error), ![]);
+      return (showTaskResultToast(error?.['message'] || '剧本文档解析失败。', 'error', error), false);
     } finally {
-      ((state['isParsingDocument'] = ![]), render());
+      ((state['isParsingDocument'] = false), render());
     }
   }
   return {

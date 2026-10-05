@@ -17,7 +17,7 @@ export function createImageGenerationPresentationModule(
           (this['_detachImagePresentation'] = enabled['attachPresentation']({
             flushPrompt: () => this['_flushPromptHtmlCommit']?.(),
             onStateChange: (value) => {
-              ((this['_generationSubmitInFlight'] = value['submitting'] === !![]),
+              ((this['_generationSubmitInFlight'] = value['submitting'] === true),
                 (this['_isGenerating'] = value['isGenerating']));
               if (this['previewEl']) {
                 if (value['isGenerating']) startLoading(this['previewEl']);
@@ -57,7 +57,7 @@ export function createImageGenerationPresentationModule(
       _handleGenerateOrCancel['_getPreviewGenerateButtonLoadingOptions'],
     unmount() {
       (this['_flushPromptHtmlCommit']?.(),
-        (this['_imagePresentationUnmounted'] = !![]),
+        (this['_imagePresentationUnmounted'] = true),
         this['_detachImagePresentation']?.(),
         (this['_detachImagePresentation'] = null),
         (this['_imageExecution'] = null),

@@ -42,7 +42,7 @@ export const BAILIAN_VIDEO_MODELS = Object['freeze']([
         defaultValue: 5,
         optionOverridesByValue: { '-1': { label: '自动', displayLabel: '自动' } },
       }),
-      { ...VIDEO_AUDIO_FIELD, defaultValue: !![] },
+      { ...VIDEO_AUDIO_FIELD, defaultValue: true },
       VIDEO_PROMPT_EXTEND_FIELD,
       VIDEO_WATERMARK_FIELD,
       ...VIDEO_SEED_FIELDS,
@@ -77,7 +77,7 @@ export const BAILIAN_VIDEO_MODELS = Object['freeze']([
             showWhen: referenceMode,
           },
         ],
-        cycleFixedInputWhenFull: !![],
+        cycleFixedInputWhenFull: true,
         policyVariants: [
           {
             when: frameMode,
@@ -104,7 +104,7 @@ export const BAILIAN_VIDEO_MODELS = Object['freeze']([
       }),
       maxVideoInputAndOutputDurationSeconds: 30,
     },
-    ratioPolicy: { ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: !![] },
+    ratioPolicy: { ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true },
     prompt: { placeholder: '描述画面、动作和声音；参考模式可用图1、视频1、音频1引用素材。' },
     help: {
       tooltip:
@@ -113,13 +113,13 @@ export const BAILIAN_VIDEO_MODELS = Object['freeze']([
     extensions: {
       ...createVideoMenuExtension(10, '百炼官方 · 文生 / 首尾帧 / 多模态参考'),
       storyWorkspace: { promptMode: 'wan-3.0' },
-      videoInputSurface: { hideFixedInputSlots: !![] },
+      videoInputSurface: { hideFixedInputSlots: true },
     },
     bodyMapping: [
       { path: 'model', from: 'model' },
       { path: 'input.prompt', from: 'prompt' },
     ],
-    executionExtensions: { bodyResolver: 'bailianVideo', strictInputCounts: !![] },
+    executionExtensions: { bodyResolver: 'bailianVideo', strictInputCounts: true },
     responseMapping: {
       taskIdPath: 'output.task_id',
       statusPath: 'output.task_status',

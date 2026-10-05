@@ -14,7 +14,7 @@ export function buildSubmitRandomizedSeedPatch({
     list2 = list['filter']((item) => {
       const key = String(item?.['id'] || '')['trim']();
       return (
-        item?.['randomizeOnSubmit'] === !![] && key && String(item?.['variant'] || '') === 'randomSeedRow'
+        item?.['randomizeOnSubmit'] === true && key && String(item?.['variant'] || '') === 'randomSeedRow'
       );
     });
   if (list2['length'] === 0) return null;
@@ -23,7 +23,7 @@ export function buildSubmitRandomizedSeedPatch({
       ...getPlainObject(payload?.['generationParams']),
     },
     requestParams = null,
-    enabled = ![];
+    enabled = false;
   list2['forEach']((index) => {
     const seedField = String(index?.['id'] || '')['trim'](),
       modeField = String(index?.['randomSeedModeField'] || '')['trim'](),
@@ -40,7 +40,7 @@ export function buildSubmitRandomizedSeedPatch({
       hasLegacyNumericSeed &&
         ((generationParams = { ...generationParams, [modeField]: 'fixed' }),
         (requestParams = { ...(requestParams || generationParams), [modeField]: 'fixed' }),
-        (enabled = !![]));
+        (enabled = true));
       return;
     }
     const result = Number(index?.['randomSeedMin'] ?? index?.['min']),
@@ -60,7 +60,7 @@ export function buildSubmitRandomizedSeedPatch({
         [seedField]: current,
         ...(modeField ? { [modeField]: 'fixed' } : {}),
       }),
-      (enabled = !![]));
+      (enabled = true));
   });
   if (!enabled) return null;
   const entry = String(payload?.['model'] || nodeData?.['model'] || modelManifest?.['modelId'] || '')[

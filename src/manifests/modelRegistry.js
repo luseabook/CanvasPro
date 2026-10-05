@@ -868,7 +868,7 @@ function assertInputPolicyExtensions(value88) {
     throw new Error(
       '[manifest] model manifest inputSlots.preserveHiddenInputsByKindFields must be a non-empty string array',
     );
-  if (Array['isArray'](list21) && value89['preserveHiddenInputsByKind'] !== !![])
+  if (Array['isArray'](list21) && value89['preserveHiddenInputsByKind'] !== true)
     throw new Error(
       '[manifest] model manifest inputSlots.preserveHiddenInputsByKindFields requires preserveHiddenInputsByKind',
     );
@@ -943,7 +943,7 @@ function assertManifestBundle(value103) {
 }
 
 export function validateManifestBundle(value104) {
-  return (assertManifestBundle(value104), !![]);
+  return (assertManifestBundle(value104), true);
 }
 
 function removeManifestFromRegistry(value105, map9, value106, value107) {
@@ -965,7 +965,7 @@ export function unregisterManifestBundle(value110) {
     list23['forEach']((value112) =>
       removeManifestFromRegistry(value112, _models, 'modelId', 'model manifest'),
     ),
-    !![]
+    true
   );
 }
 
@@ -974,7 +974,7 @@ function resolveUniqueModelDisplayName(value113, value114 = '') {
     providerId3 = normalizeProviderId(value114);
   if (!registryKey13) return null;
   const list24 = Array['from'](new Set(_models['values']()))['filter']((value115) => {
-    if (normalizeRegistryKey(value115?.['displayName'])['toLowerCase']() !== registryKey13) return ![];
+    if (normalizeRegistryKey(value115?.['displayName'])['toLowerCase']() !== registryKey13) return false;
     return !providerId3 || normalizeProviderId(value115?.['provider']) === providerId3;
   });
   return list24['length'] === 1 ? list24[0] : null;

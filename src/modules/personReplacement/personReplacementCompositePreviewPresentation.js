@@ -47,12 +47,12 @@ function renderCompositePreviewShotList(selectedAssetIds) {
       assetSelectionMode: selectedAssetIds['selectionMode'],
       assetAppearanceIndexes: {},
       generatingAppearanceKeys: [],
-      isBatchGenerating: ![],
+      isBatchGenerating: false,
       batchGeneratingAssetIds: [],
-      allowDeleteAssetCard: ![],
-      allowAssetRename: ![],
-      hideAssetRoleTag: !![],
-      hideAssetNameTooltip: !![],
+      allowDeleteAssetCard: false,
+      allowAssetRename: false,
+      hideAssetRoleTag: true,
+      hideAssetNameTooltip: true,
     };
   return selectedAssetIds['shots']
     ['map']((current, entry) => {
@@ -162,9 +162,9 @@ function renderCompositePreviewMediaCard({
   description: description,
   mediaRef: mediaRef,
   posterRef: posterRef = '',
-  playable: playable = ![],
-  loading: loading = ![],
-  showShotNavigation: showShotNavigation = ![],
+  playable: playable = false,
+  loading: loading = false,
+  showShotNavigation: showShotNavigation = false,
   footerDetail: footerDetail = '',
 } = {}) {
   const text2 = normalizeText(mediaRef),
@@ -259,7 +259,7 @@ function renderCompositePreview(
   {
     composeActionHtml: composeActionHtml = '',
     playbackControlsHtml: playbackControlsHtml = '',
-    composeOutputPending: composeOutputPending = ![],
+    composeOutputPending: composeOutputPending = false,
   } = {},
 ) {
   const description2 = mediaRef2['previewMode'] === 'full',

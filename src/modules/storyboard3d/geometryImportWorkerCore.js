@@ -98,8 +98,8 @@ export function parseStoryboard3DObjGeometry(
             positions: [],
             normals: [],
             uvs: [],
-            hasNormals: !![],
-            hasUvs: !![],
+            hasNormals: true,
+            hasUvs: true,
           }),
         normals3
       );
@@ -168,9 +168,9 @@ export function parseStoryboard3DObjGeometry(
                       );
                       if (value7['normal'] >= 0)
                         pushTuple(value5['normals'], normals2, value7['normal'], 3);
-                      else value5['hasNormals'] = ![];
+                      else value5['hasNormals'] = false;
                       if (value7['uv'] >= 0) pushTuple(value5['uvs'], uvs2, value7['uv'], 2);
-                      else value5['hasUvs'] = ![];
+                      else value5['hasUvs'] = false;
                     }
                   }
                 }
@@ -199,16 +199,16 @@ export function parseStoryboard3DObjGeometry(
   );
 }
 function isBinaryStl(value11) {
-  if (value11['byteLength'] < 84) return ![];
+  if (value11['byteLength'] < 84) return false;
   const dataView = new DataView(value11['buffer'], value11['byteOffset'], value11['byteLength'])['getUint32'](
     80,
-    !![],
+    true,
   );
   return 84 + dataView * 50 <= value11['byteLength'];
 }
 function parseBinaryStl(value12, value13) {
   const dataView2 = new DataView(value12['buffer'], value12['byteOffset'], value12['byteLength']),
-    triangleCount = dataView2['getUint32'](80, !![]),
+    triangleCount = dataView2['getUint32'](80, true),
     positions3 = new Float32Array(triangleCount * 9),
     normals4 = new Float32Array(triangleCount * 9),
     emptyBounds3 = emptyBounds();
@@ -216,14 +216,14 @@ function parseBinaryStl(value12, value13) {
     value15 = 84;
   value13?.(0.08);
   for (let count5 = 0; count5 < triangleCount; count5 += 1) {
-    const value16 = dataView2['getFloat32'](value15, !![]),
-      value17 = dataView2['getFloat32'](value15 + 4, !![]),
-      value18 = dataView2['getFloat32'](value15 + 8, !![]);
+    const value16 = dataView2['getFloat32'](value15, true),
+      value17 = dataView2['getFloat32'](value15 + 4, true),
+      value18 = dataView2['getFloat32'](value15 + 8, true);
     value15 += 12;
     for (let count6 = 0; count6 < 3; count6 += 1) {
-      const value19 = dataView2['getFloat32'](value15, !![]),
-        value20 = dataView2['getFloat32'](value15 + 4, !![]),
-        value21 = dataView2['getFloat32'](value15 + 8, !![]);
+      const value19 = dataView2['getFloat32'](value15, true),
+        value20 = dataView2['getFloat32'](value15 + 4, true),
+        value21 = dataView2['getFloat32'](value15 + 8, true);
       ((positions3[value14] = value19),
         (positions3[value14 + 1] = value20),
         (positions3[value14 + 2] = value21),

@@ -35,14 +35,14 @@ function normalizeTextGenerationResultItem(item) {
 function getErrorMessage(error2, index = '') {
   if (typeof error2 === 'string') return firstNonEmptyString(error2, index);
   if (typeof error2?.['getUserMessage'] === 'function')
-    return firstNonEmptyString(error2['getUserMessage'](![]), error2?.['message'], index);
+    return firstNonEmptyString(error2['getUserMessage'](false), error2?.['message'], index);
   return firstNonEmptyString(error2?.['message'], error2?.['error'], error2, index);
 }
 export function isTextGenerationTimeoutError(result) {
   const data = String(result?.['type'] || result?.['code'] || '')
     ['trim']()
     ['toUpperCase']();
-  if (data === 'TIMEOUT' || data === 'TASK_TIMEOUT') return !![];
+  if (data === 'TIMEOUT' || data === 'TASK_TIMEOUT') return true;
   const errorMessage = getErrorMessage(result);
   return /(?:timeout|timed\s*out|read\s+timed\s*out|aborterror|请求超时|超时)/i['test'](errorMessage);
 }
@@ -101,9 +101,9 @@ export function buildTextGenerationResultPatch(
             outputText: outputText,
             outputSources: normalizeTextResultSources(outputImageSearchRequested['sources']),
             outputImages: normalizeTextResultImages(outputImageSearchRequested['images']),
-            outputImageSearchRequested: outputImageSearchRequested['imageSearchRequested'] === !![],
+            outputImageSearchRequested: outputImageSearchRequested['imageSearchRequested'] === true,
             outputToolUsage: normalizeTextToolUsage(outputImageSearchRequested['toolUsage']),
-            outputWebSearchRequested: outputImageSearchRequested['webSearchRequested'] === !![],
+            outputWebSearchRequested: outputImageSearchRequested['webSearchRequested'] === true,
           }
         : {};
     },
@@ -128,9 +128,9 @@ export function buildTextGenerationFailurePatch({
               outputText: outputText3,
               outputSources: [],
               outputImages: [],
-              outputImageSearchRequested: ![],
+              outputImageSearchRequested: false,
               outputToolUsage: null,
-              outputWebSearchRequested: ![],
+              outputWebSearchRequested: false,
             }
           : {};
       },

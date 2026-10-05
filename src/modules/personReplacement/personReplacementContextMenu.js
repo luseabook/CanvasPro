@@ -64,7 +64,7 @@ function audioBindingItems(next, current, entry) {
               'imageUrl'
             ],
           }))
-        : [{ label: '暂无可绑定的角色', disabled: !![] }],
+        : [{ label: '暂无可绑定的角色', disabled: true }],
     },
   ];
 }
@@ -108,7 +108,7 @@ export function resolvePersonReplacementContextMenuItems({
       deleteLabel: contextMenuText('deleteResult'),
       deleteShortcutActionId: 'context-person-delete-result',
       onDelete: onDelete ? () => onDelete['click']?.() : null,
-      deleteDisabled: onDelete?.['disabled'] === !![],
+      deleteDisabled: onDelete?.['disabled'] === true,
     });
   }
   const el4 = el?.['closest']?.('[data-story-asset-id]');
@@ -134,7 +134,7 @@ export function resolvePersonReplacementContextMenuItems({
         ? 'context-story-delete-clip'
         : 'context-story-delete-asset',
       onDelete: onDelete2 ? () => onDelete2['click']?.() : null,
-      deleteDisabled: onDelete2?.['disabled'] === !![],
+      deleteDisabled: onDelete2?.['disabled'] === true,
     });
   }
   return [];

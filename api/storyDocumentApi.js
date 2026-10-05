@@ -37,16 +37,16 @@ function getFileExtension(value) {
 }
 
 export function validateStoryDocumentFile(enabled) {
-  if (!enabled) return { ok: ![], error: '请选择剧本文件。' };
+  if (!enabled) return { ok: false, error: '请选择剧本文件。' };
   const fileExtension = getFileExtension(enabled['name']);
   if (fileExtension === 'doc')
-    return { ok: ![], error: '暂不支持旧版 DOC 文件，请先另存为 DOCX、PDF 或 TXT。' };
+    return { ok: false, error: '暂不支持旧版 DOC 文件，请先另存为 DOCX、PDF 或 TXT。' };
   if (!STORY_DOCUMENT_SUPPORTED_EXTENSIONS['includes'](fileExtension))
-    return { ok: ![], error: '仅支持 TXT、DOCX 和文本型 PDF 文件。' };
+    return { ok: false, error: '仅支持 TXT、DOCX 和文本型 PDF 文件。' };
   const count2 = Number(enabled['size'] || 0);
-  if (count2 <= 0) return { ok: ![], error: '剧本文件为空。' };
-  if (count2 > STORY_DOCUMENT_MAX_FILE_BYTES) return { ok: ![], error: '剧本文件不能超过 20 MB。' };
-  return { ok: !![], extension: fileExtension };
+  if (count2 <= 0) return { ok: false, error: '剧本文件为空。' };
+  if (count2 > STORY_DOCUMENT_MAX_FILE_BYTES) return { ok: false, error: '剧本文件不能超过 20 MB。' };
+  return { ok: true, extension: fileExtension };
 }
 
 // The backend route takes a bounded raw body and verifies the file magic bytes, so DOCX and

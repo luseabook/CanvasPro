@@ -146,7 +146,7 @@ function isActiveSubscription(response, key) {
       ['trim']()
       ['toLowerCase']() !== 'active'
   )
-    return ![];
+    return false;
   const expirySeconds = normalizeExpirySeconds(response?.['expiresAt']);
   return expirySeconds === null || expirySeconds > Math['floor'](key / 1000);
 }
@@ -224,12 +224,12 @@ function assertBinghuoAssetUploadPolicy(value2, value3, value4) {
       BINGHUO_ASSET_UPLOAD_ENDPOINT,
       value3 + '.endpoint',
     ));
-  if (value2['forceProviderUpload'] !== !![])
+  if (value2['forceProviderUpload'] !== true)
     throw new Error('[modelCatalog] invalid ' + value3 + '.forceProviderUpload');
   if (
     value2['multipartField'] !== 'file' ||
     value2['responsePath'] !== 'url' ||
-    value2['strictUpload'] !== !![] ||
+    value2['strictUpload'] !== true ||
     !Array['isArray'](value2['inputKinds']) ||
     value2['inputKinds']['length'] !== 1 ||
     value2['inputKinds'][0] !== value4
@@ -289,7 +289,7 @@ function assertBinghuoTaskPolling(value8, enabled2) {
     !Number['isInteger'](value9['maxConsecutiveErrors']) ||
     value9['maxConsecutiveErrors'] < 1 ||
     value9['maxConsecutiveErrors'] > 10 ||
-    value9['surfaceLastError'] !== !![]
+    value9['surfaceLastError'] !== true
   )
     throw new Error('[modelCatalog] invalid task polling transport policy');
   (assertHttpStatusList(value9['retryableStatuses'], 'task polling retryableStatuses'),
@@ -421,9 +421,9 @@ function removeCache(value20) {
 }
 function writeCache(value21, value22) {
   try {
-    return (value21?.['setItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY, JSON['stringify'](value22)), !![]);
+    return (value21?.['setItem']?.(BINGHUO_MODEL_CATALOG_CACHE_KEY, JSON['stringify'](value22)), true);
   } catch {
-    return ![];
+    return false;
   }
 }
 function isCacheEligible(value23, { installId: installId, deviceId: deviceId, nowMs: nowMs }) {
@@ -487,7 +487,7 @@ export function createModelCatalogService({
       throw value27;
     }
   }
-  function run3(sourceId, { source: source2, etag: etag = '', synced: synced = ![] }) {
+  function run3(sourceId, { source: source2, etag: etag = '', synced: synced = false }) {
     const lastLoadedAt = now();
     run({
       status: 'ready',
@@ -502,7 +502,7 @@ export function createModelCatalogService({
       error: null,
     });
   }
-  function run4({ clearCache: clearCache = ![], status: status = 'unavailable', error: error = null } = {}) {
+  function run4({ clearCache: clearCache = false, status: status = 'unavailable', error: error = null } = {}) {
     if (status2) unregisterBundle(status2);
     status2 = null;
     if (clearCache) removeCache(storage);
@@ -523,19 +523,19 @@ export function createModelCatalogService({
     const bundle = readCache(storage);
     if (!isCacheEligible(bundle, { installId: installId2, deviceId: deviceId2, nowMs: now() })) {
       if (bundle) removeCache(storage);
-      return { loaded: ![], reason: 'cache-ineligible' };
+      return { loaded: false, reason: 'cache-ineligible' };
     }
     try {
       return (
         run2(bundle['bundle']),
         run3(bundle['bundle'], { source: 'cache', etag: String(bundle['etag'] || '') }),
-        { loaded: !![], bundle: bundle['bundle'], authorization: readCachedAuthorization(bundle) }
+        { loaded: true, bundle: bundle['bundle'], authorization: readCachedAuthorization(bundle) }
       );
     } catch (error3) {
       return (
         removeCache(storage),
         run4({ status: 'error', error: error3?.['message'] || String(error3) }),
-        { loaded: ![], reason: 'cache-invalid', error: error3 }
+        { loaded: false, reason: 'cache-invalid', error: error3 }
       );
     }
   }
@@ -559,7 +559,7 @@ export function createModelCatalogService({
         run3(bundle2['bundle'], {
           source: 'cache-fallback',
           etag: String(bundle2['etag'] || ''),
-          synced: !![],
+          synced: true,
         }),
         {
           status: 'cache-fallback',
@@ -580,12 +580,12 @@ export function createModelCatalogService({
     subscriptionState: subscriptionState,
     installId: installId4,
     deviceId: deviceId4,
-    force: force = ![],
+    force: force = false,
   } = {}) {
     const value28 = ++value25,
       nowMs2 = now();
     if (!isActiveSubscription(subscriptionState, nowMs2))
-      return (run4({ clearCache: !![], status: 'unavailable' }), { status: 'unauthorized' });
+      return (run4({ clearCache: true, status: 'unavailable' }), { status: 'unauthorized' });
     const installId5 = normalizeIdentity(installId4),
       deviceId5 = normalizeIdentity(deviceId4);
     if (!installId5 || !deviceId5)
@@ -620,7 +620,7 @@ export function createModelCatalogService({
           run3(bundle3['bundle'], {
             source: 'cache',
             etag: etag2['etag'] || bundle3['etag'],
-            synced: !![],
+            synced: true,
           }),
           { status: 'not-modified', bundle: bundle3['bundle'] }
         );
@@ -640,17 +640,17 @@ export function createModelCatalogService({
               bundle: version,
             })
           : removeCache(storage),
-        run3(version, { source: 'remote', etag: String(etag2?.['etag'] || ''), synced: !![] }),
+        run3(version, { source: 'remote', etag: String(etag2?.['etag'] || ''), synced: true }),
         { status: 'updated', bundle: version }
       );
     } catch (error6) {
       if (value28 !== value25) return { status: 'superseded', error: error6 };
       if (error6?.['status'] === 401 || error6?.['status'] === 403)
-        return (run4({ clearCache: !![], status: 'unavailable' }), { status: 'unauthorized', error: error6 });
+        return (run4({ clearCache: true, status: 'unavailable' }), { status: 'unauthorized', error: error6 });
       if (bundle3)
         return (
           (!status2 || status2['version'] !== bundle3['bundle']['version']) && run2(bundle3['bundle']),
-          run3(bundle3['bundle'], { source: 'cache-fallback', etag: bundle3['etag'], synced: !![] }),
+          run3(bundle3['bundle'], { source: 'cache-fallback', etag: bundle3['etag'], synced: true }),
           { status: 'cache-fallback', bundle: bundle3['bundle'], error: error6 }
         );
       return (
@@ -660,7 +660,7 @@ export function createModelCatalogService({
     }
   }
   function clear() {
-    ((value25 += 1), run4({ clearCache: !![], status: 'unavailable' }));
+    ((value25 += 1), run4({ clearCache: true, status: 'unavailable' }));
   }
   return {
     loadCachedCatalog: loadCachedCatalog,

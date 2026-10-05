@@ -34,8 +34,8 @@ function normalizeStatus(index) {
           ['map']((args) => ({ ...args }))
       : [model, reidModel, orientationModel]['filter'](Boolean);
   return {
-    success: success['success'] !== ![],
-    installed: success['installed'] === !![],
+    success: success['success'] !== false,
+    installed: success['installed'] === true,
     packId: normalizeText(success['packId']),
     version: normalizeText(success['version']),
     requiredVersion: normalizeText(success['requiredVersion']),
@@ -51,7 +51,7 @@ function unwrap(response, data) {
   if (!response?.['success']) throw new Error(response?.['error'] || data);
   const response2 = response['data'];
   if (!response2 || typeof response2 !== 'object') throw new Error(data);
-  if (response2['success'] === ![])
+  if (response2['success'] === false)
     throw new Error(response2['error']?.['message'] || response2['error'] || data);
   return normalizeStatus(response2);
 }
@@ -74,7 +74,7 @@ export async function detectPersonReplacementPeople(
   );
   if (!response3?.['success']) throw new Error(response3?.['error'] || '人物检测失败');
   const frame = response3['data'];
-  if (!frame || frame['success'] === ![])
+  if (!frame || frame['success'] === false)
     throw new Error(frame?.['error']?.['message'] || frame?.['error'] || '人物检测失败');
   return {
     modelId: normalizeText(frame['modelId']),
@@ -166,7 +166,7 @@ export async function identifyPersonReplacementPeople(
   );
   if (!response4?.['success']) throw new Error(response4?.['error'] || '人物身份分析失败');
   const response5 = response4['data'];
-  if (!response5 || response5['success'] === ![])
+  if (!response5 || response5['success'] === false)
     throw new Error(response5?.['error']?.['message'] || response5?.['error'] || '人物身份分析失败');
   return {
     modelId: normalizeText(response5['modelId']),
@@ -175,7 +175,7 @@ export async function identifyPersonReplacementPeople(
         id: normalizeText(reviewRequired?.['id'] || reviewRequired?.['identityId']),
         name: normalizeText(reviewRequired?.['name'] || reviewRequired?.['label']),
         confidence: Math['max'](0, Math['min'](1, Number(reviewRequired?.['confidence']) || 0)),
-        reviewRequired: reviewRequired?.['reviewRequired'] === !![],
+        reviewRequired: reviewRequired?.['reviewRequired'] === true,
         memberCount: Math['max'](0, Math['trunc'](Number(reviewRequired?.['memberCount']) || 0)),
         trackletCount: Math['max'](0, Math['trunc'](Number(reviewRequired?.['trackletCount']) || 0)),
         exemplarShotId: normalizeText(reviewRequired?.['exemplarShotId']),
@@ -204,7 +204,7 @@ export async function identifyPersonReplacementPeople(
           0,
           Math['min'](1, Number(reviewRequired2?.['matchSimilarity']) || 0),
         ),
-        reviewRequired: reviewRequired2?.['reviewRequired'] === !![],
+        reviewRequired: reviewRequired2?.['reviewRequired'] === true,
         ambiguousIdentityIds: (Array['isArray'](reviewRequired2?.['ambiguousIdentityIds'])
           ? reviewRequired2['ambiguousIdentityIds']
           : [])

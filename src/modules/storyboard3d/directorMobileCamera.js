@@ -60,7 +60,7 @@ export class DirectorMobileCamera {
     return project?.['id'] + ':' + scene?.['id'] + ':' + shot?.['id'];
   }
   ['click'](enabled) {
-    if (!enabled['startsWith']('timeline-mobile-')) return ![];
+    if (!enabled['startsWith']('timeline-mobile-')) return false;
     if (enabled === 'timeline-mobile-connect') void this['connect']();
     if (enabled === 'timeline-mobile-disconnect') this['disconnect']();
     if (enabled === 'timeline-mobile-save' && this['camera'])
@@ -88,19 +88,19 @@ export class DirectorMobileCamera {
       }
       this['timeline']['requestRender']?.();
     }
-    return !![];
+    return true;
   }
   async ['connect']() {
     if (this['pending'] || this['pairing']) return;
     const data = ++this['epoch'];
-    ((this['pending'] = !![]), (this['message'] = '正在开启配对…'), this['timeline']['requestRender']?.());
+    ((this['pending'] = true), (this['message'] = '正在开启配对…'), this['timeline']['requestRender']?.());
     try {
       const options = await this['api']['create']();
       if (data !== this['epoch']) {
         await this['api']['close'](options['readToken']);
         return;
       }
-      (this['timeline']['stopPlayback']({ render: ![] }),
+      (this['timeline']['stopPlayback']({ render: false }),
         this['timeline']['cameraPath']['stop'](),
         this['timeline']['multiView']['destroy'](),
         (this['pairing'] = options),
@@ -114,7 +114,7 @@ export class DirectorMobileCamera {
     } catch (error) {
       if (data === this['epoch']) this['message'] = error['message'];
     } finally {
-      data === this['epoch'] && ((this['pending'] = ![]), this['timeline']['requestRender']?.());
+      data === this['epoch'] && ((this['pending'] = false), this['timeline']['requestRender']?.());
     }
   }
   async ['poll'](target) {
@@ -224,17 +224,17 @@ export class DirectorMobileCamera {
     if (this['pairing'] && this['identity']() !== this['origin']) this['disconnect']();
     else this['preview']();
   }
-  ['disconnect']({ render: render = !![] } = {}) {
+  ['disconnect']({ render: render = true } = {}) {
     ++this['epoch'];
     if (!this['pairing'] && !this['pending'] && !this['recording']) return;
     ((this['timeline']['window'] || globalThis)['clearTimeout'](this['timer']), this['finishRecording']());
     const input = this['pairing'];
-    ((this['pairing'] = null), (this['pending'] = ![]), (this['camera'] = null));
+    ((this['pairing'] = null), (this['pending'] = false), (this['camera'] = null));
     if (input) void this['api']['close'](input['readToken'])['catch'](() => {});
     this['timeline']['clearPreview']?.();
     if (render) this['timeline']['requestRender']?.();
   }
   ['destroy']() {
-    this['disconnect']({ render: ![] });
+    this['disconnect']({ render: false });
   }
 }

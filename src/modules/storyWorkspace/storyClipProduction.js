@@ -98,11 +98,11 @@ function removeVideoResult(clip = {}, next) {
     activeIndex = getActiveVideoResultIndex(clip, results);
   if (results['length'] < 2 || !Number['isInteger'](count) || count < 0 || count >= results['length'])
     return {
-      changed: ![],
+      changed: false,
       clip: clip,
       results: results,
       activeIndex: activeIndex,
-      activeResultChanged: ![],
+      activeResultChanged: false,
       direction: '',
     };
   const current = results[activeIndex],
@@ -115,7 +115,7 @@ function removeVideoResult(clip = {}, next) {
           : activeIndex,
     activeResultChanged = results2[activeIndex2] !== current;
   return {
-    changed: !![],
+    changed: true,
     clip: {
       ...clip,
       video: { ...(clip?.['video'] || {}), results: results2, activeIndex: activeIndex2 },
@@ -267,7 +267,7 @@ async function runBatch(list8 = [], handler = null, { onProgress: onProgress = n
       try {
         result2 = await handler(target2, { index: index2, total: total2['length'] });
       } catch (error) {
-        result2 = { ok: ![], error: error };
+        result2 = { ok: false, error: error };
       }
       return (
         (completed2 += 1),
@@ -300,7 +300,7 @@ function getGeneratingClipIds(options6 = {}, enabled = null) {
   );
   return list9['filter']((value26) => map2['has'](value26));
 }
-function setClipGenerationRunning(args2, value27, value28 = !![]) {
+function setClipGenerationRunning(args2, value27, value28 = true) {
   if (!args2 || typeof args2 !== 'object') return [];
   const text2 = normalizeText(value27),
     map3 = new Set(getGeneratingClipIds(args2));
@@ -330,11 +330,11 @@ function getGenerationState(options7 = {}, value29 = null) {
     generatingClipIds: generatingClipIds2,
     isBatchGenerating: isBatchGenerating,
     batchLabel: normalizeText(batchCancelRequested?.['label']),
-    batchCancelRequested: batchCancelRequested?.['cancelRequested'] === !![],
+    batchCancelRequested: batchCancelRequested?.['cancelRequested'] === true,
     busy: isBatchGenerating || generatingClipIds2['length'] > 0,
   };
 }
-function setEpisodeBatchRunning(enabled2, value31, value32 = !![], value33 = '', value34 = {}) {
+function setEpisodeBatchRunning(enabled2, value31, value32 = true, value33 = '', value34 = {}) {
   if (!enabled2 || typeof enabled2 !== 'object') return null;
   const text4 = normalizeText(value31);
   if (!text4) return null;
@@ -564,7 +564,7 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
       '" ' +
       (value63 ? 'disabled' : '') +
       '>' +
-      (value66 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+      (value66 ? renderStoryGenerationSpinner({ button: true }) : '') +
       value65 +
       '</button>',
     value67 = generationState['isBatchGenerating']
@@ -589,27 +589,27 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
   return '<div class="story-clip-selection-controls">' + value68 + '</div>';
 }
 function renderAdjustmentBar(value69, value70, value71 = null) {
-  if (value69?.['clipAdjustmentOpen'] !== !![]) return '';
+  if (value69?.['clipAdjustmentOpen'] !== true) return '';
   const isStoryClipAdjustmentGenerating2 = isStoryClipAdjustmentGenerating(value69, value71, value70),
     storyPromptMode = normalizeStoryPromptMode(
       value70?.['promptMode'] ||
         value71?.['promptMode'] ||
         value69?.['data']?.['project']?.['planning']?.['promptMode'],
-      { allowDeveloperModes: !![] },
+      { allowDeveloperModes: true },
     ),
     storyPromptMode2 = normalizeStoryPromptMode(value69?.['clipAdjustmentPromptMode'] || storyPromptMode, {
-      allowDeveloperModes: !![],
+      allowDeveloperModes: true,
     }),
     canGenerateStoryClipAdjustment2 = canGenerateStoryClipAdjustment(value69, value71, value70);
   return (
     '<div class="story-clip-adjustment-bar" data-story-clip-adjustment-bar>\n    <div class="story-clip-adjustment-selectors">\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="mode">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-haspopup="listbox" aria-expanded="' +
-    (value69?.['clipAdjustmentPromptModeOpen'] === !![]) +
+    (value69?.['clipAdjustmentPromptModeOpen'] === true) +
     '" ' +
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n        <strong data-story-clip-adjustment-mode-label>' +
     escapeHtml(getStoryPromptModeLabel(storyPromptMode2)) +
     '</strong>\n      </button>\n      <div class="story-clip-adjustment-mode-menu" role="listbox" aria-label="提示词模式" ' +
-    (value69?.['clipAdjustmentPromptModeOpen'] === !![] ? '' : 'hidden') +
+    (value69?.['clipAdjustmentPromptModeOpen'] === true ? '' : 'hidden') +
     '>\n        ' +
     STORY_PROMPT_MODE_OPTIONS['map'](
       (el) =>
@@ -624,7 +624,7 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
         '</button>',
     )['join']('') +
     '\n      </div>\n    </div>\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="language">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-label="语言转换" aria-haspopup="listbox" aria-expanded="' +
-    (value69?.['clipAdjustmentLanguageOpen'] === !![]) +
+    (value69?.['clipAdjustmentLanguageOpen'] === true) +
     '" ' +
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n        <strong data-story-clip-adjustment-mode-label>' +
@@ -659,23 +659,23 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
     ' aria-busy="' +
     isStoryClipAdjustmentGenerating2 +
     '">' +
-    (isStoryClipAdjustmentGenerating2 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+    (isStoryClipAdjustmentGenerating2 ? renderStoryGenerationSpinner({ button: true }) : '') +
     (isStoryClipAdjustmentGenerating2 ? '生成中' : '生成') +
     '</button>\n    </div>\n  </div>'
   );
 }
 function shouldCloseAdjustmentOnOutsideClick(value72, el4) {
-  return value72?.['clipAdjustmentOpen'] === !![] && !el4?.['closest']?.('.story-clip-adjustment-control');
+  return value72?.['clipAdjustmentOpen'] === true && !el4?.['closest']?.('.story-clip-adjustment-control');
 }
 function shouldClosePromptHistoryOnOutsideClick(value73, el5) {
   return (
-    value73?.['clipPromptHistoryOpen'] === !![] && !el5?.['closest']?.('[data-story-clip-prompt-history]')
+    value73?.['clipPromptHistoryOpen'] === true && !el5?.['closest']?.('[data-story-clip-prompt-history]')
   );
 }
 function renderPromptHistoryControl(value74, value75) {
   const list13 = normalizeStoryClipPromptHistory(value75?.['promptHistory']);
   if (!list13['length']) return '';
-  const value76 = value74?.['clipPromptHistoryOpen'] === !![];
+  const value76 = value74?.['clipPromptHistoryOpen'] === true;
   return (
     '<div class="story-clip-prompt-history" data-story-clip-prompt-history>\n    <button type="button" class="story-clip-prompt-history-trigger" data-story-action="toggle-clip-prompt-history" aria-label="提示词历史" aria-haspopup="dialog" aria-expanded="' +
     value76 +
@@ -714,7 +714,7 @@ function renderAdjustmentControl(value79, value80, value81 = null) {
       '<div class="story-clip-adjustment-header">\n    ' +
       renderPromptHistoryControl(value79, value80) +
       '\n    <button type="button" class="story-clip-adjustment-trigger" data-story-action="toggle-clip-adjustment" aria-expanded="' +
-      (value79?.['clipAdjustmentOpen'] === !![]) +
+      (value79?.['clipAdjustmentOpen'] === true) +
       '" ' +
       (isStoryClipAdjustmentGenerating3 ? 'disabled' : '') +
       '><span aria-hidden="true">✦</span>AI 调整</button>\n  </div>';
@@ -734,10 +734,10 @@ function renderPromptComparison(value83) {
     ),
     durationSeconds2 = normalizeDurationSeconds(enabled5['candidateDurationSeconds'] || durationSeconds),
     storyPromptMode3 = normalizeStoryPromptMode(enabled5['sourcePromptMode'] || value83?.['promptMode'], {
-      allowDeveloperModes: !![],
+      allowDeveloperModes: true,
     }),
     storyPromptMode4 = normalizeStoryPromptMode(enabled5['targetPromptMode'] || storyPromptMode3, {
-      allowDeveloperModes: !![],
+      allowDeveloperModes: true,
     }),
     handler3 = (count4) => (count4 > 0 ? count4['toFixed'](1) + 's' : '--');
   return (
@@ -772,7 +772,7 @@ function renderPromptSurface(modelId2, episode3, value84) {
         value84?.['promptMode'] ||
           episode3?.['promptMode'] ||
           modelId2?.['data']?.['project']?.['planning']?.['promptMode'],
-        { allowDeveloperModes: !![] },
+        { allowDeveloperModes: true },
       ),
       isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode5)
         ? normalizeStoryMinimaxH3OfficialTags(value84?.['prompt'] || '')
@@ -814,7 +814,7 @@ function renderPromptSurface(modelId2, episode3, value84) {
         providerProfileId: modelId2['videoProviderProfileId'],
         providerProfileIdByModel: modelId2['videoProviderProfileIdByModel'],
         referenceCounts: getInputReferenceCounts(value84),
-        showSchemaControls: !![],
+        showSchemaControls: true,
         className: 'story-clip-video-model-selector',
         runningHubWorkflowAllowedModelIds: STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS,
       }) +
@@ -856,14 +856,14 @@ function renderVideoPlaybackControls(value93, value94) {
     label: '视频',
     playLabel: '播放视频',
     playTitle: '播放视频',
-    controlsAttributes: { 'data-story-video-controls': !![] },
-    playAttributes: { 'data-story-video-play': !![] },
-    currentTimeAttributes: { 'data-story-video-time-current': !![] },
-    progressAttributes: { 'data-story-video-progress': !![] },
-    progressFillAttributes: { 'data-story-video-progress-fill': !![] },
-    totalTimeAttributes: { 'data-story-video-time-total': !![] },
-    volumeAttributes: { 'data-story-video-volume': !![] },
-    volumeToggleAttributes: { 'data-story-video-volume-toggle': !![] },
+    controlsAttributes: { 'data-story-video-controls': true },
+    playAttributes: { 'data-story-video-play': true },
+    currentTimeAttributes: { 'data-story-video-time-current': true },
+    progressAttributes: { 'data-story-video-progress': true },
+    progressFillAttributes: { 'data-story-video-progress-fill': true },
+    totalTimeAttributes: { 'data-story-video-time-total': true },
+    volumeAttributes: { 'data-story-video-volume': true },
+    volumeToggleAttributes: { 'data-story-video-volume-toggle': true },
     slots: {
       beforeVolume:
         '<button type="button" class="video-snap-btn story-video-snap-btn" data-story-action="capture-video-frame" data-story-clip-id="' +
@@ -882,7 +882,7 @@ function renderVideoPlaybackControls(value93, value94) {
     },
   });
 }
-function renderVideoPreview(value95, { isGenerating: isGenerating = ![] } = {}) {
+function renderVideoPreview(value95, { isGenerating: isGenerating = false } = {}) {
   const list14 = getVideoResults(value95),
     activeVideoResultIndex3 = getActiveVideoResultIndex(value95, list14),
     value96 = list14[activeVideoResultIndex3] || {},
@@ -929,7 +929,7 @@ function renderTimeline(
   value101,
   value102,
   {
-    selectionMode: selectionMode = ![],
+    selectionMode: selectionMode = false,
     selectedClipIds: selectedClipIds = [],
     pendingDeleteClipId: pendingDeleteClipId = '',
     generatingClipIds: generatingClipIds = [],
@@ -1141,20 +1141,20 @@ function createRuntime({
     throw new Error('[storyClipProduction] generationAdapter.createController is required');
   const map9 = generationAdapter['controllers'] instanceof Map ? generationAdapter['controllers'] : new Map(),
     map10 = new Map(),
-    handler4 = (value117) => projectAdapter['isLive']?.(value117) !== ![],
-    handler5 = (value118) => projectAdapter['isCurrent']?.(value118) !== ![],
+    handler4 = (value117) => projectAdapter['isLive']?.(value117) !== false,
+    handler5 = (value118) => projectAdapter['isCurrent']?.(value118) !== false,
     handler6 = (value119, value120, value121) =>
       [value119?.['projectId'], value120?.['id'], value121?.['id']]['map'](normalizeText)['join'](':'),
     handler7 = (value122, value123) =>
       [value122?.['projectId'], value123?.['id']]['map'](normalizeText)['join'](':'),
     handler8 = () => {
-      if (projectionAdapter['refreshGeneration']?.() === !![]) return !![];
-      return (projectionAdapter['render']?.(), ![]);
+      if (projectionAdapter['refreshGeneration']?.() === true) return true;
+      return (projectionAdapter['render']?.(), false);
     };
   function run2({ episode: episode5, clip: clip2, projectToken: projectToken }) {
     return {
-      ok: ![],
-      cancelled: !![],
+      ok: false,
+      cancelled: true,
       reason: 'batch-cancelled',
       projectToken: projectToken,
       episodeId: episode5?.['id'] || '',
@@ -1227,7 +1227,7 @@ function createRuntime({
       getRecoverableStoryClipVideoTask(clip5) ||
       map9['has'](value125)
     )
-      return { ok: ![], reason: 'unavailable' };
+      return { ok: false, reason: 'unavailable' };
     let enabled7 = null,
       modelId4 = '',
       provider = '';
@@ -1238,7 +1238,7 @@ function createRuntime({
         displayedClip: displayedClip3,
         projectToken: projectToken3,
       });
-      if (!normalizeText(args4['prompt'])) return { ok: ![], reason: 'empty-prompt' };
+      if (!normalizeText(args4['prompt'])) return { ok: false, reason: 'empty-prompt' };
       const value126 = args4;
       ((modelId4 = normalizeText(value126['modelId'])), (provider = normalizeText(value126['provider'])));
       const installId = normalizeText(
@@ -1266,24 +1266,24 @@ function createRuntime({
       if (batchRun?.['cancelRequested'])
         return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
       projectAdapter['register']?.(projectToken3);
-      handler5(projectToken3) && (setClipGenerationRunning(state2, clip5['id'], !![]), handler8());
+      handler5(projectToken3) && (setClipGenerationRunning(state2, clip5['id'], true), handler8());
       const result3 = await enabled7['generate']({ ...args4, installId: installId });
       if (!handler4(projectToken3))
-        return { ok: ![], reason: 'stale-project', modelId: modelId4, provider: provider };
+        return { ok: false, reason: 'stale-project', modelId: modelId4, provider: provider };
       const text11 = normalizeText(result3?.['status'])['toLowerCase']();
       if (
         batchRun?.['cancelRequested'] &&
-        (result3?.['ok'] === ![] || ['cancelled', 'canceled', 'paused']['includes'](text11))
+        (result3?.['ok'] === false || ['cancelled', 'canceled', 'paused']['includes'](text11))
       )
         return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
-      if (result3?.['ok'] === ![] || ['cancelled', 'canceled', 'error', 'failed']['includes'](text11)) {
+      if (result3?.['ok'] === false || ['cancelled', 'canceled', 'error', 'failed']['includes'](text11)) {
         const error4 = result3?.['error'],
           error5 =
             error4 instanceof Error
               ? error4
               : new Error(normalizeText(error4?.['message'] || error4) || '片段视频生成失败');
         return {
-          ok: ![],
+          ok: false,
           type: 'single-failed',
           error: error5,
           projectToken: projectToken3,
@@ -1294,9 +1294,9 @@ function createRuntime({
         };
       }
       return (
-        await projectionAdapter['persist']?.({ immediate: !![] }),
+        await projectionAdapter['persist']?.({ immediate: true }),
         {
-          ok: !![],
+          ok: true,
           type: 'single-complete',
           result: result3,
           projectToken: projectToken3,
@@ -1308,11 +1308,11 @@ function createRuntime({
       );
     } catch (error6) {
       if (!handler4(projectToken3))
-        return { ok: ![], reason: 'stale-project', modelId: modelId4, provider: provider };
+        return { ok: false, reason: 'stale-project', modelId: modelId4, provider: provider };
       if (batchRun?.['cancelRequested'])
         return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
       return {
-        ok: ![],
+        ok: false,
         type: 'single-failed',
         error: error6,
         projectToken: projectToken3,
@@ -1326,7 +1326,7 @@ function createRuntime({
       if (enabled7) batchRun?.['controllers']['delete'](enabled7);
       enabled7 &&
         handler5(projectToken3) &&
-        (setClipGenerationRunning(state2, clip5?.['id'], ![]), handler8());
+        (setClipGenerationRunning(state2, clip5?.['id'], false), handler8());
     }
   }
   async function run5({ episode: episode9, targets: targets, projectToken: projectToken4 }) {
@@ -1350,19 +1350,19 @@ function createRuntime({
         projectToken: projectToken4,
         episodeId: normalizeText(episode9['id']),
         controllers: new Set(),
-        cancelRequested: ![],
+        cancelRequested: false,
       },
       value128 = handler7(projectToken4, episode9);
     (map10['set'](value128, batchRun2),
-      setEpisodeBatchRunning(state2, episode9['id'], !![], '批量生成 0/' + targets['length'], {
+      setEpisodeBatchRunning(state2, episode9['id'], true, '批量生成 0/' + targets['length'], {
         batchId: batch2['id'],
-        cancelRequested: ![],
+        cancelRequested: false,
       }));
     let succeeded = 0,
       failed = 0,
       cancelled = 0,
       firstFailure = null,
-      suppressToast = ![];
+      suppressToast = false;
     handler8();
     try {
       await runBatch(
@@ -1403,9 +1403,9 @@ function createRuntime({
                         error: result4['error'],
                         modelId: result4['modelId'],
                         provider: result4['provider'],
-                      }) === !![]));
+                      }) === true));
             handler5(projectToken4) &&
-              (setEpisodeBatchRunning(state2, episode9['id'], !![], label2, {
+              (setEpisodeBatchRunning(state2, episode9['id'], true, label2, {
                 batchId: batch2['id'],
                 cancelRequested: batchRun2['cancelRequested'],
               }),
@@ -1416,11 +1416,11 @@ function createRuntime({
     } finally {
       (map10['get'](value128) === batchRun2 && map10['delete'](value128),
         handler5(projectToken4) &&
-          (setEpisodeBatchRunning(state2, episode9['id'], ![]),
-          await projectionAdapter['persist']?.({ immediate: !![] }),
+          (setEpisodeBatchRunning(state2, episode9['id'], false),
+          await projectionAdapter['persist']?.({ immediate: true }),
           handler8()));
     }
-    if (!handler4(projectToken4)) return ![];
+    if (!handler4(projectToken4)) return false;
     return (
       projectionAdapter['present']?.({
         type: 'batch-complete',
@@ -1451,29 +1451,29 @@ function createRuntime({
             ['filter'](([value131]) => normalizeText(value131)['startsWith'](value130))
             ['map'](([, value132]) => value132),
         );
-      if (!id2?.['batchId'] || !controllers['size']) return ![];
+      if (!id2?.['batchId'] || !controllers['size']) return false;
       batchId = {
         batch: { id: id2['batchId'], type: 'clip-videos', episodeId: episodeId2 },
         projectToken: projectToken5,
         episodeId: episodeId2,
         controllers: controllers,
-        cancelRequested: id2['cancelRequested'] === !![],
+        cancelRequested: id2['cancelRequested'] === true,
       };
     }
-    if (!batchId || batchId['cancelRequested']) return ![];
-    batchId['cancelRequested'] = !![];
+    if (!batchId || batchId['cancelRequested']) return false;
+    batchId['cancelRequested'] = true;
     const label3 = '正在停止批量生成';
     return (
       projectAdapter['syncBatch']?.(batchId['projectToken'], batchId['batch'], {
         type: 'clip-videos-stopped',
-        cancelRequested: !![],
+        cancelRequested: true,
         pendingClipIds: [],
         label: label3,
       }),
       handler5(batchId['projectToken']) &&
-        (setEpisodeBatchRunning(state2, episodeId2, !![], label3, {
+        (setEpisodeBatchRunning(state2, episodeId2, true, label3, {
           batchId: batchId['batch']['id'],
-          cancelRequested: !![],
+          cancelRequested: true,
         }),
         handler8()),
       await Promise['allSettled'](
@@ -1482,19 +1482,19 @@ function createRuntime({
           return value133?.['pause']?.();
         }),
       ),
-      !![]
+      true
     );
   }
   async function generateSelection() {
     const episode10 = getSelectedEpisode(state2),
       generationState2 = getGenerationState(state2, episode10);
-    if (generationState2['isBatchGenerating']) return ![];
+    if (generationState2['isBatchGenerating']) return false;
     const displayedClip4 = getSelectedClip(state2, episode10),
       targets2 = state2['clipSelectionMode']
         ? selectBatchTargets(episode10?.['clips'], state2['selectedClipGenerationIds'])
         : [];
     if (state2['clipSelectionMode'] && targets2['length'] > 1) {
-      if (generationState2['busy']) return ![];
+      if (generationState2['busy']) return false;
       return run5({
         episode: episode10,
         targets: targets2,
@@ -1502,7 +1502,7 @@ function createRuntime({
       });
     }
     const clip7 = state2['clipSelectionMode'] ? targets2[0] : displayedClip4;
-    if (!clip7) return (projectionAdapter['present']?.({ type: 'selection-missing' }), ![]);
+    if (!clip7) return (projectionAdapter['present']?.({ type: 'selection-missing' }), false);
     const projectToken6 = projectAdapter['createToken'](),
       response7 = await run4({
         episode: episode10,
@@ -1511,9 +1511,9 @@ function createRuntime({
         projectToken: projectToken6,
       });
     if (response7['reason'] === 'empty-prompt')
-      return (projectionAdapter['present']?.({ ...response7, type: 'empty-prompt' }), ![]);
+      return (projectionAdapter['present']?.({ ...response7, type: 'empty-prompt' }), false);
     if (response7['type']) projectionAdapter['present']?.(response7);
-    return response7['ok'] === !![];
+    return response7['ok'] === true;
   }
   return Object['freeze']({
     generateSelection: generateSelection,

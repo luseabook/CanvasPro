@@ -5,7 +5,7 @@ export function getImageHdModelIds() {
       (value) =>
         value['kind'] === 'image' &&
         value['adapterType'] === 'workflow' &&
-        value['extensions']?.['imageHdMenu']?.['enabled'] === !![],
+        value['extensions']?.['imageHdMenu']?.['enabled'] === true,
     )
     ['map']((item) => item['modelId']);
 }

@@ -36,33 +36,33 @@ export function createRendererMediaPresentationCoordinator({
     presentedMediaLeaseMs: presentedMediaLeaseMs,
     maxRetainedPresentedMedia: maxRetainedPresentedMedia,
     suspendDelayMs: suspendDelayMs,
-    isMediaDeferred: (key) => handler(key)['deferred'] === !![],
+    isMediaDeferred: (key) => handler(key)['deferred'] === true,
     isPlaybackActive: (index, result, el) => {
-      if (isPinned?.(index)) return !![];
+      if (isPinned?.(index)) return true;
       return [...(el?.['querySelectorAll']?.('video, audio') || [])]['some'](
-        (data) => data['paused'] === ![] && data['ended'] !== !![],
+        (data) => data['paused'] === false && data['ended'] !== true,
       );
     },
     shouldRetainPresentedMedia: (options, target) => {
       try {
-        return target?.['hasPresentedRendererMedia']?.() === !![];
+        return target?.['hasPresentedRendererMedia']?.() === true;
       } catch {
-        return ![];
+        return false;
       }
     },
     isRetentionProtected: (source) =>
-      isSelected?.(source) === !![] || handler(source)['interactionActive'] === !![],
+      isSelected?.(source) === true || handler(source)['interactionActive'] === true,
     onSuspend: (next, current) => {
       preview['retainNode'](next);
       const enabled = preview['isNodePreviewReady'](next),
-        enabled2 = current?.['prepareRendererMediaFallbackForSuspend']?.() === !![];
-      if (!enabled && !enabled2) return ![];
+        enabled2 = current?.['prepareRendererMediaFallbackForSuspend']?.() === true;
+      if (!enabled && !enabled2) return false;
       return (
         media['forget'](next),
         previewRelease['forget'](next),
         current?.['suspendRendererMedia']?.(),
         videoSlots['suspendPresentedSurface'](next),
-        !![]
+        true
       );
     },
     onParkSuspend: (nodeId, entry) => {
@@ -73,8 +73,8 @@ export function createRendererMediaPresentationCoordinator({
       onParkSuspendDiagnostic?.({ nodeId: nodeId, durationMs: performance['now']() - record });
     },
     onResume: (payload, handle) => {
-      if (handle?.['prepareRendererVisibleVideoPreview']?.() !== !![]) return;
-      (preview['retainNode'](payload), media['enqueue'](payload, { urgent: !![] }));
+      if (handle?.['prepareRendererVisibleVideoPreview']?.() !== true) return;
+      (preview['retainNode'](payload), media['enqueue'](payload, { urgent: true }));
     },
   });
   media = createRendererDeferredMediaController({

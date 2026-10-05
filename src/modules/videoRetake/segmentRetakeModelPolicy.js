@@ -13,7 +13,7 @@ export function getSegmentRetakeParameterPolicy(enabled = {}) {
   const modelManifest = getModelManifest(String(enabled?.['model'] || '')['trim']()),
     segmentRetakeCapability = getSegmentRetakeCapability(modelManifest),
     index = segmentRetakeCapability?.['parameterPolicy'];
-  return segmentRetakeCapability?.['supported'] === !![] && index && typeof index === 'object' ? index : null;
+  return segmentRetakeCapability?.['supported'] === true && index && typeof index === 'object' ? index : null;
 }
 function buildForcedParameterPatch(result) {
   const data = {};
@@ -27,12 +27,12 @@ function buildForcedParameterPatch(result) {
 function releaseSegmentRetakeParameterLocks(args, options) {
   const args2 = getPlainObject(args?.['uiSchemaFieldState']),
     uiSchemaFieldState = { ...args2 };
-  let target = ![];
+  let target = false;
   for (const [source, next] of Object['entries'](options)) {
     const el2 = getPlainObject(args2[source]),
       enabled3 =
-        el2['segmentRetakeLocked'] === !![] ||
-        (el2['disabled'] === !![] &&
+        el2['segmentRetakeLocked'] === true ||
+        (el2['disabled'] === true &&
           Object['prototype']['hasOwnProperty']['call'](el2, 'lockedValue') &&
           String(el2['lockedValue']) === String(next));
     if (!enabled3) continue;
@@ -40,7 +40,7 @@ function releaseSegmentRetakeParameterLocks(args, options) {
     (delete el3['disabled'], delete el3['lockedValue'], delete el3['segmentRetakeLocked']);
     if (Object['keys'](el3)['length'] > 0) uiSchemaFieldState[source] = el3;
     else delete uiSchemaFieldState[source];
-    target = !![];
+    target = true;
   }
   return target ? { ...args, uiSchemaFieldState: uiSchemaFieldState } : args;
 }
@@ -54,9 +54,9 @@ export function decorateSegmentRetakeParameterNodeData(args3 = {}) {
   for (const current of Object['keys'](lockedValue)) {
     uiSchemaFieldState2[current] = {
       ...getPlainObject(args4[current]),
-      disabled: !![],
+      disabled: true,
       lockedValue: lockedValue[current],
-      segmentRetakeLocked: !![],
+      segmentRetakeLocked: true,
     };
   }
   return {
@@ -81,7 +81,7 @@ export function decorateSegmentRetakeParameterSchemaFields(options2 = {}, entry 
         payload,
         {
           ...args5,
-          disabled: !![],
+          disabled: true,
           defaultValue: defaultValue['value'],
           ...(handle
             ? {
@@ -115,11 +115,11 @@ export function applySegmentRetakeSubmitParameterPolicy(options3 = {}, state = {
 }
 export function isSegmentRetakeModelSupported(config) {
   const modelManifest2 = getModelManifest(String(config || '')['trim']());
-  return getSegmentRetakeCapability(modelManifest2)?.['supported'] === !![];
+  return getSegmentRetakeCapability(modelManifest2)?.['supported'] === true;
 }
 export function getSegmentRetakeAllowedModelIds() {
   return getModelsByKind('video')
-    ['filter']((scope) => getSegmentRetakeCapability(scope)?.['supported'] === !![])
+    ['filter']((scope) => getSegmentRetakeCapability(scope)?.['supported'] === true)
     ['map']((input) => input['modelId']);
 }
 export function getSegmentRetakeAllowedModelIdsForNode(options4 = {}) {

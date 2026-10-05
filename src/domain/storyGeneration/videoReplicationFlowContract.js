@@ -29,7 +29,7 @@ export function inspectFlowSpeech(enabled2) {
 export function applyFlowSpeechRecovery(args2, current, entry) {
   (exactFields(current, ['videoObserved', 'speech']),
     requireFlow(
-      current['videoObserved'] === !![] && Array['isArray'](current['speech']) && current['speech']['length'],
+      current['videoObserved'] === true && Array['isArray'](current['speech']) && current['speech']['length'],
       '人声补录未确认原片或仍为空',
     ));
   const record = [],
@@ -44,7 +44,7 @@ export function applyFlowSpeechRecovery(args2, current, entry) {
 }
 export function validateFlowSource(state, config, scope = []) {
   (requireFlow(state, '未获得可用的原片识别结果，请查看前序步骤的具体错误'),
-    requireFlow(state?.['videoObserved'] === !![], '模型未确认读取原片'),
+    requireFlow(state?.['videoObserved'] === true, '模型未确认读取原片'),
     requireFlow(
       Array['isArray'](state['characters']) &&
         Array['isArray'](state['shots']) &&
@@ -127,7 +127,7 @@ export function validateFlowSource(state, config, scope = []) {
   return (scope['push'](...args3['notes']), args4);
 }
 export function classifyFlowReview(args5, value11, value12) {
-  requireFlow(value11?.['videoObserved'] === !![] && Array['isArray'](value11['issues']), '审查结果结构无效');
+  requireFlow(value11?.['videoObserved'] === true && Array['isArray'](value11['issues']), '审查结果结构无效');
   const value13 = [],
     value14 = [],
     enabled4 = new Set();
@@ -140,7 +140,7 @@ export function classifyFlowReview(args5, value11, value12) {
         JSON['stringify'](list2['map']((value16) => value16['id'])['sort']())) &&
       value14['push']({
         code: 'review-coverage',
-        blocking: ![],
+        blocking: false,
         detail: '审查未确认覆盖全部镜头与人声，保留可定位的意见并继续',
         field: value15,
       });
@@ -181,18 +181,18 @@ export function classifyFlowReview(args5, value11, value12) {
           '审查问题类别无效',
         ));
       if (value19['has'](args6['category']) && args6['confidence'] === 'high') value13['push'](args6);
-      else value14['push']({ ...args6, blocking: ![], code: 'review-note' });
+      else value14['push']({ ...args6, blocking: false, code: 'review-note' });
     } catch (value21) {
       value14['push']({
         code: 'review-issue-skipped',
-        blocking: ![],
+        blocking: false,
         issue: args6,
         detail: value21['message'],
       });
     }
   }
   if (value11['hasMoreIssues'] || value11['issues']['length'] > 12)
-    value14['push']({ code: 'review-overflow', blocking: ![], detail: '审查仍有未列出的实质问题' });
+    value14['push']({ code: 'review-overflow', blocking: false, detail: '审查仍有未列出的实质问题' });
   return { actionable: value13, notes: value14 };
 }
 export function mapFlowReviewTimes(args7, list3, list4 = []) {
@@ -225,7 +225,7 @@ export function mapFlowReviewTimes(args7, list3, list4 = []) {
           return (
             list4['push']({
               code: 'review-issue-skipped',
-              blocking: ![],
+              blocking: false,
               issue: args8,
               detail: '审查时间无法定位到证据窗口，保留意见但不据此改稿',
             }),
@@ -238,7 +238,7 @@ export function mapFlowReviewTimes(args7, list3, list4 = []) {
           return (
             list4['push']({
               code: 'review-issue-skipped',
-              blocking: ![],
+              blocking: false,
               issue: args8,
               detail: '审查时间未与证据窗口相交，保留意见但不据此改稿',
             }),
@@ -250,7 +250,7 @@ export function mapFlowReviewTimes(args7, list3, list4 = []) {
             value32 !== args8['endSec'] + value30) &&
             list4['push']({
               code: 'review-time-normalized',
-              blocking: ![],
+              blocking: false,
               issueId: args8['id'],
               detail:
                 value26 !== args7['timeBasis']
@@ -422,7 +422,7 @@ export function createFlowReviewWindows(value84, value85, count2 = 35) {
       characters: value84['characters'],
       shots: [],
       speech: [],
-      videoObserved: !![],
+      videoObserved: true,
       title: value84['title'],
     }));
   for (const value89 of ['shots', 'speech']) {

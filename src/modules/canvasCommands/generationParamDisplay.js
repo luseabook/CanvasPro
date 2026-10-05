@@ -27,8 +27,8 @@ export function buildGenerationParamDisplayPatch({
   modelId: modelId = '',
   generationParams: generationParams = {},
   changedParamIds: changedParamIds = [],
-  force: force = ![],
-  respectManualDisplaySize: respectManualDisplaySize = !![],
+  force: force = false,
+  respectManualDisplaySize: respectManualDisplaySize = true,
 } = {}) {
   const modelManifest = getModelManifest(modelId),
     aspectRatioField = getAspectRatioField(modelManifest),
@@ -57,7 +57,7 @@ export function buildGenerationParamDisplayPatch({
       inputKinds: inputKinds ? ['image', 'video'] : ['image'],
       resultFields: inputKinds ? ['videos', 'localPath', 'thumbUrl', 'videoUrl', 'src'] : undefined,
       mediaSelector: inputKinds ? 'video, img' : undefined,
-      respectManualDisplaySize: respectManualDisplaySize2 ? ![] : respectManualDisplaySize,
+      respectManualDisplaySize: respectManualDisplaySize2 ? false : respectManualDisplaySize,
     });
-  return { ...(source ? { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: ![] } : {}), ...args };
+  return { ...(source ? { [GENERATION_MANUAL_DISPLAY_SIZE_FIELD]: false } : {}), ...args };
 }

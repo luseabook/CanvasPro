@@ -49,14 +49,14 @@ export const zImageTextToImageModelManifest = Object['freeze']({
         type: 'toggle',
         placement: 'advanced',
         label: '提示词增强',
-        defaultValue: ![],
+        defaultValue: false,
       }),
       Object['freeze']({
         id: 'rhZImageHd',
         type: 'toggle',
         placement: 'advanced',
         label: '高清',
-        defaultValue: ![],
+        defaultValue: false,
       }),
       Object['freeze']({
         id: 'rhZImageLora',
@@ -72,8 +72,8 @@ export const zImageTextToImageModelManifest = Object['freeze']({
       RH_IMAGE_INSTANCE_FIELD,
     ]),
   }),
-  async: !![],
-  cancellable: !![],
+  async: true,
+  cancellable: true,
   outputType: 'image',
 });
 export const zImageTextToImageExecutionManifest = Object['freeze']({
@@ -118,7 +118,7 @@ export const zImageTextToImageExecutionManifest = Object['freeze']({
         fieldName: 'value',
         field: 'generationParams.rhZImageHd',
         fallbackFields: Object['freeze'](['rhZImageHd']),
-        defaultValue: ![],
+        defaultValue: false,
         description: '高清',
       }),
       Object['freeze']({
@@ -126,7 +126,7 @@ export const zImageTextToImageExecutionManifest = Object['freeze']({
         fieldName: 'value',
         field: 'generationParams.rhZImagePromptEnhance',
         fallbackFields: Object['freeze'](['rhZImagePromptEnhance']),
-        defaultValue: ![],
+        defaultValue: false,
         description: '提示词增强',
       }),
       Object['freeze']({

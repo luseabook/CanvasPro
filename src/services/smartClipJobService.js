@@ -57,8 +57,8 @@ export function normalizeSmartClipRunOptions(options2 = {}) {
   const payload = options2 && typeof options2 === 'object' ? options2 : {};
   return {
     mode: normalizeSmartClipMode(payload['mode']),
-    ...(payload['unlimitedSegments'] === !![]
-      ? { unlimitedSegments: !![] }
+    ...(payload['unlimitedSegments'] === true
+      ? { unlimitedSegments: true }
       : { maxSegments: normalizeSmartClipMaxSegments(payload['maxSegments']) }),
     fps: normalizeSmartClipFps(payload['fps']),
     outputMode: normalizeSmartClipOutputMode(payload['outputMode']),
@@ -67,7 +67,7 @@ export function normalizeSmartClipRunOptions(options2 = {}) {
       ['toLowerCase']() === SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON
       ? { keyframeSelectionPolicy: SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON }
       : {}),
-    ...(payload['preserveWholeVideo'] === !![] ? { preserveWholeVideo: !![] } : {}),
+    ...(payload['preserveWholeVideo'] === true ? { preserveWholeVideo: true } : {}),
     ...(normalizeSmartClipMaxSegmentDuration(payload['maxSegmentDurationSec']) > 0
       ? { maxSegmentDurationSec: normalizeSmartClipMaxSegmentDuration(payload['maxSegmentDurationSec']) }
       : {}),
@@ -80,7 +80,7 @@ function emitProgress(handler, handle) {
   } catch {}
 }
 function isCancelled(state, handler2) {
-  return state?.['aborted'] === !![] || (typeof handler2 === 'function' && handler2() === ![]);
+  return state?.['aborted'] === true || (typeof handler2 === 'function' && handler2() === false);
 }
 function throwIfCancelled(config, scope, jobId2 = '') {
   if (!isCancelled(config, scope)) return;
@@ -94,10 +94,10 @@ function waitForNextPoll(input, el) {
   const count2 = Math['max'](0, Number(input) || 0);
   if (count2 <= 0) return Promise['resolve']();
   return new Promise((output, handler3) => {
-    let value2 = ![];
+    let value2 = false;
     const run = (handler4) => {
         if (value2) return;
-        ((value2 = !![]), el?.['removeEventListener']?.('abort', handler5), handler4());
+        ((value2 = true), el?.['removeEventListener']?.('abort', handler5), handler4());
       },
       setTimeout2 = setTimeout(() => run(output), count2),
       handler5 = () => {
@@ -109,7 +109,7 @@ function waitForNextPoll(input, el) {
           ));
       };
     if (el?.['aborted']) handler5();
-    else el?.['addEventListener']?.('abort', handler5, { once: !![] });
+    else el?.['addEventListener']?.('abort', handler5, { once: true });
   });
 }
 function readResponseData(value3) {
@@ -141,8 +141,8 @@ export async function runSmartClipJob({
       provider: 'local',
       headers: { 'Content-Type': 'application/json' },
       body: JSON['stringify']({ src: src2, options: options4 }),
-      allow404Null: !![],
-      returnMeta: !![],
+      allow404Null: true,
+      returnMeta: true,
       signal: signal,
     });
   } catch (value4) {
@@ -179,7 +179,7 @@ export async function runSmartClipJob({
         method: 'GET',
         provider: 'local',
         timeout: 20000,
-        returnMeta: !![],
+        returnMeta: true,
         signal: signal,
       });
     } catch (value5) {

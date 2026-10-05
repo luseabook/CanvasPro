@@ -48,10 +48,10 @@ function activateWorkspaceAssetLibraryImages(next) {
 export function handleWorkspaceAssetLibraryImageError(entry) {
   const record = entry?.['target'],
     text = normalizeText(record?.['getAttribute']?.('data-workspace-asset-library-fallback-src'));
-  if (!text) return ![];
+  if (!text) return false;
   record['removeAttribute']?.('data-workspace-asset-library-fallback-src');
-  if (normalizeText(record['getAttribute']?.('src')) === text) return ![];
-  return ((record['loading'] = 'eager'), record['setAttribute']?.('src', text), !![]);
+  if (normalizeText(record['getAttribute']?.('src')) === text) return false;
+  return ((record['loading'] = 'eager'), record['setAttribute']?.('src', text), true);
 }
 export function getWorkspaceAssetLibraryMediaLabel(payload) {
   return MEDIA_LABELS[normalizeText(payload)['toLocaleLowerCase']()] || '素材';
@@ -88,7 +88,7 @@ export function buildWorkspaceAssetLibraryItems({
       imageUrl: imageUrl,
       thumbnailUrl: thumbnailUrl,
       sourceUrl: imageUrl,
-      isLibraryAsset: !![],
+      isLibraryAsset: true,
     };
   });
 }
@@ -234,7 +234,7 @@ export function createWorkspaceAssetLibraryDisclosure({ expandedCategories: expa
     toggle = (value19) => {
       const text2 = normalizeText(value19),
         categoryKey2 = normalizeCategoryKey(text2);
-      if (!categoryKey2) return ![];
+      if (!categoryKey2) return false;
       value17['set'](categoryKey2, text2);
       if (args3['has'](categoryKey2)) args3['delete'](categoryKey2);
       else args3['add'](categoryKey2);
@@ -246,7 +246,7 @@ export function createWorkspaceAssetLibraryDisclosure({ expandedCategories: expa
     toggle: toggle,
     toggleFromTarget(value21) {
       const enabled2 = value21?.['closest']?.('[data-workspace-asset-library-toggle]');
-      if (!enabled2) return ![];
+      if (!enabled2) return false;
       const value22 = enabled2['dataset']?.['workspaceAssetLibraryToggle'],
         enabled3 = toggle(value22),
         value23 = enabled2['closest']?.('[data-workspace-asset-library-category]'),
@@ -261,7 +261,7 @@ export function createWorkspaceAssetLibraryDisclosure({ expandedCategories: expa
         ((value24['hidden'] = !enabled3), value24['setAttribute']?.('aria-hidden', String(!enabled3)));
         if (enabled3) activateWorkspaceAssetLibraryImages(value24);
       }
-      return !![];
+      return true;
     },
     render(args4 = {}) {
       return renderWorkspaceAssetLibraryGroups({

@@ -25,8 +25,8 @@ function filterPersistableStoryData(enabled2) {
     Array['isArray'](enabled2['clipFrames']) &&
       (enabled2['clipFrames'] = enabled2['clipFrames']['filter'](
         (result) =>
-          result?.['captureSavePending'] !== !![] &&
-          result?.['isTransient'] !== !![] &&
+          result?.['captureSavePending'] !== true &&
+          result?.['isTransient'] !== true &&
           ![result?.['imageUrl'], result?.['videoUrl'], result?.['thumbUrl'], result?.['posterUrl']]['some'](
             (data) => normalizeText(data)['startsWith']('blob:'),
           ),
@@ -47,8 +47,8 @@ export function createStoryWorkspaceSnapshot(hasCreatedProject = {}) {
     schemaVersion: STORY_WORKSPACE_PERSISTENCE_VERSION,
     savedAt: Date['now'](),
     activeProjectId: normalizeText(hasCreatedProject['data']?.['project']?.['id']),
-    hasCreatedProject: hasCreatedProject['hasCreatedProject'] === !![],
-    projectTitleEdited: hasCreatedProject['projectTitleEdited'] === !![],
+    hasCreatedProject: hasCreatedProject['hasCreatedProject'] === true,
+    projectTitleEdited: hasCreatedProject['projectTitleEdited'] === true,
     projects: clonePersistableProjects(source),
     currentData: clonePersistableStoryData(hasCreatedProject['data']),
     models: cloneJson(hasCreatedProject['models'] || {}),
@@ -94,12 +94,12 @@ export function createStoryWorkspaceSnapshot(hasCreatedProject = {}) {
       assetAppearanceIndexes: cloneJson(hasCreatedProject['assetAppearanceIndexes'] || {}),
       outlineSectionOpenState: cloneJson(hasCreatedProject['outlineSectionOpenState'] || {}),
       pageScrollPositions: cloneJson(hasCreatedProject['pageScrollPositions'] || {}),
-      experimentalSplitMode: hasCreatedProject['experimentalSplitMode'] === !![],
+      experimentalSplitMode: hasCreatedProject['experimentalSplitMode'] === true,
       selectedAssetId: normalizeText(hasCreatedProject['selectedAssetId']),
       selectedEpisodeId: normalizeText(hasCreatedProject['selectedEpisodeId']),
       selectedClipId: normalizeText(hasCreatedProject['selectedClipId']),
       characterVoiceEditor: hasCreatedProject['characterVoiceEditor']
-        ? { ...cloneJson(hasCreatedProject['characterVoiceEditor']), isGenerating: ![] }
+        ? { ...cloneJson(hasCreatedProject['characterVoiceEditor']), isGenerating: false }
         : null,
     },
   };
@@ -159,8 +159,8 @@ export function mergeStoryWorkspaceHydratedProjects(args = [], entry = []) {
   );
 }
 export function hasStoryWorkspaceSnapshotChanged(enabled4, enabled5) {
-  if (enabled4 === enabled5) return ![];
-  if (!enabled4 || !enabled5) return !![];
+  if (enabled4 === enabled5) return false;
+  if (!enabled4 || !enabled5) return true;
   try {
     const cloneJson3 = cloneJson(enabled4),
       cloneJson4 = cloneJson(enabled5);
@@ -170,6 +170,6 @@ export function hasStoryWorkspaceSnapshotChanged(enabled4, enabled5) {
       JSON['stringify'](cloneJson3) !== JSON['stringify'](cloneJson4)
     );
   } catch {
-    return !![];
+    return true;
   }
 }

@@ -90,7 +90,7 @@ export function drawCollaborationCommentMarkers({
   const source = el4['querySelector']('[data-role="more-menu"] .v2-img-toolbar-zone-more');
   if (source) moreMenus['set'](el4, source);
   const next = source || moreMenus['get'](el4);
-  el6['lastChild']['hidden'] = ![];
+  el6['lastChild']['hidden'] = false;
   if (next) {
     const enabled3 =
       el4['getBoundingClientRect']()['width'] > Math['min'](bounds['width'], window['innerWidth']) - 48;

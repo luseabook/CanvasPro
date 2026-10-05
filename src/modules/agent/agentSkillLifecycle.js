@@ -20,7 +20,7 @@ function installedSkills(list = []) {
 }
 function includesSkillSubject(key, index = []) {
   const list2 = normalizeText(key)['toLowerCase']();
-  if (/(?:skills?|技能)/iu['test'](list2) || /[$/][a-z0-9][a-z0-9-]{0,63}/iu['test'](list2)) return !![];
+  if (/(?:skills?|技能)/iu['test'](list2) || /[$/][a-z0-9][a-z0-9-]{0,63}/iu['test'](list2)) return true;
   return installedSkills(index)['some']((result) => {
     const text = normalizeText(result['id'])['toLowerCase'](),
       text2 = normalizeText(result['title'])['toLowerCase']();

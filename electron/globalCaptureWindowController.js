@@ -71,7 +71,7 @@ export function createGlobalCaptureWindowController({
   BrowserWindowClass: BrowserWindowClass = BrowserWindow,
   screenApi: screenApi = screen,
   nativeThemeApi: nativeThemeApi = nativeTheme,
-  onAction: onAction = async () => ({ ok: !![] }),
+  onAction: onAction = async () => ({ ok: true }),
   logDiagnosticEvent: logDiagnosticEvent = () => {},
   prepareWindow: prepareWindow = disableWindowsWindowTransitions,
   windowSize: windowSize = DEFAULT_WINDOW_SIZE,
@@ -85,14 +85,14 @@ export function createGlobalCaptureWindowController({
     prewarmPromise = null,
     presentation = null,
     cancelledCaptureId = '',
-    userFocused = ![],
+    userFocused = false,
     focusRetryTimer = null,
     pendingShowTimer = null,
     presentationSeq = 0,
     dispatchSeq = 0,
-    runImmediately = ![],
+    runImmediately = false,
     activeActionId = 'source-text',
-    destroyed = ![];
+    destroyed = false;
   function isWindowAlive() {
     return Boolean(captureWindow && !captureWindow['isDestroyed']?.());
   }
@@ -100,21 +100,21 @@ export function createGlobalCaptureWindowController({
     return isWindowAlive() && captureWindow['webContents'] === sender;
   }
   function isWindowVisible() {
-    return isWindowAlive() && captureWindow['isVisible']?.() === !![];
+    return isWindowAlive() && captureWindow['isVisible']?.() === true;
   }
   function clearPendingPresentation() {
     presentation?.['dispatchAbort']?.['abort']();
     if (pendingShowTimer !== null) clearTimeoutFn(pendingShowTimer);
-    ((pendingShowTimer = null), (presentation = null), (userFocused = ![]));
+    ((pendingShowTimer = null), (presentation = null), (userFocused = false));
   }
   function clearFocusRetryTimer() {
     if (focusRetryTimer === null) return;
     (clearTimeoutFn(focusRetryTimer), (focusRetryTimer = null));
   }
   function focusWindow(targetWindow) {
-    if (targetWindow['isFocused']?.() === !![]) return;
+    if (targetWindow['isFocused']?.() === true) return;
     (targetWindow['focus']?.(),
-      presentation && targetWindow['isFocused']?.() === !![] && (userFocused = !![]));
+      presentation && targetWindow['isFocused']?.() === true && (userFocused = true));
   }
   function scheduleFocusRetry(expectedWindow, expectedCaptureId) {
     (clearFocusRetryTimer(),
@@ -125,7 +125,7 @@ export function createGlobalCaptureWindowController({
           captureWindow !== expectedWindow ||
           !isWindowVisible() ||
           presentation?.['captureId'] !== expectedCaptureId ||
-          expectedWindow['isFocused']?.() === !![]
+          expectedWindow['isFocused']?.() === true
         )
           return;
         focusWindow(expectedWindow);
@@ -134,12 +134,12 @@ export function createGlobalCaptureWindowController({
   function hideWindow() {
     clearFocusRetryTimer();
     if (presentation) cancelledCaptureId = presentation['captureId'];
-    if (!isWindowAlive()) return (clearPendingPresentation(), ![]);
+    if (!isWindowAlive()) return (clearPendingPresentation(), false);
     return (
       captureWindow['hide']?.(),
-      captureWindow['webContents']?.['setBackgroundThrottling']?.(!![]),
+      captureWindow['webContents']?.['setBackgroundThrottling']?.(true),
       clearPendingPresentation(),
-      !![]
+      true
     );
   }
   async function ensureWindow() {
@@ -152,29 +152,29 @@ export function createGlobalCaptureWindowController({
       width: windowSize['width'],
       height: windowSize['height'],
       title: '发送到 Canvas 无限画布',
-      show: ![],
-      frame: ![],
-      thickFrame: ![],
-      roundedCorners: ![],
-      transparent: !![],
+      show: false,
+      frame: false,
+      thickFrame: false,
+      roundedCorners: false,
+      transparent: true,
       backgroundColor: NATIVE_TRANSPARENT_BACKGROUND,
       backgroundMaterial: 'none',
-      hasShadow: ![],
-      paintWhenInitiallyHidden: !![],
-      alwaysOnTop: !![],
-      focusable: !![],
-      skipTaskbar: !![],
-      resizable: ![],
-      movable: ![],
-      minimizable: ![],
-      maximizable: ![],
-      fullscreenable: ![],
+      hasShadow: false,
+      paintWhenInitiallyHidden: true,
+      alwaysOnTop: true,
+      focusable: true,
+      skipTaskbar: true,
+      resizable: false,
+      movable: false,
+      minimizable: false,
+      maximizable: false,
+      fullscreenable: false,
       webPreferences: {
         preload: path['join'](dirname, 'globalCaptureWindowPreload.cjs'),
-        contextIsolation: !![],
-        nodeIntegration: ![],
-        sandbox: !![],
-        backgroundThrottling: ![],
+        contextIsolation: true,
+        nodeIntegration: false,
+        sandbox: true,
+        backgroundThrottling: false,
       },
     })),
       captureWindow['on']?.('closed', () => {
@@ -184,13 +184,13 @@ export function createGlobalCaptureWindowController({
         if (presentation && userFocused && !presentation['pending']) hideWindow();
       }),
       captureWindow['on']?.('focus', () => {
-        if (presentation) userFocused = !![];
+        if (presentation) userFocused = true;
       }));
     const pendingWindow = captureWindow,
       preparationPromise = Promise['resolve']()
         ['then'](() => prepareWindow(pendingWindow))
         ['then']((preparationResult) => {
-          if (preparationResult?.['ok'] === ![])
+          if (preparationResult?.['ok'] === false)
             throw new Error(preparationResult['reason'] || 'native-window-preparation-failed');
           if (preparationResult?.['ok'] && !preparationResult['skipped'])
             logDiagnosticEvent({
@@ -241,18 +241,18 @@ export function createGlobalCaptureWindowController({
     );
   }
   async function show(payload = {}) {
-    if (destroyed) return { ok: ![], reason: 'capture-controller-destroyed' };
+    if (destroyed) return { ok: false, reason: 'capture-controller-destroyed' };
     const text = String(payload?.['text'] || '')['trim'](),
       captureId = String(payload?.['captureId'] || '')['trim']();
-    if (captureId && captureId === cancelledCaptureId) return { ok: ![], reason: 'capture-cancelled' };
+    if (captureId && captureId === cancelledCaptureId) return { ok: false, reason: 'capture-cancelled' };
     const requestedPhase = String(payload?.['phase'] || '')['trim'](),
       phase = CAPTURE_PHASES['has'](requestedPhase) ? requestedPhase : text ? 'ready' : '';
-    if (!captureId || !phase || (phase === 'ready' && !text)) return { ok: ![], reason: 'invalid-capture' };
+    if (!captureId || !phase || (phase === 'ready' && !text)) return { ok: false, reason: 'invalid-capture' };
     try {
       const readyWindow = await ensureWindow();
-      if (destroyed) return { ok: ![], reason: 'capture-controller-destroyed' };
-      if (captureId === cancelledCaptureId) return { ok: ![], reason: 'capture-cancelled' };
-      if (!readyWindow || readyWindow['isDestroyed']?.()) return { ok: ![], reason: 'window-unavailable' };
+      if (destroyed) return { ok: false, reason: 'capture-controller-destroyed' };
+      if (captureId === cancelledCaptureId) return { ok: false, reason: 'capture-cancelled' };
+      if (!readyWindow || readyWindow['isDestroyed']?.()) return { ok: false, reason: 'window-unavailable' };
       const reusablePresentation = presentation?.['captureId'] === captureId ? presentation : null;
       if (!reusablePresentation) presentation?.['dispatchAbort']?.['abort']();
       const cursor = reusablePresentation?.['cursor'] ||
@@ -280,14 +280,14 @@ export function createGlobalCaptureWindowController({
           cursor: cursor,
           workArea: workArea,
           bounds: bounds,
-          pending: ![],
+          pending: false,
         }),
         !reusablePresentation &&
-          ((userFocused = ![]),
+          ((userFocused = false),
           readyWindow['setBounds']?.(bounds),
-          readyWindow['setAlwaysOnTop']?.(!![], 'pop-up-menu'),
-          readyWindow['setVisibleOnAllWorkspaces']?.(!![], { visibleOnFullScreen: !![] })),
-        readyWindow['webContents']?.['setBackgroundThrottling']?.(![]),
+          readyWindow['setAlwaysOnTop']?.(true, 'pop-up-menu'),
+          readyWindow['setVisibleOnAllWorkspaces']?.(true, { visibleOnFullScreen: true })),
+        readyWindow['webContents']?.['setBackgroundThrottling']?.(false),
         readyWindow['webContents']?.['send']?.('globalCaptureWindow:present', {
           captureId: captureId,
           presentationId: presentationId,
@@ -295,12 +295,12 @@ export function createGlobalCaptureWindowController({
           phase: phase,
           errorReason: String(payload?.['errorReason'] || '')['trim'](),
           shortcutLabel: String(payload?.['shortcutLabel'] || 'Control+Alt+Shift+C')['trim']() || 'Control+Alt+Shift+C',
-          theme: nativeThemeApi?.['shouldUseDarkColors'] === ![] ? 'light' : 'dark',
+          theme: nativeThemeApi?.['shouldUseDarkColors'] === false ? 'light' : 'dark',
           runImmediately: runImmediately,
           activeActionId: activeActionId,
         }),
         clearFocusRetryTimer(),
-        { ok: !![], captureId: captureId, bounds: bounds, phase: phase }
+        { ok: true, captureId: captureId, bounds: bounds, phase: phase }
       );
     } catch (showError) {
       return (
@@ -312,26 +312,26 @@ export function createGlobalCaptureWindowController({
           message: 'Global capture window failed to show',
           error: showError,
         }),
-        { ok: ![], reason: 'window-show-failed' }
+        { ok: false, reason: 'window-show-failed' }
       );
     }
   }
   async function didPresent(presentPayload = {}, presentSender = null) {
-    if (!isTrustedSender(presentSender)) return { ok: ![], reason: 'untrusted-sender' };
+    if (!isTrustedSender(presentSender)) return { ok: false, reason: 'untrusted-sender' };
     const currentPresentation = presentation;
     if (
       !currentPresentation ||
       currentPresentation['captureId'] !== presentPayload['captureId'] ||
       currentPresentation['presentationId'] !== presentPayload['presentationId']
     )
-      return { ok: ![], reason: 'stale-presentation' };
-    if (currentPresentation['presented']) return { ok: !![] };
-    currentPresentation['presented'] = !![];
+      return { ok: false, reason: 'stale-presentation' };
+    if (currentPresentation['presented']) return { ok: true };
+    currentPresentation['presented'] = true;
     if (!isWindowVisible()) {
       try {
         const frame = await captureWindow['webContents']['capturePage'](undefined, {
-          stayHidden: !![],
-          stayAwake: !![],
+          stayHidden: true,
+          stayAwake: true,
         });
         if (frame['isEmpty']()) throw new Error('empty-capture-frame');
       } catch (frameError) {
@@ -344,11 +344,11 @@ export function createGlobalCaptureWindowController({
             message: 'Global capture window frame unavailable',
             error: frameError,
           }),
-          { ok: ![], reason: 'window-frame-failed' }
+          { ok: false, reason: 'window-frame-failed' }
         );
       }
       if (presentation !== currentPresentation || !isWindowAlive())
-        return { ok: ![], reason: 'stale-presentation' };
+        return { ok: false, reason: 'stale-presentation' };
     }
     const revealWindow = () => {
       pendingShowTimer = null;
@@ -363,16 +363,16 @@ export function createGlobalCaptureWindowController({
     if (currentPresentation['phase'] === 'capturing')
       pendingShowTimer = setTimeoutFn(revealWindow, pendingShowDelayMs);
     else revealWindow();
-    return { ok: !![] };
+    return { ok: true };
   }
   function setExpanded(expandPayload = {}, expandSender = null) {
-    if (!isTrustedSender(expandSender)) return { ok: ![], reason: 'untrusted-sender' };
+    if (!isTrustedSender(expandSender)) return { ok: false, reason: 'untrusted-sender' };
     if (!presentation || presentation['captureId'] !== expandPayload?.['captureId'])
-      return { ok: ![], reason: 'stale-capture' };
+      return { ok: false, reason: 'stale-capture' };
     if (presentation['pending'] || presentation['phase'] !== 'ready')
-      return { ok: ![], reason: 'capture-not-ready' };
+      return { ok: false, reason: 'capture-not-ready' };
     const { bounds: baseBounds, workArea: expandWorkArea } = presentation,
-      expanded = expandPayload?.['expanded'] === !![],
+      expanded = expandPayload?.['expanded'] === true,
       expandedHeight = expanded
         ? Math['min'](EXPANDED_HEIGHT, Math['max'](1, expandWorkArea['height'] - 24))
         : baseBounds['height'],
@@ -387,28 +387,28 @@ export function createGlobalCaptureWindowController({
       };
     return (
       captureWindow['setBounds']?.(nextBounds),
-      { ok: !![], expanded: expanded, opensUp: opensUp, bounds: nextBounds }
+      { ok: true, expanded: expanded, opensUp: opensUp, bounds: nextBounds }
     );
   }
   async function chooseAction(actionPayload = {}, actionSender = null) {
-    if (!isTrustedSender(actionSender)) return { ok: ![], reason: 'untrusted-sender' };
+    if (!isTrustedSender(actionSender)) return { ok: false, reason: 'untrusted-sender' };
     const actionId = String(actionPayload?.['actionId'] || '')['trim'](),
       actionCaptureId = String(actionPayload?.['captureId'] || '')['trim']();
-    if (!GLOBAL_CAPTURE_ACTION_IDS['includes'](actionId)) return { ok: ![], reason: 'invalid-action' };
+    if (!GLOBAL_CAPTURE_ACTION_IDS['includes'](actionId)) return { ok: false, reason: 'invalid-action' };
     if (!presentation || presentation['captureId'] !== actionCaptureId)
-      return { ok: ![], reason: 'stale-capture' };
-    if (presentation['pending']) return { ok: ![], reason: 'action-in-flight' };
+      return { ok: false, reason: 'stale-capture' };
+    if (presentation['pending']) return { ok: false, reason: 'action-in-flight' };
     if (presentation['phase'] !== 'ready' || !presentation['text'])
-      return { ok: ![], reason: 'capture-not-ready' };
+      return { ok: false, reason: 'capture-not-ready' };
     const actionPresentation = presentation,
       shouldRunImmediately = AI_ACTION_IDS['has'](actionId)
-        ? actionPayload?.['runImmediately'] === !![]
-        : ![];
-    if (AI_ACTION_IDS['has'](actionId) && actionPayload?.['rememberRunImmediately'] !== ![])
+        ? actionPayload?.['runImmediately'] === true
+        : false;
+    if (AI_ACTION_IDS['has'](actionId) && actionPayload?.['rememberRunImmediately'] !== false)
       runImmediately = shouldRunImmediately;
     ((activeActionId = actionId),
       clearFocusRetryTimer(),
-      (actionPresentation['pending'] = !![]),
+      (actionPresentation['pending'] = true),
       (actionPresentation['dispatchAbort'] = new AbortController()));
     let result;
     try {
@@ -426,7 +426,7 @@ export function createGlobalCaptureWindowController({
       result =
         dispatchResult && typeof dispatchResult === 'object'
           ? dispatchResult
-          : { ok: ![], reason: 'dispatch-failed' };
+          : { ok: false, reason: 'dispatch-failed' };
     } catch (dispatchError) {
       (logDiagnosticEvent({
         type: 'global_capture.action_dispatch_failed',
@@ -436,25 +436,25 @@ export function createGlobalCaptureWindowController({
         error: dispatchError,
         context: { actionId: actionId },
       }),
-        (result = { ok: ![], reason: 'dispatch-failed' }));
+        (result = { ok: false, reason: 'dispatch-failed' }));
     }
     return (
       presentation === actionPresentation &&
         isWindowAlive() &&
-        ((actionPresentation['pending'] = ![]),
-        result['ok'] === ![] ? (captureWindow['show']?.(), focusWindow(captureWindow)) : hideWindow()),
+        ((actionPresentation['pending'] = false),
+        result['ok'] === false ? (captureWindow['show']?.(), focusWindow(captureWindow)) : hideWindow()),
       result
     );
   }
   function cancel(cancelPayload = {}, cancelSender = null) {
-    if (!isTrustedSender(cancelSender)) return { ok: ![], reason: 'untrusted-sender' };
+    if (!isTrustedSender(cancelSender)) return { ok: false, reason: 'untrusted-sender' };
     const cancelCaptureId = String(cancelPayload?.['captureId'] || '')['trim']();
     if (cancelCaptureId && presentation?.['captureId'] !== cancelCaptureId)
-      return { ok: ![], reason: 'stale-capture' };
-    return (hideWindow(), { ok: !![] });
+      return { ok: false, reason: 'stale-capture' };
+    return (hideWindow(), { ok: true });
   }
   function destroy() {
-    ((destroyed = !![]),
+    ((destroyed = true),
       clearFocusRetryTimer(),
       (windowReady = null),
       (prewarmPromise = null),

@@ -136,11 +136,11 @@ function sanitizePanoramaStateForHistory(result) {
 function cloneNodeSnapshot(
   args5,
   {
-    stripRichText: stripRichText = ![],
+    stripRichText: stripRichText = false,
     hydratedAt: hydratedAt = null,
     featureSelections: featureSelections = null,
-    stripPanoramaViewport: stripPanoramaViewport = ![],
-    preserveLiveGeneration: preserveLiveGeneration = ![],
+    stripPanoramaViewport: stripPanoramaViewport = false,
+    preserveLiveGeneration: preserveLiveGeneration = false,
   } = {},
 ) {
   if (!args5 || typeof args5 !== 'object') return args5;
@@ -185,23 +185,23 @@ function cloneNodeSnapshot(
   return featureSelections ? applyFeatureSelectionsToNodeData(data, featureSelections) : data;
 }
 function shallowEqual(options, target) {
-  if (options === target) return !![];
-  if (typeof options !== typeof target) return ![];
-  if (typeof options !== 'object' || options === null || target === null) return ![];
+  if (options === target) return true;
+  if (typeof options !== typeof target) return false;
+  if (typeof options !== 'object' || options === null || target === null) return false;
   const list2 = Object['keys'](options),
     list3 = Object['keys'](target);
-  if (list2['length'] !== list3['length']) return ![];
+  if (list2['length'] !== list3['length']) return false;
   for (const source of list2) {
     if (
       !Object['prototype']['hasOwnProperty']['call'](target, source) ||
       options[source] !== target[source]
     )
-      return ![];
+      return false;
   }
-  return !![];
+  return true;
 }
 function isPlainObject(enabled3) {
-  if (!enabled3 || typeof enabled3 !== 'object' || Array['isArray'](enabled3)) return ![];
+  if (!enabled3 || typeof enabled3 !== 'object' || Array['isArray'](enabled3)) return false;
   const next = Object['getPrototypeOf'](enabled3);
   return next === Object['prototype'] || next === null;
 }
@@ -219,9 +219,9 @@ function _isSameStoreValue(current, entry) {
   return Object['is'](current, entry);
 }
 function _isPatchNoop(enabled4, enabled5) {
-  if (!enabled4 || !enabled5 || typeof enabled5 !== 'object') return ![];
+  if (!enabled4 || !enabled5 || typeof enabled5 !== 'object') return false;
   const list5 = Object['keys'](enabled5);
-  if (list5['length'] === 0) return !![];
+  if (list5['length'] === 0) return true;
   return list5['every']((record) => _isSameStoreValue(enabled4[record], enabled5[record]));
 }
 function _trimText(payload) {
@@ -264,11 +264,11 @@ function normalizeNodesCollection(list6) {
   typeof list6 === 'object' && Object['values'](list6)['forEach'](normalizeNodeModel);
 }
 function isDreaminaTaskNodeSnapshot(enabled7) {
-  if (!enabled7 || typeof enabled7 !== 'object') return ![];
+  if (!enabled7 || typeof enabled7 !== 'object') return false;
   const value5 = String(enabled7['type'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (!['ai-video', 'ai-image', 'source-image', 'source-video']['includes'](value5)) return ![];
+  if (!['ai-video', 'ai-image', 'source-image', 'source-video']['includes'](value5)) return false;
   const value6 = String(enabled7['provider'] || '')
       ['trim']()
       ['toLowerCase'](),
@@ -276,7 +276,7 @@ function isDreaminaTaskNodeSnapshot(enabled7) {
   return value6 === 'dreamina' || resolveModelProvider(value7, value6) === 'dreamina';
 }
 function inferAsyncProviderByModel(value8, value9 = '') {
-  const modelProvider = resolveModelProvider(value8, '', { allowProviderHint: ![] });
+  const modelProvider = resolveModelProvider(value8, '', { allowProviderHint: false });
   if (modelProvider) return modelProvider;
   const value10 = String(value9 || '')
     ['trim']()
@@ -287,21 +287,21 @@ function inferAsyncProviderByModel(value8, value9 = '') {
   return 'grsai';
 }
 function isAsyncTaskNodeSnapshot(enabled8) {
-  if (!enabled8 || typeof enabled8 !== 'object') return ![];
+  if (!enabled8 || typeof enabled8 !== 'object') return false;
   const value11 = String(enabled8['type'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (!['ai-video', 'ai-image', 'source-video', 'source-image']['includes'](value11)) return ![];
+  if (!['ai-video', 'ai-image', 'source-video', 'source-image']['includes'](value11)) return false;
   const inferAsyncProviderByModel2 = inferAsyncProviderByModel(
     enabled8['model'],
     enabled8['asyncTaskProvider'] || enabled8['provider'] || '',
   );
   if (!inferAsyncProviderByModel2 || inferAsyncProviderByModel2 === 'runninghubwf' || inferAsyncProviderByModel2 === 'runninghub' || inferAsyncProviderByModel2 === 'dreamina')
-    return ![];
-  return !![];
+    return false;
+  return true;
 }
 function isRunningHubTaskNodeSnapshot(enabled9) {
-  if (!enabled9 || typeof enabled9 !== 'object') return ![];
+  if (!enabled9 || typeof enabled9 !== 'object') return false;
   const value12 = String(enabled9['type'] || '')
       ['trim']()
       ['toLowerCase'](),
@@ -309,7 +309,7 @@ function isRunningHubTaskNodeSnapshot(enabled9) {
       ['trim']()
       ['toLowerCase'](),
     value14 = String(enabled9['model'] || '')['trim'](),
-    modelProvider2 = resolveModelProvider(value14, value13, { allowProviderHint: ![] }),
+    modelProvider2 = resolveModelProvider(value14, value13, { allowProviderHint: false }),
     isWorkflowModel2 = isWorkflowModel(value14, value13 || 'runninghubwf'),
     value15 = modelProvider2 === 'runninghub' && isModelApiModel(value14, 'runninghub');
   if (value12 === 'ai-audio') return value13 === 'runninghubwf';
@@ -320,12 +320,12 @@ function isRunningHubTaskNodeSnapshot(enabled9) {
   if (value12 === 'ai-video') return value13 === 'runninghubwf' && isWorkflowModel2;
   if (value12 === 'ai-image')
     return isWorkflowModel2 || value15 || value13 === 'runninghub' || value13 === 'runninghubwf';
-  return ![];
+  return false;
 }
 function hasResolvedVideoResultSnapshot(enabled10) {
-  if (!enabled10 || typeof enabled10 !== 'object') return ![];
+  if (!enabled10 || typeof enabled10 !== 'object') return false;
   const list8 = Array['isArray'](enabled10['videos']) ? enabled10['videos'] : [];
-  if (list8['length'] > 0) return !![];
+  if (list8['length'] > 0) return true;
   return !!String(enabled10['videoUrl'] || '')['trim']() || !!String(enabled10['localPath'] || '')['trim']();
 }
 const HYDRATE_ACTIVE_STATUS_FIELDS = Object['freeze']([
@@ -343,19 +343,19 @@ const HYDRATE_ACTIVE_STATUS_FIELDS = Object['freeze']([
   ]);
 function finalizeHydratedGenerationSnapshot(value16, value17) {
   value16['generationDuration'] = value17;
-  if (value16['isGenerating'] === !![]) value16['isGenerating'] = ![];
+  if (value16['isGenerating'] === true) value16['isGenerating'] = false;
   for (const value18 of HYDRATE_ACTIVE_STATUS_FIELDS) {
     const value19 = String(value16[value18] || '')['trim']();
     if (value19 && !isGenerationTaskTerminalStatus(value19)) value16[value18] = 'cancelled';
   }
   for (const value20 of HYDRATE_RECOVERING_FIELDS)
-    if (value16[value20] === !![]) value16[value20] = ![];
+    if (value16[value20] === true) value16[value20] = false;
 }
 function shouldPreserveRunningGenerationOnHydrate(
   value21,
-  { preserveLiveGeneration: preserveLiveGeneration = ![] } = {},
+  { preserveLiveGeneration: preserveLiveGeneration = false } = {},
 ) {
-  if (preserveLiveGeneration && value21?.['isGenerating'] === !![]) {
+  if (preserveLiveGeneration && value21?.['isGenerating'] === true) {
     const enabled11 = [
       value21['dreaminaTaskPhase'],
       value21['dreaminaTaskStatus'],
@@ -369,46 +369,46 @@ function shouldPreserveRunningGenerationOnHydrate(
         ['toLowerCase']();
       return !!enabled12 && enabled12 !== 'idle' && isGenerationTaskTerminalStatus(enabled12);
     });
-    if (!enabled11) return !![];
+    if (!enabled11) return true;
   }
   if (isDreaminaTaskNodeSnapshot(value21)) {
     const enabled13 = String(value21['dreaminaSubmitId'] || '')['trim']();
-    if (!enabled13) return ![];
+    if (!enabled13) return false;
     const value23 = String(value21['dreaminaTaskPhase'] || '')
         ['trim']()
         ['toLowerCase'](),
       value24 = String(value21['dreaminaTaskStatus'] || '')
         ['trim']()
         ['toLowerCase']();
-    if (isGenerationTaskTerminalStatus(value23)) return ![];
-    if (isGenerationTaskTerminalStatus(value24)) return ![];
-    return !![];
+    if (isGenerationTaskTerminalStatus(value23)) return false;
+    if (isGenerationTaskTerminalStatus(value24)) return false;
+    return true;
   }
   if (isAsyncTaskNodeSnapshot(value21)) {
     const enabled14 = String(value21['asyncTaskId'] || '')['trim']();
-    if (!enabled14) return ![];
+    if (!enabled14) return false;
     const value25 = String(value21['asyncTaskKind'] || '')
         ['trim']()
         ['toLowerCase'](),
       value26 = String(value21['type'] || '')
         ['trim']()
         ['toLowerCase']();
-    if (value25 === 'image' && !['ai-image', 'source-image']['includes'](value26)) return ![];
-    if (value25 === 'video' && !['ai-video', 'source-video']['includes'](value26)) return ![];
+    if (value25 === 'image' && !['ai-image', 'source-image']['includes'](value26)) return false;
+    if (value25 === 'video' && !['ai-video', 'source-video']['includes'](value26)) return false;
     const value27 = String(value21['asyncTaskStatus'] || '')
       ['trim']()
       ['toLowerCase']();
-    if (isGenerationTaskTerminalStatus(value27)) return ![];
-    return !![];
+    if (isGenerationTaskTerminalStatus(value27)) return false;
+    return true;
   }
-  if (!isRunningHubTaskNodeSnapshot(value21)) return ![];
+  if (!isRunningHubTaskNodeSnapshot(value21)) return false;
   const enabled15 = String(value21['rhTaskId'] || '')['trim']();
-  if (!enabled15) return ![];
+  if (!enabled15) return false;
   const value28 = String(value21['rhTaskStatus'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (isGenerationTaskTerminalStatus(value28)) return ![];
-  return !![];
+  if (isGenerationTaskTerminalStatus(value28)) return false;
+  return true;
 }
 function createStore() {
   const map = createGenerationHistoryState();
@@ -420,9 +420,9 @@ function createStore() {
     list10 = [],
     list11 = [];
   let count2 = 0,
-    enabled16 = ![],
-    handler = () => !![];
-  function run(value29 = !![]) {
+    enabled16 = false,
+    handler = () => true;
+  function run(value29 = true) {
     args6['_persistRev'] = (args6['_persistRev'] || 0) + 1;
     if (value29) args6['_contentPersistRev'] = (args6['_contentPersistRev'] || 0) + 1;
   }
@@ -430,7 +430,7 @@ function createStore() {
     args6['_edgesRev'] = (args6['_edgesRev'] || 0) + 1;
   }
   function setViewportPersistPolicy(value30) {
-    handler = typeof value30 === 'function' ? value30 : () => !![];
+    handler = typeof value30 === 'function' ? value30 : () => true;
   }
   function setViewportScreenOrigin(value31, value32) {
     if (!viewport['set'](value31, value32)) return;
@@ -444,7 +444,7 @@ function createStore() {
         const value36 = [value34['images'], value34['videos']]['filter'](Array['isArray']);
         for (const value37 of value36) {
           let enabled17 = '',
-            enabled18 = ![];
+            enabled18 = false;
           for (const error of value37) {
             if (!error || typeof error !== 'object') continue;
             const value38 = String(error['error'] || error['message'] || '')['trim']();
@@ -459,7 +459,7 @@ function createStore() {
                 error['thumbUrl'] ||
                 error['sourceUrl'] ||
                 '',
-            )['trim']() && (enabled18 = !![]);
+            )['trim']() && (enabled18 = true);
           }
           if (enabled17 && !enabled18) return enabled17;
         }
@@ -479,9 +479,9 @@ function createStore() {
       },
       handler5 = () => !!handler4('dreaminaSubmitId'),
       active2 = (value42) => {
-        if (active(value42)) return !![];
-        if (handler5()) return !![];
-        if (handler3(value42) === 'idle') return ![];
+        if (active(value42)) return true;
+        if (handler5()) return true;
+        if (handler3(value42) === 'idle') return false;
         return handler3(value34['dreaminaTaskStatus']) !== 'idle';
       },
       list12 = [
@@ -507,8 +507,8 @@ function createStore() {
           status: status('dreaminaTaskPhase') ? value34['dreaminaTaskPhase'] : null,
           active: active2(value34['dreaminaTaskPhase']),
         },
-        { status: status('mediaTaskStatus') ? value34['mediaTaskStatus'] : null, active: !![] },
-      ]['filter']((response) => response['active'] === !![] && String(response['status'] || '')['trim']()),
+        { status: status('mediaTaskStatus') ? value34['mediaTaskStatus'] : null, active: true },
+      ]['filter']((response) => response['active'] === true && String(response['status'] || '')['trim']()),
       enabled21 = list12['find']((response2) => isGenerationTaskTerminalStatus(response2['status']))?.[
         'status'
       ],
@@ -519,30 +519,30 @@ function createStore() {
         : '';
     !enabled19 &&
       (value43 === 'waiting' || value43 === 'processing') &&
-      (value34['isGenerating'] = !![]);
+      (value34['isGenerating'] = true);
     if (enabled20) {
-      ((value34['isGenerating'] = ![]),
+      ((value34['isGenerating'] = false),
         (value34['jobStatus'] = 'error'),
         (value34['jobError'] = enabled20));
       if (status('dreaminaTaskStatus')) value34['dreaminaTaskStatus'] = 'failed';
       if (status('dreaminaTaskPhase')) value34['dreaminaTaskPhase'] = 'failed';
       if (status('dreaminaTaskLabel')) value34['dreaminaTaskLabel'] = enabled20;
-      if (status('dreaminaTaskRecovering')) value34['dreaminaTaskRecovering'] = ![];
+      if (status('dreaminaTaskRecovering')) value34['dreaminaTaskRecovering'] = false;
       if (status('asyncTaskStatus')) value34['asyncTaskStatus'] = 'failed';
-      if (status('asyncTaskRecovering')) value34['asyncTaskRecovering'] = ![];
+      if (status('asyncTaskRecovering')) value34['asyncTaskRecovering'] = false;
       if (status('rhTaskStatus')) value34['rhTaskStatus'] = 'failed';
-      if (status('rhTaskRecovering')) value34['rhTaskRecovering'] = ![];
+      if (status('rhTaskRecovering')) value34['rhTaskRecovering'] = false;
     }
     if (enabled21) {
-      value34['isGenerating'] = ![];
+      value34['isGenerating'] = false;
       const jobStatusFromTaskStatus = resolveJobStatusFromTaskStatus(enabled21, value34['jobStatus'] ?? null);
       if (jobStatusFromTaskStatus !== undefined) value34['jobStatus'] = jobStatusFromTaskStatus;
       (status('dreaminaTaskStatus') || status('dreaminaTaskPhase')) &&
-        (value34['dreaminaTaskRecovering'] = ![]);
-      if (status('asyncTaskStatus')) value34['asyncTaskRecovering'] = ![];
-      if (status('rhTaskStatus')) value34['rhTaskRecovering'] = ![];
+        (value34['dreaminaTaskRecovering'] = false);
+      if (status('asyncTaskStatus')) value34['asyncTaskRecovering'] = false;
+      if (status('rhTaskStatus')) value34['rhTaskRecovering'] = false;
     }
-    if (value34['isGenerating'] === !![]) {
+    if (value34['isGenerating'] === true) {
       if (!status('jobStatus')) value34['jobStatus'] = 'running';
       const count3 = Number(value34['generationStartTime']);
       if (!Number['isFinite'](count3) || count3 <= 0) {
@@ -552,9 +552,9 @@ function createStore() {
       }
       return ((value34['generationDuration'] = null), value34);
     }
-    const value44 = value33?.['isGenerating'] === !![],
+    const value44 = value33?.['isGenerating'] === true,
       value45 =
-        value34['isGenerating'] === ![] &&
+        value34['isGenerating'] === false &&
         value34['generationDuration'] == null &&
         (value44 || !!enabled20 || !!enabled21);
     if (value45) {
@@ -572,7 +572,7 @@ function createStore() {
   }
   function run3() {
     if (count2 > 0) {
-      enabled16 = !![];
+      enabled16 = true;
       return;
     }
     subscribeNodeField['flush']();
@@ -602,7 +602,7 @@ function createStore() {
     try {
       return handler6();
     } finally {
-      (count2--, count2 === 0 && enabled16 && ((enabled16 = ![]), run3()));
+      (count2--, count2 === 0 && enabled16 && ((enabled16 = false), run3()));
     }
   }
   function requestRender() {
@@ -739,7 +739,7 @@ function createStore() {
     run12(planNodeMovement(args6, 'moveNodesByOffsets', [value66]));
   }
   function run12(value67) {
-    let enabled23 = ![];
+    let enabled23 = false;
     for (const [value68, value69] of Object['entries'](value67)) {
       const box = args6['nodes'][value68];
       if (!box) continue;
@@ -750,7 +750,7 @@ function createStore() {
         (box['y'] = y2),
         subscribeNodeField['touch'](value68),
         map['record'](value68, { x: x2, y: y2 }),
-        (enabled23 = !![]));
+        (enabled23 = true));
     }
     if (!enabled23) return;
     (el['geometry'](), run(), run3());
@@ -758,7 +758,7 @@ function createStore() {
   function groupNodes(list13, value70) {
     if (!Array['isArray'](list13) || list13['length'] === 0) return;
     const parentId = value70 || null;
-    let enabled24 = ![];
+    let enabled24 = false;
     list13['forEach']((value71) => {
       const value72 = args6['nodes'][value71];
       if (value72) {
@@ -770,7 +770,7 @@ function createStore() {
           (value72['_bizRev'] =
             (typeof value72['_bizRev'] === 'number' ? value72['_bizRev'] : 0) + 1),
           run10(value71, parentId, value73),
-          (enabled24 = !![]));
+          (enabled24 = true));
       }
     });
     if (!enabled24) return;
@@ -793,13 +793,13 @@ function createStore() {
     const run14 = (value77, value78) => {
       const value79 = Number(targetInputPolicy?.['maxByKind']?.[value77]),
         value80 = Number(value74[value77] || 0);
-      if (!Number['isFinite'](value79) || value79 <= value78 || value80 >= value79) return ![];
-      return ((value74[value77] = value80 + 1), !![]);
+      if (!Number['isFinite'](value79) || value79 <= value78 || value80 >= value79) return false;
+      return ((value74[value77] = value80 + 1), true);
     };
     return {
       reserveSlot(value81, value82 = null) {
         const value83 = String(value81 || '')['trim']();
-        if (value83 === 'text') return !![];
+        if (value83 === 'text') return true;
         const value84 = String(value82?.['refSlot'] || '')['trim'](),
           list14 = (fixedInputSlotConfigFromManifest['slotOrderByType']?.[value83] || [])['filter']((value85) =>
             map3['has'](value85),
@@ -900,7 +900,7 @@ function createStore() {
             list16['push'](
               ...list17['map']((args12) => ({
                 ...args12,
-                isGroupShared: !![],
+                isGroupShared: true,
                 sharedGroupId: sharedGroupId,
               })),
             );
@@ -916,7 +916,7 @@ function createStore() {
             ...(refSlot2 && typeof refSlot2 === 'string' && !edge3['refSlot']
               ? { refSlot: refSlot2 }
               : null),
-            isGroupShared: !![],
+            isGroupShared: true,
             sharedGroupId: sharedGroupId,
             effectiveTargetId: targetId,
           }),
@@ -941,18 +941,18 @@ function createStore() {
     for (const { id: id2, parentId: parentId3 } of list18) {
       run11(id2, parentId3);
     }
-    let value98 = ![];
+    let value98 = false;
     for (const value99 of Object['keys'](args6['edges'])) {
       const value100 = args6['edges'][value99];
       (map7['has'](value100['sourceId']) || map7['has'](value100['targetId'])) &&
-        (delete args6['edges'][value99], (value98 = !![]));
+        (delete args6['edges'][value99], (value98 = true));
     }
     if (value98) run2();
     (run(), emitNodeDeletions(list18), run3());
   }
   function addEdge(args13) {
     if (!args13 || !args13['id']) throw new Error('[store] addEdge() 需要提供含有 id 字段的连线数据');
-    ((args6['edges'][args13['id']] = { isThumbnailActive: !![], type: null, ...args13 }),
+    ((args6['edges'][args13['id']] = { isThumbnailActive: true, type: null, ...args13 }),
       run2(),
       run(),
       run3());
@@ -981,11 +981,11 @@ function createStore() {
       return;
     const value103 = box2['zoom'];
     args6['viewport'] = viewport['attach']({ x: x3, y: y3, zoom: zoom2 });
-    if (value103 !== zoom2 && handler()) run(![]);
+    if (value103 !== zoom2 && handler()) run(false);
     run3();
   }
   function markViewportPersist() {
-    (run(![]), run3());
+    (run(false), run3());
   }
   function updateNodeData(value104, value105, value106 = {}) {
     const id3 = args6['nodes'][value104];
@@ -998,7 +998,7 @@ function createStore() {
       (args15['cells'] = args15['cells']['map']((args16) => ({ ...args16 })));
     const sanitizeCanvasNodeMediaPatchForStore3 = sanitizeCanvasNodeMediaPatchForStore(args15, id3),
       args17 = run4(id3, sanitizeCanvasNodeMediaPatchForStore3);
-    if (value106['replace'] !== !![] && _isPatchNoop(id3, args17)) return;
+    if (value106['replace'] !== true && _isPatchNoop(id3, args17)) return;
     map['record'](value104, args17, value106);
     const value108 = Object['prototype']['hasOwnProperty']['call'](args17, 'parentId')
       ? args17['parentId']
@@ -1006,7 +1006,7 @@ function createStore() {
     captureFeatureSelectionsFromNodePatch(id3, args17, args6['ui']?.['featureSelections'] || {});
     const _bizRev3 = (typeof id3['_bizRev'] === 'number' ? id3['_bizRev'] : 0) + 1;
     ((args6['nodes'][value104] = {
-      ...(value106['replace'] === !![] ? { id: id3['id'], type: id3['type'] } : id3),
+      ...(value106['replace'] === true ? { id: id3['id'], type: id3['type'] } : id3),
       ...args17,
       _bizRev: _bizRev3,
     }),
@@ -1017,7 +1017,7 @@ function createStore() {
       run3());
   }
   function updateNodesData(value109) {
-    let value110 = ![];
+    let value110 = false;
     const store = el['batch']();
     for (const [value111, value112] of Object['entries'](value109)) {
       const args18 = args6['nodes'][value111];
@@ -1044,7 +1044,7 @@ function createStore() {
           store['patch'](args18, args6['nodes'][value111]),
           subscribeNodeField['touch'](value111),
           value114 !== args18['parentId'] && run10(value111, value114, args18['parentId']),
-          (value110 = !![]));
+          (value110 = true));
       }
     }
     value110 && (store['commit'](), run(), run3());
@@ -1058,8 +1058,8 @@ function createStore() {
       !_isValidStoryboardCellTarget(args22, value119) ||
       !_isValidStoryboardCellTarget(args23, value120)
     )
-      return ![];
-    if (value115 === value117 && value119 === value120) return ![];
+      return false;
+    if (value115 === value117 && value119 === value120) return false;
     const cells = args22['cells']['slice'](),
       value121 = args22['cells'][value119],
       value122 = args23['cells'][value120];
@@ -1116,7 +1116,7 @@ function createStore() {
       subscribeNodeField['touch'](value117),
       run(),
       run3(),
-      !![]
+      true
     );
   }
   function renameNode(value123, name2) {
@@ -1136,7 +1136,7 @@ function createStore() {
   }
   function showPicker(screenX, screenY, x4, y4) {
     ((args6['picker'] = {
-      visible: !![],
+      visible: true,
       x: x4,
       y: y4,
       screenX: screenX,
@@ -1145,8 +1145,8 @@ function createStore() {
       run3());
   }
   function hidePicker() {
-    if (args6['picker']?.['visible'] === ![]) return;
-    ((args6['picker'] = { ...args6['picker'], visible: ![] }), run3());
+    if (args6['picker']?.['visible'] === false) return;
+    ((args6['picker'] = { ...args6['picker'], visible: false }), run3());
   }
   function getState() {
     return deepClone(args6);
@@ -1154,7 +1154,7 @@ function createStore() {
   function getStateRaw() {
     return args6;
   }
-  function loadState(enabled30, { preserveHistoryProjection: preserveHistoryProjection = ![] } = {}) {
+  function loadState(enabled30, { preserveHistoryProjection: preserveHistoryProjection = false } = {}) {
     if (!enabled30) return;
     if (!preserveHistoryProjection) map['clear']();
     ((args6['nodes'] = deepClone(enabled30['nodes'] ?? {})), map['prune'](args6['nodes']));
@@ -1183,7 +1183,7 @@ function createStore() {
   function getHistorySnapshot() {
     const nodes2 = {};
     for (const [value129, value130] of Object['entries'](args6['nodes'] || {})) {
-      nodes2[value129] = cloneNodeSnapshot(value130, { stripPanoramaViewport: !![] });
+      nodes2[value129] = cloneNodeSnapshot(value130, { stripPanoramaViewport: true });
     }
     const edges = {};
     for (const [value131, value132] of Object['entries'](args6['edges'] || {})) {
@@ -1216,7 +1216,7 @@ function createStore() {
     }
     loadState(
       { ...args24, nodes: nodes3, viewport: cloneViewportSnapshot(args6['viewport']) },
-      { preserveHistoryProjection: !![] },
+      { preserveHistoryProjection: true },
     );
   }
   function getSourcesForNode(value138) {
@@ -1228,23 +1228,23 @@ function createStore() {
     );
   }
   function run15(value141, enabled34) {
-    if (!enabled34 || typeof enabled34 !== 'object') return ![];
+    if (!enabled34 || typeof enabled34 !== 'object') return false;
     for (const [value142, value143] of Object['entries'](enabled34)) {
-      if (value141?.[value142] !== value143) return !![];
+      if (value141?.[value142] !== value143) return true;
     }
-    return ![];
+    return false;
   }
   function run16(list22, list23) {
-    if (list22 === list23) return !![];
-    if (!Array['isArray'](list22) || !Array['isArray'](list23)) return ![];
-    if (list22['length'] !== list23['length']) return ![];
+    if (list22 === list23) return true;
+    if (!Array['isArray'](list22) || !Array['isArray'](list23)) return false;
+    if (list22['length'] !== list23['length']) return false;
     for (let value144 = 0; value144 < list22['length']; value144 += 1) {
-      if (!Object['is'](list22[value144], list23[value144])) return ![];
+      if (!Object['is'](list22[value144], list23[value144])) return false;
     }
-    return !![];
+    return true;
   }
   function run17(enabled35, enabled36) {
-    if (enabled35 === enabled36) return !![];
+    if (enabled35 === enabled36) return true;
     if (
       !enabled35 ||
       !enabled36 ||
@@ -1253,21 +1253,21 @@ function createStore() {
       Array['isArray'](enabled35) ||
       Array['isArray'](enabled36)
     )
-      return ![];
+      return false;
     const list24 = Object['keys'](enabled35),
       list25 = Object['keys'](enabled36);
-    if (list24['length'] !== list25['length']) return ![];
+    if (list24['length'] !== list25['length']) return false;
     for (const value145 of list24) {
-      if (!Object['prototype']['hasOwnProperty']['call'](enabled36, value145)) return ![];
+      if (!Object['prototype']['hasOwnProperty']['call'](enabled36, value145)) return false;
       const value146 = enabled35[value145],
         value147 = enabled36[value145];
       if (Array['isArray'](value146) || Array['isArray'](value147)) {
-        if (!run16(value146, value147)) return ![];
+        if (!run16(value146, value147)) return false;
       } else {
-        if (!Object['is'](value146, value147)) return ![];
+        if (!Object['is'](value146, value147)) return false;
       }
     }
-    return !![];
+    return true;
   }
   function setSelectionBox(args25) {
     if (!args25 || typeof args25 !== 'object') return;
@@ -1285,24 +1285,24 @@ function createStore() {
     ((args6['selectedNodeIds'] = value150), run3());
   }
   function clearSelection() {
-    const enabled37 = args6['selectionBox']?.['active'] === !![],
+    const enabled37 = args6['selectionBox']?.['active'] === true,
       enabled38 = Array['isArray'](args6['selectedNodeIds'])
         ? args6['selectedNodeIds']['length'] > 0
-        : ![],
+        : false,
       enabled39 = args6['selectionMeta']?.['source'] != null;
     if (!enabled37 && !enabled38 && !enabled39) return;
-    ((args6['selectionBox']['active'] = ![]),
+    ((args6['selectionBox']['active'] = false),
       (args6['selectedNodeIds'] = []),
       (args6['selectionMeta']['source'] = null),
       run3());
   }
   function showContextMenu(x5, y5, items) {
-    ((args6['contextMenu'] = { visible: !![], x: x5, y: y5, items: items }),
+    ((args6['contextMenu'] = { visible: true, x: x5, y: y5, items: items }),
       run3());
   }
   function hideContextMenu() {
-    if (args6['contextMenu']?.['visible'] !== !![]) return;
-    ((args6['contextMenu'] = { visible: ![], x: 0, y: 0, items: [] }), run3());
+    if (args6['contextMenu']?.['visible'] !== true) return;
+    ((args6['contextMenu'] = { visible: false, x: 0, y: 0, items: [] }), run3());
   }
   function setConnOverlay({ srcId: srcId, invalidNodeIds: invalidNodeIds, hoverId: hoverId, side: side }) {
     const value151 = {
@@ -1327,12 +1327,12 @@ function createStore() {
   function serializeNode(value153) {
     const value154 = args6['nodes']?.[value153];
     return value154
-      ? sanitizeNodeForPersistence(cloneNodeSnapshot(value154, { stripRichText: !![] }))
+      ? sanitizeNodeForPersistence(cloneNodeSnapshot(value154, { stripRichText: true }))
       : null;
   }
   function serialize() {
     const nodes4 = Object['values'](args6['nodes'] || {})['map']((value155) =>
-        cloneNodeSnapshot(value155, { stripRichText: !![] }),
+        cloneNodeSnapshot(value155, { stripRichText: true }),
       ),
       edges2 = Object['values'](args6['edges'] || {})['map']((value156) =>
         cloneEdgeSnapshot(value156),
@@ -1348,7 +1348,7 @@ function createStore() {
       };
     return sanitizeSerializedCanvasData(value157);
   }
-  function run18(enabled40, { preserveLiveGeneration: preserveLiveGeneration = ![] } = {}) {
+  function run18(enabled40, { preserveLiveGeneration: preserveLiveGeneration = false } = {}) {
     if (!enabled40) return;
     map['clear']();
     const hydratedAt2 = Date['now'](),
@@ -1517,28 +1517,28 @@ function createStore() {
     ((args6['ui'][value185] = value186), run3());
   }
   function setShowVideoMeta(value187) {
-    run19('showVideoMeta', value187 === !![]);
+    run19('showVideoMeta', value187 === true);
   }
   function setShowSelectionMediaProperties(value188) {
-    run19('showSelectionMediaProperties', value188 !== ![]);
+    run19('showSelectionMediaProperties', value188 !== false);
   }
   function setTitleFollowsCanvasZoom(value189) {
-    run19('titleFollowsCanvasZoom', value189 === !![]);
+    run19('titleFollowsCanvasZoom', value189 === true);
   }
   function setPromptBoxResizeEnabled(value190) {
-    run19('promptBoxResizeEnabled', value190 !== ![]);
+    run19('promptBoxResizeEnabled', value190 !== false);
   }
   function setPromptEnterBehavior(value191) {
     run19('promptEnterBehavior', value191 === 'newline' ? 'newline' : 'submit');
   }
   function setPromptAttachmentButtonHidden(value192) {
-    run19('promptAttachmentButtonHidden', value192 === !![]);
+    run19('promptAttachmentButtonHidden', value192 === true);
   }
   function setPromptPresetButtonHidden(value193) {
-    run19('promptPresetButtonHidden', value193 === !![]);
+    run19('promptPresetButtonHidden', value193 === true);
   }
   function setVideoAudioDefaultEnabled(value194) {
-    run19('videoAudioDefaultEnabled', value194 === !![]);
+    run19('videoAudioDefaultEnabled', value194 === true);
   }
   function setCanvasToolbarPlacement(value195) {
     run19('canvasToolbarPlacement', normalizeCanvasToolbarPlacement(value195));
@@ -1547,13 +1547,13 @@ function createStore() {
     run19('nodeManagerPlacement', normalizeNodeManagerPlacement(value196));
   }
   function setLeftSidebarAutoHideEnabled(value197) {
-    run19('leftSidebarAutoHideEnabled', value197 === !![]);
+    run19('leftSidebarAutoHideEnabled', value197 === true);
   }
   function setBottomLeftBarAutoHideEnabled(value198) {
-    run19('bottomLeftBarAutoHideEnabled', value198 === !![]);
+    run19('bottomLeftBarAutoHideEnabled', value198 === true);
   }
   function setImageVideoNodeResizeEnabled(value199) {
-    run19('imageVideoNodeResizeEnabled', value199 === !![]);
+    run19('imageVideoNodeResizeEnabled', value199 === true);
   }
   function run20(value200, value201, handler9, handler10) {
     const value202 = handler9(value201);
@@ -1568,13 +1568,13 @@ function createStore() {
     run20('videoToolbarLayout', value204, normalizeVideoToolbarLayout, serializeVideoToolbarLayout);
   }
   function setAlignFeatureEnabled(value205) {
-    const enabled49 = value205 !== ![];
+    const enabled49 = value205 !== false;
     if (args6['ui'] && args6['ui']['alignFeatureEnabled'] === enabled49) return;
     if (!args6['ui']) args6['ui'] = {};
     args6['ui']['alignFeatureEnabled'] = enabled49;
     if (!enabled49)
       ((args6['ui']['alignFeatureTriggerMode'] = 'off'),
-        (args6['ui']['alignPanelVisible'] = ![]),
+        (args6['ui']['alignPanelVisible'] = false),
         (args6['ui']['alignPanelAnchorWorld'] = null));
     else
       args6['ui']['alignFeatureTriggerMode'] === 'off' &&
@@ -1589,7 +1589,7 @@ function createStore() {
     ((args6['ui']['alignFeatureTriggerMode'] = value207),
       (args6['ui']['alignFeatureEnabled'] = value207 !== 'off'),
       value207 === 'off' &&
-        ((args6['ui']['alignPanelVisible'] = ![]), (args6['ui']['alignPanelAnchorWorld'] = null)),
+        ((args6['ui']['alignPanelVisible'] = false), (args6['ui']['alignPanelAnchorWorld'] = null)),
       run3());
   }
   function setAlignDistributeGap(value208) {
@@ -1602,12 +1602,12 @@ function createStore() {
     ((args6['ui']['alignDistributeGap'] = value210), run3());
   }
   function setAlignPanelVisible(value211) {
-    const enabled50 = value211 === !![];
+    const enabled50 = value211 === true;
     if (!args6['ui']) args6['ui'] = {};
     if (!enabled50) {
       const enabled51 = !!args6['ui']['alignPanelAnchorWorld'];
       if (args6['ui']['alignPanelVisible'] === enabled50 && !enabled51) return;
-      ((args6['ui']['alignPanelVisible'] = ![]),
+      ((args6['ui']['alignPanelVisible'] = false),
         (args6['ui']['alignPanelAnchorWorld'] = null),
         run3());
       return;
@@ -1633,13 +1633,13 @@ function createStore() {
     ((args6['ui']['alignPanelAnchorWorld'] = box4), run3());
   }
   function setSnapGuidesEnabled(value213) {
-    const value214 = value213 !== ![];
+    const value214 = value213 !== false;
     if (args6['ui'] && args6['ui']['snapGuidesEnabled'] === value214) return;
     if (!args6['ui']) args6['ui'] = {};
     ((args6['ui']['snapGuidesEnabled'] = value214), run3());
   }
   function setSelectionRelatedHighlightEnabled(value215) {
-    const value216 = value215 !== ![];
+    const value216 = value215 !== false;
     if (args6['ui'] && args6['ui']['selectionRelatedHighlightEnabled'] === value216) return;
     if (!args6['ui']) args6['ui'] = {};
     ((args6['ui']['selectionRelatedHighlightEnabled'] = value216), run3());
@@ -1657,7 +1657,7 @@ function createStore() {
     ((args6['ui']['selectionRelatedHighlightColor'] = value220), run3());
   }
   function setConnectionLinesVisible(value221) {
-    const value222 = value221 !== ![];
+    const value222 = value221 !== false;
     if (args6['ui'] && args6['ui']['connectionLinesVisible'] === value222) return;
     if (!args6['ui']) args6['ui'] = {};
     ((args6['ui']['connectionLinesVisible'] = value222), run3());
@@ -1669,47 +1669,47 @@ function createStore() {
     ((args6['ui']['connectionLineStyle'] = connectionLineStyle), run3());
   }
   function initUiPrefs(options4 = {}) {
-    const value224 = options4?.['showSelectionMediaProperties'] !== ![],
-      value225 = options4?.['titleFollowsCanvasZoom'] === !![],
-      value226 = options4?.['promptBoxResizeEnabled'] !== ![],
-      value227 = options4?.['promptAttachmentButtonHidden'] === !![],
-      value228 = options4?.['imageVideoNodeResizeEnabled'] === !![],
-      value229 = options4?.['selectionRelatedHighlightEnabled'] !== ![],
+    const value224 = options4?.['showSelectionMediaProperties'] !== false,
+      value225 = options4?.['titleFollowsCanvasZoom'] === true,
+      value226 = options4?.['promptBoxResizeEnabled'] !== false,
+      value227 = options4?.['promptAttachmentButtonHidden'] === true,
+      value228 = options4?.['imageVideoNodeResizeEnabled'] === true,
+      value229 = options4?.['selectionRelatedHighlightEnabled'] !== false,
       value230 = run21(options4?.['selectionRelatedHighlightColor']),
-      value231 = options4?.['connectionLinesVisible'] !== ![],
+      value231 = options4?.['connectionLinesVisible'] !== false,
       connectionLineStyle2 = normalizeConnectionLineStyle(options4?.['connectionLineStyle']),
       value232 = String(options4?.['alignFeatureTriggerMode'] || '')['trim'](),
       value233 =
         value232 === 'hold' || value232 === 'click' || value232 === 'off'
           ? value232
-          : options4?.['alignFeatureEnabled'] === ![]
+          : options4?.['alignFeatureEnabled'] === false
             ? 'off'
             : 'click',
-      value234 = options4?.['alignFeatureEnabled'] === ![] ? ![] : value233 !== 'off',
+      value234 = options4?.['alignFeatureEnabled'] === false ? false : value233 !== 'off',
       value235 = Number(options4?.['alignDistributeGap']),
       value236 = Number['isFinite'](value235)
         ? Math['max'](0, Math['min'](200, Math['round'](value235)))
         : 40,
-      value237 = options4?.['snapGuidesEnabled'] !== ![];
+      value237 = options4?.['snapGuidesEnabled'] !== false;
     if (!args6['ui']) args6['ui'] = {};
-    ((args6['ui']['showVideoMeta'] = ![]),
+    ((args6['ui']['showVideoMeta'] = false),
       (args6['ui']['showSelectionMediaProperties'] = value224),
       (args6['ui']['titleFollowsCanvasZoom'] = value225),
       (args6['ui']['promptBoxResizeEnabled'] = value226),
       (args6['ui']['promptEnterBehavior'] =
         options4?.['promptEnterBehavior'] === 'newline' ? 'newline' : 'submit'),
       (args6['ui']['promptAttachmentButtonHidden'] = value227),
-      (args6['ui']['promptPresetButtonHidden'] = options4?.['promptPresetButtonHidden'] === !![]),
-      (args6['ui']['videoAudioDefaultEnabled'] = options4?.['videoAudioDefaultEnabled'] === !![]),
+      (args6['ui']['promptPresetButtonHidden'] = options4?.['promptPresetButtonHidden'] === true),
+      (args6['ui']['videoAudioDefaultEnabled'] = options4?.['videoAudioDefaultEnabled'] === true),
       (args6['ui']['canvasToolbarPlacement'] = normalizeCanvasToolbarPlacement(
         options4?.['canvasToolbarPlacement'],
       )),
       (args6['ui']['nodeManagerPlacement'] = normalizeNodeManagerPlacement(
         options4?.['nodeManagerPlacement'],
       )),
-      (args6['ui']['leftSidebarAutoHideEnabled'] = options4?.['leftSidebarAutoHideEnabled'] === !![]),
+      (args6['ui']['leftSidebarAutoHideEnabled'] = options4?.['leftSidebarAutoHideEnabled'] === true),
       (args6['ui']['bottomLeftBarAutoHideEnabled'] =
-        options4?.['bottomLeftBarAutoHideEnabled'] === !![]),
+        options4?.['bottomLeftBarAutoHideEnabled'] === true),
       (args6['ui']['imageVideoNodeResizeEnabled'] = value228),
       (args6['ui']['imageToolbarLayout'] = normalizeImageToolbarLayout(
         options4?.['imageToolbarLayout'],
@@ -1724,7 +1724,7 @@ function createStore() {
       (args6['ui']['alignFeatureEnabled'] = value234),
       (args6['ui']['alignFeatureTriggerMode'] = value233),
       (args6['ui']['alignDistributeGap'] = value236),
-      (args6['ui']['alignPanelVisible'] = ![]),
+      (args6['ui']['alignPanelVisible'] = false),
       (args6['ui']['alignPanelAnchorWorld'] = null),
       (args6['ui']['snapGuidesEnabled'] = value237),
       initFeatureSelections(options4?.['featureSelections'] || {}),
@@ -1768,7 +1768,7 @@ function createStore() {
   }
   function run23() {
     ((!args6['workflows'] || typeof args6['workflows'] !== 'object') &&
-      (args6['workflows'] = { items: [], loading: ![], error: null, loadedAt: 0 }),
+      (args6['workflows'] = { items: [], loading: false, error: null, loadedAt: 0 }),
       !Array['isArray'](args6['workflows']['items']) && (args6['workflows']['items'] = []),
       (!args6['workflowUi'] || typeof args6['workflowUi'] !== 'object') &&
         (args6['workflowUi'] = createInitialWorkflowUiState()));
@@ -1777,7 +1777,7 @@ function createStore() {
     (run23(),
       (args6['workflows'] = {
         ...args6['workflows'],
-        loading: loading === !![],
+        loading: loading === true,
         error: error3 == null ? null : String(error3),
       }),
       run3());
@@ -1789,7 +1789,7 @@ function createStore() {
         items: Array['isArray'](list26)
           ? list26['map']((value251) => cloneWorkflowSnapshot(value251))
           : [],
-        loading: ![],
+        loading: false,
         error: null,
         loadedAt: Date['now'](),
       }),
@@ -1856,7 +1856,7 @@ function createStore() {
         ...args6['workflowUi'],
         draft: { ...createInitialWorkflowDraftState(), ...cloneWorkflowSnapshot(options5) },
         tagDraft: '',
-        updateConfirmOpen: ![],
+        updateConfirmOpen: false,
         error: null,
       }),
       run3());
@@ -1865,15 +1865,15 @@ function createStore() {
     (run23(),
       (args6['workflowUi'] = {
         ...args6['workflowUi'],
-        modalOpen: !![],
+        modalOpen: true,
         modalTab: tab === 'update' ? 'update' : 'create',
         sourceGroupId: sourceGroupId == null ? null : String(sourceGroupId || '')['trim']() || null,
         draft: createInitialWorkflowDraftState(),
         tagDraft: '',
         updateTargetId: null,
         updateSearchKeyword: '',
-        updateConfirmOpen: ![],
-        saving: ![],
+        updateConfirmOpen: false,
+        saving: false,
         error: null,
       }),
       run3());
@@ -1882,21 +1882,21 @@ function createStore() {
     (run23(),
       (args6['workflowUi'] = {
         ...args6['workflowUi'],
-        modalOpen: ![],
+        modalOpen: false,
         modalTab: 'create',
         sourceGroupId: null,
         draft: createInitialWorkflowDraftState(),
         tagDraft: '',
         updateTargetId: null,
         updateSearchKeyword: '',
-        updateConfirmOpen: ![],
-        saving: ![],
+        updateConfirmOpen: false,
+        saving: false,
         error: null,
       }),
       run3());
   }
   function setWorkflowSaving(saving) {
-    setWorkflowUi({ saving: saving === !![] });
+    setWorkflowUi({ saving: saving === true });
   }
   function setWorkflowApplying(value258) {
     const applyingWorkflowId = value258 == null ? null : String(value258);

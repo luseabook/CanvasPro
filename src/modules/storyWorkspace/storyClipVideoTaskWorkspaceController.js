@@ -27,7 +27,7 @@ export function createStoryClipVideoTaskWorkspaceController({
   render: render,
   showTaskResultToast: showTaskResultToast,
   showNavigableTaskResultToast: showNavigableTaskResultToast,
-  getWorkspaceDestroyed: getWorkspaceDestroyed = () => ![],
+  getWorkspaceDestroyed: getWorkspaceDestroyed = () => false,
   windowObject: windowObject = globalThis['window'] || globalThis,
 } = {}) {
   if (
@@ -49,15 +49,15 @@ export function createStoryClipVideoTaskWorkspaceController({
     typeof render !== 'function'
   )
     throw new TypeError('Story clip video tasks require project, persistence, and presentation adapters.');
-  const run = () => getWorkspaceDestroyed() === !![],
+  const run = () => getWorkspaceDestroyed() === true,
     replaceClip = (item, key, enabled, index = state['data']) => {
       const response = index?.['episodes']?.['find']((result) => result['id'] === item),
         count = response?.['clips']?.['findIndex']((data) => data['id'] === key) ?? -1;
-      if (!response || count < 0 || !enabled) return ![];
+      if (!response || count < 0 || !enabled) return false;
       return (
         (response['clips'][count] = enabled),
         (response['status'] = deriveStoryEpisodeStatus(response['clips'])),
-        !![]
+        true
       );
     },
     getGenerationKey = (options, target, source) =>
@@ -114,7 +114,7 @@ export function createStoryClipVideoTaskWorkspaceController({
           (replaceClip(payload, handle, value3, scope),
             syncBackgroundTask(record, payload, handle, value3, { batch: batch2 }),
             syncProjectEntry(record),
-            schedulePersistence({ immediate: !![] }));
+            schedulePersistence({ immediate: true }));
           if (!isProjectTaskCurrent(record)) return;
           restoreProjectTaskState(scope);
           if (state['view'] === 'project' && state['step'] === 3) {
@@ -137,11 +137,11 @@ export function createStoryClipVideoTaskWorkspaceController({
         const modelExecution = resolveModelExecution(providerHint['modelId'], {
           providerHint: providerHint['provider'],
         });
-        if (modelExecution?.['modelManifest'] && modelExecution?.['executionManifest']) return !![];
-        if (Date['now']() - value5 >= value4) return ![];
+        if (modelExecution?.['modelManifest'] && modelExecution?.['executionManifest']) return true;
+        if (Date['now']() - value5 >= value4) return false;
         await new Promise((value6) => windowObject['setTimeout'](value6, 250));
       }
-      return ![];
+      return false;
     },
     resumeTask = async ({
       episodeId: episodeId2,
@@ -151,9 +151,9 @@ export function createStoryClipVideoTaskWorkspaceController({
     }) => {
       registerProjectData(projectToken);
       const value7 = getGenerationKey(projectToken['projectId'], episodeId2, clipId2);
-      if (activeControllers['has'](value7) || run()) return ![];
+      if (activeControllers['has'](value7) || run()) return false;
       const enabled2 = await waitForRecoveryManifest(recovery);
-      if (!isProjectTaskLive(projectToken) || activeControllers['has'](value7)) return ![];
+      if (!isProjectTaskLive(projectToken) || activeControllers['has'](value7)) return false;
       if (!enabled2) {
         const value8 = projectToken['data']?.['episodes']?.['find']((value9) => value9['id'] === episodeId2),
           args2 = value8?.['clips']?.['find']((value10) => value10['id'] === clipId2);
@@ -168,7 +168,7 @@ export function createStoryClipVideoTaskWorkspaceController({
           };
           (replaceClip(episodeId2, clipId2, value11, projectToken['data']),
             syncBackgroundTask(projectToken, episodeId2, clipId2, value11),
-            schedulePersistence({ immediate: !![] }));
+            schedulePersistence({ immediate: true }));
           if (isProjectTaskCurrent(projectToken)) {
             restoreProjectTaskState(projectToken['data']);
             if (state['view'] === 'project' && state['step'] === 3) refreshEpisodeCard(episodeId2);
@@ -178,11 +178,11 @@ export function createStoryClipVideoTaskWorkspaceController({
                 render();
           }
         }
-        return ![];
+        return false;
       }
       const value12 = projectToken['data']?.['episodes']?.['find']((value13) => value13['id'] === episodeId2),
         enabled3 = value12?.['clips']?.['find']((value14) => value14['id'] === clipId2);
-      if (!enabled3 || !getRecoverableStoryClipVideoTask(enabled3)) return ![];
+      if (!enabled3 || !getRecoverableStoryClipVideoTask(enabled3)) return false;
       const value15 = createGenerationController(projectToken, episodeId2, clipId2, enabled3);
       activeControllers['set'](value7, value15);
       try {
@@ -196,18 +196,18 @@ export function createStoryClipVideoTaskWorkspaceController({
           executionId: recovery['executionId'],
           startedAt: recovery['startedAt'],
         });
-        if (!isProjectTaskLive(projectToken)) return ![];
+        if (!isProjectTaskLive(projectToken)) return false;
         return (
           response2?.['status'] === 'success' &&
             showNavigableTaskResultToast?.('片段视频任务已恢复并生成完成。', 'success', projectToken, {
               episodeId: episodeId2,
               clipId: clipId2,
             }),
-          schedulePersistence({ immediate: !![] }),
+          schedulePersistence({ immediate: true }),
           response2?.['status'] === 'success' || response2?.['status'] === 'pending'
         );
       } catch (error) {
-        if (!isProjectTaskLive(projectToken)) return ![];
+        if (!isProjectTaskLive(projectToken)) return false;
         const value16 = projectToken['data']?.['episodes']?.['find'](
             (value17) => value17['id'] === episodeId2,
           ),
@@ -223,7 +223,7 @@ export function createStoryClipVideoTaskWorkspaceController({
           };
           (replaceClip(episodeId2, clipId2, value19, projectToken['data']),
             syncBackgroundTask(projectToken, episodeId2, clipId2, value19),
-            schedulePersistence({ immediate: !![] }));
+            schedulePersistence({ immediate: true }));
         }
         return (
           showTaskResultToast?.(error?.['message'] || '片段视频任务恢复失败。', 'error', {
@@ -232,7 +232,7 @@ export function createStoryClipVideoTaskWorkspaceController({
             taskId: recovery['taskId'],
             error: error,
           }),
-          ![]
+          false
         );
       } finally {
         activeControllers['get'](value7) === value15 && activeControllers['delete'](value7);

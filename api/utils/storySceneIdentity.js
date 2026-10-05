@@ -39,8 +39,8 @@ function getIdentityBigrams(result) {
 export function storySceneIdentitiesOverlap(target, source) {
   const list = getStorySceneIdentityKey(target),
     list2 = getStorySceneIdentityKey(source);
-  if (!list || !list2) return ![];
-  if (list['includes'](list2) || list2['includes'](list)) return !![];
+  if (!list || !list2) return false;
+  if (list['includes'](list2) || list2['includes'](list)) return true;
   const map = getIdentityBigrams(list);
   return [...getIdentityBigrams(list2)]['some']((next) => map['has'](next));
 }

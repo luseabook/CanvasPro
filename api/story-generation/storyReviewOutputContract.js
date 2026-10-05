@@ -22,7 +22,7 @@ function normalizeAssessment(verdict, clipRef) {
 }
 function inspectResponse(
   index,
-  { episodeRef: episodeRef, batchRef: batchRef, refs: refs, repair: repair = ![] },
+  { episodeRef: episodeRef, batchRef: batchRef, refs: refs, repair: repair = false },
 ) {
   const result = repair ? '修复' : '审片',
     strictJson = parseStrictJson(getResultText(index), result + ' Agent 未返回有效 JSON。');
@@ -86,7 +86,7 @@ export function parseRepairResponse(payload, { episodeRef: episodeRef3, failedCl
   const inspectResponse3 = inspectResponse(payload, {
     episodeRef: episodeRef3,
     refs: failedClipRefs,
-    repair: !![],
+    repair: true,
   });
   if (inspectResponse3['errors']['length']) throw new Error(inspectResponse3['errors']['join']('；'));
   return new Map(failedClipRefs['map']((handle) => [handle, inspectResponse3['accepted'][handle]['clips']]));

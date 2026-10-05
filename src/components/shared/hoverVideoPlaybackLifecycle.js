@@ -1,28 +1,28 @@
 const externalVideoPlaybackOwners = new WeakMap();
 export function claimExternalVideoPlayback(enabled, enabled2) {
-  if (!enabled || !enabled2) return ![];
-  return (externalVideoPlaybackOwners['set'](enabled, enabled2), !![]);
+  if (!enabled || !enabled2) return false;
+  return (externalVideoPlaybackOwners['set'](enabled, enabled2), true);
 }
 export function releaseExternalVideoPlayback(enabled3, value) {
-  if (!enabled3) return ![];
+  if (!enabled3) return false;
   const enabled4 = externalVideoPlaybackOwners['get'](enabled3);
-  if (!enabled4 || (value && enabled4 !== value)) return ![];
-  return (externalVideoPlaybackOwners['delete'](enabled3), !![]);
+  if (!enabled4 || (value && enabled4 !== value)) return false;
+  return (externalVideoPlaybackOwners['delete'](enabled3), true);
 }
 export function isExternallyOwnedVideoPlayback(enabled5) {
   return !!enabled5 && externalVideoPlaybackOwners['has'](enabled5);
 }
 export function shouldTakeOverActiveHoverPlayback(item, key) {
   return (
-    item?.['_isHovered'] === !![] &&
-    item?.['_isManualControl'] !== !![] &&
-    item?.['_hoverManualPause'] !== !![] &&
-    key?.['paused'] === ![]
+    item?.['_isHovered'] === true &&
+    item?.['_isManualControl'] !== true &&
+    item?.['_hoverManualPause'] !== true &&
+    key?.['paused'] === false
   );
 }
 export function setHoverPlaybackChromeVisible(
   { controlsEl: controlsEl = null, muteEl: muteEl = null, centerEl: centerEl = null } = {},
-  index = ![],
+  index = false,
 ) {
   const result = index ? 'flex' : 'none';
   if (controlsEl?.['style']) controlsEl['style']['display'] = result;
@@ -31,9 +31,9 @@ export function setHoverPlaybackChromeVisible(
 }
 export function shouldKeepManualPlaybackPresentationActive(data, options) {
   return (
-    options?.['paused'] === ![] &&
-    (data?.['_isManualControl'] === !![] ||
-      data?.['_isManualLoopPlayback'] === !![] ||
+    options?.['paused'] === false &&
+    (data?.['_isManualControl'] === true ||
+      data?.['_isManualLoopPlayback'] === true ||
       isExternallyOwnedVideoPlayback(options))
   );
 }
@@ -43,23 +43,23 @@ export function createHoverVideoPlaybackLifecycle({
   schedule: schedule = (target, source) => globalThis['setTimeout'](target, source),
   cancel: cancel = (next) => globalThis['clearTimeout'](next),
 } = {}) {
-  let current = ![],
+  let current = false,
     schedule2 = null,
     entry = 0;
   const run = () => {
     entry += 1;
-    if (schedule2 === null) return ![];
-    return (cancel(schedule2), (schedule2 = null), !![]);
+    if (schedule2 === null) return false;
+    return (cancel(schedule2), (schedule2 = null), true);
   };
   return {
     activate() {
-      if (current) return ![];
-      return (run(), !![]);
+      if (current) return false;
+      return (run(), true);
     },
-    deactivate({ release: release = !![] } = {}) {
-      if (current) return ![];
+    deactivate({ release: release = true } = {}) {
+      if (current) return false;
       run();
-      if (release !== !![] || typeof releaseMedia !== 'function') return ![];
+      if (release !== true || typeof releaseMedia !== 'function') return false;
       const record = ++entry;
       return (
         (schedule2 = schedule(
@@ -69,12 +69,12 @@ export function createHoverVideoPlaybackLifecycle({
           },
           Math['max'](0, Number(releaseDelayMs) || 0),
         )),
-        !![]
+        true
       );
     },
     dispose() {
       if (current) return;
-      (run(), (current = !![]));
+      (run(), (current = true));
     },
     hasPendingRelease() {
       return schedule2 !== null;

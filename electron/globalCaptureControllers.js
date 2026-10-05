@@ -21,7 +21,7 @@ export function createGlobalCaptureControllers({
       dirname: dirname,
       onAction: (capturePayload, dispatchOptions) =>
         shortcutController?.['dispatchCaptureAction']?.(capturePayload, dispatchOptions) || {
-          ok: ![],
+          ok: false,
           reason: 'controller-unavailable',
         },
       logDiagnosticEvent: logDiagnosticEvent,
@@ -30,7 +30,7 @@ export function createGlobalCaptureControllers({
     accelerator: accelerator,
     ...(globalShortcutApi ? { globalShortcutApi: globalShortcutApi } : {}),
     copySelectedText: selectedTextCapture['capture'],
-    hasKeyReleaseTracking: () => selectedTextCapture['isKeyReleaseTrackingAvailable']?.() === !![],
+    hasKeyReleaseTracking: () => selectedTextCapture['isKeyReleaseTrackingAvailable']?.() === true,
     focusCanvas: focusCanvas,
     getMainWindow: getMainWindow,
     showCapturePanel: captureWindowController['show'],

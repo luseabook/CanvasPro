@@ -2956,22 +2956,22 @@ function findFirstEnabledUiSchemaValueOption(value476) {
 }
 
 function isFieldDisabledByCondition(enabled34, enabled35) {
-  if (!enabled34 || !enabled35) return ![];
+  if (!enabled34 || !enabled35) return false;
   const enabled36 = enabled34?.['disableWhen'];
-  if (!enabled36 || typeof enabled36 !== 'object') return ![];
+  if (!enabled36 || typeof enabled36 !== 'object') return false;
   return optionDisableWhenMatches(enabled36, enabled35);
 }
 
 function isFieldDisabledByUiState(value478, enabled37) {
   const enabled38 = String(value478?.['id'] || '')['trim']();
-  if (!enabled38 || !enabled37) return ![];
+  if (!enabled38 || !enabled37) return false;
   const value479 = enabled37?.['uiSchemaFieldState']?.[enabled38];
-  return value479 === !![] || value479?.['disabled'] === !![] || value479?.['readOnly'] === !![];
+  return value479 === true || value479?.['disabled'] === true || value479?.['readOnly'] === true;
 }
 
 function resolveFieldDisabled(enabled39, value480) {
-  if (!enabled39) return ![];
-  if (isFieldDisabled(enabled39)) return !![];
+  if (!enabled39) return false;
+  if (isFieldDisabled(enabled39)) return true;
   return (
     isFieldDisabledByUiState(enabled39, value480 || {}) ||
     isFieldDisabledByCondition(enabled39, value480 || {})
@@ -3187,8 +3187,8 @@ function formatRhAiAppFooterParamLabel(value518, value519) {
 }
 
 function isRhAiAppFooterToggleOn(value522) {
-  if (value522 === !![]) return !![];
-  if (value522 === ![]) return ![];
+  if (value522 === true) return true;
+  if (value522 === false) return false;
   const value523 = String(value522 ?? '')
     ['trim']()
     ['toLowerCase']();
@@ -3357,7 +3357,7 @@ function renderRhAiAppFooterParamField(value534, value535) {
     });
   const renderControl3 = renderControl(value534, fieldValue12, controlType6, {
       nodeData: value535,
-      advanced: !![],
+      advanced: true,
     }),
     formatRhAiAppFooterParamValue4 = formatRhAiAppFooterParamValue(controlType6, fieldValue12),
     value540 = formatRhAiAppFooterParamValue4
@@ -3390,7 +3390,7 @@ function renderRhAiAppFooterParamField(value534, value535) {
 }
 
 function isStandaloneResolutionField(value541) {
-  if (value541?.['standaloneInResolution'] === !![]) return !![];
+  if (value541?.['standaloneInResolution'] === true) return true;
   return (
     String(value541?.['resolutionComposite'] || '')
       ['trim']()
@@ -3412,9 +3412,9 @@ function handleRandomSeedRowBindEvent({
   fieldEl: fieldEl4,
   helpers: helpers = {},
 } = {}) {
-  if (eventName !== 'click' || !fieldEl4) return ![];
+  if (eventName !== 'click' || !fieldEl4) return false;
   const run7 = helpers['commitValue'];
-  if (typeof run7 !== 'function') return ![];
+  if (typeof run7 !== 'function') return false;
   const run8 =
       typeof helpers['setRhVideoStepperValueEl'] === 'function'
         ? helpers['setRhVideoStepperValueEl']
@@ -3432,7 +3432,7 @@ function handleRandomSeedRowBindEvent({
           '',
       )['trim'](),
       randomSeedMode3 = normalizeRandomSeedMode(el121['dataset']['uiSchemaRandomSeedMode'], 'fixed');
-    if (!enabled43) return !![];
+    if (!enabled43) return true;
     run7(enabled43, randomSeedMode3);
     if (randomSeedMode3 === 'random') {
       const value545 = String(fieldEl4['dataset']['uiSchemaField'] || '')['trim'](),
@@ -3442,20 +3442,20 @@ function handleRandomSeedRowBindEvent({
       if (el122) el122['value'] = value546;
       if (value545) run7(value545, value546);
     }
-    return !![];
+    return true;
   }
   const value547 = event12?.['target']?.['closest']?.('[data-ui-schema-random-seed]');
   if (value547 && fieldEl4['contains'](value547)) {
     (event12['preventDefault']?.(), event12['stopPropagation']?.());
     const enabled44 = String(fieldEl4?.['dataset']?.['uiSchemaField'] || '')['trim']();
-    if (!enabled44) return !![];
+    if (!enabled44) return true;
     const value548 = handler25(fieldEl4);
     fieldEl4['classList']?.['contains']('ui-schema-rh-video-stepper') && run8(fieldEl4, value548);
     const value549 = fieldEl4['querySelector']('[data-ui-schema-input]');
     if (value549) value549['value'] = value548;
-    return (run7(enabled44, value548), !![]);
+    return (run7(enabled44, value548), true);
   }
-  return ![];
+  return false;
 }
 
 const uiSchemaStateOwner = createUiSchemaStateOwner({

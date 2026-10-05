@@ -20,9 +20,9 @@ const AUDIO_VOICE_ACTION_ICONS = Object['freeze']({
     remove: 'context-audio-voice-delete',
   });
 export function buildAudioVoiceSegmentMenuEntries({
-  hasConverted: hasConverted = ![],
-  hasSource: hasSource = ![],
-  usingConverted: usingConverted = ![],
+  hasConverted: hasConverted = false,
+  hasSource: hasSource = false,
+  usingConverted: usingConverted = false,
   text: text,
 } = {}) {
   return [
@@ -60,7 +60,7 @@ export function buildAudioVoiceSegmentMenuEntries({
         },
       ],
     },
-    { action: 'remove', label: text('menu.remove'), disabled: ![], danger: !![] },
+    { action: 'remove', label: text('menu.remove'), disabled: false, danger: true },
   ];
 }
 function buildAudioVoiceContextMenuEntry(label, action) {
@@ -71,7 +71,7 @@ function buildAudioVoiceContextMenuEntry(label, action) {
     label: label['label'],
     icon: label['icon'] || AUDIO_VOICE_ACTION_ICONS[label['action']] || 'action',
     checked: label['checked'],
-    disabled: label['disabled'] === !![],
+    disabled: label['disabled'] === true,
     danger: label['danger'],
     ...(subItems
       ? { subItems: subItems }
@@ -85,8 +85,8 @@ export function buildAudioVoiceSegmentContextMenuItems({
   entries: entries = [],
   modelOptions: modelOptions = [],
   selectedModelId: selectedModelId = '',
-  imitateToneAvailable: imitateToneAvailable = ![],
-  imitateToneEnabled: imitateToneEnabled = ![],
+  imitateToneAvailable: imitateToneAvailable = false,
+  imitateToneEnabled: imitateToneEnabled = false,
   text: text2,
   onAction: onAction = null,
 } = {}) {
@@ -143,7 +143,7 @@ function createAudioVoiceInlineMenuItem(el, result, data = '') {
     Object['entries'](el['dataset'] || {})['forEach'](([options, target]) => {
       el2['dataset'][options] = String(target ?? '');
     }),
-    (el2['disabled'] = el['disabled'] === !![]));
+    (el2['disabled'] = el['disabled'] === true));
   if (el2['disabled']) el2['setAttribute']('aria-disabled', 'true');
   return (
     el['checked'] && (el2['classList']['add']('is-active'), el2['setAttribute']('aria-pressed', 'true')),
@@ -177,7 +177,7 @@ export function renderAudioVoiceSegmentInlineMenu({
   el7['setAttribute']('role', 'menu');
   const record = {
     label: text3('actions.segmentModel'),
-    modelMenu: !![],
+    modelMenu: true,
     subItems: [
       {
         action: 'select-segment-model',
@@ -238,7 +238,7 @@ export function createAudioVoiceSegmentContextMenuController({
           config,
           {
             className: 'v2-canvas-ctx-menu audio-voice-segment-context-menu',
-            ensureItemIcons: !![],
+            ensureItemIcons: true,
             ownerElement: ownerElement,
             ownerRoot: panel,
           },

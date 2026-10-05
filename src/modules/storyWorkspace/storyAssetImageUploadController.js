@@ -22,7 +22,7 @@ export function createStoryAssetImageUploadController({
   saveFile: saveFile = uploadFile,
 } = {}) {
   const map = new Set(),
-    capture = (assetId, { appendAppearance: appendAppearance = ![] } = {}) => {
+    capture = (assetId, { appendAppearance: appendAppearance = false } = {}) => {
       const projectToken = createProjectToken(),
         appearanceId = projectToken['data']?.['assets']?.['find']((value) => value['id'] === assetId);
       return {
@@ -37,22 +37,22 @@ export function createStoryAssetImageUploadController({
       };
     };
   async function upload(error, enabled) {
-    if (!error || !enabled) return ![];
+    if (!error || !enabled) return false;
     if (
       !/^image\//iu['test'](error['type'] || '') &&
       !/\.(png|jpe?g|webp|gif|bmp|avif|svg|tiff?|heic|heif)$/iu['test'](error['name'] || '')
     )
-      return (showToast('请拖入图片文件。', 'warn'), ![]);
+      return (showToast('请拖入图片文件。', 'warn'), false);
     const { projectToken: projectToken2, assetId: assetId2, appearanceId: appearanceId2 } = enabled,
       index = projectToken2['data']?.['assets']?.['find']((item) => item['id'] === assetId2),
       prompt = getStoryAssetAppearances(index)['find']((key) => key['id'] === appearanceId2);
-    if (!index || index['isLibraryAsset'] || !prompt || !isProjectTaskLive(projectToken2)) return ![];
+    if (!index || index['isLibraryAsset'] || !prompt || !isProjectTaskLive(projectToken2)) return false;
     const result = projectToken2['projectId'] + ':' + assetId2 + ':' + appearanceId2;
     if (
       map['has'](result) ||
       (isProjectTaskCurrent(projectToken2) && isLoading(state, assetId2, appearanceId2))
     )
-      return (showToast('请等待当前生成或上传任务完成。', 'info'), ![]);
+      return (showToast('请等待当前生成或上传任务完成。', 'info'), false);
     map['add'](result);
     const id = buildStoryBackgroundTaskId('asset-image-upload', {
         assetId: assetId2,
@@ -63,7 +63,7 @@ export function createStoryAssetImageUploadController({
         projectToken2['data']?.['assets']?.['includes'](index) &&
         getStoryAssetAppearances(index)['includes'](prompt);
     isProjectTaskCurrent(projectToken2) &&
-      (setGenerating(state, assetId2, appearanceId2, !![]), refresh(assetId2));
+      (setGenerating(state, assetId2, appearanceId2, true), refresh(assetId2));
     startTask(projectToken2, {
       id: id,
       type: 'asset-image-upload',
@@ -76,7 +76,7 @@ export function createStoryAssetImageUploadController({
       if (!handler()) {
         if (isProjectTaskLive(projectToken2))
           finishTask(projectToken2, id, { status: 'cancelled', message: '目标形象已移除' });
-        return ![];
+        return false;
       }
       const data = enabled['appendAppearance']
         ? normalizeStoryAssetAppearance(
@@ -98,9 +98,9 @@ export function createStoryAssetImageUploadController({
             [assetId2]: index['appearances']['length'] - 1,
           };
       }
-      return (finishTask(projectToken2, id, { status: 'succeeded', message: '本地图片已保存' }), !![]);
+      return (finishTask(projectToken2, id, { status: 'succeeded', message: '本地图片已保存' }), true);
     } catch (error2) {
-      if (!isProjectTaskLive(projectToken2)) return ![];
+      if (!isProjectTaskLive(projectToken2)) return false;
       finishTask(projectToken2, id, {
         status: 'failed',
         message: '本地图片保存失败',
@@ -108,11 +108,11 @@ export function createStoryAssetImageUploadController({
       });
       if (isProjectTaskCurrent(projectToken2))
         showToast(error2?.['message'] || '素材保存失败，请稍后重试。', 'error');
-      return ![];
+      return false;
     } finally {
       (map['delete'](result),
         isProjectTaskCurrent(projectToken2) &&
-          (setGenerating(state, assetId2, appearanceId2, ![]), refresh(assetId2)));
+          (setGenerating(state, assetId2, appearanceId2, false), refresh(assetId2)));
     }
   }
   return { capture: capture, upload: upload };
@@ -150,19 +150,19 @@ export function bindStoryAssetImageDrop(el, { state: state2, capture: capture2, 
       run();
       if (!el5 || !event3['dataTransfer']?.['files']?.['length']) return;
       (event3['preventDefault'](), event3['stopPropagation']());
-      const entry = capture2(el5['dataset']['storyAssetId'], { appendAppearance: !![] });
+      const entry = capture2(el5['dataset']['storyAssetId'], { appendAppearance: true });
       void upload2(event3['dataTransfer']['files'][0], entry);
     };
   return (
-    el['addEventListener']('dragover', target, !![]),
-    el['addEventListener']('dragleave', source, !![]),
-    el['addEventListener']('drop', current, !![]),
+    el['addEventListener']('dragover', target, true),
+    el['addEventListener']('dragleave', source, true),
+    el['addEventListener']('drop', current, true),
     {
       destroy() {
         (run(),
-          el['removeEventListener']('dragover', target, !![]),
-          el['removeEventListener']('dragleave', source, !![]),
-          el['removeEventListener']('drop', current, !![]));
+          el['removeEventListener']('dragover', target, true),
+          el['removeEventListener']('dragleave', source, true),
+          el['removeEventListener']('drop', current, true));
       },
     }
   );

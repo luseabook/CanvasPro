@@ -126,7 +126,7 @@ export function resolveStoryStyleSelection({
       stylePrompt: styleId2['prompt'],
       label: styleId2['label'],
       thumbnail: styleId2['thumbnail'],
-      isCustom: ![],
+      isCustom: false,
     });
   const stylePrompt2 = String(stylePrompt || videoStyle || '')['trim']();
   return Object['freeze']({
@@ -134,6 +134,6 @@ export function resolveStoryStyleSelection({
     stylePrompt: stylePrompt2,
     label: stylePrompt2 || '自定义风格提示词',
     thumbnail: '',
-    isCustom: !![],
+    isCustom: true,
   });
 }

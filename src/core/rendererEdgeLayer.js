@@ -59,7 +59,7 @@ export function buildEdgePathGeometry(enabled, next, current = null, style = 'cu
   return buildConnectionPathGeometry({ ...args, style: style });
 }
 export function resolveEdgeVisualOwner({
-  poolingEnabled: poolingEnabled = ![],
+  poolingEnabled: poolingEnabled = false,
   edge: edge,
   relatedEdgeIds: relatedEdgeIds2,
   movedNodeIds: movedNodeIds,
@@ -95,8 +95,8 @@ export function buildPooledEdgeVisualBuckets(
   }));
 }
 function isEdgeVisible(enabled3, box, input, output, value2) {
-  if (!enabled3) return ![];
-  if (value2) return !![];
+  if (!enabled3) return false;
+  if (value2) return true;
   const number3 = normalizeNumber(box?.['zoom'], 1),
     number4 = normalizeNumber(box?.['x']),
     number5 = normalizeNumber(box?.['y']),
@@ -135,7 +135,7 @@ export function createRendererEdgeLayer({
     el5 = null,
     interactionVisualCount = null,
     box2 = { x: 0, y: 0, zoom: 1 },
-    poolingEnabled2 = ![],
+    poolingEnabled2 = false,
     value8 = '',
     value9 = '',
     pooledPathWriteCount = 0;
@@ -174,7 +174,7 @@ export function createRendererEdgeLayer({
     }
   }
   function run5(value12) {
-    const value13 = value12 === !![];
+    const value13 = value12 === true;
     if (poolingEnabled2 === value13) return;
     ((poolingEnabled2 = value13), el['clear']());
     for (const map3 of value7) map3['clear']();
@@ -191,13 +191,13 @@ export function createRendererEdgeLayer({
       map4 = value7[edgePoolBucketIndex],
       value18 = map4['get'](value15);
     if (value17) {
-      if (value18 === value16) return ![];
+      if (value18 === value16) return false;
       map4['set'](value15, value16);
     } else {
-      if (!map4['has'](value15)) return ![];
+      if (!map4['has'](value15)) return false;
       map4['delete'](value15);
     }
-    return (map2['add'](edgePoolBucketIndex), !![]);
+    return (map2['add'](edgePoolBucketIndex), true);
   }
   function run7() {
     if (!poolingEnabled2 || map2['size'] === 0) return 0;
@@ -216,7 +216,7 @@ export function createRendererEdgeLayer({
   }
   function run8(edgeId) {
     let cache = cacheSize['get'](edgeId);
-    if (cache) return { cache: cache, created: ![] };
+    if (cache) return { cache: cache, created: false };
     return (
       (cache = {
         edgeId: edgeId,
@@ -224,14 +224,14 @@ export function createRendererEdgeLayer({
         hoverPath: null,
         pathEl: null,
         highlighted: null,
-        pooled: ![],
+        pooled: false,
         d: '',
         geometry: null,
         geometryCacheKey: '',
         order: 0,
       }),
       cacheSize['set'](edgeId, cache),
-      { cache: cache, created: !![] }
+      { cache: cache, created: true }
     );
   }
   function run9(enabled5) {
@@ -260,8 +260,8 @@ export function createRendererEdgeLayer({
     return (value22['groupEl']['appendChild'](el10), (value22['pathEl'] = el10), el10);
   }
   function run11(enabled6) {
-    if (!enabled6) return ![];
-    const value23 = enabled6['groupEl']?.['isConnected'] === !![];
+    if (!enabled6) return false;
+    const value23 = enabled6['groupEl']?.['isConnected'] === true;
     return (
       enabled6['groupEl']?.['remove']?.(),
       (enabled6['groupEl'] = null),
@@ -289,12 +289,12 @@ export function createRendererEdgeLayer({
       (value24['order'] = order));
     if (value27)
       (run11(value24),
-        run6(edgeId2['id'], geometry['d'], !![]),
+        run6(edgeId2['id'], geometry['d'], true),
         (value29 || !enabled10 || value28 !== order) &&
           el['upsert']({ edgeId: edgeId2['id'], geometry: geometry, order: order }));
     else {
       if (enabled10) el['remove'](edgeId2['id']);
-      (run6(edgeId2['id'], geometry['d'], ![]),
+      (run6(edgeId2['id'], geometry['d'], false),
         run9(value24),
         run12(value24, !!map6?.['has']?.(edgeId2['id'])));
       value24['hoverPath']['getAttribute']('d') !== geometry['d'] &&
@@ -306,15 +306,15 @@ export function createRendererEdgeLayer({
   }
   function run14(value30) {
     const enabled11 = cacheSize['get'](value30);
-    if (!enabled11) return ![];
+    if (!enabled11) return false;
     (el['remove'](value30),
-      run6(value30, enabled11['d'], ![]),
+      run6(value30, enabled11['d'], false),
       enabled11['groupEl']?.['remove']?.(),
       cacheSize['delete'](value30),
       forcedDynamicEdgeIds2['delete'](value30));
     if (value8 === value30) value8 = '';
     if (value9 === value30) value9 = '';
-    return !![];
+    return true;
   }
   function run15() {
     if (!el2) return null;
@@ -404,7 +404,7 @@ export function createRendererEdgeLayer({
           value41,
           layoutReadMs2['containerW'],
           layoutReadMs2['containerH'],
-          ![],
+          false,
         )
       ) {
         skippedInvisibleCount += 1;
@@ -444,7 +444,7 @@ export function createRendererEdgeLayer({
         layoutReadMs: layoutReadMs2['layoutReadMs'] || 0,
         pathBuildMs: Math['max'](0, nowMs4 - nowMs3),
         domWriteMs: Math['max'](0, nowMs5 - nowMs4),
-        clearedDom: ![],
+        clearedDom: false,
       }),
       { mutated: mutated }
     );
@@ -564,24 +564,24 @@ export function createRendererEdgeLayer({
         layoutReadMs: containerWidth['layoutReadMs'] || 0,
         pathBuildMs: Math['max'](0, nowMs8 - nowMs7),
         domWriteMs: Math['max'](0, nowMs9 - nowMs8),
-        clearedDom: options?.['clearedDom'] === !![],
+        clearedDom: options?.['clearedDom'] === true,
         renderAllLowZoomEdges: renderAllLowZoomEdges,
       }),
-      { mutated: !![] }
+      { mutated: true }
     );
   }
   function prepareDynamicEdges(value54) {
-    let value55 = ![];
+    let value55 = false;
     for (const value56 of value54 || []) {
       const enabled13 = cacheSize['get'](value56);
       if (!enabled13) continue;
       forcedDynamicEdgeIds2['add'](value56);
       if (!enabled13['pooled']) continue;
       (el['remove'](value56),
-        run6(value56, enabled13['d'], ![]),
+        run6(value56, enabled13['d'], false),
         run10(enabled13),
-        (enabled13['pooled'] = ![]),
-        (value55 = !![]));
+        (enabled13['pooled'] = false),
+        (value55 = true));
     }
     return (value55 && (run7(), run17()), value55);
   }
@@ -595,7 +595,7 @@ export function createRendererEdgeLayer({
     options: options = {},
   } = {}) {
     const edgeIds2 = new Set(forcedDynamicEdgeIds2);
-    if (edgeIds2['size'] === 0) return { mutated: ![] };
+    if (edgeIds2['size'] === 0) return { mutated: false };
     return (
       forcedDynamicEdgeIds2['clear'](),
       renderPartial({
@@ -657,7 +657,7 @@ export function createRendererEdgeLayer({
     if (el3?.['isConnected']) value67 += 1;
     run4();
     if (el4?.['isConnected']) value67 += 1;
-    return (run16(), (poolingEnabled2 = ![]), (value8 = ''), (value9 = ''), value67);
+    return (run16(), (poolingEnabled2 = false), (value8 = ''), (value9 = ''), value67);
   }
   function reset() {
     const value69 = clearRenderedEdges(el2);

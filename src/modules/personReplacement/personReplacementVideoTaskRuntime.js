@@ -154,7 +154,7 @@ export function createPersonReplacementVideoTaskRuntime({
 } = {}) {
   if (typeof getProject !== 'function' || typeof setProject !== 'function')
     throw new Error('Person replacement video task runtime requires project access');
-  let entry = ![],
+  let entry = false,
     record = null,
     payload = '';
   const list2 = [],
@@ -165,8 +165,8 @@ export function createPersonReplacementVideoTaskRuntime({
     },
     handler2 = (state) =>
       typeof setProjectById === 'function'
-        ? setProjectById(state?.['id'], state, { renderWorkspace: ![] })
-        : setProject(state, { renderWorkspace: ![] }),
+        ? setProjectById(state?.['id'], state, { renderWorkspace: false })
+        : setProject(state, { renderWorkspace: false }),
     acceptUploadedResult = ({
       shotId: shotId = '',
       videoRef: videoRef = '',
@@ -243,10 +243,10 @@ export function createPersonReplacementVideoTaskRuntime({
     handler3 = (
       { projectId: projectId, shotId: shotId2, requestId: requestId, revision: revision },
       args2 = {},
-      { persistIdentity: persistIdentity = ![] } = {},
+      { persistIdentity: persistIdentity = false } = {},
     ) => {
       if (!handler4({ projectId: projectId, shotId: shotId2, requestId: requestId, revision: revision }))
-        return ![];
+        return false;
       const shots = handler(projectId),
         args3 = shots['workspace']?.['videoGenerationsByShotId']?.[shotId2] || {},
         generationStatus = { ...args3, ...args2, shotId: shotId2, requestId: requestId },
@@ -254,7 +254,7 @@ export function createPersonReplacementVideoTaskRuntime({
           Object['keys'](generationStatus)['some'](
             (scope) => !Object['is'](generationStatus[scope], args3[scope]),
           ) || Object['keys'](args3)['some']((input) => !Object['hasOwn'](generationStatus, input));
-      if (!enabled) return !![];
+      if (!enabled) return true;
       return (
         handler2({
           ...shots,
@@ -280,23 +280,23 @@ export function createPersonReplacementVideoTaskRuntime({
           normalizeText(generationStatus['taskId']) &&
           hasPersonReplacementGenerationTaskIdentityChanged(args3, generationStatus) &&
           void Promise['resolve'](persistNow())['catch'](() => {}),
-        !![]
+        true
       );
     },
     handler4 = ({ projectId: projectId2, shotId: shotId3, requestId: requestId2, revision: revision2 }) => {
-      if (entry) return ![];
+      if (entry) return false;
       const project3 = handler(projectId2);
-      if (normalizeText(project3?.['id']) !== projectId2) return ![];
+      if (normalizeText(project3?.['id']) !== projectId2) return false;
       const shot3 = project3?.['shots']?.['find']((output) => normalizeText(output?.['id']) === shotId3);
-      if (!shot3) return ![];
+      if (!shot3) return false;
       const value2 = project3['workspace']?.['videoGenerationsByShotId']?.[shotId3];
-      if (normalizeText(value2?.['requestId']) !== requestId2) return ![];
+      if (normalizeText(value2?.['requestId']) !== requestId2) return false;
       return createPersonReplacementVideoGenerationRevision({ project: project3, shot: shot3 }) === revision2;
     },
     handler5 = ({ projectId: projectId3, shotId: shotId4, requestId: requestId3 }) => {
-      if (entry) return ![];
+      if (entry) return false;
       const shots2 = handler(projectId3);
-      if (normalizeText(shots2?.['id']) !== projectId3) return ![];
+      if (normalizeText(shots2?.['id']) !== projectId3) return false;
       const response3 = shots2['workspace']?.['videoGenerationsByShotId']?.[shotId4];
       if (
         normalizeText(response3?.['requestId']) !== requestId3 ||
@@ -304,7 +304,7 @@ export function createPersonReplacementVideoTaskRuntime({
           normalizeText(response3?.['status'])['toLowerCase'](),
         )
       )
-        return ![];
+        return false;
       return (
         handler2({
           ...shots2,
@@ -319,12 +319,12 @@ export function createPersonReplacementVideoTaskRuntime({
             error: '',
           }),
         }),
-        !![]
+        true
       );
     },
     handler6 = (value3 = '') => ({
-      ok: ![],
-      stale: !![],
+      ok: false,
+      stale: true,
       failures: [],
       project: cloneJson(handler(value3)),
     }),
@@ -348,7 +348,7 @@ export function createPersonReplacementVideoTaskRuntime({
                       notify: projectId4['notify'],
                       renderWorkspace: projectId4['renderWorkspace'],
                     })
-                  : { ok: !![], failures: [], project: cloneJson(handler(projectId4['projectId'])) };
+                  : { ok: true, failures: [], project: cloneJson(handler(projectId4['projectId'])) };
               projectId4['resolve'](entry ? handler6(projectId4['projectId']) : value4);
             } catch (value5) {
               projectId4['reject'](value5);
@@ -370,10 +370,10 @@ export function createPersonReplacementVideoTaskRuntime({
           : [],
         value6 = list2['at'](-1);
       if (value6 && value6['projectId'] === projectId5) {
-        if (!list3['length']) value6['prepareAll'] = !![];
+        if (!list3['length']) value6['prepareAll'] = true;
         (list3['forEach']((value7) => value6['shotIds']['add'](value7)),
-          (value6['notify'] = value6['notify'] || notify?.['notify'] !== ![]),
-          (value6['renderWorkspace'] = value6['renderWorkspace'] || notify?.['renderWorkspace'] !== ![]));
+          (value6['notify'] = value6['notify'] || notify?.['notify'] !== false),
+          (value6['renderWorkspace'] = value6['renderWorkspace'] || notify?.['renderWorkspace'] !== false));
         const value8 = new Promise((resolve2, reject2) => {
           value6['listeners']['push']({ resolve: resolve2, reject: reject2 });
         });
@@ -387,8 +387,8 @@ export function createPersonReplacementVideoTaskRuntime({
           projectId: projectId5,
           prepareAll: !list3['length'],
           shotIds: new Set(list3),
-          notify: notify?.['notify'] !== ![],
-          renderWorkspace: notify?.['renderWorkspace'] !== ![],
+          notify: notify?.['notify'] !== false,
+          renderWorkspace: notify?.['renderWorkspace'] !== false,
           listeners: [],
           resolve(value13) {
             (run(value13), this['listeners']['forEach']((promise) => promise['resolve'](value13)));
@@ -402,7 +402,7 @@ export function createPersonReplacementVideoTaskRuntime({
     generate = async ({
       projectId: projectId6 = '',
       shotId: shotId5,
-      notifyCompletion: notifyCompletion = !![],
+      notifyCompletion: notifyCompletion = true,
       recoveryTask: recoveryTask = null,
     } = {}) => {
       const shotId6 = normalizeText(shotId5);
@@ -420,7 +420,7 @@ export function createPersonReplacementVideoTaskRuntime({
       let slotState = resolvePersonReplacementVideoSlotState(projectId7, shot4);
       if (!slotState['slotEntries']['sourceVideo']?.['url']) {
         const value16 = await prepare({ projectId: projectId7?.['id'], shotIds: [shotId6] });
-        if (value16?.['stale'] || entry) return { ok: ![], stale: !![], shotId: shotId6 };
+        if (value16?.['stale'] || entry) return { ok: false, stale: true, shotId: shotId6 };
         ((projectId7 = handler(projectId7?.['id'])),
           (shot4 = projectId7?.['shots']?.['find']((value17) => normalizeText(value17?.['id']) === shotId6)),
           (slotState = resolvePersonReplacementVideoSlotState(projectId7, shot4)));
@@ -485,7 +485,7 @@ export function createPersonReplacementVideoTaskRuntime({
             providerProfileId: providerProfileId2,
             executionId: executionId,
             startedAt: startedAt,
-            useOpenapiQuery: providerHint2?.['useOpenapiQuery'] === !![],
+            useOpenapiQuery: providerHint2?.['useOpenapiQuery'] === true,
             error: '',
           }),
           shots: projectId7['shots']['map']((args7) =>
@@ -497,7 +497,7 @@ export function createPersonReplacementVideoTaskRuntime({
         if (!handler4({ projectId: projectId8, shotId: shotId6, requestId: requestId4, revision: revision3 }))
           return (
             handler5({ projectId: projectId8, shotId: shotId6, requestId: requestId4 }),
-            { ok: ![], stale: !![], shotId: shotId6 }
+            { ok: false, stale: true, shotId: shotId6 }
           );
         const personReplacementVideoRequest = buildPersonReplacementVideoRequest({
             currentProject: projectId7,
@@ -526,11 +526,11 @@ export function createPersonReplacementVideoTaskRuntime({
               });
             if (!args9['taskId']) return;
             ((value19['taskId'] = args9['taskId']),
-              handler3(value19, { status: 'running', ...args9, error: '' }, { persistIdentity: !![] }));
+              handler3(value19, { status: 'running', ...args9, error: '' }, { persistIdentity: true }));
           },
           value20 = {
             signal: abortController['signal'],
-            useOpenapiQuery: providerHint2?.['useOpenapiQuery'] === !![],
+            useOpenapiQuery: providerHint2?.['useOpenapiQuery'] === true,
             onTaskId: (value21) => handler9(value21),
             onTaskMeta: (options3 = {}) => handler9(options3['taskId'], options3),
             onRunningHubWorkflowQueueChange: (response4 = {}) => {
@@ -545,7 +545,7 @@ export function createPersonReplacementVideoTaskRuntime({
         if (!handler4({ projectId: projectId8, shotId: shotId6, requestId: requestId4, revision: revision3 }))
           return (
             handler5({ projectId: projectId8, shotId: shotId6, requestId: requestId4 }),
-            { ok: ![], stale: !![], shotId: shotId6 }
+            { ok: false, stale: true, shotId: shotId6 }
           );
         const now2 = now(),
           list4 = getSuccessfulVideoGenerationItems(value22),
@@ -593,32 +593,32 @@ export function createPersonReplacementVideoTaskRuntime({
             type: PERSON_REPLACEMENT_OUTPUT_TRANSITIONS['INVALIDATE'],
           }),
         );
-        let enabled2 = !![];
+        let enabled2 = true;
         try {
           await persistNow();
         } catch {
-          enabled2 = ![];
+          enabled2 = false;
         }
         if (!handler4({ projectId: projectId8, shotId: shotId6, requestId: requestId4, revision: revision3 }))
           return (
             handler5({ projectId: projectId8, shotId: shotId6, requestId: requestId4 }),
-            { ok: ![], stale: !![], shotId: shotId6 }
+            { ok: false, stale: true, shotId: shotId6 }
           );
         return (
-          (!enabled2 || notifyCompletion === ![]) &&
+          (!enabled2 || notifyCompletion === false) &&
             showToast(
               enabled2 ? '视频替换已生成。' : '视频替换已生成，项目数据正在重试保存，请暂时不要刷新。',
               enabled2 ? 'success' : 'warn',
             ),
-          notifyCompletion !== ![] &&
+          notifyCompletion !== false &&
             notifyGenerationCompleted({ kind: 'video', mediaRef: resultVideoRef2, projectId: projectId8 }),
-          { project: cloneJson(handler(projectId8)), ok: !![], shotId: shotId6 }
+          { project: cloneJson(handler(projectId8)), ok: true, shotId: shotId6 }
         );
       } catch (error2) {
         if (!handler4({ projectId: projectId8, shotId: shotId6, requestId: requestId4, revision: revision3 }))
           return (
             handler5({ projectId: projectId8, shotId: shotId6, requestId: requestId4 }),
-            { ok: ![], stale: !![], shotId: shotId6 }
+            { ok: false, stale: true, shotId: shotId6 }
           );
         const error3 = error2?.['getUserMessage']?.() || error2?.['message'] || '视频替换生成失败',
           shots4 = handler(projectId8),
@@ -634,7 +634,7 @@ export function createPersonReplacementVideoTaskRuntime({
               error: error3,
             }),
           });
-        return { project: cloneJson(value28), ok: ![], shotId: shotId6, error: error3 };
+        return { project: cloneJson(value28), ok: false, shotId: shotId6, error: error3 };
       } finally {
         map['get'](value18)?.['requestId'] === requestId4 && map['delete'](value18);
       }
@@ -642,7 +642,7 @@ export function createPersonReplacementVideoTaskRuntime({
     resume = async ({
       projectId: projectId9 = '',
       shotId: shotId7,
-      notifyCompletion: notifyCompletion = !![],
+      notifyCompletion: notifyCompletion = true,
     } = {}) => {
       const shotId8 = normalizeText(shotId7),
         projectId10 = handler(projectId9),
@@ -708,7 +708,7 @@ export function createPersonReplacementVideoTaskRuntime({
             modelId: normalizeText(personReplacementVideoGenerationState['modelId']),
             provider: normalizeText(personReplacementVideoGenerationState['provider']),
           }),
-            (remoteCancelled = !![]));
+            (remoteCancelled = true));
         } catch (error4) {
           const text4 =
             normalizeText(error4?.['getUserMessage']?.() || error4?.['message']) ||
@@ -716,7 +716,7 @@ export function createPersonReplacementVideoTaskRuntime({
           showToast('已停止本地等待，但' + text4, 'warn');
         }
       if (remoteCancelled) showToast('视频替换已取消。', 'info');
-      return { ok: !![], shotId: shotId10, taskId: taskId3, remoteCancelled: remoteCancelled };
+      return { ok: true, shotId: shotId10, taskId: taskId3, remoteCancelled: remoteCancelled };
     },
     resumeRecoverable = async () => {
       if (entry) return [];
@@ -741,7 +741,7 @@ export function createPersonReplacementVideoTaskRuntime({
     getActiveGenerationCount: () => map['size'],
     hasActiveTasksForProject: (value36) => {
       const text6 = normalizeText(value36);
-      if (!text6) return ![];
+      if (!text6) return false;
       return (
         list2['some']((value37) => value37['projectId'] === text6) ||
         payload === text6 ||
@@ -757,7 +757,7 @@ export function createPersonReplacementVideoTaskRuntime({
         list2['splice'](0)['forEach']((promise3) => {
           promise3['resolve'](handler6());
         }),
-        (entry = !![]));
+        (entry = true));
     },
   };
 }

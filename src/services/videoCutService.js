@@ -28,7 +28,7 @@ export async function cutVideoRangeToLocal({
         src: src2,
         args: { start: start, end: end },
       },
-      { wait: !![], timeout: 300000 },
+      { wait: true, timeout: 300000 },
     );
   else {
     const response = await requester({
@@ -37,8 +37,8 @@ export async function cutVideoRangeToLocal({
       provider: 'local',
       headers: { 'Content-Type': 'application/json' },
       body: JSON['stringify']({ src: src2, start: start, end: end }),
-      allow404Null: !![],
-      returnMeta: !![],
+      allow404Null: true,
+      returnMeta: true,
     });
     if (response?.['status'] === 404 || response?.['data'] == null)
       throw new VideoCutServiceError('Video cut endpoint is unavailable', 'endpoint_unavailable');
@@ -46,7 +46,7 @@ export async function cutVideoRangeToLocal({
   }
   const result = data?.['result'] && typeof data['result'] === 'object' ? data['result'] : data,
     localPath = pickResultLocalPath(data);
-  if (!localPath || data?.['success'] === ![] || result?.['success'] === ![])
+  if (!localPath || data?.['success'] === false || result?.['success'] === false)
     throw new VideoCutServiceError(
       result?.['error'] || data?.['error'] || data?.['message'] || 'Video cut failed',
     );

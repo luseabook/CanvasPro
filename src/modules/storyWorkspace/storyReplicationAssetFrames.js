@@ -4,7 +4,7 @@ export async function collectStoryReplicationAssetFrames({
   assets: assets,
   projectId: projectId,
   sources: sources,
-  isActive: isActive = () => !![],
+  isActive: isActive = () => true,
   onProgress: onProgress,
   capture: capture = captureStoryReplicationRepresentativeFrame,
 }) {
@@ -14,13 +14,13 @@ export async function collectStoryReplicationAssetFrames({
     map = new Map(),
     list2 = [];
   for (const [item, key] of list['entries']()) {
-    if (!isActive()) return ![];
+    if (!isActive()) return false;
     const timeSec = key['replicationSource'],
       index = data['episodes']['find']((result) => result['id'] === timeSec['episodeId']),
       options = index?.['replication']?.['sourceAnalysis'],
       target = options?.['revision'],
       enabled = sources?.['find']((source) => source['episodeId'] === timeSec['episodeId']);
-    if (sources && (!enabled || enabled['revision'] !== target)) return ![];
+    if (sources && (!enabled || enabled['revision'] !== target)) return false;
     const videoRef = index?.['sourceVideo']?.['videoRef'],
       isActive2 = () =>
         isActive() &&
@@ -47,11 +47,11 @@ export async function collectStoryReplicationAssetFrames({
             projectId: projectId,
             isActive: isActive2,
           }));
-      if (!isActive2()) return ![];
+      if (!isActive2()) return false;
       if (!args) throw new Error('原片截图未保存，请重新提取素材。');
       (map['set'](next, args), (timeSec['frame'] = { ...args }), (timeSec['frameError'] = ''));
     } catch (error) {
-      if (!isActive2()) return ![];
+      if (!isActive2()) return false;
       timeSec['frameError'] = error?.['message'] || '原片截图失败，请重新提取素材。';
     }
   }

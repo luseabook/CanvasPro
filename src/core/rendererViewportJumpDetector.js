@@ -16,7 +16,7 @@ export function createRendererViewportJumpDetector({
       const box2 = normalizeViewport(options),
         box3 = value;
       value = box2;
-      if (!box3) return ![];
+      if (!box3) return false;
       return (
         Math['abs'](box2['x'] - box3['x']) > panThreshold ||
         Math['abs'](box2['y'] - box3['y']) > panThreshold ||

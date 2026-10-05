@@ -81,8 +81,8 @@ function isDirectViewportGestureBusyForPreview() {
   return Boolean(result?.['contains']?.('is-panning') || result?.['contains']?.('is-zooming'));
 }
 function isElementVisible(el) {
-  if (!el || el['isConnected'] === ![]) return ![];
-  if (el['hidden'] === !![] || el['classList']?.['contains']?.('is-hidden')) return ![];
+  if (!el || el['isConnected'] === false) return false;
+  if (el['hidden'] === true || el['classList']?.['contains']?.('is-hidden')) return false;
   const data = el['style'] || {};
   return data['display'] !== 'none' && data['visibility'] !== 'hidden' && data['opacity'] !== '0';
 }
@@ -90,8 +90,8 @@ function isMountedImageReady(options) {
   const enabled = String(
     options?.['currentSrc'] || options?.['src'] || options?.['getAttribute']?.('src') || '',
   )['trim']();
-  if (!enabled || !isElementVisible(options)) return ![];
-  if (options['complete'] === ![]) return ![];
+  if (!enabled || !isElementVisible(options)) return false;
+  if (options['complete'] === false) return false;
   return Number(options['naturalWidth'] || 0) > 0 || options['complete'] === undefined;
 }
 function isMountedVideoReady(target) {
@@ -109,8 +109,8 @@ function hasActiveMountedVideoPlayback(el2) {
     (source) =>
       isMountedPresentationMediaElement(source) &&
       isMountedVideoReady(source) &&
-      source['paused'] === ![] &&
-      source['ended'] !== !![],
+      source['paused'] === false &&
+      source['ended'] !== true,
   );
 }
 function hasMountedMediaElement(el3) {
@@ -128,25 +128,25 @@ function isMountedPresentationMediaElement(el4) {
       current?.['contains']?.('source-video-capture-preview') ||
       current?.['contains']?.('ai-video-deferred-poster')
     );
-  if (next === 'video') return !![];
-  return ![];
+  if (next === 'video') return true;
+  return false;
 }
 function isMountedMediaReady(el5) {
-  if (!hasMountedMediaElement(el5)) return ![];
+  if (!hasMountedMediaElement(el5)) return false;
   const list = Array['from'](el5?.['querySelectorAll']?.('img') || [])['filter'](
       isMountedPresentationMediaElement,
     ),
     list2 = Array['from'](el5?.['querySelectorAll']?.('video') || [])['filter'](
       isMountedPresentationMediaElement,
     );
-  if (list['length'] === 0 && list2['length'] === 0) return ![];
+  if (list['length'] === 0 && list2['length'] === 0) return false;
   for (const entry of list) {
-    if (isMountedImageReady(entry)) return !![];
+    if (isMountedImageReady(entry)) return true;
   }
   for (const record of list2) {
-    if (isMountedVideoReady(record)) return !![];
+    if (isMountedVideoReady(record)) return true;
   }
-  return ![];
+  return false;
 }
 function isFastPreviewReleasedForPlayback(el6) {
   return el6?.['dataset']?.['fastPreviewReleasedForPlayback'] === '1';
@@ -211,8 +211,8 @@ function uniquePreviewUrls(list7 = []) {
 }
 function isLikelyImagePreviewUrl(value2) {
   const enabled4 = String(value2 || '')['trim']();
-  if (!enabled4) return ![];
-  if (/^(data:image\/|blob:)/i['test'](enabled4)) return !![];
+  if (!enabled4) return false;
+  if (/^(data:image\/|blob:)/i['test'](enabled4)) return true;
   return /\.(?:png|jpe?g|webp|gif|avif|bmp)(?:[?#].*)?$/i['test'](enabled4);
 }
 function normalizeViewport(box = {}) {
@@ -250,7 +250,7 @@ function getViewportWorldCenter(options5 = {}) {
 function resolveMediaSrcBatchSize(value3, value4 = {}) {
   const count2 = Number(value4['batchLimit']);
   if (Number['isFinite'](count2) && count2 >= 0) return Math['max'](0, Math['trunc'](count2));
-  if (value4['viewportBusy'] === !![]) return FAST_PREVIEW_BUSY_MEDIA_SRC_BATCH_SIZE;
+  if (value4['viewportBusy'] === true) return FAST_PREVIEW_BUSY_MEDIA_SRC_BATCH_SIZE;
   if (value3 >= FAST_PREVIEW_HUGE_CANDIDATE_COUNT) return FAST_PREVIEW_HUGE_MEDIA_SRC_BATCH_SIZE;
   if (value3 >= FAST_PREVIEW_LARGE_CANDIDATE_COUNT) return FAST_PREVIEW_LARGE_MEDIA_SRC_BATCH_SIZE;
   return FAST_PREVIEW_MEDIA_SRC_BATCH_SIZE;
@@ -258,14 +258,14 @@ function resolveMediaSrcBatchSize(value3, value4 = {}) {
 function resolveVideoMediaSrcBatchSize(value5, value6 = {}) {
   const count3 = Number(value6['batchLimit']);
   if (Number['isFinite'](count3) && count3 >= 0) return Math['max'](0, Math['trunc'](count3));
-  if (value6['viewportBusy'] === !![]) return FAST_PREVIEW_BUSY_VIDEO_MEDIA_SRC_BATCH_SIZE;
+  if (value6['viewportBusy'] === true) return FAST_PREVIEW_BUSY_VIDEO_MEDIA_SRC_BATCH_SIZE;
   if (value5 >= FAST_PREVIEW_HUGE_CANDIDATE_COUNT) return FAST_PREVIEW_HUGE_VIDEO_MEDIA_SRC_BATCH_SIZE;
   if (value5 >= FAST_PREVIEW_LARGE_CANDIDATE_COUNT) return FAST_PREVIEW_LARGE_VIDEO_MEDIA_SRC_BATCH_SIZE;
   return FAST_PREVIEW_VIDEO_MEDIA_SRC_BATCH_SIZE;
 }
 function getExplicitImagePreviewUrls(
   options6 = {},
-  { displayFirst: displayFirst = ![], displayVersionKey: displayVersionKey = '' } = {},
+  { displayFirst: displayFirst = false, displayVersionKey: displayVersionKey = '' } = {},
 ) {
   options6 = options6 && typeof options6 === 'object' ? options6 : {};
   const localPreviewUrl = firstLocalPreviewUrl([
@@ -303,7 +303,7 @@ function getExplicitVideoPreviewUrls(options7 = {}) {
   );
 }
 function hasExplicitPreviewValue(enabled5 = {}, list9 = []) {
-  if (!enabled5 || typeof enabled5 !== 'object') return ![];
+  if (!enabled5 || typeof enabled5 !== 'object') return false;
   return list9['some']((value8) => !!String(enabled5[value8] || '')['trim']());
 }
 function hasPreviewMediaHint(options8 = {}, value9 = 'node') {
@@ -333,7 +333,7 @@ function hasPreviewMediaHint(options8 = {}, value9 = 'node') {
         isTaskCancelled(options8) ||
         !!String(primaryListItem2?.['error'] || '')['trim']())
     )
-      return ![];
+      return false;
     const list10 = [primaryListItem2];
     return (
       (!primaryListItem2 || !Array['isArray'](options8['videos']) || options8['videos']['length'] <= 1) &&
@@ -353,9 +353,9 @@ function hasPreviewMediaHint(options8 = {}, value9 = 'node') {
       )
     );
   }
-  return ![];
+  return false;
 }
-function getPreviewMediaUrls(options9 = {}, value12 = 'node', { displayFirst: displayFirst = ![] } = {}) {
+function getPreviewMediaUrls(options9 = {}, value12 = 'node', { displayFirst: displayFirst = false } = {}) {
   if (value12 === 'image') {
     const primaryListItemIndex = getPrimaryListItemIndex(options9['images'], options9['mainImageIndex']),
       primaryListItem3 = getPrimaryListItem(options9['images'], options9['mainImageIndex']),
@@ -401,8 +401,8 @@ function getPreviewMediaUrls(options9 = {}, value12 = 'node', { displayFirst: di
 function getNodePresentationMediaUrls(options10 = {}) {
   const previewKind = getPreviewKind(options10),
     list11 = [
-      ...getPreviewMediaUrls(options10, previewKind, { displayFirst: ![] }),
-      ...getPreviewMediaUrls(options10, previewKind, { displayFirst: !![] }),
+      ...getPreviewMediaUrls(options10, previewKind, { displayFirst: false }),
+      ...getPreviewMediaUrls(options10, previewKind, { displayFirst: true }),
     ];
   if (previewKind === 'image') {
     const primaryListItem5 = getPrimaryListItem(options10['images'], options10['mainImageIndex']);
@@ -452,11 +452,11 @@ function canonicalizePresentationMediaSource(value15) {
   }
 }
 function isPresentationMediaSourceForNode(value17, enabled7) {
-  if (!enabled7) return !![];
+  if (!enabled7) return true;
   const presentationMediaSource = readPresentationMediaSource(value17);
-  if (!presentationMediaSource) return ![];
+  if (!presentationMediaSource) return false;
   const list12 = getNodePresentationMediaUrls(enabled7);
-  if (list12['includes'](presentationMediaSource)) return !![];
+  if (list12['includes'](presentationMediaSource)) return true;
   const canonicalizePresentationMediaSource2 = canonicalizePresentationMediaSource(presentationMediaSource);
   return list12['some'](
     (value18) => canonicalizePresentationMediaSource(value18) === canonicalizePresentationMediaSource2,
@@ -464,7 +464,7 @@ function isPresentationMediaSourceForNode(value17, enabled7) {
 }
 export function resolveRendererPreviewNodePresentation(
   options11 = {},
-  { displayFirst: displayFirst = ![] } = {},
+  { displayFirst: displayFirst = false } = {},
 ) {
   const kind2 = getPreviewKind(options11);
   return {
@@ -479,7 +479,7 @@ function shouldUseFastPreviewLayer(value19, value20, value21 = {}) {
       ? value21['nodeCount']
       : Object['keys'](value19 || {})['length'],
     count5 = value20 instanceof Set ? value20['size'] : 0;
-  if (value21['previewOnly'] === !![]) return count5 > 0;
+  if (value21['previewOnly'] === true) return count5 > 0;
   return value22 >= FAST_PREVIEW_NODE_COUNT_THRESHOLD || count5 >= FAST_PREVIEW_CANDIDATE_THRESHOLD;
 }
 function createEmptyStats() {
@@ -647,7 +647,7 @@ function getPreviewGeometry(box3 = {}) {
 }
 function setPreviewMediaSrc(el26, value44, value45) {
   const enabled8 = value44[value45] || '';
-  if (!enabled8) return ![];
+  if (!enabled8) return false;
   return (
     (el26['dataset']['srcIndex'] = String(value45)),
     el26['getAttribute']?.('src') !== enabled8 &&
@@ -655,7 +655,7 @@ function setPreviewMediaSrc(el26, value44, value45) {
       (delete el26['dataset']['previewLoaded'],
       trackCanvasImageDisplayLoad(enabled8, el26),
       (el26['src'] = enabled8)),
-    !![]
+    true
   );
 }
 function getPreviewMediaCurrentSrc(value46) {
@@ -675,7 +675,7 @@ function clearPreviewMediaSrc(el27) {
     (el27['_previewMediaQueuePriority'] = null),
     (el27['_previewMediaSrcBatchLimit'] = null),
     (el27['_previewVideoMediaSrcBatchLimit'] = null),
-    (el27['_previewDirectWhenBlank'] = ![]),
+    (el27['_previewDirectWhenBlank'] = false),
     (el27['_previewPresentedNotificationKey'] = ''));
   if (el27['style']) el27['style']['visibility'] = '';
   (delete el27['dataset']['srcIndex'],
@@ -684,10 +684,10 @@ function clearPreviewMediaSrc(el27) {
     delete el27['dataset']['previewCritical']);
 }
 function isPreviewMediaLoaded(el28) {
-  if (!getPreviewMediaCurrentSrc(el28)) return ![];
+  if (!getPreviewMediaCurrentSrc(el28)) return false;
   return (
     el28?.['dataset']?.['previewLoaded'] === '1' ||
-    el28?.['complete'] === !![] ||
+    el28?.['complete'] === true ||
     Number(el28?.['naturalWidth'] || 0) > 0 ||
     Number(el28?.['naturalHeight'] || 0) > 0
   );
@@ -697,15 +697,15 @@ function getPreviewRasterFrameEl(el29) {
 }
 function isPreviewRasterFrameReady(value47) {
   const el30 = getPreviewRasterFrameEl(value47);
-  return !!el30 && el30['isConnected'] !== ![];
+  return !!el30 && el30['isConnected'] !== false;
 }
 function restorePreviewRasterFrameState(el31) {
-  if (!getPreviewRasterFrameEl(el31)) return ![];
+  if (!getPreviewRasterFrameEl(el31)) return false;
   return (
     (el31['dataset']['hasMedia'] = '1'),
     (el31['dataset']['rasterFrame'] = '1'),
     delete el31['dataset']['placeholderReady'],
-    !![]
+    true
   );
 }
 function removePreviewRasterFrame(el32) {
@@ -719,7 +719,7 @@ function removePreviewRasterFrame(el32) {
 }
 function attachPreviewRasterFrame(el34, canvas) {
   const el35 = canvas?.['canvas'];
-  if (!el34 || !el35) return ![];
+  if (!el34 || !el35) return false;
   const el36 = getPreviewRasterFrameEl(el34);
   if (el36 && el36 !== el35) el36['remove']?.();
   ((el35['className'] = 'v2-fast-preview-raster-frame'),
@@ -732,23 +732,23 @@ function attachPreviewRasterFrame(el34, canvas) {
 }
 function isPreviewRasterFrameCompatible(value49, value50) {
   const box4 = value49?.['_previewRasterFrame'];
-  if (!box4 || value49?.['_previewDragActive'] === !![]) return !![];
-  if (box4['kind'] && value50?.['kind'] && box4['kind'] !== value50['kind']) return ![];
+  if (!box4 || value49?.['_previewDragActive'] === true) return true;
+  if (box4['kind'] && value50?.['kind'] && box4['kind'] !== value50['kind']) return false;
   if (
     Number['isFinite'](Number(box4['width'])) &&
     Number['isFinite'](Number(value50?.['geometry']?.['width'])) &&
     Number(box4['width']) !== Number(value50['geometry']['width'])
   )
-    return ![];
+    return false;
   if (
     Number['isFinite'](Number(box4['height'])) &&
     Number['isFinite'](Number(value50?.['geometry']?.['height'])) &&
     Number(box4['height']) !== Number(value50['geometry']['height'])
   )
-    return ![];
+    return false;
   const list13 = uniquePreviewUrls(box4['sources'] || []),
     list14 = uniquePreviewUrls(value50?.['sources'] || []);
-  if (list13['length'] === 0 || list14['length'] === 0) return !![];
+  if (list13['length'] === 0 || list14['length'] === 0) return true;
   const map2 = new Set(list14);
   return list13['some']((value51) => map2['has'](value51));
 }
@@ -756,7 +756,7 @@ function isPreviewMediaRequestInFlight(el37) {
   return (
     !!getPreviewMediaCurrentSrc(el37) &&
     el37?.['dataset']?.['previewLoaded'] !== '1' &&
-    el37?.['complete'] !== !![] &&
+    el37?.['complete'] !== true &&
     Number(el37?.['naturalWidth'] || 0) <= 0 &&
     Number(el37?.['naturalHeight'] || 0) <= 0
   );
@@ -782,23 +782,23 @@ function getReusableLoadedPreviewMediaSource(el40, value53) {
   const list15 = uniquePreviewUrls(Array['isArray'](value53) ? value53 : [value53]);
   return list15['includes'](previewMediaCurrentSrc) ? previewMediaCurrentSrc : '';
 }
-function hasRetainablePaintedPreviewMedia(el41, { includeImages: includeImages = ![] } = {}) {
+function hasRetainablePaintedPreviewMedia(el41, { includeImages: includeImages = false } = {}) {
   const value55 = el41?.['querySelector']?.('.v2-fast-preview-media');
   return isPreviewMediaLoaded(value55) && (includeImages || isPreviewVideoMedia(value55));
 }
 function getRetainablePaintedPreviewMediaSource(value56, value57) {
-  if (!hasRetainablePaintedPreviewMedia(value56, { includeImages: !![] })) return '';
+  if (!hasRetainablePaintedPreviewMedia(value56, { includeImages: true })) return '';
   return getReusableLoadedPreviewMediaSource(value56, value57);
 }
 function restorePaintedPreviewMedia(el42) {
   const el43 = el42?.['querySelector']?.('.v2-fast-preview-media');
-  if (!isPreviewMediaLoaded(el43)) return ![];
+  if (!isPreviewMediaLoaded(el43)) return false;
   delete el43['dataset']['previewResourceOnly'];
   if (el43['style']) el43['style']['visibility'] = '';
   el42['dataset']['hasMedia'] = '1';
   const count8 = Array['isArray'](el43['_previewSources']) ? el43['_previewSources']['length'] : 0;
   if (count8 > 0) el42['dataset']['previewSrcCount'] = String(count8);
-  return !![];
+  return true;
 }
 function getReusableCurrentPreviewMediaSource(el44, value58) {
   const value59 = el44?.['querySelector']?.('.v2-fast-preview-media'),
@@ -814,26 +814,26 @@ function nextPreviewMediaPreloadToken(enabled9) {
   return ((enabled9['_previewSrcPreloadToken'] = value60), value60);
 }
 function isPreviewMediaPreloadCurrent(el45, value61, value62, value63 = 0) {
-  if (!el45 || el45['isConnected'] === ![]) return ![];
-  if (el45['_previewSrcPreloadToken'] !== value62) return ![];
+  if (!el45 || el45['isConnected'] === false) return false;
+  if (el45['_previewSrcPreloadToken'] !== value62) return false;
   const value64 = el45['_previewSources'] || [];
   return String(value64[value63] || '')['trim']() === String(value61 || '')['trim']();
 }
-function resolvePreviewMediaPreloadPriority(value65, { viewportBusy: viewportBusy = ![] } = {}) {
+function resolvePreviewMediaPreloadPriority(value65, { viewportBusy: viewportBusy = false } = {}) {
   if (viewportBusy) return FAST_PREVIEW_BUSY_MEDIA_PRELOAD_PRIORITY;
   if (value65?.['loading'] === 'lazy') return FAST_PREVIEW_LOW_PRIORITY_MEDIA_PRELOAD_PRIORITY;
   return FAST_PREVIEW_MEDIA_PRELOAD_PRIORITY;
 }
 function applyPreviewMediaSrcAfterPreload(fetchPriority, value66, value67 = 0, decode = {}) {
   const enabled10 = value66[value67] || '';
-  if (!enabled10) return ![];
+  if (!enabled10) return false;
   const enabled11 = fetchPriority['getAttribute']?.('src') || fetchPriority['src'] || '';
-  if (enabled11 === enabled10) return !![];
-  if (String(fetchPriority['_previewSrcPreloadUrl'] || '')['trim']() === enabled10) return !![];
+  if (enabled11 === enabled10) return true;
+  if (String(fetchPriority['_previewSrcPreloadUrl'] || '')['trim']() === enabled10) return true;
   const value68 = !isPreviewVideoMedia(fetchPriority) && isCanvasImagePreloadCoolingDown(enabled10);
-  if (value68) return !![];
+  if (value68) return true;
   if (
-    decode['directWhenBlank'] === !![] &&
+    decode['directWhenBlank'] === true &&
     !enabled11 &&
     (isPreviewVideoMedia(fetchPriority) || !isCanvasImagePreloadPending(enabled10))
   )
@@ -844,12 +844,12 @@ function applyPreviewMediaSrcAfterPreload(fetchPriority, value66, value67 = 0, d
   return (
     (fetchPriority['_previewSrcPreloadUrl'] = enabled10),
     preloadCanvasImage(enabled10, {
-      decode: decode['decode'] === !![],
-      requireImage: !![],
+      decode: decode['decode'] === true,
+      requireImage: true,
       priority: resolvePreviewMediaPreloadPriority(fetchPriority, decode),
       fetchPriority: fetchPriority?.['fetchPriority'] === 'high' ? 'high' : 'auto',
       scope: FAST_PREVIEW_MEDIA_PRELOAD_SCOPE,
-      deferWhenPaused: decode['viewportBusy'] === !![] || fetchPriority?.['loading'] === 'lazy',
+      deferWhenPaused: decode['viewportBusy'] === true || fetchPriority?.['loading'] === 'lazy',
     })['then'](
       () => {
         if (!isPreviewMediaPreloadCurrent(fetchPriority, enabled10, nextPreviewMediaPreloadToken2, value67))
@@ -862,26 +862,26 @@ function applyPreviewMediaSrcAfterPreload(fetchPriority, value66, value67 = 0, d
         fetchPriority['_previewSrcPreloadUrl'] = '';
       },
     ),
-    !![]
+    true
   );
 }
 function setPreviewMediaSrcJoiningSharedAcquisition(value69, value70, value71 = 0, args = {}) {
   const enabled12 = value70[value71] || '';
-  if (!enabled12) return ![];
+  if (!enabled12) return false;
   if (
     !isPreviewVideoMedia(value69) &&
     !/^(data:image\/|blob:)/i['test'](enabled12) &&
-    args['directWhenBlank'] !== !![] &&
+    args['directWhenBlank'] !== true &&
     (isCanvasImagePreloadPending(enabled12) || isCanvasImagePreloadCoolingDown(enabled12))
   )
     return applyPreviewMediaSrcAfterPreload(value69, value70, value71, {
       ...args,
-      directWhenBlank: ![],
+      directWhenBlank: false,
     });
   return setPreviewMediaSrc(value69, value70, value71);
 }
 export function cancelRendererFastPreviewMediaPreloads({
-  includeActive: includeActive = ![],
+  includeActive: includeActive = false,
   belowPriority: belowPriority = null,
   reason: reason = 'canceled',
 } = {}) {
@@ -894,9 +894,9 @@ export function cancelRendererFastPreviewMediaPreloads({
 }
 function previewMediaNeedsSrc(el46, value72) {
   const uniquePreviewUrls2 = uniquePreviewUrls(Array['isArray'](value72) ? value72 : [value72])[0] || '';
-  if (!uniquePreviewUrls2) return ![];
+  if (!uniquePreviewUrls2) return false;
   const enabled13 = el46?.['querySelector']?.('.v2-fast-preview-media');
-  if (!enabled13) return !![];
+  if (!enabled13) return true;
   return (enabled13['getAttribute']?.('src') || enabled13['src'] || '') !== uniquePreviewUrls2;
 }
 function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
@@ -911,8 +911,8 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
   if (list17['length'] === 0) {
     if (image) viewportBusy2['cancelPendingMediaSrc']?.(image);
     const value75 =
-      viewportBusy2['preserveInFlightResource'] !== ![] &&
-      viewportBusy2['placeholderReady'] !== !![] &&
+      viewportBusy2['preserveInFlightResource'] !== false &&
+      viewportBusy2['placeholderReady'] !== true &&
       isPreviewMediaResourceProtected(image);
     if (value75) {
       image['dataset']['previewResourceOnly'] = '1';
@@ -921,7 +921,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
     return (
       delete el47['dataset']['hasMedia'],
       delete el47['dataset']['previewSrcCount'],
-      viewportBusy2['placeholderReady'] === !![]
+      viewportBusy2['placeholderReady'] === true
         ? (el47['dataset']['placeholderReady'] = '1')
         : delete el47['dataset']['placeholderReady'],
       { imageCount: 0, srcAssignedCount: 0 }
@@ -943,7 +943,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
     if (image['fetchPriority'] !== value77) image['fetchPriority'] = value77;
   } catch {}
   image['dataset']['previewKind'] = String(viewportBusy2['kind'] || '');
-  if (viewportBusy2['critical'] === !![]) image['dataset']['previewCritical'] = '1';
+  if (viewportBusy2['critical'] === true) image['dataset']['previewCritical'] = '1';
   else delete image['dataset']['previewCritical'];
   ((image['_previewSources'] = list17),
     (image['_previewMediaQueuePriority'] = viewportBusy2['queuePriority'] || null),
@@ -957,7 +957,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
       Number['isFinite'](Number(viewportBusy2['videoMediaSrcBatchLimit']))
         ? Math['max'](0, Math['trunc'](Number(viewportBusy2['videoMediaSrcBatchLimit'])))
         : null),
-    (image['_previewDirectWhenBlank'] = viewportBusy2['directWhenBlank'] === !![]),
+    (image['_previewDirectWhenBlank'] = viewportBusy2['directWhenBlank'] === true),
     delete image['dataset']['previewResourceOnly']);
   if (image['style']) image['style']['visibility'] = '';
   const run = () => {
@@ -965,7 +965,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
     if (!enabled14 || !isPreviewMediaLoaded(image)) return;
     if (
       String(image['tagName'] || '')['toLowerCase']() === 'img' &&
-      (image['complete'] === ![] || Number(image['naturalWidth'] || 0) <= 0)
+      (image['complete'] === false || Number(image['naturalWidth'] || 0) <= 0)
     )
       return;
     const value78 = String(viewportBusy2['nodeId'] || '') + '\x00' + enabled14;
@@ -987,7 +987,7 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
           naturalWidth: image['naturalWidth'] || image['width'] || 0,
           naturalHeight: image['naturalHeight'] || image['height'] || 0,
         },
-        { retainImage: !![] },
+        { retainImage: true },
       ),
       run());
   }),
@@ -998,29 +998,29 @@ function syncPreviewMedia(el47, value73, value74, viewportBusy2 = {}) {
       !applyPreviewMediaSrcAfterPreload(image, image['_previewSources'] || [], value80) &&
         (image['onerror'] = null);
     }));
-  if (viewportBusy2['deferSrc'] === !![]) viewportBusy2['scheduleMediaSrc']?.(image);
+  if (viewportBusy2['deferSrc'] === true) viewportBusy2['scheduleMediaSrc']?.(image);
   else {
     viewportBusy2['cancelPendingMediaSrc']?.(image);
-    let srcAssignedCount = ![];
-    if (viewportBusy2['fallbackWhileDecoding'] === !![]) {
+    let srcAssignedCount = false;
+    if (viewportBusy2['fallbackWhileDecoding'] === true) {
       const previewMediaCurrentSrc4 = getPreviewMediaCurrentSrc(image),
         enabled16 = !previewMediaCurrentSrc4 && list17['length'] > 1;
       (enabled16 &&
         (srcAssignedCount = setPreviewMediaSrcJoiningSharedAcquisition(image, list17, 1, {
-          decode: ![],
-          viewportBusy: viewportBusy2['viewportBusy'] === !![],
+          decode: false,
+          viewportBusy: viewportBusy2['viewportBusy'] === true,
         })),
-        viewportBusy2['holdFallbackWhileBusy'] !== !![] &&
+        viewportBusy2['holdFallbackWhileBusy'] !== true &&
           (srcAssignedCount = applyPreviewMediaSrcAfterPreload(image, list17, 0, {
-            decode: !![],
-            directWhenBlank: viewportBusy2['directWhenBlank'] === !![] && !enabled16,
-            viewportBusy: viewportBusy2['viewportBusy'] === !![],
+            decode: true,
+            directWhenBlank: viewportBusy2['directWhenBlank'] === true && !enabled16,
+            viewportBusy: viewportBusy2['viewportBusy'] === true,
           })));
     } else
       srcAssignedCount = setPreviewMediaSrcJoiningSharedAcquisition(image, list17, 0, {
         decode: viewportBusy2['kind'] === 'image',
-        directWhenBlank: viewportBusy2['directWhenBlank'] === !![],
-        viewportBusy: viewportBusy2['viewportBusy'] === !![],
+        directWhenBlank: viewportBusy2['directWhenBlank'] === true,
+        viewportBusy: viewportBusy2['viewportBusy'] === true,
       });
     return (
       (image['alt'] = value74 || ''),
@@ -1050,17 +1050,17 @@ function syncPreviewEl(
     offsetY: offsetY = 0,
     mediaLoading: mediaLoading = 'eager',
     mediaFetchPriority: mediaFetchPriority = 'high',
-    mediaCritical: mediaCritical = ![],
-    mediaDirectWhenBlank: mediaDirectWhenBlank = ![],
-    mediaFallbackWhileDecoding: mediaFallbackWhileDecoding = ![],
-    mediaHoldFallbackWhileBusy: mediaHoldFallbackWhileBusy = ![],
-    viewportBusy: viewportBusy = ![],
+    mediaCritical: mediaCritical = false,
+    mediaDirectWhenBlank: mediaDirectWhenBlank = false,
+    mediaFallbackWhileDecoding: mediaFallbackWhileDecoding = false,
+    mediaHoldFallbackWhileBusy: mediaHoldFallbackWhileBusy = false,
+    viewportBusy: viewportBusy = false,
     queuePriority: queuePriority = null,
     mediaSrcBatchLimit: mediaSrcBatchLimit = null,
     videoMediaSrcBatchLimit: videoMediaSrcBatchLimit = null,
-    deferMediaSrc: deferMediaSrc = ![],
-    placeholderReady: placeholderReady = ![],
-    preserveInFlightResource: preserveInFlightResource = !![],
+    deferMediaSrc: deferMediaSrc = false,
+    placeholderReady: placeholderReady = false,
+    preserveInFlightResource: preserveInFlightResource = true,
     scheduleMediaSrc: scheduleMediaSrc = null,
     cancelPendingMediaSrc: cancelPendingMediaSrc = null,
     onMediaPresented: onMediaPresented = null,
@@ -1094,10 +1094,10 @@ function syncPreviewEl(
       (el48['_previewBaseY'] = value82),
       (el48['_previewGeometrySig'] = value84));
   }
-  let value90 = ![];
+  let value90 = false;
   if (enabled18) {
     const value91 = 'v2-fast-preview-node v2-fast-preview-node--' + kind3;
-    el48['className'] !== value91 && ((el48['className'] = value91), (value90 = !![]));
+    el48['className'] !== value91 && ((el48['className'] = value91), (value90 = true));
     if (el48['dataset']['kind'] !== kind3) el48['dataset']['kind'] = kind3;
     (syncPreviewStaticContent(el48, nodeId, kind3, text), (el48['_previewContentSig'] = value86));
   }
@@ -1133,10 +1133,10 @@ function syncPreviewEl(
   });
 }
 function applyPreviewDragTransform(el49) {
-  if (!el49) return ![];
+  if (!el49) return false;
   const toNumber2 = toNumber(el49['_previewBaseX'], 0),
     toNumber3 = toNumber(el49['_previewBaseY'], 0),
-    value93 = el49['_previewDragActive'] === !![],
+    value93 = el49['_previewDragActive'] === true,
     value94 = value93 ? toNumber(el49['_previewDragDx'], 0) : 0,
     value95 = value93 ? toNumber(el49['_previewDragDy'], 0) : 0;
   ((el49['style']['transform'] =
@@ -1144,11 +1144,11 @@ function applyPreviewDragTransform(el49) {
     el49['classList']?.['toggle']?.('is-dragging-proxy', value93));
   if (value93) el49['dataset']['dragProxy'] = '1';
   else delete el49['dataset']['dragProxy'];
-  return !![];
+  return true;
 }
 function resetPreviewDragState(el50) {
   if (!el50) return;
-  ((el50['_previewDragActive'] = ![]),
+  ((el50['_previewDragActive'] = false),
     (el50['_previewDragDx'] = 0),
     (el50['_previewDragDy'] = 0),
     applyPreviewDragTransform(el50),
@@ -1156,11 +1156,11 @@ function resetPreviewDragState(el50) {
     delete el50['dataset']['dragProxy']);
 }
 function settlePreviewDragState(enabled23, value96 = 0, value97 = 0) {
-  if (!enabled23) return ![];
+  if (!enabled23) return false;
   return (
     (enabled23['_previewBaseX'] = toNumber(enabled23['_previewBaseX'], 0) + toNumber(value96, 0)),
     (enabled23['_previewBaseY'] = toNumber(enabled23['_previewBaseY'], 0) + toNumber(value97, 0)),
-    (enabled23['_previewDragActive'] = ![]),
+    (enabled23['_previewDragActive'] = false),
     (enabled23['_previewDragDx'] = 0),
     (enabled23['_previewDragDy'] = 0),
     applyPreviewDragTransform(enabled23)
@@ -1217,7 +1217,7 @@ function buildPreviewCandidateSyncSignature(response, value104, el52 = null) {
     el53 = el52?.['querySelector']?.('.v2-fast-preview-media') || null,
     value108 = String(sources[0] || '')['trim'](),
     value109 =
-      (response?.['fullEligibleVisible'] === !![] || response?.['visible'] === !![]) &&
+      (response?.['fullEligibleVisible'] === true || response?.['visible'] === true) &&
       (kind4 === 'video' ||
         toNumber(value104?.['visibleMediaCandidateCount'], 0) <=
           toNumber(value104?.['immediateMediaSrcLimit'], 0)),
@@ -1232,33 +1232,33 @@ function buildPreviewCandidateSyncSignature(response, value104, el52 = null) {
     toNumber5,
     toNumber(geometry['width'], 0),
     toNumber(geometry['height'], 0),
-    response?.['nearViewport'] === !![] ? 1 : 0,
-    response?.['visible'] === !![] ? 1 : 0,
-    response?.['fullEligibleVisible'] === !![] ? 1 : 0,
-    response?.['fullEligiblePreview'] === !![] ? 1 : 0,
-    response?.['fullEligibleMotionAhead'] === !![] ? 1 : 0,
-    response?.['motionFront'] === !![] ? 1 : 0,
-    response?.['motionAhead'] === !![] ? 1 : 0,
-    response?.['selected'] === !![] ? 1 : 0,
-    response?.['retained'] === !![] ? 1 : 0,
-    response?.['mounted'] === !![] ? 1 : 0,
-    value104?.['mediaPlan']?.['nodeIdsWithMedia']?.['has']?.(nodeId2) === !![] ? 1 : 0,
-    map3 === null ? 'legacy' : map3?.['has']?.(nodeId2) === !![] ? 1 : 0,
-    map4 === null ? 'legacy' : map4?.['has']?.(nodeId2) === !![] ? 1 : 0,
-    value104?.['mediaPlan']?.['lowPriority'] === !![] ? 1 : 0,
-    value104?.['mediaPlan']?.['prefetchAhead'] === !![] ? 1 : 0,
+    response?.['nearViewport'] === true ? 1 : 0,
+    response?.['visible'] === true ? 1 : 0,
+    response?.['fullEligibleVisible'] === true ? 1 : 0,
+    response?.['fullEligiblePreview'] === true ? 1 : 0,
+    response?.['fullEligibleMotionAhead'] === true ? 1 : 0,
+    response?.['motionFront'] === true ? 1 : 0,
+    response?.['motionAhead'] === true ? 1 : 0,
+    response?.['selected'] === true ? 1 : 0,
+    response?.['retained'] === true ? 1 : 0,
+    response?.['mounted'] === true ? 1 : 0,
+    value104?.['mediaPlan']?.['nodeIdsWithMedia']?.['has']?.(nodeId2) === true ? 1 : 0,
+    map3 === null ? 'legacy' : map3?.['has']?.(nodeId2) === true ? 1 : 0,
+    map4 === null ? 'legacy' : map4?.['has']?.(nodeId2) === true ? 1 : 0,
+    value104?.['mediaPlan']?.['lowPriority'] === true ? 1 : 0,
+    value104?.['mediaPlan']?.['prefetchAhead'] === true ? 1 : 0,
     value104?.['mediaLoading'] || '',
     value104?.['mediaFetchPriority'] || '',
     value109 ? 1 : 0,
-    value104?.['viewportBusy'] === !![] ? 1 : 0,
-    value105['suppressNewMedia'] === !![] ? 1 : 0,
-    value105['suspendNewMediaSrc'] === !![] ? 1 : 0,
-    value105['previewMotion']?.['zoomChanged'] === !![] ? 1 : 0,
+    value104?.['viewportBusy'] === true ? 1 : 0,
+    value105['suppressNewMedia'] === true ? 1 : 0,
+    value105['suspendNewMediaSrc'] === true ? 1 : 0,
+    value105['previewMotion']?.['zoomChanged'] === true ? 1 : 0,
     String(value106['srcId'] || ''),
     String(value106['hoverId'] || ''),
     String(value106['side'] || ''),
     list19['includes'](nodeId2) ? 1 : 0,
-    value107['active'] === !![] ? 1 : 0,
+    value107['active'] === true ? 1 : 0,
     String(value107['sourceNodeId'] || ''),
     String(value107['hoverNodeId'] || ''),
     String(value107['handleDirection'] || ''),
@@ -1275,7 +1275,7 @@ function buildPreviewCandidateSyncSignature(response, value104, el52 = null) {
     value108 && kind4 !== 'video' && isCanvasImagePreloadCoolingDown(value108) ? 1 : 0,
   ]['join']('\x1f');
 }
-function syncLayerBounds(offsetX2, list20, { preserveAnchor: preserveAnchor = ![] } = {}) {
+function syncLayerBounds(offsetX2, list20, { preserveAnchor: preserveAnchor = false } = {}) {
   if (!offsetX2 || !Array['isArray'](list20) || list20['length'] === 0) return null;
   if (
     preserveAnchor &&
@@ -1336,7 +1336,7 @@ export function createRendererFastPreviewLayer({
     value117 = Number['POSITIVE_INFINITY'],
     value118 = Number['POSITIVE_INFINITY'],
     nowPerf2 = 0,
-    enabled30 = ![],
+    enabled30 = false,
     value119 = null,
     value120 = null,
     args2 = null,
@@ -1351,7 +1351,7 @@ export function createRendererFastPreviewLayer({
     const nodeId3 = String(value124 || ''),
       wrapper = getWrapper?.(nodeId3);
     if (!wrapper?.['dataset']) return;
-    const active2 = value125 === !![];
+    const active2 = value125 === true;
     if (active2) wrapper['dataset']['rendererPresentationOwner'] = 'fast-preview';
     else
       wrapper['dataset']['rendererPresentationOwner'] === 'fast-preview' &&
@@ -1360,15 +1360,15 @@ export function createRendererFastPreviewLayer({
   }
   function stageRasterHandoffFrame(value126, canvas2) {
     const enabled31 = String(value126 || '')['trim']();
-    if (!enabled31 || !canvas2?.['canvas']) return ![];
+    if (!enabled31 || !canvas2?.['canvas']) return false;
     const enabled32 = existingPreviewNodeIds['get'](enabled31);
-    if (!enabled32) return (map8['set'](enabled31, canvas2), !![]);
-    return (map8['delete'](enabled31), run2(enabled31, !![]), attachPreviewRasterFrame(enabled32, canvas2));
+    if (!enabled32) return (map8['set'](enabled31, canvas2), true);
+    return (map8['delete'](enabled31), run2(enabled31, true), attachPreviewRasterFrame(enabled32, canvas2));
   }
   function run3(value127, el55, enabled33 = value122?.[String(value127 || '')]) {
     const value128 = resolveMediaPresentationReady?.(String(value127 || ''), el55),
       enabled34 = typeof value128 === 'boolean' ? value128 : isMountedMediaReady(el55);
-    if (!enabled34) return ![];
+    if (!enabled34) return false;
     const list21 = [
       ...Array['from'](el55?.['querySelectorAll']?.('img') || [])['filter'](
         (value129) => isMountedPresentationMediaElement(value129) && isMountedImageReady(value129),
@@ -1378,8 +1378,8 @@ export function createRendererFastPreviewLayer({
       ),
     ];
     if (enabled33 && !list21['some']((value131) => isPresentationMediaSourceForNode(value131, enabled33)))
-      return ![];
-    if (el55?.['dataset']?.['mediaLodMode'] !== 'full') return !![];
+      return false;
+    if (el55?.['dataset']?.['mediaLodMode'] !== 'full') return true;
     return list21['some'](
       (el56) =>
         String(el56?.['tagName'] || '')['toLowerCase']() === 'img' &&
@@ -1388,10 +1388,10 @@ export function createRendererFastPreviewLayer({
     );
   }
   function run4(value132, el57 = getWrapper?.(value132)) {
-    if (!el57 || !isMounted?.(value132) || el57['isConnected'] === ![]) return ![];
+    if (!el57 || !isMounted?.(value132) || el57['isConnected'] === false) return false;
     const value133 = el57['style'] || {};
     return !!(
-      el57['hidden'] !== !![] &&
+      el57['hidden'] !== true &&
       value133['display'] !== 'none' &&
       value133['visibility'] !== 'hidden' &&
       value133['opacity'] !== '0'
@@ -1419,25 +1419,25 @@ export function createRendererFastPreviewLayer({
     (typeof clearTimeout === 'function' && clearTimeout(setTimeout2), (setTimeout2 = null));
   }
   function run8(value135) {
-    if (value135 === !![]) {
+    if (value135 === true) {
       nowPerf2 = nowPerf() + FAST_PREVIEW_BUSY_HINT_TTL_MS;
       return;
     }
-    if (value135 === ![]) nowPerf2 = 0;
+    if (value135 === false) nowPerf2 = 0;
   }
   function run9() {
     return nowPerf2 > nowPerf();
   }
   function run10(value136) {
-    if (value136 !== !![]) {
-      enabled30 = ![];
+    if (value136 !== true) {
+      enabled30 = false;
       return;
     }
     if (enabled30) return;
-    ((enabled30 = !![]),
+    ((enabled30 = true),
       cancelQueuedCanvasImagePreloads({
         scope: FAST_PREVIEW_MEDIA_PRELOAD_SCOPE,
-        includeActive: ![],
+        includeActive: false,
         belowPriority: FAST_PREVIEW_VIEWPORT_BUSY_PRELOAD_CANCEL_PRIORITY_LIMIT,
         reason: 'fast preview viewport busy',
       }));
@@ -1448,7 +1448,7 @@ export function createRendererFastPreviewLayer({
       viewport = normalizeViewport(options15?.['viewport'])['zoom'],
       value137 = value120;
     ((value119 = center), (value120 = viewport));
-    if (!box6) return { center: center, dx: 0, dy: 0, active: ![], zoomChanged: ![] };
+    if (!box6) return { center: center, dx: 0, dy: 0, active: false, zoomChanged: false };
     const dx2 = center['x'] - box6['x'],
       dy2 = center['y'] - box6['y'];
     return {
@@ -1489,7 +1489,7 @@ export function createRendererFastPreviewLayer({
   function run14() {
     pendingMediaSrcCount['sort'](run12);
   }
-  function run15({ retryWhenBusy: retryWhenBusy = ![] } = {}) {
+  function run15({ retryWhenBusy: retryWhenBusy = false } = {}) {
     if (value116 !== null || setTimeout2 !== null) return;
     if (retryWhenBusy && typeof setTimeout === 'function') {
       setTimeout2 = setTimeout(() => {
@@ -1544,7 +1544,7 @@ export function createRendererFastPreviewLayer({
       const el58 = pendingMediaSrcCount['shift']();
       value156 += 1;
       if (!el58) continue;
-      if (el58['isConnected'] === ![]) {
+      if (el58['isConnected'] === false) {
         map9['delete'](el58);
         continue;
       }
@@ -1557,8 +1557,8 @@ export function createRendererFastPreviewLayer({
       map9['delete'](el58);
       if (
         applyPreviewMediaSrcAfterPreload(el58, el58['_previewSources'] || [], 0, {
-          decode: decode2 !== !![],
-          directWhenBlank: decode2 === !![] || el58['_previewDirectWhenBlank'] === !![],
+          decode: decode2 !== true,
+          directWhenBlank: decode2 === true || el58['_previewDirectWhenBlank'] === true,
           viewportBusy: viewportBusy3,
         })
       ) {
@@ -1617,7 +1617,7 @@ export function createRendererFastPreviewLayer({
   function run18() {
     (value121 !== null && (run6(value121), (value121 = null)), (args2 = null));
   }
-  function run19(el59, { clearSrc: clearSrc = ![] } = {}) {
+  function run19(el59, { clearSrc: clearSrc = false } = {}) {
     if (!el59) return;
     const value160 = el59['querySelector']?.('.v2-fast-preview-media');
     if (value160) {
@@ -1627,26 +1627,26 @@ export function createRendererFastPreviewLayer({
   }
   function run20(el60) {
     const el61 = el60?.['querySelector']?.('.v2-fast-preview-media');
-    if (!el61) return ![];
+    if (!el61) return false;
     cancelPendingMediaSrc2(el61);
     if (isPreviewMediaResourceProtected(el61)) {
       el61['dataset']['previewResourceOnly'] = '1';
       if (el61['style']) el61['style']['visibility'] = 'hidden';
-      return (delete el60['dataset']['hasMedia'], delete el60['dataset']['previewSrcCount'], !![]);
+      return (delete el60['dataset']['hasMedia'], delete el60['dataset']['previewSrcCount'], true);
     }
     return (
       clearPreviewMediaSrc(el61),
       el61['remove']?.(),
       delete el60['dataset']['hasMedia'],
       delete el60['dataset']['previewSrcCount'],
-      !![]
+      true
     );
   }
   function reconcileMediaSourceOwners(
     value161,
     {
-      preservePaintedMediaOwners: preservePaintedMediaOwners = ![],
-      preservePaintedVideoOwners: preservePaintedVideoOwners = ![],
+      preservePaintedMediaOwners: preservePaintedMediaOwners = false,
+      preservePaintedVideoOwners: preservePaintedVideoOwners = false,
     } = {},
   ) {
     if (value161 == null || typeof value161?.[Symbol['iterator']] !== 'function') return 0;
@@ -1701,7 +1701,7 @@ export function createRendererFastPreviewLayer({
   }
   function run22(el64) {
     if (!el64) return;
-    (run19(el64, { clearSrc: !![] }),
+    (run19(el64, { clearSrc: true }),
       removePreviewRasterFrame(el64),
       resetPreviewDragState(el64),
       delete el64['_previewSig'],
@@ -1730,9 +1730,9 @@ export function createRendererFastPreviewLayer({
   }
   function run23(value167, el65) {
     const enabled38 = String(value167 || '')['trim']();
-    if (!enabled38 || !el65) return ![];
+    if (!enabled38 || !el65) return false;
     const value168 = el65['querySelector']?.('.v2-fast-preview-media');
-    if (!isPreviewMediaLoaded(value168) && !isPreviewMediaResourceProtected(value168)) return ![];
+    if (!isPreviewMediaLoaded(value168) && !isPreviewMediaResourceProtected(value168)) return false;
     (run19(el65), resetPreviewDragState(el65));
     if (map6['has'](enabled38)) run24(map6['get'](enabled38));
     (map6['set'](enabled38, el65), Object['assign'](el65['style'], { display: 'none' }), el65['remove']?.());
@@ -1749,7 +1749,7 @@ export function createRendererFastPreviewLayer({
         value173 = map6['get'](value172);
       (map6['delete'](value172), run24(value173));
     }
-    return !![];
+    return true;
   }
   function run25() {
     const value174 = Array['from'](map6['entries']())['find'](([value175, el67]) => {
@@ -1762,10 +1762,10 @@ export function createRendererFastPreviewLayer({
     return (map6['delete'](enabled40), run22(value177), value177 || null);
   }
   function run26(value178) {
-    let value179 = ![],
-      enabled41 = ![],
+    let value179 = false,
+      enabled41 = false,
       el68 = map6['get'](value178);
-    if (el68) (map6['delete'](value178), (value179 = !![]), (enabled41 = !![]));
+    if (el68) (map6['delete'](value178), (value179 = true), (enabled41 = true));
     else {
       ((el68 = poolSize['pop']() || run25()), (value179 = !!el68));
       if (!el68) el68 = createPreviewEl(value178);
@@ -1800,10 +1800,10 @@ export function createRendererFastPreviewLayer({
     enabled44['layer']['appendChild'](enabled45);
   }
   function run28(text2, offsetX3) {
-    if (text2?.['deferredDescriptorSources'] === !![]) {
+    if (text2?.['deferredDescriptorSources'] === true) {
       const response2 = map5['get'](text2['nodeId']),
-        previewMediaUrls = getPreviewMediaUrls(text2['node'], text2['kind'], { displayFirst: !![] }),
-        previewMediaUrls2 = getPreviewMediaUrls(text2['node'], text2['kind'], { displayFirst: ![] });
+        previewMediaUrls = getPreviewMediaUrls(text2['node'], text2['kind'], { displayFirst: true }),
+        previewMediaUrls2 = getPreviewMediaUrls(text2['node'], text2['kind'], { displayFirst: false });
       (response2 &&
         ((response2['sourcesDisplayFirst'] = previewMediaUrls),
         (response2['sourcesThumbnailFirst'] = previewMediaUrls2)),
@@ -1814,7 +1814,7 @@ export function createRendererFastPreviewLayer({
           (response2['text'] = getPreviewText(text2['node'], text2['kind'])),
         text2['text'] == null &&
           (text2['text'] = response2?.['text'] ?? getPreviewText(text2['node'], text2['kind'])),
-        (text2['deferredDescriptorSources'] = ![]));
+        (text2['deferredDescriptorSources'] = false));
     }
     const {
       node: node2,
@@ -1837,11 +1837,11 @@ export function createRendererFastPreviewLayer({
       ((el69 = run26(nodeId4)),
         existingPreviewNodeIds['set'](nodeId4, el69),
         (offsetX3['mountFragment'] || offsetX3['layer'])['appendChild'](el69));
-      if (el69['_fastPreviewReused'] === !![]) reusedCount = 1;
+      if (el69['_fastPreviewReused'] === true) reusedCount = 1;
       else createdCount = 1;
       delete el69['_fastPreviewReused'];
     } else el69['parentNode'] !== offsetX3['layer'] && offsetX3['layer']['appendChild'](el69);
-    run2(nodeId4, !![]);
+    run2(nodeId4, true);
     const value183 = map8['get'](nodeId4);
     value183 && (map8['delete'](nodeId4), attachPreviewRasterFrame(el69, value183));
     isPreviewRasterFrameReady(el69) &&
@@ -1865,7 +1865,7 @@ export function createRendererFastPreviewLayer({
             text2,
             offsetX3['options'],
           )),
-          (offsetX3['pendingMediaPriorityChanged'] = !![])),
+          (offsetX3['pendingMediaPriorityChanged'] = true)),
         { createdCount: 0, imageCount: 0, reusedCount: 0, srcAssignedCount: 0 }
       );
     }
@@ -1877,13 +1877,13 @@ export function createRendererFastPreviewLayer({
         visible ||
         text2['motionFront'],
       enabled47 =
-        value185 || offsetX3['preservePaintedMediaOwners'] !== !![]
+        value185 || offsetX3['preservePaintedMediaOwners'] !== true
           ? ''
           : getRetainablePaintedPreviewMediaSource(el69, sources3),
       value186 = value185 || !!enabled47;
     if (value186) el69['dataset']['mediaSourceOwner'] = '1';
     else delete el69['dataset']['mediaSourceOwner'];
-    const value187 = offsetX3['viewportBusy'] === !![] || offsetX3['options']?.['suppressNewMedia'] === !![],
+    const value187 = offsetX3['viewportBusy'] === true || offsetX3['options']?.['suppressNewMedia'] === true,
       value188 =
         enabled46 &&
         kind5 === 'video' &&
@@ -1906,7 +1906,7 @@ export function createRendererFastPreviewLayer({
               offsetX3['requiredImmediateMediaSourceOwnerIds']['has'](nodeId4))) ||
           offsetX3['mediaPlan']['explicitMediaSourceOwnerIds']?.['has'](nodeId4)),
       enabled48 =
-        value186 && (!enabled46 || offsetX3['options']?.['suspendNewMediaSrc'] === !![])
+        value186 && (!enabled46 || offsetX3['options']?.['suspendNewMediaSrc'] === true)
           ? getReusableLoadedPreviewMediaSource(el69, sources3)
           : '',
       value190 =
@@ -1914,7 +1914,7 @@ export function createRendererFastPreviewLayer({
           ? getReusableCurrentPreviewMediaSource(el69, sources3)
           : '';
     let sources4 = [];
-    if (enabled46 && (offsetX3['options']?.['suspendNewMediaSrc'] !== !![] || value188 || value189))
+    if (enabled46 && (offsetX3['options']?.['suspendNewMediaSrc'] !== true || value188 || value189))
       sources4 = sources3;
     else {
       if (enabled47) sources4 = [enabled47];
@@ -1929,7 +1929,7 @@ export function createRendererFastPreviewLayer({
       value194 = kind5 === 'video' && value191,
       value195 =
         (text2['fullEligibleVisible'] || visible) &&
-        offsetX3['options']?.['deferVisibleMediaSrc'] !== !![] &&
+        offsetX3['options']?.['deferVisibleMediaSrc'] !== true &&
         (kind5 === 'video' || offsetX3['visibleMediaCandidateCount'] <= offsetX3['immediateMediaSrcLimit']),
       mediaCritical2 = enabled46 && value191 && (value192 || value195),
       value196 = value194 && mediaCritical2,
@@ -1945,8 +1945,8 @@ export function createRendererFastPreviewLayer({
       value197 =
         enabled46 &&
         value191 &&
-        offsetX3['mediaPlan']['lowPriority'] === !![] &&
-        offsetX3['viewportBusy'] !== !![] &&
+        offsetX3['mediaPlan']['lowPriority'] === true &&
+        offsetX3['viewportBusy'] !== true &&
         nearViewport,
       deferMediaSrc2 =
         value193 &&
@@ -1957,7 +1957,7 @@ export function createRendererFastPreviewLayer({
       if (!mediaCritical2) offsetX3['immediateMediaSrcSlotsRef']['value'] -= 1;
       value194 && !mediaCritical2 && (offsetX3['immediateVideoMediaSrcSlotsRef']['value'] -= 1);
     }
-    const value198 = (enabled46 && value191 && offsetX3['mediaPlan']['prefetchAhead'] === !![]) || value197,
+    const value198 = (enabled46 && value191 && offsetX3['mediaPlan']['prefetchAhead'] === true) || value197,
       syncPreviewEl2 = syncPreviewEl(el69, node2, {
         kind: kind5,
         text: text2['text'] ?? getPreviewText(node2, kind5),
@@ -1977,10 +1977,10 @@ export function createRendererFastPreviewLayer({
                 offsetX3['mediaPlan']['explicitMediaSourceOwnerIds']?.['has'](nodeId4)))),
         mediaFallbackWhileDecoding: text2['fullEligiblePreview'],
         mediaHoldFallbackWhileBusy:
-          offsetX3['viewportBusy'] && offsetX3['options']?.['suspendNewMediaSrc'] === !![],
+          offsetX3['viewportBusy'] && offsetX3['options']?.['suspendNewMediaSrc'] === true,
         viewportBusy: offsetX3['viewportBusy'],
         placeholderReady: sources3['length'] === 0,
-        preserveInFlightResource: offsetX3['options']?.['suspendNewMediaSrc'] !== !![],
+        preserveInFlightResource: offsetX3['options']?.['suspendNewMediaSrc'] !== true,
         queuePriority: resolveRendererFastPreviewMediaQueuePriority(text2, offsetX3['options']),
         mediaSrcBatchLimit: offsetX3['mediaSrcBatchLimit'],
         videoMediaSrcBatchLimit: offsetX3['videoMediaSrcBatchLimit'],
@@ -2010,7 +2010,7 @@ export function createRendererFastPreviewLayer({
     if (
       !pendingCreateCount ||
       pendingCreateCount['generation'] !== generation ||
-      pendingCreateCount['layer']?.['isConnected'] === ![]
+      pendingCreateCount['layer']?.['isConnected'] === false
     ) {
       args2 = null;
       return;
@@ -2031,8 +2031,8 @@ export function createRendererFastPreviewLayer({
     }
     run27(pendingCreateCount);
     pendingCreateCount['pendingMediaPriorityChanged'] &&
-      (run14(), (pendingCreateCount['pendingMediaPriorityChanged'] = ![]));
-    pendingCreateCount['viewportBusy'] === !![] &&
+      (run14(), (pendingCreateCount['pendingMediaPriorityChanged'] = false));
+    pendingCreateCount['viewportBusy'] === true &&
       ((value117 = Math['min'](
         value117,
         Math['max'](0, pendingCreateCount['immediateMediaSrcSlotsRef']['value']),
@@ -2082,8 +2082,8 @@ export function createRendererFastPreviewLayer({
     );
   }
   function clear({
-    preserveStagedReleases: preserveStagedReleases = ![],
-    preserveDragPreviewScene: preserveDragPreviewScene = ![],
+    preserveStagedReleases: preserveStagedReleases = false,
+    preserveDragPreviewScene: preserveDragPreviewScene = false,
   } = {}) {
     (run18(), run17());
     for (const run33 of map10['values']()) {
@@ -2092,10 +2092,10 @@ export function createRendererFastPreviewLayer({
     map10['clear']();
     if (!preserveStagedReleases)
       for (const value200 of Array['from'](map7['values']())) {
-        run34(value200, { cache: ![] });
+        run34(value200, { cache: false });
       }
     (existingPreviewNodeIds['forEach']((value201, value202) => {
-      (run2(value202, ![]), run22(value201));
+      (run2(value202, false), run22(value201));
     }),
       existingPreviewNodeIds['clear'](),
       poolSize['forEach']((value203) => run22(value203)),
@@ -2108,7 +2108,7 @@ export function createRendererFastPreviewLayer({
       (value122 = null));
     if (!preserveDragPreviewScene) value123 = null;
     ((nowPerf2 = 0),
-      (enabled30 = ![]),
+      (enabled30 = false),
       (value119 = null),
       (!preserveStagedReleases || map7['size'] === 0) && (el54?.['remove']?.(), (el54 = null)),
       (args3 = createEmptyStats()));
@@ -2116,19 +2116,19 @@ export function createRendererFastPreviewLayer({
   function run21() {
     const emptyStats = createEmptyStats();
     for (const [value205, el71] of existingPreviewNodeIds['entries']()) {
-      (run2(value205, !![]), (emptyStats['fastPreviewCount'] += 1));
+      (run2(value205, true), (emptyStats['fastPreviewCount'] += 1));
       if (isElementVisible(el71)) emptyStats['visibleFastPreviewCount'] += 1;
       if (el71?.['dataset']?.['hasMedia'] === '1') emptyStats['previewWithMediaCount'] += 1;
       const el72 = getWrapper?.(value205);
       isMounted?.(value205) &&
-        el72?.['isConnected'] !== ![] &&
+        el72?.['isConnected'] !== false &&
         (el72?.['classList']?.['contains']?.('v2-node-detail-deferred') ||
           el72?.['dataset']?.['detailStage'] === 'deferred') &&
         (emptyStats['deferredMountedWithPreviewCount'] += 1);
     }
     for (const { el: el73 } of map7['values']()) {
       emptyStats['stagedPreviewCount'] += 1;
-      if (el73?.['isConnected'] === ![]) continue;
+      if (el73?.['isConnected'] === false) continue;
       ((emptyStats['connectedStagedPreviewCount'] += 1), (emptyStats['fastPreviewCount'] += 1));
       if (isElementVisible(el73)) emptyStats['visibleFastPreviewCount'] += 1;
       if (el73?.['dataset']?.['hasMedia'] === '1') emptyStats['previewWithMediaCount'] += 1;
@@ -2193,7 +2193,7 @@ export function createRendererFastPreviewLayer({
     run24(enabled50['el']);
   }
   function run29(enabled51) {
-    if (!enabled51 || map7['get'](enabled51['el']) !== enabled51) return ![];
+    if (!enabled51 || map7['get'](enabled51['el']) !== enabled51) return false;
     const { el: el77, nodeId: nodeId5 } = enabled51;
     (run6(enabled51['finalizeFrameId']),
       (enabled51['finalizeFrameId'] = null),
@@ -2204,7 +2204,7 @@ export function createRendererFastPreviewLayer({
     return (
       el78 && el77['parentNode'] !== el78 && el78['appendChild'](el77),
       existingPreviewNodeIds['set'](nodeId5, el77),
-      !![]
+      true
     );
   }
   function run38(value212, value213) {
@@ -2219,15 +2219,15 @@ export function createRendererFastPreviewLayer({
       (!enabled53 || !run3(value214['nodeId'], value215)) && run29(value214);
     }
   }
-  function run37(value216, { collect: collect = !![] } = {}) {
+  function run37(value216, { collect: collect = true } = {}) {
     const nodeId6 = String(value216 || ''),
       enabled54 = getWrapper?.(nodeId6);
-    if (!nodeId6 || !enabled54 || !run4(nodeId6, enabled54) || !run3(nodeId6, enabled54)) return ![];
-    (retained['delete'](nodeId6), run2(nodeId6, ![]), run35(nodeId6));
+    if (!nodeId6 || !enabled54 || !run4(nodeId6, enabled54) || !run3(nodeId6, enabled54)) return false;
+    (retained['delete'](nodeId6), run2(nodeId6, false), run35(nodeId6));
     const el79 = existingPreviewNodeIds['get'](nodeId6);
     args2?.['candidates'] &&
       (args2['candidates'] = args2['candidates']['filter']((value217) => value217['nodeId'] !== nodeId6));
-    if (!el79) return !![];
+    if (!el79) return true;
     (existingPreviewNodeIds['delete'](nodeId6), run19(el79));
     const layerEl = el79['parentNode'] || el54;
     ((el79['dataset']['previewReleaseStage'] = 'detached'), el79['remove']?.());
@@ -2237,7 +2237,7 @@ export function createRendererFastPreviewLayer({
         ((value218['finalizeFrameId'] = null), run34(value218), run21());
       })));
     if (collect) run21();
-    return !![];
+    return true;
   }
   function run39(value219) {
     const value220 = String(value219 || '');
@@ -2246,11 +2246,11 @@ export function createRendererFastPreviewLayer({
       run34(value221);
     }
   }
-  function removeNode(value222, { cache: cache = !![], collect: collect = !![] } = {}) {
+  function removeNode(value222, { cache: cache = true, collect: collect = true } = {}) {
     const value223 = String(value222 || '');
     (map8['delete'](value223),
       retained['delete'](value223),
-      run2(value223, ![]),
+      run2(value223, false),
       run35(value223),
       run39(value223));
     const el80 = existingPreviewNodeIds['get'](value223);
@@ -2263,11 +2263,11 @@ export function createRendererFastPreviewLayer({
     ((!cache && !isPreviewMediaResourceProtected2) || !run23(value223, el80)) && run24(el80);
     if (collect) run21();
   }
-  function discardNode(value226, { collect: collect = !![] } = {}) {
+  function discardNode(value226, { collect: collect = true } = {}) {
     const value227 = String(value226 || '');
     (map8['delete'](value227),
       retained['delete'](value227),
-      run2(value227, ![]),
+      run2(value227, false),
       run35(value227),
       run39(value227));
     args2?.['candidates'] &&
@@ -2288,7 +2288,7 @@ export function createRendererFastPreviewLayer({
     let count12 = 0;
     for (const value233 of Array['from'](existingPreviewNodeIds['keys']())) {
       if (map11['has'](value233)) continue;
-      (removeNode(value233, { collect: ![] }), (count12 += 1));
+      (removeNode(value233, { collect: false }), (count12 += 1));
     }
     for (const value234 of Array['from'](map7['values']())) {
       if (map11['has'](value234['nodeId'])) continue;
@@ -2301,73 +2301,73 @@ export function createRendererFastPreviewLayer({
     return count12;
   }
   function run40(el81) {
-    if (!el81) return ![];
+    if (!el81) return false;
     if (el81['classList']?.['contains']?.('selected') || el81['classList']?.['contains']?.('v2-selected'))
-      return !![];
+      return true;
     const value236 = typeof document !== 'undefined' ? document['activeElement'] : null;
     return !!(value236 && el81['contains']?.(value236));
   }
   function run41(enabled55, enabled56, value237 = {}) {
-    if (!enabled55 || !enabled56) return ![];
+    if (!enabled55 || !enabled56) return false;
     const map12 = value237?.['dragTargets'];
-    if (!map12?.['has']?.(enabled55)) return ![];
+    if (!map12?.['has']?.(enabled55)) return false;
     const value238 = value237?.['dragContext'] || {};
-    if (value238['isDragging'] !== !![] || value238['isCommittingDrag'] === !![]) return ![];
+    if (value238['isDragging'] !== true || value238['isCommittingDrag'] === true) return false;
     const toNumber6 = toNumber(value238['pendingDx'], 0),
       toNumber7 = toNumber(value238['pendingDy'], 0);
-    return value238['hasMoved'] === !![] || Math['hypot'](toNumber6, toNumber7) > 0;
+    return value238['hasMoved'] === true || Math['hypot'](toNumber6, toNumber7) > 0;
   }
   function run42(
     value239,
     map13,
     {
       kind: kind = '',
-      hasMedia: hasMedia = ![],
+      hasMedia: hasMedia = false,
       dragTargets: dragTargets = null,
       dragContext: dragContext = null,
-      fullEligibleVisible: fullEligibleVisible = ![],
+      fullEligibleVisible: fullEligibleVisible = false,
     } = {},
   ) {
     const value240 = retained['has'](String(value239 || '')),
       el82 = getWrapper?.(value239),
       enabled57 = run4(value239, el82),
       value241 = kind === 'image' || kind === 'video',
-      enabled58 = enabled57 && value241 && hasMedia ? run3(value239, el82) : !![];
+      enabled58 = enabled57 && value241 && hasMedia ? run3(value239, el82) : true;
     if (kind === 'video' && enabled57 && hasActiveMountedVideoPlayback(el82))
-      return (retained['delete'](String(value239 || '')), run35(value239), ![]);
+      return (retained['delete'](String(value239 || '')), run35(value239), false);
     if (kind === 'image' && fullEligibleVisible && enabled57 && enabled58)
-      return (retained['delete'](String(value239 || '')), run35(value239), ![]);
+      return (retained['delete'](String(value239 || '')), run35(value239), false);
     if (enabled57 && run41(value239, el82, { dragTargets: dragTargets, dragContext: dragContext }))
-      return (run35(value239), ![]);
+      return (run35(value239), false);
     if (enabled57 && value241 && hasMedia && enabled58 && isFastPreviewReleasedForPlayback(el82))
-      return (run35(value239), ![]);
+      return (run35(value239), false);
     if (map13?.['has']?.(value239) || run40(el82)) {
-      if (!enabled57) return !![];
-      if (hasMedia && value241 && !enabled58) return (run36(value239, el82), !![]);
-      return (retained['delete'](String(value239 || '')), run35(value239), ![]);
+      if (!enabled57) return true;
+      if (hasMedia && value241 && !enabled58) return (run36(value239, el82), true);
+      return (retained['delete'](String(value239 || '')), run35(value239), false);
     }
     if (value240) {
       if (!enabled57) return hasMedia;
-      if (hasMedia && value241 && !enabled58) return (run36(value239, el82), !![]);
-      return (retained['delete'](String(value239 || '')), run35(value239), ![]);
+      if (hasMedia && value241 && !enabled58) return (run36(value239, el82), true);
+      return (retained['delete'](String(value239 || '')), run35(value239), false);
     }
-    if (!enabled57) return !![];
-    if ((kind === 'image' || kind === 'video') && !hasMedia) return ![];
-    if (hasMedia && value241 && !enabled58) return (run36(value239, el82), !![]);
+    if (!enabled57) return true;
+    if ((kind === 'image' || kind === 'video') && !hasMedia) return false;
+    if (hasMedia && value241 && !enabled58) return (run36(value239, el82), true);
     run35(value239);
     if (
       el82['classList']?.['contains']?.('v2-node-detail-deferred') ||
       el82['dataset']?.['detailStage'] === 'deferred'
     )
-      return !![];
-    return ![];
+      return true;
+    return false;
   }
   function run43(value242, value243, value244 = {}) {
     if (
       getPreviewKind(value243) !== 'image' ||
-      value244['fullEligibleVisibleImageNodeIds']?.['has']?.(value242) !== !![]
+      value244['fullEligibleVisibleImageNodeIds']?.['has']?.(value242) !== true
     )
-      return ![];
+      return false;
     const value245 = getWrapper?.(value242);
     return !!(run4(value242, value245) && run3(value242, value245));
   }
@@ -2380,26 +2380,26 @@ export function createRendererFastPreviewLayer({
       previewRasterFrameEl = getPreviewRasterFrameEl(el83);
     if (isPreviewRasterFrameReady(el83)) {
       for (const value248 of [el54, el83, previewRasterFrameEl]) {
-        if (!isElementVisible(value248)) return ![];
+        if (!isElementVisible(value248)) return false;
       }
-      return !![];
+      return true;
     }
     const value249 = el83?.['querySelector']?.('.v2-fast-preview-media');
-    if (!el83 || el83['isConnected'] === ![] || !isPreviewMediaLoaded(value249)) return ![];
+    if (!el83 || el83['isConnected'] === false || !isPreviewMediaLoaded(value249)) return false;
     if (
       String(value249?.['tagName'] || '')['toLowerCase']() === 'img' &&
       typeof value249?.['complete'] === 'boolean' &&
-      (value249['complete'] !== !![] || Number(value249['naturalWidth'] || 0) <= 0)
+      (value249['complete'] !== true || Number(value249['naturalWidth'] || 0) <= 0)
     )
-      return ![];
+      return false;
     for (const value250 of [el54, el83, value249]) {
-      if (!isElementVisible(value250)) return ![];
+      if (!isElementVisible(value250)) return false;
     }
     return isPresentationMediaSourceForNode(value249, value247);
   }
   function isNodePresentationReady(value251, value252 = value122?.[String(value251 || '')]) {
     const value253 = String(value251 || '');
-    if (isNodePreviewReady(value253, value252)) return !![];
+    if (isNodePreviewReady(value253, value252)) return true;
     const value254 = getWrapper?.(value253);
     return !!(run4(value253, value254) && run3(value253, value254, value252));
   }
@@ -2409,7 +2409,7 @@ export function createRendererFastPreviewLayer({
   function releaseNode(enabled60) {
     if (!enabled60) return;
     const value256 = getWrapper?.(enabled60);
-    if (!run4(enabled60, value256)) return ![];
+    if (!run4(enabled60, value256)) return false;
     return run37(enabled60);
   }
   function syncNodeDragPreview(
@@ -2417,53 +2417,53 @@ export function createRendererFastPreviewLayer({
     {
       dx: dx = 0,
       dy: dy = 0,
-      active: active = ![],
-      settle: settle = ![],
-      remove: remove = ![],
+      active: active = false,
+      settle: settle = false,
+      remove: remove = false,
       rasterFrame: rasterFrame = null,
-      existingOnly: existingOnly = ![],
+      existingOnly: existingOnly = false,
       width: width5,
       height: height5,
     } = {},
   ) {
     const enabled61 = String(value257 || '')['trim']();
-    if (!enabled61) return ![];
-    if (remove === !![]) return (removeNode(enabled61), !![]);
+    if (!enabled61) return false;
+    if (remove === true) return (removeNode(enabled61), true);
     let el84 = existingPreviewNodeIds['get'](enabled61),
-      value258 = ![];
+      value258 = false;
     const enabled62 = rasterFrame || map8['get'](enabled61) || null;
-    if (!el84 && existingOnly && !enabled62) return ![];
+    if (!el84 && existingOnly && !enabled62) return false;
     el84 && enabled62 && (map8['delete'](enabled61), attachPreviewRasterFrame(el84, enabled62));
-    if (!el84 && active === !![]) {
+    if (!el84 && active === true) {
       const value259 = value123?.['nodes']?.[enabled61],
         value260 = value123?.['canvasEl'] || el54?.['parentNode'] || null;
       if (value259 && value260) {
         const el85 = run31(value260),
           geometry4 = resolveRendererPreviewNodePresentation(value259),
           offsetX4 = syncLayerBounds(el85, [{ geometry: geometry4['geometry'] }], {
-            preserveAnchor: !![],
+            preserveAnchor: true,
           }) || { offsetX: 0, offsetY: 0 };
         (run32(value123?.['options']?.['viewport']),
           (el84 = run26(enabled61)),
-          (value258 = !![]),
+          (value258 = true),
           existingPreviewNodeIds['set'](enabled61, el84),
           el85['appendChild'](el84),
           delete el84['_fastPreviewReused'],
-          run2(enabled61, !![]),
+          run2(enabled61, true),
           syncPreviewEl(el84, value259, {
             ...geometry4,
             offsetX: offsetX4['offsetX'],
             offsetY: offsetX4['offsetY'],
             mediaLoading: 'eager',
             mediaFetchPriority: 'high',
-            mediaCritical: !![],
-            mediaDirectWhenBlank: !![],
-            mediaFallbackWhileDecoding: !![],
+            mediaCritical: true,
+            mediaDirectWhenBlank: true,
+            mediaFallbackWhileDecoding: true,
             placeholderReady:
               geometry4['sources']['length'] === 0 &&
               geometry4['kind'] !== 'image' &&
               geometry4['kind'] !== 'video',
-            preserveInFlightResource: !![],
+            preserveInFlightResource: true,
             scheduleMediaSrc: scheduleMediaSrc2,
             cancelPendingMediaSrc: cancelPendingMediaSrc2,
             onMediaPresented: onMediaPresented2,
@@ -2473,27 +2473,27 @@ export function createRendererFastPreviewLayer({
           run21());
       }
     }
-    if (!el84) return ![];
+    if (!el84) return false;
     if (Number['isFinite'](width5) && width5 > 0) el84['style']['width'] = width5 + 'px';
     if (Number['isFinite'](height5) && height5 > 0) el84['style']['height'] = height5 + 'px';
-    if (active !== !![] && settle === !![]) {
+    if (active !== true && settle === true) {
       const value261 = getWrapper?.(enabled61),
         value262 = value123?.['nodes']?.[enabled61],
         previewKind2 = getPreviewKind(value262),
         value263 =
           run4(enabled61, value261) &&
           ((previewKind2 !== 'image' && previewKind2 !== 'video') || run3(enabled61, value261, value262));
-      if (value263) return (removeNode(enabled61), !![]);
+      if (value263) return (removeNode(enabled61), true);
       return settlePreviewDragState(el84, dx, dy);
     }
-    ((el84['_previewDragActive'] = active === !![]),
+    ((el84['_previewDragActive'] = active === true),
       (el84['_previewDragDx'] = toNumber(dx, 0)),
       (el84['_previewDragDy'] = toNumber(dy, 0)));
     const previewDragTransform = applyPreviewDragTransform(el84);
-    if (active !== !![]) return previewDragTransform;
+    if (active !== true) return previewDragTransform;
     const enabled63 = isNodePreviewReady(enabled61) || el84['dataset']?.['placeholderReady'] === '1';
     return (
-      !enabled63 && value258 && removeNode(enabled61, { cache: ![] }),
+      !enabled63 && value258 && removeNode(enabled61, { cache: false }),
       previewDragTransform && enabled63
     );
   }
@@ -2522,10 +2522,10 @@ export function createRendererFastPreviewLayer({
         viewportBusy: viewportBusy4,
         availablePreviewNodePoolSize: poolSize['length'],
       },
-      preservePaintedMediaOwners2 = viewportBusy4 || previewMotion['zoomChanged'] === !![];
+      preservePaintedMediaOwners2 = viewportBusy4 || previewMotion['zoomChanged'] === true;
     run38(enabled64, dragTargets2);
     if (!shouldUseFastPreviewLayer(enabled64, value264, options16))
-      return clear({ preserveStagedReleases: !![], preserveDragPreviewScene: !![] });
+      return clear({ preserveStagedReleases: true, preserveDragPreviewScene: true });
     for (const value268 of Array['from'](existingPreviewNodeIds['keys']())) {
       const value269 = enabled64?.[value268];
       if (!shouldShowGenerationBusyUi(value269)) continue;
@@ -2535,7 +2535,7 @@ export function createRendererFastPreviewLayer({
         isRendererFastPreviewGeometryVisible(getPreviewGeometry(value269), dragTargets2)
       )
         continue;
-      removeNode(value268, { cache: ![], collect: ![] });
+      removeNode(value268, { cache: false, collect: false });
     }
     const isPerfProbeEnabled4 = isPerfProbeEnabled(),
       startPerf3 = isPerfProbeEnabled4 ? nowPerf() : 0,
@@ -2574,7 +2574,7 @@ export function createRendererFastPreviewLayer({
         const value276 = getWrapper?.(nodeId7);
         previewGeometry = getPreviewGeometry(node3);
         if (run4(nodeId7, value276) || !isRendererFastPreviewGeometryVisible(previewGeometry, dragTargets2)) {
-          removeNode(nodeId7, { cache: ![], collect: ![] });
+          removeNode(nodeId7, { cache: false, collect: false });
           continue;
         }
       }
@@ -2583,17 +2583,17 @@ export function createRendererFastPreviewLayer({
       let text3 = map5['get'](nodeId7);
       if (nodeBizRev === null || !text3 || text3['nodeBizRev'] !== nodeBizRev) {
         const kind6 = getPreviewKind(node3),
-          sourcesDisplayFirst = dragTargets2['deferVisibleMediaSrc'] === !![];
+          sourcesDisplayFirst = dragTargets2['deferVisibleMediaSrc'] === true;
         text3 = {
           kind: kind6,
           nodeBizRev: nodeBizRev,
           hasMediaHint: hasPreviewMediaHint(node3, kind6),
           sourcesDisplayFirst: sourcesDisplayFirst
             ? null
-            : getPreviewMediaUrls(node3, kind6, { displayFirst: !![] }),
+            : getPreviewMediaUrls(node3, kind6, { displayFirst: true }),
           sourcesThumbnailFirst: sourcesDisplayFirst
             ? null
-            : getPreviewMediaUrls(node3, kind6, { displayFirst: ![] }),
+            : getPreviewMediaUrls(node3, kind6, { displayFirst: false }),
           text: sourcesDisplayFirst ? null : getPreviewText(node3, kind6),
         };
         if (nodeBizRev === null) map5['delete'](nodeId7);
@@ -2601,15 +2601,15 @@ export function createRendererFastPreviewLayer({
       }
       const kind7 = text3['kind'],
         fullEligibleVisible2 =
-          kind7 === 'image' && dragTargets2['fullEligibleVisibleImageNodeIds']?.['has']?.(nodeId7) === !![],
+          kind7 === 'image' && dragTargets2['fullEligibleVisibleImageNodeIds']?.['has']?.(nodeId7) === true,
         fullEligiblePreview =
           kind7 === 'image' &&
           (fullEligibleVisible2 ||
-            dragTargets2['fullEligiblePreviewImageNodeIds']?.['has']?.(nodeId7) === !![]),
+            dragTargets2['fullEligiblePreviewImageNodeIds']?.['has']?.(nodeId7) === true),
         value277 = fullEligiblePreview ? text3['sourcesDisplayFirst'] : text3['sourcesThumbnailFirst'],
         deferredDescriptorSources = !Array['isArray'](value277),
         sources5 = deferredDescriptorSources ? [] : value277,
-        hasMedia2 = deferredDescriptorSources ? text3['hasMediaHint'] === !![] : sources5['length'] > 0;
+        hasMedia2 = deferredDescriptorSources ? text3['hasMediaHint'] === true : sources5['length'] > 0;
       if (
         !run42(nodeId7, selected, {
           kind: kind7,
@@ -2631,7 +2631,7 @@ export function createRendererFastPreviewLayer({
         deferredDescriptorSources: deferredDescriptorSources,
         text: text3['text'],
         geometry: geometry5,
-        selected: selected?.['has']?.(nodeId7) === !![],
+        selected: selected?.['has']?.(nodeId7) === true,
         fullEligibleVisible: fullEligibleVisible2,
         fullEligiblePreview: fullEligiblePreview,
         retained: retained['has'](nodeId7),
@@ -2648,11 +2648,11 @@ export function createRendererFastPreviewLayer({
       admissionMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0,
       list24 = mediaSrcBatchLimit2['candidates'];
     if (list24['length'] === 0) {
-      let value278 = ![];
+      let value278 = false;
       for (const value279 of Array['from'](existingPreviewNodeIds['keys']())) {
         const value280 = enabled64?.[value279];
         if (run43(value279, value280, dragTargets2)) {
-          removeNode(value279, { cache: ![], collect: ![] });
+          removeNode(value279, { cache: false, collect: false });
           continue;
         }
         const value281 = getWrapper?.(value279),
@@ -2662,16 +2662,16 @@ export function createRendererFastPreviewLayer({
           value280 &&
           isRendererFastPreviewGeometryVisible(getPreviewGeometry(value280), dragTargets2)
         ) {
-          value278 = !![];
+          value278 = true;
           continue;
         }
-        const enabled66 = enabled65 && run37(value279, { collect: ![] });
-        if (!enabled66) removeNode(value279, { collect: ![] });
+        const enabled66 = enabled65 && run37(value279, { collect: false });
+        if (!enabled66) removeNode(value279, { collect: false });
       }
       run21();
       if (value278) return;
       if (map7['size'] > 0) return;
-      return clear({ preserveStagedReleases: !![], preserveDragPreviewScene: !![] });
+      return clear({ preserveStagedReleases: true, preserveDragPreviewScene: true });
     }
     const layer = run31(canvasEl);
     if (!layer) return;
@@ -2737,7 +2737,7 @@ export function createRendererFastPreviewLayer({
         mediaLoading: mediaLoading3,
         mediaPlan: mediaPlan,
         options: dragTargets2,
-        pendingMediaPriorityChanged: ![],
+        pendingMediaPriorityChanged: false,
         preservePaintedMediaOwners: preservePaintedMediaOwners2,
         requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds,
         visibleMediaCandidateCount: mediaSrcBatchLimit2['visibleMediaCandidateCount'],
@@ -2759,7 +2759,7 @@ export function createRendererFastPreviewLayer({
     }
     run27(args5);
     const immediateSyncMs = isRendererRuntimeDiagnosticsEnabled2 ? nowPerf() : 0;
-    args5['pendingMediaPriorityChanged'] && (run14(), (args5['pendingMediaPriorityChanged'] = ![]));
+    args5['pendingMediaPriorityChanged'] && (run14(), (args5['pendingMediaPriorityChanged'] = false));
     viewportBusy4 &&
       ((value117 = Math['min'](value117, Math['max'](0, args5['immediateMediaSrcSlotsRef']['value']))),
       (value118 = Math['min'](value118, Math['max'](0, args5['immediateVideoMediaSrcSlotsRef']['value']))));
@@ -2768,7 +2768,7 @@ export function createRendererFastPreviewLayer({
       if (!map15['has'](value288)) {
         const value289 = enabled64?.[value288];
         if (run43(value288, value289, dragTargets2)) {
-          (removeNode(value288, { cache: ![], collect: ![] }), (removedCount += 1));
+          (removeNode(value288, { cache: false, collect: false }), (removedCount += 1));
           continue;
         }
         const value290 = getWrapper?.(value288),
@@ -2781,8 +2781,8 @@ export function createRendererFastPreviewLayer({
           map15['add'](value288);
           continue;
         }
-        const enabled68 = enabled67 && run37(value288, { collect: ![] });
-        if (!enabled68) removeNode(value288, { collect: ![] });
+        const enabled68 = enabled67 && run37(value288, { collect: false });
+        if (!enabled68) removeNode(value288, { collect: false });
         removedCount += 1;
       }
     }

@@ -306,7 +306,7 @@ export async function requestStoryEpisodeScriptTimingReview({
   };
 }
 function isOutlineEstimateOutsideReview(enabled2, value11 = {}) {
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   const positiveNumber2 = normalizePositiveNumber(value11?.['reasonableRangeSeconds']?.['minimum']),
     positiveNumber3 = normalizePositiveNumber(value11?.['reasonableRangeSeconds']?.['maximum']);
   return !!positiveNumber2 && !!positiveNumber3 && (enabled2 < positiveNumber2 || enabled2 > positiveNumber3);
@@ -334,7 +334,7 @@ export function preserveStoryEpisodeScriptWithoutTimingReview(args3, value12, er
       reviewPasses: 0,
       reviewAgreement: 'review-unavailable',
       outlineEstimateSeconds: outlineEstimateSeconds3['outlineEstimateSeconds'] || null,
-      outlineEstimateMismatch: ![],
+      outlineEstimateMismatch: false,
       spokenUnits: outlineEstimateSeconds3['spokenUnits'],
       minimumSpokenDurationSeconds: outlineEstimateSeconds3['minimumSpokenDurationSeconds'],
     },

@@ -14,9 +14,9 @@ export function createAudioModelApiManifest({
   inputSlots: inputSlots,
   help: help,
   prompt: prompt,
-  vip: vip = ![],
-  async: async = ![],
-  cancellable: cancellable = ![],
+  vip: vip = false,
+  async: async = false,
+  cancellable: cancellable = false,
   modelType: modelType = '',
 }) {
   const item = {};
@@ -143,7 +143,7 @@ export const VOLCENGINE_SPEAKER_ID_FIELD = Object['freeze']({
   placement: 'mode',
   label: '自定义音色ID',
   defaultValue: '',
-  allowEmpty: !![],
+  allowEmpty: true,
   modeField: 'voiceMode',
   filledModeValue: 'custom',
   emptyModeValue: 'default',
@@ -153,7 +153,7 @@ export const VOLCENGINE_SPEAKER_ID_FIELD = Object['freeze']({
   description:
     '填写后覆盖预设音色，默认音色将不可选。_uranus_bigtts 走 TTS 2.0，_mars_bigtts 走 TTS 1.0，其它火山自定义/音色设计音色 ID 走 ICL 2.0。',
   helpUrl: 'https://console.volcengine.com/speech/new/voices',
-  showInfoTip: !![],
+  showInfoTip: true,
 });
 export const VOLCENGINE_SPEED_FIELD = Object['freeze']({
   id: 'speechRate',

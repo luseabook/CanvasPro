@@ -88,7 +88,7 @@ export function buildStoryReplicationTimelinePrompt({
         if (value7['every'](Boolean))
           return value7['map'](({ part: part, line: line }, value9) => ({
             id: value5['id'] + '-' + value6 + '-' + value9,
-            asrTimed: !![],
+            asrTimed: true,
             startSec: Math['max'](0, line['startSec'] - (clip['sourceStartSec'] || 0)),
             endSec: Math['min'](output, line['endSec'] - (clip['sourceStartSec'] || 0)),
             parts: [part],
@@ -151,9 +151,9 @@ export function buildStoryReplicationTimelinePrompt({
         promptMode: clip['promptMode'],
         referenceHeader: '',
         continuityLines: continuityLines,
-        integerTime: !![],
-        shotSpeech: !![],
-        stagingHandoff: clip['replicationStagingHandoff'] === !![],
+        integerTime: true,
+        shotSpeech: true,
+        stagingHandoff: clip['replicationStagingHandoff'] === true,
       },
     );
   return defineReplicationPromptMaterials(replicationFlowPrompt['prompt'], shots, assets, visualStyle);

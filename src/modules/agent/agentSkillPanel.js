@@ -29,7 +29,7 @@ export function createAgentSkillPanel({
 } = {}) {
   hydrateDisabledAgentSkillIds({ registry: registry, windowObject: windowObject });
   const element = createAgentElement('section', 'agent-custom-panel agent-skill-panel');
-  ((element['hidden'] = !![]), element['setAttribute']('aria-hidden', 'true'));
+  ((element['hidden'] = true), element['setAttribute']('aria-hidden', 'true'));
   const agentElement = createAgentElement('div', 'agent-custom-panel-header'),
     agentElement2 = createAgentElement('div', 'agent-custom-panel-copy'),
     el = createAgentElement('div', 'agent-custom-panel-title'),
@@ -67,7 +67,7 @@ export function createAgentSkillPanel({
     key = 0,
     index = '',
     result = '',
-    enabled2 = ![];
+    enabled2 = false;
   const agentScrollableWheelHandler = createAgentScrollableWheelHandler(el9),
     agentScrollableWheelHandler2 = createAgentScrollableWheelHandler(agentSkillEditor['element']);
   function run(el10, data) {
@@ -87,7 +87,7 @@ export function createAgentSkillPanel({
       const el11 = createAgentElement('div', 'agent-skill-item');
       ((el11['dataset']['agentSkillId'] = name['id']),
         el11['setAttribute']('role', 'listitem'),
-        el11['classList']['toggle']('is-disabled', name['enabled'] === ![]));
+        el11['classList']['toggle']('is-disabled', name['enabled'] === false));
       const agentElement4 = createAgentElement('div', 'agent-skill-item-copy');
       agentElement4['append'](
         createAgentElement('div', 'agent-skill-item-title', name['title'] || name['id']),
@@ -121,15 +121,15 @@ export function createAgentSkillPanel({
         const el16 = createAgentButton('agent-icon-btn agent-skill-action-btn agent-skill-insert-btn', '', {
           title: text('skillInsert'),
           icon: agentIconSvg('wand'),
-          disabled: name['enabled'] === ![],
+          disabled: name['enabled'] === false,
         });
         el16['dataset']['agentSkillInsert'] = name['id'];
         const el17 = createAgentButton('agent-skill-toggle-btn', '', {
-          title: text(name['enabled'] === ![] ? 'skillEnable' : 'skillDisable'),
+          title: text(name['enabled'] === false ? 'skillEnable' : 'skillDisable'),
         });
         ((el17['dataset']['agentSkillToggle'] = name['id']),
           el17['setAttribute']('role', 'switch'),
-          el17['setAttribute']('aria-checked', String(name['enabled'] !== ![])),
+          el17['setAttribute']('aria-checked', String(name['enabled'] !== false)),
           el17['appendChild'](createAgentElement('span', 'agent-skill-toggle-thumb')),
           el12['append'](el17, el16));
         if (name['editable']) {
@@ -191,7 +191,7 @@ export function createAgentSkillPanel({
       return (await entry?.(handle), handle);
     } catch (error) {
       if (!enabled2 && payload === key) record?.(error);
-      return { success: ![], error: error };
+      return { success: false, error: error };
     } finally {
       if (!enabled2 && payload === key) {
         run2('');
@@ -205,7 +205,7 @@ export function createAgentSkillPanel({
       refreshSkills,
       (count2) => {
         (render(),
-          count2?.['available'] === ![]
+          count2?.['available'] === false
             ? onNotice?.(text('skillRefreshFailed'))
             : onNotice?.(formatText('skillRefreshDone', { count: count2?.['loaded'] || 0 })));
       },
@@ -218,7 +218,7 @@ export function createAgentSkillPanel({
       installSkill,
       (name2) => {
         if (name2?.['canceled']) return;
-        if (name2?.['success'] === !![]) {
+        if (name2?.['success'] === true) {
           render();
           const state =
             name2['scriptsSkipped'] || Number(name2['skippedResources'] || 0) > 0
@@ -266,9 +266,9 @@ export function createAgentSkillPanel({
     result = id;
     const input = run3(
       'delete',
-      () => deleteSkill?.({ id: id, confirmed: !![] }),
+      () => deleteSkill?.({ id: id, confirmed: true }),
       (name3) => {
-        if (name3?.['success'] === !![]) {
+        if (name3?.['success'] === true) {
           ((index = ''),
             (result = ''),
             render(),
@@ -288,15 +288,15 @@ export function createAgentSkillPanel({
   }
   function run5({ focusId: focusId = '' } = {}) {
     (agentSkillEditor['close'](),
-      (el5['hidden'] = ![]),
-      (el9['hidden'] = ![]),
+      (el5['hidden'] = false),
+      (el9['hidden'] = false),
       focusId &&
         !element['hidden'] &&
         el9['querySelector']('[data-agent-skill-edit="' + focusId + '"]')?.['focus']?.());
   }
   function run6(value2 = null) {
     if (enabled) return;
-    ((el5['hidden'] = !![]), (el9['hidden'] = !![]), agentSkillEditor['open'](value2));
+    ((el5['hidden'] = true), (el9['hidden'] = true), agentSkillEditor['open'](value2));
   }
   function run7() {
     if (enabled) return;
@@ -308,7 +308,7 @@ export function createAgentSkillPanel({
       return (
         agentSkillEditor['setError'](el21['message']),
         el21['focus']?.['focus']?.(),
-        Promise['resolve']({ success: ![], errorCode: 'SKILL_FORM_INVALID' })
+        Promise['resolve']({ success: false, errorCode: 'SKILL_FORM_INVALID' })
       );
     return (
       agentSkillEditor['setError'](),
@@ -316,7 +316,7 @@ export function createAgentSkillPanel({
         'save',
         () => saveSkill?.(el21['definition']),
         (focusId2) => {
-          if (focusId2?.['success'] === !![]) {
+          if (focusId2?.['success'] === true) {
             (render(),
               run5({ focusId: focusId2['skillId'] }),
               onNotice?.(formatText('skillSaveDone', { name: focusId2['skillId'] || 'Skill' })));
@@ -340,7 +340,7 @@ export function createAgentSkillPanel({
   function open() {
     (refreshText(),
       run5(),
-      (element['hidden'] = ![]),
+      (element['hidden'] = false),
       element['setAttribute']('aria-hidden', 'false'),
       element['classList']['add']('is-open'));
   }
@@ -349,7 +349,7 @@ export function createAgentSkillPanel({
       !enabled && ((index = ''), (result = ''), render()),
       element['classList']['remove']('is-open'),
       element['setAttribute']('aria-hidden', 'true'),
-      (element['hidden'] = !![]));
+      (element['hidden'] = true));
   }
   return (
     el9['addEventListener']('click', (event) => {
@@ -384,7 +384,7 @@ export function createAgentSkillPanel({
         setAgentSkillEnabledPreference({
           registry: registry,
           skillId: skillId,
-          enabled: enabled3?.['enabled'] === ![],
+          enabled: enabled3?.['enabled'] === false,
           windowObject: windowObject,
         }) && render();
         return;
@@ -395,10 +395,10 @@ export function createAgentSkillPanel({
       else onInsert?.('$' + el27['dataset']['agentSkillInsert'] + ' ');
       close();
     }),
-    el9['addEventListener']('wheel', agentScrollableWheelHandler, { passive: ![] }),
+    el9['addEventListener']('wheel', agentScrollableWheelHandler, { passive: false }),
     agentSkillEditor['element']['addEventListener']('wheel', agentScrollableWheelHandler2, {
-      passive: ![],
-      capture: !![],
+      passive: false,
+      capture: true,
     }),
     el3['addEventListener']('click', refresh),
     el7['addEventListener']('click', install),
@@ -419,10 +419,10 @@ export function createAgentSkillPanel({
       save: save,
       refreshText: refreshText,
       destroy() {
-        ((enabled2 = !![]),
+        ((enabled2 = true),
           (key += 1),
           el9['removeEventListener']('wheel', agentScrollableWheelHandler),
-          agentSkillEditor['element']['removeEventListener']('wheel', agentScrollableWheelHandler2, !![]),
+          agentSkillEditor['element']['removeEventListener']('wheel', agentScrollableWheelHandler2, true),
           run2(''));
       },
     }

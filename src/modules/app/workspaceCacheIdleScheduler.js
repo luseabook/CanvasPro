@@ -6,15 +6,15 @@ function normalizeDelay(value, item = 0) {
   return Number['isFinite'](count) && count >= 0 ? count : item;
 }
 function hasIdleBudget(enabled, key) {
-  if (!enabled || typeof enabled !== 'object') return !![];
-  if (enabled['didTimeout'] === !![]) return ![];
+  if (!enabled || typeof enabled !== 'object') return true;
+  if (enabled['didTimeout'] === true) return false;
   return typeof enabled['timeRemaining'] !== 'function' || Number(enabled['timeRemaining']()) >= key;
 }
 export function isWorkspaceCacheInteractionBusy({
   documentRef: documentRef = globalThis['document'],
   CanvasTabManager: CanvasTabManager = null,
 } = {}) {
-  if (CanvasTabManager?.['_isVisualSnapshotInteractionBusy']?.() === !![]) return !![];
+  if (CanvasTabManager?.['_isVisualSnapshotInteractionBusy']?.() === true) return true;
   const index = documentRef?.['body']?.['classList'],
     result = documentRef?.['documentElement']?.['classList'],
     data = documentRef?.['getElementById']?.('v2-canvas')?.['classList'];
@@ -30,7 +30,7 @@ export function isWorkspaceCacheInteractionBusy({
 }
 export function createWorkspaceCacheIdleScheduler({
   run: run,
-  isBusy: isBusy = () => ![],
+  isBusy: isBusy = () => false,
   retryDelayMs: retryDelayMs = DEFAULT_RETRY_DELAY_MS,
   minIdleBudgetMs: minIdleBudgetMs = DEFAULT_MIN_IDLE_BUDGET_MS,
   idleTimeoutMs: idleTimeoutMs = DEFAULT_IDLE_TIMEOUT_MS,
@@ -46,7 +46,7 @@ export function createWorkspaceCacheIdleScheduler({
   let options = 0,
     timer = null,
     requestIdleCallbackFn2 = null,
-    enabled2 = ![];
+    enabled2 = false;
   const run2 = () => {
       (timer !== null && typeof clearTimeoutFn === 'function' && clearTimeoutFn(timer), (timer = null));
     },
@@ -75,7 +75,7 @@ export function createWorkspaceCacheIdleScheduler({
         run3(next, delay);
         return;
       }
-      ((enabled2 = ![]), handler3());
+      ((enabled2 = false), handler3());
     },
     handler5 = (entry) => {
       if (!handler4(entry)) return;
@@ -109,10 +109,10 @@ export function createWorkspaceCacheIdleScheduler({
       timer?.['unref']?.());
   };
   const cancel = () => {
-      ((options += 1), (enabled2 = ![]), handler2());
+      ((options += 1), (enabled2 = false), handler2());
     },
     schedule = ({ delayMs: delayMs = 0 } = {}) => {
-      ((options += 1), (enabled2 = !![]), handler2());
+      ((options += 1), (enabled2 = true), handler2());
       const state = options;
       return (run3(state, delayMs), state);
     };

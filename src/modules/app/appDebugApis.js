@@ -44,13 +44,13 @@ export function installAppDebugApis({
   canvasCommands: canvasCommands,
   canvasAgent: canvasAgent,
 } = {}) {
-  if (windowObject?.['DEV_MODE'] !== !![]) return ![];
+  if (windowObject?.['DEV_MODE'] !== true) return false;
   return (
     (windowObject['__aiCanvasDebug'] = {
       ...(windowObject['__aiCanvasDebug'] || {}),
       canvasCommands: canvasCommands,
       canvasAgent: canvasAgent,
     }),
-    !![]
+    true
   );
 }

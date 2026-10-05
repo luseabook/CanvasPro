@@ -26,8 +26,8 @@ export function createPromptPresetTriggerController({
   }
   panel['classList']?.['add']('has-prompt-preset-trigger');
   const onOpenChange = (value) => {
-      const item = value === !![],
-        key = panel['classList']?.['contains']?.('is-prompt-expanded') === !![];
+      const item = value === true,
+        key = panel['classList']?.['contains']?.('is-prompt-expanded') === true;
       (anchorEl?.['setAttribute']('aria-expanded', String(item)),
         anchorEl?.['classList']?.['toggle']?.('is-open', item),
         panel['classList']?.['toggle']?.('has-prompt-preset-drawer', item && key));
@@ -37,7 +37,7 @@ export function createPromptPresetTriggerController({
       ((anchorEl['title'] = t2), anchorEl['setAttribute']('aria-label', t2));
       const isPromptPresetNodeTypeSupported2 = isPromptPresetNodeTypeSupported(getNodeType?.());
       anchorEl['hidden'] = !isPromptPresetNodeTypeSupported2;
-      if (!isPromptPresetNodeTypeSupported2) onOpenChange(![]);
+      if (!isPromptPresetNodeTypeSupported2) onOpenChange(false);
     },
     index = (event) => {
       (event['preventDefault'](), event['stopPropagation']());
@@ -51,7 +51,7 @@ export function createPromptPresetTriggerController({
       const promptEl = getPromptEl?.(),
         nodeType = getNodeType?.();
       if (!promptEl || !isPromptPresetNodeTypeSupported(nodeType)) return;
-      const placement = panel['classList']?.['contains']?.('is-prompt-expanded') === !![];
+      const placement = panel['classList']?.['contains']?.('is-prompt-expanded') === true;
       (openMenu({
         promptEl: promptEl,
         nodeType: nodeType,
@@ -62,7 +62,7 @@ export function createPromptPresetTriggerController({
         containerEl: placement ? panel : null,
         onOpenChange: onOpenChange,
       }),
-        promptEl['focus']?.({ preventScroll: !![] }));
+        promptEl['focus']?.({ preventScroll: true }));
     };
   (anchorEl['addEventListener']('pointerdown', index),
     anchorEl['addEventListener']('mousedown', index),

@@ -136,11 +136,11 @@ function isToolbarCancelledError(error2) {
 }
 function createLocalSaveFailureError() {
   const error3 = new Error(IMAGE_LOCAL_SAVE_FAILURE_MESSAGE);
-  return ((error3['isLocalSaveFailure'] = !![]), error3);
+  return ((error3['isLocalSaveFailure'] = true), error3);
 }
 function isLocalSaveFailure(error4) {
   return (
-    error4?.['isLocalSaveFailure'] === !![] ||
+    error4?.['isLocalSaveFailure'] === true ||
     String(error4?.['message'] || error4 || '') === IMAGE_LOCAL_SAVE_FAILURE_MESSAGE
   );
 }

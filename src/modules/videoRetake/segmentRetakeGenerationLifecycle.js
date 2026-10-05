@@ -20,26 +20,26 @@ export function createSegmentRetakeGenerationLifecycle(
 ) {
   const ok = validateSegmentRetakeSubmitNode(nodeData),
     index = nodeData?.['segmentRetake']?.['phase'] || '';
-  let enabled = ![],
-    result = ![];
+  let enabled = false,
+    result = false;
   return {
     ok: ok['ok'],
-    isSegmentRetake: ok['isSegmentRetake'] === !![],
+    isSegmentRetake: ok['isSegmentRetake'] === true,
     reject() {
-      if (ok['ok']) return ![];
+      if (ok['ok']) return false;
       return (
         globalThis['window']?.['showToast']?.(
           t('segmentRetake.errors.' + getSegmentRetakeSubmitErrorKey(ok['reason'])),
           'warn',
         ),
-        !![]
+        true
       );
     },
     begin() {
-      if (!ok['isSegmentRetake']) return ![];
-      ((key['_segmentRetakePreparing'] = !![]),
-        (key['_isGenerating'] = !![]),
-        key['_setGenerateButtonBusyUi']({ cancellable: ![] }),
+      if (!ok['isSegmentRetake']) return false;
+      ((key['_segmentRetakePreparing'] = true),
+        (key['_isGenerating'] = true),
+        key['_setGenerateButtonBusyUi']({ cancellable: false }),
         key['btnEl']?.['setAttribute']?.('aria-busy', 'true'));
       const args = buildSegmentRetakePhasePatch(nodeData, SEGMENT_RETAKE_PHASE_SUBMITTED);
       return (
@@ -47,33 +47,33 @@ export function createSegmentRetakeGenerationLifecycle(
           (store['updateNodeData'](key['nodeId'], args),
           (key['_data'] = { ...(key['_data'] || {}), ...args })),
         startLoading(key['previewEl']),
-        (enabled = !![]),
-        !![]
+        (enabled = true),
+        true
       );
     },
     hasStartedPresentation() {
       return enabled;
     },
     markTaskStarted() {
-      ((result = !![]),
-        (key['_segmentRetakePreparing'] = ![]),
+      ((result = true),
+        (key['_segmentRetakePreparing'] = false),
         key['btnEl']?.['removeAttribute']?.('aria-busy'));
     },
     restoreBeforeTaskStart() {
-      if (!enabled || result) return ![];
-      ((key['_segmentRetakePreparing'] = ![]), key['btnEl']?.['removeAttribute']?.('aria-busy'));
+      if (!enabled || result) return false;
+      ((key['_segmentRetakePreparing'] = false), key['btnEl']?.['removeAttribute']?.('aria-busy'));
       const data = store['getState']()['nodes']?.[key['nodeId']] || key['_data'] || {},
         args2 = buildSegmentRetakePhasePatch(data, index);
       return (
         args2 &&
           (store['updateNodeData'](key['nodeId'], args2),
           (key['_data'] = { ...(key['_data'] || {}), ...args2 })),
-        (key['_isGenerating'] = ![]),
-        key['_resetGenerateButtonIdleUi']({ cancellable: ![] }),
+        (key['_isGenerating'] = false),
+        key['_resetGenerateButtonIdleUi']({ cancellable: false }),
         stopLoading(key['previewEl']),
         key['_updateSubmitButtonState']?.(),
         index === 'editing' && globalThis['window']?.['v2Renderer']?.['flushNode']?.(key['nodeId']),
-        !![]
+        true
       );
     },
   };

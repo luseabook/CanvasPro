@@ -820,14 +820,14 @@ function disconnectLongAnimationFrameObserver(value86, value87) {
   value86?.['__perfProbeLongAnimationFrameObserver']?.['disconnect']?.();
   value86 &&
     ((value86['__perfProbeLongAnimationFrameObserver'] = null),
-    (value86['__perfProbeLongAnimationFrameObserverInstalled'] = ![]),
-    (value86['__perfProbeLongAnimationFrameObserverAttempted'] = ![]));
-  if (value87) value87['longAnimationFrameObserverActive'] = ![];
+    (value86['__perfProbeLongAnimationFrameObserverInstalled'] = false),
+    (value86['__perfProbeLongAnimationFrameObserverAttempted'] = false));
+  if (value87) value87['longAnimationFrameObserverActive'] = false;
 }
 
 function detectLongAnimationFrameSupport(value88) {
   const value89 = value88?.['PerformanceObserver'] || globalThis['PerformanceObserver'];
-  if (typeof value89 !== 'function') return ![];
+  if (typeof value89 !== 'function') return false;
   const value90 = value89['supportedEntryTypes'];
   if (Array['isArray'](value90)) return value90['includes']('long-animation-frame');
   return null;
@@ -863,24 +863,24 @@ function syncLongAnimationFrameObserver(enabled8) {
       (enabled8['longAnimationFrameSupported'] = detectLongAnimationFrameSupport2);
     return;
   }
-  if (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] === !![]) {
-    ((enabled8['longAnimationFrameSupported'] = !![]), (enabled8['longAnimationFrameObserverActive'] = !![]));
+  if (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] === true) {
+    ((enabled8['longAnimationFrameSupported'] = true), (enabled8['longAnimationFrameObserverActive'] = true));
     return;
   }
-  if (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] === !![]) return;
+  if (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] === true) return;
   const run2 = globalWindow7['PerformanceObserver'] || globalThis['PerformanceObserver'];
   if (typeof run2 !== 'function') {
-    ((enabled8['longAnimationFrameSupported'] = ![]),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = !![]));
+    ((enabled8['longAnimationFrameSupported'] = false),
+      (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = true));
     return;
   }
   const enabled9 = run2['supportedEntryTypes'];
   if (Array['isArray'](enabled9) && !enabled9['includes']('long-animation-frame')) {
-    ((enabled8['longAnimationFrameSupported'] = ![]),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = !![]));
+    ((enabled8['longAnimationFrameSupported'] = false),
+      (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = true));
     return;
   }
-  globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = !![];
+  globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = true;
   try {
     const value92 = new run2((value93) => {
       const value94 = typeof value93?.['getEntries'] === 'function' ? value93['getEntries']() : [];
@@ -888,14 +888,14 @@ function syncLongAnimationFrameObserver(enabled8) {
     });
     (value92['observe']({ type: 'long-animation-frame' }),
       (globalWindow7['__perfProbeLongAnimationFrameObserver'] = value92),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] = !![]),
-      (enabled8['longAnimationFrameSupported'] = !![]),
-      (enabled8['longAnimationFrameObserverActive'] = !![]));
+      (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] = true),
+      (enabled8['longAnimationFrameSupported'] = true),
+      (enabled8['longAnimationFrameObserverActive'] = true));
   } catch {
     ((globalWindow7['__perfProbeLongAnimationFrameObserver'] = null),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] = ![]),
-      (enabled8['longAnimationFrameSupported'] = ![]),
-      (enabled8['longAnimationFrameObserverActive'] = ![]));
+      (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] = false),
+      (enabled8['longAnimationFrameSupported'] = false),
+      (enabled8['longAnimationFrameObserverActive'] = false));
   }
 }
 
@@ -952,7 +952,7 @@ export function recordRendererNodeLifecycleSample(options6 = {}) {
       renderNodeCount: toFiniteNumber(options6['renderNodeCount'], 0),
       mountCandidateCount: toFiniteNumber(options6['mountCandidateCount'], 0),
       parkCandidateCount: toFiniteNumber(options6['parkCandidateCount'], 0),
-      viewportBusy: options6['viewportBusy'] === !![],
+      viewportBusy: options6['viewportBusy'] === true,
       createdCount: toFiniteNumber5,
       createRuntimeMs: toFiniteNumber(options6['createRuntimeMs'], 0),
       createRuntimeMaxMs: toFiniteNumber(options6['createRuntimeMaxMs'], 0),

@@ -1,13 +1,13 @@
 import { SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED } from '../config/productFeatures.js';
 
-const createShortcut = (label, group, { hidden: hidden = ![], disabled: disabled = ![] } = {}) =>
+const createShortcut = (label, group, { hidden: hidden = false, disabled: disabled = false } = {}) =>
     Object['freeze']({
       label: label,
       keys: Object['freeze']([]),
       group: group,
-      contextMenuOnly: !![],
-      ...(hidden ? { hidden: !![] } : {}),
-      ...(disabled ? { disabled: !![] } : {}),
+      contextMenuOnly: true,
+      ...(hidden ? { hidden: true } : {}),
+      ...(disabled ? { disabled: true } : {}),
     }),
   CANVAS_GROUP = '右键菜单·画布',
   MATERIAL_GROUP = '右键菜单·素材与文件',

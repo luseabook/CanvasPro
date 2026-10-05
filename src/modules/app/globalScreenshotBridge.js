@@ -44,27 +44,27 @@ export function installGlobalScreenshotBridge({
           name: name('globalScreenshot.nodeName'),
           placement: 'viewport-center-sequence',
           sequenceKey: 'global-screenshot',
-          ...(target ? { returnNode: !![], isImportCurrent: isImportCurrent } : {}),
+          ...(target ? { returnNode: true, isImportCurrent: isImportCurrent } : {}),
         });
       if (!isImportCurrent()) return;
       if (target && sourceId?.['id']) {
         const run = async (next, current) => {
             if (!isImportCurrent()) throw new Error('canvas-changed');
             const error = await executeCanvasCommand?.(next, current);
-            if (error?.['ok'] !== !![])
+            if (error?.['ok'] !== true)
               throw new Error(error?.['message'] || error?.['errorCode'] || 'canvas-command-failed');
             return error['result'];
           },
           entry = await run('node.createConnected', {
             sourceId: sourceId['id'],
             type: 'ai-text',
-            inheritSource: ![],
+            inheritSource: false,
             name: name('globalScreenshot.reverseNodeName'),
           });
         nodeId = entry?.['nodeId'];
         if (!nodeId) throw new Error('node-id-missing');
         await run('node.setPrompt', { nodeId: nodeId, text: REVERSE_IMAGE_PROMPT_PRESET_PROMPT });
-        if (options2['runImmediately'] === !![]) {
+        if (options2['runImmediately'] === true) {
           const waitForGlobalCaptureNodeMounted2 = await waitForGlobalCaptureNodeMounted({
             nodeId: nodeId,
             isNodeMounted: isNodeMounted,
@@ -77,7 +77,7 @@ export function installGlobalScreenshotBridge({
         if (isImportCurrent())
           showToast?.(
             name(
-              options2['runImmediately'] === !![]
+              options2['runImmediately'] === true
                 ? 'globalScreenshot.reverseStarted'
                 : 'globalScreenshot.reverseCreated',
             ),
@@ -98,7 +98,7 @@ export function installGlobalScreenshotBridge({
     }
   }),
     screenshotApi['onGlobalShortcutStatus']?.((accelerator = {}) => {
-      if (accelerator?.['registered'] === ![] && accelerator?.['reason'] === 'registration-failed') {
+      if (accelerator?.['registered'] === false && accelerator?.['reason'] === 'registration-failed') {
         showToast?.(
           name('globalScreenshot.shortcutRegistrationFailed', {
             accelerator: accelerator?.['accelerator'] || 'Alt+Q',
@@ -107,8 +107,8 @@ export function installGlobalScreenshotBridge({
         );
         return;
       }
-      accelerator?.['registered'] === !![] &&
-        accelerator?.['ok'] === ![] &&
+      accelerator?.['registered'] === true &&
+        accelerator?.['ok'] === false &&
         showToast?.(name('globalScreenshot.captureFailed'), 'error');
     }));
 }

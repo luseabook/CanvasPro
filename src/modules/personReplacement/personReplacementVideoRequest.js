@@ -51,8 +51,8 @@ export function buildPersonReplacementVideoRequest({
       generationParams: generationParams,
     });
   payloadPatch['maskVideoUrl'] &&
-    generationParams['rhSubtractSubject'] === !![] &&
-    ((generationParams['rhSubtractSubject'] = ![]), (payloadPatch['subtractSubject'] = ![]));
+    generationParams['rhSubtractSubject'] === true &&
+    ((generationParams['rhSubtractSubject'] = false), (payloadPatch['subtractSubject'] = false));
   payloadPatch['rhBerniniFunction'] &&
     (generationParams['rhBerniniFunction'] = payloadPatch['rhBerniniFunction']);
   const index = {

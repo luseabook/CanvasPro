@@ -61,13 +61,13 @@ export function renderAIGenImageModelSelectorMarkup({
   generationParams: generationParams = {},
   providerProfileId: providerProfileId = '',
   providerProfileIdByModel: providerProfileIdByModel = {},
-  showSchemaControls: showSchemaControls = ![],
-  excludeRunningHubWorkflowModels: excludeRunningHubWorkflowModels = ![],
+  showSchemaControls: showSchemaControls = false,
+  excludeRunningHubWorkflowModels: excludeRunningHubWorkflowModels = false,
   runningHubWorkflowModelIds: runningHubWorkflowModelIds = null,
   allowedWorkflowModelIds: allowedWorkflowModelIds = null,
   modelMenuGroups: modelMenuGroups = null,
   excludeFieldIds: excludeFieldIds = [],
-  showCaret: showCaret = ![],
+  showCaret: showCaret = false,
 } = {}) {
   const model = String(modelId || '')['trim'](),
     index = {
@@ -139,7 +139,7 @@ export function bindAIGenImageModelSelector(
     generationParamsByModel: generationParamsByModel = {},
     providerProfileId: providerProfileId = '',
     providerProfileIdByModel: providerProfileIdByModel = {},
-    showSchemaControls: showSchemaControls = ![],
+    showSchemaControls: showSchemaControls = false,
     onChange: onChange,
     documentObject: documentObject = globalThis['document'],
     windowObject: windowObject = globalThis['window'],
@@ -332,7 +332,7 @@ export function bindAIGenImageModelSelector(
     el9 = selector['querySelector']('.rh-adv-panel'),
     value3 = (event4) => {
       (event4['stopPropagation'](), handler());
-      const value4 = el9?.['classList']['toggle']('show') === !![];
+      const value4 = el9?.['classList']['toggle']('show') === true;
       (el8?.['setAttribute']('aria-expanded', String(value4)), floatingModelMenuPortal['close']());
     },
     value5 = (preserveAdvPanel) => {
@@ -340,7 +340,7 @@ export function bindAIGenImageModelSelector(
         closeNodeFooterMenus(selector, null, {
           preserveAdvPanel: preserveAdvPanel?.['detail']?.['fieldEl'] || null,
         }),
-        el8?.['setAttribute']('aria-expanded', String(el9?.['classList']['contains']('show') === !![])));
+        el8?.['setAttribute']('aria-expanded', String(el9?.['classList']['contains']('show') === true)));
     };
   return (
     el8?.['addEventListener']('click', value3),
@@ -367,7 +367,7 @@ export function bindAIGenImageModelSelector(
             documentObject: documentObject,
             getProviderProfileId: () => String(nodeData['providerProfileId'] || '')['trim'](),
           }),
-          !![]
+          true
         );
       },
       destroy() {

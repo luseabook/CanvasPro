@@ -110,7 +110,7 @@ function removeConfiguredToolbarActions(el2, result = []) {
     if (options) el3['remove']();
   });
 }
-function attachUiStop(el4, { wheel: wheel = ![] } = {}) {
+function attachUiStop(el4, { wheel: wheel = false } = {}) {
   if (!el4) return;
   ((el4['dataset']['uiStop'] = '1'),
     el4['addEventListener']('pointerdown', (event) => event['stopPropagation']()),
@@ -120,7 +120,7 @@ function attachUiStop(el4, { wheel: wheel = ![] } = {}) {
         (event2) => {
           event2['stopPropagation']();
         },
-        { passive: ![] },
+        { passive: false },
       ));
 }
 function getShortcutLabel(source) {
@@ -157,7 +157,7 @@ function cameraTimelineSampleToDraft(fov) {
     quaternion: { x: x2['x'], y: x2['y'], z: x2['z'], w: x2['w'] },
     rotation: { x: x3['x'], y: x3['y'], z: x3['z'] },
     fov: fov['fov'],
-    disableSmoothing: !![],
+    disableSmoothing: true,
   };
 }
 function normalizeCameraSlot(handle) {
@@ -210,7 +210,7 @@ function quaternionToRotation(value7) {
   return { x: x4['x'], y: x4['y'], z: x4['z'] };
 }
 function areSceneViewsEquivalent(event3, event4, value9 = 0.00001) {
-  if (!event3 || !event4) return ![];
+  if (!event3 || !event4) return false;
   return (
     Math['abs'](
       (Number(event3?.['target']?.['x']) || 0) - (Number(event4?.['target']?.['x']) || 0),
@@ -367,9 +367,9 @@ export class PanoramaSceneNode {
       (this['_unsubscribeViewport'] = null),
       (this['_unsubscribeSelection'] = null),
       (this['_unsubscribePanoramaIncomingSync'] = null),
-      (this['_isSelected'] = ![]),
-      (this['_isNodeHovered'] = ![]),
-      (this['_isUnmounted'] = ![]),
+      (this['_isSelected'] = false),
+      (this['_isNodeHovered'] = false),
+      (this['_isUnmounted'] = false),
       (this['_contextMenuTarget'] = null),
       (this['_cameraJumpRaf'] = 0),
       (this['_cameraJumpToken'] = 0),
@@ -379,8 +379,8 @@ export class PanoramaSceneNode {
       (this['_timelinePlaybackStartedAt'] = 0),
       (this['_timelinePlaybackStartTime'] = 0),
       (this['_timelinePreviewTime'] = 0),
-      (this['_isTimelinePlaying'] = ![]),
-      (this['_hasRequestedCharacterPreload'] = ![]),
+      (this['_isTimelinePlaying'] = false),
+      (this['_hasRequestedCharacterPreload'] = false),
       (this['_defaultSceneFocalLength'] = SCENE_DEFAULT_FOCAL_LENGTH_MM),
       (this['_browserFullscreenOverlayEl'] = null),
       (this['_browserFullscreenAnchorEl'] = null),
@@ -406,7 +406,7 @@ export class PanoramaSceneNode {
       (this['_handleWindowBlur'] = this['_handleWindowBlur']['bind'](this)));
   }
   ['mount']() {
-    ((this['_isUnmounted'] = ![]),
+    ((this['_isUnmounted'] = false),
       Object['assign'](this['el']['style'], {
         display: 'flex',
         flexDirection: 'column',
@@ -504,7 +504,7 @@ export class PanoramaSceneNode {
             this['_closeMenus']());
         },
       })),
-      attachUiStop(this['_assetBrowserEl'], { wheel: !![] }),
+      attachUiStop(this['_assetBrowserEl'], { wheel: true }),
       this['_assetBrowserEl']['addEventListener']('mouseenter', () => this['_openMenu']('assets')),
       this['_assetBrowserEl']['addEventListener']('mouseleave', () => this['_scheduleMenuHide']('assets')));
     const run = () =>
@@ -546,7 +546,7 @@ export class PanoramaSceneNode {
           this['_bridge']?.['clearDraftMannequinBonePose']?.(mannequinId3));
       },
     })),
-      attachUiStop(this['_posePanelEl'], { wheel: !![] }),
+      attachUiStop(this['_posePanelEl'], { wheel: true }),
       this['_posePanelEl']['addEventListener']('mouseenter', () => this['_openMenu']('pose')),
       this['_posePanelEl']['addEventListener']('mouseleave', () => this['_scheduleMenuHide']('pose')),
       (this['_timelinePanelEl'] = createCameraTimelinePanel({
@@ -570,9 +570,9 @@ export class PanoramaSceneNode {
           updatePanoramaSceneCameraTimeline({ nodeId: this['id'], patch: patch });
         },
       })),
-      attachUiStop(this['_timelinePanelEl'], { wheel: !![] }),
+      attachUiStop(this['_timelinePanelEl'], { wheel: true }),
       (this['_gridPanelEl'] = this['_createGridPanel']()),
-      attachUiStop(this['_gridPanelEl'], { wheel: !![] }),
+      attachUiStop(this['_gridPanelEl'], { wheel: true }),
       this['_gridPanelEl']['addEventListener']('mouseenter', () => this['_openMenu']('grid')),
       this['_gridPanelEl']['addEventListener']('mouseleave', () => this['_scheduleMenuHide']('grid')),
       (this['_captureMenuEl'] = this['_createCaptureMenu']()),
@@ -581,7 +581,7 @@ export class PanoramaSceneNode {
       this['_captureMenuEl']['addEventListener']('mouseleave', () => this['_scheduleMenuHide']('capture')),
       this['_captureMenuEl']['addEventListener']('click', this['_handleCaptureMenuClick']),
       (this['_focusMenuEl'] = this['_createFocusMenu']()),
-      attachUiStop(this['_focusMenuEl'], { wheel: !![] }),
+      attachUiStop(this['_focusMenuEl'], { wheel: true }),
       this['_focusMenuEl']['addEventListener']('mouseenter', () => this['_openMenu']('focus')),
       this['_focusMenuEl']['addEventListener']('mouseleave', () => this['_scheduleMenuHide']('focus')),
       (this['_statusEl'] = document['createElement']('div')),
@@ -603,7 +603,7 @@ export class PanoramaSceneNode {
       attachUiStop(this['_hintEl']),
       (this['_contextMenuEl'] = document['createElement']('div')),
       (this['_contextMenuEl']['className'] = 'panorama-scene-object-menu'),
-      (this['_contextMenuEl']['hidden'] = !![]));
+      (this['_contextMenuEl']['hidden'] = true));
     const el5 = document['createElement']('button');
     ((el5['type'] = 'button'),
       (el5['className'] = 'panorama-scene-object-menu__item act-delete-selected'));
@@ -635,7 +635,7 @@ export class PanoramaSceneNode {
       }),
       (this['_captureSafeFrameEl'] = document['createElement']('div')),
       (this['_captureSafeFrameEl']['className'] = 'panorama-scene-capture-safe-frame'),
-      (this['_captureSafeFrameEl']['hidden'] = !![]),
+      (this['_captureSafeFrameEl']['hidden'] = true),
       (this['_captureSafeFrameLabelEl'] = document['createElement']('div')),
       (this['_captureSafeFrameLabelEl']['className'] = 'panorama-scene-capture-safe-frame__label'),
       this['_captureSafeFrameEl']['appendChild'](this['_captureSafeFrameLabelEl']),
@@ -661,7 +661,7 @@ export class PanoramaSceneNode {
       this['el']['appendChild'](this['_editToolbarEl']),
       (this['_browserFullscreenAnchorEl'] = document['createElement']('div')),
       (this['_browserFullscreenAnchorEl']['className'] = 'panorama-scene-browser-fullscreen-anchor'),
-      (this['_browserFullscreenAnchorEl']['hidden'] = !![]),
+      (this['_browserFullscreenAnchorEl']['hidden'] = true),
       this['el']['appendChild'](this['_browserFullscreenAnchorEl']),
       this['el']['appendChild'](this['_shellEl']),
       this['el']['addEventListener']('pointerenter', this['_handleNodePointerEnter']),
@@ -740,12 +740,12 @@ export class PanoramaSceneNode {
           return list5['includes'](this['id']);
         },
         (value37) => {
-          const value38 = this['_isSelected'] === !![],
-            enabled2 = value37 === !![];
+          const value38 = this['_isSelected'] === true,
+            enabled2 = value37 === true;
           ((this['_isSelected'] = enabled2),
             value38 &&
               !enabled2 &&
-              this['_sceneState']?.['ui']?.['isEditing'] === !![] &&
+              this['_sceneState']?.['ui']?.['isEditing'] === true &&
               this['_exitEditing'](),
             this['_syncAttachedUiVisibility'](this['_shouldShowBottomToolbar']()));
         },
@@ -767,9 +767,9 @@ export class PanoramaSceneNode {
           },
         )),
       window['addEventListener']('resize', this['_handleWindowResize']),
-      window['addEventListener']('pointerdown', this['_handleGlobalPointerDown'], !![]),
-      window['addEventListener']('keydown', this['_handleWindowKeyDown'], !![]),
-      window['addEventListener']('keyup', this['_handleWindowKeyUp'], !![]),
+      window['addEventListener']('pointerdown', this['_handleGlobalPointerDown'], true),
+      window['addEventListener']('keydown', this['_handleWindowKeyDown'], true),
+      window['addEventListener']('keyup', this['_handleWindowKeyUp'], true),
       window['addEventListener']('blur', this['_handleWindowBlur']),
       window['addEventListener']('shortcuts-updated', this['_handleShortcutsUpdated']),
       window['addEventListener']('panorama-scene:camera-shortcut', this['_handleCameraShortcutEvent']),
@@ -794,7 +794,7 @@ export class PanoramaSceneNode {
       args4 = list6['find']((value42) => value42['slot'] === cameraSlot);
     return args4 ? { ...args4 } : null;
   }
-  ['_cancelCameraJumpAnimation']({ clearDraft: clearDraft = !![] } = {}) {
+  ['_cancelCameraJumpAnimation']({ clearDraft: clearDraft = true } = {}) {
     ((this['_cameraJumpToken'] += 1),
       this['_cameraJumpRaf'] &&
         (cancelAnimationFrame(this['_cameraJumpRaf']), (this['_cameraJumpRaf'] = 0)),
@@ -852,10 +852,10 @@ export class PanoramaSceneNode {
   ['_maybePreloadCharacterModels'](value50 = null) {
     if (this['_isPanorama360']) return;
     if (this['_hasRequestedCharacterPreload']) return;
-    const enabled5 = this['_sceneState']?.['ui']?.['isEditing'] === !![],
-      value51 = value50?.['ui']?.['isEditing'] === !![];
+    const enabled5 = this['_sceneState']?.['ui']?.['isEditing'] === true,
+      value51 = value50?.['ui']?.['isEditing'] === true;
     if (!enabled5 || value51) return;
-    ((this['_hasRequestedCharacterPreload'] = !![]),
+    ((this['_hasRequestedCharacterPreload'] = true),
       void preloadPanoramaCharacterModels()['catch'](() => {}));
   }
   ['_commitCameraJumpTarget']({
@@ -921,7 +921,7 @@ export class PanoramaSceneNode {
         ? Number(rotation['focalLength'])
         : SCENE_DEFAULT_FOCAL_LENGTH_MM,
       fov2 = focalLengthToFov(targetFocalLength2);
-    ((targetPose2['fov'] = fov2), this['_cancelCameraJumpAnimation']({ clearDraft: ![] }));
+    ((targetPose2['fov'] = fov2), this['_cancelCameraJumpAnimation']({ clearDraft: false }));
     const rotation2 = this['_bridge']?.['readCurrentViewPose']?.();
     if (!rotation2?.['position']) {
       this['_commitCameraJumpTarget']({
@@ -965,7 +965,7 @@ export class PanoramaSceneNode {
           quaternion: { x: x7['x'], y: x7['y'], z: x7['z'], w: x7['w'] },
           rotation: quaternionToRotation(x7),
           fov: fov3,
-          disableSmoothing: !![],
+          disableSmoothing: true,
         });
       };
     handler5(0);
@@ -995,8 +995,8 @@ export class PanoramaSceneNode {
     if (!viewPose) return;
     upsertPanoramaSceneCameraAtSlot({ nodeId: this['id'], slot: slot3, viewPose: viewPose });
   }
-  ['_previewCameraTimelineAt'](value63, { fromPlayback: fromPlayback = ![] } = {}) {
-    if (!fromPlayback) this['_stopCameraTimelinePlayback']({ clearDraft: ![] });
+  ['_previewCameraTimelineAt'](value63, { fromPlayback: fromPlayback = false } = {}) {
+    if (!fromPlayback) this['_stopCameraTimelinePlayback']({ clearDraft: false });
     const cameraTimeline = normalizeCameraTimeline(this['_sceneState']?.['cameraTimeline']),
       sampleCameraTimeline2 = sampleCameraTimeline(cameraTimeline, value63);
     if (!sampleCameraTimeline2) return;
@@ -1006,24 +1006,24 @@ export class PanoramaSceneNode {
       this['_bridge']?.['setDraftView']?.(draft),
       setCameraTimelineDisplayTime(this['_timelinePanelEl'], sampleCameraTimeline2['time']));
   }
-  ['_stopCameraTimelinePlayback']({ clearDraft: clearDraft = ![] } = {}) {
+  ['_stopCameraTimelinePlayback']({ clearDraft: clearDraft = false } = {}) {
     this['_timelinePlaybackRaf'] &&
       (cancelAnimationFrame(this['_timelinePlaybackRaf']), (this['_timelinePlaybackRaf'] = 0));
-    this['_isTimelinePlaying'] = ![];
+    this['_isTimelinePlaying'] = false;
     if (clearDraft) this['_bridge']?.['clearDraftView']?.();
     renderCameraTimelinePanel(this['_timelinePanelEl'], this['_sceneState']?.['cameraTimeline'], {
       currentTime: this['_timelinePreviewTime'],
-      isPlaying: ![],
+      isPlaying: false,
     });
   }
   ['_toggleCameraTimelinePlayback']() {
     if (this['_isTimelinePlaying']) {
-      this['_stopCameraTimelinePlayback']({ clearDraft: ![] });
+      this['_stopCameraTimelinePlayback']({ clearDraft: false });
       return;
     }
     const cameraTimeline2 = normalizeCameraTimeline(this['_sceneState']?.['cameraTimeline']);
     if (cameraTimeline2['keyframes']['length'] < 2) return;
-    ((this['_isTimelinePlaying'] = !![]),
+    ((this['_isTimelinePlaying'] = true),
       (this['_timelinePlaybackStartTime'] =
         this['_timelinePreviewTime'] >= cameraTimeline2['duration']
           ? 0
@@ -1037,17 +1037,17 @@ export class PanoramaSceneNode {
       if (cameraTimeline3['loop'] && cameraTimeline3['duration'] > 0) value67 %= cameraTimeline3['duration'];
       else {
         if (value67 >= cameraTimeline3['duration']) {
-          (this['_previewCameraTimelineAt'](cameraTimeline3['duration'], { fromPlayback: !![] }),
-            this['_stopCameraTimelinePlayback']({ clearDraft: ![] }));
+          (this['_previewCameraTimelineAt'](cameraTimeline3['duration'], { fromPlayback: true }),
+            this['_stopCameraTimelinePlayback']({ clearDraft: false }));
           return;
         }
       }
-      (this['_previewCameraTimelineAt'](value67, { fromPlayback: !![] }),
+      (this['_previewCameraTimelineAt'](value67, { fromPlayback: true }),
         (this['_timelinePlaybackRaf'] = requestAnimationFrame(value64)));
     };
     (renderCameraTimelinePanel(this['_timelinePanelEl'], cameraTimeline2, {
       currentTime: this['_timelinePreviewTime'],
-      isPlaying: !![],
+      isPlaying: true,
     }),
       (this['_timelinePlaybackRaf'] = requestAnimationFrame(value64)));
   }
@@ -1076,7 +1076,7 @@ export class PanoramaSceneNode {
     const el10 = document['createElement']('div');
     return (
       (el10['className'] = 'panorama-capture-menu'),
-      (el10['hidden'] = !![]),
+      (el10['hidden'] = true),
       (el10['innerHTML'] =
         '\n      <div class="panorama-capture-menu__grid">\n        ' +
         PANORAMA_CAPTURE_MODE_OPTIONS['map']((event10) => {
@@ -1110,7 +1110,7 @@ export class PanoramaSceneNode {
   }
   ['_createFocusMenu']() {
     const el12 = document['createElement']('div');
-    ((el12['className'] = 'panorama-scene-focus-menu'), (el12['hidden'] = !![]));
+    ((el12['className'] = 'panorama-scene-focus-menu'), (el12['hidden'] = true));
     const el13 = document['createElement']('div');
     el13['className'] = 'panorama-scene-focus-menu__header';
     const el14 = document['createElement']('span');
@@ -1180,7 +1180,7 @@ export class PanoramaSceneNode {
         this['_isEditing']() &&
         this['_isNodeSelected']() &&
         value78 !== 'adaptive' &&
-        this['_sceneState']?.['capture']?.['showSafeFrame'] === !![];
+        this['_sceneState']?.['capture']?.['showSafeFrame'] === true;
     ((this['_captureSafeFrameEl']['hidden'] = !enabled7),
       this['_captureSafeFrameEl']['classList']['toggle']('is-visible', enabled7),
       this['_captureSafeFrameEl']['classList']['toggle']('is-adaptive', value78 === 'adaptive'));
@@ -1193,7 +1193,7 @@ export class PanoramaSceneNode {
       (this['_captureSafeFrameLabelEl']['textContent'] = getCaptureModeLabel(value78)));
   }
   async ['_captureViewportByCurrentMode']() {
-    const blob2 = await this['_bridge']?.['captureBlob']?.({ includeEditorOverlays: ![] });
+    const blob2 = await this['_bridge']?.['captureBlob']?.({ includeEditorOverlays: false });
     if (!blob2) return null;
     return cropCaptureBlobToFrame({
       blob: blob2,
@@ -1298,7 +1298,7 @@ export class PanoramaSceneNode {
           enabled10 = el18['querySelector']('[data-grid-field="' + value96 + '"]');
         if (!enabled10) return;
         let box11 = null,
-          enabled11 = ![];
+          enabled11 = false;
         const run4 = () => {
             const value98 = handler6(value96, this['_sceneState']?.['gridPlacement']?.[value96]);
             if (Number['isFinite'](value98)) return value98;
@@ -1309,7 +1309,7 @@ export class PanoramaSceneNode {
           value100 = (event13) => {
             if (!box11) return;
             const value101 = event13['clientX'] - box11['x'];
-            if (!box11['moved'] && Math['abs'](value101) >= 3) box11['moved'] = !![];
+            if (!box11['moved'] && Math['abs'](value101) >= 3) box11['moved'] = true;
             const value102 = Math['trunc'](value101 / 6),
               value103 = box11['v'] + value102 * value97['step'];
             if (value103 === box11['last']) return;
@@ -1321,7 +1321,7 @@ export class PanoramaSceneNode {
             (box11['el']['classList']['remove']('is-dragging'),
               document['removeEventListener']('mousemove', value100),
               document['removeEventListener']('mouseup', value104),
-              value105 && ((enabled11 = !![]), (this['_suppressDocClickOnce'] = !![])),
+              value105 && ((enabled11 = true), (this['_suppressDocClickOnce'] = true)),
               (box11 = null));
           },
           handler10 = (value106) => {
@@ -1354,16 +1354,16 @@ export class PanoramaSceneNode {
                 handler11(el21));
             };
             ((el20['onkeydown'] = (event14) => {
-              if (event14['key'] === 'Enter') run5(!![]);
-              if (event14['key'] === 'Escape') run5(![]);
+              if (event14['key'] === 'Enter') run5(true);
+              if (event14['key'] === 'Escape') run5(false);
             }),
-              (el20['onblur'] = () => run5(!![])));
+              (el20['onblur'] = () => run5(true)));
           },
           handler11 = (el22) => {
             ((el22['onclick'] = (event15) => {
               event15['stopPropagation']();
               if (enabled11) {
-                enabled11 = ![];
+                enabled11 = false;
                 return;
               }
               handler10(el22);
@@ -1382,12 +1382,12 @@ export class PanoramaSceneNode {
               }),
               (el22['onmousedown'] = (x8) => {
                 if (x8['button'] !== 0) return;
-                (x8['preventDefault'](), (enabled11 = ![]));
+                (x8['preventDefault'](), (enabled11 = false));
                 const v = run4();
                 ((box11 = {
                   x: x8['clientX'],
                   v: v,
-                  moved: ![],
+                  moved: false,
                   last: v,
                   el: el22,
                 }),
@@ -1423,7 +1423,7 @@ export class PanoramaSceneNode {
     );
   }
   ['_isNodeSelected']() {
-    return this['_isSelected'] === !![];
+    return this['_isSelected'] === true;
   }
   ['_handleWindowResize']() {
     (this['_positionMenus'](), this['_syncCaptureSafeFrame']());
@@ -1453,7 +1453,7 @@ export class PanoramaSceneNode {
       this['_positionMenus'](),
       this['_bridge']?.['resize']());
   }
-  async ['_exitBrowserFullscreen']({ skipSync: skipSync = ![] } = {}) {
+  async ['_exitBrowserFullscreen']({ skipSync: skipSync = false } = {}) {
     if (!this['_isBrowserFullscreen']()) return;
     const el27 = this['_browserFullscreenOverlayEl'];
     ((this['_browserFullscreenOverlayEl'] = null), (this['_browserFullscreenExitBtnEl'] = null));
@@ -1470,7 +1470,7 @@ export class PanoramaSceneNode {
       this['_bridge']?.['resize']());
   }
   ['_handleOwnedNavigationKeyDown'](event17, enabled12) {
-    if (!enabled12 || event17['ctrlKey'] || event17['metaKey'] || event17['altKey']) return ![];
+    if (!enabled12 || event17['ctrlKey'] || event17['metaKey'] || event17['altKey']) return false;
     if (!event17['repeat'] && (event17['key'] === 'f' || event17['key'] === 'F'))
       return (
         event17['preventDefault'](),
@@ -1486,11 +1486,11 @@ export class PanoramaSceneNode {
               nodeId: this['id'],
               frame: this['_bridge']?.['readSelectionFrame']?.(),
             }),
-        !![]
+        true
       );
     return (
       this['_sceneState']?.['ui']?.['navigationMode'] === 'fly' &&
-      this['_interaction']?.['handleFlightKeyDown']?.(event17) === !![]
+      this['_interaction']?.['handleFlightKeyDown']?.(event17) === true
     );
   }
   ['_handleWindowKeyDown'](event18) {
@@ -1503,7 +1503,7 @@ export class PanoramaSceneNode {
     }
     if (!this['_isEditing']()) return;
     if (
-      this['_contextMenuEl']?.['hidden'] === ![] &&
+      this['_contextMenuEl']?.['hidden'] === false &&
       resolveShortcutActionForEvent(event18, ['delete']) === 'delete'
     ) {
       (event18['preventDefault']?.(),
@@ -1535,7 +1535,7 @@ export class PanoramaSceneNode {
     this['_interaction']?.['handleFlightKeyUp']?.(value117) && value117['stopImmediatePropagation']?.();
   }
   ['_handleWindowBlur']() {
-    this['_interaction']?.['cancelFlightNavigation']?.({ commit: !![] });
+    this['_interaction']?.['cancelFlightNavigation']?.({ commit: true });
   }
   ['_syncAttachedUiVisibility'](enabled14) {
     this['_bottomToolbarAnchorEl'] && (this['_bottomToolbarAnchorEl']['hidden'] = !enabled14);
@@ -1543,23 +1543,23 @@ export class PanoramaSceneNode {
     this['_infoDockEl'] && (this['_infoDockEl']['hidden'] = !enabled15);
   }
   ['_handleNodePointerEnter']() {
-    ((this['_isNodeHovered'] = !![]), this['_syncAttachedUiVisibility'](this['_shouldShowBottomToolbar']()));
+    ((this['_isNodeHovered'] = true), this['_syncAttachedUiVisibility'](this['_shouldShowBottomToolbar']()));
   }
   ['_handleNodePointerLeave'](value118) {
     const value119 = value118['relatedTarget'];
     if (value119 && this['el']['contains'](value119)) return;
-    ((this['_isNodeHovered'] = ![]),
+    ((this['_isNodeHovered'] = false),
       this['_closeObjectContextMenu'](),
       this['_syncAttachedUiVisibility'](this['_shouldShowBottomToolbar']()));
   }
-  ['_selectNodeOnCanvas']({ preserveExistingSelection: preserveExistingSelection = ![] } = {}) {
+  ['_selectNodeOnCanvas']({ preserveExistingSelection: preserveExistingSelection = false } = {}) {
     const list7 = appStore['getStateRaw']()['selectedNodeIds'] || [];
     if (preserveExistingSelection && list7['includes'](this['id'])) return;
     if (list7['length'] === 1 && list7[0] === this['id']) return;
     appStore['setSelectedNodes']([this['id']]);
   }
   ['_isEditing']() {
-    return this['_sceneState']?.['ui']?.['isEditing'] === !![] && this['_data']?.['isCollapsed'] !== !![];
+    return this['_sceneState']?.['ui']?.['isEditing'] === true && this['_data']?.['isCollapsed'] !== true;
   }
   ['_shouldShowBottomToolbar']() {
     const value120 = this['_isNodeSelected']();
@@ -1589,13 +1589,13 @@ export class PanoramaSceneNode {
     );
   }
   ['_supportsPanoramaUpload']() {
-    return this['_isPanorama360'] === !![];
+    return this['_isPanorama360'] === true;
   }
   ['_supportsCubeCreation']() {
-    return this['_isPanorama360'] !== !![];
+    return this['_isPanorama360'] !== true;
   }
   ['_supportsCameraFeatures']() {
-    return this['_isPanorama360'] !== !![];
+    return this['_isPanorama360'] !== true;
   }
   ['_buildPanorama360IncomingImageSignature'](value122) {
     if (!this['_isPanorama360']) return '';
@@ -1658,14 +1658,14 @@ export class PanoramaSceneNode {
   }
   ['_enterEditing']() {
     (this['_selectNodeOnCanvas'](),
-      this['_data']?.['isCollapsed'] && setPanoramaSceneCollapsed({ nodeId: this['id'], isCollapsed: ![] }),
-      setPanoramaSceneEditing({ nodeId: this['id'], isEditing: !![] }),
+      this['_data']?.['isCollapsed'] && setPanoramaSceneCollapsed({ nodeId: this['id'], isCollapsed: false }),
+      setPanoramaSceneEditing({ nodeId: this['id'], isEditing: true }),
       requestAnimationFrame(() => this['_viewportEl']?.['focus']()));
   }
   ['_exitEditing']() {
     (this['_closeMenus'](),
-      this['_interaction']?.['cancelFlightNavigation']?.({ commit: !![] }),
-      setPanoramaSceneEditing({ nodeId: this['id'], isEditing: ![] }));
+      this['_interaction']?.['cancelFlightNavigation']?.({ commit: true }),
+      setPanoramaSceneEditing({ nodeId: this['id'], isEditing: false }));
   }
   async ['_handleFileInputChange'](event19) {
     if (!this['_supportsPanoramaUpload']()) {
@@ -1732,14 +1732,14 @@ export class PanoramaSceneNode {
     ((this['_contextMenuEl']['style']['left'] = value136 + 'px'),
       (this['_contextMenuEl']['style']['top'] = value137 + 'px'),
       (this['_contextMenuTarget'] = value133),
-      (this['_contextMenuEl']['hidden'] = ![]),
+      (this['_contextMenuEl']['hidden'] = false),
       this['_contextMenuEl']['classList']['add']('is-visible'));
   }
   ['_closeObjectContextMenu']() {
     if (!this['_contextMenuEl']) return;
     ((this['_contextMenuTarget'] = null),
       this['_contextMenuEl']['classList']['remove']('is-visible'),
-      (this['_contextMenuEl']['hidden'] = !![]));
+      (this['_contextMenuEl']['hidden'] = true));
   }
   ['_handleViewportDoubleClick'](event23) {
     (event23['preventDefault'](), event23['stopPropagation']());
@@ -1912,19 +1912,19 @@ export class PanoramaSceneNode {
       case 'snap-toggle':
         setPanoramaSceneInteractionOptions({
           nodeId: this['id'],
-          patch: { snapEnabled: navigationMode?.['ui']?.['snapEnabled'] !== !![] },
+          patch: { snapEnabled: navigationMode?.['ui']?.['snapEnabled'] !== true },
         });
         return;
       case 'ground-lock':
         setPanoramaSceneInteractionOptions({
           nodeId: this['id'],
-          patch: { groundLock: navigationMode?.['ui']?.['groundLock'] !== !![] },
+          patch: { groundLock: navigationMode?.['ui']?.['groundLock'] !== true },
         });
         return;
       case 'uniform-scale':
         setPanoramaSceneInteractionOptions({
           nodeId: this['id'],
-          patch: { uniformScale: navigationMode?.['ui']?.['uniformScale'] !== !![] },
+          patch: { uniformScale: navigationMode?.['ui']?.['uniformScale'] !== true },
         });
         return;
       case 'environment-toggle':
@@ -1935,7 +1935,7 @@ export class PanoramaSceneNode {
         return;
       case 'collapse-node':
         {
-          const enterEditingOnExpand = this['_data']?.['isCollapsed'] === !![];
+          const enterEditingOnExpand = this['_data']?.['isCollapsed'] === true;
           (setPanoramaSceneCollapsed({
             nodeId: this['id'],
             isCollapsed: !enterEditingOnExpand,
@@ -1973,9 +1973,9 @@ export class PanoramaSceneNode {
       case 'timeline':
         if (!this['_supportsCameraFeatures']()) return;
         {
-          const showTimeline = navigationMode?.['ui']?.['showTimeline'] !== !![];
+          const showTimeline = navigationMode?.['ui']?.['showTimeline'] !== true;
           (setPanoramaSceneInteractionOptions({ nodeId: this['id'], patch: { showTimeline: showTimeline } }),
-            !showTimeline && this['_stopCameraTimelinePlayback']({ clearDraft: !![] }));
+            !showTimeline && this['_stopCameraTimelinePlayback']({ clearDraft: true }));
         }
         return;
       case 'focus':
@@ -2236,14 +2236,14 @@ export class PanoramaSceneNode {
     }
     const el50 = this['_editToolbarEl']['querySelector']('.act-snap-toggle');
     el50 &&
-      el50['classList']['toggle']('active', this['_sceneState']?.['ui']?.['snapEnabled'] === !![]);
+      el50['classList']['toggle']('active', this['_sceneState']?.['ui']?.['snapEnabled'] === true);
     const el51 = this['_editToolbarEl']['querySelector']('.act-ground-lock');
     el51 &&
-      (el51['classList']['toggle']('active', this['_sceneState']?.['ui']?.['groundLock'] === !![]),
+      (el51['classList']['toggle']('active', this['_sceneState']?.['ui']?.['groundLock'] === true),
       (el51['hidden'] = value158 !== 'move'));
     const el52 = this['_editToolbarEl']['querySelector']('.act-uniform-scale');
     el52 &&
-      (el52['classList']['toggle']('active', this['_sceneState']?.['ui']?.['uniformScale'] === !![]),
+      (el52['classList']['toggle']('active', this['_sceneState']?.['ui']?.['uniformScale'] === true),
       (el52['hidden'] = value158 !== 'scale'));
     const el53 = this['_cornerToolbarEl']['querySelector']('.act-environment-toggle');
     if (el53) {
@@ -2253,7 +2253,7 @@ export class PanoramaSceneNode {
           : panoramaSceneText('toolbar.switchToDay');
       ((el53['dataset']['tooltip'] = value167),
         el53['setAttribute']('aria-label', value167),
-        (el53['hidden'] = ![]),
+        (el53['hidden'] = false),
         el53['setAttribute']('aria-hidden', 'false'));
     }
     const el54 = this['_sceneToolbarEl']['querySelector']('.act-upload-panorama');
@@ -2321,7 +2321,7 @@ export class PanoramaSceneNode {
       const enabled32 = this['_supportsCameraFeatures']();
       ((el61['hidden'] = !enabled32),
         (el61['disabled'] = !enabled32),
-        el61['classList']['toggle']('active', this['_sceneState']?.['ui']?.['showTimeline'] === !![]));
+        el61['classList']['toggle']('active', this['_sceneState']?.['ui']?.['showTimeline'] === true));
     }
     const el62 = this['_bottomToolbarEl']['querySelector']('.act-focus');
     if (el62) {
@@ -2354,7 +2354,7 @@ export class PanoramaSceneNode {
       this['_editToolbarEl']?.['querySelector']('.act-collapse-node'),
     ]['filter'](Boolean);
     list14['forEach']((el65) => {
-      const value169 = this['_data']?.['isCollapsed'] === !![],
+      const value169 = this['_data']?.['isCollapsed'] === true,
         value170 = value169 ? panoramaSceneText('toolbar.expand') : panoramaSceneText('toolbar.collapse');
       ((el65['dataset']['tooltip'] = value170),
         el65['setAttribute']('aria-label', value170),
@@ -2461,7 +2461,7 @@ export class PanoramaSceneNode {
   }
   ['_syncOverlayState']() {
     const enabled36 = this['_isEditing'](),
-      enabled37 = this['_data']?.['isCollapsed'] === !![],
+      enabled37 = this['_data']?.['isCollapsed'] === true,
       value175 = this['_isNodeSelected'](),
       enabled38 = !enabled36,
       enabled39 = enabled36 && !enabled37 && value175,
@@ -2506,7 +2506,7 @@ export class PanoramaSceneNode {
       enabled49 =
         enabled39 &&
         this['_supportsCameraFeatures']() &&
-        this['_sceneState']?.['ui']?.['showTimeline'] === !![];
+        this['_sceneState']?.['ui']?.['showTimeline'] === true;
     (this['el']['classList']['toggle']('has-camera-timeline', enabled49),
       this['_captureMenuEl']['classList']['toggle']('is-visible', enabled44),
       this['_cameraListEl']['classList']['toggle']('is-visible', enabled42),
@@ -2524,10 +2524,10 @@ export class PanoramaSceneNode {
       (this['_assetBrowserEl']['hidden'] = !enabled47),
       (this['_posePanelEl']['hidden'] = !enabled48),
       (this['_timelinePanelEl']['hidden'] = !enabled49));
-    !enabled49 && this['_isTimelinePlaying'] && this['_stopCameraTimelinePlayback']({ clearDraft: !![] });
+    !enabled49 && this['_isTimelinePlaying'] && this['_stopCameraTimelinePlayback']({ clearDraft: true });
     enabled43 && this['_focusMenuEl']?.['_syncValue']?.();
-    (this['_statusEl']['classList']['toggle']('is-visible', !![]),
-      this['_hintEl']['classList']['toggle']('is-visible', !![]),
+    (this['_statusEl']['classList']['toggle']('is-visible', true),
+      this['_hintEl']['classList']['toggle']('is-visible', true),
       this['_syncAttachedUiVisibility'](enabled40),
       this['_syncCaptureSafeFrame']());
     const el67 = this['_bottomToolbarEl']?.['querySelector']('.act-focus');
@@ -2574,7 +2574,7 @@ export class PanoramaSceneNode {
       this['_maybeReleasePendingCameraJumpDraft']());
   }
   ['unmount']() {
-    ((this['_isUnmounted'] = !![]),
+    ((this['_isUnmounted'] = true),
       clearTimeout(this['_menuHideTimer']),
       this['_fileInput']?.['removeEventListener']('change', this['_handleFileInputChange']),
       this['_viewportEl']?.['removeEventListener']('pointerdown', this['_handleViewportPointerDown']),
@@ -2604,21 +2604,21 @@ export class PanoramaSceneNode {
       this['_unsubscribeLocale']?.(),
       (this['_unsubscribeLocale'] = null),
       window['removeEventListener']('resize', this['_handleWindowResize']),
-      window['removeEventListener']('pointerdown', this['_handleGlobalPointerDown'], !![]),
-      window['removeEventListener']('keydown', this['_handleWindowKeyDown'], !![]),
-      window['removeEventListener']('keyup', this['_handleWindowKeyUp'], !![]),
+      window['removeEventListener']('pointerdown', this['_handleGlobalPointerDown'], true),
+      window['removeEventListener']('keydown', this['_handleWindowKeyDown'], true),
+      window['removeEventListener']('keyup', this['_handleWindowKeyUp'], true),
       window['removeEventListener']('blur', this['_handleWindowBlur']),
       window['removeEventListener']('shortcuts-updated', this['_handleShortcutsUpdated']),
       window['removeEventListener']('panorama-scene:camera-shortcut', this['_handleCameraShortcutEvent']),
       window['removeEventListener']('panorama-scene:capture-shortcut', this['_handleCaptureShortcutEvent']),
-      void this['_exitBrowserFullscreen']({ skipSync: !![] }),
+      void this['_exitBrowserFullscreen']({ skipSync: true }),
       this['_cameraJumpRaf'] &&
         (cancelAnimationFrame(this['_cameraJumpRaf']), (this['_cameraJumpRaf'] = 0)),
       this['_pendingCameraJumpReleaseRaf'] &&
         (cancelAnimationFrame(this['_pendingCameraJumpReleaseRaf']),
         (this['_pendingCameraJumpReleaseRaf'] = 0)),
       (this['_pendingCameraJumpCommit'] = null),
-      this['_stopCameraTimelinePlayback']({ clearDraft: !![] }),
+      this['_stopCameraTimelinePlayback']({ clearDraft: true }),
       this['_resizeObserver']?.['disconnect'](),
       this['_interaction']?.['detach']?.(),
       this['_bridge']?.['dispose']?.());

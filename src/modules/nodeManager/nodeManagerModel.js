@@ -168,7 +168,7 @@ export function buildNodeManagerModel({
   }
   list9['forEach'](addDescendantCounts);
   const roots = list9['map']((value14) =>
-      filterTreeItem(value14, { filter: filter3, query: query3, inheritedQueryMatch: ![] }),
+      filterTreeItem(value14, { filter: filter3, query: query3, inheritedQueryMatch: false }),
     )['filter'](Boolean),
     toCollapsedIdSet2 = toCollapsedIdSet(collapsedGroupIds),
     items = flattenTree(roots, toCollapsedIdSet2),

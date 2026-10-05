@@ -27,7 +27,7 @@ export async function captureDirectorShotFrame({
   });
   try {
     return (
-      (storyboard3DSceneRuntime['timelinePreviewActive'] = !![]),
+      (storyboard3DSceneRuntime['timelinePreviewActive'] = true),
       storyboard3DSceneRuntime['sync']({ project: project2, sceneId: sceneId2['id'] }),
       storyboard3DSceneRuntime['resize'](width, height),
       await storyboard3DSceneRuntime['waitForCaptureReady']({}),
@@ -42,7 +42,7 @@ export async function captureDirectorShotFrame({
       ),
       storyboard3DSceneRuntime['renderNow'](),
       {
-        blob: await storyboard3DSceneRuntime['captureBlob']({ includeEditorOverlays: ![] }),
+        blob: await storyboard3DSceneRuntime['captureBlob']({ includeEditorOverlays: false }),
         width: width,
         height: height,
       }
@@ -84,7 +84,7 @@ export async function renderStoryboard3DShotFrame({
     runtime['renderNow']());
   try {
     await runtime['waitForCaptureReady']?.({});
-    const data = await runtime['captureBlob']({ includeEditorOverlays: ![] }),
+    const data = await runtime['captureBlob']({ includeEditorOverlays: false }),
       handler = windowObject2?.['createImageBitmap'] || globalThis['createImageBitmap'];
     if (typeof handler === 'function') return handler(data);
     const enabled2 = windowObject2?.['URL'] || globalThis['URL'],

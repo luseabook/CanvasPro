@@ -8,8 +8,8 @@ function tokenRows(args) {
     handler = (data, options, section) => {
       for (const list2 of new Set([...Object['keys'](data || {}), ...Object['keys'](options || {})])) {
         if (list2 === 'up_to_input_tokens') continue;
-        if (list2['includes']('cached') && args['limits']?.['supports_cache_read'] === ![]) continue;
-        if (list2['startsWith']('cache_write') && args['limits']?.['supports_cache_write'] === ![]) continue;
+        if (list2['includes']('cached') && args['limits']?.['supports_cache_read'] === false) continue;
+        if (list2['startsWith']('cache_write') && args['limits']?.['supports_cache_write'] === false) continue;
         const amount = valid(options?.[list2])
           ? options[list2]
           : valid(data?.[list2]) && valid(result)

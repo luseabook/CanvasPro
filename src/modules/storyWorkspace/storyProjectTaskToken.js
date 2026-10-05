@@ -24,7 +24,7 @@ export function createStoryProjectTaskToken(args2 = {}) {
     projectId: text,
     sessionId: key,
     data: args2?.['data'] || null,
-    projectTitleEdited: args2?.['projectTitleEdited'] === !![],
+    projectTitleEdited: args2?.['projectTitleEdited'] === true,
     modelSettings: {
       models: { ...(args2?.['models'] || {}) },
       textProvider: normalizeText(args2?.['textProvider']),
@@ -44,16 +44,16 @@ export function createStoryProjectTaskToken(args2 = {}) {
   };
 }
 export function isStoryProjectTaskTokenLive(options = {}, enabled = null) {
-  if (!enabled || typeof enabled !== 'object') return ![];
+  if (!enabled || typeof enabled !== 'object') return false;
   const text2 = normalizeText(enabled['projectId']);
-  if (!text2 || text2 !== normalizeText(enabled['data']?.['project']?.['id'])) return ![];
+  if (!text2 || text2 !== normalizeText(enabled['data']?.['project']?.['id'])) return false;
   const index = options?.['storyProjectSessionById'],
     result =
       index && typeof index === 'object'
         ? Math['max'](0, Math['trunc'](Number(index[text2]) || 0))
         : Math['max'](0, Math['trunc'](Number(options?.['storyProjectSessionId']) || 0));
-  if (enabled['sessionId'] !== result) return ![];
-  if (text2 === normalizeText(options?.['data']?.['project']?.['id'])) return !![];
+  if (enabled['sessionId'] !== result) return false;
+  if (text2 === normalizeText(options?.['data']?.['project']?.['id'])) return true;
   return (Array['isArray'](options?.['projects']) ? options['projects'] : [])['some'](
     (data) => normalizeText(data?.['id'] || data?.['data']?.['project']?.['id']) === text2,
   );

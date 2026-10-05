@@ -4,9 +4,9 @@ const DEFAULT_VIEWPORT_WIDTH = 1024,
   DEFAULT_EASING = 'cubic-bezier(0.22, 1, 0.36, 1)';
 function isReducedMotionPreferred(value) {
   try {
-    return value?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![];
+    return value?.['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === true;
   } catch {
-    return ![];
+    return false;
   }
 }
 function getViewportSize(dom, width) {
@@ -43,7 +43,7 @@ function getRevealRadius(key, index, result, data) {
     ),
   );
 }
-function formatPercentage(options, { roundUp: roundUp = ![] } = {}) {
+function formatPercentage(options, { roundUp: roundUp = false } = {}) {
   const target = options * 10000,
     source = (roundUp ? Math['ceil'](target) : Math['round'](target)) / 10000;
   return String(Object['is'](source, -0) ? 0 : source);
@@ -55,7 +55,7 @@ function getRelativeRevealGeometry(next, current, entry, record) {
   return {
     x: formatPercentage((entry / width4) * 100),
     y: formatPercentage((record / height3) * 100),
-    radius: formatPercentage((revealRadius / payload) * 100, { roundUp: !![] }),
+    radius: formatPercentage((revealRadius / payload) * 100, { roundUp: true }),
   };
 }
 export function runCircularRevealTransition({
@@ -83,10 +83,10 @@ export function runCircularRevealTransition({
     event: event,
     sourceElement: sourceElement,
   });
-  let handle = ![];
+  let handle = false;
   const run = () => {
       if (handle) return undefined;
-      return ((handle = !![]), apply());
+      return ((handle = true), apply());
     },
     handler = () => el3['classList']?.['remove'](rootClassName);
   el3['classList']?.['add'](rootClassName);

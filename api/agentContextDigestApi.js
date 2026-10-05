@@ -22,7 +22,7 @@ function createStructuredOutput() {
     fallback: 'prompt',
     schema: {
       type: 'object',
-      additionalProperties: ![],
+      additionalProperties: false,
       required: ['goal', 'constraints', 'decisions', 'completed', 'pending'],
       properties: {
         goal: { type: 'string' },
@@ -123,7 +123,7 @@ export async function requestAgentContextDigest({
       prompt: JSON['stringify']({
         ...JSON['parse'](prompt),
         retry: {
-          previousAttemptRejected: !![],
+          previousAttemptRejected: true,
           instruction: 'Return the corrected strict JSON object only.',
         },
       }),

@@ -187,8 +187,8 @@ export class MediaClipNode {
       (this['_mediaClip'] = normalizeMediaClipState(this['nodeData'], this['_sources'])),
       (this['_timelineView'] = normalizeMediaClipTimelineView(this['_mediaClip']['timelineView'])),
       (this['_playheadSec'] = 0),
-      (this['_exporting'] = ![]),
-      (this['_menuOpen'] = ![]),
+      (this['_exporting'] = false),
+      (this['_menuOpen'] = false),
       (this['_materialMenu'] = null),
       (this['_materialMenuEl'] = null),
       (this['_exportLoadingTarget'] = null),
@@ -196,24 +196,24 @@ export class MediaClipNode {
       (this['_unsubscribeInputs'] = null),
       (this['_unsubscribeLocale'] = null),
       (this['_timelineInteractionState'] = this['_createTimelineInteractionState']()),
-      (this['_suppressTrackClick'] = ![]),
+      (this['_suppressTrackClick'] = false),
       (this['_activeClipIndex'] = 0),
       (this['_selectedClipIndex'] = -1),
       (this['_activeAudioClipIndex'] = 0),
       (this['_selectedAudioClipIndex'] = -1),
       (this['_timelineScrollLeft'] = this['_timelineView']['scrollLeft']),
       (this['_timelineViewPersistTimer'] = 0),
-      (this['_timelineViewPersistRender'] = ![]),
+      (this['_timelineViewPersistRender'] = false),
       (this['_timelineSettleTimer'] = 0),
       (this['_timelineSettleRow'] = null),
-      (this['_timelineSettlePendingPersist'] = ![]),
-      (this['_timelineSettlePendingCommit'] = ![]),
+      (this['_timelineSettlePendingPersist'] = false),
+      (this['_timelineSettlePendingCommit'] = false),
       (this['_timelineSettleVersion'] = 0),
       (this['_timelineDragSessionSeq'] = 0),
       (this['_timelineDragAutoScrollRaf'] = 0),
       (this['_deferredTimelineDragNodeData'] = null),
-      (this['_skipNextStoreMediaClipRender'] = ![]),
-      (this['_skipNextIncomingMediaClipRender'] = ![]),
+      (this['_skipNextStoreMediaClipRender'] = false),
+      (this['_skipNextIncomingMediaClipRender'] = false),
       (this['_restoringTimelineScroll'] = null),
       (this['_onDocumentPointerDown'] = null),
       (this['_onMaterialMenuPointerDown'] = null),
@@ -228,7 +228,7 @@ export class MediaClipNode {
         audio: this['_createPreviewSeekState'](),
       }),
       (this['_playbackRaf'] = 0),
-      (this['_playing'] = ![]),
+      (this['_playing'] = false),
       (this['_playPreviewPending'] = null),
       (this['_previewVisualKind'] = ''),
       (this['_playbackStartedAtMs'] = Number['NaN']),
@@ -270,13 +270,13 @@ export class MediaClipNode {
   ['mount']() {
     return (
       this['el']['addEventListener']('pointerdown', (event) => {
-        (this['_mediaClip']['expanded'] === !![] ||
+        (this['_mediaClip']['expanded'] === true ||
           event['target']['closest']('button, video, audio, .media-clip-menu')) &&
           event['stopPropagation']();
       }),
       (this['_unsubscribePick'] = appStore['subscribeSelector']?.(
         (active) => ({
-          active: active['pickConnectMode']?.['active'] === !![],
+          active: active['pickConnectMode']?.['active'] === true,
           sourceNodeId: active['pickConnectMode']?.['sourceNodeId'] || '',
         }),
         () => this['_render'](),
@@ -284,8 +284,8 @@ export class MediaClipNode {
       (this['_unsubscribeInputs'] = appStore['subscribeSelector']?.(
         (payload) => buildMediaClipIncomingSignature(payload, this['id']),
         () => {
-          const handle = this['_skipNextIncomingMediaClipRender'] === !![];
-          this['_skipNextIncomingMediaClipRender'] = ![];
+          const handle = this['_skipNextIncomingMediaClipRender'] === true;
+          this['_skipNextIncomingMediaClipRender'] = false;
           const state = appStore['getState']()?.['nodes']?.[this['id']] || this['nodeData'];
           ((this['nodeData'] = state), this['_syncFromStore'](state));
           if (handle) return;
@@ -311,10 +311,10 @@ export class MediaClipNode {
         (window['removeEventListener']('shortcuts-updated', this['_onShortcutsUpdated']),
         (this['_onShortcutsUpdated'] = null)),
       this['_detachDragListeners'](),
-      this['_syncDocumentExitListener'](![]),
-      this['_syncMaterialMenuDismissListener'](![]),
-      this['_syncDocumentKeyListener'](![]),
-      this['_syncDeleteMaterialShortcutListener'](![]),
+      this['_syncDocumentExitListener'](false),
+      this['_syncMaterialMenuDismissListener'](false),
+      this['_syncDocumentKeyListener'](false),
+      this['_syncDeleteMaterialShortcutListener'](false),
       this['_removeMaterialMenuPortal'](),
       this['_stopExportLoading'](),
       this['_releaseExpandedEditor'](),
@@ -327,9 +327,9 @@ export class MediaClipNode {
         this['_timelineSettleRow']?.['classList']['remove']('is-settling'),
         this['_flushTimelineSettlePersist']()),
       (this['_timelineSettleRow'] = null),
-      (this['_skipNextStoreMediaClipRender'] = ![]),
-      (this['_skipNextIncomingMediaClipRender'] = ![]),
-      (this['_timelineViewPersistRender'] = ![]),
+      (this['_skipNextStoreMediaClipRender'] = false),
+      (this['_skipNextIncomingMediaClipRender'] = false),
+      (this['_timelineViewPersistRender'] = false),
       (this['_restoringTimelineScroll'] = null),
       this['_stopTimelineDragAutoScroll']());
   }
@@ -344,29 +344,29 @@ export class MediaClipNode {
       this['_skipNextStoreMediaClipRender'] &&
       isSameMediaClipState(scope?.['mediaClip'], this['_mediaClip'])
     ) {
-      ((this['_skipNextStoreMediaClipRender'] = ![]), (this['nodeData'] = scope));
+      ((this['_skipNextStoreMediaClipRender'] = false), (this['nodeData'] = scope));
       return;
     }
     if (
       (this['_timelineSettleTimer'] || this['_timelineSettleRow']) &&
       isSameMediaClipState(scope?.['mediaClip'], this['_mediaClip'])
     ) {
-      ((this['_skipNextStoreMediaClipRender'] = ![]), (this['nodeData'] = scope));
+      ((this['_skipNextStoreMediaClipRender'] = false), (this['nodeData'] = scope));
       return;
     }
     if (this['_isTimelinePresentationOnlyUpdate'](scope)) {
-      ((this['_skipNextStoreMediaClipRender'] = ![]),
+      ((this['_skipNextStoreMediaClipRender'] = false),
         (this['nodeData'] = { ...(scope || {}), mediaClip: this['_mediaClip'] }));
       return;
     }
-    ((this['_skipNextStoreMediaClipRender'] = ![]),
+    ((this['_skipNextStoreMediaClipRender'] = false),
       (this['nodeData'] = scope),
       this['_syncFromStore'](this['nodeData']),
       this['_render']());
   }
   ['_isTimelinePresentationOnlyUpdate'](box = {}) {
-    if (!box || !Object['prototype']['hasOwnProperty']['call'](box, 'mediaClip')) return ![];
-    if (!isSameMediaClipState(box['mediaClip'], this['_mediaClip'])) return ![];
+    if (!box || !Object['prototype']['hasOwnProperty']['call'](box, 'mediaClip')) return false;
+    if (!isSameMediaClipState(box['mediaClip'], this['_mediaClip'])) return false;
     const box2 = this['nodeData'] || {},
       toNumber2 = toNumber(box2['width'], MEDIA_CLIP_COMPACT_SIZE['width']),
       toNumber3 = toNumber(box2['height'], MEDIA_CLIP_COMPACT_SIZE['height']),
@@ -440,7 +440,7 @@ export class MediaClipNode {
   }
   ['_isPicking']() {
     const value10 = appStore['getState']()?.['pickConnectMode'] || {};
-    return value10['active'] === !![] && value10['sourceNodeId'] === this['id'];
+    return value10['active'] === true && value10['sourceNodeId'] === this['id'];
   }
   ['_normalizeMediaClipWithTimelineView'](args3 = {}) {
     const timelineView2 = normalizeMediaClipTimelineView(args3['timelineView'] || this['_timelineView']);
@@ -457,8 +457,8 @@ export class MediaClipNode {
       (this['_timelineScrollLeft'] = timelineView3['scrollLeft']),
       (this['_mediaClip'] = { ...this['_mediaClip'], timelineView: timelineView3 }),
       (this['nodeData'] = { ...(this['nodeData'] || {}), mediaClip: this['_mediaClip'] }),
-      render['persist'] === !![] &&
-        this['_scheduleTimelineViewPersist']({ render: render['renderOnPersist'] !== ![] }),
+      render['persist'] === true &&
+        this['_scheduleTimelineViewPersist']({ render: render['renderOnPersist'] !== false }),
       timelineView3
     );
   }
@@ -469,39 +469,39 @@ export class MediaClipNode {
       (this['_timelineScrollLeft'] = timelineView4['scrollLeft']),
       (this['_mediaClip'] = mediaClip2),
       (this['nodeData'] = { ...(this['nodeData'] || {}), mediaClip: mediaClip2 }));
-    if (options2['render'] === ![]) this['_skipNextStoreMediaClipRender'] = !![];
+    if (options2['render'] === false) this['_skipNextStoreMediaClipRender'] = true;
     appStore['updateNodeData'](this['id'], { mediaClip: mediaClip2 });
-    if (options2['render'] !== ![]) this['_render']();
+    if (options2['render'] !== false) this['_render']();
   }
   ['_flushTimelineViewPersist'](options3 = {}) {
-    if (!this['_timelineViewPersistTimer']) return ![];
+    if (!this['_timelineViewPersistTimer']) return false;
     (clearTimeout(this['_timelineViewPersistTimer']), (this['_timelineViewPersistTimer'] = 0));
     const render2 =
-      options3['render'] === ![] ? ![] : options3['render'] === !![] || this['_timelineViewPersistRender'];
+      options3['render'] === false ? false : options3['render'] === true || this['_timelineViewPersistRender'];
     return (
-      (this['_timelineViewPersistRender'] = ![]),
+      (this['_timelineViewPersistRender'] = false),
       this['_persistTimelineView']({ render: render2 }),
-      !![]
+      true
     );
   }
   ['_scheduleTimelineViewPersist'](options4 = {}) {
     if (this['_timelineViewPersistTimer']) clearTimeout(this['_timelineViewPersistTimer']);
-    ((this['_timelineViewPersistRender'] = this['_timelineViewPersistRender'] || options4['render'] !== ![]),
+    ((this['_timelineViewPersistRender'] = this['_timelineViewPersistRender'] || options4['render'] !== false),
       (this['_timelineViewPersistTimer'] = setTimeout(() => {
         const render3 = this['_timelineViewPersistRender'];
         ((this['_timelineViewPersistTimer'] = 0),
-          (this['_timelineViewPersistRender'] = ![]),
+          (this['_timelineViewPersistRender'] = false),
           this['_persistTimelineView']({ render: render3 }));
       }, TIMELINE_VIEW_PERSIST_DELAY_MS)));
   }
-  ['_setMediaClip'](value11, value12 = ![], value13 = {}) {
+  ['_setMediaClip'](value11, value12 = false, value13 = {}) {
     const mediaClip3 = this['_normalizeMediaClipWithTimelineView'](value11);
     ((this['_mediaClip'] = mediaClip3),
       (this['nodeData'] = { ...(this['nodeData'] || {}), mediaClip: mediaClip3 }));
-    if (value13['render'] === ![]) this['_skipNextStoreMediaClipRender'] = !![];
+    if (value13['render'] === false) this['_skipNextStoreMediaClipRender'] = true;
     appStore['updateNodeData'](this['id'], { mediaClip: mediaClip3 });
     if (value12) commit();
-    if (value13['render'] !== ![]) this['_render']();
+    if (value13['render'] !== false) this['_render']();
   }
   ['_claimExpandedEditor']() {
     (activeExpandedMediaClipNode &&
@@ -513,19 +513,19 @@ export class MediaClipNode {
     activeExpandedMediaClipNode === this && (activeExpandedMediaClipNode = null);
   }
   ['_collapseFromPeer']() {
-    if (this['_mediaClip']['expanded'] !== !![]) return;
-    this['_setMediaClipWithLayout']({ ...this['_mediaClip'], expanded: ![] }, ![], { claimExpanded: ![] });
+    if (this['_mediaClip']['expanded'] !== true) return;
+    this['_setMediaClipWithLayout']({ ...this['_mediaClip'], expanded: false }, false, { claimExpanded: false });
   }
   ['_prepareTimelineForCollapse']() {
     (this['_stopTimelineDragAutoScroll'](),
       this['_cancelTimelineSettle'](),
-      this['_flushTimelineViewPersist']({ render: ![] }),
+      this['_flushTimelineViewPersist']({ render: false }),
       (this['_deferredTimelineDragNodeData'] = null));
   }
-  ['_setMediaClipWithLayout'](value14, value15 = ![], value16 = {}) {
-    if (value14['expanded'] === !![] && value16['claimExpanded'] !== ![]) this['_claimExpandedEditor']();
+  ['_setMediaClipWithLayout'](value14, value15 = false, value16 = {}) {
+    if (value14['expanded'] === true && value16['claimExpanded'] !== false) this['_claimExpandedEditor']();
     else
-      value14['expanded'] !== !![] &&
+      value14['expanded'] !== true &&
         (this['_prepareTimelineForCollapse'](),
         this['_releaseExpandedEditor'](),
         this['_disposePreviewMedia']());
@@ -534,24 +534,24 @@ export class MediaClipNode {
       width2 = this['_compactLayoutSize'](mediaClip4),
       args6 = { width: width2['width'], height: width2['height'], mediaClip: mediaClip4 };
     ((this['_mediaClip'] = args6['mediaClip']), (this['nodeData'] = { ...args5, ...args6 }));
-    if (value16['render'] === ![]) this['_skipNextStoreMediaClipRender'] = !![];
+    if (value16['render'] === false) this['_skipNextStoreMediaClipRender'] = true;
     appStore['updateNodeData'](this['id'], args6);
     if (value15) commit();
-    if (value16['render'] !== ![]) this['_render']();
+    if (value16['render'] !== false) this['_render']();
   }
   ['_setActiveTrack'](activeTrack, value17 = null, value18 = {}) {
     const enabled = this['_mediaClip']['tracks']?.[activeTrack];
     if (!enabled) return;
-    this['_pausePreviewPlayback']({ updateControls: ![] });
+    this['_pausePreviewPlayback']({ updateControls: false });
     const mediaClip5 = { ...this['_mediaClip'], activeTrack: activeTrack };
     this['_playheadSec'] = value17 == null ? this['_playheadSec'] : value17;
     const value19 = this['_mediaClip']['activeTrack'] !== activeTrack;
     ((this['_mediaClip'] = mediaClip5),
       (this['nodeData'] = { ...(this['nodeData'] || {}), mediaClip: mediaClip5 }));
     value19 && appStore['updateNodeData'](this['id'], { mediaClip: mediaClip5 });
-    value19 || value18['forceRender'] === !![]
+    value19 || value18['forceRender'] === true
       ? this['_render']()
-      : this['_updateTrackVisuals'](activeTrack, { syncTimelineWidth: ![] });
+      : this['_updateTrackVisuals'](activeTrack, { syncTimelineWidth: false });
     if (activeTrack === 'video') this['_syncVideoPreviewSourceForTimelineSec'](this['_playheadSec']);
     else
       activeTrack === 'audio' &&
@@ -566,14 +566,14 @@ export class MediaClipNode {
     stopPointer(value20);
     const value21 = this['_isPicking']();
     if (value21) {
-      appStore['setPickConnectMode']({ active: ![] });
+      appStore['setPickConnectMode']({ active: false });
       return;
     }
-    appStore['setPickConnectMode']({ active: !![], sourceNodeId: this['id'], handleDirection: 'left' });
+    appStore['setPickConnectMode']({ active: true, sourceNodeId: this['id'], handleDirection: 'left' });
   }
   ['_setExpanded'](expanded, args7 = {}) {
-    const value22 = { ...this['_mediaClip'], ...args7, expanded: expanded === !![] };
-    this['_setMediaClipWithLayout'](value22, !![]);
+    const value22 = { ...this['_mediaClip'], ...args7, expanded: expanded === true };
+    this['_setMediaClipWithLayout'](value22, true);
   }
   ['_splitActiveMaterial'](value23 = this['_getPlaybackKind']()) {
     const activeTrack2 = value23 === 'audio' ? 'audio' : 'video',
@@ -595,19 +595,19 @@ export class MediaClipNode {
       const value26 = this['_clipIndexAtTimelineSec'](value24 + 0.001, args8['clips']);
       ((this['_activeClipIndex'] = value26), (this['_selectedClipIndex'] = value26));
     }
-    (this['_pausePreviewPlayback']({ updateControls: ![] }),
-      this['_setMediaClipWithLayout']({ ...args8, activeTrack: activeTrack2, expanded: !![] }, !![], {
-        render: ![],
+    (this['_pausePreviewPlayback']({ updateControls: false }),
+      this['_setMediaClipWithLayout']({ ...args8, activeTrack: activeTrack2, expanded: true }, true, {
+        render: false,
       }),
       this['_rerenderCompactOnly'](),
       activeTrack2 === 'audio'
         ? (this['_syncAudioPreviewSourceForTimelineSec'](value24),
           this['_syncPreviewTime']('audio', this['_audioSourceSecForPlayhead'](value24), {
-            immediate: !![],
+            immediate: true,
           }))
         : (this['_syncVideoPreviewSourceForTimelineSec'](value24),
           this['_syncPreviewTime']('video', this['_videoSourceSecForPlayhead'](value24), {
-            immediate: !![],
+            immediate: true,
           })),
       this['_updatePreviewControls']());
   }
@@ -654,7 +654,7 @@ export class MediaClipNode {
     return value37 ? this['_getPreviewMedia'](value37) : null;
   }
   ['_isSecInsideTrack'](enabled3, value38) {
-    if (!enabled3) return ![];
+    if (!enabled3) return false;
     const toNumber8 = toNumber(value38, -1);
     return (
       toNumber8 >= toNumber(enabled3['startSec'], 0) && toNumber8 <= toNumber(enabled3['endSec'], 0)
@@ -746,10 +746,10 @@ export class MediaClipNode {
   ['_syncVideoPreviewSourceForTimelineSec'](value58 = this['_playheadSec'], value59 = {}) {
     const el = this['_videoPreview'],
       response = this['_getVideoPreviewContextAtTimelineSec'](value58, value59['clips']);
-    if (!response['url']) return ![];
+    if (!response['url']) return false;
     if (response['clipKind'] === 'image')
-      return (this['_showPreviewImage'](response['source'], response['url']), !![]);
-    if (!el) return ![];
+      return (this['_showPreviewImage'](response['source'], response['url']), true);
+    if (!el) return false;
     (this['_showPreviewVideo'](response['source']),
       (el['__mediaClipFallbackHost'] ??= el['parentElement'] || null),
       (el['__mediaClipPosterUrl'] = response['posterUrl']));
@@ -771,7 +771,7 @@ export class MediaClipNode {
       (this['_showVideoSourceSwitchHold'](el), el['classList']?.['add']('is-source-switching'));
     const setMediaElementSource2 = setMediaElementSource(el, response['url']);
     if (setMediaElementSource2)
-      (this['_cancelPendingVideoSourceSeek'](el, { clearHold: ![] }),
+      (this['_cancelPendingVideoSourceSeek'](el, { clearHold: false }),
         this['_resetPreviewSeekState']('video'),
         (el['__mediaClipPendingSourceSeek'] = {
           src: normalizeText(response['url']),
@@ -797,9 +797,9 @@ export class MediaClipNode {
       list5 = list4['map']((clip3, index4) => ({ clip: clip3, index: index4 }))[
         'filter'
       ](({ clip: clip4 }) =>
-        value64['audibleOnly'] === !![]
-          ? clip4?.['muted'] !== !![] && clip4?.['disabled'] !== !![]
-          : !![],
+        value64['audibleOnly'] === true
+          ? clip4?.['muted'] !== true && clip4?.['disabled'] !== true
+          : true,
       ),
       toNumber10 = toNumber(value63, 0),
       count = list5['findIndex'](({ clip: clip5 }, value65) => {
@@ -810,19 +810,19 @@ export class MediaClipNode {
           : toNumber10 >= toNumber11 && toNumber10 < value66;
       }),
       count2 =
-        count >= 0 || value64['nearest'] === ![]
+        count >= 0 || value64['nearest'] === false
           ? count
           : this['_audioClipIndexAtTimelineSec'](
               value63,
               list5['map'](({ clip: clip6 }) => clip6),
             ),
-      value67 = value64['nearest'] === ![] ? null : list5[0] || null,
+      value67 = value64['nearest'] === false ? null : list5[0] || null,
       value68 = count2 >= 0 ? list5[count2] || null : value67,
       clip7 = value68?.['clip'] || null,
       index5 = value68?.['index'] ?? -1,
       source4 = clip7
         ? this['_audioClipSource'](clip7, index5)
-        : value64['nearest'] === ![]
+        : value64['nearest'] === false
           ? null
           : this['_sources']['audio'];
     return {
@@ -835,16 +835,16 @@ export class MediaClipNode {
   }
   ['_syncAudioPreviewSourceForTimelineSec'](value69 = this['_playheadSec']) {
     const enabled5 = this['_audioPreview'];
-    if (!enabled5) return ![];
+    if (!enabled5) return false;
     this['_videoPreview'] &&
       this['_mediaClip']['tracks']?.['audio'] &&
-      (this['_videoPreview']['muted'] = !![]);
+      (this['_videoPreview']['muted'] = true);
     const response2 = this['_getAudioClipContextAtTimelineSec'](value69, {
-      audibleOnly: !![],
-      nearest: ![],
+      audibleOnly: true,
+      nearest: false,
     });
     if (!response2['url'])
-      return (setMediaElementSource(enabled5, ''), (this['_previewAudioSrc'] = ''), ![]);
+      return (setMediaElementSource(enabled5, ''), (this['_previewAudioSrc'] = ''), false);
     const setMediaElementSource3 = setMediaElementSource(enabled5, response2['url']);
     if (setMediaElementSource3) this['_resetPreviewSeekState']('audio');
     return ((this['_previewAudioSrc'] = response2['url']), setMediaElementSource3);
@@ -881,7 +881,7 @@ export class MediaClipNode {
   }
   ['_disposePreviewMedia'](enabled7 = '') {
     (!enabled7 || enabled7 === this['_getPlaybackKind']()) &&
-      this['_pausePreviewPlayback']({ updateControls: ![] });
+      this['_pausePreviewPlayback']({ updateControls: false });
     const value74 = !enabled7 || enabled7 === 'video',
       value75 = !enabled7 || enabled7 === 'video' || enabled7 === 'image',
       value76 = !enabled7 || enabled7 === 'audio';
@@ -918,7 +918,7 @@ export class MediaClipNode {
       this['_updatePreviewControls']();
       return;
     }
-    const enabled8 = value82['immediate'] === !![] || value82['allowDuringPlayback'] === !![];
+    const enabled8 = value82['immediate'] === true || value82['allowDuringPlayback'] === true;
     if ((this['_playing'] || this['_playPreviewPending']) && !enabled8) {
       ((this['_pendingPreviewSeek'][value81] = null), this['_updatePreviewControls']());
       return;
@@ -928,18 +928,18 @@ export class MediaClipNode {
     if (!el2) return;
     if (el2['readyState'] < 1) {
       !el2['__mediaClipSeekPending'] &&
-        ((el2['__mediaClipSeekPending'] = !![]),
+        ((el2['__mediaClipSeekPending'] = true),
         el2['addEventListener'](
           'loadedmetadata',
           () => {
-            ((el2['__mediaClipSeekPending'] = ![]), this['_applyPreviewSeek'](value81, value82));
+            ((el2['__mediaClipSeekPending'] = false), this['_applyPreviewSeek'](value81, value82));
           },
-          { once: !![] },
+          { once: true },
         ));
       return;
     }
     const value84 = this['_getPreviewSeekState'](value81),
-      enabled9 = value82['immediate'] === !![],
+      enabled9 = value82['immediate'] === true,
       value85 =
         Number['isFinite'](el2['duration']) && el2['duration'] > 0
           ? Math['min'](value83, el2['duration'])
@@ -961,7 +961,7 @@ export class MediaClipNode {
     this['_updatePreviewControls']();
   }
   ['_syncPreviewTime'](value86, value87, value88 = {}) {
-    const enabled10 = value88['immediate'] === !![] || value88['allowDuringPlayback'] === !![];
+    const enabled10 = value88['immediate'] === true || value88['allowDuringPlayback'] === true;
     if ((this['_playing'] || this['_playPreviewPending']) && !enabled10) return;
     const value89 = Math['max'](0, toNumber(value87, 0));
     this['_pendingPreviewSeek'][value86] = value89;
@@ -970,15 +970,15 @@ export class MediaClipNode {
       return;
     }
     if (!this['_getPreviewMedia'](value86)) return;
-    if (value88['immediate'] === !![]) {
-      (this['_cancelPreviewSeek'](value86), this['_applyPreviewSeek'](value86, { immediate: !![] }));
+    if (value88['immediate'] === true) {
+      (this['_cancelPreviewSeek'](value86), this['_applyPreviewSeek'](value86, { immediate: true }));
       return;
     }
     this['_schedulePreviewSeek'](value86, value88);
   }
   ['_applyPendingVideoSourceSeek'](el3 = this['_videoPreview']) {
     const enabled11 = el3?.['__mediaClipPendingSourceSeek'];
-    if (!enabled11 || typeof enabled11 !== 'object') return ![];
+    if (!enabled11 || typeof enabled11 !== 'object') return false;
     const text2 = normalizeText(enabled11['src']),
       value90 = this['_normalizePreviewSourceIdentity'](
         firstNonEmpty(
@@ -989,14 +989,14 @@ export class MediaClipNode {
         ),
       ),
       value91 = this['_normalizePreviewSourceIdentity'](text2);
-    if (value91 && value90 !== value91) return ![];
+    if (value91 && value90 !== value91) return false;
     delete el3['__mediaClipPendingSourceSeek'];
     const toNumber14 = toNumber(enabled11['sec'], Number['NaN']);
-    if (!Number['isFinite'](toNumber14)) return ![];
+    if (!Number['isFinite'](toNumber14)) return false;
     return (
-      this['_syncPreviewTime']('video', Math['max'](0, toNumber14), { immediate: !![] }),
+      this['_syncPreviewTime']('video', Math['max'](0, toNumber14), { immediate: true }),
       this['_waitForPendingVideoSourceSeek'](el3, toNumber14),
-      !![]
+      true
     );
   }
   ['_normalizePreviewSourceIdentity'](value92) {
@@ -1010,7 +1010,7 @@ export class MediaClipNode {
   }
   ['_showVideoSourceSwitchHold'](el4 = this['_videoPreview']) {
     const el5 = el4?.['parentElement'];
-    if (!el5 || !el4) return ![];
+    if (!el5 || !el4) return false;
     this['_clearVideoSourceSwitchHold'](el4);
     const box6 = document['createElement']('canvas');
     box6['className'] = 'media-clip-source-switch-hold';
@@ -1024,10 +1024,10 @@ export class MediaClipNode {
         Math['round'](toNumber(el4['videoHeight'], 0) || toNumber(box7['height'], 0) || 1),
       );
     ((box6['width'] = value93), (box6['height'] = value94));
-    let value95 = ![];
+    let value95 = false;
     try {
       const ctx = box6['getContext']?.('2d');
-      ctx && (ctx['drawImage'](el4, 0, 0, value93, value94), (value95 = !![]));
+      ctx && (ctx['drawImage'](el4, 0, 0, value93, value94), (value95 = true));
     } catch {}
     return (
       value95 &&
@@ -1064,7 +1064,7 @@ export class MediaClipNode {
       delete el8['__mediaClipSourceSeekFallbackTimer'],
       delete el8['__mediaClipSourceSeekTargetSec'],
       delete el8['__mediaClipSourceSeekToken']);
-    if (value96['clearHold'] !== ![]) this['_clearVideoSourceSwitchHold'](el8);
+    if (value96['clearHold'] !== false) this['_clearVideoSourceSwitchHold'](el8);
   }
   ['_waitForPendingVideoSourceSeek'](el9 = this['_videoPreview'], value99 = 0) {
     if (!el9) return;
@@ -1075,10 +1075,10 @@ export class MediaClipNode {
       return;
     }
     if (!el9['__mediaClipWaitingSourceSeek']) {
-      el9['__mediaClipWaitingSourceSeek'] = !![];
+      el9['__mediaClipWaitingSourceSeek'] = true;
       const value101 = () => this['_finishPendingVideoSourceSeek'](el9);
       ((el9['__mediaClipSourceSeekFinish'] = value101),
-        el9['addEventListener']?.('seeked', value101, { once: !![] }));
+        el9['addEventListener']?.('seeked', value101, { once: true }));
     }
     const value102 = el9['__mediaClipSourceSeekFallbackTimer'];
     if (value102)
@@ -1127,7 +1127,7 @@ export class MediaClipNode {
     if (!this['el']) return;
     this['_removeMaterialMenuPortal']();
     const enabled12 = !!(this['_mediaClip']['tracks']?.['video'] || this['_mediaClip']['tracks']?.['audio']),
-      value105 = enabled12 && this['_mediaClip']['expanded'] === !![];
+      value105 = enabled12 && this['_mediaClip']['expanded'] === true;
     value105
       ? this['_claimExpandedEditor']()
       : ((this['_materialMenu'] = null), this['_releaseExpandedEditor'](), this['_disposePreviewMedia']());
@@ -1150,10 +1150,10 @@ export class MediaClipNode {
       this['_exporting'] && this['_startExportLoading']());
   }
   ['_rerenderCompactOnly']() {
-    if (!this['el']) return ![];
+    if (!this['el']) return false;
     const el11 = this['el']['querySelector']?.('.media-clip-compact'),
       el12 = el11?.['parentNode'];
-    if (!el11 || !el12) return (this['_render'](), ![]);
+    if (!el11 || !el12) return (this['_render'](), false);
     this['_removeMaterialMenuPortal']();
     const el13 = this['_renderCompact']();
     if (typeof el12['replaceChild'] === 'function') el12['replaceChild'](el13, el11);
@@ -1167,14 +1167,14 @@ export class MediaClipNode {
       }
     }
     const value106 = !!(this['_mediaClip']['tracks']?.['video'] || this['_mediaClip']['tracks']?.['audio']),
-      value107 = value106 && this['_mediaClip']['expanded'] === !![];
+      value107 = value106 && this['_mediaClip']['expanded'] === true;
     return (
       this['_syncDocumentExitListener'](value107),
       this['_syncMaterialMenuDismissListener'](value107 && !!this['_materialMenu']),
       this['_syncDocumentKeyListener'](value107),
       this['_syncDeleteMaterialShortcutListener'](value107),
       value107 && this['_materialMenu'] && this['_renderMaterialMenuPortal'](),
-      !![]
+      true
     );
   }
   ['_syncHostPresentation'](value108) {
@@ -1183,10 +1183,10 @@ export class MediaClipNode {
       el14?.['style'] && (el14['style']['overflow'] = 'visible');
       const el15 = document['getElementById'](this['id']);
       if (!el15?.['style']) return;
-      (el15['classList']['toggle']('media-clip-expanded-host', value108 === !![]),
+      (el15['classList']['toggle']('media-clip-expanded-host', value108 === true),
         syncRendererNodePresentationZIndex(
           el15,
-          value108 === !![]
+          value108 === true
             ? MEDIA_CLIP_EXPANDED_HOST_Z_INDEX
             : el15['classList']['contains']('selected') ||
                 el15['classList']['contains']('v2-selected')
@@ -1203,13 +1203,13 @@ export class MediaClipNode {
     if (typeof document === 'undefined') return;
     if (!enabled13) {
       this['_onDocumentPointerDown'] &&
-        (document['removeEventListener']('pointerdown', this['_onDocumentPointerDown'], !![]),
+        (document['removeEventListener']('pointerdown', this['_onDocumentPointerDown'], true),
         (this['_onDocumentPointerDown'] = null));
       return;
     }
     if (this['_onDocumentPointerDown']) return;
     ((this['_onDocumentPointerDown'] = (event2) => {
-      if (this['_mediaClip']['expanded'] !== !![]) return;
+      if (this['_mediaClip']['expanded'] !== true) return;
       const value109 = document['getElementById'](this['id']);
       if (this['el']?.['contains']?.(event2['target'])) return;
       if (this['_materialMenuEl']?.['contains']?.(event2['target'])) return;
@@ -1217,15 +1217,15 @@ export class MediaClipNode {
         (event2['preventDefault']?.(), event2['stopPropagation']?.());
         return;
       }
-      this['_setExpanded'](![]);
+      this['_setExpanded'](false);
     }),
-      document['addEventListener']('pointerdown', this['_onDocumentPointerDown'], !![]));
+      document['addEventListener']('pointerdown', this['_onDocumentPointerDown'], true));
   }
   ['_syncMaterialMenuDismissListener'](enabled14) {
     if (typeof document === 'undefined') return;
     if (!enabled14) {
       this['_onMaterialMenuPointerDown'] &&
-        (document['removeEventListener']('pointerdown', this['_onMaterialMenuPointerDown'], !![]),
+        (document['removeEventListener']('pointerdown', this['_onMaterialMenuPointerDown'], true),
         (this['_onMaterialMenuPointerDown'] = null));
       return;
     }
@@ -1236,7 +1236,7 @@ export class MediaClipNode {
       if (this['_materialMenuEl']?.['contains']?.(event3['target'])) return;
       this['_closeMaterialMenu']();
     }),
-      document['addEventListener']('pointerdown', this['_onMaterialMenuPointerDown'], !![]));
+      document['addEventListener']('pointerdown', this['_onMaterialMenuPointerDown'], true));
   }
   ['_removeMaterialMenuPortal']() {
     (this['_materialMenuEl']?.['parentNode']?.['removeChild']?.(this['_materialMenuEl']),
@@ -1245,9 +1245,9 @@ export class MediaClipNode {
   ['_closeMaterialMenu'](options6 = {}) {
     if (!this['_materialMenu'] && !this['_materialMenuEl']) return;
     ((this['_materialMenu'] = null),
-      this['_syncMaterialMenuDismissListener'](![]),
+      this['_syncMaterialMenuDismissListener'](false),
       this['_removeMaterialMenuPortal']());
-    if (options6['render'] === !![]) this['_render']();
+    if (options6['render'] === true) this['_render']();
   }
   ['_materialMenuHost']() {
     return (
@@ -1328,13 +1328,13 @@ export class MediaClipNode {
     if (typeof document === 'undefined') return;
     if (!enabled15) {
       this['_onDocumentKeyDown'] &&
-        (document['removeEventListener']('keydown', this['_onDocumentKeyDown'], !![]),
+        (document['removeEventListener']('keydown', this['_onDocumentKeyDown'], true),
         (this['_onDocumentKeyDown'] = null));
       return;
     }
     if (this['_onDocumentKeyDown']) return;
     ((this['_onDocumentKeyDown'] = (value118) => this['_handleDocumentKeyDown'](value118)),
-      document['addEventListener']('keydown', this['_onDocumentKeyDown'], !![]));
+      document['addEventListener']('keydown', this['_onDocumentKeyDown'], true));
   }
   ['_syncDeleteMaterialShortcutListener'](enabled16) {
     if (typeof window === 'undefined') return;
@@ -1348,7 +1348,7 @@ export class MediaClipNode {
     ((this['_onDeleteMaterialShortcut'] = (value119) => {
       const text4 = normalizeText(value119?.['detail']?.['nodeId']);
       if (text4 && text4 !== this['id']) return;
-      if (this['_mediaClip']['expanded'] !== !![]) return;
+      if (this['_mediaClip']['expanded'] !== true) return;
       this['_deleteActiveMaterialFromShortcut']();
     }),
       window['addEventListener'](MEDIA_CLIP_DELETE_MATERIAL_EVENT, this['_onDeleteMaterialShortcut']));
@@ -1362,7 +1362,7 @@ export class MediaClipNode {
     ((this['_lastDeleteMaterialShortcutAt'] = value120), this['_deleteActiveMaterial']());
   }
   ['_handleDocumentKeyDown'](event4) {
-    if (this['_mediaClip']['expanded'] !== !![]) return;
+    if (this['_mediaClip']['expanded'] !== true) return;
     if (this['_materialMenuEl']) {
       const list7 = Array['from'](
           this['_materialMenuEl']['querySelectorAll']?.('[data-shortcut-action]') || [],
@@ -1371,7 +1371,7 @@ export class MediaClipNode {
           event4,
           list7['map']((el21) => el21['dataset']['shortcutAction']),
         );
-      if (shortcutActionForEvent && event4?.['repeat'] !== !![]) {
+      if (shortcutActionForEvent && event4?.['repeat'] !== true) {
         const value121 = list7['find'](
           (el22) => el22['dataset']['shortcutAction'] === shortcutActionForEvent,
         );
@@ -1443,19 +1443,19 @@ export class MediaClipNode {
     return (el25['appendChild'](el27), el24['appendChild'](el25), el24);
   }
   ['_renderCompact']() {
-    const enabled17 = this['_mediaClip']['expanded'] === !![],
+    const enabled17 = this['_mediaClip']['expanded'] === true,
       el30 = document['createElement']('div');
     ((el30['className'] = 'media-clip-compact'),
       el30['classList']['toggle']('is-editing', enabled17),
-      el30['classList']['toggle']('is-menu-open', this['_menuOpen'] === !![]));
+      el30['classList']['toggle']('is-menu-open', this['_menuOpen'] === true));
     const value124 = document['createElement']('div');
     value124['className'] = 'media-clip-compact-body';
     const el31 = document['createElement']('div');
     ((el31['className'] = 'media-clip-timeline-scroll'),
       this['_primeTimelineScroll'](el31),
       el31['addEventListener']('click', () => {
-        if (this['_mediaClip']['expanded'] === !![]) return;
-        this['_setExpanded'](!![]);
+        if (this['_mediaClip']['expanded'] === true) return;
+        this['_setExpanded'](true);
       }),
       this['_bindTimelineScroll'](el31));
     const el32 = document['createElement']('div');
@@ -1639,11 +1639,11 @@ export class MediaClipNode {
     );
   }
   ['_setDownloadMenuOpen'](value158) {
-    this['_menuOpen'] = value158 === !![];
+    this['_menuOpen'] = value158 === true;
     this['_materialMenu'] &&
       ((this['_materialMenu'] = null),
       this['_removeMaterialMenuPortal'](),
-      this['_syncMaterialMenuDismissListener'](![]));
+      this['_syncMaterialMenuDismissListener'](false));
     const el43 = this['el']?.['querySelector']?.('.media-clip-compact');
     el43?.['classList']?.['toggle']('is-menu-open', this['_menuOpen']);
     const el44 = this['el']?.['querySelector']?.('.media-clip-compact-tools');
@@ -1794,7 +1794,7 @@ export class MediaClipNode {
     const toNumber22 = toNumber(options10['timelineWidthPx'], 0);
     if (toNumber22 > 0) return Math['max'](240, toNumber22);
     const toNumber23 = toNumber(this['nodeData']?.['width'], MEDIA_CLIP_COMPACT_SIZE['width']),
-      value173 = options10['compact'] === !![] ? 0x88 : 116;
+      value173 = options10['compact'] === true ? 0x88 : 116;
     return Math['max'](240, toNumber23 - value173);
   }
   ['_timelineViewportWidth']() {
@@ -1942,7 +1942,7 @@ export class MediaClipNode {
     return (
       (el62['className'] =
         'media-clip-hover-playhead media-clip-timeline-cursor media-clip-timeline-cursor-hover'),
-      (el62['hidden'] = !![]),
+      (el62['hidden'] = true),
       el61['append'](value202, el62),
       el61
     );
@@ -1995,14 +1995,14 @@ export class MediaClipNode {
     (event5['preventDefault']?.(), event5['stopPropagation']?.());
     const value209 = this['_materialMenuHost'](),
       x = this['_materialMenuLocalPoint'](event5['clientX'], event5['clientY'], value209);
-    ((this['_menuOpen'] = ![]),
+    ((this['_menuOpen'] = false),
       (this['_materialMenu'] = {
         kind: kind2,
         clipIndex: Math['max'](0, Math['trunc'](toNumber(value208, 0))),
         x: x['x'],
         y: x['y'],
       }),
-      this['_syncMaterialMenuDismissListener'](!![]),
+      this['_syncMaterialMenuDismissListener'](true),
       this['_removeMaterialMenuPortal'](),
       this['_renderMaterialMenuPortal']());
   }
@@ -2038,7 +2038,7 @@ export class MediaClipNode {
           enabled23['kind'],
           event7,
           enabled23['duration'],
-          { updateActiveTrack: ![], updateClipSelection: ![], selectClip: ![], syncPreview: ![] },
+          { updateActiveTrack: false, updateClipSelection: false, selectClip: false, syncPreview: false },
         );
       }),
       el68['addEventListener']('pointerleave', () => {
@@ -2060,7 +2060,7 @@ export class MediaClipNode {
               ? this['_setActiveClipIndex'](this['_clipIndexAtTimelineSec'](value210))
               : enabled24['kind'] === 'audio'
                 ? this['_setActiveAudioClipIndex'](this['_audioClipIndexAtTimelineSec'](value210))
-                : ![];
+                : false;
         if (enabled24['kind'] === 'audio') this['_selectAudioClipIndex'](this['_activeAudioClipIndex']);
         this['_setActiveTrack'](enabled24['kind'], value210, { forceRender: forceRender });
       }));
@@ -2145,8 +2145,8 @@ export class MediaClipNode {
         timelineStartSec: startSec,
         timelineEndSec: endSec,
         laneIndex: 0,
-        muted: ![],
-        disabled: ![],
+        muted: false,
+        disabled: false,
       },
     ];
   }
@@ -2392,7 +2392,7 @@ export class MediaClipNode {
     const value306 = Math['max'](0, Math['trunc'](toNumber(value304, 0))),
       value307 = this['_audioTimelineClips'](this['_mediaClip']['tracks']?.['audio']),
       enabled26 = value307[value306];
-    if (!enabled26) return ![];
+    if (!enabled26) return false;
     return (
       (this['_mediaClip'] = patchMediaClipAudioClipState(this['_mediaClip'], value306, value305)),
       this['_setActiveAudioClipIndex'](value306),
@@ -2401,14 +2401,14 @@ export class MediaClipNode {
       appStore['updateNodeData'](this['id'], { mediaClip: this['_mediaClip'] }),
       commit(),
       this['_refreshMediaClipTimelineInPlace'](),
-      !![]
+      true
     );
   }
   ['_toggleAudioClipMuted'](value308 = this['_activeAudioClipIndex']) {
     const value309 = Math['max'](0, Math['trunc'](toNumber(value308, 0))),
       muted = this['_audioTimelineClips'](this['_mediaClip']['tracks']?.['audio'])[value309];
-    if (!muted) return ![];
-    return this['_patchAudioClipState'](value309, { muted: muted['muted'] !== !![] });
+    if (!muted) return false;
+    return this['_patchAudioClipState'](value309, { muted: muted['muted'] !== true });
   }
   ['_audioClipsForLane'](
     value310 = 0,
@@ -2423,13 +2423,13 @@ export class MediaClipNode {
     value314 = this['_audioTimelineClips'](this['_mediaClip']['tracks']?.['audio']),
   ) {
     const list28 = this['_audioClipsForLane'](value313, value314);
-    return list28['length'] > 0 && list28['every']((value315) => value315?.['muted'] === !![]);
+    return list28['length'] > 0 && list28['every']((value315) => value315?.['muted'] === true);
   }
   ['_toggleAudioLaneMuted'](value316 = 0) {
     const mediaClipAudioLaneIndex2 = normalizeMediaClipAudioLaneIndex(value316),
       value317 = this['_audioTimelineClips'](this['_mediaClip']['tracks']?.['audio']),
       list29 = this['_audioClipsForLane'](mediaClipAudioLaneIndex2, value317);
-    if (!list29['length']) return ![];
+    if (!list29['length']) return false;
     const value318 = !this['_isAudioLaneMuted'](mediaClipAudioLaneIndex2, value317);
     this['_mediaClip'] = patchMediaClipAudioLaneMuted(this['_mediaClip'], mediaClipAudioLaneIndex2, value318);
     const value319 = Math['max'](
@@ -2445,14 +2445,14 @@ export class MediaClipNode {
       appStore['updateNodeData'](this['id'], { mediaClip: this['_mediaClip'] }),
       commit(),
       this['_refreshMediaClipTimelineInPlace'](),
-      !![]
+      true
     );
   }
   ['_toggleAudioClipDisabled'](value321 = this['_activeAudioClipIndex']) {
     const value322 = Math['max'](0, Math['trunc'](toNumber(value321, 0))),
       disabled = this['_audioTimelineClips'](this['_mediaClip']['tracks']?.['audio'])[value322];
-    if (!disabled) return ![];
-    return this['_patchAudioClipState'](value322, { disabled: disabled['disabled'] !== !![] });
+    if (!disabled) return false;
+    return this['_patchAudioClipState'](value322, { disabled: disabled['disabled'] !== true });
   }
   ['_segmentClipIndex'](el73, value323 = 'video', value324 = null) {
     const text10 = normalizeText(el73?.['dataset']?.['clipId']);
@@ -2709,10 +2709,10 @@ export class MediaClipNode {
         ),
           this['_updateTimelineSegmentLabel'](el88, value369),
           this['_setAudioSegmentLaneVisual'](el88, this['_audioClipLaneIndex'](el89)),
-          (el88['dataset']['mutedClip'] = el89['muted'] === !![] ? 'true' : 'false'),
-          (el88['dataset']['disabledClip'] = el89['disabled'] === !![] ? 'true' : 'false'),
-          el88['classList']?.['toggle']?.('is-muted', el89['muted'] === !![]),
-          el88['classList']?.['toggle']?.('is-disabled', el89['disabled'] === !![]),
+          (el88['dataset']['mutedClip'] = el89['muted'] === true ? 'true' : 'false'),
+          (el88['dataset']['disabledClip'] = el89['disabled'] === true ? 'true' : 'false'),
+          el88['classList']?.['toggle']?.('is-muted', el89['muted'] === true),
+          el88['classList']?.['toggle']?.('is-disabled', el89['disabled'] === true),
           this['_syncAudioSegmentWaveformViewport'](el88, el89),
           (value367 += 1));
       }),
@@ -2720,20 +2720,20 @@ export class MediaClipNode {
     );
   }
   ['_setTimelinePlayheadFromPointer'](enabled29, activeTrack3, value370, value371 = 0, value372 = {}) {
-    if (!enabled29 || !this['_mediaClip']['tracks']?.[activeTrack3]) return ![];
+    if (!enabled29 || !this['_mediaClip']['tracks']?.[activeTrack3]) return false;
     const playheadSec2 = this['_timelineSecFromPointerEvent'](enabled29, value370, value371);
     this['_playheadSec'] = playheadSec2;
     const value373 = this['_mediaClip']['activeTrack'] !== activeTrack3;
     if (activeTrack3 === 'video') {
-      if (value372['updateClipSelection'] !== ![]) {
+      if (value372['updateClipSelection'] !== false) {
         const value374 =
           value372['clipIndex'] == null
             ? this['_clipIndexAtTimelineSec'](playheadSec2)
             : Math['max'](0, Math['trunc'](toNumber(value372['clipIndex'], 0)));
         this['_setActiveClipIndex'](value374);
-        if (value372['selectClip'] !== ![]) this['_selectClipIndex'](value374);
+        if (value372['selectClip'] !== false) this['_selectClipIndex'](value374);
       }
-      value372['syncPreview'] !== ![] && this['_syncVideoPreviewSourceForTimelineSec'](playheadSec2);
+      value372['syncPreview'] !== false && this['_syncVideoPreviewSourceForTimelineSec'](playheadSec2);
     } else {
       if (activeTrack3 === 'audio') {
         const value375 =
@@ -2741,21 +2741,21 @@ export class MediaClipNode {
             ? this['_audioClipIndexAtTimelineSec'](playheadSec2)
             : Math['max'](0, Math['trunc'](toNumber(value372['clipIndex'], 0)));
         this['_setActiveAudioClipIndex'](value375);
-        if (value372['selectClip'] !== ![]) this['_selectAudioClipIndex'](value375);
-        value372['syncPreview'] !== ![] && this['_syncAudioPreviewSourceForTimelineSec'](playheadSec2);
+        if (value372['selectClip'] !== false) this['_selectAudioClipIndex'](value375);
+        value372['syncPreview'] !== false && this['_syncAudioPreviewSourceForTimelineSec'](playheadSec2);
       }
     }
     return (
       value373 &&
-        value372['updateActiveTrack'] !== ![] &&
+        value372['updateActiveTrack'] !== false &&
         ((this['_mediaClip'] = { ...this['_mediaClip'], activeTrack: activeTrack3 }),
         (this['nodeData'] = { ...(this['nodeData'] || {}), mediaClip: this['_mediaClip'] }),
-        value372['persistActiveTrack'] !== ![] &&
+        value372['persistActiveTrack'] !== false &&
           appStore['updateNodeData'](this['id'], { mediaClip: this['_mediaClip'] })),
       this['_updateTrackPlayheadVisual'](enabled29, value371, { playheadSec: playheadSec2 }),
-      value372['syncPreview'] !== ![] &&
+      value372['syncPreview'] !== false &&
         this['_syncPreviewTime'](activeTrack3, this['_previewSourceSecForTimelineSec'](activeTrack3, playheadSec2)),
-      !![]
+      true
     );
   }
   ['_applyTimelinePlayheadModel'](el90, value376 = {}) {
@@ -2782,7 +2782,7 @@ export class MediaClipNode {
       (waveformBarsPathFromPersistedUrl = await getWaveformBarsPathFromUrl(mediaClipAudioUrl, value379));
     if (!waveformBarsPathFromPersistedUrl) return;
     if (el91['dataset']?.['waveformKey'] && el91['dataset']['waveformKey'] !== value378) return;
-    if (this['el']?.['isConnected'] === ![]) return;
+    if (this['el']?.['isConnected'] === false) return;
     (el92['setAttribute']('d', waveformBarsPathFromPersistedUrl), el91['classList']?.['add']('has-waveform'));
   }
   ['_renderTrack'](value380, args11 = {}) {
@@ -2801,7 +2801,7 @@ export class MediaClipNode {
       el93 = document['createElement']('div');
     ((el93['className'] = 'media-clip-track media-clip-track-' + value380),
       el93['classList']['toggle']('is-active', value381),
-      el93['classList']['toggle']('is-compact', args11['compact'] === !![]));
+      el93['classList']['toggle']('is-compact', args11['compact'] === true));
     if (value380 === 'audio') {
       ((el93['dataset']['audioLaneCount'] = String(value383)),
         this['_setAudioLaneCountStyle'](el93, value383));
@@ -2823,12 +2823,12 @@ export class MediaClipNode {
     el93['addEventListener']('click', (event9) => {
       event9['stopPropagation']();
       if (this['_suppressTrackClick']) {
-        this['_suppressTrackClick'] = ![];
+        this['_suppressTrackClick'] = false;
         return;
       }
       if (this['_isTimelineControlTarget'](event9['target'])) return;
-      if (args11['compact'] === !![]) {
-        this['_setMediaClipWithLayout']({ ...this['_mediaClip'], expanded: !![] }, !![]);
+      if (args11['compact'] === true) {
+        this['_setMediaClipWithLayout']({ ...this['_mediaClip'], expanded: true }, true);
         return;
       }
       if (!this['_timelineEventSegment'](event9['target'])) return;
@@ -2839,7 +2839,7 @@ export class MediaClipNode {
             ? this['_setActiveClipIndex'](this['_clipIndexAtTimelineSec'](value386))
             : value380 === 'audio'
               ? this['_setActiveAudioClipIndex'](this['_audioClipIndexAtTimelineSec'](value386))
-              : ![];
+              : false;
       if (value380 === 'audio') this['_selectAudioClipIndex'](this['_activeAudioClipIndex']);
       this['_setActiveTrack'](value380, value386, { forceRender: forceRender2 });
     });
@@ -2854,9 +2854,9 @@ export class MediaClipNode {
             ((el97['className'] = 'media-clip-filmstrip-frame'),
               (el97['src'] = list36[value388 % list36['length']]),
               (el97['alt'] = ''),
-              (el97['draggable'] = ![]),
+              (el97['draggable'] = false),
               el97['addEventListener']('error', () => fillFilmstripPlaceholder(el96, mediaClipFrameCount), {
-                once: !![],
+                once: true,
               }),
               el96['appendChild'](el97));
           }
@@ -2922,15 +2922,15 @@ export class MediaClipNode {
           (el106['classList']['add']('media-clip-segment-audio'),
             (el106['dataset']['mediaKind'] = 'audio'),
             this['_setAudioSegmentLaneVisual'](el106, this['_audioClipLaneIndex'](item)),
-            (el106['dataset']['mutedClip'] = item?.['muted'] === !![] ? 'true' : 'false'),
-            (el106['dataset']['disabledClip'] = item?.['disabled'] === !![] ? 'true' : 'false'),
-            el106['classList']['toggle']('is-muted', item?.['muted'] === !![]),
-            el106['classList']['toggle']('is-disabled', item?.['disabled'] === !![]),
+            (el106['dataset']['mutedClip'] = item?.['muted'] === true ? 'true' : 'false'),
+            (el106['dataset']['disabledClip'] = item?.['disabled'] === true ? 'true' : 'false'),
+            el106['classList']['toggle']('is-muted', item?.['muted'] === true),
+            el106['classList']['toggle']('is-disabled', item?.['disabled'] === true),
             clipIndex === this['_clampAudioClipIndex']() && (el106['dataset']['activeClip'] = 'true'),
             clipIndex === this['_selectedAudioClipIndex'] && (el106['dataset']['selectedClip'] = 'true'),
             handler2(el106, item, source));
         handler3(el106, item || {});
-        if (args11['compact'] !== !![]) {
+        if (args11['compact'] !== true) {
           el106['addEventListener']('contextmenu', (value393) => {
             const value394 = this['_segmentClipIndex'](el106, value380);
             if (value380 === 'video')
@@ -3149,15 +3149,15 @@ export class MediaClipNode {
   ['_flushTimelineSettlePersist']() {
     if (!this['_timelineSettlePendingPersist']) return;
     const commitHistory = this['_timelineSettlePendingCommit'];
-    ((this['_timelineSettlePendingPersist'] = ![]),
-      (this['_timelineSettlePendingCommit'] = ![]),
+    ((this['_timelineSettlePendingPersist'] = false),
+      (this['_timelineSettlePendingCommit'] = false),
       this['_persistTimelineMediaClip']({ commitHistory: commitHistory }));
   }
   ['_persistTimelineMediaClip'](options18 = {}) {
-    ((this['_skipNextStoreMediaClipRender'] = !![]),
+    ((this['_skipNextStoreMediaClipRender'] = true),
       appStore['updateNodeData'](this['id'], { mediaClip: this['_mediaClip'] }),
       (this['nodeData'] = { ...(this['nodeData'] || {}), mediaClip: this['_mediaClip'] }));
-    if (options18['commitHistory'] === !![]) commit();
+    if (options18['commitHistory'] === true) commit();
   }
   ['_applyDeferredTimelineDragUpdate'](value445 = null) {
     const enabled35 = this['_deferredTimelineDragNodeData'];
@@ -3173,31 +3173,31 @@ export class MediaClipNode {
     this['_timelineSettleRow'] = value447 || this['_timelineSettleRow'];
     const value449 = this['_timelineSettleVersion'];
     ((this['_timelineSettlePendingPersist'] =
-      this['_timelineSettlePendingPersist'] || value448['persist'] === !![]),
+      this['_timelineSettlePendingPersist'] || value448['persist'] === true),
       (this['_timelineSettlePendingCommit'] =
-        this['_timelineSettlePendingCommit'] || value448['commitHistory'] === !![]),
+        this['_timelineSettlePendingCommit'] || value448['commitHistory'] === true),
       (this['_timelineSettleTimer'] = setTimeout(() => {
         if (value449 !== this['_timelineSettleVersion']) return;
         this['_timelineSettleTimer'] = 0;
         const el114 = this['_timelineSettleRow'] || value447;
         (el114?.['classList']['remove']('is-settling'),
           (this['_timelineSettleRow'] = null),
-          value448['syncTimelineWidthAfterSettle'] !== ![] && this['_syncTimelineContentWidth'](),
+          value448['syncTimelineWidthAfterSettle'] !== false && this['_syncTimelineContentWidth'](),
           this['_flushTimelineSettlePersist']());
       }, TIMELINE_SETTLE_ANIMATION_MS)));
   }
   ['_animateTrackVisualsToCurrentState'](value450, value451 = 'video', args12 = {}) {
     const value452 = this['_startTimelineSettle'](value450),
       commitHistory2 = { ...args12 };
-    commitHistory2['persist'] === !![] &&
-      (this['_persistTimelineMediaClip']({ commitHistory: commitHistory2['commitHistory'] === !![] }),
-      (commitHistory2['persist'] = ![]),
-      (commitHistory2['commitHistory'] = ![]));
+    commitHistory2['persist'] === true &&
+      (this['_persistTimelineMediaClip']({ commitHistory: commitHistory2['commitHistory'] === true }),
+      (commitHistory2['persist'] = false),
+      (commitHistory2['commitHistory'] = false));
     const value453 = () => {
       if (value452 !== this['_timelineSettleVersion'] || this['_timelineDrag']()) return;
       (this['_updateTrackVisuals'](value451, {
         durationSec: commitHistory2['durationSec'],
-        syncTimelineWidth: ![],
+        syncTimelineWidth: false,
       }),
         this['_scheduleTimelineSettleRender'](value450, commitHistory2));
     };
@@ -3228,9 +3228,9 @@ export class MediaClipNode {
     const el117 = this['_timelineSettleRow'];
     (el117?.['classList']['remove']('is-settling'),
       (this['_timelineSettleRow'] = null),
-      options19['flushPersist'] !== ![]
+      options19['flushPersist'] !== false
         ? this['_flushTimelineSettlePersist']()
-        : ((this['_timelineSettlePendingPersist'] = ![]), (this['_timelineSettlePendingCommit'] = ![])));
+        : ((this['_timelineSettlePendingPersist'] = false), (this['_timelineSettlePendingCommit'] = false)));
   }
   ['_updateTrackPlayheadVisual'](el118, value454 = 0, playheadSec5 = {}) {
     if (!el118) return;
@@ -3259,7 +3259,7 @@ export class MediaClipNode {
         el121?.['querySelector']?.('.media-clip-hover-playhead') ||
         el120['querySelector']?.('.media-clip-hover-playhead');
     if (!el122) return;
-    ((el122['hidden'] = ![]),
+    ((el122['hidden'] = false),
       el122['classList']?.['add']('is-visible'),
       this['_applyTimelinePlayheadModel'](
         el122,
@@ -3281,7 +3281,7 @@ export class MediaClipNode {
       el123?.['querySelector']?.('.media-clip-hover-playhead');
     if (value457 && !list38['includes'](value457)) list38['push'](value457);
     list38['forEach']((el125) => {
-      (el125['classList']?.['remove']('is-visible'), (el125['hidden'] = !![]));
+      (el125['classList']?.['remove']('is-visible'), (el125['hidden'] = true));
     });
   }
   ['_clearTimelinePlaybackVisualLocks']() {
@@ -3324,7 +3324,7 @@ export class MediaClipNode {
             value461['durationSec'] ?? this['_timelineDurationForKind'](value460),
           );
     this['_setTimelineRowDuration'](el132, durationSec10);
-    if (value460 === 'video' && value461['syncTimelineWidth'] !== ![])
+    if (value460 === 'video' && value461['syncTimelineWidth'] !== false)
       this['_syncTimelineContentWidth'](undefined, { durationSec: durationSec10 });
     else
       value460 === 'video' &&
@@ -3378,10 +3378,10 @@ export class MediaClipNode {
             ),
               this['_updateTimelineSegmentLabel'](el134, Math['max'](0, endSec8 - startSec9)),
               this['_setAudioSegmentLaneVisual'](el134, this['_audioClipLaneIndex'](el135)),
-              (el134['dataset']['mutedClip'] = el135['muted'] === !![] ? 'true' : 'false'),
-              (el134['dataset']['disabledClip'] = el135['disabled'] === !![] ? 'true' : 'false'),
-              el134['classList']?.['toggle']?.('is-muted', el135['muted'] === !![]),
-              el134['classList']?.['toggle']?.('is-disabled', el135['disabled'] === !![]),
+              (el134['dataset']['mutedClip'] = el135['muted'] === true ? 'true' : 'false'),
+              (el134['dataset']['disabledClip'] = el135['disabled'] === true ? 'true' : 'false'),
+              el134['classList']?.['toggle']?.('is-muted', el135['muted'] === true),
+              el134['classList']?.['toggle']?.('is-disabled', el135['disabled'] === true),
               this['_syncAudioSegmentWaveformViewport'](el134, el135));
           }));
       } else {
@@ -3425,7 +3425,7 @@ export class MediaClipNode {
   }
   ['_refreshMediaClipTimelineInPlace']() {
     if (
-      this['_mediaClip']['expanded'] !== !![] ||
+      this['_mediaClip']['expanded'] !== true ||
       !(this['_mediaClip']['tracks']?.['video'] || this['_mediaClip']['tracks']?.['audio'])
     ) {
       this['_render']();
@@ -3436,14 +3436,14 @@ export class MediaClipNode {
     if (value470 === 'video')
       (this['_syncVideoPreviewSourceForTimelineSec'](this['_playheadSec']),
         this['_syncPreviewTime']('video', this['_videoSourceSecForPlayhead'](this['_playheadSec']), {
-          immediate: !![],
+          immediate: true,
         }));
     else
       value470 === 'audio' &&
         (this['_setActiveAudioClipIndex'](this['_audioClipIndexAtTimelineSec'](this['_playheadSec'])),
         this['_syncAudioPreviewSourceForTimelineSec'](this['_playheadSec']),
         this['_syncPreviewTime']('audio', this['_audioSourceSecForPlayhead'](this['_playheadSec']), {
-          immediate: !![],
+          immediate: true,
         }));
     this['_updatePreviewControls']();
   }
@@ -3473,7 +3473,7 @@ export class MediaClipNode {
     if (this['_timelineDrag']()) return;
     const value481 = value479 === 'audio' ? 'audio' : 'video',
       value482 = this['_mediaClip']['activeTrack'];
-    (this['_pausePreviewPlayback']({ updateControls: ![] }), (this['_materialMenu'] = null));
+    (this['_pausePreviewPlayback']({ updateControls: false }), (this['_materialMenu'] = null));
     let activeTrack4 = this['_mediaClip'],
       value483 = '';
     if (value481 === 'audio') {
@@ -3510,7 +3510,7 @@ export class MediaClipNode {
               : 'video',
           expanded:
             !!(activeTrack4['tracks']?.['video'] || activeTrack4['tracks']?.['audio']) &&
-            this['_mediaClip']['expanded'] === !![],
+            this['_mediaClip']['expanded'] === true,
         }));
     } else {
       const list42 = this['_videoTimelineClips'](this['_mediaClip']['tracks']?.['video']),
@@ -3545,16 +3545,16 @@ export class MediaClipNode {
               : 'video',
           expanded:
             !!(activeTrack4['tracks']?.['video'] || activeTrack4['tracks']?.['audio']) &&
-            this['_mediaClip']['expanded'] === !![],
+            this['_mediaClip']['expanded'] === true,
         }));
     }
-    const value492 = activeTrack4['expanded'] !== !![] || value482 !== activeTrack4['activeTrack'];
-    this['_setMediaClipWithLayout'](activeTrack4, ![], { render: ![] });
+    const value492 = activeTrack4['expanded'] !== true || value482 !== activeTrack4['activeTrack'];
+    this['_setMediaClipWithLayout'](activeTrack4, false, { render: false });
     value483 &&
       typeof appStore['removeEdge'] === 'function' &&
-      ((this['_skipNextIncomingMediaClipRender'] = !![]),
+      ((this['_skipNextIncomingMediaClipRender'] = true),
       appStore['removeEdge'](value483),
-      this['_skipNextIncomingMediaClipRender'] === !![] && (this['_skipNextIncomingMediaClipRender'] = ![]));
+      this['_skipNextIncomingMediaClipRender'] === true && (this['_skipNextIncomingMediaClipRender'] = false));
     commit();
     if (value492) this['_render']();
     else this['_refreshMediaClipTimelineInPlace']();

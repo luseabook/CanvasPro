@@ -11,7 +11,7 @@ export function selectTextMediaExecution(manifest, payload, ctx) {
     inputAudioUrls: payload['inputAudioUrls'],
   });
   if (!resolvedInputs['inputVideoUrls']?.['length']) return manifest;
-  if (payload['webSearch'] === !![] || (payload['imageSearch'] && payload['imageSearch'] !== 'off'))
+  if (payload['webSearch'] === true || (payload['imageSearch'] && payload['imageSearch'] !== 'off'))
     throw new Error('视频理解暂不能同时使用联网或搜图，请关闭联网和搜图后重试');
   const manifestMaxTokens = Number(manifest['extensions']['maxOutputTokens']);
   if (Number(payload['maxOutputTokens']) > manifestMaxTokens)
@@ -84,7 +84,7 @@ export async function buildTextResponsesBody({
   if (maxOutputTokens && Number['isFinite'](manifestMaxTokens) && maxOutputTokens > manifestMaxTokens)
     throw new Error('输出上限不能超过 ' + manifestMaxTokens + ' tokens');
   const tools =
-      payload['webSearch'] === !![]
+      payload['webSearch'] === true
         ? (extensions['webSearchTools'] || [{ type: 'web_search' }])['map']((tool) => ({ ...tool }))
         : [],
     imageSearchMode = payload['imageSearch'] || 'off',
@@ -101,7 +101,7 @@ export async function buildTextResponsesBody({
   return {
     apiKey: apiKey,
     model: modelToken,
-    stream: ![],
+    stream: false,
     ...(instructions ? { instructions: instructions } : {}),
     input: [{ role: 'user', content: inputParts }],
     ...(tools['length'] ? { tools: tools } : {}),

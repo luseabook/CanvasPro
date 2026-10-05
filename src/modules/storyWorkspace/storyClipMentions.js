@@ -95,7 +95,7 @@ function parseStoryAssetMentionId(value4 = '') {
 }
 function matchesQuery(options3 = {}, value7 = '') {
   const text3 = normalizeText(value7)['replace'](/^@+/, '')['toLowerCase']();
-  if (!text3) return !![];
+  if (!text3) return true;
   const list2 = Array['isArray'](options3['mentionVariants']) ? options3['mentionVariants'] : [];
   return [
     options3['label'],
@@ -134,7 +134,7 @@ export function getStoryEpisodeMentionAssets(list3 = [], value14 = null) {
 function buildStoryClipAssetMentionCandidate({
   asset: asset,
   appearance: appearance = null,
-  allowAssetImageFallback: allowAssetImageFallback = ![],
+  allowAssetImageFallback: allowAssetImageFallback = false,
   displayAssets: displayAssets = [],
 } = {}) {
   const text4 = normalizeText(asset?.['name']) || '本集素材',
@@ -143,8 +143,8 @@ function buildStoryClipAssetMentionCandidate({
     text7 = normalizeText(appearance?.['imageUrl'] || (allowAssetImageFallback ? asset?.['imageUrl'] : ''));
   return {
     origin: 'asset',
-    menuDirect: !![],
-    suppressTooltip: !![],
+    menuDirect: true,
+    suppressTooltip: true,
     assetId: buildStoryAssetMentionId(asset?.['id'], text5),
     assetIndex: 0,
     type: 'image',
@@ -171,8 +171,8 @@ export function buildStoryClipMentionCandidates({
   libraryCandidates: libraryCandidates = [],
   clipFrames: clipFrames = [],
   query: query = '',
-  includeTime: includeTime = ![],
-  includeClipFrames: includeClipFrames = ![],
+  includeTime: includeTime = false,
+  includeClipFrames: includeClipFrames = false,
   defaultDuration: defaultDuration = '3.0s',
 } = {}) {
   const value17 = new Map([
@@ -199,7 +199,7 @@ export function buildStoryClipMentionCandidates({
                 buildStoryClipAssetMentionCandidate({
                   asset: value20,
                   appearance: null,
-                  allowAssetImageFallback: !![],
+                  allowAssetImageFallback: true,
                   displayAssets: episode?.['replication'] ? assets : [],
                 }),
               ],
@@ -218,11 +218,11 @@ export function buildStoryClipMentionCandidates({
     args4 = (Array['isArray'](libraryCandidates) ? libraryCandidates : [])['map']((args5) => ({
       ...args5,
       origin: 'asset',
-      menuDirect: !![],
+      menuDirect: true,
       menuPage: 'assets',
       menuGroup: '全部素材',
       menuSection: '',
-      suppressTooltip: !![],
+      suppressTooltip: true,
       assetIndex: Number(args5?.['itemIndex'] || 0),
       label: normalizeText(args5?.['insertLabel'] || args5?.['label'] || args5?.['name']) || '素材库内容',
       assetName: normalizeText(args5?.['assetName']) || '素材库',
@@ -232,8 +232,8 @@ export function buildStoryClipMentionCandidates({
       ? [
           {
             origin: 'asset',
-            menuDirect: !![],
-            suppressTooltip: !![],
+            menuDirect: true,
+            suppressTooltip: true,
             assetId: STORY_TIME_MENTION_ASSET_ID,
             assetIndex: 0,
             type: '',
@@ -245,7 +245,7 @@ export function buildStoryClipMentionCandidates({
             assetName: '片段设置',
             menuPage: 'tools',
             menuSection: '',
-            compactVisual: !![],
+            compactVisual: true,
           },
         ]
       : [],
@@ -261,7 +261,7 @@ export function buildStoryClipMentionCandidates({
 }
 function renderStoryAssetMentionPill(value26, list5 = []) {
   const text9 = normalizeText(value26?.['pillLabel'] || value26?.['label']) || '本集素材',
-    value27 = value26?.['missingAsset'] === !![],
+    value27 = value26?.['missingAsset'] === true,
     text10 = normalizeText(value26?.['storyAssetId']),
     text11 = normalizeText(value26?.['storyAppearanceId']),
     value28 = list5['find']((value29) => value29['id'] === text10),
@@ -334,13 +334,13 @@ export function beginStoryClipTimePillEdit({
     (el2['inputMode'] = 'decimal'),
     (el2['value'] = storyClipTimeLabel2['replace'](/s$/i, '')),
     (el2['autocomplete'] = 'off'),
-    (el2['spellcheck'] = ![]),
+    (el2['spellcheck'] = false),
     (el2['dataset']['promptPillInlineEditor'] = 'true'),
     el2['setAttribute']?.('aria-label', '片段时间（秒）'));
-  let value36 = ![];
+  let value36 = false;
   const run = (value37) => {
     if (value36) return;
-    value36 = !![];
+    value36 = true;
     const value38 = value37
         ? normalizeStoryClipTimeLabel(el2['value'], storyClipTimeLabel2)
         : storyClipTimeLabel2,
@@ -354,12 +354,12 @@ export function beginStoryClipTimePillEdit({
   return (
     el2['addEventListener']?.('keydown', (event) => {
       if (event['key'] === 'Enter') {
-        (event['preventDefault']?.(), run(!![]));
+        (event['preventDefault']?.(), run(true));
         return;
       }
-      event['key'] === 'Escape' && (event['preventDefault']?.(), run(![]));
+      event['key'] === 'Escape' && (event['preventDefault']?.(), run(false));
     }),
-    el2['addEventListener']?.('blur', () => run(!![])),
+    el2['addEventListener']?.('blur', () => run(true)),
     pill['replaceChild'](el2, enabled2),
     pill['classList']?.['add']?.('is-editing'),
     el2['focus']?.(),
@@ -375,10 +375,10 @@ export function resolveStoryClipPromptPillPresentation(value40, value41 = [], va
       value40?.['dataset']?.['promptPillKind'] || value40?.['getAttribute']?.('data-prompt-pill-kind'),
     );
   if (text13 === 'time' || text12 === STORY_TIME_MENTION_ASSET_ID)
-    return { pillKind: 'time', missingAsset: ![] };
+    return { pillKind: 'time', missingAsset: false };
   if (text12['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX))
     return { pillKind: 'frame', missingAsset: !resolveStoryClipFrameMentionRef(value40, value42) };
-  if (!text12['startsWith'](STORY_ASSET_NODE_PREFIX)) return { pillKind: '', missingAsset: ![] };
+  if (!text12['startsWith'](STORY_ASSET_NODE_PREFIX)) return { pillKind: '', missingAsset: false };
   return { pillKind: '', missingAsset: !resolveStoryClipAssetMentionRef(value40, value41) };
 }
 export function syncStoryClipPromptPillPresentation(el3, value43 = [], value44 = []) {
@@ -483,7 +483,7 @@ export function renderStoryClipPromptMentions(
       ['sort']((value64, value65) => value65['length'] - value64['length']),
     value66 = list6['length'] ? '@(?:' + list6['map'](escapeRegExp)['join']('|') + ')' : '(?!)',
     regExp = new RegExp('(' + value66 + ')|(⏱\\s*-?\\d+(?:\\.\\d+)?\\s*(?:s|秒))', 'gi'),
-    handler = (list7, { escapeText: escapeText = !![] } = {}) => {
+    handler = (list7, { escapeText: escapeText = true } = {}) => {
       regExp['lastIndex'] = 0;
       let value67 = 0,
         value68 = '',
@@ -504,7 +504,7 @@ export function renderStoryClipPromptMentions(
     return ctx['restore'](
       ctx2['restore'](
         enabled3['split'](/(<[^>]+>)/gu)
-          ['map']((value73) => (value73['startsWith']('<') ? value73 : handler(value73, { escapeText: ![] })))
+          ['map']((value73) => (value73['startsWith']('<') ? value73 : handler(value73, { escapeText: false })))
           ['join'](''),
       ),
     );
@@ -551,7 +551,7 @@ export function resolveStoryClipPromptAssetRefs(
         ? resolveStoryClipAssetMentionRefs({ dataset: { assetId: enabled5 } }, assets, {
             voiceEnabled:
               enabled4 && !enabled4['has'](storyAssetIdFromMentionNodeId)
-                ? ![]
+                ? false
                 : getStoryEpisodeCharacterVoiceEnabled(episode, storyAssetIdFromMentionNodeId),
           })
         : enabled5['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX)
@@ -589,17 +589,17 @@ export function getStoryEpisodeCharacterVoiceEnabled(options5 = {}, value86 = ''
     return undefined;
   return enabled6[text20];
 }
-export function setStoryEpisodeCharacterVoiceEnabled(enabled7 = {}, value87 = '', value88 = ![]) {
-  if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) return ![];
+export function setStoryEpisodeCharacterVoiceEnabled(enabled7 = {}, value87 = '', value88 = false) {
+  if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) return false;
   const text21 = normalizeText(value87);
-  if (!text21) return ![];
+  if (!text21) return false;
   const args9 = enabled7['characterVoiceEnabledByAssetId'];
   return (
     (enabled7['characterVoiceEnabledByAssetId'] = {
       ...(args9 && typeof args9 === 'object' && !Array['isArray'](args9) ? args9 : {}),
-      [text21]: value88 === !![],
+      [text21]: value88 === true,
     }),
-    !![]
+    true
   );
 }
 export function syncStoryClipPromptPillHoverTarget(el5) {
@@ -675,10 +675,10 @@ export function getStoryClipMentionVoiceState(value95, value96 = [], { voiceEnab
     url: text22,
   };
 }
-export function setStoryClipMentionVoiceEnabled(el6, value102 = [], value103 = ![]) {
+export function setStoryClipMentionVoiceEnabled(el6, value102 = [], value103 = false) {
   if (!el6?.['dataset']) return getStoryClipMentionVoiceState(el6, value102);
   const storyClipMentionVoiceState = getStoryClipMentionVoiceState(el6, value102);
-  if (storyClipMentionVoiceState['available'] && value103 === !![])
+  if (storyClipMentionVoiceState['available'] && value103 === true)
     el6['dataset']['storyVoiceEnabled'] = 'true';
   else
     storyClipMentionVoiceState['available']

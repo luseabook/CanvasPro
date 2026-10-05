@@ -164,10 +164,10 @@ function normalizeGenerationResponseStatus(response2 = {}) {
         response3['status'] ||
         response3['jobStatus'] ||
         response3['result']?.['status'] ||
-        (response2['ok'] === ![] ? 'failed' : ''),
+        (response2['ok'] === false ? 'failed' : ''),
     );
   if (taskStatus) return taskStatus;
-  if (response2['ok'] === !![] && (el['taskId'] || response3['taskId'])) return 'running';
+  if (response2['ok'] === true && (el['taskId'] || response3['taskId'])) return 'running';
   return '';
 }
 function getGenerationResponseNodeId(options6 = {}) {
@@ -286,7 +286,7 @@ export function createAgentTaskBindingRuntime({
       taskId: taskId2,
       commandId: String(options8['commandId'] || 'generation.run'),
       status: status3 || 'running',
-      notifiedTerminal: ![],
+      notifiedTerminal: false,
     };
   }
   function run4(binding2 = {}, { node: node = {}, status: status = '', error: error = '' } = {}) {
@@ -305,7 +305,7 @@ export function createAgentTaskBindingRuntime({
   function sync(value7 = readCanvasState()) {
     const value8 = sessionStore['getTaskBindings']?.() || [];
     for (const taskId3 of value8) {
-      if (!taskId3?.['nodeId'] || taskId3['notifiedTerminal'] === !![]) continue;
+      if (!taskId3?.['nodeId'] || taskId3['notifiedTerminal'] === true) continue;
       const node3 = getNode(value7, taskId3['nodeId']) || {},
         status4 = getNodeTaskStatus(node3);
       if (!status4) continue;
@@ -317,10 +317,10 @@ export function createAgentTaskBindingRuntime({
         };
       if (isTerminalTaskStatus(status4))
         (run4(
-          { ...taskId3, ...args, notifiedTerminal: !![] },
+          { ...taskId3, ...args, notifiedTerminal: true },
           { node: node3, status: status4, error: getTaskErrorText(node3) },
         ),
-          run5(taskId3, { ...args, notifiedTerminal: !![] }));
+          run5(taskId3, { ...args, notifiedTerminal: true }));
       else
         (messageStatus !== taskId3['messageStatus'] || status4 !== taskId3['status']) && run5(taskId3, args);
     }
@@ -372,8 +372,8 @@ export function createAgentTaskBindingRuntime({
     const value17 = String(value16 || '')['trim'](),
       value18 = readCanvasState();
     return (sessionStore['getTaskBindings']?.() || [])['filter']((response6) => {
-      if (value17 && response6['turnId'] !== value17) return ![];
-      if (isTerminalTaskStatus(response6['status'])) return ![];
+      if (value17 && response6['turnId'] !== value17) return false;
+      if (isTerminalTaskStatus(response6['status'])) return false;
       const nodeTaskStatus = getNodeTaskStatus(getNode(value18, response6['nodeId']) || {});
       return Boolean(
         response6['taskId'] || ['pending', 'running']['includes'](normalizeTaskStatus(nodeTaskStatus)),
@@ -390,7 +390,7 @@ export function createAgentTaskBindingRuntime({
       bindings['length'] !== map['size'] ||
       bindings['some']((response7) => !isTerminalTaskStatus(response7['status']))
     )
-      return { settled: ![], allSucceeded: ![], bindings: bindings };
+      return { settled: false, allSucceeded: false, bindings: bindings };
     const allSucceeded = bindings['every']((response8) =>
         TASK_SUCCESS_STATUSES['has'](normalizeTaskStatus(response8['status'])),
       ),
@@ -401,7 +401,7 @@ export function createAgentTaskBindingRuntime({
           ) || null,
       value20 = readCanvasState();
     return {
-      settled: !![],
+      settled: true,
       allSucceeded: allSucceeded,
       bindings: bindings,
       failedBinding: failedBinding,
@@ -414,11 +414,11 @@ export function createAgentTaskBindingRuntime({
         : '',
     };
   }
-  let enabled3 = ![],
+  let enabled3 = false,
     value21 = null;
   function start() {
     if (enabled3) return;
-    enabled3 = !![];
+    enabled3 = true;
     if (typeof store?.['subscribeSelector'] === 'function')
       value21 = store['subscribeSelector'](
         (value22) => Number(value22?.['_persistRev'] || 0),
@@ -439,7 +439,7 @@ export function createAgentTaskBindingRuntime({
     start: start,
     sync: sync,
     dispose() {
-      (value21?.(), (value21 = null), (enabled3 = ![]));
+      (value21?.(), (value21 = null), (enabled3 = false));
     },
   });
 }

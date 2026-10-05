@@ -14,7 +14,7 @@ export function renderPreviewPanel(key) {
     el2 = makeButton('media-clip-close', mediaClipText('preview.collapse'), '×');
   return (
     el2['addEventListener']('click', (result) => {
-      (stopPointer(result), key['_setExpanded'](![]));
+      (stopPointer(result), key['_setExpanded'](false));
     }),
     el['appendChild'](el2),
     index['append'](el),
@@ -70,18 +70,18 @@ export function syncPreviewVideoLayoutFromElement(input, output = input['_videoP
 export function showPreviewImage(value2, value3 = {}, value4 = '') {
   const el6 = value2['_ensurePreviewImageElement'](),
     text = normalizeText(value4) || resolveMediaClipImageUrl(value3);
-  if (!el6 || !text) return ![];
+  if (!el6 || !text) return false;
   value2['_previewVisualKind'] = 'image';
   try {
     value2['_videoPreview']?.['pause']?.();
   } catch {}
-  if (value2['_videoPreview']) value2['_videoPreview']['hidden'] = !![];
-  el6['hidden'] = ![];
+  if (value2['_videoPreview']) value2['_videoPreview']['hidden'] = true;
+  el6['hidden'] = false;
   if (el6['getAttribute']?.('src') !== text) el6['src'] = text;
   return (
     value2['_applyPreviewVideoLayout'](el6['parentElement'], value3),
     value2['_updatePreviewControls'](),
-    !![]
+    true
   );
 }
 export function clearPreviewVideoFallback(value5) {
@@ -93,8 +93,8 @@ export function clearPreviewVideoFallback(value5) {
 }
 export function showPreviewVideo(value6, value7 = {}) {
   ((value6['_previewVisualKind'] = 'video'), value6['_clearPreviewVideoFallback']());
-  if (value6['_imagePreview']) value6['_imagePreview']['hidden'] = !![];
-  if (value6['_videoPreview']) value6['_videoPreview']['hidden'] = ![];
+  if (value6['_imagePreview']) value6['_imagePreview']['hidden'] = true;
+  if (value6['_videoPreview']) value6['_videoPreview']['hidden'] = false;
   value6['_applyPreviewVideoLayout'](value6['_videoPreview']?.['parentElement'], value7);
 }
 export function ensurePreviewVideoElement(value8) {
@@ -102,12 +102,12 @@ export function ensurePreviewVideoElement(value8) {
   const el9 = document['createElement']('video');
   ((el9['className'] = 'media-clip-video-preview'),
     (el9['preload'] = 'auto'),
-    (el9['controls'] = ![]),
+    (el9['controls'] = false),
     el9['removeAttribute']('controls'),
-    (el9['muted'] = !![]),
-    (el9['defaultMuted'] = !![]),
-    (el9['playsInline'] = !![]),
-    (el9['disablePictureInPicture'] = !![]),
+    (el9['muted'] = true),
+    (el9['defaultMuted'] = true),
+    (el9['playsInline'] = true),
+    (el9['disablePictureInPicture'] = true),
     el9['setAttribute']('controlsList', 'nodownload nofullscreen noremoteplayback'));
   const value9 = () => {
     (value8['_syncPreviewVideoLayoutFromElement'](el9), value8['_applyPendingVideoSourceSeek'](el9));
@@ -119,7 +119,7 @@ export function ensurePreviewVideoElement(value8) {
       return;
     }
     const value10 = value8['_resolveVideoPreviewSeekTarget']();
-    value8['_syncPreviewTime']('video', value10, { immediate: !![] });
+    value8['_syncPreviewTime']('video', value10, { immediate: true });
   };
   return (
     el9['addEventListener']('loadedmetadata', value9),
@@ -143,8 +143,8 @@ export function ensurePreviewImageElement(value11) {
   return (
     (width2['className'] = 'media-clip-image-preview'),
     (width2['alt'] = ''),
-    (width2['draggable'] = ![]),
-    (width2['hidden'] = !![]),
+    (width2['draggable'] = false),
+    (width2['hidden'] = true),
     width2['addEventListener']('load', () => {
       value11['_applyPreviewVideoLayout'](width2['parentElement'], {
         width: width2['naturalWidth'],
@@ -160,12 +160,12 @@ export function ensurePreviewAudioElement(value12) {
   const el11 = document['createElement']('audio');
   return (
     (el11['className'] = 'media-clip-audio-element'),
-    (el11['controls'] = ![]),
+    (el11['controls'] = false),
     el11['removeAttribute']('controls'),
     (el11['preload'] = 'metadata'),
     el11['addEventListener']('loadedmetadata', () => {
       const value13 = value12['_audioSourceSecForPlayhead'](value12['_playheadSec'] || 0);
-      value12['_syncPreviewTime']('audio', value13, { immediate: !![] });
+      value12['_syncPreviewTime']('audio', value13, { immediate: true });
     }),
     (value12['_audioPreview'] = el11),
     el11
@@ -222,15 +222,15 @@ export function renderPreview(value18) {
       const value25 = value18['_ensurePreviewAudioElement']();
       (setMediaElementSource(value25, value24) && value18['_resetPreviewSeekState']('audio'),
         (value18['_previewAudioSrc'] = value24),
-        (value22['muted'] = !![]),
+        (value22['muted'] = true),
         el13['appendChild'](value25));
-    } else ((value22['muted'] = ![]), value18['_disposePreviewMedia']('audio'));
+    } else ((value22['muted'] = false), value18['_disposePreviewMedia']('audio'));
     (el13['appendChild'](value23),
       el13['appendChild'](value22),
       response['clipKind'] === 'image'
         ? value18['_showPreviewImage'](response['source'], enabled)
         : (value18['_showPreviewVideo'](response['source']),
-          value18['_syncPreviewTime']('video', response['sourceSec'], { immediate: !![] })),
+          value18['_syncPreviewTime']('video', response['sourceSec'], { immediate: true })),
       el13['appendChild'](value18['_renderPreviewControls']()));
   } else {
     value18['_disposePreviewMedia']('video');
@@ -248,7 +248,7 @@ export function renderPreview(value18) {
         value18['_syncPreviewTime'](
           'audio',
           value18['_audioSourceSecForPlayhead'](value18['_playheadSec'] || 0),
-          { immediate: !![] },
+          { immediate: true },
         ),
       el13['appendChild'](value18['_renderPreviewControls']()));
   }
@@ -262,7 +262,7 @@ export function renderVideoFallback(value28 = '') {
       (value29['className'] = 'media-clip-video-fallback'),
       (value29['src'] = text3),
       (value29['alt'] = ''),
-      (value29['draggable'] = ![]),
+      (value29['draggable'] = false),
       value29
     );
   }

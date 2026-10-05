@@ -2,7 +2,7 @@ import { stopLoading } from '../../modules/loadingOverlay.js';
 import { resetVideoFramePresentation } from '../../services/videoFramePresentation.js';
 const pendingCommits = new Map();
 let reportedFrames = new WeakMap(),
-  frameScheduled = ![];
+  frameScheduled = false;
 function isCurrentCommit({ node: node, sourceKey: sourceKey, mediaSlotToken: mediaSlotToken }) {
   return !!(
     node &&
@@ -11,19 +11,19 @@ function isCurrentCommit({ node: node, sourceKey: sourceKey, mediaSlotToken: med
   );
 }
 function prepareCommit(entry) {
-  if (!isCurrentCommit(entry)) return ![];
+  if (!isCurrentCommit(entry)) return false;
   const { node: node, sourceKey: sourceKey, mediaSlotToken: mediaSlotToken } = entry;
   if (node['_restorePausedFirstFrameNudge'](sourceKey))
     return (
       resetVideoFramePresentation(node['_video']),
-      node['_syncPosterFrameVisibility']({ force: !![] }),
+      node['_syncPosterFrameVisibility']({ force: true }),
       node['_armFirstVideoFramePresentation'](sourceKey, mediaSlotToken),
-      ![]
+      false
     );
-  return (node['_syncPosterFrameVisibility'](), stopLoading(node['_card']), !![]);
+  return (node['_syncPosterFrameVisibility'](), stopLoading(node['_card']), true);
 }
 function flushPendingCommits() {
-  frameScheduled = ![];
+  frameScheduled = false;
   const entries = Array['from'](pendingCommits['values']());
   pendingCommits['clear']();
   const prepared = entries['filter'](prepareCommit);
@@ -39,17 +39,17 @@ function flushPendingCommits() {
   }
 }
 export function scheduleSourceVideoFramePresentationCommit(node, sourceKey, mediaSlotToken) {
-  if (!node || !sourceKey) return ![];
+  if (!node || !sourceKey) return false;
   pendingCommits['set'](node, {
     node: node,
     sourceKey: sourceKey,
     mediaSlotToken: mediaSlotToken,
     facts: null,
   });
-  if (frameScheduled) return !![];
+  if (frameScheduled) return true;
   const requestFrame = globalThis['requestAnimationFrame'];
-  if (typeof requestFrame !== 'function') return (flushPendingCommits(), !![]);
-  return ((frameScheduled = !![]), requestFrame(flushPendingCommits), !![]);
+  if (typeof requestFrame !== 'function') return (flushPendingCommits(), true);
+  return ((frameScheduled = true), requestFrame(flushPendingCommits), true);
 }
 export function reportSourceVideoMediaSlotFrameOnce(
   node,
@@ -58,21 +58,21 @@ export function reportSourceVideoMediaSlotFrameOnce(
   const videoEl = node?.['_video'],
     normalizedSourceKey = String(sourceKey || '')['trim'](),
     sourceEpoch = mediaSlotToken?.['sourceEpoch'];
-  if (!videoEl || !normalizedSourceKey || !Number['isInteger'](sourceEpoch)) return ![];
+  if (!videoEl || !normalizedSourceKey || !Number['isInteger'](sourceEpoch)) return false;
   if (
     hasReportedSourceVideoMediaSlotFrame(node, {
       sourceKey: normalizedSourceKey,
       mediaSlotToken: mediaSlotToken,
     })
   )
-    return !![];
+    return true;
   const reported =
     globalThis['window']?.['v2Renderer']?.['reportMediaSlotFrame']?.(node['id'], {
       slotIndex: 0,
       sourceKey: normalizedSourceKey,
       sourceEpoch: sourceEpoch,
       facts: presentationFacts || node['_getRendererVideoPresentationFacts'](),
-    }) === !![];
+    }) === true;
   return (
     reported &&
       reportedFrames['set'](node, {
@@ -90,7 +90,7 @@ export function hasReportedSourceVideoMediaSlotFrame(
   const videoEl = node?.['_video'],
     normalizedSourceKey = String(sourceKey || '')['trim'](),
     sourceEpoch = mediaSlotToken?.['sourceEpoch'];
-  if (!videoEl || !normalizedSourceKey || !Number['isInteger'](sourceEpoch)) return ![];
+  if (!videoEl || !normalizedSourceKey || !Number['isInteger'](sourceEpoch)) return false;
   const record = reportedFrames['get'](node);
   return !!(
     record?.['videoEl'] === videoEl &&
@@ -100,6 +100,6 @@ export function hasReportedSourceVideoMediaSlotFrame(
 }
 export const __sourceVideoFramePresentationBatchForTest = {
   reset() {
-    (pendingCommits['clear'](), (reportedFrames = new WeakMap()), (frameScheduled = ![]));
+    (pendingCommits['clear'](), (reportedFrames = new WeakMap()), (frameScheduled = false));
   },
 };

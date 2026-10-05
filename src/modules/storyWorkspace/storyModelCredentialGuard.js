@@ -18,11 +18,11 @@ export async function requireStoryModelCredentials(
 ) {
   const guardCredentials2 = await guardCredentials({
     ...buildStoryModelCredentialOptions(options),
-    waitForConfig: !![],
+    waitForConfig: true,
   });
-  if (guardCredentials2?.['ready'] !== ![]) return guardCredentials2;
+  if (guardCredentials2?.['ready'] !== false) return guardCredentials2;
   const credentialError = createCredentialError(guardCredentials2);
-  credentialError['credentialPromptShown'] = !![];
+  credentialError['credentialPromptShown'] = true;
   throw credentialError;
 }
 export function guardStoryModelTaskCredentials(handler, value) {

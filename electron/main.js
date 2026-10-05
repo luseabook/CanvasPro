@@ -539,7 +539,7 @@ async function clearPortBeforeStart(value13 = null) {
         const windowsSystemToolPath = resolveWindowsSystemToolPath('taskkill', { env: process['env'] });
         execFileSync(windowsSystemToolPath, ['/PID', String(value14), '/F', '/T'], {
           stdio: 'ignore',
-          windowsHide: !![],
+          windowsHide: true,
         });
       } else process['kill'](value14, 'SIGTERM');
     },

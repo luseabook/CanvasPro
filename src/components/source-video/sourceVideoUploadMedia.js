@@ -15,10 +15,10 @@ export function buildSourceVideoUploadSizePatch(...args) {
       height: width2['height'],
       videoWidth: videoWidth['width'],
       videoHeight: videoWidth['height'],
-      needsAutoResize: ![],
+      needsAutoResize: false,
     };
   }
-  return { needsAutoResize: !![] };
+  return { needsAutoResize: true };
 }
 export function readVideoFileNaturalSize(enabled) {
   const el = globalThis['document'];
@@ -33,11 +33,11 @@ export function readVideoFileNaturalSize(enabled) {
   }
   return new Promise((handler) => {
     const result = el['createElement']('video');
-    let data = ![],
+    let data = false,
       setTimeout2 = null;
     const run = (options) => {
         if (data) return;
-        data = !![];
+        data = true;
         if (setTimeout2) clearTimeout(setTimeout2);
         (handler2(), handler(options));
       },
@@ -51,7 +51,7 @@ export function readVideoFileNaturalSize(enabled) {
         } catch {}
       };
     ((result['preload'] = 'metadata'),
-      (result['muted'] = !![]),
+      (result['muted'] = true),
       (result['onloadedmetadata'] = () => {
         const args2 = normalizeUploadMediaDimensions(result['videoWidth'], result['videoHeight']),
           duration = Number(result['duration'] || 0),
@@ -77,11 +77,11 @@ export function waitForNextPaint() {
   const run2 = globalThis['window']?.['requestAnimationFrame'] || globalThis['requestAnimationFrame'];
   if (typeof run2 === 'function')
     return new Promise((handler3) => {
-      let source = ![],
+      let source = false,
         setTimeout3 = null;
       const next = () => {
         if (source) return;
-        source = !![];
+        source = true;
         if (setTimeout3) clearTimeout(setTimeout3);
         handler3();
       };

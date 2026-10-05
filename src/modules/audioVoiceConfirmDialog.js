@@ -11,13 +11,13 @@ export function createAudioVoiceConfirmDialog({
   windowObject: windowObject = globalThis['window'],
 } = {}) {
   let value2 = null;
-  const close = (enabled = ![]) => {
+  const close = (enabled = false) => {
       const promise = value2;
       if (!promise) return;
       ((value2 = null),
-        documentObject?.['removeEventListener']?.('keydown', promise['handleKeydown'], !![]),
+        documentObject?.['removeEventListener']?.('keydown', promise['handleKeydown'], true),
         promise['overlay']?.['remove']?.(),
-        promise['resolve']?.(enabled === !![]),
+        promise['resolve']?.(enabled === true),
         promise['returnFocus']?.['focus']?.());
     },
     confirm = ({
@@ -28,9 +28,9 @@ export function createAudioVoiceConfirmDialog({
       confirmLabel: confirmLabel = '确定',
       returnFocus: returnFocus,
     } = {}) => {
-      close(![]);
+      close(false);
       const el3 = documentObject?.['body'] || root;
-      if (!el3 || typeof documentObject?.['createElement'] !== 'function') return Promise['resolve'](![]);
+      if (!el3 || typeof documentObject?.['createElement'] !== 'function') return Promise['resolve'](false);
       return new Promise((resolve) => {
         const overlay = createElement(
             documentObject,
@@ -62,8 +62,8 @@ export function createAudioVoiceConfirmDialog({
             close(options);
           },
           handleKeydown = (event) => {
-            if (event['key'] === 'Escape') (event['preventDefault']?.(), run(![]));
-            else event['key'] === 'Enter' && (event['preventDefault']?.(), run(!![]));
+            if (event['key'] === 'Escape') (event['preventDefault']?.(), run(false));
+            else event['key'] === 'Enter' && (event['preventDefault']?.(), run(true));
           };
         ((value2 = {
           overlay: overlay,
@@ -71,15 +71,15 @@ export function createAudioVoiceConfirmDialog({
           returnFocus: returnFocus,
           handleKeydown: handleKeydown,
         }),
-          el5['addEventListener']('click', () => run(![])),
-          el6['addEventListener']('click', () => run(!![])),
+          el5['addEventListener']('click', () => run(false)),
+          el6['addEventListener']('click', () => run(true)),
           overlay['addEventListener']('click', (event2) => {
-            if (event2['target'] === overlay) run(![]);
+            if (event2['target'] === overlay) run(false);
           }),
-          documentObject?.['addEventListener']?.('keydown', handleKeydown, !![]),
+          documentObject?.['addEventListener']?.('keydown', handleKeydown, true),
           el3['appendChild'](overlay),
           windowObject?.['setTimeout']?.(() => el5['focus']?.(), 0));
       });
     };
-  return Object['freeze']({ confirm: confirm, close: close, destroy: () => close(![]) });
+  return Object['freeze']({ confirm: confirm, close: close, destroy: () => close(false) });
 }

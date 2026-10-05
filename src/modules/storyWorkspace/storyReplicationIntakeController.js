@@ -49,8 +49,8 @@ export function bindStoryReplicationIntake(
       (handler2(), sync(), persist());
     },
     handler4 = () => {
-      state['replicationSelectionMode'] = ![];
-      for (const next of state['data']['episodes']) next['replication']['selectedForAnalysis'] = ![];
+      state['replicationSelectionMode'] = false;
+      for (const next of state['data']['episodes']) next['replication']['selectedForAnalysis'] = false;
       (handler2(), sync(), persist());
     },
     current = data

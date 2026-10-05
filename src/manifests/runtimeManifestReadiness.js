@@ -23,13 +23,13 @@ export function hasPendingRuntimeManifestLoad() {
 export async function waitForRuntimeManifestLoad({ timeoutMs: timeoutMs = 500 } = {}) {
   const promise = pendingRuntimeManifestLoad,
     enabled = Math['max'](0, Number(timeoutMs) || 0);
-  if (!enabled) return (await promise, !![]);
+  if (!enabled) return (await promise, true);
   let setTimeout2 = null;
   try {
     return await Promise['race']([
-      promise['then'](() => !![]),
+      promise['then'](() => true),
       new Promise((handler) => {
-        setTimeout2 = setTimeout(() => handler(![]), enabled);
+        setTimeout2 = setTimeout(() => handler(false), enabled);
       }),
     ]);
   } finally {

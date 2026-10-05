@@ -1663,10 +1663,10 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
     handler9 = (value405, value406) => {
       const value407 = handler8(value405),
         value408 = handler8(value406);
-      if (value407 === value408) return !![];
+      if (value407 === value408) return true;
       const args4 = map15['get'](value407) || new Set(),
         map16 = map15['get'](value408) || new Set();
-      if ([...args4]['some']((value409) => map16['has'](value409))) return ![];
+      if ([...args4]['some']((value409) => map16['has'](value409))) return false;
       const value410 =
           (map9['get'](value407) ?? Number['MAX_SAFE_INTEGER']) <=
           (map9['get'](value408) ?? Number['MAX_SAFE_INTEGER']),
@@ -1676,7 +1676,7 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
         map14['set'](value412, value411),
         map15['set'](value411, new Set([...args4, ...map16])),
         map15['delete'](value412),
-        !![]
+        true
       );
     };
   value396['sort']((value413, value414) => {

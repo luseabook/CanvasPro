@@ -41,8 +41,8 @@ export function createStoryReplicationPortraitEditor({
   let box = { x: 0, y: 0, width: 1, height: 1 },
     enabled = null,
     value2 = null,
-    enabled2 = ![],
-    enabled3 = ![];
+    enabled2 = false,
+    enabled3 = false;
   function run() {
     for (const [key, index] of Object['entries'](box)) {
       (el5['style']['setProperty']('--crop-' + key, index * 100 + '%'),
@@ -57,7 +57,7 @@ export function createStoryReplicationPortraitEditor({
     if (result !== null && el3['hasPointerCapture']?.(result)) el3['releasePointerCapture'](result);
   }
   function destroy() {
-    ((enabled2 = !![]), run2(), el2['remove']());
+    ((enabled2 = true), run2(), el2['remove']());
   }
   (el3['addEventListener']('pointerdown', (x) => {
     if (enabled3 || x['button'] !== 0 || !el4['naturalWidth']) return;
@@ -101,12 +101,12 @@ export function createStoryReplicationPortraitEditor({
         showToast('请在原图范围内框选完整人物。', 'warn');
         return;
       }
-      ((enabled3 = !![]),
+      ((enabled3 = true),
         el2['setAttribute']('aria-busy', 'true'),
         (el2['querySelector']('[role=status]')['innerHTML'] =
-          renderStoryGenerationSpinner({ button: !![] }) + '正在保存人物图…'),
+          renderStoryGenerationSpinner({ button: true }) + '正在保存人物图…'),
         el2['querySelectorAll']('input, [data-crop-save]')['forEach']((el6) => {
-          el6['disabled'] = !![];
+          el6['disabled'] = true;
         }));
       try {
         const options = await capture({
@@ -118,12 +118,12 @@ export function createStoryReplicationPortraitEditor({
       } catch (error) {
         if (!enabled2) showToast(error?.['message'] || '人物图保存失败。', 'error');
       } finally {
-        ((enabled3 = ![]),
+        ((enabled3 = false),
           !enabled2 &&
             (el2['setAttribute']('aria-busy', 'false'),
             (el2['querySelector']('[role=status]')['textContent'] = ''),
             el2['querySelectorAll']('input, [data-crop-save]')['forEach']((el7) => {
-              el7['disabled'] = ![];
+              el7['disabled'] = false;
             })));
       }
     }),

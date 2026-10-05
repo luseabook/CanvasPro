@@ -12,7 +12,7 @@ export function isPathInsideRoot(candidate, root) {
         !path['isAbsolute'](relativePath))
     );
   } catch {
-    return ![];
+    return false;
   }
 }
 export function resolveExistingPathWithinRoot(

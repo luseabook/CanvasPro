@@ -39,16 +39,16 @@ export function switchLocalEditMode(enabled, data) {
     enabled['_localEditSubmission'] ||
     enabled['_draft']
   )
-    return ![];
-  if (data !== 'repaint' && data !== 'erase') return ![];
-  if (data === enabled['_mode']['scene']) return ![];
+    return false;
+  if (data !== 'repaint' && data !== 'erase') return false;
+  if (data === enabled['_mode']['scene']) return false;
   return (
     enabled['_closeGenerationMenus'](),
     (enabled['_mode']['scene'] = data),
     syncLocalEditMode(enabled),
     persistLocalEditState(enabled),
     enabled['_updateView'](enabled['_view']),
-    !![]
+    true
   );
 }
 export function bindLocalEditControls(selection) {
@@ -103,7 +103,7 @@ export async function submitLocalEdit(enabled2, args, options, handler = runGene
   const list = [...el6['querySelectorAll']('button, input')],
     entry = list['map']((el8) => el8['disabled']);
   (list['forEach']((el9) => {
-    el9['disabled'] = !![];
+    el9['disabled'] = true;
   }),
     el6['setAttribute']('aria-busy', 'true'),
     setGenerateButtonLoadingUi(el7, { title: t('imageAnnotate.actions.generating') }));

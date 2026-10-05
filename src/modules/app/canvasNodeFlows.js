@@ -119,26 +119,26 @@ function getSequenceNodes(enabled, enabled2) {
 async function readElectronClipboardContents() {
   const enabled3 = desktopBridge['clipboard'];
   if (!enabled3['canUseFiles']() && !enabled3['canUseImages']() && !enabled3['canUseText']())
-    return { pastedFiles: [], pastedMedia: null, pastedText: '', failed: ![] };
+    return { pastedFiles: [], pastedMedia: null, pastedText: '', failed: false };
   const output = {
     pastedFiles: [],
     pastedMedia: null,
     pastedText: '',
-    failed: ![],
-    imageReadSucceeded: ![],
+    failed: false,
+    imageReadSucceeded: false,
   };
   try {
     if (typeof enabled3['readFileReferences'] === 'function') {
       const response = await enabled3['readFileReferences']();
-      if (response?.['reason'] === 'read-failed') output['failed'] = !![];
+      if (response?.['reason'] === 'read-failed') output['failed'] = true;
       response?.['ok'] &&
         Array['isArray'](response['files']) &&
         (output['pastedFiles'] = response['files']);
     }
     if (output['pastedFiles']['length'] === 0 && typeof enabled3['readImage'] === 'function') {
       const response2 = await enabled3['readImage']();
-      output['imageReadSucceeded'] = response2?.['ok'] === !![] || response2?.['reason'] === 'no-image';
-      if (response2?.['reason'] && response2['reason'] !== 'no-image') output['failed'] = !![];
+      output['imageReadSucceeded'] = response2?.['ok'] === true || response2?.['reason'] === 'no-image';
+      if (response2?.['reason'] && response2['reason'] !== 'no-image') output['failed'] = true;
       if (response2?.['ok'] && response2['dataBase64']) {
         const mimeType = String(response2['mimeType'] || 'image/png'),
           blob = clipboardImageBlobFromBase64(response2['dataBase64'], mimeType);
@@ -147,13 +147,13 @@ async function readElectronClipboardContents() {
     }
     if (typeof enabled3['readText'] === 'function') {
       const response3 = await enabled3['readText']();
-      if (response3?.['reason'] === 'read-failed') output['failed'] = !![];
+      if (response3?.['reason'] === 'read-failed') output['failed'] = true;
       response3?.['ok'] &&
         typeof response3['text'] === 'string' &&
         (output['pastedText'] = response3['text']);
     }
   } catch (value2) {
-    (console['warn']('[paste] Electron 剪贴板读取失败:', value2), (output['failed'] = !![]));
+    (console['warn']('[paste] Electron 剪贴板读取失败:', value2), (output['failed'] = true));
   }
   return output;
 }
@@ -161,7 +161,7 @@ async function readSystemClipboardContents() {
   let pastedMedia2 = null,
     pastedText2 = '',
     pastedFiles2 = [],
-    clipboardReadFailed = ![];
+    clipboardReadFailed = false;
   const electronClipboardContents = await readElectronClipboardContents();
   ((pastedFiles2 = electronClipboardContents['pastedFiles']),
     (pastedMedia2 = electronClipboardContents['pastedMedia']),
@@ -226,7 +226,7 @@ export function createAppCanvasNodeFlows({
     return {
       ...args,
       projectId: getCurrentProjectId?.() || 'default_v2_project',
-      isImportCurrent: () => canvasIdentity === getCanvasIdentity() && args['isImportCurrent']?.() !== ![],
+      isImportCurrent: () => canvasIdentity === getCanvasIdentity() && args['isImportCurrent']?.() !== false,
     };
   }
   function run2() {
@@ -313,20 +313,20 @@ export function createAppCanvasNodeFlows({
       if (value18) box5['spawnSequenceKey'] = value18;
     }
     (graphStore['addNode'](box5), graphStore['setSelectedNodes']([id2]));
-    if (value14['skipCommit'] !== !![]) commit();
+    if (value14['skipCommit'] !== true) commit();
     return box5;
   }
   async function run5(enabled4, type3, value20, value21, value22 = {}) {
-    if (!enabled4 || !type3) return ![];
+    if (!enabled4 || !type3) return false;
     const pastedMediaDescriptor = resolvePastedMediaDescriptor(String(type3), value22);
-    if (!pastedMediaDescriptor) return ![];
+    if (!pastedMediaDescriptor) return false;
     const mimeExtension = getMimeExtension(type3, 'dat'),
       value23 = 'pasted-' + pastedMediaDescriptor['typeSlug'] + '-' + Date['now']() + '.' + mimeExtension,
       file = new File([enabled4], value23, { type: type3 }),
       value24 = value22['projectId'] || getCurrentProjectId?.() || 'default_v2_project',
       enabled5 = await processFile(file, value20, value21, value24);
-    if (!enabled5) return ![];
-    if (value22['isImportCurrent']?.() === ![]) return ![];
+    if (!enabled5) return false;
+    if (value22['isImportCurrent']?.() === false) return false;
     const box7 = centerNodeAtWorldPosition(enabled5, value20, value21);
     if (value22['placement'] === 'viewport-center-sequence') {
       const { spacing: spacing2, direction: direction2, avoidOverlap: avoidOverlap2 } = getNodeSpawnPrefs(),
@@ -355,7 +355,7 @@ export function createAppCanvasNodeFlows({
       graphStore['addNode'](box7),
       graphStore['setSelectedNodes']([box7['id']]),
       commit(),
-      value22['returnNode'] === !![] ? box7 : !![]
+      value22['returnNode'] === true ? box7 : true
     );
   }
   async function createMediaNodeFromBlob(value32, value33, value34 = {}) {
@@ -371,7 +371,7 @@ export function createAppCanvasNodeFlows({
     if (!value35 || !type4) return null;
     const file2 = new File([], value36, { type: type4 });
     try {
-      Object['defineProperty'](file2, 'path', { value: value35, configurable: !![] });
+      Object['defineProperty'](file2, 'path', { value: value35, configurable: true });
     } catch {
       file2['path'] = value35;
     }
@@ -380,19 +380,19 @@ export function createAppCanvasNodeFlows({
   async function run7(value37, value38, value39, enabled6) {
     const value40 = String(value37?.['type'] || '')['trim'](),
       pastedMediaDescriptor2 = resolvePastedMediaDescriptor(value40);
-    if (!pastedMediaDescriptor2) return ![];
+    if (!pastedMediaDescriptor2) return false;
     const enabled7 = run6(value37);
-    if (!enabled7) return ![];
+    if (!enabled7) return false;
     const value41 = enabled6['projectId'],
       enabled8 = await processFile(enabled7, value38, value39, value41);
-    if (!enabled8 || !enabled6['isImportCurrent']()) return ![];
+    if (!enabled8 || !enabled6['isImportCurrent']()) return false;
     const error4 = centerNodeAtWorldPosition(enabled8, value38, value39);
     return (
       (error4['name'] = pastedMediaDescriptor2['nodeName']),
       graphStore['addNode'](error4),
       graphStore['setSelectedNodes']([error4['id']]),
       commit(),
-      !![]
+      true
     );
   }
   async function run8(list3, value42, value43, enabled9) {
@@ -460,8 +460,8 @@ export function createAppCanvasNodeFlows({
       const enabled16 = count4 > count3 && count3 > 0,
         value51 = count3 > count4 && count4 > 0,
         value52 = !!enabled14 && !!enabled13,
-        value53 = value52 ? enabled14 === enabled13 : ![],
-        enabled17 = value52 ? enabled14 !== enabled13 : ![],
+        value53 = value52 ? enabled14 === enabled13 : false,
+        enabled17 = value52 ? enabled14 !== enabled13 : false,
         value54 = !enabled14 && !!enabled15 && enabled15 === enabled13,
         value55 = (!enabled12 && !clipboardReadFailed2) || value53 || (value51 && value54);
       if (value55 && !enabled16 && !enabled17) {

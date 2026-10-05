@@ -29,7 +29,7 @@ export function createDirectorGenerationService({
   urlApi: urlApi = globalThis['URL'],
 } = {}) {
   const map = new Set();
-  let key = ![];
+  let key = false;
   const run = (layer, index) =>
     JSON['stringify']({
       layer: layer['generatedLayers']?.['find']((result) => result['id'] === index),
@@ -61,11 +61,11 @@ export function createDirectorGenerationService({
               });
           return next;
         },
-        { history: ![], label: '恢复生成任务状态' },
+        { history: false, label: '恢复生成任务状态' },
       );
     },
     dispose() {
-      key = !![];
+      key = true;
       if (!map['size']) void repository['close']?.();
     },
     async start(kind) {
@@ -106,7 +106,7 @@ export function createDirectorGenerationService({
             if (state) Object['assign'](state, payload);
             return handle;
           },
-          { history: ![], label: '生成进度' },
+          { history: false, label: '生成进度' },
         );
       try {
         commitProject(
@@ -114,7 +114,7 @@ export function createDirectorGenerationService({
           (scope) => {
             return ((scope['generationJobs'] ||= [])['push'](jobId), scope);
           },
-          { history: ![], label: '开始场景生成' },
+          { history: false, label: '开始场景生成' },
         );
         if (kind['kind'] === 'panorama') {
           const modelId = getDirectorPanoramaModels()['find']((input) => input['modelId'] === kind['model']);
@@ -173,7 +173,7 @@ export function createDirectorGenerationService({
                 const args = error['directorSettings']['panorama'];
                 return (
                   Object['assign'](args, {
-                    enabled: !![],
+                    enabled: true,
                     assetId: assetId,
                     history: [
                       ...args['history'],
@@ -183,7 +183,7 @@ export function createDirectorGenerationService({
                   value4
                 );
               },
-              { history: !![], label: '应用生成全景' },
+              { history: true, label: '应用生成全景' },
             ));
         } else {
           const generateDraft2 = await generateDraft({
@@ -206,7 +206,7 @@ export function createDirectorGenerationService({
                 value6
               );
             },
-            { history: !![], label: '应用 AI 生成层' },
+            { history: true, label: '应用 AI 生成层' },
           );
         }
         (run2({ status: 'completed', message: '生成完成，已保存到原项目。' }),

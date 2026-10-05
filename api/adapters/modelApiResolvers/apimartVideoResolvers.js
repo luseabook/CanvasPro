@@ -47,10 +47,10 @@ function getApimartVeo3GenerationType(options2 = {}) {
 function validateApimartVeo3ImageCount(
   options3 = {},
   data = 0,
-  { allowTextOnly: allowTextOnly = ![] } = {},
+  { allowTextOnly: allowTextOnly = false } = {},
 ) {
   const ok = Math['max'](0, Math['trunc'](Number(data) || 0));
-  if (allowTextOnly && ok === 0) return Object['freeze']({ ok: !![], message: '' });
+  if (allowTextOnly && ok === 0) return Object['freeze']({ ok: true, message: '' });
   const apimartVeo3GenerationType = getApimartVeo3GenerationType(options3);
   if (apimartVeo3GenerationType === 'reference')
     return Object['freeze']({
@@ -92,12 +92,12 @@ export function apimartVeo3Video({
   const current = String(next['resolution'] || '')
     ['trim']()
     ['toLowerCase']();
-  if (next['enable_gif'] === !![] && (current === '1080p' || current === '4k'))
+  if (next['enable_gif'] === true && (current === '1080p' || current === '4k'))
     throw new Error('APIMart VEO3 GIF output only supports 720p resolution');
   const error = validateApimartVeo3ImageCount(
     { generationParams: { mode: mode, generation_type: generation_type } },
     list2['length'],
-    { allowTextOnly: !![] },
+    { allowTextOnly: true },
   );
   if (!error['ok']) throw new Error(error['message']);
   if (list2['length'] === 0) return (delete next['generation_type'], delete next['image_urls'], next);
@@ -125,7 +125,7 @@ export function apimartHappyHorseVideo({
         ? executionManifest['extensions']['happyHorse']
         : {},
     handle = String(record['versionLabel'] || 'HappyHorse 1.0')['trim'](),
-    enabled = record['supportsEdit'] !== ![],
+    enabled = record['supportsEdit'] !== false,
     enabled2 = String(entry['prompt'] || finalPrompt || payload?.['prompt'] || '')['trim']();
   if (!enabled2) throw new Error(handle + ' prompt is required');
   const list3 = normalizeInputList(inputImages),
@@ -379,7 +379,7 @@ function normalizeKlingV3OmniMode(value14) {
     ['toLowerCase']();
   return value15 === 'reference' || value15 === 'edit' ? value15 : 'image';
 }
-function buildKlingV3OmniVideoItem(video_url, refer_type, value16 = ![]) {
+function buildKlingV3OmniVideoItem(video_url, refer_type, value16 = false) {
   return {
     video_url: video_url,
     refer_type: refer_type,
@@ -549,15 +549,15 @@ function isSeedanceAdaptiveRatio(value30) {
     ['toLowerCase']();
   return ['自适应', 'adaptive', 'auto', 'default']['includes'](value31);
 }
-function normalizeSeedanceBoolean(count3, value32 = ![]) {
+function normalizeSeedanceBoolean(count3, value32 = false) {
   if (typeof count3 === 'boolean') return count3;
   if (typeof count3 === 'number') return count3 !== 0;
   const value33 = String(count3 ?? '')
     ['trim']()
     ['toLowerCase']();
-  if (['true', '1', 'yes', 'on']['includes'](value33)) return !![];
-  if (['false', '0', 'no', 'off']['includes'](value33)) return ![];
-  return value32 === !![];
+  if (['true', '1', 'yes', 'on']['includes'](value33)) return true;
+  if (['false', '0', 'no', 'off']['includes'](value33)) return false;
+  return value32 === true;
 }
 function normalizeSeedanceVideoDuration(value34, value35 = {}) {
   const value36 = Number(value35['defaultDuration'] ?? 5),
@@ -565,7 +565,7 @@ function normalizeSeedanceVideoDuration(value34, value35 = {}) {
     value38 = Number(value34 ?? value37);
   if (!Number['isFinite'](value38)) return value37;
   const value39 = Math['trunc'](value38);
-  if (value35['allowAutoDuration'] === !![] && value39 === -1) return -1;
+  if (value35['allowAutoDuration'] === true && value39 === -1) return -1;
   const value40 = Number(value35['minDuration']),
     value41 = Number(value35['maxDuration']);
   if (Number['isFinite'](value40) && value39 < value40)
@@ -624,7 +624,7 @@ async function resolveInputVideos(list22, value51) {
   if (list22['length'] === 0) return [];
   const list23 = await uploadModelApiMediaInputs('video', list22, value51, {
     fallbackProvider: 'runninghub',
-    strictUpload: !![],
+    strictUpload: true,
   });
   if (!Array['isArray'](list23) || list23['length'] === 0)
     throw new Error('APIMART 视频上传失败：未返回有效视频地址，请重试或重新选择视频');
@@ -634,7 +634,7 @@ async function resolveInputAudios(list24, value53) {
   if (list24['length'] === 0) return [];
   const list25 = await uploadModelApiMediaInputs('audio', list24, value53, {
     fallbackProvider: 'runninghub',
-    strictUpload: !![],
+    strictUpload: true,
   });
   if (!Array['isArray'](list25) || list25['length'] === 0)
     throw new Error('APIMART 音频上传失败：未返回有效音频地址，请重试或重新选择音频');
@@ -651,8 +651,8 @@ export async function apimartSeedanceVideo({
   const model = modelToken2 || stripPrefix(payload2['model'], 'apimart/'),
     apimartSeedanceVideoPolicy = getApimartSeedanceVideoPolicy(executionManifest2),
     enabled9 = supportsApimartPrivateAvatarAssets(model, apimartSeedanceVideoPolicy),
-    enabled10 = apimartSeedanceVideoPolicy['supportsVideoReferences'] === !![],
-    enabled11 = apimartSeedanceVideoPolicy['supportsAudioReferences'] === !![],
+    enabled10 = apimartSeedanceVideoPolicy['supportsVideoReferences'] === true,
+    enabled11 = apimartSeedanceVideoPolicy['supportsAudioReferences'] === true,
     list26 = applyApimartPrivateAvatarAssetsToUrls(collectVideoInputUrls(payload2), payload2, {
       sourceKind: 'video',
       enabled: enabled9,
@@ -679,8 +679,8 @@ export async function apimartSeedanceVideo({
     const uploadModelApiMediaInputs2 = await uploadModelApiMediaInputs('image', list28, ctx, {
       apiKey: apiKey,
       fallbackProvider: 'apimart',
-      uploadOptions: { applyInputQualityProfile: !![] },
-      strictUpload: !![],
+      uploadOptions: { applyInputQualityProfile: true },
+      strictUpload: true,
     });
     list29 = [
       uploadModelApiMediaInputs2?.[0]
@@ -702,17 +702,17 @@ export async function apimartSeedanceVideo({
     }),
     map = new Set(list28),
     list31 =
-      list29['length'] > 0 && apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === !![]
+      list29['length'] > 0 && apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === true
         ? list30['filter']((value56) => !map['has'](value56))
         : list30,
     list32 =
       list31['length'] > 0 &&
-      (list29['length'] <= 0 || apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === !![])
+      (list29['length'] <= 0 || apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === true)
         ? await uploadModelApiMediaInputs('image', list31, ctx, {
             apiKey: apiKey,
             fallbackProvider: 'apimart',
-            uploadOptions: { applyInputQualityProfile: !![] },
-            strictUpload: !![],
+            uploadOptions: { applyInputQualityProfile: true },
+            strictUpload: true,
           })
         : [],
     list33 = applyApimartPrivateAvatarAssetsToUrls(collectAudioInputUrls(payload2), payload2, {
@@ -726,7 +726,7 @@ export async function apimartSeedanceVideo({
     seedanceVideoParam2 = readSeedanceVideoParam(payload2, 'resolution'),
     seedanceVideoParam3 = readSeedanceVideoParam(payload2, 'aspectRatio', 'size', 'aspect_ratio'),
     value57 =
-      apimartSeedanceVideoPolicy['preserveAdaptiveRatio'] === !![] &&
+      apimartSeedanceVideoPolicy['preserveAdaptiveRatio'] === true &&
       isSeedanceAdaptiveRatio(seedanceVideoParam3)
         ? seedanceVideoParam3
         : payload2['resolvedRatioLabel'] || seedanceVideoParam3,
@@ -746,41 +746,41 @@ export async function apimartSeedanceVideo({
     max: 0x7fffffff,
   });
   if (optionalIntegerInRange !== null) value58['seed'] = optionalIntegerInRange;
-  if (apimartSeedanceVideoPolicy['supportsGenerateAudioParam'] === !![]) {
+  if (apimartSeedanceVideoPolicy['supportsGenerateAudioParam'] === true) {
     const seedanceVideoParam4 = readSeedanceVideoParam(payload2, 'generateAudio', 'generate_audio', 'audio'),
       seedanceBoolean = normalizeSeedanceBoolean(
         seedanceVideoParam4,
-        apimartSeedanceVideoPolicy['generateAudioDefault'] === !![],
+        apimartSeedanceVideoPolicy['generateAudioDefault'] === true,
       );
-    if (seedanceBoolean || apimartSeedanceVideoPolicy['emitGenerateAudioBoolean'] === !![]) {
+    if (seedanceBoolean || apimartSeedanceVideoPolicy['emitGenerateAudioBoolean'] === true) {
       const value59 = String(apimartSeedanceVideoPolicy['generateAudioField'] || 'audio')['trim']();
       value58[value59 || 'audio'] = seedanceBoolean;
     }
   }
-  apimartSeedanceVideoPolicy['supportsWatermarkParam'] === !![] &&
-    (value58['watermark'] = normalizeSeedanceBoolean(readSeedanceVideoParam(payload2, 'watermark'), ![]));
-  if (apimartSeedanceVideoPolicy['supportsOutputFormatParam'] === !![]) {
+  apimartSeedanceVideoPolicy['supportsWatermarkParam'] === true &&
+    (value58['watermark'] = normalizeSeedanceBoolean(readSeedanceVideoParam(payload2, 'watermark'), false));
+  if (apimartSeedanceVideoPolicy['supportsOutputFormatParam'] === true) {
     const value60 = String(readSeedanceVideoParam(payload2, 'outputFormat', 'output_format') || 'mp4')
       ['trim']()
       ['toLowerCase']();
     value58['output_format'] = ['mp4', 'mov']['includes'](value60) ? value60 : 'mp4';
   }
-  apimartSeedanceVideoPolicy['supportsWebSearchParam'] === !![] &&
-    normalizeSeedanceBoolean(readSeedanceVideoParam(payload2, 'webSearch'), ![]) &&
+  apimartSeedanceVideoPolicy['supportsWebSearchParam'] === true &&
+    normalizeSeedanceBoolean(readSeedanceVideoParam(payload2, 'webSearch'), false) &&
     (value58['tools'] = [{ type: 'web_search' }]);
-  apimartSeedanceVideoPolicy['supportsCameraFixedParam'] === !![] &&
-    normalizeSeedanceBoolean(readSeedanceVideoParam(payload2, 'camerafixed', 'cameraFixed'), ![]) &&
-    (value58['camerafixed'] = !![]);
+  apimartSeedanceVideoPolicy['supportsCameraFixedParam'] === true &&
+    normalizeSeedanceBoolean(readSeedanceVideoParam(payload2, 'camerafixed', 'cameraFixed'), false) &&
+    (value58['camerafixed'] = true);
   const positiveInteger2 = normalizePositiveInteger(apimartSeedanceVideoPolicy['maxImageCount'], 1);
   if (list29['length'] > 0) {
-    const value61 = apimartSeedanceVideoPolicy['allowRoleImagesWithMedia'] === !![],
+    const value61 = apimartSeedanceVideoPolicy['allowRoleImagesWithMedia'] === true,
       value62 = list27['length'] > 0 || list34['length'] > 0,
       list35 =
         value61 && value62 ? list29['map']((args2) => ({ ...args2, role: 'reference_image' })) : list29,
       map2 = new Set(list35['map']((response) => String(response?.['url'] || '')['trim']()));
     value58['image_with_roles'] = [
       ...list35,
-      ...(apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === !![]
+      ...(apimartSeedanceVideoPolicy['combineRoleAndReferenceImages'] === true
         ? list32['filter']((value63) => !map2['has'](String(value63 || '')['trim']()))['map']((url5) => ({
             url: url5,
             role: 'reference_image',
@@ -790,12 +790,12 @@ export async function apimartSeedanceVideo({
     const value64 = value58['image_with_roles']['some'](
       (value65) => value65['role'] === 'first_frame' || value65['role'] === 'last_frame',
     );
-    if (value64 && apimartSeedanceVideoPolicy['roleImagesRequireAdaptiveRatio'] === !![]) {
+    if (value64 && apimartSeedanceVideoPolicy['roleImagesRequireAdaptiveRatio'] === true) {
       const value66 = apimartSeedanceVideoPolicy['ratioField'] === 'size' ? 'size' : 'aspect_ratio';
       value58[value66] = 'adaptive';
     }
   } else list32['length'] > 0 && (value58['image_urls'] = list32['slice'](0, positiveInteger2));
-  const enabled12 = list29['length'] > 0 && apimartSeedanceVideoPolicy['allowRoleImagesWithMedia'] !== !![];
+  const enabled12 = list29['length'] > 0 && apimartSeedanceVideoPolicy['allowRoleImagesWithMedia'] !== true;
   return (
     enabled10 &&
       !enabled12 &&

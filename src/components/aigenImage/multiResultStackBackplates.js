@@ -200,13 +200,13 @@ export function buildMultiResultCollapsedFrame(value4 = 1) {
 }
 
 export function shouldEnableMultiResultLayerDragOut({
-  isImagesExpanded: isImagesExpanded = ![],
+  isImagesExpanded: isImagesExpanded = false,
   imageCount: imageCount = 0,
   imageIndex: imageIndex = -1,
   mainImageIndex: mainImageIndex = 0,
 } = {}) {
   const toFiniteCount5 = toFiniteCount(imageCount);
-  if (!isImagesExpanded || toFiniteCount5 <= 1) return ![];
+  if (!isImagesExpanded || toFiniteCount5 <= 1) return false;
   const mainIndex3 = normalizeMainIndex(mainImageIndex, toFiniteCount5),
     count4 = Number['isFinite'](Number(imageIndex)) ? Math['floor'](Number(imageIndex)) : -1;
   return count4 >= 0 && count4 < toFiniteCount5 && count4 !== mainIndex3;

@@ -56,7 +56,7 @@ function getRunInput({
   previousEpisode: previousEpisode = null,
   nextEpisode: nextEpisode = null,
   execution: execution = {},
-  regeneration: regeneration = ![],
+  regeneration: regeneration = false,
 } = {}) {
   return {
     projectId: normalizeText(project['id']),
@@ -83,7 +83,7 @@ function getRunInput({
       synopsis: nextEpisode?.['synopsis'],
       hook: nextEpisode?.['hook'],
     }),
-    regeneration: regeneration === !![],
+    regeneration: regeneration === true,
     execution: {
       modelId: normalizeText(execution['modelId']),
       provider: normalizeText(execution['provider']),
@@ -169,14 +169,14 @@ function createRun(options3 = {}) {
 function canResumeRun(next, args = {}) {
   const execution2 = normalizeStoryEpisodeScriptRun(next);
   if (!execution2 || !['running', 'failed_retryable', 'ready_to_commit']['includes'](execution2['status']))
-    return ![];
+    return false;
   const current =
     execution2['status'] === 'failed_retryable' &&
     execution2['errorCode'] === 'MODEL_CREDENTIAL_MISSING' &&
     execution2['invocations']['length'] === 0 &&
     !execution2['checkpoint'] &&
     !execution2['candidateArtifact'];
-  if (current) return ![];
+  if (current) return false;
   const fingerprintValue2 =
       fingerprintValue(getRunInput(args)['execution']) !== fingerprintValue(execution2['input']['execution']),
     enabled =
@@ -191,7 +191,7 @@ function canResumeRun(next, args = {}) {
     !enabled &&
     !runRequiresPaidRetry(execution2)
   )
-    return ![];
+    return false;
   return (
     execution2['inputFingerprint'] ===
     fingerprintValue(getRunInput({ ...args, execution: execution2['input']['execution'] }))
@@ -199,12 +199,12 @@ function canResumeRun(next, args = {}) {
 }
 function runRequiresPaidRetry(record) {
   const storyEpisodeScriptRun = normalizeStoryEpisodeScriptRun(record);
-  if (!storyEpisodeScriptRun) return ![];
+  if (!storyEpisodeScriptRun) return false;
   const list3 = storyEpisodeScriptRun['invocations']['filter'](
     (enabled2) =>
       ['prepared', 'outcome-unknown']['includes'](enabled2['state']) && !enabled2['retryAuthorizedAt'],
   );
-  if (!list3['length']) return ![];
+  if (!list3['length']) return false;
   const enabled3 = storyEpisodeScriptRun['invocations']['some'](
     (payload) =>
       SCRIPT_RESPONSE_STEPS['has'](payload['stepId']) &&
@@ -303,7 +303,7 @@ function mergeRepairDrafts(episodeRef, output) {
       ...rawResponses['map']((value9) => Math['trunc'](Number(value9?.['attempt']) || 0)),
     ),
     rawResponses: rawResponses,
-    ...(value8 ? { skipPostGenerationReview: !![] } : {}),
+    ...(value8 ? { skipPostGenerationReview: true } : {}),
   };
 }
 function getErrorCode(value10) {
@@ -316,7 +316,7 @@ export function createStoryEpisodeScriptApplication({ generateEpisodeScript: gen
     const response4 = normalizeStoryEpisodeScriptRun(project2['resumeRun']),
       resumed = canResumeRun(response4, project2);
     if (resumed && response4['status'] === 'ready_to_commit' && response4['candidateArtifact'])
-      return { result: cloneJson(response4['candidateArtifact']), run: cloneJson(response4), resumed: !![] };
+      return { result: cloneJson(response4['candidateArtifact']), run: cloneJson(response4), resumed: true };
     let model = resumed ? response4 : createRun(project2);
     ((model['status'] = 'running'),
       (model['errorCode'] = ''),
@@ -420,7 +420,7 @@ export function createStoryEpisodeScriptWorkspaceController({
   async function request(
     episodeId,
     value13 = host['createProjectTaskToken'](),
-    { batch: batch = null, regeneration: regeneration = ![] } = {},
+    { batch: batch = null, regeneration: regeneration = false } = {},
   ) {
     const value14 = value13['data'];
     if (!host['isProjectTaskLive'](value13)) return null;
@@ -466,8 +466,8 @@ export function createStoryEpisodeScriptWorkspaceController({
           '上次正文生成或正文修复请求可能已经提交并计费，但没有收到确定结果。只有你确认后才会再次请求正文。',
         fallbackValue: null,
         choices: [
-          { label: '暂不重试', value: null, autofocus: !![] },
-          { label: '确认重新请求正文', value: 'retry', primary: !![] },
+          { label: '暂不重试', value: null, autofocus: true },
+          { label: '确认重新请求正文', value: 'retry', primary: true },
         ],
       });
       if (value17 !== 'retry') throw new Error('已停止重复请求本集剧本。');
@@ -479,7 +479,7 @@ export function createStoryEpisodeScriptWorkspaceController({
           scope: { episodeId: episodeId['id'] },
           label: '生成第 ' + (episodeIndex2 + 1) + ' 集完整剧本',
           status: status['status'] === 'failed_retryable' ? 'failed' : 'running',
-          resumable: !![],
+          resumable: true,
           modelId: status['input']['execution']['modelId'],
           provider: status['input']['execution']['provider'],
           message: status['error'] || state2['episodeScriptGenerationStatus'],
@@ -528,10 +528,10 @@ export function createStoryEpisodeScriptWorkspaceController({
         host['finishBackgroundTask'](value13, id, {
           status: 'succeeded',
           message: '第 ' + (episodeIndex2 + 1) + ' 集完整剧本已生成',
-          resumable: ![],
+          resumable: false,
           resumePayload: createRunPayload(completeRun(value19['run'])),
         }),
-        host['schedulePersistence']({ immediate: !![] }),
+        host['schedulePersistence']({ immediate: true }),
         await host['persistNow'](),
         { episode: episode2['episodes'][episodeIndex2], compiled: compiled }
       );
@@ -548,14 +548,14 @@ export function createStoryEpisodeScriptWorkspaceController({
             value14['episodes'][episodeIndex2],
             message3,
           )),
-          host['schedulePersistence']({ immediate: !![] })),
+          host['schedulePersistence']({ immediate: true })),
           host['finishBackgroundTask'](value13, id, {
             status: 'failed',
             message: message3
               ? '第 ' + (episodeIndex2 + 1) + ' 集返回已保存，可继续修复'
               : '第 ' + (episodeIndex2 + 1) + ' 集剧本生成失败',
             error: error2?.['message'] || '完整分集剧本生成失败。',
-            resumable: !![],
+            resumable: true,
             ...(error2?.['storyEpisodeScriptRun']
               ? { resumePayload: createRunPayload(error2['storyEpisodeScriptRun']) }
               : {}),

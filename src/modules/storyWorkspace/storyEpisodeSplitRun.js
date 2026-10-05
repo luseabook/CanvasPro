@@ -54,16 +54,16 @@ function createInput(
     constraints: constraints = {},
     execution: execution = {},
     mode: mode = 'standard',
-    promptExperiment: promptExperiment = ![],
+    promptExperiment: promptExperiment = false,
   } = {},
-  appearances = !![],
+  appearances = true,
 ) {
   return {
     projectId: normalizeText(project['id']),
     episodeId: normalizeText(episode['id']),
     episodeRef: normalizeText(episode['ref'] || episode['planningRef'] || episode['id']),
     mode: normalizeText(mode) || 'standard',
-    promptExperiment: promptExperiment === !![],
+    promptExperiment: promptExperiment === true,
     promptMode: normalizeText(constraints?.['promptMode']),
     sourceFingerprint: fingerprint({
       scriptMode: project['scriptMode'],
@@ -189,19 +189,19 @@ function createRun(entry) {
 }
 function isResumable(execution2, args2) {
   if (!execution2 || !['running', 'failed_retryable', 'ready_to_commit']['includes'](execution2['status']))
-    return ![];
+    return false;
   const record = execution2['status'] === 'ready_to_commit' && execution2['candidateArtifact'],
     payload = { ...args2, ...(record ? { execution: execution2['input']['execution'] } : {}) };
   return (
     execution2['inputFingerprint'] === fingerprint(createInput(payload)) ||
-    execution2['inputFingerprint'] === fingerprint(createInput(payload, ![]))
+    execution2['inputFingerprint'] === fingerprint(createInput(payload, false))
   );
 }
 function hasUncommittedPaidCall(response2) {
-  if (response2['status'] === 'ready_to_commit' && response2['candidateArtifact']) return ![];
+  if (response2['status'] === 'ready_to_commit' && response2['candidateArtifact']) return false;
   return response2['invocations']['some']((handle) => {
-    if (handle['retryAuthorizedAt']) return ![];
-    if (['prepared', 'outcome-unknown']['includes'](handle['state'])) return !![];
+    if (handle['retryAuthorizedAt']) return false;
+    if (['prepared', 'outcome-unknown']['includes'](handle['state'])) return true;
     return handle['state'] === 'completed' && handle['completedAt'] > response2['checkpointAt'];
   });
 }

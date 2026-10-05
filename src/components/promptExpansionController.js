@@ -35,9 +35,9 @@ export function createPromptExpansionController({
     value = 0,
     item = 0,
     el4 = null,
-    key = ![],
-    index = ![],
-    enabled = ![],
+    key = false,
+    index = false,
+    enabled = false,
     result = null;
   const promptExpansionMotion = createPromptExpansionMotion(panel);
   function sync() {
@@ -66,7 +66,7 @@ export function createPromptExpansionController({
     };
   }
   function run2(data) {
-    promptEl['focus']({ preventScroll: !![] });
+    promptEl['focus']({ preventScroll: true });
     if (el4 && promptEl['contains'](el4['anchor']) && promptEl['contains'](el4['focus'])) {
       const { anchor: anchor2, anchorOffset: anchorOffset, focus: focus, focusOffset: focusOffset } = el4;
       dom['getSelection']()['setBaseAndExtent'](anchor2, anchorOffset, focus, focusOffset);
@@ -79,10 +79,10 @@ export function createPromptExpansionController({
       panel['hidePopover'](),
       panel['removeAttribute']('popover'),
       panel['classList']['remove']('is-prompt-expanded'),
-      (el3['hidden'] = !![]));
+      (el3['hidden'] = true));
     const options = panel['getBoundingClientRect']();
     return (
-      (el3['hidden'] = ![]),
+      (el3['hidden'] = false),
       panel['classList']['add']('is-prompt-expanded'),
       panel['setAttribute']('popover', 'manual'),
       panel['showPopover'](),
@@ -92,9 +92,9 @@ export function createPromptExpansionController({
     );
   }
   function onClose2({
-    commit: commit = !![],
-    restoreFocus: restoreFocus = !![],
-    animate: animate = !![],
+    commit: commit = true,
+    restoreFocus: restoreFocus = true,
+    animate: animate = true,
   } = {}) {
     if (!overlay) return;
     if (enabled && animate && commit && restoreFocus) return;
@@ -104,17 +104,17 @@ export function createPromptExpansionController({
     if (animate && commit && restoreFocus && panel['isConnected'] && panel['matches'](':popover-open')) {
       const target = panel['getBoundingClientRect'](),
         source = run3();
-      ((enabled = !![]),
+      ((enabled = true),
         promptExpansionMotion['play'](target, source, {
           overlay: overlay,
-          closing: !![],
-          onFinish: () => onClose2({ commit: commit, restoreFocus: restoreFocus, animate: ![] }),
+          closing: true,
+          onFinish: () => onClose2({ commit: commit, restoreFocus: restoreFocus, animate: false }),
         }));
       return;
     }
-    ((enabled = ![]),
+    ((enabled = false),
       promptExpansionMotion['cancel'](),
-      beginModalInteraction2?.({ restoreFocus: ![] }),
+      beginModalInteraction2?.({ restoreFocus: false }),
       (beginModalInteraction2 = null),
       closeMenus?.(),
       hostPromptFloatingSurfaces2?.(),
@@ -140,12 +140,12 @@ export function createPromptExpansionController({
     if (index || !panel['isConnected'] || !promptEl['isContentEditable']) return;
     if (overlay) {
       enabled &&
-        ((enabled = ![]),
+        ((enabled = false),
         promptExpansionMotion['play'](panel['getBoundingClientRect'](), null, { overlay: overlay }));
       return;
     }
     if (!promptEl['getClientRects']()['length']) return;
-    (activeController?.['close']({ animate: ![] }),
+    (activeController?.['close']({ animate: false }),
       run(),
       (value = promptEl['scrollTop']),
       flush?.(),
@@ -159,7 +159,7 @@ export function createPromptExpansionController({
       }),
       overlay['addEventListener']('click', (event2) => event2['stopPropagation']()),
       overlay['addEventListener']('wheel', (event3) => event3['stopPropagation'](), {
-        passive: !![],
+        passive: true,
       }),
       mountRoot['appendChild'](overlay),
       panel['classList']['remove']('is-resize-hover'),
@@ -171,7 +171,7 @@ export function createPromptExpansionController({
       panel['showPopover'](),
       (hostPromptFloatingSurfaces2 = hostPromptFloatingSurfaces(panel, floatingSurfaceSelector, {
         externalDialogSelector: externalDialogSelector,
-        onExternalDialog: () => onClose2({ restoreFocus: ![] }),
+        onExternalDialog: () => onClose2({ restoreFocus: false }),
       })),
       (el3 = el['createElement']('div')),
       (el3['className'] = 'prompt-expansion-title'),
@@ -181,7 +181,7 @@ export function createPromptExpansionController({
       (beginModalInteraction2 = beginModalInteraction({
         root: panel,
         onClose: onClose2,
-        onSuspend: () => onClose2({ restoreFocus: ![] }),
+        onSuspend: () => onClose2({ restoreFocus: false }),
         preferredSelector: '.prompt-textarea',
       })),
       run2(item || value),
@@ -215,13 +215,13 @@ export function createPromptExpansionController({
     }
   }
   const current = () => {
-      key = !![];
+      key = true;
     },
     entry = () => {
-      key = ![];
+      key = false;
     },
     record = () => {
-      if (overlay && !panel['matches'](':popover-open')) onClose2({ restoreFocus: ![] });
+      if (overlay && !panel['matches'](':popover-open')) onClose2({ restoreFocus: false });
     };
   (el2['addEventListener']('pointerdown', run4),
     el2['addEventListener']('mousedown', run4),
@@ -239,8 +239,8 @@ export function createPromptExpansionController({
         return !!overlay;
       },
       remove() {
-        ((index = !![]),
-          onClose2({ commit: ![], restoreFocus: ![] }),
+        ((index = true),
+          onClose2({ commit: false, restoreFocus: false }),
           onLocaleChange2?.(),
           el2['remove'](),
           panel['classList']['remove']('has-prompt-expand'),

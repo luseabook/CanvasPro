@@ -13,7 +13,7 @@ export async function executeTaskCenterAction(store, value, taskCenterTaskId, lo
     const providerTaskConsoleUrl = getProviderTaskConsoleUrl(taskCenterTaskId);
     if (providerTaskConsoleUrl) {
       const response = await openExternalLink(providerTaskConsoleUrl, { label: label('actions.apiConsole') });
-      if (response?.['ok'] === ![] || response?.['success'] === ![])
+      if (response?.['ok'] === false || response?.['success'] === false)
         throw new Error(response['error'] || label('actionFailed'));
     }
     return;
@@ -53,12 +53,12 @@ export async function executeTaskCenterAction(store, value, taskCenterTaskId, lo
       ? (response2 = await store['generationCancelTask'](taskCenterTaskId['nodeId'], {
           store: store['generationStore'],
           taskCenterTaskId: taskCenterTaskId['taskId'],
-          cancellable: !![],
-          abortLocal: !![],
+          cancellable: true,
+          abortLocal: true,
           taskId: taskCenterTaskId['remoteTaskId'],
         }))
       : (response2 = await desktopBridge['mediaTask']['cancel']({ taskId: taskCenterTaskId['taskId'] }));
-  if (response2?.['ok'] === ![] || response2?.['success'] === ![])
+  if (response2?.['ok'] === false || response2?.['success'] === false)
     throw new Error(response2['reason'] || label('cancelFailed'));
   globalThis['window']?.['showToast']?.(label('cancelledMessage'), 'ok');
   const response3 = store['tasks']['get'](taskCenterTaskId['taskId']);

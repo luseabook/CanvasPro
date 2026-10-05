@@ -46,7 +46,7 @@ export async function fetchModelPricing(index) {
       { method: 'GET' },
       12000,
     );
-  if (!response['success'] || response['data']?.['success'] !== !![] || !response['data']?.['data'])
+  if (!response['success'] || response['data']?.['success'] !== true || !response['data']?.['data'])
     throw new Error('价格暂不可用');
   return response['data']['data'];
 }
@@ -58,10 +58,10 @@ export function createModelPricingCache({
   const map = new Map(),
     map2 = new Map(),
     data = new Map();
-  let options = ![];
+  let options = false;
   const run = () => {
       if (options) return;
-      options = !![];
+      options = true;
       try {
         const target = JSON['parse'](storage()?.['getItem'](STORAGE_KEY) || '[]');
         for (const [source, next] of target['slice'](-MAX_ENTRIES)) {
@@ -95,14 +95,14 @@ export function createModelPricingCache({
       const handle = Promise['resolve']()
         ['then'](() => fetchPrice(event))
         ['then']((state) => {
-          const config = { data: state, fetchedAt: now(), persist: event['persist'] !== ![] };
+          const config = { data: state, fetchedAt: now(), persist: event['persist'] !== false };
           (map['delete'](event['key']), map['set'](event['key'], config));
           while (map['size'] > MAX_ENTRIES) map['delete'](map['keys']()['next']()['value']);
           data['delete'](event['key']);
           try {
             storage()?.['setItem'](
               STORAGE_KEY,
-              JSON['stringify']([...map]['filter'](([, scope]) => scope['persist'] !== ![])),
+              JSON['stringify']([...map]['filter'](([, scope]) => scope['persist'] !== false)),
             );
           } catch {}
           return config;

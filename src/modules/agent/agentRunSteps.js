@@ -69,7 +69,7 @@ export function buildAgentRunSteps({ runEvents: runEvents = [], currentRun: curr
           if (ts['type'] === 'tool.completed')
             upsertStep(list3, enabled + ':tool:' + (ts['step'] || 0) + ':' + ts['commandId'], {
               label: commandLabel(ts['commandId']),
-              status: ts['ok'] === ![] ? 'failed' : 'success',
+              status: ts['ok'] === false ? 'failed' : 'success',
               commandId: ts['commandId'],
               step: Number(ts['step'] || 0),
               ts: ts['ts'],

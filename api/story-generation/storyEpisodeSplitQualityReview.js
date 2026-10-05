@@ -790,10 +790,10 @@ export async function reviewStoryEpisodeSplitQuality({
           !enabled3['issues']?.['length'] ||
           !enabled3['issues']['every']((value35) => /^replication_shot_/u['test'](value35['code']))
         )
-          return !![];
+          return true;
         const value36 = clips6['find']((value37) => value37['ref'] === enabled3['clipRef']);
-        if (!inspectReplicationSourceCompleteness({ clips: [value36] }, episode)['length']) return !![];
-        return (map8['add'](enabled3['clipRef']), ![]);
+        if (!inspectReplicationSourceCompleteness({ clips: [value36] }, episode)['length']) return true;
+        return (map8['add'](enabled3['clipRef']), false);
       })
       ['map']((value38) => value38['clipRef']);
     if (!list20['length']) {
@@ -935,7 +935,7 @@ export async function reviewStoryEpisodeSplitQuality({
         const list24 = list23['filter']((value54) => !map10['has'](value54)),
           list25 = list23['filter']((value55) => map10['has'](value55)),
           list26 = [...list24];
-        let value56 = ![];
+        let value56 = false;
         if (list25['length']) {
           const assessments3 = list25['flatMap']((value57) => map10['get'](value57) || []),
             batchRef3 = batchRef2['ref'] + '-repair-recheck' + (repairRound2 > 1 ? '-' + repairRound2 : '');
@@ -1009,7 +1009,7 @@ export async function reviewStoryEpisodeSplitQuality({
                       ['join']('；') || '定点修复结果复审仍未通过。'),
                   map8['add'](value63),
                   list26['push'](value63),
-                  (value56 = !![]));
+                  (value56 = true));
                 return;
               }
               ((value47[value63] = cloneJson(list28)),
@@ -1030,7 +1030,7 @@ export async function reviewStoryEpisodeSplitQuality({
                 map8['add'](value70),
                 list26['push'](value70));
             }),
-              (value56 = !![]));
+              (value56 = true));
             if (error10['code'] === 'STORY_REVIEW_PROTOCOL') break;
           }
         }

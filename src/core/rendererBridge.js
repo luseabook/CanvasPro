@@ -49,71 +49,71 @@ export function syncRendererBridge(enabled, value = {}) {
         return data ? el3?.['querySelector']?.(data) || null : el3 || null;
       },
       highlightDropSlot(enabled3, { kind: kind = '', index: index = -1 } = {}) {
-        if (!enabled3) return ![];
+        if (!enabled3) return false;
         const target = componentMap?.['get']?.(enabled3);
         if (kind === 'storyboard' && typeof target?.['highlightCell'] === 'function')
-          return (target['highlightCell'](index), !![]);
+          return (target['highlightCell'](index), true);
         if (kind === 'collage' && typeof target?.['highlightSlot'] === 'function')
-          return (target['highlightSlot'](index), !![]);
-        return ![];
+          return (target['highlightSlot'](index), true);
+        return false;
       },
       clearDropSlotHighlight(enabled4) {
-        if (!enabled4) return ![];
+        if (!enabled4) return false;
         const source = componentMap?.['get']?.(enabled4);
-        let next = ![];
+        let next = false;
         return (
-          typeof source?.['highlightCell'] === 'function' && (source['highlightCell'](-1), (next = !![])),
-          typeof source?.['highlightSlot'] === 'function' && (source['highlightSlot'](-1), (next = !![])),
+          typeof source?.['highlightCell'] === 'function' && (source['highlightCell'](-1), (next = true)),
+          typeof source?.['highlightSlot'] === 'function' && (source['highlightSlot'](-1), (next = true)),
           next
         );
       },
       syncNodeDragPreview(enabled5, el4) {
-        if (!enabled5) return ![];
-        let current = ![];
+        if (!enabled5) return false;
+        let current = false;
         const el5 = wrapperMap?.['get']?.(enabled5),
-          entry = !!el5 && el5['isConnected'] !== ![],
+          entry = !!el5 && el5['isConnected'] !== false,
           record = entry && el5?.['dataset']?.['rendererPresentationOwner'] !== 'fast-preview',
           rasterFrame =
-            el4?.['active'] === !![] && typeof captureRasterPreviewNode === 'function'
+            el4?.['active'] === true && typeof captureRasterPreviewNode === 'function'
               ? captureRasterPreviewNode(enabled5)
               : null,
           payload = rasterFrame ? { ...el4, rasterFrame: rasterFrame } : el4,
           handle = componentMap?.['get']?.(enabled5);
         typeof handle?.['syncDragPreview'] === 'function' &&
-          (handle['syncDragPreview'](el4), (current = !![]));
-        let state = ![];
+          (handle['syncDragPreview'](el4), (current = true));
+        let state = false;
         typeof syncFastPreviewDragProxy === 'function' &&
-          ((state = syncFastPreviewDragProxy(enabled5, payload) === !![]), (current = state || current));
+          ((state = syncFastPreviewDragProxy(enabled5, payload) === true), (current = state || current));
         const config =
-          (el4?.['active'] === !![] || el4?.['remove'] === !![]) &&
-          (record || (el4?.['active'] === !![] && state));
+          (el4?.['active'] === true || el4?.['remove'] === true) &&
+          (record || (el4?.['active'] === true && state));
         return (
           config &&
             typeof excludeRasterPreviewNode === 'function' &&
-            (current = excludeRasterPreviewNode(enabled5) === !![] || current),
+            (current = excludeRasterPreviewNode(enabled5) === true || current),
           current
         );
       },
       applyImmediateCellSwapPreview(enabled6, { sourceIndex: sourceIndex, targetIndex: targetIndex } = {}) {
-        if (!enabled6) return { ok: ![], revert() {} };
+        if (!enabled6) return { ok: false, revert() {} };
         const scope = componentMap?.['get']?.(enabled6);
-        if (typeof scope?.['applyImmediateCellSwap'] !== 'function') return { ok: ![], revert() {} };
+        if (typeof scope?.['applyImmediateCellSwap'] !== 'function') return { ok: false, revert() {} };
         const response = scope['applyImmediateCellSwap'](sourceIndex, targetIndex);
-        return response && response['ok'] === !![] && typeof response['revert'] === 'function'
+        return response && response['ok'] === true && typeof response['revert'] === 'function'
           ? response
-          : { ok: ![], revert() {} };
+          : { ok: false, revert() {} };
       },
       previewCollageItems(enabled7, input) {
-        if (!enabled7) return ![];
+        if (!enabled7) return false;
         const output = componentMap?.['get']?.(enabled7);
-        if (typeof output?.['previewItems'] !== 'function') return ![];
-        return (output['previewItems'](input), !![]);
+        if (typeof output?.['previewItems'] !== 'function') return false;
+        return (output['previewItems'](input), true);
       },
       runMountedNodeGeneration(enabled8) {
-        if (!enabled8) return { started: ![], result: null };
+        if (!enabled8) return { started: false, result: null };
         const value2 = componentMap?.['get']?.(enabled8);
-        if (typeof value2?.['runGeneration'] !== 'function') return { started: ![], result: null };
-        return { started: !![], result: Promise['resolve']()['then'](() => value2['runGeneration']()) };
+        if (typeof value2?.['runGeneration'] !== 'function') return { started: false, result: null };
+        return { started: true, result: Promise['resolve']()['then'](() => value2['runGeneration']()) };
       },
       getEdgeIdsForNode(enabled9) {
         if (!enabled9) return [];

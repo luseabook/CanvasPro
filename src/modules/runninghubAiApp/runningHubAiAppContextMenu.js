@@ -35,7 +35,7 @@ function createActionItem(disabled) {
     label: getActionLabel(disabled),
     icon: ACTION_ICONS[disabled?.['dataset']?.['action']] || 'action',
     shortcutActionId: ACTION_SHORTCUTS[disabled?.['dataset']?.['action']],
-    disabled: disabled?.['disabled'] === !![] || disabled?.['getAttribute']?.('aria-disabled') === 'true',
+    disabled: disabled?.['disabled'] === true || disabled?.['getAttribute']?.('aria-disabled') === 'true',
     danger: DANGER_ACTIONS['has'](disabled?.['dataset']?.['action']),
     action: () => disabled?.['click']?.(),
   };
@@ -47,25 +47,25 @@ export function createRunningHubAiAppContextMenuController({
 } = {}) {
   let presentMenu2 = null;
   const run = (ownerElement, list) => {
-      if (!list['length']) return ![];
+      if (!list['length']) return false;
       return (
         ownerElement['preventDefault'](),
         ownerElement['stopPropagation'](),
         beforeOpen?.(ownerElement),
         presentMenu2?.['close']?.(),
         (presentMenu2 = presentMenu(ownerElement['clientX'], ownerElement['clientY'], list, {
-          ensureItemIcons: !![],
+          ensureItemIcons: true,
           ownerElement: ownerElement['target'],
           ownerRoot: getPanel?.(),
         })),
-        !![]
+        true
       );
     },
     close = () => {
       (presentMenu2?.['close']?.(), (presentMenu2 = null));
     },
     handleContextMenu = (event) => {
-      if (event['target']?.['closest']?.(EDITABLE_SELECTOR)) return ![];
+      if (event['target']?.['closest']?.(EDITABLE_SELECTOR)) return false;
       const enabled = getPanel?.(),
         el2 = event['target']?.['closest']?.('.rh-ai-app-saved-app-row');
       if (el2 && enabled?.['contains']?.(el2)) {
@@ -79,7 +79,7 @@ export function createRunningHubAiAppContextMenuController({
         );
       }
       const el3 = event['target']?.['closest']?.('.rh-ai-app-preview-component');
-      if (!el3 || !enabled?.['contains']?.(el3)) return ![];
+      if (!el3 || !enabled?.['contains']?.(el3)) return false;
       const list2 = Array['from'](el3['querySelectorAll']?.(PREVIEW_ACTION_SELECTOR) || []);
       return run(event, list2['map'](createActionItem));
     };

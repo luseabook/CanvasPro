@@ -9,7 +9,7 @@ export function bindCollaborationChatPosition({
 }) {
   let box = null,
     x = null,
-    enabled = ![],
+    enabled = false,
     box2 = null;
   const value = resizeHandle ? [...handles, resizeHandle] : handles;
   try {
@@ -55,7 +55,7 @@ export function bindCollaborationChatPosition({
       (id['target']['closest']('button') && id['currentTarget'] !== id['target']['closest']('button'))
     )
       return;
-    (root['getAnimations']()['forEach']((item) => item['finish']()), place(), (enabled = ![]));
+    (root['getAnimations']()['forEach']((item) => item['finish']()), place(), (enabled = false));
     const width = root['getBoundingClientRect']();
     ((x = {
       id: id['pointerId'],
@@ -104,7 +104,7 @@ export function bindCollaborationChatPosition({
       } catch {}
   }
   function run4(event2) {
-    enabled && ((enabled = ![]), event2['preventDefault'](), event2['stopImmediatePropagation']());
+    enabled && ((enabled = false), event2['preventDefault'](), event2['stopImmediatePropagation']());
   }
   for (const el of value) {
     (el['addEventListener']('pointerdown', run),
@@ -112,7 +112,7 @@ export function bindCollaborationChatPosition({
       el['addEventListener']('pointerup', run3),
       el['addEventListener']('pointercancel', run3),
       el['addEventListener']('lostpointercapture', run3),
-      el['addEventListener']('click', run4, !![]));
+      el['addEventListener']('click', run4, true));
   }
   function run5() {
     (root['getAnimations']()['forEach']((next) => next['finish']()), place());
@@ -132,7 +132,7 @@ export function bindCollaborationChatPosition({
             el2['removeEventListener']('pointerup', run3),
             el2['removeEventListener']('pointercancel', run3),
             el2['removeEventListener']('lostpointercapture', run3),
-            el2['removeEventListener']('click', run4, !![]));
+            el2['removeEventListener']('click', run4, true));
         }
       },
     }

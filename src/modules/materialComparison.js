@@ -54,9 +54,9 @@ function safeRevokeObjectUrl(input) {
   } catch (output) {}
 }
 export function closeActiveMaterialComparison() {
-  if (typeof activeMaterialComparisonClose !== 'function') return ![];
+  if (typeof activeMaterialComparisonClose !== 'function') return false;
   const run = activeMaterialComparisonClose;
-  return (run(), !![]);
+  return (run(), true);
 }
 export function openMaterialComparison(list = [], value2 = {}) {
   const translate = typeof value2['translate'] === 'function' ? value2['translate'] : t,
@@ -104,13 +104,13 @@ export function openMaterialComparison(list = [], value2 = {}) {
       stageHeight: 1,
     },
     revokeUrlOnClose = new Set();
-  let enabled = ![],
+  let enabled = false,
     beginModalInteraction2 = null,
     value6 = null,
     event = null,
-    enabled2 = ![],
+    enabled2 = false,
     enabled3 = '',
-    enabled4 = ![];
+    enabled4 = false;
   const overlay = createElement(documentObject, 'div', 'v2-material-comparison-overlay');
   (overlay['setAttribute']('role', 'dialog'),
     overlay['setAttribute']('aria-modal', 'true'),
@@ -182,11 +182,11 @@ export function openMaterialComparison(list = [], value2 = {}) {
       }
       const image =
         entryKind?.['image'] || createElement(documentObject, 'img', 'v2-material-comparison-image');
-      ((image['draggable'] = ![]), (image['decoding'] = 'async'), (image['fetchPriority'] = 'high'));
+      ((image['draggable'] = false), (image['decoding'] = 'async'), (image['fetchPriority'] = 'high'));
       const video = createElement(documentObject, 'video', 'v2-material-comparison-video');
-      ((video['hidden'] = !![]),
-        (video['controls'] = ![]),
-        (video['playsInline'] = !![]),
+      ((video['hidden'] = true),
+        (video['controls'] = false),
+        (video['playsInline'] = true),
         (video['preload'] = 'auto'));
       const badge = createTextElement(
         documentObject,
@@ -207,8 +207,8 @@ export function openMaterialComparison(list = [], value2 = {}) {
           attachToken: 0,
           sourceUrl: '',
           entryKind: entryKind ? value7['kind'] : '',
-          playbackReady: ![],
-          playbackFailed: ![],
+          playbackReady: false,
+          playbackFailed: false,
         }
       );
     },
@@ -301,7 +301,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
         ? ((el15 = createElement(documentObject, 'img', 'v2-material-comparison-thumbnail-image')),
           (el15['src'] = name['thumbnailUrl']),
           (el15['alt'] = name['label']),
-          (el15['draggable'] = ![]))
+          (el15['draggable'] = false))
         : ((el15 = createTextElement(
             documentObject,
             'span',
@@ -368,7 +368,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
       materialComparisonPlaybackController['clearPanelSource'](slot2),
       (slot2['entryKind'] = value14['kind']),
       (slot2['attachToken'] += 1),
-      (image2['hidden'] = !![]),
+      (image2['hidden'] = true),
       panel2['setAttribute']('aria-busy', 'true'),
       panel2['classList']['add']('is-loading'),
       panel2['classList']['remove']('is-error'),
@@ -382,7 +382,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
       (value17['entryKind'] = value18['kind']),
       (value17['attachToken'] += 1),
       (image3['alt'] = value18['label']),
-      (image3['hidden'] = !![]),
+      (image3['hidden'] = true),
       image3['removeAttribute']?.('src'),
       panel3['classList']['add']('is-loading'),
       panel3['classList']['remove']('is-error'),
@@ -390,8 +390,8 @@ export function openMaterialComparison(list = [], value2 = {}) {
   }
   function run9(slot3) {
     ((slot3['attachToken'] += 1),
-      (slot3['image']['hidden'] = !![]),
-      (slot3['video']['hidden'] = !![]),
+      (slot3['image']['hidden'] = true),
+      (slot3['video']['hidden'] = true),
       slot3['panel']['classList']['remove']('is-loading'),
       slot3['panel']['classList']['add']('is-error'),
       slot3['panel']['setAttribute']('aria-busy', 'false'),
@@ -402,7 +402,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     const { image: image4, panel: panel4 } = value19;
     (imageLoadDiagnostics['mark']('original-loaded', { slot: slot4, ...getImageLoadTiming(image4) }),
       onMediaAspect(slot4, value19),
-      (image4['hidden'] = ![]),
+      (image4['hidden'] = false),
       panel4['classList']['remove']('is-loading', 'is-error'),
       panel4['setAttribute']('aria-busy', 'false'),
       windowObject?.['requestAnimationFrame']?.(() =>
@@ -448,7 +448,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
           }
           return (
             (enabled5['originalUrl'] = enabled6),
-            (enabled5['revokeUrlOnClose'] = response?.['revokeUrlOnClose'] === !![]),
+            (enabled5['revokeUrlOnClose'] = response?.['revokeUrlOnClose'] === true),
             enabled6
           );
         })
@@ -486,8 +486,8 @@ export function openMaterialComparison(list = [], value2 = {}) {
   }
   function run13(value29) {
     const enabled9 = leftAspectRatio[value29];
-    if (!enabled9 || (map['get'](enabled9['kind']) || 0) < 2) return !![];
-    if (state2['nextSlot'] !== SLOT_RIGHT) return ![];
+    if (!enabled9 || (map['get'](enabled9['kind']) || 0) < 2) return true;
+    if (state2['nextSlot'] !== SLOT_RIGHT) return false;
     return enabled9['kind'] !== getActiveEntry(SLOT_LEFT)?.['kind'];
   }
   function run14() {
@@ -525,7 +525,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
     } else ((state2['rightIndex'] = value33), (state2['nextSlot'] = SLOT_LEFT));
     (run12(value34, value33),
       materialComparisonPlaybackController['syncVisibility'](),
-      run16() && enabled3 === 'pan' && run17(![]),
+      run16() && enabled3 === 'pan' && run17(false),
       run14());
   }
   function run18(value38) {
@@ -556,9 +556,9 @@ export function openMaterialComparison(list = [], value2 = {}) {
     if (event3?.['pointerId'] != null && value6 != null && event3['pointerId'] !== value6) return;
     (event3?.['preventDefault']?.(),
       event3?.['stopPropagation']?.(),
-      windowObject?.['removeEventListener']?.('pointermove', run22, !![]),
-      windowObject?.['removeEventListener']?.('pointerup', run21, !![]),
-      windowObject?.['removeEventListener']?.('pointercancel', run21, !![]),
+      windowObject?.['removeEventListener']?.('pointermove', run22, true),
+      windowObject?.['removeEventListener']?.('pointerup', run21, true),
+      windowObject?.['removeEventListener']?.('pointercancel', run21, true),
       stage['classList']['remove']('is-dragging-divider'),
       (value6 = null));
   }
@@ -577,9 +577,9 @@ export function openMaterialComparison(list = [], value2 = {}) {
       (value6 = event5?.['pointerId'] ?? 0),
       stage['classList']['add']('is-dragging-divider'),
       run20(event5),
-      windowObject?.['addEventListener']?.('pointermove', run22, !![]),
-      windowObject?.['addEventListener']?.('pointerup', run21, !![]),
-      windowObject?.['addEventListener']?.('pointercancel', run21, !![]));
+      windowObject?.['addEventListener']?.('pointermove', run22, true),
+      windowObject?.['addEventListener']?.('pointerup', run21, true),
+      windowObject?.['addEventListener']?.('pointercancel', run21, true));
   }
   function run24(event6) {
     if (state2['mode'] !== MODE_SLIDE) return;
@@ -589,9 +589,9 @@ export function openMaterialComparison(list = [], value2 = {}) {
       run19(state2['dividerPercent'] + (event6['key'] === 'ArrowRight' ? 2 : -2)));
   }
   function run25() {
-    (windowObject?.['removeEventListener']?.('pointermove', run26, !![]),
-      windowObject?.['removeEventListener']?.('pointerup', run27, !![]),
-      windowObject?.['removeEventListener']?.('pointercancel', run27, !![]));
+    (windowObject?.['removeEventListener']?.('pointermove', run26, true),
+      windowObject?.['removeEventListener']?.('pointerup', run27, true),
+      windowObject?.['removeEventListener']?.('pointercancel', run27, true));
   }
   function run28() {
     (run25(),
@@ -615,14 +615,14 @@ export function openMaterialComparison(list = [], value2 = {}) {
         scrollTop: Number(main['scrollTop'] || 0),
         captureTarget: main,
         usesSpaceHand: usesSpaceHand,
-        moved: ![],
+        moved: false,
       }),
       overlay['classList']['add']('is-panning'),
       stage['classList']['add']('is-panning'),
       main['setPointerCapture']?.(pointerId?.['pointerId']),
-      windowObject?.['addEventListener']?.('pointermove', run26, !![]),
-      windowObject?.['addEventListener']?.('pointerup', run27, !![]),
-      windowObject?.['addEventListener']?.('pointercancel', run27, !![]));
+      windowObject?.['addEventListener']?.('pointermove', run26, true),
+      windowObject?.['addEventListener']?.('pointerup', run27, true),
+      windowObject?.['addEventListener']?.('pointercancel', run27, true));
   }
   function run26(event7) {
     if (!event) return;
@@ -637,7 +637,7 @@ export function openMaterialComparison(list = [], value2 = {}) {
       value43 = Number(event7?.['clientY'] || 0) - event['startY'];
     (!event['moved'] &&
       Math['hypot'](value42, value43) >= 2 &&
-      ((event['moved'] = !![]), (enabled4 = !![])),
+      ((event['moved'] = true), (enabled4 = true)),
       (main['scrollLeft'] = event['scrollLeft'] - value42),
       (main['scrollTop'] = event['scrollTop'] - value43),
       handler());
@@ -660,14 +660,14 @@ export function openMaterialComparison(list = [], value2 = {}) {
     return event9?.['code'] === 'Space' || event9?.['key'] === ' ' || event9?.['key'] === 'Space';
   }
   function run31(el16) {
-    if (!el16) return ![];
+    if (!el16) return false;
     const value45 = String(el16['tagName'] || '')['toLowerCase']();
-    if (['button', 'input', 'select', 'textarea']['includes'](value45)) return !![];
-    if (el16['isContentEditable'] === !![]) return !![];
+    if (['button', 'input', 'select', 'textarea']['includes'](value45)) return true;
+    if (el16['isContentEditable'] === true) return true;
     return el16['closest']?.("button, input, select, textarea, [contenteditable='true']") != null;
   }
   function run17(value46) {
-    ((enabled2 = value46 === !![]), overlay['classList']['toggle']('is-space-pan-ready', enabled2));
+    ((enabled2 = value46 === true), overlay['classList']['toggle']('is-space-pan-ready', enabled2));
   }
   function run16() {
     return (
@@ -678,17 +678,17 @@ export function openMaterialComparison(list = [], value2 = {}) {
   function run32(event10) {
     if (!run30(event10)) return;
     if (!enabled3 && !enabled2) return;
-    (event10['preventDefault']?.(), event10['stopPropagation']?.(), run2(), (enabled3 = ''), run17(![]));
+    (event10['preventDefault']?.(), event10['stopPropagation']?.(), run2(), (enabled3 = ''), run17(false));
     if (event?.['usesSpaceHand']) run27(event10);
   }
   function run33() {
     (materialComparisonViewport['cancelZoom'](),
       run2(),
       (enabled3 = ''),
-      run17(![]),
+      run17(false),
       run21(),
       run27(),
-      (enabled4 = ![]));
+      (enabled4 = false));
   }
   function run34(event11) {
     if (Number(event11?.['button']) !== 1) return;
@@ -696,11 +696,11 @@ export function openMaterialComparison(list = [], value2 = {}) {
   }
   const onClose = () => {
     if (enabled) return;
-    ((enabled = !![]),
+    ((enabled = true),
       materialComparisonViewport['dispose'](),
       imageLoadDiagnostics['finish'](),
-      documentObject['removeEventListener']?.('keydown', run35, !![]),
-      documentObject['removeEventListener']?.('keyup', run32, !![]),
+      documentObject['removeEventListener']?.('keydown', run35, true),
+      documentObject['removeEventListener']?.('keyup', run32, true),
       windowObject?.['removeEventListener']?.('resize', onGeometryChange),
       windowObject?.['removeEventListener']?.('blur', run33),
       windowObject?.['removeEventListener']?.('aicanvas:active-canvas-changed', onClose),
@@ -740,11 +740,11 @@ export function openMaterialComparison(list = [], value2 = {}) {
     if (event12['repeat']) return;
     if (run16()) {
       ((enabled3 = 'playback'),
-        run17(![]),
+        run17(false),
         void materialComparisonPlaybackController['togglePlayback'](event12));
       return;
     }
-    ((enabled3 = 'pan'), run17(!![]));
+    ((enabled3 = 'pan'), run17(true));
   }
   return (
     el7['addEventListener']('click', () => run18(MODE_SLIDE)),
@@ -756,8 +756,8 @@ export function openMaterialComparison(list = [], value2 = {}) {
     main['addEventListener']('pointerdown', run29),
     main['addEventListener']('auxclick', run34),
     el10['addEventListener']('auxclick', run34),
-    main['addEventListener']('scroll', handler, { passive: !![] }),
-    viewport['addEventListener']('wheel', materialComparisonViewport['zoomBy'], { passive: ![] }),
+    main['addEventListener']('scroll', handler, { passive: true }),
+    viewport['addEventListener']('wheel', materialComparisonViewport['zoomBy'], { passive: false }),
     el10['addEventListener']('keydown', run24),
     [SLOT_LEFT, SLOT_RIGHT]['forEach']((value50) => {
       const value51 = run5(value50);
@@ -787,11 +787,11 @@ export function openMaterialComparison(list = [], value2 = {}) {
         if (clamp2 !== value53) el14['scrollLeft'] = clamp2;
         (event13['preventDefault']?.(), event13['stopPropagation']?.());
       },
-      { passive: ![] },
+      { passive: false },
     ),
     main['addEventListener']('click', (event14) => {
       if (enabled4) {
-        ((enabled4 = ![]), event14['preventDefault']?.(), event14['stopPropagation']?.());
+        ((enabled4 = false), event14['preventDefault']?.(), event14['stopPropagation']?.());
         return;
       }
       if (event14['target'] === main || event14['target'] === stageShell) onClose();
@@ -802,8 +802,8 @@ export function openMaterialComparison(list = [], value2 = {}) {
     overlay['addEventListener']('contextmenu', (event16) => {
       (event16['preventDefault']?.(), event16['stopPropagation']?.());
     }),
-    documentObject['addEventListener']?.('keydown', run35, !![]),
-    documentObject['addEventListener']?.('keyup', run32, !![]),
+    documentObject['addEventListener']?.('keydown', run35, true),
+    documentObject['addEventListener']?.('keyup', run32, true),
     windowObject?.['addEventListener']?.('resize', onGeometryChange),
     windowObject?.['addEventListener']?.('blur', run33),
     run12(SLOT_LEFT, state2['leftIndex']),

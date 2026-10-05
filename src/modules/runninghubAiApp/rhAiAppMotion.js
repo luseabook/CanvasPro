@@ -1,6 +1,6 @@
 const motions = new WeakMap();
 export const reduceMotion = () =>
-  globalThis['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![];
+  globalThis['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === true;
 export function animatePreviewOrder(list, handler) {
   const map = new Map(list['map']((el) => [el, el['getBoundingClientRect']()]));
   (handler(),
@@ -23,7 +23,7 @@ export function animatePreviewOrder(list, handler) {
 }
 export function showGroupPanel(el3, duration) {
   motions['get'](el3)?.['cancel']();
-  if (duration) el3['hidden'] = ![];
+  if (duration) el3['hidden'] = false;
   if (reduceMotion() || !el3['animate']) {
     el3['hidden'] = !duration;
     return;

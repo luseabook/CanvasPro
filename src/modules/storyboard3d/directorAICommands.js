@@ -33,7 +33,7 @@ export function normalizeDirectorAIArgs(
     ((key['points'] = item['points']['map']((index, result) =>
       vector3(index, 'args.points[' + result + ']', [0, 0, 0]),
     )),
-      (key['smooth'] = item['smooth'] === !![]));
+      (key['smooth'] = item['smooth'] === true));
   }
   if (value === 'setCameraMotion') {
     if (!DIRECTOR_CAMERA_MOTIONS['some'](([data]) => data === item['preset']))
@@ -50,7 +50,7 @@ export function normalizeDirectorAIArgs(
       lookAtObjectId: item['lookAtObjectId'] ? requiredId(item['lookAtObjectId'], 'args.lookAtObjectId') : '',
       followOffset: vector3(item['followOffset'], 'args.followOffset', [0, 2, 5]),
       lookAtOffset: vector3(item['lookAtOffset'], 'args.lookAtOffset', [0, 1.2, 0]),
-      followHeading: item['followHeading'] === !![],
+      followHeading: item['followHeading'] === true,
     });
   }
   if (value === 'addActionClip') {
@@ -101,7 +101,7 @@ export function executeDirectorAICommand(enabled, target, args) {
   return (
     (enabled2['animation'] = normalizeStoryboard3DShotAnimation(storyboard3DShotAnimation)),
     {
-      changed: !![],
+      changed: true,
       result: {
         shotId: enabled2['id'],
         keyframes: enabled2['animation']['cameraKeyframes']['length'],

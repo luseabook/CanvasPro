@@ -75,8 +75,8 @@ export function openProviderApiKeySettings(current) {
     openSettingsPanelToField({
       paneName: 'api-input',
       fieldIds: guideConfig['inputIds'],
-      select: !![],
-      highlight: !![],
+      select: true,
+      highlight: true,
     }));
 }
 function createGuideNote(entry) {

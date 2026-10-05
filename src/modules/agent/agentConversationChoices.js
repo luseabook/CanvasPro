@@ -14,15 +14,15 @@ export function renderAgentConversationChoices(
   el['replaceChildren']();
   const list = Array['isArray'](questionId?.['options']) ? questionId['options'] : [];
   el['hidden'] = list['length'] === 0;
-  let key = ![];
+  let key = false;
   for (const index of list) {
     const el2 = createAgentElement('button', 'agent-option-btn', index['label']);
     ((el2['type'] = 'button'),
       el2['addEventListener']('click', async () => {
         if (key || el2['disabled']) return;
-        key = !![];
+        key = true;
         const displayAnswer = String(index['label'] || index['id'] || '')['trim']();
-        (onAnswer?.(displayAnswer), (el['hidden'] = !![]), item?.(!![]));
+        (onAnswer?.(displayAnswer), (el['hidden'] = true), item?.(true));
         const el3 = onWaitingStart?.();
         try {
           const result =
@@ -34,14 +34,14 @@ export function renderAgentConversationChoices(
           handler(result);
         } catch (reply) {
           handler({
-            ok: ![],
+            ok: false,
             status: 'failed',
             reply: reply?.['message'] || 'Agent clarification failed.',
           });
         } finally {
           const data = !el3 || Boolean(el3['parentNode']);
           onWaitingEnd?.(el3);
-          if (data) item?.(![]);
+          if (data) item?.(false);
         }
       }),
       el['appendChild'](el2));

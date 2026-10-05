@@ -18,15 +18,15 @@ export function createBackendStartupMonitor({
 } = {}) {
   if (!child || typeof child['once'] !== 'function')
     throw new TypeError('Backend child process is required');
-  let ready = ![],
-    failureSettled = ![],
+  let ready = false,
+    failureSettled = false,
     rejectFailure;
   const failure = new Promise((_resolve, reject) => {
       rejectFailure = reject;
     }),
     settleFailure = (error) => {
-      if (ready || failureSettled) return ![];
-      return ((failureSettled = !![]), rejectFailure(error), !![]);
+      if (ready || failureSettled) return false;
+      return ((failureSettled = true), rejectFailure(error), true);
     };
   return (
     child['once']('error', (error) => {
@@ -57,7 +57,7 @@ export function createBackendStartupMonitor({
     {
       failure: failure,
       markReady() {
-        ready = !![];
+        ready = true;
       },
     }
   );
@@ -73,14 +73,14 @@ export function launchMonitoredBackendProcess({
 } = {}) {
   if (typeof spawnProcess !== 'function')
     throw new TypeError('Backend process launcher is required');
-  let logClosed = ![],
-    spawnFailed = ![];
+  let logClosed = false,
+    spawnFailed = false;
   const closeLog = () => {
       if (logClosed) return;
-      ((logClosed = !![]), logStream?.['end']?.());
+      ((logClosed = true), logStream?.['end']?.());
     },
     handleSpawnError = (error) => {
-      ((spawnFailed = !![]), safeNotify(onSpawnError, error), closeLog());
+      ((spawnFailed = true), safeNotify(onSpawnError, error), closeLog());
     };
   let child;
   try {
@@ -94,8 +94,8 @@ export function launchMonitoredBackendProcess({
     );
   }
   logStream &&
-    (child['stdout']?.['pipe']?.(logStream, { end: ![] }),
-    child['stderr']?.['pipe']?.(logStream, { end: ![] }));
+    (child['stdout']?.['pipe']?.(logStream, { end: false }),
+    child['stderr']?.['pipe']?.(logStream, { end: false }));
   const monitor = createBackendStartupMonitor({
     child: child,
     onError: handleSpawnError,

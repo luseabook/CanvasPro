@@ -13,7 +13,7 @@ function pickAdaptiveSourceSize({
   inEdges: inEdges = [],
   nodes: nodes = {},
   nodeData: nodeData = {},
-  preferConfiguredSource: preferConfiguredSource = ![],
+  preferConfiguredSource: preferConfiguredSource = false,
 } = {}) {
   const list2 = [];
   for (const nodeId of inEdges) {
@@ -25,7 +25,7 @@ function pickAdaptiveSourceSize({
       nodeId: nodeId?.['sourceId'],
       nodeData: nodeData2,
       edge: nodeId,
-      includeNodeFrame: !![],
+      includeNodeFrame: true,
     });
     if (!(size?.['width'] > 0 && size?.['height'] > 0)) continue;
     list2['push']({ edge: nodeId, kind: kind, size: size });

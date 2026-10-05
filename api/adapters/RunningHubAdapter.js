@@ -849,12 +849,12 @@ function isImportedRunningHubAiAppManifest(value112) {
   );
 }
 
-function relaxCustomAiAppMediaNodeMappings(args = null, { enabled: enabled = ![] } = {}) {
+function relaxCustomAiAppMediaNodeMappings(args = null, { enabled: enabled = false } = {}) {
   if (!enabled || !args || typeof args !== 'object' || Array['isArray'](args)) return args;
   const nodeInfoList5 = Array['isArray'](args['nodeInfoList'])
     ? args['nodeInfoList']['map']((args2) =>
         CUSTOM_AI_APP_MEDIA_NODE_SOURCES['has'](String(args2?.['source'] || '')['trim']())
-          ? { ...args2, required: ![] }
+          ? { ...args2, required: false }
           : args2,
       )
     : args['nodeInfoList'];
@@ -981,7 +981,7 @@ function buildOpenApiImageWorkflowRequest({
       instanceType: instanceType4,
       usePersonalQueue: 'false',
     },
-    isAsync: !![],
+    isAsync: true,
     taskIdPath: executionManifest7['result']?.['taskIdPath'] || 'taskId',
     adapterTrace: { source: 'manifest', executionId: executionManifest7['id'], modelId: payload10['model'] },
     pollUrlBuilder: () => getRunningHubWorkflowBaseUrl(payload10) + '/openapi/v2/query',
@@ -1002,7 +1002,7 @@ async function uploadRunningHubMediaInputs(
       apiKey: apiKey10,
       apiUrl: getRunningHubWorkflowBaseUrl(value144),
       fallbackProvider: 'runninghub',
-      strictUpload: !![],
+      strictUpload: true,
     });
   } catch (value146) {
     throw createMediaUploadError(value146, { kind: kind, label: uploadFailedMessage });

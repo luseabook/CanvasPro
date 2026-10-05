@@ -43,9 +43,9 @@ export function renderMediaClipMaterialMenu(data) {
         'add-to-canvas',
         'context-media-clip-export-to-canvas',
         async () => {
-          if (data['_exporting'] === !![]) return;
+          if (data['_exporting'] === true) return;
           const { kind: kind, clipIndex: clipIndex } = data['_materialMenu'] || options;
-          (data['_closeMaterialMenu']({ render: ![] }),
+          (data['_closeMaterialMenu']({ render: false }),
             await data['_exportMaterialToCanvas'](kind, clipIndex));
         },
       ),
@@ -60,12 +60,12 @@ export function renderMediaClipMaterialMenu(data) {
     el6 &&
       el5['appendChild'](
         createMaterialMenuRow(
-          mediaClipText(el6['disabled'] === !![] ? 'materialMenu.enable' : 'materialMenu.disable'),
-          el6['disabled'] === !![] ? 'enable' : 'disable',
-          el6['disabled'] === !![] ? 'context-media-clip-enable-audio' : 'context-media-clip-disable-audio',
+          mediaClipText(el6['disabled'] === true ? 'materialMenu.enable' : 'materialMenu.disable'),
+          el6['disabled'] === true ? 'enable' : 'disable',
+          el6['disabled'] === true ? 'context-media-clip-enable-audio' : 'context-media-clip-disable-audio',
           () => {
             const { clipIndex: clipIndex2 } = data['_materialMenu'] || options;
-            (data['_closeMaterialMenu']({ render: ![] }), data['_toggleAudioClipDisabled'](clipIndex2));
+            (data['_closeMaterialMenu']({ render: false }), data['_toggleAudioClipDisabled'](clipIndex2));
           },
         ),
       ),
@@ -76,7 +76,7 @@ export function renderMediaClipMaterialMenu(data) {
         'context-media-clip-delete',
         () => {
           const { kind: kind2, clipIndex: clipIndex3 } = data['_materialMenu'] || options;
-          (data['_closeMaterialMenu']({ render: ![] }), data['_deleteMaterial'](kind2, clipIndex3));
+          (data['_closeMaterialMenu']({ render: false }), data['_deleteMaterial'](kind2, clipIndex3));
         },
       ),
     ),

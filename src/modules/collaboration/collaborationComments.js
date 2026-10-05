@@ -18,12 +18,12 @@ export function createCollaborationComments({ store: store, getSession: getSessi
   const list = reviewElement('div', 'collaboration-comment-list');
   list['setAttribute']('aria-label', '评论内容');
   const el4 = reviewElement('button', 'collaboration-button', '重新加载评论');
-  el4['hidden'] = !![];
+  el4['hidden'] = true;
   const el5 = reviewElement('form', 'collaboration-comment-composer'),
     el6 = reviewElement('div', 'collaboration-actions'),
     el7 = reviewElement('span'),
     el8 = reviewElement('button', 'collaboration-button', '取消回复');
-  (el6['append'](el7, el8), (el6['hidden'] = !![]));
+  (el6['append'](el7, el8), (el6['hidden'] = true));
   const input = reviewElement('textarea', 'collaboration-input');
   ((input['maxLength'] = 2000),
     (input['rows'] = 3),
@@ -67,8 +67,8 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     nodeId = '',
     item = 0,
     key = -1,
-    enabled2 = ![],
-    enabled = ![],
+    enabled2 = false,
+    enabled = false,
     comments = [],
     index = '',
     handler = () => {},
@@ -76,7 +76,7 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     dom = null,
     result = -1,
     data = { x: 0, y: 0 },
-    enabled4 = !![];
+    enabled4 = true;
   const map = new Map(),
     handler2 = () => !!nodeId && root['matches'](':popover-open');
   function run2(options) {
@@ -90,10 +90,10 @@ export function createCollaborationComments({ store: store, getSession: getSessi
       (el6['hidden'] = !dom['threadId']),
       (el7['textContent'] = dom['threadId'] ? '回复 ' + dom['replyName'] : ''));
   }
-  function onClose(restoreFocus = !![]) {
+  function onClose(restoreFocus = true) {
     (item++, timer['close'](), handler({ restoreFocus: restoreFocus }), (handler = () => {}));
     if (root['matches'](':popover-open')) root['hidePopover']();
-    ((nodeId = ''), (enabled2 = ![]), (enabled = ![]));
+    ((nodeId = ''), (enabled2 = false), (enabled = false));
   }
   function position(x = data) {
     ((data = { x: x['x'], y: x['y'] }),
@@ -143,19 +143,19 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     const entry = item,
       record = nodeId,
       payload = session;
-    ((enabled2 = !![]), (el4['hidden'] = !![]));
+    ((enabled2 = true), (el4['hidden'] = true));
     !enabled && ((el3['textContent'] = '正在加载评论…'), el3['classList']['add']('is-pending'));
     try {
       const handle = await payload['review']['readNode'](record);
       if (!run2(entry)) return;
       ((comments = handle['comments']), (key = handle['revision']));
       if (!enabled) el3['textContent'] = '';
-      (run4(), (enabled4 = ![]));
+      (run4(), (enabled4 = false));
     } catch (error4) {
-      run2(entry) && ((el3['textContent'] = error4['message']), (el4['hidden'] = ![]));
+      run2(entry) && ((el3['textContent'] = error4['message']), (el4['hidden'] = false));
     } finally {
       if (run2(entry)) {
-        enabled2 = ![];
+        enabled2 = false;
         if (!enabled) el3['classList']['remove']('is-pending');
         if (el4['hidden'] && key < session['review']['snapshot']()['revision']) void run6();
       }
@@ -164,13 +164,13 @@ export function createCollaborationComments({ store: store, getSession: getSessi
   async function run5(el10, handler3) {
     if (enabled || !handler2()) return;
     const state = item;
-    ((enabled = !![]),
-      (el10['disabled'] = !![]),
+    ((enabled = true),
+      (el10['disabled'] = true),
       el10['setAttribute']('aria-busy', 'true'),
       timer['close'](),
-      (input['disabled'] = !![]),
-      (el9['disabled'] = !![]),
-      (trigger['disabled'] = !![]),
+      (input['disabled'] = true),
+      (el9['disabled'] = true),
+      (trigger['disabled'] = true),
       (el3['textContent'] = '正在保存评论…'),
       el3['classList']['add']('is-pending'));
     try {
@@ -183,8 +183,8 @@ export function createCollaborationComments({ store: store, getSession: getSessi
       if (run2(state)) el3['textContent'] = error5['message'] || '保存失败，请重试';
     } finally {
       run2(state) &&
-        ((enabled = ![]),
-        (el10['disabled'] = ![]),
+        ((enabled = false),
+        (el10['disabled'] = false),
         el10['removeAttribute']('aria-busy'),
         (input['disabled'] = !store['getStateRaw']()['nodes'][nodeId]),
         (el9['disabled'] = input['disabled']),
@@ -227,7 +227,7 @@ export function createCollaborationComments({ store: store, getSession: getSessi
         };
       void run5(el9, async () => {
         await config['review']['write']('commentAdd', scope);
-        if (config === session && nodeId2 === nodeId) enabled4 = !![];
+        if (config === session && nodeId2 === nodeId) enabled4 = true;
         if (body['requestId'] === commentId)
           Object['assign'](body, { body: '', threadId: '', mentions: {}, requestId: null });
       });
@@ -236,11 +236,11 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     el2['addEventListener']('click', () => onClose()));
   const value4 = (event3) => {
     if (handler2() && !root['contains'](event3['target']) && !enabled3?.['contains'](event3['target']))
-      onClose(![]);
+      onClose(false);
   };
-  document['addEventListener']('pointerdown', value4, !![]);
+  document['addEventListener']('pointerdown', value4, true);
   function update() {
-    getSession() !== session && (onClose(![]), (session = getSession()), map['clear'](), (result = -1));
+    getSession() !== session && (onClose(false), (session = getSession()), map['clear'](), (result = -1));
     if (!handler2()) return;
     const error6 = store['getStateRaw']()['nodes'][nodeId];
     (updateNodeReference(reviewElement3, error6, nodeId),
@@ -259,7 +259,7 @@ export function createCollaborationComments({ store: store, getSession: getSessi
   }
   return {
     open(value7, returnFocus) {
-      onClose(![]);
+      onClose(false);
       if (session !== getSession()) map['clear']();
       session = getSession();
       if (!session?.['review']) return;
@@ -269,7 +269,7 @@ export function createCollaborationComments({ store: store, getSession: getSessi
         (result = -1),
         (comments = []),
         (index = ''),
-        (enabled4 = !![]));
+        (enabled4 = true));
       if (!map['has'](value7)) map['set'](value7, { body: '', threadId: '', mentions: {}, requestId: null });
       ((dom = map['get'](value7)),
         run3(),
@@ -293,10 +293,10 @@ export function createCollaborationComments({ store: store, getSession: getSessi
     position: position,
     nodeId: () => nodeId,
     destroy() {
-      (onClose(![]),
+      (onClose(false),
         timer['destroy'](),
         root['remove'](),
-        document['removeEventListener']('pointerdown', value4, !![]));
+        document['removeEventListener']('pointerdown', value4, true));
     },
   };
 }

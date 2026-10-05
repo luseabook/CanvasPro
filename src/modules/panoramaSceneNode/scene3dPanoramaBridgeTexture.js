@@ -11,12 +11,12 @@ export function abortPanoramaTextureLoad(value) {
 export function loadPanoramaBridgeTexture(
   enabled,
   enabled2,
-  { token: token, isPreview: isPreview = ![], fullUrl: fullUrl = '' } = {},
+  { token: token, isPreview: isPreview = false, fullUrl: fullUrl = '' } = {},
 ) {
   if (!enabled || !enabled2 || token !== enabled['_panoramaLoadToken']) return;
   enabled['_pendingPanoramaUrl'] = enabled2;
   !enabled['_panoramaSphere']['material']?.['map'] &&
-    enabled['onPanoramaStatusChange']?.({ isLoaded: ![], error: null });
+    enabled['onPanoramaStatusChange']?.({ isLoaded: false, error: null });
   let signal = null;
   const key = (index) => {
       signal &&
@@ -32,10 +32,10 @@ export function loadPanoramaBridgeTexture(
         (enabled['_loadedPanoramaUrl'] = enabled2),
         (enabled['_pendingPanoramaUrl'] = ''),
         (enabled['_panoramaSphere']['material']['map'] = index),
-        (enabled['_panoramaSphere']['material']['needsUpdate'] = !![]),
-        (enabled['_panoramaSphere']['visible'] = !![]),
+        (enabled['_panoramaSphere']['material']['needsUpdate'] = true),
+        (enabled['_panoramaSphere']['visible'] = true),
         enabled['_syncPanoramaCanvasVisibility'](),
-        enabled['onPanoramaStatusChange']?.({ isLoaded: !![], error: null }),
+        enabled['onPanoramaStatusChange']?.({ isLoaded: true, error: null }),
         enabled['requestRender'](),
         isPreview && fullUrl && fullUrl !== enabled2 && enabled['_schedulePanoramaFullLoad'](fullUrl, token));
     },
@@ -79,7 +79,7 @@ export function schedulePanoramaFullLoad(enabled3, enabled4, token2) {
   enabled3['_panoramaFullLoadFrame'] = run(() => {
     enabled3['_panoramaFullLoadFrame'] = null;
     if (token2 !== enabled3['_panoramaLoadToken']) return;
-    enabled3['_loadPanoramaTexture'](enabled4, { token: token2, isPreview: ![], fullUrl: '' });
+    enabled3['_loadPanoramaTexture'](enabled4, { token: token2, isPreview: false, fullUrl: '' });
   });
 }
 export function cancelPanoramaFullLoad(enabled5) {

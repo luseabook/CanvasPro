@@ -19,10 +19,10 @@ export function createNodeGeometryOverlay(item, enabled) {
     if (!args || !args2) continue;
     if (!enabled2) enabled2 = Object['create'](key);
     Object['defineProperty'](enabled2, index, {
-      configurable: !![],
-      enumerable: !![],
+      configurable: true,
+      enumerable: true,
       value: { ...args, ...args2 },
-      writable: !![],
+      writable: true,
     });
   }
   return enabled2 || key;

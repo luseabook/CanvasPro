@@ -64,7 +64,7 @@ export function createStoryAssetExtractionResponseSchema(record = STORY_ASSET_EX
     };
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['assets'],
     properties: {
       assets: {
@@ -73,7 +73,7 @@ export function createStoryAssetExtractionResponseSchema(record = STORY_ASSET_EX
         maxItems: 128,
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: [
             'ref',
             'kind',
@@ -105,7 +105,7 @@ export function createStoryAssetExtractionResponseSchema(record = STORY_ASSET_EX
                 : 1,
               items: {
                 type: 'object',
-                additionalProperties: ![],
+                additionalProperties: false,
                 required: ['ref', 'name', 'description', 'occurrences', 'sourceChapterIds', 'prompt'],
                 properties: {
                   ref: { type: 'string', maxLength: 64 },
@@ -139,7 +139,7 @@ export function createStoryAssetCompactExtractionResponseSchema(
     minItems = enumValue2['length'];
   return {
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: ['assets'],
     properties: {
       assets: {
@@ -148,7 +148,7 @@ export function createStoryAssetCompactExtractionResponseSchema(
         maxItems: minItems,
         items: {
           type: 'object',
-          additionalProperties: ![],
+          additionalProperties: false,
           required: ['clientKey', 'include', 'description', 'visualPrompt', 'voiceDescription'],
           properties: {
             clientKey: {
@@ -258,7 +258,7 @@ export function parseStoryAssetExtractionResult(
   {
     chapterIds: chapterIds = [],
     allowedKinds: allowedKinds = STORY_ASSET_EXTRACTION_KINDS,
-    allowEmptyResult: allowEmptyResult = ![],
+    allowEmptyResult: allowEmptyResult = false,
   } = {},
 ) {
   const strictJson = parseStrictJson(getResultText(value19), 'Agent 未返回资产提取结果。'),
@@ -436,7 +436,7 @@ export function parseStoryAssetCompactExtractionResult(
             requiredAssetNamesByKind,
             candidateAssetsByKind,
             requiredAssetsByKind,
-            { includeClientKeys: !![] },
+            { includeClientKeys: true },
           )['payload'],
     list21 = Array['isArray'](value36['requiredAssets']) ? value36['requiredAssets'] : [],
     args3 = Array['isArray'](value36['candidateAssets']) ? value36['candidateAssets'] : [],
@@ -455,7 +455,7 @@ export function parseStoryAssetCompactExtractionResult(
     if (map4['has'](text5)) throw new Error('Agent 紧凑结果重复返回 clientKey：' + text5 + '。');
     if (typeof value39?.['include'] !== 'boolean')
       throw new Error('Agent 紧凑结果中的 ' + text5 + ' 缺少明确 include 裁决。');
-    if (required['has'](text5) && value39['include'] === ![])
+    if (required['has'](text5) && value39['include'] === false)
       throw new Error('Agent 紧凑结果试图排除必需资产 ' + text5 + '；必需资产不能排除。');
     map4['set'](text5, value39);
   });
@@ -476,7 +476,7 @@ export function parseStoryAssetCompactExtractionResult(
         value44 = kind3 + ':' + name3['normalize']('NFKC')['toLowerCase']();
       if (!kind3 || !name3)
         throw new Error('客户端紧凑资产合同 ' + clientKey['clientKey'] + ' 缺少 kind 或 name。');
-      const include = value43['include'] === !![],
+      const include = value43['include'] === true,
         description = sanitizeStoryAssetPublicDescriptionText(value43['description']),
         visualPrompt = sanitizeStoryAssetPublicPromptText(value43['visualPrompt']),
         sanitizeStoryAssetPublicDescriptionText2 = sanitizeStoryAssetPublicDescriptionText(

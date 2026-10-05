@@ -41,9 +41,9 @@ function createSourceState(el3, source) {
     source: source,
     declaredSource: getDeclaredVideoSource(el3),
     callbackId: null,
-    frameCallbackObserved: ![],
+    frameCallbackObserved: false,
     frameCallbackAt: 0,
-    presented: ![],
+    presented: false,
     presentedAt: 0,
     metadata: null,
     listeners: new Set(),
@@ -71,7 +71,7 @@ function isCurrentPresentedFrameValid(el4, target, next = 2) {
   return !!(
     el4 &&
     target &&
-    el4['isConnected'] !== ![] &&
+    el4['isConnected'] !== false &&
     getVideoPresentationSource(el4) === target &&
     videoFramePresentationState['get'](el4)?.['declaredSource'] === getDeclaredVideoSource(el4) &&
     Number(el4['readyState'] || 0) >= next &&
@@ -89,23 +89,23 @@ export function resetVideoFramePresentation(enabled3) {
     clearPresentedDataset(enabled3));
 }
 export function hasPresentedVideoFrame(enabled4, entry = '') {
-  if (!enabled4) return ![];
+  if (!enabled4) return false;
   const videoPresentationSource = getVideoPresentationSource(enabled4),
     source3 = normalizeSource(entry);
-  if (!videoPresentationSource || (source3 && videoPresentationSource !== source3)) return ![];
+  if (!videoPresentationSource || (source3 && videoPresentationSource !== source3)) return false;
   const record = videoFramePresentationState['get'](enabled4);
   return !!(
-    record?.['presented'] === !![] &&
+    record?.['presented'] === true &&
     record['source'] === videoPresentationSource &&
     isCurrentPresentedFrameValid(enabled4, videoPresentationSource, 1)
   );
 }
 export function watchVideoFramePresentation(el5, payload) {
-  if (!el5) return ![];
+  if (!el5) return false;
   const { source: source4, state: state2 } = readSourceState(el5);
-  if (!source4 || !state2) return ![];
+  if (!source4 || !state2) return false;
   if (!state2['presented'] && state2['frameCallbackObserved'] && isCurrentPresentedFrameValid(el5, source4)) {
-    ((state2['presented'] = !![]), (state2['presentedAt'] = state2['frameCallbackAt']));
+    ((state2['presented'] = true), (state2['presentedAt'] = state2['frameCallbackAt']));
     el5['dataset'] &&
       ((el5['dataset']['firstFramePresented'] = '1'),
       (el5['dataset']['firstFramePresentedAt'] = String(state2['presentedAt'])),
@@ -135,25 +135,25 @@ export function watchVideoFramePresentation(el5, payload) {
         presentedAt: state2['presentedAt'],
         metadata: state2['metadata'],
       }),
-      !![]
+      true
     );
   if (typeof payload === 'function') state2['listeners']['add'](payload);
-  if (state2['callbackId'] != null) return !![];
-  if (typeof el5['requestVideoFrameCallback'] !== 'function') return ![];
+  if (state2['callbackId'] != null) return true;
+  if (typeof el5['requestVideoFrameCallback'] !== 'function') return false;
   return (
     (state2['callbackId'] = el5['requestVideoFrameCallback']((scope, box = {}) => {
       const input = videoFramePresentationState['get'](el5);
       if (input !== state2) return;
       state2['callbackId'] = null;
       const output = !!(
-        el5?.['isConnected'] !== ![] &&
+        el5?.['isConnected'] !== false &&
         getVideoPresentationSource(el5) === source4 &&
         Number(el5?.['videoWidth'] || box['width'] || 0) > 0 &&
         Number(el5?.['videoHeight'] || box['height'] || 0) > 0 &&
         !el5?.['error']
       );
       output &&
-        ((state2['frameCallbackObserved'] = !![]),
+        ((state2['frameCallbackObserved'] = true),
         (state2['frameCallbackAt'] = Number(scope || 0)),
         (state2['metadata'] = {
           mediaTime: Number(box['mediaTime'] || 0),
@@ -171,7 +171,7 @@ export function watchVideoFramePresentation(el5, payload) {
         });
         return;
       }
-      ((state2['presented'] = !![]), (state2['presentedAt'] = state2['frameCallbackAt']));
+      ((state2['presented'] = true), (state2['presentedAt'] = state2['frameCallbackAt']));
       el5['dataset'] &&
         ((el5['dataset']['firstFramePresented'] = '1'),
         (el5['dataset']['firstFramePresentedAt'] = String(state2['presentedAt'])),
@@ -194,7 +194,7 @@ export function watchVideoFramePresentation(el5, payload) {
         run2(value3);
       }
     })),
-    !![]
+    true
   );
 }
 export const __videoFramePresentationForTest = {

@@ -10,7 +10,7 @@ export function resolveNodeVideoElement(el, value = 0) {
     if (!el2) continue;
     const index = Number(el2['dataset']?.['idx']),
       result =
-        el2['classList']?.['contains']?.('video-player') === !![] ||
+        el2['classList']?.['contains']?.('video-player') === true ||
         (Number['isFinite'](index) && index === key),
       mediaElementCurrentSource = getMediaElementCurrentSource(el2);
     if (result && !enabled3) enabled3 = el2;

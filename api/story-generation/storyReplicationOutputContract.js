@@ -4,7 +4,7 @@ import { REPLICATION_CONTENT_TYPES } from '../../src/domain/storyGeneration/vide
 import { replicationVisualSchema } from '../../src/domain/storyGeneration/videoReplicationVisualContract.js';
 const object = (properties) => ({
     type: 'object',
-    additionalProperties: ![],
+    additionalProperties: false,
     required: Object['keys'](properties),
     properties: properties,
   }),
@@ -41,7 +41,7 @@ export function createReplicationSplitOutput({
     });
   return {
     name: 'replication_episode_split',
-    strict: !![],
+    strict: true,
     fallback: 'prompt',
     schema: object({
       contentType: { type: 'string', enum: REPLICATION_CONTENT_TYPES },

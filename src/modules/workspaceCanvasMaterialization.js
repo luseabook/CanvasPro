@@ -68,7 +68,7 @@ export function createWorkspaceCanvasMaterializationAdapter({
   return {
     canvasExists(current) {
       const text = normalizeText(current);
-      if (!text) return ![];
+      if (!text) return false;
       const entry = canvasTabManager['getMultiDataSnapshot']?.() || {};
       return Array['isArray'](entry['canvases'])
         ? entry['canvases']['some']((record) => normalizeText(record?.['id']) === text)
@@ -76,10 +76,10 @@ export function createWorkspaceCanvasMaterializationAdapter({
     },
     async switchCanvas(payload) {
       const text2 = normalizeText(payload);
-      if (!text2) return ![];
-      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text2) return !![];
-      if (typeof canvasTabManager['switchTo'] !== 'function') return ![];
-      return (await canvasTabManager['switchTo'](text2)) !== ![];
+      if (!text2) return false;
+      if (normalizeText(canvasTabManager['getActiveCanvasId']()) === text2) return true;
+      if (typeof canvasTabManager['switchTo'] !== 'function') return false;
+      return (await canvasTabManager['switchTo'](text2)) !== false;
     },
     async createCanvas(handle) {
       await canvasTabManager['addCanvas']();
@@ -104,7 +104,7 @@ export function createWorkspaceCanvasMaterializationAdapter({
         args2 = createNodeAtCursor(text4, output, value2, error?.['name'], {
           placement: 'viewport-center-sequence',
           sequenceKey: sequenceKey['sequenceKey'],
-          skipCommit: !![],
+          skipCommit: true,
         });
       if (!args2?.['id']) throw new Error('创建项目画布节点失败：' + (error?.['name'] || text4));
       const args3 = withoutNodeType(error);
@@ -129,7 +129,7 @@ export function createWorkspaceCanvasMaterializationAdapter({
             ? nodeSpawnPrefs['direction']
             : 'right',
         x3 =
-          nodeSpawnPrefs['avoidOverlap'] === ![]
+          nodeSpawnPrefs['avoidOverlap'] === false
             ? { x: x2, y: y2 }
             : findAvailablePosition(
                 value4,
@@ -171,39 +171,39 @@ export function createWorkspaceCanvasMaterializationAdapter({
       return handler(id2) || { id: id2, ...args4 };
     },
     deleteNodes(list2 = []) {
-      if (typeof deleteNodes2 !== 'function') return ![];
+      if (typeof deleteNodes2 !== 'function') return false;
       const list3 = (Array['isArray'](list2) ? list2 : [])
         ['map'](normalizeText)
         ['filter']((value17) => value17 && handler(value17));
-      if (!list3['length']) return !![];
-      return (deleteNodes2([...new Set(list3)]), !![]);
+      if (!list3['length']) return true;
+      return (deleteNodes2([...new Set(list3)]), true);
     },
     createMutationSnapshot() {
       if (typeof getGraphSnapshot !== 'function') return null;
       return getGraphSnapshot();
     },
     restoreMutationSnapshot(enabled) {
-      if (!enabled || typeof restoreGraphSnapshot !== 'function') return ![];
-      return restoreGraphSnapshot(enabled) !== ![];
+      if (!enabled || typeof restoreGraphSnapshot !== 'function') return false;
+      return restoreGraphSnapshot(enabled) !== false;
     },
     async deleteCanvas(value18) {
       const text5 = normalizeText(value18);
-      if (!text5 || typeof canvasTabManager?.['deleteCanvas'] !== 'function') return ![];
-      return (await canvasTabManager['deleteCanvas'](text5, { skipDirtyConfirm: !![] })) !== ![];
+      if (!text5 || typeof canvasTabManager?.['deleteCanvas'] !== 'function') return false;
+      return (await canvasTabManager['deleteCanvas'](text5, { skipDirtyConfirm: true })) !== false;
     },
     setNodeParent(value19, value20) {
       const text6 = normalizeText(value19),
         text7 = normalizeText(value20);
-      if (!text6 || !text7) return ![];
-      if (normalizeText(handler(text6)?.['parentId']) === text7) return !![];
-      if (typeof groupNodes !== 'function') return ![];
+      if (!text6 || !text7) return false;
+      if (normalizeText(handler(text6)?.['parentId']) === text7) return true;
+      if (typeof groupNodes !== 'function') return false;
       const groupNodes2 = groupNodes([text6], text7);
-      return groupNodes2 !== ![];
+      return groupNodes2 !== false;
     },
     connectNodes(value21, value22, value23 = {}) {
       const sourceId = normalizeText(value21),
         targetId = normalizeText(value22);
-      if (!sourceId || !targetId) return ![];
+      if (!sourceId || !targetId) return false;
       const value24 = getGraphState()?.['edges'],
         list4 = Array['isArray'](value24) ? value24 : Object['values'](asObject(value24)),
         value25 = list4['some'](
@@ -211,19 +211,19 @@ export function createWorkspaceCanvasMaterializationAdapter({
             normalizeText(value26?.['sourceId']) === sourceId &&
             normalizeText(value26?.['targetId']) === targetId,
         );
-      if (value25) return !![];
-      if (typeof connectNodes2 !== 'function') return ![];
+      if (value25) return true;
+      if (typeof connectNodes2 !== 'function') return false;
       const value27 = connectNodes2({
         sourceId: sourceId,
         targetId: targetId,
         preferredRefSlot: normalizeText(value23['preferredRefSlot']),
       });
-      return value27 !== ![];
+      return value27 !== false;
     },
     focusNodes(list5, value28 = {}) {
-      if (typeof focusNodes2 !== 'function') return ![];
+      if (typeof focusNodes2 !== 'function') return false;
       const list6 = Array['isArray'](list5) ? list5['map'](normalizeText)['filter'](Boolean) : [];
-      if (!list6['length']) return ![];
+      if (!list6['length']) return false;
       return focusNodes2(list6, value28['padding'], value28['durationMs'], value28);
     },
     commit: commit,

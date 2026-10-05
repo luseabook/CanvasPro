@@ -63,13 +63,13 @@ export function getMaterialAssetItems(state = {}) {
   }));
 }
 export function isMaterialAssetFavorite(options2 = {}) {
-  return options2['favorite'] === !![] || options2['isFavorite'] === !![];
+  return options2['favorite'] === true || options2['isFavorite'] === true;
 }
 export function getMaterialLibraryGroups({
   assets: assets = [],
   categories: categories = [],
   query: query = '',
-  favoritesOnly: favoritesOnly = ![],
+  favoritesOnly: favoritesOnly = false,
   categoryKey: categoryKey = (source) => normalizeSearchText(source),
 } = {}) {
   const searchText = normalizeSearchText(query),
@@ -218,10 +218,10 @@ export function normalizeMaterialFolderParents({
   for (const [value11, value12] of map7) {
     const map8 = new Set([value11]);
     let value13 = value12['parentKey'],
-      enabled = ![];
+      enabled = false;
     while (map7['has'](value13)) {
       if (map8['has'](value13)) {
-        enabled = !![];
+        enabled = true;
         break;
       }
       (map8['add'](value13), (value13 = map7['get'](value13)['parentKey']));
@@ -277,7 +277,7 @@ export function buildMaterialDuplicate(
     (error4['name'] = '' + (trimText(error3['name']) || '未命名素材') + nameSuffix),
     (error4['createdAt'] = now),
     (error4['updatedAt'] = now),
-    (error4['favorite'] = ![]),
+    (error4['favorite'] = false),
     delete error4['isFavorite'],
     delete error4['packageKey'],
     delete error4['packageMetadata']);

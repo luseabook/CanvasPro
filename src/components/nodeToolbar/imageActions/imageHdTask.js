@@ -136,8 +136,8 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
             generationParams: generationParams,
             outputText: outputText3,
           },
-          cancellable: !![],
-          resumable: !![],
+          cancellable: true,
+          resumable: true,
           onTaskChange: notifyImageToolbarTaskChange,
           createTargetNode: ({
             startedAt: startedAt,
@@ -151,7 +151,7 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
               y: y,
               width: width2,
               height: height,
-              needsAutoResize: ![],
+              needsAutoResize: false,
               name: imageHdText('processingName'),
               src: '',
               outputText: outputText3,
@@ -175,7 +175,7 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
                 outNodeId: outNodeId['targetNodeId'],
               }));
             const list = await processInputImages([apiUrl['imgUrl']], apiUrl['apiKey'], {
-              applyInputQualityProfile: !![],
+              applyInputQualityProfile: true,
               provider: 'runninghub',
               apiUrl: apiUrl['runningHubApiUrl'],
             });
@@ -189,7 +189,7 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
                 providerProfileId: apiUrl['providerProfileId'],
                 runningHubApiUrl: apiUrl['runningHubApiUrl'],
                 workflowId: workflowId,
-                addMetadata: ![],
+                addMetadata: false,
                 nodeInfoList: await buildRunningHubNodeInfoListFromManifest({
                   mapping: executionManifest['mapping'],
                   payload: apiUrl,
@@ -253,7 +253,7 @@ export async function submitImageHdTask(key, index, isTargetCurrent) {
             try {
               args = await saveRemoteImageResultLocally(imageUrl2, {
                 projectId: window['currentProjectId'] || 'default_v2_project',
-                includeSrc: !![],
+                includeSrc: true,
               });
             } catch (record) {
               console['error']('保存图片失败:', record);

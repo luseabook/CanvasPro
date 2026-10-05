@@ -27,18 +27,18 @@ function buildInteractionSignature(state = {}) {
     target = state['pickConnectMode'] || {};
   return [
     normalizeIds(state['selectedNodeIds']),
-    options['active'] === !![] ? 1 : 0,
+    options['active'] === true ? 1 : 0,
     options['srcId'] || '',
     options['hoverId'] || '',
     normalizeIds(options['invalidNodeIds']),
-    target['active'] === !![] ? 1 : 0,
+    target['active'] === true ? 1 : 0,
     target['sourceNodeId'] || target['srcId'] || '',
     target['hoverNodeId'] || target['hoverId'] || '',
-    state['ui']?.['showVideoMeta'] === !![] ? 1 : 0,
+    state['ui']?.['showVideoMeta'] === true ? 1 : 0,
   ]['join']('\x1e');
 }
 function containsBounds(enabled2, enabled3) {
-  if (!enabled2 || !enabled3) return ![];
+  if (!enabled2 || !enabled3) return false;
   return (
     finiteNumber(enabled3['minX'], Number['NEGATIVE_INFINITY']) >=
       finiteNumber(enabled2['minX'], Number['POSITIVE_INFINITY']) - BOUNDS_EPSILON &&
@@ -59,9 +59,9 @@ export function shouldPrepareRendererViewportPreviewCoverage({
   const nodeCount2 = Math['max'](0, Math['trunc'](finiteNumber(nodeCount, 0))),
     source = Math['max'](0, Math['trunc'](finiteNumber(visibleNodeCount, 0)));
   if (resolveRendererVirtualizationTier({ viewport: viewport, nodeCount: nodeCount2 }) === 'default')
-    return ![];
-  if (source <= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount']) return !![];
-  if (source > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxRasterAssistedVisibleNodeCount']) return ![];
+    return false;
+  if (source <= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxDirectVisibleNodeCount']) return true;
+  if (source > RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['maxRasterAssistedVisibleNodeCount']) return false;
   const next = Math['max'](0, Math['trunc'](finiteNumber(rasterVisibleNodeCount, 0)));
   return (
     next / Math['max'](1, source) >= RENDERER_VIEWPORT_PREVIEW_COVERAGE_CONFIG['minRasterVisibleShare']
@@ -76,9 +76,9 @@ export function createRendererViewportPreviewCoverage({
   snapshot: snapshot = {},
   spatialIndex: spatialIndex = null,
   presentedNodeIds: presentedNodeIds = null,
-  ready: ready = !![],
+  ready: ready = true,
 } = {}) {
-  if (ready !== !![]) return null;
+  if (ready !== true) return null;
   const containerWidth2 = Math['max'](1, finiteNumber(containerWidth, 1)),
     containerHeight2 = Math['max'](1, finiteNumber(containerHeight, 1)),
     nodeCount3 = Math['max'](0, Math['trunc'](finiteNumber(nodeCount, 0)));
@@ -109,35 +109,35 @@ export function canReuseRendererViewportPreviewCoverage(
   containerWidth3,
   { viewport: viewport3, nodeCount: nodeCount = 0, snapshot: snapshot = {} } = {},
 ) {
-  if (!containerWidth3?.['bounds']) return ![];
+  if (!containerWidth3?.['bounds']) return false;
   const nodeCount4 = Math['max'](0, Math['trunc'](finiteNumber(nodeCount, 0))),
     rendererVirtualizationTier = resolveRendererVirtualizationTier({
       viewport: viewport3,
       nodeCount: nodeCount4,
     });
-  if (rendererVirtualizationTier === 'default' || containerWidth3['tier'] === 'default') return ![];
-  if (Number(containerWidth3['nodeCount']) !== nodeCount4) return ![];
-  if (containerWidth3['nodesRef'] && containerWidth3['nodesRef'] !== snapshot?.['nodes']) return ![];
+  if (rendererVirtualizationTier === 'default' || containerWidth3['tier'] === 'default') return false;
+  if (Number(containerWidth3['nodeCount']) !== nodeCount4) return false;
+  if (containerWidth3['nodesRef'] && containerWidth3['nodesRef'] !== snapshot?.['nodes']) return false;
   if (
     Object['prototype']['hasOwnProperty']['call'](containerWidth3, 'nodesRev') &&
     containerWidth3['nodesRev'] !== finiteRevision(snapshot?.['_nodesRev'])
   )
-    return ![];
+    return false;
   if (
     Object['prototype']['hasOwnProperty']['call'](containerWidth3, 'nodeGeometryRev') &&
     containerWidth3['nodeGeometryRev'] !== finiteRevision(snapshot?.['_nodeGeometryRev'])
   )
-    return ![];
+    return false;
   if (
     Object['prototype']['hasOwnProperty']['call'](containerWidth3, 'persistRev') &&
     containerWidth3['persistRev'] !== finiteRevision(snapshot?.['_persistRev'])
   )
-    return ![];
+    return false;
   if (
     typeof containerWidth3['interactionSignature'] === 'string' &&
     containerWidth3['interactionSignature'] !== buildInteractionSignature(snapshot)
   )
-    return ![];
+    return false;
   const worldBounds = screenViewportToWorldBounds({
     viewport: viewport3,
     containerWidth: containerWidth3['containerWidth'],
@@ -145,15 +145,15 @@ export function canReuseRendererViewportPreviewCoverage(
     padding: 0,
   });
   if (containerWidth3['presentedNodeIds'] instanceof Set) {
-    if (!containerWidth3['spatialIndex']) return ![];
+    if (!containerWidth3['spatialIndex']) return false;
     const queryRendererSpatialIndexIds2 = queryRendererSpatialIndexIds(
       containerWidth3['spatialIndex'],
       worldBounds,
     );
     for (const current of queryRendererSpatialIndexIds2) {
-      if (!containerWidth3['presentedNodeIds']['has'](current)) return ![];
+      if (!containerWidth3['presentedNodeIds']['has'](current)) return false;
     }
-    return !![];
+    return true;
   }
   return containsBounds(containerWidth3['bounds'], worldBounds);
 }

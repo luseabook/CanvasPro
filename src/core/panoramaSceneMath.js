@@ -634,7 +634,7 @@ export function applySceneFlyMovement(
     },
     length33 = length3(value134),
     value135 = length33 > 1 ? normalize3(value134) : value134,
-    value136 = box28['boost'] === !![] ? Math.max(1, Number(boostMultiplier) || 1) : 1,
+    value136 = box28['boost'] === true ? Math.max(1, Number(boostMultiplier) || 1) : 1,
     value137 =
       Math.max(0, Math.min(0.1, Number(value132) || 0)) * Math.max(0.01, Number(speed) || 4) * value136,
     box30 = scale(value135, value137),

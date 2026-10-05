@@ -28,13 +28,13 @@ export async function resolveNodeImageOriginalSource(enabled) {
   if (nonEmpty)
     try {
       const image = await getImage(nonEmpty);
-      if (image) return { url: URL['createObjectURL'](image), revokeUrlOnClose: !![] };
+      if (image) return { url: URL['createObjectURL'](image), revokeUrlOnClose: true };
     } catch (index) {}
   const url = firstNonEmpty(
     resolveCanvasImageSourceUrl(key),
     resolveCanvasImageSourceUrl(enabled),
   );
-  if (url) return { url: url, revokeUrlOnClose: ![] };
+  if (url) return { url: url, revokeUrlOnClose: false };
   return null;
 }
 export async function resolveNodeImagePreviewSource(result) {
@@ -47,12 +47,12 @@ export async function resolveNodeImagePreviewSource(result) {
       resolveCanvasImagePreviewUrl(target),
       resolveCanvasImagePreviewUrl(result),
     );
-  if (url2) return { url: url2, revokeUrlOnClose: ![] };
+  if (url2) return { url: url2, revokeUrlOnClose: false };
   const url3 = firstNonEmpty(
     resolveCanvasImageThumbUrl(target),
     resolveCanvasImageThumbUrl(result),
   );
-  if (url3) return { url: url3, revokeUrlOnClose: ![] };
+  if (url3) return { url: url3, revokeUrlOnClose: false };
   return null;
 }
 function markSidebarSubmenuOwner(el, source) {
@@ -90,14 +90,14 @@ let activeImagePreviewClose = null,
   activeVideoPreviewClose = null,
   videoPreviewOwnerSequence = 0;
 export function closeActiveImagePreview() {
-  if (typeof activeImagePreviewClose !== 'function') return ![];
+  if (typeof activeImagePreviewClose !== 'function') return false;
   const run = activeImagePreviewClose;
-  return (run(), !![]);
+  return (run(), true);
 }
 export function closeActiveVideoPreview() {
-  if (typeof activeVideoPreviewClose !== 'function') return ![];
+  if (typeof activeVideoPreviewClose !== 'function') return false;
   const run2 = activeVideoPreviewClose;
-  return (run2(), !![]);
+  return (run2(), true);
 }
 function clampNumber(config, scope, input) {
   const output = Number(config);
@@ -117,7 +117,7 @@ function getOverlayCenterPoint(el2) {
   return { x: x['left'] + x['width'] / 2, y: x['top'] + x['height'] / 2 };
 }
 function isPointerInsideElementBounds(el3, event2) {
-  if (!el3 || !event2) return ![];
+  if (!el3 || !event2) return false;
   const value2 = Number(event2['clientX']),
     value3 = Number(event2['clientY']);
   if (!Number['isFinite'](value2) || !Number['isFinite'](value3))
@@ -158,7 +158,7 @@ function applyImagePreviewTransform(el4, el5, box2) {
     ));
 }
 export function openImagePreview(enabled3, value8 = {}) {
-  const enabled4 = value8['deferredSource'] === !![];
+  const enabled4 = value8['deferredSource'] === true;
   if (!enabled3 && !enabled4) return () => {};
   (closeActiveVideoPreview(), closeActiveImagePreview());
   let list3 = collectUniquePreviewUrls([
@@ -169,7 +169,7 @@ export function openImagePreview(enabled3, value8 = {}) {
   if (value8['revokeUrlOnClose'] && enabled3) value9['add'](enabled3);
   const offsetX = { scale: 1, offsetX: 0, offsetY: 0 };
   let event3 = null,
-    enabled5 = ![];
+    enabled5 = false;
   const el6 = document['createElement']('div');
   ((el6['className'] = 'v2-image-preview-overlay'),
     (el6['style']['zIndex'] = '99999'),
@@ -179,17 +179,17 @@ export function openImagePreview(enabled3, value8 = {}) {
   const el8 = document['createElement']('img');
   ((el8['className'] = 'v2-image-preview-media'),
     (el8['alt'] = value8['alt'] || 'Image preview'),
-    (el8['draggable'] = ![]));
+    (el8['draggable'] = false));
   let value10 = 0;
   const run3 = (value11) => {
-      if (!list3[value11]) return ![];
+      if (!list3[value11]) return false;
       return (
         (value10 = value11),
         el6['classList']['add']('is-loading'),
         el6['classList']['remove']('is-error'),
         value8['loadDiagnostics']?.['mark']('source-assigned'),
         (el8['src'] = list3[value10]),
-        !![]
+        true
       );
     },
     value12 = () => {
@@ -214,18 +214,18 @@ export function openImagePreview(enabled3, value8 = {}) {
   if (!run3(0)) el6['classList']['add']('is-loading');
   applyImagePreviewTransform(el7, el8, offsetX);
   const run4 = () => {
-      (globalThis['window']?.['removeEventListener']?.('pointermove', run5, !![]),
-        globalThis['window']?.['removeEventListener']?.('pointerup', run6, !![]),
-        globalThis['window']?.['removeEventListener']?.('pointercancel', run6, !![]));
+      (globalThis['window']?.['removeEventListener']?.('pointermove', run5, true),
+        globalThis['window']?.['removeEventListener']?.('pointerup', run6, true),
+        globalThis['window']?.['removeEventListener']?.('pointercancel', run6, true));
     },
     handler = () => {
       (run4(), el6['classList']['remove']('is-panning'), (event3 = null));
     },
     handler2 = () => {
       if (enabled5) return;
-      ((enabled5 = !![]),
+      ((enabled5 = true),
         value8['loadDiagnostics']?.['finish'](),
-        document['removeEventListener']('keydown', value15, !![]),
+        document['removeEventListener']('keydown', value15, true),
         handler(),
         el8['removeEventListener']('load', value12),
         el8['removeEventListener']('error', value13),
@@ -272,9 +272,9 @@ export function openImagePreview(enabled3, value8 = {}) {
         }),
         el6['classList']['add']('is-panning'),
         el7['setPointerCapture']?.(pointerId['pointerId']),
-        globalThis['window']?.['addEventListener']?.('pointermove', run5, !![]),
-        globalThis['window']?.['addEventListener']?.('pointerup', run6, !![]),
-        globalThis['window']?.['addEventListener']?.('pointercancel', run6, !![]));
+        globalThis['window']?.['addEventListener']?.('pointermove', run5, true),
+        globalThis['window']?.['addEventListener']?.('pointerup', run6, true),
+        globalThis['window']?.['addEventListener']?.('pointercancel', run6, true));
     };
   function run5(event6) {
     if (!event3) return;
@@ -313,7 +313,7 @@ export function openImagePreview(enabled3, value8 = {}) {
       }
       handler2();
     }),
-    el6['addEventListener']('wheel', value18, { passive: ![] }),
+    el6['addEventListener']('wheel', value18, { passive: false }),
     el6['addEventListener']('pointerdown', value24),
     el6['addEventListener']('auxclick', (event9) => {
       if (event9['button'] === 1) stopPreviewEvent(event9);
@@ -321,17 +321,17 @@ export function openImagePreview(enabled3, value8 = {}) {
     el8['addEventListener']('dragstart', stopPreviewEvent),
     el7['appendChild'](el8),
     el6['appendChild'](el7),
-    document['addEventListener']('keydown', value15, !![]),
+    document['addEventListener']('keydown', value15, true),
     document['body']['appendChild'](el6),
     (activeImagePreviewClose = handler2),
     (handler2['setSources'] = (value26, value27 = {}) => {
-      if (enabled5) return ![];
+      if (enabled5) return false;
       const list4 = collectUniquePreviewUrls(value26);
       if (list4['length'] === 0)
         return (
           el6['classList']['remove']('is-loading'),
           el6['classList']['add']('is-error'),
-          ![]
+          false
         );
       return (
         (list3 = list4),
@@ -340,11 +340,11 @@ export function openImagePreview(enabled3, value8 = {}) {
       );
     }),
     (handler2['setError'] = () => {
-      if (enabled5) return ![];
+      if (enabled5) return false;
       return (
         el6['classList']['remove']('is-loading'),
         el6['classList']['add']('is-error'),
-        !![]
+        true
       );
     }),
     handler2
@@ -368,9 +368,9 @@ export function openVideoPreview(value29, enabled7 = {}) {
         : attachMediaElementPlaybackSource,
     label = 'video-preview:' + ++videoPreviewOwnerSequence,
     value30 = String(enabled7['playbackUrl'] || '')['trim']();
-  let enabled9 = ![],
-    value31 = ![],
-    value32 = ![],
+  let enabled9 = false,
+    value31 = false,
+    value32 = false,
     value33 = 0,
     value34 = '';
   const el9 = document['createElement']('div');
@@ -386,11 +386,11 @@ export function openVideoPreview(value29, enabled7 = {}) {
     el9['setAttribute']?.('aria-label', enabled7['ariaLabel'] || 'Video preview'));
   const el10 = document['createElement']('video');
   ((el10['className'] = 'v2-video-preview-media'),
-    (el10['controls'] = !![]),
-    (el10['autoplay'] = enabled7['autoplay'] !== ![]),
-    (el10['loop'] = enabled7['loop'] === !![]),
+    (el10['controls'] = true),
+    (el10['autoplay'] = enabled7['autoplay'] !== false),
+    (el10['loop'] = enabled7['loop'] === true),
     (el10['muted'] = !!enabled7['muted']),
-    (el10['playsInline'] = !![]),
+    (el10['playsInline'] = true),
     (el10['preload'] = 'auto'));
   const run8 = () =>
       String(el10['getAttribute']?.('src') || el10['src'] || el10['currentSrc'] || '')[
@@ -416,9 +416,9 @@ export function openVideoPreview(value29, enabled7 = {}) {
       (el9['classList']['remove']('is-loading'), el9['classList']['add']('is-error'));
     },
     handler9 = () => {
-      if (enabled9 || enabled7['autoplay'] === ![]) return ![];
+      if (enabled9 || enabled7['autoplay'] === false) return false;
       const enabled11 = run8();
-      if (!enabled11 || value34 === enabled11) return ![];
+      if (!enabled11 || value34 === enabled11) return false;
       value34 = enabled11;
       if (
         !claimVideoPlaybackOwnership(el10, {
@@ -427,15 +427,15 @@ export function openVideoPreview(value29, enabled7 = {}) {
           readyTimeoutMs: 350,
           recoveryDebounceMs: 150,
           recoveryCooldownMs: 500,
-          shouldRecover: () => !enabled9 && el10['isConnected'] !== ![] && !el10['paused'],
+          shouldRecover: () => !enabled9 && el10['isConnected'] !== false && !el10['paused'],
         })
       )
-        return ![];
+        return false;
       try {
         const promise = el10['play']?.();
         promise?.['catch']?.(() => {});
       } catch {}
-      return !![];
+      return true;
     };
   let promise2;
   try {
@@ -447,32 +447,32 @@ export function openVideoPreview(value29, enabled7 = {}) {
     promise2 = Promise['resolve']('');
   }
   const run9 = async (value37) => {
-      if (enabled9) return ![];
+      if (enabled9) return false;
       const playbackUrl = String(value37 || enabled8)['trim']();
-      if (!playbackUrl) return ![];
+      if (!playbackUrl) return false;
       const value38 = ++value33;
       try {
         const value39 = handler4(el10, enabled8, {
           playbackUrl: playbackUrl,
           preload: 'auto',
-          load: !![],
+          load: true,
           shouldAssign: () => !enabled9 && value38 === value33,
         });
         handler9();
         const value40 = await value39;
-        if (enabled9 || value38 !== value33) return ![];
-        if (!String(value40 || '')['trim']() && !run8()) return ![];
-        return (handler9(), !![]);
+        if (enabled9 || value38 !== value33) return false;
+        if (!String(value40 || '')['trim']() && !run8()) return false;
+        return (handler9(), true);
       } catch {
-        return ![];
+        return false;
       }
     },
     handler10 = async (value41 = '') => {
-      if (enabled9) return ![];
-      if (value32) return (handler8(), ![]);
-      ((value32 = !![]), handler6());
+      if (enabled9) return false;
+      if (value32) return (handler8(), false);
+      ((value32 = true), handler6());
       const value42 = await promise2;
-      if (enabled9) return ![];
+      if (enabled9) return false;
       const value43 = String(value41 || '')['trim'](),
         value44 = run8(),
         uniquePreviewUrls = collectUniquePreviewUrls([value42, enabled8])['filter'](
@@ -480,9 +480,9 @@ export function openVideoPreview(value29, enabled7 = {}) {
         );
       for (const value46 of uniquePreviewUrls) {
         if (run8()) handler5();
-        if (await run9(value46)) return !![];
+        if (await run9(value46)) return true;
       }
-      return (handler8(), ![]);
+      return (handler8(), false);
     },
     value47 = () => handler7(),
     value48 = () => {
@@ -494,16 +494,16 @@ export function openVideoPreview(value29, enabled7 = {}) {
     el10['addEventListener']('error', value48));
   const run10 = () => {
       if (value31) return;
-      value31 = !![];
+      value31 = true;
       try {
         handler3(label);
       } catch {}
     },
     handler11 = () => {
       if (enabled9) return;
-      ((enabled9 = !![]),
+      ((enabled9 = true),
         (value33 += 1),
-        document['removeEventListener']('keydown', value49, !![]),
+        document['removeEventListener']('keydown', value49, true),
         el10['removeEventListener']?.('loadeddata', value47),
         el10['removeEventListener']?.('canplay', value47),
         el10['removeEventListener']?.('playing', value47),
@@ -523,7 +523,7 @@ export function openVideoPreview(value29, enabled7 = {}) {
       if (event11['target'] === el9) handler11();
     }),
     el9['appendChild'](el10),
-    document['addEventListener']('keydown', value49, !![]),
+    document['addEventListener']('keydown', value49, true),
     document['body']['appendChild'](el9),
     (activeVideoPreviewClose = handler11),
     value30
@@ -531,10 +531,10 @@ export function openVideoPreview(value29, enabled7 = {}) {
           if (!enabled12) void handler10(value30);
         })
       : void promise2['then']((value51) => {
-          if (enabled9) return ![];
+          if (enabled9) return false;
           return run9(value51 || enabled8);
         })['then']((value52) => {
-          if (!enabled9 && value52 === ![]) void handler10(run8());
+          if (!enabled9 && value52 === false) void handler10(run8());
         }),
     handler11
   );
@@ -548,13 +548,13 @@ export async function openNodeImagePreview(value53, args = {}) {
           ...args,
           loadDiagnostics: loadDiagnostics,
           fallbackUrls: fallbackUrls['slice'](1),
-          revokeUrlOnClose: ![],
+          revokeUrlOnClose: false,
         })
       : openImagePreview('', {
           ...args,
           loadDiagnostics: loadDiagnostics,
-          deferredSource: !![],
-          revokeUrlOnClose: ![],
+          deferredSource: true,
+          revokeUrlOnClose: false,
         }),
     handler12 =
       typeof args['sourceResolver'] === 'function'

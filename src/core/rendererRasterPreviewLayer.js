@@ -34,8 +34,8 @@ function normalizeIdSet(enabled) {
 }
 function resolveMediaLoadingBusy(source) {
   if (source && Object['prototype']['hasOwnProperty']['call'](source, 'mediaLoadingBusy'))
-    return source['mediaLoadingBusy'] === !![];
-  return source?.['viewportBusy'] === !![];
+    return source['mediaLoadingBusy'] === true;
+  return source?.['viewportBusy'] === true;
 }
 function normalizeSources(next) {
   const current =
@@ -159,9 +159,9 @@ function computeRasterWorldBounds(value12, value13) {
     height: Math['max'](1, value16 - top2),
   };
 }
-function createEmptyStats(revision = 0, supported = ![]) {
+function createEmptyStats(revision = 0, supported = false) {
   return {
-    active: ![],
+    active: false,
     supported: supported,
     drawnNodeIds: [],
     drawnMediaNodeIds: [],
@@ -215,7 +215,7 @@ function drawImageCover(ctx, box2, box3) {
     );
   try {
     if (!(count2 > 0 && count3 > 0))
-      return (ctx['drawImage'](box2, box3['x'], box3['y'], box3['width'], box3['height']), !![]);
+      return (ctx['drawImage'](box2, box3['x'], box3['y'], box3['width'], box3['height']), true);
     const value18 = count2 / count3,
       value19 = box3['width'] / box3['height'];
     let value20 = 0,
@@ -236,10 +236,10 @@ function drawImageCover(ctx, box2, box3) {
         box3['width'],
         box3['height'],
       ),
-      !![]
+      true
     );
   } catch {
-    return ![];
+    return false;
   }
 }
 function strokeRoundedRect(ctx2, value24, value25, value26, value27, value28) {
@@ -254,8 +254,8 @@ function strokeCircle(ctx3, value29, value30, value31) {
   (ctx3['beginPath'](), ctx3['arc'](value29, value30, value31, 0, Math['PI'] * 2), ctx3['stroke']());
 }
 function drawMediaTypeIcon(ctx4, value32, value33, value34, count4, count5) {
-  if (!['image', 'video']['includes'](value32)) return ![];
-  if (!(count4 > 0) || count4 * count5 < 3) return ![];
+  if (!['image', 'video']['includes'](value32)) return false;
+  if (!(count4 > 0) || count4 * count5 < 3) return false;
   const value35 = count4 / 24,
     value36 = value33 - count4 / 2,
     value37 = value34 - count4 / 2,
@@ -271,7 +271,7 @@ function drawMediaTypeIcon(ctx4, value32, value33, value34, count4, count5) {
       ctx4['lineTo'](handler2(16), handler3(10)),
       ctx4['lineTo'](handler2(5), handler3(21)),
       ctx4['stroke'](),
-      !![]
+      true
     );
   if (value32 === 'video')
     return (
@@ -282,9 +282,9 @@ function drawMediaTypeIcon(ctx4, value32, value33, value34, count4, count5) {
       ctx4['lineTo'](handler2(23), handler3(0x11)),
       ctx4['closePath'](),
       ctx4['stroke'](),
-      !![]
+      true
     );
-  return ![];
+  return false;
 }
 function drawPlaceholder(ctx5, box4, value40, count6, value41) {
   const value42 = Math['min'](40, box4['width'] * 0.32, box4['height'] * 0.32);
@@ -365,9 +365,9 @@ export function createRendererRasterPreviewLayer({
   let el = null,
     ctx7 = null,
     rendererRasterPaintSurface = null,
-    enabled3 = ![],
-    enabled4 = ![],
-    value55 = ![],
+    enabled3 = false,
+    enabled4 = false,
+    value55 = false,
     revision2 = 0,
     revision3 = { ...createEmptyStats(), cacheLimit: cacheLimit },
     candidateCount = null,
@@ -460,9 +460,9 @@ export function createRendererRasterPreviewLayer({
   }
   function run6() {
     for (const response3 of cachedImageCount['values']()) {
-      if (response3['status'] === 'ready') return !![];
+      if (response3['status'] === 'ready') return true;
     }
-    return ![];
+    return false;
   }
   function run7() {
     let value67 = 0;
@@ -488,9 +488,9 @@ export function createRendererRasterPreviewLayer({
   function run10() {
     if (value55 || !candidateCount || candidateCount['viewportBusy'] || value56 != null) return;
     const value69 = ++value57;
-    let enabled6 = ![];
+    let enabled6 = false;
     const requestFrame2 = requestFrame(() => {
-      enabled6 = !![];
+      enabled6 = true;
       if (value69 !== value57 || value55) return;
       ((value56 = null), run11());
     });
@@ -498,7 +498,7 @@ export function createRendererRasterPreviewLayer({
   }
   function run12(enabled7) {
     if (!enabled7 || enabled7['listenersRemoved']) return;
-    enabled7['listenersRemoved'] = !![];
+    enabled7['listenersRemoved'] = true;
     const { image: image, onLoad: onLoad, onError: onError } = enabled7;
     if (typeof image?.['removeEventListener'] === 'function')
       (image['removeEventListener']('load', onLoad), image['removeEventListener']('error', onError));
@@ -513,13 +513,13 @@ export function createRendererRasterPreviewLayer({
     if (!enabled8) return;
     run12(enabled8);
     try {
-      if (enabled8['ownsImage'] === !![] && enabled8['image']) enabled8['image']['src'] = '';
+      if (enabled8['ownsImage'] === true && enabled8['image']) enabled8['image']['src'] = '';
     } catch {}
   }
   function run14(value70) {
     const enabled9 = cachedImageCount['get'](value70);
-    if (!enabled9) return ![];
-    return (cachedImageCount['delete'](value70), run13(enabled9), !![]);
+    if (!enabled9) return false;
+    return (cachedImageCount['delete'](value70), run13(enabled9), true);
   }
   function run15(enabled10) {
     if (!enabled10 || cachedImageCount['get'](enabled10['source']) !== enabled10) return;
@@ -531,7 +531,7 @@ export function createRendererRasterPreviewLayer({
       if (map5 instanceof Set ? map5['has'](value71) : value71 === map5) continue;
       return run14(value71);
     }
-    return ![];
+    return false;
   }
   function run17(source3, value72 = null) {
     if (!source3 || cacheLimit <= 0) return null;
@@ -542,7 +542,7 @@ export function createRendererRasterPreviewLayer({
       response6 = {
         image: image2,
         ownsImage: !!image2,
-        listenersRemoved: ![],
+        listenersRemoved: false,
         onError: null,
         onLoad: null,
         source: source3,
@@ -552,12 +552,12 @@ export function createRendererRasterPreviewLayer({
     if (!image2)
       return (
         preloadCanvasImage(source3, {
-          decode: !![],
-          requireImage: !![],
+          decode: true,
+          requireImage: true,
           priority: 5,
           fetchPriority: 'auto',
           scope: 'renderer-raster-preview',
-          deferWhenPaused: !![],
+          deferWhenPaused: true,
         })['then'](
           (enabled11) => {
             if (cachedImageCount['get'](source3) !== response6 || response6['status'] !== 'pending') return;
@@ -609,7 +609,7 @@ export function createRendererRasterPreviewLayer({
     return response6;
   }
   function run19(el2) {
-    if (value55 || !el2 || typeof documentRef?.['createElement'] !== 'function') return ![];
+    if (value55 || !el2 || typeof documentRef?.['createElement'] !== 'function') return false;
     !el &&
       ((el = documentRef['createElement']('canvas')),
       (el['className'] = 'v2-raster-preview-canvas'),
@@ -626,7 +626,7 @@ export function createRendererRasterPreviewLayer({
     if (el['parentNode'] !== el2) el2['appendChild']?.(el);
     return (
       !enabled3 &&
-        ((enabled3 = !![]),
+        ((enabled3 = true),
         (rendererRasterPaintSurface = createRendererRasterPaintSurface(el)),
         (ctx7 = rendererRasterPaintSurface['context']),
         (enabled4 = Boolean(
@@ -793,7 +793,7 @@ export function createRendererRasterPreviewLayer({
         box7['left'] === 0 ? 0 : -box7['left'] * effectiveScale,
         box7['top'] === 0 ? 0 : -box7['top'] * effectiveScale,
       ),
-      (ctx7['imageSmoothingEnabled'] = !![]),
+      (ctx7['imageSmoothingEnabled'] = true),
       (ctx7['imageSmoothingQuality'] = 'low'),
       {
         bitmapHeight: bitmapHeight,
@@ -816,13 +816,13 @@ export function createRendererRasterPreviewLayer({
       if (response7?.['status'] !== 'loaded') continue;
       (run15(response7), (value93['cacheHitCount'] += 1));
       if (drawImageCover(ctx7, response7['image'], value92))
-        return (map4['set'](value92['id'], value95), !![]);
+        return (map4['set'](value92['id'], value95), true);
     }
-    return ![];
+    return false;
   }
   function run23(value96, value97) {
     if (candidateCount?.['mediaLoadNodeIds'] && !candidateCount['mediaLoadNodeIds']['has'](value96['id']))
-      return ![];
+      return false;
     const value98 = candidateCount?.['admittedSources'],
       value99 = run5(value96);
     for (const value100 of value99) {
@@ -832,23 +832,23 @@ export function createRendererRasterPreviewLayer({
         response8?.['status'] === 'ready' ||
         response8?.['status'] === 'loaded'
       )
-        return ![];
+        return false;
       if (response8?.['status'] === 'error') continue;
-      if (isCanvasImageDisplayLoadPending(value100)) return ![];
+      if (isCanvasImageDisplayLoadPending(value100)) return false;
       value97['cacheMissCount'] += 1;
-      if (value97['viewportBusy']) return ((value97['skippedBusyImageCount'] += 1), ![]);
-      if (value97['newImageStartsRemaining'] <= 0) return ![];
+      if (value97['viewportBusy']) return ((value97['skippedBusyImageCount'] += 1), false);
+      if (value97['newImageStartsRemaining'] <= 0) return false;
       value97['newImageStartsRemaining'] -= 1;
       const value101 = run17(value100, value98);
       if (value101) value97['startedImageCount'] += 1;
-      return ![];
+      return false;
     }
-    return ![];
+    return false;
   }
   function run24(value102, value103) {
-    if (value102['sources']['length'] === 0) return ![];
-    if (run22(value102, value103)) return !![];
-    return (run23(value102, value103), ![]);
+    if (value102['sources']['length'] === 0) return false;
+    if (run22(value102, value103)) return true;
+    return (run23(value102, value103), false);
   }
   function run25(box9, value104, value105, value106) {
     const value107 = box9['invalid'] ? 0.38 : 1,
@@ -859,7 +859,7 @@ export function createRendererRasterPreviewLayer({
       ctx7['fillRect'](box9['x'], box9['y'], box9['width'], box9['height']));
     const enabled13 = run24(box9, value106);
     if (!enabled13) {
-      if (enabled12) return ((ctx7['globalAlpha'] = 1), ![]);
+      if (enabled12) return ((ctx7['globalAlpha'] = 1), false);
       drawPlaceholder(ctx7, box9, value104, value105, value107);
     }
     return (
@@ -897,14 +897,14 @@ export function createRendererRasterPreviewLayer({
     if (value55 || !candidateCount || candidateCount['viewportBusy'] || !enabled4 || !el || !ctx7)
       return revision3;
     const { items: items2, options: options3, palette: palette2, worldBounds: worldBounds } = candidateCount;
-    if (!worldBounds || items2['length'] === 0 || revision3['active'] !== !![]) return run28();
+    if (!worldBounds || items2['length'] === 0 || revision3['active'] !== true) return run28();
     revision2 += 1;
     const value112 = items2['length'] >= DENSE_READY_REVEAL_NODE_COUNT ? value54 : value53,
       revealedImageCount = new Set(run8(value112)),
       value113 = Math['max'](0.0001, finiteNumber(revision3['rasterScale'], 1)),
       mediaDrawCount = new Set(revision3['drawnMediaNodeIds'] || []),
       nodeIds = [],
-      cacheHitCount = run27(0, ![]);
+      cacheHitCount = run27(0, false);
     if (revealedImageCount['size'] > 0)
       for (const enabled14 of items2) {
         if (
@@ -962,7 +962,7 @@ export function createRendererRasterPreviewLayer({
         (el['style']['display'] = 'none'),
         run2(),
         run4({
-          ...createEmptyStats(revision2, !![]),
+          ...createEmptyStats(revision2, true),
           candidateCount: candidateCount['candidateCount'],
           excludedNodeCount: candidateCount['excludedNodeCount'],
         })
@@ -984,7 +984,7 @@ export function createRendererRasterPreviewLayer({
     rendererRasterPaintSurface['present']();
     const value124 = run4({
       active: active['length'] > 0,
-      supported: !![],
+      supported: true,
       drawnNodeIds: active,
       drawnMediaNodeIds: drawnMediaNodeIds,
       drawnNodeCount: active['length'],
@@ -1013,9 +1013,9 @@ export function createRendererRasterPreviewLayer({
   }
   function sync(value125, value126, list7, value127 = {}) {
     const value128 =
-      value127?.['viewportBusy'] === !![] &&
-      value127?.['reuseWhileBusy'] === !![] &&
-      value127?.['forceRender'] !== !![] &&
+      value127?.['viewportBusy'] === true &&
+      value127?.['reuseWhileBusy'] === true &&
+      value127?.['forceRender'] !== true &&
       revision3['active'] &&
       (Number(list7?.['size']) > 0 || Number(list7?.['length']) > 0);
     if (value128 && run19(value125)) {
@@ -1034,7 +1034,7 @@ export function createRendererRasterPreviewLayer({
         (revision2 += 1),
         (candidateCount = candidateCount3),
         run4({
-          ...createEmptyStats(revision2, !![]),
+          ...createEmptyStats(revision2, true),
           candidateCount: candidateCount3['candidateCount'],
           excludedNodeCount: candidateCount3['excludedNodeCount'],
         })
@@ -1044,17 +1044,17 @@ export function createRendererRasterPreviewLayer({
         (revision2 += 1),
         (candidateCount = null),
         run4({
-          ...createEmptyStats(revision2, ![]),
+          ...createEmptyStats(revision2, false),
           candidateCount: candidateCount3['candidateCount'],
           excludedNodeCount: candidateCount3['excludedNodeCount'],
         })
       );
     const value129 =
       revision3['active'] &&
-      value127?.['forceRender'] !== !![] &&
+      value127?.['forceRender'] !== true &&
       canReuseRasterPaint(candidateCount, candidateCount3) &&
       candidateCount3['items']['every']((value130) => {
-        if (!map4['has'](value130['id'])) return !![];
+        if (!map4['has'](value130['id'])) return true;
         const value131 = value130['sources']['find'](
           (value132) =>
             candidateCount3['admittedSources']['has'](value132) &&
@@ -1068,10 +1068,10 @@ export function createRendererRasterPreviewLayer({
   }
   function excludeNode(value133) {
     const enabled15 = String(value133 || '')['trim']();
-    if (!enabled15 || !candidateCount) return ![];
+    if (!enabled15 || !candidateCount) return false;
     const list8 = candidateCount['items'] || [],
       items4 = list8['filter']((value134) => value134['id'] !== enabled15);
-    if (items4['length'] === list8['length']) return ![];
+    if (items4['length'] === list8['length']) return false;
     return (
       run9(),
       (candidateCount = {
@@ -1081,7 +1081,7 @@ export function createRendererRasterPreviewLayer({
         worldBounds: computeRasterWorldBounds(items4, candidateCount['options']),
       }),
       run28(),
-      !![]
+      true
     );
   }
   function captureNodeFrame(value135) {
@@ -1116,7 +1116,7 @@ export function createRendererRasterPreviewLayer({
     const canvas = documentRef['createElement']('canvas');
     ((canvas['width'] = Math['max'](1, Math['ceil'](value141))),
       (canvas['height'] = Math['max'](1, Math['ceil'](value142))));
-    const ctx8 = canvas['getContext']?.('2d', { alpha: !![] }) || null;
+    const ctx8 = canvas['getContext']?.('2d', { alpha: true }) || null;
     if (!ctx8 || typeof ctx8['drawImage'] !== 'function') return null;
     const value147 = canvas['width'] / value141,
       value148 = canvas['height'] / value142;
@@ -1149,7 +1149,7 @@ export function createRendererRasterPreviewLayer({
   function setMediaLoadingBusy(value149) {
     if (value55 || !candidateCount) return revision3;
     const value150 = candidateCount['viewportBusy'];
-    candidateCount['viewportBusy'] = value149 === !![];
+    candidateCount['viewportBusy'] = value149 === true;
     if (candidateCount['viewportBusy']) run9();
     else value150 && run6() ? run11() : run10();
     return run4(revision3);
@@ -1165,7 +1165,7 @@ export function createRendererRasterPreviewLayer({
         (Object['prototype']['hasOwnProperty']['call'](options5, 'keepSources') &&
           (map8 = normalizeIdSet(options5['keepSources'])),
         (value151 = Math['max'](0, Math['trunc'](finiteNumber(options5['maxEntries'], cacheLimit)))));
-    let value152 = ![];
+    let value152 = false;
     for (const [value153, response9] of Array['from'](cachedImageCount['entries']())) {
       ((map8 && !map8['has'](value153)) || (!map8 && response9['status'] === 'error')) &&
         (value152 = run14(value153) || value152);
@@ -1173,11 +1173,11 @@ export function createRendererRasterPreviewLayer({
     while (cachedImageCount['size'] > value151) {
       const enabled16 = run16();
       if (!enabled16) break;
-      value152 = !![];
+      value152 = true;
     }
     if (value152 && candidateCount && enabled4) {
       const value154 = candidateCount['viewportBusy'];
-      candidateCount['viewportBusy'] = !![];
+      candidateCount['viewportBusy'] = true;
       const value155 = run28();
       return ((candidateCount['viewportBusy'] = value154), value155);
     }
@@ -1185,7 +1185,7 @@ export function createRendererRasterPreviewLayer({
   }
   function destroy() {
     if (value55) return;
-    ((value55 = !![]), run(), run9(), (candidateCount = null));
+    ((value55 = true), run(), run9(), (candidateCount = null));
     for (const value156 of cachedImageCount['values']()) run13(value156);
     (cachedImageCount['clear'](), map4['clear'](), (revision2 += 1));
     const el3 = el;

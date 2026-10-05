@@ -66,7 +66,7 @@ function getModelPackProgressMessage(error2) {
 }
 export function isStoryboard3DModelPackReady(options2 = {}) {
   return (
-    options2?.['installed'] === !![] &&
+    options2?.['installed'] === true &&
     Array['isArray'](options2?.['assets']) &&
     options2['assets']['length'] > 0
   );
@@ -147,10 +147,10 @@ export function renderStoryboard3DProjectCard(
   value2,
   now2,
   {
-    menuOpen: menuOpen = ![],
-    editing: editing = ![],
+    menuOpen: menuOpen = false,
+    editing: editing = false,
     editingName: editingName = '',
-    confirmingDelete: confirmingDelete = ![],
+    confirmingDelete: confirmingDelete = false,
   } = {},
 ) {
   const value3 = value2['title'] + ' ' + value2['activeSceneName'],
@@ -444,11 +444,11 @@ export class Storyboard3DWorkspaceHome {
     const storyboard3DTextModelSelection = resolveStoryboard3DTextModelSelection();
     ((this['modelId'] = storyboard3DTextModelSelection['modelId']),
       (this['provider'] = storyboard3DTextModelSelection['provider']),
-      (this['isGenerating'] = ![]),
+      (this['isGenerating'] = false),
       (this['generationStatus'] = ''),
       (this['generationError'] = ''),
-      (this['modelPackStatus'] = { state: 'checking', installed: ![], assets: [], error: '' }),
-      (this['modelPackDialogOpen'] = ![]),
+      (this['modelPackStatus'] = { state: 'checking', installed: false, assets: [], error: '' }),
+      (this['modelPackDialogOpen'] = false),
       (this['referenceImageUrl'] = ''),
       (this['referenceImageName'] = ''),
       (this['referenceImages'] = []),
@@ -459,8 +459,8 @@ export class Storyboard3DWorkspaceHome {
       (this['_modelPackCheckPromise'] = null),
       (this['_modelPackProgressTimer'] = null),
       (this['_modelPackProgressPollGeneration'] = 0),
-      (this['_destroyed'] = ![]),
-      (this['_promptForMissingModelPack'] = ![]),
+      (this['_destroyed'] = false),
+      (this['_promptForMissingModelPack'] = false),
       (this['_modelSelectorController'] = null),
       (this['_handleClick'] = this['_handleClick']['bind'](this)),
       (this['_handleInput'] = this['_handleInput']['bind'](this)),
@@ -473,14 +473,14 @@ export class Storyboard3DWorkspaceHome {
     return (
       (el['id'] = 'storyboard3DWorkspaceHome'),
       (el['className'] = 'storyboard-3d-workspace-home'),
-      (el['hidden'] = !![]),
+      (el['hidden'] = true),
       el['setAttribute']('aria-hidden', 'true'),
       el['setAttribute']('aria-label', '3D 场景预演项目首页'),
       (el['dataset']['uiStop'] = '1'),
       el['addEventListener']('contextmenu', containWorkspaceContextMenu),
       el['addEventListener']('pointerdown', (event) => event['stopPropagation']()),
       el['addEventListener']('wheel', (event2) => event2['stopPropagation'](), {
-        passive: !![],
+        passive: true,
       }),
       el['addEventListener']('click', this['_handleClick']),
       el['addEventListener']('input', this['_handleInput']),
@@ -499,8 +499,8 @@ export class Storyboard3DWorkspaceHome {
           }),
         },
       ])),
-      (this['_destroyed'] = ![]),
-      void this['_refreshModelPackStatus']({ promptIfMissing: ![] }),
+      (this['_destroyed'] = false),
+      void this['_refreshModelPackStatus']({ promptIfMissing: false }),
       el
     );
   }
@@ -591,7 +591,7 @@ export class Storyboard3DWorkspaceHome {
     if (!isStoryboard3DModelPackReady(this['modelPackStatus']))
       return (
         (this['generationError'] = '请先下载 3D 场景基础模型包。'),
-        (this['modelPackDialogOpen'] = !![]),
+        (this['modelPackDialogOpen'] = true),
         this['render'](),
         null
       );
@@ -600,7 +600,7 @@ export class Storyboard3DWorkspaceHome {
       return ((this['generationError'] = '请先描述要搭建的 3D 场景。'), this['_syncGenerationUi'](), null);
     if (typeof this['onGenerateProject'] !== 'function')
       return ((this['generationError'] = '3D 场景生成功能尚未初始化。'), this['_syncGenerationUi'](), null);
-    ((this['isGenerating'] = !![]),
+    ((this['isGenerating'] = true),
       (this['generationStatus'] = '正在规划场景、物体与镜头'),
       (this['generationError'] = ''),
       this['_syncGenerationUi']());
@@ -624,7 +624,7 @@ export class Storyboard3DWorkspaceHome {
         },
       });
       return (
-        (this['isGenerating'] = ![]),
+        (this['isGenerating'] = false),
         (this['generationStatus'] = ''),
         this['onNotify']?.('3D 场景项目创建完成。', 'success'),
         this['_syncGenerationUi'](),
@@ -632,7 +632,7 @@ export class Storyboard3DWorkspaceHome {
       );
     } catch (error4) {
       return (
-        (this['isGenerating'] = ![]),
+        (this['isGenerating'] = false),
         (this['generationStatus'] = ''),
         (this['generationError'] = normalizeText(error4?.['message']) || '3D 场景创建失败，请稍后重试。'),
         this['onNotify']?.(this['generationError'], 'error'),
@@ -662,36 +662,36 @@ export class Storyboard3DWorkspaceHome {
   }
   ['_cloneProject'](value19) {
     const enabled5 = this['_findProject'](value19);
-    if (!enabled5) return ![];
+    if (!enabled5) return false;
     try {
       const enabled6 = this['onCloneProject']?.(enabled5['projectId']);
-      if (!enabled6) return (this['onNotify']?.('克隆项目失败。', 'error'), ![]);
+      if (!enabled6) return (this['onNotify']?.('克隆项目失败。', 'error'), false);
       return (this['onNotify']?.('已克隆：' + enabled5['title'], 'success'), this['render'](), enabled6);
     } catch (error5) {
-      return (this['onNotify']?.(error5?.['message'] || '克隆项目失败。', 'error'), ![]);
+      return (this['onNotify']?.(error5?.['message'] || '克隆项目失败。', 'error'), false);
     }
   }
   ['_startProjectRename'](value20) {
     const enabled7 = this['_findProject'](value20);
-    if (!enabled7) return ![];
+    if (!enabled7) return false;
     return (
       (this['openProjectMenuId'] = ''),
       (this['confirmingDeleteProjectId'] = ''),
       (this['editingProjectId'] = enabled7['projectId']),
       (this['editingProjectName'] = enabled7['title']),
       this['render'](),
-      !![]
+      true
     );
   }
-  ['_commitProjectRename']({ render: render = !![] } = {}) {
+  ['_commitProjectRename']({ render: render = true } = {}) {
     const value21 = this['editingProjectId'],
       enabled8 = this['_findProject'](value21),
       text2 = normalizeText(this['editingProjectName'])['slice'](0, 120);
-    if (!enabled8) return (this['_cancelProjectRename']({ render: render }), ![]);
+    if (!enabled8) return (this['_cancelProjectRename']({ render: render }), false);
     if (!text2) {
       this['onNotify']?.('项目名称不能为空。', 'error');
       if (render) this['render']();
-      return ![];
+      return false;
     }
     if (text2 === enabled8['title']) return (this['_cancelProjectRename']({ render: render }), enabled8);
     try {
@@ -699,7 +699,7 @@ export class Storyboard3DWorkspaceHome {
       if (!enabled9) {
         this['onNotify']?.('重命名项目失败。', 'error');
         if (render) this['render']();
-        return ![];
+        return false;
       }
       ((this['editingProjectId'] = ''),
         (this['editingProjectName'] = ''),
@@ -709,17 +709,17 @@ export class Storyboard3DWorkspaceHome {
     } catch (error6) {
       this['onNotify']?.(error6?.['message'] || '重命名项目失败。', 'error');
       if (render) this['render']();
-      return ![];
+      return false;
     }
   }
-  ['_cancelProjectRename']({ render: render = !![] } = {}) {
+  ['_cancelProjectRename']({ render: render = true } = {}) {
     const value22 = Boolean(this['editingProjectId']);
     ((this['editingProjectId'] = ''), (this['editingProjectName'] = ''));
     if (render && value22) this['render']();
     return value22;
   }
   ['_closeProjectMenu']() {
-    if (!this['openProjectMenuId']) return ![];
+    if (!this['openProjectMenuId']) return false;
     return (
       (this['openProjectMenuId'] = ''),
       this['root']
@@ -728,36 +728,36 @@ export class Storyboard3DWorkspaceHome {
       this['root']
         ?.['querySelectorAll']('.storyboard-3d-home-project-menu:not([hidden])')
         ['forEach']((el13) => {
-          el13['hidden'] = !![];
+          el13['hidden'] = true;
         }),
       this['root']
         ?.['querySelectorAll']('[data-storyboard-3d-home-action="toggle-project-menu"]')
         ['forEach']((el14) => el14['setAttribute']('aria-expanded', 'false')),
-      !![]
+      true
     );
   }
   ['_deleteProject'](value23) {
     const enabled10 = this['_findProject'](value23);
-    if (!enabled10 || this['confirmingDeleteProjectId'] !== enabled10['projectId']) return ![];
+    if (!enabled10 || this['confirmingDeleteProjectId'] !== enabled10['projectId']) return false;
     try {
       const enabled11 = this['onDeleteProject']?.(enabled10['projectId']);
-      if (!enabled11) return (this['onNotify']?.('删除项目失败。', 'error'), this['render'](), ![]);
+      if (!enabled11) return (this['onNotify']?.('删除项目失败。', 'error'), this['render'](), false);
       return (
         (this['confirmingDeleteProjectId'] = ''),
         this['onNotify']?.('已删除：' + enabled10['title'], 'success'),
         this['render'](),
-        !![]
+        true
       );
     } catch (error7) {
-      return (this['onNotify']?.(error7?.['message'] || '删除项目失败。', 'error'), this['render'](), ![]);
+      return (this['onNotify']?.(error7?.['message'] || '删除项目失败。', 'error'), this['render'](), false);
     }
   }
   ['_startProjectDelete'](value24) {
     const enabled12 = this['_findProject'](value24);
-    if (!enabled12) return ![];
+    if (!enabled12) return false;
     return (
       (this['openProjectMenuId'] = ''),
-      this['_cancelProjectRename']({ render: ![] }),
+      this['_cancelProjectRename']({ render: false }),
       (this['confirmingDeleteProjectId'] = enabled12['projectId']),
       this['render'](),
       [
@@ -769,10 +769,10 @@ export class Storyboard3DWorkspaceHome {
           (value25) => value25['getAttribute']('data-storyboard-3d-project-id') === enabled12['projectId'],
         )
         ?.['focus']?.(),
-      !![]
+      true
     );
   }
-  ['_cancelProjectDelete']({ render: render = !![], focusProjectId: focusProjectId = '' } = {}) {
+  ['_cancelProjectDelete']({ render: render = true, focusProjectId: focusProjectId = '' } = {}) {
     const value26 = this['confirmingDeleteProjectId'] || normalizeText(focusProjectId),
       value27 = Boolean(this['confirmingDeleteProjectId']);
     this['confirmingDeleteProjectId'] = '';
@@ -799,9 +799,9 @@ export class Storyboard3DWorkspaceHome {
     const value29 = el15['getAttribute']('data-storyboard-3d-home-action'),
       focusProjectId2 = el15['getAttribute']('data-storyboard-3d-project-id') || '';
     if (value29 === 'toggle-project-menu') {
-      (this['_cancelProjectDelete']({ render: ![] }),
+      (this['_cancelProjectDelete']({ render: false }),
         (this['openProjectMenuId'] = this['openProjectMenuId'] === focusProjectId2 ? '' : focusProjectId2),
-        this['_cancelProjectRename']({ render: ![] }),
+        this['_cancelProjectRename']({ render: false }),
         this['render']());
       this['openProjectMenuId'] &&
         [...(this['root']?.['querySelectorAll']('[data-storyboard-3d-home-action="clone-project"]') || [])]
@@ -850,7 +850,7 @@ export class Storyboard3DWorkspaceHome {
       return;
     }
     if (value29 === 'skip-model-pack') {
-      ((this['modelPackDialogOpen'] = ![]),
+      ((this['modelPackDialogOpen'] = false),
         (this['generationError'] = '未下载模型包，暂时不能生成 3D 场景。'),
         this['render']());
       return;
@@ -884,7 +884,7 @@ export class Storyboard3DWorkspaceHome {
   }
   ['_handleChange'](event5) {
     if (event5['target']['matches']('[data-storyboard-3d-project-rename-input]')) {
-      (this['_commitProjectRename']({ render: ![] }),
+      (this['_commitProjectRename']({ render: false }),
         this['setTimeoutFn']?.(() => {
           if (!this['_destroyed']) this['render']();
         }, 0));
@@ -928,18 +928,18 @@ export class Storyboard3DWorkspaceHome {
       this['urlApi']?.['revokeObjectURL']?.(value33);
     ((this['referenceImages'] = []), (this['referenceImageUrl'] = ''), (this['referenceImageName'] = ''));
   }
-  async ['_refreshModelPackStatus']({ promptIfMissing: promptIfMissing = ![] } = {}) {
-    if (promptIfMissing) this['_promptForMissingModelPack'] = !![];
+  async ['_refreshModelPackStatus']({ promptIfMissing: promptIfMissing = false } = {}) {
+    if (promptIfMissing) this['_promptForMissingModelPack'] = true;
     if (this['modelPackStatus']['state'] === 'installing') return this['modelPackStatus'];
     if (this['_modelPackCheckPromise']) return this['_modelPackCheckPromise'];
     if (typeof this['modelPackApi']?.['getStatus'] !== 'function') {
       this['modelPackStatus'] = {
         state: 'error',
-        installed: ![],
+        installed: false,
         assets: [],
         error: '模型包服务尚未初始化。',
       };
-      if (this['_promptForMissingModelPack']) this['modelPackDialogOpen'] = !![];
+      if (this['_promptForMissingModelPack']) this['modelPackDialogOpen'] = true;
       return (this['render'](), this['modelPackStatus']);
     }
     ((this['modelPackStatus'] = { ...this['modelPackStatus'], state: 'checking', error: '' }),
@@ -947,7 +947,7 @@ export class Storyboard3DWorkspaceHome {
     const value34 = Promise['resolve'](this['modelPackApi']['getStatus']())
       ['then']((args2) => {
         const assets = Array['isArray'](args2?.['assets']) ? args2['assets'] : [],
-          state2 = args2?.['installed'] === !![] && assets['length'] > 0;
+          state2 = args2?.['installed'] === true && assets['length'] > 0;
         return (
           (this['modelPackStatus'] = {
             ...args2,
@@ -964,11 +964,11 @@ export class Storyboard3DWorkspaceHome {
       ['catch']((error8) => {
         this['modelPackStatus'] = {
           state: 'error',
-          installed: ![],
+          installed: false,
           assets: [],
           error: normalizeText(error8?.['message']) || '无法检测模型包状态。',
         };
-        if (this['_promptForMissingModelPack']) this['modelPackDialogOpen'] = !![];
+        if (this['_promptForMissingModelPack']) this['modelPackDialogOpen'] = true;
         return (this['render'](), this['modelPackStatus']);
       })
       ['finally'](() => {
@@ -984,11 +984,11 @@ export class Storyboard3DWorkspaceHome {
         this['render'](),
         null
       );
-    ((this['modelPackDialogOpen'] = !![]),
+    ((this['modelPackDialogOpen'] = true),
       (this['modelPackStatus'] = {
         ...this['modelPackStatus'],
         state: 'installing',
-        installed: ![],
+        installed: false,
         error: '',
         installProgress: {
           state: 'downloading',
@@ -1007,18 +1007,18 @@ export class Storyboard3DWorkspaceHome {
       this['_startModelPackProgressPolling']();
       const args3 = await value35,
         assets2 = Array['isArray'](args3?.['assets']) ? args3['assets'] : [];
-      if (args3?.['installed'] !== !![] || assets2['length'] === 0)
+      if (args3?.['installed'] !== true || assets2['length'] === 0)
         throw new Error('模型包下载未完成，请重试。');
       return (
         this['_stopModelPackProgressPolling'](),
         (this['modelPackStatus'] = {
           ...args3,
           state: 'installed',
-          installed: !![],
+          installed: true,
           assets: assets2,
           error: '',
         }),
-        (this['modelPackDialogOpen'] = ![]),
+        (this['modelPackDialogOpen'] = false),
         (this['generationError'] = ''),
         this['onNotify']?.('3D 场景基础模型包下载完成。', 'success'),
         this['render'](),
@@ -1029,16 +1029,16 @@ export class Storyboard3DWorkspaceHome {
       try {
         const args4 = await this['modelPackApi']['getStatus']?.(),
           assets3 = Array['isArray'](args4?.['assets']) ? args4['assets'] : [];
-        if (args4?.['installed'] === !![] && assets3['length'] > 0)
+        if (args4?.['installed'] === true && assets3['length'] > 0)
           return (
             (this['modelPackStatus'] = {
               ...args4,
               state: 'installed',
-              installed: !![],
+              installed: true,
               assets: assets3,
               error: '',
             }),
-            (this['modelPackDialogOpen'] = ![]),
+            (this['modelPackDialogOpen'] = false),
             (this['generationError'] = ''),
             this['onNotify']?.('3D 场景基础模型包下载完成。', 'success'),
             this['render'](),
@@ -1048,11 +1048,11 @@ export class Storyboard3DWorkspaceHome {
       return (
         (this['modelPackStatus'] = {
           state: 'error',
-          installed: ![],
+          installed: false,
           assets: [],
           error: normalizeText(error9?.['message']) || '模型包下载失败，请稍后重试。',
         }),
-        (this['modelPackDialogOpen'] = !![]),
+        (this['modelPackDialogOpen'] = true),
         this['render'](),
         null
       );
@@ -1081,7 +1081,7 @@ export class Storyboard3DWorkspaceHome {
             ...this['modelPackStatus'],
             ...args5,
             state: 'installing',
-            installed: ![],
+            installed: false,
             assets: this['modelPackStatus']['assets'],
             error: '',
           }),
@@ -1130,22 +1130,22 @@ export class Storyboard3DWorkspaceHome {
     if (!this['root']) return null;
     return (
       this['render'](),
-      (this['root']['hidden'] = ![]),
+      (this['root']['hidden'] = false),
       this['root']['setAttribute']('aria-hidden', 'false'),
-      void this['_refreshModelPackStatus']({ promptIfMissing: !![] }),
+      void this['_refreshModelPackStatus']({ promptIfMissing: true }),
       this
     );
   }
   ['hide']() {
-    if (!this['root']) return ![];
+    if (!this['root']) return false;
     return (
       (this['openProjectMenuId'] = ''),
       (this['editingProjectId'] = ''),
       (this['editingProjectName'] = ''),
       (this['confirmingDeleteProjectId'] = ''),
-      (this['root']['hidden'] = !![]),
+      (this['root']['hidden'] = true),
       this['root']['setAttribute']('aria-hidden', 'true'),
-      !![]
+      true
     );
   }
   ['isVisible']() {
@@ -1153,17 +1153,17 @@ export class Storyboard3DWorkspaceHome {
   }
   ['focusProject'](value37) {
     const enabled13 = String(value37 || '')['trim']();
-    if (!enabled13 || !this['root'] || this['root']['hidden']) return ![];
+    if (!enabled13 || !this['root'] || this['root']['hidden']) return false;
     const el16 = [
       ...this['root']['querySelectorAll'](
         '.storyboard-3d-home-project-details[data-storyboard-3d-home-action="open-project"]',
       ),
     ]['find']((value38) => value38['getAttribute']('data-storyboard-3d-project-id') === enabled13);
-    if (!el16 || typeof el16['focus'] !== 'function') return ![];
-    return (el16['focus']({ preventScroll: !![] }), !![]);
+    if (!el16 || typeof el16['focus'] !== 'function') return false;
+    return (el16['focus']({ preventScroll: true }), true);
   }
   ['destroy']() {
-    (this['_pricing']?.['destroy'](), (this['_destroyed'] = !![]), this['_stopModelPackProgressPolling']());
+    (this['_pricing']?.['destroy'](), (this['_destroyed'] = true), this['_stopModelPackProgressPolling']());
     if (!this['root']) return;
     (this['root']['removeEventListener']('contextmenu', containWorkspaceContextMenu),
       this['root']['removeEventListener']('click', this['_handleClick']),

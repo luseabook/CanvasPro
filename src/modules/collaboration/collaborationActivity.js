@@ -34,7 +34,7 @@ export function createCollaborationActivity({ root: root, getState: getState, ac
     item !== key['session']?.['roomId'] &&
       ((item = key['session']?.['roomId']),
       (value = ''),
-      (el['open'] = ![]),
+      (el['open'] = false),
       map['clear'](),
       el4['replaceChildren']());
     if (!el['open']) return;
@@ -72,7 +72,7 @@ export function createCollaborationActivity({ root: root, getState: getState, ac
               error2['name'],
             );
             ((el9['dataset']['nodeId'] = error2['id']),
-              (el9['disabled'] = actions['hasReviewNode'] ? !actions['hasReviewNode'](error2['id']) : !![]),
+              (el9['disabled'] = actions['hasReviewNode'] ? !actions['hasReviewNode'](error2['id']) : true),
               el9['addEventListener']('click', () =>
                 actions['openReviewNode']?.(
                   error2['id'],

@@ -3,7 +3,7 @@ export function createPersonReplacementResultHistoryLayout() {
   let el = null,
     el2 = null,
     value = null;
-  const run = (item, enabled = !![]) => {
+  const run = (item, enabled = true) => {
       if (!el) return [];
       if (!enabled) el['classList']['add']('is-results-layout-static');
       el['style']['setProperty'](SIZE, item + 'px');
@@ -21,7 +21,7 @@ export function createPersonReplacementResultHistoryLayout() {
   return Object['freeze']({
     show(el3) {
       const data = el3?.['closest']?.('.person-replacement-middle-layout');
-      data !== el && (handler(), run(0, ![]), (el = data));
+      data !== el && (handler(), run(0, false), (el = data));
       const options = el3?.['querySelector']?.('.person-replacement-result-history-content');
       if (options !== el2) {
         (handler(), (el2 = options));
@@ -30,11 +30,11 @@ export function createPersonReplacementResultHistoryLayout() {
       }
       handler2();
     },
-    hide({ animate: animate = ![] } = {}) {
+    hide({ animate: animate = false } = {}) {
       return (handler(), run(0, animate));
     },
     destroy() {
-      (handler(), run(0, ![]), (el = null));
+      (handler(), run(0, false), (el = null));
     },
   });
 }

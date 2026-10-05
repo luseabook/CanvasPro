@@ -19,7 +19,7 @@ export function createMaterialComparisonViewport({
 }) {
   let value2 = null,
     box2 = null,
-    result = ![];
+    result = false;
   function run() {
     const box3 = main['getBoundingClientRect']?.(),
       data = windowObject?.['getComputedStyle']?.(stageShell),
@@ -137,7 +137,7 @@ export function createMaterialComparisonViewport({
     },
     cancelZoom: cancelZoom,
     dispose() {
-      ((result = !![]), cancelZoom());
+      ((result = true), cancelZoom());
     },
   };
 }

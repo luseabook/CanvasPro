@@ -31,8 +31,8 @@ export function createRendererStartupState() {
       handler();
     },
     fail(result = 'initialization') {
-      if (failure || phase === 'ready') return ![];
-      return ((failure = result), handler(), !![]);
+      if (failure || phase === 'ready') return false;
+      return ((failure = result), handler(), true);
     },
   };
 }

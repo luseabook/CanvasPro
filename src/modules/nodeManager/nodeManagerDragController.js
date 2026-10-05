@@ -65,7 +65,7 @@ export function createNodeManagerDragController({
           edgePolicy: 'all-touching',
         });
       enabled = '';
-      if (response?.['ok'] === ![]) {
+      if (response?.['ok'] === false) {
         onDuplicateFailed?.(response);
         return;
       }
@@ -78,7 +78,7 @@ export function createNodeManagerDragController({
     {
       bindNodeRow({ trigger: trigger, row: row, nodeId: nodeId } = {}) {
         if (!trigger) return;
-        ((trigger['draggable'] = !![]),
+        ((trigger['draggable'] = true),
           trigger['addEventListener']('dragstart', (current) => {
             ((enabled = nodeId),
               row?.['classList']?.['add']('is-dragging'),

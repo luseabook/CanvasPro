@@ -36,9 +36,9 @@ export function isPublicModelCatalogEntry(index, result) {
     manifest = resolveManifest(result);
   return Boolean(text3 && manifest?.['kind'] === text3 && isModelManifestPubliclyListed(manifest));
 }
-export function projectPublicModelCatalog(data, { isEligible: isEligible = () => !![] } = {}) {
+export function projectPublicModelCatalog(data, { isEligible: isEligible = () => true } = {}) {
   const text4 = normalizeText(data),
-    handler = typeof isEligible === 'function' ? isEligible : () => !![];
+    handler = typeof isEligible === 'function' ? isEligible : () => true;
   if (!text4) return [];
   return getModelsByKind(text4)
     ['filter']((target) => isPublicModelCatalogEntry(text4, target) && handler(target))
@@ -50,7 +50,7 @@ export function projectPublicModelCatalog(data, { isEligible: isEligible = () =>
       label: translateManifestText(source['displayName'] || source['modelId']),
       description: translateManifestText(source['description'] || ''),
       icon: resolveModelIcon(source),
-      vip: source['vip'] === !![],
+      vip: source['vip'] === true,
     }))
     ['sort']((next, current) => {
       const entry = next['providerLabel']['localeCompare'](current['providerLabel'], 'zh-CN');

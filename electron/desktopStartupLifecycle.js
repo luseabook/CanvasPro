@@ -8,8 +8,8 @@ export function createDesktopStartupLifecycle({
   clearTimer: clearTimer = clearTimeout,
 } = {}) {
   let pendingQuitTimer = null,
-    quitting = ![],
-    relaunchRequested = ![];
+    quitting = false,
+    relaunchRequested = false;
   function clearPendingQuitTimer() {
     if (pendingQuitTimer !== null) clearTimer(pendingQuitTimer);
     pendingQuitTimer = null;
@@ -26,24 +26,24 @@ export function createDesktopStartupLifecycle({
         if (!relaunchRequested) {
           if (relaunchArgs) app['relaunch']({ args: relaunchArgs });
           else app['relaunch']();
-          relaunchRequested = !![];
+          relaunchRequested = true;
         }
-        return ![];
+        return false;
       }
-      return (clearPendingQuitTimer(), !![]);
+      return (clearPendingQuitTimer(), true);
     },
     onShellClosed({ isQuittingForUpdate: isQuittingForUpdate, hasUnsavedChanges: hasUnsavedChanges }) {
       clearPendingQuitTimer();
-      if (quitting || isQuittingForUpdate) return ![];
-      if (!hasUnsavedChanges) return !![];
+      if (quitting || isQuittingForUpdate) return false;
+      if (!hasUnsavedChanges) return true;
       const quitTimer = setTimer(() => {
         if (pendingQuitTimer !== quitTimer) return;
         ((pendingQuitTimer = null), app['quit']());
       }, 1200);
-      return ((pendingQuitTimer = quitTimer), ![]);
+      return ((pendingQuitTimer = quitTimer), false);
     },
     beginQuit() {
-      ((quitting = !![]), clearPendingQuitTimer());
+      ((quitting = true), clearPendingQuitTimer());
     },
     isQuitting: () => quitting,
     assertStarting: assertStarting,

@@ -11,7 +11,7 @@ function normalizeText(value) {
 }
 export function writeStoryAssetDragData(item, key, index = 0) {
   const text = normalizeText(key);
-  if (!text || typeof item?.['setData'] !== 'function') return ![];
+  if (!text || typeof item?.['setData'] !== 'function') return false;
   try {
     return (
       item['setData'](STORY_ASSET_DRAG_MIME, text),
@@ -20,10 +20,10 @@ export function writeStoryAssetDragData(item, key, index = 0) {
         String(Math['max'](0, Math['trunc'](Number(index) || 0))),
       ),
       (item['effectAllowed'] = 'copy'),
-      !![]
+      true
     );
   } catch {
-    return ![];
+    return false;
   }
 }
 export function readStoryAssetDragData(result) {
@@ -43,11 +43,11 @@ export function readStoryAssetDragItemIndex(data) {
   }
 }
 export function hasStoryAssetDragData(options) {
-  if (readStoryAssetDragData(options)) return !![];
+  if (readStoryAssetDragData(options)) return true;
   try {
     return Array['from'](options?.['types'] || [])['includes'](STORY_ASSET_DRAG_MIME);
   } catch {
-    return ![];
+    return false;
   }
 }
 export const resolveStoryAssetDragPreview = resolveWorkspaceAssetDragPreview;
@@ -70,19 +70,19 @@ export function getStoryPromptDropRange(dom, enabled, target, source) {
     enabled2['parentElement']?.['closest']?.('.ref-pill')
   )
     return null;
-  return (entry['collapse']?.(!![]), entry);
+  return (entry['collapse']?.(true), entry);
 }
 export function activateStoryPromptDropSelection(dom2, el, enabled3) {
   const enabled4 = dom2?.['getSelection']?.();
-  if (!el || !enabled3 || !enabled4) return ![];
+  if (!el || !enabled3 || !enabled4) return false;
   try {
     return (
-      el['focus']?.({ preventScroll: !![] }),
+      el['focus']?.({ preventScroll: true }),
       enabled4['removeAllRanges']?.(),
       enabled4['addRange']?.(enabled3),
-      !![]
+      true
     );
   } catch {
-    return ![];
+    return false;
   }
 }

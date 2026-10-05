@@ -111,8 +111,8 @@ export function createAIGenerateNodeStateSyncModule(value) {
     }
     ['_shouldRenderRefBarNow'](state, data) {
       const list = Array['isArray'](state?.['selectedNodeIds']) ? state['selectedNodeIds'] : [];
-      if (list['includes'](this['nodeId'])) return !![];
-      if (data?.['active'] && data?.['sourceNodeId'] === this['nodeId']) return !![];
+      if (list['includes'](this['nodeId'])) return true;
+      if (data?.['active'] && data?.['sourceNodeId'] === this['nodeId']) return true;
       return shouldAlwaysShowImageRefBar(this['_data']?.['model']);
     }
     ['update'](options) {
@@ -129,18 +129,18 @@ export function createAIGenerateNodeStateSyncModule(value) {
         isTerminalGenerationUiState2 = isTerminalGenerationUiState(options),
         isFailureGenerationUiState2 = isFailureGenerationUiState(options);
       if (shouldShowGenerationBusyUi2)
-        ((this['_isGenerating'] = !![]),
+        ((this['_isGenerating'] = true),
           this['previewEl'] && typeof startLoading === 'function' && startLoading(this['previewEl']));
       else {
         if (isTerminalGenerationUiState2) {
-          this['_isGenerating'] = ![];
+          this['_isGenerating'] = false;
           isDreaminaTerminalGenerationState(options) && (this['_dreaminaActiveSubmitId'] = '');
           stopPreviewNodeLoading(this['nodeId']);
           if (this['previewEl']) stopLoading(this['previewEl']);
           resetGenerateButtonIdleUi(this['btnEl']);
         }
       }
-      this['_rendererMediaDeferred'] !== !![] &&
+      this['_rendererMediaDeferred'] !== true &&
         (this['_loadAndDisplayImage'](),
         this['_applyMaskPreview'](options['maskPreviewUrl'] || options['maskPreview']));
       const state2 = this['_getStoreStateForRead'](),
@@ -197,8 +197,8 @@ export function createAIGenerateNodeStateSyncModule(value) {
           nodes: nodes,
           targetNodeData: nodes?.[this['nodeId']] || options || {},
         }));
-      if (this['_rendererMediaDeferred'] === !![] || !enabled)
-        this['_renderRefBarPendingWhenVisible'] = !![];
+      if (this['_rendererMediaDeferred'] === true || !enabled)
+        this['_renderRefBarPendingWhenVisible'] = true;
       else {
         const list2 = [...inEdges],
           scope = list2['map']((input) => {
@@ -232,7 +232,7 @@ export function createAIGenerateNodeStateSyncModule(value) {
           payload ||
           this['_renderRefBarPendingWhenVisible'] ||
           scope !== this['_lastEdgeSig']) &&
-          ((this['_renderRefBarPendingWhenVisible'] = ![]),
+          ((this['_renderRefBarPendingWhenVisible'] = false),
           (this['_lastEdgeSig'] = scope),
           this['_renderRefBar']());
       }
@@ -241,24 +241,24 @@ export function createAIGenerateNodeStateSyncModule(value) {
     }
     async ['_renderRefBar']() {
       if (!this['refBarEl']) return;
-      if (this['_rendererMediaDeferred'] === !![])
-        return void (this['_renderRefBarPendingWhenVisible'] = !![]);
+      if (this['_rendererMediaDeferred'] === true)
+        return void (this['_renderRefBarPendingWhenVisible'] = true);
       const value7 = this['_getStoreStateForRead'](),
         value8 = value7?.['pickConnectMode'] || {};
       if (!this['_shouldRenderRefBarNow'](value7, value8)) {
-        this['_renderRefBarPendingWhenVisible'] = !![];
+        this['_renderRefBarPendingWhenVisible'] = true;
         return;
       }
       if (this['_renderRefBarLock']) {
-        this['_renderRefBarPending'] = !![];
+        this['_renderRefBarPending'] = true;
         return;
       }
-      ((this['_renderRefBarLock'] = !![]), (this['_renderRefBarPending'] = ![]));
+      ((this['_renderRefBarLock'] = true), (this['_renderRefBarPending'] = false));
       try {
         await this['_renderRefBarImpl']();
       } finally {
-        ((this['_renderRefBarLock'] = ![]),
-          this['_renderRefBarPending'] && ((this['_renderRefBarPending'] = ![]), this['_renderRefBar']()));
+        ((this['_renderRefBarLock'] = false),
+          this['_renderRefBarPending'] && ((this['_renderRefBarPending'] = false), this['_renderRefBar']()));
       }
     }
     async ['_renderRefBarImpl']() {
@@ -426,7 +426,7 @@ export function createAIGenerateNodeStateSyncModule(value) {
             thumbHTML: createReferenceInputThumbnailHtml({ kind: 'image', thumbnailUrl: thumbnailUrl3 }),
             thumbSrc: thumbnailUrl3,
             previewSrc: String(label2['url'] || thumbnailUrl3),
-            virtual: !![],
+            virtual: true,
             assetId: assetId,
             assetIndex: assetIndex,
             assetOccurrence: assetOccurrence,

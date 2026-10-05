@@ -13,7 +13,7 @@ import {
 const COUNT = audioSelect('count', '生成数量', [1, 2, 3], 2, {
     placement: 'batch',
     description: '一次请求生成 1–3 首，按生成数量计费。',
-    showInfoTip: !![],
+    showInfoTip: true,
   }),
   STYLE = audioTextarea('stylePrompt', '音乐风格', '描述曲风、情绪、乐器和人声，最多 1024 字符。', {
     maxLength: 1024,
@@ -22,7 +22,7 @@ const COUNT = audioSelect('count', '生成数量', [1, 2, 3], 2, {
     audioText(value, item, '可选。已有 Mureka 素材 ID 可直接复用；连接对应参考音频时自动处理。', {
       maxLength: 64,
     }),
-  prepare = (slot, targetField, purpose, executionId = ![]) => ({
+  prepare = (slot, targetField, purpose, executionId = false) => ({
     executionId: executionId ? RH_AUDIO_HELPER_IDS['murekaClone'] : RH_AUDIO_HELPER_IDS['murekaUpload'],
     slot: slot,
     inputField: 'fileUrl',
@@ -44,12 +44,12 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
       docId: docId,
       order: 240 + index,
       promptField: 'prompt',
-      promptRequired: ![],
+      promptRequired: false,
       promptMaxLength: 1024,
       promptPlaceholder: '描述伴奏风格，或连接一段参考伴奏（二选一）',
       slots: [audioSlot('instrumental', '参考伴奏')],
       fields: [COUNT, idField('instrumentalId', '伴奏素材 ID')],
-      mapping: [paramMapping('n', 'count'), paramMapping('instrumentalId'), constantMapping('stream', ![])],
+      mapping: [paramMapping('n', 'count'), paramMapping('instrumentalId'), constantMapping('stream', false)],
       rules: { ...fileRules, controlMode: 'murekaBgm' },
       preparations: [prepare('instrumental', 'instrumentalId', 'instrumental')],
     }),
@@ -85,14 +85,14 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
         paramMapping('prompt', 'stylePrompt'),
         paramMapping('referenceId'),
         ...(supportsVoice
-          ? [paramMapping('vocalId'), paramMapping('melodyId'), constantMapping('stream', ![])]
+          ? [paramMapping('vocalId'), paramMapping('melodyId'), constantMapping('stream', false)]
           : []),
       ],
       rules: { ...fileRules, controlMode: 'murekaSong', supportsVoice: supportsVoice },
       preparations: [
         prepare('reference', 'referenceId', 'reference'),
         ...(supportsVoice
-          ? [prepare('vocal', 'vocalId', null, !![]), prepare('melody', 'melodyId', 'melody')]
+          ? [prepare('vocal', 'vocalId', null, true), prepare('melody', 'melodyId', 'melody')]
           : []),
       ],
       description: supportsVoice
@@ -113,7 +113,7 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
       promptField: 'lyrics',
       promptMaxLength: 3000,
       promptPlaceholder: '输入延长部分的歌词，最多 3000 字符',
-      slots: [audioSlot('sourceAudio', '待延长歌曲', !![])],
+      slots: [audioSlot('sourceAudio', '待延长歌曲', true)],
       fields: [
         audioSlider('extendAt', '延长起点（秒）', 8, 420, 8, 0.001),
         ...(options === 'v8'

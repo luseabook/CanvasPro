@@ -440,8 +440,8 @@ export function searchSceneAssets({
     value18 = Math['max'](0, Math['floor'](Number(offset) || 0)),
     value19 = Math['max'](1, Math['min'](360, Math['floor'](Number(limit) || 80)));
   return ASSETS['filter']((error) => {
-    if (value17 !== 'all' && error['category'] !== value17) return ![];
-    if (!enabled) return !![];
+    if (value17 !== 'all' && error['category'] !== value17) return false;
+    if (!enabled) return true;
     const list2 = [error['id'], error['familyId'], error['name'], error['category'], ...error['tags']]
       ['join'](' ')
       ['toLowerCase']();

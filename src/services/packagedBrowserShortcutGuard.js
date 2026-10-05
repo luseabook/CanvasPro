@@ -8,9 +8,9 @@ function normalizeKeyboardKey(event) {
 const INITIAL_APP_SHORTCUT_BINDINGS = Object['freeze'](['CTRL+SHIFT+C']);
 function eventBinding(item) {
   const list = [];
-  if (item?.['ctrlKey'] === !![] || item?.['metaKey'] === !![]) list['push']('CTRL');
-  if (item?.['shiftKey'] === !![]) list['push']('SHIFT');
-  if (item?.['altKey'] === !![]) list['push']('ALT');
+  if (item?.['ctrlKey'] === true || item?.['metaKey'] === true) list['push']('CTRL');
+  if (item?.['shiftKey'] === true) list['push']('SHIFT');
+  if (item?.['altKey'] === true) list['push']('ALT');
   const keyboardKey = normalizeKeyboardKey(item);
   return (
     keyboardKey &&
@@ -30,8 +30,8 @@ function isInspectElementShortcut(result) {
   const keyboardKey2 = normalizeKeyboardKey(result);
   return (
     keyboardKey2 === 'c' &&
-    ((result?.['ctrlKey'] === !![] && result?.['shiftKey'] === !![]) ||
-      (result?.['metaKey'] === !![] && result?.['shiftKey'] === !![]))
+    ((result?.['ctrlKey'] === true && result?.['shiftKey'] === true) ||
+      (result?.['metaKey'] === true && result?.['shiftKey'] === true))
   );
 }
 export function isPackagedChromeShellLocation(data = globalThis['location']) {
@@ -39,18 +39,18 @@ export function isPackagedChromeShellLocation(data = globalThis['location']) {
     const map = new URLSearchParams(String(data?.['search'] || ''));
     return map['get']('aicRuntime') === 'chrome-shell' && map['get']('aicPackaged') === '1';
   } catch {
-    return ![];
+    return false;
   }
 }
 export function isBlockedPackagedBrowserShortcut(options) {
   const keyboardKey3 = normalizeKeyboardKey(options);
-  if (keyboardKey3 === 'f5' || keyboardKey3 === 'f12') return !![];
-  const target = options?.['ctrlKey'] === !![] || options?.['metaKey'] === !![];
-  if (target && keyboardKey3 === 'r') return !![];
+  if (keyboardKey3 === 'f5' || keyboardKey3 === 'f12') return true;
+  const target = options?.['ctrlKey'] === true || options?.['metaKey'] === true;
+  if (target && keyboardKey3 === 'r') return true;
   const source =
-      (options?.['ctrlKey'] === !![] && options?.['shiftKey'] === !![]) ||
-      (options?.['metaKey'] === !![] && options?.['altKey'] === !![]),
-    next = options?.['metaKey'] === !![] && options?.['shiftKey'] === !![];
+      (options?.['ctrlKey'] === true && options?.['shiftKey'] === true) ||
+      (options?.['metaKey'] === true && options?.['altKey'] === true),
+    next = options?.['metaKey'] === true && options?.['shiftKey'] === true;
   return (source && ['c', 'i', 'j']['includes'](keyboardKey3)) || (next && keyboardKey3 === 'c');
 }
 export function installPackagedBrowserShortcutGuard({
@@ -59,7 +59,7 @@ export function installPackagedBrowserShortcutGuard({
 } = {}) {
   if (!windowObject?.['addEventListener']) return () => {};
   const current = (event2) => {
-    if (windowObject['__aicShortcutRecording'] === !![]) return;
+    if (windowObject['__aicShortcutRecording'] === true) return;
     const isBlockedPackagedBrowserShortcut2 = isBlockedPackagedBrowserShortcut(event2);
     if (isBlockedPackagedBrowserShortcut2 && isConfiguredAppShortcut(windowObject, event2)) {
       event2['preventDefault']?.();
@@ -74,9 +74,9 @@ export function installPackagedBrowserShortcutGuard({
     (event2['preventDefault']?.(), event2['stopImmediatePropagation']?.());
   };
   return (
-    windowObject['addEventListener']('keydown', current, !![]),
+    windowObject['addEventListener']('keydown', current, true),
     () => {
-      windowObject['removeEventListener']?.('keydown', current, !![]);
+      windowObject['removeEventListener']?.('keydown', current, true);
     }
   );
 }

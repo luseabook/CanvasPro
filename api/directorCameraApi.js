@@ -1,7 +1,7 @@
 import { post } from './requester.js';
 const path = '/api/v2/storyboard3d/director-camera';
 export const createDirectorCameraPairing = () =>
-  post(path, { action: 'create', enableLan: !![] }, { provider: 'local' });
+  post(path, { action: 'create', enableLan: true }, { provider: 'local' });
 export const readDirectorCameraPose = (readToken) =>
   post(path, { action: 'read', readToken: readToken }, { provider: 'local' });
 export const closeDirectorCameraPairing = (readToken2) =>

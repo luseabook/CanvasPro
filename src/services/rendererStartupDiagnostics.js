@@ -19,8 +19,8 @@ export function installRendererStartupDiagnostics({
     if (!startup['snapshot']()['failure']) evidence = collectRendererStartupEvidence(event, windowObject);
     startup['fail']('entry');
   };
-  let enabled = ![],
-    item = ![],
+  let enabled = false,
+    item = false,
     handler = () => {};
   handler = startup['subscribe']((stage) => {
     if (stage['ready']) {
@@ -28,7 +28,7 @@ export function installRendererStartupDiagnostics({
       return;
     }
     if (!stage['failure'] || item) return;
-    item = !![];
+    item = true;
     const href = String(windowObject['location']?.['href'] || ''),
       args = readChromeShellStartupMetadata(href);
     if (!args) return;
@@ -54,14 +54,14 @@ export function installRendererStartupDiagnostics({
     })();
   });
   function run() {
-    ((enabled = !![]),
+    ((enabled = true),
       handler(),
-      windowObject['removeEventListener']('error', value, !![]),
+      windowObject['removeEventListener']('error', value, true),
       windowObject['removeEventListener']('pagehide', run));
   }
   return (
-    windowObject['addEventListener']('error', value, !![]),
-    windowObject['addEventListener']('pagehide', run, { once: !![] }),
+    windowObject['addEventListener']('error', value, true),
+    windowObject['addEventListener']('pagehide', run, { once: true }),
     run
   );
 }

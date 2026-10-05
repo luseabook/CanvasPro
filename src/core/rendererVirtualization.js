@@ -177,7 +177,7 @@ export function isNodeInsideViewportPadding(
   value3 = 0,
   value4 = 0,
 ) {
-  if (!box3 || !box4) return ![];
+  if (!box3 || !box4) return false;
   const value5 = Number['isFinite'](box4['zoom']) ? box4['zoom'] : 1,
     value6 = Number['isFinite'](box3['x']) ? box3['x'] : 0,
     value7 = Number['isFinite'](box3['y']) ? box3['y'] : 0,

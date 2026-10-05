@@ -16,11 +16,11 @@ function isResolvedSourceMediaNode(key) {
   if (
     !isNodeType(key, 'source-video') ||
     !!String(key?.['rhTaskId'] || key?.['asyncTaskId'] || key?.['dreaminaSubmitId'] || '')['trim']() ||
-    key?.['rhTaskRecovering'] === !![] ||
-    key?.['asyncTaskRecovering'] === !![] ||
-    key?.['dreaminaTaskRecovering'] === !![]
+    key?.['rhTaskRecovering'] === true ||
+    key?.['asyncTaskRecovering'] === true ||
+    key?.['dreaminaTaskRecovering'] === true
   )
-    return ![];
+    return false;
   const list2 = Array['isArray'](key?.['videos']) ? key['videos'] : [];
   return (
     hasResolvedMediaValue(key, [
@@ -51,7 +51,7 @@ function isRunningTimerNode(enabled) {
     enabled['generationDuration'] != null ||
     isResolvedSourceMediaNode(enabled)
   )
-    return ![];
+    return false;
   return RUNNING_TIMER_STATES['has'](resolveGenerationUiState(enabled));
 }
 function defaultRequestFrame(handler) {
@@ -143,7 +143,7 @@ export function createRendererNodeTimerController({
     list3['forEach']((input) => hideNode(input));
     if (map['size'] > 0) run2();
   }
-  function renderNode(output, value2, { selected: selected = ![] } = {}) {
+  function renderNode(output, value2, { selected: selected = false } = {}) {
     const el4 = getWrapper(output)?.['__v2_timer_el'];
     if (el4) {
       const isRunningTimerNode2 = isRunningTimerNode(value2),

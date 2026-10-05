@@ -42,7 +42,7 @@ function getPromptHistoryEntryKey(options2 = {}) {
   return [
     normalizeText(options2['promptHtml']),
     normalizeStoryPromptLanguage(options2['promptLanguage']),
-    normalizeStoryPromptMode(options2['promptMode'], { allowDeveloperModes: !![] }),
+    normalizeStoryPromptMode(options2['promptMode'], { allowDeveloperModes: true }),
     normalizeDurationSeconds(options2['durationSec'] || options2['duration']),
   ]['join']('\x00');
 }
@@ -53,7 +53,7 @@ export function normalizeStoryClipPromptHistory(list = []) {
     if (!enabled || typeof enabled !== 'object') continue;
     const text = normalizeText(enabled['promptHtml'] || enabled['prompt']);
     if (!text) continue;
-    const storyPromptMode = normalizeStoryPromptMode(enabled['promptMode'], { allowDeveloperModes: !![] }),
+    const storyPromptMode = normalizeStoryPromptMode(enabled['promptMode'], { allowDeveloperModes: true }),
       durationSeconds2 = normalizeDurationSeconds(
         enabled['durationSec'] || enabled['durationSeconds'] || enabled['duration'],
       ),
@@ -97,7 +97,7 @@ export function createStoryClipPromptHistoryEntry(
   const text2 = normalizeText(value3?.['prompt']);
   if (!text2) return null;
   const storyPromptMode2 = normalizeStoryPromptMode(promptMode || value3?.['promptMode'], {
-      allowDeveloperModes: !![],
+      allowDeveloperModes: true,
     }),
     durationSeconds3 = normalizeDurationSeconds(
       value3?.['durationSec'] || value3?.['durationSeconds'] || value3?.['duration'],
@@ -179,7 +179,7 @@ function getNodeTagName(value13) {
   return String(value13?.['tagName'] || value13?.['nodeName'] || '')['toLowerCase']();
 }
 function nodeHasClass(value14, value15) {
-  if (value14?.['classList']?.['contains']?.(value15)) return !![];
+  if (value14?.['classList']?.['contains']?.(value15)) return true;
   return String(value14?.['className'] || '')
     ['split'](/\s+/)
     ['includes'](value15);
@@ -233,8 +233,8 @@ export function getStoryClipPromptLockedTokens(value19) {
   return { assetTokens: value20, durationTokens: list3 };
 }
 function isNodeInside(enabled7, enabled8) {
-  if (!enabled7 || !enabled8) return ![];
-  return enabled7 === enabled8 || enabled7['contains']?.(enabled8) === !![];
+  if (!enabled7 || !enabled8) return false;
+  return enabled7 === enabled8 || enabled7['contains']?.(enabled8) === true;
 }
 export function captureStoryClipPromptSelection({
   promptEl: promptEl,
@@ -266,7 +266,7 @@ export function captureStoryClipPromptSelection({
   if (count3 < 0) return null;
   return { start: count3, end: count3 + list4['length'], text: list4, sourcePromptText: enabled9 };
 }
-export function normalizeStoryClipAdjustmentScope(value31, enabled10 = ![]) {
+export function normalizeStoryClipAdjustmentScope(value31, enabled10 = false) {
   const text4 = normalizeText(value31);
   if (text4 === 'selection' && !enabled10) return 'prompt';
   return STORY_CLIP_ADJUSTMENT_SCOPES['includes'](text4) ? text4 : 'prompt';
@@ -294,26 +294,26 @@ function getAdjustmentState(value34) {
     : {};
 }
 export function setStoryClipAdjustmentCandidate(enabled11, args) {
-  if (!enabled11 || typeof enabled11 !== 'object' || !args?.['promptHtml']) return ![];
+  if (!enabled11 || typeof enabled11 !== 'object' || !args?.['promptHtml']) return false;
   return (
     (enabled11['promptAdjustment'] = { ...getAdjustmentState(enabled11), candidate: { ...args } }),
-    !![]
+    true
   );
 }
 export function discardStoryClipAdjustmentCandidate(enabled12) {
-  if (!enabled12 || typeof enabled12 !== 'object') return ![];
+  if (!enabled12 || typeof enabled12 !== 'object') return false;
   const args2 = getAdjustmentState(enabled12);
-  if (!args2['candidate']) return ![];
-  return ((enabled12['promptAdjustment'] = { ...args2, candidate: null }), !![]);
+  if (!args2['candidate']) return false;
+  return ((enabled12['promptAdjustment'] = { ...args2, candidate: null }), true);
 }
 export function applyStoryClipAdjustmentCandidate(enabled13, value35 = Date['now']()) {
   if (
     enabled13?.['requiredDialogueLanguage'] &&
     enabled13['requiredDialogueLanguage'] !== enabled13['promptAdjustment']?.['candidate']?.['targetLanguage']
   )
-    return ![];
+    return false;
   const adjustmentState = getAdjustmentState(enabled13)['candidate'];
-  if (!enabled13 || !adjustmentState?.['promptHtml']) return ![];
+  if (!enabled13 || !adjustmentState?.['promptHtml']) return false;
   const value36 = String(enabled13['prompt'] || ''),
     storyPromptLanguage = normalizeStoryPromptLanguage(enabled13['promptLanguage']),
     value37 = String(enabled13['duration'] || ''),
@@ -323,10 +323,10 @@ export function applyStoryClipAdjustmentCandidate(enabled13, value35 = Date['now
     durationSeconds5 = normalizeDurationSeconds(adjustmentState['candidateDurationSeconds']),
     storyPromptMode3 = normalizeStoryPromptMode(
       adjustmentState['sourcePromptMode'] || enabled13['promptMode'],
-      { allowDeveloperModes: !![] },
+      { allowDeveloperModes: true },
     ),
     storyPromptMode4 = normalizeStoryPromptMode(adjustmentState['targetPromptMode'] || storyPromptMode3, {
-      allowDeveloperModes: !![],
+      allowDeveloperModes: true,
     }),
     text5 =
       normalizeText(adjustmentState['promptHtml']) !== normalizeText(value36) ||
@@ -366,19 +366,19 @@ export function applyStoryClipAdjustmentCandidate(enabled13, value35 = Date['now
         appliedAt: Number(value35) || Date['now'](),
       },
     }),
-    !![]
+    true
   );
 }
 export function undoStoryClipAdjustment(enabled14) {
   const adjustmentState2 = getAdjustmentState(enabled14);
-  if (!enabled14 || !adjustmentState2['lastApplied']?.['previousPromptHtml']) return ![];
+  if (!enabled14 || !adjustmentState2['lastApplied']?.['previousPromptHtml']) return false;
   ((enabled14['prompt'] = String(adjustmentState2['lastApplied']['previousPromptHtml'])),
     (enabled14['promptLanguage'] = normalizeStoryPromptLanguage(
       adjustmentState2['lastApplied']['previousPromptLanguage'],
     )),
     (enabled14['promptMode'] = normalizeStoryPromptMode(
       adjustmentState2['lastApplied']['previousPromptMode'] || enabled14['promptMode'],
-      { allowDeveloperModes: !![] },
+      { allowDeveloperModes: true },
     )));
   const durationSeconds6 = normalizeDurationSeconds(
     adjustmentState2['lastApplied']['previousDurationSec'] ||
@@ -389,11 +389,11 @@ export function undoStoryClipAdjustment(enabled14) {
       ((enabled14['durationSec'] = durationSeconds6),
       (enabled14['duration'] = formatDurationSeconds(durationSeconds6))),
     (enabled14['promptAdjustment'] = { candidate: adjustmentState2['candidate'] || null, lastApplied: null }),
-    !![]
+    true
   );
 }
 export function clearStoryClipAdjustmentUndo(enabled15) {
   const args3 = getAdjustmentState(enabled15);
-  if (!enabled15 || !args3['lastApplied']) return ![];
-  return ((enabled15['promptAdjustment'] = { ...args3, lastApplied: null }), !![]);
+  if (!enabled15 || !args3['lastApplied']) return false;
+  return ((enabled15['promptAdjustment'] = { ...args3, lastApplied: null }), true);
 }

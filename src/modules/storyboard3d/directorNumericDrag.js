@@ -4,7 +4,7 @@ export class DirectorNumericDrag {
   }
   ['bind'](el) {
     if (el === this['root']) return;
-    (this['destroy'](), (this['root'] = el), el?.['addEventListener']('pointerdown', this['onDown'], !![]));
+    (this['destroy'](), (this['root'] = el), el?.['addEventListener']('pointerdown', this['onDown'], true));
   }
   ['down'](event) {
     const el2 = event['target']['closest']?.('[data-storyboard-3d-shot-timeline] label'),
@@ -22,7 +22,7 @@ export class DirectorNumericDrag {
       result = Number(key);
     if (!Number['isFinite'](result)) return;
     const signal = new el4['AbortController']();
-    let enabled = ![];
+    let enabled = false;
     this['cancel']?.();
     const run = (data) => {
       (signal['abort'](), (this['cancel'] = null));
@@ -30,10 +30,10 @@ export class DirectorNumericDrag {
       if (data) el3['value'] = key;
       else {
         if (enabled && el3['value'] !== key)
-          el3['dispatchEvent'](new el4['Event']('change', { bubbles: !![] }));
+          el3['dispatchEvent'](new el4['Event']('change', { bubbles: true }));
       }
     };
-    ((this['cancel'] = () => run(!![])),
+    ((this['cancel'] = () => run(true)),
       el4['addEventListener'](
         'pointermove',
         (event2) => {
@@ -42,7 +42,7 @@ export class DirectorNumericDrag {
             (Math['abs'](event2['clientX'] - event['clientX']) < 4 && !enabled)
           )
             return;
-          ((enabled = !![]), event2['preventDefault']());
+          ((enabled = true), event2['preventDefault']());
           const options = el3['hasAttribute']('min') ? Number(el3['min']) : -Infinity,
             target = el3['hasAttribute']('max') ? Number(el3['max']) : Infinity;
           el3['value'] = String(
@@ -66,7 +66,7 @@ export class DirectorNumericDrag {
       el4['addEventListener'](
         'pointerup',
         (event3) => {
-          if (event3['pointerId'] === event['pointerId']) run(![]);
+          if (event3['pointerId'] === event['pointerId']) run(false);
         },
         { signal: signal['signal'] },
       ),
@@ -74,7 +74,7 @@ export class DirectorNumericDrag {
   }
   ['destroy']() {
     (this['cancel']?.(),
-      this['root']?.['removeEventListener']('pointerdown', this['onDown'], !![]),
+      this['root']?.['removeEventListener']('pointerdown', this['onDown'], true),
       (this['root'] = null));
   }
 }

@@ -60,7 +60,7 @@ function cloneExistingIcon(target, source = '', map) {
   !map['has'](target) &&
     map['set'](target, (next ? document['querySelector'](next) : null) || createSharedIcon(target));
   const current = map['get'](target),
-    el2 = current?.['cloneNode']?.(!![]);
+    el2 = current?.['cloneNode']?.(true);
   if (!el2) return null;
   (el2['removeAttribute']?.('id'),
     el2['setAttribute']?.('aria-hidden', 'true'),
@@ -71,7 +71,7 @@ function cloneExistingIcon(target, source = '', map) {
 function installNodeManagerButtonIcon(el3) {
   if (!el3 || el3['querySelector']?.('svg')) return;
   const entry = document['querySelector']('#btnToggleDots svg'),
-    el4 = entry?.['cloneNode']?.(!![]);
+    el4 = entry?.['cloneNode']?.(true);
   if (!el4) return;
   (el4['removeAttribute']?.('id'),
     el4['setAttribute']?.('width', '20'),
@@ -98,7 +98,7 @@ export function installScrollableWheelBoundary(el5, { getAxis: getAxis = () => '
       const scope = Math['max'](0, Number(el5['clientWidth']) || 0),
         count = Math['max'](0, (Number(el5['scrollWidth']) || 0) - scope);
       if (count <= 0) return;
-      if (!scrollElementHorizontallyWithWheel(event2, el5, { stopPropagation: !![] })) {
+      if (!scrollElementHorizontallyWithWheel(event2, el5, { stopPropagation: true })) {
         const enabled = Number(event2['deltaY']) || Number(event2['deltaX']) || 0;
         if (!enabled) return;
         (event2['preventDefault'](), event2['stopPropagation']());
@@ -118,7 +118,7 @@ export function installScrollableWheelBoundary(el5, { getAxis: getAxis = () => '
       event2['stopPropagation']());
   };
   return (
-    el5['addEventListener']('wheel', config, { passive: ![] }),
+    el5['addEventListener']('wheel', config, { passive: false }),
     () => el5['removeEventListener']('wheel', config)
   );
 }
@@ -187,13 +187,13 @@ export function createNodeManagerPanel({
   }
   let filter = 'all',
     query = '',
-    value7 = ![],
+    value7 = false,
     value8 = null;
   const map3 = createNodeManagerListSnapshot(),
     map4 = new Map();
   let value9 = null,
     enabled4 = null,
-    value10 = ![],
+    value10 = false,
     count3 = buildNodeManagerModel({ nodes: {} });
   const collapsedGroupIds = new Set(),
     map5 = new Set(),
@@ -285,7 +285,7 @@ export function createNodeManagerPanel({
     return placement2['classList']['contains']('show');
   }
   function run3() {
-    (value8?.['close']?.({ restoreFocus: ![] }), (value8 = null));
+    (value8?.['close']?.({ restoreFocus: false }), (value8 = null));
   }
   function run4(value13) {
     const nodeManagerPlacement2 = normalizeNodeManagerPlacement(value13);
@@ -374,7 +374,7 @@ export function createNodeManagerPanel({
       () => {
         (el29['remove'](), run10(el28, value22['category']));
       },
-      { once: !![] },
+      { once: true },
     ),
       el28['appendChild'](el29));
     if (value22['category'] === 'video') {
@@ -386,11 +386,11 @@ export function createNodeManagerPanel({
   function run12(value23) {
     const el30 = document['getElementById'](value23),
       value24 = el30?.['querySelector']?.('video');
-    if (value24 && value24['paused'] === ![]) return !![];
+    if (value24 && value24['paused'] === false) return true;
     const el31 = el30?.['querySelector']?.('.video-play-btn');
-    if (el31) return (el31['click'](), !![]);
-    if (value24?.['play']) return (Promise['resolve'](value24['play']())['catch'](() => {}), !![]);
-    return ![];
+    if (el31) return (el31['click'](), true);
+    if (value24?.['play']) return (Promise['resolve'](value24['play']())['catch'](() => {}), true);
+    return false;
   }
   function run13(value25) {
     const value26 = performance['now'](),
@@ -402,7 +402,7 @@ export function createNodeManagerPanel({
   }
   function run14(value28) {
     const response = executeCanvasCommand?.('node.select', { ids: [value28['id']] });
-    if (response?.['ok'] === ![]) return;
+    if (response?.['ok'] === false) return;
     if (value28['category'] === 'video') run12(value28['id']);
     appViewport?.['focusNode']?.(value28['id'], 96, 320, run2());
     if (value28['category'] === 'video') run13(value28['id']);
@@ -436,9 +436,9 @@ export function createNodeManagerPanel({
     ((input2['value'] = nodeManagerName),
       el34['replaceChildren'](input2),
       el33['classList']['add']('is-renaming'));
-    let value31 = ![];
+    let value31 = false;
     const cancel = () => {
-      ((value31 = !![]),
+      ((value31 = true),
         (value9 = null),
         (el34['textContent'] = resolveNodeManagerName(
           getStoreState(graphStore)['nodes']?.[id['id']],
@@ -459,7 +459,7 @@ export function createNodeManagerPanel({
       if (!enabled5) return;
       if (!name || name === nodeManagerName) return;
       const error2 = executeCanvasCommand?.('node.rename', { nodeId: id['id'], name: name });
-      error2?.['ok'] === ![] &&
+      error2?.['ok'] === false &&
         (showToast?.(error2['message'] || t('nodeManager.toasts.renameFailed'), 'error'), run18());
     };
     (input2['addEventListener']('pointerdown', (event3) => event3['stopPropagation']()),
@@ -472,7 +472,7 @@ export function createNodeManagerPanel({
             (event4['preventDefault'](),
             event4['stopPropagation'](),
             run16(),
-            el33['querySelector']('.node-manager-row-main')?.['focus']({ preventScroll: !![] }));
+            el33['querySelector']('.node-manager-row-main')?.['focus']({ preventScroll: true }));
       }),
       input2['addEventListener']('blur', value32),
       input2['focus'](),
@@ -480,7 +480,7 @@ export function createNodeManagerPanel({
   }
   async function run19(nodeId) {
     if (map5['has'](nodeId['id'])) return;
-    (map5['add'](nodeId['id']), run15(nodeId['id'], !![]));
+    (map5['add'](nodeId['id']), run15(nodeId['id'], true));
     try {
       await downloadNodeOutput({
         node: getStoreState(graphStore)['nodes']?.[nodeId['id']] || nodeId['node'],
@@ -488,12 +488,12 @@ export function createNodeManagerPanel({
         showToast: showToast,
       });
     } finally {
-      (map5['delete'](nodeId['id']), run15(nodeId['id'], ![]));
+      (map5['delete'](nodeId['id']), run15(nodeId['id'], false));
     }
   }
   function run20(value33) {
     const error3 = executeCanvasCommand?.('node.delete', { ids: [value33['id']] });
-    error3?.['ok'] === ![] && showToast?.(error3['message'] || t('nodeManager.toasts.deleteFailed'), 'error');
+    error3?.['ok'] === false && showToast?.(error3['message'] || t('nodeManager.toasts.deleteFailed'), 'error');
   }
   function run21(disabled, value34, value35, restoreTarget) {
     const dismissOnOwnerPointerDown = restoreTarget?.['closest']?.('.node-manager-more-button');
@@ -523,15 +523,15 @@ export function createNodeManagerPanel({
         {
           label: t('nodeManager.actions.delete'),
           icon: 'delete',
-          danger: !![],
+          danger: true,
           shortcutActionId: 'context-node-manager-delete',
           action: () => run20(disabled),
         },
       ],
       {
         ariaLabel: t('nodeManager.actions.menuAria', { name: disabled['name'] }),
-        ensureItemIcons: !![],
-        dismissOnOwnerPointerDown: dismissOnOwnerPointerDown ? ![] : undefined,
+        ensureItemIcons: true,
+        dismissOnOwnerPointerDown: dismissOnOwnerPointerDown ? false : undefined,
         ownerElement:
           dismissOnOwnerPointerDown || restoreTarget?.['closest']?.('.node-manager-row') || restoreTarget,
         ownerRoot: ownerRoot2,
@@ -639,7 +639,7 @@ export function createNodeManagerPanel({
       row2
     );
   }
-  function run18({ force: force = ![] } = {}) {
+  function run18({ force: force = false } = {}) {
     const nodes = getStoreState(graphStore),
       enabled6 = map3['read'](nodes['nodes'] || {});
     if (!force && !enabled6['changed']) return;
@@ -685,7 +685,7 @@ export function createNodeManagerPanel({
     const el40 = value9?.['input'],
       value45 = el40 && document['activeElement'] === el40,
       args = value45 ? [el40['selectionStart'], el40['selectionEnd']] : null;
-    value10 = !![];
+    value10 = true;
     try {
       let el41 = ownerRoot2['firstChild'];
       for (const value46 of list3) {
@@ -699,9 +699,9 @@ export function createNodeManagerPanel({
       value45 &&
         el40['isConnected'] &&
         document['activeElement'] !== el40 &&
-        (el40['focus']({ preventScroll: !![] }), el40['setSelectionRange'](...args));
+        (el40['focus']({ preventScroll: true }), el40['setSelectionRange'](...args));
     } finally {
-      value10 = ![];
+      value10 = false;
     }
     for (const value48 of map4['keys']()) if (!map8['has'](value48)) map4['delete'](value48);
     ((ownerRoot2['scrollTop'] = value42),
@@ -712,7 +712,7 @@ export function createNodeManagerPanel({
       run8());
   }
   function run22() {
-    run18({ force: !![] });
+    run18({ force: true });
   }
   function run23(ownerElement = el15) {
     if (ownerElement['getAttribute']('aria-expanded') === 'true') {
@@ -735,7 +735,7 @@ export function createNodeManagerPanel({
       })),
       {
         ariaLabel: t('nodeManager.filter'),
-        dismissOnOwnerPointerDown: ![],
+        dismissOnOwnerPointerDown: false,
         ownerElement: ownerElement,
         ownerRoot: ownerRoot,
         restoreTarget: ownerElement,
@@ -748,8 +748,8 @@ export function createNodeManagerPanel({
     )),
       (value8 = showContextMenu3));
   }
-  function run24(value49, { clear: clear = ![], focus: focus = !![] } = {}) {
-    value7 = value49 === !![];
+  function run24(value49, { clear: clear = false, focus: focus = true } = {}) {
+    value7 = value49 === true;
     clear && ((query = ''), (el19['value'] = ''));
     placement2['classList']['toggle']('is-searching', value7);
     if (focus && value7) requestAnimationFrame(() => el19['focus']());
@@ -764,8 +764,8 @@ export function createNodeManagerPanel({
         'aria-label': t('nodeManager.projectNameAria'),
       });
     ((el42['value'] = projectName2), el9['replaceChildren'](el42));
-    let value51 = ![],
-      enabled8 = ![];
+    let value51 = false,
+      enabled8 = false;
     const run26 = () => {
         (enabled4 === handler2 && ((enabled4 = null), el8['removeAttribute']('aria-busy')),
           el9['replaceChildren'](el10),
@@ -773,7 +773,7 @@ export function createNodeManagerPanel({
       },
       handler2 = () => {
         if (value51) return;
-        ((value51 = !![]), run26());
+        ((value51 = true), run26());
       };
     enabled4 = handler2;
     const run27 = async () => {
@@ -789,7 +789,7 @@ export function createNodeManagerPanel({
         handler2();
         return;
       }
-      ((enabled8 = !![]), (el42['disabled'] = !![]), el8['setAttribute']('aria-busy', 'true'));
+      ((enabled8 = true), (el42['disabled'] = true), el8['setAttribute']('aria-busy', 'true'));
       const el43 = createElement('span', 'project-package-loading-spinner node-manager-project-spinner', {
         'aria-hidden': 'true',
       });
@@ -798,11 +798,11 @@ export function createNodeManagerPanel({
         const enabled10 = await Promise['resolve'](renameCurrentProject?.(enabled9));
         if (value51) return;
         if (!enabled10) throw new Error(t('nodeManager.toasts.projectRenameFailed'));
-        ((value51 = !![]), run26());
+        ((value51 = true), run26());
       } catch (error5) {
         if (value51) return;
-        ((enabled8 = ![]),
-          (el42['disabled'] = ![]),
+        ((enabled8 = false),
+          (el42['disabled'] = false),
           el43['remove'](),
           showToast?.(error5?.['message'] || t('nodeManager.toasts.projectRenameFailed'), 'error'),
           el42['focus'](),
@@ -826,7 +826,7 @@ export function createNodeManagerPanel({
       placement2['setAttribute']('aria-hidden', 'false'),
       wrap['classList']['add']('node-manager-open'),
       run7(),
-      run18({ force: !![] }));
+      run18({ force: true }));
   }
   function close() {
     (run16(), enabled4?.());
@@ -844,14 +844,14 @@ export function createNodeManagerPanel({
     open: open,
     close: close,
     isOpen: isOpen,
-    closeOnOutsidePointerDown: ![],
+    closeOnOutsidePointerDown: false,
     ignorePointerDown: (event9) =>
       !!event9?.['target']?.['closest']?.('[data-sidebar-submenu-owner="' + SIDEBAR_KEY + '"]'),
   }),
     button['removeAttribute']('aria-haspopup'),
     el10['addEventListener']('click', run25),
-    el17['addEventListener']('click', () => run24(!![])),
-    el21['addEventListener']('click', () => run24(![], { clear: !![], focus: ![] })),
+    el17['addEventListener']('click', () => run24(true)),
+    el21['addEventListener']('click', () => run24(false, { clear: true, focus: false })),
     el15['addEventListener']('click', () => run23(el15)),
     el20['addEventListener']('click', () => run23(el20)),
     el14['addEventListener']('click', () => {
@@ -870,7 +870,7 @@ export function createNodeManagerPanel({
       if (event10['key'] !== 'Escape') return;
       (event10['preventDefault'](),
         event10['stopPropagation'](),
-        run24(![], { clear: !![], focus: ![] }),
+        run24(false, { clear: true, focus: false }),
         el17['focus']());
     }),
     list['push'](
@@ -900,7 +900,7 @@ export function createNodeManagerPanel({
   const value62 = (value63) => run4(value63?.['detail']?.['placement']),
     value64 = () => {
       (run16(), enabled4?.(), run5(), map3['clear']());
-      if (isOpen()) run18({ force: !![] });
+      if (isOpen()) run18({ force: true });
     },
     value65 = () => {
       run7();
@@ -915,11 +915,11 @@ export function createNodeManagerPanel({
   const value66 = document['getElementById']('projectNameText'),
     value67 = value66 && typeof MutationObserver === 'function' ? new MutationObserver(run5) : null;
   return (
-    value67?.['observe'](value66, { childList: !![], characterData: !![], subtree: !![] }),
+    value67?.['observe'](value66, { childList: true, characterData: true, subtree: true }),
     list['push'](() => value67?.['disconnect']()),
     run4(getStoreState(uiStore)['ui']?.['nodeManagerPlacement']),
     run7(),
-    run18({ force: !![] }),
+    run18({ force: true }),
     {
       panel: placement2,
       open: () => open(),

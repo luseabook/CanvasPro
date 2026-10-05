@@ -9,7 +9,7 @@ export function syncTextResultImages(nodeId) {
   if (!el?.['ownerDocument']) return;
   const enabled = nodeId['_data'] || {},
     list = normalizeTextResultImages(enabled['outputImages']),
-    enabled2 = enabled['outputImageSearchRequested'] === !![],
+    enabled2 = enabled['outputImageSearchRequested'] === true,
     text = normalizeTextToolUsage(enabled['outputToolUsage']),
     value = JSON['stringify']([list, enabled2, text, t('aigenText.result.images')]),
     el2 = nodeId['_textResultImagesElement'];
@@ -41,7 +41,7 @@ export function syncTextResultImages(nodeId) {
       (el8['loading'] = 'lazy'),
       (el8['decoding'] = 'async'),
       (el8['referrerPolicy'] = 'no-referrer'),
-      (el8['draggable'] = ![]));
+      (el8['draggable'] = false));
     const el9 = el3['createElement']('span');
     ((el9['className'] = 'aigen-text-image-load-error'),
       (el9['textContent'] = t('aigenText.result.imageLoadFailed')),
@@ -76,7 +76,7 @@ export function syncTextResultImages(nodeId) {
       el12['addEventListener']('click', async (event5) => {
         event5['stopPropagation']();
         if (el12['disabled']) return;
-        ((el12['disabled'] = !![]),
+        ((el12['disabled'] = true),
           (el12['textContent'] = t('aigenText.result.imageAdding')),
           (el13['textContent'] = ''));
         try {
@@ -86,7 +86,7 @@ export function syncTextResultImages(nodeId) {
           ((el12['textContent'] = t('aigenText.result.imageRetry')),
             (el13['textContent'] = error?.['message'] || t('aigenText.result.imageImportFailed')));
         } finally {
-          el12['disabled'] = ![];
+          el12['disabled'] = false;
         }
       }),
       item['append'](el7, el10, el11, el12, el13),

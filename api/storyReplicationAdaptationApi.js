@@ -16,11 +16,11 @@ export async function prepareStoryReplicationGenerationScript({
 } = {}) {
   const structuredOutput = {
       name: 'story_replication_adapted_script',
-      strict: !![],
+      strict: true,
       fallback: 'prompt',
       schema: {
         type: 'object',
-        additionalProperties: ![],
+        additionalProperties: false,
         required: ['title', 'fullScript'],
         properties: { title: { type: 'string' }, fullScript: { type: 'string', minLength: 1 } },
       },

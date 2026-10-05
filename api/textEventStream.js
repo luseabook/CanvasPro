@@ -9,16 +9,16 @@ export function visibleTextStreamContent(value) {
   }
   return list;
 }
-export function enableTextRequestStreaming(dom, item, key = ![]) {
-  if (typeof item !== 'function' && key !== !![]) return dom;
+export function enableTextRequestStreaming(dom, item, key = false) {
+  if (typeof item !== 'function' && key !== true) return dom;
   const index = String(dom?.['body']?.['apiUrl'] || dom?.['url'] || '');
   if (/:generateContent(?:\?|$)/u['test'](index) && Array['isArray'](dom['body']?.['contents'])) {
     const apiUrl = new URL(index['replace'](':generateContent', ':streamGenerateContent'));
     return (
       apiUrl['searchParams']['set']('alt', 'sse'),
       dom['isProxy']
-        ? { ...dom, textStream: !![], body: { ...dom['body'], apiUrl: apiUrl['href'] } }
-        : { ...dom, textStream: !![], url: apiUrl['href'] }
+        ? { ...dom, textStream: true, body: { ...dom['body'], apiUrl: apiUrl['href'] } }
+        : { ...dom, textStream: true, url: apiUrl['href'] }
     );
   }
   const result = String(dom?.['body']?.['apiUrl'] || dom?.['url'] || '')['split']('?')[0],
@@ -26,16 +26,16 @@ export function enableTextRequestStreaming(dom, item, key = ![]) {
       /(?:\/chat\/completions|\/responses|\/proxy\/completions)\/?$/u['test'](result) ||
       dom?.['url'] === '/api/v2/proxy/completions';
   if (
-    (typeof item !== 'function' && key !== !![]) ||
+    (typeof item !== 'function' && key !== true) ||
     !enabled ||
     !(Array['isArray'](dom['body']?.['messages']) || Array['isArray'](dom['body']?.['input']))
   )
     return dom;
-  return { ...dom, body: { ...dom['body'], stream: !![] } };
+  return { ...dom, body: { ...dom['body'], stream: true } };
 }
 export function shouldRetryWithoutTextStreaming(dom2, data, options) {
   return (
-    dom2?.['body']?.['stream'] === !![] &&
+    dom2?.['body']?.['stream'] === true &&
     [400, 422]['includes'](data) &&
     /\bstream(?:ing)?\b|流式/iu['test'](options) &&
     /not supported|unsupported|not available|must be false|不支持|不允许/iu['test'](options)
@@ -49,14 +49,14 @@ export async function readTextEventStream(
     timeoutMs: timeoutMs = null,
     firstChunkTimeoutMs: firstChunkTimeoutMs = null,
     idleTimeoutMs: idleTimeoutMs = null,
-    allowTruncatedOutput: allowTruncatedOutput = ![],
+    allowTruncatedOutput: allowTruncatedOutput = false,
   } = {},
 ) {
   const target = dom3['body']['getReader'](),
     textDecoder = new TextDecoder();
   let list2 = '',
     list3 = '',
-    enabled2 = ![],
+    enabled2 = false,
     finishReason = '',
     finalResponse = null;
   const textResponseDeadline = createTextResponseDeadline(target, {
@@ -72,7 +72,7 @@ export async function readTextEventStream(
       ['join']('\n');
     if (!enabled3['trim']()) return;
     if (enabled3['trim']() === '[DONE]') {
-      enabled2 = !![];
+      enabled2 = true;
       return;
     }
     const current = JSON['parse'](enabled3);
@@ -85,7 +85,7 @@ export async function readTextEventStream(
     const payload = current['candidates']?.['find']((enabled5) => !enabled5['index']);
     payload &&
       ((record = (payload['content']?.['parts'] || [])
-        ['filter']((handle) => handle['thought'] !== !![])
+        ['filter']((handle) => handle['thought'] !== true)
         ['map']((response) => (typeof response['text'] === 'string' ? response['text'] : ''))
         ['join']('')),
       (finalResponse = current));
@@ -104,7 +104,7 @@ export async function readTextEventStream(
         throw Object['assign'](new Error('回答未正常完成（' + finishReason + '），未提交不完整结果'), {
           type: 'OUTPUT_TRUNCATED',
         });
-      enabled2 = !![];
+      enabled2 = true;
     }
     if (current['promptFeedback']?.['blockReason'])
       throw new Error('回答被拦截（' + current['promptFeedback']['blockReason'] + '）');
@@ -114,17 +114,17 @@ export async function readTextEventStream(
         throw Object['assign'](new Error('回答未正常完成（' + finishReason + '），未提交不完整结果'), {
           type: 'OUTPUT_TRUNCATED',
         });
-      enabled2 = !![];
+      enabled2 = true;
     }
     if (current['type'] === 'response.incomplete') throw new Error('回答未完整结束，请重试或分段生成');
-    current['type'] === 'response.completed' && ((enabled2 = !![]), (finalResponse = current['response']));
+    current['type'] === 'response.completed' && ((enabled2 = true), (finalResponse = current['response']));
   }
   try {
-    while (!![]) {
+    while (true) {
       const { value: value2, done: done } = await target['read']();
       textResponseDeadline['check']();
       if (value2?.['length']) textResponseDeadline['activity']();
-      list2 += done ? textDecoder['decode']() : textDecoder['decode'](value2, { stream: !![] });
+      list2 += done ? textDecoder['decode']() : textDecoder['decode'](value2, { stream: true });
       let state;
       while ((state = /\r?\n\r?\n/u['exec'](list2))) {
         (run(list2['slice'](0, state['index'])),

@@ -30,12 +30,12 @@ async function yieldToMainThread(result) {
 async function readBoundedResponseBlob(dom, options, { signal: signal = null, url: url = '' } = {}) {
   const nowMs2 = nowMs();
   if (typeof dom['body']?.['getReader'] !== 'function') {
-    markLocalPlaybackProbe('body-read-start', { url: url, streamed: ![] });
+    markLocalPlaybackProbe('body-read-start', { url: url, streamed: false });
     const target = await dom['blob']();
     return (
       markLocalPlaybackProbe('body-read-end', {
         url: url,
-        streamed: ![],
+        streamed: false,
         blobSize: Number(target?.['size'] || 0),
         durationMs: nowMs() - nowMs2,
       }),
@@ -47,9 +47,9 @@ async function readBoundedResponseBlob(dom, options, { signal: signal = null, ur
   let totalBytes = 0,
     chunkCount = 0,
     yieldCount = 0;
-  markLocalPlaybackProbe('body-read-start', { url: url, streamed: !![] });
+  markLocalPlaybackProbe('body-read-start', { url: url, streamed: true });
   try {
-    while (!![]) {
+    while (true) {
       throwIfAborted(signal);
       const { done: done, value: value2 } = await source['read']();
       if (done) break;
@@ -98,7 +98,7 @@ async function readBoundedResponseBlob(dom, options, { signal: signal = null, ur
     }),
     markLocalPlaybackProbe('body-read-end', {
       url: url,
-      streamed: !![],
+      streamed: true,
       chunkCount: chunkCount,
       totalBytes: totalBytes,
       yieldCount: yieldCount,
@@ -138,7 +138,7 @@ export async function fetchLocalMediaPlaybackBlob(
           if (!signal3['signal']['aborted']) entry = 'aborted';
           signal3['abort']();
         }),
-        signal2['addEventListener']('abort', record, { once: !![] })));
+        signal2['addEventListener']('abort', record, { once: true })));
   try {
     const response = await fetch(url2, {
       method: 'GET',

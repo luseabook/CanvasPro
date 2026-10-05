@@ -1,6 +1,6 @@
 import { MATERIAL_TREE_CHEVRON_ICON_SVG } from '../../components/sharedIconMarkup.js';
 export function createCollaborationSelect(el, value) {
-  ((el['hidden'] = !![]), el['removeAttribute']('aria-label'));
+  ((el['hidden'] = true), el['removeAttribute']('aria-label'));
   const el2 = document['createElement']('div');
   el2['className'] = 'collaboration-select';
   const trigger = document['createElement']('button');
@@ -20,16 +20,16 @@ export function createCollaborationSelect(el, value) {
     trigger['setAttribute']('aria-controls', el5['id']),
     el['before'](el2),
     el2['append'](el, trigger, el5));
-  let enabled = ![],
+  let enabled = false,
     requestAnimationFrame2 = 0,
     item = '';
-  function close(enabled2 = ![]) {
+  function close(enabled2 = false) {
     if (!enabled) return;
-    ((enabled = ![]),
+    ((enabled = false),
       cancelAnimationFrame(requestAnimationFrame2),
       el5['hidePopover'](),
       trigger['setAttribute']('aria-expanded', 'false'),
-      document['removeEventListener']('pointerdown', run, !![]));
+      document['removeEventListener']('pointerdown', run, true));
     if (enabled2 && trigger['isConnected']) trigger['focus']();
   }
   function run(event) {
@@ -74,8 +74,8 @@ export function createCollaborationSelect(el, value) {
           el8['addEventListener']('click', () => {
             ((el['value'] = el7['value']),
               sync(),
-              close(!![]),
-              el['dispatchEvent'](new Event('change', { bubbles: !![] })));
+              close(true),
+              el['dispatchEvent'](new Event('change', { bubbles: true })));
           }),
           el5['append'](el8));
       }
@@ -88,20 +88,20 @@ export function createCollaborationSelect(el, value) {
   function open() {
     if (trigger['disabled']) return;
     (sync(),
-      (enabled = !![]),
+      (enabled = true),
       el5['showPopover'](),
       trigger['setAttribute']('aria-expanded', 'true'),
       run2(),
-      document['addEventListener']('pointerdown', run, !![]),
+      document['addEventListener']('pointerdown', run, true),
       (el5['querySelector']('[aria-selected="true"]') || el5['firstElementChild'])?.['focus']());
   }
   return (
-    trigger['addEventListener']('click', () => (enabled ? close(!![]) : open())),
+    trigger['addEventListener']('click', () => (enabled ? close(true) : open())),
     trigger['addEventListener']('keydown', (event2) => {
       ['ArrowDown', 'ArrowUp']['includes'](event2['key']) && (event2['preventDefault'](), open());
     }),
     el5['addEventListener']('keydown', (event3) => {
-      event3['key'] === 'Escape' && (event3['preventDefault'](), event3['stopPropagation'](), close(!![]));
+      event3['key'] === 'Escape' && (event3['preventDefault'](), event3['stopPropagation'](), close(true));
       if (event3['key'] === 'Tab') close();
       if (!['ArrowDown', 'ArrowUp', 'Home', 'End']['includes'](event3['key'])) return;
       event3['preventDefault']();

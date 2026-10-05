@@ -50,7 +50,7 @@ export function bindStoryReplicationReviewLayout(el, box) {
             ? list['length'] - 1
             : (list['indexOf'](args) + (event2['key'] === 'ArrowLeft' ? -1 : 1) + list['length']) %
               list['length'];
-    (list[options]['focus']({ preventScroll: !![] }), list[options]['click']());
+    (list[options]['focus']({ preventScroll: true }), list[options]['click']());
   }
   return (
     run('left', box['left']),

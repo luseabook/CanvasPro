@@ -76,8 +76,8 @@ export function createStoryReplicationReviewNavigation(el, enabled) {
         config === source ||
         !enabled['replication']['sourceAnalysis']['events']['some']((scope) => scope['id'] === config)
       )
-        return ![];
-      return ((source = config), sync(), !![]);
+        return false;
+      return ((source = config), sync(), true);
     },
     adjacent(input) {
       const list2 = enabled['replication']['sourceAnalysis']['events'];

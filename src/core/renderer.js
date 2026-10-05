@@ -172,7 +172,7 @@ const _wrapperMap = new Map(),
   _nodeTypeSnapshotMap = new Map(),
   _nodePinReasons = new Map(),
   MANIFEST_MODEL_NODE_TYPES = new Set(['ai-image', 'ai-text', 'ai-video', 'ai-audio']);
-let _rendererRuntimeDiagnosticRenderState = { previewOnly: ![], viewportBusy: ![] };
+let _rendererRuntimeDiagnosticRenderState = { previewOnly: false, viewportBusy: false };
 const _rendererRuntimeDiagnosticsEnabled = isRendererRuntimeDiagnosticsEnabled();
 installRendererRuntimeDiagnosticAccess((nodeId) => {
   const rendererMediaDeferred = _componentMap['get'](nodeId),
@@ -181,7 +181,7 @@ installRendererRuntimeDiagnosticAccess((nodeId) => {
     nodeId: nodeId,
     mounted: _mountedNodeIds['has'](nodeId),
     parked: _parkedNodeIds['has'](nodeId),
-    rendererMediaDeferred: rendererMediaDeferred?.['_rendererMediaDeferred'] === !![],
+    rendererMediaDeferred: rendererMediaDeferred?.['_rendererMediaDeferred'] === true,
     pinReasons: Array['from'](_nodePinReasons['get'](nodeId) || []),
     wrapperVideoCount: wrapperVideoCount?.['querySelectorAll']?.('video')?.['length'] || 0,
     ..._rendererRuntimeDiagnosticRenderState,
@@ -242,7 +242,7 @@ const _rendererMediaRuntimePreparer = createRendererMediaRuntimePreparer({
     onRasterHandoffFrame: _fastPreviewLayer['stageRasterHandoffFrame'],
     onRasterMediaClaimed: (config) => {
       _fastPreviewContinuation['excludeNodes'](config);
-      for (const scope of config) _fastPreviewLayer['removeNode'](scope, { collect: ![] });
+      for (const scope of config) _fastPreviewLayer['removeNode'](scope, { collect: false });
     },
     onMediaPresented: () => {
       if (_rendererInteractionGrace['isBusy']()) return;
@@ -250,10 +250,10 @@ const _rendererMediaRuntimePreparer = createRendererMediaRuntimePreparer({
     },
   });
 function _markRasterMediaInteractionBusy() {
-  (_rendererInteractionGrace['markBusy'](), _rasterPreviewCoordinator['setMediaLoadingBusy'](!![]));
+  (_rendererInteractionGrace['markBusy'](), _rasterPreviewCoordinator['setMediaLoadingBusy'](true));
 }
 function _releaseRasterMediaInteractionBusy() {
-  (_rasterPreviewCoordinator['setMediaLoadingBusy'](![]), _schedulePreparedMediaRuntimeCommit?.());
+  (_rasterPreviewCoordinator['setMediaLoadingBusy'](false), _schedulePreparedMediaRuntimeCommit?.());
 }
 const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 2,
   RENDERER_VIDEO_MEDIA_RESIDENCY_PADDING = 120,
@@ -271,12 +271,12 @@ const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 2,
     getParkedWrappers: () => _parkedWrapperMap['values'](),
     isMounted: (value4) => _mountedNodeIds['has'](value4),
     isInteractionBusy: _rendererInteractionGrace['isBusy'],
-    isPinned: (value5) => _getNodePinSet(value5, ![])?.['size'] > 0,
+    isPinned: (value5) => _getNodePinSet(value5, false)?.['size'] > 0,
     isSelected: (value6) => {
       const list = _currentSnapshot?.['selectedNodeIds'];
       return Array['isArray'](list)
         ? list['includes'](value6)
-        : list?.['has']?.(value6) === !![];
+        : list?.['has']?.(value6) === true;
     },
     preview: _fastPreviewLayer,
     previewRelease: _fastPreviewRelease,
@@ -292,7 +292,7 @@ const RENDERER_DEFERRED_MEDIA_HYDRATION_BATCH_SIZE = 2,
           recordRendererRuntimeDiagnostic({
             kind: 'video-media-suspend',
             reason: 'park',
-            suspended: !![],
+            suspended: true,
             ...args3,
           })
       : null,
@@ -333,7 +333,7 @@ const SELECTION_RELATED_HIGHLIGHT_COLORS = Object['freeze']([
   'yellow',
 ]);
 function cancelStaleLowPriorityPreloadsForHighZoom(value7) {
-  if (value7 !== !![]) return;
+  if (value7 !== true) return;
   const value8 =
     typeof performance !== 'undefined' && performance && typeof performance['now'] === 'function'
       ? performance['now']()
@@ -345,18 +345,18 @@ function cancelStaleLowPriorityPreloadsForHighZoom(value7) {
     return;
   ((_lastHighZoomStalePreloadCancelAt = value8),
     cancelCanvasVisibleMediaWarmupPreloads({
-      includeActive: ![],
+      includeActive: false,
       belowPriority: HIGH_ZOOM_STALE_WARMUP_PRELOAD_CANCEL_PRIORITY_LIMIT,
       reason: 'high zoom viewport media priority',
     }),
     cancelRendererFastPreviewMediaPreloads({
-      includeActive: ![],
+      includeActive: false,
       belowPriority: HIGH_ZOOM_STALE_FAST_PREVIEW_PRELOAD_CANCEL_PRIORITY_LIMIT,
       reason: 'high zoom viewport media priority',
     }));
 }
 function cancelQueuedViewportInteractionPreloads(value9) {
-  if (value9 !== !![]) return;
+  if (value9 !== true) return;
   const value10 =
     typeof performance !== 'undefined' && performance && typeof performance['now'] === 'function'
       ? performance['now']()
@@ -368,12 +368,12 @@ function cancelQueuedViewportInteractionPreloads(value9) {
     return;
   ((_lastViewportInteractionPreloadCancelAt = value10),
     cancelCanvasVisibleMediaWarmupPreloads({
-      includeActive: ![],
+      includeActive: false,
       belowPriority: VIEWPORT_INTERACTION_WARMUP_CANCEL_PRIORITY_LIMIT,
       reason: 'viewport interaction',
     }),
     cancelRendererFastPreviewMediaPreloads({
-      includeActive: ![],
+      includeActive: false,
       belowPriority: VIEWPORT_INTERACTION_FAST_PREVIEW_CANCEL_PRIORITY_LIMIT,
       reason: 'viewport interaction',
     }));
@@ -388,9 +388,9 @@ function isViewportPriorityImageNode({
   isSelected: isSelected,
   isSelectionRelated: isSelectionRelated,
 } = {}) {
-  if (!nodeId4 || !isNodeType(node, ['source-image', 'ai-image'])) return ![];
-  if (!mountCandidateIds?.['has']?.(nodeId4)) return ![];
-  if (isSelected || isSelectionRelated) return !![];
+  if (!nodeId4 || !isNodeType(node, ['source-image', 'ai-image'])) return false;
+  if (!mountCandidateIds?.['has']?.(nodeId4)) return false;
+  if (isSelected || isSelectionRelated) return true;
   return _isNodeVisible(node, viewport, containerW, containerH);
 }
 function isRendererMediaRuntimeInteractionPriority({
@@ -401,7 +401,7 @@ function isRendererMediaRuntimeInteractionPriority({
   connOverlay: connOverlay,
   pickMode: pickMode,
 } = {}) {
-  if (!nodeId5) return ![];
+  if (!nodeId5) return false;
   return !!(
     isSelected2 ||
     isSelectionRelated2 ||
@@ -419,14 +419,14 @@ let _edgeIndexRev = -1,
   _cachedContainerWidth = null,
   _cachedContainerHeight = null,
   _lastFullEdgeRenderSignature = '',
-  _edgeDomClearedSinceLastFull = ![],
+  _edgeDomClearedSinceLastFull = false,
   _lastVirtualCandidateSignature = '',
   _lastVirtualCandidateResult = null,
   _containerSizeSourceEl = null,
   _containerResizeObserver = null,
   _containerResizeHandler = null,
   _currentSnapshot = null;
-function _getNodePinSet(value11, value12 = ![]) {
+function _getNodePinSet(value11, value12 = false) {
   let enabled = _nodePinReasons['get'](value11);
   return (
     !enabled && value12 && ((enabled = new Set()), _nodePinReasons['set'](value11, enabled)),
@@ -463,9 +463,9 @@ function _parkNode(value21) {
   (_mediaPresentation['forgetHydration'](value21), _nodeTimerController['hideNode'](value21));
   el['isConnected'] && el['remove']();
   const value22 = _componentMap['get'](value21);
-  let retainPresentedMedia = ![];
+  let retainPresentedMedia = false;
   try {
-    retainPresentedMedia = value22?.['hasPresentedRendererMedia']?.() === !![];
+    retainPresentedMedia = value22?.['hasPresentedRendererMedia']?.() === true;
   } catch {}
   return (
     _videoMediaResidency['park'](value21, {
@@ -543,15 +543,15 @@ function _syncRendererBridge() {
     excludeRasterPreviewNode: _rasterPreviewCoordinator['excludeNode'],
     syncFastPreviewDragProxy: _fastPreviewLayer['syncNodeDragPreview'],
     releaseFastPreviewForPlayback(enabled4) {
-      if (!enabled4) return ![];
-      if (_sourceVideoSlotLifecycle['isManagedNode'](enabled4)) return ![];
-      const enabled5 = _fastPreviewLayer['releaseNode'](enabled4) === !![];
-      if (!enabled5) return ![];
+      if (!enabled4) return false;
+      if (_sourceVideoSlotLifecycle['isManagedNode'](enabled4)) return false;
+      const enabled5 = _fastPreviewLayer['releaseNode'](enabled4) === true;
+      if (!enabled5) return false;
       const el6 = _wrapperMap['get'](enabled4);
       return (
         el6?.['dataset'] && (el6['dataset']['fastPreviewReleasedForPlayback'] = '1'),
         _fastPreviewRelease['forget'](enabled4),
-        !![]
+        true
       );
     },
     prepareMediaSlotSource(value26, value27, value28 = {}) {
@@ -560,7 +560,7 @@ function _syncRendererBridge() {
     reportMediaSlotFrame: _sourceVideoSlotLifecycle['reportFrame'],
     pinNode(nodeId6, value29 = 'src/ui/') {
       if (!nodeId6) return;
-      const _getNodePinSet2 = _getNodePinSet(nodeId6, !![]);
+      const _getNodePinSet2 = _getNodePinSet(nodeId6, true);
       (_getNodePinSet2['add'](String(value29 || 'src/ui/')),
         _rendererRuntimeDiagnosticsEnabled &&
           recordRendererRuntimeDiagnostic({
@@ -572,7 +572,7 @@ function _syncRendererBridge() {
     },
     unpinNode(nodeId7, value30 = 'src/ui/') {
       if (!nodeId7) return;
-      const map = _getNodePinSet(nodeId7, ![]);
+      const map = _getNodePinSet(nodeId7, false);
       if (!map) return;
       (map['delete'](String(value30 || 'src/ui/')),
         map['size'] === 0 &&
@@ -684,7 +684,7 @@ function _getCachedContainerSize(value54 = _containerSizeSourceEl, timer = {}) {
   const value55 = value54 || _containerSizeSourceEl || null,
     enabled14 = typeof ResizeObserver === 'function' && !!_containerResizeObserver,
     value56 =
-      timer?.['refresh'] === !![] ||
+      timer?.['refresh'] === true ||
       !_hasCachedContainerSize() ||
       !enabled14 ||
       (value55 && _containerSizeSourceEl && value55 !== _containerSizeSourceEl);
@@ -701,8 +701,8 @@ function _getEdgeContainerSize(value57) {
     layoutReadMs: Math['max'](0, _nowMs3 - _nowMs2),
   };
 }
-function _invalidateFullEdgeRenderSignature({ clearedDom: clearedDom = ![] } = {}) {
-  ((_lastFullEdgeRenderSignature = ''), clearedDom && (_edgeDomClearedSinceLastFull = !![]));
+function _invalidateFullEdgeRenderSignature({ clearedDom: clearedDom = false } = {}) {
+  ((_lastFullEdgeRenderSignature = ''), clearedDom && (_edgeDomClearedSinceLastFull = true));
 }
 function _notifyVirtualizationProbe(value58) {
   const enabled15 = typeof window !== 'undefined' ? window['__rendererVirtualizationProbe'] : null;
@@ -762,7 +762,7 @@ export function clearRendererCache() {
     (_cachedContainerWidth = null),
     (_cachedContainerHeight = null),
     (_lastFullEdgeRenderSignature = ''),
-    (_edgeDomClearedSinceLastFull = ![]),
+    (_edgeDomClearedSinceLastFull = false),
     (_lastVirtualCandidateSignature = ''),
     (_lastVirtualCandidateResult = null),
     _fastPreviewContinuation['reset'](),
@@ -810,7 +810,7 @@ function _isNodeVisible(value71, value72, value73, value74, value75 = 0, value76
   return isNodeInsideViewportPadding(value71, value72, value73, value74, 200, value75, value76);
 }
 function _renderCullingOnly(value77, value78, value79, value80 = {}) {
-  const enabled19 = value80?.['hideInvisible'] !== ![],
+  const enabled19 = value80?.['hideInvisible'] !== false,
     { width: width, height: height } = _getCachedContainerSize(
       value77['parentElement'] || value77,
     );
@@ -881,13 +881,13 @@ export function initRenderer(containerEl, canvasEl, value82) {
   let count = 0,
     setTimeout2 = null,
     requestAnimationFrame2 = null,
-    value91 = !![],
-    enabled21 = ![],
+    value91 = true,
+    enabled21 = false,
     value92 = null;
   function run4(enabled22, enabled23, mode, framePlan) {
     if (!enabled22 || !enabled23) return null;
     const value93 =
-      enabled22['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+      enabled22['ui']?.['selectionRelatedHighlightEnabled'] === false
         ? { relatedNodeIds: new Set() }
         : _buildSelectionRelatedSets(enabled22['selectedNodeIds'], enabled22['edges']);
     return _renderNodes(
@@ -901,9 +901,9 @@ export function initRenderer(containerEl, canvasEl, value82) {
       enabled23,
       enabled22['edges'],
       enabled22['_parentToChildren'],
-      enabled22['ui']?.['showVideoMeta'] === !![],
+      enabled22['ui']?.['showVideoMeta'] === true,
       enabled22,
-      { deferParking: !![], mode: mode, viewportPriorityMediaOnly: !![], framePlan: framePlan },
+      { deferParking: true, mode: mode, viewportPriorityMediaOnly: true, framePlan: framePlan },
     );
   }
   function run2() {
@@ -912,7 +912,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
   }
   function scheduleDeferredReconcile(
     value94 = RENDERER_VIRTUALIZATION_CONFIG['settleDelayMs'],
-    { bypassInteractionGrace: bypassInteractionGrace = ![], edgeOnlySnapshot: edgeOnlySnapshot = null } = {},
+    { bypassInteractionGrace: bypassInteractionGrace = false, edgeOnlySnapshot: edgeOnlySnapshot = null } = {},
   ) {
     run2();
     if (!hasPendingRender['isActive']()) return;
@@ -963,7 +963,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       consumeViewport: (value97) => _viewportJumpDetector['consume'](value97),
       flushSelectionUpdate: (value98, value99) => run5(value98, value99),
       renderAffectedEdges: (value100, pathStyle, value101) => {
-        if (value100['size'] === 0 || pathStyle['ui']?.['connectionLinesVisible'] === ![]) return;
+        if (value100['size'] === 0 || pathStyle['ui']?.['connectionLinesVisible'] === false) return;
         _renderEdgesByIds(
           svgEl,
           value100,
@@ -1012,7 +1012,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
         { pathStyle: pathStyle2['ui']?.['connectionLineStyle'] },
       ),
   );
-  function run6(viewport2, renderMode = 'steady', framePlan2, { skipNodes: skipNodes = ![] } = {}) {
+  function run6(viewport2, renderMode = 'steady', framePlan2, { skipNodes: skipNodes = false } = {}) {
     const nodeCount = Number['isFinite'](framePlan2?.['nodeCount'])
         ? framePlan2['nodeCount']
         : typeof viewport2['_nodeCount'] === 'number'
@@ -1038,7 +1038,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       _cleanupEdges(svgEl, viewport2['edges']));
     _ensureEdgeIndex(viewport2['edges'], edgesRev);
     const relatedEdgeIds2 =
-        viewport2['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+        viewport2['ui']?.['selectionRelatedHighlightEnabled'] === false
           ? { relatedNodeIds: new Set(), relatedEdgeIds: new Set() }
           : _buildSelectionRelatedSets(viewport2['selectedNodeIds'], viewport2['edges']),
       _normalizeSelectionRelatedHighlightColor2 = _normalizeSelectionRelatedHighlightColor(
@@ -1049,9 +1049,9 @@ export function initRenderer(containerEl, canvasEl, value82) {
         remainingMs: remainingMs,
         viewport: viewport2['viewport'],
         nodeCount: nodeCount,
-        hasPriorityMediaWork: ![],
+        hasPriorityMediaWork: false,
       }),
-      hasPriorityMediaWork = framePlan2?.['hasPriorityMediaWork']?.({ needed: needed }) === !![],
+      hasPriorityMediaWork = framePlan2?.['hasPriorityMediaWork']?.({ needed: needed }) === true,
       deferHeavyMediaMount = shouldDeferHeavyMediaForInteractionGrace({
         remainingMs: remainingMs,
         viewport: viewport2['viewport'],
@@ -1061,7 +1061,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       value108 = viewport2['edges'] || {},
       edgeEntries = _getEdgeEntries(value108, edgesRev),
       edgeCount = edgeEntries['length'],
-      connectionLinesVisible = viewport2['ui']?.['connectionLinesVisible'] !== ![],
+      connectionLinesVisible = viewport2['ui']?.['connectionLinesVisible'] !== false,
       deferInitialRasterPlanning = shouldDeferDenseStructuralEdgeRender({
         renderMode: renderMode,
         nodeStructureChanged: nodeStructureChanged,
@@ -1071,19 +1071,19 @@ export function initRenderer(containerEl, canvasEl, value82) {
         connectionLinesVisible: connectionLinesVisible,
       }),
       deferDenseStructuralEdgeRender = deferInitialRasterPlanning || enabled21;
-    if (deferInitialRasterPlanning) enabled21 = !![];
-    else enabled21 && (enabled21 = ![]);
+    if (deferInitialRasterPlanning) enabled21 = true;
+    else enabled21 && (enabled21 = false);
     const {
         hasPendingStructuralOps: hasPendingStructuralOps,
         deferredParkCount: deferredParkCount = 0,
-        hasPendingVisibleVideoMounts: hasPendingVisibleVideoMounts = ![],
-        hasPendingFullEligibleVisibleImageMounts: hasPendingFullEligibleVisibleImageMounts = ![],
+        hasPendingVisibleVideoMounts: hasPendingVisibleVideoMounts = false,
+        hasPendingFullEligibleVisibleImageMounts: hasPendingFullEligibleVisibleImageMounts = false,
       } = value107
         ? {
-            hasPendingStructuralOps: ![],
+            hasPendingStructuralOps: false,
             deferredParkCount: 0,
-            hasPendingVisibleVideoMounts: ![],
-            hasPendingFullEligibleVisibleImageMounts: ![],
+            hasPendingVisibleVideoMounts: false,
+            hasPendingFullEligibleVisibleImageMounts: false,
           }
         : _renderNodes(
             canvasEl,
@@ -1098,7 +1098,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
             viewport2['_parentToChildren'],
             viewport2['ui'] && typeof viewport2['ui']['showVideoMeta'] === 'boolean'
               ? viewport2['ui']['showVideoMeta']
-              : ![],
+              : false,
             viewport2,
             {
               mode: renderMode,
@@ -1148,7 +1148,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
         cachedEdgeVisibilityIndex
       );
     }
-    function run7(enabled24 = ![]) {
+    function run7(enabled24 = false) {
       !containerW2 && (containerW2 = _getEdgeContainerSize(containerEl));
       const renderSignature = buildFullEdgeRenderSignature({
         edgeEntries: edgeEntries,
@@ -1184,7 +1184,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       else {
         if (edgesRevChanged) {
           if (edgesRevChanged) _ensureEdgeIndex(viewport2['edges'], edgesRev);
-          const args4 = run7(!![]);
+          const args4 = run7(true);
           _renderEdges(
             svgEl,
             value108,
@@ -1221,7 +1221,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
               );
             else {
               if (!enabled25 || enabled25['size'] === 0) {
-                const args5 = run7(![]);
+                const args5 = run7(false);
                 args5 &&
                   _renderEdges(
                     svgEl,
@@ -1238,7 +1238,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
               }
             }
           } else {
-            const args6 = run7(![]);
+            const args6 = run7(false);
             args6 &&
               _renderEdges(
                 svgEl,
@@ -1267,7 +1267,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
         hasPendingStructuralOps: hasPendingStructuralOps,
       });
       ((value92 = edgeOnlySnapshot2 ? viewport2 : null),
-        scheduleDeferredReconcile(0, { bypassInteractionGrace: !![], edgeOnlySnapshot: edgeOnlySnapshot2 ? viewport2 : null }));
+        scheduleDeferredReconcile(0, { bypassInteractionGrace: true, edgeOnlySnapshot: edgeOnlySnapshot2 ? viewport2 : null }));
     } else {
       if (hasPendingStructuralOps) {
         const rendererLowZoomMountLimit =
@@ -1283,13 +1283,13 @@ export function initRenderer(containerEl, canvasEl, value82) {
                   ? 360
                   : 96,
           ),
-          { bypassInteractionGrace: hasPendingFullEligibleVisibleImageMounts === !![] },
+          { bypassInteractionGrace: hasPendingFullEligibleVisibleImageMounts === true },
         );
       } else remainingMs > 0 && scheduleDeferredReconcile(remainingMs + 16);
     }
     rendererSelectionFastPath['rememberRenderedSnapshot'](viewport2);
   }
-  function run(snapshot, { skipNodesForDenseEdgeFollowup: skipNodesForDenseEdgeFollowup = ![] } = {}) {
+  function run(snapshot, { skipNodesForDenseEdgeFollowup: skipNodesForDenseEdgeFollowup = false } = {}) {
     if (!snapshot || !hasPendingRender['isActive']()) return;
     const isPerfProbeEnabled2 = isPerfProbeEnabled(),
       value112 =
@@ -1303,7 +1303,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
         viewportInteractionState = readViewportInteractionState({ interactionState: interactionState }),
         interactionActive =
           viewportPanPreview && !viewportInteractionState['isViewportBusy']
-            ? readViewportInteractionState({ interactionState: interactionState, panPreviewActive: !![] })
+            ? readViewportInteractionState({ interactionState: interactionState, panPreviewActive: true })
             : viewportInteractionState,
         nodeCount2 =
           typeof snapshot['_nodeCount'] === 'number'
@@ -1312,7 +1312,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
         value113 = run3(snapshot, nodeCount2),
         value114 = typeof snapshot['_edgesRev'] === 'number' ? snapshot['_edgesRev'] : 0,
         value115 =
-          (interactionState['isDragging'] || interactionState['isDraggingCell']) && interactionState['isCommittingDrag'] !== !![],
+          (interactionState['isDragging'] || interactionState['isDraggingCell']) && interactionState['isCommittingDrag'] !== true,
         enabled27 = nodeCount2 !== value86 || value113 !== value87,
         enabled28 = value115 && (enabled27 || value114 !== value88),
         value116 = !interactionActive['isViewportBusy'] && _viewportJumpDetector['consume'](snapshot['viewport']);
@@ -1332,15 +1332,15 @@ export function initRenderer(containerEl, canvasEl, value82) {
           );
         },
         value118 =
-          interactionActive['isViewportBusy'] !== !![] &&
-          value116 !== !![] &&
+          interactionActive['isViewportBusy'] !== true &&
+          value116 !== true &&
           shouldPauseViewportMediaForInteractionGrace({
             remainingMs: remainingMs2,
             viewport: snapshot['viewport'],
             nodeCount: nodeCount2,
-            hasPriorityMediaWork: ![],
+            hasPriorityMediaWork: false,
           }),
-        hasPriorityMediaWork2 = value118 ? run8()['hasPriorityMediaWork']() : ![],
+        hasPriorityMediaWork2 = value118 ? run8()['hasPriorityMediaWork']() : false,
         value119 =
           interactionActive['isViewportBusy'] ||
           value116 ||
@@ -1357,7 +1357,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
           hasPriorityMediaWork: hasPriorityMediaWork2,
         }),
         viewportInteractionReconcileDelay = resolveViewportInteractionReconcileDelay({ hasPriorityMediaWork: hasPriorityMediaWork2 });
-      renderViewport(canvasEl, viewport3, snapshot['ui']?.['titleFollowsCanvasZoom'] === !![]);
+      renderViewport(canvasEl, viewport3, snapshot['ui']?.['titleFollowsCanvasZoom'] === true);
       if (interactionActive['isViewportAnimating']) {
         (_rendererInteractionGrace['markBusy'](),
           (mode2 = shouldHydratePriorityMediaDuringViewportInteraction2 ? 'viewport-animating-priority-media' : 'viewport-animating'));
@@ -1430,14 +1430,14 @@ export function initRenderer(containerEl, canvasEl, value82) {
     }
   }
   function flushNode(enabled29) {
-    if (!enabled29 || !hasPendingRender['isActive']()) return ![];
+    if (!enabled29 || !hasPendingRender['isActive']()) return false;
     const pickMode2 = _currentSnapshot,
       node2 = pickMode2?.['nodes']?.[enabled29];
-    if (!node2) return ![];
+    if (!node2) return false;
     const enabled30 = _componentMap['get'](enabled29),
       el13 = _wrapperMap['get'](enabled29);
-    if (!enabled30 || typeof enabled30['update'] !== 'function') return ![];
-    if (!_mountedNodeIds['has'](enabled29) || !el13?.['isConnected']) return ![];
+    if (!enabled30 || typeof enabled30['update'] !== 'function') return false;
+    if (!_mountedNodeIds['has'](enabled29) || !el13?.['isConnected']) return false;
     const map4 = new Set(pickMode2['selectedNodeIds'] || []),
       isSelected3 = map4['has'](enabled29),
       map5 = _buildSelectionRelatedSets(map4, pickMode2['edges'] || {})['relatedNodeIds'],
@@ -1450,7 +1450,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
         pickMode: pickMode2['pickConnectMode'],
         isSelected: isSelected3,
         isSelectionRelated: isSelectionRelated3,
-        showVideoMeta: pickMode2['ui']?.['showVideoMeta'] === !![],
+        showVideoMeta: pickMode2['ui']?.['showVideoMeta'] === true,
         viewport: pickMode2['viewport'],
         mediaLodMode: mediaLodMode2,
       });
@@ -1458,24 +1458,24 @@ export function initRenderer(containerEl, canvasEl, value82) {
       _pendingNodeDataMap['delete'](enabled29),
       _nodeDataSnapshotMap['set'](enabled29, rendererNodeSignature),
       enabled30['update'](node2),
-      !![]
+      true
     );
   }
   function flushNodes(value121) {
     const list4 = Array['isArray'](value121) ? value121 : [value121];
-    let value122 = ![];
+    let value122 = false;
     for (const value123 of new Set(list4['filter'](Boolean))) {
       value122 = flushNode(value123) || value122;
     }
     return value122;
   }
   function flushSelection(value124, value125 = {}) {
-    if (!hasPendingRender['isActive']()) return ![];
-    if (value125?.['settleInteraction'] === !![]) {
+    if (!hasPendingRender['isActive']()) return false;
+    if (value125?.['settleInteraction'] === true) {
       const edges = _currentSnapshot;
-      if (edges && edges['ui']?.['connectionLinesVisible'] !== ![]) {
+      if (edges && edges['ui']?.['connectionLinesVisible'] !== false) {
         const relatedEdgeIds3 =
-            edges['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+            edges['ui']?.['selectionRelatedHighlightEnabled'] === false
               ? { relatedEdgeIds: new Set() }
               : _buildSelectionRelatedSets(edges['selectedNodeIds'] || [], edges['edges'] || {}),
           value126 = _edgeLayer['settleDynamicEdges']({
@@ -1493,18 +1493,18 @@ export function initRenderer(containerEl, canvasEl, value82) {
     }
     if (
       rendererSelectionFastPath['flushSelectionOnlySnapshot'](_currentSnapshot, {
-        allowPendingRaf: !![],
-        cancelPendingRaf: !![],
+        allowPendingRaf: true,
+        cancelPendingRaf: true,
       })
     )
-      return !![];
+      return true;
     return run5(value124);
   }
   function run5(enabled31, skipInstanceUpdate2 = {}) {
-    if (!enabled31) return ![];
+    if (!enabled31) return false;
     const parentToChildren = _currentSnapshot,
       enabled32 = parentToChildren?.['nodes'] || {};
-    if (!parentToChildren || !enabled32) return ![];
+    if (!parentToChildren || !enabled32) return false;
     const list5 = Array['isArray'](enabled31) ? enabled31 : [enabled31],
       value127 = Array['isArray'](parentToChildren['selectedNodeIds']) ? parentToChildren['selectedNodeIds'] : [],
       selectedNodeSet = new Set(value127),
@@ -1513,7 +1513,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
       value129 = typeof parentToChildren['_edgesRev'] === 'number' ? parentToChildren['_edgesRev'] : 0;
     _ensureEdgeIndex(value128, value129);
     const value130 =
-        parentToChildren['ui']?.['selectionRelatedHighlightEnabled'] === ![]
+        parentToChildren['ui']?.['selectionRelatedHighlightEnabled'] === false
           ? { relatedNodeIds: new Set() }
           : _buildSelectionRelatedSets(selectedNodeSet, value128),
       relatedNodeIds2 = value130['relatedNodeIds'] || new Set(),
@@ -1533,8 +1533,8 @@ export function initRenderer(containerEl, canvasEl, value82) {
       showVideoMeta =
         parentToChildren['ui'] && typeof parentToChildren['ui']['showVideoMeta'] === 'boolean'
           ? parentToChildren['ui']['showVideoMeta']
-          : ![];
-    let value131 = ![];
+          : false;
+    let value131 = false;
     for (const nodeId8 of new Set(list5['filter'](Boolean))) {
       const node3 = enabled32[nodeId8],
         wrapperEl = _wrapperMap['get'](nodeId8);
@@ -1572,7 +1572,7 @@ export function initRenderer(containerEl, canvasEl, value82) {
         inEdgeSig: inEdgeSig2,
         signature: signature,
         mediaLodMode: mediaLodMode3,
-        skipInstanceUpdate: skipInstanceUpdate2?.['skipInstanceUpdate'] !== ![],
+        skipInstanceUpdate: skipInstanceUpdate2?.['skipInstanceUpdate'] !== false,
       });
       if (
         shouldHydrateVideoMediaImmediately({
@@ -1585,11 +1585,11 @@ export function initRenderer(containerEl, canvasEl, value82) {
           pickMode: parentToChildren['pickConnectMode'],
         })
       ) {
-        if (_componentMap['get'](nodeId8)?.['_rendererMediaDeferred'] === !![])
+        if (_componentMap['get'](nodeId8)?.['_rendererMediaDeferred'] === true)
           _videoHydrationBackpressure['markPriorityWork']();
         _rendererDeferredMedia['hydrateNow'](nodeId8);
       }
-      value131 = !![];
+      value131 = true;
     }
     return value131;
   }
@@ -1788,14 +1788,14 @@ function _syncMountedNodePresentation({
   inEdgeSig: inEdgeSig3,
   signature: signature3,
   mediaLodMode: mediaLodMode = null,
-  skipInstanceUpdate: skipInstanceUpdate = ![],
-  deferInstanceUpdate: deferInstanceUpdate = ![],
-  mountedThisFrame: mountedThisFrame = ![],
+  skipInstanceUpdate: skipInstanceUpdate = false,
+  deferInstanceUpdate: deferInstanceUpdate = false,
+  mountedThisFrame: mountedThisFrame = false,
   lifecycleStats: lifecycleStats = null,
-  allowActiveDetailHydration: allowActiveDetailHydration = !![],
+  allowActiveDetailHydration: allowActiveDetailHydration = true,
 }) {
-  let deferredUpdate = ![],
-    didUpdate = ![];
+  let deferredUpdate = false,
+    didUpdate = false;
   const value158 =
       node6['x'] + ',' + node6['y'] + ',' + node6['width'] + ',' + node6['height'],
     positionChanged = wrapperEl2['_posKey'] !== value158,
@@ -1816,7 +1816,7 @@ function _syncMountedNodePresentation({
     positionChanged: positionChanged,
   });
   isNodeType(node6, ['source-video', 'ai-video']) && _ensureVideoMetaEl(wrapperEl2, nodeId10);
-  const value160 = dragContext3['isDragging'] === !![] && dragTargets4?.['has']?.(nodeId10) === !![];
+  const value160 = dragContext3['isDragging'] === true && dragTargets4?.['has']?.(nodeId10) === true;
   value160 ? wrapperEl2['classList']['add']('is-dragging') : wrapperEl2['classList']['remove']('is-dragging');
   value160 && (dragContext3['hasMoved'] || !dragContext3['wasSelectedOnDown'])
     ? wrapperEl2['classList']['add']('is-ui-hidden')
@@ -1826,7 +1826,7 @@ function _syncMountedNodePresentation({
   if (!visible2) {
     value159 &&
       typeof value159['syncSelectionState'] === 'function' &&
-      value159['syncSelectionState']({ selected: ![], singleSelected: ![], visible: ![] });
+      value159['syncSelectionState']({ selected: false, singleSelected: false, visible: false });
     _nodeTimerController['hideNode'](nodeId10);
     wrapperEl2['style']['display'] !== 'none' && (wrapperEl2['style']['display'] = 'none');
     if (
@@ -1847,7 +1847,7 @@ function _syncMountedNodePresentation({
         _nodeDataSnapshotMap['set'](nodeId10, signature3);
         const value161 = lifecycleStats ? _nowMs() : 0;
         (value159['update'](node6),
-          (didUpdate = !![]),
+          (didUpdate = true),
           lifecycleStats &&
             recordRendererLifecycleDuration(
               lifecycleStats,
@@ -1889,7 +1889,7 @@ function _syncMountedNodePresentation({
     _nodeDataSnapshotMap['get'](nodeId10) === signature3 &&
     wrapperEl2['_presentationStableKey'] === _buildNodePresentationStableKey2
   )
-    return { deferredUpdate: ![], didUpdate: ![] };
+    return { deferredUpdate: false, didUpdate: false };
   ((wrapperEl2['_presentationStableKey'] = _buildNodePresentationStableKey2), syncNodeMediaMetricsDataset(wrapperEl2, node6));
   const shouldForceDeferActiveNodeDetails2 = shouldForceDeferActiveNodeDetails({
       nodeId: nodeId10,
@@ -1916,7 +1916,7 @@ function _syncMountedNodePresentation({
     }
   }
   if (
-    allowActiveDetailHydration !== ![] &&
+    allowActiveDetailHydration !== false &&
     !shouldForceDeferActiveNodeDetails2 &&
     _nodeDetailHydration['isNodeDetailActive']({
       node: node6,
@@ -1939,7 +1939,7 @@ function _syncMountedNodePresentation({
     value159['syncSelectionState']({
       selected: isSelected6,
       singleSelected: selectedNodeSet3['size'] === 1,
-      visible: !![],
+      visible: true,
     });
   const rendererNodeZIndex = getRendererNodeZIndex(node6, isSelected6, selectedNodeRankMap3?.['get']?.(nodeId10) ?? -1, {
     isFocused: focused2,
@@ -2020,11 +2020,11 @@ function _syncMountedNodePresentation({
     if (skipInstanceUpdate) _nodeDataSnapshotMap['set'](nodeId10, signature3);
     else
       deferInstanceUpdate
-        ? ((deferredUpdate = !![]), recordRendererLifecycleSkippedUpdate(lifecycleStats))
+        ? ((deferredUpdate = true), recordRendererLifecycleSkippedUpdate(lifecycleStats))
         : _nodeDataSnapshotMap['set'](nodeId10, signature3);
     if (!skipInstanceUpdate && !deferInstanceUpdate) {
       const value171 = lifecycleStats ? _nowMs() : 0;
-      (value159['update'](node6), (didUpdate = !![]));
+      (value159['update'](node6), (didUpdate = true));
       if (lifecycleStats) {
         const breakdown = value159?.['_lastUpdatePerfBreakdown'] || null;
         recordRendererLifecycleDuration(
@@ -2058,9 +2058,9 @@ function _syncMountedNodePresentation({
       if (isNaN(count2) || count2 <= 0) count2 = 16;
       wrapperEl2['style']['setProperty']('--hover-br', count2 + 4 + 'px');
     }
-    let value175 = ![];
-    if (connOverlay3 && connOverlay3['side'] === 'left') value175 = !![];
-    else value173 && pickMode4 && pickMode4['handleDirection'] === 'left' && (value175 = !![]);
+    let value175 = false;
+    if (connOverlay3 && connOverlay3['side'] === 'left') value175 = true;
+    else value173 && pickMode4 && pickMode4['handleDirection'] === 'left' && (value175 = true);
     value175
       ? (wrapperEl2['classList']['add']('conn-hover-output'),
         wrapperEl2['classList']['remove']('conn-hover-input'))
@@ -2094,8 +2094,8 @@ function _renderNodesImpl(
     viewport6 = value177 || { x: 0, y: 0, zoom: 1 },
     value181 = value178 || {},
     parentToChildren2 = value179 || {},
-    showVideoMeta4 = value180 !== ![],
-    value182 = interactionBusy?.['deferParking'] === !![],
+    showVideoMeta4 = value180 !== false,
+    value182 = interactionBusy?.['deferParking'] === true,
     dragContext4 = getInteractionRenderState(),
     selectedNodeSet4 = selectedNodeIds instanceof Set ? selectedNodeIds : new Set(selectedNodeIds || []),
     selectedNodeRankMap4 = buildSelectedNodeRankMap(selectedNodeIds),
@@ -2123,7 +2123,7 @@ function _renderNodesImpl(
       : Number['isFinite'](snapshot2?.['_persistRev'])
         ? snapshot2['_persistRev']
         : null,
-    enabled36 = interactionBusy?.['deferInitialRasterPlanning'] === !![],
+    enabled36 = interactionBusy?.['deferInitialRasterPlanning'] === true,
     pinnedNodeIds = _getPinnedNodeIds(),
     value186 =
       value184 ||
@@ -2213,8 +2213,8 @@ function _renderNodesImpl(
         getPreviousMode: (value191) =>
           String(_wrapperMap['get'](value191)?.['dataset']?.['mediaLodMode'] || '')['trim'](),
         interactionBusy:
-          interactionBusy?.['viewportBusy'] === !![] ||
-          interactionBusy?.['previewOnly'] === !![] ||
+          interactionBusy?.['viewportBusy'] === true ||
+          interactionBusy?.['previewOnly'] === true ||
           _rendererInteractionGrace['isBusy'](),
       });
   virtualizationResult = applyRendererFullEligibleImageCandidates(virtualizationResult, fullEligibleVisibleImageNodeIds);
@@ -2227,8 +2227,8 @@ function _renderNodesImpl(
       keepAliveNodeIds: virtualizationResult['keepAliveNodeIds'],
       mountedNodeIds: _mountedNodeIds,
       fullEligibleVisibleImageNodeIds: fullEligibleVisibleImageNodeIds,
-      includeParkIds: ![],
-      deferInitialPlanning: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+      includeParkIds: false,
+      deferInitialPlanning: interactionBusy?.['deferInitialRasterPlanning'] === true,
     }),
     value192 = signature4 + '|scene:' + mountCandidateIds2['surfaceSignature'],
     { plannedFullEligibleVisibleImageNodeIds: plannedFullEligibleVisibleImageNodeIds } = mountCandidateIds2;
@@ -2271,13 +2271,13 @@ function _renderNodesImpl(
       sceneFullSurfaceBudget: mountCandidateIds2['fullSurfaceBudget'],
       sceneFullSurfaceCount: mountCandidateIds2['fullSurfaceIds']['size'],
       sceneProxySurfaceCount: mountCandidateIds2['proxySurfaceIds']['size'],
-      fullImageSettleReady: interactionBusy?.['fullImageSettleReady'] === !![],
+      fullImageSettleReady: interactionBusy?.['fullImageSettleReady'] === true,
       durationMs: _nowMs() - value183,
       viewport: { ...viewport6 },
     });
   const { mountCandidateIds: mountCandidateIds3 } = virtualizationResult;
   let { parkCandidateIds: parkCandidateIds } = virtualizationResult;
-  interactionBusy?.['viewportPriorityMediaOnly'] !== !![] && _rendererMediaRuntimePreparer['prune'](mountCandidateIds3);
+  interactionBusy?.['viewportPriorityMediaOnly'] !== true && _rendererMediaRuntimePreparer['prune'](mountCandidateIds3);
   const candidateNodeIds = virtualizationResult['previewCandidateIds'] || mountCandidateIds3,
     fullEligiblePreviewImageNodeIds = enabled36
       ? new Set()
@@ -2285,20 +2285,20 @@ function _renderNodesImpl(
           nodes: nodes,
           candidateNodeIds: candidateNodeIds,
           viewport: viewport6,
-          isVisible: () => !![],
+          isVisible: () => true,
           getPreviousMode: (value193) =>
             String(_wrapperMap['get'](value193)?.['dataset']?.['mediaLodMode'] || '')['trim'](),
           interactionBusy:
-            interactionBusy?.['viewportBusy'] === !![] ||
-            interactionBusy?.['previewOnly'] === !![] ||
+            interactionBusy?.['viewportBusy'] === true ||
+            interactionBusy?.['previewOnly'] === true ||
             _rendererInteractionGrace['isBusy'](),
         }),
     viewportBusy =
-      interactionBusy?.['viewportBusy'] === !![] ||
-      interactionBusy?.['deferParking'] === !![] ||
-      interactionBusy?.['deferHeavyMediaMount'] === !![] ||
+      interactionBusy?.['viewportBusy'] === true ||
+      interactionBusy?.['deferParking'] === true ||
+      interactionBusy?.['deferHeavyMediaMount'] === true ||
       _rendererInteractionGrace['isBusy'](),
-    mediaLoadingBusy = viewportBusy || interactionBusy?.['previewOnly'] === !![],
+    mediaLoadingBusy = viewportBusy || interactionBusy?.['previewOnly'] === true,
     suppressNewMedia =
       viewportBusy && resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0,
     freezeActive = _rasterPreviewCoordinator['sync']({
@@ -2315,8 +2315,8 @@ function _renderNodesImpl(
       containerHeight: height4,
       mediaLoadingBusy: mediaLoadingBusy,
       freezeRasterSurface: viewportBusy,
-      lockRasterParticipation: interactionBusy?.['lockRasterParticipation'] === !![],
-      deferInitialPlanning: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+      lockRasterParticipation: interactionBusy?.['lockRasterParticipation'] === true,
+      deferInitialPlanning: interactionBusy?.['deferInitialRasterPlanning'] === true,
       releaseFullSurface(value194) {
         const el21 = _wrapperMap['get'](value194);
         if (!el21?.['style'] || el21['classList']?.['contains']?.('is-dragging')) return;
@@ -2324,7 +2324,7 @@ function _renderNodesImpl(
       },
     }),
     suspendNewMediaSrc =
-      interactionBusy?.['suspendNewMediaSrc'] === !![] || (freezeActive['freezeActive'] === !![] && mediaLoadingBusy);
+      interactionBusy?.['suspendNewMediaSrc'] === true || (freezeActive['freezeActive'] === true && mediaLoadingBusy);
   parkCandidateIds = freezeActive['releasableFullSurfaceIds'];
   const { domPreviewCandidateIds: domPreviewCandidateIds, domPreviewMediaSourceOwnerIds: domPreviewMediaSourceOwnerIds } = freezeActive,
     args7 = [...mountCandidateIds2['exactVisibleGenerationBusyIds']]['filter'](
@@ -2336,11 +2336,11 @@ function _renderNodesImpl(
       claimedRasterNodeIds: [...freezeActive['rasterIds']],
       domPreviewCandidateNodeIds: [...domPreviewCandidateIds],
       domPreviewMediaSourceOwnerNodeIds: [...domPreviewMediaSourceOwnerIds],
-      freezeActive: freezeActive['freezeActive'] === !![],
+      freezeActive: freezeActive['freezeActive'] === true,
       viewportBusyForPreview: viewportBusy,
-      viewportBusyOption: interactionBusy?.['viewportBusy'] === !![],
-      deferParkingOption: interactionBusy?.['deferParking'] === !![],
-      deferHeavyMediaMountOption: interactionBusy?.['deferHeavyMediaMount'] === !![],
+      viewportBusyOption: interactionBusy?.['viewportBusy'] === true,
+      deferParkingOption: interactionBusy?.['deferParking'] === true,
+      deferHeavyMediaMountOption: interactionBusy?.['deferHeavyMediaMount'] === true,
       interactionGraceBusy: _rendererInteractionGrace['isBusy'](),
       policy: { ...(freezeActive['policy']?.['stats'] || {}) },
     });
@@ -2350,7 +2350,7 @@ function _renderNodesImpl(
         ? new Set([...domPreviewCandidateIds, ...mountCandidateIds2['exactVisibleGenerationBusyIds']])
         : domPreviewCandidateIds;
   cancelStaleLowPriorityPreloadsForHighZoom(suppressNewMedia);
-  if (interactionBusy?.['previewOnly'] === !![]) {
+  if (interactionBusy?.['previewOnly'] === true) {
     _fastPreviewContinuation['reset']();
     const visibleNodeCount = mountCandidateIds2['exactVisibleIds']['size'];
     let rasterVisibleNodeCount = 0;
@@ -2376,9 +2376,9 @@ function _renderNodesImpl(
       viewport: viewport6,
       containerWidth: width4,
       containerHeight: height4,
-      freezeRasterSurface: freezeActive['freezeActive'] === !![],
-      previewOnly: !![],
-      deferVisibleMediaSrc: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+      freezeRasterSurface: freezeActive['freezeActive'] === true,
+      previewOnly: true,
+      deferVisibleMediaSrc: interactionBusy?.['deferInitialRasterPlanning'] === true,
       suppressNewMedia: suppressNewMedia,
       mediaSourceOwnerIds: domPreviewMediaSourceOwnerIds,
       requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds,
@@ -2393,7 +2393,7 @@ function _renderNodesImpl(
       fullEligiblePreviewImageNodeIds: fullEligiblePreviewImageNodeIds,
     });
     let previewCoverageCreated = null,
-      ready = ![],
+      ready = false,
       presentedNodeCount = 0,
       missingExactVisibleNodeCount = [];
     if (previewCoverageEligible) {
@@ -2403,7 +2403,7 @@ function _renderNodesImpl(
           value198 =
             _mountedNodeIds['has'](value197) &&
             el22 &&
-            el22['isConnected'] !== ![] &&
+            el22['isConnected'] !== false &&
             el22['style']?.['display'] !== 'none';
         (value198 ||
           freezeActive['rasterIds']['has'](value197) ||
@@ -2441,10 +2441,10 @@ function _renderNodesImpl(
           }, {}),
         }),
       {
-        hasPendingStructuralOps: ![],
+        hasPendingStructuralOps: false,
         deferredParkCount: 0,
-        hasPendingVisibleVideoMounts: ![],
-        hasPendingFullEligibleVisibleImageMounts: ![],
+        hasPendingVisibleVideoMounts: false,
+        hasPendingFullEligibleVisibleImageMounts: false,
         previewCoverage: previewCoverageCreated,
       }
     );
@@ -2480,7 +2480,7 @@ function _renderNodesImpl(
         cacheHit: cacheHit,
         dragContext: dragContext4,
         fullEligibleVisibleImageCount: plannedFullEligibleVisibleImageNodeIds['size'],
-        fullImageSettleReady: interactionBusy?.['fullImageSettleReady'] === !![],
+        fullImageSettleReady: interactionBusy?.['fullImageSettleReady'] === true,
         nodeCount: nodeCount4,
         pendingFullEligibleVisibleImageCount: pendingFullEligibleVisibleImageCount,
         renderMode: interactionBusy?.['mode'] || 'steady',
@@ -2491,15 +2491,15 @@ function _renderNodesImpl(
       batchSize: RENDERER_FULL_SURFACE_RELEASE_BATCH_SIZE,
       frameBudgetMs: RENDERER_FULL_SURFACE_RELEASE_FRAME_BUDGET_MS,
     });
-  let hasPendingStructuralOps2 = ![],
+  let hasPendingStructuralOps2 = false,
     deferredParkCount2 = 0,
     enabled37 = null;
   const heavyMediaUpdateFrameBudget = createHeavyMediaUpdateFrameBudget({ nodeCount: nodeCount4, now: _nowMs });
-  let hasPendingVisibleVideoMounts2 = ![],
-    hasPendingFullEligibleVisibleImageMounts2 = ![],
-    mountedHeavyMediaThisFrame = ![],
-    updatedHeavyMediaThisFrame = ![],
-    hasPendingStructuralVideoMounts = ![];
+  let hasPendingVisibleVideoMounts2 = false,
+    hasPendingFullEligibleVisibleImageMounts2 = false,
+    mountedHeavyMediaThisFrame = false,
+    updatedHeavyMediaThisFrame = false,
+    hasPendingStructuralVideoMounts = false;
   const value204 = nodeCount4 >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'],
     handler = createHeavyMediaPreviewOnlyDecider({
       viewport: viewport6,
@@ -2517,7 +2517,7 @@ function _renderNodesImpl(
     const nodeId11 = node7['id'];
     let wrapperEl3 = _wrapperMap['get'](nodeId11),
       instance = _componentMap['get'](nodeId11),
-      deferMediaOnMount = ![];
+      deferMediaOnMount = false;
     const nodeType2 = normalizeNodeType(node7['type']),
       isNodeType3 = isNodeType(node7, 'source-video');
     isNodeType3 &&
@@ -2535,8 +2535,8 @@ function _renderNodesImpl(
     const enabled38 = _mountedNodeIds['has'](nodeId11) && !!wrapperEl3?.['isConnected'],
       value206 = _sourceVideoSlotLifecycle['shouldRetainPresentedSurface'](nodeId11),
       enabled39 = value206 || mountCandidateIds3['has'](nodeId11) || (enabled38 && !parkCandidateIds['has'](nodeId11));
-    let mountedThisFrame2 = ![],
-      value207 = ![];
+    let mountedThisFrame2 = false,
+      value207 = false;
     if (!enabled39) {
       if (wrapperEl3 && instance) {
         const enabled40 = _pendingNodeDataMap['get'](nodeId11);
@@ -2554,7 +2554,7 @@ function _renderNodesImpl(
             lifecycleStats2 &&
               recordRendererLifecycleDuration(lifecycleStats2, 'park', node7, _nowMs() - value208, 'park'),
             rendererStructuralBudget2['consume']());
-        } else hasPendingStructuralOps2 = !![];
+        } else hasPendingStructuralOps2 = true;
       }
       continue;
     }
@@ -2580,7 +2580,7 @@ function _renderNodesImpl(
       });
     }
     const enabled41 = isVisibleVideoMediaNode && !!resolveCanvasVideoDisplayUrl(node7);
-    if (interactionBusy?.['viewportPriorityMediaOnly'] === !![] && !enabled41) continue;
+    if (interactionBusy?.['viewportPriorityMediaOnly'] === true && !enabled41) continue;
     const value209 = lowZoomRealVideoNodeIds['has'](nodeId11),
       shouldHydrateVideoMediaImmediately2 = shouldHydrateVideoMediaImmediately({
         node: node7,
@@ -2642,9 +2642,9 @@ function _renderNodesImpl(
           options: interactionBusy,
         })
       ) {
-        hasPendingStructuralOps2 = !![];
-        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
-        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+        hasPendingStructuralOps2 = true;
+        if (isNodeType4) hasPendingStructuralVideoMounts = true;
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
         continue;
       }
       if (
@@ -2659,23 +2659,23 @@ function _renderNodesImpl(
           pickMode: pickConnectMode,
         })
       ) {
-        hasPendingStructuralOps2 = !![];
-        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
-        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
-        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+        hasPendingStructuralOps2 = true;
+        if (isNodeType4) hasPendingStructuralVideoMounts = true;
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
+        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = true);
         continue;
       }
       if (value204 && isNodeType4 && mountedHeavyMediaThisFrame && !shouldHydrateVideoMediaImmediately2) {
-        ((hasPendingStructuralOps2 = !![]), (hasPendingStructuralVideoMounts = !![]));
-        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+        ((hasPendingStructuralOps2 = true), (hasPendingStructuralVideoMounts = true));
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
         continue;
       }
       const enabled43 = rendererStructuralBudget['hasBudget']();
       if (!enabled43 && !shouldHydrateVideoMediaImmediately2) {
-        hasPendingStructuralOps2 = !![];
-        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
-        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
-        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+        hasPendingStructuralOps2 = true;
+        if (isNodeType4) hasPendingStructuralVideoMounts = true;
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
+        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = true);
         continue;
       }
       const deferDetailsOnMount = _nodeDetailHydration['shouldDeferNodeDetails']({
@@ -2694,10 +2694,10 @@ function _renderNodesImpl(
               dragContext: dragContext4,
               dragTargets: activeNodeIds,
             }) ||
-            (interactionBusy?.['viewportPriorityMediaOnly'] === !![] && isNodeType3 && !shouldHydrateVideoMediaImmediately2) ||
+            (interactionBusy?.['viewportPriorityMediaOnly'] === true && isNodeType3 && !shouldHydrateVideoMediaImmediately2) ||
             shouldForceDeferRelatedVideoDetails2,
         }),
-        eagerVideoPreviewOnMount = ![],
+        eagerVideoPreviewOnMount = false,
         shouldDeferInitialVideoMediaOnMount2 = shouldDeferInitialVideoMediaOnMount({
           node: node7,
           nodeId: nodeId11,
@@ -2738,7 +2738,7 @@ function _renderNodesImpl(
           interactionPriority: interactionPriority,
           deferMediaOnMount: deferMediaOnMount,
           eagerVideoPreviewOnMount: eagerVideoPreviewOnMount,
-          viewportPriorityMediaOnly: interactionBusy?.['viewportPriorityMediaOnly'] === !![],
+          viewportPriorityMediaOnly: interactionBusy?.['viewportPriorityMediaOnly'] === true,
           idlePreparationSupported: typeof requestIdleCallback === 'function',
         });
       if (!enabled44 && shouldPrebuildRendererMediaRuntime2) {
@@ -2755,19 +2755,19 @@ function _renderNodesImpl(
               selectedNodeRankMap: selectedNodeRankMap4,
               dragContext: dragContext4,
               dragTargets: activeNodeIds,
-              options: { ...args8, prebuildOffscreen: !![] },
+              options: { ...args8, prebuildOffscreen: true },
             }),
           dispose: disposePreparedRendererNodeRuntime,
         }),
-          (hasPendingStructuralOps2 = !![]));
-        if (isNodeType4) hasPendingStructuralVideoMounts = !![];
-        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
-        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+          (hasPendingStructuralOps2 = true));
+        if (isNodeType4) hasPendingStructuralVideoMounts = true;
+        if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
+        enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = true);
         continue;
       }
       !enabled44 && !shouldPrebuildRendererMediaRuntime2 && _rendererMediaRuntimePreparer['forget'](nodeId11);
       if (isVisibleVideoMediaNode && !shouldHydrateVideoMediaImmediately2 && !_videoHydrationBackpressure['tryAcquire']()) {
-        hasPendingStructuralOps2 = hasPendingStructuralVideoMounts = hasPendingVisibleVideoMounts2 = !![];
+        hasPendingStructuralOps2 = hasPendingStructuralVideoMounts = hasPendingVisibleVideoMounts2 = true;
         continue;
       }
       const value210 = lifecycleStats2 ? _nowMs() : 0,
@@ -2784,9 +2784,9 @@ function _renderNodesImpl(
           value211 ? 'commit-prepared-runtime' : deferMediaOnMount ? 'create-deferred-media' : 'create',
         );
       !enabled37 && (enabled37 = document['createDocumentFragment']());
-      (_mountNode(nodeId11, enabled37), (mountedThisFrame2 = !![]), heavyMediaUpdateFrameBudget['consume'](node7));
+      (_mountNode(nodeId11, enabled37), (mountedThisFrame2 = true), heavyMediaUpdateFrameBudget['consume'](node7));
       if (shouldHydrateVideoMediaImmediately2) _videoHydrationBackpressure['markPriorityWork']();
-      if (isNodeType4) mountedHeavyMediaThisFrame = !![];
+      if (isNodeType4) mountedHeavyMediaThisFrame = true;
       if (enabled43) rendererStructuralBudget['consume']();
     } else {
       if (!enabled38) {
@@ -2802,27 +2802,27 @@ function _renderNodesImpl(
             pickMode: pickConnectMode,
           })
         ) {
-          hasPendingStructuralOps2 = !![];
-          if (isNodeType4) hasPendingStructuralVideoMounts = !![];
-          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
-          enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+          hasPendingStructuralOps2 = true;
+          if (isNodeType4) hasPendingStructuralVideoMounts = true;
+          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
+          enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = true);
           continue;
         }
         if (value204 && isNodeType4 && mountedHeavyMediaThisFrame && !shouldHydrateVideoMediaImmediately2) {
-          ((hasPendingStructuralOps2 = !![]), (hasPendingStructuralVideoMounts = !![]));
-          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+          ((hasPendingStructuralOps2 = true), (hasPendingStructuralVideoMounts = true));
+          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
           continue;
         }
         const enabled45 = rendererStructuralBudget['hasBudget']();
         if (!enabled45 && !shouldHydrateVideoMediaImmediately2) {
-          hasPendingStructuralOps2 = !![];
-          if (isNodeType4) hasPendingStructuralVideoMounts = !![];
-          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
-          enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = !![]);
+          hasPendingStructuralOps2 = true;
+          if (isNodeType4) hasPendingStructuralVideoMounts = true;
+          if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
+          enabled42 && (hasPendingFullEligibleVisibleImageMounts2 = true);
           continue;
         }
         if (isVisibleVideoMediaNode && !shouldHydrateVideoMediaImmediately2 && !_videoHydrationBackpressure['tryAcquire']()) {
-          hasPendingStructuralOps2 = hasPendingStructuralVideoMounts = hasPendingVisibleVideoMounts2 = !![];
+          hasPendingStructuralOps2 = hasPendingStructuralVideoMounts = hasPendingVisibleVideoMounts2 = true;
           continue;
         }
         !enabled37 && (enabled37 = document['createDocumentFragment']());
@@ -2830,9 +2830,9 @@ function _renderNodesImpl(
         _mountNode(nodeId11, enabled37);
         lifecycleStats2 &&
           recordRendererLifecycleDuration(lifecycleStats2, 'remount', node7, _nowMs() - value212, 'remount');
-        ((mountedThisFrame2 = !![]), heavyMediaUpdateFrameBudget['consume'](node7));
+        ((mountedThisFrame2 = true), heavyMediaUpdateFrameBudget['consume'](node7));
         if (shouldHydrateVideoMediaImmediately2) _videoHydrationBackpressure['markPriorityWork']();
-        if (isNodeType4) mountedHeavyMediaThisFrame = !![];
+        if (isNodeType4) mountedHeavyMediaThisFrame = true;
         if (enabled45) rendererStructuralBudget['consume']();
       } else
         isViewportPriorityImageNode2 &&
@@ -2863,8 +2863,8 @@ function _renderNodesImpl(
         connOverlay4?.['hoverId'] !== nodeId11 &&
         pickConnectMode?.['sourceNodeId'] !== nodeId11 &&
         pickConnectMode?.['hoverNodeId'] !== nodeId11 &&
-        node7?.['isVideosExpanded'] !== !![] &&
-        node7?.['isImagesExpanded'] !== !![];
+        node7?.['isVideosExpanded'] !== true &&
+        node7?.['isImagesExpanded'] !== true;
     (mountedThisFrame2 || wrapperEl3?.['dataset']?.['detailStage'] === 'deferred') &&
       (_nodeDetailHydration['syncNodeDetailMountStage']({
         wrapperEl: wrapperEl3,
@@ -2887,7 +2887,7 @@ function _renderNodesImpl(
             dragContext: dragContext4,
             dragTargets: activeNodeIds,
           }) ||
-          (interactionBusy?.['viewportPriorityMediaOnly'] === !![] && isNodeType3 && !shouldHydrateVideoMediaImmediately2) ||
+          (interactionBusy?.['viewportPriorityMediaOnly'] === true && isNodeType3 && !shouldHydrateVideoMediaImmediately2) ||
           shouldForceDeferRelatedVideoDetails2,
       }),
       mountedThisFrame2 &&
@@ -2928,7 +2928,7 @@ function _renderNodesImpl(
         (value209 ||
           shouldHydrateVideoMediaImmediately2 ||
           resolveRendererLowZoomMountLimit({ viewport: viewport6, nodeCount: nodeCount4 }) <= 0) &&
-        instance?.['prepareRendererVisibleVideoPreview']?.() === !![],
+        instance?.['prepareRendererVisibleVideoPreview']?.() === true,
       _syncMountedNodePresentation2 = _syncMountedNodePresentation({
         wrapperEl: wrapperEl3,
         node: node8,
@@ -2972,19 +2972,19 @@ function _renderNodesImpl(
         allowActiveDetailHydration: !deferHydrate && !enabled46,
       });
     if (_syncMountedNodePresentation2?.['deferredUpdate']) {
-      hasPendingStructuralOps2 = !![];
-      if (isNodeType4) hasPendingStructuralVideoMounts = !![];
-      if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = !![];
+      hasPendingStructuralOps2 = true;
+      if (isNodeType4) hasPendingStructuralVideoMounts = true;
+      if (isVisibleVideoMediaNode) hasPendingVisibleVideoMounts2 = true;
     }
     if (_syncMountedNodePresentation2?.['didUpdate']) {
       heavyMediaUpdateFrameBudget['consume'](node8);
-      if (isNodeType4) updatedHeavyMediaThisFrame = !![];
+      if (isNodeType4) updatedHeavyMediaThisFrame = true;
     }
     if (value207 || value214) {
       _fastPreviewLayer['retainNode'](nodeId11);
       if (value214) {
         if (mountedThisFrame2) _rendererDeferredMedia['hydrateNow'](nodeId11);
-        else _rendererDeferredMedia['enqueue'](nodeId11, { urgent: !![] });
+        else _rendererDeferredMedia['enqueue'](nodeId11, { urgent: true });
       } else _rendererDeferredMedia['enqueue'](nodeId11);
     }
     const isVisible = _isNodeVisible(node8, viewport6, width4, height4);
@@ -3022,8 +3022,8 @@ function _renderNodesImpl(
       viewport: viewport6,
       containerWidth: width4,
       containerHeight: height4,
-      freezeRasterSurface: freezeActive['freezeActive'] === !![],
-      deferVisibleMediaSrc: interactionBusy?.['deferInitialRasterPlanning'] === !![],
+      freezeRasterSurface: freezeActive['freezeActive'] === true,
+      deferVisibleMediaSrc: interactionBusy?.['deferInitialRasterPlanning'] === true,
       suppressNewMedia: suppressNewMedia,
       mediaSourceOwnerIds: domPreviewMediaSourceOwnerIds,
       requiredImmediateMediaSourceOwnerIds: requiredImmediateMediaSourceOwnerIds,
@@ -3059,11 +3059,11 @@ function _renderNodes(...args9) {
         ? value217['_nodeCount']
         : Object['keys'](value216)['length'];
   _rendererRuntimeDiagnosticRenderState = {
-    previewOnly: previewOnly?.['previewOnly'] === !![],
+    previewOnly: previewOnly?.['previewOnly'] === true,
     viewportBusy:
-      previewOnly?.['viewportBusy'] === !![] ||
-      previewOnly?.['deferParking'] === !![] ||
-      previewOnly?.['deferHeavyMediaMount'] === !![] ||
+      previewOnly?.['viewportBusy'] === true ||
+      previewOnly?.['deferParking'] === true ||
+      previewOnly?.['deferHeavyMediaMount'] === true ||
       _rendererInteractionGrace['isBusy'](),
   };
   try {
@@ -3072,14 +3072,14 @@ function _renderNodes(...args9) {
     recordRendererRuntimeDiagnostic({
       kind: 'render-nodes',
       mode: previewOnly?.['mode'] || 'steady',
-      previewOnly: previewOnly?.['previewOnly'] === !![],
+      previewOnly: previewOnly?.['previewOnly'] === true,
       nodeCount: nodeCount5,
       durationMs: _nowMs() - _nowMs5,
     });
   }
 }
 function _cleanupNodes(el23, value218) {
-  let value219 = ![];
+  let value219 = false;
   const map6 = new Set(Object['keys'](value218 || {})),
     value220 = new Set([
       ..._componentMap['keys'](),
@@ -3089,11 +3089,11 @@ function _cleanupNodes(el23, value218) {
       ..._parkedNodeIds,
     ]);
   for (const value221 of value220) {
-    !map6['has'](value221) && (_destroyNode(value221), (value219 = !![]));
+    !map6['has'](value221) && (_destroyNode(value221), (value219 = true));
   }
   el23['querySelectorAll']('.v2-node')['forEach']((el24) => {
     const value222 = el24['id'] || el24['dataset']['nodeId'];
-    value222 && !map6['has'](value222) && (el24['remove'](), (value219 = !![]));
+    value222 && !map6['has'](value222) && (el24['remove'](), (value219 = true));
   });
   if (value219) {
     const el25 = document['getElementById']('v2-side-plus-holder');
@@ -3165,14 +3165,14 @@ function _renderEdges(
     relatedEdgeIds: relatedEdgeIds5,
     edgeEntries: edgeEntries2,
     reason: reason,
-    options: { ...args10, clearedDom: _edgeDomClearedSinceLastFull === !![] },
+    options: { ...args10, clearedDom: _edgeDomClearedSinceLastFull === true },
   }),
     args10?.['renderSignature'] && (_lastFullEdgeRenderSignature = args10['renderSignature']),
-    (_edgeDomClearedSinceLastFull = ![]));
+    (_edgeDomClearedSinceLastFull = false));
 }
 function _clearRenderedEdges(value224) {
   const count4 = _edgeLayer['clearRenderedEdges'](value224);
-  count4 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] });
+  count4 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true });
 }
 function _clearRenderedEdgesFromDocument() {
   if (typeof document === 'undefined') {
@@ -3189,7 +3189,7 @@ function _cleanupEdges(value226, value227) {
   const count5 = _edgeLayer['cleanupEdges'](value226, value227);
   (document['querySelectorAll']('.v2-edge-thumbnail')['forEach']((el30) => el30['remove']()),
     document['querySelectorAll']('[id^="v2-thumb-"]')['forEach']((el31) => el31['remove']()),
-    count5 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: !![] }));
+    count5 > 0 && _invalidateFullEdgeRenderSignature({ clearedDom: true }));
 }
 function _createPickerEl() {
   const el32 = document['createElement']('div');

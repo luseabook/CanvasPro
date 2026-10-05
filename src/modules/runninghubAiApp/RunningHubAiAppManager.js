@@ -143,9 +143,9 @@ function normalizeKind(item) {
 }
 function shouldReduceMotion() {
   try {
-    return window['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === !![];
+    return window['matchMedia']?.('(prefers-reduced-motion: reduce)')?.['matches'] === true;
   } catch {
-    return ![];
+    return false;
   }
 }
 function normalizeComponentKind(key) {
@@ -260,7 +260,7 @@ function buildRhAiAppNodeData({
     providerProfileId =
       provider === 'runninghubwf' ? normalizeRunningHubModelApiProfileId(runningHubProfileId) : '',
     width = getGenerationNodeSize(type),
-    generationParams = sanitizeModelUiSchemaParams(model, {}, { includeDefaults: !![] }),
+    generationParams = sanitizeModelUiSchemaParams(model, {}, { includeDefaults: true }),
     value14 = {
       id: generateId(type),
       type: type,
@@ -342,14 +342,14 @@ function buildOptionsFromValues(list4 = [], value29 = {}) {
 function getComponentKindOptions(value35, value36) {
   const list6 = buildOptionsFromValues(value35?.['componentKindOptions'], COMPONENT_KIND_LABELS);
   if (list6['length']) return list6;
-  if (value35?.['componentKindLocked'] === !![] || isMediaComponent(value35))
+  if (value35?.['componentKindLocked'] === true || isMediaComponent(value35))
     return [[value36, COMPONENT_KIND_LABELS[value36] || value36]];
   return COMPONENT_KIND_OPTIONS['filter'](([value37]) => value37 === 'param' || value37 === 'prompt');
 }
 function getControlTypeOptions(value38, value39) {
   const list7 = buildOptionsFromValues(value38?.['controlTypeOptions'], CONTROL_TYPE_LABELS);
   if (list7['length']) return list7;
-  if (value38?.['controlTypeLocked'] === !![]) return [[value39, CONTROL_TYPE_LABELS[value39] || value39]];
+  if (value38?.['controlTypeLocked'] === true) return [[value39, CONTROL_TYPE_LABELS[value39] || value39]];
   return CONTROL_TYPE_OPTIONS['filter'](([value40]) => value40 !== 'toggle' && value40 !== 'prompt');
 }
 function getPreviewTextTypeOptions(enabled4) {
@@ -376,14 +376,14 @@ function previewTextTypeOptionsInclude(value46, value47) {
   return optionValuesInclude(getPreviewTextTypeOptions(value46), value47);
 }
 function canPreviewComponentBecomePrompt(enabled5) {
-  if (!enabled5 || isMediaComponent(enabled5)) return ![];
-  if (normalizeComponentKind(enabled5['componentKind']) === 'prompt') return !![];
+  if (!enabled5 || isMediaComponent(enabled5)) return false;
+  if (normalizeComponentKind(enabled5['componentKind']) === 'prompt') return true;
   const controlType2 = normalizeControlType(enabled5['controlType']);
-  if (!PREVIEW_PARAM_TEXT_TYPE_VALUES['includes'](controlType2)) return ![];
+  if (!PREVIEW_PARAM_TEXT_TYPE_VALUES['includes'](controlType2)) return false;
   return previewTextTypeOptionsInclude(enabled5, 'prompt');
 }
 function canPreviewPromptBecomeParam(value48) {
-  if (normalizeComponentKind(value48?.['componentKind']) !== 'prompt') return ![];
+  if (normalizeComponentKind(value48?.['componentKind']) !== 'prompt') return false;
   return PREVIEW_PARAM_TEXT_TYPE_VALUES['some']((value49) => previewTextTypeOptionsInclude(value48, value49));
 }
 function getPreviewPromptReturnControlType(value50, value51 = '') {
@@ -397,7 +397,7 @@ function getPreviewPromptReturnControlType(value50, value51 = '') {
     PREVIEW_PARAM_TEXT_TYPE_VALUES['find']((value52) => previewTextTypeOptionsInclude(value50, value52)) || ''
   );
 }
-function renderPreviewTypeBarHtml(value53, { canRemove: canRemove = ![] } = {}) {
+function renderPreviewTypeBarHtml(value53, { canRemove: canRemove = false } = {}) {
   const value54 = Number(value53?.['index']);
   if (!Number['isInteger'](value54)) return '';
   const list9 = getPreviewTextTypeOptions(value53),
@@ -405,8 +405,8 @@ function renderPreviewTypeBarHtml(value53, { canRemove: canRemove = ![] } = {}) 
     isMediaComponent2 = isMediaComponent(value53),
     enabled6 = isParamComponent2 || isMediaComponent2,
     enabled7 = isParamComponent2 || normalizeComponentKind(value53?.['componentKind']) === 'prompt',
-    value55 = isParamComponent2 && canRemove === !![],
-    enabled8 = isMediaComponent2 && canRemove === !![];
+    value55 = isParamComponent2 && canRemove === true,
+    enabled8 = isMediaComponent2 && canRemove === true;
   if (!list9['length'] && !enabled6 && !enabled7 && !enabled8) return '';
   const componentKind2 =
       normalizeComponentKind(value53['componentKind']) === 'prompt'
@@ -531,7 +531,7 @@ function isParamComponent(value74) {
 }
 function getParamComponents(list10 = []) {
   return list10['filter']((enabled10) => {
-    if (!enabled10 || !Number['isInteger'](Number(enabled10['index']))) return ![];
+    if (!enabled10 || !Number['isInteger'](Number(enabled10['index']))) return false;
     return isParamComponent(enabled10);
   });
 }
@@ -623,7 +623,7 @@ function isPreviewPromptHelpFieldName(value101) {
 }
 function isPreviewPromptHelpTextComponent(error2 = {}) {
   const controlType4 = normalizeControlType(error2['controlType']);
-  if (!PREVIEW_TEXT_TYPE_VALUES['includes'](controlType4)) return ![];
+  if (!PREVIEW_TEXT_TYPE_VALUES['includes'](controlType4)) return false;
   return [error2['label'], error2['fieldName'], error2['name'], error2['id'], error2['path']]['some'](
     isPreviewPromptHelpFieldName,
   );
@@ -636,13 +636,13 @@ function getPreviewPromptHelpComponent(list16 = []) {
   );
 }
 function shouldRefreshPreviewPromptForDraft(value104, value105) {
-  if (value105 === 'componentKind' || value105 === 'controlType' || value105 === 'label') return !![];
+  if (value105 === 'componentKind' || value105 === 'controlType' || value105 === 'label') return true;
   if (value105 === 'description')
     return (
       normalizeComponentKind(value104?.['componentKind']) === 'prompt' ||
       isPreviewPromptHelpTextComponent(value104)
     );
-  return ![];
+  return false;
 }
 function buildComponentByIndex(list17 = []) {
   const map2 = new Map();
@@ -657,7 +657,7 @@ function buildComponentByIndex(list17 = []) {
 function isPreviewSystemField(options2 = {}) {
   const value108 = String(options2?.['id'] || '')['trim'](),
     value109 = String(options2?.['placement'] || '')['trim']();
-  return value108 === 'rhInstanceType' || value109 === 'batch' || options2?.['comfyUiSystemField'] === !![];
+  return value108 === 'rhInstanceType' || value109 === 'batch' || options2?.['comfyUiSystemField'] === true;
 }
 function getBundleParamFields(value110) {
   const list18 = Array['isArray'](value110?.['models']?.[0]?.['uiSchema']?.['fields'])
@@ -684,8 +684,8 @@ function getPreviewAdvancedParamFields({ bundle: bundle = null, components: comp
     ['filter']((value116, value117) => {
       map5['set'](value116, value117);
       const customAiAppComponentIndex = getCustomAiAppComponentIndex(value116);
-      if (!Number['isInteger'](customAiAppComponentIndex)) return !![];
-      if (!map4['has'](customAiAppComponentIndex)) return !![];
+      if (!Number['isInteger'](customAiAppComponentIndex)) return true;
+      if (!map4['has'](customAiAppComponentIndex)) return true;
       return !map3['has'](customAiAppComponentIndex);
     })
     ['sort']((value118, value119) => {
@@ -732,7 +732,7 @@ function renderPreviewBatchControlsHtml(value127 = null) {
 }
 function renderPreviewInputComponentsHtml(
   list19 = [],
-  { canRemovePreviewInputs: canRemovePreviewInputs = !![] } = {},
+  { canRemovePreviewInputs: canRemovePreviewInputs = true } = {},
 ) {
   const list20 = getPreviewInputComponents(list19);
   if (!list20['length']) return '';
@@ -822,8 +822,8 @@ function renderPreviewPromptHelpTipHtml(value137, { bundle: bundle = null } = {}
   );
 }
 function isPreviewToggleOn(value143) {
-  if (value143 === !![]) return !![];
-  if (value143 === ![]) return ![];
+  if (value143 === true) return true;
+  if (value143 === false) return false;
   const value144 = String(value143 ?? '')
     ['trim']()
     ['toLowerCase']();
@@ -835,7 +835,7 @@ function getPreviewToggleLabel(value145) {
 function renderPreviewHomeParamsHtml(
   list21 = [],
   value146 = null,
-  { canRemovePreviewParams: canRemovePreviewParams = !![] } = {},
+  { canRemovePreviewParams: canRemovePreviewParams = true } = {},
 ) {
   return renderGroupedPreviewParams(list21, value146, (value147, value148) => {
     const value149 = Number(value147['index']),
@@ -958,10 +958,10 @@ function mergeComfyComponentDraft(args3 = {}, value167 = {}) {
     ]['forEach']((value169) => {
       if (Object['hasOwn'](value167, value169)) value168[value169] = value167[value169];
     }),
-    args3['componentKindLocked'] !== !![] &&
+    args3['componentKindLocked'] !== true &&
       Object['hasOwn'](value167, 'componentKind') &&
       (value168['componentKind'] = value167['componentKind']),
-    args3['controlTypeLocked'] !== !![] &&
+    args3['controlTypeLocked'] !== true &&
       Object['hasOwn'](value167, 'controlType') &&
       (value168['controlType'] = value167['controlType']),
     value168
@@ -991,12 +991,12 @@ function preserveComfyComponentDrafts(list26 = [], list27 = []) {
 }
 function moveComponentToOrder(list28 = [], value176, value177, value178) {
   const componentByIndex = getComponentByIndex(list28, value176);
-  if (!componentByIndex) return ![];
+  if (!componentByIndex) return false;
   const list29 = sortComponentsByOrder(list28, value177)['filter'](
       (value179) => Number(value179['index']) !== Number(value176),
     ),
     value180 = Math['max'](0, Math['min'](list29['length'], Number(value178) || 0));
-  return (list29['splice'](value180, 0, componentByIndex), assignSequentialOrder(list29, value177), !![]);
+  return (list29['splice'](value180, 0, componentByIndex), assignSequentialOrder(list29, value177), true);
 }
 function renderSavedAppsMenuHtml({
   savedApps: savedApps = [],
@@ -1094,7 +1094,7 @@ function filterComfyUiCandidates(list30 = [], map9 = new Set(), value187 = '') {
     ['toLowerCase']();
   return (Array['isArray'](list30) ? list30 : [])['filter']((value188) => {
     const value189 = Number(value188?.['index']);
-    if (!Number['isInteger'](value189) || map9['has'](value189)) return ![];
+    if (!Number['isInteger'](value189) || map9['has'](value189)) return false;
     return !enabled16 || getComfyUiCandidateSearchText(value188)['includes'](enabled16);
   });
 }
@@ -1141,11 +1141,11 @@ function renderComfyUiCandidateMenuHtml(list31 = [], map10 = new Set(), value191
   return '<div class="rh-ai-app-candidate-options">' + value194 + '</div>';
 }
 function renderComfyUiComponentAddPanelHtml({
-  show: show = ![],
-  canAdd: canAdd = !![],
-  hasComponents: hasComponents = ![],
+  show: show = false,
+  canAdd: canAdd = true,
+  hasComponents: hasComponents = false,
   emptyText: emptyText = '',
-  isOpen: isOpen = ![],
+  isOpen: isOpen = false,
   searchText: searchText = '',
 } = {}) {
   if (!show) return '';
@@ -1175,7 +1175,7 @@ function renderComfyUiComponentAddPanelHtml({
 function renderPreviewAppMenuHtml({
   appName: appName = DEFAULT_AI_APP_NAME,
   savedApps: savedApps = [],
-  isOpen: isOpen = ![],
+  isOpen: isOpen = false,
   pendingDeleteSavedAppId: pendingDeleteSavedAppId = '',
   pendingOverwriteSavedAppId: pendingOverwriteSavedAppId = '',
   pendingOverwriteIntent: pendingOverwriteIntent = '',
@@ -1204,19 +1204,19 @@ function renderRhAiAppNodePreviewHtml({
   bundle: bundle = null,
   appName: appName = DEFAULT_AI_APP_NAME,
   savedApps: savedApps = [],
-  isAppMenuOpen: isAppMenuOpen = ![],
+  isAppMenuOpen: isAppMenuOpen = false,
   pendingDeleteSavedAppId: pendingDeleteSavedAppId = '',
   pendingOverwriteSavedAppId: pendingOverwriteSavedAppId = '',
   pendingOverwriteIntent: pendingOverwriteIntent = '',
   sourceLabel: sourceLabel = 'RH AI应用',
   runningHubProfileLabel: runningHubProfileLabel = '',
-  showComfyAddPanel: showComfyAddPanel = ![],
-  canAddComfyComponents: canAddComfyComponents = !![],
-  comfyCandidatePickerOpen: comfyCandidatePickerOpen = ![],
+  showComfyAddPanel: showComfyAddPanel = false,
+  canAddComfyComponents: canAddComfyComponents = true,
+  comfyCandidatePickerOpen: comfyCandidatePickerOpen = false,
   comfyCandidateSearchText: comfyCandidateSearchText = '',
   comfyCandidateEmptyText: comfyCandidateEmptyText = '',
-  canRemovePreviewParams: canRemovePreviewParams = !![],
-  canRemovePreviewInputs: canRemovePreviewInputs = !![],
+  canRemovePreviewParams: canRemovePreviewParams = true,
+  canRemovePreviewInputs: canRemovePreviewInputs = true,
 } = {}) {
   const value201 = components['find'](
       (value202) => normalizeComponentKind(value202?.['componentKind']) === 'prompt',
@@ -1240,7 +1240,7 @@ function renderRhAiAppNodePreviewHtml({
       canAdd: canAddComfyComponents,
       hasComponents: components['length'] > 0,
       emptyText: comfyCandidateEmptyText,
-      isOpen: canAddComfyComponents && comfyCandidatePickerOpen === !![],
+      isOpen: canAddComfyComponents && comfyCandidatePickerOpen === true,
       searchText: comfyCandidateSearchText,
     });
   return (
@@ -1348,8 +1348,8 @@ class RunningHubAiAppManager {
       (this['componentCandidates'] = []),
       (this['componentDraftKey'] = ''),
       (this['comfyCandidateSearchText'] = ''),
-      (this['comfyCandidatePickerOpen'] = ![]),
-      (this['workflowInputCollapsed'] = ![]),
+      (this['comfyCandidatePickerOpen'] = false),
+      (this['workflowInputCollapsed'] = false),
       (this['errorMessage'] = ''),
       (this['configRepository'] = createRhAiAppConfigRepository({
         getSnapshot: () => this['_getConfigRepositorySnapshot'](),
@@ -1364,7 +1364,7 @@ class RunningHubAiAppManager {
       (this['kindStates'] = value216['kindStates']));
     ((this['savedApps'] = value215['savedApps']),
       (this['localStorageSeedHasData'] = value215['hasData']),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -1573,7 +1573,7 @@ class RunningHubAiAppManager {
         (value244) => void this['_handleWorkflowJsonFileDrop'](value244),
       ),
       this['textarea']?.['addEventListener']('input', () => {
-        ((this['workflowInputCollapsed'] = ![]),
+        ((this['workflowInputCollapsed'] = false),
           this['_syncWorkflowInputCollapsed'](),
           this['_scheduleParse']());
       }));
@@ -1596,7 +1596,7 @@ class RunningHubAiAppManager {
     (document['addEventListener']('keydown', (event4) => {
       if (event4['key'] !== 'Escape' || !this['_isOpen']()) return;
       if (this['previewAppMenuOpen']) {
-        ((this['previewAppMenuOpen'] = ![]),
+        ((this['previewAppMenuOpen'] = false),
           (this['pendingDeleteSavedAppId'] = ''),
           (this['pendingOverwriteSavedAppId'] = ''),
           (this['pendingOverwriteIntent'] = ''),
@@ -1608,7 +1608,7 @@ class RunningHubAiAppManager {
       document['addEventListener']('pointerdown', (event5) => {
         if (!this['previewAppMenuOpen'] || !this['_isOpen']()) return;
         if (this['panel']?.['contains'](event5['target'])) return;
-        ((this['previewAppMenuOpen'] = ![]),
+        ((this['previewAppMenuOpen'] = false),
           (this['pendingDeleteSavedAppId'] = ''),
           (this['pendingOverwriteSavedAppId'] = ''),
           (this['pendingOverwriteIntent'] = ''),
@@ -1646,7 +1646,7 @@ class RunningHubAiAppManager {
     const kind3 = normalizeKind(value252),
       sourceType2 = normalizeSourceType(this['sourceType']) || SOURCE_TYPES['runninghub'];
     return this['savedApps']['filter']((value253) => {
-      if (normalizeKind(value253['kind']) !== kind3) return ![];
+      if (normalizeKind(value253['kind']) !== kind3) return false;
       const sourceType3 = normalizeSourceType(value253['sourceType']) || SOURCE_TYPES['runninghub'];
       if (isComfyUiSource(sourceType2)) return isComfyUiSource(sourceType3);
       if (isRunningHubSource(sourceType2)) return isRunningHubSource(sourceType3);
@@ -1657,7 +1657,7 @@ class RunningHubAiAppManager {
     const kind4 = normalizeKind(value254),
       sourceType4 = normalizeSourceType(value255) || SOURCE_TYPES['runninghub'];
     return this['savedApps']['filter']((value256) => {
-      if (normalizeKind(value256['kind']) !== kind4) return ![];
+      if (normalizeKind(value256['kind']) !== kind4) return false;
       const sourceType5 = normalizeSourceType(value256['sourceType']) || SOURCE_TYPES['runninghub'];
       return sourceType5 === sourceType4;
     });
@@ -1675,24 +1675,24 @@ class RunningHubAiAppManager {
       ) || null
     );
   }
-  ['_clearPendingOverwrite']({ keepMenuOpen: keepMenuOpen = ![], render: render = !![] } = {}) {
+  ['_clearPendingOverwrite']({ keepMenuOpen: keepMenuOpen = false, render: render = true } = {}) {
     ((this['pendingOverwriteSavedAppId'] = ''), (this['pendingOverwriteIntent'] = ''));
-    if (keepMenuOpen) this['previewAppMenuOpen'] = !![];
+    if (keepMenuOpen) this['previewAppMenuOpen'] = true;
     render &&
       (this['_patchPreviewAppChrome'](), this['_patchSaveConfigMenu'](), this['_patchCreateConfigMenu']());
   }
   ['_showOverwriteConfirm'](value260, value261 = 'save') {
     const enabled18 = String(value260 || '')['trim']();
-    if (!enabled18) return ![];
+    if (!enabled18) return false;
     return (
       (this['pendingOverwriteSavedAppId'] = enabled18),
       (this['pendingOverwriteIntent'] = value261 === 'create' ? 'create' : 'save'),
       (this['pendingDeleteSavedAppId'] = ''),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       this['_patchPreviewAppChrome'](),
       this['_patchSaveConfigMenu'](),
       this['_patchCreateConfigMenu'](),
-      !![]
+      true
     );
   }
   ['_getConfigRepositorySnapshot']() {
@@ -1723,7 +1723,7 @@ class RunningHubAiAppManager {
       (this['kind'] = value262['panelDraft']['kind']),
       (this['kindStates'] = value262['panelDraft']['kindStates']));
     (this['_dropUnauthorizedRunningHubAiAppSource'](),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -1774,7 +1774,7 @@ class RunningHubAiAppManager {
       try {
         const value265 = this['_buildBundleForSavedApp'](value264);
         ((value264['bundle'] = value265),
-          registerCustomAiAppBundle(value265, this['registeredBundleKeys'], { replace: !![] }));
+          registerCustomAiAppBundle(value265, this['registeredBundleKeys'], { replace: true }));
       } catch (value266) {
         console['warn']('[RH AI App] register saved app failed:', value266);
       }
@@ -1816,8 +1816,8 @@ class RunningHubAiAppManager {
   ['_isRunningHubAiAppAuthorized']() {
     const value271 = globalThis['window'],
       handler = value271?.['isModelAllowedBySubscription'];
-    if (typeof handler !== 'function') return ![];
-    return handler(RH_AI_APP_VIP_MODEL_ID, RH_AI_APP_VIP_PROVIDER) === !![];
+    if (typeof handler !== 'function') return false;
+    return handler(RH_AI_APP_VIP_MODEL_ID, RH_AI_APP_VIP_PROVIDER) === true;
   }
   ['_requestRunningHubAiAppAuthorization'](onSuccess = null) {
     const value272 = globalThis['window'];
@@ -1832,13 +1832,13 @@ class RunningHubAiAppManager {
     value272?.['showToast']?.('需要VIP授权，请先激活CDKEY', 'warn');
   }
   ['_guardRunningHubAiAppAccess'](value273 = null) {
-    if (this['_isRunningHubAiAppAuthorized']()) return !![];
-    return (this['_requestRunningHubAiAppAuthorization'](value273), ![]);
+    if (this['_isRunningHubAiAppAuthorized']()) return true;
+    return (this['_requestRunningHubAiAppAuthorization'](value273), false);
   }
   ['_dropUnauthorizedRunningHubAiAppSource']() {
-    if (!this['_isRunningHubAiAppSource']()) return ![];
-    if (this['_isRunningHubAiAppAuthorized']()) return ![];
-    return ((this['sourceType'] = ''), !![]);
+    if (!this['_isRunningHubAiAppSource']()) return false;
+    if (this['_isRunningHubAiAppAuthorized']()) return false;
+    return ((this['sourceType'] = ''), true);
   }
   ['_shouldShowManualComponentPicker']() {
     return this['_isComfyUiSource']() || this['sourceType'] === SOURCE_TYPES['runninghubWorkflow'];
@@ -1872,13 +1872,13 @@ class RunningHubAiAppManager {
   }
   ['_applySourceViewTransition'](enabled21, enabled22) {
     if (shouldReduceMotion() || !enabled22 || !this['sourceSelectEl'] || !this['workbenchEl'])
-      return (this['_setSourceViewHiddenState'](enabled21), ![]);
+      return (this['_setSourceViewHiddenState'](enabled21), false);
     const enabled23 = enabled22 === 'forward' && enabled21,
       enabled24 = enabled22 === 'back' && !enabled21;
-    if (!enabled23 && !enabled24) return (this['_setSourceViewHiddenState'](enabled21), ![]);
+    if (!enabled23 && !enabled24) return (this['_setSourceViewHiddenState'](enabled21), false);
     return (
-      (this['sourceSelectEl']['hidden'] = ![]),
-      (this['workbenchEl']['hidden'] = ![]),
+      (this['sourceSelectEl']['hidden'] = false),
+      (this['workbenchEl']['hidden'] = false),
       this['bodyEl']?.['classList']['add']('is-view-transitioning'),
       enabled23
         ? (this['sourceSelectEl']['classList']['add']('is-page-exit-left'),
@@ -1888,7 +1888,7 @@ class RunningHubAiAppManager {
       (this['sourceViewAnimationTimer'] = window['setTimeout'](() => {
         (this['_clearSourceViewAnimation'](), this['_setSourceViewHiddenState'](enabled21));
       }, SOURCE_PAGE_ANIMATION_MS)),
-      !![]
+      true
     );
   }
   ['_syncSourceView']() {
@@ -1918,7 +1918,7 @@ class RunningHubAiAppManager {
         (this['textarea']['placeholder'] = value274['inputPlaceholder']),
       this['_syncComfyUiRuntimeControl'](),
       this['_syncRunningHubRuntimeControl'](),
-      !enabled25 && (this['_setActionButtonsEnabled'](![]), this['_setError']('')),
+      !enabled25 && (this['_setActionButtonsEnabled'](false), this['_setError']('')),
       this['_syncStickyHeaderShadow']());
   }
   ['_syncComfyUiRuntimeControl']() {
@@ -1961,7 +1961,7 @@ class RunningHubAiAppManager {
     window['clearTimeout'](this['parseTimer']);
     if (this['sourceType']) this['_saveKindState']();
     ((this['sourceType'] = sourceType7),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -1980,20 +1980,20 @@ class RunningHubAiAppManager {
     (window['clearTimeout'](this['parseTimer']),
       this['_saveKindState'](),
       (this['sourceType'] = comfyUiSourceTypeFromBaseUrlMode),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
       this['_syncSourceView']());
     if (this['_getInputText']()['trim']()) {
-      const value280 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+      const value280 = this['_refreshBundleFromComponents']({ renderPreview: false });
       this['_patchPreviewWithoutRebuild'](value280 || this['currentBundle'], {
-        renderInputs: !![],
-        renderParams: !![],
-        renderAdvanced: !![],
-        renderPrompt: !![],
-        renderAppChrome: !![],
-        renderActionControls: !![],
+        renderInputs: true,
+        renderParams: true,
+        renderAdvanced: true,
+        renderPrompt: true,
+        renderAppChrome: true,
+        renderActionControls: true,
       });
       return;
     }
@@ -2010,14 +2010,14 @@ class RunningHubAiAppManager {
     (window['clearTimeout'](this['parseTimer']),
       (this['runningHubProfileId'] = runningHubModelApiProfileId3),
       this['_syncRunningHubRuntimeControl']());
-    if (this['_getInputText']()['trim']()) this['_refreshBundleFromComponents']({ renderPreview: ![] });
+    if (this['_getInputText']()['trim']()) this['_refreshBundleFromComponents']({ renderPreview: false });
     (this['_saveKindState'](), this['_patchPreviewAppChrome']());
   }
   ['_showSourceSelect']() {
     (this['definitionController']['cancel'](), window['clearTimeout'](this['parseTimer']));
     if (this['sourceType']) this['_saveKindState']();
     ((this['sourceType'] = ''),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -2031,7 +2031,7 @@ class RunningHubAiAppManager {
     const enabled28 = this['_isOpen']();
     if (this['sourceType']) this['_saveKindState']();
     ((this['sourceType'] = ''),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -2049,7 +2049,7 @@ class RunningHubAiAppManager {
     this['_openSourceSelect']();
   }
   ['_isOpen']() {
-    return this['panel']?.['classList']['contains']('is-open') === !![];
+    return this['panel']?.['classList']['contains']('is-open') === true;
   }
   ['_open']() {
     (this['previewDragController']['bindGroups'](),
@@ -2074,7 +2074,7 @@ class RunningHubAiAppManager {
       this['_clearSourceViewAnimation'](),
       this['_closeComponentSelectMenus'](),
       this['contextMenuController']['close'](),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -2197,7 +2197,7 @@ class RunningHubAiAppManager {
       }
       if (value282 === 'rename-current-app') {
         (this['_closeComponentSelectMenus'](),
-          (this['previewAppMenuOpen'] = ![]),
+          (this['previewAppMenuOpen'] = false),
           (this['pendingDeleteSavedAppId'] = ''),
           (this['pendingOverwriteSavedAppId'] = ''),
           (this['pendingOverwriteIntent'] = ''),
@@ -2210,7 +2210,7 @@ class RunningHubAiAppManager {
           (this['pendingDeleteSavedAppId'] = String(el11['dataset']['savedAppId'] || '')),
           (this['pendingOverwriteSavedAppId'] = ''),
           (this['pendingOverwriteIntent'] = ''),
-          (this['previewAppMenuOpen'] = !![]),
+          (this['previewAppMenuOpen'] = true),
           this['_patchPreviewAppChrome']());
         return;
       }
@@ -2221,7 +2221,7 @@ class RunningHubAiAppManager {
       if (value282 === 'cancel-delete-app') {
         (this['_closeComponentSelectMenus'](),
           (this['pendingDeleteSavedAppId'] = ''),
-          (this['previewAppMenuOpen'] = !![]),
+          (this['previewAppMenuOpen'] = true),
           this['_patchPreviewAppChrome']());
         return;
       }
@@ -2280,7 +2280,7 @@ class RunningHubAiAppManager {
       !enabled30 &&
         !enabled33 &&
         this['previewAppMenuOpen'] &&
-        ((this['previewAppMenuOpen'] = ![]),
+        ((this['previewAppMenuOpen'] = false),
         (this['pendingDeleteSavedAppId'] = ''),
         (this['pendingOverwriteSavedAppId'] = ''),
         (this['pendingOverwriteIntent'] = ''),
@@ -2303,7 +2303,7 @@ class RunningHubAiAppManager {
     if (value288 && this['panel']?.['contains'](value288)) {
       (event7['preventDefault'](),
         event7['stopPropagation'](),
-        (this['previewAppMenuOpen'] = ![]),
+        (this['previewAppMenuOpen'] = false),
         (this['pendingDeleteSavedAppId'] = ''),
         (this['pendingOverwriteSavedAppId'] = ''),
         (this['pendingOverwriteIntent'] = ''),
@@ -2341,7 +2341,7 @@ class RunningHubAiAppManager {
     (window['clearTimeout'](this['parseTimer']),
       this['_saveKindState'](),
       (this['kind'] = kind6),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -2426,12 +2426,12 @@ class RunningHubAiAppManager {
       }
     (this['_renderComponentConfig'](),
       this['_patchPreviewWithoutRebuild'](this['currentBundle'], {
-        renderInputs: !![],
-        renderParams: !![],
-        renderAdvanced: !![],
-        renderPrompt: !![],
-        renderAppChrome: !![],
-        renderActionControls: !![],
+        renderInputs: true,
+        renderParams: true,
+        renderAdvanced: true,
+        renderPrompt: true,
+        renderAppChrome: true,
+        renderActionControls: true,
       }),
       this['_setSummary'](this['currentBundle']),
       this['_setError'](value297),
@@ -2503,7 +2503,7 @@ class RunningHubAiAppManager {
       ),
       (el24['textContent'] = isMediaComponent3));
   }
-  ['_commitPreviewInlineRename'](el25, { cancel: cancel = ![] } = {}) {
+  ['_commitPreviewInlineRename'](el25, { cancel: cancel = false } = {}) {
     if (!el25 || el25['dataset']['committing'] === 'true') return;
     el25['dataset']['committing'] = 'true';
     const value306 = Number(el25['dataset']['previewComponentIndex']);
@@ -2569,14 +2569,14 @@ class RunningHubAiAppManager {
     typeof window['requestAnimationFrame'] === 'function' ? window['requestAnimationFrame'](run2) : run2();
   }
   ['_restorePreviewInlineDescriptionEdit']() {
-    const value314 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+    const value314 = this['_refreshBundleFromComponents']({ renderPreview: false });
     this['_patchPreviewWithoutRebuild'](value314, {
-      renderParams: !![],
-      renderAdvanced: !![],
-      renderPrompt: !![],
+      renderParams: true,
+      renderAdvanced: true,
+      renderPrompt: true,
     });
   }
-  ['_commitPreviewInlineDescriptionEdit'](el29, { cancel: cancel = ![] } = {}) {
+  ['_commitPreviewInlineDescriptionEdit'](el29, { cancel: cancel = false } = {}) {
     if (!el29 || el29['dataset']['committing'] === 'true') return;
     el29['dataset']['committing'] = 'true';
     const value315 = Number(el29['dataset']['previewComponentIndex']),
@@ -2618,7 +2618,7 @@ class RunningHubAiAppManager {
       event8['key'] === 'Escape' &&
         (event8['preventDefault'](),
         event8['stopPropagation'](),
-        this['_commitPreviewInlineDescriptionEdit'](value319, { cancel: !![] }));
+        this['_commitPreviewInlineDescriptionEdit'](value319, { cancel: true }));
       return;
     }
     const enabled41 = event8['target']?.['closest']?.("[data-role='preview-rename-input']");
@@ -2632,7 +2632,7 @@ class RunningHubAiAppManager {
     event8['key'] === 'Escape' &&
       (event8['preventDefault'](),
       event8['stopPropagation'](),
-      this['_commitPreviewInlineRename'](enabled41, { cancel: !![] }));
+      this['_commitPreviewInlineRename'](enabled41, { cancel: true }));
   }
   ['_handlePanelFocusOut'](event9) {
     const value320 = event9['target']?.['closest']?.("[data-role='preview-description-input']");
@@ -2646,16 +2646,16 @@ class RunningHubAiAppManager {
     if (value321 && this['panel']?.['contains'](value321)) return;
     this['_commitPreviewInlineRename'](enabled42);
   }
-  ['_closeComponentSelectMenus'](value322 = null, { preserveComfyPicker: preserveComfyPicker = ![] } = {}) {
+  ['_closeComponentSelectMenus'](value322 = null, { preserveComfyPicker: preserveComfyPicker = false } = {}) {
     this['componentListEl']?.['querySelectorAll']?.('[data-component-select].is-open')['forEach']((el31) => {
       if (value322 && el31 === value322) return;
       (el31['classList']['remove']('is-open'),
         el31['querySelector']('.rh-ai-app-select-trigger')?.['setAttribute']('aria-expanded', 'false'));
     });
     if (preserveComfyPicker) return;
-    this['comfyCandidatePickerOpen'] = ![];
+    this['comfyCandidatePickerOpen'] = false;
     if (this['componentPickerEl']) {
-      ((this['componentPickerEl']['hidden'] = ![]),
+      ((this['componentPickerEl']['hidden'] = false),
         this['componentPickerEl']['setAttribute']('aria-hidden', 'true'));
       const el32 = this['componentPickerEl']['closest']?.('.rh-ai-app-comfy-add-panel');
       el32?.['classList']?.['remove']('is-open');
@@ -2667,12 +2667,12 @@ class RunningHubAiAppManager {
   ['_closeInlineMenusBeforeContextMenu']() {
     this['_closeComponentSelectMenus']();
     if (!this['previewAppMenuOpen']) return;
-    ((this['previewAppMenuOpen'] = ![]),
+    ((this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''));
     const el34 = this['panel']?.['querySelector']?.('[data-role=\'saved-app-menu\']');
-    if (el34) el34['hidden'] = !![];
+    if (el34) el34['hidden'] = true;
   }
   ['_toggleComponentSelect'](el35) {
     const el36 = el35?.['closest']?.('[data-component-select]');
@@ -2681,7 +2681,7 @@ class RunningHubAiAppManager {
     (this['_closeComponentSelectMenus'](el36),
       el36['classList']['toggle']('is-open', value323),
       el35['setAttribute']('aria-expanded', value323 ? 'true' : 'false'),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -2714,7 +2714,7 @@ class RunningHubAiAppManager {
           ? this['previewDragController']['captureComponentRect'](value325)
           : null;
     (this['_closeComponentSelectMenus'](),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''));
@@ -2761,7 +2761,7 @@ class RunningHubAiAppManager {
   }
   ['_syncWorkflowInputCollapsed']() {
     const enabled48 = Boolean(this['currentBundle']);
-    if (!enabled48) this['workflowInputCollapsed'] = ![];
+    if (!enabled48) this['workflowInputCollapsed'] = false;
     this['workflowInputFieldEl']?.['classList']?.['toggle'](
       'is-collapsed',
       enabled48 && this['workflowInputCollapsed'],
@@ -2810,7 +2810,7 @@ class RunningHubAiAppManager {
   }
   ['_setWorkflowJsonDropActive'](enabled50) {
     if (!enabled50) this['workflowJsonDragDepth'] = 0;
-    this['workflowInputFieldEl']?.['classList']?.['toggle']('is-json-drag-over', enabled50 === !![]);
+    this['workflowInputFieldEl']?.['classList']?.['toggle']('is-json-drag-over', enabled50 === true);
   }
   ['_canAcceptWorkflowJsonDrop'](value335) {
     return Boolean(this['sourceType'] && hasFileDragPayload(value335));
@@ -2820,12 +2820,12 @@ class RunningHubAiAppManager {
     (event10['preventDefault'](),
       event10['stopPropagation'](),
       (this['workflowJsonDragDepth'] += 1),
-      this['_setWorkflowJsonDropActive'](!![]));
+      this['_setWorkflowJsonDropActive'](true));
     if (event10['dataTransfer']) event10['dataTransfer']['dropEffect'] = 'copy';
   }
   ['_handleWorkflowJsonFileDragOver'](event11) {
     if (!this['_canAcceptWorkflowJsonDrop'](event11)) return;
-    (event11['preventDefault'](), event11['stopPropagation'](), this['_setWorkflowJsonDropActive'](!![]));
+    (event11['preventDefault'](), event11['stopPropagation'](), this['_setWorkflowJsonDropActive'](true));
     if (event11['dataTransfer']) event11['dataTransfer']['dropEffect'] = 'copy';
   }
   ['_handleWorkflowJsonFileDragLeave'](event12) {
@@ -2833,11 +2833,11 @@ class RunningHubAiAppManager {
     (event12['preventDefault'](),
       event12['stopPropagation'](),
       (this['workflowJsonDragDepth'] = Math['max'](0, this['workflowJsonDragDepth'] - 1)));
-    if (this['workflowJsonDragDepth'] === 0) this['_setWorkflowJsonDropActive'](![]);
+    if (this['workflowJsonDragDepth'] === 0) this['_setWorkflowJsonDropActive'](false);
   }
   async ['_handleWorkflowJsonFileDrop'](event13) {
     if (!this['_canAcceptWorkflowJsonDrop'](event13)) return;
-    (event13['preventDefault'](), event13['stopPropagation'](), this['_setWorkflowJsonDropActive'](![]));
+    (event13['preventDefault'](), event13['stopPropagation'](), this['_setWorkflowJsonDropActive'](false));
     const [error6] = Array['from'](event13['dataTransfer']?.['files'] || []);
     if (!error6) return;
     if (!isJsonFile(error6)) {
@@ -2853,8 +2853,8 @@ class RunningHubAiAppManager {
       if (this['textarea']) this['textarea']['value'] = String(value337 || '');
       ((this['appName'] = normalizeDroppedJsonAppName(error6['name'])),
         (this['savedAppId'] = ''),
-        (this['workflowInputCollapsed'] = ![]),
-        (this['previewAppMenuOpen'] = ![]),
+        (this['workflowInputCollapsed'] = false),
+        (this['previewAppMenuOpen'] = false),
         (this['pendingDeleteSavedAppId'] = ''),
         (this['pendingOverwriteSavedAppId'] = ''),
         (this['pendingOverwriteIntent'] = ''),
@@ -2877,7 +2877,7 @@ class RunningHubAiAppManager {
       isComfyUiSource4 + '\n' + String(value341 || '')['trim']() + '\n' + String(value340 || '')['trim']()
     );
   }
-  ['_syncComponentDrafts']({ force: force = ![] } = {}) {
+  ['_syncComponentDrafts']({ force: force = false } = {}) {
     const value342 = this['_getInputText'](),
       appId = this['_getAppIdText'](),
       value343 = this['_getComponentDraftKey'](value342, appId);
@@ -2894,7 +2894,7 @@ class RunningHubAiAppManager {
           : createComfyUiWorkflowComponentDrafts(value342);
       ((this['componentDraftKey'] = value343),
         (this['comfyCandidateSearchText'] = ''),
-        (this['comfyCandidatePickerOpen'] = ![]),
+        (this['comfyCandidatePickerOpen'] = false),
         (this['componentCandidates'] = cloneComponentDrafts(components3)),
         (this['componentDrafts'] = preserveComfyComponentDrafts(this['componentDrafts'], components3)),
         this['_renderComponentConfig']());
@@ -2909,7 +2909,7 @@ class RunningHubAiAppManager {
       (this['componentDraftKey'] = value343),
       (this['componentDrafts'] = cloneComponentDrafts(components4)),
       (this['componentCandidates'] = []),
-      (this['comfyCandidatePickerOpen'] = ![]),
+      (this['comfyCandidatePickerOpen'] = false),
       this['_renderComponentConfig']());
   }
   ['_renderComponentConfig']() {
@@ -2920,19 +2920,19 @@ class RunningHubAiAppManager {
         this['appDescription'],
         {},
       )),
-      this['builderEl'] && (this['builderEl']['hidden'] = ![]));
+      this['builderEl'] && (this['builderEl']['hidden'] = false));
   }
-  ['_renderComfyCandidatePicker']({ open: open = ![], preserveSearchFocus: preserveSearchFocus = ![] } = {}) {
+  ['_renderComfyCandidatePicker']({ open: open = false, preserveSearchFocus: preserveSearchFocus = false } = {}) {
     if (!this['componentPickerEl']) return;
     const enabled52 = this['_shouldShowManualComponentPicker']() && Boolean(this['componentDraftKey']);
     if (!enabled52) {
-      ((this['comfyCandidatePickerOpen'] = ![]),
-        (this['componentPickerEl']['hidden'] = !![]),
+      ((this['comfyCandidatePickerOpen'] = false),
+        (this['componentPickerEl']['hidden'] = true),
         this['componentPickerEl']['setAttribute']('aria-hidden', 'true'),
         (this['componentPickerEl']['innerHTML'] = ''));
       return;
     }
-    this['comfyCandidatePickerOpen'] = open === !![];
+    this['comfyCandidatePickerOpen'] = open === true;
     const value344 = new Set(
       this['componentDrafts']
         ['map']((value345) => Number(value345?.['index']))
@@ -2943,13 +2943,13 @@ class RunningHubAiAppManager {
       value344,
       this['comfyCandidateSearchText'],
     )),
-      (this['componentPickerEl']['hidden'] = ![]),
-      this['componentPickerEl']['setAttribute']('aria-hidden', open === !![] ? 'false' : 'true'));
+      (this['componentPickerEl']['hidden'] = false),
+      this['componentPickerEl']['setAttribute']('aria-hidden', open === true ? 'false' : 'true'));
     const el40 = this['componentPickerEl']['closest']?.('.rh-ai-app-comfy-add-panel');
-    el40?.['classList']?.['toggle']('is-open', open === !![]);
+    el40?.['classList']?.['toggle']('is-open', open === true);
     const el41 = el40?.['querySelector']?.('[data-action=\'toggle-comfy-candidate-select\']');
-    el41?.['setAttribute']('aria-expanded', open === !![] ? 'true' : 'false');
-    if (el41) el41['textContent'] = open === !![] ? '收起组件' : '点击添加组件';
+    el41?.['setAttribute']('aria-expanded', open === true ? 'true' : 'false');
+    if (el41) el41['textContent'] = open === true ? '收起组件' : '点击添加组件';
     if (open && preserveSearchFocus) {
       const el42 = el40?.['querySelector']('[data-role=\'comfyui-candidate-search\']'),
         value347 = String(this['comfyCandidateSearchText'] || '')['length'];
@@ -2959,12 +2959,12 @@ class RunningHubAiAppManager {
   ['_toggleComfyCandidateMenu']() {
     if (!this['_shouldShowManualComponentPicker']()) return;
     if (!this['componentDraftKey']) {
-      ((this['comfyCandidatePickerOpen'] = ![]), this['_renderComfyCandidatePicker']({ open: ![] }));
+      ((this['comfyCandidatePickerOpen'] = false), this['_renderComfyCandidatePicker']({ open: false }));
       return;
     }
-    const open2 = this['comfyCandidatePickerOpen'] !== !![];
-    (this['_closeComponentSelectMenus'](null, { preserveComfyPicker: !![] }),
-      (this['previewAppMenuOpen'] = ![]),
+    const open2 = this['comfyCandidatePickerOpen'] !== true;
+    (this['_closeComponentSelectMenus'](null, { preserveComfyPicker: true }),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''));
@@ -3001,17 +3001,17 @@ class RunningHubAiAppManager {
       ...args5,
       label: getComfyUiCandidateDefaultComponentName(args5),
     }),
-      (this['comfyCandidatePickerOpen'] = !![]));
-    const value355 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+      (this['comfyCandidatePickerOpen'] = true));
+    const value355 = this['_refreshBundleFromComponents']({ renderPreview: false });
     (this['_patchPreviewWithoutRebuild'](value355, {
-      renderInputs: !![],
-      renderParams: !![],
-      renderAdvanced: !![],
-      renderPrompt: !![],
-      renderAppChrome: !![],
-      renderActionControls: !![],
+      renderInputs: true,
+      renderParams: true,
+      renderAdvanced: true,
+      renderPrompt: true,
+      renderAppChrome: true,
+      renderActionControls: true,
     }),
-      this['_renderComfyCandidatePicker']({ open: !![] }),
+      this['_renderComfyCandidatePicker']({ open: true }),
       this['_restoreComfyCandidateScrollState'](value354),
       requestAnimationFrame(() => this['_restoreComfyCandidateScrollState'](value354)));
   }
@@ -3051,9 +3051,9 @@ class RunningHubAiAppManager {
       (this['componentCandidates'] = []),
       (this['promptHelpTooltip'] = ''),
       (this['comfyCandidateSearchText'] = ''),
-      (this['comfyCandidatePickerOpen'] = ![]),
-      (this['workflowInputCollapsed'] = ![]),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['comfyCandidatePickerOpen'] = false),
+      (this['workflowInputCollapsed'] = false),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
@@ -3061,19 +3061,19 @@ class RunningHubAiAppManager {
       this['_renderComponentConfig'](),
       this['_renderNodePreview'](null),
       this['_syncWorkflowInputCollapsed'](),
-      this['_setActionButtonsEnabled'](![]));
+      this['_setActionButtonsEnabled'](false));
   }
   ['_clearCurrentDraftIdentity']() {
     ((this['savedAppId'] = ''),
       (this['appName'] = DEFAULT_AI_APP_NAME),
       (this['appDescription'] = ''),
       (this['promptHelpTooltip'] = ''),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''));
   }
-  ['_buildCurrentBundle']({ syncComponents: syncComponents = !![] } = {}) {
+  ['_buildCurrentBundle']({ syncComponents: syncComponents = true } = {}) {
     if (this['_isRunningHubAiAppSource']())
       assertRunningHubDefinitionProfile(this['_getInputText'](), this['runningHubProfileId']);
     if (syncComponents) this['definitionController']['syncInputSource']();
@@ -3112,16 +3112,16 @@ class RunningHubAiAppManager {
       appKey: this['savedAppId'],
     });
   }
-  ['_refreshBundleFromComponents']({ renderPreview: renderPreview = !![] } = {}) {
+  ['_refreshBundleFromComponents']({ renderPreview: renderPreview = true } = {}) {
     try {
-      const value365 = this['_buildCurrentBundle']({ syncComponents: ![] });
+      const value365 = this['_buildCurrentBundle']({ syncComponents: false });
       ((this['currentBundle'] = value365), this['_setSummary'](value365), this['_setError'](''));
       if (renderPreview) this['_renderNodePreview'](value365);
-      return (this['_setActionButtonsEnabled'](!![]), this['_saveKindState'](), value365);
+      return (this['_setActionButtonsEnabled'](true), this['_saveKindState'](), value365);
     } catch (error8) {
       return (
         (this['currentBundle'] = null),
-        this['_setActionButtonsEnabled'](![]),
+        this['_setActionButtonsEnabled'](false),
         this['_setError'](error8?.['message'] || '解析失败'),
         this['_saveKindState'](),
         null
@@ -3146,7 +3146,7 @@ class RunningHubAiAppManager {
     const controlType8 = normalizeControlType(enabled54['controlType']);
     if (controlType8 === 'toggle')
       enabled54['defaultValue'] =
-        value367 === !![] || String(value367)['toLowerCase']() === 'true' ? 'true' : 'false';
+        value367 === true || String(value367)['toLowerCase']() === 'true' ? 'true' : 'false';
     else {
       if (controlType8 === 'stepper')
         enabled54['defaultValue'] = String(Math['trunc'](Number(value367) || 0));
@@ -3157,7 +3157,7 @@ class RunningHubAiAppManager {
         } else enabled54['defaultValue'] = String(value367 ?? '');
       }
     }
-    const value370 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+    const value370 = this['_refreshBundleFromComponents']({ renderPreview: false });
     return buildPreviewUiSchemaNodeData(value370 || this['currentBundle']);
   }
   ['_decoratePreviewAdvancedFields'](value371 = this['currentBundle']) {
@@ -3216,7 +3216,7 @@ class RunningHubAiAppManager {
     if (el48 && this['panel']?.['contains'](el48)) {
       if (this['comfyCandidateSearchText'] === String(el48['value'] || '')) return;
       ((this['comfyCandidateSearchText'] = String(el48['value'] || '')),
-        this['_renderComfyCandidatePicker']({ open: !![], preserveSearchFocus: !![] }));
+        this['_renderComfyCandidatePicker']({ open: true, preserveSearchFocus: true }));
       return;
     }
     const el49 = event14['target']?.['closest']?.('[data-app-prop]');
@@ -3231,7 +3231,7 @@ class RunningHubAiAppManager {
         if (value373 === 'appDescription') this['appDescription'] = String(el49['value'] || '');
         else return;
       }
-      (this['_refreshBundleFromComponents']({ renderPreview: ![] }), this['_patchPreviewAppChrome']());
+      (this['_refreshBundleFromComponents']({ renderPreview: false }), this['_patchPreviewAppChrome']());
       return;
     }
     const el50 = event14['target']?.['closest']?.('[data-component-prop]');
@@ -3250,8 +3250,8 @@ class RunningHubAiAppManager {
   }
   ['_updatePromptHelpTooltip'](value375) {
     this['promptHelpTooltip'] = normalizePromptHelpTooltip(value375);
-    const value376 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
-    this['_patchPreviewWithoutRebuild'](value376, { renderPrompt: !![] });
+    const value376 = this['_refreshBundleFromComponents']({ renderPreview: false });
+    this['_patchPreviewWithoutRebuild'](value376, { renderPrompt: true });
   }
   ['_updateComponentDraft'](
     value377,
@@ -3265,7 +3265,7 @@ class RunningHubAiAppManager {
     const enabled56 = this['componentDrafts']['find']((value379) => Number(value379['index']) === value377);
     if (!enabled56) return;
     if (renderInputs === 'componentKind') {
-      if (enabled56['componentKindLocked'] === !![]) return;
+      if (enabled56['componentKindLocked'] === true) return;
       const componentKind4 = normalizeComponentKind(value378),
         componentKindOptions2 = getComponentKindOptions(
           enabled56,
@@ -3285,7 +3285,7 @@ class RunningHubAiAppManager {
         delete enabled56['previewPlacement']);
     } else {
       if (renderInputs === 'controlType') {
-        if (enabled56['controlTypeLocked'] === !![]) return;
+        if (enabled56['controlTypeLocked'] === true) return;
         const controlType9 = normalizeControlType(value378),
           controlTypeOptions2 = getControlTypeOptions(
             enabled56,
@@ -3320,11 +3320,11 @@ class RunningHubAiAppManager {
     }
     if (renderInputs === 'componentKind' || renderInputs === 'controlType') this['_renderComponentConfig']();
     const renderPrompt = shouldRefreshPreviewPromptForDraft(enabled56, renderInputs),
-      value381 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+      value381 = this['_refreshBundleFromComponents']({ renderPreview: false });
     (this['_patchPreviewWithoutRebuild'](value381, {
       renderInputs: renderInputs === 'componentKind' || renderInputs === 'label',
-      renderParams: !![],
-      renderAdvanced: !![],
+      renderParams: true,
+      renderAdvanced: true,
       renderPrompt: renderPrompt,
     }),
       animatePreviewMoveFromRect &&
@@ -3395,13 +3395,13 @@ class RunningHubAiAppManager {
     this['componentDrafts'] = this['componentDrafts']['filter'](
       (value388) => Number(value388?.['index']) !== value387,
     );
-    const value389 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+    const value389 = this['_refreshBundleFromComponents']({ renderPreview: false });
     (this['_patchPreviewWithoutRebuild'](value389, {
-      renderParams: !![],
-      renderAdvanced: !![],
-      renderPrompt: !![],
-      renderAppChrome: !![],
-      renderActionControls: !![],
+      renderParams: true,
+      renderAdvanced: true,
+      renderPrompt: true,
+      renderAppChrome: true,
+      renderActionControls: true,
     }),
       this['_renderComfyCandidatePicker']({ open: this['comfyCandidatePickerOpen'] }));
   }
@@ -3414,14 +3414,14 @@ class RunningHubAiAppManager {
     this['componentDrafts'] = this['componentDrafts']['filter'](
       (value391) => Number(value391?.['index']) !== value390,
     );
-    const value392 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+    const value392 = this['_refreshBundleFromComponents']({ renderPreview: false });
     (this['_patchPreviewWithoutRebuild'](value392, {
-      renderInputs: !![],
-      renderParams: !![],
-      renderAdvanced: !![],
-      renderPrompt: !![],
-      renderAppChrome: !![],
-      renderActionControls: !![],
+      renderInputs: true,
+      renderParams: true,
+      renderAdvanced: true,
+      renderPrompt: true,
+      renderAppChrome: true,
+      renderActionControls: true,
     }),
       this['_renderComfyCandidatePicker']({ open: this['comfyCandidatePickerOpen'] }));
   }
@@ -3437,20 +3437,20 @@ class RunningHubAiAppManager {
       return;
     }
     (this['_saveKindState'](),
-      (this['parseTimer'] = window['setTimeout'](() => this['_parseNow']({ silent: !![] }), 180)));
+      (this['parseTimer'] = window['setTimeout'](() => this['_parseNow']({ silent: true }), 180)));
   }
-  ['_parseNow']({ silent: silent = ![] } = {}) {
+  ['_parseNow']({ silent: silent = false } = {}) {
     window['clearTimeout'](this['parseTimer']);
     const enabled57 = this['_getInputText']();
     try {
       const value393 = this['_buildCurrentBundle']();
       this['currentBundle'] = value393;
-      if (!silent) this['workflowInputCollapsed'] = !![];
+      if (!silent) this['workflowInputCollapsed'] = true;
       return (
         this['_setSummary'](value393),
         this['_setError'](''),
         this['_renderNodePreview'](value393),
-        this['_setActionButtonsEnabled'](!![]),
+        this['_setActionButtonsEnabled'](true),
         this['_saveKindState'](),
         value393
       );
@@ -3466,7 +3466,7 @@ class RunningHubAiAppManager {
           );
       if (enabled58) this['_clearCurrentDraftIdentity']();
       if (enabled58 || !enabled59) this['_clearBuilder']();
-      (this['_setSummary'](null), this['_setActionButtonsEnabled'](![]));
+      (this['_setSummary'](null), this['_setActionButtonsEnabled'](false));
       if (!silent || enabled57['trim']()) this['_setError'](error9?.['message'] || '解析失败');
       else this['_setError']('');
       return (this['_saveKindState'](), null);
@@ -3490,7 +3490,7 @@ class RunningHubAiAppManager {
   }
   async ['_saveCurrentConfigAsSavedApp']({
     overwriteSavedAppId: overwriteSavedAppId = '',
-    isCurrentDraft: isCurrentDraft = () => !![],
+    isCurrentDraft: isCurrentDraft = () => true,
   } = {}) {
     const value395 = String(overwriteSavedAppId || '')['trim'](),
       enabled60 = value395 ? this['_findSavedApp'](value395) : null;
@@ -3505,34 +3505,34 @@ class RunningHubAiAppManager {
         this['savedApps'] = value397;
       }));
     if (value396) unregisterCustomAiAppBundle(value396, this['registeredBundleKeys']);
-    (registerCustomAiAppBundle(bundle3, this['registeredBundleKeys'], { replace: !![] }),
+    (registerCustomAiAppBundle(bundle3, this['registeredBundleKeys'], { replace: true }),
       this['_registerBundlesFromNodes']());
-    if (!isCurrentDraft()) return { record: record2, bundle: bundle3, isCurrentDraft: ![] };
+    if (!isCurrentDraft()) return { record: record2, bundle: bundle3, isCurrentDraft: false };
     return (
       (this['savedAppId'] = record2['id']),
       (this['currentBundle'] = bundle3),
       (this['appName'] = record2['name']),
       (this['appDescription'] = record2['description']),
       (this['promptHelpTooltip'] = normalizePromptHelpTooltip(record2['promptHelpTooltip'])),
-      (this['previewAppMenuOpen'] = ![]),
+      (this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''),
       this['_setSummary'](bundle3),
-      this['_setActionButtonsEnabled'](!![]),
+      this['_setActionButtonsEnabled'](true),
       this['_saveKindState'](),
-      { record: record2, bundle: bundle3, isCurrentDraft: !![] }
+      { record: record2, bundle: bundle3, isCurrentDraft: true }
     );
   }
   ['_patchSavedConfigSuccessPreview'](value399) {
     (this['_renderComponentConfig'](),
       this['_patchPreviewWithoutRebuild'](value399, {
-        renderInputs: !![],
-        renderParams: !![],
-        renderAdvanced: !![],
-        renderPrompt: !![],
-        renderAppChrome: !![],
-        renderActionControls: !![],
+        renderInputs: true,
+        renderParams: true,
+        renderAdvanced: true,
+        renderPrompt: true,
+        renderAppChrome: true,
+        renderActionControls: true,
       }));
   }
   ['_saveConfigFromCurrentInput']() {
@@ -3565,8 +3565,8 @@ class RunningHubAiAppManager {
       (this['componentDrafts'] = cloneComponentDrafts(error10['componentDrafts'])));
     (this['_shouldShowManualComponentPicker']() || !this['componentDrafts']['length']) &&
       error10['input']['trim']() &&
-      this['_syncComponentDrafts']({ force: !![] });
-    ((this['previewAppMenuOpen'] = ![]),
+      this['_syncComponentDrafts']({ force: true });
+    ((this['previewAppMenuOpen'] = false),
       (this['pendingDeleteSavedAppId'] = ''),
       (this['pendingOverwriteSavedAppId'] = ''),
       (this['pendingOverwriteIntent'] = ''));
@@ -3579,19 +3579,19 @@ class RunningHubAiAppManager {
         this['_setError'](''),
         this['_renderComponentConfig'](),
         this['_patchPreviewWithoutRebuild'](value402, {
-          renderInputs: !![],
-          renderParams: !![],
-          renderAdvanced: !![],
-          renderPrompt: !![],
-          renderAppChrome: !![],
-          renderActionControls: !![],
+          renderInputs: true,
+          renderParams: true,
+          renderAdvanced: true,
+          renderPrompt: true,
+          renderAppChrome: true,
+          renderActionControls: true,
         }),
-        this['_setActionButtonsEnabled'](!![]));
+        this['_setActionButtonsEnabled'](true));
     } catch (error11) {
       ((this['currentBundle'] = null),
         this['_setSummary'](null),
         this['_setError'](error11?.['message'] || '配置载入失败'),
-        this['_setActionButtonsEnabled'](![]));
+        this['_setActionButtonsEnabled'](false));
     }
     this['_saveKindState']();
   }
@@ -3615,7 +3615,7 @@ class RunningHubAiAppManager {
         this['_clearBuilder'](),
         this['_setSummary'](null),
         this['_setError'](''));
-    } else ((this['previewAppMenuOpen'] = !![]), this['_patchPreviewAppChrome']());
+    } else ((this['previewAppMenuOpen'] = true), this['_patchPreviewAppChrome']());
     (this['_persistSavedApps'](),
       this['_saveKindState'](),
       window['showToast']?.(this['_getSourceMeta']()?.['deleteSuccess'] || '配置已删除', 'success'));
@@ -3640,7 +3640,7 @@ class RunningHubAiAppManager {
     );
   }
   async ['_createNodeFromCurrentInput']() {
-    if (!this['_refreshBundleFromComponents']({ renderPreview: ![] })) return;
+    if (!this['_refreshBundleFromComponents']({ renderPreview: false })) return;
     let rhAiAppTestBundle;
     try {
       ((rhAiAppTestBundle = buildRhAiAppTestBundle(this)),

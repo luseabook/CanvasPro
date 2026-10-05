@@ -57,11 +57,11 @@ export function buildImageCropOutputSize(
   };
 }
 export function isLoadedCropImageElement(el) {
-  if (!el || String(el['tagName'] || '')['toUpperCase']() !== 'IMG') return ![];
-  if (el['complete'] === ![]) return ![];
-  if (String(el['style']?.['display'] || '')['toLowerCase']() === 'none') return ![];
+  if (!el || String(el['tagName'] || '')['toUpperCase']() !== 'IMG') return false;
+  if (el['complete'] === false) return false;
+  if (String(el['style']?.['display'] || '')['toLowerCase']() === 'none') return false;
   const payload = String(el['dataset']?.['lodSrc'] || '')['trim']();
-  if (payload === 'thumb' || payload === 'placeholder') return ![];
+  if (payload === 'thumb' || payload === 'placeholder') return false;
   return (
     Math['max'](0, Math['round'](Number(el['naturalWidth'] || el['width'] || 0))) > 0 &&
     Math['max'](0, Math['round'](Number(el['naturalHeight'] || el['height'] || 0))) > 0
@@ -147,7 +147,7 @@ export function buildImageCropDragRect({
   return { rect: rect, isValid: rect['w'] >= value2 && rect['h'] >= value2 };
 }
 const ImageCropController = {
-  active: ![],
+  active: false,
   nodeData: null,
   cropRect: { x: 0, y: 0, w: 0, h: 0 },
   aspectRatio: null,
@@ -160,15 +160,15 @@ const ImageCropController = {
   _unsubscribeLocale: null,
   _view: null,
   _redrawSelection: null,
-  _isProcessingCrop: ![],
+  _isProcessingCrop: false,
   init(value3) {
     if (this['active']) return;
     const viewport = appStore['getStateRaw'](),
       node2 = viewport['nodes']?.[value3];
     if (!node2) return;
-    ((this['active'] = !![]),
+    ((this['active'] = true),
       (this['nodeData'] = node2),
-      (this['_isProcessingCrop'] = ![]),
+      (this['_isProcessingCrop'] = false),
       (this['aspectRatio'] = null),
       (this['_view'] = { viewport: viewport['viewport'], node: node2 }),
       (this['_redrawSelection'] = null));
@@ -314,7 +314,7 @@ const ImageCropController = {
     const el22 = document['createElement']('div');
     el22['className'] = 'floating-menu v2-expand-menu v2-crop-ratio-menu';
     const list2 = [
-      { v: 'free', key: 'free', active: !![] },
+      { v: 'free', key: 'free', active: true },
       { v: 'original', key: 'original' },
       { v: '21:9', t: '21:9' },
       { v: '16:9', t: '16:9' },
@@ -464,7 +464,7 @@ const ImageCropController = {
     }
   },
   _isPointInsideNode(box10) {
-    if (!this['nodeData'] || !box10) return ![];
+    if (!this['nodeData'] || !box10) return false;
     return (
       box10['x'] >= this['nodeData']['x'] &&
       box10['x'] <= this['nodeData']['x'] + this['nodeData']['width'] &&
@@ -489,7 +489,7 @@ const ImageCropController = {
       }),
       this['_applyRedrawVisualState']());
   },
-  _exitRedrawSelectionMode({ restore: restore = !![] } = {}) {
+  _exitRedrawSelectionMode({ restore: restore = true } = {}) {
     const args = this['_redrawSelection']?.['previousRect'];
     ((this['_redrawSelection'] = null),
       restore && args && ((this['cropRect'] = { ...args }), this['_updateView'](this['_view'])),
@@ -497,7 +497,7 @@ const ImageCropController = {
   },
   _beginRedrawSelection(pointerId) {
     const startPoint2 = this['_getWorldPointFromEvent'](pointerId);
-    if (!this['_isPointInsideNode'](startPoint2)) return ![];
+    if (!this['_isPointInsideNode'](startPoint2)) return false;
     const previousRect = this['_redrawSelection']?.['previousRect'] || { ...this['cropRect'] };
     return (
       (this['_redrawSelection'] = {
@@ -511,7 +511,7 @@ const ImageCropController = {
       this['_applyRedrawVisualState'](),
       this['_updateView'](this['_view']),
       this['overlayEl']?.['setPointerCapture']?.(pointerId['pointerId']),
-      !![]
+      true
     );
   },
   _updateRedrawSelection(value34) {
@@ -529,7 +529,7 @@ const ImageCropController = {
       args2?.['rect'] &&
         ((this['cropRect'] = { ...args2['rect'] }), this['_updateView'](this['_view'])));
   },
-  _finishRedrawSelection(value35, { cancel: cancel = ![] } = {}) {
+  _finishRedrawSelection(value35, { cancel: cancel = false } = {}) {
     const event3 = this['_redrawSelection'];
     if (event3?.['mode'] !== 'dragging') return;
     !cancel && this['_updateRedrawSelection'](value35);
@@ -546,17 +546,17 @@ const ImageCropController = {
   },
   _bindEvents() {
     const value37 = (event4) => event4['stopPropagation']();
-    this['overlayEl']['addEventListener']('wheel', value37, { passive: ![] });
+    this['overlayEl']['addEventListener']('wheel', value37, { passive: false });
     const value38 = () => this['_updateView'](this['_view']);
     window['addEventListener']('resize', value38);
-    let enabled4 = ![],
+    let enabled4 = false,
       box11 = { x: 0, y: 0 },
       box12 = { ...this['cropRect'] },
       list3 = null;
     const value39 = (event5) => {
       if (event5['key'] === 'Escape') {
         if (this['_redrawSelection']?.['mode'] === 'dragging') {
-          this['_finishRedrawSelection'](event5, { cancel: !![] });
+          this['_finishRedrawSelection'](event5, { cancel: true });
           return;
         }
         this['exit']();
@@ -567,7 +567,7 @@ const ImageCropController = {
     window['addEventListener']('keydown', value39);
     const value40 = (event6) => {
       if (event6['key'] !== 'Control') return;
-      this['_redrawSelection']?.['mode'] === 'armed' && this['_exitRedrawSelectionMode']({ restore: !![] });
+      this['_redrawSelection']?.['mode'] === 'armed' && this['_exitRedrawSelectionMode']({ restore: true });
     };
     window['addEventListener']('keyup', value40);
     const value41 = (event7) => {
@@ -603,17 +603,17 @@ const ImageCropController = {
           return;
         (event10['preventDefault'](),
           event10['stopPropagation'](),
-          this['_finishRedrawSelection'](event10, { cancel: !![] }));
+          this['_finishRedrawSelection'](event10, { cancel: true }));
       };
-    (this['overlayEl']['addEventListener']('pointerdown', value41, !![]),
-      this['overlayEl']['addEventListener']('pointermove', value42, !![]),
-      this['overlayEl']['addEventListener']('pointerup', value43, !![]),
-      this['overlayEl']['addEventListener']('pointercancel', value44, !![]),
+    (this['overlayEl']['addEventListener']('pointerdown', value41, true),
+      this['overlayEl']['addEventListener']('pointermove', value42, true),
+      this['overlayEl']['addEventListener']('pointerup', value43, true),
+      this['overlayEl']['addEventListener']('pointercancel', value44, true),
       this['boxEl']['addEventListener']('pointerdown', (x5) => {
         if (x5['target']['classList']['contains']('v2-crop-handle')) return;
         if (x5['ctrlKey']) return;
         (x5['stopPropagation'](),
-          (enabled4 = !![]),
+          (enabled4 = true),
           (box11 = { x: x5['clientX'], y: x5['clientY'] }),
           (box12 = { ...this['cropRect'] }),
           this['boxEl']['setPointerCapture'](x5['pointerId']));
@@ -643,7 +643,7 @@ const ImageCropController = {
           this['_updateView'](this['_view']));
       }));
     const value52 = () => {
-      enabled4 = ![];
+      enabled4 = false;
     };
     (this['boxEl']['addEventListener']('pointerup', value52),
       this['boxEl']['addEventListener']('pointercancel', value52),
@@ -693,10 +693,10 @@ const ImageCropController = {
                 Math['min'](value60, this['nodeData']['y'] + this['nodeData']['height'] - y4),
               );
           };
-        if (list3['includes']('r')) run3(box12['w'] + value54, ![]);
-        if (list3['includes']('l')) run3(box12['w'] - value54, !![]);
-        if (list3['includes']('b')) handler3(box12['h'] + value55, ![]);
-        if (list3['includes']('t')) handler3(box12['h'] - value55, !![]);
+        if (list3['includes']('r')) run3(box12['w'] + value54, false);
+        if (list3['includes']('l')) run3(box12['w'] - value54, true);
+        if (list3['includes']('b')) handler3(box12['h'] + value55, false);
+        if (list3['includes']('t')) handler3(box12['h'] - value55, true);
         if (this['aspectRatio']) {
           if (list3 === 'tm' || list3 === 'bm' || list3 === 'lm' || list3 === 'rm')
             list3['includes']('m') &&
@@ -793,10 +793,10 @@ const ImageCropController = {
           window['removeEventListener']('keyup', value40),
           document['removeEventListener']('pointerdown', value70),
           this['overlayEl']['removeEventListener']('wheel', value37),
-          this['overlayEl']['removeEventListener']('pointerdown', value41, !![]),
-          this['overlayEl']['removeEventListener']('pointermove', value42, !![]),
-          this['overlayEl']['removeEventListener']('pointerup', value43, !![]),
-          this['overlayEl']['removeEventListener']('pointercancel', value44, !![]));
+          this['overlayEl']['removeEventListener']('pointerdown', value41, true),
+          this['overlayEl']['removeEventListener']('pointermove', value42, true),
+          this['overlayEl']['removeEventListener']('pointerup', value43, true),
+          this['overlayEl']['removeEventListener']('pointercancel', value44, true));
       }));
   },
   _subscribeLocaleChanges() {
@@ -837,7 +837,7 @@ const ImageCropController = {
   },
   exit() {
     if (!this['active']) return;
-    ((this['active'] = ![]), (this['_isProcessingCrop'] = ![]));
+    ((this['active'] = false), (this['_isProcessingCrop'] = false));
     this['_unsubscribe'] && (this['_unsubscribe'](), (this['_unsubscribe'] = null));
     (this['_unsubscribeViewportPreview']?.(), (this['_unsubscribeViewportPreview'] = null));
     this['_unsubscribeLocale'] && (this['_unsubscribeLocale'](), (this['_unsubscribeLocale'] = null));
@@ -867,15 +867,15 @@ const ImageCropController = {
     const el39 = this['toolbarEl']?.['querySelector']('.confirm');
     if (!el39) return;
     const list4 = Array['from'](el39['childNodes'])['map']((value76) =>
-      value76['cloneNode'](!![]),
+      value76['cloneNode'](true),
     );
-    ((this['_isProcessingCrop'] = !![]),
+    ((this['_isProcessingCrop'] = true),
       (el39['textContent'] = imageCropText('actions.processing')),
       (el39['style']['pointerEvents'] = 'none'));
     const startedAt = Date['now']();
     let id = '',
-      enabled6 = ![],
-      enabled7 = ![],
+      enabled6 = false,
+      enabled7 = false,
       imageUrl = '',
       duration = null;
     try {
@@ -904,15 +904,15 @@ const ImageCropController = {
               src: '',
               outputText: imageCropText('actions.processing'),
               ...buildGenerationStartPatch({ startedAt: startedAt }),
-              needsAutoResize: ![],
-              fixedSize: !![],
+              needsAutoResize: false,
+              fixedSize: true,
             }),
           ],
-          persist: ![],
+          persist: false,
         }));
       const imageCropSourceUrl = resolveImageCropSourceUrl(box13),
         loadedCropImageElement = findLoadedCropImageElement(value77);
-      (this['exit'](), (enabled6 = !![]), await waitForCropBackgroundFrame());
+      (this['exit'](), (enabled6 = true), await waitForCropBackgroundFrame());
       if (!loadedCropImageElement && !imageCropSourceUrl) throw new Error(imageCropText('errors.sourceLoadFailed'));
       const value78 = loadedCropImageElement || (await this['_loadImage'](imageCropSourceUrl)),
         value79 = value78['naturalWidth'] / box13['width'],
@@ -964,15 +964,15 @@ const ImageCropController = {
         sourceUrl: imageUrl,
         thumbUrl: '',
         capturePreviewUrl: imageUrl,
-        captureSavePending: !![],
+        captureSavePending: true,
         captureSaveError: null,
         localPath: '',
         fileName: fileName['name'],
         outputText: '',
-        needsAutoResize: ![],
-        fixedSize: !![],
+        needsAutoResize: false,
+        fixedSize: true,
       }),
-        (enabled7 = !![]),
+        (enabled7 = true),
         await waitForCropBackgroundFrame());
       const imageUrl2 = await saveOutputBlob(fileName, { ext: 'jpg' }),
         localPath = pickResultLocalPath(imageUrl2),
@@ -990,7 +990,7 @@ const ImageCropController = {
             thumbUrl: imageUrl2['thumbUrl'],
             fileName: fileName2,
           },
-          { includeSrc: !![] },
+          { includeSrc: true },
         ),
         src =
           imageUrl3['src'] ||
@@ -1015,12 +1015,12 @@ const ImageCropController = {
         src: src,
         localPath: imageUrl3['localPath'] || localPath,
         capturePreviewUrl: '',
-        captureSavePending: ![],
+        captureSavePending: false,
         captureSaveError: null,
         fileName: fileName2,
         outputText: '',
-        needsAutoResize: ![],
-        fixedSize: !![],
+        needsAutoResize: false,
+        fixedSize: true,
       }),
         persistToolbarResultNodes(),
         imageUrl && (URL['revokeObjectURL'](imageUrl), (imageUrl = '')),
@@ -1035,16 +1035,16 @@ const ImageCropController = {
             startedAt: startedAt,
             clearMediaFields: !enabled7,
           }) || {}),
-          captureSavePending: ![],
+          captureSavePending: false,
           captureSaveError: error2,
           ...(enabled7 ? {} : { capturePreviewUrl: '' }),
         }),
         persistToolbarResultNodes()),
         window['showToast']?.(imageCropText('toasts.failed', { error: error2 }), 'error'),
-        (this['_isProcessingCrop'] = ![]),
+        (this['_isProcessingCrop'] = false),
         !enabled6 &&
           el39['isConnected'] &&
-          (el39['replaceChildren'](...list4['map']((value87) => value87['cloneNode'](!![]))),
+          (el39['replaceChildren'](...list4['map']((value87) => value87['cloneNode'](true))),
           (el39['style']['pointerEvents'] = 'auto')));
     }
   },

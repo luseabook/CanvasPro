@@ -51,7 +51,7 @@ function parseMentionId(current = '') {
 }
 function matchesQuery(state, config = '') {
   const text2 = normalizeText(config)['replace'](/^@+/, '')['toLowerCase']();
-  if (!text2) return !![];
+  if (!text2) return true;
   return [
     state?.['label'],
     state?.['subtitle'],
@@ -78,8 +78,8 @@ function createImageMentionCandidate({
     mediaUrl = normalizeMediaUrl(thumbUrl);
   return {
     origin: 'asset',
-    menuDirect: !![],
-    suppressTooltip: !![],
+    menuDirect: true,
+    suppressTooltip: true,
     assetId: buildMentionId(kind, assetId, itemId),
     assetIndex: 0,
     type: 'image',

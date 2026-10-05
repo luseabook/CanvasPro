@@ -30,7 +30,7 @@ export function normalizeRunningHubQueueStatusPayload(options = {}) {
   const response =
     isPlainObject(options?.['data']) && !Array['isArray'](options['data']) ? options['data'] : options;
   if (!isPlainObject(response)) return null;
-  if (response['success'] === ![]) return null;
+  if (response['success'] === false) return null;
   if (response['code'] !== undefined && Number(response['code']) !== 0) return null;
   const isPlainObject2 =
       isPlainObject(response['data']) && !Array['isArray'](response['data']) ? response['data'] : response,

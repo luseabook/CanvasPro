@@ -103,7 +103,7 @@ function sanitizeDiagnosticText(next, current = MAX_STRING_LENGTH) {
 }
 function isSensitiveDiagnosticKey(entry) {
   const record = String(entry || '');
-  if (SAFE_DIAGNOSTIC_KEYS['has'](record)) return ![];
+  if (SAFE_DIAGNOSTIC_KEYS['has'](record)) return false;
   return SENSITIVE_KEY_RE['test'](record) || PRIVATE_CONTENT_KEY_RE['test'](record);
 }
 export function sanitizeDiagnosticValue(list2, event = {}) {
@@ -175,7 +175,7 @@ export function buildDiagnosticLogEntry(error = {}, ts = new Date(), input = {})
   };
 }
 function ensureDir(value2) {
-  return (mkdirSync(value2, { recursive: !![] }), value2);
+  return (mkdirSync(value2, { recursive: true }), value2);
 }
 function safeUnlink(value3) {
   try {
@@ -196,10 +196,10 @@ function readTailSnapshot(enabled2, value7) {
     if (!enabled2 || !existsSync(enabled2))
       return {
         buffer: Buffer['alloc'](0),
-        exists: ![],
+        exists: false,
         sourceBytes: 0,
         includedBytes: 0,
-        truncated: ![],
+        truncated: false,
       };
     const exists = statSync(enabled2);
     if (!exists['isFile']() || exists['size'] <= 0)
@@ -208,7 +208,7 @@ function readTailSnapshot(enabled2, value7) {
         exists: exists['isFile'](),
         sourceBytes: Math['max'](0, Number(exists['size'] || 0)),
         includedBytes: 0,
-        truncated: ![],
+        truncated: false,
       };
     const value8 = Math['min'](exists['size'], value7),
       value9 = Math['max'](0, exists['size'] - value8),
@@ -221,7 +221,7 @@ function readTailSnapshot(enabled2, value7) {
     }
     return {
       buffer: buffer,
-      exists: !![],
+      exists: true,
       sourceBytes: exists['size'],
       includedBytes: buffer['length'],
       truncated: exists['size'] > buffer['length'],
@@ -229,11 +229,11 @@ function readTailSnapshot(enabled2, value7) {
   } catch {
     return {
       buffer: Buffer['alloc'](0),
-      exists: ![],
+      exists: false,
       sourceBytes: 0,
       includedBytes: 0,
-      truncated: ![],
-      readFailed: !![],
+      truncated: false,
+      readFailed: true,
     };
   }
 }
@@ -358,12 +358,12 @@ function describePackageFile(name, truncated, kind = {}) {
   return {
     name: name,
     kind: kind['kind'] || 'log',
-    included: kind['included'] !== ![],
+    included: kind['included'] !== false,
     sourceBytes: Number(truncated?.['sourceBytes'] || 0),
     includedBytes: Number(kind['includedBytes'] ?? truncated?.['includedBytes'] ?? 0),
-    truncated: truncated?.['truncated'] === !![],
-    readFailed: truncated?.['readFailed'] === !![],
-    redacted: kind['redacted'] === !![],
+    truncated: truncated?.['truncated'] === true,
+    readFailed: truncated?.['readFailed'] === true,
+    redacted: kind['redacted'] === true,
   };
 }
 function writeZip(value27, value28) {
@@ -417,8 +417,8 @@ export function createDiagnosticsManager(options2 = {}) {
     app = options2['app'] || null,
     handler = typeof options2['getMetadata'] === 'function' ? options2['getMetadata'] : () => ({});
   let eventSeq2 = 0,
-    enabled5 = ![],
-    value38 = ![],
+    enabled5 = false,
+    value38 = false,
     launchVersion = null;
   const precedingEvents = [];
   function logEvent(options3 = {}) {
@@ -445,9 +445,9 @@ export function createDiagnosticsManager(options2 = {}) {
         } catch {}
       precedingEvents['push'](event2);
       if (precedingEvents['length'] > 8) precedingEvents['shift']();
-      return { ok: !![] };
+      return { ok: true };
     } catch (error3) {
-      return { ok: ![], error: String(error3?.['message'] || error3) };
+      return { ok: false, error: String(error3?.['message'] || error3) };
     }
   }
   function getSuggestedPackagePath(value39 = new Date()) {
@@ -524,18 +524,18 @@ export function createDiagnosticsManager(options2 = {}) {
         describePackageFile(DESKTOP_LOG_NAME, tailSnapshot, {
           kind: 'structured-log',
           includedBytes: includedBytes2['length'],
-          redacted: !![],
+          redacted: true,
         }),
         describePackageFile(ROTATED_DESKTOP_LOG_NAME, included, {
           kind: 'structured-log-archive',
           included: included['exists'],
           includedBytes: includedBytes['length'],
-          redacted: !![],
+          redacted: true,
         }),
         describePackageFile('server.log', tailSnapshot2, {
           kind: 'backend-log',
           includedBytes: backendLog['length'],
-          redacted: !![],
+          redacted: true,
         }),
         describePackageFile(DIAGNOSTIC_README_NAME, null, {
           kind: 'instructions',
@@ -548,7 +548,7 @@ export function createDiagnosticsManager(options2 = {}) {
           kind: 'incident-evidence',
           included: included2['snapshot']['exists'],
           includedBytes: included2['buffer']['length'],
-          redacted: !![],
+          redacted: true,
         }),
       );
     }
@@ -576,11 +576,11 @@ export function createDiagnosticsManager(options2 = {}) {
         structuredLogRange: structuredLogRange['timeRange'],
         files: files,
         privacy: {
-          structuredLogsRedacted: !![],
-          backendLogRedactedDuringPackaging: !![],
-          projectFilesIncluded: ![],
-          assetFilesIncluded: ![],
-          promptsIncluded: ![],
+          structuredLogsRedacted: true,
+          backendLogRedactedDuringPackaging: true,
+          projectFilesIncluded: false,
+          assetFilesIncluded: false,
+          promptsIncluded: false,
         },
       }),
       value45 = new yazl['ZipFile']();
@@ -608,7 +608,7 @@ export function createDiagnosticsManager(options2 = {}) {
           message: 'Diagnostics package created',
           context: { filename: filename, outputDirectory: outputDirectory ? 'user-selected' : 'downloads' },
         }),
-        { ok: !![], path: path2, filename: filename }
+        { ok: true, path: path2, filename: filename }
       );
     } catch (error5) {
       logEvent({
@@ -625,7 +625,7 @@ export function createDiagnosticsManager(options2 = {}) {
     (ensureDir(logDir),
       !existsSync(desktopLogPath) && writeFileSync(desktopLogPath, '', 'utf8'),
       !enabled5 &&
-        ((enabled5 = !![]),
+        ((enabled5 = true),
         (launchVersion = recordDiagnosticsLaunchVersion({ logDir: logDir, app: app })),
         logEvent({
           type: 'app.session_started',
@@ -634,14 +634,14 @@ export function createDiagnosticsManager(options2 = {}) {
           message: 'Desktop application session started',
           context: {
             pid: process['pid'],
-            packaged: app?.['isPackaged'] === !![],
+            packaged: app?.['isPackaged'] === true,
             launchVersion: launchVersion,
           },
         }),
         typeof app?.['once'] === 'function' &&
           app['once']('before-quit', () => {
             if (value38) return;
-            ((value38 = !![]),
+            ((value38 = true),
               logEvent({
                 type: 'app.session_ended',
                 level: 'info',

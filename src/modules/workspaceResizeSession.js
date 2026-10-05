@@ -10,13 +10,13 @@ export function beginWorkspaceResizeSession({
   onFinish: onFinish = null,
   signal: signal = null,
 } = {}) {
-  if (!event || !splitter || !layout || typeof onRatio !== 'function' || signal?.['aborted']) return ![];
-  if (event['isPrimary'] === ![] || (Number['isFinite'](event['button']) && event['button'] !== 0))
-    return ![];
+  if (!event || !splitter || !layout || typeof onRatio !== 'function' || signal?.['aborted']) return false;
+  if (event['isPrimary'] === false || (Number['isFinite'](event['button']) && event['button'] !== 0))
+    return false;
   const box = layout['getBoundingClientRect']?.(),
     value = orientation === 'vertical',
     count = value ? Number(box?.['height']) : Number(box?.['width']);
-  if (!(count > 0)) return ![];
+  if (!(count > 0)) return false;
   (event['preventDefault']?.(), event['stopPropagation']?.());
   const pointerId = event['pointerId'];
   try {
@@ -49,11 +49,11 @@ export function beginWorkspaceResizeSession({
     },
     data = () => handler({ pointerId: pointerId });
   return (
-    signal?.['addEventListener']('abort', data, { once: !![] }),
+    signal?.['addEventListener']('abort', data, { once: true }),
     windowObject?.['addEventListener']?.('pointermove', item),
     windowObject?.['addEventListener']?.('pointerup', handler),
     windowObject?.['addEventListener']?.('pointercancel', handler),
-    !![]
+    true
   );
 }
 export function beginWorkspaceHorizontalResizeSession(args = {}) {

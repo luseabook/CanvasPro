@@ -65,9 +65,9 @@ export function normalizeStoryboard3DNavigationSettings(invertOrbitX = {}) {
     orbitSensitivity: clamp(invertOrbitX['orbitSensitivity'], 0.2, 3, entry['orbitSensitivity']),
     panSensitivity: clamp(invertOrbitX['panSensitivity'], 0.2, 3, entry['panSensitivity']),
     zoomSensitivity: clamp(invertOrbitX['zoomSensitivity'], 0.2, 3, entry['zoomSensitivity']),
-    invertOrbitX: invertOrbitX['invertOrbitX'] === !![],
-    invertOrbitY: invertOrbitX['invertOrbitY'] === !![],
-    invertWheel: invertOrbitX['invertWheel'] === !![],
+    invertOrbitX: invertOrbitX['invertOrbitX'] === true,
+    invertOrbitY: invertOrbitX['invertOrbitY'] === true,
+    invertWheel: invertOrbitX['invertWheel'] === true,
   };
 }
 export function createStoryboard3DNavigationPresetSettings(preset2) {

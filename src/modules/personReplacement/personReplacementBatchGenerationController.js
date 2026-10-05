@@ -35,7 +35,7 @@ export function createPersonReplacementBatchGenerationController({
     );
   const map2 = new Map();
   let key = 0,
-    active = ![],
+    active = false,
     label = '',
     map3 = new Set(),
     map4 = new Set(),
@@ -84,20 +84,20 @@ export function createPersonReplacementBatchGenerationController({
         active: Boolean(label2),
         label: label2?.['label'] || '',
         generatingShotIds: generatingShotIds(),
-        cancelRequested: label2?.['cancellation']?.['isRequested']?.() === !![],
+        cancelRequested: label2?.['cancellation']?.['isRequested']?.() === true,
       };
     },
     getAssetRenderState = () => ({
       active: active,
       label: label,
       generatingCharacterIds: [...map3],
-      cancelRequested: cancelRequested?.['isRequested']?.() === !![],
+      cancelRequested: cancelRequested?.['isRequested']?.() === true,
     }),
     isShotBatchForCurrentProject = () => Boolean(getMatchingShotSession()),
     runShotBatch = (current = 'image') => {
       const args2 = getProject(),
         list2 = [...new Set(args2['workspace']['selectedShotIds']['map'](normalizeText)['filter'](Boolean))];
-      if (!list2['length']) return ![];
+      if (!list2['length']) return false;
       const text3 = normalizeText(args2['workspace']['selectedShotId']),
         targetShotIds = list2['includes'](text3)
           ? [text3, ...list2['filter']((entry) => entry !== text3)]
@@ -110,13 +110,13 @@ export function createPersonReplacementBatchGenerationController({
             payload['kind'] === current &&
             isSameShotSelection(payload['targetShotIds'], new Set(targetShotIds)),
         );
-      if (record) return ![];
+      if (record) return false;
       const list3 = kind
         ? []
         : targetShotIds['map']((handle) => args2['shots']['find']((state) => state['id'] === handle))[
             'filter'
           ]((enabled2) => {
-            if (!enabled2) return ![];
+            if (!enabled2) return false;
             const enabled3 = buildImagePresentation({
               ...args2,
               workspace: { ...args2['workspace'], selectedShotId: normalizeText(enabled2['id']) },
@@ -129,7 +129,7 @@ export function createPersonReplacementBatchGenerationController({
             '有 ' + list3['length'] + ' 个镜头存在重复角色名，请先修改红色框中的角色。',
             'warn',
           ),
-          ![]
+          false
         );
       const config = kind ? onGenerateReplacementVideoRequested : onGenerateReplacementImageRequested,
         label3 = kind ? '批量生成视频' : '批量生成',
@@ -158,7 +158,7 @@ export function createPersonReplacementBatchGenerationController({
           runTarget: (shotId) =>
             runRequest(
               config,
-              { projectId: projectId, shotId: shotId, notifyCompletion: ![] },
+              { projectId: projectId, shotId: shotId, notifyCompletion: false },
               {},
               { applyCallbackResult: !kind },
             ),
@@ -175,7 +175,7 @@ export function createPersonReplacementBatchGenerationController({
           ['then']((cancelledCount) => {
             const totalCount = cancelledCount['filter']((response) => response['status'] !== 'cancelled'),
               successCount = totalCount['filter'](
-                (el) => el['status'] === 'fulfilled' && el['value']?.['ok'] === !![],
+                (el) => el['status'] === 'fulfilled' && el['value']?.['ok'] === true,
               )['length'];
             runRequest(
               onGenerationBatchCompleted,
@@ -191,20 +191,20 @@ export function createPersonReplacementBatchGenerationController({
                   : {}),
               },
               {},
-              { applyCallbackResult: ![] },
+              { applyCallbackResult: false },
             );
           })
           ['finally'](() => {
             if (map2['get'](id) !== scope) return;
             (map2['delete'](id), run());
           }),
-        !![]
+        true
       );
     },
     cancelShotBatch = () => {
       const projectId2 = getMatchingShotSession(),
         enabled4 = projectId2?.['cancellation'];
-      if (!projectId2 || !enabled4?.['request']?.()) return ![];
+      if (!projectId2 || !enabled4?.['request']?.()) return false;
       const list4 = [...projectId2['activeShotIds']];
       ((projectId2['generatingShotIds'] = new Set(list4)), (projectId2['label'] = '正在停止批量生成'), run());
       const output =
@@ -219,16 +219,16 @@ export function createPersonReplacementBatchGenerationController({
                 output,
                 { projectId: projectId2['projectId'], shotId: shotId2 },
                 {},
-                { applyCallbackResult: ![] },
+                { applyCallbackResult: false },
               ),
             ),
           ),
         ),
-        !![]
+        true
       );
     },
     runAssetBatch = () => {
-      if (active) return ![];
+      if (active) return false;
       const modelId = getProject(),
         targetCount = [
           ...new Set(
@@ -239,10 +239,10 @@ export function createPersonReplacementBatchGenerationController({
               ),
           ),
         ];
-      if (!targetCount['length']) return ![];
+      if (!targetCount['length']) return false;
       const shouldStop = createTaskBatchCancellationController();
       ((cancelRequested = shouldStop),
-        (active = !![]),
+        (active = true),
         (map3 = new Set(targetCount)),
         (map4 = new Set()),
         (label = '批量生成 0/' + targetCount['length']),
@@ -274,7 +274,7 @@ export function createPersonReplacementBatchGenerationController({
               provider: promptPresetId['settings']['characterImageProvider'],
               providerProfileId: promptPresetId['settings']['characterImageProviderProfileId'],
               generationParams: promptPresetId['settings']['characterImageGenerationParams'],
-              notifyCompletion: ![],
+              notifyCompletion: false,
             });
           },
           onTargetSettled: ({ target: target5 }) => {
@@ -290,7 +290,7 @@ export function createPersonReplacementBatchGenerationController({
           ['then']((cancelledCount2) => {
             const totalCount2 = cancelledCount2['filter']((response2) => response2['status'] !== 'cancelled'),
               successCount2 = totalCount2['filter'](
-                (el2) => el2['status'] === 'fulfilled' && el2['value']?.['ok'] === !![],
+                (el2) => el2['status'] === 'fulfilled' && el2['value']?.['ok'] === true,
               )['length'];
             runRequest(
               onGenerationBatchCompleted,
@@ -305,31 +305,31 @@ export function createPersonReplacementBatchGenerationController({
                   : {}),
               },
               {},
-              { applyCallbackResult: ![] },
+              { applyCallbackResult: false },
             );
           })
           ['finally'](() => {
             if (cancelRequested !== shouldStop) return;
-            ((active = ![]),
+            ((active = false),
               (label = ''),
               (map3 = new Set()),
               (map4 = new Set()),
               (cancelRequested = null),
               requestRender());
           }),
-        !![]
+        true
       );
     },
     cancelAssetBatch = () => {
       const enabled5 = cancelRequested;
-      if (!active || !enabled5?.['request']?.()) return ![];
+      if (!active || !enabled5?.['request']?.()) return false;
       return (
         (map3 = new Set(map4)),
         (label = map4['size']
           ? '已取消后续生成 · 正在完成 ' + map4['size'] + ' 项'
           : '已取消后续生成'),
         requestRender(),
-        !![]
+        true
       );
     },
     destroy = () => {

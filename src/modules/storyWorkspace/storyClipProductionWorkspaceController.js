@@ -61,8 +61,8 @@ export function createStoryClipProductionWorkspaceController({
     );
   function present(providerId = {}) {
     if (providerId['type'] === 'selection-missing')
-      return (showToast('请先选择要生成的片段。', 'warn'), !![]);
-    if (providerId['type'] === 'empty-prompt') return (showToast('请先填写视频提示词。', 'warn'), !![]);
+      return (showToast('请先选择要生成的片段。', 'warn'), true);
+    if (providerId['type'] === 'empty-prompt') return (showToast('请先填写视频提示词。', 'warn'), true);
     if (providerId['type'] === 'provider-error')
       return showTaskApiKeyError(providerId['error'], {
         providerId: providerId['provider'],
@@ -82,17 +82,17 @@ export function createStoryClipProductionWorkspaceController({
             'error',
             providerId['error'],
           ),
-        !![]
+        true
       );
     }
     if (providerId['type'] === 'single-complete')
       return (
-        (providerId['result']?.['status'] === 'success' || providerId['result']?.['ok'] === !![]) &&
+        (providerId['result']?.['status'] === 'success' || providerId['result']?.['ok'] === true) &&
           showNavigableTaskResultToast('片段视频生成完成。', 'success', providerId['projectToken'], {
             episodeId: providerId['episodeId'],
             clipId: providerId['clipId'],
           }),
-        !![]
+        true
       );
     if (providerId['type'] === 'batch-complete') {
       if (providerId['cancelRequested'])
@@ -109,7 +109,7 @@ export function createStoryClipProductionWorkspaceController({
             providerId['projectToken'],
             { episodeId: providerId['episodeId'], clipId: providerId['clipId'] },
           ),
-          !![]
+          true
         );
       const item =
         providerId['firstFailure']?.['reason'] === 'empty-prompt'
@@ -127,13 +127,13 @@ export function createStoryClipProductionWorkspaceController({
           {
             tone: providerId['failed'] ? 'warn' : 'success',
             details: providerId['firstFailure']?.['error'] || providerId['firstFailure'],
-            showResultToast: providerId['suppressToast'] !== !![],
+            showResultToast: providerId['suppressToast'] !== true,
           },
         ),
-        !![]
+        true
       );
     }
-    return ![];
+    return false;
   }
   function resolveGenerationPrompt(episode, clip, enabled2 = null, assets = state['data']) {
     assertStoryEpisodeProductionCurrent(episode);
@@ -151,7 +151,7 @@ export function createStoryClipProductionWorkspaceController({
           ? null
           : new Set(storyVideoReplicationClipVoiceAssetIds),
       voiceEnabled = (key) => {
-        if (map && !map['has'](key)) return ![];
+        if (map && !map['has'](key)) return false;
         return getStoryEpisodeCharacterVoiceEnabled(episode, key);
       },
       promptTextWithTextRefs = resolvePromptTextWithTextRefs({
@@ -165,7 +165,7 @@ export function createStoryClipProductionWorkspaceController({
             clipFrames: assets['clipFrames'],
             resolveExternalAssetRef: resolveAssetMentionRef,
           }),
-        dedupeAssetMentions: !![],
+        dedupeAssetMentions: true,
       }),
       index =
         assets['project']?.['sourceMode'] === 'video-replication'
@@ -225,9 +225,9 @@ export function createStoryClipProductionWorkspaceController({
     projectionAdapter: {
       render: render,
       refreshGeneration: refreshGeneration,
-      persist: ({ immediate: immediate = ![] } = {}) => {
+      persist: ({ immediate: immediate = false } = {}) => {
         if (immediate) return persistWorkspaceNow();
-        return (schedulePersistence(), Promise['resolve'](!![]));
+        return (schedulePersistence(), Promise['resolve'](true));
       },
       present: present,
     },

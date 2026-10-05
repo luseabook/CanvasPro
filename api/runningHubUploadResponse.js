@@ -7,7 +7,7 @@ function pickFirstUploadMessage(value) {
 const RUNNINGHUB_UPLOAD_SUCCESS_CODES = new Set(['0', '200', 'ok', 'success']);
 export function hasRunningHubUploadFailureCode(key) {
   const index = key?.['code'];
-  if (index === undefined || index === null || String(index)['trim']() === '') return ![];
+  if (index === undefined || index === null || String(index)['trim']() === '') return false;
   return !RUNNINGHUB_UPLOAD_SUCCESS_CODES['has'](String(index)['trim']()['toLowerCase']());
 }
 export function getRunningHubUploadErrorMessage(error) {

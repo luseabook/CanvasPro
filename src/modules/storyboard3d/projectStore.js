@@ -35,17 +35,17 @@ export function createStoryboard3DProjectStore(
   }
   function run3(target, source) {
     if (target !== data) return;
-    ((result = 'saved'), run2(source, { persisted: !![] }));
+    ((result = 'saved'), run2(source, { persisted: true }));
   }
   function run4(next, current, entry) {
     if (next !== data) return;
-    ((result = 'error'), run2(current, { persisted: ![], error: entry }));
+    ((result = 'error'), run2(current, { persisted: false, error: entry }));
   }
   function run5(record) {
     const payload = ++data;
     result = 'saving';
     const handle = run();
-    run2(record, { persisted: ![] });
+    run2(record, { persisted: false });
     if (typeof onPersist !== 'function') return (run3(payload, record), handle);
     try {
       const state = onPersist(handle, { reason: record, revision: payload });
@@ -60,10 +60,10 @@ export function createStoryboard3DProjectStore(
     }
     return handle;
   }
-  function run6(input, output = 'replace-project', { shouldPersist: shouldPersist = !![] } = {}) {
+  function run6(input, output = 'replace-project', { shouldPersist: shouldPersist = true } = {}) {
     migrateStoryboard3DProject2 = migrateStoryboard3DProject(input, { now: now(), idFactory: idFactory });
     if (shouldPersist) return run5(output);
-    return ((result = 'saved'), run2(output, { persisted: !![] }), run());
+    return ((result = 'saved'), run2(output, { persisted: true }), run());
   }
   function run7(value2, handler2) {
     const value3 = run();
@@ -84,10 +84,10 @@ export function createStoryboard3DProjectStore(
     },
     subscribe: emitter['subscribe'],
     load(value4) {
-      return run6(value4, 'load-project', { shouldPersist: !![] });
+      return run6(value4, 'load-project', { shouldPersist: true });
     },
     replaceProject(value5, value6 = 'replace-project') {
-      return run6(value5, value6, { shouldPersist: !![] });
+      return run6(value5, value6, { shouldPersist: true });
     },
     updateProject(value7, value8) {
       if (typeof value8 !== 'function') return run();
@@ -100,7 +100,7 @@ export function createStoryboard3DProjectStore(
       return run6(
         createStoryboard3DProject({ ...args2, now: now(), idFactory: idFactory }),
         'create-project',
-        { shouldPersist: !![] },
+        { shouldPersist: true },
       );
     },
     renameProject(value9) {

@@ -40,7 +40,7 @@ export async function runStoryReplicationFlow({
   onCheckpoint: onCheckpoint,
   onProgress: onProgress,
   signal: signal,
-  isActive: isActive = () => !![],
+  isActive: isActive = () => true,
   totalMs: totalMs = 8 * 60000,
   stageMs: stageMs = 180000,
   reviewWindowSec: reviewWindowSec = 35,
@@ -91,11 +91,11 @@ export async function runStoryReplicationFlow({
     requireFlow(count > 1000, '自动流程总时限已到');
     const signal2 = new AbortController(),
       data = () => signal2['abort'](signal['reason']);
-    signal?.['addEventListener']('abort', data, { once: !![] });
+    signal?.['addEventListener']('abort', data, { once: true });
     const options = Math['min'](stageMs, count),
       setTimeout2 = setTimeout(() => signal2['abort'](new Error('自动流程请求达到时限')), options),
       target = Date['now']();
-    let enabled = ![];
+    let enabled = false;
     onProgress?.({ stage: stage3, status: 'running', elapsedMs: Date['now']() - item });
     try {
       const response = await invokeStoryGenerationRequest({
@@ -110,14 +110,14 @@ export async function runStoryReplicationFlow({
           ...args3,
           inputVideoUrls: [result],
           mediaPolicy: 'image-video',
-          allowVideo: !![],
+          allowVideo: true,
           thinking: { type: 'disabled' },
           temperature: 0.2,
           maxOutputTokens: maxOutputTokens,
           timeoutMs: Math['min'](90000, options),
           signal: signal2['signal'],
           onText: (next) => {
-            if (String(next)['trim']()) enabled = !![];
+            if (String(next)['trim']()) enabled = true;
           },
         },
       });
@@ -153,7 +153,7 @@ export async function runStoryReplicationFlow({
       if (
         !enabled &&
         !error2['partialText'] &&
-        error2['retryable'] === !![] &&
+        error2['retryable'] === true &&
         transportRetries === 0 &&
         !signal2['signal']['aborted']
       )
@@ -164,7 +164,7 @@ export async function runStoryReplicationFlow({
           await handler2(stage3 + '-transport-retry', { error: error2['message'] }),
           run2(stage3, args3, result, maxOutputTokens, attempt + 1)
         );
-      throw Object['assign'](error2, { flowRequestFailed: !![] });
+      throw Object['assign'](error2, { flowRequestFailed: true });
     } finally {
       (clearTimeout(setTimeout2), signal?.['removeEventListener']('abort', data));
     }
@@ -224,7 +224,7 @@ export async function runStoryReplicationFlow({
         (notes['push']({
           code: 'stage-failed',
           stage: 'speech-recovery',
-          blocking: ![],
+          blocking: false,
           detail: detail['message'],
         }),
           await handler2('speech-recovery-skipped'));
@@ -233,7 +233,7 @@ export async function runStoryReplicationFlow({
     await handler2('observe');
     const id = createFlowReviewWindows(source, durationSec, reviewWindowSec),
       actionable = { actionable: [] };
-    let enabled2 = ![];
+    let enabled2 = false;
     for (const [entry, enabled3] of id['entries']()) {
       const stage4 = id['length'] === 1 ? 'review' : 'review-' + (entry + 1);
       let record;
@@ -276,12 +276,12 @@ export async function runStoryReplicationFlow({
           notes['push']({
             code: 'stage-failed',
             stage: stage4,
-            blocking: ![],
+            blocking: false,
             detail: detail2['message'],
           }),
           await handler2(stage4 + '-skipped'));
         if (detail2['flowRequestFailed'] && !detail2['rawResponse']) {
-          enabled2 = !![];
+          enabled2 = true;
           break;
         }
       } finally {
@@ -311,12 +311,12 @@ export async function runStoryReplicationFlow({
             ...args6['rejected']['map']((args7) => ({
               ...args7,
               code: 'patch-rejected',
-              blocking: ![],
+              blocking: false,
             })),
           ),
           handler(candidate));
       } catch (detail3) {
-        (notes['push']({ code: 'repair-contract', blocking: ![], detail: detail3['message'] }),
+        (notes['push']({ code: 'repair-contract', blocking: false, detail: detail3['message'] }),
           await handler2('repair-rejected', { repair: repair }));
       }
       if (candidate && !notes['some']((output) => output['code'] === 'repair-contract')) {
@@ -328,7 +328,7 @@ export async function runStoryReplicationFlow({
           4096,
         );
         (requireFlow(
-          verification?.['videoObserved'] === !![] &&
+          verification?.['videoObserved'] === true &&
             Array['isArray'](verification['checks']) &&
             Array['isArray'](verification['newMaterialIssues']),
           '复验返回结构无效',
@@ -346,13 +346,13 @@ export async function runStoryReplicationFlow({
             '复验结论缺少有效状态或证据',
           );
           if (response2['status'] !== 'resolved')
-            notes['push']({ ...response2, code: 'verification', blocking: ![] });
+            notes['push']({ ...response2, code: 'verification', blocking: false });
         }
         (notes['push'](
           ...verification['newMaterialIssues']['map']((args8) => ({
             ...args8,
             code: 'new-material-issue',
-            blocking: ![],
+            blocking: false,
           })),
         ),
           (source = candidate),
@@ -364,7 +364,7 @@ export async function runStoryReplicationFlow({
     notes['push']({
       code: 'stage-failed',
       stage: stage,
-      blocking: ![],
+      blocking: false,
       detail: detail4['message'],
     });
   } finally {
@@ -384,9 +384,9 @@ export async function runStoryReplicationFlow({
         (value4, value5) => value4 + new TextEncoder()['encode'](value5['prompt'])['length'],
         0,
       ),
-      initialObservationRerun: !![],
-      importedFindings: ![],
-      productionProjectWritten: ![],
+      initialObservationRerun: true,
+      importedFindings: false,
+      productionProjectWritten: false,
       transportRetries: transportRetries,
     };
   return (await handler2('finished', { result: result2 }), result2);

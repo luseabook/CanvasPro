@@ -17,7 +17,7 @@ export function deriveAgentPrecreatedNodeType({
 } = {}) {
   const list = String(message || '')['trim'](),
     requestedCreatedNodeType = deriveRequestedCreatedNodeType(list, plannerExtra, {
-      includeGenerateVerb: !![],
+      includeGenerateVerb: true,
     });
   if (!requestedCreatedNodeType) return '';
   const list2 = Array['isArray'](canvasState?.['selectedNodeIds']) ? canvasState['selectedNodeIds'] : [],
@@ -26,7 +26,7 @@ export function deriveAgentPrecreatedNodeType({
     );
   if (value && EXISTING_TARGET_PATTERN['test'](list) && !EXPLICIT_NEW_TARGET_PATTERN['test'](list)) return '';
   const key = Object['values'](canvasState?.['nodes'] || {})['some']((error) => {
-    if (String(error?.['type'] || '')['trim']() !== requestedCreatedNodeType) return ![];
+    if (String(error?.['type'] || '')['trim']() !== requestedCreatedNodeType) return false;
     const list3 = String(error?.['name'] || '')['trim']();
     return list3['length'] >= 2 && list['includes'](list3);
   });
@@ -35,18 +35,18 @@ export function deriveAgentPrecreatedNodeType({
 }
 export function doesActionConsumePrecreatedNode(options = {}, index = null) {
   const agentPrecreatedNode = normalizeAgentPrecreatedNode(index);
-  if (!agentPrecreatedNode) return ![];
+  if (!agentPrecreatedNode) return false;
   const result = String(options['type'] || options['commandId'] || '')['trim'](),
     data = String(options['args']?.['type'] || '')['trim']();
   return result === 'node.create' && data === agentPrecreatedNode['type'];
 }
 export function createAgentPrecreatedNodeRuntime({
-  plannerAvailable: plannerAvailable = () => ![],
-  hasCanvasActionIntent: hasCanvasActionIntent = () => ![],
+  plannerAvailable: plannerAvailable = () => false,
+  hasCanvasActionIntent: hasCanvasActionIntent = () => false,
   readCanvasState: readCanvasState = () => ({}),
   executeActions: executeActions = async () => null,
   buildExecutionOptions: buildExecutionOptions = () => ({}),
-  isActiveRun: isActiveRun = () => !![],
+  isActiveRun: isActiveRun = () => true,
   sessionStore: sessionStore = null,
   markUnfinishedOperation: markUnfinishedOperation = () => {},
   commandContext: commandContext = {},
@@ -70,12 +70,12 @@ export function createAgentPrecreatedNodeRuntime({
           : [],
         response = await executeActions([{ type: 'node.create', args: { type: type2 } }], {
           commandContext: commandContext,
-          precreateReservation: !![],
+          precreateReservation: true,
           ...buildExecutionOptions(message2['runId']),
         });
       if (!isActiveRun(message2['runId'])) return message2;
       const nodeId2 = String(response?.['createdNodeIds']?.[0] || '')['trim']();
-      if (response?.['ok'] !== !![] || !nodeId2)
+      if (response?.['ok'] !== true || !nodeId2)
         return (
           sessionStore?.['recordTrace']?.({
             type: 'agent_precreated_node_failed',

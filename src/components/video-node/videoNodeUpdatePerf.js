@@ -1,5 +1,5 @@
 function isPerfProbeEnabled() {
-  return typeof window !== 'undefined' && window['__perfProbeEnabled'] === !![];
+  return typeof window !== 'undefined' && window['__perfProbeEnabled'] === true;
 }
 function nowMs() {
   return typeof performance !== 'undefined' && typeof performance['now'] === 'function'

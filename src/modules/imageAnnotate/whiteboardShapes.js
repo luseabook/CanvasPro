@@ -24,7 +24,7 @@ export function isClosedWhiteboardShape(result) {
   return result !== 'line' && result !== 'frame';
 }
 export function traceWhiteboardShapePath(ctx2, data, box2) {
-  if (!ctx2) return ![];
+  if (!ctx2) return false;
   const x = finiteNumberOr(box2?.['x']),
     y = finiteNumberOr(box2?.['y']),
     options = Math['max'](0, finiteNumberOr(box2?.['width'])),
@@ -36,14 +36,14 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
   switch (data) {
     case 'circle':
       (ctx2['ellipse'](x3, y3, options / 2, target / 2, 0, 0, Math['PI'] * 2), ctx2['closePath']());
-      return !![];
+      return true;
     case 'triangle':
       addPolygon(ctx2, [
         { x: x3, y: y },
         { x: x2, y: y2 },
         { x: x, y: y2 },
       ]);
-      return !![];
+      return true;
     case 'diamond':
       addPolygon(ctx2, [
         { x: x3, y: y },
@@ -51,7 +51,7 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
         { x: x3, y: y2 },
         { x: x, y: y3 },
       ]);
-      return !![];
+      return true;
     case 'hexagon':
       addPolygon(ctx2, [
         { x: x + options * 0.25, y: y },
@@ -61,7 +61,7 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
         { x: x + options * 0.25, y: y2 },
         { x: x, y: y3 },
       ]);
-      return !![];
+      return true;
     case 'pill': {
       const source = Math['min'](options / 2, target / 2);
       return (
@@ -75,7 +75,7 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
         ctx2['lineTo'](x, y + source),
         ctx2['quadraticCurveTo'](x, y, x + source, y),
         ctx2['closePath'](),
-        !![]
+        true
       );
     }
     case 'parallelogram':
@@ -85,7 +85,7 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
         { x: x + options * 0.8, y: y2 },
         { x: x, y: y2 },
       ]);
-      return !![];
+      return true;
     case 'star': {
       const list2 = [],
         next = Math['min'](options, target) / 2,
@@ -98,7 +98,7 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
           y: y3 + Math['sin'](record) * entry,
         });
       }
-      return (addPolygon(ctx2, list2), !![]);
+      return (addPolygon(ctx2, list2), true);
     }
     case 'cloud':
       (ctx2['moveTo'](x + options * 0.22, y2),
@@ -121,7 +121,7 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
         ),
         ctx2['bezierCurveTo'](x2, y2, x + options * 0.76, y2, x + options * 0.6, y2),
         ctx2['closePath']());
-      return !![];
+      return true;
     case 'heart':
       (ctx2['moveTo'](x3, y2),
         ctx2['bezierCurveTo'](
@@ -143,20 +143,20 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
         ),
         ctx2['bezierCurveTo'](x2, y + target * 0.35, x + options * 0.9, y + target * 0.65, x3, y2),
         ctx2['closePath']());
-      return !![];
+      return true;
     case 'crossed-box':
       (ctx2['rect'](x, y, options, target),
         ctx2['moveTo'](x, y),
         ctx2['lineTo'](x2, y2),
         ctx2['moveTo'](x2, y),
         ctx2['lineTo'](x, y2));
-      return !![];
+      return true;
     case 'checkbox':
       (ctx2['rect'](x, y, options, target),
         ctx2['moveTo'](x + options * 0.2, y3),
         ctx2['lineTo'](x + options * 0.42, y + target * 0.75),
         ctx2['lineTo'](x + options * 0.82, y + target * 0.22));
-      return !![];
+      return true;
     case 'arrow-left':
     case 'arrow-right':
     case 'arrow-up':
@@ -191,12 +191,12 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
             y: y4 ? y2 - (box3['y'] - y) : box3['y'],
           })),
         ),
-        !![]
+        true
       );
     }
     case 'line':
       (ctx2['moveTo'](x, y2), ctx2['lineTo'](x2, y));
-      return !![];
+      return true;
     case 'frame': {
       const handle = Math['min'](options, target) * 0.25;
       return (
@@ -212,11 +212,11 @@ export function traceWhiteboardShapePath(ctx2, data, box2) {
         ctx2['moveTo'](x + handle, y2),
         ctx2['lineTo'](x, y2),
         ctx2['lineTo'](x, y2 - handle),
-        !![]
+        true
       );
     }
     default:
       ctx2['rect'](x, y, options, target);
-      return !![];
+      return true;
   }
 }

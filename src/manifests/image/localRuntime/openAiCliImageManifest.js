@@ -12,13 +12,13 @@ const OPENAI_CLI_IMAGE_INPUT_SLOTS = Object['freeze']({
     fields: Object['freeze']([
       Object['freeze']({
         ...GPT_IMAGE_2_IMAGE_SIZE_FIELD,
-        showInfoTip: !![],
+        showInfoTip: true,
         description: '比例和分辨率作为创作要求传给 Codex，实际输出以生成结果为准。',
       }),
       ASPECT_RATIO_FIELD,
       Object['freeze']({
         ...BATCH_SIZE_FIELD,
-        showInfoTip: !![],
+        showInfoTip: true,
         menuTooltip: '逐次生成独立图片，每次均使用 Codex 额度。',
       }),
     ]),
@@ -39,12 +39,12 @@ export const openAiCliImageModelManifests = Object['freeze']([
       '使用已登录的 Codex 内置生图，当前官方标注为 GPT Image 2；底层版本由 Codex 管理。比例和分辨率为创作要求。',
     inputSlots: OPENAI_CLI_IMAGE_INPUT_SLOTS,
     uiSchema: OPENAI_CLI_IMAGE_UI_SCHEMA,
-    async: ![],
-    cancellable: ![],
+    async: false,
+    cancellable: false,
     outputType: 'image',
     extensions: Object['freeze']({
-      imageFunctionMenu: Object['freeze']({ enabled: !![] }),
-      inputValidation: Object['freeze']({ rejectImageOverflow: !![] }),
+      imageFunctionMenu: Object['freeze']({ enabled: true }),
+      inputValidation: Object['freeze']({ rejectImageOverflow: true }),
       imageMenu: Object['freeze']({
         group: 'openai-cli',
         order: 10,

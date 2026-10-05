@@ -69,12 +69,12 @@ export function createStorySummaryGenerationWorkspaceController({
   )
     throw new TypeError('Story summary generation requires project, persistence, and presentation adapters.');
   const run = (item) => {
-    ((state['assetSelectionMode'] = ![]),
+    ((state['assetSelectionMode'] = false),
       (state['selectedAssetIds'] = []),
       (state['assetAppearanceIndexes'] = {}),
-      (state['scriptSelectionMode'] = ![]),
+      (state['scriptSelectionMode'] = false),
       (state['selectedScriptEpisodeIds'] = []),
-      (state['scriptGenerationFocusMode'] = ![]),
+      (state['scriptGenerationFocusMode'] = false),
       (state['outlineSectionOpenState'] = {}),
       (state['scriptMode'] = item));
   };
@@ -109,19 +109,19 @@ export function createStorySummaryGenerationWorkspaceController({
     });
   }
   async function authorizePaidRetry(enabled2) {
-    if (!enabled2['requiresPaidRetry']) return !![];
+    if (!enabled2['requiresPaidRetry']) return true;
     const result = await requestChoice({
       overlayId: 'story-summary-paid-retry',
       title: '上次剧本摘要请求结果尚未安全提交',
       message: '上次请求可能已经计费，或响应尚未完成本地提交。确认后才会再次调用模型。',
       fallbackValue: null,
       choices: [
-        { label: '暂不重试', value: null, autofocus: !![] },
-        { label: '确认重新请求', value: 'retry', primary: !![] },
+        { label: '暂不重试', value: null, autofocus: true },
+        { label: '确认重新请求', value: 'retry', primary: true },
       ],
     });
-    if (result !== 'retry') return ![];
-    return (await enabled2['authorizePaidRetry'](), !![]);
+    if (result !== 'retry') return false;
+    return (await enabled2['authorizePaidRetry'](), true);
   }
   function run2() {
     const mode = resolveStoryHomeGenerationMode(state);
@@ -166,11 +166,11 @@ export function createStorySummaryGenerationWorkspaceController({
             request: detail,
             allowDeveloperPromptModes: state['developerModeAvailable'],
           })),
-          (state['projectTitleEdited'] = ![]),
-          (state['hasCreatedProject'] = !![]),
+          (state['projectTitleEdited'] = false),
+          (state['hasCreatedProject'] = true),
           run('plot'),
-          openProject({ resetStep: !![] }),
-          schedulePersistence({ immediate: !![] }),
+          openProject({ resetStep: true }),
+          schedulePersistence({ immediate: true }),
           windowObject?.['dispatchEvent']?.(
             new CustomEvent('storyWorkspace:storyImported', {
               detail: {
@@ -185,7 +185,7 @@ export function createStorySummaryGenerationWorkspaceController({
             '已按原剧本导入 ' + state['data']['episodes']['length'] + ' 集，未扩写正文。',
             'success',
           ),
-          await extractProjectAssets({ advance: !![] }));
+          await extractProjectAssets({ advance: true }));
       } catch (error) {
         showTaskResultToast(error?.['message'] || '剧本导入失败，请检查原始文本。', 'error', error);
       }
@@ -205,8 +205,8 @@ export function createStorySummaryGenerationWorkspaceController({
         },
       )),
       (state['data']['project']['summaryStatus'] = 'generating'),
-      (state['projectTitleEdited'] = ![]),
-      (state['hasCreatedProject'] = !![]));
+      (state['projectTitleEdited'] = false),
+      (state['hasCreatedProject'] = true));
     const projectTitleEdited = createProjectToken(),
       id = buildStoryBackgroundTaskId('story-summary'),
       resumePayload2 = createPersistedRun(projectTitleEdited, detail, id),
@@ -216,14 +216,14 @@ export function createStorySummaryGenerationWorkspaceController({
       type: 'story-summary',
       label: label['label'],
       message: label['message'],
-      resumable: !![],
+      resumable: true,
       resumePayload: resumePayload2['payload'](),
     }),
       run(detail['scriptMode']),
-      (state['isGeneratingStory'] = !![]),
+      (state['isGeneratingStory'] = true),
       (state['generationStatus'] = label['status']),
-      openProject({ resetStep: !![] }),
-      schedulePersistence({ immediate: !![] }));
+      openProject({ resetStep: true }),
+      schedulePersistence({ immediate: true }));
     try {
       await resumePayload2['start']();
       const result2 =
@@ -257,7 +257,7 @@ export function createStorySummaryGenerationWorkspaceController({
           },
         }));
       if (!resumePayload2['candidateArtifact']) await resumePayload2['ready'](result2);
-      if (!isProjectTaskLive(projectTitleEdited)) return ![];
+      if (!isProjectTaskLive(projectTitleEdited)) return false;
       ((projectTitleEdited['data'] = applyGeneratedStoryResult(projectTitleEdited['data'], result2, {
         projectTitleEdited: projectTitleEdited['projectTitleEdited'],
       })),
@@ -266,7 +266,7 @@ export function createStorySummaryGenerationWorkspaceController({
         (projectTitleEdited['data']['project']['outlineStatus'] = 'pending'));
       isProjectTaskCurrent(projectTitleEdited) &&
         ((state['data'] = projectTitleEdited['data']),
-        (state['isGeneratingStory'] = ![]),
+        (state['isGeneratingStory'] = false),
         (state['generationStatus'] = ''));
       (windowObject?.['dispatchEvent']?.(
         new CustomEvent('storyWorkspace:storyGenerated', {
@@ -285,18 +285,18 @@ export function createStorySummaryGenerationWorkspaceController({
         finishBackgroundTask(projectTitleEdited, id, {
           status: 'succeeded',
           message: '剧本摘要生成完成',
-          resumable: ![],
+          resumable: false,
         }),
         await resumePayload2['succeeded'](),
         notifyTextTaskComplete('剧本摘要生成完成。', projectTitleEdited, {
           step: 1,
           outlineSectionId: 'summary',
         }),
-        schedulePersistence({ immediate: !![] }));
+        schedulePersistence({ immediate: true }));
       if (isProjectTaskCurrent(projectTitleEdited)) render();
-      return !![];
+      return true;
     } catch (error2) {
-      if (!isProjectTaskLive(projectTitleEdited)) return ![];
+      if (!isProjectTaskLive(projectTitleEdited)) return false;
       return (
         await resumePayload2['failed'](error2)['catch'](() => {}),
         (projectTitleEdited['data']['project']['summaryStatus'] = 'error'),
@@ -304,31 +304,31 @@ export function createStorySummaryGenerationWorkspaceController({
           status: 'failed',
           message: '剧本摘要生成失败',
           error: error2?.['message'] || '剧本摘要生成失败，请稍后重试。',
-          resumable: !![],
+          resumable: true,
           resumePayload: resumePayload2['payload'](),
         }),
         isProjectTaskCurrent(projectTitleEdited) &&
-          ((state['isGeneratingStory'] = ![]), (state['generationStatus'] = ''), render()),
+          ((state['isGeneratingStory'] = false), (state['generationStatus'] = ''), render()),
         showTaskResultToast(error2?.['message'] || '剧本摘要生成失败，请稍后重试。', 'error', error2),
-        ![]
+        false
       );
     }
   }
   async function regenerateSummary() {
-    if (state['isGeneratingStory'] || state['storyPlanningOperation']) return ![];
-    if (typeof generateStory !== 'function') return (showToast('剧情 Agent 尚未初始化。', 'error'), ![]);
+    if (state['isGeneratingStory'] || state['storyPlanningOperation']) return false;
+    if (typeof generateStory !== 'function') return (showToast('剧情 Agent 尚未初始化。', 'error'), false);
     const mode2 = buildStorySummaryRegenerationRequest(state['data']['project'], {
       modelId: state['models']['text'],
       provider: state['textProvider'],
       providerProfileId: state['textProviderProfileId'],
       allowDeveloperPromptModes: state['developerModeAvailable'],
     });
-    if (!mode2['ok']) return (showToast(mode2['error'], 'warn'), ![]);
+    if (!mode2['ok']) return (showToast(mode2['error'], 'warn'), false);
     const projectTitleEdited2 = createProjectToken(),
       id2 = buildStoryBackgroundTaskId('story-summary'),
       resumePayload3 = createPersistedRun(projectTitleEdited2, mode2, id2);
-    if (!(await authorizePaidRetry(resumePayload3))) return ![];
-    ((state['isGeneratingStory'] = !![]),
+    if (!(await authorizePaidRetry(resumePayload3))) return false;
+    ((state['isGeneratingStory'] = true),
       (state['generationStatus'] = '正在根据原始创意重新生成剧本摘要...'),
       (state['data']['project']['summaryStatus'] = 'generating'),
       startBackgroundTask(projectTitleEdited2, {
@@ -336,7 +336,7 @@ export function createStorySummaryGenerationWorkspaceController({
         type: 'story-summary',
         label: '重新生成剧本摘要',
         message: state['generationStatus'],
-        resumable: !![],
+        resumable: true,
         resumePayload: resumePayload3['payload'](),
       }),
       render());
@@ -361,13 +361,13 @@ export function createStorySummaryGenerationWorkspaceController({
           },
         }));
       if (!resumePayload3['candidateArtifact']) await resumePayload3['ready'](result3);
-      if (!isProjectTaskLive(projectTitleEdited2)) return ![];
+      if (!isProjectTaskLive(projectTitleEdited2)) return false;
       return (
         (projectTitleEdited2['data'] = applyGeneratedStoryResult(projectTitleEdited2['data'], result3, {
           projectTitleEdited: projectTitleEdited2['projectTitleEdited'],
         })),
         (projectTitleEdited2['data'] = invalidateStoryPlanningDownstream(projectTitleEdited2['data'], {
-          clearEpisodeOutlines: !![],
+          clearEpisodeOutlines: true,
         })),
         registerProjectData(projectTitleEdited2),
         (projectTitleEdited2['data']['project']['summaryStatus'] = 'completed'),
@@ -381,26 +381,26 @@ export function createStorySummaryGenerationWorkspaceController({
               provider: mode2['provider'],
               aspectRatio: mode2['aspectRatio'],
               visualStyle: mode2['visualStyle'],
-              regenerated: !![],
+              regenerated: true,
               result: result3,
             },
           }),
         ),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         finishBackgroundTask(projectTitleEdited2, id2, {
           status: 'succeeded',
           message: '剧本摘要重新生成完成',
-          resumable: ![],
+          resumable: false,
         }),
         await resumePayload3['succeeded'](),
         notifyTextTaskComplete('剧本摘要已重新生成。', projectTitleEdited2, {
           step: 1,
           outlineSectionId: 'summary',
         }),
-        !![]
+        true
       );
     } catch (error3) {
-      if (!isProjectTaskLive(projectTitleEdited2)) return ![];
+      if (!isProjectTaskLive(projectTitleEdited2)) return false;
       return (
         await resumePayload3['failed'](error3)['catch'](() => {}),
         (projectTitleEdited2['data']['project']['summaryStatus'] = normalizeText(
@@ -416,7 +416,7 @@ export function createStorySummaryGenerationWorkspaceController({
           status: 'failed',
           message: '剧本摘要重新生成失败',
           error: error3?.['message'] || '剧本摘要重新生成失败。',
-          resumable: !![],
+          resumable: true,
           resumePayload: resumePayload3['payload'](),
         }),
         showTaskResultToast(
@@ -424,16 +424,16 @@ export function createStorySummaryGenerationWorkspaceController({
           'error',
           error3,
         ),
-        ![]
+        false
       );
     } finally {
       isProjectTaskCurrent(projectTitleEdited2) &&
-        ((state['isGeneratingStory'] = ![]), (state['generationStatus'] = ''), render());
+        ((state['isGeneratingStory'] = false), (state['generationStatus'] = ''), render());
     }
   }
   return {
-    preview: async ({ home: home = ![], captureRequest: captureRequest }) => {
-      if (windowObject?.['DEV_MODE'] !== !![]) throw new Error('仅开发者模式可调试请求');
+    preview: async ({ home: home = false, captureRequest: captureRequest }) => {
+      if (windowObject?.['DEV_MODE'] !== true) throw new Error('仅开发者模式可调试请求');
       const model = home
         ? run2()
         : buildStorySummaryRegenerationRequest(state['data']['project'], {

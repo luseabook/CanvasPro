@@ -54,7 +54,7 @@ export function getRecoverableStoryClipVideoTask(options2 = {}) {
     ...(providerProfileId2 ? { providerProfileId: providerProfileId2 } : {}),
     executionId: normalizeText(response['executionId']),
     startedAt: Number(response['startedAt'] || 0),
-    ...(response['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
+    ...(response['useOpenapiQuery'] === true ? { useOpenapiQuery: true } : {}),
   };
 }
 async function resumeVideoGenerationTask(result, args, data = {}) {
@@ -73,7 +73,7 @@ async function resumeVideoGenerationTask(result, args, data = {}) {
 function isAsyncStoryClipVideoExecution(source, next) {
   return (
     next?.['adapterType'] === 'modelApi' &&
-    (source?.['async'] === !![] || Boolean(next?.['extensions']?.['taskPolling']))
+    (source?.['async'] === true || Boolean(next?.['extensions']?.['taskPolling']))
   );
 }
 function normalizeInputItem(url, kind, current) {
@@ -180,7 +180,7 @@ function assignFixedSlots(manifest, args2, value7, value8 = {}) {
   }
   for (const value24 of list3) {
     const text2 = normalizeText(value24?.['id']);
-    if (value24?.['required'] === !![] && text2 && !map4['has'](text2))
+    if (value24?.['required'] === true && text2 && !map4['has'](text2))
       throw new Error('视频模型缺少必需输入：' + (normalizeText(value24['label']) || text2));
   }
   for (const value25 of args2?.['exclusiveGroups'] || []) {
@@ -390,7 +390,7 @@ export function createStoryClipTaskStoreAdapter({
         providerProfileId: normalizeText(useOpenapiQuery['providerProfileId']),
         modelId: normalizeText(useOpenapiQuery['taskModelId'] || useOpenapiQuery['model']),
         executionId: normalizeText(useOpenapiQuery['taskExecutionId']),
-        useOpenapiQuery: useOpenapiQuery['rhTaskUseOpenapiQuery'] === !![],
+        useOpenapiQuery: useOpenapiQuery['rhTaskUseOpenapiQuery'] === true,
         startedAt: Number(useOpenapiQuery['generationStartTime'] || 0),
         duration:
           useOpenapiQuery['generationDuration'] === null ||
@@ -400,8 +400,8 @@ export function createStoryClipTaskStoreAdapter({
         error: mapRuntimeStatus(useOpenapiQuery) === 'failed' ? getTaskMessage(useOpenapiQuery) : '',
       },
       video = { ...args7, results: results, activeIndex: activeIndex };
-    if (isShallowRecordEqual(args6, generation) && isShallowRecordEqual(args7, video)) return ![];
-    return (updateClip({ ...args5, generation: generation, video: video }), !![]);
+    if (isShallowRecordEqual(args6, generation) && isShallowRecordEqual(args7, video)) return false;
+    return (updateClip({ ...args5, generation: generation, video: video }), true);
   };
   return {
     getState: () => ({ nodes: { [id]: useOpenapiQuery } }),
@@ -459,20 +459,20 @@ export function createStoryClipGenerationController({
       modelManifest: model2['modelManifest'],
     };
     const resumable = isAsyncStoryClipVideoExecution(model2['modelManifest'], model2['executionManifest']);
-    let rhTaskUseOpenapiQuery = ![];
+    let rhTaskUseOpenapiQuery = false;
     const generationSubmitPlan = createGenerationSubmitPlan({
       kind: 'video',
       sourceNodeId: targetId2,
       targetNodeId: targetId2,
       trigger: 'story-workspace',
-      completionFeedback: ![],
+      completionFeedback: false,
       taskType: 'story-clip-video-generation',
       provider: model2['modelManifest']['provider'],
       adapterType: model2['executionManifest']['adapterType'],
       modelId: model2['modelManifest']['modelId'],
       executionId: model2['executionManifest']['id'],
       payload: model2['payload'],
-      cancellable: model2['modelManifest']['cancellable'] === !![],
+      cancellable: model2['modelManifest']['cancellable'] === true,
       resumable: resumable || model2['executionManifest']['adapterType'] === 'workflow',
       pauseOnAbort: 'afterTaskId',
       async: resumable,
@@ -483,10 +483,10 @@ export function createStoryClipGenerationController({
           onRunningHubWorkflowQueueChange: signal['onRunningHubWorkflowQueueChange'],
           onTaskId: (value46) => {
             (signal['onTaskId']?.(value46),
-              rhTaskUseOpenapiQuery && signal['updateTaskNode']?.({ rhTaskUseOpenapiQuery: !![] }));
+              rhTaskUseOpenapiQuery && signal['updateTaskNode']?.({ rhTaskUseOpenapiQuery: true }));
           },
           onTaskMeta: ({ taskId: taskId2, useOpenapiQuery: useOpenapiQuery2 } = {}) => {
-            ((rhTaskUseOpenapiQuery = useOpenapiQuery2 === !![]),
+            ((rhTaskUseOpenapiQuery = useOpenapiQuery2 === true),
               signal['onTaskId']?.(taskId2),
               signal['updateTaskNode']?.({ rhTaskUseOpenapiQuery: rhTaskUseOpenapiQuery }));
           },
@@ -523,7 +523,7 @@ export function createStoryClipGenerationController({
           : {}),
         ...(options6['executionId'] ? { executionId: normalizeText(options6['executionId']) } : {}),
         ...(options6['startedAt'] ? { startedAt: Number(options6['startedAt']) } : {}),
-        ...(options6['useOpenapiQuery'] === !![] ? { useOpenapiQuery: !![] } : {}),
+        ...(options6['useOpenapiQuery'] === true ? { useOpenapiQuery: true } : {}),
       };
     if (!providerProfileId3['taskId']) throw new Error('片段视频任务缺少 taskId，无法恢复轮询');
     if (!providerProfileId3['modelId']) throw new Error('片段视频任务缺少 modelId，无法恢复轮询');
@@ -569,8 +569,8 @@ export function createStoryClipGenerationController({
           asyncTaskStartedAt: generationStartTime,
           asyncTaskProvider: modelManifest2['provider'],
           asyncTaskKind: 'video',
-          taskResumable: !![],
-          rhTaskUseOpenapiQuery: providerProfileId3['useOpenapiQuery'] === !![],
+          taskResumable: true,
+          rhTaskUseOpenapiQuery: providerProfileId3['useOpenapiQuery'] === true,
         },
       }),
       abortController2 = new AbortController();
@@ -585,7 +585,7 @@ export function createStoryClipGenerationController({
       sourceNodeId: targetId3,
       targetNodeId: targetId3,
       trigger: 'story-workspace-recovery',
-      completionFeedback: ![],
+      completionFeedback: false,
       taskType: 'story-clip-video-generation',
       provider: modelManifest2['provider'],
       adapterType: executionManifest2['adapterType'],
@@ -594,14 +594,14 @@ export function createStoryClipGenerationController({
       payload: payload3,
       taskId: providerProfileId3['taskId'],
       startedAt: generationStartTime,
-      cancellable: modelManifest2['cancellable'] === !![],
-      resumable: !![],
-      pauseOnAbort: !![],
+      cancellable: modelManifest2['cancellable'] === true,
+      resumable: true,
+      pauseOnAbort: true,
       async: async2,
       poll: ({ taskId: taskId3, payload: payload4, signal: signal2 }) =>
         resumeVideoGeneration(taskId3, payload4, {
           signal: signal2,
-          useOpenapiQuery: providerProfileId3['useOpenapiQuery'] === !![],
+          useOpenapiQuery: providerProfileId3['useOpenapiQuery'] === true,
         }),
       resultBuilder: (value49, startedAt2) =>
         buildVideoGenerationResultPatch(normalizeVideoGenerationResult(value49), {
@@ -626,20 +626,20 @@ export function createStoryClipGenerationController({
     }
   }
   async function cancel() {
-    if (!enabled4) return { ok: ![], reason: 'missing-target' };
+    if (!enabled4) return { ok: false, reason: 'missing-target' };
     const store3 = enabled4,
       response11 = await cancelTask(store3['targetId'], {
         store: store3['store'],
-        cancellable: store3['modelManifest']?.['cancellable'] === !![],
-        abortLocal: !![],
+        cancellable: store3['modelManifest']?.['cancellable'] === true,
+        abortLocal: true,
       });
     if (response11?.['ok'] && enabled4?.['targetId'] === store3['targetId']) enabled4 = null;
     return response11;
   }
   function pause() {
-    if (!enabled4) return { ok: ![], reason: 'missing-target' };
+    if (!enabled4) return { ok: false, reason: 'missing-target' };
     const targetId4 = enabled4['targetId'];
-    return (enabled4['abortController']['abort'](), { ok: !![], status: 'pausing', targetId: targetId4 });
+    return (enabled4['abortController']['abort'](), { ok: true, status: 'pausing', targetId: targetId4 });
   }
   return {
     generate: generate,

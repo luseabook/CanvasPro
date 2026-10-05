@@ -11,10 +11,10 @@ function normalizeDocumentMessage(value = '') {
     ['replaceAll']('作为剧本读取', '作为文档读取');
 }
 export function validateAgentDocumentFile(item, handler = null) {
-  if (typeof handler !== 'function') return item ? { ok: !![] } : { ok: ![], error: '请选择文档。' };
+  if (typeof handler !== 'function') return item ? { ok: true } : { ok: false, error: '请选择文档。' };
   const response = handler(item);
-  if (response?.['ok'] === !![]) return response;
-  return { ...response, ok: ![], error: normalizeDocumentMessage(response?.['error'] || '文档不可读取。') };
+  if (response?.['ok'] === true) return response;
+  return { ...response, ok: false, error: normalizeDocumentMessage(response?.['error'] || '文档不可读取。') };
 }
 export function createAgentDocumentSource(truncated = {}, error = null) {
   const displayName = String(truncated['fileName'] || error?.['name'] || 'document')
@@ -43,6 +43,6 @@ export function createAgentDocumentSource(truncated = {}, error = null) {
           ['filter'](Boolean)
           ['slice'](0, 8)
       : [],
-    truncated: truncated['truncated'] === !![],
+    truncated: truncated['truncated'] === true,
   };
 }

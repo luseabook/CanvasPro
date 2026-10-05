@@ -211,7 +211,7 @@ export function commitMediaClipTimelineEditTransaction({
           timelineEditBaseState3,
           timelineEditClipIndex5,
           drag?.['pendingRollRange'] || drag?.['pendingRange'],
-          { rebaseNegativeTimeline: !![], rebaseTimelineStart: !![] },
+          { rebaseNegativeTimeline: true, rebaseTimelineStart: true },
         )
       : patchMediaClipClipRange(timelineEditBaseState3, timelineEditClipIndex5, drag?.['pendingRange']);
   else {
@@ -272,7 +272,7 @@ export function previewMediaClipTimelineTrimDrag(
   kind2 === 'video' && (drag2['pendingRollRange'] = startSec4['pendingRollRange']);
   ((drag2['previewDurationSec'] = startSec4['displayDurationSec']),
     (drag2['pendingPlayheadSec'] = startSec4['pendingPlayheadSec']),
-    (drag2['hasMoved'] = !![]));
+    (drag2['hasMoved'] = true));
   const output = input || drag2['rowEl'];
   if (kind2 === 'video') {
     !mediaClip3['_applyVideoTimelinePreview'](
@@ -465,7 +465,7 @@ export function commitMediaClipTimelineEdit(mediaClip4, kind4, mode2, drag4, val
     }
   }
   ((mediaClip4['nodeData'] = { ...(mediaClip4['nodeData'] || {}), mediaClip: mediaClip4['_mediaClip'] }),
-    value8['persist'] !== ![] &&
+    value8['persist'] !== false &&
       appStore['updateNodeData'](mediaClip4['id'], { mediaClip: mediaClip4['_mediaClip'] }));
 }
 export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, value14 = {}) {
@@ -551,7 +551,7 @@ export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, v
         pendingRange: null,
         pendingPlayheadSec: startMediaClip['_playheadSec'],
         startPlayheadSec: startMediaClip['_playheadSec'],
-        hasMoved: ![],
+        hasMoved: false,
       });
       const value17 = (value18) => handleMediaClipTimelineDrag(startMediaClip, value18, sessionId),
         value19 = (value20) => {
@@ -561,7 +561,7 @@ export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, v
           startMediaClip['_persistTimelineDragScroll'](durationSec5);
           if (durationSec5?.['kind'] === 'video' && durationSec5['pendingRange']) {
             const isMediaClipVideoLeftTrimDrag2 = isMediaClipVideoLeftTrimDrag(durationSec5);
-            commitMediaClipTimelineEdit(startMediaClip, 'video', 'trim', durationSec5, { persist: ![] });
+            commitMediaClipTimelineEdit(startMediaClip, 'video', 'trim', durationSec5, { persist: false });
             const value21 = startMediaClip['_videoTimelineDuration'](
                 startMediaClip['_mediaClip']['tracks']?.['video'],
               ),
@@ -573,27 +573,27 @@ export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, v
             isMediaClipVideoLeftTrimDrag2
               ? startMediaClip['_animateTrackVisualsToCurrentState'](durationSec5['rowEl'], 'video', {
                   durationSec: durationSec6,
-                  persist: !![],
-                  commitHistory: !![],
-                  syncTimelineWidthAfterSettle: ![],
+                  persist: true,
+                  commitHistory: true,
+                  syncTimelineWidthAfterSettle: false,
                 })
               : (startMediaClip['_updateTrackVisuals']('video', {
                   durationSec: durationSec5['previewDurationSec'],
-                  syncTimelineWidth: ![],
+                  syncTimelineWidth: false,
                 }),
-                startMediaClip['_persistTimelineMediaClip']({ commitHistory: !![] }));
+                startMediaClip['_persistTimelineMediaClip']({ commitHistory: true }));
             startMediaClip['_applyDeferredTimelineDragUpdate'](value22);
             return;
           }
           if (durationSec5?.['kind'] === 'audio' && durationSec5['pendingRange']) {
-            commitMediaClipTimelineEdit(startMediaClip, 'audio', 'trim', durationSec5, { persist: ![] });
+            commitMediaClipTimelineEdit(startMediaClip, 'audio', 'trim', durationSec5, { persist: false });
             const value23 = durationSec5;
             (detachMediaClipTimelineEditDrag(startMediaClip),
               startMediaClip['_updateTrackVisuals']('audio', {
                 durationSec: durationSec5['previewDurationSec'],
-                syncTimelineWidth: ![],
+                syncTimelineWidth: false,
               }),
-              startMediaClip['_persistTimelineMediaClip']({ commitHistory: !![] }),
+              startMediaClip['_persistTimelineMediaClip']({ commitHistory: true }),
               startMediaClip['_applyDeferredTimelineDragUpdate'](value23));
             return;
           }
@@ -610,15 +610,15 @@ export function renderMediaClipTimelineTrimHandle(startMediaClip, kind5, side, v
         };
       ((startMediaClip['_dragMove'] = value17),
         (startMediaClip['_dragUp'] = value19),
-        window['addEventListener']('pointermove', value17, !![]),
-        window['addEventListener']('pointerup', value19, { once: !![], capture: !![] }));
+        window['addEventListener']('pointermove', value17, true),
+        window['addEventListener']('pointerup', value19, { once: true, capture: true }));
     }),
     el2
   );
 }
 export function detachMediaClipTimelineEditDrag(value25) {
-  value25['_dragMove'] && window['removeEventListener']('pointermove', value25['_dragMove'], !![]);
-  value25['_dragUp'] && window['removeEventListener']('pointerup', value25['_dragUp'], !![]);
+  value25['_dragMove'] && window['removeEventListener']('pointermove', value25['_dragMove'], true);
+  value25['_dragUp'] && window['removeEventListener']('pointerup', value25['_dragUp'], true);
   value25['_stopTimelineDragAutoScroll']();
   const value26 = value25['_timelineDrag']();
   (value26?.['segmentEl']?.['classList']['remove']('is-dragging'),
@@ -638,7 +638,7 @@ export function detachMediaClipTimelineEditDrag(value25) {
     value25['_setTimelineDrag'](null));
 }
 export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, startX2, value27 = {}) {
-  if (value27['compact'] === !![] || startX2['button'] !== 0) return;
+  if (value27['compact'] === true || startX2['button'] !== 0) return;
   (stopPointer(startX2),
     startPlayheadSec['_cancelTimelineSettle'](),
     startPlayheadSec['_stopTimelineDragAutoScroll'](),
@@ -707,7 +707,7 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
     pendingDeltaSec: 0,
     pendingLaneIndex:
       kind6 === 'audio' ? startPlayheadSec['_audioClipLaneIndex'](startClips2[clipIndex4]) : 0,
-    hasMoved: ![],
+    hasMoved: false,
   });
   const value28 = (value29) => handleMediaClipTimelineDrag(startPlayheadSec, value29, sessionId2),
     value30 = (value31) => {
@@ -720,14 +720,14 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
         durationSec8['kind'] === 'video' &&
         durationSec8['startClips']?.[durationSec8['clipIndex']]
       ) {
-        commitMediaClipTimelineEdit(startPlayheadSec, 'video', 'move', durationSec8, { persist: ![] });
+        commitMediaClipTimelineEdit(startPlayheadSec, 'video', 'move', durationSec8, { persist: false });
         const value32 = durationSec8;
         (detachMediaClipTimelineEditDrag(startPlayheadSec),
           startPlayheadSec['_animateTrackVisualsToCurrentState'](durationSec8['rowEl'], 'video', {
             durationSec: durationSec8['previewDurationSec'],
-            persist: !![],
-            commitHistory: !![],
-            syncTimelineWidthAfterSettle: ![],
+            persist: true,
+            commitHistory: true,
+            syncTimelineWidthAfterSettle: false,
           }),
           startPlayheadSec['_applyDeferredTimelineDragUpdate'](value32));
         return;
@@ -737,14 +737,14 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
         durationSec8['kind'] === 'audio' &&
         durationSec8['startClips']?.[durationSec8['clipIndex']]
       ) {
-        commitMediaClipTimelineEdit(startPlayheadSec, 'audio', 'move', durationSec8, { persist: ![] });
+        commitMediaClipTimelineEdit(startPlayheadSec, 'audio', 'move', durationSec8, { persist: false });
         const value33 = durationSec8;
         (detachMediaClipTimelineEditDrag(startPlayheadSec),
           startPlayheadSec['_animateTrackVisualsToCurrentState'](durationSec8['rowEl'], 'audio', {
             durationSec: durationSec8['previewDurationSec'],
-            persist: !![],
-            commitHistory: !![],
-            syncTimelineWidthAfterSettle: ![],
+            persist: true,
+            commitHistory: true,
+            syncTimelineWidthAfterSettle: false,
           }),
           startPlayheadSec['_applyDeferredTimelineDragUpdate'](value33));
         return;
@@ -757,7 +757,7 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
           }),
           commit());
       !durationSec8?.['hasMoved'] &&
-        ((startPlayheadSec['_suppressTrackClick'] = !![]),
+        ((startPlayheadSec['_suppressTrackClick'] = true),
         startPlayheadSec['_setTimelinePlayheadFromPointer'](
           durationSec8?.['rowEl'],
           durationSec8?.['kind'],
@@ -772,8 +772,8 @@ export function startMediaClipTimelineSegmentDrag(startPlayheadSec, kind6, start
     };
   ((startPlayheadSec['_dragMove'] = value28),
     (startPlayheadSec['_dragUp'] = value30),
-    window['addEventListener']('pointermove', value28, !![]),
-    window['addEventListener']('pointerup', value30, { once: !![], capture: !![] }));
+    window['addEventListener']('pointermove', value28, true),
+    window['addEventListener']('pointerup', value30, { once: true, capture: true }));
 }
 export function handleMediaClipTimelineDrag(value35, event, value36 = null) {
   const enabled2 = value35['_timelineDrag']();
@@ -888,10 +888,10 @@ export function handleMediaClipTimelineSegmentDrag(args11, event2) {
         ? Math['max'](Math['abs'](value41), Math['abs'](value42))
         : Math['abs'](value41);
   if (!enabled3['hasMoved'] && count2 <= 3) return;
-  ((enabled3['hasMoved'] = !![]),
+  ((enabled3['hasMoved'] = true),
     enabled3['laneEl']?.['classList']['add']('is-moving'),
     enabled3['timelineEl']?.['classList']['add']('is-moving-material'),
-    (args11['_suppressTrackClick'] = !![]));
+    (args11['_suppressTrackClick'] = true));
   const mediaClipTimelineDeltaSecFromPx2 = getMediaClipTimelineDeltaSecFromPx(value41, {
     durationSec: durationSec10,
     trackWidthPx: trackWidthPx2,

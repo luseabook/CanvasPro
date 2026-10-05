@@ -67,7 +67,7 @@ export function reportRuntimeTask(taskId, message = {}) {
         ? String(title['jobError'] || title['asyncTaskError'] || title['rhTaskError'] || '')
         : '',
     remoteTaskId: taskId['taskId'],
-    cancellable: !progress && message['status'] !== 'paused' && provider['cancellable'] === !![],
+    cancellable: !progress && message['status'] !== 'paused' && provider['cancellable'] === true,
     result:
       status === 'complete'
         ? {

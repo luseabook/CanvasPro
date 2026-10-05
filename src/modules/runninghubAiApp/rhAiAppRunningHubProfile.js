@@ -21,8 +21,8 @@ export function getRunningHubProfileShortLabel(index) {
     ? '国际'
     : '国内';
 }
-export function syncRunningHubProfileBadge(el, result, enabled = !![]) {
+export function syncRunningHubProfileBadge(el, result, enabled = true) {
   const el2 = el?.['querySelector']?.("[data-role='preview-runninghub-runtime-label']");
-  if (!el2) return ![];
-  return ((el2['hidden'] = !enabled), (el2['textContent'] = getRunningHubProfileShortLabel(result)), !![]);
+  if (!el2) return false;
+  return ((el2['hidden'] = !enabled), (el2['textContent'] = getRunningHubProfileShortLabel(result)), true);
 }

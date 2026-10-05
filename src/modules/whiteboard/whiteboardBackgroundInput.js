@@ -142,7 +142,7 @@ function findLatestBackgroundEdge(input, output, value2) {
   return (
     Object['values'](value2 || {})
       ['filter']((value3) => {
-        if (normalizeText(value3?.['targetId']) !== text3) return ![];
+        if (normalizeText(value3?.['targetId']) !== text3) return false;
         const value4 = output?.[value3?.['sourceId']];
         return BACKGROUND_SOURCE_TYPE_SET['has'](normalizeText(value4?.['type']));
       })
@@ -273,9 +273,9 @@ export function drawWhiteboardBackgroundImage({
   frameWidth: frameWidth2,
   frameHeight: frameHeight2,
 } = {}) {
-  if (!ctx || !image || !viewport) return ![];
+  if (!ctx || !image || !viewport) return false;
   const count2 = Number(viewport['zoom']);
-  if (!Number['isFinite'](count2) || count2 <= 0) return ![];
+  if (!Number['isFinite'](count2) || count2 <= 0) return false;
   const box2 = getWhiteboardBackgroundWorldRect({
       imageWidth: imageWidth2,
       imageHeight: imageHeight2,
@@ -289,7 +289,7 @@ export function drawWhiteboardBackgroundImage({
     (ctx['globalAlpha'] = 1),
     ctx['drawImage'](image, value13, value14, box2['width'] * count2, box2['height'] * count2),
     ctx['restore'](),
-    !![]
+    true
   );
 }
 export function getWhiteboardSizeForBackground({

@@ -31,15 +31,15 @@ export function resolveWorkspaceStepShortcut(event, value) {
 }
 export function handleWorkspaceStepShortcut(
   event2,
-  { enabled: enabled = !![], stepCount: stepCount = 0, navigate: navigate } = {},
+  { enabled: enabled = true, stepCount: stepCount = 0, navigate: navigate } = {},
 ) {
-  if (!enabled) return ![];
+  if (!enabled) return false;
   const workspaceStepShortcut = resolveWorkspaceStepShortcut(event2, stepCount);
-  if (!workspaceStepShortcut) return ![];
+  if (!workspaceStepShortcut) return false;
   return (
     event2['preventDefault']?.(),
     event2['stopPropagation']?.(),
     navigate?.(workspaceStepShortcut),
-    !![]
+    true
   );
 }

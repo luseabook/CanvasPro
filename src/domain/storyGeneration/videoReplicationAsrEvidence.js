@@ -74,7 +74,7 @@ export function createAsrVisualOutput(payload) {
       type: 'array',
       items: {
         type: 'object',
-        additionalProperties: ![],
+        additionalProperties: false,
         required: ['fromWord', 'toWord', 'kind', 'speakerId', 'uncertain'],
         properties: {
           fromWord: { type: 'integer', minimum: 0 },
@@ -164,7 +164,7 @@ export function hydrateAsrSource(args2, output, list2 = buildReplicationAsrWords
         enabled4 = map['has'](enabled2?.['speakerId']) ? enabled2['speakerId'] : '',
         value18 =
           !enabled2 ||
-          enabled2['uncertain'] === !![] ||
+          enabled2['uncertain'] === true ||
           enabled2['kind'] === 'uncertain' ||
           (args5 === 'dialogue' && !enabled4),
         value19 = {

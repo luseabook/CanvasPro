@@ -4,11 +4,11 @@ export function buildVideoReplicationGenerationAssets(list = [], value = {}) {
   if (value?.['sourceMode'] !== 'video-replication') return list;
   return list['map']((args) => {
     if (args['kind'] !== 'character') return args;
-    let item = ![];
+    let item = false;
     const appearances = (args['appearances'] || [])['map']((args2, key) => {
       if (args2['sourceOrigin'] !== 'library' || !args2['imageUrl']) return args2;
       return (
-        (item = !![]),
+        (item = true),
         {
           ...args2,
           name: '参考形象' + (key + 1),

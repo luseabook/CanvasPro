@@ -12,7 +12,7 @@ export function initializeVideoNodePromptDetailsOnMount(
   node,
   { sanitizePromptHtml: sanitizePromptHtml } = {},
 ) {
-  if (!node || node['_rendererDetailsDeferred'] === !![]) return ![];
+  if (!node || node['_rendererDetailsDeferred'] === true) return false;
   return (
     node['_syncPromptBoxSizeFromData'](node['_data']),
     node['_setupPromptBoxResize'](),
@@ -23,20 +23,20 @@ export function initializeVideoNodePromptDetailsOnMount(
     node['_syncGenerationNodeHelpTip'](),
     node['_syncModelProviderProfileControl']?.(),
     node['_syncLocaleTexts'](),
-    !![]
+    true
   );
 }
 export function hydrateDeferredVideoNodeToolbar(node, hydrateToolbar) {
   const toolbarEl = node?.['_deferredToolbarEl'];
-  if (!toolbarEl) return ![];
+  if (!toolbarEl) return false;
   ((node['_deferredToolbarEl'] = null), node['_videoToolbarCleanup']?.());
   const cleanup = hydrateToolbar?.(toolbarEl, node['_data']);
-  return ((node['_videoToolbarCleanup'] = typeof cleanup === 'function' ? cleanup : null), !![]);
+  return ((node['_videoToolbarCleanup'] = typeof cleanup === 'function' ? cleanup : null), true);
 }
 export function hydrateVideoNodeDeferredDetails(node, helpers = {}) {
-  if (!node || node['_rendererDetailsDeferred'] !== !![]) return;
+  if (!node || node['_rendererDetailsDeferred'] !== true) return;
   const { readStoreState: readStoreState, sanitizePromptHtml: sanitizePromptHtml } = helpers;
-  ((node['_rendererDetailsDeferred'] = ![]),
+  ((node['_rendererDetailsDeferred'] = false),
     (node['_data'] = readStoreState()?.['nodes']?.[node['nodeId']] || node['_data']));
   const data = node['_data'] || {};
   node['footerEl']?.['dataset'] && delete node['footerEl']['dataset']['thinVideoHydration'];
@@ -60,11 +60,11 @@ export function hydrateVideoNodeDeferredDetails(node, helpers = {}) {
 }
 export function renderInitialVideoNodeFooter(node, footerEl) {
   if (!node || !footerEl) return;
-  if (node['_rendererThinVideoHydration'] === !![]) {
+  if (node['_rendererThinVideoHydration'] === true) {
     ((footerEl['dataset']['thinVideoHydration'] = '1'), (footerEl['innerHTML'] = ''), (node['btnEl'] = null));
     return;
   }
-  if (node['_rendererDetailsDeferred'] === !![] && typeof node['_renderFooterShell'] === 'function') {
+  if (node['_rendererDetailsDeferred'] === true && typeof node['_renderFooterShell'] === 'function') {
     node['_renderFooterShell'](footerEl);
     return;
   }

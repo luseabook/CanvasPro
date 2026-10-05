@@ -17,7 +17,7 @@ export function normalizeReplicationVoiceover(list = [], map) {
       speakerId: speakerId,
       text: String(uncertain['text'] || '')['trim'](),
       uncertain:
-        uncertain['uncertain'] === !![] || kind === 'uncertain' || (kind === 'inner_monologue' && !speakerId),
+        uncertain['uncertain'] === true || kind === 'uncertain' || (kind === 'inner_monologue' && !speakerId),
     };
   });
 }

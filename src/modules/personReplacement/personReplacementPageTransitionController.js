@@ -6,7 +6,7 @@ export function createPersonReplacementPageTransitionController({
   getRoot: getRoot,
   getTransitionKey: getTransitionKey,
   isCutEditorOpen: isCutEditorOpen,
-  isDestroyed: isDestroyed = () => ![],
+  isDestroyed: isDestroyed = () => false,
   requestRender: requestRender,
   documentObject: documentObject = globalThis['document'],
   windowObject: windowObject = globalThis['window'] || globalThis,
@@ -20,7 +20,7 @@ export function createPersonReplacementPageTransitionController({
     throw new TypeError('Person replacement page transitions require workspace adapters.');
   let value2 = null,
     item = '',
-    key = ![];
+    key = false;
   const run = (el, el2) => {
       const el3 = el?.['querySelector']?.('.story-asset-tabs'),
         el4 = el2?.['querySelector']?.('.story-asset-tabs');
@@ -32,7 +32,7 @@ export function createPersonReplacementPageTransitionController({
               (el7) => normalizeText(el7['dataset']?.['assetTab']) === text,
             );
           if (!el6) return;
-          el5['classList']?.['toggle']?.('is-active', el6['classList']?.['contains']?.('is-active') === !![]);
+          el5['classList']?.['toggle']?.('is-active', el6['classList']?.['contains']?.('is-active') === true);
           const index = el6['getAttribute']?.('aria-selected');
           if (index == null) el5['removeAttribute']?.('aria-selected');
           else el5['setAttribute']?.('aria-selected', index);
@@ -47,7 +47,7 @@ export function createPersonReplacementPageTransitionController({
         el13 = el11?.['querySelector']?.('.person-replacement-story-toolbar'),
         el14 = el12?.['querySelector']?.('.person-replacement-story-steps'),
         el15 = el13?.['querySelector']?.('.person-replacement-story-steps');
-      if (!el12 || !el13 || !el14 || !el15) return ![];
+      if (!el12 || !el13 || !el14 || !el15) return false;
       ((el12['className'] = el13['className']),
         (el14['dataset']['activeStep'] = el15['dataset']['activeStep']),
         el14['querySelectorAll']?.('[data-person-replacement-step]')?.['forEach']?.((el16) => {
@@ -66,7 +66,7 @@ export function createPersonReplacementPageTransitionController({
       const el18 = el12['querySelector']?.('.person-replacement-toolbar-side'),
         el19 = el13['querySelector']?.('.person-replacement-toolbar-side');
       if (el18 && el19) el18['innerHTML'] = el19['innerHTML'];
-      return !![];
+      return true;
     },
     captureFocus = () => {
       const enabled2 = getRoot(),
@@ -99,7 +99,7 @@ export function createPersonReplacementPageTransitionController({
       { currentToolbar: currentToolbar = null, incomingPage: incomingPage = null } = {},
     ) => {
       const el23 = getRoot();
-      if (!el22?.['value']) return ![];
+      if (!el22?.['value']) return false;
       if (el22['kind'] === 'cut-editor') {
         const target = el23?.['querySelector']?.('[data-person-replacement-shot-cut-editor]'),
           el24 =
@@ -113,9 +113,9 @@ export function createPersonReplacementPageTransitionController({
                       normalizeText(el25['dataset']?.['smartClipMode']) === el22['smartClipMode']),
                 ),
           el26 = el24 && !el24['disabled'] ? el24 : target;
-        if (!el26) return ![];
+        if (!el26) return false;
         try {
-          el26['focus']?.({ preventScroll: !![] });
+          el26['focus']?.({ preventScroll: true });
         } catch {
           el26['focus']?.();
         }
@@ -124,14 +124,14 @@ export function createPersonReplacementPageTransitionController({
       const el27 = el22['kind'] === 'step' ? currentToolbar || el23 : incomingPage || el23,
         enabled3 =
           el22['kind'] === 'step' ? 'personReplacementStep' : el22['kind'] === 'asset-tab' ? 'assetTab' : '';
-      if (!el27 || !enabled3) return ![];
+      if (!el27 || !enabled3) return false;
       const source = el22['kind'] === 'step' ? '[data-person-replacement-step]' : '[data-asset-tab]',
         el28 = Array['from'](el27['querySelectorAll']?.(source) || [])['find'](
           (el29) => normalizeText(el29['dataset']?.[enabled3]) === el22['value'],
         );
-      if (!el28 || el28['disabled']) return ![];
+      if (!el28 || el28['disabled']) return false;
       try {
-        el28['focus']?.({ preventScroll: !![] });
+        el28['focus']?.({ preventScroll: true });
       } catch {
         el28['focus']?.();
       }
@@ -141,16 +141,16 @@ export function createPersonReplacementPageTransitionController({
       windowObject: windowObject,
       disposePage: (el30) => el30?.['remove']?.(),
       restoreFocus: (next, current) => {
-        if (documentObject?.['activeElement'] !== documentObject?.['body']) return ![];
+        if (documentObject?.['activeElement'] !== documentObject?.['body']) return false;
         return restoreFocus(next, current);
       },
     }),
-    stop = ({ renderPending: renderPending = ![] } = {}) => {
+    stop = ({ renderPending: renderPending = false } = {}) => {
       (value2?.({ renderPending: renderPending }), (value2 = null));
     },
     deferRenderIfSettling = (entry = 'none') => {
-      if (value2 && entry === 'none' && item === getTransitionKey()) return ((key = !![]), !![]);
-      return ![];
+      if (value2 && entry === 'none' && item === getTransitionKey()) return ((key = true), true);
+      return false;
     },
     start = (
       current2,
@@ -164,7 +164,7 @@ export function createPersonReplacementPageTransitionController({
       } = {},
     ) => {
       const parent = next2?.['parentElement'];
-      if (!current2 || !next2 || !parent || !['forward', 'backward']['includes'](direction)) return ![];
+      if (!current2 || !next2 || !parent || !['forward', 'backward']['includes'](direction)) return false;
       const entering = direction === 'backward' ? 'is-entering-backward' : 'is-entering-forward',
         leaving = direction === 'backward' ? 'is-leaving-backward' : 'is-leaving-forward',
         payload = current2['querySelector']?.('[data-story-assets-switch-region]'),
@@ -192,10 +192,10 @@ export function createPersonReplacementPageTransitionController({
             : '',
         transitionElement = input ? config : scope ? handle : next2;
       next2['remove']?.();
-      let value6 = !![],
+      let value6 = true,
         enabled4 = null;
-      const value7 = ({ renderPending: renderPending = !![] } = {}) => {
-        ((value6 = renderPending), enabled4?.['cancel']?.({ commit: !![] }));
+      const value7 = ({ renderPending: renderPending = true } = {}) => {
+        ((value6 = renderPending), enabled4?.['cancel']?.({ commit: true }));
       };
       enabled4 = workspacePageTransitionController['start']({
         current: current2,
@@ -210,7 +210,7 @@ export function createPersonReplacementPageTransitionController({
           scopeCurrent: scopeCurrent,
           scopeNext: scopeCurrent,
           scopeTarget: scopeTarget,
-          retainCurrentOnCommit: ![],
+          retainCurrentOnCommit: false,
           directions: { [direction]: { entering: entering, leaving: leaving } },
         },
         focusKey: focusKey,
@@ -233,15 +233,15 @@ export function createPersonReplacementPageTransitionController({
           if (value2 === value7) value2 = null;
           item = '';
           const value8 = value6 && key;
-          key = ![];
+          key = false;
           if (value8 && !isDestroyed()) requestRender();
         },
       });
-      if (!enabled4) return ![];
-      return ((value2 = value7), (item = getTransitionKey()), !![]);
+      if (!enabled4) return false;
+      return ((value2 = value7), (item = getTransitionKey()), true);
     },
     destroy = () => {
-      (stop({ renderPending: ![] }), workspacePageTransitionController['destroy']());
+      (stop({ renderPending: false }), workspacePageTransitionController['destroy']());
     };
   return Object['freeze']({
     captureFocus: captureFocus,

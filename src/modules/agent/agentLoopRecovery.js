@@ -21,13 +21,13 @@ export function isAgentLoopRecoveryEditMessage(index = '') {
   return Boolean(result) && LOOP_RECOVERY_EDIT_MESSAGE_PATTERNS['some']((data) => data['test'](result));
 }
 export function shouldRetryAgentLoopNoop({
-  hasActionIntent: hasActionIntent = ![],
+  hasActionIntent: hasActionIntent = false,
   toolResultCount: toolResultCount = 0,
   retryCount: retryCount = 0,
   status: status = '',
 } = {}) {
   return (
-    hasActionIntent === !![] &&
+    hasActionIntent === true &&
     Number(toolResultCount || 0) === 0 &&
     Number(retryCount || 0) < 1 &&
     String(status || '') !== 'chat'
@@ -47,13 +47,13 @@ function getPlannedDuplicateNodeCount(options2 = {}) {
 }
 export function validateAgentLoopActionBudget(options3 = {}, next = {}) {
   const limit = Math['max'](0, Math['trunc'](Number(next['duplicateNodeLimit'] || 0)));
-  if (String(options3['type'] || '') !== 'node.duplicate' || limit === 0) return { ok: !![] };
+  if (String(options3['type'] || '') !== 'node.duplicate' || limit === 0) return { ok: true };
   const completed = Math['max'](0, Math['trunc'](Number(next['duplicatedNodeCount'] || 0))),
     planned = getPlannedDuplicateNodeCount(options3),
     remaining = Math['max'](0, limit - completed);
-  if (planned <= remaining) return { ok: !![], planned: planned, remaining: remaining };
+  if (planned <= remaining) return { ok: true, planned: planned, remaining: remaining };
   return {
-    ok: ![],
+    ok: false,
     errorCode: 'DUPLICATE_BUDGET_EXCEEDED',
     limit: limit,
     completed: completed,
@@ -62,7 +62,7 @@ export function validateAgentLoopActionBudget(options3 = {}, next = {}) {
   };
 }
 export function recordAgentLoopActionBudgetResult(args = {}, current = {}, response = {}) {
-  if (String(current['type'] || '') !== 'node.duplicate' || response['ok'] !== !![]) return args;
+  if (String(current['type'] || '') !== 'node.duplicate' || response['ok'] !== true) return args;
   const entry = Array['isArray'](response['results']) ? response['results']['at'](-1) : null,
     record = entry?.['result'] || {},
     list = Array['isArray'](record['nodeIds'])

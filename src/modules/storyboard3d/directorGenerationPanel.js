@@ -148,19 +148,19 @@ export class DirectorGenerationPanel {
       )
         this['panel']['timeline']['setMessage']?.('最多选择 6 张图片，每张不超过 32 MB。');
       else ((this['files'] = list3), this['panel']['timeline']['requestRender']?.());
-      return !![];
+      return true;
     }
-    if (!el['matches']?.('[data-director-generation]')) return ![];
+    if (!el['matches']?.('[data-director-generation]')) return false;
     this[el['dataset']['directorGeneration']] = el['value'];
     if (el['dataset']['directorGeneration'] === 'kind') this['panel']['timeline']['requestRender']?.();
-    return !![];
+    return true;
   }
   ['click'](enabled3, el2) {
-    if (!enabled3['startsWith']('timeline-generation-')) return ![];
+    if (!enabled3['startsWith']('timeline-generation-')) return false;
     const { project: project2, scene: scene2 } = this['panel']['context'](),
       options = this['panel']['timeline'];
     if (enabled3 === 'timeline-generation-start') {
-      if (!this['prompt']['trim']()) return (options['setMessage']?.('请输入场景描述。'), !![]);
+      if (!this['prompt']['trim']()) return (options['setMessage']?.('请输入场景描述。'), true);
       const provider = options['getGenerationContext']?.() || {};
       options['requestGeneration']?.({
         projectId: project2['id'],
@@ -178,6 +178,6 @@ export class DirectorGenerationPanel {
       this['panel']['scenePanel']['mutate']('恢复生成层历史', (target) =>
         restoreDirectorLayerVersion(target, el2['dataset']['layerId'], el2['dataset']['versionId']),
       );
-    return !![];
+    return true;
   }
 }

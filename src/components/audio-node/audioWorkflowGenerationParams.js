@@ -18,7 +18,7 @@ export function buildAudioWorkflowGenerationParams({
   savedParams: savedParams = {},
   currentParams: currentParams = {},
   extraParams: extraParams = {},
-  targetHasSpeakerId: targetHasSpeakerId = ![],
+  targetHasSpeakerId: targetHasSpeakerId = false,
 } = {}) {
   const args2 = getPlainParams(savedParams),
     plainParams = getPlainParams(currentParams),

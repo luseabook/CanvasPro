@@ -86,16 +86,16 @@ function executeSafeTool(value4, value5, value6) {
     return (
       value4['scenes']['push'](storyboard3DScene),
       (value4['activeSceneId'] = storyboard3DScene['id']),
-      { changed: !![], result: { sceneId: storyboard3DScene['id'] } }
+      { changed: true, result: { sceneId: storyboard3DScene['id'] } }
     );
   }
   const requireScene2 = requireScene(value4, sceneId),
     executeDirectorAICommand2 = executeDirectorAICommand(requireScene2, tool, args);
   if (executeDirectorAICommand2) return executeDirectorAICommand2;
-  if (tool === 'getSceneLayout') return { changed: ![], result: sceneLayout(requireScene2) };
+  if (tool === 'getSceneLayout') return { changed: false, result: sceneLayout(requireScene2) };
   if (tool === 'listShots')
     return {
-      changed: ![],
+      changed: false,
       result: requireScene2['shots']['map']((value7) => ({
         shotId: value7['id'],
         name: value7['name'],
@@ -106,12 +106,12 @@ function executeSafeTool(value4, value5, value6) {
   if (tool === 'checkComposition') {
     const activeShot2 = activeShot(requireScene2);
     return {
-      changed: ![],
+      changed: false,
       result: {
         sceneId: requireScene2['id'],
         shotId: activeShot2?.['id'] || null,
         objectCount: requireScene2['objects']['filter'](
-          (value8) => value8['visible'] !== ![] && value8['type'] !== 'camera',
+          (value8) => value8['visible'] !== false && value8['type'] !== 'camera',
         )['length'],
         camera: activeShot2 ? cloneStoryboard3DProject(activeShot2['camera']) : null,
       },
@@ -127,16 +127,16 @@ function executeSafeTool(value4, value5, value6) {
       type: 'prop',
       name: args['name'] || enabled4['name'],
       assetId: enabled4['source']?.['assetId'] || enabled4['id'],
-      visible: !![],
-      locked: ![],
+      visible: true,
+      locked: false,
       transform: mergeTransform(createDefaultStoryboard3DTransform(), args),
-      castShadow: !![],
-      receiveShadow: !![],
+      castShadow: true,
+      receiveShadow: true,
     };
     return (
       requireScene2['objects']['push'](value9),
       value6['usedAssetIds']['add'](args['assetId']),
-      { changed: !![], result: { objectId: value9['id'] } }
+      { changed: true, result: { objectId: value9['id'] } }
     );
   }
   if (tool === 'addCharacter') {
@@ -148,13 +148,13 @@ function executeSafeTool(value4, value5, value6) {
       name: args['name'] || 'Character',
       bodyPresetId: args['bodyPreset'] || args['assetId'],
       ...(args['actionId'] ? { actionId: args['actionId'] } : {}),
-      visible: !![],
-      locked: ![],
+      visible: true,
+      locked: false,
       transform: mergeTransform(createDefaultStoryboard3DTransform(), args),
     };
     return (
       requireScene2['objects']['push'](value10),
-      { changed: !![], result: { objectId: value10['id'] } }
+      { changed: true, result: { objectId: value10['id'] } }
     );
   }
   if (tool === 'addLight') {
@@ -165,14 +165,14 @@ function executeSafeTool(value4, value5, value6) {
       lightType: args['lightType'],
       color: args['color'] || '#ffffff',
       intensity: args['intensity'],
-      visible: !![],
-      locked: ![],
+      visible: true,
+      locked: false,
       transform: { ...createDefaultStoryboard3DTransform(), position: [...args['position']] },
       castShadow: args['lightType'] !== 'ambient',
     };
     return (
       requireScene2['objects']['push'](value11),
-      { changed: !![], result: { objectId: value11['id'] } }
+      { changed: true, result: { objectId: value11['id'] } }
     );
   }
   if (tool === 'deleteObject') {
@@ -182,19 +182,19 @@ function executeSafeTool(value4, value5, value6) {
       (requireScene2['objects'] = requireScene2['objects']['filter'](
         (value12) => value12['id'] !== requireObject2['id'],
       )),
-      { changed: !![], result: { objectId: requireObject2['id'] } }
+      { changed: true, result: { objectId: requireObject2['id'] } }
     );
   }
   if (tool === 'updateObject') {
     const requireObject3 = requireObject(requireScene2, args['objectId']);
-    if (requireObject3['locked'] && args['locked'] !== ![])
+    if (requireObject3['locked'] && args['locked'] !== false)
       throw new Error('Object is locked: ' + requireObject3['id']);
     if (args['name']) requireObject3['name'] = args['name'];
     if (typeof args['visible'] === 'boolean') requireObject3['visible'] = args['visible'];
     if (typeof args['locked'] === 'boolean') requireObject3['locked'] = args['locked'];
     return (
       (requireObject3['transform'] = mergeTransform(requireObject3['transform'], args)),
-      { changed: !![], result: { objectId: requireObject3['id'] } }
+      { changed: true, result: { objectId: requireObject3['id'] } }
     );
   }
   if (tool === 'setCharacterAction') {
@@ -207,7 +207,7 @@ function executeSafeTool(value4, value5, value6) {
     return (
       (requireObject4['actionId'] = args['actionId']),
       (requireObject4['actionTime'] = 0),
-      { changed: !![], result: { objectId: requireObject4['id'], actionId: requireObject4['actionId'] } }
+      { changed: true, result: { objectId: requireObject4['id'], actionId: requireObject4['actionId'] } }
     );
   }
   if (tool === 'setHandPose') {
@@ -219,7 +219,7 @@ function executeSafeTool(value4, value5, value6) {
     return (
       (requireObject5[args['hand'] === 'right' ? 'rightHandPoseId' : 'leftHandPoseId'] = args['poseId']),
       {
-        changed: !![],
+        changed: true,
         result: { objectId: requireObject5['id'], hand: args['hand'], poseId: args['poseId'] },
       }
     );
@@ -239,7 +239,7 @@ function executeSafeTool(value4, value5, value6) {
         camera: args2['camera'],
       })),
       (args2['updatedAt'] = value6['now']),
-      { changed: !![], result: { shotId: args2['id'] } }
+      { changed: true, result: { shotId: args2['id'] } }
     );
   }
   if (tool === 'addShot') {
@@ -256,7 +256,7 @@ function executeSafeTool(value4, value5, value6) {
     return (
       requireScene2['shots']['push'](storyboard3DShot),
       (requireScene2['activeShotId'] = storyboard3DShot['id']),
-      { changed: !![], result: { shotId: storyboard3DShot['id'] } }
+      { changed: true, result: { shotId: storyboard3DShot['id'] } }
     );
   }
   if (tool === 'updateShot') {
@@ -271,7 +271,7 @@ function executeSafeTool(value4, value5, value6) {
           camera: requireShot2['camera'],
         }))),
       (requireShot2['updatedAt'] = value6['now']),
-      { changed: !![], result: { shotId: requireShot2['id'] } }
+      { changed: true, result: { shotId: requireShot2['id'] } }
     );
   }
   throw new Error('Unsupported safe storyboard tool: ' + tool);
@@ -305,7 +305,7 @@ export function createStoryboard3DSafeToolExecutor({
       cloneStoryboard3DProject2 = cloneStoryboard3DProject(value17),
       list2 = [],
       value19 = new Set();
-    let value20 = ![];
+    let value20 = false;
     const now2 = now();
     for (const value21 of validateStoryboard3DAICommandPlan2['commands']) {
       try {
@@ -345,7 +345,7 @@ export function createStoryboard3DSafeToolExecutor({
         ),
         value19['forEach']((value23) => assetLibrary['markUsed'](value23))),
       {
-        ok: !![],
+        ok: true,
         transactionId: validateStoryboard3DAICommandPlan2['transactionId'],
         changed: value20,
         commands: list2,
@@ -531,7 +531,7 @@ export class Storyboard3DAIVoiceController {
       ...this['state'],
       plan: this['state']['plan'] ? cloneStoryboard3DProject(this['state']['plan']) : null,
       execution: this['state']['execution'] ? cloneStoryboard3DProject(this['state']['execution']) : null,
-      voiceSupported: this['voiceService']['isSupported']?.() === !![],
+      voiceSupported: this['voiceService']['isSupported']?.() === true,
     };
   }
   ['destroy']() {

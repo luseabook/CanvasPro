@@ -465,7 +465,7 @@ function getHiddenFixedSlotReasonFields(
   value34,
   value35 = {},
   value36 = null,
-  { useRhVisibilityFlags: useRhVisibilityFlags = ![] } = {},
+  { useRhVisibilityFlags: useRhVisibilityFlags = false } = {},
 ) {
   const value37 = new Set();
   return (
@@ -474,7 +474,7 @@ function getHiddenFixedSlotReasonFields(
       (value34 === 'firstFrame' || value34 === 'videoMask') &&
       value37['add']('rhSpecialMode'),
     useRhVisibilityFlags &&
-      value35?.['rhSubtractSubject'] === !![] &&
+      value35?.['rhSubtractSubject'] === true &&
       (value34 === 'firstFrame' || value34 === 'videoMask') &&
       value37['add']('rhSubtractSubject'),
     value36?.['showWhen'] &&
@@ -488,9 +488,9 @@ function getHiddenFixedSlotReasonFields(
 }
 
 export function shouldHideFixedInputSlots(value38 = null, value39 = {}) {
-  if (value38?.['inputSurfaceHidden'] === !![]) return !![];
+  if (value38?.['inputSurfaceHidden'] === true) return true;
   const value40 = value38?.['manifest'] || value38,
     value41 = value40?.['extensions']?.['videoInputSurface'];
-  if (value41?.['hideFixedInputSlots'] === !![]) return !![];
+  if (value41?.['hideFixedInputSlots'] === true) return true;
   return fixedSlotConditionMatches(value41?.['hideFixedInputSlotsWhen'], value39);
 }

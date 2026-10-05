@@ -22,14 +22,14 @@ function isTextAreaElement(index) {
   return String(index?.['tagName'] || '')['toUpperCase']() === 'TEXTAREA';
 }
 function isContentEditableElement(result) {
-  if (result?.['isContentEditable'] === !![]) return !![];
+  if (result?.['isContentEditable'] === true) return true;
   const data = result?.['getAttribute']?.('contenteditable');
   if (data !== null && data !== undefined) return String(data)['toLowerCase']() !== 'false';
   const options = String(result?.['contentEditable'] || '')['toLowerCase']();
   return options === 'true' || options === 'plaintext-only';
 }
 function isWritableTextInput(el) {
-  if (!isInputElement(el)) return ![];
+  if (!isInputElement(el)) return false;
   const target = String(el['type'] || '')['toLowerCase']();
   return TEXT_INPUT_TYPES['has'](target) && !el['disabled'] && !el['readOnly'];
 }
@@ -37,7 +37,7 @@ function isWritableTextArea(el2) {
   return isTextAreaElement(el2) && !el2['disabled'] && !el2['readOnly'];
 }
 function isSupportedTextInput(el3) {
-  if (!isInputElement(el3) || el3['disabled']) return ![];
+  if (!isInputElement(el3) || el3['disabled']) return false;
   return TEXT_INPUT_TYPES['has'](String(el3['type'] || '')['toLowerCase']());
 }
 function isSupportedTextArea(el4) {
@@ -55,7 +55,7 @@ function getTextContextMenuTarget(el5) {
   return null;
 }
 function isSensitiveTextTarget(el6) {
-  if (String(el6?.['type'] || '')['toLowerCase']() === 'password') return !![];
+  if (String(el6?.['type'] || '')['toLowerCase']() === 'password') return true;
   const next = [
     el6?.['id'],
     el6?.['name'],
@@ -78,13 +78,13 @@ export function getEditableTextTarget(el7) {
 }
 export function isEditableTextTargetInGroupedNode(entry, record = {}) {
   const el8 = getEditableTextTarget(entry);
-  if (!el8) return ![];
+  if (!el8) return false;
   const el9 = el8['closest']?.('.v2-node'),
     enabled = String(el9?.['dataset']?.['nodeId'] || el9?.['id'] || '')['trim']();
-  if (!enabled) return ![];
+  if (!enabled) return false;
   const payload = record?.[enabled],
     enabled2 = String(payload?.['parentId'] || '')['trim']();
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   return record?.[enabled2]?.['type'] === 'group';
 }
 function closeTextInputContextMenu() {
@@ -98,7 +98,7 @@ function dispatchInputEvent(handle) {
   const state = handle?.['ownerDocument']?.['defaultView'] || getWindow(),
     handler = state?.['InputEvent'] || state?.['Event'] || globalThis['Event'];
   if (typeof handler !== 'function' || typeof handle?.['dispatchEvent'] !== 'function') return;
-  handle['dispatchEvent'](new handler('input', { bubbles: !![] }));
+  handle['dispatchEvent'](new handler('input', { bubbles: true }));
 }
 function clampSelection(config, scope) {
   const input = Number(config);
@@ -141,79 +141,79 @@ function getTargetText(el13) {
 }
 function deleteEditableSelection(value7, enabled4) {
   const el14 = getEditableTextTarget(value7);
-  if (!el14 || !enabled4) return ![];
+  if (!el14 || !enabled4) return false;
   if (enabled4['kind'] === 'field') {
     const list = String(el14['value'] || ''),
       start = clampSelection(enabled4['start'], list['length']),
       end = clampSelection(enabled4['end'], list['length']);
-    if (start === end) return ![];
+    if (start === end) return false;
     return insertTextIntoField(el14, '', { kind: 'field', start: start, end: end });
   }
-  if (enabled4['kind'] !== 'contenteditable' || !enabled4['range']) return ![];
+  if (enabled4['kind'] !== 'contenteditable' || !enabled4['range']) return false;
   return (
     restoreEditableSelection(el14, enabled4),
     enabled4['range']['deleteContents']?.(),
     dispatchInputEvent(el14),
-    !![]
+    true
   );
 }
 function selectAllEditableText(el15) {
   if (isSupportedTextInput(el15) || isSupportedTextArea(el15))
     return (
-      el15['focus']?.({ preventScroll: !![] }),
+      el15['focus']?.({ preventScroll: true }),
       setFieldSelection(el15, 0, String(el15['value'] || '')['length']),
-      !![]
+      true
     );
-  if (!isContentEditableElement(el15)) return ![];
+  if (!isContentEditableElement(el15)) return false;
   const dom2 = el15['ownerDocument'] || getDocument(),
     enabled5 = dom2?.['defaultView']?.['getSelection']?.() || getWindow()?.['getSelection']?.(),
     enabled6 = dom2?.['createRange']?.();
-  if (!enabled5 || !enabled6) return ![];
+  if (!enabled5 || !enabled6) return false;
   return (
-    el15['focus']?.({ preventScroll: !![] }),
+    el15['focus']?.({ preventScroll: true }),
     enabled6['selectNodeContents'](el15),
     enabled5['removeAllRanges'](),
     enabled5['addRange'](enabled6),
-    !![]
+    true
   );
 }
 async function writeClipboardText(value8) {
   const value9 = globalThis['navigator']?.['clipboard']?.['writeText'];
-  if (typeof value9 !== 'function') return ![];
+  if (typeof value9 !== 'function') return false;
   try {
-    return (await value9['call'](globalThis['navigator']['clipboard'], value8), !![]);
+    return (await value9['call'](globalThis['navigator']['clipboard'], value8), true);
   } catch (value10) {
-    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardWriteFailed'), 'error'), ![]);
+    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardWriteFailed'), 'error'), false);
   }
 }
 async function copyEditableSelection(value11, value12) {
   const selectedText = getSelectedText(value11, value12);
-  if (!selectedText) return ![];
+  if (!selectedText) return false;
   return (restoreEditableSelection(value11, value12), writeClipboardText(selectedText));
 }
 async function cutEditableSelection(value13, value14) {
-  if (!(await copyEditableSelection(value13, value14))) return ![];
+  if (!(await copyEditableSelection(value13, value14))) return false;
   return deleteEditableSelection(value13, value14);
 }
 function undoEditableChange(value15, value16) {
   const dom3 = value15?.['ownerDocument'] || getDocument();
-  if (dom3?.['queryCommandSupported']?.('undo') !== !![]) return ![];
+  if (dom3?.['queryCommandSupported']?.('undo') !== true) return false;
   restoreEditableSelection(value15, value16);
   try {
-    return dom3['execCommand']?.('undo') === !![];
+    return dom3['execCommand']?.('undo') === true;
   } catch (value17) {
-    return ![];
+    return false;
   }
 }
 function restoreEditableSelection(el16, enabled7) {
   if (!enabled7) return;
   if (enabled7['kind'] === 'field') {
-    (el16['focus']?.({ preventScroll: !![] }),
+    (el16['focus']?.({ preventScroll: true }),
       setFieldSelection(el16, enabled7['start'], enabled7['end']));
     return;
   }
   if (enabled7['kind'] !== 'contenteditable' || !enabled7['range']) return;
-  el16['focus']?.({ preventScroll: !![] });
+  el16['focus']?.({ preventScroll: true });
   const dom4 = el16?.['ownerDocument']?.['defaultView'] || getWindow(),
     enabled8 = dom4?.['getSelection']?.();
   if (!enabled8) return;
@@ -223,7 +223,7 @@ function insertTextIntoField(el17, list2, value18) {
   const list3 = String(el17['value'] || ''),
     clampSelection2 = clampSelection(value18?.['start'] ?? el17['selectionStart'], list3['length']),
     clampSelection3 = clampSelection(value18?.['end'] ?? el17['selectionEnd'], list3['length']);
-  el17['focus']?.({ preventScroll: !![] });
+  el17['focus']?.({ preventScroll: true });
   if (typeof el17['setRangeText'] === 'function')
     try {
       el17['setRangeText'](list2, clampSelection2, clampSelection3, 'end');
@@ -237,24 +237,24 @@ function insertTextIntoField(el17, list2, value18) {
     const value21 = clampSelection2 + list2['length'];
     setFieldSelection(el17, value21, value21);
   }
-  return (dispatchInputEvent(el17), !![]);
+  return (dispatchInputEvent(el17), true);
 }
 function insertTextIntoContentEditable(el18, value22, value23) {
   const documentObject = el18?.['ownerDocument'] || getDocument();
-  (el18['focus']?.({ preventScroll: !![] }), restoreEditableSelection(el18, value23));
+  (el18['focus']?.({ preventScroll: true }), restoreEditableSelection(el18, value23));
   const value24 = documentObject?.['defaultView'];
   if (value24?.['ClipboardEvent'] && value24?.['DataTransfer']) {
     const clipboardData = new value24['DataTransfer']();
     clipboardData['setData']('text/plain', value22);
     const value25 = new value24['ClipboardEvent']('paste', {
-      bubbles: !![],
-      cancelable: !![],
+      bubbles: true,
+      cancelable: true,
       clipboardData: clipboardData,
     });
     el18['dispatchEvent'](value25);
-    if (value25['defaultPrevented']) return !![];
+    if (value25['defaultPrevented']) return true;
   }
-  if (insertPlainTextAtSelection(value22, { documentObject: documentObject })) return !![];
+  if (insertPlainTextAtSelection(value22, { documentObject: documentObject })) return true;
   const dom5 = documentObject?.['defaultView'] || getWindow(),
     value26 = dom5?.['getSelection']?.();
   if (value26 && value26['rangeCount'] > 0) {
@@ -263,23 +263,23 @@ function insertTextIntoContentEditable(el18, value22, value23) {
     const value28 = documentObject['createTextNode'](String(value22 || ''));
     (value27['insertNode'](value28),
       value27['setStartAfter'](value28),
-      value27['collapse'](!![]),
+      value27['collapse'](true),
       value26['removeAllRanges'](),
       value26['addRange'](value27));
   } else
     typeof el18['appendChild'] === 'function' && documentObject?.['createTextNode']
       ? el18['appendChild'](documentObject['createTextNode'](String(value22 || '')))
       : (el18['textContent'] = '' + (el18['textContent'] || '') + value22);
-  return (dispatchInputEvent(el18), !![]);
+  return (dispatchInputEvent(el18), true);
 }
 export function insertPlainTextIntoEditable(value29, value30, value31 = null) {
   const editableTextTarget = getEditableTextTarget(value29);
-  if (!editableTextTarget || typeof value30 !== 'string') return ![];
+  if (!editableTextTarget || typeof value30 !== 'string') return false;
   if (isWritableTextInput(editableTextTarget) || isWritableTextArea(editableTextTarget))
     return insertTextIntoField(editableTextTarget, value30, value31);
   if (isContentEditableElement(editableTextTarget))
     return insertTextIntoContentEditable(editableTextTarget, value30, value31);
-  return ![];
+  return false;
 }
 async function readClipboardText() {
   const value32 = globalThis['navigator']?.['clipboard']?.['readText'];
@@ -291,12 +291,12 @@ export async function pasteTextIntoEditableFromClipboard(value33, value34) {
   try {
     clipboardText = await readClipboardText();
   } catch (value35) {
-    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardReadFailed'), 'error'), ![]);
+    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardReadFailed'), 'error'), false);
   }
   if (typeof clipboardText !== 'string')
-    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardUnsupported'), 'error'), ![]);
+    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardUnsupported'), 'error'), false);
   if (!clipboardText)
-    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardEmpty'), 'warn'), ![]);
+    return (getWindow()?.['showToast']?.(textInputContextMenuText('clipboardEmpty'), 'warn'), false);
   return insertPlainTextIntoEditable(value33, clipboardText, value34);
 }
 export function showTextInputContextMenu({
@@ -317,7 +317,7 @@ export function showTextInputContextMenu({
     selectedText2 = getSelectedText(ownerElement, value36),
     list4 = [];
   value37 &&
-    el19['queryCommandSupported']?.('undo') === !![] &&
+    el19['queryCommandSupported']?.('undo') === true &&
     list4['push']({
       label: textInputContextMenuText('undo'),
       icon: 'undo',
@@ -375,10 +375,10 @@ export function showTextInputContextMenu({
   return (
     (activeTextInputContextMenuSession = showContextMenu(screenX, screenY, list4, {
       className: 'v2-canvas-ctx-menu v2-text-input-context-menu',
-      ensureItemIcons: !![],
+      ensureItemIcons: true,
       ownerElement: ownerElement,
       ownerRoot: ownerElement['parentElement'] || ownerElement,
-      autoFocus: ![],
+      autoFocus: false,
     })),
     activeTextInputContextMenuSession
   );
@@ -391,7 +391,7 @@ export function initTextInputContextMenu(el20 = getDocument()) {
     if (!target3) return;
     (screenX2['preventDefault'](), screenX2['stopPropagation']());
     const snapshot2 = captureEditableSelection(target3);
-    (target3['focus']?.({ preventScroll: !![] }),
+    (target3['focus']?.({ preventScroll: true }),
       showTextInputContextMenu({
         target: target3,
         screenX: screenX2['clientX'] || 0,

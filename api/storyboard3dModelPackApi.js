@@ -23,8 +23,8 @@ function normalizeInstallProgress(item) {
 function normalizeStatus(index) {
   const success = index && typeof index === 'object' ? index : {};
   return {
-    success: success['success'] !== ![],
-    installed: success['installed'] === !![],
+    success: success['success'] !== false,
+    installed: success['installed'] === true,
     packId: normalizeText(success['packId']),
     version: normalizeText(success['version']),
     requiredVersion: normalizeText(success['requiredVersion']),
@@ -38,7 +38,7 @@ function unwrap(response, result) {
   if (!response?.['success']) throw new Error(response?.['error'] || result);
   const response2 = response['data'];
   if (!response2 || typeof response2 !== 'object') throw new Error(result);
-  if (response2['success'] === ![])
+  if (response2['success'] === false)
     throw new Error(response2['error']?.['message'] || response2['error'] || result);
   return normalizeStatus(response2);
 }

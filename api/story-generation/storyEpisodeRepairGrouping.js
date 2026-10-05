@@ -5,13 +5,13 @@ const text = (value) => String(value ?? '')['trim'](),
 function sceneIdentity(result, data) {
   const args = new Set();
   for (const options of result['shots'] || []) {
-    let enabled = ![];
+    let enabled = false;
     for (const target of options['assetUsages'] || []) {
       const source = data['find']((next) =>
         [next['ref'], next['planningRef'], next['id']]['filter'](Boolean)['includes'](target['assetRef']),
       );
       if (source?.['kind'] !== 'scene') continue;
-      ((enabled = !![]),
+      ((enabled = true),
         args['add'](
           (source['id'] || source['ref'] || source['planningRef']) + ':' + (target['appearanceRef'] || ''),
         ));
@@ -29,14 +29,14 @@ export function groupStoryEpisodeRepairClips(
     rawClips: rawClips = [],
   } = {},
 ) {
-  if (normalizeStoryPromptMode(promptMode, { allowDeveloperModes: !![] }) !== 'seedance-2.0') return current;
+  if (normalizeStoryPromptMode(promptMode, { allowDeveloperModes: true }) !== 'seedance-2.0') return current;
   const entry = Math['min'](15, Math['max'](1, Number(maxSeconds) || 15)),
     record = [];
   for (const args2 of current) {
     const args3 = record['at'](-1),
       sceneIdentity2 = sceneIdentity(args2, assets),
       payload =
-        rawClips['find']((handle) => handle['ref'] === args2['ref'])?.['startsNewNarrativeBeat'] === !![],
+        rawClips['find']((handle) => handle['ref'] === args2['ref'])?.['startsNewNarrativeBeat'] === true,
       state = args3 ? duration(args3) + duration(args2) : 0;
     if (
       !args3 ||

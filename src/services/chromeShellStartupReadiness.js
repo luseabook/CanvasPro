@@ -16,11 +16,11 @@ export function isChromeShellRuntimeHref(value) {
       LOOPBACK_HOSTS['has'](uRL['hostname']) && uRL['searchParams']['get']('aicRuntime') === 'chrome-shell'
     );
   } catch {
-    return ![];
+    return false;
   }
 }
 export function isChromeShellStartupAttemptId(item) {
-  if (typeof item !== 'string') return ![];
+  if (typeof item !== 'string') return false;
   const list = item;
   return (
     list['length'] >= MIN_STARTUP_ATTEMPT_ID_LENGTH &&
@@ -99,16 +99,16 @@ export function scheduleChromeShellStartupReady({
       maxAttempts == null
         ? entry
         : Math['min'](entry, Math['max'](1, Math['round'](Number(maxAttempts) || 0)));
-  let payload = ![],
+  let payload = false,
     handle = 0,
     state = 0,
-    config = ![];
+    config = false;
   windowObject?.['addEventListener']?.(
     'pagehide',
     () => {
-      config = !![];
+      config = true;
     },
-    { once: !![] },
+    { once: true },
   );
   function run(scope) {
     if (scope >= entry || state >= record) return;
@@ -147,14 +147,14 @@ export function scheduleChromeShellStartupReady({
     } catch {
       output = null;
     }
-    if (output?.['startupReadyAccepted'] === !![]) {
-      payload = !![];
+    if (output?.['startupReadyAccepted'] === true) {
+      payload = true;
       return;
     }
     ((handle += 1),
       void Promise['resolve'](output)
         ['then']((value2) => {
-          if (value2?.['startupReadyAccepted'] === !![]) payload = !![];
+          if (value2?.['startupReadyAccepted'] === true) payload = true;
         })
         ['catch'](() => {})
         ['finally'](() => {

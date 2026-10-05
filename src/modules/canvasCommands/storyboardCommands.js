@@ -202,7 +202,7 @@ function buildStoryboardCells(id, list4 = [], value17 = {}, value18 = list4['len
     const nodeId2 = list4[value19] || '',
       enabled = nodeId2 ? getNode(value17, nodeId2) : null;
     if (!enabled) {
-      list5['push']({ id: id + '-cell-' + (value19 + 1), url: '', isEmpty: !![] });
+      list5['push']({ id: id + '-cell-' + (value19 + 1), url: '', isEmpty: true });
       continue;
     }
     const localPath2 = resolveImageNodeAsset(enabled);
@@ -222,9 +222,9 @@ function buildStoryboardCells(id, list4 = [], value17 = {}, value18 = list4['len
       imageWidth: localPath2['width'] || null,
       imageHeight: localPath2['height'] || null,
       storyboardSourceNodeId: nodeId2,
-      storyboardExtractedCell: !![],
-      storyboardLockedCell: !![],
-      isEmpty: ![],
+      storyboardExtractedCell: true,
+      storyboardLockedCell: true,
+      isEmpty: false,
     });
   }
   return list5;
@@ -273,13 +273,13 @@ export function registerStoryboardCommands(value26) {
         y: { type: 'number' },
       },
       defaults: { orderBy: 'selection', placement: 'right-of-first-image' },
-      selectionFallback: !![],
+      selectionFallback: true,
     },
     capabilitySchema: {
       reads: ['nodes', 'selection'],
       writes: ['nodes', 'selection'],
-      selectionFallback: !![],
-      requiresMountedRuntime: ![],
+      selectionFallback: true,
+      requiresMountedRuntime: false,
     },
     returnSchema: { aliasFields: ['nodeId', 'node', 'sourceNodeIds', 'cols', 'rows', 'cellCount'] },
     validate(error = {}, value27 = {}) {
@@ -297,7 +297,7 @@ export function registerStoryboardCommands(value26) {
         };
       } catch (errorCode) {
         return {
-          ok: ![],
+          ok: false,
           errorCode: errorCode['errorCode'] || 'INVALID_STORYBOARD_IMAGES',
           message: errorCode['message'] || 'Invalid storyboard image nodes.',
           details: errorCode['details'],
@@ -329,7 +329,7 @@ export function registerStoryboardCommands(value26) {
           rows: cols3['rows'],
           aspectRatio: aspectLabel,
           cells: cells,
-          isEditing: ![],
+          isEditing: false,
         }),
         handler = () => {
           (store2?.['addNode']?.(node), store2?.['setSelectedNodes']?.([id2]));
@@ -371,13 +371,13 @@ export function registerStoryboardCommands(value26) {
           node2 = getNode(value28, sourceId);
         if (!sourceId || !node2)
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'NODE_NOT_FOUND',
             message: 'Canvas node not found: ' + (sourceId || '(empty)'),
           };
         if (!resolveStoryboardSourceImageRef(node2))
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'IMAGE_ASSET_NOT_FOUND',
             message: 'Canvas node has no storyboard-compatible image: ' + sourceId,
           };

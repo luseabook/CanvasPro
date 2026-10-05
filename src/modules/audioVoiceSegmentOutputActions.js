@@ -71,7 +71,7 @@ export async function saveAudioVoiceSegmentDownload({
   if (!url2)
     return (
       showToast?.(getText(text3, 'toasts.audioMissing', {}, 'Audio is unavailable'), 'warn'),
-      { success: ![], canceled: ![], reason: 'missing-audio' }
+      { success: false, canceled: false, reason: 'missing-audio' }
     );
   try {
     const result2 = await saveMediaFile({
@@ -82,10 +82,10 @@ export async function saveAudioVoiceSegmentDownload({
       title: getText(text3, 'menu.download', {}, 'Download'),
     });
     if (result2?.['canceled']) return result2;
-    if (result2?.['success'] === ![]) throw new Error(result2['error'] || 'Audio save failed');
+    if (result2?.['success'] === false) throw new Error(result2['error'] || 'Audio save failed');
     return (
       showMediaSaveSuccessToast({ result: result2, kind: 'audio', showToast: showToast }),
-      result2 || { success: !![], canceled: ![] }
+      result2 || { success: true, canceled: false }
     );
   } catch (error) {
     const message = String(error?.['message'] || error || 'Audio save failed');
@@ -94,7 +94,7 @@ export async function saveAudioVoiceSegmentDownload({
         getText(text3, 'toasts.downloadFailed', { message: message }, 'Audio save failed: ' + message),
         'error',
       ),
-      { success: ![], canceled: ![], error: message }
+      { success: false, canceled: false, error: message }
     );
   }
 }
@@ -113,7 +113,7 @@ export function addAudioVoiceSegmentAudioToCanvas({
   if (!localPath3['localPath'])
     return (
       showToast?.(getText(text4, 'toasts.audioMissing', {}, 'Audio is unavailable'), 'warn'),
-      { success: ![], reason: 'missing-local-audio' }
+      { success: false, reason: 'missing-local-audio' }
     );
   try {
     if (typeof store?.['addNode'] !== 'function') throw new Error('Canvas store is unavailable');
@@ -157,7 +157,7 @@ export function addAudioVoiceSegmentAudioToCanvas({
         getText(text4, 'toasts.addedToCanvas', { label: label }, label + ' added to canvas'),
         'success',
       ),
-      { success: !![], nodeId: id, node: node }
+      { success: true, nodeId: id, node: node }
     );
   } catch (error2) {
     const message2 = String(error2?.['message'] || error2 || 'Add to canvas failed');
@@ -171,7 +171,7 @@ export function addAudioVoiceSegmentAudioToCanvas({
         ),
         'error',
       ),
-      { success: ![], error: message2 }
+      { success: false, error: message2 }
     );
   }
 }

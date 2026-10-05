@@ -8,7 +8,7 @@ export function createRunningHubMediaUploadApiKeyMissingError(value = '') {
     (error['code'] = RUNNINGHUB_MEDIA_UPLOAD_API_KEY_MISSING),
     (error['provider'] = 'runninghub'),
     (error['kind'] = value),
-    (error['retryable'] = ![]),
+    (error['retryable'] = false),
     error
   );
 }

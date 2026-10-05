@@ -37,7 +37,7 @@ export async function invokeCheckpointedStoryReview({
       target
     );
   } catch (source) {
-    ((draft['status'] = 'failed_retryable'), (source['storyReviewInterrupted'] = !![]), await checkpoint());
+    ((draft['status'] = 'failed_retryable'), (source['storyReviewInterrupted'] = true), await checkpoint());
     throw source;
   }
 }

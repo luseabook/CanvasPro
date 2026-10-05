@@ -40,7 +40,7 @@ export function appendUniqueUrl(list4, handle) {
   if (state && !list4['includes'](state)) list4['push'](state);
 }
 export function normalizeKlingKeepOriginalSound(config) {
-  if (config === !![] || config === ![]) return config;
+  if (config === true || config === false) return config;
   const scope = String(config ?? '')
     ['trim']()
     ['toLowerCase']();

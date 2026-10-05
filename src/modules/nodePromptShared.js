@@ -2646,13 +2646,13 @@ function _readPromptHtmlForCommit(value273) {
 export function bindPromptMentionHost(
   value275,
   {
-    enablePaste: enablePaste = !![],
-    enableSelectAll: enableSelectAll = !![],
-    ignoreInlineEditor: ignoreInlineEditor = !![],
+    enablePaste: enablePaste = true,
+    enableSelectAll: enableSelectAll = true,
+    ignoreInlineEditor: ignoreInlineEditor = true,
     inlineEditorSelector: inlineEditorSelector = '[data-prompt-pill-inline-editor="true"]',
-    rehydrate: rehydrate = !![],
-    commitHydratedPrompt: commitHydratedPrompt = !![],
-    closeMenuOnDestroy: closeMenuOnDestroy = !![],
+    rehydrate: rehydrate = true,
+    commitHydratedPrompt: commitHydratedPrompt = true,
+    closeMenuOnDestroy: closeMenuOnDestroy = true,
   } = {},
 ) {
   const el75 = value275?.['promptEl'];
@@ -2690,11 +2690,11 @@ export function bindPromptMentionHost(
     _readPromptHtmlForCommit2 !== value275['getPromptHtml']() &&
       value275['commitPromptHtml'](_readPromptHtmlForCommit2);
   }
-  let value284 = ![];
+  let value284 = false;
   return {
     destroy() {
       if (value284) return;
-      value284 = !![];
+      value284 = true;
       if (closeMenuOnDestroy) _closeMentionMenu();
       (flushPromptHtmlCommit(value275),
         el75['removeEventListener']?.('input', value277),
@@ -2731,7 +2731,7 @@ function _applyMentionPillPresentation(el77, value290 = {}) {
   if (value291) el77['dataset']['promptPillKind'] = value291;
   else delete el77['dataset']['promptPillKind'];
   el77['classList']?.['toggle']?.('story-time-pill', value291 === 'time');
-  const value292 = value290?.['missingAsset'] === !![];
+  const value292 = value290?.['missingAsset'] === true;
   el77['classList']?.['toggle']?.('ref-pill--unresolved', value292);
   if (value292) ((el77['dataset']['refUnresolved'] = 'true'), (el77['title'] = '缺少图片素材'));
   else {
@@ -2773,7 +2773,7 @@ function _populateMentionMenuTree(
       const _createMentionMenuItem4 = _createMentionMenuItem({
           label: enabled77['label'],
           subtitle: enabled77['subtitle'],
-          hasSubmenu: !![],
+          hasSubmenu: true,
         }),
         _createMentionSubmenu2 = _createMentionSubmenu();
       if (!enabled77['suppressBulkMention']) {
@@ -2824,8 +2824,8 @@ function _getMentionMenuPages(value302, value303 = []) {
       ? String(value305['icon'])['trim']()
       : '',
   }))['filter']((enabled78) => {
-    if (!enabled78['id'] || !enabled78['label'] || value304['has'](enabled78['id'])) return ![];
-    return (value304['add'](enabled78['id']), !![]);
+    if (!enabled78['id'] || !enabled78['label'] || value304['has'](enabled78['id'])) return false;
+    return (value304['add'](enabled78['id']), true);
   });
 }
 
@@ -2901,7 +2901,7 @@ function _appendMentionMenuPages(value308, value309, value310, value311) {
   let enabled80 = value320?.['hasCandidates'] ? value320 : null;
   if (!enabled80) enabled80 = value316['find']((value322) => value322['hasCandidates']);
   if (!enabled80) enabled80 = value320 || value316[0];
-  const run4 = (enabled81, { keyboard: keyboard = ![] } = {}) => {
+  const run4 = (enabled81, { keyboard: keyboard = false } = {}) => {
     if (!enabled81) return;
     const value323 = value316['indexOf'](enabled81);
     (value316['forEach']((event12) => {

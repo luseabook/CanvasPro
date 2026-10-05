@@ -62,5 +62,5 @@ export function reconcilePersonReplacementStableDom(
       } else el3['insertBefore'](child2, source);
     }
   };
-  return (run(result, data), !![]);
+  return (run(result, data), true);
 }

@@ -14,8 +14,8 @@ function renderDataAttributes(options = {}) {
     ['map'](([key, index]) => {
       const text = normalizeText(key)['toLowerCase']();
       if (!/^data-[a-z][a-z0-9-]*$/u['test'](text)) return '';
-      if (index === ![] || index == null) return '';
-      if (index === !![]) return ' ' + text;
+      if (index === false || index == null) return '';
+      if (index === true) return ' ' + text;
       return ' ' + text + '="' + escapeHtml(index) + '"';
     })
     ['join']('');
@@ -39,8 +39,8 @@ export function renderWorkspaceEpisodeRail({
           number: number,
           title: normalizeText(busy?.['title']) || '第 ' + number + ' 集',
           meta: normalizeText(busy?.['meta']) || '0',
-          busy: busy?.['busy'] === !![],
-          disabled: busy?.['disabled'] === !![],
+          busy: busy?.['busy'] === true,
+          disabled: busy?.['disabled'] === true,
         };
       })
       ['filter']((data) => data['id']);

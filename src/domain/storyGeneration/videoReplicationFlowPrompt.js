@@ -84,9 +84,9 @@ export function buildReplicationFlowPrompt(
     promptMode: promptMode2,
     referenceHeader: referenceHeader,
     continuityLines: continuityLines,
-    integerTime: integerTime = ![],
-    shotSpeech: shotSpeech = ![],
-    stagingHandoff: stagingHandoff = ![],
+    integerTime: integerTime = false,
+    shotSpeech: shotSpeech = false,
+    stagingHandoff: stagingHandoff = false,
   },
 ) {
   const run = integerTime ? (config) => String(Math['round'](config)) : seconds,

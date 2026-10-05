@@ -7,13 +7,13 @@ function readImageSource(value) {
   return String(value?.['getAttribute']?.('src') || value?.['currentSrc'] || value?.['src'] || '')['trim']();
 }
 function isImagePaintReady(item) {
-  return !!(item?.['complete'] === !![] && Number(item?.['naturalWidth'] || 0) > 0);
+  return !!(item?.['complete'] === true && Number(item?.['naturalWidth'] || 0) > 0);
 }
 function hasPaintedImageSource(el, key) {
   return !!(
     key &&
     el?.['style']?.['display'] !== 'none' &&
-    el?.['complete'] !== ![] &&
+    el?.['complete'] !== false &&
     (el?.['naturalWidth'] === undefined || Number(el['naturalWidth'] || 0) > 0)
   );
 }
@@ -57,15 +57,15 @@ function releaseFallbackCallbacks(args) {
   }
 }
 function finishHandoff(enabled2, options, target = {}) {
-  if (!enabled2 || handoffByImage['get'](enabled2) !== options) return ![];
+  if (!enabled2 || handoffByImage['get'](enabled2) !== options) return false;
   return (
     removeStateListeners(enabled2, options),
     handoffByImage['delete'](enabled2),
     clearFallbackStyle(enabled2),
-    target['releaseFallback'] !== ![]
+    target['releaseFallback'] !== false
       ? releaseFallbackCallbacks(options)
       : options['fallbackReleaseCallbacks']?.['clear']?.(),
-    !![]
+    true
   );
 }
 function schedulePaintedHandoffFinish(enabled3, source) {
@@ -76,7 +76,7 @@ function schedulePaintedHandoffFinish(enabled3, source) {
     source['finishScheduled']
   )
     return;
-  source['finishScheduled'] = !![];
+  source['finishScheduled'] = true;
   const promise =
     typeof enabled3['decode'] === 'function'
       ? Promise['resolve']()
@@ -87,7 +87,7 @@ function schedulePaintedHandoffFinish(enabled3, source) {
     if (handoffByImage['get'](enabled3) !== source || readImageSource(enabled3) !== source['targetSource'])
       return;
     if (!isImagePaintReady(enabled3)) {
-      source['finishScheduled'] = ![];
+      source['finishScheduled'] = false;
       return;
     }
     finishHandoff(enabled3, source);
@@ -96,7 +96,7 @@ function schedulePaintedHandoffFinish(enabled3, source) {
 function restoreFallbackAfterError(el5, enabled4) {
   if (!el5 || handoffByImage['get'](el5) !== enabled4 || readImageSource(el5) !== enabled4['targetSource'])
     return;
-  (removeStateListeners(el5, enabled4), (enabled4['finishScheduled'] = ![]));
+  (removeStateListeners(el5, enabled4), (enabled4['finishScheduled'] = false));
   if (!enabled4['fallbackSource']) {
     finishHandoff(el5, enabled4);
     return;
@@ -109,14 +109,14 @@ function restoreFallbackAfterError(el5, enabled4) {
   const run2 = () => {
     if (handoffByImage['get'](el5) !== enabled4) return;
     (removeStateListeners(el5, enabled4),
-      (enabled4['finishScheduled'] = ![]),
-      (enabled4['restoredFallback'] = !![]),
+      (enabled4['finishScheduled'] = false),
+      (enabled4['restoredFallback'] = true),
       clearFallbackStyle(el5));
   };
   ((enabled4['onLoad'] = run2),
-    (enabled4['onError'] = () => finishHandoff(el5, enabled4, { releaseFallback: ![] })),
-    el5['addEventListener']?.('load', enabled4['onLoad'], { once: !![] }),
-    el5['addEventListener']?.('error', enabled4['onError'], { once: !![] }),
+    (enabled4['onError'] = () => finishHandoff(el5, enabled4, { releaseFallback: false })),
+    el5['addEventListener']?.('load', enabled4['onLoad'], { once: true }),
+    el5['addEventListener']?.('error', enabled4['onError'], { once: true }),
     (el5['src'] = enabled4['fallbackSource']),
     isImagePaintReady(el5) && run2());
 }
@@ -124,21 +124,21 @@ export function deferCanvasImageDisplayFallbackRelease(next, current, entry) {
   const enabled5 = String(current || '')['trim'](),
     enabled6 = next ? handoffByImage['get'](next) : null;
   if (!enabled5 || !enabled6 || enabled6['fallbackSource'] !== enabled5 || typeof entry !== 'function')
-    return ![];
-  return (enabled6['fallbackReleaseCallbacks']['add'](entry), !![]);
+    return false;
+  return (enabled6['fallbackReleaseCallbacks']['add'](entry), true);
 }
 export function clearCanvasImageDisplayHandoff(enabled7) {
-  if (!enabled7) return ![];
+  if (!enabled7) return false;
   const enabled8 = handoffByImage['get'](enabled7);
   if (enabled8) return finishHandoff(enabled7, enabled8);
   return (clearFallbackStyle(enabled7), !!enabled8);
 }
 export function assignCanvasImageDisplaySource(el6, record) {
   const targetSource = String(record || '')['trim']();
-  if (!el6 || !targetSource) return ![];
+  if (!el6 || !targetSource) return false;
   const imageSource = readImageSource(el6),
     enabled9 = handoffByImage['get'](el6);
-  if (imageSource === targetSource && (!enabled9 || enabled9['targetSource'] === targetSource)) return ![];
+  if (imageSource === targetSource && (!enabled9 || enabled9['targetSource'] === targetSource)) return false;
   let fallbackSource = '',
     fallbackLod = '';
   const payload = !!(
@@ -163,12 +163,12 @@ export function assignCanvasImageDisplaySource(el6, record) {
   enabled9?.['fallbackReleaseCallbacks']?.['size'] &&
     enabled9['fallbackSource'] !== fallbackSource &&
     releaseFallbackCallbacks(enabled9);
-  if (!fallbackSource) return (clearFallbackStyle(el6), (el6['src'] = targetSource), !![]);
+  if (!fallbackSource) return (clearFallbackStyle(el6), (el6['src'] = targetSource), true);
   const handle = {
     fallbackSource: fallbackSource,
     fallbackLod: fallbackLod,
     targetSource: targetSource,
-    finishScheduled: ![],
+    finishScheduled: false,
     fallbackReleaseCallbacks: fallbackReleaseCallbacks,
     onLoad: null,
     onError: null,
@@ -185,9 +185,9 @@ export function assignCanvasImageDisplaySource(el6, record) {
     el6['style']?.['setProperty']?.(HANDOFF_FALLBACK_POSITION_PROPERTY, fallbackLayout['position']),
     el6['style']?.['setProperty']?.(HANDOFF_FALLBACK_SIZE_PROPERTY, fallbackLayout['size']),
     el6['classList']?.['add']?.(HANDOFF_CLASS),
-    el6['addEventListener']?.('load', handle['onLoad'], { once: !![] }),
-    el6['addEventListener']?.('error', handle['onError'], { once: !![] }),
+    el6['addEventListener']?.('load', handle['onLoad'], { once: true }),
+    el6['addEventListener']?.('error', handle['onError'], { once: true }),
     (el6['src'] = targetSource),
-    !![]
+    true
   );
 }

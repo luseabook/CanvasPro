@@ -32,7 +32,7 @@ export function createRhAiAppPreviewDragController({
   class handler {
     constructor() {
       ((this['previewDrag'] = null),
-        (this['suppressPreviewRenameClick'] = ![]),
+        (this['suppressPreviewRenameClick'] = false),
         (this['suppressPreviewRenameClickTimer'] = 0),
         (this['parameterGroups'] = createParameterGroupInteraction(this)));
     }
@@ -64,8 +64,8 @@ export function createRhAiAppPreviewDragController({
         this['suppressPreviewRenameClick'] &&
         event['target']?.['closest']?.('.rh-ai-app-preview-draggable')
       )
-        return (this['_consumeSuppressedPreviewRenameClick'](event), !![]);
-      return ![];
+        return (this['_consumeSuppressedPreviewRenameClick'](event), true);
+      return false;
     }
     ['captureComponentRect'](result) {
       return this['_capturePreviewComponentRect'](result);
@@ -84,11 +84,11 @@ export function createRhAiAppPreviewDragController({
         this['_restorePreviewLayoutSnapshot'](current['layoutSnapshot']),
         this['_clearPreviewDragState'](),
         value?.['clearTimeout']?.(this['suppressPreviewRenameClickTimer']),
-        (this['suppressPreviewRenameClick'] = ![]),
+        (this['suppressPreviewRenameClick'] = false),
         (this['suppressPreviewRenameClickTimer'] = 0));
     }
     ['_isPreviewControlTarget'](entry) {
-      return actions['isPreviewControlTarget']?.(entry) === !![];
+      return actions['isPreviewControlTarget']?.(entry) === true;
     }
     ['_startPreviewInlineRename'](record, payload) {
       return actions['startPreviewInlineRename']?.(record, payload);
@@ -144,14 +144,14 @@ export function createRhAiAppPreviewDragController({
       return this['_snapshotPreviewRect'](this['_getPreviewMotionTarget'](value8));
     }
     ['_animatePreviewComponentFromRect'](value9, box2) {
-      if (shouldReduceMotion() || !box2) return ![];
+      if (shouldReduceMotion() || !box2) return false;
       const el4 = this['_getPreviewMotionTarget'](value9);
-      if (!el4?.['animate']) return ![];
+      if (!el4?.['animate']) return false;
       const box3 = el4['getBoundingClientRect']?.();
-      if (!box3) return ![];
+      if (!box3) return false;
       const value10 = Math['round'](Number(box2['left']) - box3['left']),
         value11 = Math['round'](Number(box2['top']) - box3['top']);
-      if (Math['abs'](value10) < 1 && Math['abs'](value11) < 1) return ![];
+      if (Math['abs'](value10) < 1 && Math['abs'](value11) < 1) return false;
       return (
         el4['animate'](
           [
@@ -160,7 +160,7 @@ export function createRhAiAppPreviewDragController({
           ],
           { duration: PREVIEW_MOVE_ANIMATION_MS, easing: 'cubic-bezier(0.2, 0, 0.2, 1)' },
         ),
-        !![]
+        true
       );
     }
     ['_setPreviewDragTransform'](event2, value12, value13) {
@@ -206,20 +206,20 @@ export function createRhAiAppPreviewDragController({
     }
     ['_suppressNextPreviewRenameClick']() {
       (value['clearTimeout'](this['suppressPreviewRenameClickTimer']),
-        (this['suppressPreviewRenameClick'] = !![]),
+        (this['suppressPreviewRenameClick'] = true),
         (this['suppressPreviewRenameClickTimer'] = value['setTimeout'](() => {
-          ((this['suppressPreviewRenameClick'] = ![]), (this['suppressPreviewRenameClickTimer'] = 0));
+          ((this['suppressPreviewRenameClick'] = false), (this['suppressPreviewRenameClickTimer'] = 0));
         }, 160)));
     }
     ['_consumeSuppressedPreviewRenameClick'](event4) {
-      if (!this['suppressPreviewRenameClick']) return ![];
+      if (!this['suppressPreviewRenameClick']) return false;
       return (
-        (this['suppressPreviewRenameClick'] = ![]),
+        (this['suppressPreviewRenameClick'] = false),
         value['clearTimeout'](this['suppressPreviewRenameClickTimer']),
         (this['suppressPreviewRenameClickTimer'] = 0),
         event4?.['preventDefault']?.(),
         event4?.['stopPropagation']?.(),
-        !![]
+        true
       );
     }
     ['_updatePreviewDropTarget'](value16, value17) {
@@ -233,18 +233,18 @@ export function createRhAiAppPreviewDragController({
       );
     }
     ['_activatePreviewDrag'](event5, event6) {
-      if (!event5?.['target'] || event5['isActive']) return ![];
+      if (!event5?.['target'] || event5['isActive']) return false;
       const value19 = this['_createPreviewDragGhost'](event5['target'], event6);
       ((event5['ghost'] = value19),
-        (event5['isActive'] = !![]),
-        (event5['moved'] = !![]),
+        (event5['isActive'] = true),
+        (event5['moved'] = true),
         (event5['layoutSnapshot'] = this['_capturePreviewLayoutSnapshot']()),
         event5['target']['classList']['add']('is-dragging'));
       if (value19) event5['target']['classList']['add']('is-drag-placeholder');
       return (
         this['panel']?.['classList']['add']('is-preview-dragging'),
         this['_setPreviewDragTransform'](event5, event6['clientX'], event6['clientY']),
-        !![]
+        true
       );
     }
     ['_capturePreviewLayoutSnapshot']() {
@@ -323,7 +323,7 @@ export function createRhAiAppPreviewDragController({
     }
     ['_animatePreviewZoneOrder'](value34, value35, list6 = []) {
       const el10 = this['_getPreviewZoneElement'](value34);
-      if (!el10) return ![];
+      if (!el10) return false;
       const list7 = Array['from'](el10['querySelectorAll'](value35)),
         map2 = new Map(list7['map']((el11) => [Number(el11['dataset']['previewComponentIndex']), el11]));
       return (
@@ -333,14 +333,14 @@ export function createRhAiAppPreviewDragController({
             if (value37) el10['appendChild'](value37);
           }),
         ),
-        !![]
+        true
       );
     }
     ['_createPreviewDragGhost'](el12, event7) {
       const box5 = el12?.['getBoundingClientRect']?.();
       if (!box5) return null;
       const value38 = el12['classList']?.['contains']('rh-ai-app-preview-prompt-draggable'),
-        element = value38 ? el['createElement']('div') : el12['cloneNode'](!![]);
+        element = value38 ? el['createElement']('div') : el12['cloneNode'](true);
       if (value38) {
         const value39 = Number(el12['dataset']['previewComponentIndex']),
           value40 = getComponentByIndex(this['componentDrafts'], value39);
@@ -402,7 +402,7 @@ export function createRhAiAppPreviewDragController({
         el15
       );
     }
-    ['_clearPreviewHomeParamDropPlaceholder'](value44, { animate: animate = ![] } = {}) {
+    ['_clearPreviewHomeParamDropPlaceholder'](value44, { animate: animate = false } = {}) {
       const el18 = value44?.['homePlaceholder'];
       if (!el18) return;
       if (!el18['isConnected']) {
@@ -452,7 +452,7 @@ export function createRhAiAppPreviewDragController({
         el21
       );
     }
-    ['_clearPreviewAdvancedParamDropPlaceholder'](value48, { animate: animate = ![] } = {}) {
+    ['_clearPreviewAdvancedParamDropPlaceholder'](value48, { animate: animate = false } = {}) {
       const el25 = value48?.['advancedPlaceholder'];
       if (!el25) return;
       if (!el25['isConnected']) {
@@ -485,14 +485,14 @@ export function createRhAiAppPreviewDragController({
       if (enabled9['lastPreviewOrderKey'] === value53) return;
       (this['_animatePreviewZoneOrder']('input', '.rh-ai-app-preview-input-slot', list9),
         (enabled9['lastPreviewOrderKey'] = value53),
-        (enabled9['didLiveOrder'] = !![]));
+        (enabled9['didLiveOrder'] = true));
     }
     ['_placePreviewParamDraft'](
       enabled10,
       value54,
       { clientX: clientX = null, clientY: clientY = null } = {},
     ) {
-      if (!enabled10 || !isParamComponent(enabled10)) return ![];
+      if (!enabled10 || !isParamComponent(enabled10)) return false;
       const value55 = value54 === 'home' ? 'home' : 'advanced';
       if (value55 === 'home') {
         const enabled11 = enabled10['previewPlacement'] === 'home';
@@ -500,14 +500,14 @@ export function createRhAiAppPreviewDragController({
           !enabled11 &&
           getParameterEntries(this['componentDrafts'])['length'] >= PREVIEW_CUSTOM_COMPONENT_LIMIT
         )
-          return ![];
+          return false;
         ((enabled10['previewPlacement'] = 'home'), delete enabled10['advancedParamOrder']);
         const list10 = getPreviewHomeParamComponents(this['componentDrafts']),
           value56 =
             clientX !== null && Number['isFinite'](Number(clientX))
               ? this['_getPreviewDropOrder']('params', clientX, '.rh-ai-app-preview-param-chip')
               : list10['length'];
-        return (moveComponentToOrder(list10, enabled10['index'], 'homeParamOrder', value56), !![]);
+        return (moveComponentToOrder(list10, enabled10['index'], 'homeParamOrder', value56), true);
       }
       ((enabled10['previewPlacement'] = 'advanced'),
         delete enabled10['homeParamOrder'],
@@ -519,12 +519,12 @@ export function createRhAiAppPreviewDragController({
           value57 || value58
             ? this['_getPreviewDropOrder']('advanced', clientX, '.rh-ai-app-preview-advanced-param', clientY)
             : list11['length'];
-      return (moveComponentToOrder(list11, enabled10['index'], 'advancedParamOrder', value59), !![]);
+      return (moveComponentToOrder(list11, enabled10['index'], 'advancedParamOrder', value59), true);
     }
     ['_movePreviewTextParamToPrompt'](value60) {
       const enabled12 = getComponentByIndex(this['componentDrafts'], value60?.['index']);
       if (!enabled12 || !isParamComponent(enabled12) || !canPreviewComponentBecomePrompt(enabled12))
-        return ![];
+        return false;
       return (
         (enabled12['componentKind'] = 'prompt'),
         (enabled12['controlType'] = 'prompt'),
@@ -532,14 +532,14 @@ export function createRhAiAppPreviewDragController({
         delete enabled12['advancedParamOrder'],
         delete enabled12['previewPlacement'],
         assignSequentialOrder(getPreviewHomeParamComponents(this['componentDrafts']), 'homeParamOrder'),
-        !![]
+        true
       );
     }
     ['_movePreviewPromptToParam'](clientX2, value61, value62 = '') {
       const enabled13 = getComponentByIndex(this['componentDrafts'], clientX2?.['index']);
-      if (!enabled13 || !canPreviewPromptBecomeParam(enabled13)) return ![];
+      if (!enabled13 || !canPreviewPromptBecomeParam(enabled13)) return false;
       const enabled14 = getPreviewPromptReturnControlType(enabled13, value62);
-      if (!enabled14) return ![];
+      if (!enabled14) return false;
       ((enabled13['componentKind'] = 'param'), (enabled13['controlType'] = enabled14));
       const enabled15 = this['_placePreviewParamDraft'](enabled13, value61, {
         clientX: clientX2?.['currentClientX'],
@@ -566,7 +566,7 @@ export function createRhAiAppPreviewDragController({
     }
     ['_movePreviewParamToAdvanced'](value63) {
       const enabled16 = getComponentByIndex(this['componentDrafts'], value63['index']);
-      if (!enabled16 || !isParamComponent(enabled16)) return ![];
+      if (!enabled16 || !isParamComponent(enabled16)) return false;
       const value64 = getPreviewAdvancedParamComponents(this['componentDrafts'])
           ['map']((value65) => Number(value65['index']))
           ['join'](','),
@@ -598,7 +598,7 @@ export function createRhAiAppPreviewDragController({
         ),
         list12 = this['_getPreviewOrderedIndexesDuringDrag'](enabled18, 'params', value71);
       if (!list12['includes'](Number(enabled18['index']))) {
-        this['_clearPreviewHomeParamDropPlaceholder'](enabled18, { animate: !![] });
+        this['_clearPreviewHomeParamDropPlaceholder'](enabled18, { animate: true });
         return;
       }
       if (enabled18['dragKind'] === 'advanced-param')
@@ -617,7 +617,7 @@ export function createRhAiAppPreviewDragController({
       if (enabled18['lastPreviewOrderKey'] === value74) return;
       (this['_animatePreviewZoneOrder']('params', '.rh-ai-app-preview-param-chip', list13),
         (enabled18['lastPreviewOrderKey'] = value74));
-      if (enabled18['dragKind'] === 'param') enabled18['didLiveOrder'] = !![];
+      if (enabled18['dragKind'] === 'param') enabled18['didLiveOrder'] = true;
     }
     ['_reorderPreviewAdvancedParamsDuringDrag'](enabled19) {
       if (!enabled19 || !['param', 'advanced-param', 'group-param']['includes'](enabled19['dragKind']))
@@ -630,7 +630,7 @@ export function createRhAiAppPreviewDragController({
         ),
         list14 = this['_getPreviewOrderedIndexesDuringDrag'](enabled19, 'advanced', value75);
       if (!list14['includes'](Number(enabled19['index']))) {
-        this['_clearPreviewAdvancedParamDropPlaceholder'](enabled19, { animate: !![] });
+        this['_clearPreviewAdvancedParamDropPlaceholder'](enabled19, { animate: true });
         return;
       }
       if (enabled19['dragKind'] !== 'advanced-param')
@@ -649,7 +649,7 @@ export function createRhAiAppPreviewDragController({
       if (enabled19['lastPreviewOrderKey'] === value78) return;
       (this['_animatePreviewZoneOrder']('advanced', '.rh-ai-app-preview-advanced-param', list15),
         (enabled19['lastPreviewOrderKey'] = value78));
-      if (enabled19['dragKind'] === 'advanced-param') enabled19['didLiveOrder'] = !![];
+      if (enabled19['dragKind'] === 'advanced-param') enabled19['didLiveOrder'] = true;
     }
     ['_handlePreviewPointerDown'](pointerId) {
       if (pointerId['button'] !== 0) return;
@@ -677,10 +677,10 @@ export function createRhAiAppPreviewDragController({
         startClientY: pointerId['clientY'],
         currentClientX: pointerId['clientX'],
         currentClientY: pointerId['clientY'],
-        moved: ![],
-        isActive: ![],
+        moved: false,
+        isActive: false,
         lastPreviewOrderKey: '',
-        didLiveOrder: ![],
+        didLiveOrder: false,
         homePlaceholder: null,
         advancedPlaceholder: null,
         layoutSnapshot: null,
@@ -699,7 +699,7 @@ export function createRhAiAppPreviewDragController({
         return;
       }
       if (!enabled20['isActive'] && !this['_activatePreviewDrag'](enabled20, event8)) return;
-      ((enabled20['moved'] = !![]),
+      ((enabled20['moved'] = true),
         this['_setPreviewDragTransform'](enabled20, event8['clientX'], event8['clientY']));
       const value80 = this['_updatePreviewDropTarget'](event8['clientX'], event8['clientY']);
       if (this['parameterGroups']['move'](enabled20, value80)) {
@@ -730,20 +730,20 @@ export function createRhAiAppPreviewDragController({
       ) {
         if (value80 === 'params')
           (enabled20['advancedPlaceholder'] &&
-            this['_clearPreviewAdvancedParamDropPlaceholder'](enabled20, { animate: !![] }),
+            this['_clearPreviewAdvancedParamDropPlaceholder'](enabled20, { animate: true }),
             this['_reorderPreviewHomeParamsDuringDrag'](enabled20));
         else {
           if (value80 === 'advanced')
             (enabled20['homePlaceholder'] &&
-              this['_clearPreviewHomeParamDropPlaceholder'](enabled20, { animate: !![] }),
+              this['_clearPreviewHomeParamDropPlaceholder'](enabled20, { animate: true }),
               this['_reorderPreviewAdvancedParamsDuringDrag'](enabled20));
           else {
             if (enabled20['homePlaceholder'])
-              (this['_clearPreviewHomeParamDropPlaceholder'](enabled20, { animate: !![] }),
+              (this['_clearPreviewHomeParamDropPlaceholder'](enabled20, { animate: true }),
                 (enabled20['lastPreviewOrderKey'] = ''));
             else
               enabled20['advancedPlaceholder'] &&
-                (this['_clearPreviewAdvancedParamDropPlaceholder'](enabled20, { animate: !![] }),
+                (this['_clearPreviewAdvancedParamDropPlaceholder'](enabled20, { animate: true }),
                 (enabled20['lastPreviewOrderKey'] = ''));
           }
         }
@@ -784,10 +784,10 @@ export function createRhAiAppPreviewDragController({
       const renderPrompt = this['_getPreviewDropZone'](event10['currentClientX'], event10['currentClientY']);
       if (this['parameterGroups']['end'](event10, event9, renderPrompt)) {
         this['_clearPreviewDragState']();
-        const value86 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+        const value86 = this['_refreshBundleFromComponents']({ renderPreview: false });
         (this['_patchPreviewWithoutRebuild'](value86, {
-          renderParams: !![],
-          renderAdvanced: !![],
+          renderParams: true,
+          renderAdvanced: true,
           renderPrompt: renderPrompt === 'prompt',
         }),
           this['parameterGroups']['restorePanel']());
@@ -804,11 +804,11 @@ export function createRhAiAppPreviewDragController({
           renderPrompt === 'params' &&
           getParameterEntries(this['componentDrafts'])['length'] < PREVIEW_CUSTOM_COMPONENT_LIMIT,
         value92 = value90 && renderPrompt === 'advanced';
-      let value93 = ![],
-        renderInputs = ![],
-        renderParams = ![],
-        renderAdvanced = ![],
-        renderPrompt2 = ![];
+      let value93 = false,
+        renderInputs = false,
+        renderParams = false,
+        renderAdvanced = false,
+        renderPrompt2 = false;
       const enabled23 = event10['dragKind'] === 'input' && renderPrompt === 'input',
         enabled24 =
           (event10['dragKind'] === 'param' || event10['dragKind'] === 'advanced-param') &&
@@ -820,7 +820,7 @@ export function createRhAiAppPreviewDragController({
         !enabled24 &&
         !enabled25 &&
         (this['_restorePreviewLayoutSnapshot'](event10['layoutSnapshot']),
-        (value93 = !![]),
+        (value93 = true),
         (renderInputs = event10['dragKind'] === 'input'),
         (renderParams = event10['dragKind'] === 'param' || event10['dragKind'] === 'advanced-param'),
         (renderAdvanced = event10['dragKind'] === 'advanced-param'));
@@ -863,7 +863,7 @@ export function createRhAiAppPreviewDragController({
         }
       }
       this['_clearPreviewDragState']();
-      const value99 = this['_refreshBundleFromComponents']({ renderPreview: ![] });
+      const value99 = this['_refreshBundleFromComponents']({ renderPreview: false });
       if (value93 || renderPrompt2) {
         this['_patchPreviewWithoutRebuild'](value99, {
           renderInputs: renderInputs,

@@ -45,7 +45,7 @@ function normalizeCompilerInput(characters2 = {}) {
 function getTargetCharacterId(target, map) {
   const text = normalizeText(target['targetCharacterId']);
   if (text) return text;
-  if (target['projectMappingDisabled'] === !![]) return '';
+  if (target['projectMappingDisabled'] === true) return '';
   return map['get'](normalizeText(target['sourceCharacterId'])) || '';
 }
 function getTargetAppearanceImageRef(source, next = '') {

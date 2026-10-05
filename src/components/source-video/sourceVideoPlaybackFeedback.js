@@ -11,7 +11,7 @@ export function clearSourceVideoPlaybackFeedback(value) {
 }
 export async function playSourceVideoWithFeedback(card, playbackIntent, shouldContinue) {
   const enabled2 = card['_ensureVideoElement']();
-  if (!enabled2) return ![];
+  if (!enabled2) return false;
   (card['_attachPlaybackRecovery'](playbackIntent), clearSourceVideoPlaybackFeedback(card));
   const item = card['_currentSrc'],
     key = { card: card['_card'] };
@@ -25,7 +25,7 @@ export async function playSourceVideoWithFeedback(card, playbackIntent, shouldCo
       playbackIntent: playbackIntent,
       ensureSrc: () =>
         card['_ensurePlaybackVideoSrc']({
-          forPlayback: !![],
+          forPlayback: true,
           preload: playbackIntent === 'hover' ? 'metadata' : 'auto',
         }),
       minBufferAhead: playbackIntent === 'hover' ? 0.5 : undefined,
@@ -33,7 +33,7 @@ export async function playSourceVideoWithFeedback(card, playbackIntent, shouldCo
       recoveryDebounceMs: playbackIntent === 'hover' ? 150 : undefined,
       recoveryCooldownMs: playbackIntent === 'hover' ? 500 : undefined,
       shouldRecover: () =>
-        card['_video']?.['isConnected'] !== ![] &&
+        card['_video']?.['isConnected'] !== false &&
         (card['_isHovered'] || card['_isManualControl'] || !card['_video']?.['paused']),
       shouldContinue: shouldContinue,
     });

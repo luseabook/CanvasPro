@@ -11,13 +11,13 @@ export function jumpToStoryOutlineSection(
   { windowObject: windowObject = globalThis['window'] } = {},
 ) {
   const outlineSection = findOutlineSection(item, key);
-  if (!outlineSection) return ![];
+  if (!outlineSection) return false;
   const run = () => outlineSection['scrollIntoView']?.({ behavior: 'smooth', block: 'start' });
   return (
     typeof windowObject?.['requestAnimationFrame'] === 'function'
       ? windowObject['requestAnimationFrame'](run)
       : run(),
-    !![]
+    true
   );
 }
 export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = globalThis['window'] } = {}) {
@@ -25,8 +25,8 @@ export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = g
   if (!el4) return null;
   const el5 = el4['querySelector']('[data-story-outline-nav-toggle]'),
     dom = el3['ownerDocument'];
-  let enabled = ![],
-    index = ![],
+  let enabled = false,
+    index = false,
     result = 0,
     enabled2 = 0;
   const run2 = (data) => {
@@ -50,16 +50,16 @@ export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = g
       (event['preventDefault'](), handler3(!enabled));
     },
     next = () => {
-      (handler(), handler2(!![]));
+      (handler(), handler2(true));
     },
     current = () => {
       handler();
       if (enabled) return;
       enabled2 = windowObject['setTimeout'](() => {
-        ((enabled2 = 0), handler2(![]));
+        ((enabled2 = 0), handler2(false));
       }, 180);
     },
-    entry = () => run2(!![]),
+    entry = () => run2(true),
     record = () => {
       if (result) windowObject['clearTimeout'](result);
       result = windowObject['setTimeout'](() => {
@@ -75,11 +75,11 @@ export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = g
           }));
         return;
       }
-      !el4['contains'](event2['target']) && (handler(), handler2(![]), handler3(![]));
+      !el4['contains'](event2['target']) && (handler(), handler2(false), handler3(false));
     },
     handle = (event3) => {
       if (event3['key'] !== 'Escape') return;
-      (handler(), handler2(![]), handler3(![]), dom['activeElement']?.['blur']?.());
+      (handler(), handler2(false), handler3(false), dom['activeElement']?.['blur']?.());
     };
   return (
     el5?.['addEventListener']('click', source),

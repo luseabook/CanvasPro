@@ -18,7 +18,7 @@ export const seedVr2ImageHdModelManifest = Object['freeze']({
   extensions: {
     providerProfiles: ['runninghub', 'runninghub-international'],
     imageMenu: { group: 'runninghubWorkflow' },
-    imageHdMenu: { enabled: !![] },
+    imageHdMenu: { enabled: true },
   },
   capabilities: { inputKinds: ['image'], outputType: 'image', maxImages: 1 },
   inputSlots: {
@@ -45,8 +45,8 @@ export const seedVr2ImageHdModelManifest = Object['freeze']({
       RH_IMAGE_INSTANCE_FIELD,
     ],
   },
-  async: !![],
-  cancellable: !![],
+  async: true,
+  cancellable: true,
   outputType: 'image',
 });
 export const seedVr2ImageHdExecutionManifest = Object['freeze']({
@@ -67,7 +67,7 @@ export const seedVr2ImageHdExecutionManifest = Object['freeze']({
   },
   mapping: {
     nodeInfoList: [
-      { nodeId: '52', fieldName: 'image', source: 'imageInput', required: !![], description: '上传图片' },
+      { nodeId: '52', fieldName: 'image', source: 'imageInput', required: true, description: '上传图片' },
       {
         nodeId: '54',
         fieldName: 'value',

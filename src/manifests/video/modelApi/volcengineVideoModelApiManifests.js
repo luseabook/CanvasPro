@@ -312,7 +312,7 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
   }),
   VOLCENGINE_SEEDANCE_2_5_FIELDS = Object['freeze']([
     VOLCENGINE_SEEDANCE_2_MODE_FIELD,
-    createVolcengineSeedance2ResolutionField({ include1080p: ![] }),
+    createVolcengineSeedance2ResolutionField({ include1080p: false }),
     VOLCENGINE_SEEDANCE_2_RATIO_FIELD,
     createFooterDurationSliderOptionsField({
       values: VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES,
@@ -382,7 +382,7 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
       path: 'seed',
       from: 'param',
       field: Object['freeze'](['generationParams.seed', 'seed']),
-      omitWhenEmpty: !![],
+      omitWhenEmpty: true,
     }),
     Object['freeze']({
       path: 'omni_reference_task_type',
@@ -393,12 +393,12 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
         'omniReferenceTaskType',
         'omni_reference_task_type',
       ]),
-      omitWhenEmpty: !![],
+      omitWhenEmpty: true,
     }),
   ]),
   VOLCENGINE_SEEDANCE_2_5_RATIO_POLICY = Object['freeze']({
     ...VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
-    preserveAdaptiveAtSubmit: !![],
+    preserveAdaptiveAtSubmit: true,
   }),
   VOLCENGINE_SEEDANCE_2_5_VIDEO_POLICY = Object['freeze']({
     defaultRatio: 'adaptive',
@@ -407,14 +407,14 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     defaultDuration: -1,
     minDuration: 4,
     maxDuration: 30,
-    allowAutoDuration: !![],
+    allowAutoDuration: true,
     maxImageCount: 30,
     maxVideoReferenceCount: 10,
     maxAudioReferenceCount: 10,
-    allowAudioOnlyReferences: !![],
-    roleImagesRequireAdaptiveRatio: !![],
-    supportsOutputFormatParam: !![],
-    supportsSeedParam: !![],
+    allowAudioOnlyReferences: true,
+    roleImagesRequireAdaptiveRatio: true,
+    supportsOutputFormatParam: true,
+    supportsSeedParam: true,
   }),
   VOLCENGINE_SEEDANCE_2_5_HELP_TOOLTIP = [
     '火山方舟 Seedance 2.5',
@@ -466,7 +466,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     help: Object['freeze']({ tooltip: VOLCENGINE_SEEDANCE_2_5_HELP_TOOLTIP }),
     extensions: Object['freeze']({
       segmentRetake: Object['freeze']({
-        supported: !![],
+        supported: true,
         parameterPolicy: Object['freeze']({
           mode: Object['freeze']({ fieldId: 'dreaminaRouteMode', value: 'multimodal2video' }),
           duration: Object['freeze']({ fieldId: 'duration', value: -1 }),
@@ -500,7 +500,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
     fields: Object['freeze']([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
-      createVolcengineSeedance2ResolutionField({ include1080p: ![] }),
+      createVolcengineSeedance2ResolutionField({ include1080p: false }),
       ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
@@ -567,7 +567,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
     fields: Object['freeze']([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
-      createVolcengineSeedance2ResolutionField({ include1080p: !![], include4k: !![] }),
+      createVolcengineSeedance2ResolutionField({ include1080p: true, include4k: true }),
       ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
@@ -625,7 +625,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
     fields: Object['freeze']([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
-      createVolcengineSeedance2ResolutionField({ include1080p: ![] }),
+      createVolcengineSeedance2ResolutionField({ include1080p: false }),
       ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,

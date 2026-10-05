@@ -6,14 +6,14 @@ export async function requestCliTextStream(
 ) {
   const signal2 = new AbortController(),
     handler = () => signal2['abort']();
-  signal?.['addEventListener']('abort', handler, { once: !![] });
+  signal?.['addEventListener']('abort', handler, { once: true });
   if (signal?.['aborted']) handler();
   const value = timeoutMs == null ? null : setTimeout(handler, timeoutMs);
   try {
     const response = await fetch(buildApiUrl('/api/v2/cli-providers/generate-text'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'text/event-stream' },
-      body: JSON['stringify']({ ...provider, stream: !![] }),
+      body: JSON['stringify']({ ...provider, stream: true }),
       signal: signal2['signal'],
     });
     if (!response['ok'] || !response['headers']['get']('content-type')?.['includes']('text/event-stream')) {

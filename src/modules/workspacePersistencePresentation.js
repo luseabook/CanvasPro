@@ -7,7 +7,7 @@ export function createWorkspacePersistencePresentation({
   let el = null,
     el2 = null,
     el3 = null,
-    enabled = ![],
+    enabled = false,
     value = '',
     setTimeoutFn2 = null,
     response = { status: 'idle' };
@@ -26,7 +26,7 @@ export function createWorkspacePersistencePresentation({
       !el &&
         ((el = el5['createElement']('div')),
         (el['className'] = 'workspace-persistence-status'),
-        (el['hidden'] = !![]),
+        (el['hidden'] = true),
         el['setAttribute']('role', 'status'),
         el['setAttribute']('aria-live', 'polite'),
         (el3 = el5['createElement']('span')),
@@ -42,18 +42,18 @@ export function createWorkspacePersistencePresentation({
       const index = key === 'saving' && Number(response2['retryAttempt']) > 0,
         result = key === 'error' || index || Boolean(value);
       if (key !== 'saving' || result) run();
-      if (result) el['hidden'] = ![];
+      if (result) el['hidden'] = false;
       else {
-        if (key !== 'saving') el['hidden'] = !![];
+        if (key !== 'saving') el['hidden'] = true;
         else
           (item !== 'saving' || (el['hidden'] && setTimeoutFn2 === null)) &&
             (run(),
             typeof setTimeoutFn === 'function'
               ? (setTimeoutFn2 = setTimeoutFn(() => {
                   setTimeoutFn2 = null;
-                  if (!enabled && response['status'] === 'saving') el['hidden'] = ![];
+                  if (!enabled && response['status'] === 'saving') el['hidden'] = false;
                 }, showDelayMs))
-              : (el['hidden'] = ![]));
+              : (el['hidden'] = false));
       }
       (el['setAttribute']('data-state', result ? 'error' : key),
         (el3['hidden'] = key !== 'saving'),
@@ -66,7 +66,7 @@ export function createWorkspacePersistencePresentation({
             : '正在保存…'));
     },
     destroy() {
-      ((enabled = !![]), run(), el?.['remove']?.(), (el = el2 = el3 = null));
+      ((enabled = true), run(), el?.['remove']?.(), (el = el2 = el3 = null));
     },
   };
 }

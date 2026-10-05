@@ -83,7 +83,7 @@ export function resolveReplicationSpeechTiming({
   return {
     startSec: shot['startSec'],
     endSec: shot['endSec'],
-    ...(args3 || /(?:延续|继续|接续)/u['test'](shot['audio'] || '') ? { uncertain: !![] } : {}),
+    ...(args3 || /(?:延续|继续|接续)/u['test'](shot['audio'] || '') ? { uncertain: true } : {}),
   };
 }
 export function inspectReplicationSpeechTiming({ clips: clips = [] } = {}, value8 = {}) {

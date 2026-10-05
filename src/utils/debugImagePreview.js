@@ -24,11 +24,11 @@ export function resolveDebugImageSource(enabled) {
     return enabled;
   return localPathToUrl(enabled);
 }
-export function buildDebugJsonPreview(value, { imageContext: imageContext = ![] } = {}) {
+export function buildDebugJsonPreview(value, { imageContext: imageContext = false } = {}) {
   const content = JSON['stringify'](value, null, 2) ?? '',
     images = [];
   let end = 0;
-  function run(list, path, item = ![], label = 0) {
+  function run(list, path, item = false, label = 0) {
     if (Array['isArray'](list))
       list['forEach']((key, index) => run(key, path + '[' + index + ']', item, index + 1));
     else {

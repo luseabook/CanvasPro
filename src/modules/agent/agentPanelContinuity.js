@@ -4,7 +4,7 @@ export function createAgentPanelContinuity({
   getMessageCount: getMessageCount,
 }) {
   let epoch = 0,
-    enabled = ![],
+    enabled = false,
     value = null;
   function identity() {
     const item = getConversation?.();
@@ -36,7 +36,7 @@ export function createAgentPanelContinuity({
       );
     },
     destroy() {
-      ((enabled = !![]), invalidate());
+      ((enabled = true), invalidate());
     },
   };
 }

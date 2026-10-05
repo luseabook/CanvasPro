@@ -21,7 +21,7 @@ export function cursorCrossesViewport(box, box2, box3) {
         count2 < 0 ||
         count + box2['width'] > box3['width'] ||
         count2 + box2['height'] > box3['height']
-    : ![];
+    : false;
 }
 export function initViewportCursor(dom = globalThis['document']) {
   const width = dom?.['defaultView'];
@@ -37,20 +37,20 @@ export function initViewportCursor(dom = globalThis['document']) {
   const el3 = dom['createElement']('img');
   ((el3['className'] = 'viewport-cursor-image'),
     (el3['alt'] = ''),
-    (el3['draggable'] = ![]),
+    (el3['draggable'] = false),
     el2['appendChild'](el3),
     dom['body']['appendChild'](el2));
   let box4 = null,
     enabled = 0,
-    enabled2 = ![],
-    enabled3 = ![],
+    enabled2 = false,
+    enabled3 = false,
     item = null;
   const list = [];
-  function run(key = !![]) {
+  function run(key = true) {
     if (key && el['style']['getPropertyValue'](EDGE_CURSOR_PROPERTY))
       el['style']['removeProperty'](EDGE_CURSOR_PROPERTY);
     if (enabled3) el2['hidePopover']();
-    enabled3 = ![];
+    enabled3 = false;
   }
   function run2() {
     if (!enabled2 && box4 && !enabled) enabled = width['requestAnimationFrame'](run3);
@@ -66,7 +66,7 @@ export function initViewportCursor(dom = globalThis['document']) {
       !(uRL['origin'] === width['location']['origin'] && uRL['pathname']['endsWith']('.cur'))
     )
       return null;
-    const data = { ready: ![] };
+    const data = { ready: false };
     map['set'](result, data);
     if (map['size'] > 128) map['delete'](map['keys']()['next']()['value']);
     const source = new width['Image']();
@@ -76,7 +76,7 @@ export function initViewportCursor(dom = globalThis['document']) {
         ['then'](([, hotspot]) => {
           if (enabled2) return;
           (Object['assign'](data, {
-            ready: !![],
+            ready: true,
             source: source,
             hotspot: hotspot,
             width: source['naturalWidth'],
@@ -95,8 +95,8 @@ export function initViewportCursor(dom = globalThis['document']) {
     if (!el4) return run();
     el4 !== item &&
       (options['disconnect'](),
-      options['observe'](el, { attributes: !![], attributeFilter: ['style', 'class'] }),
-      options['observe'](el4, { attributes: !![], attributeFilter: ['style', 'class', 'disabled'] }),
+      options['observe'](el, { attributes: true, attributeFilter: ['style', 'class'] }),
+      options['observe'](el4, { attributes: true, attributeFilter: ['style', 'class', 'disabled'] }),
       (item = el4));
     const target = width['getComputedStyle'](el4);
     let next = target['cursor'];
@@ -121,7 +121,7 @@ export function initViewportCursor(dom = globalThis['document']) {
         height: width['innerHeight'],
       })
     )
-      return run(![]);
+      return run(false);
     el3['src'] !== box6['source']['src'] &&
       ((el3['src'] = box6['source']['src']),
       (el3['style']['width'] = box6['width'] + 'px'),
@@ -129,7 +129,7 @@ export function initViewportCursor(dom = globalThis['document']) {
     el3['style']['transform'] =
       'translate(' + (box4['x'] - box6['hotspot']['x']) + 'px, ' + (box4['y'] - box6['hotspot']['y']) + 'px)';
     if (!enabled3) el2['showPopover']();
-    enabled3 = !![];
+    enabled3 = true;
   }
   function run5() {
     box4 = null;
@@ -137,8 +137,8 @@ export function initViewportCursor(dom = globalThis['document']) {
     ((enabled = 0), run());
   }
   function run6(el5, handle, state) {
-    (el5['addEventListener'](handle, state, { capture: !![], passive: !![] }),
-      list['push'](() => el5['removeEventListener'](handle, state, !![])));
+    (el5['addEventListener'](handle, state, { capture: true, passive: true }),
+      list['push'](() => el5['removeEventListener'](handle, state, true)));
   }
   function run7(x) {
     if (x['pointerType'] === 'touch') return;
@@ -172,13 +172,13 @@ export function initViewportCursor(dom = globalThis['document']) {
     run6(width, 'resize', run2),
     run6(dom, 'scroll', run2));
   const options = new width['MutationObserver'](run2);
-  options['observe'](el, { attributes: !![], attributeFilter: ['style', 'class'] });
+  options['observe'](el, { attributes: true, attributeFilter: ['style', 'class'] });
   const config = {
     preload(list2) {
       (list2['forEach'](run4), run2());
     },
     destroy() {
-      ((enabled2 = !![]),
+      ((enabled2 = true),
         run5(),
         list['forEach']((handler) => handler()),
         options['disconnect'](),

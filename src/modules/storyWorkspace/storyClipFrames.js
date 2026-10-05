@@ -281,7 +281,7 @@ export function createStoryClipFrameHoverAsset(options5 = {}, value6 = '') {
     name: name2,
     hoverTitle: hoverTitle['name'] || name2,
     imageUrl: imageUrl,
-    isLibraryAsset: !![],
+    isLibraryAsset: true,
   };
 }
 export function buildStoryClipFrameMentionCandidates(
@@ -299,16 +299,16 @@ export function buildStoryClipFrameMentionCandidates(
       ['filter']((value8) => value8['id']),
     map2 = new Set(list8['map']((value9) => value9['id'])),
     list9 = normalizeStoryClipFrames(list7)['filter']((value10) => {
-      if (text5 && value10['episodeId'] && value10['episodeId'] !== text5) return ![];
-      if (map2['size'] && value10['clipId'] && !map2['has'](value10['clipId'])) return ![];
-      return !![];
+      if (text5 && value10['episodeId'] && value10['episodeId'] !== text5) return false;
+      if (map2['size'] && value10['clipId'] && !map2['has'](value10['clipId'])) return false;
+      return true;
     });
   if (!list9['length']) {
     if (text4 && !'片段帧 视频截帧'['includes'](text4)) return [];
     return [
       {
         origin: 'asset',
-        menuDirect: !![],
+        menuDirect: true,
         assetId: STORY_CLIP_FRAME_MENTION_PREFIX + 'empty',
         assetIndex: 0,
         type: 'image',
@@ -320,8 +320,8 @@ export function buildStoryClipFrameMentionCandidates(
         menuPage: 'tools',
         menuGroup: '片段帧',
         menuSection: '',
-        suppressBulkMention: !![],
-        suppressTooltip: !![],
+        suppressBulkMention: true,
+        suppressTooltip: true,
         limitReason: '请先在片段视频预览中截取当前帧。',
       },
     ];
@@ -352,7 +352,7 @@ export function buildStoryClipFrameMentionCandidates(
         label = '片段' + String(value15)['padStart'](2, '0'),
         mentionVariants = value13['frames']['map']((storyClipFrameId) => ({
           origin: 'asset',
-          menuDirect: !![],
+          menuDirect: true,
           assetId: buildStoryClipFrameMentionId(storyClipFrameId['id']),
           assetIndex: 0,
           type: getStoryClipFrameMediaType(storyClipFrameId),
@@ -379,8 +379,8 @@ export function buildStoryClipFrameMentionCandidates(
           menuPage: 'tools',
           menuGroup: '片段帧',
           menuSection: '',
-          suppressBulkMention: !![],
-          suppressTooltip: !![],
+          suppressBulkMention: true,
+          suppressTooltip: true,
           storyClipFrameId: storyClipFrameId['id'],
           storyClipId: storyClipFrameId['clipId'],
         })),

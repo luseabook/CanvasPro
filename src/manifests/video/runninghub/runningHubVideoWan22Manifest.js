@@ -42,8 +42,8 @@ export const rhVideoWan22ModelManifest = createRunningHubVideoModelManifest({
       fallbackIndex: 0,
     }),
     fixedSlots: Object['freeze']([
-      Object['freeze']({ id: 'firstFrame', kind: 'image', label: '首帧', required: ![], displayOrder: 0 }),
-      Object['freeze']({ id: 'lastFrame', kind: 'image', label: '尾帧', required: ![], displayOrder: 1 }),
+      Object['freeze']({ id: 'firstFrame', kind: 'image', label: '首帧', required: false, displayOrder: 0 }),
+      Object['freeze']({ id: 'lastFrame', kind: 'image', label: '尾帧', required: false, displayOrder: 1 }),
     ]),
   },
   uiFields: [

@@ -52,7 +52,7 @@ export function resolveGenerationModelDisplayAspectRatio({
   return aspectRatioFieldForModel?.['defaultValue'];
 }
 export function isGenerationDisplaySizeManual(options2 = {}) {
-  return options2?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === !![];
+  return options2?.[GENERATION_MANUAL_DISPLAY_SIZE_FIELD] === true;
 }
 export function buildGenerationModelSelectionDisplayPatch({
   store: store2,
@@ -68,7 +68,7 @@ export function buildGenerationModelSelectionDisplayPatch({
   resultMediaElement: resultMediaElement2,
   resultFields: resultFields2,
   mediaSelector: mediaSelector2,
-  respectManualDisplaySize: respectManualDisplaySize = !![],
+  respectManualDisplaySize: respectManualDisplaySize = true,
 } = {}) {
   if (respectManualDisplaySize && isGenerationDisplaySizeManual(nodeData)) return {};
   const source =
@@ -199,17 +199,17 @@ function getMediaSizeForRatioDisplay(nodeId2, nodeData3, edge = null, mediaSelec
       nodeData: nodeData3,
       edge: edge,
       mediaSelector: mediaSelector4,
-      includeNodeFrame: !![],
+      includeNodeFrame: true,
     }) || { width: 0, height: 0 }
   );
 }
 function isAcceptedRatioInputKind(value3, value4, map, handler) {
   const list2 = String(value3?.['refSlot'] || '')['toLowerCase']();
-  if (list2['includes']('mask')) return ![];
+  if (list2['includes']('mask')) return false;
   const value5 = value4?.[value3?.['sourceId']],
     value6 = String(value5?.['type'] || ''),
     value7 = typeof handler === 'function' ? handler(value6) : '';
-  if (value7 && map['has'](value7)) return !![];
+  if (value7 && map['has'](value7)) return true;
   const value8 = value6['toLowerCase']();
   return Array['from'](map)['some'](
     (value9) => value8 === value9 || value8 === 'source-' + value9 || value8 === 'ai-' + value9,
@@ -351,8 +351,8 @@ export function animateImageSchemaRatioResizeFlip(
     nodeData: nodeData7,
     patch: patch,
     ms: ms = GENERATION_RATIO_RESIZE_ANIMATION_MS,
-    deferStart: deferStart = !![],
-    forceLayout: forceLayout = !![],
+    deferStart: deferStart = true,
+    forceLayout: forceLayout = true,
   } = {},
 ) {
   if (!enabled4 || !previewEl || typeof previewEl['animate'] !== 'function') return;

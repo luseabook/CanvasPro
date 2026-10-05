@@ -87,7 +87,7 @@ export async function saveWorkspaceMediaDownload({
 }
 export function renderWorkspaceMediaDownloadButton({
   action: action,
-  enabled: enabled = ![],
+  enabled: enabled = false,
   className: className = '',
   label: label,
 } = {}) {
@@ -111,7 +111,7 @@ export async function runWorkspaceMediaDownloadAction(el, handler) {
   if (el['classList']?.['contains']?.('is-pending')) return null;
   const current = Boolean(el['disabled']),
     entry = el['getAttribute']?.('aria-busy');
-  ((el['disabled'] = !![]),
+  ((el['disabled'] = true),
     el['classList']?.['add']?.('is-pending'),
     el['setAttribute']?.('aria-busy', 'true'));
   try {

@@ -248,18 +248,18 @@ export function liftRendererNodePresentationZIndex(el10, value22) {
 }
 
 export function syncRendererFastPreviewPresentationOwner(el11, value25) {
-  if (!el11?.['dataset'] || !el11?.['style']) return ![];
+  if (!el11?.['dataset'] || !el11?.['style']) return false;
   !el11['dataset']['rendererPresentationTargetZIndex'] &&
     (el11['dataset']['rendererPresentationTargetZIndex'] = normalizeRendererNodeZIndex(
       el11['style']['zIndex'],
     ));
-  if (value25 === !![])
+  if (value25 === true)
     el11['dataset']['rendererPresentationOwner'] !== FAST_PREVIEW_PRESENTATION_OWNER &&
       (el11['dataset']['rendererPresentationOwner'] = FAST_PREVIEW_PRESENTATION_OWNER);
   else
     el11['dataset']['rendererPresentationOwner'] === FAST_PREVIEW_PRESENTATION_OWNER &&
       delete el11['dataset']['rendererPresentationOwner'];
-  return (applyRendererNodePresentationZIndex(el11), !![]);
+  return (applyRendererNodePresentationZIndex(el11), true);
 }
 
 export function formatVideoMetaText({ fps: fps, frames: frames, width: width, height: height } = {}) {

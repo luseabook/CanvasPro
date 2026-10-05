@@ -47,7 +47,7 @@ export function createSceneAssetVisual(metalness, value, handler) {
             index,
             new threeRuntime['LineBasicMaterial']({
               color: new threeRuntime['Color'](color)['clone']()['offsetHSL'](0, 0, -0.18),
-              transparent: !![],
+              transparent: true,
               opacity: 0.78,
             }),
           ));

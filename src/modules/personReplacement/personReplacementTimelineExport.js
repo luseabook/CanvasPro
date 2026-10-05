@@ -39,8 +39,8 @@ export function buildPersonReplacementTimelineRequest(name = {}, format) {
     },
     muted = name['audio']?.['previewTrack'] === 'original' ? 0 : 1,
     tracks = [
-      { type: 'video', name: '原视频片段', muted: ![], clips: [] },
-      { type: 'video', name: '替换视频片段', muted: ![], clips: [] },
+      { type: 'video', name: '原视频片段', muted: false, clips: [] },
+      { type: 'video', name: '替换视频片段', muted: false, clips: [] },
       { type: 'audio', name: '原视频音频片段', muted: muted !== 0, clips: [] },
       { type: 'audio', name: '替换视频音频片段', muted: muted !== 1, clips: [] },
     ],

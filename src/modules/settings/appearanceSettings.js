@@ -199,7 +199,7 @@ function getUiPrefs(store2) {
   }
 }
 function syncButtonPair(value5, value6, value7) {
-  const enabled2 = value7 === !![];
+  const enabled2 = value7 === true;
   (document['getElementById'](value5)?.['classList']['toggle']('active', enabled2),
     document['getElementById'](value6)?.['classList']['toggle']('active', !enabled2),
     document['getElementById'](value5)?.['setAttribute']?.('aria-pressed', String(enabled2)),
@@ -264,7 +264,7 @@ function syncAutoHidePinButton({
 }) {
   const el14 = document['getElementById'](buttonId);
   if (!el14) return;
-  const value13 = autoHideEnabled !== !![],
+  const value13 = autoHideEnabled !== true,
     value14 = value13 ? autoHideKey : pinKey,
     t2 = t(value14);
   (el14['classList']['toggle']('is-pinned', value13),
@@ -275,7 +275,7 @@ function syncAutoHidePinButton({
     el14['setAttribute'](i18nTooltipAttribute, value14));
 }
 function applyLeftSidebarAutoHidePref(value15) {
-  const autoHideEnabled2 = value15 === !![],
+  const autoHideEnabled2 = value15 === true,
     el15 = document['getElementById']('v2-wrap');
   return (
     el15?.['classList']['toggle']('left-sidebar-auto-hide', autoHideEnabled2),
@@ -327,9 +327,9 @@ function initLeftSidebarAutoHideFocusMode() {
       if (!document['getElementById']('v2-wrap')?.['classList']['contains']('left-sidebar-auto-hide')) return;
       document['body']?.['classList']['add'](LEFT_SIDEBAR_KEYBOARD_FOCUS_CLASS);
     },
-    !![],
+    true,
   ),
-    document['addEventListener']?.('pointerdown', run2, !![]),
+    document['addEventListener']?.('pointerdown', run2, true),
     document['querySelector']?.('.sidebar-floating')?.['addEventListener']?.('focusout', () => {
       window['setTimeout']?.(() => {
         !document['querySelector']?.('.sidebar-floating')?.['matches']?.(':focus-within') && run2();
@@ -340,7 +340,7 @@ function initLeftSidebarAutoHideFocusMode() {
     el17?.['addEventListener']?.('pointerdown', startLeftSidebarRevealGuard));
 }
 function applyBottomLeftBarAutoHidePref(value17) {
-  const autoHideEnabled3 = value17 === !![],
+  const autoHideEnabled3 = value17 === true,
     el18 = document['getElementById']('v2-wrap');
   return (
     el18?.['classList']['toggle']('bottom-left-bar-auto-hide', autoHideEnabled3),
@@ -357,7 +357,7 @@ function applyBottomLeftBarAutoHidePref(value17) {
   );
 }
 function setLeftSidebarAutoHidePref(value18, value19) {
-  const value20 = value18 === !![];
+  const value20 = value18 === true;
   return (
     typeof value19?.['setLeftSidebarAutoHideEnabled'] === 'function' &&
       value19['setLeftSidebarAutoHideEnabled'](value20),
@@ -366,7 +366,7 @@ function setLeftSidebarAutoHidePref(value18, value19) {
   );
 }
 function setBottomLeftBarAutoHidePref(value21, value22) {
-  const value23 = value21 === !![];
+  const value23 = value21 === true;
   return (
     typeof value22?.['setBottomLeftBarAutoHideEnabled'] === 'function' &&
       value22['setBottomLeftBarAutoHideEnabled'](value23),
@@ -430,10 +430,10 @@ export function applyGridDotsPref(enabled3) {
 export function readGridDotsPref() {
   const value30 = localStorage['getItem']('v2-grid-dots');
   if (value30 != null) return value30 === 'true' || value30 === '1';
-  return (localStorage['setItem']('v2-grid-dots', 'true'), !![]);
+  return (localStorage['setItem']('v2-grid-dots', 'true'), true);
 }
 export function setGridDotsPref(value31) {
-  const enabled4 = value31 !== ![];
+  const enabled4 = value31 !== false;
   (localStorage['setItem']('v2-grid-dots', enabled4 ? 'true' : 'false'), applyGridDotsPref(enabled4));
   const el21 = document['getElementById']('btnToggleDots'),
     el22 = document['getElementById']('btnGridDotsOn'),
@@ -487,8 +487,8 @@ function initAutoHideChromeSettings({ uiStore: uiStore3 } = {}) {
   if (!el27 && !el28 && !el29 && !el30 && !el31 && !el32) return;
   initLeftSidebarAutoHideFocusMode();
   const uiPrefs = getUiPrefs(uiStore3);
-  let leftSidebarAutoHidePref = uiPrefs['leftSidebarAutoHideEnabled'] === !![],
-    bottomLeftBarAutoHidePref = uiPrefs['bottomLeftBarAutoHideEnabled'] === !![];
+  let leftSidebarAutoHidePref = uiPrefs['leftSidebarAutoHideEnabled'] === true,
+    bottomLeftBarAutoHidePref = uiPrefs['bottomLeftBarAutoHideEnabled'] === true;
   const run5 = (value34) => {
       leftSidebarAutoHidePref = applyLeftSidebarAutoHidePref(value34);
     },
@@ -496,20 +496,20 @@ function initAutoHideChromeSettings({ uiStore: uiStore3 } = {}) {
       bottomLeftBarAutoHidePref = applyBottomLeftBarAutoHidePref(value35);
     },
     handler4 = (value36) => {
-      ((leftSidebarAutoHidePref = value36 === !![]), setLeftSidebarAutoHidePref(leftSidebarAutoHidePref, uiStore3));
+      ((leftSidebarAutoHidePref = value36 === true), setLeftSidebarAutoHidePref(leftSidebarAutoHidePref, uiStore3));
     },
     handler5 = (value37) => {
-      ((bottomLeftBarAutoHidePref = value37 === !![]), setBottomLeftBarAutoHidePref(bottomLeftBarAutoHidePref, uiStore3));
+      ((bottomLeftBarAutoHidePref = value37 === true), setBottomLeftBarAutoHidePref(bottomLeftBarAutoHidePref, uiStore3));
     },
     handler6 = (event3) => {
       if (Number(event3?.['detail']) > 0) event3['currentTarget']?.['blur']?.();
     };
   (run5(leftSidebarAutoHidePref),
     handler3(bottomLeftBarAutoHidePref),
-    el27?.['addEventListener']('click', () => handler4(!![])),
-    el28?.['addEventListener']('click', () => handler4(![])),
-    el29?.['addEventListener']('click', () => handler5(!![])),
-    el30?.['addEventListener']('click', () => handler5(![])),
+    el27?.['addEventListener']('click', () => handler4(true)),
+    el28?.['addEventListener']('click', () => handler4(false)),
+    el29?.['addEventListener']('click', () => handler5(true)),
+    el30?.['addEventListener']('click', () => handler5(false)),
     el31?.['addEventListener']('click', (value38) => {
       (handler4(!leftSidebarAutoHidePref), handler6(value38));
     }),
@@ -518,11 +518,11 @@ function initAutoHideChromeSettings({ uiStore: uiStore3 } = {}) {
     }),
     typeof uiStore3?.['subscribeSelector'] === 'function' &&
       (uiStore3['subscribeSelector'](
-        (value40) => value40['ui']?.['leftSidebarAutoHideEnabled'] === !![],
+        (value40) => value40['ui']?.['leftSidebarAutoHideEnabled'] === true,
         run5,
       ),
       uiStore3['subscribeSelector'](
-        (value41) => value41['ui']?.['bottomLeftBarAutoHideEnabled'] === !![],
+        (value41) => value41['ui']?.['bottomLeftBarAutoHideEnabled'] === true,
         handler3,
       )));
 }
@@ -537,8 +537,8 @@ function initGridDots() {
   };
   (setGridDotsPref(readGridDotsPref()),
     run6(),
-    el33['addEventListener']('click', () => setGridDotsPref(!![])),
-    el34['addEventListener']('click', () => setGridDotsPref(![])),
+    el33['addEventListener']('click', () => setGridDotsPref(true)),
+    el34['addEventListener']('click', () => setGridDotsPref(false)),
     window['addEventListener']('shortcuts-updated', run6));
 }
 function initFontSize() {

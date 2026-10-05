@@ -20,9 +20,9 @@ export async function saveRhAiApp(enabled, overwriteSavedAppId = null) {
     overwriteSavedAppId = enabled2?.['id'] || '';
   }
   const draftIdentity2 = draftIdentity(enabled);
-  ((enabled['savePending'] = !![]), enabled['_resetSaveSuccessFeedback']());
+  ((enabled['savePending'] = true), enabled['_resetSaveSuccessFeedback']());
   enabled['saveBtn'] &&
-    ((enabled['saveBtn']['disabled'] = !![]),
+    ((enabled['saveBtn']['disabled'] = true),
     (enabled['saveBtn']['textContent'] = '保存中…'),
     enabled['saveBtn']['setAttribute']('aria-busy', 'true'));
   try {
@@ -44,7 +44,7 @@ export async function saveRhAiApp(enabled, overwriteSavedAppId = null) {
     if (draftIdentity(enabled) === draftIdentity2) enabled['_setError'](index);
     return (window['showToast']?.(index, 'error'), enabled['_resetSaveSuccessFeedback'](), null);
   } finally {
-    enabled['savePending'] = ![];
+    enabled['savePending'] = false;
     if (enabled['saveBtn']) {
       (enabled['saveBtn']['removeAttribute']('aria-busy'),
         (enabled['saveBtn']['disabled'] = !enabled['currentBundle']));

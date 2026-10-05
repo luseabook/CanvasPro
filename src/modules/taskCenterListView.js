@@ -29,7 +29,7 @@ export function createTaskCardView(options) {
     map2 = new Map(),
     wrap = element('div', 'v2-task-thumbnail'),
     image = element('img', 'v2-task-thumbnail-image');
-  ((image['alt'] = ''), (image['decoding'] = 'async'), (image['draggable'] = ![]), (image['hidden'] = !![]));
+  ((image['alt'] = ''), (image['decoding'] = 'async'), (image['draggable'] = false), (image['hidden'] = true));
   const el11 = element('span', 'v2-task-thumbnail-fallback');
   el11['setAttribute']('aria-hidden', 'true');
   const el12 = element('span', 'v2-task-thumbnail-count'),
@@ -68,9 +68,9 @@ export function createTaskCardView(options) {
           el6['setAttribute']('role', 'progressbar'),
           el6['setAttribute']('aria-label', response['statusLabel']));
         response['active'] && response['progress'] === null
-          ? ((el7['hidden'] = !![]), el6['removeAttribute']('aria-valuenow'), startLoading(el6))
+          ? ((el7['hidden'] = true), el6['removeAttribute']('aria-valuenow'), startLoading(el6))
           : (stopLoading(el6),
-            (el7['hidden'] = ![]),
+            (el7['hidden'] = false),
             (el7['style']['width'] = Math['round']((response['progress'] || 0) * 100) + '%'),
             el6['setAttribute'](
               'aria-valuenow',
@@ -87,8 +87,8 @@ export function createTaskCardView(options) {
           el13['className'] =
             'v2-task-card-action' + (target['danger'] ? ' v2-task-card-action--danger' : '');
           if (el13['textContent'] !== target['label']) el13['textContent'] = target['label'];
-          ((el13['disabled'] = target['pending'] === !![]),
-            el13['setAttribute']('aria-busy', String(target['pending'] === !![])),
+          ((el13['disabled'] = target['pending'] === true),
+            el13['setAttribute']('aria-busy', String(target['pending'] === true)),
             (el13['dataset']['localPath'] = target['localPath'] || ''));
           if (target['pending']) startLoading(el13);
           else stopLoading(el13);

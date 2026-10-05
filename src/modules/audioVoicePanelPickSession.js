@@ -46,22 +46,22 @@ export function createAudioVoicePanelPickSession({
   windowObject: windowObject = globalThis['window'],
   getSegments: getSegments = () => [],
   getSelectedSegmentIds: getSelectedSegmentIds = () => new Set(),
-  doesSegmentSupportAudioReference: doesSegmentSupportAudioReference = () => !![],
+  doesSegmentSupportAudioReference: doesSegmentSupportAudioReference = () => true,
   loadSourceNode: loadSourceNode = () => {},
-  applyAudioReference: applyAudioReference = () => ({ applied: ![], appliedIds: [], reason: 'no-target' }),
+  applyAudioReference: applyAudioReference = () => ({ applied: false, appliedIds: [], reason: 'no-target' }),
   syncSourceUi: syncSourceUi = () => {},
   syncAudioTargetUi: syncAudioTargetUi = () => {},
   onAudioPickStateChange: onAudioPickStateChange = null,
   text: text = (source) => source,
   getConnectCursor: getConnectCursor = createConnectCursor,
 } = {}) {
-  let sourceActive = ![],
+  let sourceActive = false,
     el = null,
     audioSegmentId = '',
     args = new Set(),
     el2 = null,
     value2 = null,
-    enabled2 = ![];
+    enabled2 = false;
   function run() {
     return documentObject?.['getElementById']?.('v2-wrap') || null;
   }
@@ -79,11 +79,11 @@ export function createAudioVoicePanelPickSession({
   }
   function run6(entry) {
     if (!noticeElement) return;
-    ((noticeElement['textContent'] = text('source.pickNotice')), (noticeElement['hidden'] = entry !== !![]));
+    ((noticeElement['textContent'] = text('source.pickNotice')), (noticeElement['hidden'] = entry !== true));
   }
   function run7() {
     const stateSnapshot = getStateSnapshot(store)['pickConnectMode'] || null;
-    if (stateSnapshot?.['active']) store?.['setPickConnectMode']?.({ active: ![] });
+    if (stateSnapshot?.['active']) store?.['setPickConnectMode']?.({ active: false });
   }
   function run8() {
     (el?.['classList']?.['remove']?.('audio-voice-video-pick-hover'), (el = null));
@@ -138,9 +138,9 @@ export function createAudioVoicePanelPickSession({
   function run17() {
     if (!sourceActive && !audioSegmentId) return;
     if (enabled2) return;
-    enabled2 = !![];
+    enabled2 = true;
     const run18 = () => {
-      enabled2 = ![];
+      enabled2 = false;
       if (!sourceActive && !audioSegmentId) return;
       run16();
     };
@@ -164,7 +164,7 @@ export function createAudioVoicePanelPickSession({
   function run20(list2 = []) {
     return list2['some']((event) => {
       if (event?.['type'] === 'attributes') return run19(event['target']);
-      if (event?.['type'] !== 'childList') return ![];
+      if (event?.['type'] !== 'childList') return false;
       return (
         Array['from'](event['addedNodes'] || [])['some'](run19) ||
         Array['from'](event['removedNodes'] || [])['some'](run19)
@@ -181,13 +181,13 @@ export function createAudioVoicePanelPickSession({
     })),
       value2['observe'](enabled5, {
         attributeFilter: ['class'],
-        attributes: !![],
-        childList: !![],
-        subtree: !![],
+        attributes: true,
+        childList: true,
+        subtree: true,
       }));
   }
   function run22() {
-    (value2?.['disconnect']?.(), (value2 = null), (enabled2 = ![]));
+    (value2?.['disconnect']?.(), (value2 = null), (enabled2 = false));
   }
   function run23() {
     if (sourceActive || audioSegmentId) return;
@@ -196,7 +196,7 @@ export function createAudioVoicePanelPickSession({
   function run24(el8, accepted) {
     const nodeElement = el8?.['closest']?.(CANVAS_NODE_SELECTOR) || null,
       enabled6 = String(nodeElement?.['id'] || nodeElement?.['dataset']?.['nodeId'] || '')['trim']();
-    if (!enabled6) return { nodeElement: null, node: null, accepted: ![] };
+    if (!enabled6) return { nodeElement: null, node: null, accepted: false };
     const node = run4()[enabled6] || null;
     return { nodeElement: nodeElement, node: node, accepted: accepted(node) };
   }
@@ -217,7 +217,7 @@ export function createAudioVoicePanelPickSession({
       run5(text('toasts.sourcePickUnsupported'), 'warn');
       return;
     }
-    (loadSourceNode(node2, { markLastUsed: !![] }), run27());
+    (loadSourceNode(node2, { markLastUsed: true }), run27());
   }
   function run28(event4) {
     if (!sourceActive || event4['key'] !== 'Escape') return;
@@ -249,9 +249,9 @@ export function createAudioVoicePanelPickSession({
       run32({ toastText: text('toasts.audioPickCancelled') }));
   }
   function run27({ toastText: toastText = '' } = {}) {
-    (documentObject?.['body']?.['classList']?.['remove']?.('audio-voice-video-pick-active'), run6(![]));
+    (documentObject?.['body']?.['classList']?.['remove']?.('audio-voice-video-pick-active'), run6(false));
     if (!sourceActive) return;
-    ((sourceActive = ![]),
+    ((sourceActive = false),
       run8(),
       run12(),
       panel?.['classList']?.['remove']?.('is-video-picking'),
@@ -260,32 +260,32 @@ export function createAudioVoicePanelPickSession({
     const el9 = run3();
     (el9?.['classList']?.['remove']?.('is-connecting-mode'),
       el9?.['style']?.['removeProperty']?.('--connect-cursor'),
-      documentObject?.['removeEventListener']?.('click', run26, !![]),
-      documentObject?.['removeEventListener']?.('pointermove', run25, !![]),
-      documentObject?.['removeEventListener']?.('keydown', run28, !![]),
+      documentObject?.['removeEventListener']?.('click', run26, true),
+      documentObject?.['removeEventListener']?.('pointermove', run25, true),
+      documentObject?.['removeEventListener']?.('keydown', run28, true),
       syncSourceUi());
     if (toastText) run5(toastText, 'info');
   }
-  function startSourcePick({ toggle: toggle = !![] } = {}) {
+  function startSourcePick({ toggle: toggle = true } = {}) {
     if (sourceActive) {
       toggle && run27({ toastText: text('toasts.sourcePickCancelled') });
       return;
     }
     (run7(),
       run32(),
-      (sourceActive = !![]),
+      (sourceActive = true),
       panel?.['classList']?.['add']?.('is-video-picking'),
       documentObject?.['body']?.['classList']?.['add']?.('audio-voice-video-pick-active'),
-      run6(!![]),
+      run6(true),
       run()?.['classList']?.['add']?.('is-connecting', 'audio-voice-video-pick-mode'),
       run21(),
       run14());
     const el10 = run3();
     (el10?.['classList']?.['add']?.('is-connecting-mode'),
       el10?.['style']?.['setProperty']?.('--connect-cursor', getConnectCursor()),
-      documentObject?.['addEventListener']?.('click', run26, !![]),
-      documentObject?.['addEventListener']?.('pointermove', run25, !![]),
-      documentObject?.['addEventListener']?.('keydown', run28, !![]),
+      documentObject?.['addEventListener']?.('click', run26, true),
+      documentObject?.['addEventListener']?.('pointermove', run25, true),
+      documentObject?.['addEventListener']?.('keydown', run28, true),
       syncSourceUi(),
       run5(text('toasts.sourcePickStarted'), 'info'));
   }
@@ -296,7 +296,7 @@ export function createAudioVoicePanelPickSession({
         (response) => response?.['status'] !== 'removed',
       ),
       targetIds = resolveAudioVoiceSelectionTargetIds(input, getSelectedSegmentIds(), list3);
-    if (targetIds['length'] <= 0) return { eligible: ![], reason: 'no-target', targetIds: targetIds };
+    if (targetIds['length'] <= 0) return { eligible: false, reason: 'no-target', targetIds: targetIds };
     const reason = targetIds['some']((output) => {
       const value3 = list3['find']((value4) => value4?.['id'] === output);
       return value3 && !doesSegmentSupportAudioReference(value3);
@@ -319,14 +319,14 @@ export function createAudioVoicePanelPickSession({
     const el11 = run3();
     (el11?.['classList']?.['remove']?.('is-connecting-mode'),
       el11?.['style']?.['removeProperty']?.('--connect-cursor'),
-      documentObject?.['removeEventListener']?.('click', run30, !![]),
-      documentObject?.['removeEventListener']?.('pointermove', run29, !![]),
-      documentObject?.['removeEventListener']?.('keydown', run31, !![]),
+      documentObject?.['removeEventListener']?.('click', run30, true),
+      documentObject?.['removeEventListener']?.('pointermove', run29, true),
+      documentObject?.['removeEventListener']?.('keydown', run31, true),
       syncAudioTargetUi(value5),
-      onAudioPickStateChange?.({ active: ![], segmentId: '', targetSegmentIds: [] }));
+      onAudioPickStateChange?.({ active: false, segmentId: '', targetSegmentIds: [] }));
     if (toastText) run5(toastText, 'info');
   }
-  function startAudioPick(value6, { announce: announce = !![] } = {}) {
+  function startAudioPick(value6, { announce: announce = true } = {}) {
     const segmentId2 = String(value6 || '')['trim']();
     if (!segmentId2) return;
     const value7 = run33(segmentId2),
@@ -355,23 +355,23 @@ export function createAudioVoicePanelPickSession({
     const el12 = run3();
     (el12?.['classList']?.['add']?.('is-connecting-mode'),
       el12?.['style']?.['setProperty']?.('--connect-cursor', getConnectCursor()),
-      documentObject?.['addEventListener']?.('click', run30, !![]),
-      documentObject?.['addEventListener']?.('pointermove', run29, !![]),
-      documentObject?.['addEventListener']?.('keydown', run31, !![]),
+      documentObject?.['addEventListener']?.('click', run30, true),
+      documentObject?.['addEventListener']?.('pointermove', run29, true),
+      documentObject?.['addEventListener']?.('keydown', run31, true),
       syncAudioTargetUi(targetIds2),
-      onAudioPickStateChange?.({ active: !![], segmentId: segmentId2, targetSegmentIds: [...targetIds2] }));
+      onAudioPickStateChange?.({ active: true, segmentId: segmentId2, targetSegmentIds: [...targetIds2] }));
     if (announce) run5(text('toasts.audioPickStarted'), 'info');
   }
   function selectAudioReference(options4 = {}, { segmentId: segmentId = '' } = {}) {
     const value8 = String(segmentId || '')['trim']();
     if (value8 && value8 !== audioSegmentId) {
-      startAudioPick(value8, { announce: ![] });
-      if (audioSegmentId !== value8) return { applied: ![], reason: 'no-target', appliedIds: [] };
+      startAudioPick(value8, { announce: false });
+      if (audioSegmentId !== value8) return { applied: false, reason: 'no-target', appliedIds: [] };
     }
-    if (!audioSegmentId) return { applied: ![], reason: 'not-picking', appliedIds: [] };
+    if (!audioSegmentId) return { applied: false, reason: 'not-picking', appliedIds: [] };
     const reason2 = applyAudioReference(options4, [...args]);
     if (!reason2?.['appliedIds']?.['length'])
-      return { applied: ![], reason: reason2?.['reason'] || 'invalid', appliedIds: [] };
+      return { applied: false, reason: reason2?.['reason'] || 'invalid', appliedIds: [] };
     return (
       run32(),
       run5(
@@ -380,7 +380,7 @@ export function createAudioVoicePanelPickSession({
           : text('toasts.audioPickSelected'),
         'success',
       ),
-      { applied: !![], reason: '', appliedIds: reason2['appliedIds'] }
+      { applied: true, reason: '', appliedIds: reason2['appliedIds'] }
     );
   }
   function stopAll() {

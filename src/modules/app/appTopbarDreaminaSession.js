@@ -79,7 +79,7 @@ export function mergeDreaminaLoginRuntimeStatus(error = {}, runtime = {}) {
     loggedIn = ['success', 'reused', 'done']['includes'](value2);
   return {
     ...(error || {}),
-    loggedIn: loggedIn ? !![] : !!error?.['loggedIn'],
+    loggedIn: loggedIn ? true : !!error?.['loggedIn'],
     message: String(runtime?.['message'] || '')['trim']() || String(error?.['message'] || '')['trim'](),
     runtime: runtime || {},
   };
@@ -92,23 +92,23 @@ export function reconcileDreaminaSessionUiState(enabled6, enabled7 = {}) {
     return (
       (enabled7['currentSessionKey'] = dreaminaStatusSessionKey),
       (enabled7['dismissedSessionKey'] = ''),
-      !enabled9 && ((enabled7['manualGuideOpen'] = ![]), (enabled7['loginLaunchRequestedAt'] = 0)),
-      !![]
+      !enabled9 && ((enabled7['manualGuideOpen'] = false), (enabled7['loginLaunchRequestedAt'] = 0)),
+      true
     );
   if (!enabled8 && !dreaminaStatusSessionKey && !enabled9)
     return (
       (enabled7['currentSessionKey'] = ''),
       (enabled7['dismissedSessionKey'] = ''),
-      (enabled7['manualGuideOpen'] = ![]),
+      (enabled7['manualGuideOpen'] = false),
       (enabled7['loginLaunchRequestedAt'] = 0),
-      !![]
+      true
     );
-  return ![];
+  return false;
 }
 export function shouldDreaminaManualGuideOpenByDefault(value3, value4 = '') {
   const enabled10 = value3?.['runtime'] || {},
     value5 = String(enabled10?.['loginMode'] || '');
-  if (!enabled10?.['active'] || !['oauth', 'web', 'headless']['includes'](value5)) return ![];
+  if (!enabled10?.['active'] || !['oauth', 'web', 'headless']['includes'](value5)) return false;
   const dreaminaStatusSessionKey2 = getDreaminaStatusSessionKey(value3);
   return !dreaminaStatusSessionKey2 || String(value4 || '') !== dreaminaStatusSessionKey2;
 }
@@ -127,7 +127,7 @@ export function createDreaminaLoginSessionController({
     value7 = 0x55 * 1000,
     enabled11 = {
       pollTimer: null,
-      pollInFlight: ![],
+      pollInFlight: false,
       pollInFlightGeneration: 0,
       pollGeneration: 0,
       statusRequestGeneration: 0,
@@ -136,14 +136,14 @@ export function createDreaminaLoginSessionController({
       modalCloseTimer: null,
       currentSessionKey: '',
       dismissedSessionKey: '',
-      qrImageLoadError: ![],
+      qrImageLoadError: false,
       lastQrImageUrl: '',
       lastQrImageRequestedAt: 0,
       lastQrImageLoadedAt: 0,
       lastQrImageErrorAt: 0,
       lastQrImageErrorMessage: '',
-      qrImageListenersBound: ![],
-      manualGuideOpen: ![],
+      qrImageListenersBound: false,
+      manualGuideOpen: false,
       loginLaunchRequestedAt: 0,
       observer: null,
     };
@@ -175,11 +175,11 @@ export function createDreaminaLoginSessionController({
   }
   function syncDevVisibility() {
     const { settingsCardEl: settingsCardEl2 } = run();
-    if (!settingsCardEl2) return ![];
-    const enabled12 = !![];
+    if (!settingsCardEl2) return false;
+    const enabled12 = true;
     return (
       (settingsCardEl2['hidden'] = !enabled12),
-      !enabled12 && (run2({ force: !![], rememberDismissal: ![] }), run3()),
+      !enabled12 && (run2({ force: true, rememberDismissal: false }), run3()),
       enabled12
     );
   }
@@ -198,11 +198,11 @@ export function createDreaminaLoginSessionController({
       if (value8 !== enabled11['pollGeneration']) return;
       enabled11['pollTimer'] = null;
       if (enabled11['pollInFlight'] && enabled11['pollInFlightGeneration'] === value8) return;
-      ((enabled11['pollInFlight'] = !![]), (enabled11['pollInFlightGeneration'] = value8));
+      ((enabled11['pollInFlight'] = true), (enabled11['pollInFlightGeneration'] = value8));
       try {
-        await run6({ silent: !![] });
+        await run6({ silent: true });
       } finally {
-        enabled11['pollInFlightGeneration'] === value8 && (enabled11['pollInFlight'] = ![]);
+        enabled11['pollInFlightGeneration'] === value8 && (enabled11['pollInFlight'] = false);
         if (value8 !== enabled11['pollGeneration']) return;
         enabled11['lastStatus']?.['runtime']?.['active'] &&
           (enabled11['pollTimer'] = setTimeout(run5, 800));
@@ -211,7 +211,7 @@ export function createDreaminaLoginSessionController({
     void run5();
   }
   function run7() {
-    ((enabled11['qrImageLoadError'] = ![]),
+    ((enabled11['qrImageLoadError'] = false),
       (enabled11['lastQrImageUrl'] = ''),
       (enabled11['lastQrImageRequestedAt'] = 0),
       (enabled11['lastQrImageLoadedAt'] = 0),
@@ -224,7 +224,7 @@ export function createDreaminaLoginSessionController({
     const value11 = list8['includes']('?') ? '&' : '?';
     return '' + list8 + value11 + 'cb=' + encodeURIComponent(String(value10));
   }
-  function run9(value12, { withCacheBust: withCacheBust = ![] } = {}) {
+  function run9(value12, { withCacheBust: withCacheBust = false } = {}) {
     const value13 = Number(value12?.['qrVersion'] || 0),
       enabled13 = buildDreaminaQrImageUrl?.(value13 || Date['now']()) || '';
     if (!enabled13) return '';
@@ -287,16 +287,16 @@ export function createDreaminaLoginSessionController({
   async function run17(value28, label) {
     const enabled16 = String(value28 || '')['trim']();
     if (!enabled16)
-      return (value6['showToast']?.(trDreamina('missingValue', { label: label }), 'warning'), ![]);
+      return (value6['showToast']?.(trDreamina('missingValue', { label: label }), 'warning'), false);
     try {
-      return (await openExternalLink(enabled16, { label: label }), !![]);
+      return (await openExternalLink(enabled16, { label: label }), true);
     } catch (value29) {}
     const value30 = await run18(enabled16);
     return (
       value30
         ? value6['showToast']?.(trDreamina('browserOpenFailedCopied', { label: label }), 'warning')
         : value6['showToast']?.(trDreamina('browserOpenFailedCopyFirst', { label: label }), 'warning'),
-      ![]
+      false
     );
   }
   async function run19(value31, label2) {
@@ -355,8 +355,8 @@ export function createDreaminaLoginSessionController({
     }
     try {
       const response = await importDreaminaLoginResponseFromServer(value37);
-      if (response?.['success'] === ![]) throw new Error(response?.['message'] || trDreamina('importFailed'));
-      (response?.['status'] ? run24(response['status']) : await refreshStatus({ force: !![], silent: !![] }),
+      if (response?.['success'] === false) throw new Error(response?.['message'] || trDreamina('importFailed'));
+      (response?.['status'] ? run24(response['status']) : await refreshStatus({ force: true, silent: true }),
         manualImportJsonEl && (manualImportJsonEl['value'] = ''),
         run4(),
         value6['showToast']?.(trDreamina('importedSyncing'), 'success'));
@@ -377,31 +377,31 @@ export function createDreaminaLoginSessionController({
       (enabled11['lastQrImageErrorMessage'] = ''));
   }
   function run26(enabled21, value38, enabled22 = {}) {
-    if (!enabled21) return ![];
+    if (!enabled21) return false;
     const withCacheBust2 = !!enabled22?.['withCacheBust'],
       enabled23 = run9(value38, { withCacheBust: withCacheBust2 });
-    if (!enabled23) return ![];
+    if (!enabled23) return false;
     const value39 = String(enabled21['getAttribute']('src') || '')['trim']();
-    if (!withCacheBust2 && value39 === enabled23) return ![];
+    if (!withCacheBust2 && value39 === enabled23) return false;
     return (
       (enabled11['lastQrImageUrl'] = enabled23),
       (enabled11['lastQrImageRequestedAt'] = Date['now']()),
-      (enabled11['qrImageLoadError'] = ![]),
+      (enabled11['qrImageLoadError'] = false),
       (enabled11['lastQrImageErrorMessage'] = ''),
       (enabled21['src'] = enabled23),
-      !![]
+      true
     );
   }
   function run27(el) {
     if (!el || enabled11['qrImageListenersBound']) return;
     (el['addEventListener']('load', () => {
-      (run25(![]), enabled11['lastStatus'] && run28(enabled11['lastStatus']));
+      (run25(false), enabled11['lastStatus'] && run28(enabled11['lastStatus']));
     }),
       el['addEventListener']('error', () => {
-        (run25(!![], { message: trDreamina('qrLoadFailed') }),
+        (run25(true, { message: trDreamina('qrLoadFailed') }),
           enabled11['lastStatus'] && run28(enabled11['lastStatus']));
       }),
-      (enabled11['qrImageListenersBound'] = !![]));
+      (enabled11['qrImageListenersBound'] = true));
   }
   function run29(value40) {
     const count4 = Number(value40?.['startedAt'] || 0);
@@ -412,17 +412,17 @@ export function createDreaminaLoginSessionController({
   }
   function run30(value42) {
     const enabled24 = value42?.['runtime'] || {};
-    if (!enabled24?.['active']) return ![];
+    if (!enabled24?.['active']) return false;
     const value43 = String(enabled24?.['phase'] || '');
-    if (!['preparing', 'starting']['includes'](value43)) return ![];
+    if (!['preparing', 'starting']['includes'](value43)) return false;
     return run29(enabled24) >= value7;
   }
   async function run18(value44) {
     const enabled25 = String(value44 || '');
-    if (!enabled25) return ![];
+    if (!enabled25) return false;
     try {
       if (navigator?.['clipboard']?.['writeText'])
-        return (await navigator['clipboard']['writeText'](enabled25), !![]);
+        return (await navigator['clipboard']['writeText'](enabled25), true);
     } catch (value45) {}
     try {
       const el2 = settingsCardEl['createElement']('textarea');
@@ -435,7 +435,7 @@ export function createDreaminaLoginSessionController({
       const enabled26 = settingsCardEl['execCommand']('copy');
       return (el2['remove'](), !!enabled26);
     } catch (value46) {
-      return ![];
+      return false;
     }
   }
   function run31(enabled27) {
@@ -488,12 +488,12 @@ export function createDreaminaLoginSessionController({
     enabled11['modalCloseTimer'] &&
       (clearTimeout(enabled11['modalCloseTimer']), (enabled11['modalCloseTimer'] = null));
   }
-  function run37({ clearDismissed: clearDismissed = ![] } = {}) {
+  function run37({ clearDismissed: clearDismissed = false } = {}) {
     const { modalOverlayEl: modalOverlayEl } = run();
     if (!modalOverlayEl) return;
-    (run36(), clearDismissed && (enabled11['dismissedSessionKey'] = ''), (modalOverlayEl['hidden'] = ![]));
+    (run36(), clearDismissed && (enabled11['dismissedSessionKey'] = ''), (modalOverlayEl['hidden'] = false));
   }
-  function run2({ force: force = ![], rememberDismissal: rememberDismissal = !![] } = {}) {
+  function run2({ force: force = false, rememberDismissal: rememberDismissal = true } = {}) {
     const {
       modalOverlayEl: modalOverlayEl2,
       modalQrImageEl: modalQrImageEl,
@@ -504,16 +504,16 @@ export function createDreaminaLoginSessionController({
       const value54 = run34(enabled11['lastStatus']);
       value54 && (enabled11['dismissedSessionKey'] = value54);
     }
-    if (modalOverlayEl2) modalOverlayEl2['hidden'] = !![];
+    if (modalOverlayEl2) modalOverlayEl2['hidden'] = true;
     if (modalQrImageEl) modalQrImageEl['removeAttribute']('src');
     if (manualImportJsonEl2) manualImportJsonEl2['value'] = '';
-    ((enabled11['manualGuideOpen'] = ![]), run15(enabled11['lastStatus'] || {}));
+    ((enabled11['manualGuideOpen'] = false), run15(enabled11['lastStatus'] || {}));
   }
   function run38(value55 = 0) {
     (run36(),
       (enabled11['modalCloseTimer'] = setTimeout(
         () => {
-          run2({ force: !![], rememberDismissal: ![] });
+          run2({ force: true, rememberDismissal: false });
         },
         Math['max'](0, Number(value55) || 0),
       )));
@@ -560,22 +560,22 @@ export function createDreaminaLoginSessionController({
       value67 = run10(error6),
       value68 = run12(error6),
       enabled33 = value65 || ['success', 'reused', 'done']['includes'](value64);
-    enabled33 && (enabled11['manualGuideOpen'] = ![]);
-    !enabled33 && value68 && (enabled11['manualGuideOpen'] = !![]);
+    enabled33 && (enabled11['manualGuideOpen'] = false);
+    !enabled33 && value68 && (enabled11['manualGuideOpen'] = true);
     const enabled34 = run34(error6),
       shouldDreaminaManualGuideOpenByDefault2 = shouldDreaminaManualGuideOpenByDefault(
         error6,
         enabled11['dismissedSessionKey'],
       );
-    !enabled33 && shouldDreaminaManualGuideOpenByDefault2 && (enabled11['manualGuideOpen'] = !![]);
+    !enabled33 && shouldDreaminaManualGuideOpenByDefault2 && (enabled11['manualGuideOpen'] = true);
     const value69 =
       enabled11['manualGuideOpen'] ||
-      ((value63 || enabled32) && (!!enabled34 ? enabled11['dismissedSessionKey'] !== enabled34 : !![]));
+      ((value63 || enabled32) && (!!enabled34 ? enabled11['dismissedSessionKey'] !== enabled34 : true));
     if (value69) run37();
     else
       ['success', 'reused', 'failed', 'done']['includes'](value64)
         ? run38(value64 === 'failed' ? 0 : 600)
-        : run2({ force: !![], rememberDismissal: ![] });
+        : run2({ force: true, rememberDismissal: false });
     (modalCardEl &&
       modalCardEl['classList']['toggle']('dreamina-login-modal--guide-open', !!enabled11['manualGuideOpen']),
       modalMessageEl &&
@@ -599,14 +599,14 @@ export function createDreaminaLoginSessionController({
                           String(error6?.['message'] || '')['trim']() ||
                           trDreamina('modalProcessing')),
       modalWaitTextEl && (modalWaitTextEl['textContent'] = run39(error6)),
-      modalWaitEl && (modalWaitEl['hidden'] = ![]),
+      modalWaitEl && (modalWaitEl['hidden'] = false),
       modalQrWrapEl && (modalQrWrapEl['hidden'] = !enabled32),
       modalQrImageEl2 &&
         (enabled32 ? run26(modalQrImageEl2, error7) : modalQrImageEl2['removeAttribute']('src')),
-      modalCloseEl && (modalCloseEl['disabled'] = ![]),
+      modalCloseEl && (modalCloseEl['disabled'] = false),
       modalRetryEl &&
-        ((modalRetryEl['hidden'] = ![]),
-        (modalRetryEl['disabled'] = ![]),
+        ((modalRetryEl['hidden'] = false),
+        (modalRetryEl['disabled'] = false),
         enabled11['manualGuideOpen']
           ? (modalRetryEl['textContent'] = trDreamina('guideCollapse'))
           : (modalRetryEl['textContent'] = value68 ? trDreamina('guideRecommended') : trDreamina('guide'))),
@@ -636,17 +636,17 @@ export function createDreaminaLoginSessionController({
     creditTextEl &&
       (creditTextEl['textContent'] = enabled35 ? run31(error8?.['credit']) : trDreamina('creditPlaceholder'));
     btnAuthEl &&
-      ((btnAuthEl['disabled'] = ![]), (btnAuthEl['textContent'] = getDreaminaWebLoginButtonText(error8)));
+      ((btnAuthEl['disabled'] = false), (btnAuthEl['textContent'] = getDreaminaWebLoginButtonText(error8)));
     btnQrAuthEl &&
-      ((btnQrAuthEl['hidden'] = !![]),
-      (btnQrAuthEl['disabled'] = !![]),
+      ((btnQrAuthEl['hidden'] = true),
+      (btnQrAuthEl['disabled'] = true),
       (btnQrAuthEl['textContent'] = getDreaminaQrLoginButtonText(error8)));
     btnLogoutEl && (btnLogoutEl['disabled'] = value70 || !enabled35);
     if (value70) run4();
     else run3();
     ((enabled11['lastStatus'] = error8), run35(error8), run28(error8), run32(error9));
   }
-  async function refreshStatus({ force: force = ![], silent: silent = ![] } = {}) {
+  async function refreshStatus({ force: force = false, silent: silent = false } = {}) {
     if (!syncDevVisibility()) return null;
     if (typeof fetchDreaminaCliStatusFromServer !== 'function') return null;
     const value73 = ++enabled11['statusRequestGeneration'];
@@ -663,7 +663,7 @@ export function createDreaminaLoginSessionController({
       return null;
     }
   }
-  async function run6({ silent: silent = ![] } = {}) {
+  async function run6({ silent: silent = false } = {}) {
     if (!syncDevVisibility()) return null;
     if (typeof fetchDreaminaCliLoginRuntimeFromServer !== 'function')
       return refreshStatus({ silent: silent });
@@ -685,7 +685,7 @@ export function createDreaminaLoginSessionController({
         value79 = value78 || value76 === 'failed';
       if (value79) enabled11['loginLaunchRequestedAt'] = 0;
       return (
-        value78 && refreshStatus({ force: !![], silent: !![] })['catch'](() => {}),
+        value78 && refreshStatus({ force: true, silent: true })['catch'](() => {}),
         dreaminaLoginRuntimeStatus
       );
     } catch (error11) {
@@ -700,21 +700,21 @@ export function createDreaminaLoginSessionController({
     if (!syncDevVisibility()) return;
     const value81 = enabled11['lastStatus']?.['runtime'] || {};
     if (value81?.['active']) {
-      (run37({ clearDismissed: !![] }),
-        (enabled11['manualGuideOpen'] = !![]),
+      (run37({ clearDismissed: true }),
+        (enabled11['manualGuideOpen'] = true),
         run28(enabled11['lastStatus'] || {}));
       return;
     }
     const force2 = !!enabled11['lastStatus']?.['loggedIn'];
     if (typeof startDreaminaWebLoginFromServer !== 'function') return;
-    ((enabled11['manualGuideOpen'] = !![]),
+    ((enabled11['manualGuideOpen'] = true),
       (enabled11['loginLaunchRequestedAt'] = Date['now']()),
-      run37({ clearDismissed: !![] }));
+      run37({ clearDismissed: true }));
     try {
       const response2 = await startDreaminaWebLoginFromServer({ force: force2 });
-      if (response2?.['success'] === ![])
+      if (response2?.['success'] === false)
         throw new Error(response2?.['message'] || trDreamina('startFailed'));
-      ((enabled11['manualGuideOpen'] = !![]),
+      ((enabled11['manualGuideOpen'] = true),
         response2?.['status'] && run24(response2['status']),
         value6['showToast']?.(force2 ? trDreamina('reloginStarted') : trDreamina('loginStarted'), 'info'),
         run4());
@@ -733,11 +733,11 @@ export function createDreaminaLoginSessionController({
     if (typeof logoutDreaminaFromServer !== 'function') return;
     try {
       const response3 = await logoutDreaminaFromServer();
-      if (response3?.['success'] === ![])
+      if (response3?.['success'] === false)
         throw new Error(response3?.['message'] || trDreamina('logoutFailed'));
       (response3?.['status']
         ? run24(response3['status'])
-        : await refreshStatus({ force: !![], silent: !![] }),
+        : await refreshStatus({ force: true, silent: true }),
         run3(),
         value6['showToast']?.(trDreamina('loggedOut'), 'success'));
     } catch (error13) {
@@ -768,7 +768,7 @@ export function createDreaminaLoginSessionController({
         run43()['catch'](() => {});
       }),
       modalCloseEl2?.['addEventListener']('click', () => {
-        run2({ force: !![] });
+        run2({ force: true });
       }),
       modalRetryEl2?.['addEventListener']('click', () => {
         run42();
@@ -793,12 +793,12 @@ export function createDreaminaLoginSessionController({
     if (settingsCardEl['body']) {
       const mutationObserver = new MutationObserver(() => {
         const value82 = syncDevVisibility();
-        value82 && refreshStatus({ force: !![], silent: !![] })['catch'](() => {});
+        value82 && refreshStatus({ force: true, silent: true })['catch'](() => {});
       });
       (enabled11['observer']?.['disconnect']?.(),
         (enabled11['observer'] = mutationObserver),
         mutationObserver['observe'](settingsCardEl['body'], {
-          attributes: !![],
+          attributes: true,
           attributeFilter: ['class'],
         }));
     }
@@ -806,7 +806,7 @@ export function createDreaminaLoginSessionController({
   const value83 = (value84) => {
     value84['detail']?.['provider'] === 'dreamina' &&
       ['installed', 'missing']['includes'](value84['detail']['phase']) &&
-      refreshStatus({ force: !![], silent: !![] })['catch'](() => {});
+      refreshStatus({ force: true, silent: true })['catch'](() => {});
   };
   return (
     globalThis['window']?.['addEventListener']?.(CLI_COMPONENT_CHANGED, value83),

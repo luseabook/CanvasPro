@@ -15,15 +15,15 @@ export function setReplicationCardDragImage(event, el2) {
   event['dataTransfer']?.['setDragImage']?.(el2, box['x'], box['y']);
 }
 export function previewReplicationCardOrder(el3, enabled, enabled2) {
-  if (!enabled || !enabled2 || enabled === enabled2) return ![];
+  if (!enabled || !enabled2 || enabled === enabled2) return false;
   const list = [...el3['querySelectorAll'](selector)],
     item = list['indexOf'](enabled) < list['indexOf'](enabled2),
     key = item ? enabled2['nextElementSibling'] : enabled2;
-  if (key === enabled || enabled['nextElementSibling'] === key) return ![];
+  if (key === enabled || enabled['nextElementSibling'] === key) return false;
   const map = new Map(list['map']((el4) => [el4, el4['getBoundingClientRect']()]));
   (settleReplicationCardMotion(el3), el3['insertBefore'](enabled, key));
   if (el3['ownerDocument']['defaultView']['matchMedia']('(prefers-reduced-motion: reduce)')['matches'])
-    return !![];
+    return true;
   for (const el5 of list) {
     if (el5 === enabled || !el5['animate']) continue;
     const box2 = map['get'](el5),
@@ -40,5 +40,5 @@ export function previewReplicationCardOrder(el3, enabled, enabled2) {
         if (motions['get'](el5) === data) motions['delete'](el5);
       }));
   }
-  return !![];
+  return true;
 }

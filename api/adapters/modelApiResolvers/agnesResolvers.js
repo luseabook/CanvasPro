@@ -18,7 +18,7 @@ async function resolveAgnesImageInputs(key, index = {}) {
   const list = normalizeInputList(key);
   if (list['length'] === 0) return [];
   if (isConfiguredObjectStorageEnabled())
-    return uploadModelApiMediaInputs('image', list, index, { strictUpload: !![] });
+    return uploadModelApiMediaInputs('image', list, index, { strictUpload: true });
   const list2 = [];
   for (const result of list) {
     if (isReusableAgnesImageInput(result)) {
@@ -176,7 +176,7 @@ export function agnesVideo25({
       (value10['videos'] = list6['map']((url) => ({
         url: url,
         start_seconds: 0,
-        require_audio: ![],
+        require_audio: false,
       }))),
     value10
   );

@@ -915,7 +915,7 @@ export async function runDreaminaImageUpscaleGeneration(value78, args4 = {}) {
   const submitDreaminaImageUpscale2 = await submitDreaminaImageUpscale(
     buildDreaminaImageUpscaleSubmitPayload(value78),
   );
-  if (submitDreaminaImageUpscale2?.['success'] === ![])
+  if (submitDreaminaImageUpscale2?.['success'] === false)
     throw new Error(
       normalizeDreaminaErrorMessage(submitDreaminaImageUpscale2?.['message']) ||
         '即梦图片超清/放大任务提交失败',

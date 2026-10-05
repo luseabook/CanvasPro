@@ -42,8 +42,8 @@ function dispatchWebPreviewSettingsSync(reason) {
 }
 export function activateSettingsPane(index = 'api-input') {
   const enabled3 = String(index || '')['trim']();
-  if (!enabled3) return ![];
-  let result = ![];
+  if (!enabled3) return false;
+  let result = false;
   return (
     document['querySelectorAll']?.('.settings-nav-item')?.['forEach']((data) => {
       const options = data['dataset']?.['pane'] === enabled3;
@@ -59,7 +59,7 @@ export function activateSettingsPane(index = 'api-input') {
   );
 }
 export function highlightSettingsField(enabled4, { duration: duration = 4200 } = {}) {
-  if (!enabled4?.['classList']) return ![];
+  if (!enabled4?.['classList']) return false;
   document['querySelectorAll']?.('.' + SETTINGS_FIELD_HIGHLIGHT_CLASS)?.['forEach']((source) => {
     if (source !== enabled4) source['classList']['remove'](SETTINGS_FIELD_HIGHLIGHT_CLASS);
   });
@@ -72,42 +72,42 @@ export function highlightSettingsField(enabled4, { duration: duration = 4200 } =
       fieldHighlightTimers['delete'](enabled4));
   }, duration);
   if (scheduleTimer2 != null) fieldHighlightTimers['set'](enabled4, scheduleTimer2);
-  return !![];
+  return true;
 }
 export function focusSettingsField(current, entry = {}) {
   const enabled5 = (Array['isArray'](current) ? current : [current])
     ['map']((record) => String(record || '')['trim']())
     ['filter'](Boolean);
-  if (!enabled5['length']) return ![];
+  if (!enabled5['length']) return false;
   const enabled6 = enabled5['map']((payload) => document['getElementById'](payload))['find'](Boolean);
-  if (!enabled6) return ![];
+  if (!enabled6) return false;
   (revealModelServiceSettingsField(enabled6),
     enabled6['scrollIntoView']?.({ block: 'center', behavior: 'smooth' }),
     enabled6['focus']?.());
-  if (entry['select'] !== ![]) enabled6['select']?.();
-  if (entry['highlight'] !== ![]) highlightSettingsField(enabled6, entry);
-  return !![];
+  if (entry['select'] !== false) enabled6['select']?.();
+  if (entry['highlight'] !== false) highlightSettingsField(enabled6, entry);
+  return true;
 }
 export function openSettingsPanelToField({
   paneName: paneName = 'api-input',
   fieldIds: fieldIds = [],
-  select: select = !![],
-  highlight: highlight = !![],
+  select: select = true,
+  highlight: highlight = true,
 } = {}) {
   const openSettingsPanel2 = openSettingsPanel();
-  if (!openSettingsPanel2) return ![];
+  if (!openSettingsPanel2) return false;
   return (
     settingsSearch?.['clear'](),
     activateSettingsPane(paneName),
     scheduleTimer(() => {
       focusSettingsField(fieldIds, { select: select, highlight: highlight });
     }, 0),
-    !![]
+    true
   );
 }
 export function openSettingsPanel() {
   const { settingsOverlay: settingsOverlay, avatarMenu: avatarMenu } = getSettingsPanelElements();
-  if (!settingsOverlay) return ![];
+  if (!settingsOverlay) return false;
   ((settingsOverlay['style']['display'] = 'block'), avatarMenu?.['classList']['remove']('open'));
   if (!releaseSettingsInteraction) {
     const root = settingsOverlay['querySelector']?.('.settings-modal') || settingsOverlay,
@@ -123,12 +123,12 @@ export function openSettingsPanel() {
       (focusNavigation['destroy'](), run());
     };
   }
-  return (dispatchWebPreviewSettingsSync('settings-open'), !![]);
+  return (dispatchWebPreviewSettingsSync('settings-open'), true);
 }
 export function closeSettingsPanel() {
   const { settingsOverlay: settingsOverlay2 } = getSettingsPanelElements();
-  if (!settingsOverlay2) return ![];
-  (settingsSearch?.['clear']({ restore: !![] }),
+  if (!settingsOverlay2) return false;
+  (settingsSearch?.['clear']({ restore: true }),
     (settingsOverlay2['style']['display'] = 'none'),
     releaseSettingsInteraction?.(),
     (releaseSettingsInteraction = null));
@@ -140,11 +140,11 @@ export function closeSettingsPanel() {
         : { type: 'settings-panel-closed' };
     handle['dispatchEvent'](state);
   }
-  return (dispatchWebPreviewSettingsSync('settings-close'), !![]);
+  return (dispatchWebPreviewSettingsSync('settings-close'), true);
 }
 export function toggleSettingsPanel() {
   const { settingsOverlay: settingsOverlay3 } = getSettingsPanelElements();
-  if (!settingsOverlay3) return ![];
+  if (!settingsOverlay3) return false;
   return isSettingsPanelOpen(settingsOverlay3) ? closeSettingsPanel() : openSettingsPanel();
 }
 export function initSettingsPanelEvents() {
@@ -158,13 +158,13 @@ export function initSettingsPanelEvents() {
     config?.['addEventListener']('click', () => {
       closeSettingsPanel();
     }));
-  let enabled8 = ![],
-    enabled9 = ![];
+  let enabled8 = false,
+    enabled9 = false;
   const run2 = () => {
-    ((enabled8 = ![]), (enabled9 = ![]));
+    ((enabled8 = false), (enabled9 = false));
   };
   (root2['addEventListener']('pointerdown', (input) => {
-    ((enabled8 = input['target'] === root2), (enabled9 = ![]));
+    ((enabled8 = input['target'] === root2), (enabled9 = false));
   }),
     root2['addEventListener']('pointerup', (output) => {
       enabled9 = enabled8 && output['target'] === root2;

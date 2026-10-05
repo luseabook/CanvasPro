@@ -43,24 +43,24 @@ function isInformationalQuestion(value) {
       'test'
     ](value)
   )
-    return !![];
+    return true;
   if (
     /^(?:请问)?(?:如何|怎么|为什么|为何|哪些|什么|是否|能否|可否).{0,64}(?:生成|创建|制作|修改|切换|使用|模型|画布|节点|图片|视频)/u[
       'test'
     ](value)
   )
-    return !![];
+    return true;
   if (
     /^(?:你|这个产品)?(?:支持|能|会|可以).{0,24}(?:生成|创建|制作).{0,16}(?:吗|么)[？?]?$/u['test'](value) &&
     !/(?:帮我|替我|为我|给我|一张|一幅|一个|一段)/u['test'](value)
   )
-    return !![];
+    return true;
   if (
     /^\s*(?:how|what|why|which|where)\b.{0,80}\b(?:create|generate|make|edit|change|switch|use|model|canvas|node|image|video)\b/iu[
       'test'
     ](value)
   )
-    return !![];
+    return true;
   return /^\s*(?:can|could|do)\s+you\s+(?:create|generate|make)\s+(?:images?|pictures?|videos?|audio|music)\s*[?？]?$/iu[
     'test'
   ](value);
@@ -71,12 +71,12 @@ function isDiscussionOnly(item) {
 export function routeAgentTurn({
   message: message = '',
   intent: intent = null,
-  clarificationAnswer: clarificationAnswer = ![],
-  pendingPlan: pendingPlan = ![],
+  clarificationAnswer: clarificationAnswer = false,
+  pendingPlan: pendingPlan = false,
   conversationHistory: conversationHistory = [],
 } = {}) {
   if (clarificationAnswer || pendingPlan) return { channel: 'canvas.tool', reason: 'continuation' };
-  if (intent?.['canvasAction'] === !![] || intent?.['mutatesCanvas'] === !![])
+  if (intent?.['canvasAction'] === true || intent?.['mutatesCanvas'] === true)
     return { channel: 'canvas.tool', reason: 'explicit-intent' };
   const enabled = String(message || '')['trim']();
   if (!enabled) return { channel: 'assistant.message', reason: 'empty' };

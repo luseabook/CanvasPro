@@ -11,7 +11,7 @@ const NODE_CREATING_COMMANDS = new Set([
 function normalizeAgentActionArgs(
   args = {},
   value = null,
-  { precreateReservation: precreateReservation = ![] } = {},
+  { precreateReservation: precreateReservation = false } = {},
 ) {
   const box =
     args['args'] && typeof args['args'] === 'object' && !Array['isArray'](args['args'])
@@ -38,7 +38,7 @@ function normalizeAgentActionArgs(
     ...box,
     placement: 'viewport-center-sequence',
     ...(reuseNodeId ? { reuseNodeId: reuseNodeId } : {}),
-    ...(precreateReservation ? { agentReservation: !![] } : {}),
+    ...(precreateReservation ? { agentReservation: true } : {}),
   };
 }
 function readCanvasState(options = {}) {
@@ -55,9 +55,9 @@ function collectCreatedNodeResult(list = [], item = []) {
       const result = String(key?.['type'] || key?.['commandId'] || '')['trim']();
       if (!NODE_CREATING_COMMANDS['has'](result)) return;
       const response = item[index];
-      if (response?.['ok'] !== !![]) return;
+      if (response?.['ok'] !== true) return;
       const data = response['result'] || {};
-      if (data['reused'] === !![]) {
+      if (data['reused'] === true) {
         const target = String(data['nodeId'] || data['node']?.['id'] || '')['trim']();
         if (target) args4['add'](target);
       }
@@ -124,7 +124,7 @@ function collectCreatedNodesOutsideVisibleCanvas(options4 = {}, record = {}, lis
     config = 16;
   return list4['filter']((scope) => {
     const box4 = record?.['nodes']?.[scope];
-    if (!box4) return ![];
+    if (!box4) return false;
     const box5 = worldToScreen(Number(box4['x']) || 0, Number(box4['y']) || 0, box3),
       input = Math['max'](1, Number(box4['width']) || 160) * state,
       output = Math['max'](1, Number(box4['height']) || 120) * state;
@@ -146,12 +146,12 @@ export async function executeAgentActions(
     shouldContinue: shouldContinue = null,
     createNodeSequenceKey: createNodeSequenceKey = '',
     precreatedNode: precreatedNode = null,
-    precreateReservation: precreateReservation = ![],
+    precreateReservation: precreateReservation = false,
   } = {},
 ) {
   if (!Array['isArray'](list5))
     return {
-      ok: ![],
+      ok: false,
       status: 'failed',
       errorCode: 'INVALID_AGENT_ACTIONS',
       message: 'Agent actions must be an array.',
@@ -184,11 +184,11 @@ export async function executeAgentActions(
       ? createdNodeIds['filter']((value3) => !canvasState['nodes'][value3])
       : [];
   if (
-    raw['ok'] === !![] &&
+    raw['ok'] === true &&
     (unresolvedCommandIds2['unresolvedCommandIds']['length'] > 0 || missingNodeIds['length'] > 0)
   )
     return {
-      ok: ![],
+      ok: false,
       status: 'failed',
       errorCode: 'AGENT_CREATED_NODE_MISSING',
       message:
@@ -207,8 +207,8 @@ export async function executeAgentActions(
   return (
     revealCreatedNodes(commandContext, [...new Set([...unresolvedCommandIds2['revealNodeIds'], ...args5])]),
     {
-      ok: raw['ok'] === !![],
-      status: raw['ok'] === !![] ? 'success' : 'failed',
+      ok: raw['ok'] === true,
+      status: raw['ok'] === true ? 'success' : 'failed',
       errorCode: raw['errorCode'] || '',
       message: raw['message'] || '',
       results: results,

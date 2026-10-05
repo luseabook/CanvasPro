@@ -266,7 +266,7 @@ function mergeSecureValuesIntoConfig(options7 = {}, value17 = {}) {
   );
 }
 function hasProviderConfigValue(options8 = {}) {
-  if (!isPlainObject(options8)) return ![];
+  if (!isPlainObject(options8)) return false;
   return [
     'apiUrl',
     'cloudApiUrl',
@@ -283,36 +283,36 @@ function hasProviderConfigValue(options8 = {}) {
 }
 async function readSecureValues(options9 = {}) {
   const map3 = getSecureSettingsApi();
-  if (!map3) return { available: ![], values: {} };
+  if (!map3) return { available: false, values: {} };
   try {
     const map4 = await map3['get']({ keys: collectSecureKeys(options9) });
-    if (!map4?.['available']) return { available: ![], values: {} };
-    return { available: !![], values: isPlainObject(map4['values']) ? map4['values'] : {} };
+    if (!map4?.['available']) return { available: false, values: {} };
+    return { available: true, values: isPlainObject(map4['values']) ? map4['values'] : {} };
   } catch {
-    return { available: ![], values: {} };
+    return { available: false, values: {} };
   }
 }
 async function writeSecureValues(map5) {
   const map6 = getSecureSettingsApi();
-  if (!map6 || !(map5 instanceof Map)) return { available: ![], changed: ![] };
+  if (!map6 || !(map5 instanceof Map)) return { available: false, changed: false };
   const enabled10 = await map6['get']({ keys: [] })['catch'](() => null);
-  if (!enabled10?.['available']) return { available: ![], changed: ![] };
-  let changed = ![],
-    failed = ![];
+  if (!enabled10?.['available']) return { available: false, changed: false };
+  let changed = false,
+    failed = false;
   for (const [key2, value28] of map5['entries']()) {
     if (!key2) continue;
     const value29 = String(value28 || '');
     if (value29) {
       const response = await map6['set']({ key: key2, value: value29 });
-      if (response?.['ok']) changed = !![];
-      else failed = !![];
+      if (response?.['ok']) changed = true;
+      else failed = true;
     } else {
       const response2 = await map6['delete']({ key: key2 });
-      if (response2?.['ok']) changed = !![];
-      else failed = !![];
+      if (response2?.['ok']) changed = true;
+      else failed = true;
     }
   }
-  return { available: !![], changed: changed, failed: failed };
+  return { available: true, changed: changed, failed: failed };
 }
 async function hydrateConfigFromSecureStorage(options10 = {}) {
   const list3 = extractPlaintextSecureValues(options10),

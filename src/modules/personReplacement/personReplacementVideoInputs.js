@@ -79,7 +79,7 @@ export function applyPersonReplacementVideoCrop(
               ...args3,
               ...(args3['videoIterationReferenceRef']
                 ? { videoIterationInputRef: videoIterationInputRef }
-                : { videoRef: videoIterationInputRef, videoRefIsCropped: !![] }),
+                : { videoRef: videoIterationInputRef, videoRefIsCropped: true }),
               outputFps: outputFps,
               materializationStatus: 'succeeded',
               materializationProgress: 100,
@@ -99,14 +99,14 @@ export function resolvePersonReplacementVideoSlotState(generationParams2 = {}, t
   const model = resolvePersonReplacementVideoModelId(
       generationParams2?.['settings']?.['replacementModelId'] || PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID,
     ),
-    provider = resolveModelProvider(model, '', { allowProviderHint: ![], allowPrefixInference: ![] }),
+    provider = resolveModelProvider(model, '', { allowProviderHint: false, allowPrefixInference: false }),
     fixedInputConfig = getFixedInputSlotConfigFromManifest(
       {
         model: model,
         provider: provider,
         generationParams: generationParams2?.['settings']?.['replacementVideoGenerationParams'] || {},
       },
-      { includeHiddenSlots: !![] },
+      { includeHiddenSlots: true },
     ),
     inputsBySlot = {},
     readOnlySlots = ['refImage']['filter']((next) => fixedInputConfig?.['visibleSlots']?.['includes'](next)),
@@ -151,7 +151,7 @@ export function resolvePersonReplacementVideoSlotState(generationParams2 = {}, t
           ([payload, response2]) =>
             fixedInputConfig?.['visibleSlots']?.['includes'](payload) &&
             normalizeText(response2?.['url']) &&
-            response2?.['pending'] !== !![],
+            response2?.['pending'] !== true,
         )
         ['map'](([handle, response3]) => [handle, { ...response3, url: normalizeText(response3['url']) }]),
     ),

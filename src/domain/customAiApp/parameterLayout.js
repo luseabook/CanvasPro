@@ -41,7 +41,7 @@ export function orderParameterEntries(list4) {
     next['homeParamOrder'] = current;
   });
 }
-export function groupParameters(list5, entry, record, { wholeGroup: wholeGroup = ![] } = {}) {
+export function groupParameters(list5, entry, record, { wholeGroup: wholeGroup = false } = {}) {
   const enabled2 = list5['find']((payload) => payload['index'] === entry),
     enabled3 = list5['find']((handle) => handle['index'] === record);
   if (
@@ -51,9 +51,9 @@ export function groupParameters(list5, entry, record, { wholeGroup: wholeGroup =
     enabled2['componentKind'] !== 'param' ||
     enabled3['componentKind'] !== 'param'
   )
-    return ![];
-  if (enabled3['previewPlacement'] !== 'home') return ![];
-  if (enabled2['footerGroupId'] && enabled2['footerGroupId'] === enabled3['footerGroupId']) return ![];
+    return false;
+  if (enabled3['previewPlacement'] !== 'home') return false;
+  if (enabled2['footerGroupId'] && enabled2['footerGroupId'] === enabled3['footerGroupId']) return false;
   const list6 =
     wholeGroup && enabled2['footerGroupId']
       ? list5['filter']((state) => state['footerGroupId'] === enabled2['footerGroupId'])
@@ -81,7 +81,7 @@ export function groupParameters(list5, entry, record, { wholeGroup: wholeGroup =
     }),
     normalizeParameterGroups(list5),
     orderParameterEntries(list7),
-    !![]
+    true
   );
 }
 export function getParameterFooterFields(value7) {

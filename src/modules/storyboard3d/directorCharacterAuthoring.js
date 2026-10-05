@@ -51,7 +51,7 @@ export function applyDirectorPoseChannel(args, key, index) {
     (storyboard3DEuler[data] = (Math['max'](options, Math['min'](target, index)) * Math['PI']) / 180),
     {
       ...args,
-      actionPlaying: ![],
+      actionPlaying: false,
       boneOverrides: setStoryboard3DBoneOverride(args['boneOverrides'], result, storyboard3DEuler),
     }
   );

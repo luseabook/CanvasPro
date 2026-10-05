@@ -70,9 +70,9 @@ export function normalizeStoryboard3DExportOptions(includeMetadata = {}) {
     resolution: resolution,
     gridSize: gridSize,
     columns: Math['sqrt'](gridSize),
-    includeMetadata: includeMetadata['includeMetadata'] !== ![],
+    includeMetadata: includeMetadata['includeMetadata'] !== false,
     includeThirds: Boolean(includeMetadata['includeThirds']),
-    returnToCanvas: includeMetadata['returnToCanvas'] !== ![],
+    returnToCanvas: includeMetadata['returnToCanvas'] !== false,
   };
 }
 function uniqueShotIds(list4 = []) {
@@ -412,7 +412,7 @@ export class Storyboard3DExportController {
                 for (const blob of count2) {
                   await downloadResult({ blob: blob['blob'] }, blob['filename'], value31);
                 }
-                return { success: !![], canceled: ![], count: count2['length'] };
+                return { success: true, canceled: false, count: count2['length'] };
               }
             : defaultDownloadResults),
       (this['document'] = documentObject),
@@ -423,8 +423,8 @@ export class Storyboard3DExportController {
       (this['selectedShotIds'] = []),
       (this['gridSlots'] = []),
       (this['dragState'] = null),
-      (this['exportDestinationOpen'] = ![]),
-      (this['busy'] = ![]),
+      (this['exportDestinationOpen'] = false),
+      (this['busy'] = false),
       (this['_handleClick'] = this['_handleClick']['bind'](this)),
       (this['_handleChange'] = this['_handleChange']['bind'](this)),
       (this['_handleSubmit'] = this['_handleSubmit']['bind'](this)),
@@ -473,7 +473,7 @@ export class Storyboard3DExportController {
         this['options']['gridSize'],
         value32 ? [] : this['gridSlots'],
       )),
-      (this['exportDestinationOpen'] = ![]),
+      (this['exportDestinationOpen'] = false),
       this['_render'](),
       value32 &&
         focusFirstElement(this['root'], {
@@ -511,7 +511,7 @@ export class Storyboard3DExportController {
       value35 &&
         [...this['root']['querySelectorAll']('[data-export-focus-key]')]
           ['find']((value37) => value37['getAttribute']('data-export-focus-key') === value35)
-          ?.['focus']?.({ preventScroll: !![] }));
+          ?.['focus']?.({ preventScroll: true }));
   }
   ['_setProgress'](value38) {
     const el2 = this['root']?.['querySelector']('[data-storyboard-3d-export-progress]');
@@ -578,7 +578,7 @@ export class Storyboard3DExportController {
         this['options']['gridSize'],
         value41 === 'gridSize' ? [] : this['gridSlots'],
       )),
-        (this['exportDestinationOpen'] = ![]),
+        (this['exportDestinationOpen'] = false),
         this['_render']());
       return;
     }
@@ -593,7 +593,7 @@ export class Storyboard3DExportController {
           map6['has'](value48),
         );
       } else this['options']['mode'] !== 'grid-png' && (this['selectedShotIds'] = [value46]);
-      ((this['exportDestinationOpen'] = ![]), this['_render']());
+      ((this['exportDestinationOpen'] = false), this['_render']());
       return;
     }
     if (value40 === 'toggle-all-shots') {
@@ -603,7 +603,7 @@ export class Storyboard3DExportController {
         this['selectedShotIds']['length'] === list20['length']
           ? []
           : list20['map']((value49) => value49['id'])),
-        (this['exportDestinationOpen'] = ![]),
+        (this['exportDestinationOpen'] = false),
         this['_render']());
     }
   }
@@ -668,7 +668,7 @@ export class Storyboard3DExportController {
       targetIndex: targetIndex2,
     })),
       (this['dragState'] = null),
-      (this['exportDestinationOpen'] = ![]),
+      (this['exportDestinationOpen'] = false),
       this['_render']());
   }
   ['_handleDragEnd']() {
@@ -691,7 +691,7 @@ export class Storyboard3DExportController {
       event7['submitter']?.['getAttribute']?.('data-storyboard-3d-export-destination') === 'canvas'
         ? 'canvas'
         : 'local';
-    (this['_setExportDestinationOpen'](![]), (this['options'] = this['_readOptions']()));
+    (this['_setExportDestinationOpen'](false), (this['options'] = this['_readOptions']()));
     const project = this['getProject']?.(),
       list21 = collectStoryboard3DProjectShots(project),
       map7 = new Map(list21['map']((value54) => [value54['id'], value54])),
@@ -718,7 +718,7 @@ export class Storyboard3DExportController {
       return;
     }
     const signal = new AbortController();
-    ((this['exportAbort'] = signal), this['_setBusy'](!![]), this['_setProgress']('正在准备离屏渲染…'));
+    ((this['exportAbort'] = signal), this['_setBusy'](true), this['_setProgress']('正在准备离屏渲染…'));
     try {
       const args5 = {
         renderFrame: this['renderFrame'],
@@ -767,7 +767,7 @@ export class Storyboard3DExportController {
             ];
       if (signal['signal']['aborted']) throw new DOMException('已取消导出', 'AbortError');
       const el13 = this['root']?.['querySelector']('[data-storyboard-3d-export-action="cancel"]');
-      if (el13) el13['hidden'] = !![];
+      if (el13) el13['hidden'] = true;
       if (kind) mimeType = results[0]['blob']['type'];
       const value58 = kind
         ? mimeType === 'video/mp4'
@@ -819,11 +819,11 @@ export class Storyboard3DExportController {
           : '导出失败：' + (error5?.['message'] || String(error5)),
       );
     } finally {
-      this['exportAbort'] === signal && (this['_setBusy'](![]), (this['exportAbort'] = null));
+      this['exportAbort'] === signal && (this['_setBusy'](false), (this['exportAbort'] = null));
     }
   }
   ['close']() {
-    if (this['busy'] || !this['root']) return ![];
+    if (this['busy'] || !this['root']) return false;
     const value63 = this['returnFocusElement'];
     return (
       this['root']['removeEventListener']('click', this['_handleClick']),
@@ -840,11 +840,11 @@ export class Storyboard3DExportController {
       (this['dragState'] = null),
       (this['returnFocusElement'] = null),
       restoreFocus(value63, this['document']),
-      !![]
+      true
     );
   }
   ['destroy']() {
-    return (this['exportAbort']?.['abort'](), (this['busy'] = ![]), this['close']());
+    return (this['exportAbort']?.['abort'](), (this['busy'] = false), this['close']());
   }
 }
 export function createStoryboard3DExportController(options3 = {}) {

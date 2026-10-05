@@ -134,7 +134,7 @@ export function applyAudioWorkflowFooterSchemaControls({
       advancedButton?.['classList']?.['remove']?.('active')),
     advancedButton?.['setAttribute']?.(
       'aria-expanded',
-      String(advancedPanel?.['classList']?.['contains']?.('show') === !![]),
+      String(advancedPanel?.['classList']?.['contains']?.('show') === true),
     ),
     renderAudioWorkflowFooterSchemaControls2
   );

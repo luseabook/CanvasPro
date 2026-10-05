@@ -52,7 +52,7 @@ export function restoreTimelinePresentation(el2, el3) {
         ),
         options = el5['ownerDocument']['activeElement'];
       if (!el6?.['isConnected'] || (options !== el5['ownerDocument']['body'] && options !== el6)) return;
-      el6['focus']({ preventScroll: !![] });
+      el6['focus']({ preventScroll: true });
       if (el3['selection'] && typeof el6['selectionStart'] === 'number')
         el6['setSelectionRange'](...el3['selection']);
     }),

@@ -11,7 +11,7 @@ function escapeHtml(value) {
 export function renderStoryPlanningTextModelPicker(
   modelId = {},
   item = '',
-  { disabled: disabled = ![], className: className = '' } = {},
+  { disabled: disabled = false, className: className = '' } = {},
 ) {
   if (disabled) return '';
   return (
@@ -22,7 +22,7 @@ export function renderStoryPlanningTextModelPicker(
       modelId: modelId['models']?.['text'],
       provider: modelId['textProvider'],
       providerProfileId: modelId['textProviderProfileId'],
-      includeRunningHubInternational: !![],
+      includeRunningHubInternational: true,
       getDisplayModelName: getDisplayModelName,
       className: 'story-planning-text-model-selector',
     }) +

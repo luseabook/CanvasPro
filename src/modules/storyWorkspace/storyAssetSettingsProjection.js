@@ -125,7 +125,7 @@ function formatVoiceHistoryTime(value7) {
   );
 }
 function projectPreset(disabled, assetKind, value10, value11) {
-  if (!['character', 'scene']['includes'](assetKind)) return { visible: ![] };
+  if (!['character', 'scene']['includes'](assetKind)) return { visible: false };
   const label = assetKind === 'scene',
     list5 =
       !label && Array['isArray'](disabled['assetPromptPresets']) && disabled['assetPromptPresets']['length']
@@ -140,9 +140,9 @@ function projectPreset(disabled, assetKind, value10, value11) {
     el =
       value10 && value11
         ? getStoryAssetGenerationControlState(disabled, value10['id'], value11['id'])
-        : { disabled: disabled['isBatchGenerating'] === !![] };
+        : { disabled: disabled['isBatchGenerating'] === true };
   return {
-    visible: !![],
+    visible: true,
     assetKind: assetKind,
     label: label ? '场景图片预设' : normalizeText(disabled['assetPromptPresetLabel']) || '角色图片预设',
     selectedId: selectedId?.['id'] || '',
@@ -162,9 +162,9 @@ function projectLibrarySyncState(value13, handler) {
         : null,
     assetId = normalizeText(value14?.['assetId']),
     itemIndex = Math['max'](0, Math['trunc'](Number(value14?.['itemIndex']) || 0));
-  if (!assetId) return { exists: ![], synced: ![] };
+  if (!assetId) return { exists: false, synced: false };
   const response = handler({ assetId: assetId, itemIndex: itemIndex });
-  if (!response) return { exists: ![], synced: ![] };
+  if (!response) return { exists: false, synced: false };
   const text5 = normalizeText(value14?.['itemKey']),
     text6 = normalizeText(response?.['nodeData']?.['assetPackageItemKey']),
     exists = !text5 || !text6 || text5 === text6,
@@ -181,7 +181,7 @@ function projectPreviewActions(value15, value16, value17, el2, value18, value19)
         normalizeText(value17?.['imageUrl']) &&
         normalizeText(value16?.['mediaKind'])['toLowerCase']() !== 'video',
       ),
-      showProjectActions: ![],
+      showProjectActions: false,
     };
   const librarySynced = projectLibrarySyncState(value17, value19),
     appearanceActionKey = getAppearanceActionKey(value16, value17),
@@ -209,7 +209,7 @@ function projectPreviewActions(value15, value16, value17, el2, value18, value19)
       normalizeText(value17?.['imageUrl']) &&
       normalizeText(value16?.['mediaKind'])['toLowerCase']() !== 'video',
     ),
-    showProjectActions: !![],
+    showProjectActions: true,
     saveToLibraryLabel: saveToLibraryLabel
       ? '正在加入总素材'
       : librarySynced['synced']
@@ -237,7 +237,7 @@ function projectVoicePanel(value20, value21, isActive) {
     sampleText['assetId'] !== value21?.['id'] ||
     value21['kind'] !== 'character'
   )
-    return { visible: ![] };
+    return { visible: false };
   const reference = normalizeStoryCharacterVoiceReference(value21['voiceReference']),
     history = normalizeStoryCharacterVoiceHistory(value21['voiceReferenceHistory'])['map']((label2) => ({
       ...label2,
@@ -249,7 +249,7 @@ function projectVoicePanel(value20, value21, isActive) {
     })),
     isGenerating = isStoryAssetVoiceLoading(value20, value21['id']);
   return {
-    visible: !![],
+    visible: true,
     isActive: isActive,
     isGenerating: isGenerating,
     reference: reference,
@@ -286,7 +286,7 @@ export function createStoryAssetSettingsProjection({
         appearanceCount[0] ||
         generated,
       isChecked = Array['isArray'](showRoleTag['selectedAssetIds']) ? showRoleTag['selectedAssetIds'] : [],
-      isSelectionMode = showRoleTag['assetSelectionMode'] === !![],
+      isSelectionMode = showRoleTag['assetSelectionMode'] === true,
       enabled = isSelectionMode && isChecked['length'] > 1,
       isCurrent = isChecked['includes'](generated['id']),
       isLoading = isStoryAssetCardLoading(showRoleTag, generated['id']),
@@ -299,7 +299,7 @@ export function createStoryAssetSettingsProjection({
         generated,
         preview,
         getStoryAssetGenerationControlState(showRoleTag, generated['id'], preview['id']),
-        generated['isLibraryAsset'] === !![],
+        generated['isLibraryAsset'] === true,
         resolveLibraryReference,
       );
     return {
@@ -337,10 +337,10 @@ export function createStoryAssetSettingsProjection({
       isSelectionMode: isSelectionMode,
       isLoading: isLoading,
       showRoleTag:
-        showRoleTag['hideAssetRoleTag'] !== !![] && shouldRenderStoryAssetRoleTag(generated['kind']),
-      canRename: showRoleTag['allowAssetRename'] === !![] && !generated['isLibraryAsset'],
+        showRoleTag['hideAssetRoleTag'] !== true && shouldRenderStoryAssetRoleTag(generated['kind']),
+      canRename: showRoleTag['allowAssetRename'] === true && !generated['isLibraryAsset'],
       canDelete: Boolean(showRoleTag['allowDeleteAssetCard'] && !generated['isLibraryAsset'] && !enabled),
-      draggable: statusText['draggable'] === !![],
+      draggable: statusText['draggable'] === true,
       cardClassName: [
         statusText['cardClassName'],
         !generated['isLibraryAsset'] && ['character', 'scene', 'prop']['includes'](generated['kind'])
@@ -357,7 +357,7 @@ export function createStoryAssetSettingsProjection({
       cardMetaHtml: statusText['cardMetaHtml'] || '',
       cardMediaHtml: statusText['cardMediaHtml'] || '',
       fallbackImageUrl: statusText['fallbackImageUrl'] || '',
-      workspaceAssetLibraryImage: statusText['workspaceAssetLibraryImage'] === !![],
+      workspaceAssetLibraryImage: statusText['workspaceAssetLibraryImage'] === true,
     };
   }
   function promptControl(value23, selectionMode = {}) {
@@ -366,13 +366,13 @@ export function createStoryAssetSettingsProjection({
         selectedCount = Array['isArray'](value24['selectedAssetIds'])
           ? value24['selectedAssetIds']['length']
           : 0,
-        action = value24['isBatchGenerating'] === !![],
-        cancelRequested = value24['assetBatchCancelRequested'] === !![];
+        action = value24['isBatchGenerating'] === true,
+        cancelRequested = value24['assetBatchCancelRequested'] === true;
       return {
         selectedCount: selectedCount,
         action: action ? 'cancel-asset-batch-generation' : 'batch-generate-assets',
         isCancellation: action,
-        busy: ![],
+        busy: false,
         cancelRequested: cancelRequested,
         disabled: action ? cancelRequested : !selectedCount,
         label: action
@@ -389,15 +389,15 @@ export function createStoryAssetSettingsProjection({
         selectedCount2 = Array['isArray'](value25['selectedAssetIds'])
           ? value25['selectedAssetIds']['length']
           : 0,
-        isMultiSelection = value25['assetSelectionMode'] === !![] && selectedCount2 > 1,
-        action2 = isMultiSelection && value25['isBatchGenerating'] === !![],
-        cancelRequested2 = value25['assetBatchCancelRequested'] === !![];
+        isMultiSelection = value25['assetSelectionMode'] === true && selectedCount2 > 1,
+        action2 = isMultiSelection && value25['isBatchGenerating'] === true,
+        cancelRequested2 = value25['assetBatchCancelRequested'] === true;
       return {
         isMultiSelection: isMultiSelection,
         selectedCount: selectedCount2,
         action: action2 ? 'cancel-asset-batch-generation' : 'batch-generate-assets',
         isCancellation: action2,
-        busy: !isMultiSelection && el3['isGenerating'] === !![],
+        busy: !isMultiSelection && el3['isGenerating'] === true,
         cancelRequested: cancelRequested2,
         disabled: isMultiSelection ? action2 && cancelRequested2 : Boolean(el3['disabled']),
         label: isMultiSelection
@@ -411,9 +411,9 @@ export function createStoryAssetSettingsProjection({
       const selectedCount3 = Math['max'](0, Math['trunc'](Number(selectionMode['selectedCount']) || 0)),
         targets = Array['isArray'](selectionMode['projectAssets']) ? selectionMode['projectAssets'] : [];
       return {
-        selectionMode: selectionMode['selectionMode'] === !![],
+        selectionMode: selectionMode['selectionMode'] === true,
         selectedCount: selectedCount3,
-        allSelected: selectionMode['allSelected'] === !![],
+        allSelected: selectionMode['allSelected'] === true,
         targetGroups: ['character', 'scene', 'prop']['map']((kind) => ({
           kind: kind,
           label: selectionMode['getTabLabel']?.(kind) || kind,
@@ -459,7 +459,7 @@ export function createStoryAssetSettingsProjection({
         selectionMode['asset'] || {},
         selectionMode['appearance'] || {},
         selectionMode['generationControl'] || {},
-        selectionMode['readOnly'] === !![],
+        selectionMode['readOnly'] === true,
         resolveLibraryReference,
       );
     if (value23 === 'voice-capsule') {
@@ -468,7 +468,7 @@ export function createStoryAssetSettingsProjection({
       return {
         visible: visible['kind'] === 'character' && !visible['isLibraryAsset'],
         hasReference: hasStoryCharacterVoiceReference(visible),
-        isOpen: selectionMode['isOpen'] === !![],
+        isOpen: selectionMode['isOpen'] === true,
         uploadLabel: normalizeText(value31['assetVoiceUploadLabel']),
       };
     }
@@ -488,11 +488,11 @@ export function createStoryAssetSettingsProjection({
   function run3(
     emptyDescription = {},
     id4 = null,
-    { showEmptyDescription: showEmptyDescription = !![], readOnly: readOnly = ![] } = {},
+    { showEmptyDescription: showEmptyDescription = true, readOnly: readOnly = false } = {},
   ) {
     if (!id4)
       return {
-        empty: !![],
+        empty: true,
         emptyDescription:
           emptyDescription['assetFilter'] === 'library'
             ? '总素材中还没有可引用的图片或视频。'
@@ -521,14 +521,14 @@ export function createStoryAssetSettingsProjection({
         : id4,
       value35 = value33 ? getSelectedAppearance(emptyDescription, value33) : appearance;
     return {
-      empty: ![],
+      empty: false,
       asset: {
         id: id4['id'],
         name: normalizeText(id4['name']) || '未命名素材',
         role: id4['role'],
         kind: id4['kind'],
         mediaKind: id4['mediaKind'],
-        isLibraryAsset: id4['isLibraryAsset'] === !![],
+        isLibraryAsset: id4['isLibraryAsset'] === true,
         description: id4['description'] || '',
       },
       appearance: appearance,
@@ -540,10 +540,10 @@ export function createStoryAssetSettingsProjection({
         supportsBaseAppearance &&
         emptyDescription['data']?.['project']?.['sourceMode'] !== 'video-replication',
       isBaseAppearance: isBaseAppearance,
-      canRename: emptyDescription['allowAssetRename'] === !![] && !id4['isLibraryAsset'],
+      canRename: emptyDescription['allowAssetRename'] === true && !id4['isLibraryAsset'],
       isBaseAppearanceSelectionDisabled: Boolean(isStoryAssetCardLoading(emptyDescription, id4['id'])),
       canSetBaseAppearance: hasMultipleAppearances && !isStoryAssetCardLoading(emptyDescription, id4['id']),
-      showStyleReference: isBaseAppearance && emptyDescription['allowAssetStyleReference'] !== ![],
+      showStyleReference: isBaseAppearance && emptyDescription['allowAssetStyleReference'] !== false,
       styleReference: {
         referenceImageUrl: appearance['referenceImageUrl'],
         disabled: Boolean(generationControl['disabled']),
@@ -552,7 +552,7 @@ export function createStoryAssetSettingsProjection({
         visible: id4['kind'] === 'character' && !id4['isLibraryAsset'],
         hasReference: hasStoryCharacterVoiceReference(id4),
         isOpen: isOpen,
-        useSourceMenu: !![],
+        useSourceMenu: true,
         uploadLabel: normalizeText(emptyDescription['assetVoiceUploadLabel']),
       },
       voicePlayer: {

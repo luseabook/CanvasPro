@@ -1,9 +1,9 @@
 export function createMentionMenuItem({
   label: label = '',
   subtitle: subtitle = '',
-  disabled: disabled = ![],
-  hasSubmenu: hasSubmenu = ![],
-  compactVisual: compactVisual = ![],
+  disabled: disabled = false,
+  hasSubmenu: hasSubmenu = false,
+  compactVisual: compactVisual = false,
 } = {}) {
   const item = document['createElement']('div');
   item['className'] =

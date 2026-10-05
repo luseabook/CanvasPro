@@ -12,7 +12,7 @@ export function createImageLoadDiagnostics(
   if (!enabled) return { mark() {}, finish() {} };
   const startedAt = now(),
     list = [];
-  let enabled2 = ![],
+  let enabled2 = false,
     timer;
   function run(reason) {
     void report({
@@ -42,7 +42,7 @@ export function createImageLoadDiagnostics(
       },
       finish() {
         if (enabled2) return;
-        ((enabled2 = !![]), cancel(timer), run('closed'));
+        ((enabled2 = true), cancel(timer), run('closed'));
       },
     }
   );

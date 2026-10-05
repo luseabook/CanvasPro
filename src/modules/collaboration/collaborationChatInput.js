@@ -41,13 +41,13 @@ export function bindCollaborationChatInput({
   }
   return (
     windowObject['addEventListener']('shortcut-action', run2),
-    windowObject['addEventListener']('pointerdown', run3, !![]),
-    windowObject['addEventListener']('click', run4, !![]),
+    windowObject['addEventListener']('pointerdown', run3, true),
+    windowObject['addEventListener']('click', run4, true),
     windowObject['addEventListener']('blur', run5),
     () => {
       (windowObject['removeEventListener']('shortcut-action', run2),
-        windowObject['removeEventListener']('pointerdown', run3, !![]),
-        windowObject['removeEventListener']('click', run4, !![]),
+        windowObject['removeEventListener']('pointerdown', run3, true),
+        windowObject['removeEventListener']('click', run4, true),
         windowObject['removeEventListener']('blur', run5));
     }
   );

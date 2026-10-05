@@ -36,7 +36,7 @@ export function createStoryboard3DCharacterImagePoseController({
 } = {}) {
   if (typeof getCharacter !== 'function') throw new TypeError('getCharacter is required.');
   if (typeof applyPose !== 'function') throw new TypeError('applyPose is required.');
-  let source = ![],
+  let source = false,
     next = 0,
     value2 = null;
   const map = new Map(),
@@ -113,7 +113,7 @@ export function createStoryboard3DCharacterImagePoseController({
     },
     dispose = () => {
       if (source) return;
-      ((source = !![]),
+      ((source = true),
         (next += 1),
         value2?.['abortController']['abort']('编辑器已关闭。'),
         (value2 = null),

@@ -54,7 +54,7 @@ export function createStoryboard3DBuiltinAssetThumbnailModel(options, { clayColo
     handler = (target) =>
       new threeRuntime['Color'](text4 || PREVIEW_COLORS[target] || PREVIEW_COLORS['blue']),
     sceneAssetVisual = createSceneAssetVisual(sceneAsset, handler(sceneAsset['colorKey']), handler);
-  if (sceneAssetVisual['selectionRing']) sceneAssetVisual['selectionRing']['visible'] = ![];
+  if (sceneAssetVisual['selectionRing']) sceneAssetVisual['selectionRing']['visible'] = false;
   return sceneAssetVisual['group'];
 }
 export function disposeStoryboard3DAssetThumbnailModel(source) {
@@ -77,8 +77,8 @@ export function createStoryboard3DAssetThumbnailFraming(
   state,
   { aspect: aspect = DEFAULT_WIDTH / DEFAULT_HEIGHT } = {},
 ) {
-  state?.['updateMatrixWorld']?.(!![]);
-  const bounds = new threeRuntime['Box3']()['setFromObject'](state, !![]);
+  state?.['updateMatrixWorld']?.(true);
+  const bounds = new threeRuntime['Box3']()['setFromObject'](state, true);
   if (bounds['isEmpty']()) throw new Error('模型没有可渲染的几何体。');
   const center = bounds['getCenter'](new threeRuntime['Vector3']()),
     config = bounds['getBoundingSphere'](new threeRuntime['Sphere']()),
@@ -116,13 +116,13 @@ export function createStoryboard3DAssetThumbnailRenderer({
     if (!canvas) throw new Error('当前环境无法创建模型缩略图画布。');
     ((rendererFactory2 = rendererFactory({
       canvas: canvas,
-      antialias: !![],
-      alpha: ![],
-      preserveDrawingBuffer: !![],
+      antialias: true,
+      alpha: false,
+      preserveDrawingBuffer: true,
       powerPreference: 'low-power',
     })),
       rendererFactory2['setPixelRatio']?.(1),
-      rendererFactory2['setSize']?.(aspect2, value2, ![]));
+      rendererFactory2['setSize']?.(aspect2, value2, false));
     if ('outputColorSpace' in rendererFactory2)
       rendererFactory2['outputColorSpace'] = threeRuntime['SRGBColorSpace'];
     return rendererFactory2;
@@ -130,7 +130,7 @@ export function createStoryboard3DAssetThumbnailRenderer({
   return {
     render(enabled) {
       if (!enabled?.['clone']) throw new Error('模型场景不可用于生成缩略图。');
-      const value3 = enabled['clone'](!![]),
+      const value3 = enabled['clone'](true),
         el = createPreviewScene(value3),
         { camera: camera2 } = createStoryboard3DAssetThumbnailFraming(value3, {
           aspect: aspect2 / value2,

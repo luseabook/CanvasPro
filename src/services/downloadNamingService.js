@@ -3,14 +3,14 @@ export function getDownloadUseOriginalFilename() {
   try {
     return globalThis['localStorage']?.['getItem'](DOWNLOAD_ORIGINAL_FILENAME_STORAGE_KEY) === '1';
   } catch {
-    return ![];
+    return false;
   }
 }
 export function setDownloadUseOriginalFilename(value) {
   try {
     globalThis['localStorage']?.['setItem'](
       DOWNLOAD_ORIGINAL_FILENAME_STORAGE_KEY,
-      value === !![] ? '1' : '0',
+      value === true ? '1' : '0',
     );
   } catch {}
   return getDownloadUseOriginalFilename();

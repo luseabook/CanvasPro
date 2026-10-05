@@ -49,7 +49,7 @@ function createAdapterRegistry(list2 = [], renderer = '') {
     resolveDefinition(options3 = {}) {
       const next = list3['find']((current) => current['matches'](options3));
       if (next) return next;
-      return { id: 'fallback', renderer: renderer, matches: () => !![] };
+      return { id: 'fallback', renderer: renderer, matches: () => true };
     },
     get(entry = '') {
       const key2 = normalizeKey(entry);

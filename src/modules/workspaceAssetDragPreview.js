@@ -29,13 +29,13 @@ export function applyWorkspaceAssetNativeDragPreview(
   data,
   { pointerGap: pointerGap = WORKSPACE_ASSET_DRAG_PREVIEW_POINTER_GAP } = {},
 ) {
-  if (typeof result?.['setDragImage'] !== 'function') return ![];
+  if (typeof result?.['setDragImage'] !== 'function') return false;
   const { element: element4 } = resolveWorkspaceAssetDragPreview(data);
-  if (!element4) return ![];
+  if (!element4) return false;
   const options = Math['max'](0, Number(pointerGap) || 0);
   try {
-    return (result['setDragImage'](element4, -options, -options), !![]);
+    return (result['setDragImage'](element4, -options, -options), true);
   } catch {
-    return ![];
+    return false;
   }
 }

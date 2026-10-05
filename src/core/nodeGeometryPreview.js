@@ -18,7 +18,7 @@ export function setNodeGeometryPreview(list, value = null) {
 }
 export function clearNodeGeometryPreview(options, target = null) {
   const map2 = target === null ? geometry : layers['get'](target);
-  let source = ![];
+  let source = false;
   for (const next of options) source = map2?.['delete'](next) || source;
   if (target !== null && !map2?.['size']) layers['delete'](target);
   if (source) {

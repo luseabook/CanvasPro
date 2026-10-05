@@ -125,8 +125,8 @@ export function createStoryboard3DCameraObject({
   id: id,
   name: name2,
   camera: camera,
-  visible: visible = !![],
-  locked: locked = ![],
+  visible: visible = true,
+  locked: locked = false,
   idFactory: idFactory,
 } = {}) {
   const run = resolveIdFactory(idFactory),
@@ -135,8 +135,8 @@ export function createStoryboard3DCameraObject({
     id: normalizeString(id, run('camera')),
     type: 'camera',
     name: normalizeString(name2, '摄像机'),
-    visible: visible !== ![],
-    locked: locked === !![],
+    visible: visible !== false,
+    locked: locked === true,
     transform: {
       position: [...args2['position']],
       rotation: cameraRotationFromState(args2),
@@ -239,9 +239,9 @@ export function syncStoryboard3DShotFromCameraObject(
 export function createDefaultStoryboard3DEnvironment(value35 = 'empty') {
   return {
     type: SCENE_ENVIRONMENT_TYPES['has'](value35) ? value35 : 'empty',
-    showGrid: !![],
-    showOutline: !![],
-    enableShadows: !![],
+    showGrid: true,
+    showOutline: true,
+    enableShadows: true,
     groundSize: 100,
   };
 }
@@ -350,8 +350,8 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
     args5 = {
       id: normalizeString(error['id'], run5(error['type'])),
       name: normalizeString(error['name'], error['type']),
-      visible: error['visible'] !== ![],
-      locked: error['locked'] === !![],
+      visible: error['visible'] !== false,
+      locked: error['locked'] === true,
       transform: normalizeTransform(error['transform']),
     },
     optionalString2 = normalizeOptionalString(error['parentId']);
@@ -362,8 +362,8 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
       type: 'prop',
       assetId: normalizeString(error['assetId'], 'missing-asset'),
       ...(normalizeOptionalString(error['tint']) ? { tint: normalizeOptionalString(error['tint']) } : {}),
-      castShadow: error['castShadow'] !== ![],
-      receiveShadow: error['receiveShadow'] !== ![],
+      castShadow: error['castShadow'] !== false,
+      receiveShadow: error['receiveShadow'] !== false,
     };
   if (error['type'] === 'character') {
     const args6 = Array['isArray'](error['attachmentIds'])
@@ -384,7 +384,7 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
       ...(Number['isFinite'](Number(error['actionTime']))
         ? { actionTime: Math['max'](0, Number(error['actionTime'])) }
         : {}),
-      actionPlaying: error['actionPlaying'] === !![],
+      actionPlaying: error['actionPlaying'] === true,
       ...(normalizeOptionalString(error['leftHandPoseId'])
         ? { leftHandPoseId: normalizeOptionalString(error['leftHandPoseId']) }
         : {}),
@@ -416,7 +416,7 @@ function normalizeSceneObject(error, { idFactory: idFactory5 } = {}) {
       ...(Number['isFinite'](Number(error['angle']))
         ? { angle: Math['max'](0, Number(error['angle'])) }
         : {}),
-      castShadow: error['castShadow'] === !![],
+      castShadow: error['castShadow'] === true,
     };
   if (error['type'] === 'camera')
     return {
@@ -510,7 +510,7 @@ function normalizeBackground(args7) {
       cameraHeight: toPositiveNumber(args7?.['cameraHeight'], 1.6, 0.2),
       imageScale: toPositiveNumber(args7?.['imageScale'], 1, 0.01),
       imageOffset: normalizeVector2(args7?.['imageOffset'], [0, 0]),
-      lockedCamera: args7?.['lockedCamera'] === !![],
+      lockedCamera: args7?.['lockedCamera'] === true,
       ...(args7?.['lockedCameraSnapshot']
         ? { lockedCameraSnapshot: normalizeCameraState(args7['lockedCameraSnapshot']) }
         : {}),
@@ -596,9 +596,9 @@ function normalizeScene(value47, value48, { now: now3, idFactory: idFactory7 } =
       : 'empty',
     value69 = {
       ...createDefaultStoryboard3DEnvironment(value68),
-      showGrid: value47?.['environment']?.['showGrid'] !== ![],
-      showOutline: value47?.['environment']?.['showOutline'] !== ![],
-      enableShadows: value47?.['environment']?.['enableShadows'] !== ![],
+      showGrid: value47?.['environment']?.['showGrid'] !== false,
+      showOutline: value47?.['environment']?.['showOutline'] !== false,
+      enableShadows: value47?.['environment']?.['enableShadows'] !== false,
       groundSize: toPositiveNumber(value47?.['environment']?.['groundSize'], 100, 1),
     },
     optionalString7 = normalizeOptionalString(value47?.['environment']?.['backgroundColor']);

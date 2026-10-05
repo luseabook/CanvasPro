@@ -24,8 +24,8 @@ export function createViewportPreviewCoordinator({
     );
   }
   function update(key, enabled2) {
-    if (key !== value || !enabled2) return ![];
-    return ((cloneViewport2 = cloneViewport(enabled2)), updatePreview?.(cloneViewport2), !![]);
+    if (key !== value || !enabled2) return false;
+    return ((cloneViewport2 = cloneViewport(enabled2)), updatePreview?.(cloneViewport2), true);
   }
   function commit(index) {
     if (index !== value) return null;

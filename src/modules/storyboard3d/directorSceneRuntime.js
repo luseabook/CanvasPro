@@ -7,14 +7,14 @@ export class DirectorSceneRuntime {
       (this['materials'] = new Map()),
       (this['token'] = 0),
       (this['assetId'] = ''),
-      (this['pending'] = ![]),
+      (this['pending'] = false),
       (this['error'] = null));
   }
   ['roots'](map = new Set()) {
     return (this['runtime']['adapted']?.['scene']['objects'] || [])
       ['filter'](
         (item) =>
-          item['visible'] !== ![] &&
+          item['visible'] !== false &&
           !map['has'](item['id']) &&
           ['prop', 'character']['includes'](item['type']),
       )
@@ -47,7 +47,7 @@ export class DirectorSceneRuntime {
         enabled['_ground']['material']['clone'](),
       )),
       (this['ground']['rotation']['x'] = -Math['PI'] / 2),
-      (this['ground']['receiveShadow'] = !![]),
+      (this['ground']['receiveShadow'] = true),
       enabled['scene']['add'](this['ground']));
     if (this['ground']) {
       const enabled2 =
@@ -96,7 +96,7 @@ export class DirectorSceneRuntime {
       (this['labels']['className'] = 'storyboard-3d-director-labels'),
       options['parentElement']['append'](this['labels']));
     const list = this['runtime']['adapted']['scene']['objects']['filter'](
-      (target) => target['visible'] !== ![] && target['type'] !== 'group',
+      (target) => target['visible'] !== false && target['type'] !== 'group',
     );
     this['labels']['replaceChildren'](
       ...list['map']((error) => {
@@ -179,7 +179,7 @@ export class DirectorSceneRuntime {
                   : list3['color'],
               );
             if ('map' in list2) list2['map'] = config === 'clay' ? null : list3['map'];
-            list2['needsUpdate'] = !![];
+            list2['needsUpdate'] = true;
           }));
       });
     for (const [value2, value3] of this['materials'])
@@ -201,10 +201,10 @@ export class DirectorSceneRuntime {
     ((this['assetId'] = enabled6), (this['error'] = null));
     const value7 = ++this['token'];
     if (!enabled6) {
-      this['pending'] = ![];
+      this['pending'] = false;
       return;
     }
-    ((this['pending'] = !![]),
+    ((this['pending'] = true),
       (this['repository'] ||= createStoryboard3DBinaryAssetRepository()),
       this['repository']
         ['get'](enabled6)
@@ -221,13 +221,13 @@ export class DirectorSceneRuntime {
               !this['sphere'] &&
                 ((this['sphere'] = new threeRuntime['Mesh'](
                   new threeRuntime['SphereGeometry'](1, 64, 32),
-                  new threeRuntime['MeshBasicMaterial']({ side: threeRuntime['BackSide'], depthWrite: ![] }),
+                  new threeRuntime['MeshBasicMaterial']({ side: threeRuntime['BackSide'], depthWrite: false }),
                 )),
                 (this['sphere']['renderOrder'] = -100),
                 this['runtime']['bridge']['scene']['add'](this['sphere'])),
               this['sphere']['material']['map']?.['dispose'](),
               (this['sphere']['material']['map'] = value9),
-              (this['sphere']['material']['needsUpdate'] = !![]),
+              (this['sphere']['material']['needsUpdate'] = true),
               this['syncPanorama'](this['settings']['panorama']),
               this['runtime']['renderNow']());
           } finally {
@@ -239,7 +239,7 @@ export class DirectorSceneRuntime {
         })
         ['finally'](() => {
           value7 === this['token'] &&
-            ((this['pending'] = ![]), this['runtime']['_notifyVisualChange']('panorama'));
+            ((this['pending'] = false), this['runtime']['_notifyVisualChange']('panorama'));
         }));
   }
   ['surfaceHeight'](value11, value12, value13 = []) {
@@ -250,8 +250,8 @@ export class DirectorSceneRuntime {
       list4 = this['roots'](new Set(value13)),
       value15 = list4['flatMap'](({ root: root3, instanceId: instanceId }) => {
         return (
-          root3['updateMatrixWorld'](!![]),
-          value14['intersectObject'](root3, !![])['filter'](
+          root3['updateMatrixWorld'](true),
+          value14['intersectObject'](root3, true)['filter'](
             (value16) =>
               value16['object']['isMesh'] &&
               value16['object']['visible'] &&
@@ -263,7 +263,7 @@ export class DirectorSceneRuntime {
   }
   ['obstacles'](list5 = []) {
     return this['roots'](new Set(list5))['map'](({ id: id2, root: root4, instanceId: instanceId2 }) => {
-      root4['updateMatrixWorld'](!![]);
+      root4['updateMatrixWorld'](true);
       let min;
       if (instanceId2 != null) {
         root4['geometry']['computeBoundingBox']();
@@ -276,7 +276,7 @@ export class DirectorSceneRuntime {
     });
   }
   ['dispose']() {
-    (clearTimeout(this['materialTimer']), this['syncLabels'](![]), this['token']++, (this['pending'] = ![]));
+    (clearTimeout(this['materialTimer']), this['syncLabels'](false), this['token']++, (this['pending'] = false));
     for (const [value20, value21] of this['materials']) {
       ((value20['material'] = value21['original']),
         value21['clones']['forEach']((value22) => value22['dispose']()));

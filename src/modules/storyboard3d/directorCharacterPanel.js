@@ -91,14 +91,14 @@ export class DirectorCharacterPanel {
       '<button data-storyboard-3d-action="timeline-character-crowd">创建群众阵列</button></div></fieldset>'
     );
   }
-  ['mutate'](config, handler, { requireUnlocked: requireUnlocked = !![] } = {}) {
+  ['mutate'](config, handler, { requireUnlocked: requireUnlocked = true } = {}) {
     const { scene: scene, object: object2 } = this['panel']['context']();
     if (object2?.['type'] !== 'character') return;
     if (requireUnlocked && object2['locked']) {
       this['panel']['timeline']['setMessage']?.('请先解锁角色。');
       return;
     }
-    this['panel']['timeline']['stopPlayback']({ render: ![] });
+    this['panel']['timeline']['stopPlayback']({ render: false });
     try {
       this['panel']['timeline']['commitMutation']({
         type: 'director-character',
@@ -116,17 +116,17 @@ export class DirectorCharacterPanel {
   }
   ['change'](event) {
     const el = event['target'];
-    if (el['matches']?.('[data-director-pose-name]')) return ((this['poseName'] = el['value']), !![]);
-    if (el['matches']?.('[data-director-pose-id]')) return ((this['poseId'] = el['value']), !![]);
+    if (el['matches']?.('[data-director-pose-name]')) return ((this['poseName'] = el['value']), true);
+    if (el['matches']?.('[data-director-pose-id]')) return ((this['poseId'] = el['value']), true);
     if (el['matches']?.('[data-director-crowd]'))
-      return ((this['crowd'][el['dataset']['directorCrowd']] = Number(el['value'])), !![]);
+      return ((this['crowd'][el['dataset']['directorCrowd']] = Number(el['value'])), true);
     if (el['matches']?.('[data-director-character]'))
       return (
         this['mutate']('调整角色造型', (value5, value6, value7) => {
           value7[el['dataset']['directorCharacter']] =
             el['type'] === 'number' ? Number(el['value']) : el['value'];
         }),
-        !![]
+        true
       );
     if (el['matches']?.('[data-director-pose-channel]'))
       return (
@@ -140,12 +140,12 @@ export class DirectorCharacterPanel {
             ),
           ),
         ),
-        !![]
+        true
       );
-    return ![];
+    return false;
   }
   ['click'](enabled) {
-    if (!enabled['startsWith']('timeline-character-')) return ![];
+    if (!enabled['startsWith']('timeline-character-')) return false;
     return (
       this['mutate'](
         '角色姿势与群众编排',
@@ -179,7 +179,7 @@ export class DirectorCharacterPanel {
             const enabled2 = value11['poseLibrary']?.['find']((value16) => value16['id'] === this['poseId']);
             if (!enabled2) return;
             const { id: id, name: name, ...args } = enabled2;
-            Object['assign'](value13, structuredClone(args), { actionPlaying: ![] });
+            Object['assign'](value13, structuredClone(args), { actionPlaying: false });
           }
           if (enabled === 'timeline-character-crowd')
             value12['objects'] = createDirectorCrowd(value12, value13, this['crowd'])['objects'];
@@ -190,7 +190,7 @@ export class DirectorCharacterPanel {
         },
       ),
       this['panel']['timeline']['requestRender']?.(),
-      !![]
+      true
     );
   }
 }

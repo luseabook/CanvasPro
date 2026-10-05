@@ -78,7 +78,7 @@ export function resolveImageNodeOriginalUrl(options4 = {}) {
     ])
   );
 }
-export function resolveImageNodeUrl(options5 = {}, { preferPreview: preferPreview = ![] } = {}) {
+export function resolveImageNodeUrl(options5 = {}, { preferPreview: preferPreview = false } = {}) {
   const imageNodeDisplayUrl = resolveImageNodeDisplayUrl(options5),
     imageNodeOriginalUrl = resolveImageNodeOriginalUrl(options5);
   return preferPreview

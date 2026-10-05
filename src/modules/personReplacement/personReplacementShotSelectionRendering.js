@@ -8,7 +8,7 @@ const VIDEO_REFERENCE_LIST_SELECTOR = '[data-person-replacement-video-reference-
   RESULT_HISTORY_TOGGLE_SELECTOR = ':scope > [data-person-replacement-result-history-toggle]',
   imageSourceReconcileTokens = new WeakMap();
 function syncElementAttributes(el, enabled, { preserveAttributeNames: preserveAttributeNames = [] } = {}) {
-  if (!el || !enabled) return ![];
+  if (!el || !enabled) return false;
   const map = new Set(preserveAttributeNames),
     map2 = new Set(Array['from'](enabled['attributes'] || [], (error) => error['name']));
   return (
@@ -20,13 +20,13 @@ function syncElementAttributes(el, enabled, { preserveAttributeNames: preserveAt
         el['getAttribute']?.(el2['name']) !== el2['value'] &&
         el['setAttribute']?.(el2['name'], el2['value']);
     }),
-    !![]
+    true
   );
 }
 function hasEquivalentNodeShape(enabled2, enabled3, value = '') {
-  if (!enabled2 || !enabled3 || enabled2['nodeType'] !== enabled3['nodeType']) return ![];
-  if (enabled2['nodeType'] === 1 && enabled2['tagName'] !== enabled3['tagName']) return ![];
-  if (value && enabled2['matches']?.(value) && enabled3['matches']?.(value)) return !![];
+  if (!enabled2 || !enabled3 || enabled2['nodeType'] !== enabled3['nodeType']) return false;
+  if (enabled2['nodeType'] === 1 && enabled2['tagName'] !== enabled3['tagName']) return false;
+  if (value && enabled2['matches']?.(value) && enabled3['matches']?.(value)) return true;
   const list = Array['from'](enabled2['childNodes'] || []),
     list2 = Array['from'](enabled3['childNodes'] || []);
   return (
@@ -58,7 +58,7 @@ function reconcileImageNode(el3, el4) {
   (imageSourceReconcileTokens['set'](el3, symbol),
     syncElementAttributes(el3, el4, { preserveAttributeNames: ['src'] }));
   const run = (data) => {
-    if (imageSourceReconcileTokens['get'](el3) !== symbol || el3['isConnected'] === ![]) return;
+    if (imageSourceReconcileTokens['get'](el3) !== symbol || el3['isConnected'] === false) return;
     (syncElementAttributes(el3, el4),
       data &&
         el3['classList']?.['contains']?.('ref-thumb-media') &&
@@ -66,15 +66,15 @@ function reconcileImageNode(el3, el4) {
       imageSourceReconcileTokens['delete'](el3));
   };
   if (!enabled4) {
-    run(![]);
+    run(false);
     return;
   }
-  ensureThumbDecoded(enabled4)['then'](run, () => run(![]));
+  ensureThumbDecoded(enabled4)['then'](run, () => run(false));
 }
 function syncEquivalentNodeTree(
   options,
   target,
-  { preserveImageNodes: preserveImageNodes = ![], preserveSelector: preserveSelector = '' } = {},
+  { preserveImageNodes: preserveImageNodes = false, preserveSelector: preserveSelector = '' } = {},
 ) {
   if (preserveSelector && options['matches']?.(preserveSelector) && target['matches']?.(preserveSelector))
     return;
@@ -107,12 +107,12 @@ export function reconcileElementTree(
   enabled5,
   enabled6,
   {
-    preserveImageNodes: preserveImageNodes = ![],
+    preserveImageNodes: preserveImageNodes = false,
     preserveSelector: preserveSelector = '',
-    preserveChildNodes: preserveChildNodes = ![],
+    preserveChildNodes: preserveChildNodes = false,
   } = {},
 ) {
-  if (!enabled5 || !enabled6) return ![];
+  if (!enabled5 || !enabled6) return false;
   if (preserveChildNodes)
     return reconcilePersonReplacementStableDom(enabled5, enabled6, {
       preserveSelector: preserveSelector,
@@ -125,12 +125,12 @@ export function reconcileElementTree(
         preserveImageNodes: preserveImageNodes,
         preserveSelector: preserveSelector,
       }),
-      !![]
+      true
     );
   return (
     syncElementAttributes(enabled5, enabled6),
     enabled5['replaceChildren']?.(...Array['from'](enabled6['childNodes'] || [])),
-    !![]
+    true
   );
 }
 function getShotTimelineCardRoot(entry) {
@@ -149,9 +149,9 @@ function reconcileShotTimelineCardPair(enabled7, enabled8) {
     list4['forEach']((config, scope) => {
       const enabled9 = state[scope];
       if (!enabled9) return;
-      (reconcileElementTree(config, enabled9, { preserveImageNodes: !![] }), enabled9['replaceWith'](config));
+      (reconcileElementTree(config, enabled9, { preserveImageNodes: true }), enabled9['replaceWith'](config));
     }),
-    reconcileElementTree(enabled7, enabled8, { preserveImageNodes: !![] }),
+    reconcileElementTree(enabled7, enabled8, { preserveImageNodes: true }),
     enabled8['replaceWith'](enabled7),
     payload && handle && (reconcileElementTree(payload, handle), handle['replaceWith'](payload)),
     { currentRoot: currentRoot, nextRoot: nextRoot === enabled8 ? enabled7 : nextRoot }
@@ -163,35 +163,35 @@ export function reconcilePersonReplacementShotTimelineCard({
   shotId: shotId = '',
 } = {}) {
   const enabled10 = String(shotId ?? '')['trim']();
-  if (!enabled10) return ![];
+  if (!enabled10) return false;
   const run2 = (el5) =>
       Array['from'](el5?.['querySelectorAll']?.('[data-person-replacement-shot-card="true"]') || [])[
         'find'
       ]((el6) => String(el6['dataset']?.['shotId'] ?? '')['trim']() === enabled10),
     enabled11 = run2(currentScroller),
     enabled12 = run2(nextScroller);
-  if (!enabled11 || !enabled12) return ![];
+  if (!enabled11 || !enabled12) return false;
   const shotTimelineCardRoot = getShotTimelineCardRoot(enabled11),
     el7 = shotTimelineCardRoot?.['parentElement'],
     input = shotTimelineCardRoot?.['nextSibling'] || null;
-  if (!el7 || typeof el7['insertBefore'] !== 'function') return ![];
+  if (!el7 || typeof el7['insertBefore'] !== 'function') return false;
   const reconcileShotTimelineCardPair2 = reconcileShotTimelineCardPair(enabled11, enabled12);
-  if (!reconcileShotTimelineCardPair2?.['nextRoot']) return ![];
+  if (!reconcileShotTimelineCardPair2?.['nextRoot']) return false;
   return (
     reconcileShotTimelineCardPair2['currentRoot']?.['parentElement'] === el7
       ? reconcileShotTimelineCardPair2['currentRoot']['replaceWith'](
           reconcileShotTimelineCardPair2['nextRoot'],
         )
       : el7['insertBefore'](reconcileShotTimelineCardPair2['nextRoot'], input),
-    !![]
+    true
   );
 }
 export function reconcilePersonReplacementShotCardList({
   currentList: currentList,
   nextList: nextList,
 } = {}) {
-  if (!currentList || !nextList) return ![];
-  return reconcileElementTree(currentList, nextList, { preserveChildNodes: !![] });
+  if (!currentList || !nextList) return false;
+  return reconcileElementTree(currentList, nextList, { preserveChildNodes: true });
 }
 function getDirectShotPreview(el8) {
   return (
@@ -225,10 +225,10 @@ function prepareVideoReferenceCardPairs(output, value2) {
     ['filter'](({ nextCard: nextCard2 }) => nextCard2);
 }
 function reconcileVideoElementTree(value4, value5) {
-  return reconcileElementTree(value4, value5, { preserveImageNodes: !![] });
+  return reconcileElementTree(value4, value5, { preserveImageNodes: true });
 }
 function reconcileVideoReferenceRail(el11, enabled14) {
-  if (!el11 || !enabled14) return ![];
+  if (!el11 || !enabled14) return false;
   const captureWorkspaceScrollPosition2 = captureWorkspaceScrollPosition(
       el11['querySelector']?.(VIDEO_REFERENCE_LIST_SELECTOR),
     ),
@@ -253,7 +253,7 @@ export function reconcilePersonReplacementReferenceInputs({
   currentInputs: currentInputs,
   nextInputs: nextInputs,
 } = {}) {
-  if (!currentInputs || !nextInputs) return ![];
+  if (!currentInputs || !nextInputs) return false;
   const map4 = new Map(
     Array['from'](nextInputs['querySelectorAll']?.('[data-slot]') || [])['map']((el12) => [
       String(el12['dataset']?.['slot'] || ''),
@@ -269,7 +269,7 @@ export function reconcilePersonReplacementReferenceInputs({
     }),
     reconcileVideoElementTree(currentInputs, nextInputs),
     nextInputs['replaceWith'](currentInputs),
-    !![]
+    true
   );
 }
 export function reconcilePersonReplacementVideoControlContinuity({
@@ -288,19 +288,19 @@ export function reconcilePersonReplacementVideoControlContinuity({
     !currentPromptEditor ||
     !nextPromptEditor
   )
-    return ![];
-  if (!reconcileVideoReferenceRail(currentReferenceRail, nextReferenceRail)) return ![];
+    return false;
+  if (!reconcileVideoReferenceRail(currentReferenceRail, nextReferenceRail)) return false;
   if (
     !reconcilePersonReplacementReferenceInputs({
       currentInputs: currentReferenceInputs,
       nextInputs: nextReferenceInputs,
     })
   )
-    return ![];
+    return false;
   return (
     syncElementAttributes(currentPromptEditor, nextPromptEditor),
     nextPromptEditor['replaceWith'](currentPromptEditor),
-    !![]
+    true
   );
 }
 function collectVideoShotSelectionElements(currentReferenceRail2, nextReferenceRail2) {
@@ -354,18 +354,18 @@ export function reconcilePersonReplacementVideoShotSelection({
   nextPage: nextPage,
 } = {}) {
   const currentInputs2 = collectVideoShotSelectionElements(currentPage, nextPage);
-  if (Object['values'](currentInputs2)['some']((enabled16) => !enabled16)) return ![];
+  if (Object['values'](currentInputs2)['some']((enabled16) => !enabled16)) return false;
   if (
     !reconcileVideoReferenceRail(currentInputs2['currentReferenceRail'], currentInputs2['nextReferenceRail'])
   )
-    return ![];
+    return false;
   if (
     !reconcilePersonReplacementReferenceInputs({
       currentInputs: currentInputs2['currentReferenceInputs'],
       nextInputs: currentInputs2['nextReferenceInputs'],
     })
   )
-    return ![];
+    return false;
   return (
     reconcileVideoElementTree(currentInputs2['currentPreview'], currentInputs2['nextPreview']),
     currentInputs2['nextPreview']['replaceWith'](currentInputs2['currentPreview']),
@@ -382,7 +382,7 @@ export function reconcilePersonReplacementVideoShotSelection({
       currentInputs2['nextGenerationPanel'],
     ),
     reconcileVideoElementTree(currentInputs2['currentFooter'], currentInputs2['nextFooter']),
-    !![]
+    true
   );
 }
 function getTargetCharacterCards(el14) {
@@ -412,7 +412,7 @@ function reconcileTargetCardPair({
   nextMedia: nextMedia,
 }) {
   (syncElementAttributes(currentCard4, nextCard5),
-    reconcileElementTree(currentMedia, nextMedia, { preserveImageNodes: !![] }));
+    reconcileElementTree(currentMedia, nextMedia, { preserveImageNodes: true }));
 }
 function reconcileGenerationCopy(value8) {
   const {
@@ -437,18 +437,18 @@ function reconcileGenerationCopy(value8) {
       currentInputs: currentPromptReferenceInputs,
       nextInputs: nextPromptReferenceInputs,
     }),
-    reconcileElementTree(currentPromptHeading, nextPromptHeading, { preserveImageNodes: !![] }),
-    reconcileElementTree(currentPromptEditor2, nextPromptEditor2, { preserveImageNodes: !![] }),
+    reconcileElementTree(currentPromptHeading, nextPromptHeading, { preserveImageNodes: true }),
+    reconcileElementTree(currentPromptEditor2, nextPromptEditor2, { preserveImageNodes: true }),
     syncElementAttributes(currentFooter, nextFooter),
     currentGenerateButton['replaceWith']?.(nextGenerateButton),
     Array['from'](currentCopy['children'] || [])
       ['filter']((value9) => value9 !== currentPromptField && value9 !== currentFooter)
       ['forEach']((el16) => el16['remove']?.()));
-  let value10 = ![];
+  let value10 = false;
   Array['from'](nextCopy['children'] || [])['forEach']((value11) => {
     if (value11 === nextPromptField) return;
     if (value11 === nextFooter) {
-      value10 = !![];
+      value10 = true;
       return;
     }
     if (value10) currentCopy['append']?.(value11);
@@ -527,12 +527,12 @@ export function reconcilePersonReplacementImageShotSelection({
     list6['some']((enabled17) => !enabled17) ||
     list5['some']((value12) => Object['values'](value12)['some']((enabled18) => !enabled18))
   )
-    return ![];
+    return false;
   return (
     reconcileElementTree(
       imageShotSelectionElements['currentPreview'],
       imageShotSelectionElements['nextPreview'],
-      { preserveImageNodes: !![] },
+      { preserveImageNodes: true },
     ),
     list5['forEach'](reconcileTargetCardPair),
     imageShotSelectionElements['currentResultPreview']
@@ -542,10 +542,10 @@ export function reconcilePersonReplacementImageShotSelection({
       imageShotSelectionElements['currentResultPreview'],
       imageShotSelectionElements['nextResultPreview'],
       {
-        preserveImageNodes: !![],
+        preserveImageNodes: true,
       },
     ),
     reconcileGenerationCopy(imageShotSelectionElements),
-    !![]
+    true
   );
 }

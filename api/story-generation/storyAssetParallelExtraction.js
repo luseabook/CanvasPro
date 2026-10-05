@@ -48,9 +48,9 @@ function isStoryAssetConfirmedUnchargedRejection(response) {
   return [400, 401, 403, 404, 409, 422, 429]['includes'](item);
 }
 function isStoryAssetPaidRerunAuthorized(enabled2, key) {
-  if (!enabled2 || typeof enabled2 !== 'object') return ![];
+  if (!enabled2 || typeof enabled2 !== 'object') return false;
   const list2 = Array['isArray'](enabled2['authorizedKinds']) ? enabled2['authorizedKinds'] : [];
-  return enabled2['confirmed'] === !![] && list2['includes'](key);
+  return enabled2['confirmed'] === true && list2['includes'](key);
 }
 function archiveStoryAssetPaidLane(responseMode2, index, reason) {
   const result =
@@ -124,7 +124,7 @@ export function createParallelStoryAssetExtractor({
     aspectRatio: aspectRatio = '',
     visualStyle: visualStyle = '',
     requiredAssetNamesByKind: requiredAssetNamesByKind = null,
-    compactOutput: compactOutput = ![],
+    compactOutput: compactOutput = false,
     compactOutputByKind: compactOutputByKind = null,
   } = {}) {
     const title = normalizeStoryProjectInput(project);
@@ -222,11 +222,11 @@ export function createParallelStoryAssetExtractor({
     resumeRequiredAssetNamesByKindAliases: resumeRequiredAssetNamesByKindAliases = [],
     resumeSourceAliases: resumeSourceAliases = [],
     resumeSourceFingerprintAliases: resumeSourceFingerprintAliases = [],
-    allowSavedPaidResultContractRevalidation: allowSavedPaidResultContractRevalidation = ![],
-    allowOversizedPrompt: allowOversizedPrompt = !![],
-    automaticRecovery: automaticRecovery = ![],
+    allowSavedPaidResultContractRevalidation: allowSavedPaidResultContractRevalidation = false,
+    allowOversizedPrompt: allowOversizedPrompt = true,
+    automaticRecovery: automaticRecovery = false,
     structuredOutputFallback: structuredOutputFallback = 'prompt',
-    compactOutput: compactOutput = ![],
+    compactOutput: compactOutput = false,
     compactOutputByKind: compactOutputByKind = null,
     maxOutputTokens: maxOutputTokens = STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
     request: request = generateText,
@@ -469,7 +469,7 @@ export function createParallelStoryAssetExtractor({
           current2['assetsByKind'][kind4]['length'],
         ),
         isStoryAssetPaidRerunAuthorized2 = isStoryAssetPaidRerunAuthorized(paidRerunAuthorization, kind4);
-      let enabled7 = ![];
+      let enabled7 = false;
       const enabled8 = Boolean(enabled6 && response2?.['status'] === 'blocked-quality-rerun'),
         value15 = Boolean(
           enabled6 &&
@@ -502,7 +502,7 @@ export function createParallelStoryAssetExtractor({
           errorMessage: '',
           finishedAt: 0,
         }),
-        (enabled7 = !![]));
+        (enabled7 = true));
       if ((enabled5 || value10) && value15 && !isStoryAssetPaidRerunAuthorized2) {
         current2['kindStates'][kind4] = {
           ...response2,
@@ -549,7 +549,7 @@ export function createParallelStoryAssetExtractor({
           errorMessage: '',
           finishedAt: 0,
         }),
-        (enabled7 = !![]));
+        (enabled7 = true));
       const value16 = normalizeText(current2['submissionStatesByKind'][kind4]?.['status']),
         value17 = normalizeText(response2?.['errorType']),
         value18 =
@@ -895,7 +895,7 @@ export function createParallelStoryAssetExtractor({
                   ));
                 const request2 = await request(value37),
                   enabled10 = run5(request2);
-                ((current2['paidResponseReceivedByKind'][value35] = !![]),
+                ((current2['paidResponseReceivedByKind'][value35] = true),
                   (current2['rawResponsesByKind'][value35] = enabled10),
                   (current2['rawResponseModesByKind'][value35] = compactOutput2 ? 'compact' : 'verbose'),
                   (current2['rawResponseContractSnapshotsByKind'][value35] =

@@ -38,8 +38,8 @@ export function openVolcengineSpeechApiKeySettings() {
     openSettingsPanelToField({
       paneName: 'api-input',
       fieldIds: ['providerKey-volcengine-speech'],
-      select: !![],
-      highlight: !![],
+      select: true,
+      highlight: true,
     }));
 }
 function createGuideNote(target) {

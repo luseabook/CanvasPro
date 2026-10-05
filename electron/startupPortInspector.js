@@ -43,13 +43,13 @@ export function collectListeningPortPids(
       command = resolveWindowsSystemToolPath('netstat', { env: env });
       const netstatOutput = execFileSyncFn(command, ['-ano', '-p', 'tcp'], {
         encoding: 'utf8',
-        windowsHide: !![],
+        windowsHide: true,
       });
       return parseWindowsNetstatPids(netstatOutput, port, processId);
     }
     const lsofOutput = execFileSyncFn(command, ['-nP', '-iTCP:' + port, '-sTCP:LISTEN', '-t'], {
       encoding: 'utf8',
-      windowsHide: !![],
+      windowsHide: true,
     });
     return String(lsofOutput || '')
       ['split'](/\r?\n/)
@@ -67,26 +67,26 @@ export function probeTcpPortAvailable({
 } = {}) {
   return new Promise((resolve, reject) => {
     const server = createServerFn();
-    let settled = ![];
+    let settled = false;
     const settle = (callback, value) => {
       if (settled) return;
-      ((settled = !![]), callback(value));
+      ((settled = true), callback(value));
     };
     server['once']('error', (error) => {
       if (error?.['code'] === 'EADDRINUSE') {
-        settle(resolve, ![]);
+        settle(resolve, false);
         return;
       }
       settle(reject, error);
     });
     try {
-      (server['listen']({ host: host, port: port, exclusive: !![] }, () => {
+      (server['listen']({ host: host, port: port, exclusive: true }, () => {
         server['close']((closeError) => {
           if (closeError) {
             settle(reject, closeError);
             return;
           }
-          settle(resolve, !![]);
+          settle(resolve, true);
         });
       }),
         server['unref']?.());

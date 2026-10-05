@@ -5,8 +5,8 @@ function getOwnValue(item, key) {
   const index = String(key || '')['trim'](),
     value2 = getPlainObject(item);
   return index && Object['prototype']['hasOwnProperty']['call'](value2, index)
-    ? { exists: !![], value: value2[index] }
-    : { exists: ![], value: undefined };
+    ? { exists: true, value: value2[index] }
+    : { exists: false, value: undefined };
 }
 export function normalizeRandomSeedMode(result, data = 'fixed') {
   const options = String(result ?? data)
@@ -16,13 +16,13 @@ export function normalizeRandomSeedMode(result, data = 'fixed') {
 }
 function resolveRandomSeedMode({
   seedValue: seedValue,
-  hasSeedValue: hasSeedValue = ![],
+  hasSeedValue: hasSeedValue = false,
   modeValue: modeValue,
-  hasModeValue: hasModeValue = ![],
+  hasModeValue: hasModeValue = false,
   modeField: modeField = '',
   defaultMode: defaultMode = 'fixed',
 } = {}) {
-  if (!String(modeField || '')['trim']()) return { mode: 'fixed', hasLegacyNumericSeed: ![] };
+  if (!String(modeField || '')['trim']()) return { mode: 'fixed', hasLegacyNumericSeed: false };
   const target = String(seedValue ?? '')['trim'](),
     hasLegacyNumericSeed =
       !hasModeValue && hasSeedValue && target !== '' && Number['isFinite'](Number(target));

@@ -13,7 +13,7 @@ const SKILL_TERM_PATTERN = '(?:skills?|技能)',
 export function isAgentSkillAuthoringIntent(value = '') {
   const enabled = String(value || '')['trim']();
   if (!enabled || NEGATED_AUTHORING_PATTERN['test'](enabled) || AUTHORING_QUESTION_PATTERN['test'](enabled))
-    return ![];
+    return false;
   return AUTHORING_PATTERNS['some']((item) => item['test'](enabled));
 }
 export function isAgentSkillAuthoringCancelMessage(key = '') {
@@ -23,7 +23,7 @@ export function isAgentSkillAuthoringCancelMessage(key = '') {
 }
 function failed(index, result) {
   return {
-    ok: ![],
+    ok: false,
     status: 'failed',
     errorCode: String(index || 'SKILL_AUTHORING_INVALID'),
     message: String(result || 'Skill draft is invalid.'),
@@ -38,7 +38,7 @@ export function normalizeAgentSkillAuthoringResult(error = {}) {
     if (!question)
       return failed('SKILL_AUTHORING_QUESTION_MISSING', 'Skill clarification question is missing.');
     return {
-      ok: !![],
+      ok: true,
       status: status,
       reply: String(error['reply'] || question)['trim'](),
       question: question,
@@ -60,7 +60,7 @@ export function normalizeAgentSkillAuthoringResult(error = {}) {
     instructions: instructions,
   } = error2['definition'];
   return {
-    ok: !![],
+    ok: true,
     status: 'ready',
     reply: String(error['reply'] || '')['trim'](),
     definition: {

@@ -44,14 +44,14 @@ function getWorkspaceProjectCreatedAt(options = {}) {
 }
 export function getWorkspaceProjectHomeEntries(
   list = [],
-  { query: query = '', sortOrder: sortOrder = 'updated-desc', showArchived: showArchived = ![] } = {},
+  { query: query = '', sortOrder: sortOrder = 'updated-desc', showArchived: showArchived = false } = {},
 ) {
   const text2 = normalizeText(query)['toLocaleLowerCase']('zh-CN'),
     workspaceProjectSortOrder = normalizeWorkspaceProjectSortOrder(sortOrder);
   return (Array['isArray'](list) ? list : [])
     ['filter']((index) => Boolean(Number(index?.['archivedAt'] || 0)) === Boolean(showArchived))
     ['filter']((result) => {
-      if (!text2) return !![];
+      if (!text2) return true;
       const list2 = normalizeText(result?.['title'] || result?.['data']?.['project']?.['title'])[
         'toLocaleLowerCase'
       ]('zh-CN');
@@ -86,13 +86,13 @@ export function refreshWorkspaceProjectResultsInPlace({
   renderResults: renderResults,
 } = {}) {
   const el = root?.['querySelector']?.('.story-projects-section');
-  if (!el || !documentObject?.['createElement'] || typeof renderResults !== 'function') return ![];
+  if (!el || !documentObject?.['createElement'] || typeof renderResults !== 'function') return false;
   const el2 = documentObject['createElement']('template');
   el2['innerHTML'] = String(renderResults() || '')['trim']();
   const enabled = el['querySelector']?.('.story-project-grid, .story-project-empty'),
     enabled2 = el2['content']?.['firstElementChild'];
-  if (!enabled || !enabled2?.['matches']?.('.story-project-grid, .story-project-empty')) return ![];
-  return (enabled['replaceWith'](enabled2), !![]);
+  if (!enabled || !enabled2?.['matches']?.('.story-project-grid, .story-project-empty')) return false;
+  return (enabled['replaceWith'](enabled2), true);
 }
 export function renderWorkspaceProjectSortControl(source = 'updated-desc') {
   const workspaceProjectSortOrder2 = normalizeWorkspaceProjectSortOrder(source),
@@ -163,8 +163,8 @@ function renderWorkspaceProjectCover(
 export function renderWorkspaceProjectCard(
   state,
   {
-    isDeleteConfirming: isDeleteConfirming = ![],
-    isMenuOpen: isMenuOpen = ![],
+    isDeleteConfirming: isDeleteConfirming = false,
+    isMenuOpen: isMenuOpen = false,
     fallbackTitle: fallbackTitle = '未命名项目',
     itemCount: itemCount = 0,
     itemLabel: itemLabel = '项',

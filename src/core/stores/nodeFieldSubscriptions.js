@@ -7,7 +7,7 @@ export function createNodeFieldSubscriptions(handler) {
       if (map2['values']['get'](value) === index) continue;
       if (index === undefined) map2['values']['delete'](value);
       else map2['values']['set'](value, index);
-      map2['dirty'] = !![];
+      map2['dirty'] = true;
     }
   }
   function reload() {
@@ -17,7 +17,7 @@ export function createNodeFieldSubscriptions(handler) {
           ['filter']((data) => data?.[result] !== undefined)
           ['map']((options) => [options['id'], options[result]]),
       )),
-        (map3['dirty'] = !![]));
+        (map3['dirty'] = true));
     }
   }
   return {
@@ -26,7 +26,7 @@ export function createNodeFieldSubscriptions(handler) {
     flush() {
       for (const map4 of map['values']()) {
         if (!map4['dirty']) continue;
-        map4['dirty'] = ![];
+        map4['dirty'] = false;
         const target = [...map4['values']['values']()];
         for (const run of [...map4['listeners']]) run(target);
       }
@@ -44,7 +44,7 @@ export function createNodeFieldSubscriptions(handler) {
                 ['map']((next) => [next['id'], next[enabled]]),
             ),
             listeners: new Set(),
-            dirty: ![],
+            dirty: false,
           }),
           map['set'](enabled, map5)),
         map5['listeners']['add'](handler2),

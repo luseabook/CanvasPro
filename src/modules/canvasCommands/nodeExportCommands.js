@@ -31,7 +31,7 @@ function normalizeDestinationArgs(args = {}) {
   };
 }
 function normalizeExportItems(args = {}, context = {}) {
-  const ids = normalizeNodeIds(args, context, { min: 1, allowSelection: !![] }),
+  const ids = normalizeNodeIds(args, context, { min: 1, allowSelection: true }),
     { items: items, skipped: skipped } = collectSelectedNodeExportItems({
       nodes: getState(context)['nodes'] || {},
       selectedNodeIds: ids,
@@ -60,20 +60,20 @@ export function registerNodeExportCommands(registry) {
         outputPath: { type: 'string' },
         filename: { type: 'string' },
       },
-      selectionFallback: !![],
+      selectionFallback: true,
     },
     capabilitySchema: {
       reads: ['nodes', 'selection'],
       writes: ['filesystem'],
-      selectionFallback: !![],
-      requiresSystemAccess: !![],
+      selectionFallback: true,
+      requiresSystemAccess: true,
     },
     returnSchema: { aliasFields: ['path', 'filename', 'exportedCount', 'counts'] },
     validate(args = {}, context = {}) {
       try {
         if (!getNodeExportApi(context))
           return {
-            ok: ![],
+            ok: false,
             errorCode: 'NODE_EXPORT_UNAVAILABLE',
             message: 'Node export is unavailable in this environment.',
           };
@@ -81,7 +81,7 @@ export function registerNodeExportCommands(registry) {
         return { args: { ...normalizeDestinationArgs(args), ...selection } };
       } catch (error) {
         return {
-          ok: ![],
+          ok: false,
           errorCode: error['errorCode'] || 'INVALID_NODE_EXPORT_SELECTION',
           message: error['message'],
           details: error['details'],
@@ -103,7 +103,7 @@ export function registerNodeExportCommands(registry) {
       });
       if (result?.['canceled'])
         throw createCanvasCommandError('NODE_EXPORT_CANCELED', 'Node export was canceled.');
-      if (result?.['success'] !== !![])
+      if (result?.['success'] !== true)
         throw createCanvasCommandError(
           result?.['code'] || 'NODE_EXPORT_FAILED',
           result?.['message'] || result?.['error'] || 'Node export failed.',

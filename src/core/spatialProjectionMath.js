@@ -18,7 +18,7 @@ export function intersectRayWithAxisPlane(list, key, index, result) {
   if (count < 0 || count > 10000) return null;
   return list['map']((data, options) => data + key[options] * count);
 }
-export function adjustSpatialCamera(event, target, source, next = ![]) {
+export function adjustSpatialCamera(event, target, source, next = false) {
   const event2 = structuredClone(event),
     args = event['target']['map']((current, entry) => current - event['position'][entry]),
     record = Math['max'](0.01, Math['hypot'](...args));

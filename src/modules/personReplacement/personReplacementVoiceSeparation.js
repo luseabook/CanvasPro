@@ -76,7 +76,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
 } = {}) {
   if (typeof getProject !== 'function' || typeof setProject !== 'function')
     throw new TypeError('Voice separation runtime requires project access');
-  let enabled = ![];
+  let enabled = false;
   const map = new Map(),
     handler2 = (next, current) => normalizeText(next) + ':' + normalizeText(current),
     handler3 = (entry, record) =>
@@ -103,7 +103,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
           inputRevision
       );
     },
-    handler5 = (sourceId2, args = {}, { persistIdentity: persistIdentity = ![] } = {}) => {
+    handler5 = (sourceId2, args = {}, { persistIdentity: persistIdentity = false } = {}) => {
       if (!handler4(sourceId2)) return null;
       const args2 = getProject(),
         args3 = resolvePersonReplacementVoiceSeparationState(args2, sourceId2['sourceId']),
@@ -122,7 +122,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
               personReplacementVoiceSeparationState2,
             ),
           },
-          { renderWorkspace: ![] },
+          { renderWorkspace: false },
         );
       return (
         onStateChange({
@@ -163,7 +163,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
               personReplacementVoiceSeparationState3,
             ),
           },
-          { renderWorkspace: ![] },
+          { renderWorkspace: false },
         );
       return (
         onStateChange({
@@ -182,7 +182,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
       inputRevision: inputRevision3,
       taskId: taskId = '',
       providerProfileId: providerProfileId = '',
-      resume: resume = ![],
+      resume: resume = false,
       runtime: runtime,
     }) => {
       const config = {
@@ -196,7 +196,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
             ? await resumeSeparation(
                 taskId,
                 { providerProfileId: providerProfileId },
-                { signal: runtime['abortController']['signal'], pollImmediately: !![] },
+                { signal: runtime['abortController']['signal'], pollImmediately: true },
               )
             : await runSeparation(
                 { audioUrl: localPathToUrl(sourceVideoRef) || sourceVideoRef },
@@ -212,7 +212,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
                           taskId: runtime['taskId'],
                           providerProfileId: runtime['providerProfileId'],
                         },
-                        { persistIdentity: !![] },
+                        { persistIdentity: true },
                       ));
                   },
                   onTaskId: (input) => {
@@ -220,7 +220,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
                       handler5(
                         config,
                         { status: 'running', taskId: runtime['taskId'] },
-                        { persistIdentity: !![] },
+                        { persistIdentity: true },
                       ));
                   },
                 },
@@ -261,7 +261,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
         if (map['get'](value3) === runtime) map['delete'](value3);
       }
     },
-    handler8 = ({ project: project3, source: source4, state: state2, resume: resume = ![] }) => {
+    handler8 = ({ project: project3, source: source4, state: state2, resume: resume = false }) => {
       const projectId3 = normalizeText(project3['id']),
         sourceId4 = normalizeText(source4['id']),
         value4 = handler2(projectId3, sourceId4),
@@ -350,7 +350,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
                 personReplacementVoiceSeparationState5,
               ),
             },
-            { renderWorkspace: ![] },
+            { renderWorkspace: false },
           );
         return (
           onStateChange({
@@ -361,14 +361,14 @@ export function createPersonReplacementVoiceSeparationRuntime({
           Promise['resolve'](null)
         );
       }
-      return handler8({ project: project5, source: source6, state: state4, resume: !![] });
+      return handler8({ project: project5, source: source6, state: state4, resume: true });
     },
     cancel = async (value10 = '') => {
-      if (enabled) return ![];
+      if (enabled) return false;
       const projectId4 = getProject(),
         sourceId5 = handler3(projectId4, value10),
         requestId5 = resolvePersonReplacementVoiceSeparationState(projectId4, value10);
-      if (!sourceId5 || !isPersonReplacementVoiceSeparationActive(requestId5)) return ![];
+      if (!sourceId5 || !isPersonReplacementVoiceSeparationActive(requestId5)) return false;
       const value11 = {
           projectId: projectId4['id'],
           sourceId: sourceId5['id'],
@@ -390,9 +390,9 @@ export function createPersonReplacementVoiceSeparationRuntime({
         } catch (value14) {
           console['warn']('[replacementStudio] voice separation cancel failed', value14);
           const error3 = '已停止本地等待，但云端任务取消失败，可能仍在运行。请到任务平台确认状态。';
-          return (handler5(value11, { error: error3 }), showToast(error3, 'warn'), !![]);
+          return (handler5(value11, { error: error3 }), showToast(error3, 'warn'), true);
         }
-      return (showToast('已取消清晰人声提取。', 'info'), !![]);
+      return (showToast('已取消清晰人声提取。', 'info'), true);
     };
   return Object['freeze']({
     extract: extract,
@@ -400,7 +400,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
     cancel: cancel,
     destroy() {
       if (enabled) return;
-      ((enabled = !![]),
+      ((enabled = true),
         map['forEach']((value15) => value15['abortController']?.['abort']?.()),
         map['clear']());
     },

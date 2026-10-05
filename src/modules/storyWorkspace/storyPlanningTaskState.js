@@ -26,7 +26,7 @@ export async function runStoryEpisodeSplitBatchTasks(
     }),
   );
 }
-export function getStoryEpisodeBatchTargets(list2 = [], key = [], enabled = ![]) {
+export function getStoryEpisodeBatchTargets(list2 = [], key = [], enabled = false) {
   const list3 = getStoryVideoEpisodes(list2);
   if (!enabled) return [...list3];
   const map = new Set((Array['isArray'](key) ? key : [])['map'](normalizeText)['filter'](Boolean));
@@ -39,7 +39,7 @@ export function getStoryEpisodeCardAction(options = {}) {
   );
   return count > 0 ? { kind: 'edit', label: '进入编辑' } : { kind: 'generate', label: '生成分镜脚本' };
 }
-export function setStoryEpisodeSplitRunning(args, data, source = !![]) {
+export function setStoryEpisodeSplitRunning(args, data, source = true) {
   if (!args || typeof args !== 'object') return [];
   const text = normalizeText(data),
     map2 = new Set(
@@ -68,7 +68,7 @@ export function getStoryEpisodeBatchControlState(cancelRequested = {}) {
     ...(operation
       ? {
           batchId: normalizeText(cancelRequested['episodeBatchSplitId']),
-          cancelRequested: cancelRequested['episodeBatchSplitCancelRequested'] === !![],
+          cancelRequested: cancelRequested['episodeBatchSplitCancelRequested'] === true,
         }
       : {}),
   };

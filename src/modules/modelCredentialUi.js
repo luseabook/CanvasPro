@@ -42,7 +42,7 @@ function getCredentialStatusRevision(el = globalThis['window']) {
       enabled['revision'] += 1;
     };
     (CREDENTIAL_STATUS_EVENTS['forEach']((item) => {
-      el['addEventListener'](item, value, !![]);
+      el['addEventListener'](item, value, true);
     }),
       CREDENTIAL_STATUS_REVISIONS['set'](el, enabled));
   }
@@ -63,10 +63,10 @@ function bindModelCredentialStatusEvents(key, el2 = globalThis['window']) {
       }));
   }
   store['listeners']['add'](key);
-  let enabled2 = !![];
+  let enabled2 = true;
   return () => {
     if (!enabled2) return;
-    ((enabled2 = ![]), store['listeners']['delete'](key));
+    ((enabled2 = false), store['listeners']['delete'](key));
     if (store['listeners']['size'] > 0) return;
     (CREDENTIAL_STATUS_EVENTS['forEach']((data) => {
       el2['removeEventListener']?.(data, store['dispatch']);
@@ -81,14 +81,14 @@ function getMenuItemCredentialContext(el3) {
   };
 }
 function showMissingCredential(providerId) {
-  if (!providerId || providerId['status'] !== 'missing') return ![];
+  if (!providerId || providerId['status'] !== 'missing') return false;
   if (providerId['requirementType'] === 'cliLogin')
     return (
       showCliLoginMissingToast(providerId['message'], {
         providerId: providerId['cliProviderId'],
         fieldIds: providerId['fieldIds'],
       }),
-      !![]
+      true
     );
   return (
     showProviderApiKeyMissingToast(providerId['message'], {
@@ -98,18 +98,18 @@ function showMissingCredential(providerId) {
       adapterType: providerId['adapterType'],
       model: providerId['modelId'],
     }),
-    !![]
+    true
   );
 }
 export function guardModelGenerationCredentials(options = {}) {
   let response = getModelGenerationReadiness(options);
-  if (response['status'] === 'loading' && options['waitForConfig'] === !![])
+  if (response['status'] === 'loading' && options['waitForConfig'] === true)
     return ensureModelGenerationReadiness(options)['then']((target) => {
       if (target['ready']) return target;
       return (showMissingCredential(target), target);
     });
   if (response['status'] === 'loading')
-    return { ...response, ready: !![], status: 'deferred', reason: 'runtime-check-pending' };
+    return { ...response, ready: true, status: 'deferred', reason: 'runtime-check-pending' };
   if (response['ready']) return response;
   return (showMissingCredential(response), response);
 }
@@ -150,7 +150,7 @@ export function applyModelCredentialButtonState(el5, next = {}) {
     el5['classList']?.['add'](CREDENTIAL_BUTTON_CLASS),
     (current['credentialProvider'] = error['configProviderId'] || error['providerId']),
     (current['credentialField'] = error['credentialField']),
-    (el5['disabled'] = ![]),
+    (el5['disabled'] = false),
     (el5['title'] = error['message']),
     el5['setAttribute']?.('aria-label', error['message']),
     (el5['style']['cursor'] = 'var(--link-cursor)'),
@@ -164,7 +164,7 @@ export function bindModelCredentialButtonState(el6, entry = {}) {
         ? entry['getCredentialOptions']
         : () => entry['credentialOptions'] || {},
     handler2 = () => {
-      if (el6['isConnected'] === ![]) return null;
+      if (el6['isConnected'] === false) return null;
       if (typeof entry['onRefresh'] === 'function') return entry['onRefresh'](el6);
       const enabled3 = run();
       if (!enabled3) return (resetModelCredentialButtonState(el6), null);
@@ -174,7 +174,7 @@ export function bindModelCredentialButtonState(el6, entry = {}) {
       handler2,
       entry['windowObject'] || globalThis['window'],
     );
-  if (entry['syncOnBind'] !== ![]) handler2();
+  if (entry['syncOnBind'] !== false) handler2();
   return bindModelCredentialStatusEvents2;
 }
 function clearMenuItemCredentialState(el7) {
@@ -232,7 +232,7 @@ function getMenuItemCredentialStateSignature(error3, payload) {
 }
 function hasExpectedMenuItemCredentialState(el11, response2) {
   const handle = response2?.['status'] === 'missing',
-    enabled4 = el11['classList']?.['contains']?.('needs-model-credential') === !![],
+    enabled4 = el11['classList']?.['contains']?.('needs-model-credential') === true,
     enabled5 = Boolean(el11['querySelector']?.(CREDENTIAL_BADGE_SELECTOR));
   return handle ? enabled4 && enabled5 : !enabled4 && !enabled5;
 }
@@ -387,7 +387,7 @@ export function bindModelCredentialMenu(el16, value19 = {}) {
       void syncModelCredentialMenu(el16, value19);
     },
     value21 = (event) => {
-      if (value19['guardSelection'] === ![]) return;
+      if (value19['guardSelection'] === false) return;
       const el17 = event['target']?.['closest']?.(CREDENTIAL_MENU_ITEM_SELECTOR);
       if (!el17 || !el16['contains']?.(el17)) return;
       const { modelId: modelId3, providerId: providerId4 } = getMenuItemCredentialContext(el17),
@@ -404,13 +404,13 @@ export function bindModelCredentialMenu(el16, value19 = {}) {
         event['stopPropagation']?.(),
         showMissingCredential(response5));
     };
-  el16['addEventListener']('click', value21, !![]);
+  el16['addEventListener']('click', value21, true);
   const run5 =
-    value19['listenConfigChanges'] === ![] ? () => {} : bindModelCredentialStatusEvents(run4, value20);
+    value19['listenConfigChanges'] === false ? () => {} : bindModelCredentialStatusEvents(run4, value20);
   return (
     run4(),
     () => {
-      (el16['removeEventListener']?.('click', value21, !![]), run5());
+      (el16['removeEventListener']?.('click', value21, true), run5());
     }
   );
 }

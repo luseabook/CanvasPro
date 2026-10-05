@@ -15,7 +15,7 @@ export function initDownloadNamingSettings() {
   (handler(getDownloadUseOriginalFilename()),
     list['forEach']((el2) => {
       if (el2['__downloadNamingBound']) return;
-      ((el2['__downloadNamingBound'] = !![]),
+      ((el2['__downloadNamingBound'] = true),
         el2['addEventListener']('click', () => {
           handler(setDownloadUseOriginalFilename(el2['dataset']['downloadOriginalFilename'] === 'on'));
         }));

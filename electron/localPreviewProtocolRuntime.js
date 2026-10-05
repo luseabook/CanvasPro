@@ -47,7 +47,7 @@ export function parseLocalPreviewRange(rangeHeader, size) {
 export function isPreviewableLocalMedia(fileInfo = {}, filePath = '') {
   const type = String(fileInfo?.['type'] || '')['toLowerCase']();
   if (type['startsWith']('image/') || type['startsWith']('video/') || type['startsWith']('audio/'))
-    return !![];
+    return true;
   return PREVIEWABLE_MEDIA_PATTERN['test'](String(filePath || ''));
 }
 export function getLocalPreviewMimeType(filePath, type = '') {
@@ -84,7 +84,7 @@ export function createLocalPreviewProtocolRuntime({
     mintToken = requireFunction(createToken, 'createToken'),
     entryTtlMs = Math['max'](1, Number(ttlMs) || 1),
     entries = new Map();
-  let installed = ![];
+  let installed = false;
   function resolveSourcePath(request = {}) {
     const directPath = String(request?.['path'] || '')['trim']();
     return (
@@ -119,9 +119,9 @@ export function createLocalPreviewProtocolRuntime({
     return scheme + '://preview/' + token + '/' + basename;
   }
   function install() {
-    if (installed) return ![];
+    if (installed) return false;
     return (
-      (installed = !![]),
+      (installed = true),
       protocolApi['handle'](scheme, (request) => {
         try {
           clearExpired();
@@ -168,7 +168,7 @@ export function createLocalPreviewProtocolRuntime({
           );
         }
       }),
-      !![]
+      true
     );
   }
   return { clearExpired: clearExpired, createUrl: createUrl, install: install };

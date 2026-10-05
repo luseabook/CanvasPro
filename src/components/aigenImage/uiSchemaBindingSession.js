@@ -25,7 +25,7 @@ export function createUiSchemaBindingSession(
     t: t,
   } = value;
   if (!root || typeof commitFieldValue !== 'function') return () => {};
-  const commitValue = (item, key, { skipSync: skipSync = ![] } = {}) => {
+  const commitValue = (item, key, { skipSync: skipSync = false } = {}) => {
     const args = typeof getNodeData === 'function' ? getNodeData() || {} : {},
       index = commitFieldValue(item, key, args),
       args2 =
@@ -37,9 +37,9 @@ export function createUiSchemaBindingSession(
     return (!skipSync && syncModelUiSchemaControls(root, { ...args, ...args2 }), args2);
   };
   let box = null,
-    result = ![],
+    result = false,
     box2 = null,
-    data = ![],
+    data = false,
     box3 = null,
     options = 0;
   const map = new Map(),
@@ -104,7 +104,7 @@ export function createUiSchemaBindingSession(
     },
     handler6 = (enabled2) => {
       if (!enabled2) return null;
-      if (enabled2['menu'] && enabled2['menu']['isConnected'] !== ![]) return enabled2['menu'];
+      if (enabled2['menu'] && enabled2['menu']['isConnected'] !== false) return enabled2['menu'];
       if (enabled2['compositeField']) {
         const el6 = Array['from'](root['querySelectorAll']?.('[data-ui-schema-composite-field]') || [])[
             'find'
@@ -128,7 +128,7 @@ export function createUiSchemaBindingSession(
       return null;
     },
     handler7 = (el10) => {
-      if (!el10 || el10['classList']?.['contains']('is-closing')) return ![];
+      if (!el10 || el10['classList']?.['contains']('is-closing')) return false;
       if (el10['classList']?.['contains']('floating-menu')) return el10['classList']['contains']('show');
       return el10['style']['display'] !== 'none';
     },
@@ -163,10 +163,10 @@ export function createUiSchemaBindingSession(
       return scope === 'text' || scope === 'textarea' || input === 'textarea' || output === 'text';
     },
     handler12 = (el13) => {
-      if (!el13?.['addEventListener']) return ![];
+      if (!el13?.['addEventListener']) return false;
       let setTimeout2 = null;
       const run = () => {
-          (el13['removeEventListener']('click', value3, !![]),
+          (el13['removeEventListener']('click', value3, true),
             setTimeout2 && (clearTimeout(setTimeout2), (setTimeout2 = null)));
         },
         value3 = (event) => {
@@ -175,7 +175,7 @@ export function createUiSchemaBindingSession(
             event['stopImmediatePropagation']?.(),
             run());
         };
-      return (el13['addEventListener']('click', value3, !![]), (setTimeout2 = setTimeout(run, 350)), !![]);
+      return (el13['addEventListener']('click', value3, true), (setTimeout2 = setTimeout(run, 350)), true);
     },
     handler13 = (value4, value5) => {
       const value6 = Number(value4);
@@ -250,7 +250,7 @@ export function createUiSchemaBindingSession(
       const fieldEl = event2?.['target']?.['closest']?.('[data-ui-schema-field][data-ui-schema-adapter]'),
         value29 = String(fieldEl?.['dataset']?.['uiSchemaAdapter'] || '')['trim'](),
         enabled3 = value29 ? getUiSchemaFieldAdapterDefinition(value29) : null;
-      if (!fieldEl || !enabled3 || typeof enabled3['bind'] !== 'function') return ![];
+      if (!fieldEl || !enabled3 || typeof enabled3['bind'] !== 'function') return false;
       return (
         enabled3['bind']({
           event: event2,
@@ -262,7 +262,7 @@ export function createUiSchemaBindingSession(
             generateRandomSeedForField: generateRandomSeedForField,
             setRhVideoStepperValueEl: setRhVideoStepperValueEl,
           },
-        }) === !![]
+        }) === true
       );
     },
     handler21 = (el23) => {
@@ -287,10 +287,10 @@ export function createUiSchemaBindingSession(
         (el26['min'] = String(el25['dataset']['uiSchemaMin'] || '0')),
         (el26['max'] = String(el25['dataset']['uiSchemaMax'] || '')),
         (el26['value'] = String(value32)));
-      let value33 = ![];
+      let value33 = false;
       const run2 = (value34) => {
         if (value33) return;
-        value33 = !![];
+        value33 = true;
         const value35 = value34 ? handler15(el25, el26['value']) : value32,
           el27 = root['ownerDocument']['createElement']('div');
         ((el27['className'] = 'rh-stepper-value'),
@@ -310,10 +310,10 @@ export function createUiSchemaBindingSession(
       (el26['addEventListener']('click', (event3) => event3['stopPropagation']()),
         el26['addEventListener']('mousedown', (event4) => event4['stopPropagation']()),
         el26['addEventListener']('keydown', (event5) => {
-          if (event5['key'] === 'Enter') run2(!![]);
-          if (event5['key'] === 'Escape') run2(![]);
+          if (event5['key'] === 'Enter') run2(true);
+          if (event5['key'] === 'Escape') run2(false);
         }),
-        el26['addEventListener']('blur', () => run2(!![])),
+        el26['addEventListener']('blur', () => run2(true)),
         el24['replaceWith'](el26),
         el26['focus'](),
         el26['select']());
@@ -328,12 +328,12 @@ export function createUiSchemaBindingSession(
     value36 = (event6) => {
       if (!box2) return;
       const value38 = event6['clientX'] - box2['x'];
-      if (Math['abs'](value38) >= 2) box2['dragged'] = !![];
+      if (Math['abs'](value38) >= 2) box2['dragged'] = true;
       const value39 = Math['trunc'](value38 / 6),
         value40 = handler13(box2['fieldEl']?.['dataset']?.['uiSchemaStep'], 1),
         value41 = handler15(box2['fieldEl'], box2['base'] + value39 * value40);
       value41 !== box2['last'] &&
-        ((box2['moved'] = !![]),
+        ((box2['moved'] = true),
         (box2['last'] = value41),
         setRhVideoStepperValueEl(box2['fieldEl'], value41));
     },
@@ -355,12 +355,12 @@ export function createUiSchemaBindingSession(
       if (!box3) return;
       event7['preventDefault']?.();
       const value45 = event7['clientX'] - box3['x'];
-      if (Math['abs'](value45) >= 2) box3['dragged'] = !![];
+      if (Math['abs'](value45) >= 2) box3['dragged'] = true;
       const value46 = Math['trunc'](value45 / 6),
         value47 = handler13(box3['fieldEl']?.['dataset']?.['uiSchemaStep'], 1),
         value48 = handler15(box3['fieldEl'], box3['base'] + value46 * value47);
       value48 !== box3['last'] &&
-        ((box3['moved'] = !![]), (box3['last'] = value48), handler18(box3['fieldEl'], value48));
+        ((box3['moved'] = true), (box3['last'] = value48), handler18(box3['fieldEl'], value48));
     },
     value44 = () => {
       if (!box3) return;
@@ -409,10 +409,10 @@ export function createUiSchemaBindingSession(
         (el34['min'] = String(el33['dataset']['uiSchemaMin'] || '-9999')),
         (el34['max'] = String(el33['dataset']['uiSchemaMax'] || '9999')),
         (el34['value'] = String(value58)));
-      let value59 = ![];
+      let value59 = false;
       const run3 = (value60) => {
         if (value59) return;
-        value59 = !![];
+        value59 = true;
         const value61 = value60 ? handler25(el33, el34['value']) : value58,
           el35 = root['ownerDocument']['createElement']('div');
         ((el35['className'] = 'rh-stepper-value'),
@@ -430,10 +430,10 @@ export function createUiSchemaBindingSession(
       (el34['addEventListener']('click', (event8) => event8['stopPropagation']()),
         el34['addEventListener']('mousedown', (event9) => event9['stopPropagation']()),
         el34['addEventListener']('keydown', (event10) => {
-          if (event10['key'] === 'Enter') run3(!![]);
-          if (event10['key'] === 'Escape') run3(![]);
+          if (event10['key'] === 'Enter') run3(true);
+          if (event10['key'] === 'Escape') run3(false);
         }),
-        el34['addEventListener']('blur', () => run3(!![])),
+        el34['addEventListener']('blur', () => run3(true)),
         el32['replaceWith'](el34),
         el34['focus'](),
         el34['select']());
@@ -448,11 +448,11 @@ export function createUiSchemaBindingSession(
     value62 = (event11) => {
       if (!box) return;
       const value64 = event11['clientX'] - box['x'];
-      if (Math['abs'](value64) >= 2) box['dragged'] = !![];
+      if (Math['abs'](value64) >= 2) box['dragged'] = true;
       const value65 = Math['trunc'](value64 / 6),
         value66 = handler25(box['fieldEl'], box['base'] + value65);
       value66 !== box['last'] &&
-        ((box['moved'] = !![]), (box['last'] = value66), handler26(box['fieldEl'], value66));
+        ((box['moved'] = true), (box['last'] = value66), handler26(box['fieldEl'], value66));
     },
     value63 = () => {
       if (!box) return;
@@ -484,8 +484,8 @@ export function createUiSchemaBindingSession(
             x: x['clientX'],
             base: base,
             last: base,
-            moved: ![],
-            dragged: ![],
+            moved: false,
+            dragged: false,
             fieldEl: fieldEl2,
             fieldId: fieldId2,
             input: input2,
@@ -510,8 +510,8 @@ export function createUiSchemaBindingSession(
             x: x['clientX'],
             base: base2,
             last: base2,
-            moved: ![],
-            dragged: ![],
+            moved: false,
+            dragged: false,
             fieldEl: fieldEl3,
             fieldId: fieldId3,
             el: el36,
@@ -536,8 +536,8 @@ export function createUiSchemaBindingSession(
           x: x['clientX'],
           base: base3,
           last: base3,
-          moved: ![],
-          dragged: ![],
+          moved: false,
+          dragged: false,
           fieldEl: fieldEl4,
           fieldId: fieldId4,
           el: el37,
@@ -561,7 +561,7 @@ export function createUiSchemaBindingSession(
       if (value71) {
         event12['stopPropagation']();
         if (data) {
-          data = ![];
+          data = false;
           return;
         }
         handler22(value71);
@@ -571,7 +571,7 @@ export function createUiSchemaBindingSession(
       if (value72) {
         event12['stopPropagation']();
         if (result) {
-          result = ![];
+          result = false;
           return;
         }
         handler28(value72);
@@ -586,7 +586,7 @@ export function createUiSchemaBindingSession(
             fieldEl5?.['querySelector']('.ui-schema-floating-menu') ||
             fieldEl5?.['querySelector']('.ui-schema-popup') ||
             fieldEl5?.['__uiSchemaPortaledPopup'],
-          shouldOpen = popup ? !handler7(popup) : ![];
+          shouldOpen = popup ? !handler7(popup) : false;
         (root['dispatchEvent'](
           new CustomEvent('ui-schema-menu-before-open', {
             detail: { fieldEl: fieldEl5, popup: popup, shouldOpen: shouldOpen },
@@ -623,7 +623,7 @@ export function createUiSchemaBindingSession(
           el41['hasAttribute']?.('data-ui-schema-static-disabled');
       if (
         value76 ||
-        ((el41['dataset']['uiSchemaDisabled'] === 'true' || el41['disabled'] === !![]) && !enabled8)
+        ((el41['dataset']['uiSchemaDisabled'] === 'true' || el41['disabled'] === true) && !enabled8)
       )
         return;
       event12['stopPropagation']();
@@ -638,7 +638,7 @@ export function createUiSchemaBindingSession(
           event12['target']?.['closest']?.(
             '.ui-schema-popup, .ui-schema-floating-menu, .img-ratio-popup, .rh-res-popup',
           ) || null,
-        enabled9 = except?.['classList']?.['contains']?.('ui-schema-popup') === !![],
+        enabled9 = except?.['classList']?.['contains']?.('ui-schema-popup') === true,
         value79 = enabled9 ? handler5(el40, except) : null,
         handler30 = () => {
           if (!enabled9) return;
@@ -656,8 +656,8 @@ export function createUiSchemaBindingSession(
           });
         };
       enabled9 && except
-        ? handler4({ immediate: !![], except: except })
-        : (handler4({ immediate: !![] }),
+        ? handler4({ immediate: true, except: except })
+        : (handler4({ immediate: true }),
           except?.['__uiSchemaPortalRoot'] === root &&
             root['dispatchEvent'](
               new CustomEvent('ui-schema-portaled-close-request', { detail: { popup: except } }),
@@ -676,14 +676,14 @@ export function createUiSchemaBindingSession(
       }
       (syncRhAiAppFooterParamField(el40, value78), syncInstanceToggleField(el40, value78));
       for (const [value83, value84] of Object['entries'](enabled8 || {})) {
-        value83 !== enabled7 && commitValue(value83, value84, { skipSync: !![] });
+        value83 !== enabled7 && commitValue(value83, value84, { skipSync: true });
       }
       const el44 = el40['closest']('[data-ui-schema-composite-field="voiceQualityRatio"]'),
         value85 = String(el44?.['dataset']?.['uiSchemaPrimaryField'] || '')['trim'](),
         value86 = String(el44?.['dataset']?.['uiSchemaSecondaryField'] || '')['trim']();
       if (el44 && enabled7 === value85) {
         if (value86) handler8(value86);
-        const value87 = commitValue(enabled7, value78, { skipSync: !![] });
+        const value87 = commitValue(enabled7, value78, { skipSync: true });
         syncModelUiSchemaControls(root, value87);
       } else commitValue(enabled7, value78);
       handler31();

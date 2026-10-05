@@ -108,7 +108,7 @@ function createRun(next) {
   );
 }
 function canResume(model, args) {
-  if (!model || !['running', 'failed_retryable', 'ready_to_commit']['includes'](model['status'])) return ![];
+  if (!model || !['running', 'failed_retryable', 'ready_to_commit']['includes'](model['status'])) return false;
   return (
     model['inputFingerprint'] ===
     fingerprint(
@@ -126,7 +126,7 @@ function canResume(model, args) {
   );
 }
 function requiresPaidRetry(response2) {
-  if (response2['status'] === 'ready_to_commit' && response2['candidateArtifact']) return ![];
+  if (response2['status'] === 'ready_to_commit' && response2['candidateArtifact']) return false;
   return response2['invocations']['some'](
     (enabled) =>
       !enabled['retryAuthorizedAt'] &&

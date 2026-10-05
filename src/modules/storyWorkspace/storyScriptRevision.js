@@ -3,7 +3,7 @@ export const STORY_SCRIPT_STALE_MESSAGE =
   '剧本已修改，现有分镜与视频已保留；请重新生成分镜脚本后再生成视频。';
 export function markStoryEpisodeProductionStale(value) {
   return (
-    (value['storyboardStale'] = !![]),
+    (value['storyboardStale'] = true),
     delete value['splitDraft'],
     delete value['experimentalSplitDraft'],
     delete value['splitQualityReview'],
@@ -11,9 +11,9 @@ export function markStoryEpisodeProductionStale(value) {
   );
 }
 export function updateStoryEpisodeScriptText(episodeRef, item) {
-  if (!episodeRef?.['script']) return ![];
+  if (!episodeRef?.['script']) return false;
   const fullText = String(item ?? '');
-  if (episodeRef['script']['fullText'] === fullText) return ![];
+  if (episodeRef['script']['fullText'] === fullText) return false;
   return (
     (episodeRef['script'] = {
       ...episodeRef['script'],
@@ -29,7 +29,7 @@ export function updateStoryEpisodeScriptText(episodeRef, item) {
     delete episodeRef['endingState'],
     delete episodeRef['continuityFacts'],
     markStoryEpisodeProductionStale(episodeRef),
-    !![]
+    true
   );
 }
 export function getStoryEpisodeScriptInputKey(key) {
@@ -54,9 +54,9 @@ export function createStoryEpisodeScriptGuard(handler, source) {
     assertCurrent: assertCurrent,
     isCurrent: () => {
       try {
-        return (assertCurrent(), !![]);
+        return (assertCurrent(), true);
       } catch {
-        return ![];
+        return false;
       }
     },
   };

@@ -32,7 +32,7 @@ export async function saveWorkspaceImageDownload({
 }
 export function renderWorkspaceImageDownloadButton({
   action: action = 'download-asset-image',
-  enabled: enabled = ![],
+  enabled: enabled = false,
   className: className = '',
   label: label = '下载图片',
 } = {}) {

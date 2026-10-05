@@ -117,8 +117,8 @@ function validateRawFieldValue(value11, value12, value13) {
   if (value15 === 'toggle') {
     const value17 = String(rawFieldValue)['trim']()['toLowerCase']();
     if (
-      rawFieldValue !== !![] &&
-      rawFieldValue !== ![] &&
+      rawFieldValue !== true &&
+      rawFieldValue !== false &&
       !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](value17)
     )
       throw new Error('便宜渠道 ' + value13 + ' 的' + value14 + '只能开启或关闭');
@@ -188,7 +188,7 @@ function collectRawInputUrls(value27, value28) {
   );
 }
 function collectRawActiveImageUrls(value30, value31, value32) {
-  if (value32 !== !![]) return collectRawInputUrls(value30, 'image');
+  if (value32 !== true) return collectRawInputUrls(value30, 'image');
   const value33 =
       value30?.['inputUrlsBySlot'] &&
       typeof value30['inputUrlsBySlot'] === 'object' &&
@@ -206,7 +206,7 @@ function collectRawActiveImageUrls(value30, value31, value32) {
 }
 function validateRawInputCounts(value36, image) {
   const value37 =
-      image['supportsFrames'] === !![]
+      image['supportsFrames'] === true
         ? String(readRawFieldValue(value36, image['modeField']) || 'reference')
             ['trim']()
             ['toLowerCase']()
@@ -277,7 +277,7 @@ function applySeedanceInputs({
     delete body['end_frame'],
     delete body['reference_videos'],
     delete body['reference_audios']);
-  const value51 = policy['supportsFrames'] === !![] ? getMode(payload2, policy) || 'reference' : 'reference';
+  const value51 = policy['supportsFrames'] === true ? getMode(payload2, policy) || 'reference' : 'reference';
   if (value51 === 'frames') {
     const args3 = getSlotUrls(finalUrlsBySlot2, 'firstFrame'),
       args4 = getSlotUrls(finalUrlsBySlot2, 'lastFrame'),
@@ -302,10 +302,10 @@ function applySeedanceInputs({
   }),
     requireMinimumImages(list14, policy['minImages']),
     requireMaximum('参考图', list14, policy['maxImages']));
-  if (policy['audioRequiresImage'] === !![] && list12['length'] > 0 && list14['length'] === 0)
+  if (policy['audioRequiresImage'] === true && list12['length'] > 0 && list14['length'] === 0)
     throw new Error('便宜渠道当前模型使用参考音频时至少需要 1 张参考图');
   if (
-    policy['audioRequiresVisual'] === !![] &&
+    policy['audioRequiresVisual'] === true &&
     list12['length'] > 0 &&
     list14['length'] === 0 &&
     list11['length'] === 0

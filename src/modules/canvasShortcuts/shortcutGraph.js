@@ -7,11 +7,11 @@ export function captureShortcutGraph(store, value = null) {
     map = new Set(value || state['selectedNodeIds'] || []);
   if (!map['size']) throw new Error('请先在画布中选中需要保存的节点');
   const edgesById = store['serialize']();
-  let item = !![];
+  let item = true;
   while (item) {
-    item = ![];
+    item = false;
     for (const key of edgesById['nodes']) {
-      map['has'](key['parentId']) && !map['has'](key['id']) && (map['add'](key['id']), (item = !![]));
+      map['has'](key['parentId']) && !map['has'](key['id']) && (map['add'](key['id']), (item = true));
     }
   }
   const clipboardGraphSnapshot = buildClipboardGraphSnapshot({

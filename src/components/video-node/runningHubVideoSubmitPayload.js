@@ -532,7 +532,7 @@ export function buildRunningHubVideoFixedSlotPayloadPatch({
   const value57 = String(model || nodeData?.['model'] || '')['trim'](),
     fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(
       { ...nodeData, model: value57 },
-      { includeHiddenSlots: !![] },
+      { includeHiddenSlots: true },
     );
   if (!fixedInputSlotConfigFromManifest) return {};
   const runningHubVideoParameterPanelPolicy3 =
@@ -563,7 +563,7 @@ export function buildRunningHubVideoFixedSlotPayloadPatch({
 }
 
 function buildCollectedMediaPayloadPatch(value63, value64 = {}) {
-  if (value63?.['extensions']?.['collectMediaInputs'] !== !![]) return {};
+  if (value63?.['extensions']?.['collectMediaInputs'] !== true) return {};
   const run = (value65) =>
     (Array['isArray'](value65) ? value65 : [])
       ['map']((value66) => String(value66 || '')['trim']())

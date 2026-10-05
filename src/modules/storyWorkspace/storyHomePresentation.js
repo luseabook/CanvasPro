@@ -93,7 +93,7 @@ function renderHomeTabs(options) {
     list['map'](([target, source]) => {
       const enabled =
           (target === 'replication' && !isStoryVideoReplicationHomeAvailable2) ||
-          (target === 'collaborate' && options['developerModeAvailable'] !== !![]),
+          (target === 'collaborate' && options['developerModeAvailable'] !== true),
         next = options['homeTab'] === target && !enabled;
       return (
         '<button type="button" class="story-home-tab ' +
@@ -205,7 +205,7 @@ export function renderStoryHomeComposerBody(current) {
       Boolean(current['isParsingDocument']) +
       '">\n          <span class="story-home-reference-upload-icon" aria-hidden="true">' +
       (current['isParsingDocument']
-        ? renderStoryGenerationSpinner({ button: !![] })
+        ? renderStoryGenerationSpinner({ button: true })
         : '<span class="story-home-reference-document-icon"></span><span class="story-home-reference-add-icon"></span><span class="story-home-reference-extension">' +
           escapeHtml(getStoryDocumentExtension(text3)) +
           '</span>') +
@@ -275,7 +275,7 @@ export function renderStoryHomeComposerBody(current) {
     ' aria-busy="' +
     Boolean(current['isParsingDocument']) +
     '">' +
-    (current['isParsingDocument'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+    (current['isParsingDocument'] ? renderStoryGenerationSpinner({ button: true }) : '') +
     '<span>' +
     (current['isParsingDocument'] ? '解析中' : '上传剧本') +
     '</span></button>\n      <button type="button" class="story-secondary-button button-press-feedback' +
@@ -283,7 +283,7 @@ export function renderStoryHomeComposerBody(current) {
     '" data-story-action="choose-novel" aria-pressed="false"><span>上传小说</span></button>\n      <button type="button" class="story-secondary-button button-press-feedback" data-story-action="paste-script" aria-pressed="false"><span>粘贴文本</span></button>\n    </div>\n  </div>'
   );
 }
-export function renderStoryScriptModeControl(config = 'plot', { hidden: hidden = ![] } = {}) {
+export function renderStoryScriptModeControl(config = 'plot', { hidden: hidden = false } = {}) {
   const storyScriptMode = normalizeStoryScriptMode(config),
     scope = storyScriptMode === 'narration' ? '解说模式' : '剧情模式',
     input = storyScriptMode === 'narration' ? '剧情模式' : '解说模式';
@@ -318,7 +318,7 @@ export function renderStoryHomeParamChevron() {
 }
 function renderStoryAspectRatioPicker(
   value2,
-  { placement: placement = 'above', compact: compact = ![] } = {},
+  { placement: placement = 'above', compact: compact = false } = {},
 ) {
   const storyAspectRatio = normalizeStoryAspectRatio(value2['data']?.['project']?.['aspectRatio']),
     value3 = placement === 'below' ? ' story-ratio-picker--below' : '',
@@ -356,8 +356,8 @@ function renderStoryPlanningPicker({
   disabledOptions: disabledOptions = [],
   customOption: customOption = null,
   formatOption: formatOption,
-  singleColumn: singleColumn = ![],
-  hidden: hidden = ![],
+  singleColumn: singleColumn = false,
+  hidden: hidden = false,
 } = {}) {
   const map = new Set(disabledOptions);
   return (
@@ -423,7 +423,7 @@ function renderStoryPlanningPicker({
     '\n      </div>\n    </div>\n  </div>'
   );
 }
-function renderStoryStylePicker(value8, { placement: placement = 'overlay', compact: compact = ![] } = {}) {
+function renderStoryStylePicker(value8, { placement: placement = 'overlay', compact: compact = false } = {}) {
   const styleId = value8['data']?.['project'] || {},
     storyStyleSelection = resolveStoryStyleSelection({
       styleId: styleId['videoStyleId'],
@@ -499,7 +499,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
   const value13 = allowDeveloperModes['data']?.['project']?.['planning'] || {},
     value14 = normalizeStoryEpisodeCount(value13['episodeCount']),
     value15 = normalizeStoryPromptMode(value13['promptMode'], {
-      allowDeveloperModes: allowDeveloperModes['developerModeAvailable'] === !![],
+      allowDeveloperModes: allowDeveloperModes['developerModeAvailable'] === true,
     }),
     value16 =
       allowDeveloperModes['homeTab'] === 'collaborate'
@@ -523,7 +523,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
       modelId: modelId,
       provider: allowDeveloperModes['textProvider'],
       providerProfileId: allowDeveloperModes['textProviderProfileId'],
-      includeRunningHubInternational: !![],
+      includeRunningHubInternational: true,
       getDisplayModelName: getDisplayModelName,
       className: 'story-home-text-model-selector',
       allowedModelIds: allowDeveloperModes['homeTab'] === 'replication' ? list4 : undefined,
@@ -536,7 +536,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
           icon: '♫',
           value: allowDeveloperModes['replicationAsrProvider'] || 'volcengine-speech',
           options: RECORDING_ASR_MODELS['map']((value19) => value19['id']),
-          singleColumn: !![],
+          singleColumn: true,
           formatOption: (value20) =>
             RECORDING_ASR_MODELS['find']((value21) => value21['id'] === value20)?.['label'] || value20,
         })
@@ -552,8 +552,8 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
         (enabled2) => !enabled2['enabled'] && !allowDeveloperModes['developerModeAvailable'],
       )['map']((el3) => el3['value']),
       formatOption: getStoryPromptModeLabel,
-      singleColumn: !![],
-      hidden: ![],
+      singleColumn: true,
+      hidden: false,
     }) +
     '\n      ' +
     renderStoryPlanningPicker({
@@ -575,11 +575,11 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
         ? [...STORY_PUBLIC_EPISODE_COUNT_OPTIONS, ...STORY_DEVELOPER_EPISODE_COUNT_OPTIONS]
         : STORY_PUBLIC_EPISODE_COUNT_OPTIONS,
       customOption: {
-        visible: allowDeveloperModes['developerModeAvailable'] === !![],
+        visible: allowDeveloperModes['developerModeAvailable'] === true,
         selected: !STORY_EPISODE_COUNT_OPTIONS['includes'](value14),
       },
       formatOption: (value23) => value23 + '集',
-      singleColumn: !![],
+      singleColumn: true,
       hidden: !['generate', 'collaborate']['includes'](allowDeveloperModes['homeTab']),
     }) +
     '\n      ' +
@@ -599,7 +599,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
     ' aria-busy="' +
     Boolean(allowDeveloperModes['isGeneratingStory']) +
     '">' +
-    (allowDeveloperModes['isGeneratingStory'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+    (allowDeveloperModes['isGeneratingStory'] ? renderStoryGenerationSpinner({ button: true }) : '') +
     '<span data-story-generate-label>' +
     escapeHtml(getStoryHomeGenerateButtonLabel(allowDeveloperModes)) +
     '</span>' +
@@ -612,7 +612,7 @@ export function renderStoryHomeModelBar(allowDeveloperModes) {
 export function renderStoryHomeProjectResults(query) {
   query = { ...query, projects: getStorySurfaceProjects(query) };
   const value24 = query['workspaceSurface'] === 'replication' ? '复刻项目' : '剧本项目',
-    showArchived = query['showArchivedProjects'] === !![],
+    showArchived = query['showArchivedProjects'] === true,
     list5 = getStoryProjectHomeEntries(query['projects'], {
       query: query['projectSearchQuery'],
       sortOrder: query['projectSortOrder'],
@@ -658,7 +658,7 @@ export function renderStoryHome(args) {
       ...args,
       homeTab: resolveStoryVideoReplicationHomeTab(args, args['homeTab']),
     },
-    value27 = args['showArchivedProjects'] === !![],
+    value27 = args['showArchivedProjects'] === true,
     value28 = args['projects']['filter']((value29) => Number(value29?.['archivedAt'] || 0) > 0)['length'];
   return (
     '<div class="story-home-page' +
@@ -719,8 +719,8 @@ export function getStoryProjectTypeLabel(options3 = {}) {
 export function renderStoryProjectCard(
   value31,
   {
-    isDeleteConfirming: isDeleteConfirming = ![],
-    isMenuOpen: isMenuOpen = ![],
+    isDeleteConfirming: isDeleteConfirming = false,
+    isMenuOpen: isMenuOpen = false,
     fallbackTitle: fallbackTitle = '未命名故事',
     itemCount: itemCount = null,
     itemLabel: itemLabel = '集',

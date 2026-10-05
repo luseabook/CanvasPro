@@ -744,24 +744,24 @@ function findActiveTaskContext(
 
 function normalizeCompletionFeedbackOutcome(value32, value33) {
   if (value32['status'] === 'rejected')
-    return { ok: ![], error: String(value32['reason']?.['message'] || value32['reason'] || 'Unknown error') };
+    return { ok: false, error: String(value32['reason']?.['message'] || value32['reason'] || 'Unknown error') };
   const response = value32['value'] && typeof value32['value'] === 'object' ? value32['value'] : {};
   if (value33 === 'notification')
     return {
-      ok: response['success'] !== ![],
-      shown: response['shown'] === !![],
+      ok: response['success'] !== false,
+      shown: response['shown'] === true,
       reason: String(response['reason'] || ''),
       error: String(response['error'] || ''),
     };
   return {
-    ok: response['ok'] === !![],
-    native: response['native'] === !![],
+    ok: response['ok'] === true,
+    native: response['native'] === true,
     skipped: String(response['skipped'] || ''),
     error: String(response['error']?.['message'] || response['error'] || ''),
   };
 }
 
-function dispatchGenerationCompletionFeedback(value34, { recovering: recovering = ![] } = {}) {
+function dispatchGenerationCompletionFeedback(value34, { recovering: recovering = false } = {}) {
   const stateSnapshot5 = getStateSnapshot(value34['store'])['nodes']?.[value34['targetNodeId']] || {},
     promise = Promise['allSettled']([
       playCompletionSound('generation-success'),
@@ -872,7 +872,7 @@ function mergeManifestResultPatch(args21, args22) {
 }
 
 function persistResumableTaskState(value46, value47 = {}) {
-  if (value46?.['spec']?.['resumable'] !== !![]) return;
+  if (value46?.['spec']?.['resumable'] !== true) return;
   if (typeof value46['persistTaskState'] !== 'function') return;
   try {
     const promise2 = value46['persistTaskState']({
@@ -887,7 +887,7 @@ function persistResumableTaskState(value46, value47 = {}) {
 }
 
 function updateContextNode(value48, value49, value50, value51 = {}) {
-  if (value48?.['background'] !== !![] && value48?.['isTargetCurrent']?.() === ![]) return ![];
+  if (value48?.['background'] !== true && value48?.['isTargetCurrent']?.() === false) return false;
   const updateTaskNode2 = updateTaskNode(value48['store'], value49, value50, value51);
   if (updateTaskNode2) {
     value49 === value48['targetNodeId'] && persistResumableTaskState(value48, value50);
@@ -923,7 +923,7 @@ function getQueuedMessage() {
 }
 
 function canAbortContextSignal(enabled15) {
-  if (typeof enabled15?.['abortController']?.['abort'] !== 'function') return ![];
+  if (typeof enabled15?.['abortController']?.['abort'] !== 'function') return false;
   return !enabled15['signal'] || enabled15['signal'] === enabled15['abortController']['signal'];
 }
 
@@ -949,16 +949,16 @@ function cancelContextRemoteTaskOnce(
 
 async function pauseTaskContexts(list4, value59, value60 = {}) {
   const value61 = list4['filter']((value62) => {
-    if (value62?.['spec']?.['resumable'] !== !![]) return !![];
-    if (!String(value62?.['taskId'] || '')['trim']()) return !![];
-    if (!shouldPauseOnAbort(value62['spec'], value62)) return !![];
+    if (value62?.['spec']?.['resumable'] !== true) return true;
+    if (!String(value62?.['taskId'] || '')['trim']()) return true;
+    if (!shouldPauseOnAbort(value62['spec'], value62)) return true;
     return !canAbortContextSignal(value62);
   })['map']((value63) => ({
     targetNodeId: value63['targetNodeId'],
     taskId: String(value63['taskId'] || '')['trim'](),
     taskType: value63['taskType'],
     reason:
-      value63?.['spec']?.['resumable'] !== !![]
+      value63?.['spec']?.['resumable'] !== true
         ? 'not-resumable'
         : !String(value63?.['taskId'] || '')['trim']()
           ? 'missing-task-id'
@@ -967,10 +967,10 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
             : 'abort-unavailable',
   }));
   if (value61['length'] > 0)
-    return { ok: ![], projectId: value59, activeCount: list4['length'], pausedCount: 0, blockers: value61 };
-  if (value60['dryRun'] === !![])
+    return { ok: false, projectId: value59, activeCount: list4['length'], pausedCount: 0, blockers: value61 };
+  if (value60['dryRun'] === true)
     return {
-      ok: !![],
+      ok: true,
       projectId: value59,
       activeCount: list4['length'],
       pausedCount: 0,
@@ -979,7 +979,7 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
     };
   const list5 = [];
   list4['forEach']((value64) => {
-    (value64['abortController']['signal']?.['aborted'] !== !![] && value64['abortController']['abort'](),
+    (value64['abortController']['signal']?.['aborted'] !== true && value64['abortController']['abort'](),
       list5['push']({
         targetNodeId: value64['targetNodeId'],
         taskId: String(value64['taskId'] || '')['trim'](),
@@ -990,16 +990,16 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
   if (list4['length'] > 0) {
     let setTimeout2 = null;
     const value66 = new Promise((handler3) => {
-        ((setTimeout2 = setTimeout(() => handler3(![]), value65)), setTimeout2?.['unref']?.());
+        ((setTimeout2 = setTimeout(() => handler3(false), value65)), setTimeout2?.['unref']?.());
       }),
       enabled18 = await Promise['race']([
-        Promise['all'](list4['map']((value67) => value67['settledPromise']))['then'](() => !![]),
+        Promise['all'](list4['map']((value67) => value67['settledPromise']))['then'](() => true),
         value66,
       ]);
     if (setTimeout2 !== null) clearTimeout(setTimeout2);
     if (!enabled18)
       return {
-        ok: ![],
+        ok: false,
         projectId: value59,
         activeCount: list4['length'],
         pausedCount: list5['length'],
@@ -1009,7 +1009,7 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
     await new Promise((value68) => setTimeout(value68, 0));
   }
   return {
-    ok: !![],
+    ok: true,
     projectId: value59,
     activeCount: list4['length'],
     pausedCount: list5['length'],
@@ -1038,7 +1038,7 @@ export function handoffActiveGenerationTasks({
   mirrorTaskState: mirrorTaskState = null,
 } = {}) {
   const enabled19 = String(taskScopeId || '')['trim']();
-  if (!targetStore2 || !enabled19) return { ok: ![], movedCount: 0, taskScopeId: enabled19 };
+  if (!targetStore2 || !enabled19) return { ok: false, movedCount: 0, taskScopeId: enabled19 };
   const value74 = Array['from'](activeTasks['values']())['filter'](
     (value75) => isContextInFlight(value75) && value75['store'] === sourceStore,
   );
@@ -1046,11 +1046,11 @@ export function handoffActiveGenerationTasks({
     value74['forEach']((value76) => {
       ((value76['store'] = targetStore2),
         (value76['taskScopeId'] = enabled19),
-        (value76['background'] = !![]),
+        (value76['background'] = true),
         (value76['mirrorTaskState'] = typeof mirrorTaskState === 'function' ? mirrorTaskState : null));
     }),
     {
-      ok: !![],
+      ok: true,
       movedCount: value74['length'],
       taskScopeId: enabled19,
       targetNodeIds: value74['map']((value77) => value77['targetNodeId']),
@@ -1068,10 +1068,10 @@ export function restoreActiveGenerationTasks({
     );
   return (
     value79['forEach']((value81) => {
-      ((value81['store'] = targetStore), (value81['background'] = ![]), (value81['mirrorTaskState'] = null));
+      ((value81['store'] = targetStore), (value81['background'] = false), (value81['mirrorTaskState'] = null));
     }),
     {
-      ok: !![],
+      ok: true,
       restoredCount: value79['length'],
       taskScopeId: value78,
       targetNodeIds: value79['map']((value82) => value82['targetNodeId']),
@@ -1087,7 +1087,7 @@ export function hasActiveGenerationTasksForStore(value83) {
 
 export function hasActiveGenerationTasksForScope(value85) {
   const enabled20 = String(value85 || '')['trim']();
-  if (!enabled20) return ![];
+  if (!enabled20) return false;
   return Array['from'](activeTasks['values']())['some'](
     (value86) => isContextInFlight(value86) && String(value86['taskScopeId'] || '')['trim']() === enabled20,
   );
@@ -1097,11 +1097,11 @@ export function shouldPreserveGenerationTaskOnUnmount(value87) {
   const value88 = String(value87 || '')['trim']();
   return Array['from'](activeTasks['values']())['some'](
     (value89) =>
-      value89?.['targetNodeId'] === value88 && isContextInFlight(value89) && value89['background'] === !![],
+      value89?.['targetNodeId'] === value88 && isContextInFlight(value89) && value89['background'] === true,
   );
 }
 
-function startTaskContext(value90, args24, { recovering: recovering = ![] } = {}) {
+function startTaskContext(value90, args24, { recovering: recovering = false } = {}) {
   const { spec: spec8, startedAt: startedAt6, taskId: taskId6 } = value90;
   if (value90['cancelRequested'] || value90['signal']?.['aborted']) throw createCancelledError();
   updateContextTaskNode(value90, {
@@ -1116,12 +1116,12 @@ function startTaskContext(value90, args24, { recovering: recovering = ![] } = {}
         })
       : {}),
     ...args24,
-    ...(recovering && isWorkflowSpec(spec8) ? { rhTaskRecovering: !![] } : {}),
-    ...(recovering && isAsyncModelApiSpec(spec8) ? { asyncTaskRecovering: !![] } : {}),
+    ...(recovering && isWorkflowSpec(spec8) ? { rhTaskRecovering: true } : {}),
+    ...(recovering && isAsyncModelApiSpec(spec8) ? { asyncTaskRecovering: true } : {}),
   });
   const run3 = () => {
       if (isContextCancelled(value90)) throw createCancelledError();
-      notifyTaskChange(value90, { status: 'running', ...(recovering ? { recovering: !![] } : {}) });
+      notifyTaskChange(value90, { status: 'running', ...(recovering ? { recovering: true } : {}) });
     },
     promise3 = typeof spec8['onTaskStart'] === 'function' ? spec8['onTaskStart'](value90) : null;
   return promise3 && typeof promise3['then'] === 'function'

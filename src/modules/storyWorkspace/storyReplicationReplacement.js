@@ -64,15 +64,15 @@ export function getStoryReplicationBindingError(enabled2) {
     : '';
 }
 export function updateStoryReplicationReplacement(enabled3, { field: field, key: key2, value: value2 } = {}) {
-  if (enabled3['project']?.['sourceMode'] !== 'video-replication') return ![];
+  if (enabled3['project']?.['sourceMode'] !== 'video-replication') return false;
   const source = enabled3['project']['replication'];
   if (field === 'characterBinding') {
     if (
       !getStoryReplicationSubjects(enabled3)['some']((event3) => event3['key'] === key2) ||
       (value2 && !enabled3['assets']['some']((next) => next['id'] === value2 && next['kind'] === 'character'))
     )
-      return ![];
-    if (source['characterBindings']?.[key2] === text(value2)) return ![];
+      return false;
+    if (source['characterBindings']?.[key2] === text(value2)) return false;
     (((source['characterBindings'] ||= {})[key2] = text(value2)),
       markStoryReplicationPromptsStale(
         enabled3,
@@ -88,7 +88,7 @@ export function updateStoryReplicationReplacement(enabled3, { field: field, key:
             (entry) => entry['promptLanguage'] && entry['promptLanguage'] !== value2,
           ),
         );
-      if (source['targetLocale'] === value2 && !enabled5) return ![];
+      if (source['targetLocale'] === value2 && !enabled5) return false;
       source['targetLocale'] = value2;
       for (const record of list4) {
         markStoryReplicationPromptsStale(enabled3, record['id']);
@@ -97,7 +97,7 @@ export function updateStoryReplicationReplacement(enabled3, { field: field, key:
           else payload['requiredDialogueLanguage'] = value2;
         }
       }
-    } else return ![];
+    } else return false;
   }
-  return !![];
+  return true;
 }

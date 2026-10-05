@@ -4,11 +4,11 @@ export function createCollaborationPresenceChannel({
   onUpdate: onUpdate,
   onError: onError,
   signal: signal,
-  changeDriven: changeDriven = ![],
+  changeDriven: changeDriven = false,
   now: now = () => performance['now'](),
 }) {
   let setTimeout2 = null,
-    enabled = ![],
+    enabled = false,
     value = null,
     item = null,
     key = '',
@@ -65,7 +65,7 @@ export function createCollaborationPresenceChannel({
       await start();
     },
     stop() {
-      ((enabled = !![]), clearTimeout(setTimeout2));
+      ((enabled = true), clearTimeout(setTimeout2));
     },
   };
 }

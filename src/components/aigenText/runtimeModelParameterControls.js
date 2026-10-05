@@ -82,7 +82,7 @@ function restoreRuntimeParameterMenu(el5, target) {
       (el7) => String(el7?.['dataset']?.['uiSchemaField'] || '')['trim']() === enabled2,
     ),
     el8 = el6?.['querySelector']?.('[data-ui-schema-menu-trigger]');
-  if (!el8 || el8['disabled'] === !![]) return;
+  if (!el8 || el8['disabled'] === true) return;
   el8['click']?.();
   const el9 =
     el6?.['__uiSchemaPortaledPopup'] ||
@@ -95,7 +95,7 @@ function restoreRuntimeParameterMenu(el5, target) {
   const el10 = Array['from'](el9['querySelectorAll']?.('[data-ui-schema-value]') || [])['find'](
     (el11) => String(el11?.['dataset']?.['uiSchemaValue'] || '')['trim']() === enabled3,
   );
-  el10?.['focus']?.({ preventScroll: !![] });
+  el10?.['focus']?.({ preventScroll: true });
 }
 function normalizeCatalogModels(options2 = {}) {
   const list = Array['isArray'](options2?.['models']) ? options2['models'] : [],
@@ -121,7 +121,7 @@ function normalizeCatalogModels(options2 = {}) {
         id: id,
         model: String(isDefault['model'] || id)['trim']() || id,
         displayName: String(isDefault['displayName'] || isDefault['name'] || id)['trim']() || id,
-        isDefault: isDefault['isDefault'] === !![],
+        isDefault: isDefault['isDefault'] === true,
         defaultReasoningEffort: String(isDefault['defaultReasoningEffort'] || '')
           ['trim']()
           ['toLowerCase'](),
@@ -161,7 +161,7 @@ function appendCatalogStatusOption(args, handle = '') {
     {
       value: value3,
       label: label === 'loading' ? '正在读取模型…' : '模型列表读取失败',
-      disabled: !![],
+      disabled: true,
     },
   ];
 }
@@ -333,10 +333,10 @@ export function bindAIGenTextRuntimeParameterControls(
   let modelId3 = String(modelId || run()?.['model'] || '')['trim'](),
     catalog2 = {},
     bindModelUiSchemaControls2 = () => {},
-    value38 = ![],
+    value38 = false,
     value39 = 0,
-    enabled5 = ![],
-    enabled6 = ![],
+    enabled5 = false,
+    enabled6 = false,
     value40 = '';
   const run2 = () => {
       if (value38) return;
@@ -380,12 +380,12 @@ export function bindAIGenTextRuntimeParameterControls(
       })),
         restoreRuntimeParameterMenu(el17, captureOpenRuntimeParameterMenu2));
     },
-    handler = async ({ force: force = ![] } = {}) => {
+    handler = async ({ force: force = false } = {}) => {
       const value44 = ++value39;
-      ((enabled5 = !![]), (enabled6 = ![]), (catalog2 = {}), run2());
+      ((enabled5 = true), (enabled6 = false), (catalog2 = {}), run2());
       const runtimeParameterContract2 = getRuntimeParameterContract(modelId3);
       if (!runtimeParameterContract2?.['cliProvider']) {
-        enabled5 = ![];
+        enabled5 = false;
         return;
       }
       try {
@@ -397,19 +397,19 @@ export function bindAIGenTextRuntimeParameterControls(
         catalog2 = isPlainObject(fetchCliProviderModels2) ? fetchCliProviderModels2 : {};
       } catch {
         if (value38 || value44 !== value39) return;
-        ((catalog2 = {}), (enabled6 = !![]));
+        ((catalog2 = {}), (enabled6 = true));
       }
-      ((enabled5 = ![]), run2());
+      ((enabled5 = false), run2());
     },
     value45 = () => {
       const runtimeParameterContract3 = getRuntimeParameterContract(modelId3);
       if (!runtimeParameterContract3?.['cliProvider']) return;
       const cachedCliProviderStatus = getCachedCliProviderStatus(runtimeParameterContract3['cliProvider']),
         enabled8 =
-          cachedCliProviderStatus?.['loggedIn'] === !![] ||
-          cachedCliProviderStatus?.['authConfigured'] === !![];
+          cachedCliProviderStatus?.['loggedIn'] === true ||
+          cachedCliProviderStatus?.['authConfigured'] === true;
       if (!enabled8) return;
-      !enabled5 && normalizeCatalogModels(catalog2)['length'] === 0 && void handler({ force: !![] });
+      !enabled5 && normalizeCatalogModels(catalog2)['length'] === 0 && void handler({ force: true });
     };
   return (
     windowObject?.['addEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, value45),
@@ -438,7 +438,7 @@ export function bindAIGenTextRuntimeParameterControls(
         syncModelUiSchemaControls(el17, value48);
       },
       destroy() {
-        ((value38 = !![]),
+        ((value38 = true),
           (value39 += 1),
           bindModelUiSchemaControls2?.(),
           windowObject?.['removeEventListener']?.(CLI_PROVIDER_STATUS_CHANGED_EVENT, value45),

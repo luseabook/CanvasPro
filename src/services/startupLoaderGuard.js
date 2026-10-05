@@ -3,7 +3,7 @@ export const STARTUP_LOADER_HARD_DEADLINE_MS = 10000;
 const STARTUP_LOADER_GUARD_CANCEL_KEY = '__aicCancelStartupLoaderGuard';
 function revealAppShell(el) {
   const el2 = el?.['getElementById']?.('v2-initial-loader');
-  if (!el2) return ![];
+  if (!el2) return false;
   const el3 = el['getElementById']?.('v2-wrap'),
     el4 = el['getElementById']?.('v2-canvas') || el['querySelector']?.('.v2-canvas');
   if (el4) el4['style']['transition'] = '';
@@ -16,7 +16,7 @@ function revealAppShell(el) {
     (el2['style']['opacity'] = '0'),
     (el2['style']['visibility'] = 'hidden'),
     el2['remove']?.(),
-    !![]
+    true
   );
 }
 export function cancelStartupLoaderGuard(value = globalThis['window']) {
@@ -34,8 +34,8 @@ export function installStartupLoaderGuard({
 } = {}) {
   cancelStartupLoaderGuard(windowObject);
   if (!windowObject || typeof scheduleTimeout !== 'function') return () => {};
-  let enabled = !![],
-    item = ![],
+  let enabled = true,
+    item = false,
     handler = () => {};
   const run2 = (enabled2) => {
       const el5 = documentObject?.['getElementById']?.('v2-initial-loader');
@@ -58,7 +58,7 @@ export function installStartupLoaderGuard({
       () => {
         if (!enabled) return;
         if (!startup['snapshot']()['ready']) {
-          ((item = !![]),
+          ((item = true),
             run2(startup['snapshot']()),
             warn?.(
               '[startup] Still waiting for ' +
@@ -80,7 +80,7 @@ export function installStartupLoaderGuard({
     ),
     handler2 = () => {
       if (!enabled) return;
-      enabled = ![];
+      enabled = false;
       if (typeof cancelTimeout === 'function') cancelTimeout(scheduleTimeout2);
       (handler(),
         windowObject['removeEventListener']?.('pagehide', handler2),
@@ -92,7 +92,7 @@ export function installStartupLoaderGuard({
     (handler = startup['subscribe']((key) => {
       if (key['failure'] || item) run2(key);
     })),
-    windowObject['addEventListener']?.('pagehide', handler2, { once: !![] }),
+    windowObject['addEventListener']?.('pagehide', handler2, { once: true }),
     handler2
   );
 }

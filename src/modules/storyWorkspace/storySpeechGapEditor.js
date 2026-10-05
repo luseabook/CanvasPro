@@ -45,5 +45,5 @@ export function mountStorySpeechGapEditor(el3) {
     const source = el3['ownerDocument']['getSelection']();
     (source['removeAllRanges'](), source['addRange'](target));
   };
-  (el3['addEventListener']('click', options, !![]), el3['addEventListener']('keydown', options, !![]));
+  (el3['addEventListener']('click', options, true), el3['addEventListener']('keydown', options, true));
 }

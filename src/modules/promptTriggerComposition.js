@@ -7,7 +7,7 @@ export function shouldSkipPromptTriggerForBulkInput(value) {
     item === 'insertReplacementText' ||
     item === 'insertHTML'
   )
-    return !![];
+    return true;
   return typeof value?.['data'] === 'string' && value['data']['length'] > 1;
 }
 function _getCompositionTriggerState(el) {
@@ -33,14 +33,14 @@ export function deferPromptTriggerUntilCompositionEnd({
   triggerKey: triggerKey,
   onCompositionEnd: onCompositionEnd,
 }) {
-  const enabled = event?.['isComposing'] === !![] || event?.['inputType'] === 'insertCompositionText',
+  const enabled = event?.['isComposing'] === true || event?.['inputType'] === 'insertCompositionText',
     index = promptEl ? _compositionTriggerStateByElement['get'](promptEl) : null;
-  if (!enabled) return (index?.['pending']['delete'](triggerKey), ![]);
-  if (!promptEl?.['addEventListener'] || typeof onCompositionEnd !== 'function') return !![];
+  if (!enabled) return (index?.['pending']['delete'](triggerKey), false);
+  if (!promptEl?.['addEventListener'] || typeof onCompositionEnd !== 'function') return true;
   const result = index || _getCompositionTriggerState(promptEl);
   return (
     result['timer'] && (clearTimeout(result['timer']), (result['timer'] = 0)),
     result['pending']['set'](triggerKey, onCompositionEnd),
-    !![]
+    true
   );
 }

@@ -24,7 +24,7 @@ function sceneMentionsAsset(dom = {}, index = {}, list = []) {
     data = list2['some']((list3) =>
       list['some']((list4) => list3 === list4 || list3['includes'](list4) || list4['includes'](list3)),
     );
-  if (data) return !![];
+  if (data) return true;
   const list5 = normalizeText(dom?.['heading']) + '\n' + normalizeText(dom?.['body']);
   return list['some']((options) => list5['includes'](options));
 }
@@ -81,7 +81,7 @@ export function createStoryAssetEvidenceDossiers(
   {
     maxScenes: maxScenes = STORY_ASSET_EVIDENCE_DOSSIER_MAX_SCENES,
     maxCharacters: maxCharacters = STORY_ASSET_EVIDENCE_DOSSIER_MAX_CHARACTERS,
-    includeSourceMappings: includeSourceMappings = !![],
+    includeSourceMappings: includeSourceMappings = true,
   } = {},
 ) {
   const list15 = Array['isArray'](value8) ? value8 : [],

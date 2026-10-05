@@ -515,7 +515,7 @@ function normalizeText(item) {
   return String(item || '')['trim']();
 }
 export function syncStoryClipFrameCardSaveError(el, key = '') {
-  if (!el) return ![];
+  if (!el) return false;
   const text = normalizeText(key);
   el['classList']?.['toggle']?.('is-save-error', Boolean(text));
   if (text) el['setAttribute']?.('data-tooltip', text);
@@ -524,19 +524,19 @@ export function syncStoryClipFrameCardSaveError(el, key = '') {
     el['removeAttribute']?.('data-native-title'),
     el['removeAttribute']?.('data-tooltip-source'),
     el['removeAttribute']?.('title'),
-    !![]
+    true
   );
 }
 export function toggleStoryAssetSelectAll(list = [], index = []) {
   return toggleWorkspaceAssetSelectAll(list, index);
 }
-export function toggleStoryAssetSelection(list2 = [], result = '', data = ![]) {
+export function toggleStoryAssetSelection(list2 = [], result = '', data = false) {
   return toggleWorkspaceAssetSelection(list2, result, data);
 }
 export function updateStoryAssetBatchButtonLabel(el2, options = '') {
   const el3 = el2?.['querySelector']?.('.story-asset-batch-trigger-label');
-  if (!el3) return ![];
-  return ((el3['textContent'] = String(options ?? '')), !![]);
+  if (!el3) return false;
+  return ((el3['textContent'] = String(options ?? '')), true);
 }
 export function toggleStoryEpisodeSelectAll(list3 = [], target = []) {
   return toggleStoryAssetSelectAll(list3, target);
@@ -648,7 +648,7 @@ export function buildStoryAssetHoverPreviewContent(
     appearanceId: appearanceId = '',
     selectedAssetId: selectedAssetId = '',
     selectedAppearanceId: selectedAppearanceId = '',
-    mediaOnly: mediaOnly = ![],
+    mediaOnly: mediaOnly = false,
   } = {},
 ) {
   return buildWorkspaceAssetHoverPreviewContent(state, {
@@ -739,7 +739,7 @@ export function buildStoryAssetPackageItemRequest({
 function renderImageOrEmpty({
   imageUrl: imageUrl = '',
   fallbackImageUrl: fallbackImageUrl = '',
-  workspaceAssetLibraryImage: workspaceAssetLibraryImage = ![],
+  workspaceAssetLibraryImage: workspaceAssetLibraryImage = false,
   alt: alt = '',
   className: className = '',
 } = {}) {
@@ -774,7 +774,7 @@ function renderImageOrEmpty({
 }
 export { renderStoryGenerationSpinner };
 export function renderStoryAssetLoadingOverlay({
-  compact: compact = ![],
+  compact: compact = false,
   title: title = '图片生成中',
   description: description,
 } = {}) {
@@ -877,7 +877,7 @@ export function updateStorySummaryCharacterField(list8 = [], value20 = -1, value
       'relationships',
       'arc',
     ]);
-  if (!enabled2 || !map2['has'](value21)) return ![];
+  if (!enabled2 || !map2['has'](value21)) return false;
   return (
     value21 === 'coreTags'
       ? (enabled2['coreTags'] = String(value22 || '')
@@ -885,26 +885,26 @@ export function updateStorySummaryCharacterField(list8 = [], value20 = -1, value
           ['map']((value23) => normalizeText(value23))
           ['filter'](Boolean))
       : (enabled2[value21] = String(value22 || '')),
-    !![]
+    true
   );
 }
 export function updateStoryEpisodeOutlineField(options4 = {}, value24 = '', value25 = '', value26 = '') {
-  if (!['synopsis', 'hook']['includes'](value25) || !Array['isArray'](options4?.['episodes'])) return ![];
+  if (!['synopsis', 'hook']['includes'](value25) || !Array['isArray'](options4?.['episodes'])) return false;
   const count2 = options4['episodes']['findIndex'](
     (value27) => String(value27?.['id'] || '') === String(value24 || ''),
   );
-  if (count2 < 0) return ![];
+  if (count2 < 0) return false;
   return (
     options4['episodes'][count2]?.['script']?.['fullText'] &&
       (options4['episodes'] = invalidateStoryEpisodeScriptsFrom(options4['episodes'], count2)),
     (options4['episodes'][count2][value25] = String(value26 ?? '')),
-    !![]
+    true
   );
 }
-export function isStoryOutlineSectionOpen(options5 = {}, value28 = '', value29 = ![]) {
+export function isStoryOutlineSectionOpen(options5 = {}, value28 = '', value29 = false) {
   const value30 = options5?.['outlineSectionOpenState'];
   if (value30 && Object['prototype']['hasOwnProperty']['call'](value30, value28))
-    return value30[value28] === !![];
+    return value30[value28] === true;
   return Boolean(value29);
 }
 function createStoryScriptPlanningEpisodeView(selectionMode, title2, value31) {
@@ -939,7 +939,7 @@ function createStoryScriptPlanningEpisodeView(selectionMode, title2, value31) {
       canGenerate['sourceMode'] !== 'upload-original' &&
       canGenerate['outlineStatus'] !== 'stale' &&
       canGenerateStoryEpisodeScript(value32, index2),
-    selectionMode: selectionMode['scriptSelectionMode'] === !![],
+    selectionMode: selectionMode['scriptSelectionMode'] === true,
     disabled: Boolean(selectionMode['storyPlanningOperation']),
     generationMessage:
       selectionMode['episodeScriptGenerationStatus'] || '正在生成第 ' + number + ' 集完整剧本',
@@ -961,7 +961,7 @@ function createStoryScriptPlanningEpisodeSectionView(isOutlineGenerating) {
       ? isOutlineGenerating['selectedScriptEpisodeIds']
       : [],
     list10 = list9['length'] ? getStoryEpisodeScriptBatchTargets(episodes, list9) : [],
-    selectionMode2 = isOutlineGenerating['scriptSelectionMode'] === !![];
+    selectionMode2 = isOutlineGenerating['scriptSelectionMode'] === true;
   return {
     episodes: episodes['map']((value34, value35) =>
       createStoryScriptPlanningEpisodeView(isOutlineGenerating, value34, value35),
@@ -977,7 +977,7 @@ function createStoryScriptPlanningEpisodeSectionView(isOutlineGenerating) {
     isStale: isUploadedOriginal['outlineStatus'] === 'stale',
     busy: Boolean(isOutlineGenerating['storyPlanningOperation']),
     batchGenerating: isOutlineGenerating['storyPlanningOperation'] === 'writing-episode-scripts',
-    batchCancelRequested: isOutlineGenerating['episodeScriptBatchCancelRequested'] === !![],
+    batchCancelRequested: isOutlineGenerating['episodeScriptBatchCancelRequested'] === true,
   };
 }
 export function renderStoryEpisodeOutlineItem(value36, value37, value38) {
@@ -996,10 +996,10 @@ export function renderStoryEpisodeOutlineSection(value39) {
   });
 }
 export function renderStoryTextRequestDebugAction({
-  isDeveloperMode: isDeveloperMode = ![],
+  isDeveloperMode: isDeveloperMode = false,
   action: action = '',
   title: title = '只预览下一次请求，不发送 API',
-  disabled: disabled = ![],
+  disabled: disabled = false,
 } = {}) {
   if (!isDeveloperMode || !normalizeText(action)) return '';
   return renderRequestDebugButton(
@@ -1025,7 +1025,7 @@ export function renderStoryScriptGenerationFooter(hint) {
     disabled2 = Boolean(hint['storyPlanningOperation']),
     value41 = hint['storyPlanningOperation'] === 'writing-episode-scripts',
     value42 = hint['storyPlanningOperation'] === 'writing-episode-script',
-    value43 = hint['episodeScriptBatchCancelRequested'] === !![],
+    value43 = hint['episodeScriptBatchCancelRequested'] === true,
     list11 = hint['scriptSelectionMode']
       ? getStoryEpisodeScriptBatchTargets(hint['data']['episodes'], hint['selectedScriptEpisodeIds'])
       : [],
@@ -1060,7 +1060,7 @@ export function renderStoryScriptGenerationFooter(hint) {
         ' aria-busy="' +
         value42 +
         '">' +
-        (value42 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+        (value42 ? renderStoryGenerationSpinner({ button: true }) : '') +
         escapeHtml(value42 ? hint['storyPlanningStatus'] || '正在生成分集正文' : value45) +
         '</button>';
   return renderPageFooter(hint, {
@@ -1124,7 +1124,7 @@ export function renderStoryAssetExtractionFooter(options6 = {}) {
         ' aria-busy="' +
         value48 +
         '">' +
-        (value48 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+        (value48 ? renderStoryGenerationSpinner({ button: true }) : '') +
         escapeHtml(value50) +
         '</button>'
       : '',
@@ -1153,7 +1153,7 @@ export function renderStoryAssetExtractionFooter(options6 = {}) {
       ' aria-busy="' +
       disabled3 +
       '">' +
-      (disabled3 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+      (disabled3 ? renderStoryGenerationSpinner({ button: true }) : '') +
       '<span>' +
       escapeHtml(value53) +
       '</span>' +
@@ -1161,7 +1161,7 @@ export function renderStoryAssetExtractionFooter(options6 = {}) {
       '</button>',
   });
 }
-export function renderStoryEpisodeOutlinePlanningFooter(options7 = {}, { stale: stale = ![] } = {}) {
+export function renderStoryEpisodeOutlinePlanningFooter(options7 = {}, { stale: stale = false } = {}) {
   const disabled4 = Boolean(options7['storyPlanningOperation']),
     nextLabel = stale ? '重新运行' : '生成分集大纲',
     renderStoryTextRequestDebugAction4 = renderStoryTextRequestDebugAction({
@@ -1186,7 +1186,7 @@ export function renderStoryEpisodeOutlinePlanningFooter(options7 = {}, { stale: 
       ' aria-busy="' +
       disabled4 +
       '">' +
-      (disabled4 ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+      (disabled4 ? renderStoryGenerationSpinner({ button: true }) : '') +
       '<span>' +
       escapeHtml(value55) +
       '</span>' +
@@ -1201,9 +1201,9 @@ function createStoryScriptPlanningPageView(loadingMessage, footerMarkup = '') {
     isUploadedRewrite = originalCreative['sourceMode'] === 'upload-rewrite',
     value56 = loadingMessage['storyPlanningOperation'] === 'planning-episode-outlines',
     enabled6 = Boolean(value56 || (loadingMessage['scriptGenerationFocusMode'] && list12['length'])),
-    originalOpen = !enabled6 && isStoryOutlineSectionOpen(loadingMessage, 'original', !![]),
-    summaryOpen = !enabled6 && isStoryOutlineSectionOpen(loadingMessage, 'summary', !![]),
-    episodesOpen = enabled6 || isStoryOutlineSectionOpen(loadingMessage, 'episodes', !![]),
+    originalOpen = !enabled6 && isStoryOutlineSectionOpen(loadingMessage, 'original', true),
+    summaryOpen = !enabled6 && isStoryOutlineSectionOpen(loadingMessage, 'summary', true),
+    episodesOpen = enabled6 || isStoryOutlineSectionOpen(loadingMessage, 'episodes', true),
     disabled5 = Boolean(loadingMessage['storyPlanningOperation'] || loadingMessage['isGeneratingStory']);
   return {
     isUploadedOriginal: isUploadedOriginal2,
@@ -1258,7 +1258,7 @@ export function renderOutlinePage(value57) {
         : storyScriptWorkflowStage === 'summary-ready'
           ? renderStoryEpisodeOutlinePlanningFooter(value57)
           : storyScriptWorkflowStage === 'outline-stale'
-            ? renderStoryEpisodeOutlinePlanningFooter(value57, { stale: !![] })
+            ? renderStoryEpisodeOutlinePlanningFooter(value57, { stale: true })
             : storyScriptWorkflowStage === 'scripts-complete'
               ? renderStoryAssetExtractionFooter(value57)
               : '';
@@ -1300,7 +1300,7 @@ export function renderStoryEpisodeCardActionIcon(value65 = 'generate') {
 }
 export function renderStoryEpisodeExperimentalSplitAction(
   options9 = {},
-  { isDeveloperMode: isDeveloperMode = ![], disabled: disabled = ![], busy: busy = ![] } = {},
+  { isDeveloperMode: isDeveloperMode = false, disabled: disabled = false, busy: busy = false } = {},
 ) {
   if (!isDeveloperMode) return '';
   const value66 = Math['max'](1, Math['trunc'](Number(options9?.['number']) || 1)),
@@ -1317,15 +1317,15 @@ export function renderStoryEpisodeExperimentalSplitAction(
     ' aria-busy="' +
     busy +
     '">' +
-    (busy ? renderStoryGenerationSpinner({ button: !![] }) : renderStoryEpisodeCardActionIcon('generate')) +
+    (busy ? renderStoryGenerationSpinner({ button: true }) : renderStoryEpisodeCardActionIcon('generate')) +
     '<span>' +
     (busy ? '生成中' : '开发测试') +
     '</span></button>'
   );
 }
-export function renderStoryEpisodeExperimentalModeToggle(enabled7 = ![], { disabled: disabled = ![] } = {}) {
-  const value67 = ![];
-  disabled = !![];
+export function renderStoryEpisodeExperimentalModeToggle(enabled7 = false, { disabled: disabled = false } = {}) {
+  const value67 = false;
+  disabled = true;
   const value68 = '实验模式暂未开放';
   return (
     '<button type="button" class="story-experimental-mode-toggle ' +
@@ -1343,7 +1343,7 @@ export function renderStoryEpisodeExperimentalModeToggle(enabled7 = ![], { disab
 }
 export function renderStoryEpisodeRequestDebugAction(
   options10 = {},
-  { isDeveloperMode: isDeveloperMode = ![], disabled: disabled = ![] } = {},
+  { isDeveloperMode: isDeveloperMode = false, disabled: disabled = false } = {},
 ) {
   if (!isDeveloperMode) return '';
   const value69 = Math['max'](1, Math['trunc'](Number(options10?.['number']) || 1)),
@@ -1357,7 +1357,7 @@ export function renderStoryEpisodeRequestDebugAction(
       (disabled ? 'disabled' : ''),
   );
 }
-export function renderStoryEpisodeSplitDraftStatus(options11 = {}, { disabled: disabled = ![] } = {}) {
+export function renderStoryEpisodeSplitDraftStatus(options11 = {}, { disabled: disabled = false } = {}) {
   const value70 = options11?.['splitDraft'],
     list14 = Array['isArray'](value70?.['items']) ? value70['items'] : [],
     count3 = list14['reduce'](
@@ -1421,7 +1421,7 @@ function createStoryEpisodeCardPresentation(sequenceLabel, id2) {
     isSplitting = disabled6['isGenerating'],
     storyEpisodeStatus = deriveStoryEpisodeStatus(id2['clips']),
     actionKind = getStoryEpisodeCardAction(id2),
-    isSelectionMode = sequenceLabel['episodeSelectionMode'] === !![];
+    isSelectionMode = sequenceLabel['episodeSelectionMode'] === true;
   return {
     id: id2['id'],
     number: id2['number'],
@@ -1487,14 +1487,14 @@ export function renderEpisodesPage(title3) {
     experimentalModeToggleMarkup: renderStoryEpisodeExperimentalModeToggle(experimentalMode, {
       disabled: disabled7,
     }),
-    selectionMode: title3['episodeSelectionMode'] === !![],
+    selectionMode: title3['episodeSelectionMode'] === true,
     allEpisodesSelected: allEpisodesSelected,
     selectedCount: title3['selectedEpisodeIds']['length'],
     batchControl: batchControl,
     cards: cards['map']((value83) => createStoryEpisodeCardPresentation(title3, value83)),
     footerMarkup: renderPageFooter(title3, {
       nextLabel: '保存并返回项目列表',
-      isLast: !![],
+      isLast: true,
       leadingActionsMarkup: renderStoryPlanningTextModelPicker(title3, 'video', {
         disabled: Boolean(title3['storyPlanningOperation']),
       }),
@@ -1571,7 +1571,7 @@ export function renderEpisodeAssetRail(value92) {
       name: id5['name'],
       clipId: id5['clipId'],
       clipTitle: id5['clipTitle'],
-      captureSavePending: id5['captureSavePending'] === !![],
+      captureSavePending: id5['captureSavePending'] === true,
       mentionId: buildStoryClipFrameMentionId(id5['id']),
       mediaType: getStoryClipFrameMediaType(id5),
       imageUrl: resolveStoryClipFrameImageUrl(id5),
@@ -1644,7 +1644,7 @@ function renderProjectPage(styleId2) {
       episodes: styleId2['data']['episodes'],
       targetLabel: targetLabel['label'],
       styleLabel: styleLabel['label'],
-      selectionMode: styleId2['replicationSelectionMode'] === !![],
+      selectionMode: styleId2['replicationSelectionMode'] === true,
       footerMarkup: renderStoryVideoReplicationFooter(styleId2),
     });
   }
@@ -1662,7 +1662,7 @@ function renderStoryVideoReplicationFooter(planningStatus) {
   return renderPageFooter(planningStatus, {
     title: title5['title'],
     hint: title5['hint'],
-    useDefaultCopy: ![],
+    useDefaultCopy: false,
     actionsMarkup:
       '<button type="button" class="story-next-button story-replication-next-button' +
       (title5['actionAttention'] ? ' is-attention' : '') +
@@ -1673,7 +1673,7 @@ function renderStoryVideoReplicationFooter(planningStatus) {
       ' aria-busy="' +
       title5['busy'] +
       '">' +
-      (title5['busy'] ? renderStoryGenerationSpinner({ button: !![] }) : '') +
+      (title5['busy'] ? renderStoryGenerationSpinner({ button: true }) : '') +
       '<span>' +
       escapeHtml(title5['actionLabel']) +
       '</span>' +
@@ -1700,12 +1700,12 @@ function getStoryAssetPromptEditorContext(options12 = {}, el4 = null) {
 }
 export function updateStoryAssetPromptFromEditor(options13 = {}, value103 = null) {
   const { asset: asset3, appearance: appearance3 } = getStoryAssetPromptEditorContext(options13, value103);
-  if (!asset3 || !appearance3 || asset3['isLibraryAsset']) return ![];
+  if (!asset3 || !appearance3 || asset3['isLibraryAsset']) return false;
   return (
     (appearance3['prompt'] = readStoryAssetPromptText(value103)),
     normalizeText(getStoryAssetAppearances(asset3)[0]?.['id']) === normalizeText(appearance3['id']) &&
       (asset3['prompt'] = appearance3['prompt']),
-    !![]
+    true
   );
 }
 function updateSelectedClipPrompt(value104, value105) {
@@ -1805,12 +1805,12 @@ export function notifyStoryTaskResult(
       ? value122['call'](consoleObject, '[storyWorkspace][task-result]', value123)
       : value122['call'](consoleObject, '[storyWorkspace][task-result]', value123, details);
   }
-  if (typeof handler !== 'function') return ![];
+  if (typeof handler !== 'function') return false;
   return (
     duration === undefined && toastOptions === undefined
       ? handler(message, tone2)
       : handler(message, tone2, duration, toastOptions),
-    !![]
+    true
   );
 }
 export function notifyStoryTextGenerationComplete(
@@ -1859,7 +1859,7 @@ export function initStoryWorkspace({
   loadWorkspace: loadWorkspace = null,
   saveWorkspace: saveWorkspace = null,
   projectPackages: projectPackages = null,
-  requestWorkspaceMode: requestWorkspaceMode = () => ![],
+  requestWorkspaceMode: requestWorkspaceMode = () => false,
 } = {}) {
   if (!documentObject?.['body']) return null;
   const value125 = documentObject['getElementById']('storyWorkspaceRoot');
@@ -1868,7 +1868,7 @@ export function initStoryWorkspace({
   if (!el5) return null;
   const selectedAssetId2 = normalizeStoryWorkspaceAssetData(createDemoStoryWorkspaceData());
   selectedAssetId2['project']['planning'] = normalizeStoryProjectPlanning(selectedAssetId2['project'], {
-    allowDeveloperPromptModes: windowObject?.['DEV_MODE'] === !![],
+    allowDeveloperPromptModes: windowObject?.['DEV_MODE'] === true,
   });
   const text15 = resolveStoryWorkspaceModelId('text'),
     image2 = resolveStoryWorkspaceModelId('image'),
@@ -1878,7 +1878,7 @@ export function initStoryWorkspace({
       storyProjectSessionById: { [normalizeText(selectedAssetId2['project']?.['id'])]: 1 },
       experimentalSplitAvailable: isStoryEpisodeExperimentalSplitAvailable(windowObject),
       experimentalAssetExtractionAvailable: isStoryAssetExperimentalExtractionAvailable(windowObject),
-      developerModeAvailable: windowObject?.['DEV_MODE'] === !![],
+      developerModeAvailable: windowObject?.['DEV_MODE'] === true,
       view: 'home',
       step: 1,
       homeTab: 'generate',
@@ -1891,16 +1891,16 @@ export function initStoryWorkspace({
       scriptFileName: '',
       scriptText: '',
       scriptCharacterCount: null,
-      isGeneratingStory: ![],
-      isParsingDocument: ![],
-      canvasSyncPending: ![],
+      isGeneratingStory: false,
+      isParsingDocument: false,
+      canvasSyncPending: false,
       canvasSyncScope: '',
-      hasCreatedProject: ![],
-      projectTitleEdited: ![],
+      hasCreatedProject: false,
+      projectTitleEdited: false,
       projects: [],
       projectSearchQuery: '',
       projectSortOrder: 'updated-desc',
-      showArchivedProjects: ![],
+      showArchivedProjects: false,
       openProjectMenuId: '',
       pendingDeleteProjectId: '',
       pendingDeleteAssetAppearanceKey: '',
@@ -1909,13 +1909,13 @@ export function initStoryWorkspace({
       storyPlanningStatus: '',
       assetBreakdownEpisodes: [],
       assetBreakdownVisibleCount: 0,
-      scriptSelectionMode: ![],
+      scriptSelectionMode: false,
       selectedScriptEpisodeIds: [],
       generatingEpisodeScriptId: '',
-      isBatchGeneratingScripts: ![],
+      isBatchGeneratingScripts: false,
       episodeScriptBatchId: '',
-      episodeScriptBatchCancelRequested: ![],
-      scriptGenerationFocusMode: ![],
+      episodeScriptBatchCancelRequested: false,
+      scriptGenerationFocusMode: false,
       outlineSectionOpenState: {},
       pageScrollPositions: {},
       episodeScriptGenerationStatus: '',
@@ -1924,15 +1924,15 @@ export function initStoryWorkspace({
       generatingClipId: '',
       generatingClipIds: [],
       pendingDeleteClipId: '',
-      clipAdjustmentOpen: ![],
+      clipAdjustmentOpen: false,
       clipAdjustmentInstruction: '',
       clipAdjustmentPromptMode: '',
-      clipAdjustmentPromptModeOpen: ![],
+      clipAdjustmentPromptModeOpen: false,
       clipAdjustmentLanguage: '',
-      clipAdjustmentLanguageOpen: ![],
-      clipPromptHistoryOpen: ![],
+      clipAdjustmentLanguageOpen: false,
+      clipPromptHistoryOpen: false,
       clipAdjustmentGeneratingIds: [],
-      clipSelectionMode: ![],
+      clipSelectionMode: false,
       selectedClipGenerationIds: [],
       clipBatchGenerationByEpisode: {},
       textProvider: getStoryWorkspaceModelChoice('text', text15)?.['provider'] || '',
@@ -1959,17 +1959,17 @@ export function initStoryWorkspace({
       episodeAssetPanelRatio: 22,
       episodeEditorPanelRatio: 0x22,
       episodeAssetRailTab: 'assets',
-      assetSelectionMode: ![],
+      assetSelectionMode: false,
       selectedAssetIds: [],
       exportingAssetAppearanceKey: '',
-      experimentalSplitMode: ![],
-      episodeSelectionMode: ![],
+      experimentalSplitMode: false,
+      episodeSelectionMode: false,
       selectedEpisodeIds: [],
       splittingEpisodeIds: [],
       episodeBatchSplitOperation: '',
       episodeBatchSplitStatus: '',
       episodeBatchSplitId: '',
-      episodeBatchSplitCancelRequested: ![],
+      episodeBatchSplitCancelRequested: false,
       assetAppearanceIndexes: {},
       assetAppearanceMotion: '',
       selectedAssetId:
@@ -1983,12 +1983,12 @@ export function initStoryWorkspace({
       characterVoicePanelMotion: '',
       generatingAppearanceKeys: [],
       generatingVoiceAssetIds: [],
-      isBatchGenerating: ![],
+      isBatchGenerating: false,
       batchGeneratingAssetIds: [],
       batchGeneratingAppearanceKeys: [],
       batchGeneratingVoiceAssetIds: [],
       assetBatchId: '',
-      assetBatchCancelRequested: ![],
+      assetBatchCancelRequested: false,
       batchGenerationLabel: '',
       data: selectedAssetId2,
       models: { text: text15, image: image2, video: video },
@@ -2000,7 +2000,7 @@ export function initStoryWorkspace({
   ((storyRoot['id'] = 'storyWorkspaceRoot'),
     (storyRoot['className'] = 'story-workspace-root'),
     (storyRoot['dataset']['uiStop'] = '1'),
-    (storyRoot['hidden'] = !![]),
+    (storyRoot['hidden'] = true),
     storyRoot['setAttribute']('aria-hidden', 'true'),
     (storyRoot['innerHTML'] =
       '<div class="story-workspace-shell" data-story-workspace-shell>\n    <div class="story-workspace-toolbar" data-story-toolbar></div>\n    <div class="story-page-stage" data-story-page-stage>\n      <main class="story-page-viewport" data-story-page-viewport></main>\n      <div class="story-workspace-generation-loading storyboard-script-loading-overlay" data-story-planning-loading role="status" aria-live="polite" hidden>\n        <div class="storyboard-script-loading-spinner"></div>\n        <div class="storyboard-script-loading-label" data-story-planning-loading-label>正在提取角色、场景与道具</div>\n        <div class="storyboard-script-loading-bar"><div class="storyboard-script-loading-bar-fill"></div></div>\n      </div>\n    </div>\n  </div>\n  <div class="story-canvas-sync-loading storyboard-script-loading-overlay" data-story-canvas-sync-loading role="status" aria-live="polite" aria-label="正在加入画布" aria-hidden="true" tabindex="-1" hidden>\n    <div class="storyboard-script-loading-spinner"></div>\n    <strong class="storyboard-script-loading-label">正在加入画布</strong>\n    <small>同步完成后将自动跳转到画布</small>\n  </div>\n  <div class="story-asset-hover-preview" data-story-asset-hover-preview role="tooltip" aria-hidden="true"></div>\n  <div class="story-clip-video-history-menu" data-story-clip-video-history-menu aria-hidden="true"></div>\n  <input class="story-hidden-input" type="file" data-story-script-file accept=".txt,.docx,.pdf">\n  <input class="story-hidden-input" type="file" data-story-replication-video-file accept="' +
@@ -2066,8 +2066,8 @@ export function initStoryWorkspace({
     map5 = createStoryTaskBatchCancellationRegistry(),
     cancellationRegistry = createStoryTaskBatchCancellationRegistry(),
     projectData = createStoryProjectDataOwner({ state: state2 });
-  let enabled10 = ![],
-    enabled11 = ![],
+  let enabled10 = false,
+    enabled11 = false,
     collaboration = null;
   const workspacePresentationLifecycle = createWorkspacePresentationLifecycle({
       getRoot: () => storyRoot,
@@ -2078,7 +2078,7 @@ export function initStoryWorkspace({
           isStoryEpisodeExperimentalSplitAvailable(windowObject),
         isStoryAssetExperimentalExtractionAvailable2 =
           isStoryAssetExperimentalExtractionAvailable(windowObject),
-        allowDeveloperPromptModes = windowObject?.['DEV_MODE'] === !![];
+        allowDeveloperPromptModes = windowObject?.['DEV_MODE'] === true;
       if (
         state2['experimentalSplitAvailable'] === isStoryEpisodeExperimentalSplitAvailable2 &&
         state2['experimentalAssetExtractionAvailable'] === isStoryAssetExperimentalExtractionAvailable2 &&
@@ -2093,7 +2093,7 @@ export function initStoryWorkspace({
         ((state2['data']['project']['planning'] = normalizeStoryProjectPlanning(state2['data']['project'], {
           allowDeveloperPromptModes: allowDeveloperPromptModes,
         })),
-        schedulePersistence({ immediate: !![] }));
+        schedulePersistence({ immediate: true }));
       if (enabled10) return;
       if (enabled11) render();
     };
@@ -2112,7 +2112,7 @@ export function initStoryWorkspace({
     }),
     showTaskApiKeyError = (details2, args4 = {}) => {
       const value148 =
-        details2?.['credentialPromptShown'] === !![] ||
+        details2?.['credentialPromptShown'] === true ||
         showProviderApiKeyMissingToastForError(details2, { ...args4 });
       return (
         value148 &&
@@ -2126,7 +2126,7 @@ export function initStoryWorkspace({
       );
     },
     showTaskResultToast = (value149, value150 = 'info', details3, value151) => {
-      if (value150 === 'error' && details3 && showTaskApiKeyError(details3)) return !![];
+      if (value150 === 'error' && details3 && showTaskApiKeyError(details3)) return true;
       const value152 = Boolean(value151?.['projectId']);
       return notifyStoryTaskResult(windowObject?.['showToast'], value149, value150, {
         details: details3,
@@ -2151,11 +2151,11 @@ export function initStoryWorkspace({
         notificationMessage: notificationMessage = value153,
         tone: tone = 'success',
         details: details4,
-        showResultToast: showResultToast = !![],
+        showResultToast: showResultToast = true,
       } = {},
     ) => {
       const navigationTarget2 = handler6(value154, value155),
-        value156 = showResultToast ? showTaskResultToast(value153, tone, details4, navigationTarget2) : ![];
+        value156 = showResultToast ? showTaskResultToast(value153, tone, details4, navigationTarget2) : false;
       return (
         void notifyStoryTextGenerationComplete(notificationMessage, { navigationTarget: navigationTarget2 }),
         value156
@@ -2242,9 +2242,9 @@ export function initStoryWorkspace({
     });
     if (changed) {
       if (enabled11 && state2['view'] === 'episode') {
-        if (!syncFrameRail({ refreshContent: !![] })) render();
+        if (!syncFrameRail({ refreshContent: true })) render();
       }
-      schedulePersistence({ immediate: !![] });
+      schedulePersistence({ immediate: true });
     }
     return changed;
   }
@@ -2260,13 +2260,13 @@ export function initStoryWorkspace({
         });
       },
     );
-    if (!changed2) return ![];
+    if (!changed2) return false;
     if (currentProjectChanged) {
       if (enabled11 && state2['view'] === 'episode') {
-        if (!syncFrameRail({ refreshContent: !![] })) render();
+        if (!syncFrameRail({ refreshContent: true })) render();
       }
     }
-    return (schedulePersistence({ immediate: !![] }), !![]);
+    return (schedulePersistence({ immediate: true }), true);
   }
   const projectTasks = createStoryProjectTaskWorkspaceController({
       state: state2,
@@ -2525,7 +2525,7 @@ export function initStoryWorkspace({
         name: normalizeText(error2['name']) || '总素材',
         hoverTitle: normalizeText(error2['assetName']) || '总素材',
         imageUrl: imageUrl2,
-        isLibraryAsset: !![],
+        isLibraryAsset: true,
       });
     }
     const text17 = normalizeText(assetId2?.['dataset']?.['storyReferenceFrame']);
@@ -2574,7 +2574,7 @@ export function initStoryWorkspace({
   function run11(value182, event3) {
     timer?.['show'](value182, { event: event3 });
   }
-  function run12(value183, value184, { persist: persist = ![], layout: layout = null } = {}) {
+  function run12(value183, value184, { persist: persist = false, layout: layout = null } = {}) {
     const assetSplitter =
         layout ||
         viewportElement['querySelector']('.story-page.is-current .story-episode-detail-page') ||
@@ -2591,11 +2591,11 @@ export function initStoryWorkspace({
         value184,
       );
     ((state2['episodeAssetPanelRatio'] = box['left']), (state2['episodeEditorPanelRatio'] = box['center']));
-    if (persist) schedulePersistence({ uiOnly: !![] });
+    if (persist) schedulePersistence({ uiOnly: true });
   }
   function run13(event4) {
     const splitter = event4['target']['closest']?.('[data-story-episode-splitter]');
-    if (!splitter) return ![];
+    if (!splitter) return false;
     const layout2 = splitter['closest']('.story-episode-detail-page'),
       value185 = splitter['dataset']['storyEpisodeSplitter'];
     return beginStoryHorizontalResizeSession({
@@ -2612,7 +2612,7 @@ export function initStoryWorkspace({
               layout: layout2,
             });
       },
-      onFinish: () => schedulePersistence({ uiOnly: !![] }),
+      onFinish: () => schedulePersistence({ uiOnly: true }),
     });
   }
   function renderToolbar() {
@@ -2629,7 +2629,7 @@ export function initStoryWorkspace({
       storyAssetIdFromMentionNodeId = getStoryAssetIdFromMentionNodeId(el16['dataset']?.['assetId']),
       list20 = resolveStoryVideoReplicationClipVoiceAssetIds(state2['data'], value187);
     if (list20 && !list20['includes'](storyAssetIdFromMentionNodeId)) {
-      setStoryClipMentionVoiceEnabled(el16, state2['data']['assets'], ![]);
+      setStoryClipMentionVoiceEnabled(el16, state2['data']['assets'], false);
       return;
     }
     const voiceEnabled = getStoryEpisodeCharacterVoiceEnabled(
@@ -2642,7 +2642,7 @@ export function initStoryWorkspace({
       voiceEnabled: voiceEnabled,
     });
     if (!storyClipMentionVoiceState['available']) {
-      setStoryClipMentionVoiceEnabled(el16, state2['data']['assets'], ![]);
+      setStoryClipMentionVoiceEnabled(el16, state2['data']['assets'], false);
       return;
     }
     (el16['classList']?.['add']('has-story-voice-reference'),
@@ -2664,7 +2664,7 @@ export function initStoryWorkspace({
         'aria-label',
         storyClipMentionVoiceState['enabled'] ? '关闭角色声音参考' : '启用角色声音参考',
       ),
-      (el20['innerHTML'] = renderStoryVoiceIcon(![])),
+      (el20['innerHTML'] = renderStoryVoiceIcon(false)),
       el20['addEventListener']('mousedown', (event5) => {
         (event5['preventDefault'](), event5['stopPropagation']());
       }),
@@ -2752,7 +2752,7 @@ export function initStoryWorkspace({
     return {
       nodeId: 'story-clip:' + defaultDuration['id'],
       promptEl: promptEl2,
-      keepAssetMentionPills: !![],
+      keepAssetMentionPills: true,
       _data: {
         type: 'ai-video',
         model: state2['models']['video'],
@@ -2771,8 +2771,8 @@ export function initStoryWorkspace({
           libraryCandidates: getAssetMentionCandidates(),
           clipFrames: state2['data']['clipFrames'],
           query: query,
-          includeTime: !![],
-          includeClipFrames: !![],
+          includeTime: true,
+          includeClipFrames: true,
           defaultDuration: defaultDuration['duration'],
         })['map']((args24) =>
           args24['pillKind'] === 'time'
@@ -2796,7 +2796,7 @@ export function initStoryWorkspace({
             name: normalizeText(candidate['subtitle'] || error3['name']) || '视频提取帧',
             hoverTitle: normalizeText(candidate['label']) || '片段帧',
             imageUrl: imageUrl3,
-            isLibraryAsset: !![],
+            isLibraryAsset: true,
           });
           return;
         }
@@ -2841,7 +2841,7 @@ export function initStoryWorkspace({
       },
       getPromptHtml: () => defaultDuration['prompt'],
       onPromptPillActivate: ({ pill: pill4 } = {}) => {
-        if (pill4?.['dataset']?.['promptPillKind'] !== 'time') return ![];
+        if (pill4?.['dataset']?.['promptPillKind'] !== 'time') return false;
         return (
           beginStoryClipTimePillEdit({
             pill: pill4,
@@ -2851,7 +2851,7 @@ export function initStoryWorkspace({
                 schedulePersistence());
             },
           }),
-          !![]
+          true
         );
       },
     };
@@ -2860,7 +2860,7 @@ export function initStoryWorkspace({
     const storyAsset = findStoryAsset(state2, assetId3),
       clips2 = getSelectedEpisode(state2),
       selectedClip2 = getSelectedClip(state2, clips2);
-    if (!selectedClip2) return ![];
+    if (!selectedClip2) return false;
     const el22 = storyRoot['querySelector']('[data-story-clip-prompt]'),
       enabled12 = run17(el22);
     let candidate2 = storyAsset
@@ -2887,7 +2887,7 @@ export function initStoryWorkspace({
         ? buildStoryClipMentionCandidates({ libraryCandidates: [assetMentionRef] })[0]
         : null;
     }
-    if (!enabled12 || !candidate2) return ![];
+    if (!enabled12 || !candidate2) return false;
     const enabled14 = triggerRange
       ? _insertMentionPill(enabled12, {
           candidate: candidate2,
@@ -2895,8 +2895,8 @@ export function initStoryWorkspace({
           atIndex: triggerRange['startOffset'],
         })
       : Boolean(appendMentionPillToPrompt(enabled12, candidate2));
-    if (!enabled14) return ![];
-    return (el22?.['focus']?.(), !![]);
+    if (!enabled14) return false;
+    return (el22?.['focus']?.(), true);
   }
   const map7 = createStoryAssetPromptDragController({
       root: storyRoot,
@@ -2965,7 +2965,7 @@ export function initStoryWorkspace({
     const value193 = el24?.['querySelector']?.('[data-story-asset-prompt][contenteditable="true"]'),
       enabled16 = run16(value193);
     if (!enabled16) return null;
-    return bindPromptMentionHost(enabled16, { commitHydratedPrompt: ![] });
+    return bindPromptMentionHost(enabled16, { commitHydratedPrompt: false });
   }
   function run21(value194) {
     const episodeId2 = getSelectedEpisode(state2),
@@ -3071,7 +3071,7 @@ export function initStoryWorkspace({
           state: state2,
           analyze: (value197) => storyVideoReplicationWorkspaceController['analyzeSelected'](value197),
           sync: syncCurrentProjectEntry,
-          persist: () => schedulePersistence({ immediate: !![] }),
+          persist: () => schedulePersistence({ immediate: true }),
         }),
       ),
       list21['push'](
@@ -3086,10 +3086,10 @@ export function initStoryWorkspace({
           showToast: showToast,
         }),
       ));
-    let value199 = ![];
+    let value199 = false;
     const destroy3 = () => {
       if (value199) return;
-      value199 = !![];
+      value199 = true;
       for (const value200 of list21['reverse']()) {
         try {
           value200?.['destroy']?.();
@@ -3163,7 +3163,7 @@ export function initStoryWorkspace({
           provider: state2['imageProvider'],
           generationParams: state2['imageGenerationParams'],
           generationParamsByModel: state2['imageGenerationParamsByModel'],
-          showSchemaControls: !![],
+          showSchemaControls: true,
           onChange: ({
             modelId: modelId2,
             provider: provider2,
@@ -3209,7 +3209,7 @@ export function initStoryWorkspace({
           referenceCounts: storyClipProduction['getInputReferenceCounts'](
             getSelectedClip(state2, getSelectedEpisode(state2)),
           ),
-          showSchemaControls: !![],
+          showSchemaControls: true,
           runningHubWorkflowAllowedModelIds: STORY_WORKSPACE_RUNNINGHUB_WORKFLOW_MODEL_IDS,
           modelSubmenuPlacement: 'viewport-auto',
           onChange: ({
@@ -3443,7 +3443,7 @@ export function initStoryWorkspace({
         viewportElement['replaceChildren'](page),
         page['classList']['add']('is-current'),
         onTransitionComplete2?.(),
-        { page: page, committed: Promise['resolve'](!![]), committedImmediately: !![] }
+        { page: page, committed: Promise['resolve'](true), committedImmediately: true }
       );
     const value225 = current2['querySelector']('[data-story-assets-switch-region]'),
       el38 = page['querySelector']('[data-story-assets-switch-region]'),
@@ -3477,8 +3477,8 @@ export function initStoryWorkspace({
     });
     return {
       page: page,
-      committed: committed?.['committed'] || Promise['resolve'](![]),
-      committedImmediately: ![],
+      committed: committed?.['committed'] || Promise['resolve'](false),
+      committedImmediately: false,
     };
   }
   function run27() {
@@ -3522,25 +3522,25 @@ export function initStoryWorkspace({
       enabled18 && (el8['textContent'] = state2['storyPlanningStatus'] || '正在生成分镜视频'));
   }
   function refreshStoryAssetExtractionFooterInPlace() {
-    if (state2['view'] !== 'project' || state2['step'] !== 1) return ![];
+    if (state2['view'] !== 'project' || state2['step'] !== 1) return false;
     if (state2['data']?.['project']?.['sourceMode'] === 'video-replication') return refreshFooter();
     const enabled19 = viewportElement['querySelector']('.story-page.is-current .story-page-footer');
-    if (!enabled19) return ![];
+    if (!enabled19) return false;
     const el42 = documentObject['createElement']('template');
     el42['innerHTML'] = renderStoryAssetExtractionFooter(state2)['trim']();
     const enabled20 = el42['content']['firstElementChild'];
-    if (!enabled20) return ![];
-    return (enabled19['replaceWith'](enabled20), !![]);
+    if (!enabled20) return false;
+    return (enabled19['replaceWith'](enabled20), true);
   }
   function render({
     direction: direction = 'none',
-    updateToolbar: updateToolbar = !![],
-    capturePageState: capturePageState = !![],
+    updateToolbar: updateToolbar = true,
+    capturePageState: capturePageState = true,
     onTransitionComplete: onTransitionComplete = null,
     transitionScope: transitionScope = 'page',
   } = {}) {
     collaboration?.['sync']();
-    if (!enabled11) return (workspacePresentationLifecycle['invalidate'](), Promise['resolve'](![]));
+    if (!enabled11) return (workspacePresentationLifecycle['invalidate'](), Promise['resolve'](false));
     hideHistory();
     const value229 = viewportElement['querySelector']('.story-page.is-current'),
       value230 = value132 || run27(),
@@ -3587,11 +3587,11 @@ export function initStoryWorkspace({
     if (state2['view'] !== 'project' || state2['step'] !== 2) return null;
     return viewportElement['querySelector']('.story-page.is-current');
   }
-  function syncFrameRail({ refreshContent: refreshContent = ![] } = {}) {
-    if (state2['view'] !== 'episode') return ![];
+  function syncFrameRail({ refreshContent: refreshContent = false } = {}) {
+    if (state2['view'] !== 'episode') return false;
     const el44 = viewportElement['querySelector']('.story-page.is-current'),
       el45 = el44?.['querySelector']('[data-story-episode-asset-rail]');
-    if (!el44 || !el45) return ![];
+    if (!el44 || !el45) return false;
     if (refreshContent) {
       const el46 = documentObject['createElement']('div');
       el46['innerHTML'] = renderEpisodeAssetRail(state2);
@@ -3620,35 +3620,35 @@ export function initStoryWorkspace({
           (el53['inert'] = !enabled21));
       }));
     const el54 = el45['querySelector']('[data-story-episode-asset-help]');
-    return (el54 && (el54['textContent'] = getStoryEpisodeAssetRailHelp(storyEpisodeAssetRailTab)), !![]);
+    return (el54 && (el54['textContent'] = getStoryEpisodeAssetRailHelp(storyEpisodeAssetRailTab)), true);
   }
   function settleFrameCard(value238, { errorMessage: errorMessage = '' } = {}) {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const text24 = normalizeText(value238),
       el55 = [...viewportElement['querySelectorAll']('[data-story-reference-frame]')]['find'](
         (el56) => el56['dataset']['storyReferenceFrame'] === text24,
       );
-    if (!el55) return ![];
+    if (!el55) return false;
     el55['setAttribute']('aria-busy', 'false');
     const el57 = el55['closest']('.story-episode-frame-card')?.['querySelector'](
       '[data-story-action="delete-clip-frame"]',
     );
-    if (el57) el57['disabled'] = ![];
-    return (syncStoryClipFrameCardSaveError(el55, errorMessage), !![]);
+    if (el57) el57['disabled'] = false;
+    return (syncStoryClipFrameCardSaveError(el55, errorMessage), true);
   }
   function run7(value239) {
-    if (state2['view'] !== 'project' || state2['step'] !== 3) return ![];
+    if (state2['view'] !== 'project' || state2['step'] !== 3) return false;
     const el58 = viewportElement['querySelector']('.story-page.is-current'),
       enabled22 = state2['data']['episodes']['find']((value240) => value240['id'] === value239),
       enabled23 = [...(el58?.['querySelectorAll']('.story-episode-card[data-story-marquee-id]') || [])][
         'find'
       ]((el59) => el59['dataset']['storyMarqueeId'] === value239);
-    if (!el58 || !enabled22 || !enabled23) return ![];
+    if (!el58 || !enabled22 || !enabled23) return false;
     const el60 = documentObject['createElement']('div');
     el60['innerHTML'] = renderEpisodeCard(state2, enabled22);
     const enabled24 = el60['firstElementChild'];
-    if (!enabled24) return ![];
-    return (enabled23['replaceWith'](enabled24), !![]);
+    if (!enabled24) return false;
+    return (enabled23['replaceWith'](enabled24), true);
   }
   function refreshAssetCard(value241) {
     const el61 = run28(),
@@ -3656,19 +3656,19 @@ export function initStoryWorkspace({
       el62 = [...(el61?.['querySelectorAll']('[data-story-asset-id]') || [])]['find'](
         (el63) => el63['dataset']['storyAssetId'] === value241,
       );
-    if (!el61 || !storyAsset2 || !el62) return ![];
+    if (!el61 || !storyAsset2 || !el62) return false;
     const el64 = documentObject['createElement']('div');
     el64['innerHTML'] = renderStoryAssetCard(state2, storyAsset2);
     const enabled25 = el64['firstElementChild'];
-    if (!enabled25) return ![];
-    return ((el62['closest']('.story-asset-card-shell') || el62)['replaceWith'](enabled25), !![]);
+    if (!enabled25) return false;
+    return ((el62['closest']('.story-asset-card-shell') || el62)['replaceWith'](enabled25), true);
   }
   function refreshSelectedAsset() {
     const el65 = run28(),
       visibleStoryAssets = getVisibleStoryAssets(state2),
       alt2 = getSelectedStoryAsset(state2, visibleStoryAssets),
       el66 = el65?.['querySelector']('.story-asset-detail');
-    if (!el65 || !alt2 || alt2['isLibraryAsset'] || !el66) return ![];
+    if (!el65 || !alt2 || alt2['isLibraryAsset'] || !el66) return false;
     el65['querySelectorAll']('[data-story-asset-id]')['forEach']((el67) => {
       el67['classList']['toggle']('is-selected', el67['dataset']['storyAssetId'] === alt2['id']);
     });
@@ -3682,7 +3682,7 @@ export function initStoryWorkspace({
       el69 = el66['querySelector']('.story-asset-preview-wrap');
     el69?.['querySelectorAll']('.story-asset-preview-slide--outgoing')['forEach']((el70) => el70['remove']());
     if (el68 && el69 && state2['assetAppearanceMotion']) {
-      const el71 = el68['cloneNode'](!![]);
+      const el71 = el68['cloneNode'](true);
       (el71['classList']['remove']('img-preview-loading'),
         el71['classList']['add'](
           'story-asset-preview-slide--outgoing',
@@ -3693,7 +3693,7 @@ export function initStoryWorkspace({
         el71['querySelector']('.img-loading-overlay')?.['remove'](),
         el68['after'](el71));
       const value244 = () => el71['remove']();
-      (el71['addEventListener']('animationend', value244, { once: !![] }),
+      (el71['addEventListener']('animationend', value244, { once: true }),
         windowObject['setTimeout'](value244, 460));
     }
     el66['classList']['remove']('is-sliding-next', 'is-sliding-previous');
@@ -3768,7 +3768,7 @@ export function initStoryWorkspace({
       isStoryAssetBaseAppearance3 = isStoryAssetBaseAppearance(alt2, imageUrl4),
       el80 = el74?.['querySelector']('.story-asset-caption-tags'),
       el81 = el80?.['querySelector'](':scope > .story-asset-style-reference-control');
-    if (state2['allowAssetStyleReference'] !== ![] && isStoryAssetBaseAppearance3 && el80) {
+    if (state2['allowAssetStyleReference'] !== false && isStoryAssetBaseAppearance3 && el80) {
       const el82 = documentObject['createElement']('div');
       el82['innerHTML'] = renderStoryAssetReferenceInput(imageUrl4, {
         disabled: generationControl['disabled'],
@@ -3792,22 +3792,22 @@ export function initStoryWorkspace({
       const el85 = el84['querySelector']('[data-story-asset-generate-label]');
       if (el85) el85['textContent'] = generationControl['label'];
     }
-    return !![];
+    return true;
   }
   function refreshSelectedClip(value249) {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el86 = viewportElement['querySelector']('.story-page.is-current'),
       enabled26 = el86?.['querySelector']('.story-clip-editor'),
       el87 = el86?.['querySelector']('.story-video-preview'),
       el88 = el86?.['querySelector']('.story-clip-timeline');
-    if (!el86 || !enabled26 || !el87 || !el88) return ![];
+    if (!el86 || !enabled26 || !el87 || !el88) return false;
     const el89 = documentObject['createElement']('div');
     el89['innerHTML'] = renderEpisodeDetail(state2);
     const el90 = el89['firstElementChild'],
       enabled27 = el90?.['querySelector']('.story-clip-editor'),
       el91 = el90?.['querySelector']('.story-video-preview'),
       enabled28 = el91?.['querySelector']('[data-story-clip-preview-slide]');
-    if (!enabled27 || !el91 || !enabled28) return ![];
+    if (!enabled27 || !el91 || !enabled28) return false;
     const value250 = value249 === 'previous' ? 'previous' : 'next',
       el92 = el87['querySelector'](
         '[data-story-clip-preview-slide]:not(.story-clip-preview-slide--outgoing)',
@@ -3833,7 +3833,7 @@ export function initStoryWorkspace({
         el91['classList']['remove']('is-sliding-next', 'is-sliding-previous'));
     };
     return (
-      el92?.['addEventListener']('animationend', value252, { once: !![] }),
+      el92?.['addEventListener']('animationend', value252, { once: true }),
       windowObject['setTimeout'](value252, 460),
       windowObject['requestAnimationFrame'](() => {
         el88['querySelector']('[data-story-clip-id].is-selected')?.['scrollIntoView']?.({
@@ -3841,23 +3841,23 @@ export function initStoryWorkspace({
           inline: 'nearest',
         });
       }),
-      !![]
+      true
     );
   }
   function refreshSelectedVideoResult(value253) {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el94 = viewportElement['querySelector']('.story-page.is-current'),
       el95 = el94?.['querySelector']('.story-video-preview'),
       el96 = el95?.['querySelector'](
         '[data-story-clip-preview-slide]:not(.story-clip-preview-slide--outgoing)',
       );
-    if (!el94 || !el95 || !el96) return ![];
+    if (!el94 || !el95 || !el96) return false;
     const el97 = documentObject['createElement']('div');
     el97['innerHTML'] = renderEpisodeDetail(state2);
     const el98 = el97['firstElementChild'],
       el99 = el98?.['querySelector']('.story-video-preview'),
       enabled29 = el99?.['querySelector']('[data-story-clip-preview-slide]');
-    if (!el99 || !enabled29) return ![];
+    if (!el99 || !enabled29) return false;
     const value254 = value253 === 'previous' ? 'previous' : 'next';
     (map4['get'](el94)?.['destroy']?.(),
       map4['delete'](el94),
@@ -3880,35 +3880,35 @@ export function initStoryWorkspace({
         el99['classList']['remove']('is-result-sliding-next', 'is-result-sliding-previous'));
     };
     return (
-      el96['addEventListener']('animationend', value257, { once: !![] }),
+      el96['addEventListener']('animationend', value257, { once: true }),
       windowObject['setTimeout'](value257, 460),
-      !![]
+      true
     );
   }
   function refreshTimeline() {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el102 = viewportElement['querySelector']('.story-page.is-current'),
       el103 = el102?.['querySelector']('.story-clip-timeline');
-    if (!el102 || !el103) return ![];
+    if (!el102 || !el103) return false;
     const value258 = el103['querySelector']('.story-clip-strip'),
       el104 = documentObject['createElement']('div');
     el104['innerHTML'] = renderEpisodeDetail(state2);
     const el105 = el104['firstElementChild']?.['querySelector']('.story-clip-timeline');
-    if (!el105) return ![];
+    if (!el105) return false;
     const value259 = Math['max'](0, Number(value258?.['scrollLeft']) || 0);
     el103['replaceWith'](el105);
     const value260 = el105['querySelector']('.story-clip-strip');
     if (value260) value260['scrollLeft'] = value259;
-    return !![];
+    return true;
   }
   function refreshReferenceSummary() {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el106 = viewportElement['querySelector'](
         '.story-page.is-current [data-story-clip-reference-summary]',
       ),
       selectedEpisode6 = getSelectedEpisode(state2),
       selectedClip4 = getSelectedClip(state2, selectedEpisode6);
-    if (!el106 || !selectedEpisode6 || !selectedClip4) return ![];
+    if (!el106 || !selectedEpisode6 || !selectedClip4) return false;
     const value261 = storyClipProduction['renderEpisode'](state2, selectedEpisode6, selectedClip4),
       value262 = value261['referenceCounts'];
     (['image', 'audio', 'video']['forEach']((value263) => {
@@ -3948,16 +3948,16 @@ export function initStoryWorkspace({
         if (el110) el108['className'] = el110['className'];
       }
     }
-    return !![];
+    return true;
   }
   function refreshPromptRestore() {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el114 = viewportElement['querySelector']('.story-page.is-current'),
       el115 = el114?.['querySelector']('[data-story-clip-prompt]'),
       enabled30 = el114?.['querySelector']('.story-clip-adjustment-control'),
       episode4 = getSelectedEpisode(state2),
       selectedClip5 = getSelectedClip(state2, episode4);
-    if (!el114 || !el115 || !enabled30 || !episode4 || !selectedClip5) return ![];
+    if (!el114 || !el115 || !enabled30 || !episode4 || !selectedClip5) return false;
     el115['innerHTML'] = renderStoryClipPromptMentions(selectedClip5['prompt'] || '', {
       assets: state2['data']['assets'],
       episode: episode4,
@@ -3973,43 +3973,43 @@ export function initStoryWorkspace({
       'adjustmentControl'
     ];
     const enabled31 = el116['firstElementChild'];
-    if (!enabled31) return ![];
-    return (enabled30['replaceWith'](enabled31), !![]);
+    if (!enabled31) return false;
+    return (enabled30['replaceWith'](enabled31), true);
   }
   function run29() {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el117 = viewportElement['querySelector']('.story-page.is-current'),
       el118 = el117?.['querySelector']('.story-clip-adjustment-control'),
       el119 = el118?.['querySelector']('[data-story-action="toggle-clip-adjustment"]'),
       selectedEpisode7 = getSelectedEpisode(state2),
       selectedClip6 = getSelectedClip(state2, selectedEpisode7);
-    if (!el117 || !el118 || !el119 || !selectedEpisode7 || !selectedClip6) return ![];
+    if (!el117 || !el118 || !el119 || !selectedEpisode7 || !selectedClip6) return false;
     const el120 = el118['querySelector']('[data-story-clip-adjustment-bar]'),
       enabled32 = storyClipProduction['renderEpisode'](state2, selectedEpisode7, selectedClip6)[
         'adjustmentBar'
       ];
-    el119['setAttribute']('aria-expanded', String(state2['clipAdjustmentOpen'] === !![]));
-    if (!enabled32) return (el120?.['remove'](), !![]);
+    el119['setAttribute']('aria-expanded', String(state2['clipAdjustmentOpen'] === true));
+    if (!enabled32) return (el120?.['remove'](), true);
     const el121 = documentObject['createElement']('div');
     el121['innerHTML'] = enabled32;
     const enabled33 = el121['firstElementChild'];
-    if (!enabled33) return ![];
+    if (!enabled33) return false;
     if (el120) el120['replaceWith'](enabled33);
     else el118['appendChild'](enabled33);
-    return !![];
+    return true;
   }
   function run30({ focus: focus = '' } = {}) {
     const el122 = viewportElement['querySelector']('.story-page.is-current [data-story-clip-prompt-history]'),
       el123 = el122?.['querySelector']('[data-story-action="toggle-clip-prompt-history"]'),
       el124 = el122?.['querySelector']('[data-story-clip-prompt-history-panel]');
-    if (!el122 || !el123 || !el124) return ![];
-    const enabled34 = state2['clipPromptHistoryOpen'] === !![];
+    if (!el122 || !el123 || !el124) return false;
+    const enabled34 = state2['clipPromptHistoryOpen'] === true;
     (el123['setAttribute']('aria-expanded', String(enabled34)), (el124['hidden'] = !enabled34));
     if (focus === 'trigger') el123['focus']();
     return (
       focus === 'first' &&
         el124['querySelector']('[data-story-action="restore-clip-prompt-history"]')?.['focus'](),
-      !![]
+      true
     );
   }
   function run31(args26 = {}) {
@@ -4023,12 +4023,12 @@ export function initStoryWorkspace({
     });
   }
   function refreshGeneration() {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el125 = viewportElement['querySelector']('.story-page.is-current'),
       enabled35 = el125?.['querySelector']('.story-clip-selection-controls'),
       el126 = el125?.['querySelector']('[data-story-clip-preview-slide]'),
       el127 = el125?.['querySelector']('.story-clip-timeline');
-    if (!el125 || !enabled35 || !el126 || !el127) return ![];
+    if (!el125 || !enabled35 || !el126 || !el127) return false;
     const el128 = documentObject['createElement']('div');
     el128['innerHTML'] = renderEpisodeDetail(state2);
     const el129 = el128['firstElementChild'],
@@ -4039,9 +4039,9 @@ export function initStoryWorkspace({
       list24 = Array['from'](
         el131?.['querySelectorAll']?.('.story-clip-card-shell[data-story-clip-id]') || [],
       );
-    if (!enabled36 || !el130 || !el131 || list23['length'] !== list24['length']) return ![];
+    if (!enabled36 || !el130 || !el131 || list23['length'] !== list24['length']) return false;
     const map8 = new Map(list23['map']((el132) => [normalizeText(el132['dataset']['storyClipId']), el132]));
-    if (list24['some']((el133) => !map8['has'](normalizeText(el133['dataset']['storyClipId'])))) return ![];
+    if (list24['some']((el133) => !map8['has'](normalizeText(el133['dataset']['storyClipId'])))) return false;
     return (
       enabled35['outerHTML'] !== enabled36['outerHTML'] && enabled35['replaceWith'](enabled36),
       el126['innerHTML'] !== el130['innerHTML'] &&
@@ -4050,14 +4050,14 @@ export function initStoryWorkspace({
         const value266 = map8['get'](normalizeText(el134['dataset']['storyClipId']));
         value266?.['outerHTML'] !== el134['outerHTML'] && value266['replaceWith'](el134);
       }),
-      !![]
+      true
     );
   }
   function run32() {
-    if (state2['view'] !== 'episode') return ![];
+    if (state2['view'] !== 'episode') return false;
     const el135 = viewportElement['querySelector']('.story-page.is-current'),
       el136 = el135?.['querySelector']('.story-clip-timeline');
-    if (!el135 || !el136) return ![];
+    if (!el135 || !el136) return false;
     const value267 = el135['querySelector']('.story-clip-selection-controls'),
       el137 = documentObject['createElement']('div');
     el137['innerHTML'] = storyClipProduction['renderEpisode'](state2, getSelectedEpisode(state2))[
@@ -4093,7 +4093,7 @@ export function initStoryWorkspace({
         if (el141) el141['hidden'] = state2['clipSelectionMode'] || enabled37;
         if (el142) el142['hidden'] = state2['clipSelectionMode'] || !enabled37;
       }),
-      !![]
+      true
     );
   }
   function refreshBatchLabel() {
@@ -4101,7 +4101,7 @@ export function initStoryWorkspace({
       value271 = storyAssetSettingsProjection['projectAssetControl']('batch-generation', {
         state: state2,
       });
-    let updateStoryAssetBatchButtonLabel2 = ![];
+    let updateStoryAssetBatchButtonLabel2 = false;
     return (
       list25['forEach']((value272) => {
         updateStoryAssetBatchButtonLabel2 =
@@ -4115,17 +4115,17 @@ export function initStoryWorkspace({
     if (state2['workspaceSurface'] !== surface) syncCurrentProjectEntry();
     const storyWorkspaceSurface = selectStoryWorkspaceSurface(state2, surface);
     if (storyWorkspaceSurface) workspacePresentationLifecycle['invalidate']();
-    enabled11 = !![];
+    enabled11 = true;
     if (workspacePresentationLifecycle['activate']()) render({ capturePageState: previousMode === 'story' });
     return (collaboration?.['sync'](), storyRoot);
   }
   function deactivate({ nextMode: nextMode = '' } = {}) {
-    if (['story', 'replication']['includes'](nextMode)) return !![];
-    if (enabled10) return ![];
+    if (['story', 'replication']['includes'](nextMode)) return true;
+    if (enabled10) return false;
     return (
       closeStoryRequestDebugPreview(documentObject),
-      enabled11 && (capturePageState2(), schedulePersistence({ immediate: !![] })),
-      (enabled11 = ![]),
+      enabled11 && (capturePageState2(), schedulePersistence({ immediate: true })),
+      (enabled11 = false),
       collaboration?.['sync'](),
       hideHoverPreview(),
       hideHistory(),
@@ -4136,7 +4136,7 @@ export function initStoryWorkspace({
       run6(),
       run36(),
       workspacePresentationLifecycle['deactivate'](),
-      !![]
+      true
     );
   }
   function run33(value273 = null) {
@@ -4304,7 +4304,7 @@ export function initStoryWorkspace({
       schedulePersistence(),
       render());
   }
-  function run46(field, value291, { renderWorkspace: renderWorkspace = !![] } = {}) {
+  function run46(field, value291, { renderWorkspace: renderWorkspace = true } = {}) {
     if (field === 'replicationAsrProvider') {
       if (!RECORDING_ASR_MODELS['some']((value292) => value292['id'] === value291)) return;
       ((state2['replicationAsrProvider'] = value291), schedulePersistence(), render());
@@ -4347,16 +4347,16 @@ export function initStoryWorkspace({
         el166?.['setAttribute']('aria-invalid', 'true'),
         showToast('请输入 1-' + STORY_EPISODE_COUNT_MAX + ' 的整数集数。', 'warn'),
         el166?.['focus'](),
-        ![]
+        false
       );
     el166?.['setAttribute']('aria-invalid', 'false');
-    const value294 = run46('episodeCount', count5, { renderWorkspace: ![] });
-    return (run48(el166, value294), !![]);
+    const value294 = run46('episodeCount', count5, { renderWorkspace: false });
+    return (run48(el166, value294), true);
   }
   function run48(el167, value295) {
     const el168 = el167?.['closest']('.story-episode-count-custom-editor'),
       el169 = el168?.['closest']('.story-planning-picker');
-    if (!el168 || !el169) return ![];
+    if (!el168 || !el169) return false;
     const value296 = !STORY_EPISODE_COUNT_OPTIONS['includes'](value295);
     (el168['classList']['toggle']('is-selected', value296),
       el168['setAttribute']('aria-selected', String(value296)),
@@ -4368,7 +4368,7 @@ export function initStoryWorkspace({
       }));
     const el171 = el169['querySelector']('[data-story-planning-trigger-label]');
     if (el171) el171['textContent'] = value295 + '集';
-    return !![];
+    return true;
   }
   function run49(el172) {
     windowObject['setTimeout'](() => {
@@ -4439,9 +4439,9 @@ export function initStoryWorkspace({
         episode: episode6,
         enteringEpisode: state2['view'] === 'episode',
       }),
-        openProject3({ restoreView: !![] }),
+        openProject3({ restoreView: true }),
         restoreStoryAssetBreakdownProgress(),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         resumeTasks(),
         resumePersistedTasks());
       return;
@@ -4449,7 +4449,7 @@ export function initStoryWorkspace({
     if (!enabled41?.['data']) return;
     const enabled42 = projectData['activate'](text28, {
       beforeActivate: () => {
-        (stopStoryAssetBreakdownProgress({ clearState: !![] }), resetTaskState());
+        (stopStoryAssetBreakdownProgress({ clearState: true }), resetTaskState());
       },
     });
     if (!enabled42) return;
@@ -4465,74 +4465,74 @@ export function initStoryWorkspace({
       (state2['scriptCharacterCount'] = Number['isFinite'](response6['characterCount'])
         ? response6['characterCount']
         : state2['scriptText']['length']));
-    ((state2['assetSelectionMode'] = ![]),
+    ((state2['assetSelectionMode'] = false),
       (state2['selectedAssetIds'] = []),
-      (state2['scriptSelectionMode'] = ![]),
+      (state2['scriptSelectionMode'] = false),
       (state2['selectedScriptEpisodeIds'] = []),
       (state2['characterVoiceEditor'] = null),
       (state2['characterVoicePanelMotion'] = ''),
       (state2['pendingCharacterVoiceAssetId'] = ''),
       (state2['pendingDeleteClipId'] = ''),
       (state2['pendingDeleteAssetAppearanceKey'] = ''),
-      (state2['clipSelectionMode'] = ![]),
+      (state2['clipSelectionMode'] = false),
       (state2['selectedClipGenerationIds'] = []),
       applyStoryProjectUiState(state2, enabled42['ui'], state2['data']),
       restoreTaskState(state2['data']),
-      (state2['projectTitleEdited'] = enabled42['projectTitleEdited'] === !![]),
-      (state2['hasCreatedProject'] = !![]));
+      (state2['projectTitleEdited'] = enabled42['projectTitleEdited'] === true),
+      (state2['hasCreatedProject'] = true));
     const episode7 = getSelectedEpisode(state2);
     (prepareVideoSettings(getSelectedClip(state2, episode7), {
       episode: episode7,
       enteringEpisode: state2['view'] === 'episode',
     }),
-      openProject3({ restoreView: !![] }),
+      openProject3({ restoreView: true }),
       restoreStoryAssetBreakdownProgress(),
-      schedulePersistence({ immediate: !![] }),
+      schedulePersistence({ immediate: true }),
       resumeTasks(),
       resumePersistedTasks());
   }
   function run52(value300) {
     const el174 = viewportElement['querySelector']('.story-page.is-current');
-    if (!el174) return ![];
+    if (!el174) return false;
     if (value300['outlineSectionId'])
       return jumpToStoryOutlineSection(el174, value300['outlineSectionId'], {
         windowObject: windowObject,
       });
     const enabled43 = value300['assetId'] ? 'storyAssetId' : value300['clipId'] ? 'storyClipId' : '',
       enabled44 = value300['assetId'] || value300['clipId'];
-    if (!enabled43 || !enabled44) return ![];
+    if (!enabled43 || !enabled44) return false;
     const value301 = value300['assetId'] ? '[data-story-asset-id]' : '[data-story-clip-id]',
       enabled45 = [...el174['querySelectorAll'](value301)]['find'](
         (el175) => normalizeText(el175?.['dataset']?.[enabled43]) === enabled44,
       );
-    if (!enabled45) return ![];
+    if (!enabled45) return false;
     const run53 = () =>
       enabled45['scrollIntoView']?.({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
     return (
       typeof windowObject?.['requestAnimationFrame'] === 'function'
         ? windowObject['requestAnimationFrame'](run53)
         : run53(),
-      !![]
+      true
     );
   }
   async function run(options17 = {}) {
     const text30 = normalizeText(options17['projectId']);
-    if (!text30) return ![];
+    if (!text30) return false;
     if (normalizeText(state2['data']?.['project']?.['id']) !== text30) {
       const enabled46 = state2['projects']['some'](
         (value302) => normalizeText(value302?.['id'] || value302?.['data']?.['project']?.['id']) === text30,
       );
-      if (!enabled46) return (showToast('对应的剧本项目已不存在。', 'warn'), ![]);
+      if (!enabled46) return (showToast('对应的剧本项目已不存在。', 'warn'), false);
       openProject2(text30);
     }
     if (normalizeText(state2['data']?.['project']?.['id']) !== text30)
-      return (showToast('无法打开任务对应的剧本项目。', 'warn'), ![]);
+      return (showToast('无法打开任务对应的剧本项目。', 'warn'), false);
     requestWorkspaceMode(getStoryProjectWorkspaceMode(state2['data']?.['project']));
     const assetId4 = resolveStoryTaskResultDestination(state2['data'], options17);
     if (assetId4['view'] === 'episode') {
       const enabled47 = await run54(assetId4['episodeId'], assetId4['clipId']);
-      if (!enabled47) return ![];
-      return (run52(assetId4), !![]);
+      if (!enabled47) return false;
+      return (run52(assetId4), true);
     }
     if (
       !(await run55(assetId4['step'], {
@@ -4541,8 +4541,8 @@ export function initStoryWorkspace({
         outlineSectionId: assetId4['outlineSectionId'],
       }))
     )
-      return ![];
-    return (run52(assetId4), !![]);
+      return false;
+    return (run52(assetId4), true);
   }
   function run56(value303) {
     const text31 = normalizeText(value303),
@@ -4556,7 +4556,7 @@ export function initStoryWorkspace({
         (state2['pendingDeleteClipId'] = ''),
         render(),
         showToast('删除片段失败，请刷新后重试。', 'error'),
-        ![]
+        false
       );
     ((state2['data']['episodes'][count6] = removeStoryEpisodeClip2['episode']),
       (state2['pendingDeleteClipId'] = ''),
@@ -4570,10 +4570,10 @@ export function initStoryWorkspace({
     return (
       (state2['selectedClipId'] = value308?.['id'] || ''),
       applyVideoSettings(value308),
-      schedulePersistence({ immediate: !![] }),
+      schedulePersistence({ immediate: true }),
       render(),
       showToast('片段已删除。', 'success'),
-      !![]
+      true
     );
   }
   function run4(value309) {
@@ -4615,9 +4615,9 @@ export function initStoryWorkspace({
     const text32 = normalizeText(value315),
       list26 = normalizeStoryClipFrames(state2['data']['clipFrames']),
       canvasId = list26['find']((value316) => value316['id'] === text32);
-    if (!canvasId) return (showToast('删除失败，当前内容已不存在。', 'error'), ![]);
-    if (canvasId['captureSavePending'] === !![])
-      return (showToast('请等待当前片段帧保存完成。', 'info'), ![]);
+    if (!canvasId) return (showToast('删除失败，当前内容已不存在。', 'error'), false);
+    if (canvasId['captureSavePending'] === true)
+      return (showToast('请等待当前片段帧保存完成。', 'info'), false);
     if (
       typeof deleteCanvasNodes === 'function' &&
       normalizeText(canvasId['canvasId']) &&
@@ -4626,14 +4626,14 @@ export function initStoryWorkspace({
       try {
         await deleteCanvasNodes({ canvasId: canvasId['canvasId'], nodeIds: [canvasId['canvasNodeId']] });
       } catch (error4) {
-        return (showToast(error4?.['message'] || '关联画布节点删除失败。', 'error'), ![]);
+        return (showToast(error4?.['message'] || '关联画布节点删除失败。', 'error'), false);
       }
     const count7 = run4(text32);
     ((state2['data']['clipFrames'] = removeStoryClipFrame(list26, text32)),
       hideHoverPreview(),
       refreshReferenceSummary());
-    if (!syncFrameRail({ refreshContent: !![] })) render();
-    schedulePersistence({ immediate: !![] });
+    if (!syncFrameRail({ refreshContent: true })) render();
+    schedulePersistence({ immediate: true });
     const storyClipFrameMediaType =
       getStoryClipFrameMediaType(canvasId) === STORY_CLIP_MEDIA_TYPE_VIDEO ? '视频片段' : '片段帧';
     return (
@@ -4643,7 +4643,7 @@ export function initStoryWorkspace({
           : storyClipFrameMediaType + '已删除。',
         'success',
       ),
-      !![]
+      true
     );
   }
   const storyVideoReplicationWorkspaceController = createStoryVideoReplicationWorkspaceController({
@@ -4734,12 +4734,12 @@ export function initStoryWorkspace({
           value318['append'](el181, el182, el183),
           el180['appendChild'](value318),
           documentObject['body']['appendChild'](el180));
-        let value319 = ![],
+        let value319 = false,
           el184 = null;
         const run59 = (value320) => {
             if (value319) return;
-            ((value319 = !![]),
-              documentObject['removeEventListener']('keydown', value321, !![]),
+            ((value319 = true),
+              documentObject['removeEventListener']('keydown', value321, true),
               el180['remove'](),
               handler9(value320));
           },
@@ -4759,7 +4759,7 @@ export function initStoryWorkspace({
               el183['appendChild'](el186));
             if (el185['autofocus']) el184 = el186;
           }),
-          documentObject['addEventListener']('keydown', value321, !![]),
+          documentObject['addEventListener']('keydown', value321, true),
           el184?.['focus']?.());
       })
     );
@@ -4853,19 +4853,19 @@ export function initStoryWorkspace({
     );
   }
   function resetDownstreamUi({ selectedEpisodeId: selectedEpisodeId = '' } = {}) {
-    ((state2['assetSelectionMode'] = state2['replicationSelectionMode'] = ![]),
+    ((state2['assetSelectionMode'] = state2['replicationSelectionMode'] = false),
       (state2['selectedAssetIds'] = []),
       (state2['selectedAssetId'] = ''),
       (state2['assetAppearanceIndexes'] = {}),
       (state2['characterVoiceEditor'] = null),
-      (state2['episodeSelectionMode'] = ![]),
+      (state2['episodeSelectionMode'] = false),
       (state2['selectedEpisodeIds'] = []),
       (state2['selectedEpisodeId'] = selectedEpisodeId),
       (state2['selectedClipId'] = ''),
       (state2['pendingDeleteClipId'] = ''),
-      (state2['clipSelectionMode'] = ![]),
+      (state2['clipSelectionMode'] = false),
       (state2['selectedClipGenerationIds'] = []),
-      (state2['scriptSelectionMode'] = ![]),
+      (state2['scriptSelectionMode'] = false),
       (state2['selectedScriptEpisodeIds'] = []));
   }
   const storySummaryGenerationWorkspaceController = createStorySummaryGenerationWorkspaceController({
@@ -4924,34 +4924,34 @@ export function initStoryWorkspace({
   async function run61(
     value324,
     value325 = createProjectToken(state2),
-    { batch: batch = null, regeneration: regeneration = ![] } = {},
+    { batch: batch = null, regeneration: regeneration = false } = {},
   ) {
     return await storyEpisodeScriptWorkspaceController['request'](value324, value325, {
       batch: batch,
       regeneration: regeneration,
     });
   }
-  async function run62(episodeId3, { regeneration: regeneration = ![] } = {}) {
-    if (state2['storyPlanningOperation']) return ![];
+  async function run62(episodeId3, { regeneration: regeneration = false } = {}) {
+    if (state2['storyPlanningOperation']) return false;
     const count8 = state2['data']['episodes']['findIndex']((value326) => value326['id'] === episodeId3);
-    if (count8 < 0) return ![];
+    if (count8 < 0) return false;
     if (!regeneration && !canGenerateStoryEpisodeScript(state2['data']['episodes'], count8))
       return (
         showToast(
           '请先完成第 ' + (getNextStoryEpisodeScriptIndex(state2['data']['episodes']) + 1) + ' 集剧本。',
           'warn',
         ),
-        ![]
+        false
       );
     const value327 = state2['data']['episodes'][count8];
-    ((state2['scriptGenerationFocusMode'] = !![]),
+    ((state2['scriptGenerationFocusMode'] = true),
       (state2['generatingEpisodeScriptId'] = value327['id']),
       (state2['episodeScriptGenerationStatus'] = '正在生成第 ' + (count8 + 1) + ' 集完整剧本'),
       setStoryPlanningOperation('writing-episode-script', state2['episodeScriptGenerationStatus']));
     const value328 = createProjectToken(state2);
     try {
       const value329 = await run61(value327, value328, { regeneration: regeneration });
-      if (!isLive(value328)) return ![];
+      if (!isLive(value328)) return false;
       return (
         notifyTextTaskComplete('第 ' + (count8 + 1) + ' 集完整剧本生成完成。', value328, {
           step: 1,
@@ -4960,7 +4960,7 @@ export function initStoryWorkspace({
         Boolean(value329)
       );
     } catch (error5) {
-      if (!isLive(value328)) return ![];
+      if (!isLive(value328)) return false;
       return (
         reportStoryWorkspaceApiError('write-episode-script', error5, {
           model: state2['models']['text'],
@@ -4972,7 +4972,7 @@ export function initStoryWorkspace({
           'error',
           error5,
         ),
-        ![]
+        false
       );
     } finally {
       isCurrent3(value328) &&
@@ -4984,13 +4984,13 @@ export function initStoryWorkspace({
     }
   }
   function run63() {
-    if (state2['storyPlanningOperation'] !== 'writing-episode-scripts') return ![];
+    if (state2['storyPlanningOperation'] !== 'writing-episode-scripts') return false;
     const text33 = normalizeText(state2['episodeScriptBatchId']);
-    if (!text33) return ![];
+    if (!text33) return false;
     const storyBackgroundTasks = getStoryBackgroundTasks(state2['data'])['find'](
       (value330) => isStoryBackgroundTaskActive(value330) && value330['batch']?.['id'] === text33,
     );
-    if (!storyBackgroundTasks) return ![];
+    if (!storyBackgroundTasks) return false;
     const pendingEpisodeIds = normalizeText(state2['generatingEpisodeScriptId']),
       cancelledEpisodeIds = (
         Array['isArray'](storyBackgroundTasks['batch']?.['pendingEpisodeIds'])
@@ -5000,8 +5000,8 @@ export function initStoryWorkspace({
         ['map']((value331) => normalizeText(value331))
         ['filter']((value332) => value332 && value332 !== pendingEpisodeIds);
     if (!cancelledEpisodeIds['length'])
-      return (showToast('当前集正在生成，暂无可取消的排队分集。', 'info'), ![]);
-    if (!map5['request'](text33)) return ![];
+      return (showToast('当前集正在生成，暂无可取消的排队分集。', 'info'), false);
+    if (!map5['request'](text33)) return false;
     const count9 = state2['data']['episodes']['findIndex'](
         (value333) => normalizeText(value333?.['id']) === pendingEpisodeIds,
       ),
@@ -5016,23 +5016,23 @@ export function initStoryWorkspace({
       value334 = createProjectToken(state2);
     return (
       updateBackgroundTaskBatch(value334, text33, {
-        cancelRequested: !![],
+        cancelRequested: true,
         cancelledEpisodeIds: cancelledEpisodeIds,
         pendingEpisodeIds: pendingEpisodeIds ? [pendingEpisodeIds] : [],
         label: label,
       }),
-      (state2['episodeScriptBatchCancelRequested'] = !![]),
+      (state2['episodeScriptBatchCancelRequested'] = true),
       (state2['episodeScriptGenerationStatus'] = label),
       (state2['storyPlanningStatus'] = label),
       render(),
       showToast('已取消后续 ' + cancelledEpisodeIds['length'] + ' 集排队；当前集会继续生成。', 'info'),
-      !![]
+      true
     );
   }
-  async function run64({ selectedOnly: selectedOnly = ![] } = {}) {
-    if (state2['storyPlanningOperation']) return ![];
+  async function run64({ selectedOnly: selectedOnly = false } = {}) {
+    if (state2['storyPlanningOperation']) return false;
     if (selectedOnly && !state2['selectedScriptEpisodeIds']['length'])
-      return (showToast('请先选择从下一集开始的连续分集。', 'info'), ![]);
+      return (showToast('请先选择从下一集开始的连续分集。', 'info'), false);
     const total = getStoryEpisodeScriptBatchTargets(
       state2['data']['episodes'],
       selectedOnly ? state2['selectedScriptEpisodeIds'] : [],
@@ -5040,9 +5040,9 @@ export function initStoryWorkspace({
     if (!total['length'])
       return (
         showToast(selectedOnly ? '请选择从下一集开始的连续分集。' : '没有待生成的分集剧本。', 'info'),
-        ![]
+        false
       );
-    ((state2['isBatchGeneratingScripts'] = !![]), (state2['scriptGenerationFocusMode'] = !![]));
+    ((state2['isBatchGeneratingScripts'] = true), (state2['scriptGenerationFocusMode'] = true));
     const value335 = createProjectToken(state2),
       value336 = value335['data'],
       batchId = createTaskBatch('episode-scripts', {
@@ -5053,7 +5053,7 @@ export function initStoryWorkspace({
         label: '批量生成 0/' + total['length'],
       });
     ((state2['episodeScriptBatchId'] = batchId['id']),
-      (state2['episodeScriptBatchCancelRequested'] = ![]),
+      (state2['episodeScriptBatchCancelRequested'] = false),
       setStoryPlanningOperation('writing-episode-scripts', '准备按顺序生成 ' + total['length'] + ' 集'));
     let completed = 0;
     try {
@@ -5101,7 +5101,7 @@ export function initStoryWorkspace({
             }));
         },
       });
-      if (response7['status'] === 'interrupted') return ![];
+      if (response7['status'] === 'interrupted') return false;
       if (response7['status'] === 'cancelled')
         return (
           notifyTextTaskComplete(
@@ -5112,8 +5112,8 @@ export function initStoryWorkspace({
             { step: 1, outlineSectionId: 'episodes' },
           ),
           isCurrent3(value335) &&
-            ((state2['scriptSelectionMode'] = ![]), (state2['selectedScriptEpisodeIds'] = [])),
-          !![]
+            ((state2['scriptSelectionMode'] = false), (state2['selectedScriptEpisodeIds'] = [])),
+          true
         );
       return (
         notifyTextTaskComplete('已按顺序完成 ' + completed + ' 集完整剧本。', value335, {
@@ -5121,11 +5121,11 @@ export function initStoryWorkspace({
           outlineSectionId: 'episodes',
         }),
         isCurrent3(value335) &&
-          ((state2['scriptSelectionMode'] = ![]), (state2['selectedScriptEpisodeIds'] = [])),
-        !![]
+          ((state2['scriptSelectionMode'] = false), (state2['selectedScriptEpisodeIds'] = [])),
+        true
       );
     } catch (error6) {
-      if (!isLive(value335)) return ![];
+      if (!isLive(value335)) return false;
       return (
         reportStoryWorkspaceApiError('write-episode-scripts-batch', error6, {
           model: state2['models']['text'],
@@ -5137,15 +5137,15 @@ export function initStoryWorkspace({
           'error',
           error6,
         ),
-        ![]
+        false
       );
     } finally {
       (map5['clear'](batchId['id']),
         isCurrent3(value335) &&
-          ((state2['isBatchGeneratingScripts'] = ![]),
+          ((state2['isBatchGeneratingScripts'] = false),
           (state2['generatingEpisodeScriptId'] = ''),
           (state2['episodeScriptBatchId'] = ''),
-          (state2['episodeScriptBatchCancelRequested'] = ![]),
+          (state2['episodeScriptBatchCancelRequested'] = false),
           (state2['episodeScriptGenerationStatus'] = ''),
           (state2['storyPlanningOperation'] = ''),
           (state2['storyPlanningStatus'] = ''),
@@ -5153,18 +5153,18 @@ export function initStoryWorkspace({
     }
   }
   async function run65(value347) {
-    if (state2['storyPlanningOperation']) return ![];
+    if (state2['storyPlanningOperation']) return false;
     if (state2['data']['project']?.['sourceMode'] === 'upload-original')
-      return (showToast('上传剧本保持原稿，不支持 AI 扩写分集正文。', 'info'), ![]);
+      return (showToast('上传剧本保持原稿，不支持 AI 扩写分集正文。', 'info'), false);
     const count10 = state2['data']['episodes']['findIndex']((value348) => value348['id'] === value347);
     if (count10 < 0 || !normalizeText(state2['data']['episodes'][count10]?.['script']?.['fullText']))
-      return (showToast('当前分集正文尚未生成。', 'info'), ![]);
-    return run62(value347, { regeneration: !![] });
+      return (showToast('当前分集正文尚未生成。', 'info'), false);
+    return run62(value347, { regeneration: true });
   }
   function run66(value349) {
     const nextStoryEpisodeScriptIndex2 = getNextStoryEpisodeScriptIndex(state2['data']['episodes']),
       count11 = state2['data']['episodes']['findIndex']((value350) => value350['id'] === value349);
-    if (count11 < nextStoryEpisodeScriptIndex2 || count11 < 0) return ![];
+    if (count11 < nextStoryEpisodeScriptIndex2 || count11 < 0) return false;
     const value351 = state2['selectedScriptEpisodeIds']['includes'](value349),
       value352 = value351 ? count11 : count11 + 1;
     return (
@@ -5173,7 +5173,7 @@ export function initStoryWorkspace({
         ['map']((value353) => value353['id'])),
       (state2['scriptSelectionMode'] = state2['selectedScriptEpisodeIds']['length'] > 0),
       render(),
-      !![]
+      true
     );
   }
   const storyEpisodeSplitWorkspaceController = createStoryEpisodeSplitWorkspaceController({
@@ -5211,10 +5211,10 @@ export function initStoryWorkspace({
       splitEpisodeExperimental: splitEpisodeExperimental2,
     } = storyEpisodeSplitWorkspaceController;
   async function run67() {
-    if (!isStoryEpisodeExperimentalSplitAvailable(windowObject)) return ![];
-    if (state2['storyPlanningOperation']) return ![];
+    if (!isStoryEpisodeExperimentalSplitAvailable(windowObject)) return false;
+    if (state2['storyPlanningOperation']) return false;
     if (typeof planEpisodes !== 'function')
-      return (showToast('分集规划 Agent 尚未初始化。', 'error'), ![]);
+      return (showToast('分集规划 Agent 尚未初始化。', 'error'), false);
     const storyWorkspaceAssetData = normalizeStoryWorkspaceAssetData(run2(state2['data'])),
       project2 = getStoryPlanningAgentContext(storyWorkspaceAssetData);
     try {
@@ -5237,25 +5237,25 @@ export function initStoryWorkspace({
           title: '分集大纲请求调试',
           subtitle: '以下是点击“生成分集大纲”后构造的实际请求；本次仅预览，不会发送到 API。',
         }),
-        !![]
+        true
       );
     } catch (error7) {
       return (
         reportStoryWorkspaceApiError('debug-episode-outline-request', error7),
         showToast(error7?.['message'] || '分集大纲调试请求构建失败。', 'error'),
-        ![]
+        false
       );
     }
   }
   async function run68() {
-    if (!isStoryEpisodeExperimentalSplitAvailable(windowObject)) return ![];
-    if (state2['storyPlanningOperation']) return ![];
+    if (!isStoryEpisodeExperimentalSplitAvailable(windowObject)) return false;
+    if (state2['storyPlanningOperation']) return false;
     if (typeof generateEpisodeScript !== 'function')
-      return (showToast('完整分集剧本 Agent 尚未初始化。', 'error'), ![]);
+      return (showToast('完整分集剧本 Agent 尚未初始化。', 'error'), false);
     const nextEpisode = normalizeStoryWorkspaceAssetData(run2(state2['data'])),
       previousEpisode = getNextStoryEpisodeScriptIndex(nextEpisode['episodes']),
       episode8 = nextEpisode['episodes'][previousEpisode];
-    if (!episode8) return (showToast('没有待生成的分集正文。', 'info'), ![]);
+    if (!episode8) return (showToast('没有待生成的分集正文。', 'info'), false);
     const project3 = getStoryPlanningAgentContext(nextEpisode);
     try {
       const preparePayload2 = () =>
@@ -5279,7 +5279,7 @@ export function initStoryWorkspace({
           title: '第 ' + (episode8['number'] || previousEpisode + 1) + ' 集正文请求调试',
           subtitle: '以下是下一集正文生成时构造的实际请求；本次仅预览，不会发送到 API。',
         }),
-        !![]
+        true
       );
     } catch (error8) {
       return (
@@ -5287,15 +5287,15 @@ export function initStoryWorkspace({
           episodeId: episode8['id'],
         }),
         showToast(error8?.['message'] || '分集正文调试请求构建失败。', 'error'),
-        ![]
+        false
       );
     }
   }
   async function run69() {
-    if (!isStoryAssetExperimentalExtractionAvailable(windowObject)) return ![];
-    if (state2['storyPlanningOperation']) return ![];
+    if (!isStoryAssetExperimentalExtractionAvailable(windowObject)) return false;
+    if (state2['storyPlanningOperation']) return false;
     if (typeof extractAssetsExperimental !== 'function')
-      return (showToast('混合素材开发测试尚未初始化。', 'error'), ![]);
+      return (showToast('混合素材开发测试尚未初始化。', 'error'), false);
     const episodes3 = normalizeStoryWorkspaceAssetData(run2(state2['data'])),
       args35 = getStoryPlanningAgentContext(episodes3);
     try {
@@ -5305,7 +5305,7 @@ export function initStoryWorkspace({
             ...args35,
             episodes: episodes3['episodes'],
             resumeDraft: episodes3['experimentalAssetExtractionDraft'],
-            preferLocal: ![],
+            preferLocal: false,
             request: request3,
           }),
         );
@@ -5318,26 +5318,26 @@ export function initStoryWorkspace({
           subtitle:
             '以下是开发链路构造的首个 API 请求；中短剧本预览角色专用请求，超长剧本因本次不运行本地模型而预览备用分批请求。仅供调试，不会发送到 API。',
         }),
-        !![]
+        true
       );
     } catch (error9) {
       return (
         reportStoryWorkspaceApiError('debug-asset-extraction-experimental-request', error9),
         showToast(error9?.['message'] || '混合素材抽取调试请求构建失败。', 'error'),
-        ![]
+        false
       );
     }
   }
-  async function run70(value355, promptExperiment = !![]) {
-    if (!isStoryEpisodeExperimentalSplitAvailable(windowObject)) return ![];
+  async function run70(value355, promptExperiment = true) {
+    if (!isStoryEpisodeExperimentalSplitAvailable(windowObject)) return false;
     const el187 = getStoryEpisodeGenerationControlState(state2, value355);
-    if (el187['disabled']) return ![];
+    if (el187['disabled']) return false;
     const run71 = promptExperiment ? splitEpisodeExperimental : splitEpisode;
     if (typeof run71 !== 'function')
-      return (showToast('实验分批拆分 Agent 尚未初始化。', 'error'), ![]);
+      return (showToast('实验分批拆分 Agent 尚未初始化。', 'error'), false);
     const assets2 = normalizeStoryWorkspaceAssetData(run2(state2['data'])),
       episode9 = assets2['episodes']['find']((value356) => value356['id'] === value355);
-    if (!episode9) return ![];
+    if (!episode9) return false;
     const project4 = getStoryPlanningAgentContext(assets2),
       count12 = assets2['episodes']['findIndex']((value357) => value357['id'] === episode9['id']),
       previousEpisode2 = count12 > 0 ? assets2['episodes'][count12 - 1] : null,
@@ -5372,7 +5372,7 @@ export function initStoryWorkspace({
           title: '第 ' + (episode9['number'] || '') + ' 集请求调试',
           subtitle: '下一次分镜生成构造的请求；本次仅预览，不会发送到 API。',
         }),
-        !![]
+        true
       );
     } catch (error10) {
       return (
@@ -5380,7 +5380,7 @@ export function initStoryWorkspace({
           episodeId: episode9['id'],
         }),
         showToast(error10?.['message'] || '调试请求构建失败。', 'error'),
-        ![]
+        false
       );
     }
   }
@@ -5414,10 +5414,10 @@ export function initStoryWorkspace({
     const episode10 = getSelectedEpisode(state2),
       clip2 = getSelectedClip(state2, episode10);
     if (!episode10 || (mode === 'current' && !clip2))
-      return (showToast('请先选择要导出的片段。', 'warn'), ![]);
-    const value358 = el188?.['disabled'] === !![];
-    if (el188 && 'disabled' in el188) el188['disabled'] = !![];
-    syncStoryAsyncButton(el188, !![]);
+      return (showToast('请先选择要导出的片段。', 'warn'), false);
+    const value358 = el188?.['disabled'] === true;
+    if (el188 && 'disabled' in el188) el188['disabled'] = true;
+    syncStoryAsyncButton(el188, true);
     try {
       const error11 = await exportStoryClipVideos({
         project: state2['data']['project'],
@@ -5425,7 +5425,7 @@ export function initStoryWorkspace({
         clip: clip2,
         mode: mode,
       });
-      if (error11?.['canceled']) return ![];
+      if (error11?.['canceled']) return false;
       if (!error11?.['success'])
         throw new Error(error11?.['error'] || error11?.['message'] || '视频片段导出失败。');
       const value359 = Math['max'](0, Number(error11['exportedCount']) || 0),
@@ -5439,12 +5439,12 @@ export function initStoryWorkspace({
               : '已导出本集 ' + value359 + ' 个片段。',
           'success',
         ),
-        !![]
+        true
       );
     } catch (error12) {
-      return (showToast(error12?.['message'] || '视频片段导出失败。', 'error'), ![]);
+      return (showToast(error12?.['message'] || '视频片段导出失败。', 'error'), false);
     } finally {
-      syncStoryAsyncButton(el188, ![]);
+      syncStoryAsyncButton(el188, false);
       if (el188 && 'disabled' in el188) el188['disabled'] = value358;
     }
   }
@@ -5452,41 +5452,41 @@ export function initStoryWorkspace({
     const error13 = getSelectedStoryAsset(state2, getVisibleStoryAssets(state2)),
       error14 = error13 ? getSelectedAssetAppearance(state2, error13) : null,
       imageRef = normalizeText(error14?.['imageUrl']);
-    if (!error13 || !error14 || !imageRef) return (showToast('当前没有可下载的图片。', 'warn'), ![]);
+    if (!error13 || !error14 || !imageRef) return (showToast('当前没有可下载的图片。', 'warn'), false);
     const text34 = normalizeText(error14['name']),
       text35 = normalizeText(error13['name']) || '生成图片',
       filenameBase =
         text34 && text34 !== text35 && text34 !== '基础形象' ? [text35, text34]['join']('-') : text35;
     try {
-      syncStoryAsyncButton(value361, !![], { spinnerOnly: !![] });
+      syncStoryAsyncButton(value361, true, { spinnerOnly: true });
       const response8 = await runWorkspaceImageDownloadAction(value361, () =>
         saveWorkspaceImageDownload({ imageRef: imageRef, filenameBase: filenameBase, saveMedia: saveMedia }),
       );
-      if (!response8 || response8['canceled']) return ![];
-      if (response8['success'] === ![]) throw new Error(response8['error'] || '图片下载失败，请稍后重试。');
-      return (showToast('图片已保存。', 'success'), !![]);
+      if (!response8 || response8['canceled']) return false;
+      if (response8['success'] === false) throw new Error(response8['error'] || '图片下载失败，请稍后重试。');
+      return (showToast('图片已保存。', 'success'), true);
     } catch (error15) {
-      return (showToast(error15?.['message'] || '图片下载失败，请稍后重试。', 'error'), ![]);
+      return (showToast(error15?.['message'] || '图片下载失败，请稍后重试。', 'error'), false);
     } finally {
-      syncStoryAsyncButton(value361, ![]);
+      syncStoryAsyncButton(value361, false);
     }
   }
   async function run74() {
     const asset6 = findStoryAsset(state2, state2['selectedAssetId']),
       appearance7 = asset6 ? getSelectedAssetAppearance(state2, asset6) : null;
     if (!asset6 || !appearance7 || asset6['isLibraryAsset'])
-      return (showToast('当前形象不可加入总素材。', 'warn'), ![]);
-    if (!normalizeText(appearance7['imageUrl'])) return (showToast('请先生成或上传当前形象。', 'warn'), ![]);
+      return (showToast('当前形象不可加入总素材。', 'warn'), false);
+    if (!normalizeText(appearance7['imageUrl'])) return (showToast('请先生成或上传当前形象。', 'warn'), false);
     if (typeof saveAssetPackageItem !== 'function')
-      return (showToast('总素材服务尚未初始化。', 'error'), ![]);
+      return (showToast('总素材服务尚未初始化。', 'error'), false);
     const value362 = asset6['id'] + ':' + appearance7['id'];
-    if (normalizeText(state2['exportingAssetAppearanceKey']) === value362) return ![];
+    if (normalizeText(state2['exportingAssetAppearanceKey']) === value362) return false;
     const project5 = createProjectToken(state2),
       contentElement = storyRoot['querySelector'](
         '.story-page.is-current .story-asset-detail .story-asset-preview',
       ),
       fromRect = contentElement?.['getBoundingClientRect']?.() || null;
-    let value363 = ![];
+    let value363 = false;
     ((state2['exportingAssetAppearanceKey'] = value362), render());
     try {
       let itemKey = buildStoryAssetPackageItemRequest({
@@ -5534,7 +5534,7 @@ export function initStoryWorkspace({
         });
       }
       const saveAssetPackageItem2 = await saveAssetPackageItem(itemKey);
-      if (!isLive(project5)) return ![];
+      if (!isLive(project5)) return false;
       const imageUrl6 = normalizeText(saveAssetPackageItem2?.['imageUrl'] || itemKey['image']?.['imageUrl']);
       return (
         imageUrl6 && (appearance7['imageUrl'] = imageUrl6),
@@ -5545,20 +5545,20 @@ export function initStoryWorkspace({
           imageUrl: imageUrl6,
           updatedAt: Date['now'](),
         }),
-        schedulePersistence({ immediate: !![] }),
+        schedulePersistence({ immediate: true }),
         showToast(
-          saveAssetPackageItem2?.['itemCreated'] === ![]
+          saveAssetPackageItem2?.['itemCreated'] === false
             ? '已更新总素材中的当前形象。'
             : '当前形象已加入总素材。',
           'success',
         ),
-        (value363 = !![]),
-        !![]
+        (value363 = true),
+        true
       );
     } catch (error16) {
       return (
         isLive(project5) && showToast(error16?.['message'] || '加入总素材失败，请稍后重试。', 'error'),
-        ![]
+        false
       );
     } finally {
       isCurrent3(project5) &&
@@ -5576,13 +5576,13 @@ export function initStoryWorkspace({
           }));
     }
   }
-  function run75(value364 = '', targetAppearanceId = '', createAppearance = ![], value365 = null) {
+  function run75(value364 = '', targetAppearanceId = '', createAppearance = false, value365 = null) {
     const targetAssetId = findStoryAsset(state2, value364);
-    if (!targetAssetId) return (showToast('请选择本剧已有的角色、场景或道具。', 'warn'), ![]);
+    if (!targetAssetId) return (showToast('请选择本剧已有的角色、场景或道具。', 'warn'), false);
     const visibleStoryAssets2 = getVisibleStoryAssets(state2),
       list27 = value365 || getStoryLibraryActionAssetIds(state2, visibleStoryAssets2);
     if (normalizeText(targetAppearanceId) && list27['length'] !== 1)
-      return (showToast('替换已有形象时只能选择一张总素材图片。', 'warn'), ![]);
+      return (showToast('替换已有形象时只能选择一张总素材图片。', 'warn'), false);
     const args36 = addStoryLibraryAssetsToProject(
         state2['data']['assets'],
         visibleStoryAssets2,
@@ -5591,7 +5591,7 @@ export function initStoryWorkspace({
         { targetAppearanceId: targetAppearanceId, createAppearance: createAppearance },
       ),
       list28 = [...args36['updatedAppearanceIds'], ...args36['existingAssetIds'], ...args36['addedAssetIds']];
-    if (!list28['length']) return (showToast('请选择总素材中的图片后再加入项目。', 'warn'), ![]);
+    if (!list28['length']) return (showToast('请选择总素材中的图片后再加入项目。', 'warn'), false);
     (run35(), (state2['data']['assets'] = args36['assets']));
     const storyAsset3 = findStoryAsset(state2, targetAssetId['id']),
       value366 = list28['at'](-1) || '',
@@ -5603,7 +5603,7 @@ export function initStoryWorkspace({
       selectedAppearanceIndex: selectedAppearanceIndex,
     }),
       render(),
-      schedulePersistence({ immediate: !![] }));
+      schedulePersistence({ immediate: true }));
     if (args36['updatedAppearanceIds']['length'])
       showToast('已更新' + targetAssetId['name'] + '的所选形象。', 'success');
     else
@@ -5613,7 +5613,7 @@ export function initStoryWorkspace({
             'success',
           )
         : showToast('所选图片已在' + targetAssetId['name'] + '的形象中。', 'info');
-    return !![];
+    return true;
   }
   function run76(count13, value368 = state2['selectedAssetId']) {
     const storyAsset4 = findStoryAsset(state2, value368),
@@ -5652,19 +5652,19 @@ export function initStoryWorkspace({
       }
     }
     if (value368 === state2['selectedAssetId'] && !refreshSelectedAsset()) render();
-    ((state2['assetAppearanceMotion'] = ''), schedulePersistence({ uiOnly: !![] }));
+    ((state2['assetAppearanceMotion'] = ''), schedulePersistence({ uiOnly: true }));
   }
   function run77(event14) {
     const el193 = event14['target']['closest']?.(
       '[data-story-appearance-wheel="true"], [data-story-card-appearance-wheel]',
     );
-    if (!el193 || state2['view'] !== 'project' || state2['step'] !== 2) return ![];
+    if (!el193 || state2['view'] !== 'project' || state2['step'] !== 2) return false;
     for (
       let value372 = event14['target'];
       value372 && value372 !== el193;
       value372 = value372['parentElement']
     ) {
-      if (hasWorkspaceScrollableOverflow(value372, windowObject['getComputedStyle'](value372))) return ![];
+      if (hasWorkspaceScrollableOverflow(value372, windowObject['getComputedStyle'](value372))) return false;
     }
     event14['preventDefault']();
     const consumeStoryWheelDirection2 = consumeStoryWheelDirection(event14, value141);
@@ -5673,7 +5673,7 @@ export function initStoryWorkspace({
         consumeStoryWheelDirection2,
         el193['dataset']['storyCardAppearanceWheel'] || state2['selectedAssetId'],
       );
-    return !![];
+    return true;
   }
   const storyClipResultSelectionController = createStoryClipResultSelectionController({
       state: state2,
@@ -5720,7 +5720,7 @@ export function initStoryWorkspace({
           !getStoryEpisodeBatchControlState(state2)['disabled'],
         selectedIds: state2['selectedEpisodeIds'],
         commit(value374) {
-          ((state2['episodeSelectionMode'] = !![]), (state2['selectedEpisodeIds'] = value374), render());
+          ((state2['episodeSelectionMode'] = true), (state2['selectedEpisodeIds'] = value374), render());
         },
       };
     if (text37 === 'clips')
@@ -5729,7 +5729,7 @@ export function initStoryWorkspace({
         selectedIds: state2['selectedClipGenerationIds'],
         commit(value375) {
           ((state2['pendingDeleteClipId'] = ''),
-            (state2['clipSelectionMode'] = !![]),
+            (state2['clipSelectionMode'] = true),
             (state2['selectedClipGenerationIds'] = value375),
             run6(),
             run32());
@@ -5766,20 +5766,20 @@ export function initStoryWorkspace({
   function run78(event15) {
     const enabled50 = viewportElement['querySelector']('.story-page.is-current'),
       el195 = event15?.['target'];
-    if (!enabled50?.['contains'](el195) || !el195?.['closest']) return ![];
-    if (el195['closest'](value376)) return ![];
+    if (!enabled50?.['contains'](el195) || !el195?.['closest']) return false;
+    if (el195['closest'](value376)) return false;
     if (state2['view'] === 'project' && state2['step'] === 2 && state2['assetSelectionMode'])
-      ((state2['assetSelectionMode'] = ![]), (state2['selectedAssetIds'] = []), render());
+      ((state2['assetSelectionMode'] = false), (state2['selectedAssetIds'] = []), render());
     else {
       if (state2['view'] === 'project' && state2['step'] === 3 && state2['episodeSelectionMode'])
-        ((state2['episodeSelectionMode'] = ![]), (state2['selectedEpisodeIds'] = []), render());
+        ((state2['episodeSelectionMode'] = false), (state2['selectedEpisodeIds'] = []), render());
       else {
         if (state2['view'] === 'episode' && state2['clipSelectionMode'])
-          ((state2['clipSelectionMode'] = ![]), (state2['selectedClipGenerationIds'] = []), run32());
-        else return ![];
+          ((state2['clipSelectionMode'] = false), (state2['selectedClipGenerationIds'] = []), run32());
+        else return false;
       }
     }
-    return (storyMarqueeSelectionController['cancel'](), !![]);
+    return (storyMarqueeSelectionController['cancel'](), true);
   }
   const storyWorkspaceNavigationTransaction = createStoryWorkspaceNavigationTransaction({
     state: state2,
@@ -5787,7 +5787,7 @@ export function initStoryWorkspace({
     windowObject: windowObject,
     renderAdapter: { render: render, renderToolbar: renderToolbar, capturePageState: capturePageState2 },
     onClipSelected: prepareVideoSettings,
-    onCommit: () => schedulePersistence({ uiOnly: !![] }),
+    onCommit: () => schedulePersistence({ uiOnly: true }),
     notify: showToast,
   });
   async function run55(step2, args37 = {}) {
@@ -5811,9 +5811,9 @@ export function initStoryWorkspace({
     });
   }
   async function run54(episodeId4, clipId3 = '', el196 = null) {
-    const value380 = el196?.['disabled'] === !![];
-    (el196?.['classList']?.['add']('is-opening'), syncStoryAsyncButton(el196, !![]));
-    if (el196 && 'disabled' in el196) el196['disabled'] = !![];
+    const value380 = el196?.['disabled'] === true;
+    (el196?.['classList']?.['add']('is-opening'), syncStoryAsyncButton(el196, true));
+    if (el196 && 'disabled' in el196) el196['disabled'] = true;
     try {
       return (
         hasPendingRuntimeManifestLoad() && (await waitForRuntimeManifestLoad({ timeoutMs: 500 })),
@@ -5824,7 +5824,7 @@ export function initStoryWorkspace({
         })
       );
     } finally {
-      (el196?.['classList']?.['remove']('is-opening'), syncStoryAsyncButton(el196, ![]));
+      (el196?.['classList']?.['remove']('is-opening'), syncStoryAsyncButton(el196, false));
       if (el196 && 'disabled' in el196) el196['disabled'] = value380;
     }
   }
@@ -5853,7 +5853,7 @@ export function initStoryWorkspace({
             )
           )
             return;
-          (syncCurrentProjectEntry(), schedulePersistence({ immediate: !![] }), render());
+          (syncCurrentProjectEntry(), schedulePersistence({ immediate: true }), render());
         },
         bindAudioCharacter: (value382, value383) => {
           const visibleStoryAssets3 = getVisibleStoryAssets(state2)['find'](
@@ -5864,7 +5864,7 @@ export function initStoryWorkspace({
             !bindStoryAudioToCharacter(state2['data'], visibleStoryAssets3, value383)
           )
             return;
-          (syncCurrentProjectEntry(), schedulePersistence({ immediate: !![] }), render());
+          (syncCurrentProjectEntry(), schedulePersistence({ immediate: true }), render());
         },
         addLibraryAssets: (value385, value386, value387, value388) =>
           run75(value386, value387, value388, value385),
@@ -5881,7 +5881,7 @@ export function initStoryWorkspace({
       },
     });
   }
-  windowObject?.['addEventListener']?.('keydown', run80, !![]);
+  windowObject?.['addEventListener']?.('keydown', run80, true);
   const run82 = bindWorkspaceEntityContextMenu(storyRoot, {
     resolveItems: resolveItems,
     beforeOpen() {
@@ -5889,9 +5889,9 @@ export function initStoryWorkspace({
       ((state2['openProjectMenuId'] = ''), render());
     },
   });
-  (windowObject?.['addEventListener']?.('pointermove', handleWindowPointerMove, !![]),
-    windowObject?.['addEventListener']?.('pointerup', handleWindowPointerUp, !![]),
-    windowObject?.['addEventListener']?.('pointercancel', handleWindowPointerCancel, !![]),
+  (windowObject?.['addEventListener']?.('pointermove', handleWindowPointerMove, true),
+    windowObject?.['addEventListener']?.('pointerup', handleWindowPointerUp, true),
+    windowObject?.['addEventListener']?.('pointercancel', handleWindowPointerCancel, true),
     storyRoot['addEventListener']('pointerdown', (event17) => {
       (event17['stopPropagation'](), hideHoverPreview());
       !event17['target']['closest']?.('[data-story-clip-video-history-menu]') && hideHistory();
@@ -5932,11 +5932,11 @@ export function initStoryWorkspace({
       storyMarqueeSelectionController['finish'](value395);
     }),
     storyRoot['addEventListener']('pointercancel', (value396) => {
-      storyMarqueeSelectionController['finish'](value396, { cancelled: !![] });
+      storyMarqueeSelectionController['finish'](value396, { cancelled: true });
     }),
     storyRoot['addEventListener']('lostpointercapture', (value397) => {
-      if (finish(value397, { cancelled: !![] })) return;
-      (map7['cancelSession'](), storyMarqueeSelectionController['finish'](value397, { cancelled: !![] }));
+      if (finish(value397, { cancelled: true })) return;
+      (map7['cancelSession'](), storyMarqueeSelectionController['finish'](value397, { cancelled: true }));
     }),
     storyRoot['addEventListener']('dragstart', (event21) => {
       const el198 = event21['target']['closest']?.('article[data-story-replication-episode-id]');
@@ -6043,7 +6043,7 @@ export function initStoryWorkspace({
           syncStoryVideoReplicationCardElement(value407, value405, value406);
         }),
         el205['querySelector']('[data-story-replication-drag-handle]')?.['focus']()),
-        schedulePersistence({ immediate: !![] }));
+        schedulePersistence({ immediate: true }));
     }),
     storyRoot['addEventListener']('pointerout', (event23) => {
       const value408 = event23['target']['closest']?.(
@@ -6052,7 +6052,7 @@ export function initStoryWorkspace({
       value408 &&
         !(event23['relatedTarget'] && value408['contains'](event23['relatedTarget'])) &&
         !menuElement?.['contains'](event23['relatedTarget']) &&
-        hideHistory({ delayed: !![] });
+        hideHistory({ delayed: true });
       const storyAssetHoverCard3 = getStoryAssetHoverCard(event23['target']);
       if (
         !storyAssetHoverCard3 ||
@@ -6092,7 +6092,7 @@ export function initStoryWorkspace({
           (enabled53['scrollTop'] += Number(event25['deltaY'] || 0)),
           (enabled53['scrollLeft'] += Number(event25['deltaX'] || 0)));
       },
-      { passive: ![] },
+      { passive: false },
     ),
     viewportElement['addEventListener'](
       'scroll',
@@ -6107,9 +6107,9 @@ export function initStoryWorkspace({
             left: Math['max'](0, Number(enabled54['scrollLeft']) || 0),
           },
         }),
-          schedulePersistence({ uiOnly: !![] }));
+          schedulePersistence({ uiOnly: true }));
       },
-      !![],
+      true,
     ),
     storyRoot['addEventListener']('keydown', (event27) => {
       const value413 = event27['target']['closest']?.('[data-story-custom-episode-count-input]');
@@ -6131,8 +6131,8 @@ export function initStoryWorkspace({
         (event27['preventDefault'](), event27['stopPropagation']());
         const kind =
           el209['closest']('[data-story-adjustment-kind]')?.['dataset']['storyAdjustmentKind'] || 'mode';
-        ((state2[kind === 'language' ? 'clipAdjustmentLanguageOpen' : 'clipAdjustmentPromptModeOpen'] = !![]),
-          (state2[kind === 'language' ? 'clipAdjustmentPromptModeOpen' : 'clipAdjustmentLanguageOpen'] = ![]),
+        ((state2[kind === 'language' ? 'clipAdjustmentLanguageOpen' : 'clipAdjustmentPromptModeOpen'] = true),
+          (state2[kind === 'language' ? 'clipAdjustmentPromptModeOpen' : 'clipAdjustmentLanguageOpen'] = false),
           run31({ kind: kind === 'language' ? 'mode' : 'language' }),
           run31({ kind: kind, focus: 'selected' }));
         return;
@@ -6165,14 +6165,14 @@ export function initStoryWorkspace({
         if (state2['clipPromptHistoryOpen']) {
           (event27['preventDefault'](),
             event27['stopPropagation'](),
-            (state2['clipPromptHistoryOpen'] = ![]),
+            (state2['clipPromptHistoryOpen'] = false),
             run30({ focus: 'trigger' }));
           return;
         }
         if (state2['clipAdjustmentPromptModeOpen'] || state2['clipAdjustmentLanguageOpen']) {
           (event27['preventDefault'](), event27['stopPropagation']());
           const kind2 = state2['clipAdjustmentLanguageOpen'] ? 'language' : 'mode';
-          ((state2['clipAdjustmentPromptModeOpen'] = state2['clipAdjustmentLanguageOpen'] = ![]),
+          ((state2['clipAdjustmentPromptModeOpen'] = state2['clipAdjustmentLanguageOpen'] = false),
             run31({ kind: kind2, focus: 'trigger' }));
           return;
         }
@@ -6183,11 +6183,11 @@ export function initStoryWorkspace({
           run6(),
           state2['view'] === 'project' &&
             state2['step'] === 2 &&
-            ((state2['assetSelectionMode'] = ![]), (state2['selectedAssetIds'] = []), render()),
+            ((state2['assetSelectionMode'] = false), (state2['selectedAssetIds'] = []), render()),
           state2['clipSelectionMode'] &&
-            ((state2['clipSelectionMode'] = ![]), (state2['selectedClipGenerationIds'] = []), run32()),
+            ((state2['clipSelectionMode'] = false), (state2['selectedClipGenerationIds'] = []), run32()),
           (state2['episodeSelectionMode'] || state2['scriptSelectionMode']) &&
-            ((state2['episodeSelectionMode'] = state2['scriptSelectionMode'] = ![]),
+            ((state2['episodeSelectionMode'] = state2['scriptSelectionMode'] = false),
             (state2['selectedEpisodeIds'] = []),
             (state2['selectedScriptEpisodeIds'] = []),
             render()));
@@ -6218,10 +6218,10 @@ export function initStoryWorkspace({
         const value417 = event27['key'] === 'ArrowLeft' ? -2 : 2;
         el213['dataset']['storyEpisodeSplitter'] === 'assets'
           ? run12(state2['episodeAssetPanelRatio'] + value417, state2['episodeEditorPanelRatio'], {
-              persist: !![],
+              persist: true,
             })
           : run12(state2['episodeAssetPanelRatio'], state2['episodeEditorPanelRatio'] + value417, {
-              persist: !![],
+              persist: true,
             });
         return;
       }
@@ -6241,18 +6241,18 @@ export function initStoryWorkspace({
           ...(state2['outlineSectionOpenState'] || {}),
           [value418]: el214['open'],
         }),
-          schedulePersistence({ uiOnly: !![] }));
+          schedulePersistence({ uiOnly: true }));
         if (!el214['open']) return;
         if (!state2['scriptGenerationFocusMode'] || !['original', 'summary']['includes'](value418)) return;
         if (
           ['writing-episode-script', 'writing-episode-scripts']['includes'](state2['storyPlanningOperation'])
         )
           return;
-        state2['scriptGenerationFocusMode'] = ![];
+        state2['scriptGenerationFocusMode'] = false;
       },
-      !![],
+      true,
     ),
-    storyRoot['addEventListener']('error', handleStoryWorkspaceImageError, !![]),
+    storyRoot['addEventListener']('error', handleStoryWorkspaceImageError, true),
     storyRoot['addEventListener']('click', (toggleKey) => {
       if (storyMarqueeSelectionController['consumeClick'](toggleKey)) return;
       if (run78(toggleKey)) return;
@@ -6289,7 +6289,7 @@ export function initStoryWorkspace({
         !toggleKey['target']['closest']('[data-story-action]')
       ) {
         (toggleKey['preventDefault'](),
-          (state2['scriptSelectionMode'] = !![]),
+          (state2['scriptSelectionMode'] = true),
           run66(el216['dataset']['storySelectScriptEpisode']));
         return;
       }
@@ -6344,12 +6344,12 @@ export function initStoryWorkspace({
       }
       const el226 = toggleKey['target']['closest']('[data-story-style-custom]');
       if (el226) {
-        run43(el226['closest']('.story-style-picker'), !![]);
+        run43(el226['closest']('.story-style-picker'), true);
         return;
       }
       const el227 = toggleKey['target']['closest']('[data-story-style-custom-back]');
       if (el227) {
-        run43(el227['closest']('.story-style-picker'), ![]);
+        run43(el227['closest']('.story-style-picker'), false);
         return;
       }
       const el228 = toggleKey['target']['closest']('[data-story-style-custom-confirm]');
@@ -6395,7 +6395,7 @@ export function initStoryWorkspace({
           (state2['assetFilter'] = text41),
           (state2['selectedAssetId'] = ''),
           (state2['pendingDeleteAssetAppearanceKey'] = ''),
-          (state2['assetSelectionMode'] = ![]),
+          (state2['assetSelectionMode'] = false),
           (state2['selectedAssetIds'] = []));
         const el234 = run28()?.['querySelector']('.story-asset-tabs');
         el234 &&
@@ -6405,8 +6405,8 @@ export function initStoryWorkspace({
               el235['setAttribute']('aria-selected', String(value423)),
               (el235['tabIndex'] = value423 ? 0 : -1));
           });
-        (render({ direction: direction3, updateToolbar: ![], transitionScope: 'asset-content' }),
-          schedulePersistence({ uiOnly: !![] }));
+        (render({ direction: direction3, updateToolbar: false, transitionScope: 'asset-content' }),
+          schedulePersistence({ uiOnly: true }));
         return;
       }
       const el236 = toggleKey['target']['closest']('[data-story-episode-asset-tab]');
@@ -6415,7 +6415,7 @@ export function initStoryWorkspace({
           el236['dataset']['storyEpisodeAssetTab'],
         );
         if (!syncFrameRail()) render();
-        schedulePersistence({ uiOnly: !![] });
+        schedulePersistence({ uiOnly: true });
         return;
       }
       const el237 = toggleKey['target']['closest']('[data-story-asset-id]');
@@ -6463,14 +6463,14 @@ export function initStoryWorkspace({
                   : getVisibleStoryAssets(state2)['map']((value428) => value428['id']),
               toggleKey: toggleKey['ctrlKey'] || toggleKey['metaKey'],
               selectionMode: state2['assetSelectionMode'],
-              shiftKey: toggleKey['shiftKey'] === !![],
+              shiftKey: toggleKey['shiftKey'] === true,
               enabled: enabled55,
             });
           workspaceCardMultiSelection['handled'] &&
             ((state2['assetSelectionMode'] = workspaceCardMultiSelection['selectionMode']),
             (state2['selectedAssetIds'] = workspaceCardMultiSelection['selectedIds']));
         }
-        (render(), schedulePersistence({ uiOnly: !![] }), focusWorkspaceAssetCard(storyRoot, itemId));
+        (render(), schedulePersistence({ uiOnly: true }), focusWorkspaceAssetCard(storyRoot, itemId));
         return;
       }
       const el238 = toggleKey['target']['closest']('[data-story-select-episode]');
@@ -6489,7 +6489,7 @@ export function initStoryWorkspace({
           itemId: itemId2,
           activeItemId: state2['selectedEpisodeId'],
           selectionMode: state2['episodeSelectionMode'],
-          shiftKey: toggleKey['shiftKey'] === !![],
+          shiftKey: toggleKey['shiftKey'] === true,
           toggleKey: toggleKey['ctrlKey'] || toggleKey['metaKey'],
           orderedIds: getStoryVideoEpisodes(state2['data']['episodes'])['map']((value429) => value429['id']),
         });
@@ -6531,12 +6531,12 @@ export function initStoryWorkspace({
           return;
         }
         ((state2['data']['episodes'][count17] = insertStoryEpisodeClip2['episode']),
-          resetUi({ close: !![] }),
+          resetUi({ close: true }),
           (state2['selectedClipId'] = insertStoryEpisodeClip2['clip']['id']),
           (state2['pendingDeleteClipId'] = ''),
           (state2['selectedClipGenerationIds'] = []),
           applyVideoSettings(insertStoryEpisodeClip2['clip']),
-          schedulePersistence({ immediate: !![] }),
+          schedulePersistence({ immediate: true }),
           render(),
           showToast('已新增片段。', 'success'));
         return;
@@ -6549,7 +6549,7 @@ export function initStoryWorkspace({
             itemId: itemId3,
             activeItemId: state2['selectedClipId'],
             selectionMode: state2['clipSelectionMode'],
-            shiftKey: toggleKey['shiftKey'] === !![],
+            shiftKey: toggleKey['shiftKey'] === true,
             toggleKey: toggleKey['ctrlKey'] || toggleKey['metaKey'],
             orderedIds: (getSelectedEpisode(state2)?.['clips'] || [])['map']((value432) => value432['id']),
           });
@@ -6567,17 +6567,17 @@ export function initStoryWorkspace({
             value436 = state2['selectedClipId'] !== itemId3,
             value437 = count18 >= 0 && count18 < value433 ? 'previous' : 'next';
           state2['pendingDeleteClipId'] = '';
-          if (value436) resetUi({ close: !![] });
+          if (value436) resetUi({ close: true });
           ((state2['selectedClipId'] = itemId3),
             applyVideoSettings(getSelectedClip(state2, selectedEpisode9)));
           if (value436) {
             if (!refreshSelectedClip(value437)) render();
           } else run32();
-          schedulePersistence({ uiOnly: !![] });
+          schedulePersistence({ uiOnly: true });
         }
         storyRoot['querySelector'](
           '.story-clip-card[data-story-clip-id="' + CSS['escape'](itemId3) + '"]',
-        )?.['focus']({ preventScroll: !![] });
+        )?.['focus']({ preventScroll: true });
         return;
       }
       const el242 = toggleKey['target']['closest']('[data-story-clip-prompt-surface] .ref-thumb-delete');
@@ -6748,10 +6748,10 @@ export function initStoryWorkspace({
       }
       if (home === 'toggle-clip-adjustment') {
         ((state2['clipAdjustmentOpen'] = !state2['clipAdjustmentOpen']),
-          (state2['clipAdjustmentPromptModeOpen'] = ![]),
-          (state2['clipAdjustmentLanguageOpen'] = ![]),
+          (state2['clipAdjustmentPromptModeOpen'] = false),
+          (state2['clipAdjustmentLanguageOpen'] = false),
           (state2['clipAdjustmentLanguage'] = ''),
-          (state2['clipPromptHistoryOpen'] = ![]),
+          (state2['clipPromptHistoryOpen'] = false),
           run30());
         if (state2['clipAdjustmentOpen']) {
           const selectedEpisode10 = getSelectedEpisode(state2),
@@ -6764,8 +6764,8 @@ export function initStoryWorkspace({
       } else {
         if (home === 'toggle-clip-prompt-history') {
           state2['clipPromptHistoryOpen'] = !state2['clipPromptHistoryOpen'];
-          const value447 = state2['clipAdjustmentOpen'] === !![];
-          ((state2['clipAdjustmentOpen'] = ![]), (state2['clipAdjustmentPromptModeOpen'] = ![]));
+          const value447 = state2['clipAdjustmentOpen'] === true;
+          ((state2['clipAdjustmentOpen'] = false), (state2['clipAdjustmentPromptModeOpen'] = false));
           if (value447) run29();
           run30({ focus: state2['clipPromptHistoryOpen'] ? 'first' : 'trigger' });
         } else {
@@ -6782,7 +6782,7 @@ export function initStoryWorkspace({
               ((state2[value448] = !state2[value448]),
                 (state2[
                   kind5 === 'language' ? 'clipAdjustmentPromptModeOpen' : 'clipAdjustmentLanguageOpen'
-                ] = ![]),
+                ] = false),
                 run31({ kind: kind5 === 'language' ? 'mode' : 'language' }),
                 run31({ kind: kind5, focus: state2[value448] ? 'selected' : 'trigger' }));
             } else {
@@ -6795,11 +6795,11 @@ export function initStoryWorkspace({
                   kind6 === 'language'
                     ? normalizeStoryPromptLanguage(selectedOnly2['dataset']['storyClipAdjustmentModeOption'])
                     : normalizeStoryPromptMode(selectedOnly2['dataset']['storyClipAdjustmentModeOption'], {
-                        allowDeveloperModes: !![],
+                        allowDeveloperModes: true,
                       })),
-                  (state2['clipAdjustmentPromptModeOpen'] = ![]),
-                  (state2['clipAdjustmentLanguageOpen'] = ![]),
-                  run31({ kind: kind6, focus: 'instruction', updateSelection: !![] }));
+                  (state2['clipAdjustmentPromptModeOpen'] = false),
+                  (state2['clipAdjustmentLanguageOpen'] = false),
+                  run31({ kind: kind6, focus: 'instruction', updateSelection: true }));
               } else {
                 if (home === 'generate-clip-adjustment') void generateCandidate();
                 else {
@@ -6820,7 +6820,7 @@ export function initStoryWorkspace({
                         else {
                           if (home === 'remove-rewrite-script')
                             (clearStoryHomeReferenceScript(state2),
-                              schedulePersistence({ immediate: !![] }),
+                              schedulePersistence({ immediate: true }),
                               render(),
                               storyRoot['querySelector']('[data-story-idea-input]')?.['focus']());
                           else {
@@ -6874,7 +6874,7 @@ export function initStoryWorkspace({
                                       storyRoot['querySelector']('[data-story-paste-input]')?.['focus']());
                                   else {
                                     if (home === 'debug-story-summary' || home === 'debug-story-home') {
-                                      if (windowObject?.['DEV_MODE'] !== !![]) return;
+                                      if (windowObject?.['DEV_MODE'] !== true) return;
                                       openDebugRequestWindow({
                                         documentObject: documentObject,
                                         windowObject: windowObject,
@@ -6911,14 +6911,14 @@ export function initStoryWorkspace({
                                               ariaLabel:
                                                 (normalizeText(storyReplicationEpisode2?.['title']) ||
                                                   '原视频') + '预览',
-                                              loop: ![],
+                                              loop: false,
                                             });
                                         } else {
                                           if (home === 'retry-replication-analysis')
                                             void retryFailedAnalysis();
                                           else {
                                             if (home === 'localize-replication-assets')
-                                              void extractProjectAssets({ advance: !![] });
+                                              void extractProjectAssets({ advance: true });
                                             else {
                                               if (home === 'request-inline-regeneration') {
                                                 if (
@@ -6956,8 +6956,8 @@ export function initStoryWorkspace({
                                                     else {
                                                       if (text47 === 'episode-outlines')
                                                         void run60({
-                                                          advance: ![],
-                                                          confirmRegeneration: ![],
+                                                          advance: false,
+                                                          confirmRegeneration: false,
                                                         });
                                                       else
                                                         text47['startsWith']('episode-script:') &&
@@ -6985,7 +6985,7 @@ export function initStoryWorkspace({
                                                         void run68();
                                                       } else {
                                                         if (home === 'debug-asset-extraction-request') {
-                                                          if (windowObject?.['DEV_MODE'] !== !![]) return;
+                                                          if (windowObject?.['DEV_MODE'] !== true) return;
                                                           openStoryRequestDebugPreview({
                                                             documentObject: documentObject,
                                                             windowObject: windowObject,
@@ -7015,8 +7015,8 @@ export function initStoryWorkspace({
                                                           } else {
                                                             if (home === 'plan-episode-outlines')
                                                               void run60({
-                                                                advance: ![],
-                                                                confirmRegeneration: !![],
+                                                                advance: false,
+                                                                confirmRegeneration: true,
                                                               });
                                                             else {
                                                               if (home === 'generate-episode-script')
@@ -7059,7 +7059,7 @@ export function initStoryWorkspace({
                                                                           home === 'cancel-script-selection'
                                                                         )
                                                                           ((state2['scriptSelectionMode'] =
-                                                                            ![]),
+                                                                            false),
                                                                             (state2[
                                                                               'selectedScriptEpisodeIds'
                                                                             ] = []),
@@ -7151,7 +7151,7 @@ export function initStoryWorkspace({
                                                                                     run37(''),
                                                                                     run38(),
                                                                                     render({
-                                                                                      capturePageState: ![],
+                                                                                      capturePageState: false,
                                                                                     }));
                                                                                 else {
                                                                                   if (
@@ -7240,7 +7240,7 @@ export function initStoryWorkspace({
                                                                                                 ][
                                                                                                   'storyProjectId'
                                                                                                 ],
-                                                                                                !![],
+                                                                                                true,
                                                                                               );
                                                                                             else {
                                                                                               if (
@@ -7253,7 +7253,7 @@ export function initStoryWorkspace({
                                                                                                   ][
                                                                                                     'storyProjectId'
                                                                                                   ],
-                                                                                                  ![],
+                                                                                                  false,
                                                                                                 );
                                                                                               else {
                                                                                                 if (
@@ -7424,7 +7424,7 @@ export function initStoryWorkspace({
                                                                                                                   void extractProjectAssets(
                                                                                                                     {
                                                                                                                       advance:
-                                                                                                                        !![],
+                                                                                                                        true,
                                                                                                                     },
                                                                                                                   );
                                                                                                                 else {
@@ -7441,9 +7441,9 @@ export function initStoryWorkspace({
                                                                                                                     void extractProjectAssets(
                                                                                                                       {
                                                                                                                         advance:
-                                                                                                                          !![],
+                                                                                                                          true,
                                                                                                                         experimental:
-                                                                                                                          !![],
+                                                                                                                          true,
                                                                                                                       },
                                                                                                                     );
                                                                                                                   } else {
@@ -7454,7 +7454,7 @@ export function initStoryWorkspace({
                                                                                                                       void run60(
                                                                                                                         {
                                                                                                                           advance:
-                                                                                                                            !![],
+                                                                                                                            true,
                                                                                                                         },
                                                                                                                       );
                                                                                                                     else {
@@ -7465,7 +7465,7 @@ export function initStoryWorkspace({
                                                                                                                         void openEpisodeStage(
                                                                                                                           {
                                                                                                                             confirmMissingImages:
-                                                                                                                              !![],
+                                                                                                                              true,
                                                                                                                           },
                                                                                                                         );
                                                                                                                       else {
@@ -7485,7 +7485,7 @@ export function initStoryWorkspace({
                                                                                                                               (state2[
                                                                                                                                 'episodeSelectionMode'
                                                                                                                               ] =
-                                                                                                                                ![]),
+                                                                                                                                false),
                                                                                                                               (state2[
                                                                                                                                 'selectedEpisodeIds'
                                                                                                                               ] =
@@ -7536,7 +7536,7 @@ export function initStoryWorkspace({
                                                                                                                                 void splitBatch(
                                                                                                                                   {
                                                                                                                                     selectionMode:
-                                                                                                                                      !![],
+                                                                                                                                      true,
                                                                                                                                   },
                                                                                                                                 );
                                                                                                                               else {
@@ -7547,7 +7547,7 @@ export function initStoryWorkspace({
                                                                                                                                   void splitBatch(
                                                                                                                                     {
                                                                                                                                       selectionMode:
-                                                                                                                                        ![],
+                                                                                                                                        false,
                                                                                                                                     },
                                                                                                                                   );
                                                                                                                                 else {
@@ -7569,7 +7569,7 @@ export function initStoryWorkspace({
                                                                                                                                         ],
                                                                                                                                         {
                                                                                                                                           openAfter:
-                                                                                                                                            ![],
+                                                                                                                                            false,
                                                                                                                                         },
                                                                                                                                       );
                                                                                                                                     else {
@@ -7637,7 +7637,7 @@ export function initStoryWorkspace({
                                                                                                                                                 ],
                                                                                                                                                 {
                                                                                                                                                   openAfter:
-                                                                                                                                                    ![],
+                                                                                                                                                    false,
                                                                                                                                                 },
                                                                                                                                               );
                                                                                                                                             else {
@@ -7674,7 +7674,7 @@ export function initStoryWorkspace({
                                                                                                                                                     (schedulePersistence(
                                                                                                                                                       {
                                                                                                                                                         immediate:
-                                                                                                                                                          !![],
+                                                                                                                                                          true,
                                                                                                                                                       },
                                                                                                                                                     ),
                                                                                                                                                       (state2[
@@ -7710,7 +7710,7 @@ export function initStoryWorkspace({
                                                                                                                                                           schedulePersistence(
                                                                                                                                                             {
                                                                                                                                                               immediate:
-                                                                                                                                                                !![],
+                                                                                                                                                                true,
                                                                                                                                                             },
                                                                                                                                                           ),
                                                                                                                                                           render(
@@ -7843,7 +7843,7 @@ export function initStoryWorkspace({
                                                                                                                                                             (schedulePersistence(
                                                                                                                                                               {
                                                                                                                                                                 immediate:
-                                                                                                                                                                  !![],
+                                                                                                                                                                  true,
                                                                                                                                                               },
                                                                                                                                                             ),
                                                                                                                                                               render());
@@ -7984,7 +7984,7 @@ export function initStoryWorkspace({
                                                                                                                                                                 schedulePersistence(
                                                                                                                                                                   {
                                                                                                                                                                     immediate:
-                                                                                                                                                                      !![],
+                                                                                                                                                                      true,
                                                                                                                                                                   },
                                                                                                                                                                 ),
                                                                                                                                                                 render(),
@@ -8143,7 +8143,7 @@ export function initStoryWorkspace({
                                                                                                                                                                       schedulePersistence(
                                                                                                                                                                         {
                                                                                                                                                                           immediate:
-                                                                                                                                                                            !![],
+                                                                                                                                                                            true,
                                                                                                                                                                         },
                                                                                                                                                                       ),
                                                                                                                                                                       showToast(
@@ -8246,7 +8246,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                 schedulePersistence(
                                                                                                                                                                                   {
                                                                                                                                                                                     immediate:
-                                                                                                                                                                                      !![],
+                                                                                                                                                                                      true,
                                                                                                                                                                                   },
                                                                                                                                                                                 ),
                                                                                                                                                                                 render(),
@@ -8497,7 +8497,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                   schedulePersistence(
                                                                                                                                                                                                                     {
                                                                                                                                                                                                                       immediate:
-                                                                                                                                                                                                                        !![],
+                                                                                                                                                                                                                        true,
                                                                                                                                                                                                                     },
                                                                                                                                                                                                                   ),
                                                                                                                                                                                                                   showToast(
@@ -8720,7 +8720,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                         ](
                                                                                                                                                                                                                           {
                                                                                                                                                                                                                             preventScroll:
-                                                                                                                                                                                                                              !![],
+                                                                                                                                                                                                                              true,
                                                                                                                                                                                                                           },
                                                                                                                                                                                                                         ));
                                                                                                                                                                                                                     } else {
@@ -8734,7 +8734,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                           (state2[
                                                                                                                                                                                                                             'clipSelectionMode'
                                                                                                                                                                                                                           ] =
-                                                                                                                                                                                                                            ![]),
+                                                                                                                                                                                                                            false),
                                                                                                                                                                                                                           (state2[
                                                                                                                                                                                                                             'selectedClipGenerationIds'
                                                                                                                                                                                                                           ] =
@@ -8751,7 +8751,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                             (state2[
                                                                                                                                                                                                                               'clipSelectionMode'
                                                                                                                                                                                                                             ] =
-                                                                                                                                                                                                                              ![]),
+                                                                                                                                                                                                                              false),
                                                                                                                                                                                                                             (state2[
                                                                                                                                                                                                                               'selectedClipGenerationIds'
                                                                                                                                                                                                                             ] =
@@ -8873,7 +8873,7 @@ export function initStoryWorkspace({
                                                                                                                                                                                                                                           windowObject?.[
                                                                                                                                                                                                                                             'DEV_MODE'
                                                                                                                                                                                                                                           ] !==
-                                                                                                                                                                                                                                          !![]
+                                                                                                                                                                                                                                          true
                                                                                                                                                                                                                                         )
                                                                                                                                                                                                                                           return;
                                                                                                                                                                                                                                         openDebugRequestWindow(
@@ -9077,10 +9077,10 @@ export function initStoryWorkspace({
             selectedClip9?.['promptMode'] ||
               selectedEpisode12?.['promptMode'] ||
               state2['data']['project']?.['planning']?.['promptMode'],
-            { allowDeveloperModes: !![] },
+            { allowDeveloperModes: true },
           ),
           storyPromptMode2 = normalizeStoryPromptMode(state2['clipAdjustmentPromptMode'] || storyPromptMode, {
-            allowDeveloperModes: !![],
+            allowDeveloperModes: true,
           }),
           el254 = root['target']
             ['closest']('[data-story-clip-adjustment-bar]')
@@ -9099,7 +9099,7 @@ export function initStoryWorkspace({
           documentObject: documentObject,
           renderResults: () => renderStoryHomeProjectResults(state2),
         });
-        if (!refreshWorkspaceProjectResultsInPlace2) render({ capturePageState: ![] });
+        if (!refreshWorkspaceProjectResultsInPlace2) render({ capturePageState: false });
         const el255 = refreshWorkspaceProjectResultsInPlace2
           ? root['target']
           : storyRoot['querySelector']('[data-story-project-search]');
@@ -9277,11 +9277,11 @@ export function initStoryWorkspace({
                                     (value484?.['data']?.['project'] &&
                                       ((value484['data']['project']['title'] = value482),
                                       (value484['title'] = value482),
-                                      (value484['projectTitleEdited'] = !![]),
+                                      (value484['projectTitleEdited'] = true),
                                       (value484['updatedAt'] = Date['now']())),
                                       String(state2['data']['project']?.['id']) === String(value483) &&
                                         ((state2['data']['project']['title'] = value482),
-                                        (state2['projectTitleEdited'] = !![])));
+                                        (state2['projectTitleEdited'] = true)));
                                   }
                                 }
                               }
@@ -9311,12 +9311,12 @@ export function initStoryWorkspace({
       (value487?.['data']?.['project'] &&
         ((value487['data']['project']['title'] = text53),
         (value487['title'] = text53),
-        (value487['projectTitleEdited'] = !![]),
+        (value487['projectTitleEdited'] = true),
         (value487['updatedAt'] = Date['now']())),
         String(state2['data']['project']?.['id']) === String(value486) &&
-          ((state2['data']['project']['title'] = text53), (state2['projectTitleEdited'] = !![])),
+          ((state2['data']['project']['title'] = text53), (state2['projectTitleEdited'] = true)),
         (event29['target']['value'] = text53),
-        schedulePersistence({ immediate: !![] }));
+        schedulePersistence({ immediate: true }));
     }),
     el9?.['addEventListener']('change', async () => {
       const enabled62 = el9['files']?.[0];
@@ -9331,7 +9331,7 @@ export function initStoryWorkspace({
       if (response10['ok']) list44['push'](value489);
       else showToast(response10['error'], 'warn');
     });
-    if (!list44['length']) return ![];
+    if (!list44['length']) return false;
     const list45 = state2['replicationSourceFiles'],
       value490 = state2['replicationSourcePreviewUrls'];
     state2['replicationSourceFiles'] = mergeStoryReplicationSourceFiles(
@@ -9347,8 +9347,8 @@ export function initStoryWorkspace({
     return (
       value494 && state2['view'] === 'home' && state2['homeTab'] === 'replication'
         ? (syncStoryReplicationHomeSources(value494, state2), syncGenerateState())
-        : render({ capturePageState: ![] }),
-      !![]
+        : render({ capturePageState: false }),
+      true
     );
   }
   el10?.['addEventListener']('change', () => {
@@ -9431,7 +9431,7 @@ export function initStoryWorkspace({
         appearanceId: appearanceId3['id'],
       });
       isCurrent3(enabled63) &&
-        (setStoryAssetAppearanceGenerating(state2, assetId6['id'], appearanceId3['id'], !![]), render());
+        (setStoryAssetAppearanceGenerating(state2, assetId6['id'], appearanceId3['id'], true), render());
       startBackgroundTask(enabled63, {
         id: id6,
         type: 'asset-image-upload',
@@ -9458,7 +9458,7 @@ export function initStoryWorkspace({
             showToast(error18?.['message'] || '风格参考上传失败，请稍后重试。', 'error'));
       } finally {
         (isCurrent3(enabled63) &&
-          (setStoryAssetAppearanceGenerating(state2, assetId6['id'], appearanceId3['id'], ![]), render()),
+          (setStoryAssetAppearanceGenerating(state2, assetId6['id'], appearanceId3['id'], false), render()),
           (el12['value'] = ''));
       }
     }));
@@ -9488,9 +9488,9 @@ export function initStoryWorkspace({
     }
     const id7 = buildStoryBackgroundTaskId('asset-voice-upload', { assetId: assetId7['id'] });
     isCurrent3(value504) &&
-      (setStoryAssetVoiceGenerating(state2, assetId7['id'], !![]),
+      (setStoryAssetVoiceGenerating(state2, assetId7['id'], true),
       state2['characterVoiceEditor']?.['assetId'] === assetId7['id'] &&
-        (state2['characterVoiceEditor']['isGenerating'] = !![]),
+        (state2['characterVoiceEditor']['isGenerating'] = true),
       render());
     startBackgroundTask(value504, {
       id: id7,
@@ -9501,7 +9501,7 @@ export function initStoryWorkspace({
     });
     try {
       const audioUrl = await uploadFile(fileName, value504['projectId']);
-      if (!isLive(value504)) return ![];
+      if (!isLive(value504)) return false;
       const storyCharacterVoiceReference = normalizeStoryCharacterVoiceReference({
         source: 'upload',
         audioUrl:
@@ -9525,10 +9525,10 @@ export function initStoryWorkspace({
             (state2['characterVoiceEditor']['error'] = ''),
           render(),
           showToast('角色声音参考已上传。', 'success')),
-        !![]
+        true
       );
     } catch (error19) {
-      if (!isLive(value504)) return ![];
+      if (!isLive(value504)) return false;
       return (
         sampleText && (sampleText['error'] = error19?.['message'] || '声音参考上传失败。'),
         finishBackgroundTask(value504, id7, {
@@ -9540,13 +9540,13 @@ export function initStoryWorkspace({
           (state2['characterVoiceEditor']?.['assetId'] === assetId7['id'] &&
             (state2['characterVoiceEditor']['error'] = error19?.['message'] || '声音参考上传失败。'),
           render()),
-        ![]
+        false
       );
     } finally {
       isCurrent3(value504) &&
-        (setStoryAssetVoiceGenerating(state2, assetId7['id'], ![]),
+        (setStoryAssetVoiceGenerating(state2, assetId7['id'], false),
         state2['characterVoiceEditor']?.['assetId'] === assetId7['id'] &&
-          (state2['characterVoiceEditor']['isGenerating'] = ![]),
+          (state2['characterVoiceEditor']['isGenerating'] = false),
         render());
     }
   }
@@ -9648,7 +9648,7 @@ export function initStoryWorkspace({
           (text16 = ''),
           (list18 = []),
           el267['classList']['remove']('is-reordering'),
-          schedulePersistence({ immediate: !![] }));
+          schedulePersistence({ immediate: true }));
         return;
       }
       const el271 = event32['target']['closest']('[data-story-clip-prompt-surface]'),
@@ -9684,19 +9684,19 @@ export function initStoryWorkspace({
     }),
     documentObject['addEventListener']('click', (event33) => {
       if (storyClipProduction['shouldCloseAdjustmentOnOutsideClick'](state2, event33['target']))
-        ((state2['clipAdjustmentOpen'] = ![]),
-          (state2['clipAdjustmentPromptModeOpen'] = ![]),
-          (state2['clipAdjustmentLanguageOpen'] = ![]),
+        ((state2['clipAdjustmentOpen'] = false),
+          (state2['clipAdjustmentPromptModeOpen'] = false),
+          (state2['clipAdjustmentLanguageOpen'] = false),
           run29());
       else
         (state2['clipAdjustmentPromptModeOpen'] || state2['clipAdjustmentLanguageOpen']) &&
           !event33['target']['closest']?.('[data-story-clip-adjustment-mode]') &&
-          ((state2['clipAdjustmentPromptModeOpen'] = ![]),
-          (state2['clipAdjustmentLanguageOpen'] = ![]),
+          ((state2['clipAdjustmentPromptModeOpen'] = false),
+          (state2['clipAdjustmentLanguageOpen'] = false),
           run31(),
           run31({ kind: 'language' }));
       (storyClipProduction['shouldClosePromptHistoryOnOutsideClick'](state2, event33['target']) &&
-        ((state2['clipPromptHistoryOpen'] = ![]), run30()),
+        ((state2['clipPromptHistoryOpen'] = false), run30()),
         !storyRoot['contains'](event33['target']) &&
           (run37(''), run38(), run33(), run34(), run35(), run6(), run36()));
     }));
@@ -9711,7 +9711,7 @@ export function initStoryWorkspace({
         return;
       }
       if (enabled11 && state2['view'] === 'episode') {
-        if (!syncFrameRail({ refreshContent: !![] })) render();
+        if (!syncFrameRail({ refreshContent: true })) render();
       }
     }),
     value518 = typeof subscribeCanvasNodeDeletions === 'function' ? subscribeCanvasNodeDeletions(run3) : null,
@@ -9719,13 +9719,13 @@ export function initStoryWorkspace({
       typeof subscribeCanvasMediaNodeChanges === 'function' ? subscribeCanvasMediaNodeChanges(run5) : null;
   async function run85() {
     if (typeof loadWorkspace !== 'function') {
-      coordinator['setReady'](!![]);
+      coordinator['setReady'](true);
       return;
     }
     const value520 = coordinator['getRevision'](),
       storyWorkspaceSnapshot = createStoryWorkspaceSnapshot(state2);
-    let value521 = ![],
-      value522 = ![];
+    let value521 = false,
+      value522 = false;
     try {
       const workspace = await loadWorkspace();
       await waitForRuntimeManifestLoad({ timeoutMs: 500 });
@@ -9742,7 +9742,7 @@ export function initStoryWorkspace({
             hasStoryWorkspaceSnapshotChanged(storyWorkspaceSnapshot, createStoryWorkspaceSnapshot(state2));
         if (value523)
           (projectData['restoreEntries'](mergeStoryWorkspaceHydratedProjects(state2['projects'], list46), {
-            preserveLive: !![],
+            preserveLive: true,
           }),
             (value521 = list46['length'] > 0),
             coordinator['schedule']());
@@ -9757,8 +9757,8 @@ export function initStoryWorkspace({
               state2['data']['project'],
               { allowDeveloperPromptModes: state2['developerModeAvailable'] },
             )),
-            (state2['hasCreatedProject'] = providerProfileId3['hasCreatedProject'] === !![]),
-            (state2['projectTitleEdited'] = providerProfileId3['projectTitleEdited'] === !![]),
+            (state2['hasCreatedProject'] = providerProfileId3['hasCreatedProject'] === true),
+            (state2['projectTitleEdited'] = providerProfileId3['projectTitleEdited'] === true),
             (state2['models'] = { ...state2['models'], ...providerProfileId3['models'] }),
             (state2['textProvider'] =
               providerProfileId3['modelProviders']?.['text'] ||
@@ -9887,7 +9887,7 @@ export function initStoryWorkspace({
               typeof providerProfileId3['ui']['pageScrollPositions'] === 'object'
                 ? { ...providerProfileId3['ui']['pageScrollPositions'] }
                 : {}),
-            (state2['experimentalSplitMode'] = providerProfileId3['ui']['experimentalSplitMode'] === !![]),
+            (state2['experimentalSplitMode'] = providerProfileId3['ui']['experimentalSplitMode'] === true),
             (state2['selectedAssetId'] = providerProfileId3['ui']['selectedAssetId'] || ''),
             (state2['selectedEpisodeId'] = providerProfileId3['ui']['selectedEpisodeId'] || ''),
             (state2['selectedClipId'] = providerProfileId3['ui']['selectedClipId'] || ''),
@@ -9901,9 +9901,9 @@ export function initStoryWorkspace({
             episode: episode11,
             enteringEpisode: state2['view'] === 'episode',
           })),
-            (value521 = !![]));
+            (value521 = true));
           if (state2['workspaceSurface']) selectStoryWorkspaceSurface(state2, state2['workspaceSurface']);
-          if (enabled11) render({ capturePageState: ![] });
+          if (enabled11) render({ capturePageState: false });
         }
       }
     } catch (value524) {
@@ -9912,9 +9912,9 @@ export function initStoryWorkspace({
         showToast('历史剧本项目加载失败，已暂停自动保存以防覆盖数据。', 'error', 10000));
       return;
     }
-    coordinator['setReady'](!![]);
+    coordinator['setReady'](true);
     typeof getCanvasMediaSnapshot === 'function' && run5(getCanvasMediaSnapshot() || {});
-    value522 && schedulePersistence({ immediate: !![] });
+    value522 && schedulePersistence({ immediate: true });
     if (value521 && !enabled10)
       for (const value525 of projectData['getAllData']()) {
         (resumeTasks(value525), resumePersistedTasks(value525));
@@ -9924,7 +9924,7 @@ export function initStoryWorkspace({
       void backfillStoryVideoThumbnails(projectData['getAllData'](), { concurrency: 1 })
         ['then']((enabled65) => {
           if (enabled10 || !enabled65['updatedCount']) return;
-          schedulePersistence({ immediate: !![] });
+          schedulePersistence({ immediate: true });
           if (!enabled11) return;
           if (state2['view'] === 'project' && state2['step'] === 3)
             enabled65['changedEpisodeIds']['forEach']((value526) => {
@@ -9956,9 +9956,9 @@ export function initStoryWorkspace({
     deactivate: deactivate,
     isActive: () => enabled11,
     flushPersistence() {
-      return coordinator['destroy']({ flush: !![], force: !![] })['then'](
-        () => !![],
-        () => ![],
+      return coordinator['destroy']({ flush: true, force: true })['then'](
+        () => true,
+        () => false,
       );
     },
     hasUnsavedChanges: () => coordinator.isDirty(),
@@ -9982,7 +9982,7 @@ export function initStoryWorkspace({
       (bindStoryAssetImageDrop2['destroy'](),
         deactivate(),
         collaboration['destroy'](),
-        (enabled10 = !![]),
+        (enabled10 = true),
         workspacePresentationLifecycle['dispose'](),
         releaseSourcePreviewUrls(),
         closeStoryRequestDebugPreview(documentObject),
@@ -9994,7 +9994,7 @@ export function initStoryWorkspace({
         replicationAnalysisPromises['clear'](),
         replicationSourceFileByEpisodeKey['clear'](),
         destroy2(),
-        stopStoryAssetBreakdownProgress({ clearState: !![] }),
+        stopStoryAssetBreakdownProgress({ clearState: true }),
         storyAssetHoverPreviewController['destroy'](),
         timer?.['destroy'](),
         (timer = null),
@@ -10008,12 +10008,12 @@ export function initStoryWorkspace({
         value519?.(),
         viewportElement['querySelectorAll'](':scope > .story-page')['forEach'](disposePage),
         run82(),
-        storyRoot['removeEventListener']('error', handleStoryWorkspaceImageError, !![]),
-        windowObject?.['removeEventListener']?.('pointermove', handleWindowPointerMove, !![]),
-        windowObject?.['removeEventListener']?.('pointerup', handleWindowPointerUp, !![]),
-        windowObject?.['removeEventListener']?.('pointercancel', handleWindowPointerCancel, !![]),
+        storyRoot['removeEventListener']('error', handleStoryWorkspaceImageError, true),
+        windowObject?.['removeEventListener']?.('pointermove', handleWindowPointerMove, true),
+        windowObject?.['removeEventListener']?.('pointerup', handleWindowPointerUp, true),
+        windowObject?.['removeEventListener']?.('pointercancel', handleWindowPointerCancel, true),
         storyLibraryAssignmentMenuPortal['destroy'](),
-        windowObject?.['removeEventListener']?.('keydown', run80, !![]),
+        windowObject?.['removeEventListener']?.('keydown', run80, true),
         windowObject?.['removeEventListener']?.('aicanvas:runtime-info', value142),
         windowObject?.['removeEventListener']?.('dev-mode-changed', value142),
         storyRoot['remove']());

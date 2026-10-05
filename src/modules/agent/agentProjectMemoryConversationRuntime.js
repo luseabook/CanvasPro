@@ -57,9 +57,9 @@ export function createAgentProjectMemoryConversationRuntime({
         content: content,
         turnId: turnId,
       }),
-      sessionStore?.['setCurrentRun']?.({ id: turnId, status: 'success', stopped: ![] }),
+      sessionStore?.['setCurrentRun']?.({ id: turnId, status: 'success', stopped: false }),
       {
-        ok: !![],
+        ok: true,
         status: 'success',
         reply: content,
         responseChannel: 'project.memory',

@@ -45,7 +45,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
   workflow: Object['freeze']({
     id: 'workflow',
     adapterType: 'workflow',
-    async: ![],
+    async: false,
     taskIdField: 'rhTaskId',
     statusField: 'rhTaskStatus',
     startedAtField: 'rhTaskStartedAt',
@@ -57,20 +57,20 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
       taskId: taskId = '',
       status: status = 'pending',
       startedAt: startedAt = 0,
-      recovering: recovering = ![],
-      useOpenapiQuery: useOpenapiQuery = ![],
+      recovering: recovering = false,
+      useOpenapiQuery: useOpenapiQuery = false,
     } = {}) => ({
       rhTaskId: normalizeText(taskId),
       rhTaskStatus: normalizeStatus(status),
       rhTaskStartedAt: normalizeNumber(startedAt),
-      rhTaskRecovering: recovering === !![],
-      rhTaskUseOpenapiQuery: useOpenapiQuery === !![],
+      rhTaskRecovering: recovering === true,
+      rhTaskUseOpenapiQuery: useOpenapiQuery === true,
     }),
   }),
   dreamina: Object['freeze']({
     id: 'dreamina',
     adapterType: 'localRuntime',
-    async: ![],
+    async: false,
     taskIdField: 'dreaminaSubmitId',
     statusField: 'dreaminaTaskStatus',
     startedAtField: 'dreaminaTaskStartedAt',
@@ -86,7 +86,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
       label: label = '',
       startedAt: startedAt = 0,
       lastCheckedAt: lastCheckedAt = Date['now'](),
-      recovering: recovering = ![],
+      recovering: recovering = false,
       raw: raw = {},
       defaultLabel: defaultLabel = '',
     } = {}) => {
@@ -98,7 +98,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
         dreaminaTaskLabel: normalizeText(label || text2),
         dreaminaTaskStartedAt: normalizeNumber(startedAt),
         dreaminaTaskLastCheckedAt: normalizeNumber(lastCheckedAt, Date['now']()),
-        dreaminaTaskRecovering: recovering === !![],
+        dreaminaTaskRecovering: recovering === true,
         dreaminaTaskLastRaw: normalizeRecord(raw),
       };
     },
@@ -106,7 +106,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
   asyncModelApi: Object['freeze']({
     id: 'asyncModelApi',
     adapterType: 'modelApi',
-    async: !![],
+    async: true,
     taskIdField: 'asyncTaskId',
     statusField: 'asyncTaskStatus',
     startedAtField: 'asyncTaskStartedAt',
@@ -120,14 +120,14 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
       taskId: taskId = '',
       status: status = 'pending',
       startedAt: startedAt = 0,
-      recovering: recovering = ![],
+      recovering: recovering = false,
     } = {}) => ({
       asyncTaskProvider: normalizeText(provider),
       asyncTaskKind: normalizeText(kind) || 'generation',
       asyncTaskId: normalizeText(taskId),
       asyncTaskStatus: normalizeStatus(status),
       asyncTaskStartedAt: normalizeNumber(startedAt),
-      asyncTaskRecovering: recovering === !![],
+      asyncTaskRecovering: recovering === true,
     }),
   }),
 });
@@ -148,17 +148,17 @@ export function inferGenerationTaskProtocol({
   taskProtocol: taskProtocol = '',
   adapterType: adapterType = '',
   provider: provider = '',
-  async: async = ![],
+  async: async = false,
   node: node = {},
 } = {}) {
   const text4 = normalizeText(taskProtocol),
-    input = text4 === 'modelApi' && async !== !![] ? '' : normalizeGenerationTaskProtocol(text4);
+    input = text4 === 'modelApi' && async !== true ? '' : normalizeGenerationTaskProtocol(text4);
   if (input) return input;
   const adapterType2 = normalizeAdapterType(adapterType || node['taskAdapterType'] || node['adapterType']);
   if (adapterType2 === 'workflow') return GENERATION_TASK_PROTOCOLS['WORKFLOW'];
   if (firstText(node['asyncTaskId'])) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
   if (firstText(node['dreaminaSubmitId'])) return GENERATION_TASK_PROTOCOLS['DREAMINA'];
-  if (adapterType2 === 'modelapi' && async === !![]) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
+  if (adapterType2 === 'modelapi' && async === true) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
   if (
     adapterType2 === 'localruntime' &&
     normalizeText(provider || node['provider'])['toLowerCase']() === 'dreamina'

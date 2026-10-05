@@ -8,7 +8,7 @@ function version(list) {
     : '';
 }
 export function recordDiagnosticsLaunchVersion({ logDir: logDir, app: app } = {}) {
-  const version2 = { currentVersion: '', previousVersion: '', versionChanged: null, markerSaved: ![] },
+  const version2 = { currentVersion: '', previousVersion: '', versionChanged: null, markerSaved: false },
     value = path['join'](logDir, 'launch-version.json'),
     item = value + '.' + process['pid'] + '.tmp';
   try {
@@ -21,7 +21,7 @@ export function recordDiagnosticsLaunchVersion({ logDir: logDir, app: app } = {}
       version2['versionChanged'] = version2['previousVersion'] !== version2['currentVersion'];
     (writeFileSync(item, JSON['stringify']({ version: version2['currentVersion'] }), 'utf8'),
       renameSync(item, value),
-      (version2['markerSaved'] = !![]));
+      (version2['markerSaved'] = true));
   } catch {
     try {
       unlinkSync(item);

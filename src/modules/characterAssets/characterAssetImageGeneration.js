@@ -3,7 +3,7 @@ function normalizeText(value) {
   return String(value ?? '')['trim']();
 }
 export function normalizeCharacterAssetImageGenerationParams(item, key = {}) {
-  const sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(item, key, { includeDefaults: !![] });
+  const sanitizeModelUiSchemaParams2 = sanitizeModelUiSchemaParams(item, key, { includeDefaults: true });
   return (
     Object['prototype']['hasOwnProperty']['call'](sanitizeModelUiSchemaParams2, 'batchSize') &&
       (sanitizeModelUiSchemaParams2['batchSize'] = 1),

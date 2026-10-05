@@ -12,7 +12,7 @@ export function authorDirectorPath(
     object: object,
     start: start = 0,
     duration: duration = 3,
-    smooth: smooth = ![],
+    smooth: smooth = false,
   } = {},
 ) {
   const item = (points || [])

@@ -57,11 +57,11 @@ export function createPersonReplacementShotReverseOperation({
   updateShotCutRanges: updateShotCutRanges,
   enqueueMediaTask: enqueueMediaTask,
   resolveMediaRef: resolveMediaRef,
-  isDestroyed: isDestroyed = () => ![],
+  isDestroyed: isDestroyed = () => false,
 } = {}) {
   return function run({
     shotId: shotId2,
-    isReversed: isReversed = ![],
+    isReversed: isReversed = false,
     iterationReferenceRef: iterationReferenceRef = '',
     sourceRef: sourceRef = '',
   } = {}) {
@@ -85,9 +85,9 @@ export function createPersonReplacementShotReverseOperation({
       });
     }
     const projectId3 = normalizeText(project['id']),
-      isReversed2 = isReversed === !![],
-      current = shot['isReversed'] === !![],
-      materializedIsReversed = shot['materializedIsReversed'] === !![],
+      isReversed2 = isReversed === true,
+      current = shot['isReversed'] === true,
+      materializedIsReversed = shot['materializedIsReversed'] === true,
       revision = coordinator['nextRevision'](),
       entry = current !== isReversed2,
       materializationStatus = Boolean(shot['videoRef']) && materializedIsReversed === isReversed2,
@@ -121,14 +121,14 @@ export function createPersonReplacementShotReverseOperation({
             }
           : {}),
       },
-      project2 = setProject(record, { renderWorkspace: ![] });
+      project2 = setProject(record, { renderWorkspace: false });
     if (materializationStatus)
       return {
         project: project2,
         completion: coordinator['trackReverseCompletion']({
           projectId: projectId3,
           shotId: shotId3,
-          completion: Promise['resolve']({ ok: !![], project: cloneJson(project2), changedShotCount: 0 }),
+          completion: Promise['resolve']({ ok: true, project: cloneJson(project2), changedShotCount: 0 }),
         }),
       };
     const ranges = project2['shots']['map']((shotId4) => ({
@@ -136,16 +136,16 @@ export function createPersonReplacementShotReverseOperation({
         sourceId: shotId4['sourceId'],
         startSec: shotId4['startTimeSec'],
         endSec: shotId4['endTimeSec'],
-        ...(shotId4['isReversed'] === !![] ? { isReversed: !![] } : {}),
+        ...(shotId4['isReversed'] === true ? { isReversed: true } : {}),
       })),
       completion2 = updateShotCutRanges({
         ranges: ranges,
         selectedShotId: project2['workspace']['selectedShotId'] || shotId3,
-        renderWorkspace: ![],
-        notify: ![],
+        renderWorkspace: false,
+        notify: false,
         revision: revision,
       })
-        ['then']((ok) => ({ ok: ok?.['stale'] !== !![], ...ok }))
+        ['then']((ok) => ({ ok: ok?.['stale'] !== true, ...ok }))
         ['catch']((error) => {
           const error2 = error?.['message'] || '视频倒放失败，请重试。',
             shots = getProject();
@@ -167,10 +167,10 @@ export function createPersonReplacementShotReverseOperation({
                       : args2,
                   ),
                 },
-                { renderWorkspace: ![] },
+                { renderWorkspace: false },
               ),
               showToast(error2, 'error')),
-            { ok: ![], project: snapshot(), error: error2, stale: !coordinator['isCurrent'](revision) }
+            { ok: false, project: snapshot(), error: error2, stale: !coordinator['isCurrent'](revision) }
           );
         });
     return {

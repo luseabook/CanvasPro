@@ -72,10 +72,10 @@ function normalizeSettings(groundLock = {}) {
         )
       : {};
   return {
-    groundLock: groundLock['groundLock'] === !![],
+    groundLock: groundLock['groundLock'] === true,
     groundPositions: groundPositions,
-    uniformScale: groundLock['uniformScale'] === !![],
-    snapEnabled: groundLock['snapEnabled'] === !![] || groundLock['snap']?.['enabled'] === !![],
+    uniformScale: groundLock['uniformScale'] === true,
+    snapEnabled: groundLock['snapEnabled'] === true || groundLock['snap']?.['enabled'] === true,
     translationSnap: Math['max'](
       0.0001,
       finiteNumber(groundLock['translationSnap'] ?? groundLock['snap']?.['translation'], 0.25),
@@ -92,7 +92,7 @@ function normalizeSettings(groundLock = {}) {
 }
 function transformsShareOrientation(value3) {
   const list3 = Object['values'](value3);
-  if (list3['length'] < 2) return !![];
+  if (list3['length'] < 2) return true;
   const value4 = new threeRuntime['Quaternion']()['setFromEuler'](
     new threeRuntime['Euler'](...list3[0]['rotation'], 'XYZ'),
   );
@@ -225,10 +225,10 @@ function updateScaleSession(value23, value24, { precision: precision4, toggleSna
 export function updateStoryboard3DTransformSession(
   enabled2,
   value34,
-  { precision: precision = ![], toggleSnap: toggleSnap = ![] } = {},
+  { precision: precision = false, toggleSnap: toggleSnap = false } = {},
 ) {
   if (!enabled2) return {};
-  const value35 = { precision: precision === !![], toggleSnap: toggleSnap === !![] },
+  const value35 = { precision: precision === true, toggleSnap: toggleSnap === true },
     value36 =
       enabled2['activeTool'] === 'move'
         ? updateMoveSession(enabled2, value34, value35)

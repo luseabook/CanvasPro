@@ -4,13 +4,13 @@ import {
 } from '../../services/mediaObjectUrlRegistry.js';
 function isLifecycleCurrent(value, item) {
   return Boolean(
-    value?.['_imageObjectUrlsDisposed'] !== !![] &&
+    value?.['_imageObjectUrlsDisposed'] !== true &&
     (Number(value?.['_imageObjectUrlLifecycleEpoch']) || 0) === item,
   );
 }
 export function disposeImageObjectUrls(enabled) {
   if (!enabled) return;
-  ((enabled['_imageObjectUrlsDisposed'] = !![]),
+  ((enabled['_imageObjectUrlsDisposed'] = true),
     (enabled['_imageObjectUrlLifecycleEpoch'] =
       (Number(enabled['_imageObjectUrlLifecycleEpoch']) || 0) + 1),
     (enabled['_imageDisplayLoadToken'] = (Number(enabled['_imageDisplayLoadToken']) || 0) + 1));
@@ -48,28 +48,28 @@ export function hydrateStoredImageThumbsInBackground(enabled2, data, options, ha
       const current = Promise['resolve']()
         ['then'](() => handler(sourceUrl))
         ['then']((enabled3) => {
-          if (!enabled3 || enabled2['_thumbObjectUrls']['has'](sourceUrl)) return ![];
+          if (!enabled3 || enabled2['_thumbObjectUrls']['has'](sourceUrl)) return false;
           const trackedMediaObjectUrl = createTrackedMediaObjectUrl(enabled3, {
             kind: 'image',
             ownerId: 'ai-image:' + enabled2['nodeId'] + ':thumb',
             sourceUrl: sourceUrl,
           });
-          if (!trackedMediaObjectUrl) return ![];
+          if (!trackedMediaObjectUrl) return false;
           if (
             !isLifecycleCurrent(enabled2, source) ||
             enabled2['_resolvedUrlsKey'] !== options ||
             enabled2['_thumbObjectUrls']['has'](sourceUrl)
           )
-            return (revokeTrackedMediaObjectUrl(trackedMediaObjectUrl), ![]);
-          return (enabled2['_thumbObjectUrls']['set'](sourceUrl, trackedMediaObjectUrl), !![]);
+            return (revokeTrackedMediaObjectUrl(trackedMediaObjectUrl), false);
+          return (enabled2['_thumbObjectUrls']['set'](sourceUrl, trackedMediaObjectUrl), true);
         })
-        ['catch'](() => ![])
+        ['catch'](() => false)
         ['finally'](() => enabled2['_thumbObjectUrlLoads']['delete'](sourceUrl));
       return (enabled2['_thumbObjectUrlLoads']['set'](sourceUrl, current), current);
     });
   void Promise['allSettled'](next)['then']((list2) => {
     if (!isLifecycleCurrent(enabled2, source)) return;
-    const enabled4 = list2['some']((el) => el['status'] === 'fulfilled' && el['value'] === !![]);
+    const enabled4 = list2['some']((el) => el['status'] === 'fulfilled' && el['value'] === true);
     if (!enabled4 || enabled2['_resolvedUrlsKey'] !== options || !enabled2['imgEl']) return;
     ((enabled2['_resolvedUrlsKey'] = ''), void enabled2['_loadAndDisplayImage']());
   });

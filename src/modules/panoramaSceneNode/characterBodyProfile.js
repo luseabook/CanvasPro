@@ -52,5 +52,5 @@ export function applyCharacterBodyProfile(character, profile = {}) {
       base['headScale']['y'] * headScale,
       base['headScale']['z'] * headScale,
     ),
-    character['modelRoot']['updateMatrixWorld']?.(!![]));
+    character['modelRoot']['updateMatrixWorld']?.(true));
 }

@@ -60,13 +60,13 @@ export function buildFixedSlotOccupancy({
       if (!enabled2['refSlot'] || map5['has'](enabled2['index'])) return;
       const enabled3 = map2['get'](enabled2['refSlot']);
       if (!enabled3 || enabled3['kind'] !== enabled2['kind'] || enabled[enabled3['id']]) return;
-      ((enabled[enabled3['id']] = !![]), map5['add'](enabled2['index']));
+      ((enabled[enabled3['id']] = true), map5['add'](enabled2['index']));
     }),
     list3['forEach']((entry) => {
       if (map5['has'](entry['index'])) return;
       const enabled4 = (map3['get'](entry['kind']) || [])['find']((record) => !enabled[record]);
       if (!enabled4) return;
-      ((enabled[enabled4] = !![]), map5['add'](entry['index']));
+      ((enabled[enabled4] = true), map5['add'](entry['index']));
     }),
     enabled
   );
@@ -83,7 +83,7 @@ export function getMissingManifestInputRequirement({
         : { text: 0, image: 0, video: 0, audio: 0 },
     handle = occupiedFixedSlots && typeof occupiedFixedSlots === 'object' ? occupiedFixedSlots : {},
     kind2 = getVisibleFixedSlots(fixedInputConfig)['find'](
-      (state) => state['required'] === !![] && handle[state['id']] !== !![],
+      (state) => state['required'] === true && handle[state['id']] !== true,
     );
   if (kind2)
     return {

@@ -49,7 +49,7 @@ export function createWorkspaceMarqueeRect(entry, record, payload, handle, box =
   };
 }
 export function doesWorkspaceMarqueeIntersect(box2, box3) {
-  if (!box2 || !box3) return ![];
+  if (!box2 || !box3) return false;
   return !(
     normalizeCoordinate(box3['right']) < normalizeCoordinate(box2['left']) ||
     normalizeCoordinate(box3['left']) > normalizeCoordinate(box2['right']) ||
@@ -57,7 +57,7 @@ export function doesWorkspaceMarqueeIntersect(box2, box3) {
     normalizeCoordinate(box3['top']) > normalizeCoordinate(box2['bottom'])
   );
 }
-export function resolveWorkspaceMarqueeSelection(list = [], list2 = [], { additive: additive = ![] } = {}) {
+export function resolveWorkspaceMarqueeSelection(list = [], list2 = [], { additive: additive = false } = {}) {
   const args = new Set(
     additive && Array['isArray'](list2)
       ? list2['map']((scope) => String(scope ?? '')['trim']())['filter'](Boolean)
@@ -101,7 +101,7 @@ export function createWorkspaceMarqueeSelectionController({
   if (!selector3 || !enabled)
     throw new Error('workspace marquee selection itemSelector and getItemId are required');
   let value2 = null,
-    enabled2 = ![];
+    enabled2 = false;
   const run = () => {
       const el = typeof root['querySelectorAll'] === 'function' ? root : value2?.['surface'],
         value3 = value2?.['itemSelector'] || selector3,
@@ -115,7 +115,7 @@ export function createWorkspaceMarqueeSelectionController({
     },
     update = (event) => {
       const event2 = value2;
-      if (!event2 || event2['pointerId'] !== event['pointerId']) return ![];
+      if (!event2 || event2['pointerId'] !== event['pointerId']) return false;
       if (
         !event2['active'] &&
         !hasWorkspaceMarqueeDrag(
@@ -126,9 +126,9 @@ export function createWorkspaceMarqueeSelectionController({
           event2['dragThreshold'],
         )
       )
-        return ![];
+        return false;
       if (!event2['active']) {
-        ((event2['active'] = !![]),
+        ((event2['active'] = true),
           (event2['overlay'] = documentObject['createElement']('div')),
           (event2['overlay']['className'] = [event2['baseOverlayClassName'], event2['overlayClassName']]
             ['filter'](Boolean)
@@ -167,12 +167,12 @@ export function createWorkspaceMarqueeSelectionController({
           if (doesWorkspaceMarqueeIntersect2) list3['push'](String(event2['getItemId'](el3) || '')['trim']());
         }),
         (event2['hitIds'] = list3['filter'](Boolean)),
-        !![]
+        true
       );
     },
-    finish = (event3, { cancelled: cancelled = ![] } = {}) => {
+    finish = (event3, { cancelled: cancelled = false } = {}) => {
       const additive2 = value2;
-      if (!additive2 || additive2['pointerId'] !== event3['pointerId']) return ![];
+      if (!additive2 || additive2['pointerId'] !== event3['pointerId']) return false;
       if (additive2['active'] && !cancelled) update(event3);
       const enabled3 = additive2['active'] && !cancelled,
         value6 = enabled3
@@ -185,60 +185,60 @@ export function createWorkspaceMarqueeSelectionController({
         root['hasPointerCapture']?.(event3['pointerId']) &&
           root['releasePointerCapture'](event3['pointerId']);
       } catch {}
-      if (!enabled3) return ![];
+      if (!enabled3) return false;
       return (
         event3['preventDefault'](),
         event3['stopPropagation'](),
-        (enabled2 = !![]),
+        (enabled2 = true),
         windowObject['setTimeout'](() => {
-          enabled2 = ![];
+          enabled2 = false;
         }, 0),
         additive2['commit'](value6),
         onCommit?.(value6),
-        !![]
+        true
       );
     },
     cancel = () => {
       const event4 = value2;
       (run(), (value2 = null));
-      if (!event4) return ![];
+      if (!event4) return false;
       try {
         root['hasPointerCapture']?.(event4['pointerId']) &&
           root['releasePointerCapture'](event4['pointerId']);
       } catch {}
-      return !![];
+      return true;
     },
     value7 = (value8) => update(value8),
     value9 = (value10) => finish(value10),
-    value11 = (value12) => finish(value12, { cancelled: !![] });
+    value11 = (value12) => finish(value12, { cancelled: true });
   return (
-    windowObject['addEventListener']?.('pointermove', value7, !![]),
-    windowObject['addEventListener']?.('pointerup', value9, !![]),
-    windowObject['addEventListener']?.('pointercancel', value11, !![]),
+    windowObject['addEventListener']?.('pointermove', value7, true),
+    windowObject['addEventListener']?.('pointerup', value9, true),
+    windowObject['addEventListener']?.('pointercancel', value11, true),
     {
       begin(pointerId) {
         if (
           pointerId['button'] !== 0 ||
-          pointerId['isPrimary'] === ![] ||
+          pointerId['isPrimary'] === false ||
           (pointerId['pointerType'] && pointerId['pointerType'] !== 'mouse')
         )
-          return ![];
+          return false;
         const surface = resolveSurface
           ? resolveSurface(pointerId)
           : pointerId['target']['closest']?.(selector);
-        if (!surface || !root['contains'](surface)) return ![];
+        if (!surface || !root['contains'](surface)) return false;
         const commit = getConfig(surface);
         if (
           !commit?.['enabled'] ||
           typeof commit['commit'] !== 'function' ||
-          commit['canBegin']?.(pointerId) === ![]
+          commit['canBegin']?.(pointerId) === false
         )
-          return ![];
+          return false;
         const selector6 = normalizeSelector(commit['blockedControlSelector'] ?? selector2),
           itemSelector2 = normalizeSelector(commit['itemSelector'] || selector3),
           getItemId2 = typeof commit['getItemId'] === 'function' ? commit['getItemId'] : enabled,
           enabled4 = selector6 ? pointerId['target']['closest']?.(selector6) : null;
-        if (enabled4 && !enabled4['matches']?.(itemSelector2)) return ![];
+        if (enabled4 && !enabled4['matches']?.(itemSelector2)) return false;
         return (
           cancel(),
           (value2 = {
@@ -248,12 +248,12 @@ export function createWorkspaceMarqueeSelectionController({
             additive:
               typeof commit['additive'] === 'boolean'
                 ? commit['additive']
-                : pointerId['shiftKey'] === !![] ||
-                  pointerId['ctrlKey'] === !![] ||
-                  pointerId['metaKey'] === !![],
+                : pointerId['shiftKey'] === true ||
+                  pointerId['ctrlKey'] === true ||
+                  pointerId['metaKey'] === true,
             initialSelectedIds: Array['isArray'](commit['selectedIds']) ? [...commit['selectedIds']] : [],
             hitIds: [],
-            active: ![],
+            active: false,
             overlay: null,
             baseOverlayClassName: baseOverlayClassName,
             overlayClassName: normalizeSelector(commit['overlayClassName']),
@@ -265,21 +265,21 @@ export function createWorkspaceMarqueeSelectionController({
             surface: surface,
             commit: commit['commit'],
           }),
-          !![]
+          true
         );
       },
       update: update,
       finish: finish,
       cancel: cancel,
       consumeClick(event5) {
-        if (!enabled2) return ![];
-        return ((enabled2 = ![]), event5['preventDefault'](), event5['stopPropagation'](), !![]);
+        if (!enabled2) return false;
+        return ((enabled2 = false), event5['preventDefault'](), event5['stopPropagation'](), true);
       },
       destroy() {
         (cancel(),
-          windowObject['removeEventListener']?.('pointermove', value7, !![]),
-          windowObject['removeEventListener']?.('pointerup', value9, !![]),
-          windowObject['removeEventListener']?.('pointercancel', value11, !![]));
+          windowObject['removeEventListener']?.('pointermove', value7, true),
+          windowObject['removeEventListener']?.('pointerup', value9, true),
+          windowObject['removeEventListener']?.('pointercancel', value11, true));
       },
     }
   );

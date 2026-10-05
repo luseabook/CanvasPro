@@ -48,7 +48,7 @@ function buildRasterVisualStateSignature(options, map2) {
 }
 function buildRasterPresentationIdentity(enabled, handler = resolveRendererPreviewNodePresentation) {
   if (!enabled || typeof enabled !== 'object') return '';
-  const response = handler(enabled, { displayFirst: !![] }),
+  const response = handler(enabled, { displayFirst: true }),
     box2 = response['geometry'] || {};
   return [
     response['kind'],
@@ -115,7 +115,7 @@ function collectExplicitDomRequiredIds({
   return record;
 }
 export function resolveRendererRasterPreviewSources(input) {
-  return resolveRendererPreviewNodePresentation(input, { displayFirst: ![] })['sources'];
+  return resolveRendererPreviewNodePresentation(input, { displayFirst: false })['sources'];
 }
 export function createRendererRasterPreviewCoordinator({
   layer: layer = null,
@@ -140,10 +140,10 @@ export function createRendererRasterPreviewCoordinator({
     map6 = new Map();
   const map7 = new Map();
   let value2 = '',
-    mediaLoadingBusy2 = ![],
-    enabled2 = ![],
+    mediaLoadingBusy2 = false,
+    enabled2 = false,
     box4 = null,
-    previewMotion = { active: ![] },
+    previewMotion = { active: false },
     value3 = null;
   function onMediaPresented2(value4) {
     const state2 = value3,
@@ -187,24 +187,24 @@ export function createRendererRasterPreviewCoordinator({
     viewport: viewport,
     containerWidth: containerWidth,
     containerHeight: containerHeight,
-    viewportBusy: viewportBusy = ![],
+    viewportBusy: viewportBusy = false,
     mediaLoadingBusy: mediaLoadingBusy = viewportBusy,
-    freezeRasterSurface: freezeRasterSurface = ![],
-    lockRasterParticipation: lockRasterParticipation = ![],
-    deferInitialPlanning: deferInitialPlanning = ![],
+    freezeRasterSurface: freezeRasterSurface = false,
+    lockRasterParticipation: lockRasterParticipation = false,
+    deferInitialPlanning: deferInitialPlanning = false,
     releaseFullSurface: releaseFullSurface,
     devicePixelRatio: devicePixelRatio = typeof window !== 'undefined' ? window['devicePixelRatio'] : 1,
   } = {}) {
-    ((value3 = null), (mediaLoadingBusy2 = mediaLoadingBusy === !![]));
+    ((value3 = null), (mediaLoadingBusy2 = mediaLoadingBusy === true));
     const enabled3 =
       box4 && viewport?.['zoom'] === box4['zoom']
         ? {
-            active: !![],
+            active: true,
             dx: (box4['x'] - viewport['x']) / viewport['zoom'],
             dy: (box4['y'] - viewport['y']) / viewport['zoom'],
           }
-        : { active: ![] };
-    if (!enabled3['dx'] && !enabled3['dy']) enabled3['active'] = ![];
+        : { active: false };
+    if (!enabled3['dx'] && !enabled3['dy']) enabled3['active'] = false;
     if (enabled3['active'] || !viewportBusy || viewport?.['zoom'] !== box4?.['zoom'])
       previewMotion = enabled3;
     box4 = viewport ? { ...viewport } : null;
@@ -216,7 +216,7 @@ export function createRendererRasterPreviewCoordinator({
         mediaLoadingBusy2 &&
         proxyCount['size'] >= DENSE_RASTER_MEDIA_DEFER_NODE_COUNT &&
         map4['size'] === 0;
-    if (map4['size'] === 0 && (deferInitialPlanning === !![] || value10)) {
+    if (map4['size'] === 0 && (deferInitialPlanning === true || value10)) {
       const rasterIds = new Set(),
         domProxyIds = new Set([...exactVisibleCount]['filter']((value11) => !fullSurfaceIds['has'](value11))),
         domPreviewCandidateIds = new Set([...fullSurfaceIds, ...domProxyIds]),
@@ -235,7 +235,7 @@ export function createRendererRasterPreviewCoordinator({
       ((previousRasterIds = rasterIds), (map3 = new Set(domPreviewMediaSourceOwnerIds)));
       const signature = 'deferred-initial:' + fullSurfaceIds['size'] + ':' + domProxyIds['size'],
         policy = {
-          active: ![],
+          active: false,
           rasterIds: rasterIds,
           domProxyIds: domProxyIds,
           reason: 'deferred-initial-raster-planning',
@@ -260,22 +260,22 @@ export function createRendererRasterPreviewCoordinator({
           },
         };
       return {
-        active: ![],
+        active: false,
         rasterIds: rasterIds,
         domProxyIds: domProxyIds,
         domPreviewCandidateIds: domPreviewCandidateIds,
         domPreviewMediaSourceOwnerIds: domPreviewMediaSourceOwnerIds,
         releasableFullSurfaceIds: releasableFullSurfaceIds,
         policy: policy,
-        layerStats: { active: ![], supported: !![], deferred: !![], drawnNodeIds: [], drawnMediaNodeIds: [] },
-        freezeActive: ![],
+        layerStats: { active: false, supported: true, deferred: true, drawnNodeIds: [], drawnMediaNodeIds: [] },
+        freezeActive: false,
         signature: signature,
       };
     }
     const rasterSupportedNodeIds = new Set(
         [...proxyCount]['filter']((value15) => {
           const node = getNode(nodes, value15);
-          if (!isRasterSupportedNode(node, value15)) return ![];
+          if (!isRasterSupportedNode(node, value15)) return false;
           return !(value10 && exactVisibleCount['has'](value15) && isVisualMediaNode(node));
         }),
       ),
@@ -314,9 +314,9 @@ export function createRendererRasterPreviewCoordinator({
         if (!map8['has'](value16) || !exactVisibleCount['has'](value16)) continue;
         const node2 = getNode(nodes, value16);
         if (!node2 || map6['get'](value16) !== run3(value16, node2)) continue;
-        let value17 = ![];
+        let value17 = false;
         try {
-          value17 = isDomMediaPresented?.(value16, node2) === !![];
+          value17 = isDomMediaPresented?.(value16, node2) === true;
         } catch {}
         if (value17) continue;
         map9['add'](value16);
@@ -336,18 +336,18 @@ export function createRendererRasterPreviewCoordinator({
             (value19 && !map9['has'](value18)) ||
             map10['has'](value18)
           )
-            return ![];
+            return false;
           const node3 = getNode(nodes, value18);
-          if (!node3 || !isVisualMediaNode(node3)) return ![];
-          if (map6['get'](value18) !== run3(value18, node3)) return ![];
+          if (!node3 || !isVisualMediaNode(node3)) return false;
+          if (map6['get'](value18) !== run3(value18, node3)) return false;
           try {
-            return isDomMediaPresented?.(value18, node3) !== !![];
+            return isDomMediaPresented?.(value18, node3) !== true;
           } catch {
-            return !![];
+            return true;
           }
         }),
       ),
-      value20 = lockRasterParticipation === !![] && freezeRasterSurface === !![] && viewportBusy === !![],
+      value20 = lockRasterParticipation === true && freezeRasterSurface === true && viewportBusy === true,
       map11 = value20 && map4['size'] === 0 ? new Set() : policy2['rasterIds'],
       map12 = new Set([...map11, ...args2]),
       list3 = [...map11]['filter']((value21) => exactVisibleCount['has'](value21)),
@@ -360,7 +360,7 @@ export function createRendererRasterPreviewCoordinator({
       }),
       enabled7 = [...map4]['some']((value25) => map8['has'](value25)),
       reuseWhileBusy =
-        freezeRasterSurface === !![] &&
+        freezeRasterSurface === true &&
         viewportBusy &&
         map4['size'] > 0 &&
         (map11['size'] > 0 || value20) &&
@@ -394,11 +394,11 @@ export function createRendererRasterPreviewCoordinator({
           (pickConnectMode2?.['active'] ? pickConnectMode2['hoverNodeId'] : null),
       }),
       map13 =
-        layerStats?.['supported'] === !![] && layerStats?.['active'] === !![]
+        layerStats?.['supported'] === true && layerStats?.['active'] === true
           ? toIdSet(layerStats['drawnNodeIds'])
           : new Set(),
       map14 =
-        layerStats?.['supported'] === !![] && layerStats?.['active'] === !![]
+        layerStats?.['supported'] === true && layerStats?.['active'] === true
           ? toIdSet(layerStats['drawnMediaNodeIds'])
           : new Set();
     ((map4 = map13),
@@ -438,7 +438,7 @@ export function createRendererRasterPreviewCoordinator({
         : new Set();
     for (const value33 of policy2['rasterIds']) {
       !active['has'](value33) &&
-        (layerStats?.['active'] !== !![] || exactVisibleCount['has'](value33) || map15['has'](value33)) &&
+        (layerStats?.['active'] !== true || exactVisibleCount['has'](value33) || map15['has'](value33)) &&
         domProxyIds2['add'](value33);
     }
     previousRasterIds = active;
@@ -508,33 +508,33 @@ export function createRendererRasterPreviewCoordinator({
       (map6 = new Map()),
       map7['clear'](),
       (value2 = ''),
-      (mediaLoadingBusy2 = ![]),
-      (enabled2 = ![]),
+      (mediaLoadingBusy2 = false),
+      (enabled2 = false),
       (box4 = null),
-      (previewMotion = { active: ![] }),
+      (previewMotion = { active: false }),
       output['destroy']?.());
     if (!layer) output = run2();
   }
   function setMediaLoadingBusy(value41) {
     return (
-      (enabled2 = value41 === !![]),
+      (enabled2 = value41 === true),
       output['setMediaLoadingBusy']?.(mediaLoadingBusy2 || enabled2) || null
     );
   }
   function excludeNode(value42) {
     const enabled8 = String(value42 || '')['trim']();
-    if (!enabled8) return ![];
+    if (!enabled8) return false;
     const enabled9 = map4['has'](enabled8) || map5['has'](enabled8) || previousRasterIds['has'](enabled8);
-    if (typeof output['excludeNode'] !== 'function') return ![];
-    const enabled10 = output['excludeNode'](enabled8) === !![];
-    if (!enabled10 && !enabled9) return ![];
+    if (typeof output['excludeNode'] !== 'function') return false;
+    const enabled10 = output['excludeNode'](enabled8) === true;
+    if (!enabled10 && !enabled9) return false;
     return (
       map4['delete'](enabled8),
       map5['delete'](enabled8),
       map6['delete'](enabled8),
       map7['delete'](enabled8),
       previousRasterIds['delete'](enabled8),
-      !![]
+      true
     );
   }
   function captureNodeFrame(value43) {

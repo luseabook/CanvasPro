@@ -110,7 +110,7 @@ function resolveLiveSourcePlaybackUrl(output, value2) {
     value5 =
       value3 ||
       list['find']((el5) => el5['classList']?.['contains']('video-player')) ||
-      list['find']((value6) => value6['paused'] === ![]) ||
+      list['find']((value6) => value6['paused'] === false) ||
       list[0];
   return getMediaElementCurrentSource(value5);
 }
@@ -120,14 +120,14 @@ export class SegmentRetakeController {
       (this['nodeId'] = value7['nodeId']),
       (this['clipController'] = createVideoClipController()),
       (this['smartAbortController'] = null),
-      (this['disposed'] = ![]),
-      (this['annotationMode'] = ![]),
-      (this['rangeSyncing'] = ![]),
+      (this['disposed'] = false),
+      (this['annotationMode'] = false),
+      (this['rangeSyncing'] = false),
       (this['draft'] = null),
       (this['smartSegments'] = []),
       (this['annotationSubmitEpoch'] = 0),
       (this['markerRenderSignature'] = ''),
-      (this['annotationReconcilePending'] = ![]),
+      (this['annotationReconcilePending'] = false),
       (this['unsubscribeAnnotationDependencies'] = null));
   }
   get ['nodeData']() {
@@ -163,7 +163,7 @@ export class SegmentRetakeController {
     };
   }
   ['mount']({ root: root, previewEl: previewEl, promptPanel: promptPanel }) {
-    if (!this['session'] || !root || !previewEl || !promptPanel) return ![];
+    if (!this['session'] || !root || !previewEl || !promptPanel) return false;
     ((this['root'] = root),
       (this['previewEl'] = previewEl),
       (this['promptPanel'] = promptPanel),
@@ -172,8 +172,8 @@ export class SegmentRetakeController {
       previewEl['querySelector']('.img-node-placeholder')?.['setAttribute']('hidden', ''),
       (this['videoEl'] = document['createElement']('video')),
       (this['videoEl']['className'] = 'segment-retake-video video-player'),
-      (this['videoEl']['controls'] = ![]),
-      (this['videoEl']['playsInline'] = !![]),
+      (this['videoEl']['controls'] = false),
+      (this['videoEl']['playsInline'] = true),
       (this['videoEl']['preload'] = 'auto'),
       previewEl['appendChild'](this['videoEl']),
       (this['owner']['videoEl'] = this['videoEl']),
@@ -205,7 +205,7 @@ export class SegmentRetakeController {
       this['timelineShell']['appendChild'](this['timelineRow']),
       (this['segmentList'] = document['createElement']('div')),
       (this['segmentList']['className'] = 'segment-retake-segment-list'),
-      (this['segmentList']['hidden'] = !![]),
+      (this['segmentList']['hidden'] = true),
       this['timelineShell']['appendChild'](this['segmentList']),
       root['insertBefore'](this['controlsStack'], promptPanel),
       this['controlsStack']['append'](this['timelineShell'], promptPanel),
@@ -225,7 +225,7 @@ export class SegmentRetakeController {
       void attachMediaElementPlaybackSource(this['videoEl'], sourceUrl2, {
         playbackUrl: playbackUrl,
         preload: 'auto',
-        load: ![],
+        load: false,
         shouldAssign: () => !this['disposed'],
       })['catch'](() => {
         if (!this['disposed']) window['showToast']?.(text('errors.invalidSource'), 'error');
@@ -239,7 +239,7 @@ export class SegmentRetakeController {
         initialStartSec: durationSec['range']?.['startSec'],
         initialEndSec: durationSec['range']?.['endSec'],
         anchorId: this['nodeId'],
-        embedded: !![],
+        embedded: true,
         selectionBodyCursor: 'pointer',
         onEscape: () => this['cancelAnnotation'](),
         onRangeChange: (value12) => this['onRangeChange'](value12),
@@ -249,7 +249,7 @@ export class SegmentRetakeController {
       this['observePrompt'](),
       this['syncAnnotationPresentation'](),
       this['observeAnnotationDependencies'](),
-      !![]
+      true
     );
   }
   ['onAnnotationButtonClick'] = (event) => {
@@ -267,7 +267,7 @@ export class SegmentRetakeController {
     this['owner']['_syncVideoControlsFromVideo']?.(this['videoEl']);
   };
   ['beginAnnotation']() {
-    ((this['annotationMode'] = !![]),
+    ((this['annotationMode'] = true),
       this['previewEl']['classList']['add']('is-segment-retake-annotating'),
       this['annotationButton']['classList']['add']('is-active'),
       this['videoEl']['pause']?.(),
@@ -275,7 +275,7 @@ export class SegmentRetakeController {
   }
   ['cancelAnnotation']() {
     (this['clearAnnotationDraft'](),
-      (this['annotationMode'] = ![]),
+      (this['annotationMode'] = false),
       this['previewEl']?.['classList']['remove']('is-segment-retake-annotating'),
       this['annotationButton']?.['classList']['remove']('is-active'),
       this['owner']['_syncVideoControlsFromVideo']?.(this['videoEl']));
@@ -369,7 +369,7 @@ export class SegmentRetakeController {
     ((el8['type'] = 'button'),
       (el8['className'] = 'is-primary'),
       (el8['textContent'] = text('annotate.confirm')),
-      (el8['disabled'] = !![]),
+      (el8['disabled'] = true),
       el6['addEventListener']('input', () => {
         el8['disabled'] = !el6['value']['trim']();
       }),
@@ -392,7 +392,7 @@ export class SegmentRetakeController {
     const value19 = this['draft'],
       annotationTimeSec = Number(this['videoEl']['currentTime']) || 0,
       value20 = ++this['annotationSubmitEpoch'];
-    ((el9['disabled'] = !![]), el9['setAttribute']('aria-busy', 'true'));
+    ((el9['disabled'] = true), el9['setAttribute']('aria-busy', 'true'));
     try {
       const waitForVideoFrame2 = await waitForVideoFrame(this['videoEl']);
       if (value20 !== this['annotationSubmitEpoch'] || this['disposed']) return;
@@ -427,7 +427,7 @@ export class SegmentRetakeController {
       (commit(), window['_triggerLocalCacheSave']?.(), this['cancelAnnotation'](), this['renderMarkers']());
     } catch (error) {
       (window['showToast']?.(error?.['message'] || text('errors.annotationFailed'), 'error'),
-        el9['isConnected'] && ((el9['disabled'] = ![]), el9['removeAttribute']('aria-busy')));
+        el9['isConnected'] && ((el9['disabled'] = false), el9['removeAttribute']('aria-busy')));
     }
   }
   ['createAnnotationNode']({
@@ -481,9 +481,9 @@ export class SegmentRetakeController {
         displayLocalPath: saved2['displayLocalPath'],
         thumbLocalPath: saved2['thumbLocalPath'],
         fileName: saved2['fileName'],
-        fixedSize: !![],
-        needsAutoResize: ![],
-        segmentRetakeManaged: !![],
+        fixedSize: true,
+        needsAutoResize: false,
+        segmentRetakeManaged: true,
         segmentRetakeOwnerId: this['nodeId'],
         segmentRetakeAnnotationId: annotationId2,
       }),
@@ -524,9 +524,9 @@ export class SegmentRetakeController {
         label: nodeId['name'],
         refLabel: nodeId['name'],
       },
-      { focus: ![] },
+      { focus: false },
     );
-    if (!el10) return ![];
+    if (!el10) return false;
     el10['dataset']['retakeAnnotationId'] = value22['id'];
     const el11 = document['createElement']('span');
     ((el11['className'] = 'segment-retake-prompt-instruction'),
@@ -537,8 +537,8 @@ export class SegmentRetakeController {
       value24 = el10['nextSibling'] || el10;
     return (
       value24['after'](el11, value23),
-      this['owner']['promptEl']['dispatchEvent'](new Event('input', { bubbles: !![] })),
-      !![]
+      this['owner']['promptEl']['dispatchEvent'](new Event('input', { bubbles: true })),
+      true
     );
   }
   ['observePrompt']() {
@@ -554,7 +554,7 @@ export class SegmentRetakeController {
             enabled4 = this['owner']['promptEl']['querySelector'](
               '.segment-retake-prompt-instruction[data-retake-annotation-id="' + value26 + '"]',
             );
-          (!enabled3 || !enabled4) && this['deleteAnnotation'](value25['id'], { promptAlreadyRemoved: !![] });
+          (!enabled3 || !enabled4) && this['deleteAnnotation'](value25['id'], { promptAlreadyRemoved: true });
         }
       });
     }),
@@ -564,11 +564,11 @@ export class SegmentRetakeController {
     const state4 = readState(),
       value27 = this['session']?.['annotations'] || [],
       value28 = {};
-    let value29 = ![];
+    let value29 = false;
     for (const value30 of value27) {
       const name = buildSegmentRetakePromptTime(value30['timeSec']),
         error2 = state4['nodes']?.[value30['nodeId']];
-      error2?.['segmentRetakeManaged'] === !![] &&
+      error2?.['segmentRetakeManaged'] === true &&
         error2['segmentRetakeOwnerId'] === this['nodeId'] &&
         error2['name'] !== name &&
         (value28[value30['nodeId']] = { name: name });
@@ -578,7 +578,7 @@ export class SegmentRetakeController {
           '.segment-retake-prompt-time[data-retake-annotation-id="' + value31 + '"]',
         )
         ['forEach']((el12) => {
-          (el12['remove'](), (value29 = !![]));
+          (el12['remove'](), (value29 = true));
         });
       const el13 = this['owner']['promptEl']?.['querySelector'](
           '.ref-pill[data-retake-annotation-id="' + value31 + '"]',
@@ -588,12 +588,12 @@ export class SegmentRetakeController {
         ((el13['dataset']['label'] = name), (el13['dataset']['refLabel'] = name));
         if (el14) el14['textContent'] = name;
         else el13['textContent'] = name;
-        value29 = !![];
+        value29 = true;
       }
     }
     (Object['keys'](value28)['length'] > 0 && appStore['updateNodesData'](value28),
       value29 &&
-        (this['owner']['promptEl']?.['dispatchEvent'](new Event('input', { bubbles: !![] })),
+        (this['owner']['promptEl']?.['dispatchEvent'](new Event('input', { bubbles: true })),
         window['_triggerLocalCacheSave']?.()));
   }
   ['observeAnnotationDependencies']() {
@@ -623,7 +623,7 @@ export class SegmentRetakeController {
       edges: nodes['edges'],
     });
     if (list2['length'] === 0) return;
-    ((this['annotationReconcilePending'] = !![]),
+    ((this['annotationReconcilePending'] = true),
       queueMicrotask(() => {
         try {
           if (this['disposed']) return;
@@ -639,17 +639,17 @@ export class SegmentRetakeController {
             this['deleteAnnotation'](value34);
           });
         } finally {
-          this['annotationReconcilePending'] = ![];
+          this['annotationReconcilePending'] = false;
         }
       }));
   }
-  ['deleteAnnotation'](value35, { promptAlreadyRemoved: promptAlreadyRemoved = ![] } = {}) {
+  ['deleteAnnotation'](value35, { promptAlreadyRemoved: promptAlreadyRemoved = false } = {}) {
     const node2 = readState(),
       value36 = node2['nodes']?.[this['nodeId']],
       args2 = value36?.['segmentRetake'],
       annotations = Array['isArray'](args2?.['annotations']) ? args2['annotations'] : [],
       nodeId2 = annotations['find']((value37) => value37['id'] === value35);
-    if (!nodeId2) return ![];
+    if (!nodeId2) return false;
     const edges = Object['values'](node2['edges'] || {}),
       shouldDeleteManagedRetakeInputNode2 = shouldDeleteManagedRetakeInputNode({
         node: node2['nodes']?.[nodeId2['nodeId']],
@@ -672,12 +672,12 @@ export class SegmentRetakeController {
         (this['owner']['promptEl']
           ?.['querySelectorAll']('[data-retake-annotation-id="' + CSS['escape'](value35) + '"]')
           ['forEach']((el15) => el15['remove']()),
-        this['owner']['promptEl']?.['dispatchEvent'](new Event('input', { bubbles: !![] }))),
+        this['owner']['promptEl']?.['dispatchEvent'](new Event('input', { bubbles: true }))),
       commit(),
       window['_triggerLocalCacheSave']?.(),
       this['owner']['_updateSubmitButtonState']?.(),
       this['renderMarkers'](),
-      !![]
+      true
     );
   }
   ['onRangeChange'](value39) {
@@ -690,15 +690,15 @@ export class SegmentRetakeController {
         value39['sourceDurationSec'] || args3?.['sourceDurationSec'],
       );
     !sameRange(range, value39) &&
-      ((this['rangeSyncing'] = !![]),
+      ((this['rangeSyncing'] = true),
       this['clipController']['setSourceRange'](range['startSec'], range['endSec']),
-      (this['rangeSyncing'] = ![]));
+      (this['rangeSyncing'] = false));
     if (sameRange(range, args3?.['range'])) return;
     (appStore['updateNodeData'](this['nodeId'], { segmentRetake: { ...args3, range: range } }),
       this['owner']['_updateSubmitButtonState']?.(),
       window['_triggerLocalCacheSave']?.());
   }
-  ['renderMarkers'](value40 = null, { force: force = ![] } = {}) {
+  ['renderMarkers'](value40 = null, { force: force = false } = {}) {
     const enabled5 = this['clipController']['getSourceTimelineElements']();
     if (!enabled5?.['trackEl']) return;
     const value41 = this['session'],
@@ -781,7 +781,7 @@ export class SegmentRetakeController {
         signal: this['smartAbortController']['signal'],
         options: {
           mode: 'stable',
-          unlimitedSegments: !![],
+          unlimitedSegments: true,
           outputMode: SMART_CLIP_OUTPUT_MODE_ANALYSIS,
           maxSegmentDurationSec: 30,
         },
@@ -831,14 +831,14 @@ export class SegmentRetakeController {
     (this['renderMarkers'](), this['scheduleAnnotationReconcile']());
   }
   ['dispose']() {
-    ((this['disposed'] = !![]),
+    ((this['disposed'] = true),
       this['unsubscribeAnnotationDependencies']?.(),
       (this['unsubscribeAnnotationDependencies'] = null),
       this['smartAbortController']?.['abort'](),
       (this['smartAbortController'] = null),
       this['owner']['promptEl']?.['removeEventListener']('input', this['onPromptInput']),
       (this['onPromptInput'] = null),
-      this['clipController']['exit']({ silent: !![], reason: 'unmount' }),
+      this['clipController']['exit']({ silent: true, reason: 'unmount' }),
       this['annotationButton']?.['removeEventListener']('click', this['onAnnotationButtonClick']),
       this['annotationLayer']?.['removeEventListener']('pointerdown', this['onAnnotationPointerDown']),
       this['smartButton']?.['removeEventListener']('click', this['onSmartClick']),

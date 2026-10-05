@@ -24,7 +24,7 @@ const COMFYUI_GENERATION_COUNT_FIELD = Object['freeze']({
       Object['freeze']({ value: value, label: value + 'x', selectedLabel: value + 'x' }),
     ),
   ),
-  comfyUiSystemField: !![],
+  comfyUiSystemField: true,
 });
 function normalizeText(item, key = '') {
   const index = String(item ?? '')['trim']();
@@ -69,25 +69,25 @@ function extractFirstJsonObject(config) {
     count = list2['indexOf']('{');
   if (count < 0) return '';
   let count2 = 0,
-    enabled = ![],
+    enabled = false,
     scope = '',
-    input = ![];
+    input = false;
   for (let output = count; output < list2['length']; output += 1) {
     const value2 = list2[output];
     if (enabled) {
       if (input) {
-        input = ![];
+        input = false;
         continue;
       }
       if (value2 === '\\') {
-        input = !![];
+        input = true;
         continue;
       }
-      value2 === scope && ((enabled = ![]), (scope = ''));
+      value2 === scope && ((enabled = false), (scope = ''));
       continue;
     }
     if (value2 === '"' || value2 === '\'') {
-      ((enabled = !![]), (scope = value2));
+      ((enabled = true), (scope = value2));
       continue;
     }
     if (value2 === '{') count2 += 1;
@@ -185,8 +185,8 @@ function isMediaInput(value18, value19) {
 function isPromptInput(value20, value21, value22) {
   const list7 = String(value20 || '')['toLowerCase'](),
     value23 = String(value21 || '')['toLowerCase']();
-  if (typeof value22 !== 'string') return ![];
-  if (list7['includes']('cliptextencode') && value23 === 'text') return !![];
+  if (typeof value22 !== 'string') return false;
+  if (list7['includes']('cliptextencode') && value23 === 'text') return true;
   return (
     /prompt|positive|negative|text|caption|description/['test'](value23) && looksLikeStructuredText(value22)
   );
@@ -202,7 +202,7 @@ function looksLikeLongEnglishText(value25) {
 }
 function looksLikeStructuredText(value27) {
   const list9 = String(value27 ?? '')['trim']();
-  if (!list9) return !![];
+  if (!list9) return true;
   return (
     containsCjkText(list9) ||
     looksLikeLongEnglishText(list9) ||
@@ -235,34 +235,34 @@ function inferComponentConfig({ classType: classType, inputName: inputName, valu
   if (componentKind)
     return {
       componentKind: componentKind,
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: [componentKind],
       controlType: 'text',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: [],
     };
   if (isPromptInput(classType, inputName, value36))
     return {
       componentKind: 'prompt',
-      componentKindLocked: ![],
+      componentKindLocked: false,
       componentKindOptions: TEXT_COMPONENT_KIND_OPTIONS['slice'](),
       controlType: 'prompt',
-      controlTypeLocked: ![],
+      controlTypeLocked: false,
       controlTypeOptions: TEXT_CONTROL_OPTIONS['slice'](),
     };
   if (typeof value36 === 'boolean' || isBooleanLiteral(value36))
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'toggle',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: ['toggle'],
     };
   if (typeof value36 === 'number' && Number['isInteger'](value36))
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'stepper',
       controlTypeLocked: value36 !== 0,
@@ -271,16 +271,16 @@ function inferComponentConfig({ classType: classType, inputName: inputName, valu
   if (typeof value36 === 'number' || isDecimalLiteral(value36))
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'float',
-      controlTypeLocked: !![],
+      controlTypeLocked: true,
       controlTypeOptions: ['float'],
     };
   if (isIntegerLiteral(value36))
     return {
       componentKind: 'param',
-      componentKindLocked: !![],
+      componentKindLocked: true,
       componentKindOptions: ['param'],
       controlType: 'stepper',
       controlTypeLocked: !isAmbiguousZeroLiteral(value36),
@@ -290,10 +290,10 @@ function inferComponentConfig({ classType: classType, inputName: inputName, valu
     };
   return {
     componentKind: 'param',
-    componentKindLocked: ![],
+    componentKindLocked: false,
     componentKindOptions: TEXT_COMPONENT_KIND_OPTIONS['slice'](),
     controlType: inferTextControlType(value36, inputName),
-    controlTypeLocked: ![],
+    controlTypeLocked: false,
     controlTypeOptions: TEXT_CONTROL_OPTIONS['slice'](),
   };
 }
@@ -363,7 +363,7 @@ function normalizeBooleanDefault(value52) {
   const value53 = String(value52 ?? '')
     ['trim']()
     ['toLowerCase']();
-  return value52 === !![] || value53 === 'true' || value53 === '1' || value53 === 'yes' || value53 === 'on';
+  return value52 === true || value53 === 'true' || value53 === '1' || value53 === 'yes' || value53 === 'on';
 }
 function normalizeIntegerDefault(value54) {
   const value55 = Number(value54);
@@ -411,7 +411,7 @@ function normalizeOptionList(list10 = [], map = null) {
       ['trim']()
       ['toLowerCase'](),
   )['filter']((enabled4, value71, list11) => {
-    if (!enabled4 || list11['indexOf'](enabled4) !== value71) return ![];
+    if (!enabled4 || list11['indexOf'](enabled4) !== value71) return false;
     return !map || map['has'](enabled4);
   });
 }
@@ -429,7 +429,7 @@ function normalizeComponentOverride(required, el) {
     controlType4 = normalizeControlType(componentKindLocked['controlType']),
     componentKind2 = normalizeComponentKind(required?.['componentKind'], value75);
   let componentKind3 =
-    componentKindLocked['componentKindLocked'] === !![]
+    componentKindLocked['componentKindLocked'] === true
       ? value75
       : pickAllowedValue(
           componentKind2,
@@ -440,7 +440,7 @@ function normalizeComponentOverride(required, el) {
   let controlType6 =
     componentKind3 === 'prompt'
       ? 'prompt'
-      : componentKindLocked['controlTypeLocked'] === !![]
+      : componentKindLocked['controlTypeLocked'] === true
         ? controlType4
         : pickAllowedValue(
             controlType5,
@@ -456,10 +456,10 @@ function normalizeComponentOverride(required, el) {
       label: normalizeText(required?.['label'], el['label']),
       description: normalizeText(required?.['description'], el['label']),
       componentKind: componentKind3,
-      componentKindLocked: componentKindLocked['componentKindLocked'] === !![],
+      componentKindLocked: componentKindLocked['componentKindLocked'] === true,
       componentKindOptions: componentKindOptions['length'] ? componentKindOptions : [componentKind3],
       controlType: controlType6,
-      controlTypeLocked: componentKindLocked['controlTypeLocked'] === !![],
+      controlTypeLocked: componentKindLocked['controlTypeLocked'] === true,
       controlTypeOptions: controlTypeOptions,
       inputOrder: normalizeOrderValue(required?.['inputOrder'], el['index']),
       homeParamOrder: normalizeOrderValue(required?.['homeParamOrder'], el['index']),
@@ -468,7 +468,7 @@ function normalizeComponentOverride(required, el) {
       footerGroupId: String(required?.['footerGroupId'] || '')['trim'](),
       footerGroupLabel: String(required?.['footerGroupLabel'] || '参数组')['trim'](),
       footerGroupDescription: String(required?.['footerGroupDescription'] || '')['trim'](),
-      required: required?.['required'] !== ![],
+      required: required?.['required'] !== false,
       defaultValue: normalizeDefaultValueForControl(
         controlType6,
         required?.['defaultValue'] === undefined ? el['value'] : required['defaultValue'],
@@ -521,10 +521,10 @@ function collectComponentDraftItems(value77) {
         list14['push']({
           ...args2,
           componentKind: componentKind4['componentKind'],
-          componentKindLocked: componentKind4['componentKindLocked'] === !![],
+          componentKindLocked: componentKind4['componentKindLocked'] === true,
           componentKindOptions: componentKind4['componentKindOptions'] || ['param'],
           controlType: componentKind4['controlType'],
-          controlTypeLocked: componentKind4['controlTypeLocked'] === !![],
+          controlTypeLocked: componentKind4['controlTypeLocked'] === true,
           controlTypeOptions: componentKind4['controlTypeOptions'] || [],
           defaultValue: String(value81 ?? ''),
         });
@@ -570,7 +570,7 @@ export function compileComfyUiWorkflowComponents(workflow2, outputType, value85 
     list17 = [],
     list18 = [],
     inputs = [];
-  let value89 = ![],
+  let value89 = false,
     text3 = '';
   list16['forEach'](({ item: item4, component: component2 }) => {
     const value90 = item4['index'],
@@ -602,14 +602,14 @@ export function compileComfyUiWorkflowComponents(workflow2, outputType, value85 
       return;
     }
     if (kind2 === 'prompt') {
-      value89 = !![];
+      value89 = true;
       !text3 && (text3 = normalizeText(map4['get'](item4['index'])?.['description']));
       inputs['push']({
         nodeId: item4['nodeId'],
         inputName: item4['inputName'],
         source: 'prompt',
         defaultValue: component2['defaultValue'],
-        includeEmpty: !![],
+        includeEmpty: true,
         description: description2,
       });
       return;
@@ -741,7 +741,7 @@ function buildComfyUiSystemUiFields(value105) {
   return [COMFYUI_GENERATION_COUNT_FIELD];
 }
 function isComfyUiSystemUiField(value106) {
-  return value106?.['comfyUiSystemField'] === !![];
+  return value106?.['comfyUiSystemField'] === true;
 }
 function getComfyUiWorkflowImageMenuGroup(value107) {
   return value107 === 'cloud' ? 'comfyUiCloudWorkflow' : 'comfyUiLocalWorkflow';
@@ -903,7 +903,7 @@ export function summarizeComfyUiWorkflowBundle(value115) {
       id: id3['id'],
       kind: id3['kind'],
       label: id3['label'] || id3['id'],
-      required: id3['required'] === !![],
+      required: id3['required'] === true,
     })),
     params: paramCount['map']((id4) => ({
       id: id4['id'],

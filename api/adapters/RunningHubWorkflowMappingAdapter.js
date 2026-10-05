@@ -3,10 +3,10 @@ function hasOwnManifestValue(value, item) {
   return Object['prototype']['hasOwnProperty']['call'](value || {}, item);
 }
 function isPresentManifestValue(list) {
-  if (list === undefined || list === null) return ![];
+  if (list === undefined || list === null) return false;
   if (typeof list === 'string') return list['trim']() !== '';
   if (Array['isArray'](list)) return list['length'] > 0;
-  return !![];
+  return true;
 }
 function getManifestPayloadPathValue(options = {}, key = '') {
   const enabled = String(key || '')['trim']();
@@ -20,7 +20,7 @@ function resolveManifestPayloadValue(
   data,
   target = [],
   source = undefined,
-  { allowEmpty: allowEmpty = ![] } = {},
+  { allowEmpty: allowEmpty = false } = {},
 ) {
   const list2 = Array['isArray'](target) ? target : [target];
   for (const next of list2['filter'](Boolean)) {
@@ -47,31 +47,31 @@ function manifestValuesEqual(state, config) {
   return String(state ?? '')['trim']() === String(config ?? '')['trim']();
 }
 function evaluateManifestWhenRule(enabled2, input) {
-  if (!enabled2 || typeof enabled2 !== 'object') return !![];
+  if (!enabled2 || typeof enabled2 !== 'object') return true;
   const output = enabled2['field'] ? getManifestPayloadPathValue(input, enabled2['field']) : undefined,
     isPresentManifestValue2 = isPresentManifestValue(output);
   if (hasOwnManifestValue(enabled2, 'exists') && Boolean(enabled2['exists']) !== isPresentManifestValue2)
-    return ![];
-  if (enabled2['truthy'] === !![] && !Boolean(output)) return ![];
-  if (enabled2['falsy'] === !![] && Boolean(output)) return ![];
-  if (hasOwnManifestValue(enabled2, 'equals') && !manifestValuesEqual(output, enabled2['equals'])) return ![];
+    return false;
+  if (enabled2['truthy'] === true && !Boolean(output)) return false;
+  if (enabled2['falsy'] === true && Boolean(output)) return false;
+  if (hasOwnManifestValue(enabled2, 'equals') && !manifestValuesEqual(output, enabled2['equals'])) return false;
   if (hasOwnManifestValue(enabled2, 'notEquals') && manifestValuesEqual(output, enabled2['notEquals']))
-    return ![];
+    return false;
   if (
     Array['isArray'](enabled2['in']) &&
     !enabled2['in']['some']((value2) => manifestValuesEqual(output, value2))
   )
-    return ![];
+    return false;
   if (
     Array['isArray'](enabled2['notIn']) &&
     enabled2['notIn']['some']((value3) => manifestValuesEqual(output, value3))
   )
-    return ![];
-  return !![];
+    return false;
+  return true;
 }
 function shouldUseManifestNodeMapping(value4, value5) {
   const list4 = value4?.['when'];
-  if (list4 === undefined || list4 === null) return !![];
+  if (list4 === undefined || list4 === null) return true;
   if (Array['isArray'](list4)) return list4['every']((value6) => evaluateManifestWhenRule(value6, value5));
   return evaluateManifestWhenRule(list4, value5);
 }
@@ -114,7 +114,7 @@ function applyManifestNodeTransform(value14, value15 = {}, value16 = {}) {
       const value17 = String(value14 ?? '')
         ['trim']()
         ['toLowerCase']();
-      return value14 === !![] ||
+      return value14 === true ||
         value17 === 'true' ||
         value17 === '1' ||
         value17 === 'yes' ||
@@ -158,11 +158,11 @@ async function resolveRunningHubManifestNodeValue({
   if (value24 === 'param') {
     const list5 = normalizeManifestFieldList(item2),
       manifestPayloadValue2 = resolveManifestPayloadValue(payload2, list5, undefined, {
-        allowEmpty: item2?.['allowEmpty'] === !![],
+        allowEmpty: item2?.['allowEmpty'] === true,
       });
     if (
       isPresentManifestValue(manifestPayloadValue2) ||
-      (item2?.['allowEmpty'] === !![] &&
+      (item2?.['allowEmpty'] === true &&
         manifestPayloadValue2 !== undefined &&
         manifestPayloadValue2 !== null)
     )
@@ -171,7 +171,7 @@ async function resolveRunningHubManifestNodeValue({
       (value26) => 'generationParams.' + value26,
     );
     return resolveManifestPayloadValue(payload2, value25, undefined, {
-      allowEmpty: item2?.['allowEmpty'] === !![],
+      allowEmpty: item2?.['allowEmpty'] === true,
     });
   }
   const run = sourceResolvers[value24];
@@ -184,7 +184,7 @@ export function pushRunningHubManifestNode(list6, fieldValue, value27, descripti
     nodeId: String(fieldValue['nodeId']),
     fieldName: String(description['fieldName'] || fieldValue['fieldName']),
     fieldValue:
-      fieldValue['preserveValueType'] === !![]
+      fieldValue['preserveValueType'] === true
         ? fieldValue['transform'] === 'boolean'
           ? String(value27) === 'true'
           : value27
@@ -209,7 +209,7 @@ export async function buildRunningHubNodeInfoListFromManifest({
   transforms: transforms = {},
 }) {
   const list7 = Array['isArray'](mapping?.['nodeInfoList']) ? mapping['nodeInfoList'] : [];
-  if (list7['length'] === 0) return mapping?.['allowEmptyNodeInfoList'] === !![] ? [] : null;
+  if (list7['length'] === 0) return mapping?.['allowEmptyNodeInfoList'] === true ? [] : null;
   const value33 = [];
   for (const item3 of list7) {
     if (!item3?.['nodeId'] || !item3?.['fieldName']) continue;
@@ -220,8 +220,8 @@ export async function buildRunningHubNodeInfoListFromManifest({
         finalPrompt: finalPrompt,
         sourceResolvers: sourceResolvers,
       }),
-      value34 = item3?.['allowEmpty'] === !![],
-      enabled4 = item3?.['includeEmpty'] === !![] || value34,
+      value34 = item3?.['allowEmpty'] === true,
+      enabled4 = item3?.['includeEmpty'] === true || value34,
       hasOwnManifestValue2 = hasOwnManifestValue(item3, 'defaultValue');
     let manifestNodeValueMap = runningHubManifestNodeValue;
     !isPresentManifestValue(manifestNodeValueMap) &&
