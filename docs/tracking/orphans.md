@@ -5,15 +5,15 @@
 > 沿相对 `import` / `export … from` / 动态 `import()` / `new URL("…js", import.meta.url)` 做全图遍历，走不到的非测试 JS 模块都列在这里。
 > 脚本与证据：`deobf-tools/b126/reach.mjs`、`reach-report.txt`、`reach-orphans.json`；方法说明见 `docs/b126-reachability.md`。
 
-> scope：**1992** 个非测试 JS 模块（`src/`、`api/`、`electron/`、`db/` 加根级 `*.js`/`*.cjs`；排除 `*.test.js` / `*_test.js` / `*.spec.js`、`node_modules/`、`deobfuscated/`、`vendor/`、`user/`、`data/`、`output/`、`build/`、`dist/`、`tools/`、`backend/`）。
-> 可达 **1792** / 孤立 **200** / 断链 **0** / 解析失败 **0**（断链为 0 说明整个仓库的相对 import 都能解析到实际文件）。
+> scope：**1991** 个非测试 JS 模块（`src/`、`api/`、`electron/`、`db/` 加根级 `*.js`/`*.cjs`；排除 `*.test.js` / `*_test.js` / `*.spec.js`、`node_modules/`、`deobfuscated/`、`vendor/`、`user/`、`data/`、`output/`、`build/`、`dist/`、`tools/`、`backend/`）。
+> 可达 **1864** / 孤立 **127** / 断链 **0** / 解析失败 **0**（断链为 0 说明整个仓库的相对 import 都能解析到实际文件）。
 
 > **⚠ 口径变更（第 161 批发觉）**：本表此前记的是 **scope 1238 / 可达 835 / 孤立 403**，
-> 那是更早的一次统计（同一份排除规则，但纳入的根目录集合更窄）。现行 `reach.mjs` 输出 scope **1992**。
-> **两套数字不可直接相减** —— 孤立从 403 降到 200，主要来自口径放宽，其次才是第 150–161 批的接线。
-> 引用本表计数时务必带上口径（1992）。旧的 483/403 是 1238 口径下的历史值。
+> 那是更早的一次统计（同一份排除规则，但纳入的根目录集合更窄）。现行 `reach.mjs` 输出 scope **1991**。
+> **两套数字不可直接相减** —— 孤立从 403 降到 127，主要来自口径放宽，其次才是第 150–161 批的接线。
+> 引用本表计数时务必带上口径（1991）。旧的 483/403 是 1238 口径下的历史值。
 
-> 接线进度：第 150–157 批共接 167 件，重算后 **201**；第 161 批接 1 件（`src/components/nodeToolbar/videoActions/removeAction.js`），重算后 **200**。
+> 接线进度：第 150–157 批共接 167 件，重算后 **201**；第 161 批接 1 件（`src/components/nodeToolbar/videoActions/removeAction.js`）。
 > 第 156 批另接通 3 件 `api/errors/parsers/`，属第 126 批之后落地的新文件、不在此快照台账内。
 > 另有 12 个 `vendor/**` 文件可达，不计入 scope。
 
@@ -21,66 +21,44 @@
 
 | 目录 | 数量 |
 | --- | --- |
-| `src/components/video-node/` | 20 |
-| `src/modules/` | 19 |
 | `electron/` | 17 |
-| `api/adapters/modelApiResolvers/` | 15 |
-| `src/components/aigenImage/` | 12 |
+| `src/modules/` | 12 |
 | `src/manifests/video/modelApi/` | 11 |
 | `api/adapters/` | 9 |
+| `src/components/aigenImage/` | 9 |
 | `api/` | 8 |
 | `src/manifests/audio/modelApi/` | 6 |
-| `src/modules/videoRetake/` | 6 |
 | `src/components/nodeToolbar/videoActions/` | 5 |
-| `src/core/` | 5 |
 | `src/manifests/text/modelApi/` | 5 |
-| `./` | 4 |
 | `api/adapters/runninghubWorkflowResolvers/` | 4 |
-| `src/components/` | 4 |
-| `src/components/shared/` | 4 |
-| `src/components/source-video/` | 4 |
+| `./` | 4 |
 | `src/hooks/` | 4 |
 | `src/manifests/image/modelApi/` | 4 |
 | `src/modules/storyWorkspace/` | 4 |
-| `src/services/` | 4 |
-| `src/components/aigenText/` | 3 |
-| `src/components/audio-node/` | 3 |
+| `src/core/` | 3 |
+| `src/services/` | 3 |
 | `api/story-generation/` | 2 |
 | `src/domain/storyGeneration/` | 2 |
 | `src/modules/nodeExport/` | 2 |
 | `src/modules/storyboard3d/` | 2 |
 | `src/utils/` | 2 |
 | `src/components/nodeToolbar/imageActions/` | 1 |
+| `src/components/video-node/` | 1 |
 | `src/core/stores/` | 1 |
 | `src/manifests/image/localRuntime/` | 1 |
 | `src/manifests/text/localRuntime/` | 1 |
-| `src/modules/app/` | 1 |
 | `src/modules/interaction/` | 1 |
 | `src/modules/projectPackage/` | 1 |
-| `src/modules/promptPresetCatalog/` | 1 |
 | `src/modules/timelineExport/` | 1 |
 | `src/modules/whiteboard/` | 1 |
-| **合计** | **200** |
-
-## `src/components/video-node/`（20）
-
-deferredDetailsHydration.js、fixedInputSummarySync.js、footerShell.js、legacyVideoRatioPopup.js、mediaPlaybackStallProgress.js、mediaRuntimeState.js、modelApiVideoInputPolicy.js、modelApiVideoRandomSeedPolicy.js、modelApiVideoSubmitCompiler.js、parameterPanelPresentationPolicy.js、segmentRetakeController.js、sourceVideoFramePresentationBatch.js、sourceVideoFullscreenPreview.js、videoGenerationErrorCard.js、videoNodeAdaptiveAspectRatio.js、videoNodeUpdatePerf.js、videoNodeUpdateSignatures.js、videoResultNodeData.js、videoSchemaAspectRatioDisplayPatch.js、videoSubmitInputMaterials.js
-
-## `src/modules/`（19）
-
-ImageExpandController_lf.js、MediaTaskHistoryPanel.js、MediaTaskRecoveryPanel.js、ProjectManager.js、VideoGifController.js、canvasImageDisplayHandoff.js、externalProjectOpen.js、generationPromptPolicy.js、mediaTaskRecoveryCanvas.js、modelMediaInputLimits.js、nodePromptPaste.js、presetCoverResolver.js、promptMentionMatcher.js、promptMentionSelection.js、promptReferenceSignature.js、providerApiKeyMissingToast.mjs、runningHubMediaUploadGuide.js、videoKeyingProjection.js、videoKeyingSourceVideoLimit.js
-
+| **合计** | **127** |
 ## `electron/`（17）
 
 appWindowSizePolicy.js、backendStartupMonitor.js、canvasRuntimeMode.js、chromeBrowserWorker.js、chromeCdpPipeClient.js、chromeShellBrowserVersion.js、chromeShellLauncher.js、chromeShellProfileRecovery.js、chromeShellRuntime.js、chromeShellStartupDiagnostics.js、chromeShellStartupFallback.js、chromeShellStartupHealth.js、chromeShellWebPreviewManager.js、globalCaptureWindow.js、nativeContextMenuIcons.js、sortformerModelRoot.js、windowsTaskbarIdentity.js
 
-## `api/adapters/modelApiResolvers/`（15）
+## `src/modules/`（12）
 
-agnesResolvers.js、apimartVideoResolvers.js、bailianResolvers.js、binghuoVideoResolvers.js、imageResolvers.js、minimaxH3VideoResolverShared.js、minimaxVideoResolvers.js、registry.js、runningHubHailuoH3VideoResolvers.js、runningHubSeedance25VideoResolvers.js、runningHubVideoResolvers.js、sharedResolverUtils.js、textResolvers.js、volcengineAudioResolvers.js、volcengineVideoResolvers.js
-
-## `src/components/aigenImage/`（12）
-
-imageGenerationPrompt.js、imageObjectUrlLifecycle.js、manifestInputRequirements.js、refBarDragSort.js、refThumbObjectUrlScope.js、runningHubInstanceControl.js、runningHubInstanceDevModeBinding.js、storedThumbObjectUrl.js、uiSchemaBindingEvents.js、uiSchemaBindingSession.js、uiSchemaFieldOverrides.js、uiSchemaParameterGroups.js
+ImageExpandController_lf.js、MediaTaskHistoryPanel.js、MediaTaskRecoveryPanel.js、ProjectManager.js、VideoGifController.js、canvasImageDisplayHandoff.js、externalProjectOpen.js、mediaTaskRecoveryCanvas.js、nodePromptPaste.js、promptMentionMatcher.js、promptMentionSelection.js、promptReferenceSignature.js
 
 ## `src/manifests/video/modelApi/`（11）
 
@@ -90,6 +68,10 @@ agnesVideoModelApiManifests.js、apimartVideoModelApiManifests.js、bailianVideo
 
 ApimartAdapter.js、ComfyUiAdapter.js、ComfyUiWorkflowMappingAdapter.js、GeminiAdapter.js、ManifestResultRenderer.js、runningHubImportedAudioWorkflow.js、textResponseMetadata.js、textResponsesRequest.js、textThinkingControl.js
 
+## `src/components/aigenImage/`（9）
+
+imageGenerationPrompt.js、imageObjectUrlLifecycle.js、refBarDragSort.js、runningHubInstanceControl.js、runningHubInstanceDevModeBinding.js、uiSchemaBindingEvents.js、uiSchemaBindingSession.js、uiSchemaFieldOverrides.js、uiSchemaParameterGroups.js
+
 ## `api/`（8）
 
 cliTextInputs.js、comfyUiUploadApi.js、directorMobileClientApi.js、imageResultMedia.js、mediaTaskHistoryApi.js、modelApiVideoContent.js、storyReplicationFlowApi.js、textInlineMediaInputs.js
@@ -98,41 +80,21 @@ cliTextInputs.js、comfyUiUploadApi.js、directorMobileClientApi.js、imageResul
 
 runningHubAudioCatalog.js、runningHubAudioCatalogShared.js、runningHubDoubaoAudioManifests.js、runningHubMinimaxAudioManifests.js、runningHubMurekaAudioManifests.js、runningHubQwenAudioManifests.js
 
-## `src/modules/videoRetake/`（6）
-
-segmentRetakeGenerationLifecycle.js、segmentRetakeInputBinding.js、segmentRetakeModelPolicy.js、segmentRetakeModelPreference.js、segmentRetakeSession.js、segmentRetakeSubmit.js
-
 ## `src/components/nodeToolbar/videoActions/`（5）
 
 depthVideoAction.js、segmentRetakeAction.js、toGifAction.js、videoDepthEditor.js、voiceReplaceAction.js
-
-## `src/core/`（5）
-
-generationTaskCenterProjection.js、generationTaskErrorState.js、generationTaskRecoveryOwner.js、rendererViewportCommitGate.js、store.js
 
 ## `src/manifests/text/modelApi/`（5）
 
 apimartQwenTextManifests.js、apimartTextModelCatalog.js、bailianPartnerTextModelApiManifests.js、bailianTextModelApiManifests.js、runningHubLyricsManifests.js
 
-## `./`（4）
-
-electron-builder.win.cjs、electron-builder.win.dev.cjs、playwright.config.js、playwright.desktop.config.js
-
 ## `api/adapters/runninghubWorkflowResolvers/`（4）
 
 runningHubHailuoH3AudioDrivenResolver.js、runningHubHailuoH3OmniResolver.js、runningHubQwenImage21EditResolver.js、runningHubReferenceMediaResolverShared.js
 
-## `src/components/`（4）
+## `./`（4）
 
-nodePromptExpansion.js、promptExpansionController.js、promptExpansionFloatingSurfaces.js、promptExpansionMotion.js
-
-## `src/components/shared/`（4）
-
-generationNodeCredentialLifecycle.js、generationNodeFooterLifecycle.js、generationNodePricing.js、randomSeedPolicy.js
-
-## `src/components/source-video/`（4）
-
-sourceVideoHoverPlayback.js、sourceVideoManualPlayback.js、sourceVideoPlaybackFeedback.js、sourceVideoTaskState.js
+electron-builder.win.cjs、electron-builder.win.dev.cjs、playwright.config.js、playwright.desktop.config.js
 
 ## `src/hooks/`（4）
 
@@ -146,17 +108,13 @@ apimartGptImage25ExtManifest.js、apimartGptImage25Manifest.js、bailianImageMod
 
 storyAssetSettingsShell.js、storySourceChunking.js、storyVideoReplicationPromptAnalysis.js、textModelContextBudget.js
 
-## `src/services/`（4）
+## `src/core/`（3）
 
-initialThemeBootstrap.js、localAudioPlaybackObjectUrlService.js、nodeMediaExportService.js、payloadObjectUrlLease.js
+generationTaskCenterProjection.js、rendererViewportCommitGate.js、store.js
 
-## `src/components/aigenText/`（3）
+## `src/services/`（3）
 
-textResultImageImport.js、textResultImages.js、textResultSources.js
-
-## `src/components/audio-node/`（3）
-
-audioWorkflowImageInputs.js、audioWorkflowInputPlan.js、taskOrchestrationModule.js
+initialThemeBootstrap.js、localAudioPlaybackObjectUrlService.js、nodeMediaExportService.js
 
 ## `api/story-generation/`（2）
 
@@ -182,6 +140,10 @@ format.js、operationError.js
 
 annotateCloneAction.js
 
+## `src/components/video-node/`（1）
+
+mediaPlaybackStallProgress.js
+
 ## `src/core/stores/`（1）
 
 index.js
@@ -194,10 +156,6 @@ openAiCliImageManifest.js
 
 cliTextModelManifests.js
 
-## `src/modules/app/`（1）
-
-workspaceCacheIdleScheduler.js
-
 ## `src/modules/interaction/`（1）
 
 dropTargetSpatialQuery.js
@@ -205,10 +163,6 @@ dropTargetSpatialQuery.js
 ## `src/modules/projectPackage/`（1）
 
 fullProjectPackageSession.js
-
-## `src/modules/promptPresetCatalog/`（1）
-
-doubaoAudio1PromptPresets.js
 
 ## `src/modules/timelineExport/`（1）
 

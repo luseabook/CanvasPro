@@ -49,26 +49,26 @@ export async function fetchCollaborationConfig() {
   });
 }
 export function encodeCollaborationInvite(url, invite) {
-  const item = JSON['stringify']({
+  const inviteText = JSON['stringify']({
     endpoint: { url: url['url'], fingerprint: url['fingerprint'], hostId: url['hostId'] },
     invite: invite,
   });
-  return 'AICLAN2.' + btoa(item)['replace'](/\+/g, '-')['replace'](/\//g, '_')['replace'](/=+$/, '');
+  return 'AICLAN2.' + btoa(inviteText)['replace'](/\+/g, '-')['replace'](/\//g, '_')['replace'](/=+$/, '');
 }
 export function decodeCollaborationInvite(key) {
-  const list = String(key || '')['trim']();
-  if (!list['startsWith']('AICLAN2.') || list['length'] > 4096)
+  const inviteCode = String(key || '')['trim']();
+  if (!inviteCode['startsWith']('AICLAN2.') || inviteCode['length'] > 4096)
     throw new Error('请粘贴房主生成的完整邀请连接信息');
   try {
-    const enabled = JSON['parse'](atob(list['slice'](8)['replace'](/-/g, '+')['replace'](/_/g, '/')));
+    const decoded = JSON['parse'](atob(inviteCode['slice'](8)['replace'](/-/g, '+')['replace'](/_/g, '/')));
     if (
-      !enabled['endpoint']?.['url'] ||
-      !enabled['endpoint']['fingerprint'] ||
-      !enabled['endpoint']['hostId'] ||
-      typeof enabled['invite'] !== 'string'
+      !decoded['endpoint']?.['url'] ||
+      !decoded['endpoint']['fingerprint'] ||
+      !decoded['endpoint']['hostId'] ||
+      typeof decoded['invite'] !== 'string'
     )
       throw new Error();
-    return enabled;
+    return decoded;
   } catch {
     throw new Error('邀请连接信息不完整，请重新复制');
   }

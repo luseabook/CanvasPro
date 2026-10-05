@@ -179,19 +179,19 @@ function normalizeImageMimeType(value19, value20 = 'image/png') {
     .toLowerCase();
   return /^image\/[a-z0-9.+-]{1,64}$/.test(value22) ? value22 : 'image/png';
 }
-function normalizeImageBase64DataUrl(value23, value24) {
-  const value25 = String(value23 || '').trim();
-  if (/^data:image\/[a-z0-9.+-]{1,64};base64,[a-z0-9+/=_-]+$/i.test(value25)) return value25;
-  const list8 = value25.replace(/\s+/g, '');
-  if (!list8 || !/^[a-z0-9+/=_-]+$/i.test(list8)) return '';
+function normalizeImageBase64DataUrl(rawValue, mimeType) {
+  const trimmedValue = String(rawValue || '').trim();
+  if (/^data:image\/[a-z0-9.+-]{1,64};base64,[a-z0-9+/=_-]+$/i.test(trimmedValue)) return trimmedValue;
+  const base64Data = trimmedValue.replace(/\s+/g, '');
+  if (!base64Data || !/^[a-z0-9+/=_-]+$/i.test(base64Data)) return '';
   try {
-    const list9 = atob(list8.slice(0, 24).replace(/-/g, '+').replace(/_/g, '/'));
-    if (list9.startsWith('ÿØÿ')) value24 = 'image/jpeg';
-    else if (list9.startsWith('PNG\r\n\x1a\n')) value24 = 'image/png';
-    else if (/^GIF8[79]a/.test(list9)) value24 = 'image/gif';
-    else if (list9.startsWith('RIFF') && list9.slice(8, 12) === 'WEBP') value24 = 'image/webp';
+    const headerBytes = atob(base64Data.slice(0, 24).replace(/-/g, '+').replace(/_/g, '/'));
+    if (headerBytes.startsWith('ÿØÿ')) mimeType = 'image/jpeg';
+    else if (headerBytes.startsWith('PNG\r\n\x1a\n')) mimeType = 'image/png';
+    else if (/^GIF8[79]a/.test(headerBytes)) mimeType = 'image/gif';
+    else if (headerBytes.startsWith('RIFF') && headerBytes.slice(8, 12) === 'WEBP') mimeType = 'image/webp';
   } catch {}
-  return 'data:' + value24 + ';base64,' + list8;
+  return 'data:' + mimeType + ';base64,' + base64Data;
 }
 export function resolveMappedImageResponseValues(value26, value27 = {}) {
   const args = resolveMappedResponseValues(value26, value27?.['resultPaths'] || value27?.['paths']),

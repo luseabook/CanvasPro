@@ -8,8 +8,8 @@ function makeElement() {
     textContent: '',
     title: '',
     className: '',
-    setAttribute(_0x1, _0x2) {
-      this.attrs[_0x1] = _0x2;
+    setAttribute(name, value) {
+      this.attrs[name] = value;
     },
   };
 }

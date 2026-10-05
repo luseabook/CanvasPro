@@ -27,7 +27,17 @@ const positional = argv.filter((a) => !a.startsWith('--'));
 const treeRoot = positional[0] || process.cwd();
 const outJson = outFlag ? outFlag.slice('--out='.length) : null;
 
+// `main.js` and the root-level configs are real runtime code. ROOTS used to
+// start below the tree root, so a scan that never read the entry point could
+// still report the tree clean.
 const ROOTS = ['src', 'api', 'electron', 'vendor'];
+const ROOT_FILES = ['main.js'];
+
+// `.mjs` and `.cjs` are production code here, not scripts: `preload.cjs` is the
+// Electron bridge and `providerApiKeyMissingToast.mjs` is a ported module. The
+// old `endsWith('.js')` test skipped both, which is how a file full of `!![]`
+// survived the batch that reported this scanner's residue as zero.
+const CODE_EXT = /\.(?:js|cjs|mjs|jsx)$/;
 
 // Residue kinds. `code` positions are the only ones that may be rewritten;
 // `literal` positions are escaped text inside a string/template and are handled
@@ -114,7 +124,10 @@ const KINDS = [
   // -- leftover obfuscator identifiers ----------------------------------------
   {
     id: 'obf-identifier',
-    test: (t) => t.kind === 'identifier' && /^_0x[0-9a-f]{4,}$/i.test(t.value),
+    // `{4,}` used to be `{1,}`. Obfuscators emit `_0x1` and `_0x2` as readily as
+// `_0x17f006`, and a four-hex-digit floor let the short forms walk straight
+// through this gate.
+    test: (t) => t.kind === 'identifier' && /^_0x[0-9a-f]+$/i.test(t.value),
     render: (t) => t.value,
   },
   // -- string concatenation of single characters ------------------------------
@@ -187,12 +200,19 @@ const walk = (dir, relBase, bucket) => {
     if (entry.isDirectory()) {
       if (entry.name === 'node_modules' || entry.name === '.git') continue;
       walk(full, rel, bucket);
-    } else if (entry.name.endsWith('.js')) {
+    } else if (CODE_EXT.test(entry.name)) {
       files.push({ full, rel: `${bucket}/${rel}` });
     }
   }
 };
 for (const bucket of ROOTS) walk(path.join(treeRoot, bucket), '', bucket);
+// Root-level files have no bucket directory to walk into, so they are added
+// directly. `root/` is a synthetic prefix: it keeps them out of the per-tree
+// breakdown, which would otherwise read as "scanned and found nothing".
+for (const name of ROOT_FILES) {
+  const full = path.join(treeRoot, name);
+  if (fs.existsSync(full)) files.push({ full, rel: `root/${name}` });
+}
 
 const byKind = {};
 for (const kind of KINDS) byKind[kind.id] = { count: 0, files: new Set(), samples: [] };
