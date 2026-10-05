@@ -124,7 +124,7 @@ export function renderWorkspaceModeSwitcher(
     target +
     '>\n        ' +
     renderWorkspaceModeIcon(REPLICATION_MODE_ID) +
-    '\n        <span class="workspace-mode-option-copy"><span class="workspace-mode-option-title"><strong>复刻工作室</strong><span class="workspace-mode-beta-badge">beta 限免</span></span></span>\n      </button>\n    </div>\n  </div>'
+      '\n        <span class="workspace-mode-option-copy"><span class="workspace-mode-option-title"><strong>复刻工作室</strong><span class="workspace-mode-beta-badge">beta</span><span class="workspace-mode-vip-badge">VIP</span></span><small>复刻短剧、二创出海</small></span>\n      </button>\n    </div>\n  </div>'
   );
 }
 function resolveMountTarget(el, next) {
@@ -156,11 +156,6 @@ export function createWorkspaceModeCoordinator({
       [REPLACEMENT_STUDIO_MODE_ID]: replacementStudio,
     }),
     mode = (record) => {
-      if (
-        record === REPLICATION_MODE_ID &&
-        (windowObject?.['AI_CANVAS_IS_DEV_BUILD'] !== true || windowObject?.['DEV_MODE'] !== true)
-      )
-        return false;
       const payload = entry[record];
       if (typeof payload?.['isAvailable'] === 'function')
         try {

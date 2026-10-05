@@ -26,6 +26,7 @@ import {
       'dreaminaVideoVip',
       'audioVoiceStudio',
       'replacementStudio',
+      'replicationStudio',
       'runninghubAiApp',
       'binghuoVideo',
       'customProvider',

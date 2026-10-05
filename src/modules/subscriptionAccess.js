@@ -106,6 +106,15 @@ const subscriptionGateManifest = {
       allowAnyActiveSubscription: true,
     },
     {
+      key: 'replicationStudio',
+      modelId: 'feature/replication_studio',
+      workflowId: '',
+      displayName: '复刻工作室',
+      aliases: [],
+      providers: ['aicanvas'],
+      allowAnyActiveSubscription: true,
+    },
+    {
       key: 'runninghubAiApp',
       modelId: 'feature/rh_ai_app',
       workflowId: '',
@@ -243,6 +252,7 @@ export const RH_ADVANCED_VOICE_CLONE_VIP_AI_APP_MODEL_ID = getSubscriptionGateAl
 export const DREAMINA_VIDEO_VIP_MODEL_ID = requireSubscriptionGateModelId('dreaminaVideoVip');
 export const AUDIO_VOICE_STUDIO_VIP_MODEL_ID = requireSubscriptionGateModelId('audioVoiceStudio');
 export const REPLACEMENT_STUDIO_VIP_MODEL_ID = requireSubscriptionGateModelId('replacementStudio');
+export const REPLICATION_STUDIO_VIP_MODEL_ID = requireSubscriptionGateModelId('replicationStudio');
 export const RH_AI_APP_VIP_MODEL_ID = requireSubscriptionGateModelId('runninghubAiApp');
 export const CUSTOM_PROVIDER_VIP_MODEL_ID = requireSubscriptionGateModelId('customProvider');
 export const VIDEO_VIP_MODEL_IDS = Array.from(

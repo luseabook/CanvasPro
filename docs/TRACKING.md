@@ -369,13 +369,11 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-05（**补记：通用回退名定为政策，不开批次**）：把 `deobfuscation-workflow.md` 新增 §2.5 写进明文——
-  全仓约 **6.7 万处** `value22` / `options2` / `list8` / `enabled4`（667 件）**不是混淆**，不单开批次洗一遍。
-  依据：这些名字本身就是自动取名器的产物（`0e2e99be` 9062 个、`e8131735` 7175 个标识符，两轮改名约三成落到通用回退名），
-  原始语义在那两轮里已经丢了，换更好的工具也追不回来，只有带上下文的人工改名有用而那不可规模化。
-  **规矩只有一条：顺手改**——已经在改某函数（改逻辑/加测试/修 bug）时，顺手把内部 `valueN` / `listN` / `enabledN` 改成表意名；
-  零额外风险，正确性由同一次回归兜住。第 168 批的 `canvasCollaborationApi.js`、`modelApiMappingEngine.js` 即此例。
-  本次**仅文档一处**，无代码改动，故未跑回归；受保护文件 MD5 与混淆闸门状态均未变动。
+- 2026-10-05（169 批 **复刻工作室落地**）：裁决「只要复刻工作室」。① **复刻工作室 ≠ 替换工作室**——它是
+  `workspaceModeCoordinator.js` 的 5 个**平级**模式之一（`replication`），经 `main.js` 走 `storyWorkspaceApi`；替换工作室是 `personReplacement/`
+  独立模块。② **授权无需另建**：现有授权码链路已全在，官方账号/积分层（15 件）**不需要**。
+  **3 改 + 62 新**：gate 清单加 `replicationStudio`、删掉复刻的 dev 门、徽章对齐 `beta`+`VIP`、45 件复刻文件经四道闸门落地 + 传递闭包补 17 件。
+  零回归：**11215/11186/28** 与基线逐条一致。未启动应用；29 件未升。详见 `docs/b169-replication-studio.md`。
 
 ## 12. 变更记录机制（**已冻结**）
 

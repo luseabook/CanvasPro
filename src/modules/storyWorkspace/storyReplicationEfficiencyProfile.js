@@ -1,0 +1,1 @@
+export const REPLICATION_EFFICIENCY_MODEL_ID="aicanvas/qwen3.8-flash";export const REPLICATION_EFFICIENCY_ASR_PROVIDER='aicanvas';
