@@ -2145,6 +2145,12 @@ const zhCN = Object.freeze({
     text: '生文本',
     image: '生图像',
     video: '生视频',
+    onboarding: Object.freeze({
+      label: '上手引导',
+      connect: '连接模型',
+      connected: '已连接',
+      create: '创建节点',
+    }),
   }),
   coreUi: Object.freeze({
     rendererOverlays: Object.freeze({

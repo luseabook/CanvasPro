@@ -84,25 +84,22 @@ does not provide an export named 'hasAcceptedReplicationBetaNotice'
 | `npm test` | **11215 / 11186 / 28**，失败集与基线**逐条一致，零回归** |
 | 关键字粘连复扫 | 全仓仅剩 1 处，位于 `tools/deobf-bool.mjs` 的说明性注释内 |
 
-## 5. 仍未解决的：应用还起不来
+## 5. 已解决：应用恢复启动（171 批）
 
-修完上述三处后启动大幅推进：**模式切换器已经能渲染出来**（实测 `P_SWITCHER = true`），但 `Object.init()` 仍中断在
-`initEmptyCanvasShortcuts` → `createShortcutLibraryView`：
+反推补回 `index.html` 中 `#emptyHint` 内的 `<div class="canvas-shortcuts-rail"></div>`。判据：该选择器全仓无创建者、无 CSS、
+打包产物同样缺；它是纯容器，代码用 `replaceChildren()` 往里填分类/快捷卡片，自身无初始内容，故最小结构就是一个空 div。
 
-```
-ownerRoot.querySelector('.canvas-shortcuts-rail')  // -> null
-ownerElement.classList.add(...)                    // 崩
-```
+补后**应用完成启动**（`#v2-initial-loader` 消失）。真机实测：切换器渲染；**复刻工作室卡片带 `beta` + `VIP` 徽章与副标题
+「复刻短剧、二创出海」，与用户截图一致**；点击卡片弹出 `subscriptionGateOverlay`（「需要VIP授权 联系管理员获取授权码，或直接输入 CDKEY」），
+即项目现有授权码链路——与 §7 早先的单测结论一致。
 
-`.canvas-shortcuts-rail` 全仓库**只有这一处引用**，没有任何代码创建它，CSS 里也没有它的样式；而 0.8.0 的同一函数
-代码**一模一样、同样没有 null 保护**——说明该元素本该存在于 DOM 里，是 `index.html` 丢了它。
-**两个镜像都不带 `index.html`**，因此没有比对基准。这是下一批的入口。
-
-## 6. 复刻工作室当前状态
+顺带补齐 `emptyHint.onboarding.*`（`label`/`connect`/`connected`/`create`）四个 i18n 键：`zh-CN.js` 与 `en-US.js` 原本都没有，
+启动成功后才以原始键形式显形。中文文案为按代码语义拟写（上手引导／连接模型／已连接／创建节点），待用户过目。
+## 6. 复刻工作室当前状态（✅ 真机验证通过）
 
 - 模式已注册、入口已接、卡片与徽章与 0.8.0 对齐、VIP 门走项目现有授权码链路
 - 依赖闭包完整（512 件 / 0 缺失）
-- 但**没有真机证据**——应用尚未完成启动，界面看不到
+- 真机验证通过：卡片渲染正确、VIP 门触发正确（详见 §5）
 
 ## 7. 工具脚本
 

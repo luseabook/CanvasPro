@@ -2516,6 +2516,12 @@ const enUS = Object.freeze({
     text: 'Text',
     image: 'Image',
     video: 'Video',
+    onboarding: Object.freeze({
+      label: 'Getting started',
+      connect: 'Connect a model',
+      connected: 'Connected',
+      create: 'Create a node',
+    }),
   }),
   coreUi: Object.freeze({
     rendererOverlays: Object.freeze({

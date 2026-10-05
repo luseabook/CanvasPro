@@ -369,11 +369,11 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-06（170 批·**启动链排障 + 方案二收窄**）：真机验证查出 b169 会让应用**无法启动**（`npm test` 抓不到）。3 处根因均早于本批：
-  `deobf-bool.mjs` 缺 token 分隔致 `returnfalse`（18 文件 66 处）、`projectBootstrap.js` 调不存在的 `bindLogoProjectSave()`、
-  `history.js` 被截断丢了 `reset`/`createCheckpoint`/`undoToCheckpoint`。**方案二**：用户裁决不做整文件替换——回退 9 件升级，
-  只补 13 个缺失导出，保住现有产品行为。25 件改动。**验证**：闭包 512 件 / 0 缺失；闸门 PASS、MD5 未变；回归 **11186/28** 与基线**逐条一致**。
-  应用仍起不来（缺 rail 元素）。详见 `docs/b170-startup-chain.md`。
+- 2026-10-06（171 批·**应用恢复启动，复刻工作室真机验证通过**）：补回 `index.html` 的 `.canvas-shortcuts-rail`——纯容器，
+  由 JS `replaceChildren` 填充；全仓无创建者、无 CSS、打包产物同样缺，判为丢失。补后**应用完成启动**。真机实测：切换器渲染、
+  **复刻工作室卡片带 `beta`+`VIP` 徽章与副标题「复刻短剧、二创出海」**、点击触发 `subscriptionGateOverlay`（「需要VIP授权…输入 CDKEY」，
+  即项目现有授权码链路）。顺带补 `emptyHint.onboarding.*` 四个 i18n 键（zh-CN/en-US 原本都缺）。
+  3 件改动；回归 **11186/28** 与基线**逐条一致，零回归**。详见 `docs/b170-startup-chain.md`。
 
 ## 12. 变更记录机制（**已冻结**）
 
