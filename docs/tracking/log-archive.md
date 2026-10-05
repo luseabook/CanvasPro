@@ -4,6 +4,18 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-05（168 批·**把「已清零」变成闸门**）：用户裁决按 167 批建议执行。① **删 `providerApiKeyMissingToast.mjs`**——
+上游 0.7.16 发两份同哈希孪生但 import 全指向 `.js`（21 处对 0 处），**0.8.0 已只留 `.js`**，故随代际删除；
+连带发现 `docs/tracking/orphans.md` 自 161 批未重算（记 1792/200，实测 1864/127），已按实测整表刷新。
+② **新增 `tools/deobf-gate.mjs` 并挂进 `npm test`**：走整棵树而非手挑 `ROOTS`，命中即 `exit 1`；
+只对零歧义信号 fail（`_0x`、`![]`/`!![]`、`debugger`、字符串数组 IIFE、自防护），`eval`/`new Function` 只警告，
+排除项全部显式打印。**闸门首跑即抓到我漏掉的东西**：`.kilo/worktrees/` 下两个**本仓库已注册 worktree**
+（cf191eac / 57f10635，2026-09-30 提交）装着约 6,198 个文件的去混淆前完整副本（报 104 万处命中），已排除并建议清理。
+③ 配 **`tools/deobf-gate.test.js` 11 例**（起子进程跑真闸门）——先证明闸门会失败，再信任它会通过；
+含「注释/字符串/正则不算代码」「`.mjs`/`.cjs` 也扫」「`![][0]` 须放过」等回归。
+④ **名实不符只修两处**（`canvasCollaborationApi.js` 的 `enabled`→`decoded` 等；`modelApiMappingEngine.js` 的 `normalizeImageBase64DataUrl` 五个名），
+均过 `deobf-verify.mjs` 改名闸门（token 流一致）；21 万处方括号取属性与 6.7 万处通用回退名**继续推迟**。
+`npm test` **11215/11186/28**、闸门 **3146 件 0 命中 exit 0**、闸门自测 **11/11**，与改动前逐条一致，MD5 未变。见 `docs/obfuscation-residue-audit.md` §8。
 - 2026-10-05（167 批·**普查器盲区收口**）：用户要求复查混淆残留并确认可编译。查出 **166 批的「残留 0」是假零**——
 `deobf-residue-scan.mjs` 漏 `.mjs`/`.cjs`（扩展名只认 `.js`）、漏 `_0x1` 短式（四位下限）、且 `ROOTS` 从树根以下起步故 `main.js` 从未扫过。
 补上两处漏网并修好：`providerApiKeyMissingToast.mjs`（`!![]` **15 处**，`.js` 孪生件已被 166 批改写、它因扩展名漏掉）与 `agentMessageTime.test.js`（`_0x1`/`_0x2` **4 处**）；普查器四处盲区一并修复，
