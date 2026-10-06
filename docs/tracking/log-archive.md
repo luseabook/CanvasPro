@@ -4,6 +4,11 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-06（176 批·**按 SHUO Canvas 补回快捷模板库样式**）：用户指路 `D:\shuocancas\SHUO Canvas`，
+  查出仓库 `styles/canvas.css` **缺开头约 9 KB**：rail 的 grid 布局与 `pointer-events:auto`、`.canvas-shortcut-*` 卡片/徽章/
+  图标配色、模板菜单、`has-template-library` 响应式规则都在那一段。已补 62 条规则进两份 CSS；实测 rail 变 grid、卡片 240×56。
+  **关键澄清**：上游 0.8.0 **没有 `.empty-hint-pills`**——仓库那排「生文本/生图像/生视频」是旧版遗留，0.8.0 已由 rail 取代；
+  `has-template-library` 只在小屏收窄容器，不做显隐。同段 `canvas-onboarding` 规则未移植（上游引导 JS 是另一代）。回归 11186/28。
 - 2026-10-06（175 批·**复刻子系统整代升到 0.8.0**）：把复刻相关 60 件旧代文件整件升代（domain 27 / api 8 / ws 25），
   补传递闭包 9 件，连带升级唯一被打破的非复刻消费方 `storyEpisodeSplitPartialRepair.js`。**分层升级不可行**：0.8.0 改了导出名与契约
   （时间模型 `integer-seconds`→`seconds`+0.1、观察镜头 `sound` 清空、窗口映射改附件），须整代替换。

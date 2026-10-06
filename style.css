@@ -5302,12 +5302,6 @@ html.is-canvas-theme-light .v2-matting-overlay {
   border-radius: 40px;
   color: #fff;
 }
-.empty-hint-pills {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  pointer-events: auto;
-}
 /* 空画布上手引导（emptyCanvasOnboarding.js 动态插入 #emptyHint .empty-hint-main）
    该组件的类名在仓库与打包产物中均无样式定义，按其用途补最小布局；
    父级 .empty-hint 是 pointer-events:none，故容器必须显式恢复 auto。 */
@@ -5352,12 +5346,7 @@ button.canvas-onboarding-step:hover {
   height: 1px;
   background: var(--white-18);
 }
-/* 快捷方式/模板库容器：父级 .empty-hint 是 pointer-events:none（同理 .empty-hint-pills
-   也显式恢复 auto）。缺这一条时卡片计算值仍为 none，命中测试会落到画布上，
-   即空画布里的快捷卡片完全点不动。 */
-.canvas-shortcuts-rail {
-  pointer-events: auto;
-}
+
 .v2-empty-hint-title {
   font-weight: 500;
   font-size: var(--font-28);
@@ -5365,25 +5354,6 @@ button.canvas-onboarding-step:hover {
 .v2-empty-hint-subtitle {
   color: var(--text-secondary);
   font-size: var(--font-28);
-}
-.pill-btn {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--white-05);
-  border: 1px solid var(--white-10);
-  border-radius: 40px;
-  color: var(--text-secondary);
-  padding: 14px 26px;
-  font-size: 24px;
-  cursor: var(--link-cursor);
-  font-family: inherit;
-  transition: all 0.2s;
-}
-.pill-btn:hover {
-  background: var(--white-10);
-  color: var(--text-primary);
-  border-color: var(--white-18);
 }
 .v2-multi-select-box {
   position: absolute;
@@ -7362,7 +7332,6 @@ body.is-zoom-low
 .nam-item,
 .nam-upload,
 .node-card,
-.pill-btn,
 .project-name,
 .sidebar-btn,
 .upload-btn,
@@ -7527,7 +7496,6 @@ html.is-connecting-mode {
 .logo,
 .nam-item,
 .nam-upload,
-.pill-btn,
 .project-name,
 .settings-close,
 .settings-nav-item,
@@ -23442,7 +23410,6 @@ html.has-global-tooltip-portal body [data-tooltip]:hover::before {
 #v2-wrap .logo,
 #v2-wrap .nam-item,
 #v2-wrap .nam-upload,
-#v2-wrap .pill-btn,
 #v2-wrap .project-name,
 #v2-wrap .prompt-attachment-btn,
 #v2-wrap .prompt-attachment-btn *,
