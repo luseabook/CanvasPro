@@ -10,6 +10,10 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 GRID_TILE_MAX_AXIS = 10
@@ -173,7 +177,9 @@ class MediaFileRouteService:
                 with open(fpath, "xb") as file:
                     file.write(file_bytes)
                 return safe_fn, stored_fn, fpath
-            except FileExistsError:
+            except FileExistsError as exc:
+                # 目标文件名已被占用，尝试下一个候选
+                _LOGGER.debug("上传文件名冲突，重试下一个候选: %s", exc)
                 continue
 
         raise RuntimeError("Unable to allocate unique upload filename")
@@ -232,8 +238,9 @@ class MediaFileRouteService:
         try:
             mapping.pop(key, None)
             self._save_output_index(index_data)
-        except Exception:
-            pass
+        except Exception as exc:
+            # 索引回写失败不影响返回值
+            _LOGGER.debug("回写输出索引失败: %s", exc)
         return None
 
     def _remember_saved_output_from_url(self, dedupe_hash, local_path, url):
@@ -334,13 +341,15 @@ class MediaFileRouteService:
         try:
             if "A" in (img.getbands() or ()):
                 return True
-        except Exception:
-            pass
+        except Exception as exc:
+            # 读取图像通道失败时按无 alpha 处理
+            _LOGGER.debug("读取图像通道失败: %s", exc)
         try:
             if img.mode == "P" and "transparency" in getattr(img, "info", {}):
                 return True
-        except Exception:
-            pass
+        except Exception as exc:
+            # 读取调色板透明度失败时按无 alpha 处理
+            _LOGGER.debug("读取调色板透明度失败: %s", exc)
         return False
 
     def _build_image_derivative_target(self, root_abs, root_prefix, rel_original_path, variant, ext):
@@ -633,8 +642,9 @@ class MediaFileRouteService:
                 meta["items"] = items
                 try:
                     self._atomic_write_json(meta_file, meta)
-                except Exception:
-                    pass
+                except Exception as exc:
+                    # 写媒体元数据失败不影响主响应
+                    _LOGGER.debug("写入媒体元数据失败: %s", exc)
 
             return self._json_ok(
                 self.augment_saved_media_response(
@@ -830,23 +840,26 @@ class MediaFileRouteService:
                             if total > max_bytes:
                                 try:
                                     os.remove(fpath)
-                                except Exception:
-                                    pass
+                                except Exception as exc:
+                                    # 清理超限临时文件失败可忽略
+                                    _LOGGER.debug("清理超限临时文件失败: %s", exc)
                                 return self._json_err(413, "File too large")
                             file.write(chunk)
             except urllib.error.HTTPError as exc:
                 if fpath:
                     try:
                         os.remove(fpath)
-                    except OSError:
-                        pass
+                    except OSError as exc:
+                        # 清理临时文件失败可忽略
+                        _LOGGER.debug("清理临时文件失败: %s", exc)
                 return self._json_err(502, f"Download HTTPError: {exc.code}")
             except Exception as exc:
                 if fpath:
                     try:
                         os.remove(fpath)
-                    except OSError:
-                        pass
+                    except OSError as exc:
+                        # 清理临时文件失败可忽略
+                        _LOGGER.debug("清理临时文件失败: %s", exc)
                 return self._json_err(502, f"Download failed: {str(exc)}")
 
             rel_path = f"output/{filename}"
@@ -899,8 +912,9 @@ class MediaFileRouteService:
         try:
             if "A" in (img.getbands() or ()):
                 return True
-        except Exception:
-            pass
+        except Exception as exc:
+            # 读取图像通道失败时按无 alpha 处理
+            _LOGGER.debug("读取图像通道失败: %s", exc)
         try:
             return img.mode == "P" and "transparency" in getattr(img, "info", {})
         except Exception:
@@ -1086,7 +1100,9 @@ class MediaFileRouteService:
             local_path = self._join_virtual_local_path("output", rel_path)
             try:
                 stat = os.stat(abs_path)
-            except OSError:
+            except OSError as exc:
+                # 无法 stat 的输出项跳过
+                _LOGGER.debug("stat 输出文件失败，跳过该条目: %s", exc)
                 continue
             is_dir = os.path.isdir(abs_path)
             media_kind = "folder" if is_dir else self._classify_media_kind(name)
@@ -1246,8 +1262,9 @@ class MediaFileRouteService:
             payload["roots"] = {}
         try:
             self._atomic_write_json(self._output_index_file(), payload)
-        except Exception:
-            pass
+        except Exception as exc:
+            # 写入输出索引失败不影响主流程
+            _LOGGER.debug("写入输出索引失败: %s", exc)
 
     def _ensure_output_index_root(self, index_data, output_root):
         roots = index_data.get("roots")

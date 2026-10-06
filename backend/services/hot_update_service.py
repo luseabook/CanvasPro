@@ -7,6 +7,10 @@ import sys
 import threading
 import time
 import urllib.request
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 class HotUpdateService:
@@ -53,7 +57,9 @@ class HotUpdateService:
         for enc in ("utf-8", "gbk"):
             try:
                 return raw.decode(enc)
-            except UnicodeDecodeError:
+            except UnicodeDecodeError as exc:
+                # 按该编码解码失败，尝试下一种编码
+                _LOGGER.debug("按当前编码解码失败，尝试下一种: %s", exc)
                 continue
         return raw.decode("utf-8", errors="replace")
 
@@ -227,8 +233,9 @@ class HotUpdateService:
                 ).strip()
                 if candidate:
                     manifest_url = candidate
-            except Exception:
-                pass
+            except Exception as exc:
+                # 读取更新配置失败时忽略该覆盖
+                _LOGGER.debug("读取更新配置失败: %s", exc)
         headers = {
             "User-Agent": "Canvas-AutoUpdate/2.0",
             "Accept": "application/json, application/octet-stream;q=0.9, */*;q=0.8",
@@ -264,8 +271,9 @@ class HotUpdateService:
                 match = self.RELEASE_NOTES_PREVIEW_VIDEO_RE.search(file.read())
                 if match:
                     return match.group(1).strip()
-        except Exception:
-            pass
+        except Exception as exc:
+            # 读取 release notes 失败时回落其它来源
+            _LOGGER.debug("读取 release 说明失败: %s", exc)
 
         video_path = os.path.join(self.directory, self.LOCAL_PREVIEW_VIDEO_FILE)
         try:

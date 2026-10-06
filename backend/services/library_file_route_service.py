@@ -2,6 +2,10 @@ import base64
 import json
 import os
 import re
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 class LibraryFileRouteService:
@@ -163,8 +167,9 @@ class LibraryFileRouteService:
         if abs_path and os.path.exists(abs_path):
             try:
                 os.remove(abs_path)
-            except FileNotFoundError:
-                pass
+            except FileNotFoundError as exc:
+                # 缩略图已被并发删除，属幂等清理
+                _LOGGER.debug("删除预设缩略图时文件不存在: %s", exc)
 
     def _save_preset_thumb(self, preset_type, title, data_url):
         if not isinstance(data_url, str) or not data_url.startswith("data:image/"):
@@ -212,8 +217,9 @@ class LibraryFileRouteService:
         mime = "image/jpeg"
         try:
             mime = str(header or "")[5:].split(";", 1)[0]
-        except Exception:
-            pass
+        except Exception as exc:
+            # 解析 data URL 头失败时回落默认 jpeg
+            _LOGGER.debug("解析 data URL 头失败，回落默认扩展名: %s", exc)
         if mime.endswith("png"):
             return ".png"
         if mime.endswith("webp"):
@@ -360,13 +366,15 @@ class LibraryFileRouteService:
         if original_path != target_path and original_exists:
             try:
                 os.remove(original_path)
-            except FileNotFoundError:
-                pass
+            except FileNotFoundError as exc:
+                # 原文件已不存在，属幂等清理
+                _LOGGER.debug("删除原文件时目标不存在: %s", exc)
             if original_meta_path and os.path.exists(original_meta_path):
                 try:
                     os.remove(original_meta_path)
-                except FileNotFoundError:
-                    pass
+                except FileNotFoundError as exc:
+                    # 原元数据已不存在，属幂等清理
+                    _LOGGER.debug("删除原元数据时目标不存在: %s", exc)
         if original_thumb_local_path and original_thumb_local_path != thumb_local_path:
             self._remove_preset_thumb(original_thumb_local_path)
         return self._json_ok(

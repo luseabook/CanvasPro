@@ -12,6 +12,10 @@ import urllib.parse
 import urllib.request
 
 from .offline_cache_verifier import verify_offline_cache_proof
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 DEFAULT_LICENSE_DOMAIN = "https://api.1e1e.cn"
@@ -140,8 +144,9 @@ class SubscriptionRemoteClient:
         except Exception:
             try:
                 os.remove(temp_path)
-            except Exception:
-                pass
+            except Exception as exc:
+                # 临时文件已被清理或删除，忽略
+                _LOGGER.debug("清理临时文件失败: %s", exc)
 
     def _normalize_client_config(self, value, *, allow_http=False):
         if not isinstance(value, dict):

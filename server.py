@@ -246,6 +246,10 @@ DIRECTORY = os.path.abspath(os.path.dirname(__file__))   # v2/ 绝对路径
 # --- 版本号 ---
 # 从 index.html 读取版本号
 import re
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 def get_version_from_index_html():
     """从 index.html 读取应用版本号。"""
@@ -257,8 +261,9 @@ def get_version_from_index_html():
         match = re.search(r'<meta name="app-version" content="([^"]+)"', content)
         if match:
             return match.group(1)
-    except Exception:
-        pass
+    except Exception as exc:
+        # 读取/解析 index.html 失败时回落默认版本号
+        _LOGGER.debug("读取 index.html 版本号失败，回落默认版本: %s", exc)
     return "V0.0.7"  # 默认版本
 
 LOCAL_VERSION   = get_version_from_index_html()  # 从 index.html 读取版本号
@@ -520,8 +525,9 @@ def _clear_system_file_save_paths():
         next_system_settings = dict(system_settings)
         next_system_settings.pop("fileSavePaths", None)
         _write_json_file(SYSTEM_SETTINGS_FILE, next_system_settings)
-    except Exception:
-        pass
+    except Exception as exc:
+        # 清理系统 settings 中的 fileSavePaths 为尽力而为
+        _LOGGER.debug("清理系统 fileSavePaths 失败: %s", exc)
 
 
 def _migrate_system_file_save_paths_to_user_settings(local_settings, paths):
@@ -532,8 +538,9 @@ def _migrate_system_file_save_paths_to_user_settings(local_settings, paths):
         next_settings["fileSavePaths"] = _normalize_file_save_paths_for_policy(paths)
         _write_json_file(SETTINGS_FILE, next_settings)
         _clear_system_file_save_paths()
-    except Exception:
-        pass
+    except Exception as exc:
+        # 迁移系统级 fileSavePaths 为尽力而为，失败保留原状
+        _LOGGER.debug("迁移系统级 fileSavePaths 失败: %s", exc)
 
 
 def _persist_local_file_save_paths_if_needed(local_settings, paths):
@@ -548,8 +555,9 @@ def _persist_local_file_save_paths_if_needed(local_settings, paths):
             migrate_legacy_defaults=False,
         )
         _write_json_file(SETTINGS_FILE, next_settings)
-    except Exception:
-        pass
+    except Exception as exc:
+        # 持久化本地 fileSavePaths 为尽力而为，失败不影响内存配置
+        _LOGGER.debug("持久化本地 fileSavePaths 失败: %s", exc)
 
 
 def _infer_data_dir_from_temp_dir(temp_dir):
@@ -985,8 +993,9 @@ def _refresh_storage_globals(paths):
             subscription_gate_service=SUBSCRIPTION_GATE_SERVICE,
             video_required_model_id=DREAMINA_VIDEO_VIP_MODEL_ID,
         )
-    except NameError:
-        pass
+    except NameError as exc:
+        # 可选服务初始化，缺少符号时跳过不影响主流程
+        _LOGGER.debug("初始化 Dreamina 路由服务缺少依赖符号，跳过: %s", exc)
 
 
 def _ensure_storage_dirs():
@@ -1027,8 +1036,9 @@ def _resolve_subscription_api_base():
                     and not parsed.password and parsed.path in ("", "/")
                     and not parsed.query and not parsed.fragment):
                 return f"https://{parsed.netloc}", True
-        except Exception:
-            pass
+        except Exception as exc:
+            # 非法覆盖值回落官方默认基址，属预期降级
+            _LOGGER.debug("解析订阅 API 基址覆盖失败，回落默认: %s", exc)
     return OFFICIAL_SUBSCRIPTION_API_BASE, False
 
 SUBSCRIPTION_API_BASE, SUBSCRIPTION_API_BASE_OVERRIDDEN = _resolve_subscription_api_base()
@@ -1133,8 +1143,9 @@ def _read_user_settings():
         system_settings["installId"] = local_install_id
         try:
             _write_json_file(SYSTEM_SETTINGS_FILE, system_settings)
-        except Exception:
-            pass
+        except Exception as exc:
+            # installId 迁移为尽力而为，失败不阻塞
+            _LOGGER.debug("写入系统 settings 的 installId 失败: %s", exc)
         system_install_id = local_install_id
 
     merged = dict(local_settings)
@@ -1322,16 +1333,18 @@ def _clear_subscription_authorization():
             if os.path.isfile(path_value):
                 os.remove(path_value)
                 cleared.append("deviceIdentity")
-        except FileNotFoundError:
-            pass
+        except FileNotFoundError as exc:
+            # 设备标识文件已被并发删除，属幂等清理
+            _LOGGER.debug("清理设备标识文件时目标不存在: %s", exc)
 
     for install_id in install_ids:
         targets = device_ids or [""]
         for device_id in targets:
             try:
                 SUBSCRIPTION_GATE_SERVICE.clear_vip_allow_cache(install_id, device_id)
-            except Exception:
-                pass
+            except Exception as exc:
+                # 缓存清理失败不影响授权结果返回
+                _LOGGER.debug("清理订阅允许缓存失败: %s", exc)
 
     return {
         "success": True,
@@ -1521,8 +1534,9 @@ def _json_ok(handler, data):
     handler.end_headers()
     try:
         handler.wfile.write(body)
-    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
-        pass
+    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError) as exc:
+        # 客户端断开导致写失败，属正常情况
+        _LOGGER.debug("写入响应体失败（客户端已断开）: %s", exc)
 
 def _json_err(handler, code, msg):
     body = json.dumps({"error": msg}, ensure_ascii=False, indent=2).encode()
@@ -1533,8 +1547,9 @@ def _json_err(handler, code, msg):
     handler.end_headers()
     try:
         handler.wfile.write(body)
-    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
-        pass
+    except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError) as exc:
+        # 客户端断开导致写失败，属正常情况
+        _LOGGER.debug("写入错误响应体失败（客户端已断开）: %s", exc)
 
 
 def _send_route_response(handler, response):
@@ -1571,8 +1586,9 @@ def _send_route_response(handler, response):
         handler.end_headers()
         try:
             handler.wfile.write(body)
-        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError):
-            pass
+        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError) as exc:
+            # 客户端断开导致写失败，属正常情况
+            _LOGGER.debug("写入路由响应体失败（客户端已断开）: %s", exc)
         return
     raise ValueError(f"Unknown route response kind: {kind}")
 
@@ -1700,7 +1716,9 @@ def _normalize_chat_completion_sse_response(response):
             break
         try:
             payload = json.loads(data_line)
-        except Exception:
+        except Exception as exc:
+            # 非 JSON 行是 SSE 正常噪声，跳过继续
+            _LOGGER.debug("SSE 数据行非合法 JSON，跳过: %s", exc)
             continue
         if isinstance(payload, dict):
             last_payload = payload
@@ -1979,7 +1997,9 @@ def _run_smart_clip_job(job_id, local_src, options):
                         continue
                     try:
                         t = float(start_tc.get_seconds())
-                    except Exception:
+                    except Exception as exc:
+                        # 单个损坏时间码跳过，不影响其余边界
+                        _LOGGER.debug("场景切换时间码解析失败，跳过: %s", exc)
                         continue
                     if t and t > 0:
                         boundaries.append(t)
@@ -2039,8 +2059,9 @@ def _run_smart_clip_job(job_id, local_src, options):
                             black_intervals.append((s, e))
                 try:
                     cap.release()
-                except Exception:
-                    pass
+                except Exception as exc:
+                    # 释放资源失败不影响后续分析
+                    _LOGGER.debug("释放视频捕获资源失败: %s", exc)
         except Exception:
             black_intervals = []
 
@@ -2055,8 +2076,9 @@ def _run_smart_clip_job(job_id, local_src, options):
             for t in boundaries or []:
                 try:
                     bds.append(float(t))
-                except Exception:
-                    pass
+                except Exception as exc:
+                    # 非法边界值跳过，保持其余候选
+                    _LOGGER.debug("边界时间转换为浮点失败，跳过: %s", exc)
             for s, e in black_intervals:
                 bds.append(float(s))
                 bds.append(float(e))
@@ -2370,7 +2392,9 @@ def _scan_max_gen_seq_for_date(date_str):
                     n = int(m.group(1))
                     if n > max_n:
                         max_n = n
-                except Exception:
+                except Exception as exc:
+                    # 文件名不含合法序号时跳过
+                    _LOGGER.debug("序号文件名解析失败，跳过: %s", exc)
                     continue
         return max_n
     except Exception:
@@ -2393,8 +2417,9 @@ def _next_gen_output_filename(ext):
         state[date_str] = n
         try:
             _atomic_write_json(GEN_SEQ_STATE_FILE, state)
-        except Exception:
-            pass
+        except Exception as exc:
+            # 状态持久化失败不影响本次序号分配
+            _LOGGER.debug("写入生成序号状态文件失败: %s", exc)
     seq = str(n).zfill(4)
     return f"gen_{date_str}_{seq}.{ext}"
 
@@ -2606,8 +2631,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # --- 其余静态资源交给 SimpleHTTPRequestHandler 处理 ---
         try:
             super().do_GET()
-        except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError):
-            pass
+        except (ConnectionAbortedError, ConnectionResetError, BrokenPipeError) as exc:
+            # 客户端提前断开连接，属正常情况
+            _LOGGER.debug("静态资源响应时客户端已断开: %s", exc)
 
     def end_headers(self):
         # 避免重复响应头导致浏览器 CORS 拒绝（例如 "*, *"）
@@ -3254,8 +3280,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                             )
                             try:
                                 resp.close()
-                            except Exception:
-                                pass
+                            except Exception as exc:
+                                # 关闭连接失败可忽略，响应已处理
+                                _LOGGER.debug("关闭上游响应失败: %s", exc)
                             return
 
                         chunks = []
@@ -3283,8 +3310,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                                     )
                                     try:
                                         resp.close()
-                                    except Exception:
-                                        pass
+                                    except Exception as exc:
+                                        # 关闭连接失败可忽略，响应已处理
+                                        _LOGGER.debug("关闭上游响应失败: %s", exc)
                                     return
 
                         full_content = b"".join(chunks)
@@ -3417,8 +3445,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 finally:
                     try:
                         resp.close()
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        # finally 中关闭连接，失败可忽略
+                        _LOGGER.debug("关闭上游响应失败: %s", exc)
                 if not resp_text:
                     resp_text = "{}"
                 
@@ -3474,8 +3503,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                                 else:
                                     json_data = json.loads(last_line)
                                     resp_text = json.dumps(json_data)
-                        except Exception:
-                            pass
+                        except Exception as exc:
+                            # SSE 解析失败时保留原文，属容错
+                            _LOGGER.debug("解析 SSE 末行 JSON 失败，保留原始响应: %s", exc)
 
                     self.send_response(resp.status)
                     self.send_header("Content-Type", "application/json; charset=utf-8")

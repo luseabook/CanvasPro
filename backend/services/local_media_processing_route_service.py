@@ -4,6 +4,10 @@ import os
 import random
 import subprocess
 import time
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 VIDEO_CLIP_FPS_OPTIONS = (16, 24, 30)
@@ -151,8 +155,9 @@ class LocalMediaProcessingRouteService:
         except subprocess.TimeoutExpired:
             try:
                 process.kill()
-            except Exception:
-                pass
+            except Exception as exc:
+                # 超时后杀死子进程失败，仍向上抛出超时
+                _LOGGER.debug("杀死超时子进程失败: %s", exc)
             raise
         return process.returncode, stdout, stderr
 
@@ -361,7 +366,9 @@ class LocalMediaProcessingRouteService:
                 try:
                     start = float(start_tc.get_seconds())
                     end = float(end_tc.get_seconds())
-                except Exception:
+                except Exception as exc:
+                    # 场景时间码非法，跳过该场景
+                    _LOGGER.debug("场景时间码解析失败，跳过: %s", exc)
                     continue
                 if end > start:
                     segments.append([start, end])

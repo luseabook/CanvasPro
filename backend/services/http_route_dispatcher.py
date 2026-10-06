@@ -2,6 +2,10 @@ import json
 import subprocess
 import time
 import urllib.parse
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 SUBSCRIPTION_NETWORK_HELP_MESSAGE = (
@@ -213,8 +217,9 @@ class HttpRouteDispatcher:
                 handler.wfile.write(b"data: ping\n\n")
                 handler.wfile.flush()
                 time.sleep(5)
-        except Exception:
-            pass
+        except Exception as exc:
+            # 心跳连接断开时结束循环，属正常
+            _LOGGER.debug("心跳写入失败（连接已断开）: %s", exc)
         return True
 
     def _handle_update_check(self, handler):

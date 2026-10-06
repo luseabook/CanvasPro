@@ -8,6 +8,10 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 from backend.services.media_file_route_service import MediaFileRouteService
 from backend.services.path_security import safe_json_filename, confined_json_path
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 class JsonFileRouteService:
@@ -117,7 +121,9 @@ class JsonFileRouteService:
                     if time.time() - os.path.getmtime(lock_path) > stale_seconds:
                         os.unlink(lock_path)
                         continue
-                except FileNotFoundError:
+                except FileNotFoundError as exc:
+                    # 锁文件已被并发删除，重试获取
+                    _LOGGER.debug("锁文件已不存在，重试获取: %s", exc)
                     continue
                 if time.monotonic() >= deadline:
                     raise TimeoutError("Workspace lock timeout")
@@ -128,8 +134,9 @@ class JsonFileRouteService:
             os.close(descriptor)
             try:
                 os.unlink(lock_path)
-            except FileNotFoundError:
-                pass
+            except FileNotFoundError as exc:
+                # 锁文件已被删除，属幂等清理
+                _LOGGER.debug("删除锁文件时目标不存在: %s", exc)
 
     def _list_projects(self):
         canvas_dir = self._get_canvas_dir()

@@ -12,6 +12,10 @@ import time
 import urllib.parse
 import urllib.request
 import uuid
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 class DreaminaCliService:
@@ -534,17 +538,20 @@ class DreaminaCliService:
             return
         try:
             proc.terminate()
-        except Exception:
-            pass
+        except Exception as exc:
+            # 终止子进程失败，继续后续等待/kill
+            _LOGGER.debug("终止子进程失败: %s", exc)
         try:
             proc.wait(timeout=2)
             return
-        except Exception:
-            pass
+        except Exception as exc:
+            # 等待子进程退出失败，继续尝试 kill
+            _LOGGER.debug("等待子进程退出失败: %s", exc)
         try:
             proc.kill()
-        except Exception:
-            pass
+        except Exception as exc:
+            # 强制结束子进程失败，已尽力清理
+            _LOGGER.debug("强制结束子进程失败: %s", exc)
 
     def _download_file(self, url, target_path):
         with urllib.request.urlopen(url, timeout=90) as response:
@@ -683,8 +690,9 @@ class DreaminaCliService:
             os.replace(temp_path, target_path)
             try:
                 os.chmod(target_path, 0o755)
-            except Exception:
-                pass
+            except Exception as exc:
+                # 设置可执行权限失败不阻断安装
+                _LOGGER.debug("设置组件可执行权限失败: %s", exc)
 
             probe = self._run_command(["version"], timeout=15, command_path=target_path)
             if not probe.get("ok"):
@@ -694,8 +702,9 @@ class DreaminaCliService:
             try:
                 if os.path.exists(temp_path):
                     os.remove(temp_path)
-            except Exception:
-                pass
+            except Exception as exc:
+                # 清理临时组件文件失败可忽略
+                _LOGGER.debug("清理临时组件文件失败: %s", exc)
             raise RuntimeError(
                 f"{binary['label']} 即梦组件准备失败，请检查网络后重试"
             ) from exc
@@ -736,7 +745,9 @@ class DreaminaCliService:
                 obj, end = decoder.raw_decode(block)
                 if isinstance(obj, dict):
                     push(block[:end])
-            except Exception:
+            except Exception as exc:
+                # 候选项非合法 JSON，跳过
+                _LOGGER.debug("候选项解码失败，跳过: %s", exc)
                 continue
         if "{\n" in raw or "\n}" in raw:
             start = raw.find("{")
@@ -752,7 +763,9 @@ class DreaminaCliService:
                 obj, end = decoder.raw_decode(block)
                 if isinstance(obj, dict):
                     push(block[:end])
-            except Exception:
+            except Exception as exc:
+                # 字符级扫描候选项解码失败，跳过
+                _LOGGER.debug("字符级扫描解码失败，跳过: %s", exc)
                 continue
         return candidates
 
@@ -762,7 +775,9 @@ class DreaminaCliService:
                 data = json.loads(candidate)
                 if isinstance(data, dict):
                     return data
-            except Exception:
+            except Exception as exc:
+                # 候选项 JSON 解析失败，尝试下一个
+                _LOGGER.debug("JSON 候选项解析失败，尝试下一个: %s", exc)
                 continue
         return {}
 
@@ -795,7 +810,9 @@ class DreaminaCliService:
             try:
                 _, end = decoder.raw_decode(block)
                 push(block[:end])
-            except Exception:
+            except Exception as exc:
+                # 候选项解码失败，跳过
+                _LOGGER.debug("候选项解码失败，跳过: %s", exc)
                 continue
         for m in re.finditer(r"[\{\[]", raw):
             block = raw[m.start() :].lstrip()
@@ -804,14 +821,18 @@ class DreaminaCliService:
             try:
                 _, end = decoder.raw_decode(block)
                 push(block[:end])
-            except Exception:
+            except Exception as exc:
+                # 字符级扫描解码失败，跳过
+                _LOGGER.debug("字符级扫描解码失败，跳过: %s", exc)
                 continue
         for candidate in reversed(candidates):
             try:
                 data = json.loads(candidate)
                 if isinstance(data, (dict, list)):
                     return data
-            except Exception:
+            except Exception as exc:
+                # 候选项 JSON 解析失败，尝试下一个
+                _LOGGER.debug("候选项解析失败，尝试下一个: %s", exc)
                 continue
         return {}
 
@@ -1204,8 +1225,9 @@ class DreaminaCliService:
             with open(temp_path, "w", encoding="utf-8") as f:
                 json.dump(data if isinstance(data, dict) else {}, f, ensure_ascii=False, indent=2)
             os.replace(temp_path, self._flatten_index_file)
-        except Exception:
-            pass
+        except Exception as exc:
+            # 写入扁平索引失败不影响主流程
+            _LOGGER.debug("写入扁平索引失败: %s", exc)
 
     def _flatten_dedupe_key(self, local_path, task_type, submit_id):
         sid = str(submit_id or "").strip()
@@ -1230,8 +1252,9 @@ class DreaminaCliService:
                 if duplicate and duplicate != abs_path and os.path.isfile(duplicate):
                     try:
                         os.remove(duplicate)
-                    except Exception:
-                        pass
+                    except Exception as exc:
+                        # 删除重复输出文件失败可忽略
+                        _LOGGER.debug("删除重复输出文件失败: %s", exc)
                 return self._relative_output_path(abs_path)
             index.pop(key, None)
             self._save_flatten_index(index)
@@ -2658,5 +2681,6 @@ class DreaminaCliService:
         finally:
             try:
                 os.remove(temp_path)
-            except Exception:
-                pass
+            except Exception as exc:
+                # 清理临时文件失败可忽略
+                _LOGGER.debug("清理临时文件失败: %s", exc)

@@ -10,6 +10,10 @@ import sys
 import threading
 import urllib.parse
 import urllib.request
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 try:
     import requests
@@ -357,8 +361,9 @@ def _reset_outbound_tls_state_for_tests():
         if _REQUESTS_SESSION is not None:
             try:
                 _REQUESTS_SESSION.close()
-            except Exception:
-                pass
+            except Exception as exc:
+                # 测试重置时关闭会话失败可忽略
+                _LOGGER.debug("关闭 requests 会话失败: %s", exc)
         _REQUESTS_SESSION = None
         _OUTBOUND_SSL_CONTEXT = None
         _OUTBOUND_TLS_STATUS = None

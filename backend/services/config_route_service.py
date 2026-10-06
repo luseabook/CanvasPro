@@ -1,6 +1,10 @@
 import json
 import os
 from backend.services.json_storage import atomic_write_json, json_file_lock, CorruptJSONError
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 
 
 class ConfigRouteService:
@@ -60,8 +64,9 @@ class ConfigRouteService:
             custom_ai = cfg.get("custom_ai", {}) if isinstance(cfg, dict) else {}
             cfg_url = custom_ai.get("apiUrl") or cfg.get("apiUrl", "")
             cfg_key = custom_ai.get("apiKey") or cfg.get("apiKey", "")
-        except Exception:
-            pass
+        except Exception as exc:
+            # 读取本地自定义 AI 配置失败时回落环境变量/空值
+            _LOGGER.debug("读取自定义 AI 配置失败: %s", exc)
 
         return {
             "apiUrl": env_url if env_url else cfg_url,
