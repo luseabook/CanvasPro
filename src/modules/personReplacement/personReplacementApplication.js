@@ -2769,6 +2769,18 @@ export function createReplacementStudioApplication({
     async persist() {
       return (await value195, await persistNow({ force: !workspacePersistenceCoordinator.isDirty() }));
     },
+    hasUnsavedChanges() {
+      return workspacePersistenceCoordinator.isDirty();
+    },
+    async prepareForClose() {
+      try {
+        await value195;
+        await workspacePersistenceCoordinator.flush({ force: false });
+        return { success: !workspacePersistenceCoordinator.isDirty() };
+      } catch (error) {
+        return { success: false, reason: 'workspace-save-failed', error: String(error?.message || error) };
+      }
+    },
     async destroy() {
       if (enabled) return;
       enabled = true;

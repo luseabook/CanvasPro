@@ -615,7 +615,7 @@ const completionNavigation = createCompletionNavigation({
 });
 const workspaceCloseGuard = installWorkspaceCloseGuard({
   windowObject: window,
-  getWorkspaces: () => [storyWorkspaceApi],
+  getWorkspaces: () => [storyWorkspaceApi, replacementStudioApplication],
 });
 registerPageTeardown(window, () =>
   runCleanupSteps([
