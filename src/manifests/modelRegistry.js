@@ -418,7 +418,7 @@ function assertExecutionTarget(enabled5) {
   if (!enabled5.workflowId && !enabled5.appId)
     throw new Error('[manifest] workflow execution missing workflowId/appId');
 }
-function assertUiSchema(value32) {
+function assertUiSchema(value32, source = 'model manifest') {
   const value33 = value32.uiSchema;
   assertPlainObject(value33, 'model manifest uiSchema');
   if (!Array.isArray(value33.fields))
@@ -427,9 +427,13 @@ function assertUiSchema(value32) {
     (assertPlainObject(item18, 'model manifest uiSchema.fields[' + value34 + ']'),
       assertRequiredFields(
         item18,
-        ['id', 'type', 'defaultValue'],
-        'model manifest uiSchema.fields[' + value34 + ']',
+        ['id', 'type'],
+        source + ' uiSchema.fields[' + value34 + ']',
       ));
+    if (!Object.prototype.hasOwnProperty.call(item18, 'defaultValue') || item18.defaultValue === undefined)
+      throw new Error(
+        '[manifest] ' + source + ' uiSchema.fields[' + value34 + '] missing required fields: defaultValue',
+      );
     const value35 = String(item18.type || '')
       .trim()
       .toLowerCase();
@@ -528,7 +532,7 @@ export function validateModelManifest(value47) {
     assertPlainObject(value47, 'model manifest'),
     assertRequiredFields(value47, REQUIRED_MODEL_FIELDS, 'model manifest'),
     assertAdapterType(value47.adapterType, 'model manifest'),
-    assertUiSchema(value47),
+    assertUiSchema(value47, 'model manifest ' + value47.modelId),
     assertInputSlots(value47),
     true
   );

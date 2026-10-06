@@ -89,6 +89,7 @@ import {
 import { buildCharacterAssetImageGenerationPayload } from '../characterAssets/characterAssetImageGeneration.js';
 import { getModelManifest } from '../../manifests/index.js';
 import { createWorkspacePersistenceCoordinator } from '../workspacePersistenceCoordinator.js';
+import { createWorkspaceRecoveryJournal } from '../workspaceRecoveryJournal.js';
 import { buildPersonReplacementWorkspaceSnapshot } from './personReplacementWorkspaceSnapshot.js';
 import { saveMediaDownload, saveMediaFilesDownload } from '../../services/downloadSaveService.js';
 import { checkLocalMediaExists } from '../../services/projectService.js';
@@ -429,6 +430,16 @@ export function createReplacementStudioApplication({
         persistenceState
       );
     },
+    workspaceRecoveryJournal = createWorkspaceRecoveryJournal({
+      storage: (() => {
+        try {
+          return windowObject?.localStorage;
+        } catch {
+          return null;
+        }
+      })(),
+      key: 'canvas:person-replacement-workspace-recovery',
+    }),
     workspacePersistenceCoordinator = createWorkspacePersistenceCoordinator({
       ready: false,
       debounceMs: 350,
@@ -440,6 +451,7 @@ export function createReplacementStudioApplication({
       clearTimeoutFn: windowObject?.clearTimeout?.bind?.(windowObject),
       onStateChange: ({ status: status2, error: error4, retryAttempt: retryAttempt2 }) => {
         handler9(status2, { error: error4, retryAttempt: retryAttempt2 });
+        if (status2 === 'saved') workspaceRecoveryJournal.clear();
       },
       onError: (value19) => {
         console.warn('[replacementStudio] persist failed', value19);
@@ -447,8 +459,13 @@ export function createReplacementStudioApplication({
     }),
     persistNow = ({ force: force = false } = {}) =>
       enabled ? Promise.resolve(null) : workspacePersistenceCoordinator.flush({ force: force }),
+    writeRecoveryJournal = () => {
+      if (enabled || !workspacePersistenceCoordinator.isDirty()) return;
+      workspaceRecoveryJournal.write((rememberProject(), cloneJson(args)));
+    },
     flushWhenHidden = () => {
       if (documentObject?.visibilityState !== 'hidden' || enabled) return;
+      writeRecoveryJournal();
       void workspacePersistenceCoordinator.flush({ force: true }).catch((error) => {
         handler9('error', { error: error?.message || error });
         console.error('[replacementStudio] background flush failed', error);
@@ -456,6 +473,7 @@ export function createReplacementStudioApplication({
     },
     schedulePersistence = () => {
       if (enabled) return;
+      workspaceRecoveryJournal.write((rememberProject(), cloneJson(args)));
       workspacePersistenceCoordinator.schedule();
     },
     syncWorkspace = () => workspace?.setProject?.(snapshot()),
@@ -465,6 +483,7 @@ export function createReplacementStudioApplication({
       return syncWorkspace();
     };
   documentObject?.addEventListener?.('visibilitychange', flushWhenHidden);
+  windowObject?.addEventListener?.('pagehide', writeRecoveryJournal);
   projectSession.connect({
     rememberProject: rememberProject,
     presentProject: ({ presentation: presentation }) => {
@@ -2666,8 +2685,11 @@ export function createReplacementStudioApplication({
         enabled17 = true;
         return;
       }
-      const args39 = normalizePersonReplacementProjectLibrary(await loadWorkspace()),
+      const loadedWorkspace = await loadWorkspace(),
+        recoveryEntry = workspaceRecoveryJournal.read(),
+        args39 = normalizePersonReplacementProjectLibrary(recoveryEntry?.snapshot || loadedWorkspace),
         list21 = args39.projects.filter(isPersistable);
+      if (recoveryEntry) showToast('已恢复上次浏览器意外退出前尚未同步的项目内容。', 'info');
       payload = list21.length !== args39.projects.length;
       const list22 = list21.map((value196) => {
           const settleInterruptedReplacementStudioProjectTasks2 =
@@ -2793,6 +2815,7 @@ export function createReplacementStudioApplication({
         console.error('[replacementStudio] final persistence failed', error);
       }
       (documentObject?.removeEventListener?.('visibilitychange', flushWhenHidden),
+        windowObject?.removeEventListener?.('pagehide', writeRecoveryJournal),
         coordinator.invalidate(),
         abortController?.abort?.(),
         (abortController = null),
