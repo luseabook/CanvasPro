@@ -7,7 +7,7 @@
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
-    "test": "npm run check:obfuscation && npm run test:js && npm run test:backend",
+    "test": "npm run check:obfuscation && npm run test:js && npm run check:csp && npm run test:backend",
     "test:js": "node --test \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
     "test:e2e": "playwright test",
     "web": "venv\\Scripts\\python.exe server.py",
@@ -19,6 +19,7 @@
     "test:backend": "node tools/run-backend-tests.mjs",
     "verify:startup": "node tools/verify-startup.mjs",
     "check:obfuscation": "node tools/deobf-gate.mjs",
+    "check:csp": "node tools/check-csp.mjs",
     "build:win": "electron-builder --win --config electron-builder.win.cjs --publish never",
     "test:desktop": "playwright test --config playwright.desktop.config.js",
     "test:migrations": "node tools/check-migrations.mjs",

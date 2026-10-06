@@ -52,6 +52,9 @@ jobs:
       - name: JavaScript unit tests
         run: npm run test:js
 
+      - name: CSP static checks
+        run: npm run check:csp
+
       - name: Backend Python tests
         run: npm run test:backend
 
