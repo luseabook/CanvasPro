@@ -2452,7 +2452,7 @@ async function renderFixedRefBarForTest({
           [id21]: {
             id: id21,
             type: 'ai-video',
-            model: 'apimart/seedance-1.0',
+            model: 'apimart/seedance-1.0-pro-fast',
             provider: 'apimart',
           },
           [id22]: { id: id22, type: 'source-text', content: '用文本入参生成视频' },

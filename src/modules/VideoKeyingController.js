@@ -55,6 +55,7 @@ import {
   isVideoKeyingSourceVideoTooLarge,
 } from './videoKeyingSourceVideoLimit.js';
 import {
+  VIDEO_KEYING_TASK_CHANGE_EVENT,
   cancelVideoKeyingTaskForNode,
   getRunningVideoKeyingTaskForNode,
   runVideoKeyingTask,
@@ -621,6 +622,13 @@ const REMOVE_POS_POINT_LIMIT = 3000,
     },
     _cancelRhTaskForSourceNode(value58, value59 = {}) {
       return cancelVideoKeyingTaskForNode(value58, value59);
+    },
+    TASK_CHANGE_EVENT: VIDEO_KEYING_TASK_CHANGE_EVENT,
+    hasRunningKeyingTaskForNode(nodeId) {
+      return !!getRunningVideoKeyingTaskForNode(nodeId, { mode: 'keying' });
+    },
+    cancelRunningKeyingTaskForNode(nodeId, options = {}) {
+      return cancelVideoKeyingTaskForNode(nodeId, { ...options, mode: 'keying' });
     },
     getPosNegPoints() {
       if (this._isRemoveUiMode()) {

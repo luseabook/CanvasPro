@@ -2190,11 +2190,12 @@ export function createVideoNodeParameterPanelModule(scope) {
         return;
       }
       const run10 = () =>
+        inEdges2.length > 0 ||
         evaluateGenerationPromptBoundary({
           model: modelId2?.model,
           provider: modelId2?.provider,
           promptText: promptText,
-          hasInput: false,
+          hasInput: inEdges2.length > 0,
         }).ok;
       if (isHappyHorsePanelModel(modelId2)) {
         this.btnEl.disabled = !promptText;
@@ -2244,10 +2245,13 @@ export function createVideoNodeParameterPanelModule(scope) {
           }),
           value242 = value237 && value239;
         this.btnEl.disabled = !(value242 && run10());
+        if (this.btnEl.style)
+          this.btnEl.style.cursor = this.btnEl.disabled ? 'var(--unavailable-cursor)' : '';
         if (!this.btnEl.disabled) run9();
         return;
       }
       this.btnEl.disabled = !run10();
+      if (!this.btnEl.disabled && this.btnEl.style) this.btnEl.style.cursor = '';
       if (!this.btnEl.disabled) run9();
     }
   }

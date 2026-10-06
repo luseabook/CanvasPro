@@ -62,17 +62,24 @@ function validateApimartVeo3ImageCount(
     message: ok <= 2 ? '' : 'VEO3 首尾帧模式最多接入 2 张图片',
   });
 }
-export function apimartOmniFlashVideo({ currentBody: currentBody }) {
+export function apimartOmniFlashVideo({ currentBody: currentBody, payload: payload = {} }) {
   const target = { ...currentBody };
   if (!String(target.prompt || '').trim())
     throw new Error('Gemini Omni 1.1 Flash Ext requires a prompt');
-  const source = String(target.generation_type || 'frame')
+  const list = normalizeInputList(target.image_urls),
+    source = String(
+      list.length > 1
+        ? 'reference'
+        : target.generation_type ||
+            payload?.generationParams?.generation_type ||
+            payload?.generation_type ||
+            'frame',
+    )
     .trim()
     .toLowerCase();
   if (source !== 'frame' && source !== 'reference')
     throw new Error('Gemini Omni 1.1 Flash Ext generation_type must be frame or reference');
   target.generation_type = source;
-  const list = normalizeInputList(target.image_urls);
   if (source === 'frame' && list.length > 1)
     throw new Error('Gemini Omni 1.1 Flash Ext frame mode supports at most 1 image');
   if (source === 'reference' && list.length > 0 && list.length !== 1 && list.length !== 3)
@@ -217,6 +224,26 @@ export function apimartHailuo23Video({
   if (value5 === 'minimax-hailuo-2.3-fast' && !String(value3.first_frame_image || '').trim())
     throw new Error('APIMart Hailuo 2.3 Fast requires first_frame_image input');
   return value3;
+}
+export function apimartHailuo02Video({
+  currentBody: currentBody4,
+  inputImages: inputImages = [],
+  finalUrlsBySlot: finalUrlsBySlot = {},
+}) {
+  const body = { ...currentBody4 },
+    inputs = normalizeInputList(inputImages),
+    slots = normalizeInputUrlsBySlot(finalUrlsBySlot),
+    hasSlots = Object.keys(slots).length > 0;
+  delete body.first_frame_image;
+  delete body.last_frame_image;
+  if (hasSlots) {
+    if (slots.firstFrame) body.first_frame_image = slots.firstFrame;
+    if (slots.lastFrame) body.last_frame_image = slots.lastFrame;
+  } else {
+    if (inputs[0]) body.first_frame_image = inputs[0];
+    if (inputs[1]) body.last_frame_image = inputs[1];
+  }
+  return body;
 }
 function removeApimartMinimaxH3TransientFields(value6) {
   (delete value6.apimart_minimax_h3_mode,

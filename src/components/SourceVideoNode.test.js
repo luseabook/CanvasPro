@@ -356,12 +356,16 @@ function markVideoFramePresented(videoEl) {
       outId = createFrameInterpolationNode({
         id: 'source-video-matting-a',
         model: 'runninghub/video_matting',
+        rhSourceNodeId: sourceNodeId.id,
+        rhTaskId: 'task-a',
         rhTaskStatus: 'running',
         outputText: '模型: RH视频抠像\n状态: 处理中',
       }),
       outId2 = createFrameInterpolationNode({
         id: 'source-video-matting-b',
         model: 'runninghub/video_matting',
+        rhSourceNodeId: sourceNodeId2.id,
+        rhTaskId: 'task-b',
         rhTaskStatus: 'running',
         outputText: '模型: RH视频抠像\n状态: 处理中',
       });
@@ -371,30 +375,11 @@ function markVideoFramePresented(videoEl) {
       [outId.id]: outId,
       [outId2.id]: outId2,
     }),
-      value18._rhTasks.clear(),
-      value18._rhTasks.set(sourceNodeId.id, {
-        id: 'ctx-a',
-        running: true,
-        sourceNodeId: sourceNodeId.id,
-        outId: outId.id,
-        mode: 'keying',
-        abort: { abort() {} },
-      }),
-      value18._rhTasks.set(sourceNodeId2.id, {
-        id: 'ctx-b',
-        running: true,
-        sourceNodeId: sourceNodeId2.id,
-        outId: outId2.id,
-        mode: 'keying',
-        abort: { abort() {} },
-      }));
+      value18.__resetTaskRuntimeForTest?.());
     const value19 = await value18.cancelRunningKeyingTaskForNode(outId.id);
     (assert.equal(value19, true),
-      assert.equal(value18._rhTasks.has(sourceNodeId.id), false),
-      assert.equal(value18._rhTasks.has(sourceNodeId2.id), true),
       assert.equal(appStore.getState().nodes[outId.id].rhTaskStatus, 'cancelled'),
       assert.equal(appStore.getState().nodes[outId2.id].rhTaskStatus, 'running'),
-      value18._rhTasks.clear(),
       resetStore());
   }),
   test('videoToolbar: 结果节点抠像按钮在任务中显示并触发取消', async () => {
@@ -408,19 +393,13 @@ function markVideoFramePresented(videoEl) {
       [id6]: createFrameInterpolationNode({
         id: id6,
         model: 'runninghub/video_matting',
+        rhSourceNodeId: id5,
+        rhTaskId: 'task-keying',
         rhTaskStatus: 'running',
         outputText: '模型: RH视频抠像\n状态: 处理中',
       }),
     }),
-      value20._rhTasks.clear(),
-      value20._rhTasks.set(id5, {
-        id: 'ctx-keying',
-        running: true,
-        sourceNodeId: id5,
-        outId: id6,
-        mode: 'keying',
-        abort: { abort() {} },
-      }));
+      value20.__resetTaskRuntimeForTest?.());
     const el2 = createFakeButton(),
       fakeToolbar = createFakeToolbar(el2);
     (bindVideoToolbarEvents(fakeToolbar, { id: id6, type: 'source-video' }),
@@ -429,11 +408,9 @@ function markVideoFramePresented(videoEl) {
       assert.equal(el2.dataset.tooltip, '取消抠像任务'),
       el2.dispatchClick(),
       await new Promise((value21) => setTimeout(value21, 0)),
-      assert.equal(value20._rhTasks.has(id5), false),
       assert.equal(el2.classList.contains('is-task-cancel'), false),
       assert.match(el2.innerHTML, /data-original-keying/),
       assert.equal(appStore.getState().nodes[id6].rhTaskStatus, 'cancelled'),
-      value20._rhTasks.clear(),
       resetStore());
   }),
   test('videoToolbar: 只靠 Store 中的抠像结果节点也显示取消态', async () => {
@@ -454,7 +431,7 @@ function markVideoFramePresented(videoEl) {
         outputText: '模型: RH视频抠像\n状态: 处理中',
       }),
     }),
-      value22._rhTasks.clear());
+      value22.__resetTaskRuntimeForTest?.());
     const el3 = createFakeButton(),
       fakeToolbar2 = createFakeToolbar(el3);
     (bindVideoToolbarEvents2(fakeToolbar2, { id: id8, type: 'source-video' }),
@@ -483,7 +460,7 @@ function markVideoFramePresented(videoEl) {
         outputText: '模型: RH视频抠像\n状态: 完成',
       }),
     }),
-      value23._rhTasks.clear());
+      value23.__resetTaskRuntimeForTest?.());
     const el4 = createFakeButton(),
       fakeToolbar3 = createFakeToolbar(el4);
     (bindVideoToolbarEvents3(fakeToolbar3, { id: id10, type: 'source-video' }),

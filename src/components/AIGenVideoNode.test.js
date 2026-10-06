@@ -214,6 +214,7 @@ function createElementStub() {
       (aIGenVideoNode4._syncGenerationNodeHelpTip = () => {}),
       (aIGenVideoNode4._renderRefBar = () => {}),
       (aIGenVideoNode4._syncBtnIconState = () => {}),
+      (aIGenVideoNode4._mustRenderTerminalVideoState = () => false),
       (aIGenVideoNode4._setVideoOverlaysVisible = () => {}));
     let value4 = 0;
     ((aIGenVideoNode4._runAdaptiveRatio = () => {

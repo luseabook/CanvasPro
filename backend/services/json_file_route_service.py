@@ -2,6 +2,8 @@ import json
 import os
 import re
 import threading
+import time
+from contextlib import contextmanager
 from urllib.parse import parse_qs, unquote, urlparse
 
 from backend.services.media_file_route_service import MediaFileRouteService
@@ -99,6 +101,35 @@ class JsonFileRouteService:
 
     def _write_json_file(self, path, data):
         self._atomic_write_json(path, data)
+
+    @staticmethod
+    @contextmanager
+    def _exclusive_file_lock(path, timeout_seconds=5.0, stale_seconds=30.0):
+        lock_path = str(path) + ".lock"
+        deadline = time.monotonic() + timeout_seconds
+        descriptor = None
+        while descriptor is None:
+            try:
+                descriptor = os.open(lock_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+                os.write(descriptor, f"{os.getpid()} {time.time()}".encode("ascii"))
+            except FileExistsError:
+                try:
+                    if time.time() - os.path.getmtime(lock_path) > stale_seconds:
+                        os.unlink(lock_path)
+                        continue
+                except FileNotFoundError:
+                    continue
+                if time.monotonic() >= deadline:
+                    raise TimeoutError("Workspace lock timeout")
+                time.sleep(0.01)
+        try:
+            yield
+        finally:
+            os.close(descriptor)
+            try:
+                os.unlink(lock_path)
+            except FileNotFoundError:
+                pass
 
     def _list_projects(self):
         canvas_dir = self._get_canvas_dir()
@@ -399,7 +430,7 @@ class JsonFileRouteService:
                 expected_revision = int(data["expectedRevision"])
             except (TypeError, ValueError):
                 return self._json_err(400, "Invalid expectedRevision")
-            with self._workspace_revision_lock:
+            with self._workspace_revision_lock, self._exclusive_file_lock(file_path):
                 current_revision = 0
                 if os.path.exists(file_path):
                     with open(file_path, "r", encoding="utf-8-sig") as file:

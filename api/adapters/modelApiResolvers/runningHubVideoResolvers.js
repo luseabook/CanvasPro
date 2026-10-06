@@ -954,6 +954,65 @@ export function runninghubKlingO3VideoEndpoint({
   });
   return RUNNINGHUB_KLING_O3_ENDPOINTS[model6]?.[route5] || RUNNINGHUB_KLING_O3_ENDPOINTS.std.text;
 }
+const RUNNINGHUB_HAILUO_02_ENDPOINTS = Object.freeze({
+  t2vStandard: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/t2v-standard',
+  t2vPro: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/t2v-pro',
+  i2vStandard: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/i2v-standard',
+  i2vPro: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/i2v-pro',
+  fast: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-02/fast',
+});
+function getRunningHubHailuo02Quality(payload = {}, body = {}) {
+  const quality = String(
+    body.rh_hailuo_02_quality || payload?.generationParams?.rh_hailuo_02_quality || payload?.rh_hailuo_02_quality || '',
+  ).toLowerCase();
+  return quality === 'pro' || quality === 'fast' ? quality : 'standard';
+}
+function collectRunningHubHailuo02FrameImages({ inputImages = [], finalUrlsBySlot = {} } = {}) {
+  const images = [], slots = normalizeInputUrlsBySlot(finalUrlsBySlot);
+  appendUniqueUrl(images, slots.firstFrame);
+  normalizeInputList(inputImages).forEach((url) => appendUniqueUrl(images, url));
+  appendUniqueUrl(images, slots.lastFrame);
+  return images;
+}
+function resolveRunningHubHailuo02Route(options = {}) {
+  const quality = getRunningHubHailuo02Quality(options.payload, options.currentBody),
+    hasImage = collectRunningHubHailuo02FrameImages(options).length > 0;
+  if (quality === 'fast') return 'fast';
+  if (quality === 'pro') return hasImage ? 'i2vPro' : 't2vPro';
+  return hasImage ? 'i2vStandard' : 't2vStandard';
+}
+export function runninghubHailuo02Video({
+  currentBody = {}, inputImages = [], inputVideos = [], payload = {}, finalUrlsBySlot = {},
+}) {
+  const body = { ...currentBody }, prompt = String(body.prompt || payload?.prompt || '').trim(),
+    quality = getRunningHubHailuo02Quality(payload, body),
+    images = collectRunningHubHailuo02FrameImages({ inputImages, finalUrlsBySlot });
+  if (!prompt) throw new Error('RunningHub Hailuo 02 prompt is required');
+  if (normalizeInputList(inputVideos).length > 0) throw new Error('RunningHub Hailuo 02 does not accept video input');
+  if (images.length > 2) throw new Error('RunningHub Hailuo 02 supports at most firstImageUrl and lastImageUrl');
+  Object.assign(body, { prompt, duration: normalizeRunningHubHailuo23Duration(body.duration) });
+  delete body.rh_hailuo_02_quality;
+  delete body.firstImageUrl;
+  delete body.lastImageUrl;
+  delete body.imageUrl;
+  delete body.imageUrls;
+  delete body.videoUrl;
+  if (quality === 'fast') {
+    if (!images[0]) throw new Error('RunningHub Hailuo 02 Fast requires imageUrl');
+    body.imageUrl = images[0];
+    return body;
+  }
+  if (quality === 'pro') {
+    delete body.duration;
+    if (images.length > 1) throw new Error('RunningHub Hailuo 02 Pro supports only firstImageUrl');
+  }
+  if (images[0]) body.firstImageUrl = images[0];
+  if (images[1]) body.lastImageUrl = images[1];
+  return body;
+}
+export function runninghubHailuo02VideoEndpoint(options = {}) {
+  return RUNNINGHUB_HAILUO_02_ENDPOINTS[resolveRunningHubHailuo02Route(options)];
+}
 const RUNNINGHUB_HAILUO_23_ENDPOINTS = Object.freeze({
   t2vStandard: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3/t2v-standard',
   t2vPro: 'https://www.runninghub.cn/openapi/v2/minimax/hailuo-2.3/t2v-pro',

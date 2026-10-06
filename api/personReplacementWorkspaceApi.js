@@ -11,12 +11,19 @@ export async function fetchReplacementStudioWorkspaceFromServer() {
   return response.workspace && typeof response.workspace === 'object' ? response.workspace : response;
 }
 export async function saveReplacementStudioWorkspaceToServer(value) {
-  const response = await post(PERSON_REPLACEMENT_WORKSPACE_USER_FILE, {
-    expectedRevision: workspaceRevision,
-    workspace: value || {},
-  }, {
-    provider: 'local',
-  });
+  let response;
+  try {
+    response = await post(PERSON_REPLACEMENT_WORKSPACE_USER_FILE, {
+      expectedRevision: workspaceRevision,
+      workspace: value || {},
+    }, { provider: 'local' });
+  } catch (error) {
+    if (Number(error?.status || error?.statusCode) === 409) {
+      error.code = 'WORKSPACE_REVISION_CONFLICT';
+      error.message = '工作区已在其他窗口更新。请刷新后合并最新内容，再重新保存。';
+    }
+    throw error;
+  }
   workspaceRevision = Math.max(workspaceRevision, Math.trunc(Number(response?.workspaceRevision) || 0));
   return response;
 }

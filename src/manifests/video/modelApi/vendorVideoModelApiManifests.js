@@ -2610,6 +2610,12 @@ const APIMART_VIDEO_LEGACY_BODY_MAPPING = Object.freeze([
     APIMART_VIDEO_RESOLUTION_4K_ENTRY,
     APIMART_VIDEO_ASPECT_RATIO_ENTRY,
     Object.freeze({
+      path: 'generation_type',
+      from: 'param',
+      field: Object.freeze(['generationParams.generation_type', 'generation_type']),
+      defaultValue: 'frame',
+    }),
+    Object.freeze({
       ...APIMART_VIDEO_IMAGE_URLS_ENTRY,
       transform: Object.freeze({
         name: 'imageCountOptions',
@@ -3159,7 +3165,10 @@ const APIMART_VIDEO_MODELS = Object.freeze([
         cycleFixedInputWhenFull: true,
       }),
       bodyMapping: APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING,
-      executionExtensions: Object.freeze({ bodyResolver: 'apimartHappyHorseVideo' }),
+      executionExtensions: Object.freeze({
+        bodyResolver: 'apimartHappyHorseVideo',
+        videoFamily: 'happyHorse',
+      }),
       prompt: Object.freeze({
         placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
         variants: Object.freeze([
@@ -3231,9 +3240,10 @@ const APIMART_VIDEO_MODELS = Object.freeze([
         video: 5,
         audio: 1,
         fixedSlots: WAN27_FIXED_INPUT_SLOTS,
+        preserveHiddenInputsByKind: true,
       }),
       bodyMapping: APIMART_VIDEO_WAN27_BODY_MAPPING,
-      executionExtensions: Object.freeze({ bodyResolver: 'apimartWan27Video' }),
+      executionExtensions: Object.freeze({ bodyResolver: 'apimartWan27Video', videoFamily: 'wan27' }),
       prompt: Object.freeze({
         placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
         variants: Object.freeze([

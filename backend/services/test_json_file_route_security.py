@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+import threading
 import unittest
 from pathlib import Path
 
@@ -90,6 +91,32 @@ class JsonFileRouteSecurityTest(unittest.TestCase):
         self.assertEqual(stale["code"], 409)
         loaded = self.service.handle_get(None, path)
         self.assertEqual(loaded["data"]["workspace"], {"project": "first"})
+
+    def test_replacement_workspace_cas_is_shared_across_service_instances(self):
+        def atomic_write(path, value):
+            Path(path).write_text(json.dumps(value), encoding="utf-8")
+        self.service._atomic_write_json = atomic_write
+        second = JsonFileRouteService(
+            canvas_dir_getter=lambda: str(self.canvas), assets_dir_getter=lambda: str(self.assets),
+            workflows_dir_getter=lambda: str(self.workflows), user_dir_getter=lambda: str(self.user),
+            read_user_settings=lambda: {}, write_user_settings=lambda value: None,
+            atomic_write_json=atomic_write,
+        )
+        path = "/api/v2/user/person-replacement-workspace.json"
+        barrier = threading.Barrier(2)
+        results = []
+        def save(service, name):
+            barrier.wait()
+            results.append(service.handle_post(None, path, json.dumps({
+                "expectedRevision": 0, "workspace": {"project": name},
+            })))
+        threads = [threading.Thread(target=save, args=(service, name)) for service, name in (
+            (self.service, "first"), (second, "second"),
+        )]
+        for thread in threads: thread.start()
+        for thread in threads: thread.join()
+        self.assertEqual(sorted(result.get("code", 200) for result in results), [200, 409])
+        self.assertFalse((self.user / "person-replacement-workspace.json.lock").exists())
 
 
 if __name__ == "__main__":

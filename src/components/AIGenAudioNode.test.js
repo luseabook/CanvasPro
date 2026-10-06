@@ -52,6 +52,7 @@ let store,
 function restoreStore() {
   if (!store || !originalStoreFns) return;
   ((store.getState = originalStoreFns.getState),
+    (store.getStateRaw = originalStoreFns.getStateRaw),
     (store.getIncomingEdges = originalStoreFns.getIncomingEdges),
     (store.updateNodeData = originalStoreFns.updateNodeData));
 }
@@ -62,6 +63,7 @@ function restoreStore() {
   ((AIGenAudioNode = importValue2.AIGenAudioNode),
     (originalStoreFns = {
       getState: store.getState,
+      getStateRaw: store.getStateRaw,
       getIncomingEdges: store.getIncomingEdges,
       updateNodeData: store.updateNodeData,
     }));
@@ -202,6 +204,7 @@ function createTestContext({
     },
   };
   ((store.getState = () => state),
+    (store.getStateRaw = () => state),
     (store.getIncomingEdges = (payload) => incomingEdges.filter((item4) => item4.targetId === payload)),
     (store.updateNodeData = (handle, args) => {
       const args2 = state.nodes?.[handle] || {};

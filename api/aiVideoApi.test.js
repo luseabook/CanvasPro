@@ -638,6 +638,7 @@ import { __test__, buildGenerateVideoRequest, generateVideo, resumeAsyncVideoTas
               model: 'apimart/omni-flash-ext',
               prompt: 'blend two references',
               inputUrls: ['https://cdn.apimart.ai/omni-a.png', 'https://cdn.apimart.ai/omni-b.png'],
+              generationParams: { generation_type: 'reference' },
             }),
           /Gemini Omni Flash supports only 1 or 3 reference images/,
         ));

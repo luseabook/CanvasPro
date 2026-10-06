@@ -36,3 +36,19 @@ test('personReplacementWorkspaceApi: keeps compatibility aliases and local reque
     globalThis.fetch = originalFetch;
   }
 });
+
+test('personReplacementWorkspaceApi: exposes revision conflicts with actionable guidance', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify({error: 'Workspace revision conflict'}), {
+    status: 409, headers: {'content-type': 'application/json'},
+  });
+  try {
+    await assert.rejects(saveReplacementStudioWorkspaceToServer({scene: 'stale'}), error => {
+      assert.equal(error.code, 'WORKSPACE_REVISION_CONFLICT');
+      assert.match(error.message, /其他窗口更新/);
+      return true;
+    });
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});

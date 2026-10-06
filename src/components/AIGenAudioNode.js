@@ -1149,9 +1149,11 @@ export class AIGenAudioNode {
           sourceId: edgeId.sourceId,
           sourceType: sourceType,
           refSlot: String(edgeId?.refSlot || ''),
-          fileName: fileName.fileName,
-          size: fileName.fileSize,
-          audioDuration: pickAudioDurationSec(fileName.audioDuration, fileName.duration),
+          ...(fileName.fileName ? { fileName: fileName.fileName } : {}),
+          ...(fileName.fileSize != null ? { size: fileName.fileSize } : {}),
+          ...(pickAudioDurationSec(fileName.audioDuration, fileName.duration) > 0
+            ? { audioDuration: pickAudioDurationSec(fileName.audioDuration, fileName.duration) }
+            : {}),
           url: url,
         });
         return;
