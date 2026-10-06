@@ -7,7 +7,8 @@
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
-    "test": "npm run check:obfuscation && node --test \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
+    "test": "npm run check:obfuscation && npm run test:js && npm run test:backend",
+    "test:js": "node --test \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
     "test:e2e": "playwright test",
     "web": "venv\\Scripts\\python.exe server.py",
     "desktop": "set \"AICANVAS_PORT=8778\" && electron .",
