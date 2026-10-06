@@ -369,11 +369,11 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-06（171 批·**应用恢复启动，复刻工作室真机验证通过**）：补回 `index.html` 的 `.canvas-shortcuts-rail`——纯容器，
-  由 JS `replaceChildren` 填充；全仓无创建者、无 CSS、打包产物同样缺，判为丢失。补后**应用完成启动**。真机实测：切换器渲染、
-  **复刻工作室卡片带 `beta`+`VIP` 徽章与副标题「复刻短剧、二创出海」**、点击触发 `subscriptionGateOverlay`（「需要VIP授权…输入 CDKEY」，
-  即项目现有授权码链路）。顺带补 `emptyHint.onboarding.*` 四个 i18n 键（zh-CN/en-US 原本都缺）。
-  3 件改动；回归 **11186/28** 与基线**逐条一致，零回归**。详见 `docs/b170-startup-chain.md`。
+- 2026-10-06（172 批·**补齐空画布上手引导样式**）：`canvas-onboarding*` 四类在仓库与打包产物中均无样式定义，
+  导致「连接模型／创建节点」按钮挤在标题左侧并与徽章重叠。按其用途补最小布局（沿用 `.pill-btn` 的令牌语言），
+  并显式恢复 `pointer-events:auto`（父级 `.empty-hint` 为 none）、补 `[hidden]` 覆盖（`display:flex` 会压过 UA 的 hidden 规则）。
+  **踩坑**：先写进 `styles/canvas.css` 不生效——`index.html` 只 link 了 `style.css`（669 KB 合集），二者同内容、只有它被加载；已同步。
+  真机实测：容器 `display:flex`、宽 254，步骤 110×43、当前步边框蓝色、无重叠。回归 11186/28 零回归。
 
 ## 12. 变更记录机制（**已冻结**）
 
