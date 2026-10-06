@@ -73,6 +73,7 @@ from backend.services.subscription_gate_manifest import (
 from backend.services.subscription_client import SubscriptionRemoteClient
 from backend.services.dreamina_cli_service import DreaminaCliService
 from backend.services.dreamina_route_service import DreaminaRouteService
+from backend.services.outbound_http_transport import unsafe_remote_url_reason
 
 mimetypes.add_type("text/javascript; charset=utf-8", ".js")
 mimetypes.add_type("text/javascript; charset=utf-8", ".mjs")
@@ -2451,7 +2452,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         resolved = self._resolve_static_file(path)
         return resolved[0] if resolved else ""
 
-    # 屏蔽日志噪音（按霢注释掉）
+    # 屏蔽日志噪音（按需注释掉）
     def log_message(self, fmt, *args):
         pass
 
@@ -2719,6 +2720,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     file_extension = (os.path.splitext(filename)[1] or "").lstrip(".")
                 if not file_extension:
                     file_extension = (mimetypes.guess_extension(file_content_type) or ".bin").lstrip(".")
+
+                # 出站请求前校验目标 URL，阻断 SSRF（含 IP 字面量与非公网解析）。
+                unsafe_reason = unsafe_remote_url_reason(api_url)
+                if unsafe_reason:
+                    _json_err(self, 400, unsafe_reason); return
 
                 if api_key and file_content_type.lower().startswith("image/"):
                     normalized_api_url = _normalize_apimart_base_url(api_url)
@@ -3140,6 +3146,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 _json_err(self, 400, "Invalid JSON"); return
             if not api_url or not api_key:
                 _json_err(self, 400, "Missing apiUrl or apiKey"); return
+            # 出站请求前校验目标 URL，阻断 SSRF。
+            unsafe_reason = unsafe_remote_url_reason(api_url)
+            if unsafe_reason:
+                _json_err(self, 400, unsafe_reason); return
             local_authorization_payload = dict(data) if isinstance(data, dict) else {}
             for key in SUBSCRIPTION_AUTHORIZATION_ID_KEYS:
                 data.pop(key, None)
@@ -3359,6 +3369,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not api_url or not api_key:
                 _json_err(self, 400, "Missing apiUrl or apiKey"); return
             
+            # 出站请求前校验目标 URL，阻断 SSRF。
+            unsafe_reason = unsafe_remote_url_reason(api_url)
+            if unsafe_reason:
+                _json_err(self, 400, unsafe_reason); return
             # 兼容 Gemini 和 OpenAI 风格接口
             if (
                 ":generateContent" in api_url
@@ -3497,6 +3511,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if not api_url or not api_key or not model or not prompt:
                 _json_err(self, 400, "Missing required fields: apiUrl, apiKey, model, prompt"); return
             
+            # 出站请求前校验目标 URL，阻断 SSRF。
+            unsafe_reason = unsafe_remote_url_reason(api_url)
+            if unsafe_reason:
+                _json_err(self, 400, unsafe_reason); return
             # 若未指定完整端点，则默认拼接 /chat/completions
             endpoint = api_url if api_url.endswith("/chat/completions") else f"{api_url}/chat/completions"
             
