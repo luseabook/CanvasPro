@@ -4,6 +4,11 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-06（175 批·**复刻子系统整代升到 0.8.0**）：把复刻相关 60 件旧代文件整件升代（domain 27 / api 8 / ws 25），
+  补传递闭包 9 件，连带升级唯一被打破的非复刻消费方 `storyEpisodeSplitPartialRepair.js`。**分层升级不可行**：0.8.0 改了导出名与契约
+  （时间模型 `integer-seconds`→`seconds`+0.1、观察镜头 `sound` 清空、窗口映射改附件），须整代替换。
+  `replicationWorkspaceBetaNotice` 与 `storyReplicationDefinitions` **保留方案二外科版**未升。同步更新 9 个测试文件 20 处断言。
+  验证：闭包 484 件 0 缺失、闸门 PASS、MD5 未变、回归 **11215/11186/28** 与基线逐条一致，零回归。79 件改动。
 - 2026-10-06（174 批·**空画布快捷/模板卡片可点击修复**）：`.canvas-shortcuts-rail` 缺 `pointer-events:auto`——父级 `.empty-hint` 是 none
   （兄弟 `.empty-hint-pills` 显式恢复过），故卡片计算值为 none、命中测试落到画布上，**空画布里的卡片完全点不动**。补一条规则
   （`style.css` 与 `styles/canvas.css` 同步）。真机实测：rail/card `auto`、命中到 `SPAN.canvas-shortcut-name`、hover 展开副标题、

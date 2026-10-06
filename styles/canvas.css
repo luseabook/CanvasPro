@@ -1352,3 +1352,71 @@ button.canvas-onboarding-step:hover {
 .v2-crop-size-label.is-redraw-armed:not(.is-redraw-dragging) {
   opacity: 0;
 }
+
+/* ==== 快捷方式/模板库样式（移植自 SHUO Canvas 0.8.0 styles/canvas.css 开头段）
+   仓库此前的 canvas.css 缺少这约 9 KB：rail 的 grid 布局与 pointer-events、
+   .canvas-shortcut-* 卡片/徽章/图标配色、模板菜单、管理弹窗，以及 has-template-library 响应式规则。
+   注意：同一段里的 canvas-onboarding 规则**未移植**——上游引导 JS 是 6982 字节的新版，
+   仓库是 3928 字节的旧版，直接套用会错位。 */
+.canvas-shortcuts-rail{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,240px));justify-content:center;gap:8px;width:100%;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable both-edges;padding:3px;pointer-events:auto}
+.canvas-shortcut-card{min-width:0}
+.canvas-shortcuts-preview{width:min(240px,100%)}
+.canvas-shortcuts-menu{width:min(280px,calc(100vw - 16px));transform-origin:bottom center}
+.canvas-shortcuts-menu .v2-menu-leading-icon img{width:100%;height:100%;object-fit:cover;border-radius:var(--radius-4)}
+.canvas-shortcuts-menu .v2-menu-txt-wrap{min-width:0}
+.canvas-shortcuts-menu :is(.v2-menu-lbl,.v2-menu-sub){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.canvas-shortcuts-menu .v2-menu-row:focus-visible{outline:0;background:var(--fill-hover)}
+.canvas-shortcuts-menu .v2-menu-row:focus-visible :is(.v2-menu-lbl,.v2-menu-sub){transform:none;opacity:1}
+.v2-node-menu-compact .canvas-shortcut-card.v2-menu-row{font-family:var(--canvas-menu-font-family);height:56px;padding:7px 13px 7px 7px;gap:12px;border-radius:var(--radius-16);background:var(--bg-panel-card);border-color:var(--stroke-default);margin-bottom:0}
+.v2-node-menu-compact .canvas-shortcut-card.v2-menu-row .v2-menu-ico{width:42px;height:42px}
+.v2-node-menu-compact .canvas-shortcut-card.v2-menu-row .v2-menu-ico svg{width:22px;height:22px}
+.v2-node-menu-compact .canvas-shortcut-card.v2-menu-row.has-desc .v2-menu-txt-wrap{height:42px}
+.v2-node-menu-compact .canvas-shortcut-card.v2-menu-row .v2-menu-lbl{font-size:var(--canvas-menu-font-size);font-weight:var(--canvas-menu-font-weight);line-height:1.2}
+.v2-node-menu-compact .canvas-shortcut-card.v2-menu-row:is(:hover,:focus-visible){background:var(--fill-hover);border-color:var(--stroke-12)}
+.canvas-shortcut-name{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.canvas-shortcut-description{overflow:hidden;text-overflow:ellipsis}
+.canvas-shortcut-icon.v2-menu-ico{color:var(--blue);overflow:hidden}
+.canvas-shortcut-icon.is-text{color:var(--green)}
+.canvas-shortcut-icon.is-image{color:var(--red)}
+.canvas-shortcut-icon.is-audio{color:var(--purple)}
+.canvas-shortcut-card.v2-menu-row.has-desc:focus-visible :is(.v2-menu-lbl,.v2-menu-sub){transform:none}
+.canvas-shortcut-card.v2-menu-row.has-desc:focus-visible .v2-menu-sub{opacity:1}
+.canvas-shortcut-icon img{width:100%;height:100%;object-fit:cover}
+.canvas-shortcut-badge{flex:0 1 auto;max-width:35%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:3px 6px;border-radius:5px;color:var(--blue);background:var(--blue-10);font-size:var(--font-12)}
+.canvas-shortcut-card:focus-visible,.canvas-shortcuts-dialog :is(button,input,select):focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.canvas-shortcut-card.v2-menu-row[data-shortcut-category]:focus{outline:0;border-color:var(--stroke-default)}
+.canvas-shortcut-card.v2-menu-row[data-shortcut-category]:is([aria-expanded=true],:focus-visible){background:var(--fill-hover)}
+.canvas-shortcuts-overlay{position:fixed;inset:0;z-index:20000;display:grid;place-items:center;padding:20px;background:var(--black-50)}
+.canvas-shortcuts-dialog{width:min(920px,100%);height:min(760px,90vh);min-height:0;display:flex;flex-direction:column;background:var(--bg-2);color:var(--text-primary);border:1px solid var(--stroke-default);border-radius:20px;box-shadow:var(--shadow-dialog);overflow:hidden}
+.canvas-shortcuts-dialog footer,.canvas-shortcuts-dialog header{display:flex;align-items:center;gap:12px;padding:18px 22px;flex:0 0 auto}
+.canvas-shortcuts-dialog header{border-bottom:1px solid var(--stroke-default)}
+.canvas-shortcuts-dialog h2{margin:0;flex:1;font-size:var(--font-18)}
+.canvas-shortcuts-dialog button{padding:8px 12px;border-radius:8px;border:1px solid var(--stroke-default);background:var(--bg-panel-card);color:var(--text-primary);font:inherit;font-size:var(--font-13);cursor:var(--link-cursor)}
+.canvas-shortcuts-dialog button:hover{background:var(--white-08)}
+.canvas-shortcuts-dialog button:disabled{opacity:.45;cursor:var(--pointer-cursor)}
+#devEntryShortcutsBtn[hidden],.canvas-shortcuts-dialog [hidden]{display:none}
+.canvas-shortcuts-manager-body{display:grid;grid-template-columns:minmax(160px,28%) minmax(0,1fr);flex:1;min-height:0}
+.canvas-shortcuts-sidebar{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--stroke-default);padding:14px;gap:12px}
+.canvas-shortcuts-tools{display:flex;gap:8px;flex-wrap:wrap}
+.canvas-shortcuts-list{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.canvas-shortcuts-list-row{margin-bottom:6px}
+.canvas-shortcuts-list-row button{display:block;width:100%;text-align:left;overflow-wrap:anywhere}
+.canvas-shortcuts-list-row .is-selected{border-color:var(--blue);background:var(--blue-10)}
+.canvas-shortcuts-editor{min-width:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding:22px}
+.canvas-shortcuts-form{display:flex;flex-direction:column;gap:16px}
+.canvas-shortcuts-form label{display:flex;flex-direction:column;gap:7px;font-size:var(--font-13);min-width:0}
+.canvas-shortcuts-form :is(input:not([type=checkbox]),select){width:100%;min-width:0;box-sizing:border-box;padding:10px 12px;background:var(--bg-input);color:var(--text-primary);border:1px solid var(--stroke-default);border-radius:8px;font:inherit}
+.canvas-shortcuts-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.canvas-shortcuts-form .canvas-shortcuts-checkbox{flex-direction:row;align-items:center}
+.canvas-shortcuts-form input[type=checkbox]{accent-color:var(--blue)}
+.canvas-shortcuts-form input::file-selector-button{margin-right:10px;padding:5px 8px;border:1px solid var(--stroke-default);border-radius:6px;background:var(--bg-panel-card);color:var(--text-primary);cursor:var(--link-cursor);font:inherit}
+.canvas-shortcuts-form p,.canvas-shortcuts-no-selection{margin:0;color:var(--text-secondary);font-size:var(--font-13);line-height:1.6}
+.canvas-shortcuts-graph{display:flex;flex-direction:column;align-items:start;gap:8px}
+.canvas-shortcuts-dialog footer{border-top:1px solid var(--stroke-default)}
+.canvas-shortcuts-status{flex:1;min-width:0;overflow-wrap:anywhere;font-size:var(--font-12);color:var(--text-secondary)}
+.canvas-shortcuts-dialog [data-action=save]{color:var(--blue);background:var(--blue-15);border-color:var(--blue-30)}
+#devEntryShortcutsBtn[aria-busy=true]::before,.canvas-shortcuts-overlay[aria-busy=true] .canvas-shortcuts-status::before{content:"";display:inline-block;width:12px;height:12px;margin-right:6px;border:2px solid var(--stroke-default);border-top-color:var(--blue);border-radius:50%;animation:spin .8s linear infinite}
+@media (prefers-reduced-motion:reduce){.canvas-shortcut-card.v2-menu-row,.canvas-shortcut-card.v2-menu-row.has-desc :is(.v2-menu-lbl,.v2-menu-sub),.canvas-shortcuts-menu .v2-menu-row,.canvas-shortcuts-menu :is(.v2-menu-lbl,.v2-menu-sub){transition:none}#devEntryShortcutsBtn[aria-busy=true]::before,.canvas-shortcuts-menu,.canvas-shortcuts-overlay[aria-busy=true] .canvas-shortcuts-status::before{animation:none}}
+@media (max-width:1100px){.canvas-shortcuts-rail{grid-template-columns:repeat(auto-fit,minmax(0,240px))}.empty-hint{width:min(528px,calc(100% - 80px))}}
+@media (max-width:600px){.empty-hint{width:calc(100% - 48px);gap:20px}.canvas-shortcuts-rail{grid-template-columns:minmax(0,240px)}.has-template-library>.canvas-shortcuts-rail{grid-template-columns:repeat(2,minmax(0,1fr))}.empty-hint.has-template-library{width:calc(100% - 144px)}.canvas-shortcuts-overlay{padding:8px}.canvas-shortcuts-dialog{height:min(820px,95vh);border-radius:12px}.canvas-shortcuts-manager-body{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(96px,24%) minmax(0,1fr)}.canvas-shortcuts-sidebar{padding:10px;border-right:0;border-bottom:1px solid var(--stroke-default)}.canvas-shortcuts-editor{padding:14px}.canvas-shortcuts-dialog footer,.canvas-shortcuts-dialog header{padding:12px;gap:8px}.canvas-shortcuts-dialog footer{flex-wrap:wrap}.canvas-shortcuts-status{flex-basis:100%}}
+@media (min-width:2400px) and (min-height:1300px){.canvas-shortcuts-dialog{width:min(1220px,80vw);height:min(1060px,84vh)}}
