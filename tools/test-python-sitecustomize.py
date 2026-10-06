@@ -7,6 +7,11 @@ import socket
 _connect = socket.socket.connect
 _connect_ex = socket.socket.connect_ex
 _allowed_port = int(os.environ["AICANVAS_PORT"])
+_extra_ports = {
+    int(port)
+    for port in (os.environ.get("AIC_TEST_ALLOWED_LOOPBACK_PORTS", "") or "").split(",")
+    if port.strip().isdigit()
+}
 
 def _allowed(address):
     if not isinstance(address, tuple):  # Unix sockets / multiprocessing IPC
@@ -16,7 +21,7 @@ def _allowed(address):
         local = ipaddress.ip_address(host).is_loopback
     except ValueError:
         local = host.lower() == "localhost"
-    return local and port == _allowed_port
+    return local and (port == _allowed_port or port in _extra_ports)
 
 def _offline_connect(sock, address):
     if not _allowed(address):

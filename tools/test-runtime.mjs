@@ -36,6 +36,22 @@ export function createTestEnvironment(port) {
     AIC_ASSETS_DIR: path.join(storage, 'data', 'assets'),
     AIC_WORKFLOWS_DIR: path.join(storage, 'data', 'workflows'),
     SHORTDRAMA_DB: path.join(directory, 'shortdrama.sqlite3'),
+    // 可选：把 e2e 的授权上游指向本地 license API（默认不启用，仅当外部显式传入时生效）
+    ...(process.env.AIC_SUBSCRIPTION_API_BASE
+      ? {
+          AIC_SUBSCRIPTION_API_BASE: process.env.AIC_SUBSCRIPTION_API_BASE,
+          AIC_ALLOW_SUBSCRIPTION_API_OVERRIDE: '1',
+          AIC_DEV_MODE: '1',
+          // 让离线守卫放行本地 license API 的端口（仅回环，其余仍全拦）
+          AIC_TEST_ALLOWED_LOOPBACK_PORTS: (() => {
+            try {
+              return String(new URL(process.env.AIC_SUBSCRIPTION_API_BASE).port || '');
+            } catch {
+              return '';
+            }
+          })(),
+        }
+      : {}),
     AICANVAS_PORT: String(port), AIC_BIND_HOST: '127.0.0.1', AIC_LOCAL_TOKEN: E2E_TOKEN,
     AIC_TEST_PYTHON: resolveTestPython(),
     PYTHONPATH: support, PYTHONDONTWRITEBYTECODE: '1', PYTHONUNBUFFERED: '1', PYTHONUTF8: '1',
