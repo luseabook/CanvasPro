@@ -117,9 +117,11 @@ import {
 import { registerIpcHandlers } from './ipc/registerIpcHandlers.js';
 let APP_DISPLAY_NAME = 'Canvas';
 const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
-    ? // Production keeps its historical folder, so an existing install keeps its projects and
-      // settings. Note the packaged name is 'canvas' from package.json, not the product name.
-      'AI CanvasPro'
+    ? // Keep a profile folder of our own. The historical 'AI CanvasPro' name is now also
+      // claimed by the separately installed SHUO Canvas build, and two Electron apps sharing
+      // one profile folder cannot both hold the single-instance lock: whichever starts second
+      // exits silently, which is what stopped the packaged app from opening.
+      'CanvasPro'
     : // A side-by-side test build carries its own productName in package.json (see
       // electron-builder.win.dev.cjs), so it gets its own folder instead of sharing data.
       app.getName() || 'AI CanvasPro',
@@ -147,7 +149,8 @@ const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
   LEGACY_PACKAGED_FILES_ROOT =
     LEGACY_PACKAGED_FILES_ROOTS[0] || (process.env.AIC_STORAGE_ROOT ? PACKAGED_FILES_ROOT : APP_ROOT),
   HOST = '127.0.0.1',
-  PORT = Number.parseInt(process.env.AICANVAS_PORT || '8777', 10) || 8777,
+  // 8790 keeps the default clear of the SHUO Canvas install, whose bundled backend binds 8777.
+  PORT = Number.parseInt(process.env.AICANVAS_PORT || '8790', 10) || 8790,
   APP_ORIGIN = 'http://' + HOST + ':' + PORT,
   APP_URL = APP_ORIGIN + '/',
   SERVER_READY_TIMEOUT_MS = 30000,

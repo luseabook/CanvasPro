@@ -2146,10 +2146,13 @@ const zhCN = Object.freeze({
     image: '生图像',
     video: '生视频',
     onboarding: Object.freeze({
-      label: '上手引导',
-      connect: '连接模型',
-      connected: '已连接',
-      create: '创建节点',
+      label: '新手引导',
+      chooseService: '① 选择模型服务',
+      connect: '连接其他模型服务',
+      connected: '✓ 模型服务已配置',
+      create: '② 点击下方节点卡片，开始创作',
+      serviceHint: '官方模型无需配置密钥，登录后生成会消耗积分。',
+      official: '使用官方模型 · 充值积分',
     }),
   }),
   coreUi: Object.freeze({

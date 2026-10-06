@@ -2518,9 +2518,12 @@ const enUS = Object.freeze({
     video: 'Video',
     onboarding: Object.freeze({
       label: 'Getting started',
-      connect: 'Connect a model',
-      connected: 'Connected',
-      create: 'Create a node',
+      chooseService: '① Choose a model service',
+      connect: 'Connect another model service',
+      connected: '✓ Model service configured',
+      create: '② Click a node card below to start creating',
+      serviceHint: 'Official models need no key setup. Sign in to generate using points.',
+      official: 'Use official models · Add points',
     }),
   }),
   coreUi: Object.freeze({

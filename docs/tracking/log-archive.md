@@ -4,6 +4,12 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-06（178 批·**修复安装版卡在加载页**）：按用户要求安装并实测 `Canvas-Setup-0.4.12-x64.exe` 成功；
+  实测发现**安装版永远停在品牌加载浮层**。根因链：`index.html` 清理卡片**缺两个 div**（`localAssetCleanupDetails`/`Toolbar`）→
+  `initLocalAssetCleanupSettings()` 只对另三个 id 做空判断，`toolbar` 为 null 时 `localAssetCleanupList.js:19` 抛**未捕获 TypeError** →
+  由 `main.js:1095` 的 `SettingsManager.init()` 触发并中断模块求值，致其后 `main.js:1113` 的 `complete('entry')` 永不执行 →
+  启动到不了 ready → 10 秒硬超时锁死浮层。补齐后界面完整。默认端口 8777 与用户正在运行的 SHUO Canvas 冲突。回归 11186/28
+
 - 2026-10-06（177 批·**删除旧版空态胶囊，与 0.8.0 对齐**）：承 176 批发现——上游 0.8.0 没有 `.empty-hint-pills`。
   实测确认那排「生文本/生图像/生视频」**没有任何 JS 处理器**（`emptyBtnText/Image/Video` 只出现在 index.html），
   点了本来就没反应，是纯惰性遗留。已删 `index.html` 46 行标记、两份 CSS 里的 `.empty-hint-pills`/`.pill-btn` 规则，

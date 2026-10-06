@@ -32,33 +32,49 @@ export function createCanvasOnboardingState() {
   };
 }
 export function initEmptyCanvasOnboarding({ store: store }) {
-  const el = document['querySelector']('#emptyHint .empty-hint-main');
-  if (!el || el['querySelector']('.canvas-onboarding')) return;
-  const el2 = document['createElement']('div');
-  ((el2['className'] = 'canvas-onboarding'), (el2['hidden'] = true), el2['setAttribute']('role', 'group'));
-  const el3 = document['createElement']('button');
-  ((el3['type'] = 'button'), (el3['className'] = 'canvas-onboarding-step canvas-onboarding-connect'));
-  const el4 = document['createElement']('span');
-  ((el4['className'] = 'canvas-onboarding-divider'), el4['setAttribute']('aria-hidden', 'true'));
-  const el5 = document['createElement']('span');
-  ((el5['className'] = 'canvas-onboarding-step canvas-onboarding-create'),
-    el2['append'](el3, el4, el5),
-    el['prepend'](el2));
+  const root = document['querySelector']('#emptyHint .empty-hint-main');
+  if (!root || root['querySelector']('.canvas-onboarding')) return;
+  const container = document['createElement']('div');
+  ((container['className'] = 'canvas-onboarding'),
+    (container['hidden'] = true),
+    container['setAttribute']('role', 'group'));
+  const stepLabel = document['createElement']('span');
+  stepLabel['className'] = 'canvas-onboarding-step';
+  const actions = document['createElement']('div');
+  actions['className'] = 'canvas-onboarding-actions';
+  const connectButton = document['createElement']('button');
+  ((connectButton['type'] = 'button'),
+    (connectButton['className'] = 'canvas-onboarding-step canvas-onboarding-connect'));
+  const officialButton = document['createElement']('button');
+  ((officialButton['type'] = 'button'),
+    (officialButton['className'] = 'canvas-onboarding-connect canvas-onboarding-official'));
+  const help = document['createElement']('span');
+  help['className'] = 'canvas-onboarding-help';
+  const createStep = document['createElement']('span');
+  createStep['className'] = 'canvas-onboarding-step canvas-onboarding-create';
+  (actions['append'](officialButton, connectButton),
+    container['append'](stepLabel, actions, help, createStep),
+    root['prepend'](container));
   const canvasOnboardingState = createCanvasOnboardingState();
   let index = { visible: false, configured: false },
     enabled2 = false;
   function run(enabled3 = index) {
     ((index = enabled3),
-      (el2['hidden'] = !enabled3['visible']),
-      el2['classList']['toggle']('is-configured', enabled3['configured']),
-      el2['setAttribute']('aria-label', t('emptyHint.onboarding.label')),
-      (el3['textContent'] = t(
+      (container['hidden'] = !enabled3['visible']),
+      root['classList']['toggle']('has-onboarding', enabled3['visible']),
+      container['classList']['toggle']('is-configured', enabled3['configured']),
+      container['setAttribute']('aria-label', t('emptyHint.onboarding.label')),
+      (stepLabel['textContent'] = t('emptyHint.onboarding.chooseService')),
+      stepLabel['setAttribute']('aria-current', enabled3['configured'] ? 'false' : 'step'),
+      (connectButton['textContent'] = t(
         enabled3['configured'] ? 'emptyHint.onboarding.connected' : 'emptyHint.onboarding.connect',
       )),
-      (el3['disabled'] = enabled3['configured']),
-      el3['setAttribute']('aria-current', enabled3['configured'] ? 'false' : 'step'),
-      (el5['textContent'] = t('emptyHint.onboarding.create')),
-      el5['setAttribute']('aria-current', enabled3['configured'] ? 'step' : 'false'));
+      (connectButton['disabled'] = enabled3['configured']),
+      (createStep['textContent'] = t('emptyHint.onboarding.create')),
+      createStep['setAttribute']('aria-current', enabled3['configured'] ? 'step' : 'false'),
+      (help['textContent'] = t('emptyHint.onboarding.serviceHint')),
+      (officialButton['textContent'] = t('emptyHint.onboarding.official')),
+      (help['hidden'] = officialButton['hidden'] = enabled3['configured']));
   }
   const run2 = () => store['getStateRaw']()['_nodeCount'] || 0,
     handler = () => {
@@ -69,10 +85,19 @@ export function initEmptyCanvasOnboarding({ store: store }) {
       if (data['detail']?.['reason'] === 'save-pending') return;
       handler();
     };
-  (el3['addEventListener']('click', (event) => {
+  (connectButton['addEventListener']('click', (event) => {
     (event['stopPropagation'](), openSettingsPanelToField({ paneName: 'api-input' }));
   }),
-    el2['addEventListener']('dblclick', (event2) => event2['stopPropagation']()),
+    officialButton['addEventListener']('click', (event2) => {
+      (event2['stopPropagation'](),
+        openSettingsPanelToField({
+          paneName: 'subscription',
+          fieldIds: ['officialAccountPoints', 'officialAccountOpen'],
+          select: false,
+          highlight: false,
+        }));
+    }),
+    container['addEventListener']('dblclick', (event3) => event3['stopPropagation']()),
     window['addEventListener'](API_CONFIG_CHANGED_EVENT, result));
   const target = store['subscribeSelector'](
       (source) => source['_nodeCount'] || 0,
@@ -88,7 +113,8 @@ export function initEmptyCanvasOnboarding({ store: store }) {
         window['removeEventListener'](API_CONFIG_CHANGED_EVENT, result),
         target?.(),
         handler2(),
-        el2['remove']());
+        root['classList']['remove']('has-onboarding'),
+        container['remove']());
     }
   );
 }

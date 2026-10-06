@@ -31,9 +31,14 @@ try {
         if (-not $linked) { $validated.Add(@{ path=$destination; hash=[string]$entry.sha256 }) }
     }
     $directories = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::OrdinalIgnoreCase)
+    # Hash through .NET instead of Get-FileHash: the cmdlet lives in an auto-loaded module, and a
+    # stripped or shadowed module path hides it. A missing cmdlet must not fail the cleanup.
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
     foreach ($entry in $validated) {
         if (-not [IO.File]::Exists($entry.path)) { continue }
-        $hash = (Get-FileHash -LiteralPath $entry.path -Algorithm SHA256).Hash
+        $stream = [IO.File]::OpenRead($entry.path)
+        try { $hash = [BitConverter]::ToString($sha256.ComputeHash($stream)).Replace('-', '') }
+        finally { $stream.Dispose() }
         if (-not $hash.Equals($entry.hash, [StringComparison]::OrdinalIgnoreCase)) {
             Write-Output 'A modified program file was retained.'
             continue
@@ -42,6 +47,7 @@ try {
         $parent = [IO.Path]::GetDirectoryName($entry.path)
         while ($parent -and $parent -ne $root) { [void]$directories.Add($parent); $parent=[IO.Path]::GetDirectoryName($parent) }
     }
+    $sha256.Dispose()
     foreach ($directory in @($directories | Sort-Object Length -Descending)) {
         if ([IO.Directory]::Exists($directory) -and @(Get-ChildItem -LiteralPath $directory -Force).Count -eq 0) { [IO.Directory]::Delete($directory) }
     }
