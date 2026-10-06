@@ -447,6 +447,13 @@ export function createReplacementStudioApplication({
     }),
     persistNow = ({ force: force = false } = {}) =>
       enabled ? Promise.resolve(null) : workspacePersistenceCoordinator.flush({ force: force }),
+    flushWhenHidden = () => {
+      if (documentObject?.visibilityState !== 'hidden' || enabled) return;
+      void workspacePersistenceCoordinator.flush({ force: true }).catch((error) => {
+        handler9('error', { error: error?.message || error });
+        console.error('[replacementStudio] background flush failed', error);
+      });
+    },
     schedulePersistence = () => {
       if (enabled) return;
       workspacePersistenceCoordinator.schedule();
@@ -457,6 +464,7 @@ export function createReplacementStudioApplication({
         return workspace.syncProjectState(snapshot(workspaceView !== 'project'), { returnSnapshot: false });
       return syncWorkspace();
     };
+  documentObject?.addEventListener?.('visibilitychange', flushWhenHidden);
   projectSession.connect({
     rememberProject: rememberProject,
     presentProject: ({ presentation: presentation }) => {
@@ -2761,9 +2769,19 @@ export function createReplacementStudioApplication({
     async persist() {
       return (await value195, await persistNow({ force: !workspacePersistenceCoordinator.isDirty() }));
     },
-    destroy() {
+    async destroy() {
       if (enabled) return;
-      (coordinator.invalidate(),
+      enabled = true;
+      let persistenceError = null;
+      try {
+        await workspacePersistenceCoordinator.destroy({ flush: true, force: true });
+      } catch (error) {
+        persistenceError = error;
+        handler9('error', { error: error?.message || error });
+        console.error('[replacementStudio] final persistence failed', error);
+      }
+      (documentObject?.removeEventListener?.('visibilitychange', flushWhenHidden),
+        coordinator.invalidate(),
         abortController?.abort?.(),
         (abortController = null),
         personReplacementImageTaskRuntime?.destroy?.(),
@@ -2772,12 +2790,11 @@ export function createReplacementStudioApplication({
         releaseAllSourcePreviews(),
         handler2(),
         (handler2 = () => {}),
-        void workspacePersistenceCoordinator.destroy({ flush: true, force: true }).catch(() => {}),
-        (enabled = true),
         workspace.destroy(),
         personReplacementOutputCoordinator.destroy(),
         handler(),
         projectSession.destroy());
+      if (persistenceError) throw persistenceError;
     },
   });
 }

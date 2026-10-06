@@ -432,7 +432,6 @@ export function isModelAllowed(value21, value22, value23 = '') {
     vipGateModelId3 = resolveVipGateModelId(value24, value23);
   if (!isVipModel(vipGateModelId3)) return true;
   if (!isSubscriptionActive(value22 || {})) return false;
-  if (SUBSCRIPTION_GATE_BY_MODEL_ID[vipGateModelId3]?.allowAnyActiveSubscription) return true;
   const value25 = value22 && typeof value22 === 'object' ? value22 : {},
     list3 = Array.isArray(value25.entitledModelIds)
       ? value25.entitledModelIds.map((item20) => normalizeVipModelId(item20)).filter(Boolean)
@@ -452,7 +451,9 @@ export function isModelAllowed(value21, value22, value23 = '') {
     if (list5.length === 0) return false;
     return list5.some((item22) => list4.includes(String(item22).toLowerCase()));
   }
-  return true;
+  // The authorization service is authoritative. Missing entitlement fields
+  // must never silently unlock a paid model or feature.
+  return false;
 }
 function _generateInstallId() {
   const list6 = Date.now() + '-' + Math.random();

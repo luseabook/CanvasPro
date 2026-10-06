@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import threading
 from urllib.parse import parse_qs, unquote, urlparse
 
 from backend.services.media_file_route_service import MediaFileRouteService
@@ -38,6 +39,7 @@ class JsonFileRouteService:
         self._atomic_write_json = atomic_write_json
         self._get_output_dir = output_dir_getter
         self._get_uploads_dir = uploads_dir_getter
+        self._workspace_revision_lock = threading.Lock()
 
     @staticmethod
     def _json_ok(data):
@@ -305,7 +307,15 @@ class JsonFileRouteService:
             return self._json_err(400, "Invalid filename")
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8-sig") as file:
-                return self._json_ok(json.load(file))
+                data = json.load(file)
+            if filename == "person-replacement-workspace.json":
+                if (isinstance(data, dict) and isinstance(data.get("workspaceRevision"), int)
+                        and "workspace" in data):
+                    return self._json_ok(data)
+                return self._json_ok({"workspaceRevision": 0, "workspace": data})
+            return self._json_ok(data)
+        if filename == "person-replacement-workspace.json":
+            return self._json_ok({"workspaceRevision": 0, "workspace": {}})
         return self._json_ok({})
 
     def _save_project(self, body):
@@ -382,6 +392,28 @@ class JsonFileRouteService:
         file_path = self._json_path(self._get_user_dir(), filename)
         if not file_path:
             return self._json_err(400, "Invalid filename")
+        if filename == "person-replacement-workspace.json":
+            if not isinstance(data, dict) or "expectedRevision" not in data or "workspace" not in data:
+                return self._json_err(400, "expectedRevision and workspace are required")
+            try:
+                expected_revision = int(data["expectedRevision"])
+            except (TypeError, ValueError):
+                return self._json_err(400, "Invalid expectedRevision")
+            with self._workspace_revision_lock:
+                current_revision = 0
+                if os.path.exists(file_path):
+                    with open(file_path, "r", encoding="utf-8-sig") as file:
+                        current = json.load(file)
+                    if isinstance(current, dict) and isinstance(current.get("workspaceRevision"), int):
+                        current_revision = current["workspaceRevision"]
+                if expected_revision != current_revision:
+                    return self._json_err(409, "Workspace revision conflict")
+                next_revision = current_revision + 1
+                self._atomic_write_json(file_path, {
+                    "workspaceRevision": next_revision,
+                    "workspace": data["workspace"],
+                })
+            return self._json_ok({"success": True, "workspaceRevision": next_revision})
         self._write_json_file(file_path, data)
         return self._json_ok({"success": True})
 

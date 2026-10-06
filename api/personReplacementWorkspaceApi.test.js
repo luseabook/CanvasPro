@@ -16,20 +16,22 @@ test('personReplacementWorkspaceApi: keeps compatibility aliases and local reque
   const calls = [];
   globalThis.fetch = async (url, options = {}) => {
     calls.push({ url, options });
-    if (options.method === 'GET') return new Response(null, { status: 404 });
-    return new Response(JSON.stringify({ success: true }), {
+    if (options.method === 'GET') return new Response(JSON.stringify({workspaceRevision: 3, workspace: {scene: 'loaded'}}), { status: 200, headers: {'content-type':'application/json'} });
+    return new Response(JSON.stringify({ success: true, workspaceRevision: 4 }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     });
   };
 
   try {
-    assert.equal(await fetchPersonReplacementWorkspaceFromServer(), null);
+    assert.deepEqual(await fetchPersonReplacementWorkspaceFromServer(), {scene: 'loaded'});
     assert.deepEqual(await savePersonReplacementWorkspaceToServer({ scene: 'studio' }), {
-      success: true,
+      success: true, workspaceRevision: 4,
     });
     assert.equal(calls[0].url, '/api/v2/user/person-replacement-workspace.json');
-    assert.deepEqual(JSON.parse(calls[1].options.body), { scene: 'studio' });
+    assert.deepEqual(JSON.parse(calls[1].options.body), {
+      expectedRevision: 3, workspace: { scene: 'studio' },
+    });
   } finally {
     globalThis.fetch = originalFetch;
   }

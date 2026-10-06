@@ -6,8 +6,13 @@ import {
   isVipModel,
 } from './subscriptionAccess.js';
 
-test('replacement studio unlocks any active subscription without model entitlements', () => {
+test('replacement studio requires its explicit feature entitlement', () => {
   const activeSubscription = { status: 'active', entitledModelIds: [], entitledModelKeys: [] };
+  const entitledSubscription = {
+    status: 'active',
+    entitledModelIds: [REPLACEMENT_STUDIO_VIP_MODEL_ID],
+    entitledModelKeys: [],
+  };
   const inactiveSubscription = {
     status: 'none',
     entitledModelIds: [REPLACEMENT_STUDIO_VIP_MODEL_ID],
@@ -18,6 +23,10 @@ test('replacement studio unlocks any active subscription without model entitleme
   assert.equal(isVipModel(REPLACEMENT_STUDIO_VIP_MODEL_ID, 'aicanvas'), true);
   assert.equal(
     isModelAllowed(REPLACEMENT_STUDIO_VIP_MODEL_ID, activeSubscription, 'aicanvas'),
+    false,
+  );
+  assert.equal(
+    isModelAllowed(REPLACEMENT_STUDIO_VIP_MODEL_ID, entitledSubscription, 'aicanvas'),
     true,
   );
   assert.equal(

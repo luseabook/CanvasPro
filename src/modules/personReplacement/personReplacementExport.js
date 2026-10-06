@@ -77,6 +77,24 @@ function createSkippedEntry(entry, record, kind2) {
     kind: kind2,
   };
 }
+const EXPECTED_MIME_PREFIX = Object.freeze({video: 'video/', image: 'image/', audio: 'audio/'});
+async function defaultMediaPreflight(file) {
+  const url = normalizeText(file?.url);
+  if (!url || typeof globalThis.fetch !== 'function') return {ok: false, reason: '媒体地址不可读'};
+  try {
+    let response = await globalThis.fetch(url, {method: 'HEAD'});
+    if (response.status === 405 || response.status === 501)
+      response = await globalThis.fetch(url, {headers: {Range: 'bytes=0-0'}});
+    if (!response.ok) return {ok: false, reason: `HTTP ${response.status}`};
+    const mime = normalizeText(response.headers?.get?.('content-type')).toLowerCase();
+    const expected = EXPECTED_MIME_PREFIX[file.kind] || '';
+    if (expected && mime && !mime.startsWith(expected))
+      return {ok: false, reason: `内容类型不匹配：${mime}`};
+    return {ok: true, mime};
+  } catch (error) {
+    return {ok: false, reason: normalizeText(error?.message) || '媒体不可访问'};
+  }
+}
 export function buildPersonReplacementExportPlan({
   project: project = {},
   mode: mode = PERSON_REPLACEMENT_EXPORT_MODES.CURRENT_CLIP,
@@ -133,19 +151,32 @@ export async function exportPersonReplacementMedia({
   mode: mode = PERSON_REPLACEMENT_EXPORT_MODES.CURRENT_CLIP,
   saveMedia: saveMedia = saveMediaDownload,
   saveMediaFiles: saveMediaFiles = saveMediaFilesDownload,
+  preflightMedia: preflightMedia = defaultMediaPreflight,
 } = {}) {
   const title2 = buildPersonReplacementExportPlan({ project: project, mode: mode }),
+    checks = await Promise.all(title2.files.map(async (file) => {
+      const result = await preflightMedia(file);
+      return result === true ? {ok: true} : result || {ok: false, reason: '媒体不可访问'};
+    })),
+    availableFiles = title2.files.filter((_file, index) => checks[index]?.ok === true),
+    unavailable = title2.files.flatMap((file, index) => checks[index]?.ok === true ? [] : [{
+      kind: file.kind, filename: file.filename, ref: file.url,
+      reason: normalizeText(checks[index]?.reason) || '媒体不可访问',
+    }]);
+  if (!availableFiles.length)
+    throw new Error('导出预检失败：' + unavailable.map((item) => `${item.filename}（${item.reason}）`).join('、'));
+  const preparedPlan = {...title2, files: availableFiles, skipped: [...title2.skipped, ...unavailable]},
     exportedCount =
-      title2.mode === PERSON_REPLACEMENT_EXPORT_MODES.FINAL_VIDEO ||
-      title2.mode === PERSON_REPLACEMENT_EXPORT_MODES.CURRENT_CLIP
-        ? await saveMedia({ ...title2.files[0], title: title2.title })
-        : await saveMediaFiles({ title: title2.title, files: title2.files });
+      preparedPlan.mode === PERSON_REPLACEMENT_EXPORT_MODES.FINAL_VIDEO ||
+      preparedPlan.mode === PERSON_REPLACEMENT_EXPORT_MODES.CURRENT_CLIP
+        ? await saveMedia({ ...preparedPlan.files[0], title: preparedPlan.title })
+        : await saveMediaFiles({ title: preparedPlan.title, files: preparedPlan.files });
   return {
     ...exportedCount,
-    mode: title2.mode,
+    mode: preparedPlan.mode,
     requestedCount: title2.files.length + title2.skipped.length,
-    exportedCount: exportedCount?.count ?? title2.files.length,
-    skipped: title2.skipped,
-    skippedCount: title2.skipped.length,
+    exportedCount: exportedCount?.count ?? preparedPlan.files.length,
+    skipped: preparedPlan.skipped,
+    skippedCount: preparedPlan.skipped.length,
   };
 }

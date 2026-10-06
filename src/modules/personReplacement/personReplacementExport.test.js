@@ -3,8 +3,13 @@ import assert from 'node:assert/strict';
 import {
   PERSON_REPLACEMENT_EXPORT_MODES as MODES,
   buildPersonReplacementExportPlan,
-  exportPersonReplacementMedia,
+  exportPersonReplacementMedia as exportPersonReplacementMediaRaw,
 } from './personReplacementExport.js';
+
+const exportPersonReplacementMedia = (options = {}) => exportPersonReplacementMediaRaw({
+  preflightMedia: async () => ({ok: true}),
+  ...options,
+});
 
 const EXPECTED_MODES = {
   FINAL_VIDEO: 'final-video',
@@ -464,4 +469,22 @@ test('export: 计划失败时以异常形式冒泡且不调用保存器', async 
     { message: '请先选择要导出的镜头片段。' },
   );
   assert.equal(called, false);
+});
+
+test('export: preflight excludes unavailable media and reports a retryable manifest', async () => {
+  const seen = [];
+  const result = await exportPersonReplacementMedia({
+    project: {shots: [
+      {id: 'a', resultVideoRef: 'output/a.mp4'},
+      {id: 'b', resultVideoRef: 'https://expired.example/b.mp4'},
+    ]},
+    mode: 'all-replacement-clips',
+    preflightMedia: async (file) => file.filename.includes('01')
+      ? {ok: true, mime: 'video/mp4'} : {ok: false, reason: 'HTTP 403'},
+    saveMediaFiles: async ({files}) => { seen.push(...files); return {count: files.length}; },
+  });
+  assert.equal(seen.length, 1);
+  assert.equal(result.skippedCount, 1);
+  assert.equal(result.skipped[0].reason, 'HTTP 403');
+  assert.equal(result.skipped[0].ref, 'https://expired.example/b.mp4');
 });

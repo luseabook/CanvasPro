@@ -627,7 +627,7 @@ registerPageTeardown(window, () =>
     () => storyboard3DWorkspaceController?.dispose?.(),
     () => replacementStudioModelGate?.destroy?.(),
     () => replacementStudioApplication?.destroy?.(),
-  ]),
+  ], { onError: error => console.error('[pageTeardown]', error) }),
 );
 
 const appViewport = createAppViewport({

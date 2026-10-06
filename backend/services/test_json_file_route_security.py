@@ -75,6 +75,22 @@ class JsonFileRouteSecurityTest(unittest.TestCase):
         self.assertEqual(renamed["code"], 400)
         self.assertTrue(outside.is_file())
 
+    def test_replacement_workspace_rejects_stale_revision(self):
+        self.service._atomic_write_json = lambda path, value: Path(path).write_text(
+            json.dumps(value), encoding="utf-8"
+        )
+        path = "/api/v2/user/person-replacement-workspace.json"
+        first = self.service.handle_post(None, path, json.dumps({
+            "expectedRevision": 0, "workspace": {"project": "first"},
+        }))
+        self.assertEqual(first["data"]["workspaceRevision"], 1)
+        stale = self.service.handle_post(None, path, json.dumps({
+            "expectedRevision": 0, "workspace": {"project": "stale"},
+        }))
+        self.assertEqual(stale["code"], 409)
+        loaded = self.service.handle_get(None, path)
+        self.assertEqual(loaded["data"]["workspace"], {"project": "first"})
+
 
 if __name__ == "__main__":
     unittest.main()
