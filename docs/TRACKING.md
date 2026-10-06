@@ -369,11 +369,10 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-06（173 批·**VIP 门控端到端验证通过**）：用 `F:\canvas-admin` 本地起 license/admin API 生成 CDKEY，把 e2e 授权上游指到本地，
-  走通完整链路：复刻工作室卡片 → `subscriptionGateOverlay` → 输入 CDKEY 激活（`active`，到期 2027-10-06）→ Beta 提示 →
-  **`replication-workspace-active`，工作区进入**。夹具改 2 件（可选、默认不生效）：① 离线守卫增 `AIC_TEST_ALLOWED_LOOPBACK_PORTS` 白名单；
-  ② `test-runtime.mjs` 在传入 `AIC_SUBSCRIPTION_API_BASE` 时自动带上。回归 11186/28 零回归。另记：`workspace.spec.js` 的
-  「toast 文本 ≤330」失败属测试/实现不匹配（镜像亦无截断），未改。
+- 2026-10-06（174 批·**空画布快捷/模板卡片可点击修复**）：`.canvas-shortcuts-rail` 缺 `pointer-events:auto`——父级 `.empty-hint` 是 none
+  （兄弟 `.empty-hint-pills` 显式恢复过），故卡片计算值为 none、命中测试落到画布上，**空画布里的卡片完全点不动**。补一条规则
+  （`style.css` 与 `styles/canvas.css` 同步）。真机实测：rail/card `auto`、命中到 `SPAN.canvas-shortcut-name`、hover 展开副标题、
+  点击分类弹出模板列表（含用户模板与角标）。`has-template-library` 本身全仓无消费者（只设置不读取），故未为它编造样式。回归 11186/28 零回归。
 
 ## 12. 变更记录机制（**已冻结**）
 

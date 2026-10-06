@@ -5352,6 +5352,12 @@ button.canvas-onboarding-step:hover {
   height: 1px;
   background: var(--white-18);
 }
+/* 快捷方式/模板库容器：父级 .empty-hint 是 pointer-events:none（同理 .empty-hint-pills
+   也显式恢复 auto）。缺这一条时卡片计算值仍为 none，命中测试会落到画布上，
+   即空画布里的快捷卡片完全点不动。 */
+.canvas-shortcuts-rail {
+  pointer-events: auto;
+}
 .v2-empty-hint-title {
   font-weight: 500;
   font-size: var(--font-28);

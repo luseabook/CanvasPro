@@ -4,6 +4,11 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-06（173 批·**VIP 门控端到端验证通过**）：用 `F:\canvas-admin` 本地起 license/admin API 生成 CDKEY，把 e2e 授权上游指到本地，
+  走通完整链路：复刻工作室卡片 → `subscriptionGateOverlay` → 输入 CDKEY 激活（`active`，到期 2027-10-06）→ Beta 提示 →
+  **`replication-workspace-active`，工作区进入**。夹具改 2 件（可选、默认不生效）：① 离线守卫增 `AIC_TEST_ALLOWED_LOOPBACK_PORTS` 白名单；
+  ② `test-runtime.mjs` 在传入 `AIC_SUBSCRIPTION_API_BASE` 时自动带上。回归 11186/28 零回归。另记：`workspace.spec.js` 的
+  「toast 文本 ≤330」失败属测试/实现不匹配（镜像亦无截断），未改。
 - 2026-10-06（172 批·**补齐空画布上手引导样式**）：`canvas-onboarding*` 四类在仓库与打包产物中均无样式定义，
   导致「连接模型／创建节点」按钮挤在标题左侧并与徽章重叠。按其用途补最小布局（沿用 `.pill-btn` 的令牌语言），
   并显式恢复 `pointer-events:auto`（父级 `.empty-hint` 为 none）、补 `[hidden]` 覆盖（`display:flex` 会压过 UA 的 hidden 规则）。
