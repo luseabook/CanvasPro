@@ -7,13 +7,13 @@ import {
   resolvePersonReplacementVideoImageInput,
 } from './personReplacementProject.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function getShot(item, key) {
   const text = normalizeText(key);
   return (
-    (Array['isArray'](item?.['shots']) ? item['shots'] : [])['find'](
-      (index) => normalizeText(index?.['id']) === text,
+    (Array.isArray(item?.shots) ? item.shots : []).find(
+      (index) => normalizeText(index?.id) === text,
     ) || null
   );
 }
@@ -21,16 +21,16 @@ function updateSourceImageResult(args, results, activeIndex) {
   const result = results[activeIndex],
     replacementImageRef = resolvePersonReplacementImageResultRef(result);
   if (!args || !replacementImageRef) return null;
-  const data = Object['prototype']['hasOwnProperty']['call'](result, 'userPrompt');
+  const data = Object.prototype.hasOwnProperty.call(result, 'userPrompt');
   return {
     ...args,
     replacementImage: {
-      ...(args['replacementImage'] || {}),
+      ...(args.replacementImage || {}),
       results: results,
       activeIndex: activeIndex,
     },
     replacementImageRef: replacementImageRef,
-    ...(data ? { imagePrompt: normalizeText(result?.['userPrompt']) } : {}),
+    ...(data ? { imagePrompt: normalizeText(result?.userPrompt) } : {}),
   };
 }
 export function selectPersonReplacementVideoReference(
@@ -49,26 +49,24 @@ export function selectPersonReplacementVideoReference(
   if (!shot) return { changed: false, project: project };
   if (referenceKind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE) {
     const list =
-        resolvePersonReplacementVideoImageInput(project, shot, 'character-reference')['referenceOptions']?.[
-          'filter'
-        ]((options) => options?.['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE) || [],
+        resolvePersonReplacementVideoImageInput(project, shot, 'character-reference').referenceOptions?.filter((options) => options?.kind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE) || [],
       text3 = normalizeText(referencePersonId),
       enabled =
-        list['find']((target) => normalizeText(target?.['reference']?.['personId']) === text3) ||
+        list.find((target) => normalizeText(target?.reference?.personId) === text3) ||
         (!text3 ? list[0] : null),
-      replacementVideoReferencePersonId = normalizeText(enabled?.['reference']?.['personId']);
+      replacementVideoReferencePersonId = normalizeText(enabled?.reference?.personId);
     if (!enabled || !replacementVideoReferencePersonId) return { changed: false, project: project };
     if (
-      shot['replacementVideoReferenceKind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
-      normalizeText(shot['replacementVideoReferencePersonId']) === replacementVideoReferencePersonId
+      shot.replacementVideoReferenceKind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
+      normalizeText(shot.replacementVideoReferencePersonId) === replacementVideoReferencePersonId
     )
       return { changed: false, project: project };
     return {
       changed: true,
       project: {
         ...project,
-        shots: project['shots']['map']((args2) =>
-          normalizeText(args2?.['id']) === text2
+        shots: project.shots.map((args2) =>
+          normalizeText(args2?.id) === text2
             ? {
                 ...args2,
                 replacementVideoReferenceKind: PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
@@ -81,16 +79,16 @@ export function selectPersonReplacementVideoReference(
   }
   const shot2 = getShot(project, sourceShotId2),
     list2 = getPersonReplacementImageResults(shot2),
-    resultIndex2 = Math['trunc'](Number(resultIndex));
-  if (!shot2 || !Number['isInteger'](resultIndex2) || resultIndex2 < 0 || resultIndex2 >= list2['length'])
+    resultIndex2 = Math.trunc(Number(resultIndex));
+  if (!shot2 || !Number.isInteger(resultIndex2) || resultIndex2 < 0 || resultIndex2 >= list2.length)
     return { changed: false, project: project };
   const updateSourceImageResult2 = updateSourceImageResult(shot2, list2, resultIndex2),
-    imageRef = normalizeText(updateSourceImageResult2?.['replacementImageRef']);
+    imageRef = normalizeText(updateSourceImageResult2?.replacementImageRef);
   if (!updateSourceImageResult2 || !imageRef) return { changed: false, project: project };
   const source =
-    shot['replacementVideoReferenceKind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE &&
-    normalizeText(shot['replacementVideoReferenceSourceShotId']) === sourceShotId2 &&
-    normalizeText(shot['replacementVideoReferenceImageRef']) === imageRef &&
+    shot.replacementVideoReferenceKind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_REPLACEMENT_IMAGE &&
+    normalizeText(shot.replacementVideoReferenceSourceShotId) === sourceShotId2 &&
+    normalizeText(shot.replacementVideoReferenceImageRef) === imageRef &&
     getPersonReplacementActiveImageResultIndex(shot2, list2) === resultIndex2;
   if (source) return { changed: false, project: project };
   return {
@@ -100,8 +98,8 @@ export function selectPersonReplacementVideoReference(
     imageRef: imageRef,
     project: {
       ...project,
-      shots: project['shots']['map']((next) => {
-        const text4 = normalizeText(next?.['id']);
+      shots: project.shots.map((next) => {
+        const text4 = normalizeText(next?.id);
         let current = text4 === sourceShotId2 ? updateSourceImageResult2 : next;
         if (text4 === text2) {
           const { replacementVideoReferencePersonId: replacementVideoReferencePersonId2, ...args3 } = current;
@@ -131,27 +129,27 @@ export function switchPersonReplacementVideoReferenceResult(
     shot3 = getShot(project2, targetShotId3),
     shot4 = getShot(project2, sourceShotId4),
     list3 = getPersonReplacementImageResults(shot4);
-  if (!shot3 || !shot4 || list3['length'] < 2) return { changed: false, project: project2 };
-  const count = Math['trunc'](Number(currentResultIndex)),
+  if (!shot3 || !shot4 || list3.length < 2) return { changed: false, project: project2 };
+  const count = Math.trunc(Number(currentResultIndex)),
     entry =
-      Number['isInteger'](count) && count >= 0 && count < list3['length']
+      Number.isInteger(count) && count >= 0 && count < list3.length
         ? count
         : getPersonReplacementActiveImageResultIndex(shot4, list3),
-    enabled2 = Math['sign'](Number(delta) || 0);
+    enabled2 = Math.sign(Number(delta) || 0);
   if (!enabled2) return { changed: false, project: project2 };
-  const resultIndex3 = (entry + enabled2 + list3['length']) % list3['length'],
+  const resultIndex3 = (entry + enabled2 + list3.length) % list3.length,
     personReplacementVideoImageInput = resolvePersonReplacementVideoImageInput(
       project2,
       shot3,
       'first-frame',
     ),
     record =
-      personReplacementVideoImageInput['referenceOptions']?.[
-        personReplacementVideoImageInput['activeReferenceIndex']
+      personReplacementVideoImageInput.referenceOptions?.[
+        personReplacementVideoImageInput.activeReferenceIndex
       ],
     payload =
-      shot3['replacementVideoReferenceKind'] !== PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
-      normalizeText(record?.['sourceShotId']) === sourceShotId4;
+      shot3.replacementVideoReferenceKind !== PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE &&
+      normalizeText(record?.sourceShotId) === sourceShotId4;
   if (payload)
     return selectPersonReplacementVideoReference(project2, {
       targetShotId: targetShotId3,
@@ -164,11 +162,11 @@ export function switchPersonReplacementVideoReferenceResult(
     changed: true,
     sourceShotId: sourceShotId4,
     resultIndex: resultIndex3,
-    imageRef: imageRef2['replacementImageRef'],
+    imageRef: imageRef2.replacementImageRef,
     project: {
       ...project2,
-      shots: project2['shots']['map']((handle) =>
-        normalizeText(handle?.['id']) === sourceShotId4 ? imageRef2 : handle,
+      shots: project2.shots.map((handle) =>
+        normalizeText(handle?.id) === sourceShotId4 ? imageRef2 : handle,
       ),
     },
   };

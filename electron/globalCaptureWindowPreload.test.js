@@ -39,7 +39,7 @@ test('the present event the preload listens for is the one the controller sends'
   const preload = read('./globalCaptureWindowPreload.cjs');
   const controller = read('./globalCaptureWindowController.js');
   assert.match(preload, /ipcRenderer\.on\('globalCaptureWindow:present', listener\);/);
-  assert.match(controller, /\['send'\]\?\.\('globalCaptureWindow:present', \{/);
+  assert.match(controller, /\.send\?\.\('globalCaptureWindow:present', \{/);
 });
 
 test('the preload subscribes and unsubscribes through the same exported closure', () => {

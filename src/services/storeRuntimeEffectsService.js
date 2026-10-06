@@ -48,7 +48,7 @@ function safeStorageGet(value, item = '') {
   const storage = getStorage();
   if (!storage) return item;
   try {
-    const key = storage['getItem'](value);
+    const key = storage.getItem(value);
     return key == null ? item : key;
   } catch {
     return item;
@@ -58,21 +58,21 @@ function safeStorageSet(index, result) {
   const storage2 = getStorage();
   if (!storage2) return;
   try {
-    storage2['setItem'](index, String(result));
+    storage2.setItem(index, String(result));
   } catch {}
 }
 function parseJsonObject(enabled) {
   if (!enabled) return {};
   try {
-    const data = JSON['parse'](enabled);
-    return data && typeof data === 'object' && !Array['isArray'](data) ? data : {};
+    const data = JSON.parse(enabled);
+    return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
   } catch {
     return {};
   }
 }
 function normalizeSelectionRelatedHighlightColor(options) {
-  const target = String(options || '')['trim']();
-  return ['white', 'blue', 'green', 'cyan', 'purple', 'red', 'yellow']['includes'](target) ? target : 'white';
+  const target = String(options || '').trim();
+  return ['white', 'blue', 'green', 'cyan', 'purple', 'red', 'yellow'].includes(target) ? target : 'white';
 }
 function normalizePromptEnterBehavior(source) {
   return source === 'newline' ? 'newline' : 'submit';
@@ -86,8 +86,8 @@ export function readThemeFromStorage() {
 export function applyThemeToDom(current) {
   const themeName = normalizeThemeName(current);
   try {
-    const el = typeof document !== 'undefined' ? document?.['documentElement'] : null;
-    el && typeof el['setAttribute'] === 'function' && el['setAttribute']('data-theme', themeName);
+    const el = typeof document !== 'undefined' ? document?.documentElement : null;
+    el && typeof el.setAttribute === 'function' && el.setAttribute('data-theme', themeName);
   } catch {}
 }
 export function persistThemeToStorage(entry) {
@@ -128,8 +128,8 @@ export function readUiPrefsFromStorage() {
           ? 'off'
           : 'click',
     record = Number(safeStorageGet22),
-    alignDistributeGap = Number['isFinite'](record)
-      ? Math['max'](0, Math['min'](200, Math['round'](record)))
+    alignDistributeGap = Number.isFinite(record)
+      ? Math.max(0, Math.min(200, Math.round(record)))
       : 40;
   return {
     showVideoMeta: false,
@@ -159,39 +159,39 @@ export function readUiPrefsFromStorage() {
   };
 }
 export function persistUiPrefsToStorage(payload) {
-  const handle = payload?.['showSelectionMediaProperties'] !== false,
-    state = payload?.['titleFollowsCanvasZoom'] === true,
-    config = payload?.['promptBoxResizeEnabled'] !== false,
-    promptEnterBehavior = normalizePromptEnterBehavior(payload?.['promptEnterBehavior']),
-    scope = payload?.['promptAttachmentButtonHidden'] === true,
-    input = payload?.['promptPresetButtonHidden'] === true,
-    output = payload?.['videoAudioDefaultEnabled'] === true,
-    canvasToolbarPlacement = normalizeCanvasToolbarPlacement(payload?.['canvasToolbarPlacement']),
-    nodeManagerPlacement = normalizeNodeManagerPlacement(payload?.['nodeManagerPlacement']),
-    value2 = payload?.['leftSidebarAutoHideEnabled'] === true,
-    value3 = payload?.['bottomLeftBarAutoHideEnabled'] === true,
-    value4 = payload?.['imageVideoNodeResizeEnabled'] === true,
-    value5 = payload?.['selectionRelatedHighlightEnabled'] !== false,
+  const handle = payload?.showSelectionMediaProperties !== false,
+    state = payload?.titleFollowsCanvasZoom === true,
+    config = payload?.promptBoxResizeEnabled !== false,
+    promptEnterBehavior = normalizePromptEnterBehavior(payload?.promptEnterBehavior),
+    scope = payload?.promptAttachmentButtonHidden === true,
+    input = payload?.promptPresetButtonHidden === true,
+    output = payload?.videoAudioDefaultEnabled === true,
+    canvasToolbarPlacement = normalizeCanvasToolbarPlacement(payload?.canvasToolbarPlacement),
+    nodeManagerPlacement = normalizeNodeManagerPlacement(payload?.nodeManagerPlacement),
+    value2 = payload?.leftSidebarAutoHideEnabled === true,
+    value3 = payload?.bottomLeftBarAutoHideEnabled === true,
+    value4 = payload?.imageVideoNodeResizeEnabled === true,
+    value5 = payload?.selectionRelatedHighlightEnabled !== false,
     selectionRelatedHighlightColor = normalizeSelectionRelatedHighlightColor(
-      payload?.['selectionRelatedHighlightColor'],
+      payload?.selectionRelatedHighlightColor,
     ),
-    value6 = payload?.['connectionLinesVisible'] !== false,
-    connectionLineStyle = normalizeConnectionLineStyle(payload?.['connectionLineStyle']),
-    imageToolbarLayout = normalizeImageToolbarLayout(payload?.['imageToolbarLayout']),
-    videoToolbarLayout = normalizeVideoToolbarLayout(payload?.['videoToolbarLayout']),
+    value6 = payload?.connectionLinesVisible !== false,
+    connectionLineStyle = normalizeConnectionLineStyle(payload?.connectionLineStyle),
+    imageToolbarLayout = normalizeImageToolbarLayout(payload?.imageToolbarLayout),
+    videoToolbarLayout = normalizeVideoToolbarLayout(payload?.videoToolbarLayout),
     value7 =
-      payload?.['alignFeatureTriggerMode'] === 'hold' ||
-      payload?.['alignFeatureTriggerMode'] === 'click' ||
-      payload?.['alignFeatureTriggerMode'] === 'off'
-        ? payload['alignFeatureTriggerMode']
-        : payload?.['alignFeatureEnabled'] === false
+      payload?.alignFeatureTriggerMode === 'hold' ||
+      payload?.alignFeatureTriggerMode === 'click' ||
+      payload?.alignFeatureTriggerMode === 'off'
+        ? payload.alignFeatureTriggerMode
+        : payload?.alignFeatureEnabled === false
           ? 'off'
           : 'click',
     value8 = value7 !== 'off',
-    value9 = Number(payload?.['alignDistributeGap']),
-    value10 = Number['isFinite'](value9) ? Math['max'](0, Math['min'](200, Math['round'](value9))) : 40,
-    value11 = payload?.['snapGuidesEnabled'] !== false,
-    sanitizeFeatureSelectionsRecord2 = sanitizeFeatureSelectionsRecord(payload?.['featureSelections'] || {});
+    value9 = Number(payload?.alignDistributeGap),
+    value10 = Number.isFinite(value9) ? Math.max(0, Math.min(200, Math.round(value9))) : 40,
+    value11 = payload?.snapGuidesEnabled !== false,
+    sanitizeFeatureSelectionsRecord2 = sanitizeFeatureSelectionsRecord(payload?.featureSelections || {});
   (safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, '0'),
     safeStorageSet(SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY, handle ? '1' : '0'),
     safeStorageSet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, state ? '1' : '0'),
@@ -215,22 +215,22 @@ export function persistUiPrefsToStorage(payload) {
     safeStorageSet(ALIGN_TRIGGER_MODE_STORAGE_KEY, value7),
     safeStorageSet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, String(value10)),
     safeStorageSet(SNAP_GUIDES_ENABLED_STORAGE_KEY, value11 ? '1' : '0'),
-    safeStorageSet(FEATURE_SELECTIONS_STORAGE_KEY, JSON['stringify'](sanitizeFeatureSelectionsRecord2)));
+    safeStorageSet(FEATURE_SELECTIONS_STORAGE_KEY, JSON.stringify(sanitizeFeatureSelectionsRecord2)));
 }
 function isViewportAnimating() {
-  return readViewportInteractionState()['isViewportBusy'];
+  return readViewportInteractionState().isViewportBusy;
 }
 export function shouldBumpViewportPersistOnZoom() {
   return !isViewportAnimating();
 }
 function resolveStoreBundle(uiStore) {
   if (!uiStore || typeof uiStore !== 'object') return { uiStore: null, graphStore: null };
-  if (uiStore['uiStore'] && uiStore['graphStore'])
-    return { uiStore: uiStore['uiStore'], graphStore: uiStore['graphStore'] };
-  if (typeof uiStore['getDomainStores'] === 'function') {
-    const uiStore2 = uiStore['getDomainStores']() || {};
-    if (uiStore2['uiStore'] && uiStore2['graphStore'])
-      return { uiStore: uiStore2['uiStore'], graphStore: uiStore2['graphStore'] };
+  if (uiStore.uiStore && uiStore.graphStore)
+    return { uiStore: uiStore.uiStore, graphStore: uiStore.graphStore };
+  if (typeof uiStore.getDomainStores === 'function') {
+    const uiStore2 = uiStore.getDomainStores() || {};
+    if (uiStore2.uiStore && uiStore2.graphStore)
+      return { uiStore: uiStore2.uiStore, graphStore: uiStore2.graphStore };
   }
   return { uiStore: uiStore, graphStore: uiStore };
 }
@@ -239,134 +239,134 @@ export function initStoreRuntimeEffects(value12) {
   if (!uiStore3 || !graphStore) return () => {};
   const dom = applyStoredThemeToDom(),
     uiPrefsFromStorage = readUiPrefsFromStorage();
-  (uiStore3['initTheme'](dom),
-    uiStore3['initUiPrefs'](uiPrefsFromStorage),
-    graphStore['setViewportPersistPolicy'](shouldBumpViewportPersistOnZoom));
-  const value13 = uiStore3['subscribeSelector'](
-    (value14) => value14['theme'],
+  (uiStore3.initTheme(dom),
+    uiStore3.initUiPrefs(uiPrefsFromStorage),
+    graphStore.setViewportPersistPolicy(shouldBumpViewportPersistOnZoom));
+  const value13 = uiStore3.subscribeSelector(
+    (value14) => value14.theme,
     (value15) => {
       const themeName2 = normalizeThemeName(value15);
       (applyThemeToDom(themeName2), persistThemeToStorage(themeName2));
     },
   );
   safeStorageSet(SHOW_VIDEO_META_STORAGE_KEY, '0');
-  const value16 = uiStore3['subscribeSelector'](
-      (value17) => value17['ui']?.['showSelectionMediaProperties'] !== false,
+  const value16 = uiStore3.subscribeSelector(
+      (value17) => value17.ui?.showSelectionMediaProperties !== false,
       (value18) => {
         safeStorageSet(SHOW_SELECTION_MEDIA_PROPERTIES_STORAGE_KEY, value18 ? '1' : '0');
       },
     ),
-    value19 = uiStore3['subscribeSelector'](
-      (value20) => value20['ui']?.['titleFollowsCanvasZoom'] === true,
+    value19 = uiStore3.subscribeSelector(
+      (value20) => value20.ui?.titleFollowsCanvasZoom === true,
       (value21) => {
         safeStorageSet(TITLE_FOLLOWS_CANVAS_ZOOM_STORAGE_KEY, value21 ? '1' : '0');
       },
     ),
-    value22 = uiStore3['subscribeSelector'](
-      (value23) => value23['ui']?.['promptBoxResizeEnabled'] !== false,
+    value22 = uiStore3.subscribeSelector(
+      (value23) => value23.ui?.promptBoxResizeEnabled !== false,
       (value24) => {
         safeStorageSet(PROMPT_BOX_RESIZE_ENABLED_STORAGE_KEY, value24 ? '1' : '0');
       },
     ),
-    value25 = uiStore3['subscribeSelector'](
-      (value26) => normalizePromptEnterBehavior(value26['ui']?.['promptEnterBehavior']),
+    value25 = uiStore3.subscribeSelector(
+      (value26) => normalizePromptEnterBehavior(value26.ui?.promptEnterBehavior),
       (value27) => {
         safeStorageSet(PROMPT_ENTER_BEHAVIOR_STORAGE_KEY, value27);
       },
     ),
-    value28 = uiStore3['subscribeSelector'](
-      (value29) => value29['ui']?.['promptAttachmentButtonHidden'] === true,
+    value28 = uiStore3.subscribeSelector(
+      (value29) => value29.ui?.promptAttachmentButtonHidden === true,
       (value30) => {
         safeStorageSet(PROMPT_ATTACHMENT_BUTTON_HIDDEN_STORAGE_KEY, value30 ? '1' : '0');
       },
     ),
-    value31 = uiStore3['subscribeSelector'](
-      (value32) => value32['ui']?.['promptPresetButtonHidden'] === true,
+    value31 = uiStore3.subscribeSelector(
+      (value32) => value32.ui?.promptPresetButtonHidden === true,
       (value33) => {
         safeStorageSet(PROMPT_PRESET_BUTTON_HIDDEN_STORAGE_KEY, value33 ? '1' : '0');
       },
     ),
-    value34 = uiStore3['subscribeSelector'](
-      (value35) => value35['ui']?.['videoAudioDefaultEnabled'] === true,
+    value34 = uiStore3.subscribeSelector(
+      (value35) => value35.ui?.videoAudioDefaultEnabled === true,
       (value36) => {
         safeStorageSet(VIDEO_AUDIO_DEFAULT_ENABLED_STORAGE_KEY, value36 ? '1' : '0');
       },
     ),
-    value37 = uiStore3['subscribeSelector'](
-      (value38) => normalizeCanvasToolbarPlacement(value38['ui']?.['canvasToolbarPlacement']),
+    value37 = uiStore3.subscribeSelector(
+      (value38) => normalizeCanvasToolbarPlacement(value38.ui?.canvasToolbarPlacement),
       (value39) => {
         safeStorageSet(CANVAS_TOOLBAR_PLACEMENT_STORAGE_KEY, value39);
       },
     ),
-    value40 = uiStore3['subscribeSelector'](
-      (value41) => normalizeNodeManagerPlacement(value41['ui']?.['nodeManagerPlacement']),
+    value40 = uiStore3.subscribeSelector(
+      (value41) => normalizeNodeManagerPlacement(value41.ui?.nodeManagerPlacement),
       (value42) => {
         safeStorageSet(NODE_MANAGER_PLACEMENT_STORAGE_KEY, value42);
       },
     ),
-    value43 = uiStore3['subscribeSelector'](
-      (value44) => value44['ui']?.['leftSidebarAutoHideEnabled'] === true,
+    value43 = uiStore3.subscribeSelector(
+      (value44) => value44.ui?.leftSidebarAutoHideEnabled === true,
       (value45) => {
         safeStorageSet(LEFT_SIDEBAR_AUTO_HIDE_STORAGE_KEY, value45 ? '1' : '0');
       },
     ),
-    value46 = uiStore3['subscribeSelector'](
-      (value47) => value47['ui']?.['bottomLeftBarAutoHideEnabled'] === true,
+    value46 = uiStore3.subscribeSelector(
+      (value47) => value47.ui?.bottomLeftBarAutoHideEnabled === true,
       (value48) => {
         safeStorageSet(BOTTOM_LEFT_BAR_AUTO_HIDE_STORAGE_KEY, value48 ? '1' : '0');
       },
     ),
-    value49 = uiStore3['subscribeSelector'](
-      (value50) => value50['ui']?.['imageVideoNodeResizeEnabled'] === true,
+    value49 = uiStore3.subscribeSelector(
+      (value50) => value50.ui?.imageVideoNodeResizeEnabled === true,
       (value51) => {
         safeStorageSet(IMAGE_VIDEO_NODE_RESIZE_ENABLED_STORAGE_KEY, value51 ? '1' : '0');
       },
     ),
-    value52 = uiStore3['subscribeSelector'](
-      (value53) => value53['ui']?.['selectionRelatedHighlightEnabled'] !== false,
+    value52 = uiStore3.subscribeSelector(
+      (value53) => value53.ui?.selectionRelatedHighlightEnabled !== false,
       (value54) => {
         safeStorageSet(SELECTION_RELATED_HIGHLIGHT_ENABLED_STORAGE_KEY, value54 ? '1' : '0');
       },
     ),
-    value55 = uiStore3['subscribeSelector'](
-      (value56) => normalizeSelectionRelatedHighlightColor(value56['ui']?.['selectionRelatedHighlightColor']),
+    value55 = uiStore3.subscribeSelector(
+      (value56) => normalizeSelectionRelatedHighlightColor(value56.ui?.selectionRelatedHighlightColor),
       (value57) => {
         safeStorageSet(SELECTION_RELATED_HIGHLIGHT_COLOR_STORAGE_KEY, value57);
       },
     ),
-    value58 = uiStore3['subscribeSelector'](
-      (value59) => value59['ui']?.['connectionLinesVisible'] !== false,
+    value58 = uiStore3.subscribeSelector(
+      (value59) => value59.ui?.connectionLinesVisible !== false,
       (value60) => {
         safeStorageSet(CONNECTION_LINES_VISIBLE_STORAGE_KEY, value60 ? '1' : '0');
       },
     ),
-    value61 = uiStore3['subscribeSelector'](
-      (value62) => normalizeConnectionLineStyle(value62['ui']?.['connectionLineStyle']),
+    value61 = uiStore3.subscribeSelector(
+      (value62) => normalizeConnectionLineStyle(value62.ui?.connectionLineStyle),
       (value63) => {
         safeStorageSet(CONNECTION_LINE_STYLE_STORAGE_KEY, value63);
       },
     ),
-    value64 = uiStore3['subscribeSelector'](
-      (value65) => serializeImageToolbarLayout(value65['ui']?.['imageToolbarLayout']),
+    value64 = uiStore3.subscribeSelector(
+      (value65) => serializeImageToolbarLayout(value65.ui?.imageToolbarLayout),
       (value66) => {
         safeStorageSet(IMAGE_TOOLBAR_LAYOUT_STORAGE_KEY, value66);
       },
     ),
-    value67 = uiStore3['subscribeSelector'](
-      (value68) => serializeVideoToolbarLayout(value68['ui']?.['videoToolbarLayout']),
+    value67 = uiStore3.subscribeSelector(
+      (value68) => serializeVideoToolbarLayout(value68.ui?.videoToolbarLayout),
       (value69) => {
         safeStorageSet(VIDEO_TOOLBAR_LAYOUT_STORAGE_KEY, value69);
       },
     ),
-    value70 = uiStore3['subscribeSelector'](
-      (value71) => value71['ui']?.['alignFeatureEnabled'] !== false,
+    value70 = uiStore3.subscribeSelector(
+      (value71) => value71.ui?.alignFeatureEnabled !== false,
       (value72) => {
         safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, value72 ? '1' : '0');
       },
     ),
-    value73 = uiStore3['subscribeSelector'](
+    value73 = uiStore3.subscribeSelector(
       (value74) => {
-        const value75 = value74['ui']?.['alignFeatureTriggerMode'];
+        const value75 = value74.ui?.alignFeatureTriggerMode;
         return value75 === 'hold' || value75 === 'click' || value75 === 'off' ? value75 : 'click';
       },
       (value76) => {
@@ -374,27 +374,27 @@ export function initStoreRuntimeEffects(value12) {
           safeStorageSet(ALIGN_FEATURE_ENABLED_STORAGE_KEY, value76 === 'off' ? '0' : '1'));
       },
     ),
-    value77 = uiStore3['subscribeSelector'](
+    value77 = uiStore3.subscribeSelector(
       (value78) => {
-        const value79 = Number(value78['ui']?.['alignDistributeGap']);
-        return Number['isFinite'](value79)
-          ? Math['max'](0, Math['min'](200, Math['round'](value79)))
+        const value79 = Number(value78.ui?.alignDistributeGap);
+        return Number.isFinite(value79)
+          ? Math.max(0, Math.min(200, Math.round(value79)))
           : 40;
       },
       (value80) => {
         safeStorageSet(ALIGN_DISTRIBUTE_GAP_STORAGE_KEY, String(value80));
       },
     ),
-    value81 = uiStore3['subscribeSelector'](
-      (value82) => value82['ui']?.['snapGuidesEnabled'] !== false,
+    value81 = uiStore3.subscribeSelector(
+      (value82) => value82.ui?.snapGuidesEnabled !== false,
       (value83) => {
         safeStorageSet(SNAP_GUIDES_ENABLED_STORAGE_KEY, value83 ? '1' : '0');
       },
     ),
-    value84 = uiStore3['subscribeSelector'](
+    value84 = uiStore3.subscribeSelector(
       (value85) => {
         try {
-          return JSON['stringify'](value85['ui']?.['featureSelections'] || {});
+          return JSON.stringify(value85.ui?.featureSelections || {});
         } catch {
           return '{}';
         }
@@ -403,7 +403,7 @@ export function initStoreRuntimeEffects(value12) {
         const jsonObject = parseJsonObject(value86);
         safeStorageSet(
           FEATURE_SELECTIONS_STORAGE_KEY,
-          JSON['stringify'](sanitizeFeatureSelectionsRecord(jsonObject)),
+          JSON.stringify(sanitizeFeatureSelectionsRecord(jsonObject)),
         );
       },
     );
@@ -432,6 +432,6 @@ export function initStoreRuntimeEffects(value12) {
       value77?.(),
       value81?.(),
       value84?.(),
-      graphStore['setViewportPersistPolicy'](() => true));
+      graphStore.setViewportPersistPolicy(() => true));
   };
 }

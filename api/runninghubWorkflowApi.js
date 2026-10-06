@@ -21,37 +21,37 @@ function getRhErrorMessage(value, item) {
   return formatRunningHubFailureMessage(value, item);
 }
 function hasRhResult(enabled) {
-  if (typeof enabled === 'string') return !!enabled['trim']();
-  if (Array['isArray'](enabled?.['data']))
-    return enabled['data']['some']((key) => hasRhResult(key));
+  if (typeof enabled === 'string') return !!enabled.trim();
+  if (Array.isArray(enabled?.data))
+    return enabled.data.some((key) => hasRhResult(key));
   const response =
-    enabled?.['data'] && typeof enabled['data'] === 'object' && !Array['isArray'](enabled['data'])
-      ? enabled['data']
+    enabled?.data && typeof enabled.data === 'object' && !Array.isArray(enabled.data)
+      ? enabled.data
       : enabled;
-  if (Array['isArray'](response?.['results']))
-    return response['results']['some']((index) => hasRhResult(index));
+  if (Array.isArray(response?.results))
+    return response.results.some((index) => hasRhResult(index));
   return !!(
-    response?.['url'] ||
-    response?.['videoUrl'] ||
-    response?.['fileUrl'] ||
-    response?.['download_url']
+    response?.url ||
+    response?.videoUrl ||
+    response?.fileUrl ||
+    response?.download_url
   );
 }
 function getInstallId(result) {
   return String(
-    result?.['installId'] ||
-      globalThis['window']?.['__aicInstallId'] ||
-      globalThis['__aicInstallId'] ||
+    result?.installId ||
+      globalThis.window?.__aicInstallId ||
+      globalThis.__aicInstallId ||
       '',
-  )['trim']();
+  ).trim();
 }
 function buildInstallIdHeaders(data) {
   const installId = getInstallId(data);
   return installId ? { 'X-AIC-Install-Id': installId } : {};
 }
 function getRunningHubWorkflowBaseUrl(options = {}) {
-  const target = String(options?.['runningHubApiUrl'] || '')['trim']();
-  if (target) return target['replace'](/\/+$/, '');
+  const target = String(options?.runningHubApiUrl || '').trim();
+  if (target) return target.replace(/\/+$/, '');
   const runningHubProviderProfileId = getRunningHubProviderProfileId(options),
     source = runningHubProviderProfileId ? normalizeRunningHubModelApiProfileId(runningHubProviderProfileId) : '';
   return resolveRunningHubModelApiBaseUrl(source);
@@ -60,43 +60,43 @@ export async function runRunninghubWorkflow(payload, concurrency = {}) {
   const { installId: installId2, ...args } = payload || {},
     args2 = resolveRunningHubWorkflowQueueConfig({
       payload: payload,
-      concurrency: concurrency?.['runningHubWorkflowConcurrency'],
+      concurrency: concurrency?.runningHubWorkflowConcurrency,
     });
   return runWithRunningHubWorkflowQueue(
     {
       ...args2,
-      signal: concurrency?.['signal'],
-      lease: concurrency?.['runningHubWorkflowQueueLease'],
-      onQueueChange: concurrency?.['onRunningHubWorkflowQueueChange'],
-      autoProbeConcurrency: concurrency?.['autoProbeConcurrency'],
-      concurrencyProbe: concurrency?.['runningHubWorkflowConcurrencyProbe'],
+      signal: concurrency?.signal,
+      lease: concurrency?.runningHubWorkflowQueueLease,
+      onQueueChange: concurrency?.onRunningHubWorkflowQueueChange,
+      autoProbeConcurrency: concurrency?.autoProbeConcurrency,
+      concurrencyProbe: concurrency?.runningHubWorkflowConcurrencyProbe,
     },
     () =>
       post('/api/v2/runninghubwf/run', args, {
         provider: 'runninghubwf',
-        signal: concurrency?.['signal'],
+        signal: concurrency?.signal,
         headers: buildInstallIdHeaders(payload),
       }),
   );
 }
 export async function runRunninghubAiApp(args3, concurrency2 = {}) {
-  const enabled2 = String(args3?.['appId'] || args3?.['workflowId'] || '')['trim'](),
-    apiKey = String(args3?.['apiKey'] || '')['trim']();
+  const enabled2 = String(args3?.appId || args3?.workflowId || '').trim(),
+    apiKey = String(args3?.apiKey || '').trim();
   if (!enabled2) throw new Error('缺少 RunningHub appId');
   if (!apiKey) throw new Error('RunningHub API Key 未配置');
   const { appId: appId, workflowId: workflowId, installId: installId3, ...args4 } = args3 || {},
     args5 = resolveRunningHubWorkflowQueueConfig({
       payload: { ...args3, apiKey: apiKey },
-      concurrency: concurrency2?.['runningHubWorkflowConcurrency'],
+      concurrency: concurrency2?.runningHubWorkflowConcurrency,
     });
   return runWithRunningHubWorkflowQueue(
     {
       ...args5,
-      signal: concurrency2?.['signal'],
-      lease: concurrency2?.['runningHubWorkflowQueueLease'],
-      onQueueChange: concurrency2?.['onRunningHubWorkflowQueueChange'],
-      autoProbeConcurrency: concurrency2?.['autoProbeConcurrency'],
-      concurrencyProbe: concurrency2?.['runningHubWorkflowConcurrencyProbe'],
+      signal: concurrency2?.signal,
+      lease: concurrency2?.runningHubWorkflowQueueLease,
+      onQueueChange: concurrency2?.onRunningHubWorkflowQueueChange,
+      autoProbeConcurrency: concurrency2?.autoProbeConcurrency,
+      concurrencyProbe: concurrency2?.runningHubWorkflowConcurrencyProbe,
     },
     () =>
       post(
@@ -108,7 +108,7 @@ export async function runRunninghubAiApp(args3, concurrency2 = {}) {
         },
         {
           provider: 'runninghubwf',
-          signal: concurrency2?.['signal'],
+          signal: concurrency2?.signal,
           headers: buildInstallIdHeaders(args3),
           timeout: 900000,
         },
@@ -116,30 +116,30 @@ export async function runRunninghubAiApp(args3, concurrency2 = {}) {
   );
 }
 export async function queryRunninghubWorkflow(next, signal = {}) {
-  const current = signal?.['useOpenapiQuery'] === true,
+  const current = signal?.useOpenapiQuery === true,
     post2 = await post(
       current ? '/api/v2/proxy/image' : '/api/v2/runninghubwf/query',
       current
         ? { apiUrl: getRunningHubWorkflowBaseUrl(next) + '/openapi/v2/query', ...(next || {}) }
         : next || {},
-      { provider: 'runninghubwf', signal: signal?.['signal'] },
+      { provider: 'runninghubwf', signal: signal?.signal },
     );
   return post2;
 }
 export async function resumeRunninghubWorkflowTask(runningHubApiUrl, entry = {}) {
-  const taskId = String(runningHubApiUrl?.['taskId'] || '')['trim']();
+  const taskId = String(runningHubApiUrl?.taskId || '').trim();
   if (!taskId) throw new Error('缺少 RunningHub 任务ID');
-  const enabled3 = String(runningHubApiUrl?.['apiKey'] || '')['trim']();
+  const enabled3 = String(runningHubApiUrl?.apiKey || '').trim();
   if (!enabled3) await ensureConfig();
   const runningHubProviderProfileId2 = getRunningHubProviderProfileId(runningHubApiUrl),
     providerConfig = getProviderConfig(runningHubProviderProfileId2 || 'runninghubwf'),
-    providerProfileId = String(runningHubProviderProfileId2 || providerConfig?.['providerProfileId'] || '')['trim'](),
-    apiKey2 = String(enabled3 || providerConfig?.['apiKey'] || '')['trim']();
+    providerProfileId = String(runningHubProviderProfileId2 || providerConfig?.providerProfileId || '').trim(),
+    apiKey2 = String(enabled3 || providerConfig?.apiKey || '').trim();
   if (!apiKey2) throw new Error('RunningHub API Key 未配置');
   return runTaskSingleFlight(
     {
       provider: 'runninghubwf',
-      kind: String(entry?.['taskKind'] || entry?.['kind'] || 'video')['trim']() || 'video',
+      kind: String(entry?.taskKind || entry?.kind || 'video').trim() || 'video',
       taskId: taskId,
     },
     async () =>
@@ -149,41 +149,41 @@ export async function resumeRunninghubWorkflowTask(runningHubApiUrl, entry = {})
           taskId: taskId,
           providerProfileId: providerProfileId,
           rhProviderProfileId: providerProfileId,
-          runningHubApiUrl: runningHubApiUrl?.['runningHubApiUrl'] || providerConfig?.['apiUrl'],
+          runningHubApiUrl: runningHubApiUrl?.runningHubApiUrl || providerConfig?.apiUrl,
         },
         entry,
       ),
   );
 }
 async function resumeRunninghubWorkflowTaskOnce(providerProfileId2, signal2 = {}) {
-  const apiKey3 = String(providerProfileId2?.['apiKey'] || '')['trim'](),
-    taskId2 = String(providerProfileId2?.['taskId'] || '')['trim'](),
+  const apiKey3 = String(providerProfileId2?.apiKey || '').trim(),
+    taskId2 = String(providerProfileId2?.taskId || '').trim(),
     {
       pollIntervalMs: pollIntervalMs,
       pollTimeoutMs: pollTimeoutMs,
       maxPolls: maxPolls,
     } = resolveRunningHubWorkflowPollingPolicy(signal2),
-    record = Date['now']();
+    record = Date.now();
   for (let handle = 0; handle < maxPolls; handle++) {
     if (hasRunningHubWorkflowPollingTimedOut(record, pollTimeoutMs)) break;
-    if (signal2?.['signal']?.['aborted']) throw new Error('CANCELLED');
+    if (signal2?.signal?.aborted) throw new Error('CANCELLED');
     if (pollIntervalMs > 0) {
       await new Promise((state) => setTimeout(state, pollIntervalMs));
-      if (signal2?.['signal']?.['aborted']) throw new Error('CANCELLED');
+      if (signal2?.signal?.aborted) throw new Error('CANCELLED');
       if (hasRunningHubWorkflowPollingTimedOut(record, pollTimeoutMs)) break;
     }
     const queryRunninghubWorkflow2 = await queryRunninghubWorkflow(
         {
           apiKey: apiKey3,
           taskId: taskId2,
-          providerProfileId: providerProfileId2?.['providerProfileId'],
-          rhProviderProfileId: providerProfileId2?.['rhProviderProfileId'],
-          runningHubApiUrl: providerProfileId2?.['runningHubApiUrl'],
+          providerProfileId: providerProfileId2?.providerProfileId,
+          rhProviderProfileId: providerProfileId2?.rhProviderProfileId,
+          runningHubApiUrl: providerProfileId2?.runningHubApiUrl,
         },
-        { signal: signal2?.['signal'], useOpenapiQuery: signal2?.['useOpenapiQuery'] === true },
+        { signal: signal2?.signal, useOpenapiQuery: signal2?.useOpenapiQuery === true },
       ),
-      count = typeof queryRunninghubWorkflow2?.['code'] === 'number' ? queryRunninghubWorkflow2['code'] : null;
-    if (count !== null && RH_PENDING_CODES['has'](count)) continue;
+      count = typeof queryRunninghubWorkflow2?.code === 'number' ? queryRunninghubWorkflow2.code : null;
+    if (count !== null && RH_PENDING_CODES.has(count)) continue;
     if (count !== null && count !== 0)
       throw new Error(getRhErrorMessage(queryRunninghubWorkflow2, '任务轮询失败 (code: ' + count + ')'));
     const runningHubTaskLifecycleStatus = resolveRunningHubTaskLifecycleStatus(queryRunninghubWorkflow2);

@@ -35,13 +35,13 @@ function cloneObjectPose(box2) {
       z: Number(box2?.rotation?.z) || 0,
     },
     x2 = hasFiniteQuaternion(box2?.quaternion)
-      ? new threeRuntime['Quaternion'](
+      ? new threeRuntime.Quaternion(
           Number(box2.quaternion.x),
           Number(box2.quaternion.y),
           Number(box2.quaternion.z),
           Number(box2.quaternion.w),
         ).normalize()
-      : new threeRuntime['Quaternion']().setFromEuler(
+      : new threeRuntime.Quaternion().setFromEuler(
           new threeRuntime.Euler(rotation.x, rotation.y, rotation.z, 'XYZ'),
         );
   return {
@@ -77,7 +77,7 @@ function toCompatibleScale(value) {
   return box4;
 }
 function toVector3(box5) {
-  return new threeRuntime['Vector3'](Number(box5?.x) || 0, Number(box5?.y) || 0, Number(box5?.z) || 0);
+  return new threeRuntime.Vector3(Number(box5?.x) || 0, Number(box5?.y) || 0, Number(box5?.z) || 0);
 }
 function fromVector3(x4) {
   return { x: x4.x, y: x4.y, z: x4.z };
@@ -117,18 +117,18 @@ function rotatePoseAroundWorldAxis(key, index, result, data) {
           Number(key.quaternion.z) || 0,
           Number(key.quaternion.w) || 1,
         ).normalize()
-      : new threeRuntime['Quaternion']().setFromEuler(
-          new threeRuntime['Euler'](
+      : new threeRuntime.Quaternion().setFromEuler(
+          new threeRuntime.Euler(
             Number(key?.rotation?.x) || 0,
             Number(key?.rotation?.y) || 0,
             Number(key?.rotation?.z) || 0,
             'XYZ',
           ),
         ),
-    options = new threeRuntime['Quaternion']().setFromAxisAngle(toVector32, result),
+    options = new threeRuntime.Quaternion().setFromAxisAngle(toVector32, result),
     target = toVector34.sub(toVector33).applyQuaternion(options).add(toVector33),
     x5 = options.clone().multiply(hasFiniteQuaternion2),
-    x6 = new threeRuntime['Euler']().setFromQuaternion(x5, 'XYZ');
+    x6 = new threeRuntime.Euler().setFromQuaternion(x5, 'XYZ');
   return {
     position: fromVector3(target),
     rotation: { x: x6.x, y: x6.y, z: x6.z },

@@ -23,7 +23,7 @@ export const audioSelect = (id2, label2, options, defaultValue, args3 = {}) => (
   variant: 'pillMenu',
   placement: 'advanced',
   defaultValue: defaultValue,
-  options: options['map']((value2) =>
+  options: options.map((value2) =>
     typeof value2 === 'object'
       ? value2
       : { value: value2, label: String(value2), selectedLabel: String(value2) },
@@ -75,13 +75,13 @@ export const slotMapping = (path4, slot) => ({
   transform: { name: 'audioSlot', slot: slot },
   omitWhenEmpty: true,
 });
-export const RH_AUDIO_RESPONSE_MAPPING = Object['freeze']({
+export const RH_AUDIO_RESPONSE_MAPPING = Object.freeze({
   taskIdPath: 'taskId',
   statusPath: 'status',
   errorPath: ['errorMessage'],
   resultPaths: ['results[].url'],
 });
-export const RH_AUDIO_HELPER_IDS = Object['freeze']({
+export const RH_AUDIO_HELPER_IDS = Object.freeze({
   murekaUpload: 'runninghub.model-api.audio.mureka-upload.v1',
   murekaClone: 'runninghub.model-api.audio.mureka-clone.v1',
   coverPreprocess: 'runninghub.model-api.audio.minimax-cover-preprocess.v1',
@@ -104,7 +104,7 @@ export function createRunningHubAudioCatalogEntry({
   description: description = '',
 }) {
   const modelId = 'runninghub/' + id6,
-    executionId = 'runninghub.model-api.audio.' + id6['replaceAll']('/', '.') + '.v1',
+    executionId = 'runninghub.model-api.audio.' + id6.replaceAll('/', '.') + '.v1',
     sourceUrl = 'https://www.runninghub.cn/runninghub-api-doc-cn/api-' + docId,
     model = createAudioModelApiManifest({
       modelId: modelId,
@@ -122,15 +122,15 @@ export function createRunningHubAudioCatalogEntry({
         placeholder: promptPlaceholder,
       },
       inputSlots: {
-        allowedKinds: ['text', ...new Set(slots['map']((result) => result['kind']))],
+        allowedKinds: ['text', ...new Set(slots.map((result) => result.kind))],
         minByKind: {
           text: promptRequired ? 1 : 0,
-          audio: slots['filter']((data) => data['kind'] === 'audio' && data['required'])['length'],
+          audio: slots.filter((data) => data.kind === 'audio' && data.required).length,
         },
         maxByKind: {
-          image: slots['filter']((target) => target['kind'] === 'image')['length'],
+          image: slots.filter((target) => target.kind === 'image').length,
           video: 0,
-          audio: slots['filter']((source) => source['kind'] === 'audio')['length'],
+          audio: slots.filter((source) => source.kind === 'audio').length,
         },
         fixedSlots: slots,
       },
@@ -139,10 +139,10 @@ export function createRunningHubAudioCatalogEntry({
           name,
           description,
           promptPlaceholder,
-          ...slots['map']((next) => next['label'] + '：' + (next['required'] ? '必填' : '可选')),
+          ...slots.map((next) => next.label + '：' + (next.required ? '必填' : '可选')),
         ]
-          ['filter'](Boolean)
-          ['join']('\n'),
+          .filter(Boolean)
+          .join('\n'),
       },
       extensions: {
         audioMenu: { group: 'runninghubModel', order: order },
@@ -153,7 +153,7 @@ export function createRunningHubAudioCatalogEntry({
     execution = createAudioModelApiExecutionManifest({
       id: executionId,
       provider: 'runninghub',
-      model: endpoint['replace']('/openapi/v2/', ''),
+      model: endpoint.replace('/openapi/v2/', ''),
       endpoint: endpoint,
       bodyMapping: [...(promptField ? [promptMapping(promptField)] : []), ...mapping],
       responseMapping: RH_AUDIO_RESPONSE_MAPPING,
@@ -167,22 +167,22 @@ export function createRunningHubAudioCatalogEntry({
         sourceUrl: sourceUrl,
       },
     });
-  return Object['freeze']({ model: model, execution: execution });
+  return Object.freeze({ model: model, execution: execution });
 }
-export const runningHubAudioHelperExecutionManifests = Object['freeze'](
+export const runningHubAudioHelperExecutionManifests = Object.freeze(
   [
     ['murekaUpload', '/openapi/v2/mureka-ai/files-upload', 0x1d7ef04b],
     ['murekaClone', '/openapi/v2/mureka-ai/vocal-clone', 0x1d7ef04e],
     ['coverPreprocess', '/openapi/v2/minimax/music-cover-preprocess', 0x1d7ef03f],
-  ]['map'](([audioPreparation, endpoint2, current]) =>
-    Object['freeze']({
+  ].map(([audioPreparation, endpoint2, current]) =>
+    Object.freeze({
       schemaVersion: '1.0',
       id: RH_AUDIO_HELPER_IDS[audioPreparation],
       provider: 'runninghub',
       kind: 'text',
       adapterType: 'modelApi',
       endpoint: endpoint2,
-      model: endpoint2['replace']('/openapi/v2/', ''),
+      model: endpoint2.replace('/openapi/v2/', ''),
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       bodyMapping: [],

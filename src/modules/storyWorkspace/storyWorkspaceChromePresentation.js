@@ -1,84 +1,84 @@
 import { renderStoryGenerationSpinner } from './storyAsyncButtonPresentation.js';
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replace'](/&/g, '&amp;')
-    ['replace'](/</g, '&lt;')
-    ['replace'](/>/g, '&gt;')
-    ['replace'](/"/g, '&quot;')
-    ['replace'](/'/g, '&#39;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 function renderStepNavigation(options = {}) {
   return (
     '<nav class="story-step-navigation" data-step-count="' +
-    (options['items']?.['length'] || 3) +
+    (options.items?.length || 3) +
     '" data-active-step="' +
-    escapeHtml(options['activeStep']) +
+    escapeHtml(options.activeStep) +
     '" aria-label="剧本制作步骤">\n    ' +
-    (options['items'] || [])
-      ['map'](
+    (options.items || [])
+      .map(
         (el) =>
           '<button type="button" class="story-step ' +
-          (el['active'] ? 'is-active' : '') +
+          (el.active ? 'is-active' : '') +
           '" data-story-step="' +
-          el['id'] +
+          el.id +
           '" aria-current="' +
-          (el['active'] ? 'step' : 'false') +
+          (el.active ? 'step' : 'false') +
           '" aria-keyshortcuts="' +
-          (el['number'] ?? el['id']) +
+          (el.number ?? el.id) +
           '" ' +
-          (el['disabled'] ? 'disabled' : '') +
+          (el.disabled ? 'disabled' : '') +
           '>\n        <span>' +
-          (el['number'] ?? el['id']) +
+          (el.number ?? el.id) +
           '</span>' +
-          escapeHtml(el['label']) +
+          escapeHtml(el.label) +
           '\n      </button>',
       )
-      ['join']('') +
+      .join('') +
     '\n  </nav>'
   );
 }
 function renderEpisodeSwitcher(options2 = {}) {
-  const list = options2['options'] || [],
-    item = list['length'] > 0;
+  const list = options2.options || [],
+    item = list.length > 0;
   return (
     '<div class="story-episode-switcher ' +
     (item ? 'has-options' : '') +
     '">\n    <button type="button" class="story-episode-toolbar-current story-menu-trigger" data-story-episode-state="' +
-    (options2['isCurrentPage'] ? 'active' : 'inactive') +
+    (options2.isCurrentPage ? 'active' : 'inactive') +
     '" ' +
-    (options2['isCurrentPage']
+    (options2.isCurrentPage
       ? 'aria-current="page"'
-      : 'data-story-open-episode="' + escapeHtml(options2['currentEpisodeId']) + '"') +
+      : 'data-story-open-episode="' + escapeHtml(options2.currentEpisodeId) + '"') +
     ' ' +
     (item ? 'aria-haspopup="menu"' : '') +
     '>\n      <span class="story-episode-toolbar-current-label">' +
-    escapeHtml(options2['currentEpisodeName']) +
+    escapeHtml(options2.currentEpisodeName) +
     '</span>\n      ' +
     (item ? '<span class="story-episode-switcher-chevron" aria-hidden="true"></span>' : '') +
     '\n    </button>\n    ' +
     (item
       ? '<div class="story-episode-switcher-menu" role="menu" aria-label="切换已生成分集">\n      ' +
-        list['map'](
+        list.map(
           (error) =>
             '<button type="button" class="story-episode-switcher-option" data-story-open-episode="' +
-            escapeHtml(error['id']) +
+            escapeHtml(error.id) +
             '" role="menuitem">\n          <span>' +
-            escapeHtml(error['name']) +
+            escapeHtml(error.name) +
             '</span>\n          <small>已生成 ' +
-            error['clipCount'] +
+            error.clipCount +
             ' 个分镜片段</small>\n        </button>',
-        )['join']('') +
+        ).join('') +
         '\n    </div>'
       : '') +
     '\n  </div>'
   );
 }
 function renderEpisodeToolbarSide(options3 = {}) {
-  const key = options3['canvasSyncPending'] === true,
+  const key = options3.canvasSyncPending === true,
     index = key ? 'disabled aria-disabled="true"' : '';
   return (
     '<div class="story-episode-toolbar-side">\n      ' +
-    renderEpisodeSwitcher(options3['episodeSwitcher']) +
+    renderEpisodeSwitcher(options3.episodeSwitcher) +
     '\n      <div class="story-episode-toolbar-actions">\n        <div class="story-canvas-sync-menu-wrap">\n          <button type="button" class="story-workbench-action-button story-canvas-sync-trigger story-menu-trigger' +
     (key ? ' is-pending' : '') +
     '" data-story-action="toggle-canvas-sync-menu" ' +
@@ -98,24 +98,24 @@ function renderEpisodeToolbarSide(options3 = {}) {
 }
 export function createStoryWorkspaceChromePresentation() {
   function renderToolbar(options4 = {}) {
-    if (options4['kind'] === 'episode')
+    if (options4.kind === 'episode')
       return (
         '<div class="story-project-toolbar story-project-toolbar--episode">\n      <button type="button" class="story-toolbar-back" data-story-action="back-home"><span class="story-toolbar-back-icon" aria-hidden="true"></span><span>' +
-        escapeHtml(options4['projectLabel'] || '剧本项目') +
+        escapeHtml(options4.projectLabel || '剧本项目') +
         '</span></button>\n      ' +
-        renderStepNavigation(options4['steps']) +
+        renderStepNavigation(options4.steps) +
         '\n      ' +
         renderEpisodeToolbarSide(options4) +
         '\n    </div>'
       );
     return (
       '<div class="story-project-toolbar">\n    <button type="button" class="story-toolbar-back" data-story-action="back-home"><span class="story-toolbar-back-icon" aria-hidden="true"></span><span>' +
-      escapeHtml(options4['projectLabel'] || '剧本项目') +
+      escapeHtml(options4.projectLabel || '剧本项目') +
       '</span></button>\n    ' +
-      renderStepNavigation(options4['steps']) +
+      renderStepNavigation(options4.steps) +
       '\n    <div class="story-episode-toolbar-side">' +
-      (options4['episodeSwitcher'] ? renderEpisodeSwitcher(options4['episodeSwitcher']) : '') +
-      (options4['collaborationAvailable']
+      (options4.episodeSwitcher ? renderEpisodeSwitcher(options4.episodeSwitcher) : '') +
+      (options4.collaborationAvailable
         ? '<button type="button" class="story-secondary-button" data-collaboration-toggle>AI 协作</button>'
         : '') +
       '</div>\n  </div>'
@@ -124,32 +124,32 @@ export function createStoryWorkspaceChromePresentation() {
   function renderFooter(options5 = {}) {
     const result =
         '\n      ' +
-        (options5['showPrevious']
+        (options5.showPrevious
           ? '<button type="button" class="story-secondary-button button-press-feedback" data-story-action="previous-step"><span>上一步</span></button>'
           : '') +
         '\n      <button type="button" class="story-next-button" data-story-action="' +
-        escapeHtml(options5['nextAction']) +
+        escapeHtml(options5.nextAction) +
         '" ' +
-        (options5['busy'] ? 'disabled' : '') +
+        (options5.busy ? 'disabled' : '') +
         ' aria-busy="' +
-        Boolean(options5['busy']) +
+        Boolean(options5.busy) +
         '">' +
-        (options5['busy'] ? renderStoryGenerationSpinner({ button: true }) : '') +
+        (options5.busy ? renderStoryGenerationSpinner({ button: true }) : '') +
         '<span>' +
-        escapeHtml(options5['nextLabel']) +
+        escapeHtml(options5.nextLabel) +
         '</span>' +
-        (options5['busy'] ? '' : '<span class="story-next-arrow" aria-hidden="true">→</span>') +
+        (options5.busy ? '' : '<span class="story-next-arrow" aria-hidden="true">→</span>') +
         '</button>',
-      data = '' + (options5['leadingActionsMarkup'] || '') + (options5['actionsMarkup'] || result);
+      data = '' + (options5.leadingActionsMarkup || '') + (options5.actionsMarkup || result);
     return (
       '<footer class="story-page-footer">\n    <div>\n      <strong>' +
-      escapeHtml(options5['title']) +
+      escapeHtml(options5.title) +
       '</strong>\n      <small>' +
-      escapeHtml(options5['hint']) +
+      escapeHtml(options5.hint) +
       '</small>\n    </div>\n    <div class="story-page-footer-actions">\n      ' +
       data +
       '\n    </div>\n  </footer>'
     );
   }
-  return Object['freeze']({ renderFooter: renderFooter, renderToolbar: renderToolbar });
+  return Object.freeze({ renderFooter: renderFooter, renderToolbar: renderToolbar });
 }

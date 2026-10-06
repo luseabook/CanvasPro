@@ -1,34 +1,34 @@
 const mirrors = new WeakMap();
 export function captureBackgroundTaskCanvas(store, nodes, value) {
-  const persistRev = store['getStateRaw'](),
-    canvas = mirrors['get'](store),
+  const persistRev = store.getStateRaw(),
+    canvas = mirrors.get(store),
     count =
-      value && canvas?.['canvas'] === nodes
-        ? nodes['nodes']?.['findIndex']((item) => item['id'] === value)
+      value && canvas?.canvas === nodes
+        ? nodes.nodes?.findIndex((item) => item.id === value)
         : -1,
     key =
       count >= 0 &&
-      typeof store['serializeNode'] === 'function' &&
-      persistRev['_persistRev'] === canvas['persistRev'] + 1 &&
-      persistRev['_contentPersistRev'] === canvas['contentRev'] + 1 &&
-      persistRev['_nodeMembershipRev'] === canvas['membershipRev'] &&
-      persistRev['_edgesRev'] === canvas['edgesRev'],
-    index = key ? store['serializeNode'](value) : null,
+      typeof store.serializeNode === 'function' &&
+      persistRev._persistRev === canvas.persistRev + 1 &&
+      persistRev._contentPersistRev === canvas.contentRev + 1 &&
+      persistRev._nodeMembershipRev === canvas.membershipRev &&
+      persistRev._edgesRev === canvas.edgesRev,
+    index = key ? store.serializeNode(value) : null,
     snapshot = index
       ? {
           ...nodes,
-          nodes: nodes['nodes']['map']((result, data) => (data === count ? index : result)),
+          nodes: nodes.nodes.map((result, data) => (data === count ? index : result)),
         }
-      : store['serialize']();
+      : store.serialize();
   return {
     snapshot: snapshot,
     remember(canvas2) {
-      mirrors['set'](store, {
+      mirrors.set(store, {
         canvas: canvas2,
-        persistRev: persistRev['_persistRev'],
-        contentRev: persistRev['_contentPersistRev'],
-        membershipRev: persistRev['_nodeMembershipRev'],
-        edgesRev: persistRev['_edgesRev'],
+        persistRev: persistRev._persistRev,
+        contentRev: persistRev._contentPersistRev,
+        membershipRev: persistRev._nodeMembershipRev,
+        edgesRev: persistRev._edgesRev,
       });
     },
   };

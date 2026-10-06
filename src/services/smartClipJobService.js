@@ -2,7 +2,7 @@ import { requester } from '../../api/requester.js';
 export const SMART_CLIP_MIN_SEGMENTS = 2;
 export const SMART_CLIP_MAX_SEGMENTS = 25;
 export const SMART_CLIP_DEFAULT_SEGMENTS = 20;
-export const SMART_CLIP_FPS_OPTIONS = Object['freeze']([16, 24, 30]);
+export const SMART_CLIP_FPS_OPTIONS = Object.freeze([16, 24, 30]);
 export const SMART_CLIP_DEFAULT_FPS = 24;
 export const SMART_CLIP_MAX_SEGMENT_DURATION_SECONDS = 600;
 export const SMART_CLIP_OUTPUT_MODE_SEGMENTS = 'videoSegments';
@@ -10,38 +10,38 @@ export const SMART_CLIP_OUTPUT_MODE_KEYFRAMES = 'keyframes';
 export const SMART_CLIP_OUTPUT_MODE_ANALYSIS = 'analysis';
 export const SMART_CLIP_DEFAULT_OUTPUT_MODE = SMART_CLIP_OUTPUT_MODE_SEGMENTS;
 export const SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON = 'person';
-const SMART_CLIP_MODE_OPTIONS = Object['freeze'](['stable', 'balanced', 'sensitive']),
+const SMART_CLIP_MODE_OPTIONS = Object.freeze(['stable', 'balanced', 'sensitive']),
   SMART_CLIP_STATUS_POLL_INTERVAL_MS = 800;
 function toErrorMessage(error, value) {
-  return String(error?.['message'] || error || value || 'Smart clip failed');
+  return String(error?.message || error || value || 'Smart clip failed');
 }
 export class SmartClipJobError extends Error {
   constructor(item, { code: code = 'smart_clip_failed', stage: stage = 'unknown', jobId: jobId = '' } = {}) {
     (super(String(item || 'Smart clip failed')),
-      (this['name'] = 'SmartClipJobError'),
-      (this['code'] = code),
-      (this['stage'] = stage),
-      (this['jobId'] = String(jobId || '')));
+      (this.name = 'SmartClipJobError'),
+      (this.code = code),
+      (this.stage = stage),
+      (this.jobId = String(jobId || '')));
   }
 }
 export function normalizeSmartClipMaxSegments(key) {
   const index = Number(key),
-    result = Number['isFinite'](index) ? Math['round'](index) : SMART_CLIP_DEFAULT_SEGMENTS;
-  return Math['max'](SMART_CLIP_MIN_SEGMENTS, Math['min'](SMART_CLIP_MAX_SEGMENTS, result));
+    result = Number.isFinite(index) ? Math.round(index) : SMART_CLIP_DEFAULT_SEGMENTS;
+  return Math.max(SMART_CLIP_MIN_SEGMENTS, Math.min(SMART_CLIP_MAX_SEGMENTS, result));
 }
 export function normalizeSmartClipFps(data) {
   const options = Number(data),
-    target = Number['isFinite'](options) ? Math['round'](options) : SMART_CLIP_DEFAULT_FPS;
-  return SMART_CLIP_FPS_OPTIONS['includes'](target) ? target : SMART_CLIP_DEFAULT_FPS;
+    target = Number.isFinite(options) ? Math.round(options) : SMART_CLIP_DEFAULT_FPS;
+  return SMART_CLIP_FPS_OPTIONS.includes(target) ? target : SMART_CLIP_DEFAULT_FPS;
 }
 export function normalizeSmartClipMaxSegmentDuration(source) {
   if (source === undefined || source === null || source === '') return 0;
   const count = Number(source);
-  if (!Number['isFinite'](count) || count <= 0) return 0;
-  return Math['max'](1, Math['min'](SMART_CLIP_MAX_SEGMENT_DURATION_SECONDS, count));
+  if (!Number.isFinite(count) || count <= 0) return 0;
+  return Math.max(1, Math.min(SMART_CLIP_MAX_SEGMENT_DURATION_SECONDS, count));
 }
 export function normalizeSmartClipOutputMode(next) {
-  const current = String(next || '')['trim']();
+  const current = String(next || '').trim();
   if (current === SMART_CLIP_OUTPUT_MODE_ANALYSIS) return SMART_CLIP_OUTPUT_MODE_ANALYSIS;
   return current === SMART_CLIP_OUTPUT_MODE_KEYFRAMES
     ? SMART_CLIP_OUTPUT_MODE_KEYFRAMES
@@ -49,27 +49,27 @@ export function normalizeSmartClipOutputMode(next) {
 }
 export function normalizeSmartClipMode(entry) {
   const record = String(entry || '')
-    ['trim']()
-    ['toLowerCase']();
-  return SMART_CLIP_MODE_OPTIONS['includes'](record) ? record : 'stable';
+    .trim()
+    .toLowerCase();
+  return SMART_CLIP_MODE_OPTIONS.includes(record) ? record : 'stable';
 }
 export function normalizeSmartClipRunOptions(options2 = {}) {
   const payload = options2 && typeof options2 === 'object' ? options2 : {};
   return {
-    mode: normalizeSmartClipMode(payload['mode']),
-    ...(payload['unlimitedSegments'] === true
+    mode: normalizeSmartClipMode(payload.mode),
+    ...(payload.unlimitedSegments === true
       ? { unlimitedSegments: true }
-      : { maxSegments: normalizeSmartClipMaxSegments(payload['maxSegments']) }),
-    fps: normalizeSmartClipFps(payload['fps']),
-    outputMode: normalizeSmartClipOutputMode(payload['outputMode']),
-    ...(String(payload['keyframeSelectionPolicy'] || '')
-      ['trim']()
-      ['toLowerCase']() === SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON
+      : { maxSegments: normalizeSmartClipMaxSegments(payload.maxSegments) }),
+    fps: normalizeSmartClipFps(payload.fps),
+    outputMode: normalizeSmartClipOutputMode(payload.outputMode),
+    ...(String(payload.keyframeSelectionPolicy || '')
+      .trim()
+      .toLowerCase() === SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON
       ? { keyframeSelectionPolicy: SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON }
       : {}),
-    ...(payload['preserveWholeVideo'] === true ? { preserveWholeVideo: true } : {}),
-    ...(normalizeSmartClipMaxSegmentDuration(payload['maxSegmentDurationSec']) > 0
-      ? { maxSegmentDurationSec: normalizeSmartClipMaxSegmentDuration(payload['maxSegmentDurationSec']) }
+    ...(payload.preserveWholeVideo === true ? { preserveWholeVideo: true } : {}),
+    ...(normalizeSmartClipMaxSegmentDuration(payload.maxSegmentDurationSec) > 0
+      ? { maxSegmentDurationSec: normalizeSmartClipMaxSegmentDuration(payload.maxSegmentDurationSec) }
       : {}),
   };
 }
@@ -80,7 +80,7 @@ function emitProgress(handler, handle) {
   } catch {}
 }
 function isCancelled(state, handler2) {
-  return state?.['aborted'] === true || (typeof handler2 === 'function' && handler2() === false);
+  return state?.aborted === true || (typeof handler2 === 'function' && handler2() === false);
 }
 function throwIfCancelled(config, scope, jobId2 = '') {
   if (!isCancelled(config, scope)) return;
@@ -91,13 +91,13 @@ function throwIfCancelled(config, scope, jobId2 = '') {
   });
 }
 function waitForNextPoll(input, el) {
-  const count2 = Math['max'](0, Number(input) || 0);
-  if (count2 <= 0) return Promise['resolve']();
+  const count2 = Math.max(0, Number(input) || 0);
+  if (count2 <= 0) return Promise.resolve();
   return new Promise((output, handler3) => {
     let value2 = false;
     const run = (handler4) => {
         if (value2) return;
-        ((value2 = true), el?.['removeEventListener']?.('abort', handler5), handler4());
+        ((value2 = true), el?.removeEventListener?.('abort', handler5), handler4());
       },
       setTimeout2 = setTimeout(() => run(output), count2),
       handler5 = () => {
@@ -108,13 +108,13 @@ function waitForNextPoll(input, el) {
             ),
           ));
       };
-    if (el?.['aborted']) handler5();
-    else el?.['addEventListener']?.('abort', handler5, { once: true });
+    if (el?.aborted) handler5();
+    else el?.addEventListener?.('abort', handler5, { once: true });
   });
 }
 function readResponseData(value3) {
-  if (value3 && typeof value3 === 'object' && Object['prototype']['hasOwnProperty']['call'](value3, 'data'))
-    return value3['data'];
+  if (value3 && typeof value3 === 'object' && Object.prototype.hasOwnProperty.call(value3, 'data'))
+    return value3.data;
   return value3;
 }
 export async function runSmartClipJob({
@@ -127,7 +127,7 @@ export async function runSmartClipJob({
   pollIntervalMs: pollIntervalMs = SMART_CLIP_STATUS_POLL_INTERVAL_MS,
   wait: wait = waitForNextPoll,
 } = {}) {
-  const src2 = String(src || '')['trim']();
+  const src2 = String(src || '').trim();
   if (!src2)
     throw new SmartClipJobError('Missing smart clip source', { code: 'invalid_source', stage: 'prepare' });
   if (typeof request !== 'function') throw new TypeError('Smart clip request function is required');
@@ -140,31 +140,31 @@ export async function runSmartClipJob({
       method: 'POST',
       provider: 'local',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON['stringify']({ src: src2, options: options4 }),
+      body: JSON.stringify({ src: src2, options: options4 }),
       allow404Null: true,
       returnMeta: true,
       signal: signal,
     });
   } catch (value4) {
-    if (signal?.['aborted'] || value4?.['code'] === 'cancelled')
+    if (signal?.aborted || value4?.code === 'cancelled')
       throw new SmartClipJobError('Smart clip cancelled', { code: 'cancelled', stage: 'cancelled' });
     throw new SmartClipJobError(toErrorMessage(value4, 'Smart clip start failed'), {
       code: 'start_failed',
       stage: 'start',
     });
   }
-  if (response?.['status'] === 404 || readResponseData(response) == null)
+  if (response?.status === 404 || readResponseData(response) == null)
     throw new SmartClipJobError('Smart clip endpoint unavailable', {
       code: 'endpoint_unavailable',
       stage: 'start',
     });
   const response2 = readResponseData(response) || {};
-  if (!response2['success'])
-    throw new SmartClipJobError(response2['error'] || 'Smart clip start failed', {
+  if (!response2.success)
+    throw new SmartClipJobError(response2.error || 'Smart clip start failed', {
       code: 'start_failed',
       stage: 'start',
     });
-  const jobId3 = String(response2['jobId'] || '')['trim']();
+  const jobId3 = String(response2.jobId || '').trim();
   if (!jobId3)
     throw new SmartClipJobError('Smart clip start response is missing jobId', {
       code: 'missing_job_id',
@@ -183,7 +183,7 @@ export async function runSmartClipJob({
         signal: signal,
       });
     } catch (value5) {
-      if (signal?.['aborted'] || value5?.['code'] === 'cancelled')
+      if (signal?.aborted || value5?.code === 'cancelled')
         throw new SmartClipJobError('Smart clip cancelled', {
           code: 'cancelled',
           stage: 'cancelled',
@@ -199,31 +199,31 @@ export async function runSmartClipJob({
     emitProgress(onProgress, {
       ...job,
       jobId: jobId3,
-      outputMode: normalizeSmartClipOutputMode(job['outputMode'] || options4['outputMode']),
+      outputMode: normalizeSmartClipOutputMode(job.outputMode || options4.outputMode),
     });
-    if (job['status'] === 'error' || job['status'] === 'failed')
-      throw new SmartClipJobError(job['error'] || 'Smart clip job failed', {
+    if (job.status === 'error' || job.status === 'failed')
+      throw new SmartClipJobError(job.error || 'Smart clip job failed', {
         code: 'job_failed',
-        stage: String(job['stage'] || 'processing'),
+        stage: String(job.stage || 'processing'),
         jobId: jobId3,
       });
-    if (job['status'] === 'cancelled')
-      throw new SmartClipJobError(job['error'] || 'Smart clip cancelled', {
+    if (job.status === 'cancelled')
+      throw new SmartClipJobError(job.error || 'Smart clip cancelled', {
         code: 'cancelled',
-        stage: String(job['stage'] || 'cancelled'),
+        stage: String(job.stage || 'cancelled'),
         jobId: jobId3,
       });
-    if (job['status'] === 'done' || job['status'] === 'complete')
+    if (job.status === 'done' || job.status === 'complete')
       return {
         jobId: jobId3,
-        outputMode: normalizeSmartClipOutputMode(job['outputMode'] || options4['outputMode']),
-        segments: Array['isArray'](job['segments']) ? job['segments'] : [],
+        outputMode: normalizeSmartClipOutputMode(job.outputMode || options4.outputMode),
+        segments: Array.isArray(job.segments) ? job.segments : [],
         job: job,
       };
     try {
       await wait(pollIntervalMs, signal);
     } catch (value6) {
-      if (signal?.['aborted'] || value6?.['code'] === 'cancelled')
+      if (signal?.aborted || value6?.code === 'cancelled')
         throw new SmartClipJobError('Smart clip cancelled', {
           code: 'cancelled',
           stage: 'cancelled',

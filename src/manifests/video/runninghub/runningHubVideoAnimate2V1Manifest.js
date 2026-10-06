@@ -11,22 +11,22 @@ export const RH_VIDEO_ANIMATE2_V1_HELP_TOOLTIP = [
   '视频编辑Animate2 V1用法',
   '必接 [[red:源视频]] + [[red:参考图]]',
   '提示词可以留空；可在高级设置中选择模式并描述原视频姿势',
-]['join']('\n');
+].join('\n');
 export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest({
   modelId: RH_VIDEO_ANIMATE2_V1_MODEL_ID,
   executionId: RH_VIDEO_ANIMATE2_V1_EXECUTION_ID,
   displayName: '视频编辑Animate2 V1',
   description: '源视频 + 参考图的 Animate2 视频编辑工作流',
   vip: false,
-  prompt: Object['freeze']({ emptyPolicy: 'allow', placeholder: '输入编辑要求（可留空）' }),
-  help: Object['freeze']({ tooltip: RH_VIDEO_ANIMATE2_V1_HELP_TOOLTIP }),
-  extensions: Object['freeze']({
-    providerProfiles: Object['freeze'](['runninghub', 'runninghub-international']),
-    videoParameterPanel: Object['freeze']({
+  prompt: Object.freeze({ emptyPolicy: 'allow', placeholder: '输入编辑要求（可留空）' }),
+  help: Object.freeze({ tooltip: RH_VIDEO_ANIMATE2_V1_HELP_TOOLTIP }),
+  extensions: Object.freeze({
+    providerProfiles: Object.freeze(['runninghub', 'runninghub-international']),
+    videoParameterPanel: Object.freeze({
       sourceFrameCountFps: 'v54',
       submitScopeTargetEdges: true,
-      frameStateDefaults: Object['freeze']({ frameRate: 24, frameCount: 50 }),
-      adaptiveRatio: Object['freeze']({
+      frameStateDefaults: Object.freeze({ frameRate: 24, frameCount: 50 }),
+      adaptiveRatio: Object.freeze({
         scopeTargetEdges: true,
         preferSlot: 'sourceVideo',
         preferVideoKind: true,
@@ -38,15 +38,15 @@ export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest
     allowedKinds: ['text', 'image', 'video'],
     minByKind: { image: 1, video: 1 },
     maxByKind: { image: 1, video: 1, audio: 0 },
-    fixedSlots: Object['freeze']([
-      Object['freeze']({ id: 'sourceVideo', kind: 'video', label: '源视频', required: true }),
-      Object['freeze']({ id: 'refImage', kind: 'image', label: '参考图', required: true }),
+    fixedSlots: Object.freeze([
+      Object.freeze({ id: 'sourceVideo', kind: 'video', label: '源视频', required: true }),
+      Object.freeze({ id: 'refImage', kind: 'image', label: '参考图', required: true }),
     ]),
   },
   uiFields: [
     RH_VIDEO_RESOLUTION_FIELD,
     RH_VIDEO_FPS_30_FIELD,
-    Object['freeze']({
+    Object.freeze({
       id: 'rhVideoFrames',
       type: 'stepper',
       placement: 'videoParams',
@@ -56,20 +56,20 @@ export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest
       max: 0xf423f,
       step: 1,
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'rhAnimate2Mode',
       type: 'select',
       placement: 'videoAdvanced',
       variant: 'advancedRow',
       label: '模式选择',
       defaultValue: '1',
-      options: Object['freeze']([
-        Object['freeze']({ value: '0', label: '原版' }),
-        Object['freeze']({ value: '1', label: '模式1' }),
-        Object['freeze']({ value: '2', label: '模式2' }),
+      options: Object.freeze([
+        Object.freeze({ value: '0', label: '原版' }),
+        Object.freeze({ value: '1', label: '模式1' }),
+        Object.freeze({ value: '2', label: '模式2' }),
       ]),
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'rhAnimate2SourcePose',
       type: 'textarea',
       placement: 'videoAdvanced',
@@ -79,16 +79,16 @@ export const rhVideoAnimate2V1ModelManifest = createRunningHubVideoModelManifest
       allowEmpty: true,
       description: '可选；用多行文本补充描述源视频中的姿势和动作。',
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'rhAnimate2LongVideoOverlay',
       type: 'segmented',
       placement: 'videoAdvanced',
       variant: 'advancedRow',
       label: '长视频叠加',
       defaultValue: false,
-      options: Object['freeze']([
-        Object['freeze']({ value: true, label: '是' }),
-        Object['freeze']({ value: false, label: '否' }),
+      options: Object.freeze([
+        Object.freeze({ value: true, label: '是' }),
+        Object.freeze({ value: false, label: '否' }),
       ]),
     }),
     RH_INSTANCE_FIELD,
@@ -100,14 +100,14 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
   workflowId: '2086051371794657282',
   submitMode: 'openapi-v2-ai-app',
   queryMode: 'openapi-v2-query',
-  extensions: Object['freeze']({
-    providerProfileBindings: Object['freeze']({
-      'runninghub-international': Object['freeze']({ appId: '2086056089641525250' }),
+  extensions: Object.freeze({
+    providerProfileBindings: Object.freeze({
+      'runninghub-international': Object.freeze({ appId: '2086056089641525250' }),
     }),
   }),
   mapping: {
-    nodeInfoList: Object['freeze']([
-      Object['freeze']({
+    nodeInfoList: Object.freeze([
+      Object.freeze({
         nodeId: '647',
         fieldName: 'video',
         source: 'videoInput',
@@ -115,29 +115,29 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         missingMessage: '请接入源视频',
         description: '视频上传',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '647',
         fieldName: 'force_rate',
         source: 'param',
-        fields: Object['freeze'](['generationParams.rhVideoFps', 'rhVideoFps', 'frameRate']),
+        fields: Object.freeze(['generationParams.rhVideoFps', 'rhVideoFps', 'frameRate']),
         defaultValue: 24,
         transform: 'normalizeRhVideoFps',
         description: '帧率',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '647',
         fieldName: 'frame_load_cap',
         source: 'param',
-        fields: Object['freeze'](['generationParams.rhVideoFrames', 'rhVideoFrames', 'frameCount']),
+        fields: Object.freeze(['generationParams.rhVideoFrames', 'rhVideoFrames', 'frameCount']),
         defaultValue: 50,
-        transform: Object['freeze']({ name: 'integer', min: 0 }),
+        transform: Object.freeze({ name: 'integer', min: 0 }),
         description: '帧数',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '728',
         fieldName: 'value',
         source: 'param',
-        fields: Object['freeze']([
+        fields: Object.freeze([
           'generationParams.rhAnimate2LongVideoOverlay',
           'rhAnimate2LongVideoOverlay',
         ]),
@@ -145,7 +145,7 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         transform: 'booleanString',
         description: '长视频叠加',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '655',
         fieldName: 'image',
         source: 'imageInput',
@@ -154,25 +154,25 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         missingMessage: '请接入参考图',
         description: '图片上传',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '722',
         fieldName: 'value',
         source: 'param',
-        fields: Object['freeze'](['generationParams.rhAnimate2Mode', 'rhAnimate2Mode']),
+        fields: Object.freeze(['generationParams.rhAnimate2Mode', 'rhAnimate2Mode']),
         defaultValue: '1',
-        transform: Object['freeze']({ name: 'integer', min: 0, max: 2 }),
+        transform: Object.freeze({ name: 'integer', min: 0, max: 2 }),
         description: '模式选择（0~2）',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '637',
         fieldName: 'value',
         source: 'param',
-        fields: Object['freeze'](['generationParams.rhVideoResolution', 'rhVideoResolution']),
+        fields: Object.freeze(['generationParams.rhVideoResolution', 'rhVideoResolution']),
         defaultValue: 832,
         transform: 'normalizeRhVideoResolution',
         description: '分辨率',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '642',
         fieldName: 'value',
         source: 'prompt',
@@ -180,11 +180,11 @@ export const rhVideoAnimate2V1ExecutionManifest = createRunningHubVideoExecution
         includeEmpty: true,
         description: '提示词',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '651',
         fieldName: 'value',
         source: 'param',
-        fields: Object['freeze'](['generationParams.rhAnimate2SourcePose', 'rhAnimate2SourcePose']),
+        fields: Object.freeze(['generationParams.rhAnimate2SourcePose', 'rhAnimate2SourcePose']),
         defaultValue: '',
         allowEmpty: true,
         description: '描述原视频姿势',

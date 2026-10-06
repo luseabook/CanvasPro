@@ -9,56 +9,56 @@ import { freezeBodyMapping, VIDEO_SIZE_RATIO_POLICY } from './vendorVideoModelAp
 import { MINIMAX_MODEL_API_PROFILE_IDS } from '../../../modules/minimaxProviderProfiles.js';
 const MINIMAX_H3_MODE_FIELD_ID = 'minimax_h3_mode',
   MINIMAX_H3_BODY_MAPPING = freezeBodyMapping([
-    Object['freeze']({ path: 'model', from: 'model' }),
-    Object['freeze']({ path: 'prompt', from: 'prompt' }),
-    Object['freeze']({
+    Object.freeze({ path: 'model', from: 'model' }),
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
       path: MINIMAX_H3_MODE_FIELD_ID,
       from: 'param',
-      field: Object['freeze'](['generationParams.' + MINIMAX_H3_MODE_FIELD_ID, MINIMAX_H3_MODE_FIELD_ID]),
+      field: Object.freeze(['generationParams.' + MINIMAX_H3_MODE_FIELD_ID, MINIMAX_H3_MODE_FIELD_ID]),
       defaultValue: 'frames',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'resolution',
       from: 'param',
-      field: Object['freeze'](['generationParams.resolution', 'resolution']),
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
       defaultValue: '2K',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'duration',
       from: 'param',
-      field: Object['freeze'](['generationParams.duration', 'duration']),
+      field: Object.freeze(['generationParams.duration', 'duration']),
       defaultValue: 5,
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'ratio',
       from: 'param',
-      field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio', 'ratio']),
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio', 'ratio']),
       defaultValue: '16:9',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'aigc_watermark',
       from: 'param',
-      field: Object['freeze'](['generationParams.watermark', 'watermark', 'aigc_watermark']),
+      field: Object.freeze(['generationParams.watermark', 'watermark', 'aigc_watermark']),
       defaultValue: false,
       transform: 'booleanParam',
     }),
   ]),
-  MINIMAX_H3_RESPONSE_MAPPING = Object['freeze']({
+  MINIMAX_H3_RESPONSE_MAPPING = Object.freeze({
     taskIdPath: 'task_id',
     statusPath: 'task.status',
-    errorPaths: Object['freeze'](['task.error.message', 'error.message', 'error']),
-    resultPaths: Object['freeze'](['task.content.url']),
+    errorPaths: Object.freeze(['task.error.message', 'error.message', 'error']),
+    resultPaths: Object.freeze(['task.content.url']),
   }),
-  MINIMAX_H3_TASK_POLLING = Object['freeze']({
+  MINIMAX_H3_TASK_POLLING = Object.freeze({
     mode: 'task-proxy',
     method: 'GET',
     urlTemplate: '{baseUrl}/v2/query/video_generation/{taskId}',
     headersMode: 'bearer',
-    successStatuses: Object['freeze'](['succeeded']),
-    failedStatuses: Object['freeze'](['failed', 'cancelled']),
+    successStatuses: Object.freeze(['succeeded']),
+    failedStatuses: Object.freeze(['failed', 'cancelled']),
   });
-export const MINIMAX_VIDEO_MODELS = Object['freeze']([
-  Object['freeze']({
+export const MINIMAX_VIDEO_MODELS = Object.freeze([
+  Object.freeze({
     modelId: 'minimax/hailuo-h3',
     executionId: 'minimax.model-api.video.hailuo-h3.v1',
     displayName: '海螺H3',
@@ -73,17 +73,17 @@ export const MINIMAX_VIDEO_MODELS = Object['freeze']([
     responseMapping: MINIMAX_H3_RESPONSE_MAPPING,
     taskPolling: MINIMAX_H3_TASK_POLLING,
     resultTaskIdPath: 'task_id',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'minimaxH3Video',
       mergeGenericInputImagesWithSlots: true,
     }),
-    ratioPolicy: Object['freeze']({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
+    ratioPolicy: Object.freeze({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
     prompt: createMinimaxH3Prompt(MINIMAX_H3_MODE_FIELD_ID),
-    help: Object['freeze']({ tooltip: MINIMAX_H3_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'minimax-h3' }),
+    help: Object.freeze({ tooltip: MINIMAX_H3_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'minimax-h3' }),
       providerProfiles: MINIMAX_MODEL_API_PROFILE_IDS,
-      videoMenu: Object['freeze']({
+      videoMenu: Object.freeze({
         role: 'minimaxOfficialModel',
         order: 10,
         label: '海螺H3',

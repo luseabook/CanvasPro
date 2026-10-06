@@ -24,47 +24,47 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
       generateImage: generateImage2 = generateImage,
     } = item,
     canvasImageSourceUrl = resolveCanvasImageSourceUrl(
-      sourceNodeId['images']?.[sourceNodeId['mainImageIndex'] || 0] || sourceNodeId,
+      sourceNodeId.images?.[sourceNodeId.mainImageIndex || 0] || sourceNodeId,
     );
   if (!canvasImageSourceUrl) throw new Error(imageDepthText('missingImage'));
   const modelExecution = resolveModelExecution(RH_IMAGE_DEPTH_MODEL_ID);
   if (!modelExecution) throw new Error(imageDepthText('missingWorkflow'));
   const { modelManifest: modelManifest, executionManifest: executionManifest } = modelExecution,
-    generationParams = sanitizeModelUiSchemaParams(modelManifest['modelId'], key['generationParams']);
+    generationParams = sanitizeModelUiSchemaParams(modelManifest.modelId, key.generationParams);
   await ensureConfig();
   if (!isTargetCurrent()) return null;
-  const apiKey = getProviderConfig(key['providerProfileId'] || modelManifest['provider']) || {},
-    providerId = key['providerProfileId'] || apiKey['providerProfileId'];
-  if (!String(apiKey['apiKey'] || '')['trim']())
+  const apiKey = getProviderConfig(key.providerProfileId || modelManifest.provider) || {},
+    providerId = key.providerProfileId || apiKey.providerProfileId;
+  if (!String(apiKey.apiKey || '').trim())
     return (
       showProviderApiKeyMissingToast(imageDepthText('missingKey'), {
-        providerId: providerId || modelManifest['provider'],
+        providerId: providerId || modelManifest.provider,
       }),
       null
     );
-  const box = calcDisplaySizeByMedia(sourceNodeId['width'] || 300, sourceNodeId['height'] || 300),
+  const box = calcDisplaySizeByMedia(sourceNodeId.width || 300, sourceNodeId.height || 300),
     args = calcSafeSpawnPosNearNode(
-      (store['getStateRaw']?.() || store['getState']())['nodes'],
+      (store.getStateRaw?.() || store.getState()).nodes,
       sourceNodeId,
-      box['width'],
-      box['height'],
+      box.width,
+      box.height,
     ),
     id = generateId('source-image-depth');
   return submitTask(
     {
-      sourceNodeId: sourceNodeId['id'],
+      sourceNodeId: sourceNodeId.id,
       trigger: 'toolbar',
       taskType: IMAGE_DEPTH_TASK_TYPE,
-      provider: modelManifest['provider'],
-      adapterType: modelManifest['adapterType'],
-      modelId: modelManifest['modelId'],
-      executionId: executionManifest['id'],
+      provider: modelManifest.provider,
+      adapterType: modelManifest.adapterType,
+      modelId: modelManifest.modelId,
+      executionId: executionManifest.id,
       payload: {
-        model: modelManifest['modelId'],
-        provider: modelManifest['provider'],
+        model: modelManifest.modelId,
+        provider: modelManifest.provider,
         providerProfileId: providerId,
-        apiKey: apiKey['apiKey'],
-        runningHubApiUrl: apiKey['apiUrl'],
+        apiKey: apiKey.apiKey,
+        runningHubApiUrl: apiKey.apiUrl,
         inputUrls: [canvasImageSourceUrl],
         prompt: '',
         generationParams: generationParams,
@@ -83,19 +83,19 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
           name: imageDepthText('processing'),
           src: '',
           localPath: '',
-          provider: modelManifest['provider'],
-          model: modelManifest['modelId'],
+          provider: modelManifest.provider,
+          model: modelManifest.modelId,
           rhTaskUseOpenapiQuery: true,
           ...startPatch,
           ...protocolPatch,
         }),
       submit: async (index, signal) => {
-        if (isTargetCurrent()) store['setSelectedNodes']([signal['targetNodeId']]);
+        if (isTargetCurrent()) store.setSelectedNodes([signal.targetNodeId]);
         const result = await generateImage2(index, {
-            signal: signal['signal'],
-            runningHubWorkflowQueueLease: signal['runningHubWorkflowQueueLease'],
-            onRunningHubWorkflowQueueChange: signal['onRunningHubWorkflowQueueChange'],
-            onTaskMeta: ({ taskId: taskId }) => signal['onTaskId']?.(taskId),
+            signal: signal.signal,
+            runningHubWorkflowQueueLease: signal.runningHubWorkflowQueueLease,
+            onRunningHubWorkflowQueueChange: signal.onRunningHubWorkflowQueueChange,
+            onTaskMeta: ({ taskId: taskId }) => signal.onTaskId?.(taskId),
           }),
           imageGenerationResultError = getImageGenerationResultError(result);
         if (imageGenerationResultError) throw new Error(imageGenerationResultError);
@@ -104,19 +104,19 @@ export async function submitImageDepthTask(item, key, sourceNodeId, isTargetCurr
       cancel: ({ taskId: taskId2 }) =>
         cancelRunningHubRemoteTaskQuietly({
           taskId: taskId2,
-          apiKey: apiKey['apiKey'],
+          apiKey: apiKey.apiKey,
           providerProfileId: providerId,
           label: 'ImageDepth',
         }),
       resultBuilder: (data, startedAt) => ({
-        ...buildImageGenerationResultPatch(data, { startedAt: startedAt['startedAt'] }),
+        ...buildImageGenerationResultPatch(data, { startedAt: startedAt.startedAt }),
         name: imageDepthText('result'),
         needsAutoResize: true,
       }),
       failureBuilder: (error, startedAt2) => ({
         ...buildImageGenerationFailurePatch({
-          error: error['message'] || String(error),
-          startedAt: startedAt2['startedAt'],
+          error: error.message || String(error),
+          startedAt: startedAt2.startedAt,
         }),
         name: imageDepthText('failed'),
       }),

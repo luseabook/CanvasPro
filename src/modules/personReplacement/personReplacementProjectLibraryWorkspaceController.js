@@ -8,7 +8,7 @@ import {
   createPersonReplacementProjectPackagePayload,
 } from './personReplacementProjectPackage.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 export function createPersonReplacementProjectLibraryWorkspaceController({
   getProject: getProject,
@@ -35,7 +35,7 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
   function run(item, handler) {
     const id = normalizeText(item),
       currentProjectId = getLibrary(),
-      enabled = currentProjectId['projects']['find']((key) => key['id'] === id);
+      enabled = currentProjectId.projects.find((key) => key.id === id);
     if (!enabled || typeof handler !== 'function') return null;
     const index = createApplicationProject(
       { ...handler(cloneJson(enabled)), id: id, updatedAt: now() },
@@ -45,11 +45,11 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
       setLibrary(
         normalizePersonReplacementProjectLibrary({
           ...currentProjectId,
-          currentProjectId: currentProjectId['currentProjectId'],
-          projects: currentProjectId['projects']['map']((result) => (result['id'] === id ? index : result)),
+          currentProjectId: currentProjectId.currentProjectId,
+          projects: currentProjectId.projects.map((result) => (result.id === id ? index : result)),
         }),
       ),
-      getProject()['id'] === id &&
+      getProject().id === id &&
         replaceProject(index, {
           persist: false,
           presentation: 'none',
@@ -68,19 +68,19 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
     }));
   function duplicateProject({ projectId: projectId2 } = {}) {
     const currentProjectId2 = getLibrary(),
-      enabled2 = currentProjectId2['projects']['find']((data) => data['id'] === normalizeText(projectId2));
+      enabled2 = currentProjectId2.projects.find((data) => data.id === normalizeText(projectId2));
     if (!enabled2) return null;
     const createdAt = now(),
       options = createApplicationProject({
         ...cloneJson(enabled2),
         id: createId('person-replacement'),
-        title: (normalizeText(enabled2['title']) || '未命名人物替换项目') + ' 副本',
+        title: (normalizeText(enabled2.title) || '未命名人物替换项目') + ' 副本',
         archivedAt: 0,
         createdAt: createdAt,
         updatedAt: createdAt,
-        output: { ...(enabled2['output'] || {}), canvasBinding: {} },
+        output: { ...(enabled2.output || {}), canvasBinding: {} },
         workspace: {
-          ...(enabled2['workspace'] || {}),
+          ...(enabled2.workspace || {}),
           view: 'home',
           openProjectMenuId: '',
           pendingDeleteProjectId: '',
@@ -90,8 +90,8 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
       setLibrary(
         normalizePersonReplacementProjectLibrary({
           ...currentProjectId2,
-          currentProjectId: currentProjectId2['currentProjectId'],
-          projects: [options, ...currentProjectId2['projects']],
+          currentProjectId: currentProjectId2.currentProjectId,
+          projects: [options, ...currentProjectId2.projects],
         }),
       ),
       syncWorkspace(),
@@ -102,30 +102,30 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
   }
   async function collectProject({ projectId: projectId3 } = {}) {
     const projectId4 = normalizeText(projectId3);
-    if (projectId4 === normalizeText(getProject()['id'])) rememberProject();
+    if (projectId4 === normalizeText(getProject().id)) rememberProject();
     const projectName = getProjectById(projectId4);
     if (!projectName) return (showToast('人物替换项目不存在。', 'error'), null);
     if (hasActiveProjectTask(projectId4) || !canCollectPersonReplacementProject(projectName))
       return (showToast('项目仍有任务处理中，请完成后再收集。', 'info'), null);
-    if (typeof projectPackages?.['exportProject'] !== 'function')
+    if (typeof projectPackages?.exportProject !== 'function')
       return (showToast('当前环境不支持收集项目。', 'error'), null);
-    return await projectPackages['exportProject']({
+    return await projectPackages.exportProject({
       projectType: 'person-replacement',
       projectId: projectId4,
-      projectName: projectName['title'],
+      projectName: projectName.title,
       projectData: createPersonReplacementProjectPackagePayload(projectName),
     });
   }
   async function importProjectPackage() {
-    if (typeof projectPackages?.['importProject'] !== 'function')
+    if (typeof projectPackages?.importProject !== 'function')
       return (showToast('当前环境不支持导入项目。', 'error'), null);
-    return await projectPackages['importProject']();
+    return await projectPackages.importProject();
   }
   function importProjectPackageResult(options2 = {}) {
-    if (normalizeText(options2['projectType']) !== 'person-replacement') return null;
+    if (normalizeText(options2.projectType) !== 'person-replacement') return null;
     const now2 = now(),
       currentProjectId3 = createImportedPersonReplacementProject(
-        options2['projectData'] || options2['data'],
+        options2.projectData || options2.data,
         {
           projectId: createId('person-replacement'),
           now: now2,
@@ -137,25 +137,25 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
       setLibrary(
         normalizePersonReplacementProjectLibrary({
           ...args2,
-          currentProjectId: currentProjectId3['id'],
+          currentProjectId: currentProjectId3.id,
           projects: [
             currentProjectId3,
-            ...args2['projects']['filter']((target) => target['id'] !== currentProjectId3['id']),
+            ...args2.projects.filter((target) => target.id !== currentProjectId3.id),
           ],
         }),
       ),
       syncWorkspace(),
       schedulePersistence({ immediate: true }),
-      openProject(currentProjectId3['id']),
+      openProject(currentProjectId3.id),
       cloneJson(currentProjectId3)
     );
   }
   const archiveProject = ({ projectId: projectId5, archived: archived } = {}) =>
-    run(projectId5, (args3) => ({ ...args3, archivedAt: archived ? Date['now']() : 0 }));
+    run(projectId5, (args3) => ({ ...args3, archivedAt: archived ? Date.now() : 0 }));
   function deleteProject({ projectId: projectId6 } = {}) {
     const text = normalizeText(projectId6),
       enabled3 = getLibrary();
-    if (!enabled3['projects']['some']((source) => source['id'] === text)) return null;
+    if (!enabled3.projects.some((source) => source.id === text)) return null;
     if (hasActiveProjectTask(text))
       return (
         showToast(
@@ -167,7 +167,7 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
     return (
       setLibrary(removePersonReplacementProject(enabled3, text)),
       releaseAllSourcePreviews(text),
-      getProject()['id'] === text &&
+      getProject().id === text &&
         replaceProject(createInitialProject(), {
           persist: false,
           presentation: 'none',
@@ -180,7 +180,7 @@ export function createPersonReplacementProjectLibraryWorkspaceController({
       snapshot()
     );
   }
-  return Object['freeze']({
+  return Object.freeze({
     archiveProject: archiveProject,
     collectProject: collectProject,
     deleteProject: deleteProject,

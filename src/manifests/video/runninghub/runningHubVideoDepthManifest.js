@@ -12,21 +12,21 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
   uiPlacement: ['toolbar'],
   displayName: '转为深度视频',
   description: '将源视频转换为深度视频的 RunningHub 工作流',
-  extensions: Object['freeze']({
-    providerProfiles: Object['freeze'](['runninghub', 'runninghub-international']),
-    videoToolbarAction: Object['freeze']({
+  extensions: Object.freeze({
+    providerProfiles: Object.freeze(['runninghub', 'runninghub-international']),
+    videoToolbarAction: Object.freeze({
       action: 'depth-video',
       taskType: 'video-depth',
       i18nKey: 'videoDepth',
       nodeIdPrefix: 'source-video-depth',
       fileNamePrefix: 'depth_video',
-      toolbarTaskOutputTextIncludes: Object['freeze'](['转为深度视频', '深度视频']),
+      toolbarTaskOutputTextIncludes: Object.freeze(['转为深度视频', '深度视频']),
     }),
-    sourceVideoTaskName: Object['freeze']({
+    sourceVideoTaskName: Object.freeze({
       key: 'depth',
-      textNeedles: Object['freeze'](['转为深度视频', '深度视频']),
+      textNeedles: Object.freeze(['转为深度视频', '深度视频']),
       managedNamePattern: '^深度视频(?:\\s*\\((?:处理中|恢复中|失败|已取消)\\))?$',
-      names: Object['freeze']({
+      names: Object.freeze({
         success: '深度视频',
         failed: '深度视频 (失败)',
         cancelled: '深度视频 (已取消)',
@@ -38,13 +38,13 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
     allowedKinds: ['video'],
     minByKind: { video: 1 },
     maxByKind: { image: 0, video: 1, audio: 0 },
-    fixedSlots: Object['freeze']([
-      Object['freeze']({ id: 'sourceVideo', kind: 'video', label: '源视频', required: true }),
+    fixedSlots: Object.freeze([
+      Object.freeze({ id: 'sourceVideo', kind: 'video', label: '源视频', required: true }),
     ]),
   },
   uiFields: [
     RH_INSTANCE_FIELD,
-    Object['freeze']({
+    Object.freeze({
       id: 'mode',
       type: 'segmented',
       variant: 'pillMenu',
@@ -52,22 +52,22 @@ export const rhVideoDepthModelManifest = createRunningHubVideoModelManifest({
       label: '模式选择',
       menuTitle: '模式选择',
       defaultValue: '0',
-      options: Object['freeze']([
-        Object['freeze']({ value: '0', label: '模式1' }),
-        Object['freeze']({ value: '1', label: '模式2' }),
+      options: Object.freeze([
+        Object.freeze({ value: '0', label: '模式1' }),
+        Object.freeze({ value: '1', label: '模式2' }),
       ]),
     }),
-    Object['freeze']({
+    Object.freeze({
       ...RH_VIDEO_RESOLUTION_FIELD,
       type: 'segmented',
       placement: 'resolution',
       defaultValue: 1024,
       tooltip: '视频最长边的分辨率',
       showInfoTip: true,
-      options: Object['freeze']([
-        Object['freeze']({ value: 768, label: '768' }),
-        Object['freeze']({ value: 1024, label: '1024' }),
-        Object['freeze']({ value: 1280, label: '1280' }),
+      options: Object.freeze([
+        Object.freeze({ value: 768, label: '768' }),
+        Object.freeze({ value: 1024, label: '1024' }),
+        Object.freeze({ value: 1280, label: '1280' }),
       ]),
     }),
   ],
@@ -78,14 +78,14 @@ export const rhVideoDepthExecutionManifest = createRunningHubVideoExecutionManif
   workflowId: '2095266738832240641',
   submitMode: 'openapi-v2-ai-app',
   queryMode: 'openapi-v2-query',
-  extensions: Object['freeze']({
-    providerProfileBindings: Object['freeze']({
-      'runninghub-international': Object['freeze']({ appId: '2095267024489771009' }),
+  extensions: Object.freeze({
+    providerProfileBindings: Object.freeze({
+      'runninghub-international': Object.freeze({ appId: '2095267024489771009' }),
     }),
   }),
   mapping: {
-    nodeInfoList: Object['freeze']([
-      Object['freeze']({
+    nodeInfoList: Object.freeze([
+      Object.freeze({
         nodeId: '21',
         fieldName: 'video',
         source: 'videoInput',
@@ -95,7 +95,7 @@ export const rhVideoDepthExecutionManifest = createRunningHubVideoExecutionManif
         uploadFailedMessage: '源视频上传到 RunningHub 失败',
         description: '上传视频',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '28',
         fieldName: 'value',
         source: 'param',
@@ -103,7 +103,7 @@ export const rhVideoDepthExecutionManifest = createRunningHubVideoExecutionManif
         defaultValue: '0',
         description: '选择模式（范围0~1）',
       }),
-      Object['freeze']({
+      Object.freeze({
         nodeId: '24',
         fieldName: 'value',
         source: 'param',

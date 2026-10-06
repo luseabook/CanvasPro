@@ -48,13 +48,13 @@ test('DirectorCurveEditor.change 写入曲线数值与空间切线，非有限�
   };
   const editor = new DirectorCurveEditor(path);
   assert.equal(
-    editor['change']({
+    editor.change({
       target: { matches: MATCH_ALL, type: 'number', value: '0.5', dataset: { curveValue: '0' } },
     }),
     true,
   );
   assert.deepEqual(calls[0], { easingCurve: [0.5, 0, 1, 1] });
-  editor['change']({
+  editor.change({
     target: {
       matches: MATCH_ALL,
       type: 'number',
@@ -64,16 +64,16 @@ test('DirectorCurveEditor.change 写入曲线数值与空间切线，非有限�
   });
   assert.deepEqual(calls[1], { inTangent: [0, -2, 0] });
   assert.equal(
-    editor['change']({
+    editor.change({
       target: { matches: MATCH_ALL, type: 'number', value: 'abc', dataset: { curveValue: '1' } },
     }),
     true,
   );
   assert.equal(calls.length, 2);
-  assert.equal(editor['change']({ target: { matches: (selector) => selector === 'x' } }), false);
+  assert.equal(editor.change({ target: { matches: (selector) => selector === 'x' } }), false);
   const idle = new DirectorCurveEditor({ selected: () => null, change: () => assert.fail('不应写入') });
   assert.equal(
-    idle['change']({ target: { matches: MATCH_ALL, type: 'number', value: '1', dataset: {} } }),
+    idle.change({ target: { matches: MATCH_ALL, type: 'number', value: '1', dataset: {} } }),
     false,
   );
 });
@@ -94,11 +94,11 @@ test('DirectorCurveEditor.key 用方向键微调控制柄并阻止默认行为',
   const stats = { prevented: 0, stopped: 0 };
   const path = { selected: () => ({ easingCurve: [0, 0, 1, 1] }), change: (p) => calls.push(p) };
   const editor = new DirectorCurveEditor(path);
-  assert.equal(editor['key']({ target: { dataset: {} }, key: 'ArrowUp' }), false);
-  assert.equal(editor['key'](keyEvent('Enter', '0', stats)), false);
-  assert.equal(editor['key'](keyEvent('ArrowUp', '1', stats)), true);
+  assert.equal(editor.key({ target: { dataset: {} }, key: 'ArrowUp' }), false);
+  assert.equal(editor.key(keyEvent('Enter', '0', stats)), false);
+  assert.equal(editor.key(keyEvent('ArrowUp', '1', stats)), true);
   assert.deepEqual(calls[0], { easingCurve: [0, 0, 1, 1.05] });
-  assert.equal(editor['key'](keyEvent('ArrowLeft', '0', stats)), true);
+  assert.equal(editor.key(keyEvent('ArrowLeft', '0', stats)), true);
   assert.deepEqual(calls[1], { easingCurve: [-0.05, 0, 1, 1] });
   assert.equal(stats.prevented, 2);
   assert.equal(stats.stopped, 2);
@@ -146,10 +146,10 @@ test('DirectorCurveEditor.down 拖拽时刷新控制柄与曲线，抬起后写�
     },
   };
   const editor = new DirectorCurveEditor(path);
-  assert.equal(editor['down']({ target: { closest: () => null }, button: 0 }), false);
-  assert.equal(editor['down']({ target: { closest: () => handle }, button: 1 }), false);
+  assert.equal(editor.down({ target: { closest: () => null }, button: 0 }), false);
+  assert.equal(editor.down({ target: { closest: () => handle }, button: 1 }), false);
   assert.equal(
-    editor['down']({
+    editor.down({
       target: { closest: () => handle },
       button: 0,
       pointerId: 7,
@@ -158,16 +158,16 @@ test('DirectorCurveEditor.down 拖拽时刷新控制柄与曲线，抬起后写�
     }),
     true,
   );
-  handlers['pointermove']({ pointerId: 7, clientX: 100, clientY: 20 });
+  handlers.pointermove({ pointerId: 7, clientX: 100, clientY: 20 });
   assert.equal(handle.cx, 100);
   assert.equal(handle.cy, 20);
   assert.ok(line.d.startsWith('M20 120 C'));
-  handlers['pointerup']({ pointerId: 7 });
+  handlers.pointerup({ pointerId: 7 });
   assert.deepEqual(calls.at(-1), { easingCurve: [0.5, 1, 1, 1] });
   identity = 'id-2';
   calls.length = 0;
   assert.equal(
-    editor['down']({
+    editor.down({
       target: { closest: () => handle },
       button: 0,
       pointerId: 8,
@@ -177,7 +177,7 @@ test('DirectorCurveEditor.down 拖拽时刷新控制柄与曲线，抬起后写�
     true,
   );
   identity = 'id-3';
-  handlers['pointermove']({ pointerId: 8, clientX: 20, clientY: 120 });
-  handlers['pointerup']({ pointerId: 8 });
+  handlers.pointermove({ pointerId: 8, clientX: 20, clientY: 120 });
+  handlers.pointerup({ pointerId: 8 });
   assert.deepEqual(calls, []);
 });

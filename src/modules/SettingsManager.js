@@ -26,14 +26,14 @@ const SettingsManager = {
   init(uiStore = {}) {
     (initSettingsPanelEvents(),
       initAppearanceSettings({
-        uiStore: uiStore['uiStore'],
-        getCanvasPresentationContext: uiStore['getCanvasPresentationContext'],
+        uiStore: uiStore.uiStore,
+        getCanvasPresentationContext: uiStore.getCanvasPresentationContext,
       }),
-      initNodeManagerSettings({ uiStore: uiStore['uiStore'] }),
+      initNodeManagerSettings({ uiStore: uiStore.uiStore }),
       initCanvasAlignmentSettings(),
       initCanvasControlSettings(),
-      bindCollaborationSettings(document['getElementById']('collaborationOffscreenMembersGroup')),
-      bindHostAttentionSettings(document['getElementById']('collaborationHostAttentionGroup')),
+      bindCollaborationSettings(document.getElementById('collaborationOffscreenMembersGroup')),
+      bindHostAttentionSettings(document.getElementById('collaborationHostAttentionGroup')),
       initNodeBehaviorSettings(),
       initDownloadNamingSettings(),
       initImageInputUploadQualitySettings(),
@@ -42,7 +42,7 @@ const SettingsManager = {
       initApiSettings(),
       initFileSaveSettings(),
       initLocalAssetCleanupSettings(),
-      initDiagnosticsSettings({ graphStore: uiStore['graphStore'] }));
+      initDiagnosticsSettings({ graphStore: uiStore.graphStore }));
   },
   applyGridDotsPref: applyGridDotsPref,
   applyGridDotsPrefFromStorage: applyGridDotsPrefFromStorage,

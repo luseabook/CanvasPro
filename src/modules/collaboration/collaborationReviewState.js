@@ -8,15 +8,15 @@ export function createCollaborationReviewState({
   let args = { revision: -1, summaries: [], activities: [], loading: false, error: '' },
     value = null,
     item = -1,
-    count = Number['isInteger'](initialRevision) ? initialRevision : -1;
+    count = Number.isInteger(initialRevision) ? initialRevision : -1;
   const run = (args2) => {
     current() && ((args = { ...args, ...args2 }), onChange(args));
   };
   function refresh(key = item, enabled = false) {
-    if (!current() || !Number['isInteger'](key)) return Promise['resolve']();
-    item = Math['max'](item, key);
+    if (!current() || !Number.isInteger(key)) return Promise.resolve();
+    item = Math.max(item, key);
     if (value) return value;
-    if (!enabled && args['revision'] >= item && !args['error']) return Promise['resolve']();
+    if (!enabled && args.revision >= item && !args.error) return Promise.resolve();
     return (
       run({ loading: true, error: '' }),
       (value = (async () => {
@@ -25,25 +25,25 @@ export function createCollaborationReviewState({
             const args3 = await rpc({ action: 'reviewRead' });
             if (!current()) return;
             if (
-              !Number['isInteger'](args3['revision']) ||
-              !Array['isArray'](args3['summaries']) ||
-              !Array['isArray'](args3['activities'])
+              !Number.isInteger(args3.revision) ||
+              !Array.isArray(args3.summaries) ||
+              !Array.isArray(args3.activities)
             )
               throw new Error('协作动态响应无效');
             const index =
               count < 0
                 ? []
-                : args3['activities']
-                    ['filter'](
-                      (result) => result['seq'] > count && ['comment', 'resolve']['includes'](result['kind']),
+                : args3.activities
+                    .filter(
+                      (result) => result.seq > count && ['comment', 'resolve'].includes(result.kind),
                     )
-                    ['sort']((data, options) => data['seq'] - options['seq']);
-            count = Math['max'](count, args3['revision']);
+                    .sort((data, options) => data.seq - options.seq);
+            count = Math.max(count, args3.revision);
             for (const target of index) onComment(target);
             run({ ...args3, error: '' });
-          } while (current() && args['revision'] < item);
+          } while (current() && args.revision < item);
         } catch (error) {
-          run({ error: error['name'] === 'AbortError' ? '' : error['message'] });
+          run({ error: error.name === 'AbortError' ? '' : error.message });
         } finally {
           ((value = null), run({ loading: false }));
         }
@@ -68,7 +68,7 @@ export function createCollaborationReviewState({
       if (!current()) throw new DOMException('Aborted', 'AbortError');
       const entry = await rpc({ action: action, ...args5 });
       if (!current()) throw new DOMException('Aborted', 'AbortError');
-      return (await refresh(entry['revision']), entry);
+      return (await refresh(entry.revision), entry);
     },
   };
 }

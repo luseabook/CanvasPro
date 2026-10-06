@@ -4,20 +4,20 @@ import {
   normalizePersonReplacementLayout,
 } from './personReplacementProjectSession.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 export function renderPersonReplacementLayoutSplitter(item, key, index = {}) {
   const result = item === 'asset-detail',
     data = item === 'center' || result,
     options = result
-      ? normalizePersonReplacementAssetDetailSplitRatio(key['assetDetailSplitRatio'])
+      ? normalizePersonReplacementAssetDetailSplitRatio(key.assetDetailSplitRatio)
       : item === 'center'
-        ? key['centerTop']
+        ? key.centerTop
         : key[item],
     target = result ? 32 : item === 'center' ? 38 : item === 'left' ? 18 : 24,
     source = result ? 0x44 : item === 'center' ? 82 : item === 'left' ? 38 : 42,
     next =
-      index['label'] ||
+      index.label ||
       (result
         ? '调整形象预览与提示词区域高度'
         : item === 'center'
@@ -44,24 +44,24 @@ export function renderPersonReplacementLayoutSplitter(item, key, index = {}) {
     '" aria-valuemax="' +
     source +
     '" aria-valuenow="' +
-    Math['round'](options) +
+    Math.round(options) +
     '" tabindex="0"></div>'
   );
 }
 export function applyPersonReplacementCompositeSidebarWidthToLayout(el, el2, entry) {
   const personReplacementCompositeSidebarWidth = normalizePersonReplacementCompositeSidebarWidth(entry);
   return (
-    el?.['style']?.['setProperty']?.(
+    el?.style?.setProperty?.(
       '--person-replacement-composite-sidebar-width',
       personReplacementCompositeSidebarWidth + 'px',
     ),
-    el2?.['setAttribute']?.('aria-valuenow', String(Math['round'](personReplacementCompositeSidebarWidth))),
+    el2?.setAttribute?.('aria-valuenow', String(Math.round(personReplacementCompositeSidebarWidth))),
     personReplacementCompositeSidebarWidth
   );
 }
 export function createPersonReplacementLayoutResizeController({
-  documentObject: documentObject = globalThis['document'],
-  windowObject: windowObject = globalThis['window'] || globalThis,
+  documentObject: documentObject = globalThis.document,
+  windowObject: windowObject = globalThis.window || globalThis,
   getProject: getProject,
   commitLayoutChange: commitLayoutChange,
 } = {}) {
@@ -73,75 +73,75 @@ export function createPersonReplacementLayoutResizeController({
     },
     begin = (event, el3) => {
       if (!event || !el3) return false;
-      if (event['isPrimary'] === false || (Number['isFinite'](event['button']) && event['button'] !== 0))
+      if (event.isPrimary === false || (Number.isFinite(event.button) && event.button !== 0))
         return false;
-      const text = normalizeText(el3['dataset']?.['personReplacementLayoutSplitter']);
-      if (!['left', 'center', 'right', 'asset-detail']['includes'](text)) return false;
+      const text = normalizeText(el3.dataset?.personReplacementLayoutSplitter);
+      if (!['left', 'center', 'right', 'asset-detail'].includes(text)) return false;
       const record = text === 'asset-detail',
         payload = text === 'center',
         handle = payload || record,
         el4 = record
-          ? el3['closest']?.('[data-person-replacement-asset-detail-layout]')
+          ? el3.closest?.('[data-person-replacement-asset-detail-layout]')
           : payload
-            ? el3['closest']?.('.person-replacement-middle-layout') ||
-              el3['closest']?.('.person-replacement-generation-panel')
-            : el3['closest']?.('[data-person-replacement-layout]'),
-        el5 = el3['closest']?.('[data-person-replacement-layout]'),
-        box = el4?.['getBoundingClientRect']?.(),
-        count = handle ? Number(box?.['height']) : Number(box?.['width']);
+            ? el3.closest?.('.person-replacement-middle-layout') ||
+              el3.closest?.('.person-replacement-generation-panel')
+            : el3.closest?.('[data-person-replacement-layout]'),
+        el5 = el3.closest?.('[data-person-replacement-layout]'),
+        box = el4?.getBoundingClientRect?.(),
+        count = handle ? Number(box?.height) : Number(box?.width);
       if (!(count > 0)) return false;
-      (event['preventDefault']?.(), event['stopPropagation']?.(), destroy());
-      const state = event['pointerId'];
+      (event.preventDefault?.(), event.stopPropagation?.(), destroy());
+      const state = event.pointerId;
       try {
-        el3['setPointerCapture']?.(state);
+        el3.setPointerCapture?.(state);
       } catch {}
-      (el3['classList']?.['add']?.('is-active'),
-        documentObject?.['body']?.['classList']?.['add']?.('person-replacement-layout-resizing'));
+      (el3.classList?.add?.('is-active'),
+        documentObject?.body?.classList?.add?.('person-replacement-layout-resizing'));
       const run = (event2) =>
-        !Number['isFinite'](Number(state)) ||
-        !Number['isFinite'](Number(event2?.['pointerId'])) ||
-        Number(event2['pointerId']) === Number(state);
+        !Number.isFinite(Number(state)) ||
+        !Number.isFinite(Number(event2?.pointerId)) ||
+        Number(event2.pointerId) === Number(state);
       let value3 = null,
         config = 0;
       const run2 = (event3) => {
           if (!event3) return;
-          const scope = handle ? event3['clientY'] : event3['clientX'],
-            input = handle ? box['top'] : box['left'],
+          const scope = handle ? event3.clientY : event3.clientX,
+            input = handle ? box.top : box.left,
             output = ((Number(scope) - Number(input || 0)) / count) * 100,
-            centerTop = Math['round']((text === 'right' ? 100 - output : output) * 100) / 100,
+            centerTop = Math.round((text === 'right' ? 100 - output : output) * 100) / 100,
             value4 = getProject();
           if (record) {
             const personReplacementAssetDetailSplitRatio =
               normalizePersonReplacementAssetDetailSplitRatio(centerTop);
-            ((value4['workspace']['assetDetailSplitRatio'] = personReplacementAssetDetailSplitRatio),
-              el4['style']?.['setProperty']?.(
+            ((value4.workspace.assetDetailSplitRatio = personReplacementAssetDetailSplitRatio),
+              el4.style?.setProperty?.(
                 '--person-replacement-asset-detail-top',
                 personReplacementAssetDetailSplitRatio + '%',
               ),
-              el3['setAttribute']?.(
+              el3.setAttribute?.(
                 'aria-valuenow',
-                String(Math['round'](personReplacementAssetDetailSplitRatio)),
+                String(Math.round(personReplacementAssetDetailSplitRatio)),
               ));
             return;
           }
-          const args = value4['workspace']['replacementLayout'],
+          const args = value4.workspace.replacementLayout,
             personReplacementLayout = normalizePersonReplacementLayout({
               ...args,
               ...(text === 'center' ? { centerTop: centerTop } : { [text]: centerTop }),
             });
-          ((value4['workspace']['replacementLayout'] = personReplacementLayout),
+          ((value4.workspace.replacementLayout = personReplacementLayout),
             text === 'center'
-              ? el5?.['style']?.['setProperty']?.(
+              ? el5?.style?.setProperty?.(
                   '--person-replacement-center-top',
-                  personReplacementLayout['centerTop'] + '%',
+                  personReplacementLayout.centerTop + '%',
                 )
-              : el4['style']?.['setProperty']?.(
+              : el4.style?.setProperty?.(
                   '--person-replacement-' + text + '-width',
                   personReplacementLayout[text] + '%',
                 ),
-            el3['setAttribute']?.(
+            el3.setAttribute?.(
               'aria-valuenow',
-              String(Math['round'](personReplacementLayout[text === 'center' ? 'centerTop' : text])),
+              String(Math.round(personReplacementLayout[text === 'center' ? 'centerTop' : text])),
             ));
         },
         handler = () => {
@@ -151,51 +151,51 @@ export function createPersonReplacementLayoutResizeController({
         },
         handler2 = (clientX) => {
           if (!run(clientX)) return;
-          value3 = { clientX: clientX?.['clientX'], clientY: clientX?.['clientY'] };
+          value3 = { clientX: clientX?.clientX, clientY: clientX?.clientY };
           if (config) return;
-          const value6 = windowObject?.['requestAnimationFrame'];
+          const value6 = windowObject?.requestAnimationFrame;
           if (typeof value6 === 'function') {
-            config = value6['call'](windowObject, handler);
+            config = value6.call(windowObject, handler);
             return;
           }
           handler();
         },
         value7 = (clientX2) => {
           if (!run(clientX2)) return;
-          const value8 = handle ? Number(clientX2?.['clientY']) : Number(clientX2?.['clientX']);
-          (Number['isFinite'](value8) &&
-            (value3 = { clientX: clientX2?.['clientX'], clientY: clientX2?.['clientY'] }),
+          const value8 = handle ? Number(clientX2?.clientY) : Number(clientX2?.clientX);
+          (Number.isFinite(value8) &&
+            (value3 = { clientX: clientX2?.clientX, clientY: clientX2?.clientY }),
             config &&
-              typeof windowObject?.['cancelAnimationFrame'] === 'function' &&
-              windowObject['cancelAnimationFrame'](config),
+              typeof windowObject?.cancelAnimationFrame === 'function' &&
+              windowObject.cancelAnimationFrame(config),
             handler(),
             destroy(),
             commitLayoutChange(text));
         },
         value9 = () => {
           config &&
-            typeof windowObject?.['cancelAnimationFrame'] === 'function' &&
-            windowObject['cancelAnimationFrame'](config);
+            typeof windowObject?.cancelAnimationFrame === 'function' &&
+            windowObject.cancelAnimationFrame(config);
           ((config = 0),
             (value3 = null),
-            el3['classList']?.['remove']?.('is-active'),
-            documentObject?.['body']?.['classList']?.['remove']?.('person-replacement-layout-resizing'));
+            el3.classList?.remove?.('is-active'),
+            documentObject?.body?.classList?.remove?.('person-replacement-layout-resizing'));
           try {
-            el3['releasePointerCapture']?.(state);
+            el3.releasePointerCapture?.(state);
           } catch {}
-          (windowObject?.['removeEventListener']?.('pointermove', handler2, true),
-            windowObject?.['removeEventListener']?.('pointerup', value7, true),
-            windowObject?.['removeEventListener']?.('pointercancel', value7, true));
+          (windowObject?.removeEventListener?.('pointermove', handler2, true),
+            windowObject?.removeEventListener?.('pointerup', value7, true),
+            windowObject?.removeEventListener?.('pointercancel', value7, true));
           if (value2 === value9) value2 = null;
         };
       return (
         (value2 = value9),
-        windowObject?.['addEventListener']?.('pointermove', handler2, true),
-        windowObject?.['addEventListener']?.('pointerup', value7, true),
-        windowObject?.['addEventListener']?.('pointercancel', value7, true),
+        windowObject?.addEventListener?.('pointermove', handler2, true),
+        windowObject?.addEventListener?.('pointerup', value7, true),
+        windowObject?.addEventListener?.('pointercancel', value7, true),
         handler2(event),
         true
       );
     };
-  return Object['freeze']({ begin: begin, destroy: destroy, stop: destroy });
+  return Object.freeze({ begin: begin, destroy: destroy, stop: destroy });
 }

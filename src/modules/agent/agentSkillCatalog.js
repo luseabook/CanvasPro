@@ -533,7 +533,7 @@ const mpSetupPreCommitSkill = {
   commands: [],
 };
 
-const CANVAS_AGENT_SKILLS = Object['freeze']([
+const CANVAS_AGENT_SKILLS = Object.freeze([
   textToImageSkill,
   textToVideoSkill,
   imageToVideoSkill,
@@ -544,7 +544,7 @@ const CANVAS_AGENT_SKILLS = Object['freeze']([
   taskManagementSkill,
   sceneDirectorSkill,
 ]);
-const ENGINEERING_AGENT_SKILLS = Object['freeze']([
+const ENGINEERING_AGENT_SKILLS = Object.freeze([
   mpDiagnoseSkill,
   mpGrillWithDocsSkill,
   mpImproveArchitectureSkill,
@@ -565,74 +565,74 @@ const ENGINEERING_AGENT_SKILLS = Object['freeze']([
   mpScaffoldExercisesSkill,
   mpSetupPreCommitSkill,
 ]);
-const SKILL_PATTERNS = Object['freeze']({
-  'story-writing': Object['freeze']([
+const SKILL_PATTERNS = Object.freeze({
+  'story-writing': Object.freeze([
     /(?:写|创作|生成|续写|改写|扩写).{0,24}(?:故事|小说|剧情|章节)|剧情走向|互动故事|\b(?:write|create|continue|rewrite)\b.{0,32}\b(?:story|stories|novel|chapter)\b/i,
   ]),
-  'text-to-image': Object['freeze']([
+  'text-to-image': Object.freeze([
     /(?:\btext[- ]to[- ]image\b|\b(?:create|generate|make)\b.{0,32}\b(?:image|picture|photo|poster|thumbnail|illustration)\b|\b(?:draw|paint|illustrate)\b)/i,
     /(?:文生图|文字生成图片|产品图|商品图|效果图|概念图|创建.{0,10}(?:图片|图像|海报|封面)|生成.{0,10}(?:图片|图像|海报|封面)|绘制|作图|帮我画|请(?:帮我)?画|画(?:一|个|张|幅|只)|做.{0,8}(?:张|个)?(?:图片|图像|海报|封面))/,
   ]),
-  'text-to-video': Object['freeze']([
+  'text-to-video': Object.freeze([
     /\b(?:text[- ]to[- ]video|create|generate|make)\b.{0,32}\b(?:video|movie|film|animation|clip)\b/i,
     /(?:文生视频|文字生成视频|创建.{0,10}视频|生成.{0,10}视频|做.{0,8}(?:段|个|条)?视频)/,
   ]),
-  'image-to-video': Object['freeze']([
+  'image-to-video': Object.freeze([
     /\b(?:image[- ]to[- ]video|animate (?:this |the )?image|video from (?:this |the |an )?image)\b/i,
     /\bimage\b.{0,24}\b(?:make|create|generate)\b.{0,16}\bvideo\b/i,
     /\b(?:make|create|generate)\b.{0,16}\bvideo\b.{0,24}\b(?:from|using)\b.{0,8}\bimage\b/i,
     /(?:图生视频|图片.{0,10}(?:生成|制作|做成|变成).{0,6}视频|把.{0,8}(?:图片|图像).{0,8}(?:做成|变成).{0,4}视频)/,
   ]),
-  'batch-layout': Object['freeze']([
+  'batch-layout': Object.freeze([
     /\b(?:align|distribute|arrange|layout|row|column|grid|horizontal|vertical)\b/i,
     /(?:对齐|分布|排列|布局|横排|横向|竖排|纵向|网格|间距)/,
   ]),
-  'workflow-organize': Object['freeze']([
+  'workflow-organize': Object.freeze([
     /\b(?:organize|tidy|clean up|summarize|label)\b.{0,24}\b(?:canvas|workflow|nodes?)\b/i,
     /(?:整理|收拾|梳理|总结|标注).{0,12}(?:画布|工作流|节点)/,
   ]),
-  'media-processing': Object['freeze']([
+  'media-processing': Object.freeze([
     /\b(?:reverse|extract keyframes?|separate|split grid|reset size|audio stems?)\b/i,
     /(?:倒放|反转视频|关键帧|抽帧|分离音视频|分离人声|音轨分离|拆分宫格|切宫格|重置尺寸)/,
   ]),
-  'storyboard-assembly': Object['freeze']([
+  'storyboard-assembly': Object.freeze([
     /\b(?:storyboard|shot board|contact sheet)\b/i,
     /(?:分镜板|故事板|镜头板|分镜网格)/,
   ]),
-  'task-management': Object['freeze']([
+  'task-management': Object.freeze([
     /\b(?:retry|cancel|resume|focus)\b.{0,20}\b(?:task|job|generation|result)\b/i,
     /(?:重试|取消|恢复|聚焦|定位).{0,12}(?:任务|生成|结果)/,
   ]),
-  'scene-director': Object['freeze']([
+  'scene-director': Object.freeze([
     /\b(?:3d|stage|scene|mannequin|pose|camera keyframe|camera timeline)\b/i,
     /(?:3D|三维|舞台|场景|人体模型|姿势|相机关键帧|相机时间线|镜头轨迹)/i,
   ]),
 });
 
 function listBuiltInAgentSkills() {
-  return AGENT_SKILL_ALLOWLIST['map'](normalizeSkill)['filter']((value) => value['id']);
+  return AGENT_SKILL_ALLOWLIST.map(normalizeSkill).filter((value) => value.id);
 }
 
 function escapeSkillReference(key = '') {
-  return String(key || '')['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return String(key || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function containsSkillReference(index, result, { prefixed: prefixed = false } = {}) {
-  const enabled = String(index || '')['trim'](),
-    enabled2 = String(result || '')['trim']();
+  const enabled = String(index || '').trim(),
+    enabled2 = String(result || '').trim();
   if (!enabled || !enabled2) return false;
-  if (/[^\x00-\x7f]/u['test'](enabled2) && !prefixed)
-    return enabled['toLowerCase']()['includes'](enabled2['toLowerCase']());
+  if (/[^\x00-\x7f]/u.test(enabled2) && !prefixed)
+    return enabled.toLowerCase().includes(enabled2.toLowerCase());
   const escapeSkillReference2 = escapeSkillReference(enabled2),
     data = prefixed
       ? '[$/]' + escapeSkillReference2 + '(?=$|[^\\p{L}\\p{N}_-])'
       : '(?:^|[^\\p{L}\\p{N}_-])' + escapeSkillReference2 + '(?=$|[^\\p{L}\\p{N}_-])';
-  return new RegExp(data, 'iu')['test'](enabled);
+  return new RegExp(data, 'iu').test(enabled);
 }
 
 function isExplicitSkillRequest(options, target = {}) {
-  const source = String(target['id'] || '')['trim'](),
-    next = String(target['title'] || '')['trim']();
+  const source = String(target.id || '').trim(),
+    next = String(target.title || '').trim();
   return Boolean(
     (source && containsSkillReference(options, source, { prefixed: true })) ||
     (source && containsSkillReference(options, source)) ||
@@ -648,33 +648,31 @@ function scoreSkill(
     selectedInputKinds: selectedInputKinds = [],
   } = {},
 ) {
-  const entry = String(userMessage || '')['trim'](),
+  const entry = String(userMessage || '').trim(),
     isExplicitSkillRequest2 = isExplicitSkillRequest(entry, current);
-  if (current['id']['startsWith']('mp-') && !isExplicitSkillRequest2) return 0;
+  if (current.id.startsWith('mp-') && !isExplicitSkillRequest2) return 0;
   let count = isExplicitSkillRequest2 ? 1000 : 0;
-  for (const record of SKILL_PATTERNS[current['id']] || []) {
-    if (record['test'](entry)) count += 200;
+  for (const record of SKILL_PATTERNS[current.id] || []) {
+    if (record.test(entry)) count += 200;
   }
-  count > 0 && targetKind && current['recommendedModelKind'] === targetKind && (count += 40);
+  count > 0 && targetKind && current.recommendedModelKind === targetKind && (count += 40);
   const map = new Set(
-    (Array['isArray'](selectedInputKinds) ? selectedInputKinds : [])
-      ['map']((payload) => String(payload || '')['trim']())
-      ['filter'](Boolean),
+    (Array.isArray(selectedInputKinds) ? selectedInputKinds : [])
+      .map((payload) => String(payload || '').trim())
+      .filter(Boolean),
   );
   return (
     count > 0 &&
-      current['id'] === 'image-to-video' &&
+      current.id === 'image-to-video' &&
       targetKind === 'video' &&
-      map['has']('image') &&
+      map.has('image') &&
       (count += 260),
-    current['id'] === 'text-to-video' && targetKind === 'video' && map['has']('image') && (count -= 120),
-    current['id'] === 'text-to-video' &&
+    current.id === 'text-to-video' && targetKind === 'video' && map.has('image') && (count -= 120),
+    current.id === 'text-to-video' &&
       !isExplicitSkillRequest2 &&
-      /(?:\bimage\b.{0,24}\bvideo\b|\bvideo\b.{0,24}\bimage\b|图生视频|图片.{0,16}视频|图像.{0,16}视频)/i[
-        'test'
-      ](entry) &&
+      /(?:\bimage\b.{0,24}\bvideo\b|\bvideo\b.{0,24}\bimage\b|图生视频|图片.{0,16}视频|图像.{0,16}视频)/i.test(entry) &&
       (count = 0),
-    Math['max'](0, count)
+    Math.max(0, count)
   );
 }
 
@@ -684,9 +682,9 @@ export function createAgentSkillRegistry({ packages: packages = [] } = {}) {
     scoreBuiltInSkill: scoreSkill,
   });
   return (
-    Array['isArray'](packages) &&
-      packages['length'] > 0 &&
-      agentSkillRegistryCore['replaceInstalledPackages'](packages),
+    Array.isArray(packages) &&
+      packages.length > 0 &&
+      agentSkillRegistryCore.replaceInstalledPackages(packages),
     agentSkillRegistryCore
   );
 }
@@ -694,7 +692,7 @@ export function createAgentSkillRegistry({ packages: packages = [] } = {}) {
 export const defaultAgentSkillRegistry = createAgentSkillRegistry();
 
 export function listAgentSkillCatalog({ registry: registry = defaultAgentSkillRegistry } = {}) {
-  return registry['listCatalog']();
+  return registry.listCatalog();
 }
 
 export function selectAgentSkills({
@@ -706,33 +704,33 @@ export function selectAgentSkills({
   registry: registry = defaultAgentSkillRegistry,
 } = {}) {
   const handle = Number(maxSkills),
-    state = Math['max'](0, Number['isFinite'](handle) ? Math['trunc'](handle) : 2),
+    state = Math.max(0, Number.isFinite(handle) ? Math.trunc(handle) : 2),
     config = [
       ...new Set(
-        (Array['isArray'](selectedSkillIds) ? selectedSkillIds : [])
-          ['map']((scope) =>
+        (Array.isArray(selectedSkillIds) ? selectedSkillIds : [])
+          .map((scope) =>
             String(scope || '')
-              ['trim']()
-              ['toLowerCase'](),
+              .trim()
+              .toLowerCase(),
           )
-          ['filter'](Boolean),
+          .filter(Boolean),
       ),
     ],
-    list = (registry['listSkills']?.() || [])
-      ['filter']((input) => input['enabled'] !== false && config['includes'](input['id']))
-      ['sort']((output, value2) => config['indexOf'](output['id']) - config['indexOf'](value2['id']))
-      ['slice'](0, state),
-    enabled3 = new Set(list['map']((value3) => value3['id'])),
-    args = registry['select']({
+    list = (registry.listSkills?.() || [])
+      .filter((input) => input.enabled !== false && config.includes(input.id))
+      .sort((output, value2) => config.indexOf(output.id) - config.indexOf(value2.id))
+      .slice(0, state),
+    enabled3 = new Set(list.map((value3) => value3.id)),
+    args = registry.select({
       userMessage: userMessage,
       targetKind: targetKind,
       selectedInputKinds: selectedInputKinds,
-      maxSkills: Math['max'](0, state - list['length']),
+      maxSkills: Math.max(0, state - list.length),
     });
-  return [...list, ...args['filter']((value4) => !enabled3['has'](value4['id']))]['slice'](0, state);
+  return [...list, ...args.filter((value4) => !enabled3.has(value4.id))].slice(0, state);
 }
 
-export const agentSkillCatalogInternals = Object['freeze']({
+export const agentSkillCatalogInternals = Object.freeze({
   scoreSkill: scoreSkill,
   isExplicitSkillRequest: isExplicitSkillRequest,
   CANVAS_AGENT_SKILLS: CANVAS_AGENT_SKILLS,

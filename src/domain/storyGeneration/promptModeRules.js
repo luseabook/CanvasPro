@@ -65,7 +65,7 @@ export function getStoryEpisodePromptModePlanningRequirements(item = '') {
   return [STORY_EPISODE_OPENING_POSITION_GUIDANCE, ...getStoryEpisodeClipGroupingRequirements(item)];
 }
 export function isStoryEpisodeTimelineGuidance(key = '') {
-  return [STORY_EPISODE_SEEDANCE_2_5_TIMELINE_GUIDANCE, STORY_EPISODE_WAN_3_0_TIMELINE_GUIDANCE]['includes'](
+  return [STORY_EPISODE_SEEDANCE_2_5_TIMELINE_GUIDANCE, STORY_EPISODE_WAN_3_0_TIMELINE_GUIDANCE].includes(
     key,
   );
 }
@@ -75,7 +75,7 @@ export function appendStoryEpisodePromptModeSystemPrompt(
   { announceTimelineContract: announceTimelineContract = false } = {},
 ) {
   const list = getStoryEpisodePromptModePlanningRequirements(result);
-  if (!list['length']) return index;
+  if (!list.length) return index;
   const isStoryWan30PromptMode2 = isStoryWan30PromptMode(result)
       ? 'Wan 3.0'
       : isStoryMinimaxH3PromptMode(result)
@@ -97,8 +97,8 @@ export function appendStoryEpisodePromptModeSystemPrompt(
         ' JSON 结构。'
       : '',
   ]
-    ['filter'](Boolean)
-    ['join']('\n');
+    .filter(Boolean)
+    .join('\n');
 }
 export const getStoryEpisodeTimelinePlanningRequirements = getStoryEpisodePromptModePlanningRequirements;
 export function resolveStoryPromptModeClipMaxSeconds(data = '', options = 15) {

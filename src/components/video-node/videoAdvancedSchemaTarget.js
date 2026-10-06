@@ -6,22 +6,22 @@ function resolveExecution(value, providerHint) {
 }
 function isRunningHubVideoWorkflowExecution(item) {
   return (
-    normalizeProviderId(item?.['modelManifest']?.['provider']) === 'runninghubwf' &&
-    item?.['modelManifest']?.['adapterType'] === 'workflow' &&
-    item?.['executionManifest']?.['adapterType'] === 'workflow'
+    normalizeProviderId(item?.modelManifest?.provider) === 'runninghubwf' &&
+    item?.modelManifest?.adapterType === 'workflow' &&
+    item?.executionManifest?.adapterType === 'workflow'
   );
 }
 function hasModelUiSchemaPlacement(key, index) {
   const enabled = String(index || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   if (!enabled) return false;
-  const list = Array['isArray'](key?.['uiSchema']?.['fields']) ? key['uiSchema']['fields'] : [];
-  return list['some']((result) => {
+  const list = Array.isArray(key?.uiSchema?.fields) ? key.uiSchema.fields : [];
+  return list.some((result) => {
     return (
-      String(result?.['placement'] || '')
-        ['trim']()
-        ['toLowerCase']() === enabled
+      String(result?.placement || '')
+        .trim()
+        .toLowerCase() === enabled
     );
   });
 }
@@ -34,9 +34,9 @@ export function resolveVideoAdvancedSchemaTarget(
 ) {
   const nodeData = options2 || {},
     args = fallbackNodeData || {},
-    model = String(nodeData?.['model'] || args?.['model'] || '')['trim']();
+    model = String(nodeData?.model || args?.model || '').trim();
   if (!model) return null;
-  const provider = nodeData?.['provider'] || args?.['provider'],
+  const provider = nodeData?.provider || args?.provider,
     execution = resolveExecution(model, provider),
     customAiAppNodeManifest = resolveCustomAiAppNodeManifest({
       ...args,
@@ -44,14 +44,14 @@ export function resolveVideoAdvancedSchemaTarget(
       model: model,
       provider: provider,
     });
-  if (isCustomAiAppManifest(customAiAppNodeManifest || execution?.['modelManifest'])) {
-    const target = customAiAppNodeManifest || execution?.['modelManifest'];
+  if (isCustomAiAppManifest(customAiAppNodeManifest || execution?.modelManifest)) {
+    const target = customAiAppNodeManifest || execution?.modelManifest;
     return hasModelUiSchemaPlacement(target, 'advanced')
       ? { modelId: model, nodeData: buildRunningHubNodeData?.(nodeData) || nodeData, placement: 'advanced' }
       : null;
   }
   if (isRunningHubVideoWorkflowExecution(execution)) {
-    if (execution?.['modelManifest']?.['extensions']?.['rhAiApp'])
+    if (execution?.modelManifest?.extensions?.rhAiApp)
       return hasRunningHubVideoWorkflowUiPlacement(model, 'advanced')
         ? { modelId: model, nodeData: buildRunningHubNodeData?.(nodeData) || nodeData, placement: 'advanced' }
         : null;
@@ -64,12 +64,12 @@ export function resolveVideoAdvancedSchemaTarget(
       : null;
   }
   if (
-    execution?.['modelManifest']?.['adapterType'] !== 'modelApi' ||
-    execution?.['modelManifest']?.['kind'] !== 'video'
+    execution?.modelManifest?.adapterType !== 'modelApi' ||
+    execution?.modelManifest?.kind !== 'video'
   )
     return null;
   const modelId = String(
-    execution?.['canonicalModelId'] || execution?.['modelManifest']?.['modelId'] || model,
-  )['trim']();
+    execution?.canonicalModelId || execution?.modelManifest?.modelId || model,
+  ).trim();
   return modelId ? { modelId: modelId, nodeData: nodeData, placement: 'advanced' } : null;
 }

@@ -194,11 +194,11 @@ function normalizeImageBase64DataUrl(rawValue, mimeType) {
   return 'data:' + mimeType + ';base64,' + base64Data;
 }
 export function resolveMappedImageResponseValues(value26, value27 = {}) {
-  const args = resolveMappedResponseValues(value26, value27?.['resultPaths'] || value27?.['paths']),
-    list10 = Array.isArray(value27?.['base64Paths']) ? value27['base64Paths'] : [],
-    list11 = Array.isArray(value27?.['base64MimeTypePaths']) ? value27['base64MimeTypePaths'] : [],
+  const args = resolveMappedResponseValues(value26, value27?.resultPaths || value27?.paths),
+    list10 = Array.isArray(value27?.base64Paths) ? value27.base64Paths : [],
+    list11 = Array.isArray(value27?.base64MimeTypePaths) ? value27.base64MimeTypePaths : [],
     value28 = list11.flatMap((item9) => collectValuesByPath(value26, item9)),
-    imageMimeType = normalizeImageMimeType(value27?.['base64DefaultMimeType']),
+    imageMimeType = normalizeImageMimeType(value27?.base64DefaultMimeType),
     list12 = list10.flatMap((item10) => collectValuesByPath(value26, item10)),
     args2 = list12
       .map((item11, value29) =>

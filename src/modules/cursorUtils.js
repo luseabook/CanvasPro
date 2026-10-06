@@ -47,9 +47,9 @@ export function removeLinkCursor(el2) {
 
 export function createRotateCursor(options2 = {}) {
   const payload = options2 && typeof options2 === 'object' ? options2 : {},
-    handle = payload['strokeColor'] || '#17191f',
-    state = payload['outlineColor'] || '#ffffff',
-    config = payload['fallback'] || 'grab',
+    handle = payload.strokeColor || '#17191f',
+    state = payload.outlineColor || '#ffffff',
+    config = payload.fallback || 'grab',
     scope =
       '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M20.7 8.1A9 9 0 1 0 22 18.3" stroke="' +
       state +

@@ -12,8 +12,8 @@ import { buildPersonReplacementPromptPackage } from './personReplacementPromptCo
 import { syncPersonReplacementPromptReferenceInputs } from './personReplacementIdentityPresentation.js';
 function selectedShot(value) {
   return (
-    value['shots']?.['find']((item) => item['id'] === value['workspace']?.['selectedShotId']) ||
-    value['shots']?.[0] ||
+    value.shots?.find((item) => item.id === value.workspace?.selectedShotId) ||
+    value.shots?.[0] ||
     null
   );
 }
@@ -21,14 +21,14 @@ function isPromptModeLocked(key, list = []) {
   const edShot = selectedShot(key);
   return (
     !edShot ||
-    list['includes'](edShot['id']) ||
+    list.includes(edShot.id) ||
     isPersonReplacementGenerationTaskActive(
-      resolvePersonReplacementImageGenerationState(key['workspace'], edShot['id']),
+      resolvePersonReplacementImageGenerationState(key.workspace, edShot.id),
     )
   );
 }
 function modePresentation(index) {
-  const positioning = normalizePersonReplacementPromptMode(selectedShot(index)?.['replacementPromptMode']),
+  const positioning = normalizePersonReplacementPromptMode(selectedShot(index)?.replacementPromptMode),
     result = positioning === PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING,
     label = positioning === PERSON_REPLACEMENT_PROMPT_MODE_TEST;
   return {
@@ -52,7 +52,7 @@ function modePresentation(index) {
   };
 }
 export function isPersonReplacementManualPromptMode(data) {
-  return selectedShot(data)?.['replacementPromptMode'] === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL;
+  return selectedShot(data)?.replacementPromptMode === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL;
 }
 export const PERSON_REPLACEMENT_MANUAL_ENHANCEMENT_TOOLTIP =
   '手动模式仅使用你填写的提示词，不执行 AI 提示词增强。切回替换模式后恢复增强设置。';
@@ -77,56 +77,56 @@ export function renderPersonReplacementPromptModeControl(
 }
 function syncModeButton(el, target) {
   const { positioning: positioning3, label: label3, tooltip: tooltip2 } = modePresentation(target);
-  if (el['textContent'] !== label3) el['textContent'] = label3;
-  for (const [source, next] of Object['entries']({
+  if (el.textContent !== label3) el.textContent = label3;
+  for (const [source, next] of Object.entries({
     'aria-pressed': String(positioning3),
     'aria-label': label3,
     'data-tooltip': '仅对当前选中的片段生效。' + tooltip2,
   })) {
-    if (el['getAttribute']?.(source) !== next) el['setAttribute']?.(source, next);
+    if (el.getAttribute?.(source) !== next) el.setAttribute?.(source, next);
   }
 }
 export function syncPersonReplacementPromptModeControl(el2, project, current = []) {
-  const el3 = el2?.['querySelector']?.('[data-person-replacement-action="toggle-prompt-mode"]');
+  const el3 = el2?.querySelector?.('[data-person-replacement-action="toggle-prompt-mode"]');
   if (!el3) return;
   (syncModeButton(el3, project),
-    (el3['disabled'] = isPromptModeLocked(project, current)),
+    (el3.disabled = isPromptModeLocked(project, current)),
     syncPersonReplacementPromptReferenceInputs(
       el2,
       project,
       buildPersonReplacementPromptPackage({ project: project, shot: selectedShot(project) || {} }),
     ));
-  const el4 = el2?.['querySelector']?.('[data-person-replacement-action="toggle-prompt-enhancement"]');
+  const el4 = el2?.querySelector?.('[data-person-replacement-action="toggle-prompt-enhancement"]');
   if (el4) {
     const isPersonReplacementManualPromptMode2 = isPersonReplacementManualPromptMode(project);
-    ((el4['disabled'] = isPersonReplacementManualPromptMode2 || el3['disabled']),
-      el4['setAttribute'](
+    ((el4.disabled = isPersonReplacementManualPromptMode2 || el3.disabled),
+      el4.setAttribute(
         'aria-pressed',
         String(
           !isPersonReplacementManualPromptMode2 &&
-            project['settings']?.['replacementPromptEnhancementEnabled'] === true,
+            project.settings?.replacementPromptEnhancementEnabled === true,
         ),
       ),
-      el4['setAttribute'](
+      el4.setAttribute(
         'data-tooltip',
         isPersonReplacementManualPromptMode2
           ? PERSON_REPLACEMENT_MANUAL_ENHANCEMENT_TOOLTIP
-          : el4['getAttribute']('data-auto-tooltip') || '使用画布 Agent 当前模型补充替换提示词。',
+          : el4.getAttribute('data-auto-tooltip') || '使用画布 Agent 当前模型补充替换提示词。',
       ));
   }
 }
 export function applyPersonReplacementPromptControlAction(args, entry, el5, record = []) {
-  if (el5['disabled']) return null;
+  if (el5.disabled) return null;
   if (entry === 'toggle-prompt-enhancement') {
     if (isPersonReplacementManualPromptMode(args)) return null;
     const replacementPromptEnhancementEnabled =
-      args['settings']['replacementPromptEnhancementEnabled'] !== true;
+      args.settings.replacementPromptEnhancementEnabled !== true;
     return (
-      el5['setAttribute']?.('aria-pressed', String(replacementPromptEnhancementEnabled)),
+      el5.setAttribute?.('aria-pressed', String(replacementPromptEnhancementEnabled)),
       {
         patch: {
           settings: {
-            ...args['settings'],
+            ...args.settings,
             replacementPromptEnhancementEnabled: replacementPromptEnhancementEnabled,
           },
         },
@@ -136,7 +136,7 @@ export function applyPersonReplacementPromptControlAction(args, entry, el5, reco
   }
   if (entry !== 'toggle-prompt-mode' || isPromptModeLocked(args, record)) return null;
   const args2 = selectedShot(args),
-    replacementPromptMode = normalizePersonReplacementPromptMode(args2['replacementPromptMode']),
+    replacementPromptMode = normalizePersonReplacementPromptMode(args2.replacementPromptMode),
     payload = {
       ...args2,
       replacementPromptMode:
@@ -149,7 +149,7 @@ export function applyPersonReplacementPromptControlAction(args, entry, el5, reco
               ? PERSON_REPLACEMENT_PROMPT_MODE_TEST
               : PERSON_REPLACEMENT_PROMPT_MODE_REGULAR,
     },
-    shots = args['shots']['map']((handle) => (handle['id'] === args2['id'] ? payload : handle));
+    shots = args.shots.map((handle) => (handle.id === args2.id ? payload : handle));
   return (
     syncModeButton(el5, { ...args, shots: shots }),
     { patch: { shots: shots }, reason: 'image-prompt-mode' }

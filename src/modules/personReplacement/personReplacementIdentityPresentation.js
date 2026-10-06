@@ -23,7 +23,7 @@ import {
   getPersonReplacementIdentityCorrectionDraftKey,
   resolvePersonReplacementDetectionLabel,
 } from './personReplacementSourceIdentity.js';
-const PERSON_REPLACEMENT_ORIENTATION_LABELS = Object['freeze']({
+const PERSON_REPLACEMENT_ORIENTATION_LABELS = Object.freeze({
   front: '正面',
   back: '背面',
   side: '侧面',
@@ -37,14 +37,14 @@ const PERSON_REPLACEMENT_ORIENTATION_LABELS = Object['freeze']({
 });
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#39;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
 function normalizeText(item, key = '') {
-  const index = String(item ?? '')['trim']();
+  const index = String(item ?? '').trim();
   return index || key;
 }
 function normalizeMediaUrl(result) {
@@ -54,13 +54,13 @@ function normalizeMediaUrl(result) {
 function formatPersonOrientation(data) {
   return (
     PERSON_REPLACEMENT_ORIENTATION_LABELS[normalizeText(data)] ||
-    PERSON_REPLACEMENT_ORIENTATION_LABELS['unknown']
+    PERSON_REPLACEMENT_ORIENTATION_LABELS.unknown
   );
 }
 function getCharacterAppearance(options, target = '') {
   const list = getWorkspaceAssetAppearances(options);
   return (
-    list['find']((source) => source['id'] === target) ||
+    list.find((source) => source.id === target) ||
     getWorkspaceAssetBaseAppearance(options) ||
     list[0] ||
     null
@@ -69,18 +69,18 @@ function getCharacterAppearance(options, target = '') {
 function normalizeProjectAssetMediaForRender(args = {}) {
   return {
     ...args,
-    appearances: getWorkspaceAssetAppearances(args)['map']((args2) => ({
+    appearances: getWorkspaceAssetAppearances(args).map((args2) => ({
       ...args2,
-      imageUrl: normalizeMediaUrl(args2['imageUrl']),
-      referenceImageUrl: normalizeMediaUrl(args2['referenceImageUrl']),
+      imageUrl: normalizeMediaUrl(args2.imageUrl),
+      referenceImageUrl: normalizeMediaUrl(args2.referenceImageUrl),
     })),
   };
 }
 function renderPersonReplacementVoiceReferenceStatus(options2 = {}, next = '') {
   const mediaUrl = normalizeMediaUrl(
-      options2['voiceReference']?.['audioUrl'] ||
-        options2['voiceReference']?.['localPath'] ||
-        options2['voiceRef'],
+      options2.voiceReference?.audioUrl ||
+        options2.voiceReference?.localPath ||
+        options2.voiceRef,
     ),
     current = Boolean(mediaUrl);
   return (
@@ -141,12 +141,12 @@ function renderPersonDetectionPicker({
 }
 function renderPersonDetectionPickerOptions(list2 = [], payload = '') {
   const text4 = normalizeText(payload);
-  return (Array['isArray'](list2) ? list2 : [])
-    ['map']((el) => {
-      const text5 = normalizeText(el?.['value']),
-        text6 = normalizeText(el?.['label'], text5),
+  return (Array.isArray(list2) ? list2 : [])
+    .map((el) => {
+      const text5 = normalizeText(el?.value),
+        text6 = normalizeText(el?.label, text5),
         handle = text5 === text4,
-        state = el?.['deletable']
+        state = el?.deletable
           ? '<button type="button" class="person-replacement-detection-picker-option-delete" data-person-replacement-action="delete-detection-custom-label" data-person-replacement-custom-label="' +
             escapeHtml(text5) +
             '" aria-label="删除自定义名称' +
@@ -155,12 +155,12 @@ function renderPersonDetectionPickerOptions(list2 = [], payload = '') {
             renderWorkspaceActionIcon('delete') +
             '</button>'
           : '',
-        config = el?.['sourceCharacterId']
-          ? ' data-person-replacement-source-character-id="' + escapeHtml(el['sourceCharacterId']) + '"'
+        config = el?.sourceCharacterId
+          ? ' data-person-replacement-source-character-id="' + escapeHtml(el.sourceCharacterId) + '"'
           : '';
       return (
         '<span class="person-replacement-detection-picker-option-row' +
-        (el?.['deletable'] ? ' is-deletable' : '') +
+        (el?.deletable ? ' is-deletable' : '') +
         '"><button type="button" class="story-project-sort-option' +
         (handle ? ' is-selected' : '') +
         '" data-person-replacement-action="select-detection-picker-option" data-person-replacement-detection-picker-option="' +
@@ -176,7 +176,7 @@ function renderPersonDetectionPickerOptions(list2 = [], payload = '') {
         '</span>'
       );
     })
-    ['join']('');
+    .join('');
 }
 function renderPersonMappingScopeMenu({
   personLabel: personLabel = '当前人物',
@@ -194,21 +194,21 @@ function renderPersonMappingScopeMenu({
   );
 }
 function hasTargetAssetBinding(scope, input) {
-  const list3 = Array['isArray'](input?.['referenceImages']) ? input['referenceImages'] : [];
-  return list3['some'](
-    (output) => output['role'] === 'target-character' && output['targetCharacterId'] === scope['id'],
+  const list3 = Array.isArray(input?.referenceImages) ? input.referenceImages : [];
+  return list3.some(
+    (output) => output.role === 'target-character' && output.targetCharacterId === scope.id,
   );
 }
 function renderTargetAssetGroup(args3, characterAssetTab, value3) {
   const characters = characterAssetTab === 'scene',
-    list4 = characters ? args3['scenes'] : args3['characters'],
-    list5 = list4['map'](normalizeProjectAssetMediaForRender),
+    list4 = characters ? args3.scenes : args3.characters,
+    list5 = list4.map(normalizeProjectAssetMediaForRender),
     value4 = {
       ...buildPersonReplacementAssetViewState({
         ...args3,
-        characters: characters ? args3['characters'] : list5,
-        scenes: characters ? list5 : args3['scenes'],
-        workspace: { ...args3['workspace'], characterAssetTab: characterAssetTab },
+        characters: characters ? args3.characters : list5,
+        scenes: characters ? list5 : args3.scenes,
+        workspace: { ...args3.workspace, characterAssetTab: characterAssetTab },
       }),
       allowDeleteAssetCard: false,
       allowAssetRename: false,
@@ -216,20 +216,20 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
       assetSelectionMode: false,
       selectedAssetIds: [],
     },
-    list6 = list5['map']((asset) => {
+    list6 = list5.map((asset) => {
       const list7 = getWorkspaceAssetAppearances(asset),
-        appearances = list7['filter']((value5) => value5['imageUrl']),
-        value6 = Math['max'](
+        appearances = list7.filter((value5) => value5.imageUrl),
+        value6 = Math.max(
           0,
-          Math['min'](
-            list7['length'] - 1,
-            Math['trunc'](Number(args3['workspace']['assetAppearanceIndexes']?.[asset['id']]) || 0),
+          Math.min(
+            list7.length - 1,
+            Math.trunc(Number(args3.workspace.assetAppearanceIndexes?.[asset.id]) || 0),
           ),
         ),
-        value7 = list7[value6]?.['id'],
-        selectedIndex = Math['max'](
+        value7 = list7[value6]?.id,
+        selectedIndex = Math.max(
           0,
-          appearances['findIndex']((value8) => value8['id'] === value7),
+          appearances.findIndex((value8) => value8.id === value7),
         );
       return {
         asset: asset,
@@ -237,8 +237,8 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
         appearance: appearances[selectedIndex] || null,
         selectedIndex: selectedIndex,
       };
-    })['filter']((value9) => value9['appearance']),
-    enabled = list6['map'](
+    }).filter((value9) => value9.appearance),
+    enabled = list6.map(
       ({
         asset: asset2,
         appearances: appearances2,
@@ -248,34 +248,34 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
         if (characters)
           return renderPersonReplacementAssetCard(value4, asset2, {
             previewAppearance: appearance,
-            statusText: '场景图 ' + (selectedIndex2 + 1) + '/' + appearances2['length'],
+            statusText: '场景图 ' + (selectedIndex2 + 1) + '/' + appearances2.length,
             draggable: true,
             cardClassName: 'person-replacement-target-asset person-replacement-scene-reference-asset',
             cardAttributes:
               'data-person-replacement-replacement-asset-kind="scene" data-person-replacement-target-scene-id="' +
-              escapeHtml(asset2['id']) +
+              escapeHtml(asset2.id) +
               '" data-person-replacement-target-scene-appearance-id="' +
-              escapeHtml(appearance['id']) +
+              escapeHtml(appearance.id) +
               '" aria-label="' +
-              escapeHtml('拖拽' + asset2['name'] + '到首帧画面作为场景参考') +
+              escapeHtml('拖拽' + asset2.name + '到首帧画面作为场景参考') +
               '"',
             shellClassName: 'person-replacement-target-asset-shell',
           });
-        const value10 = appearances2['length'] > 1,
+        const value10 = appearances2.length > 1,
           accessoryHtml = value10
             ? '<span class="person-replacement-target-appearance-controls" data-person-replacement-target-controls="' +
-              escapeHtml(asset2['id']) +
+              escapeHtml(asset2.id) +
               '" data-story-asset-hover-id="' +
-              escapeHtml(asset2['id']) +
+              escapeHtml(asset2.id) +
               '">' +
               renderPersonReplacementPreviewArrow('previous', {
                 action: 'target-previous-appearance',
-                label: asset2['name'] + '上一个形象',
+                label: asset2.name + '上一个形象',
                 className: 'person-replacement-target-appearance-arrow',
               }) +
               renderPersonReplacementPreviewArrow('next', {
                 action: 'target-next-appearance',
-                label: asset2['name'] + '下一个形象',
+                label: asset2.name + '下一个形象',
                 className: 'person-replacement-target-appearance-arrow',
               }) +
               '</span>'
@@ -283,7 +283,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
           hasTargetAssetBinding2 = hasTargetAssetBinding(asset2, value3);
         return renderPersonReplacementAssetCard(value4, asset2, {
           previewAppearance: appearance,
-          statusText: '形象 ' + (selectedIndex2 + 1) + '/' + appearances2['length'],
+          statusText: '形象 ' + (selectedIndex2 + 1) + '/' + appearances2.length,
           cardMetaHtml: renderPersonReplacementVoiceReferenceStatus(asset2),
           draggable: true,
           cardClassName:
@@ -291,25 +291,25 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
             (hasTargetAssetBinding2 ? ' has-person-replacement-input' : ''),
           cardAttributes:
             'data-person-replacement-target-character-id="' +
-            escapeHtml(asset2['id']) +
+            escapeHtml(asset2.id) +
             '" data-person-replacement-target-appearance-id="' +
-            escapeHtml(appearance['id']) +
+            escapeHtml(appearance.id) +
             '" data-person-replacement-target-appearance-index="' +
             selectedIndex2 +
             '" data-person-replacement-target-appearance-count="' +
-            appearances2['length'] +
+            appearances2.length +
             '" data-person-replacement-target-appearance-wheel="' +
             value10 +
             '" aria-label="拖拽' +
-            escapeHtml(asset2['name']) +
+            escapeHtml(asset2.name) +
             '的' +
-            escapeHtml(appearance['name']) +
+            escapeHtml(appearance.name) +
             '到视频人物框"',
           shellClassName: 'person-replacement-target-asset-shell',
           accessoryHtml: accessoryHtml,
         });
       },
-    )['join']('');
+    ).join('');
   if (characters && !enabled) return '';
   const value11 = characters ? '场景' : '角色',
     value12 = '请先在素材设定上传基础形象';
@@ -328,7 +328,7 @@ function renderTargetAssetGroup(args3, characterAssetTab, value3) {
   );
 }
 function renderTargetAssetRail(value13, value14) {
-  const value15 = value14?.['promptPackage'] || null;
+  const value15 = value14?.promptPackage || null;
   return (
     '<aside class="person-replacement-target-assets">\n    <div class="person-replacement-target-assets-heading">\n      <strong>替换素材</strong>\n      <small>拖拽角色到首帧人物框；拖拽场景到首帧画面</small>\n    </div>\n    <div class="person-replacement-target-asset-list">\n      ' +
     renderTargetAssetGroup(value13, 'character', value15) +
@@ -338,27 +338,27 @@ function renderTargetAssetRail(value13, value14) {
   );
 }
 function renderVideoReplacementReferenceRail(value16, value17) {
-  const value18 = value17?.['shot'] || null,
-    value19 = value17?.['imageInput'] || {},
-    list8 = Array['isArray'](value19['referenceOptions']) ? value19['referenceOptions'] : [],
-    value20 = Math['trunc'](Number(value19['activeReferenceIndex'])),
-    value21 = value19['mode'] === PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE,
+  const value18 = value17?.shot || null,
+    value19 = value17?.imageInput || {},
+    list8 = Array.isArray(value19.referenceOptions) ? value19.referenceOptions : [],
+    value20 = Math.trunc(Number(value19.activeReferenceIndex)),
+    value21 = value19.mode === PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE,
     value22 = value21
       ? '包含上一轮全部图像替换结果与当前镜头的角色绑定图'
       : '来自上一轮图像替换的全部片段结果',
-    list9 = list8['map']((value23, value24) => {
+    list9 = list8.map((value23, value24) => {
       const isCharacterReference =
-          value23['kind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
-        value25 = value23['reference'] || {},
-        text7 = normalizeText(value23['sourceShotId']),
-        value26 = Math['max'](0, Math['trunc'](Number(value23['sourceShotIndex']) || 0)),
-        value27 = Math['max'](0, Math['trunc'](Number(value23['resultIndex']) || 0)),
-        count = Math['max'](1, Math['trunc'](Number(value23['resultCount']) || 1)),
+          value23.kind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE,
+        value25 = value23.reference || {},
+        text7 = normalizeText(value23.sourceShotId),
+        value26 = Math.max(0, Math.trunc(Number(value23.sourceShotIndex) || 0)),
+        value27 = Math.max(0, Math.trunc(Number(value23.resultIndex) || 0)),
+        count = Math.max(1, Math.trunc(Number(value23.resultCount) || 1)),
         label2 = isCharacterReference
-          ? normalizeText(value25['characterName']) || '人物参考图'
+          ? normalizeText(value25.characterName) || '人物参考图'
           : '片段' + (value26 + 1) + '.图片' + (value27 + 1),
         value28 = isCharacterReference
-          ? '角色绑定图 · ' + (normalizeText(value25['appearanceName']) || '基础形象')
+          ? '角色绑定图 · ' + (normalizeText(value25.appearanceName) || '基础形象')
           : '图像替换结果',
         value29 = isCharacterReference
           ? '<small>' + escapeHtml(value28) + '</small>'
@@ -373,15 +373,15 @@ function renderVideoReplacementReferenceRail(value16, value17) {
             '/' +
             count +
             '</span>',
-        mediaUrl2 = normalizeMediaUrl(value23['imageRef']),
+        mediaUrl2 = normalizeMediaUrl(value23.imageRef),
         value30 = value24 === value20,
         value31 = mediaUrl2
           ? ' data-story-asset-hover-id="' +
-            escapeHtml(text7 || value18?.['id'] || '') +
+            escapeHtml(text7 || value18?.id || '') +
             '" data-person-replacement-video-reference-hover-preview="true"'
           : '',
         characterReferenceId = isCharacterReference
-          ? normalizeText(value25['personId'] || value25['characterId'] + ':' + value25['appearanceId'])
+          ? normalizeText(value25.personId || value25.characterId + ':' + value25.appearanceId)
           : '',
         value32 = isCharacterReference ? 'character:' + characterReferenceId : 'shot:' + text7,
         value33 = isCharacterReference
@@ -419,13 +419,13 @@ function renderVideoReplacementReferenceRail(value16, value17) {
           '<span class="story-asset-card-shell person-replacement-target-asset-shell person-replacement-video-reference-shell">\n      <button type="button" class="person-replacement-video-reference-card ' +
           (value30 ? 'is-selected' : '') +
           '" data-story-action="select-video-shot-reference" data-shot-id="' +
-          escapeHtml(value18?.['id'] || '') +
+          escapeHtml(value18?.id || '') +
           '" data-person-replacement-video-reference-index="' +
           value24 +
           '" data-person-replacement-video-reference-key="' +
           escapeHtml(value32) +
           '" data-person-replacement-video-reference-kind="' +
-          escapeHtml(value23['kind']) +
+          escapeHtml(value23.kind) +
           '"' +
           (isCharacterReference
             ? ' data-person-replacement-video-character-reference="' +
@@ -468,26 +468,26 @@ function renderVideoReplacementReferenceRail(value16, value17) {
         isCharacterReference: isCharacterReference,
       };
     }),
-    cardsHtml = list9['filter'](({ isCharacterReference: isCharacterReference2 }) => !isCharacterReference2)
-      ['map'](({ cardHtml: cardHtml2 }) => cardHtml2)
-      ['join'](''),
+    cardsHtml = list9.filter(({ isCharacterReference: isCharacterReference2 }) => !isCharacterReference2)
+      .map(({ cardHtml: cardHtml2 }) => cardHtml2)
+      .join(''),
     map = new Map(
-      list9['filter'](({ isCharacterReference: isCharacterReference3 }) => isCharacterReference3)['map'](
-        (value35) => [value35['characterReferenceId'], value35['cardHtml']],
+      list9.filter(({ isCharacterReference: isCharacterReference3 }) => isCharacterReference3).map(
+        (value35) => [value35.characterReferenceId, value35.cardHtml],
       ),
     ),
-    list10 = Array['isArray'](value19['references'])
-      ? value19['references']['filter']((value36) => normalizeText(value36?.['imageRef']))
+    list10 = Array.isArray(value19.references)
+      ? value19.references.filter((value36) => normalizeText(value36?.imageRef))
       : [],
-    cardsHtml2 = list10['map']((value37) => {
+    cardsHtml2 = list10.map((value37) => {
       const text8 = normalizeText(
-          value37['personId'] || value37['characterId'] + ':' + value37['appearanceId'],
+          value37.personId || value37.characterId + ':' + value37.appearanceId,
         ),
-        value38 = map['get'](text8);
+        value38 = map.get(text8);
       return value38 || '';
-    })['join'](''),
+    }).join(''),
     noteHtml2 =
-      value21 && list10['length'] > 1
+      value21 && list10.length > 1
         ? '<p class="person-replacement-reference-note">每次生成使用一张人物参考图，请选择本次入参。</p>'
         : '',
     handler = ({
@@ -538,32 +538,32 @@ function renderDetectionBox(
   value43,
   { duplicateRoleLabels: duplicateRoleLabels = new Set() } = {},
 ) {
-  const box = value41['locator']?.['bbox'] || value41['bbox'];
+  const box = value41.locator?.bbox || value41.bbox;
   if (!box) return '';
-  const value44 = value41['detectionMethod'] === 'manual',
-    text9 = normalizeText(value43['workspace']['selectedShotId']),
+  const value44 = value41.detectionMethod === 'manual',
+    text9 = normalizeText(value43.workspace.selectedShotId),
     personReplacementIdentityCorrectionDraftKey = getPersonReplacementIdentityCorrectionDraftKey(
       text9,
-      value41['id'],
+      value41.id,
     ),
     value45 =
-      value43['workspace']['identityCorrectionDrafts'][personReplacementIdentityCorrectionDraftKey] || {},
-    error = value43['characters']['find']((value46) => value46['id'] === value41['targetCharacterId']),
-    error2 = error ? getCharacterAppearance(error, value41['targetAppearanceId']) : null,
+      value43.workspace.identityCorrectionDrafts[personReplacementIdentityCorrectionDraftKey] || {},
+    error = value43.characters.find((value46) => value46.id === value41.targetCharacterId),
+    error2 = error ? getCharacterAppearance(error, value41.targetAppearanceId) : null,
     value47 =
-      value41['identityReviewStatus'] === 'needs_review' || value41['identityReviewRequired'] === true,
-    value48 = Object['keys'](value45)['length'] > 0,
-    text10 = normalizeText(value45['orientation'], normalizeText(value41['orientation'])),
+      value41.identityReviewStatus === 'needs_review' || value41.identityReviewRequired === true,
+    value48 = Object.keys(value45).length > 0,
+    text10 = normalizeText(value45.orientation, normalizeText(value41.orientation)),
     formatPersonOrientation2 = formatPersonOrientation(text10),
     value49 = resolvePersonReplacementDetectionLabel(value41, value42, value43, text9),
-    value50 = duplicateRoleLabels['has'](value49),
+    value50 = duplicateRoleLabels.has(value49),
     sourceCharacterId2 = normalizeText(
-      value45['sourceCharacterId'],
-      normalizeText(value41['sourceCharacterId']),
+      value45.sourceCharacterId,
+      normalizeText(value41.sourceCharacterId),
     ),
     value51 = value50 ? '角色名重复' : error ? '已绑定' : '未绑定',
-    value52 = PERSON_REPLACEMENT_ORIENTATIONS['includes'](text10) && text10 !== 'unknown' ? text10 : '',
-    value53 = normalizePersonReplacementScope(value41['replacementScope']),
+    value52 = PERSON_REPLACEMENT_ORIENTATIONS.includes(text10) && text10 !== 'unknown' ? text10 : '',
+    value53 = normalizePersonReplacementScope(value41.replacementScope),
     label4 = formatPersonReplacementScopeLabel(value53),
     value54 = value47 || value48 || (PERSON_REPLACEMENT_ORIENTATION_ENABLED && !value52),
     value55 = PERSON_REPLACEMENT_ORIENTATION_ENABLED
@@ -602,25 +602,25 @@ function renderDetectionBox(
       value51 +
       '</span>',
     value59 =
-      error && error2?.['imageUrl']
+      error && error2?.imageUrl
         ? ' data-story-asset-hover-id="' +
-          escapeHtml(error['id']) +
+          escapeHtml(error.id) +
           '" data-story-asset-hover-appearance-id="' +
-          escapeHtml(error2['id']) +
+          escapeHtml(error2.id) +
           '"'
         : '',
     value60 =
       '<button type="button" class="story-action-icon-button is-danger person-replacement-detection-delete-action" data-person-replacement-action="delete-person" data-shot-id="' +
-      escapeHtml(value43['workspace']['selectedShotId']) +
+      escapeHtml(value43.workspace.selectedShotId) +
       '" data-person-id="' +
-      escapeHtml(value41['id']) +
+      escapeHtml(value41.id) +
       '" aria-label="删除' +
       escapeHtml(value49) +
       '检测框">' +
       renderWorkspaceActionIcon('delete') +
       '</button>',
     value61 = ['n', 'e', 's', 'w', 'nw', 'ne', 'sw', 'se']
-      ['map'](
+      .map(
         (value62) =>
           '<span class="person-replacement-manual-resize-handle is-' +
           value62 +
@@ -628,7 +628,7 @@ function renderDetectionBox(
           value62 +
           '" aria-hidden="true"></span>',
       )
-      ['join'](''),
+      .join(''),
     value63 = value44
       ? ' data-person-replacement-manual-person tabindex="0" aria-keyshortcuts="Delete D"'
       : ' tabindex="0" aria-keyshortcuts="Delete D"',
@@ -648,18 +648,18 @@ function renderDetectionBox(
     ' ' +
     (value50 ? 'has-role-conflict' : '') +
     '" style="--box-x:' +
-    box['x'] * 100 +
+    box.x * 100 +
     '%;--box-y:' +
-    box['y'] * 100 +
+    box.y * 100 +
     '%;--box-width:' +
-    box['width'] * 100 +
+    box.width * 100 +
     '%;--box-height:' +
-    box['height'] * 100 +
+    box.height * 100 +
     '%" data-person-replacement-person-drop' +
     value59 +
     value63 +
     ' data-person-id="' +
-    escapeHtml(value41['id']) +
+    escapeHtml(value41.id) +
     '" data-shot-id="' +
     escapeHtml(text9) +
     '" aria-label="' +
@@ -675,13 +675,13 @@ function renderDetectionBox(
     '</span></div>' +
     (error
       ? '<div class="person-replacement-mapping-badge"><span class="person-replacement-mapping-badge-text">→ ' +
-        escapeHtml(error['name']) +
+        escapeHtml(error.name) +
         ' · ' +
-        escapeHtml(error2?.['name'] || '基础形象') +
+        escapeHtml(error2?.name || '基础形象') +
         '</span><button type="button" class="story-action-icon-button is-danger story-project-delete-trigger person-replacement-mapping-remove person-replacement-detection-delete-action" data-person-replacement-action="clear-person-mapping" data-shot-id="' +
         escapeHtml(text9) +
         '" data-person-id="' +
-        escapeHtml(value41['id']) +
+        escapeHtml(value41.id) +
         '" aria-label="解除' +
         escapeHtml(value49) +
         '的人物绑定">' +
@@ -693,71 +693,71 @@ function renderDetectionBox(
   );
 }
 function renderVideoReplacementReferenceInputs(value65) {
-  const readOnlyFixedInputSlots = value65?.['slotState'] || {},
+  const readOnlyFixedInputSlots = value65?.slotState || {},
     { fixedInputConfig: fixedInputConfig } = readOnlyFixedInputSlots;
-  if (!fixedInputConfig?.['visibleSlots']?.['length']) return '';
-  const inputsBySlot = Object['fromEntries'](
-    Object['entries'](readOnlyFixedInputSlots['inputsBySlot'])['map'](([value66, previewVideoUrl]) => [
+  if (!fixedInputConfig?.visibleSlots?.length) return '';
+  const inputsBySlot = Object.fromEntries(
+    Object.entries(readOnlyFixedInputSlots.inputsBySlot).map(([value66, previewVideoUrl]) => [
       value66,
       {
         ...previewVideoUrl,
-        url: normalizeMediaUrl(previewVideoUrl['url']),
-        thumbUrl: normalizeMediaUrl(previewVideoUrl['thumbUrl']),
-        previewVideoUrl: previewVideoUrl['kind'] === 'video' ? normalizeMediaUrl(previewVideoUrl['url']) : '',
+        url: normalizeMediaUrl(previewVideoUrl.url),
+        thumbUrl: normalizeMediaUrl(previewVideoUrl.thumbUrl),
+        previewVideoUrl: previewVideoUrl.kind === 'video' ? normalizeMediaUrl(previewVideoUrl.url) : '',
       },
     ]),
   );
   return renderVideoReferenceBarMarkup({
     fixedInputConfig: fixedInputConfig,
     inputsBySlot: inputsBySlot,
-    readOnlyFixedInputSlots: readOnlyFixedInputSlots['readOnlySlots'],
+    readOnlyFixedInputSlots: readOnlyFixedInputSlots.readOnlySlots,
     showItemTitles: false,
     attachmentButtonHtml: '',
   });
 }
 function renderPromptReferenceInputs(shotId, value67) {
-  const list11 = Array['isArray'](value67?.['referenceImages']) ? value67['referenceImages'] : [];
-  if (!list11['length']) return '';
-  const map2 = new Map(shotId['characters']['map']((value68) => [value68['id'], value68])),
-    map3 = new Map(shotId['scenes']['map']((value69) => [value69['id'], value69])),
-    readOnlyInputs = list11['map']((url) => {
-      const value70 = Math['max'](1, Number(url['slot']) || 1),
-        error3 = map2['get'](url['targetCharacterId']),
-        error4 = map3['get'](url['targetSceneId']),
+  const list11 = Array.isArray(value67?.referenceImages) ? value67.referenceImages : [];
+  if (!list11.length) return '';
+  const map2 = new Map(shotId.characters.map((value68) => [value68.id, value68])),
+    map3 = new Map(shotId.scenes.map((value69) => [value69.id, value69])),
+    readOnlyInputs = list11.map((url) => {
+      const value70 = Math.max(1, Number(url.slot) || 1),
+        error3 = map2.get(url.targetCharacterId),
+        error4 = map3.get(url.targetSceneId),
         name =
-          url['role'] === 'source-keyframe'
+          url.role === 'source-keyframe'
             ? '图' +
               value70 +
               ' · 当前首帧' +
-              (value67['annotatedSource'] ? '（提交时叠加人物框）' : '')
-            : url['role'] === 'person-location-guide'
+              (value67.annotatedSource ? '（提交时叠加人物框）' : '')
+            : url.role === 'person-location-guide'
               ? '图' + value70 + ' · A–H 定位图'
-              : url['role'] === 'target-scene'
-                ? '图' + value70 + ' · 场景 · ' + (error4?.['name'] || '场景参考')
-                : '图' + value70 + ' · ' + (error3?.['name'] || '目标形象'),
-        removeAction = url['role'] === 'target-character',
-        value71 = url['role'] === 'target-scene';
+              : url.role === 'target-scene'
+                ? '图' + value70 + ' · 场景 · ' + (error4?.name || '场景参考')
+                : '图' + value70 + ' · ' + (error3?.name || '目标形象'),
+        removeAction = url.role === 'target-character',
+        value71 = url.role === 'target-scene';
       return {
         kind: 'image',
         slotId: 'image-' + value70,
         name: name,
         url:
-          url['role'] === 'person-location-guide'
-            ? resolvePersonReplacementLocationGuidePreview(url['ref'])
-            : normalizeMediaUrl(url['ref']),
+          url.role === 'person-location-guide'
+            ? resolvePersonReplacementLocationGuidePreview(url.ref)
+            : normalizeMediaUrl(url.ref),
         removeAction: removeAction
           ? 'clear-person-replacement-target'
           : value71
             ? 'clear-person-replacement-scene-reference'
             : '',
         removeValue: removeAction
-          ? JSON['stringify']({
-              shotId: shotId['workspace']['selectedShotId'],
-              targetCharacterId: url['targetCharacterId'],
-              targetAppearanceId: url['targetAppearanceId'],
+          ? JSON.stringify({
+              shotId: shotId.workspace.selectedShotId,
+              targetCharacterId: url.targetCharacterId,
+              targetAppearanceId: url.targetAppearanceId,
             })
           : value71
-            ? JSON['stringify']({ shotId: shotId['workspace']['selectedShotId'] })
+            ? JSON.stringify({ shotId: shotId.workspace.selectedShotId })
             : '',
       };
     });
@@ -772,63 +772,63 @@ function renderPromptReferenceInputs(shotId, value67) {
   );
 }
 export function syncPersonReplacementPromptReferenceInputs(el2, value72, value73) {
-  const el3 = el2?.['querySelector']?.('.person-replacement-prompt-reference-inputs');
-  if (!el3?.['ownerDocument']?.['createElement']) return;
-  const el4 = el3['ownerDocument']['createElement']('template');
-  el4['innerHTML'] = renderPromptReferenceInputs(value72, value73);
-  const el5 = el4['content']['firstElementChild'];
-  if (!el5 || el3['innerHTML'] === el5['innerHTML']) return;
-  const el6 = el3['querySelector']('.ref-thumb-container--readonly'),
-    el7 = el5['querySelector']('.ref-thumb-container--readonly');
+  const el3 = el2?.querySelector?.('.person-replacement-prompt-reference-inputs');
+  if (!el3?.ownerDocument?.createElement) return;
+  const el4 = el3.ownerDocument.createElement('template');
+  el4.innerHTML = renderPromptReferenceInputs(value72, value73);
+  const el5 = el4.content.firstElementChild;
+  if (!el5 || el3.innerHTML === el5.innerHTML) return;
+  const el6 = el3.querySelector('.ref-thumb-container--readonly'),
+    el7 = el5.querySelector('.ref-thumb-container--readonly');
   if (!el6 || !el7) {
-    (el3['querySelectorAll']('img')['forEach']((value74) => value74['removeAttribute']('src')),
-      el3['replaceChildren'](...el5['childNodes']));
+    (el3.querySelectorAll('img').forEach((value74) => value74.removeAttribute('src')),
+      el3.replaceChildren(...el5.childNodes));
     return;
   }
-  const list12 = [...el3['querySelectorAll']('[data-ref-readonly-key]')];
-  let value75 = el6['firstElementChild'];
-  for (const el8 of el7['querySelectorAll']('[data-ref-readonly-key]')) {
-    const count2 = list12['findIndex'](
-        (el9) => el9['dataset']['refReadonlyKey'] === el8['dataset']['refReadonlyKey'],
+  const list12 = [...el3.querySelectorAll('[data-ref-readonly-key]')];
+  let value75 = el6.firstElementChild;
+  for (const el8 of el7.querySelectorAll('[data-ref-readonly-key]')) {
+    const count2 = list12.findIndex(
+        (el9) => el9.dataset.refReadonlyKey === el8.dataset.refReadonlyKey,
       ),
-      el10 = count2 < 0 ? el8 : list12['splice'](count2, 1)[0];
+      el10 = count2 < 0 ? el8 : list12.splice(count2, 1)[0];
     if (el10 !== el8)
-      for (const { name: name2, value: value76 } of el8['attributes']) {
-        if (el10['getAttribute'](name2) !== value76) el10['setAttribute'](name2, value76);
+      for (const { name: name2, value: value76 } of el8.attributes) {
+        if (el10.getAttribute(name2) !== value76) el10.setAttribute(name2, value76);
       }
-    if (el10 !== value75) el6['insertBefore'](el10, value75);
-    value75 = el10['nextElementSibling'];
+    if (el10 !== value75) el6.insertBefore(el10, value75);
+    value75 = el10.nextElementSibling;
   }
   for (const el11 of list12) {
-    (el11['querySelectorAll']('img')['forEach']((value77) => value77['removeAttribute']('src')),
-      el11['remove']());
+    (el11.querySelectorAll('img').forEach((value77) => value77.removeAttribute('src')),
+      el11.remove());
   }
 }
 export function createPersonReplacementIdentityPresentation() {
-  return Object['freeze']({
+  return Object.freeze({
     buildImage(
       value78,
       value79,
       { people: people = [], duplicateRoleLabels: duplicateRoleLabels = new Set() } = {},
     ) {
-      const detectionBoxesHtml = Array['isArray'](people) ? people : [];
-      return Object['freeze']({
+      const detectionBoxesHtml = Array.isArray(people) ? people : [];
+      return Object.freeze({
         targetAssetRailHtml: renderTargetAssetRail(value78, value79),
-        detectionBoxesHtml: detectionBoxesHtml['map']((value80, value81) =>
+        detectionBoxesHtml: detectionBoxesHtml.map((value80, value81) =>
           renderDetectionBox(value80, value81, value78, { duplicateRoleLabels: duplicateRoleLabels }),
-        )['join'](''),
-        promptReferenceInputsHtml: renderPromptReferenceInputs(value78, value79?.['promptPackage']),
+        ).join(''),
+        promptReferenceInputsHtml: renderPromptReferenceInputs(value78, value79?.promptPackage),
       });
     },
     buildVideo(value82, value83) {
-      return Object['freeze']({
+      return Object.freeze({
         referenceRailHtml: renderVideoReplacementReferenceRail(value82, value83),
         referenceInputsHtml: renderVideoReplacementReferenceInputs(value83),
       });
     },
     renderOverlay(value84, value85 = {}) {
       if (value84 === 'picker-options')
-        return renderPersonDetectionPickerOptions(value85['options'], value85['selectedValue']);
+        return renderPersonDetectionPickerOptions(value85.options, value85.selectedValue);
       if (value84 === 'mapping-scope') return renderPersonMappingScopeMenu(value85);
       return '';
     },

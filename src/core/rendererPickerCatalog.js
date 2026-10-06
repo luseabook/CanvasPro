@@ -7,8 +7,8 @@ function createGenerationPickerItem(type, value, item) {
     type: type,
     label: t('coreUi.renderer.picker.items.' + value),
     defaultLabel: t('coreUi.renderer.picker.defaults.' + item),
-    width: width['width'],
-    height: width['height'],
+    width: width.width,
+    height: width.height,
   };
 }
 export function getRendererPickerNodeTypes() {
@@ -21,10 +21,10 @@ export function getRendererPickerNodeTypes() {
     createGenerationPickerItem('ai-audio', 'aiAudio', 'aiAudio'),
     {
       type: 'storyboard',
-      label: label?.['label'] || '宫格图',
-      defaultLabel: label?.['defaultName'] || label?.['label'] || '宫格图',
-      width: width2['width'],
-      height: width2['height'],
+      label: label?.label || '宫格图',
+      defaultLabel: label?.defaultName || label?.label || '宫格图',
+      width: width2.width,
+      height: width2.height,
     },
   ];
 }

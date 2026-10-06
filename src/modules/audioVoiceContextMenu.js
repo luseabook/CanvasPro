@@ -1,7 +1,7 @@
 import { showContextMenu } from './interaction/contextMenuPresenter.js';
 import { TEXT_CONTEXT_MENU_TARGET_SELECTOR } from './textInputContextMenu.js';
 import { bindAudioVoiceModelSubmenuPosition, createEl } from './audioVoicePanelPresentation.js';
-const AUDIO_VOICE_ACTION_ICONS = Object['freeze']({
+const AUDIO_VOICE_ACTION_ICONS = Object.freeze({
     'use-converted': 'generated',
     'use-source': 'source',
     'download-source': 'source',
@@ -10,7 +10,7 @@ const AUDIO_VOICE_ACTION_ICONS = Object['freeze']({
     'add-converted-to-canvas': 'generated',
     remove: 'delete',
   }),
-  AUDIO_VOICE_SHORTCUT_ACTIONS = Object['freeze']({
+  AUDIO_VOICE_SHORTCUT_ACTIONS = Object.freeze({
     'use-converted': 'context-audio-voice-use-generated',
     'use-source': 'context-audio-voice-use-source',
     'download-source': 'context-audio-voice-download-source',
@@ -64,20 +64,20 @@ export function buildAudioVoiceSegmentMenuEntries({
   ];
 }
 function buildAudioVoiceContextMenuEntry(label, action) {
-  const subItems = Array['isArray'](label?.['subItems'])
-    ? label['subItems']['map']((value) => buildAudioVoiceContextMenuEntry(value, action))
+  const subItems = Array.isArray(label?.subItems)
+    ? label.subItems.map((value) => buildAudioVoiceContextMenuEntry(value, action))
     : null;
   return {
-    label: label['label'],
-    icon: label['icon'] || AUDIO_VOICE_ACTION_ICONS[label['action']] || 'action',
-    checked: label['checked'],
-    disabled: label['disabled'] === true,
-    danger: label['danger'],
+    label: label.label,
+    icon: label.icon || AUDIO_VOICE_ACTION_ICONS[label.action] || 'action',
+    checked: label.checked,
+    disabled: label.disabled === true,
+    danger: label.danger,
     ...(subItems
       ? { subItems: subItems }
       : {
-          shortcutActionId: AUDIO_VOICE_SHORTCUT_ACTIONS[label['action']],
-          action: action(label['action'], label['dataset']),
+          shortcutActionId: AUDIO_VOICE_SHORTCUT_ACTIONS[label.action],
+          action: action(label.action, label.dataset),
         }),
   };
 }
@@ -97,14 +97,14 @@ export function buildAudioVoiceSegmentContextMenuItems({
     list = [];
   return (
     imitateToneAvailable &&
-      list['push']({
+      list.push({
         label: text2('actions.imitateTone'),
         icon: 'tone',
         checked: imitateToneEnabled,
         shortcutActionId: 'context-audio-voice-toggle-imitate-tone',
         action: action2('toggle-imitate-tone'),
       }),
-    list['push']({
+    list.push({
       label: text2('actions.segmentModel'),
       icon: 'model',
       shortcutActionId: 'context-audio-voice-open-model-menu',
@@ -116,17 +116,17 @@ export function buildAudioVoiceSegmentContextMenuItems({
           shortcutActionId: 'context-audio-voice-use-global-model',
           action: action2('select-segment-model', { modelId: '' }),
         },
-        ...modelOptions['map']((label2) => ({
-          label: label2['label'] || label2['id'],
+        ...modelOptions.map((label2) => ({
+          label: label2.label || label2.id,
           icon: 'model',
-          checked: label2['id'] === selectedModelId,
-          action: action2('select-segment-model', { modelId: label2['id'] }),
+          checked: label2.id === selectedModelId,
+          action: action2('select-segment-model', { modelId: label2.id }),
         })),
       ],
     }),
-    entries['forEach']((index) => {
-      if (index['action'] === 'remove') list['push']('sep');
-      list['push'](buildAudioVoiceContextMenuEntry(index, action2));
+    entries.forEach((index) => {
+      if (index.action === 'remove') list.push('sep');
+      list.push(buildAudioVoiceContextMenuEntry(index, action2));
     }),
     list
   );
@@ -134,36 +134,36 @@ export function buildAudioVoiceSegmentContextMenuItems({
 function createAudioVoiceInlineMenuItem(el, result, data = '') {
   const el2 = createEl(
     'button',
-    ['audio-voice-menu-item', data]['filter'](Boolean)['join'](' '),
-    el['label'],
+    ['audio-voice-menu-item', data].filter(Boolean).join(' '),
+    el.label,
   );
-  el2['type'] = 'button';
-  if (el['action']) el2['dataset']['audioVoiceAction'] = el['action'];
-  ((el2['dataset']['segmentId'] = result),
-    Object['entries'](el['dataset'] || {})['forEach'](([options, target]) => {
-      el2['dataset'][options] = String(target ?? '');
+  el2.type = 'button';
+  if (el.action) el2.dataset.audioVoiceAction = el.action;
+  ((el2.dataset.segmentId = result),
+    Object.entries(el.dataset || {}).forEach(([options, target]) => {
+      el2.dataset[options] = String(target ?? '');
     }),
-    (el2['disabled'] = el['disabled'] === true));
-  if (el2['disabled']) el2['setAttribute']('aria-disabled', 'true');
+    (el2.disabled = el.disabled === true));
+  if (el2.disabled) el2.setAttribute('aria-disabled', 'true');
   return (
-    el['checked'] && (el2['classList']['add']('is-active'), el2['setAttribute']('aria-pressed', 'true')),
+    el.checked && (el2.classList.add('is-active'), el2.setAttribute('aria-pressed', 'true')),
     el2
   );
 }
 function appendAudioVoiceInlineSubmenu(el3, source, next, current) {
   const el4 = createEl('div', 'audio-voice-menu-submenu-wrap'),
     el5 = createAudioVoiceInlineMenuItem(source, next);
-  (el5['classList']['add']('audio-voice-submenu-trigger'), el5['setAttribute']('aria-haspopup', 'menu'));
+  (el5.classList.add('audio-voice-submenu-trigger'), el5.setAttribute('aria-haspopup', 'menu'));
   const el6 = createEl('div', 'audio-voice-model-submenu');
-  (el6['setAttribute']('role', 'menu'),
-    source['subItems']['forEach']((entry) => {
-      el6['appendChild'](
-        createAudioVoiceInlineMenuItem(entry, next, source['modelMenu'] ? 'audio-voice-model-menu-item' : ''),
+  (el6.setAttribute('role', 'menu'),
+    source.subItems.forEach((entry) => {
+      el6.appendChild(
+        createAudioVoiceInlineMenuItem(entry, next, source.modelMenu ? 'audio-voice-model-menu-item' : ''),
       );
     }),
-    el4['append'](el5, el6),
+    el4.append(el5, el6),
     bindAudioVoiceModelSubmenuPosition(el4, el6, current),
-    el3['appendChild'](el4));
+    el3.appendChild(el4));
 }
 export function renderAudioVoiceSegmentInlineMenu({
   segmentId: segmentId = '',
@@ -171,10 +171,10 @@ export function renderAudioVoiceSegmentInlineMenu({
   modelOptions: modelOptions = [],
   selectedModelId: selectedModelId = '',
   text: text3,
-  windowObject: windowObject = globalThis['window'],
+  windowObject: windowObject = globalThis.window,
 } = {}) {
   const el7 = createEl('div', 'audio-voice-more-menu');
-  el7['setAttribute']('role', 'menu');
+  el7.setAttribute('role', 'menu');
   const record = {
     label: text3('actions.segmentModel'),
     modelMenu: true,
@@ -185,19 +185,19 @@ export function renderAudioVoiceSegmentInlineMenu({
         checked: !selectedModelId,
         dataset: { modelId: '' },
       },
-      ...modelOptions['map']((label3) => ({
+      ...modelOptions.map((label3) => ({
         action: 'select-segment-model',
-        label: label3['label'] || label3['id'],
-        checked: label3['id'] === selectedModelId,
-        dataset: { modelId: label3['id'] },
+        label: label3.label || label3.id,
+        checked: label3.id === selectedModelId,
+        dataset: { modelId: label3.id },
       })),
     ],
   };
   return (
-    [record, ...entries]['forEach']((payload) => {
-      Array['isArray'](payload['subItems'])
+    [record, ...entries].forEach((payload) => {
+      Array.isArray(payload.subItems)
         ? appendAudioVoiceInlineSubmenu(el7, payload, segmentId, windowObject)
-        : el7['appendChild'](createAudioVoiceInlineMenuItem(payload, segmentId));
+        : el7.appendChild(createAudioVoiceInlineMenuItem(payload, segmentId));
     }),
     el7
   );
@@ -211,30 +211,30 @@ export function createAudioVoiceSegmentContextMenuController({
 } = {}) {
   let showContextMenu2 = null;
   const close = () => {
-      (showContextMenu2?.['close']?.(), (showContextMenu2 = null));
+      (showContextMenu2?.close?.(), (showContextMenu2 = null));
     },
     handle = (event) => {
       if (
-        event['defaultPrevented'] ||
-        event['target']?.['closest']?.(
+        event.defaultPrevented ||
+        event.target?.closest?.(
           TEXT_CONTEXT_MENU_TARGET_SELECTOR + ', .audio-voice-more-menu, .audio-voice-model-submenu',
         )
       )
         return;
-      const ownerElement = event['target']?.['closest']?.('.audio-voice-segment-card'),
-        state = ownerElement ? getSegment?.(ownerElement['dataset']['segmentId'] || '') : null,
-        enabled = String(state?.['id'] || '')['trim']();
+      const ownerElement = event.target?.closest?.('.audio-voice-segment-card'),
+        state = ownerElement ? getSegment?.(ownerElement.dataset.segmentId || '') : null,
+        enabled = String(state?.id || '').trim();
       if (!enabled) return;
       const config = buildItems(state, (scope, dataset = {}) => {
         onAction2?.(scope, enabled, { dataset: dataset, closest: () => null, setAttribute: () => {} }, event);
       });
-      (event['preventDefault']?.(),
-        event['stopPropagation']?.(),
+      (event.preventDefault?.(),
+        event.stopPropagation?.(),
         closeInlineMenus?.(),
         close(),
         (showContextMenu2 = showContextMenu(
-          Number(event['clientX']) || 0,
-          Number(event['clientY']) || 0,
+          Number(event.clientX) || 0,
+          Number(event.clientY) || 0,
           config,
           {
             className: 'v2-canvas-ctx-menu audio-voice-segment-context-menu',
@@ -245,11 +245,11 @@ export function createAudioVoiceSegmentContextMenuController({
         )));
     };
   return (
-    panel?.['addEventListener']?.('contextmenu', handle),
+    panel?.addEventListener?.('contextmenu', handle),
     {
       close: close,
       destroy() {
-        (close(), panel?.['removeEventListener']?.('contextmenu', handle));
+        (close(), panel?.removeEventListener?.('contextmenu', handle));
       },
     }
   );

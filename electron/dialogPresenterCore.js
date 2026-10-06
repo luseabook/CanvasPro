@@ -1,12 +1,12 @@
 function isUsableWindow(candidateWindow) {
-  return !!candidateWindow && candidateWindow['isDestroyed']?.() !== true;
+  return !!candidateWindow && candidateWindow.isDestroyed?.() !== true;
 }
 function focusApp(app) {
   try {
-    app?.['focus']?.({ steal: true });
+    app?.focus?.({ steal: true });
   } catch {
     try {
-      app?.['focus']?.();
+      app?.focus?.();
     } catch {}
   }
 }
@@ -21,12 +21,12 @@ export function createForegroundDialogPresenterCore({
   let ownerWindow = null;
   function getOffscreenBounds() {
     try {
-      const display = screenApi['getDisplayNearestPoint'](screenApi['getCursorScreenPoint']()),
-        workArea = display?.['workArea'] || display?.['bounds'];
+      const display = screenApi.getDisplayNearestPoint(screenApi.getCursorScreenPoint()),
+        workArea = display?.workArea || display?.bounds;
       if (workArea)
         return {
-          x: Math['round'](workArea['x'] + Math['max'](0, workArea['width'] - 2)),
-          y: Math['round'](workArea['y'] + Math['max'](0, workArea['height'] - 2)),
+          x: Math.round(workArea.x + Math.max(0, workArea.width - 2)),
+          y: Math.round(workArea.y + Math.max(0, workArea.height - 2)),
           width: 1,
           height: 1,
         };
@@ -49,11 +49,11 @@ export function createForegroundDialogPresenterCore({
       maximizable: false,
       webPreferences: { contextIsolation: true, nodeIntegration: false, sandbox: true },
     })),
-      ownerWindow['on']('closed', () => {
+      ownerWindow.on('closed', () => {
         ownerWindow = null;
       }));
     try {
-      ownerWindow['setOpacity'](0);
+      ownerWindow.setOpacity(0);
     } catch {}
     return ownerWindow;
   }
@@ -67,40 +67,40 @@ export function createForegroundDialogPresenterCore({
   function presentOffscreenOwner(candidateWindow) {
     if (!isUsableWindow(candidateWindow)) return false;
     try {
-      candidateWindow['setBounds'](getOffscreenBounds());
+      candidateWindow.setBounds(getOffscreenBounds());
     } catch {}
     try {
-      candidateWindow['setOpacity'](0);
+      candidateWindow.setOpacity(0);
     } catch {}
     try {
-      candidateWindow['setAlwaysOnTop'](true, 'screen-saver');
+      candidateWindow.setAlwaysOnTop(true, 'screen-saver');
     } catch {}
     try {
-      candidateWindow['show']();
+      candidateWindow.show();
     } catch {}
     focusApp(app);
     try {
-      candidateWindow['focus']();
+      candidateWindow.focus();
     } catch {}
     try {
-      candidateWindow['moveTop']();
+      candidateWindow.moveTop();
     } catch {}
     return true;
   }
   function presentOwnerWindow(candidateWindow) {
     if (!isUsableWindow(candidateWindow)) return false;
     try {
-      if (candidateWindow['isMinimized']?.()) candidateWindow['restore']?.();
+      if (candidateWindow.isMinimized?.()) candidateWindow.restore?.();
     } catch {}
     try {
-      candidateWindow['show']();
+      candidateWindow.show();
     } catch {}
     focusApp(app);
     try {
-      candidateWindow['focus']();
+      candidateWindow.focus();
     } catch {}
     try {
-      candidateWindow['moveTop']();
+      candidateWindow.moveTop();
     } catch {}
     return true;
   }
@@ -116,12 +116,12 @@ export function createForegroundDialogPresenterCore({
     } finally {
       if (usesOffscreenOwner && isUsableWindow(ownerWindow))
         try {
-          ownerWindow['hide']();
+          ownerWindow.hide();
         } catch {}
     }
   }
   function destroyOwnerWindow() {
-    if (isUsableWindow(ownerWindow)) ownerWindow['destroy']();
+    if (isUsableWindow(ownerWindow)) ownerWindow.destroy();
     ownerWindow = null;
   }
   return {

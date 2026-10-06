@@ -1,15 +1,15 @@
 import { describeAgentCommand, searchAgentCommands, searchAgentModels } from './agentCapabilityDiscovery.js';
-export const AGENT_DISCOVERY_COMMAND_IDS = Object['freeze']([
+export const AGENT_DISCOVERY_COMMAND_IDS = Object.freeze([
   'agent.capabilities.search',
   'agent.command.describe',
   'agent.models.search',
 ]);
-const SAFE_DISCOVERY_CAPABILITY = Object['freeze']({ reads: ['agent.capabilityCatalog'], writes: [] });
+const SAFE_DISCOVERY_CAPABILITY = Object.freeze({ reads: ['agent.capabilityCatalog'], writes: [] });
 export function registerAgentDiscoveryCommands(commandRegistry) {
-  if (!commandRegistry?.['register'] || !commandRegistry?.['has']) return commandRegistry;
+  if (!commandRegistry?.register || !commandRegistry?.has) return commandRegistry;
   return (
-    !commandRegistry['has']('agent.capabilities.search') &&
-      commandRegistry['register']({
+    !commandRegistry.has('agent.capabilities.search') &&
+      commandRegistry.register({
         id: 'agent.capabilities.search',
         description:
           'Search registered Canvas Commands by user intent without executing them.',
@@ -33,8 +33,8 @@ export function registerAgentDiscoveryCommands(commandRegistry) {
           return searchAgentCommands({ commandRegistry: commandRegistry, ...args });
         },
       }),
-    !commandRegistry['has']('agent.command.describe') &&
-      commandRegistry['register']({
+    !commandRegistry.has('agent.command.describe') &&
+      commandRegistry.register({
         id: 'agent.command.describe',
         description: 'Load the complete planning schema for one registered Canvas Command.',
         riskLevel: 'safe',
@@ -55,8 +55,8 @@ export function registerAgentDiscoveryCommands(commandRegistry) {
           return describeAgentCommand({ commandRegistry: commandRegistry, ...args2 });
         },
       }),
-    !commandRegistry['has']('agent.models.search') &&
-      commandRegistry['register']({
+    !commandRegistry.has('agent.models.search') &&
+      commandRegistry.register({
         id: 'agent.models.search',
         description: 'Search model manifests and return planning-safe model fields and input slots.',
         riskLevel: 'safe',

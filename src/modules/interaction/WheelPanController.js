@@ -14,9 +14,9 @@ export function createWheelPanController({
   viewportPreview: viewportPreview,
 } = {}) {
   if (
-    typeof viewportPreview?.['acquire'] !== 'function' ||
-    typeof viewportPreview?.['update'] !== 'function' ||
-    typeof viewportPreview?.['commit'] !== 'function'
+    typeof viewportPreview?.acquire !== 'function' ||
+    typeof viewportPreview?.update !== 'function' ||
+    typeof viewportPreview?.commit !== 'function'
   )
     throw new TypeError('[WheelPanController] viewportPreview is required');
   let data = 0,
@@ -46,12 +46,12 @@ export function createWheelPanController({
   function run4(pointerTarget) {
     const source = typeof window !== 'undefined' ? window : null,
       handler =
-        typeof source?.['_v2UpdateSidePlusNow'] === 'function'
-          ? source['_v2UpdateSidePlusNow']
-          : source?.['_v2UpdateSidePlus'];
+        typeof source?._v2UpdateSidePlusNow === 'function'
+          ? source._v2UpdateSidePlusNow
+          : source?._v2UpdateSidePlus;
     if (typeof handler !== 'function') return;
-    const next = Number(source?.['_lastMx']) || 0,
-      current = Number(source?.['_lastMy']) || 0;
+    const next = Number(source?._lastMx) || 0,
+      current = Number(source?._lastMy) || 0;
     handler(next, current, { pointerTarget: pointerTarget });
   }
   function run5() {
@@ -78,15 +78,15 @@ export function createWheelPanController({
     enabled2 = false;
     data && (clearScheduledTimer(data), (data = 0));
     const payload = typeof window !== 'undefined' ? window : null,
-      box = viewportPreview['commit'](WHEEL_PAN_PREVIEW_OWNER);
+      box = viewportPreview.commit(WHEEL_PAN_PREVIEW_OWNER);
     return (
       box
-        ? (payload?.['_v2FlushMinimapViewportPreview']?.(box),
-          store['updateViewport'](box['x'], box['y'], box['zoom']),
-          store['markViewportPersist']?.(),
+        ? (payload?._v2FlushMinimapViewportPreview?.(box),
+          store.updateViewport(box.x, box.y, box.zoom),
+          store.markViewportPersist?.(),
           run5())
         : run6(),
-      payload?.['v2Renderer']?.['releaseViewportInteractionBusy']?.(),
+      payload?.v2Renderer?.releaseViewportInteractionBusy?.(),
       run2(),
       box
     );
@@ -94,27 +94,27 @@ export function createWheelPanController({
   function handleWheelPan(handle, state, config) {
     const scope = Number(handle),
       input = Number(state),
-      count = Number['isFinite'](scope) ? scope : 0,
-      count2 = Number['isFinite'](input) ? input : 0;
+      count = Number.isFinite(scope) ? scope : 0,
+      count2 = Number.isFinite(input) ? input : 0;
     if (count === 0 && count2 === 0) return false;
     const output =
-        (typeof store?.['getStateRaw'] === 'function' && store['getStateRaw']()) ||
-        (typeof store?.['getState'] === 'function' && store['getState']()) ||
+        (typeof store?.getStateRaw === 'function' && store.getStateRaw()) ||
+        (typeof store?.getState === 'function' && store.getState()) ||
         {},
-      enabled3 = viewportPreview['acquire'](WHEEL_PAN_PREVIEW_OWNER, output['viewport']);
+      enabled3 = viewportPreview.acquire(WHEEL_PAN_PREVIEW_OWNER, output.viewport);
     if (!enabled3) return false;
     const value2 = typeof window !== 'undefined' ? window : null;
-    (value2?.['v2Renderer']?.['markViewportInteractionBusy']?.(), run());
+    (value2?.v2Renderer?.markViewportInteractionBusy?.(), run());
     const x = enabled3,
       value3 = {
         ...x,
-        x: x['x'] - count,
-        y: x['y'] - count2,
-        zoom: x['zoom'],
+        x: x.x - count,
+        y: x.y - count2,
+        zoom: x.zoom,
       };
     return (
-      viewportPreview['update'](WHEEL_PAN_PREVIEW_OWNER, value3),
-      value2?.['_v2ScheduleMinimapViewportPreview']?.(value3),
+      viewportPreview.update(WHEEL_PAN_PREVIEW_OWNER, value3),
+      value2?._v2ScheduleMinimapViewportPreview?.(value3),
       (enabled2 = true),
       run3(),
       run7(config),

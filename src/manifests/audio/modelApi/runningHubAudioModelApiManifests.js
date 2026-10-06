@@ -3,7 +3,7 @@ import {
   createAudioModelApiManifest,
 } from './sharedAudioModelApiFields.js';
 import { getRunningHubModelApiProfileIds } from '../../../modules/runningHubProviderProfiles.js';
-const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
+const SUNO_INSTRUMENTAL_FIELD = Object.freeze({
     id: 'make_instrumental',
     type: 'toggle',
     placement: 'advanced',
@@ -13,7 +13,7 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
       '开启后生成无人声的纯演奏音乐；关闭则生成带人声演唱的完整歌曲。适合制作BGM、背景音乐等场景。',
     showInfoTip: true,
   }),
-  SUNO_TITLE_OPTIONAL_FIELD = Object['freeze']({
+  SUNO_TITLE_OPTIONAL_FIELD = Object.freeze({
     id: 'title',
     type: 'text',
     placement: 'advanced',
@@ -24,7 +24,7 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
       '为生成的歌曲命名。例如：「夏日回忆」「夜的钢琴曲」。留空时AI会根据音乐风格自动生成一个标题。',
     showInfoTip: true,
   }),
-  SUNO_TITLE_REQUIRED_FIELD = Object['freeze']({
+  SUNO_TITLE_REQUIRED_FIELD = Object.freeze({
     id: 'title',
     type: 'text',
     placement: 'advanced',
@@ -35,7 +35,7 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
       '自定义模式必填，为你的歌曲命名。例如：「我的故事」「追梦人」。标题会影响歌曲的整体风格走向。',
     showInfoTip: true,
   }),
-  SUNO_TAGS_FIELD = Object['freeze']({
+  SUNO_TAGS_FIELD = Object.freeze({
     id: 'tags',
     type: 'text',
     placement: 'advanced',
@@ -46,7 +46,7 @@ const SUNO_INSTRUMENTAL_FIELD = Object['freeze']({
       '必填，用英文逗号分隔描述音乐风格。例如：「流行,民谣,女声,温暖」「电子,舞曲,夜店,节奏感强」「古风,古筝,笛子,山水意境」。标签越具体，生成效果越好。',
     showInfoTip: true,
   });
-export const MINIMAX_VOICE_ID_FIELD = Object['freeze']({
+export const MINIMAX_VOICE_ID_FIELD = Object.freeze({
   id: 'voice_id',
   type: 'segmented',
   variant: 'pillMenu',
@@ -56,27 +56,27 @@ export const MINIMAX_VOICE_ID_FIELD = Object['freeze']({
   description:
     '选择朗读的人声角色。不同音色适合不同场景：睿智女性适合知识讲解，低沉男声适合有声书旁白，元气少女/活泼女孩适合娱乐内容，可爱女孩适合儿童内容。',
   showInfoTip: true,
-  options: Object['freeze']([
-    Object['freeze']({ value: 'Wise_Woman', label: '睿智女性', selectedLabel: '睿智女性' }),
-    Object['freeze']({ value: 'Friendly_Person', label: '友善亲和', selectedLabel: '友善亲和' }),
-    Object['freeze']({ value: 'Inspirational_girl', label: '元气少女', selectedLabel: '元气少女' }),
-    Object['freeze']({ value: 'Deep_Voice_Man', label: '低沉男声', selectedLabel: '低沉男声' }),
-    Object['freeze']({ value: 'Calm_Woman', label: '沉稳女性', selectedLabel: '沉稳女性' }),
-    Object['freeze']({ value: 'Casual_Guy', label: '随性男声', selectedLabel: '随性男声' }),
-    Object['freeze']({ value: 'Lively_Girl', label: '活泼女孩', selectedLabel: '活泼女孩' }),
-    Object['freeze']({ value: 'Patient_Man', label: '耐心男声', selectedLabel: '耐心男声' }),
-    Object['freeze']({ value: 'Young_Knight', label: '年轻骑士', selectedLabel: '年轻骑士' }),
-    Object['freeze']({ value: 'Determined_Man', label: '坚定男声', selectedLabel: '坚定男声' }),
-    Object['freeze']({ value: 'Lovely_Girl', label: '可爱女孩', selectedLabel: '可爱女孩' }),
-    Object['freeze']({ value: 'Decent_Boy', label: '正派男孩', selectedLabel: '正派男孩' }),
-    Object['freeze']({ value: 'Imposing_Manner', label: '威严气场', selectedLabel: '威严气场' }),
-    Object['freeze']({ value: 'Elegant_Man', label: '优雅男士', selectedLabel: '优雅男士' }),
-    Object['freeze']({ value: 'Abbess', label: '女修道院院长', selectedLabel: '女修道院院长' }),
-    Object['freeze']({ value: 'Sweet_Girl_2', label: '甜美女孩2', selectedLabel: '甜美女孩2' }),
-    Object['freeze']({ value: 'Exuberant_Girl', label: '活力女孩', selectedLabel: '活力女孩' }),
+  options: Object.freeze([
+    Object.freeze({ value: 'Wise_Woman', label: '睿智女性', selectedLabel: '睿智女性' }),
+    Object.freeze({ value: 'Friendly_Person', label: '友善亲和', selectedLabel: '友善亲和' }),
+    Object.freeze({ value: 'Inspirational_girl', label: '元气少女', selectedLabel: '元气少女' }),
+    Object.freeze({ value: 'Deep_Voice_Man', label: '低沉男声', selectedLabel: '低沉男声' }),
+    Object.freeze({ value: 'Calm_Woman', label: '沉稳女性', selectedLabel: '沉稳女性' }),
+    Object.freeze({ value: 'Casual_Guy', label: '随性男声', selectedLabel: '随性男声' }),
+    Object.freeze({ value: 'Lively_Girl', label: '活泼女孩', selectedLabel: '活泼女孩' }),
+    Object.freeze({ value: 'Patient_Man', label: '耐心男声', selectedLabel: '耐心男声' }),
+    Object.freeze({ value: 'Young_Knight', label: '年轻骑士', selectedLabel: '年轻骑士' }),
+    Object.freeze({ value: 'Determined_Man', label: '坚定男声', selectedLabel: '坚定男声' }),
+    Object.freeze({ value: 'Lovely_Girl', label: '可爱女孩', selectedLabel: '可爱女孩' }),
+    Object.freeze({ value: 'Decent_Boy', label: '正派男孩', selectedLabel: '正派男孩' }),
+    Object.freeze({ value: 'Imposing_Manner', label: '威严气场', selectedLabel: '威严气场' }),
+    Object.freeze({ value: 'Elegant_Man', label: '优雅男士', selectedLabel: '优雅男士' }),
+    Object.freeze({ value: 'Abbess', label: '女修道院院长', selectedLabel: '女修道院院长' }),
+    Object.freeze({ value: 'Sweet_Girl_2', label: '甜美女孩2', selectedLabel: '甜美女孩2' }),
+    Object.freeze({ value: 'Exuberant_Girl', label: '活力女孩', selectedLabel: '活力女孩' }),
   ]),
 });
-export const MINIMAX_CUSTOM_VOICE_FIELD = Object['freeze']({
+export const MINIMAX_CUSTOM_VOICE_FIELD = Object.freeze({
   id: 'customVoiceId',
   type: 'text',
   placement: 'advanced',
@@ -87,7 +87,7 @@ export const MINIMAX_CUSTOM_VOICE_FIELD = Object['freeze']({
   description: '填写 MiniMax 声音克隆时设置的音色 ID，留空使用预设音色。',
   showInfoTip: true,
 });
-export const MINIMAX_SPEED_FIELD = Object['freeze']({
+export const MINIMAX_SPEED_FIELD = Object.freeze({
   id: 'speed',
   type: 'slider',
   placement: 'advanced',
@@ -100,7 +100,7 @@ export const MINIMAX_SPEED_FIELD = Object['freeze']({
     '控制朗读速度，默认1.0倍速。0.5为慢速（适合教学、冥想内容），2.0为快速（适合资讯速读）。有声书建议0.9-1.1，广告配音建议1.1-1.3。',
   showInfoTip: true,
 });
-export const MINIMAX_VOLUME_FIELD = Object['freeze']({
+export const MINIMAX_VOLUME_FIELD = Object.freeze({
   id: 'volume',
   type: 'slider',
   placement: 'advanced',
@@ -112,7 +112,7 @@ export const MINIMAX_VOLUME_FIELD = Object['freeze']({
   description: '控制输出音量大小，默认1.0为标准音量。增大音量适合嘈杂环境播放，减小音量适合作为背景音使用。',
   showInfoTip: true,
 });
-export const MINIMAX_PITCH_FIELD = Object['freeze']({
+export const MINIMAX_PITCH_FIELD = Object.freeze({
   id: 'pitch',
   type: 'slider',
   placement: 'advanced',
@@ -125,7 +125,7 @@ export const MINIMAX_PITCH_FIELD = Object['freeze']({
     '调整音调高低，单位为半音。默认0为原调。正值使声音更高亢明亮（+3适合活泼角色），负值使声音更低沉厚重（-3适合成熟角色）。范围-12到+12（一个八度）。',
   showInfoTip: true,
 });
-export const MINIMAX_EMOTION_FIELD = Object['freeze']({
+export const MINIMAX_EMOTION_FIELD = Object.freeze({
   id: 'emotion',
   type: 'segmented',
   variant: 'pillMenu',
@@ -135,17 +135,17 @@ export const MINIMAX_EMOTION_FIELD = Object['freeze']({
   description:
     '选择朗读时的情感色彩。开心适合欢快内容，悲伤适合悼词/抒情散文，愤怒适合慷慨陈词，恐惧适合悬疑/恐怖故事，惊讶适合新闻播报，中性适合说明文/知识讲解。',
   showInfoTip: true,
-  options: Object['freeze']([
-    Object['freeze']({ value: 'happy', label: '开心', selectedLabel: '开心' }),
-    Object['freeze']({ value: 'neutral', label: '中性', selectedLabel: '中性' }),
-    Object['freeze']({ value: 'sad', label: '悲伤', selectedLabel: '悲伤' }),
-    Object['freeze']({ value: 'angry', label: '愤怒', selectedLabel: '愤怒' }),
-    Object['freeze']({ value: 'fearful', label: '恐惧', selectedLabel: '恐惧' }),
-    Object['freeze']({ value: 'disgusted', label: '厌恶', selectedLabel: '厌恶' }),
-    Object['freeze']({ value: 'surprised', label: '惊讶', selectedLabel: '惊讶' }),
+  options: Object.freeze([
+    Object.freeze({ value: 'happy', label: '开心', selectedLabel: '开心' }),
+    Object.freeze({ value: 'neutral', label: '中性', selectedLabel: '中性' }),
+    Object.freeze({ value: 'sad', label: '悲伤', selectedLabel: '悲伤' }),
+    Object.freeze({ value: 'angry', label: '愤怒', selectedLabel: '愤怒' }),
+    Object.freeze({ value: 'fearful', label: '恐惧', selectedLabel: '恐惧' }),
+    Object.freeze({ value: 'disgusted', label: '厌恶', selectedLabel: '厌恶' }),
+    Object.freeze({ value: 'surprised', label: '惊讶', selectedLabel: '惊讶' }),
   ]),
 });
-const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
+const MINIMAX_MUSIC_PROMPT_FIELD = Object.freeze({
     id: 'prompt',
     type: 'textarea',
     placement: 'advanced',
@@ -156,7 +156,7 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
       '描述你想要的音乐风格、情绪和场景。例如「流行,民谣,女声,温暖治愈」「电子,舞曲,夜店,节奏感强」「古风,古筝,山水意境」。填"-"时会使用歌词内容作为基础描述。',
     showInfoTip: true,
   }),
-  MINIMAX_MUSIC_LYRICS_OPTIMIZER_FIELD = Object['freeze']({
+  MINIMAX_MUSIC_LYRICS_OPTIMIZER_FIELD = Object.freeze({
     id: 'lyricsOptimizer',
     type: 'toggle',
     placement: 'advanced',
@@ -166,12 +166,12 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
       '开启后AI会根据风格描述自动优化你输入的歌词，让歌词与旋律更匹配。适合歌词较粗糙、需要AI润色的场景。',
     showInfoTip: true,
   }),
-  MINIMAX_MUSIC_HIDDEN_OUTPUT_PARAM_CONDITION = Object['freeze']({
+  MINIMAX_MUSIC_HIDDEN_OUTPUT_PARAM_CONDITION = Object.freeze({
     field: '__minimax_music_output_params_hidden',
     value: '',
   }),
-  MINIMAX_MUSIC_OUTPUT_FIELDS = Object['freeze']([
-    Object['freeze']({
+  MINIMAX_MUSIC_OUTPUT_FIELDS = Object.freeze([
+    Object.freeze({
       id: 'sampleRate',
       type: 'text',
       placement: 'advanced',
@@ -179,7 +179,7 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
       defaultValue: '44100',
       hideWhen: MINIMAX_MUSIC_HIDDEN_OUTPUT_PARAM_CONDITION,
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'bitrate',
       type: 'text',
       placement: 'advanced',
@@ -187,7 +187,7 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
       defaultValue: '256000',
       hideWhen: MINIMAX_MUSIC_HIDDEN_OUTPUT_PARAM_CONDITION,
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'format',
       type: 'text',
       placement: 'advanced',
@@ -205,7 +205,7 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
     '  • 电子舞曲，强烈节拍，夜店风格，英文歌词',
     '  • 纯音乐，古风，古筝+笛子，山水意境',
     '可在高级设置中设置纯音乐模式、歌曲标题',
-  ]['join']('\n'),
+  ].join('\n'),
   SUNO_CUSTOM_V55_HELP_TOOLTIP = [
     'Suno V5.5 自定义模式用法',
     '输入[[red:歌词]]，生成定制歌曲',
@@ -213,7 +213,7 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
     '[[red:提示词占位举例]]：',
     '  • 歌词框输入：[Verse] 阳光下的操场 我们奔跑着笑 [Chorus] 这是我们的夏天 永远不落幕',
     '  • 可在高级设置中填写歌曲标题和风格标签',
-  ]['join']('\n'),
+  ].join('\n'),
   SUNO_SINGLE_V5_HELP_TOOLTIP = [
     'Suno V5 单曲生成用法',
     '输入[[red:音乐风格/歌词描述]]，AI 自动生成完整歌曲',
@@ -223,14 +223,14 @@ const MINIMAX_MUSIC_PROMPT_FIELD = Object['freeze']({
     '  • 嘻哈说唱，强烈节奏，urban风格，中文rap',
     '  • 轻音乐，钢琴独奏，治愈系，适合睡前聆听',
     '可在高级设置中设置纯音乐模式、歌曲标题',
-  ]['join']('\n'),
+  ].join('\n'),
   SUNO_CUSTOM_V5_HELP_TOOLTIP = [
     'Suno V5 自定义模式用法',
     '输入[[red:歌词]]，生成定制歌曲',
     '[[red:提示词占位举例]]：',
     '  • [Intro] 夜色降临 [Verse] 城市的灯光 照亮了谁的梦 [Chorus] 我们在黑夜中跳舞',
     '  • 可在高级设置中填写歌曲标题和风格标签',
-  ]['join']('\n');
+  ].join('\n');
 function createMinimaxSpeechHelpTooltip(value, item) {
   return [
     'MiniMax 语音合成 ' + value + ' (' + item + ') 用法',
@@ -241,7 +241,7 @@ function createMinimaxSpeechHelpTooltip(value, item) {
     '  • 今天天气真好，适合出去走走，感受阳光和微风。',
     '  • 请注意，列车即将到站，请做好下车准备。',
     '可在高级设置中选择音色、语速、音量、音高、情感',
-  ]['join']('\n');
+  ].join('\n');
 }
 const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
     'MiniMax Music 2.6 纯音乐生成用法',
@@ -252,7 +252,7 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
     '  • 中国古风，古筝+笛子+琵琶，山水意境，宁静悠远',
     '  • 电子 ambient，太空感，合成器铺底，冥想放松',
     '  • 轻快的ukulele，阳光海滩，度假风格，无忧无虑',
-  ]['join']('\n'),
+  ].join('\n'),
   MINIMAX_MUSIC_TEXT_TO_MUSIC_HELP_TOOLTIP = [
     'MiniMax Music 2.6 文生音乐用法',
     '输入[[red:歌词]]，AI 根据歌词创作完整歌曲（含旋律+人声）',
@@ -266,89 +266,89 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
     '  [Chorus] 这是我们的夏天 永远不落幕',
     '  [Verse 2] 晚风轻轻吹过 带着青草味道',
     '  [Chorus] 这是我们的夏天 永远不落幕',
-  ]['join']('\n'),
-  TEXT_ONLY_INPUT_SLOTS = Object['freeze']({
-    allowedKinds: Object['freeze'](['text']),
-    minByKind: Object['freeze']({ text: 1 }),
-    maxByKind: Object['freeze']({ image: 0, video: 0, audio: 0 }),
-    fixedSlots: Object['freeze']([]),
+  ].join('\n'),
+  TEXT_ONLY_INPUT_SLOTS = Object.freeze({
+    allowedKinds: Object.freeze(['text']),
+    minByKind: Object.freeze({ text: 1 }),
+    maxByKind: Object.freeze({ image: 0, video: 0, audio: 0 }),
+    fixedSlots: Object.freeze([]),
   }),
-  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS = Object['freeze']([
-    Object['freeze']({
+  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS = Object.freeze([
+    Object.freeze({
       modelId: 'runninghub/suno-single-v5.5',
       executionId: 'runninghub.model-api.audio-suno-single-v55.v1',
       displayName: 'Suno V5.5 单曲',
       description: 'Suno V5.5 音乐生成 - 一句话生成歌曲',
       model: 'rhart-audio/suno-v5.5/single',
-      help: Object['freeze']({ tooltip: SUNO_SINGLE_V55_HELP_TOOLTIP }),
+      help: Object.freeze({ tooltip: SUNO_SINGLE_V55_HELP_TOOLTIP }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'suno-single',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 100 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 100 }),
       }),
       fields: [SUNO_INSTRUMENTAL_FIELD, SUNO_TITLE_OPTIONAL_FIELD],
       async: true,
       cancellable: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       modelId: 'runninghub/suno-custom-v5.5',
       executionId: 'runninghub.model-api.audio-suno-custom-v55.v1',
       displayName: 'Suno V5.5 自定义',
       description: 'Suno V5.5 音乐生成 - 自定义歌词模式',
       model: 'rhart-audio/suno-v5.5/custom',
-      help: Object['freeze']({ tooltip: SUNO_CUSTOM_V55_HELP_TOOLTIP }),
+      help: Object.freeze({ tooltip: SUNO_CUSTOM_V55_HELP_TOOLTIP }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'suno-custom',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 101 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 101 }),
       }),
       fields: [SUNO_TITLE_REQUIRED_FIELD, SUNO_TAGS_FIELD],
       async: true,
       cancellable: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       modelId: 'runninghub/suno-single-v5',
       executionId: 'runninghub.model-api.audio-suno-single-v5.v1',
       displayName: 'Suno V5 单曲',
       description: 'Suno V5 音乐生成 - 一句话生成歌曲',
       model: 'rhart-audio/suno-v5/single',
-      help: Object['freeze']({ tooltip: SUNO_SINGLE_V5_HELP_TOOLTIP }),
+      help: Object.freeze({ tooltip: SUNO_SINGLE_V5_HELP_TOOLTIP }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'suno-single',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 0x66 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 0x66 }),
       }),
       fields: [SUNO_INSTRUMENTAL_FIELD, SUNO_TITLE_OPTIONAL_FIELD],
       async: true,
       cancellable: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       modelId: 'runninghub/suno-custom-v5',
       executionId: 'runninghub.model-api.audio-suno-custom-v5.v1',
       displayName: 'Suno V5 自定义',
       description: 'Suno V5 音乐生成 - 自定义歌词模式',
       model: 'rhart-audio/suno-v5/custom',
-      help: Object['freeze']({ tooltip: SUNO_CUSTOM_V5_HELP_TOOLTIP }),
+      help: Object.freeze({ tooltip: SUNO_CUSTOM_V5_HELP_TOOLTIP }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'suno-custom',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 103 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 103 }),
       }),
       fields: [SUNO_TITLE_REQUIRED_FIELD, SUNO_TAGS_FIELD],
       async: true,
       cancellable: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       modelId: 'runninghub/minimax/speech-2.8-hd',
       executionId: 'runninghub.model-api.audio-minimax-speech-28-hd.v1',
       displayName: 'MiniMax 语音 2.8 HD',
       description: 'MiniMax 语音合成 V2.8 - 录音室级高保真',
       model: 'rhart-audio/text-to-audio/speech-2.8-hd',
-      help: Object['freeze']({ tooltip: createMinimaxSpeechHelpTooltip('V2.8', '录音室级') }),
+      help: Object.freeze({ tooltip: createMinimaxSpeechHelpTooltip('V2.8', '录音室级') }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'minimax-tts',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 110 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 110 }),
       }),
       fields: [
         MINIMAX_VOICE_ID_FIELD,
@@ -361,17 +361,17 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
       async: true,
       cancellable: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       modelId: 'runninghub/minimax/speech-2.8-turbo',
       executionId: 'runninghub.model-api.audio-minimax-speech-28-turbo.v1',
       displayName: 'MiniMax 语音 2.8 Turbo',
       description: 'MiniMax 语音合成 V2.8 - 广播级极速',
       model: 'rhart-audio/text-to-audio/speech-2.8-turbo',
-      help: Object['freeze']({ tooltip: createMinimaxSpeechHelpTooltip('V2.8', '广播级极速') }),
+      help: Object.freeze({ tooltip: createMinimaxSpeechHelpTooltip('V2.8', '广播级极速') }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'minimax-tts',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 111 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 111 }),
       }),
       fields: [
         MINIMAX_VOICE_ID_FIELD,
@@ -384,33 +384,33 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
       async: true,
       cancellable: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       modelId: 'runninghub/minimax/music-2.6-instrumental',
       executionId: 'runninghub.model-api.audio-minimax-music-26-instrumental.v1',
       displayName: 'MiniMax Music 2.6 纯音乐',
       description: 'MiniMax Music 2.6 纯音乐生成 - 文本描述生成BGM/配乐',
       model: 'minimax/music-2.6',
-      help: Object['freeze']({ tooltip: MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP }),
+      help: Object.freeze({ tooltip: MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'minimax-music-instrumental',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 115 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 115 }),
       }),
       fields: MINIMAX_MUSIC_OUTPUT_FIELDS,
       async: true,
       cancellable: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       modelId: 'runninghub/minimax/music-2.6',
       executionId: 'runninghub.model-api.audio-minimax-music-26.v1',
       displayName: 'MiniMax Music 2.6 文生音乐',
       description: 'MiniMax Music 2.6 文生音乐 - 歌词创作完整歌曲',
       model: 'minimax/music-2.6',
-      help: Object['freeze']({ tooltip: MINIMAX_MUSIC_TEXT_TO_MUSIC_HELP_TOOLTIP }),
+      help: Object.freeze({ tooltip: MINIMAX_MUSIC_TEXT_TO_MUSIC_HELP_TOOLTIP }),
       inputSlots: TEXT_ONLY_INPUT_SLOTS,
       modelType: 'minimax-music',
-      extensions: Object['freeze']({
-        audioMenu: Object['freeze']({ group: 'runninghubModel', order: 116 }),
+      extensions: Object.freeze({
+        audioMenu: Object.freeze({ group: 'runninghubModel', order: 116 }),
       }),
       fields: [
         MINIMAX_MUSIC_PROMPT_FIELD,
@@ -421,44 +421,44 @@ const MINIMAX_MUSIC_INSTRUMENTAL_HELP_TOOLTIP = [
       cancellable: true,
     }),
   ]);
-export const runningHubAudioModelApiModelManifests = Object['freeze'](
-  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS['map']((modelId) =>
+export const runningHubAudioModelApiModelManifests = Object.freeze(
+  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS.map((modelId) =>
     createAudioModelApiManifest({
-      modelId: modelId['modelId'],
-      executionId: modelId['executionId'],
+      modelId: modelId.modelId,
+      executionId: modelId.executionId,
       provider: 'runninghub',
-      displayName: modelId['displayName'],
+      displayName: modelId.displayName,
       icon: 'images/RH.png',
-      description: modelId['description'],
-      fields: modelId['fields'],
-      extensions: Object['freeze']({
-        ...(modelId['extensions'] || {}),
-        providerProfiles: getRunningHubModelApiProfileIds(modelId['modelId']),
+      description: modelId.description,
+      fields: modelId.fields,
+      extensions: Object.freeze({
+        ...(modelId.extensions || {}),
+        providerProfiles: getRunningHubModelApiProfileIds(modelId.modelId),
       }),
-      inputSlots: modelId['inputSlots'],
-      help: modelId['help'],
-      async: modelId['async'] !== false,
-      cancellable: modelId['cancellable'] !== false,
-      modelType: modelId['modelType'],
+      inputSlots: modelId.inputSlots,
+      help: modelId.help,
+      async: modelId.async !== false,
+      cancellable: modelId.cancellable !== false,
+      modelType: modelId.modelType,
     }),
   ),
 );
-export const runningHubAudioModelApiExecutionManifests = Object['freeze'](
-  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS['map']((id) =>
+export const runningHubAudioModelApiExecutionManifests = Object.freeze(
+  RUNNINGHUB_AUDIO_MODEL_API_MANIFESTS.map((id) =>
     createAudioModelApiExecutionManifest({
-      id: id['executionId'],
+      id: id.executionId,
       provider: 'runninghub',
-      model: id['model'],
+      model: id.model,
       endpoint: '/openapi/v2',
       method: 'POST',
       bodyMapping: [],
-      responseMapping: Object['freeze']({
+      responseMapping: Object.freeze({
         taskIdPath: 'taskId',
         statusPath: 'status',
-        errorPath: Object['freeze'](['errorMessage', 'msg', 'message']),
-        resultPaths: Object['freeze'](['results[].url', 'url']),
+        errorPath: Object.freeze(['errorMessage', 'msg', 'message']),
+        resultPaths: Object.freeze(['results[].url', 'url']),
       }),
-      extensions: Object['freeze']({ modelType: id['modelType'] }),
+      extensions: Object.freeze({ modelType: id.modelType }),
     }),
   ),
 );

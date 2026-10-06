@@ -596,19 +596,19 @@ function resolveSceneOrbitProjectionGain(value125) {
 export function applySceneFlyLookDelta(value126, value127, value128, value129, value130 = {}) {
   const x16 = resolveSceneCameraPose(value126),
     args5 = applyOrbitDelta(value126, value127, value128, value129, value130),
-    x17 = Math.max(SCENE_ORBIT_DISTANCE_MIN, Number(value126?.['orbitDistance']) || x16['distance'] || 8),
-    value131 = Math.cos(args5['orbitPitch']),
+    x17 = Math.max(SCENE_ORBIT_DISTANCE_MIN, Number(value126?.orbitDistance) || x16.distance || 8),
+    value131 = Math.cos(args5.orbitPitch),
     box27 = {
-      x: x17 * Math.sin(args5['orbitYaw']) * value131,
-      y: x17 * Math.sin(args5['orbitPitch']),
-      z: x17 * Math.cos(args5['orbitYaw']) * value131,
+      x: x17 * Math.sin(args5.orbitYaw) * value131,
+      y: x17 * Math.sin(args5.orbitPitch),
+      z: x17 * Math.cos(args5.orbitYaw) * value131,
     };
   return {
     ...args5,
     target: {
-      x: x16['position']['x'] - box27['x'],
-      y: x16['position']['y'] - box27['y'],
-      z: x16['position']['z'] - box27['z'],
+      x: x16.position.x - box27.x,
+      y: x16.position.y - box27.y,
+      z: x16.position.z - box27.z,
     },
   };
 }
@@ -620,32 +620,32 @@ export function applySceneFlyMovement(
   { speed: speed = 4, boostMultiplier: boostMultiplier = 4, minimumCameraY: minimumCameraY = 0.2 } = {},
 ) {
   const sceneCameraPose = resolveSceneCameraPose(event4),
-    x18 = normalizeVector3(event4?.['target'], { x: 0, y: 1.2, z: 0 }),
-    x19 = normalize3(subtract(x18, sceneCameraPose['position']), { x: 0, y: 0, z: -1 }),
+    x18 = normalizeVector3(event4?.target, { x: 0, y: 1.2, z: 0 }),
+    x19 = normalize3(subtract(x18, sceneCameraPose.position), { x: 0, y: 0, z: -1 }),
     value133 = { x: 0, y: 1, z: 0 },
     box29 = normalize3(cross(x19, value133), { x: 1, y: 0, z: 0 }),
     value134 = {
-      x: x19['x'] * (Number(box28['forward']) || 0) + box29['x'] * (Number(box28['right']) || 0),
+      x: x19.x * (Number(box28.forward) || 0) + box29.x * (Number(box28.right) || 0),
       y:
-        x19['y'] * (Number(box28['forward']) || 0) +
-        box29['y'] * (Number(box28['right']) || 0) +
-        (Number(box28['vertical']) || 0),
-      z: x19['z'] * (Number(box28['forward']) || 0) + box29['z'] * (Number(box28['right']) || 0),
+        x19.y * (Number(box28.forward) || 0) +
+        box29.y * (Number(box28.right) || 0) +
+        (Number(box28.vertical) || 0),
+      z: x19.z * (Number(box28.forward) || 0) + box29.z * (Number(box28.right) || 0),
     },
     length33 = length3(value134),
     value135 = length33 > 1 ? normalize3(value134) : value134,
-    value136 = box28['boost'] === true ? Math.max(1, Number(boostMultiplier) || 1) : 1,
+    value136 = box28.boost === true ? Math.max(1, Number(boostMultiplier) || 1) : 1,
     value137 =
       Math.max(0, Math.min(0.1, Number(value132) || 0)) * Math.max(0.01, Number(speed) || 4) * value136,
     box30 = scale(value135, value137),
-    value138 = sceneCameraPose['position']['y'] + box30['y'];
+    value138 = sceneCameraPose.position.y + box30.y;
   return (
-    value138 < minimumCameraY && (box30['y'] += minimumCameraY - value138),
+    value138 < minimumCameraY && (box30.y += minimumCameraY - value138),
     {
       target: {
-        x: x18['x'] + box30['x'],
-        y: x18['y'] + box30['y'],
-        z: x18['z'] + box30['z'],
+        x: x18.x + box30.x,
+        y: x18.y + box30.y,
+        z: x18.z + box30.z,
       },
     }
   );
@@ -653,9 +653,9 @@ export function applySceneFlyMovement(
 
 function hasFiniteVector3(box31) {
   return (
-    Number.isFinite(Number(box31?.['x'])) &&
-    Number.isFinite(Number(box31?.['y'])) &&
-    Number.isFinite(Number(box31?.['z']))
+    Number.isFinite(Number(box31?.x)) &&
+    Number.isFinite(Number(box31?.y)) &&
+    Number.isFinite(Number(box31?.z))
   );
 }
 

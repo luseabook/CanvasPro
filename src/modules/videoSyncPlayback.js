@@ -407,8 +407,8 @@ let activeSyncVideoPlaybackSession = null,
 const syncVideoPlaybackStateListeners = new Set();
 
 export function getSyncVideoPlaybackState() {
-  const active = activeSyncVideoPlaybackSession?.['isCurrent']?.() === true;
-  return { active: active, loop: active && activeSyncVideoPlaybackSession?.['loop'] === true };
+  const active = activeSyncVideoPlaybackSession?.isCurrent?.() === true;
+  return { active: active, loop: active && activeSyncVideoPlaybackSession?.loop === true };
 }
 
 function notifySyncVideoPlaybackState() {
@@ -422,28 +422,28 @@ function notifySyncVideoPlaybackState() {
 
 export function subscribeSyncVideoPlaybackState(handler3) {
   if (typeof handler3 !== 'function') return () => {};
-  syncVideoPlaybackStateListeners['add'](handler3);
+  syncVideoPlaybackStateListeners.add(handler3);
   try {
     handler3(getSyncVideoPlaybackState());
   } catch {}
-  return () => syncVideoPlaybackStateListeners['delete'](handler3);
+  return () => syncVideoPlaybackStateListeners.delete(handler3);
 }
 
 export function resolveCanvasNodePlayableVideoEntry(node2) {
-  if (!PLAYABLE_VIDEO_TYPES['has'](normalizeText(node2?.['type']))) return null;
+  if (!PLAYABLE_VIDEO_TYPES.has(normalizeText(node2?.type))) return null;
   if (isUnavailableVideoRecord(node2)) return null;
-  if (normalizeText(node2?.['type']) === 'ai-video') {
+  if (normalizeText(node2?.type) === 'ai-video') {
     const videoIndex2 = getMainVideoRecord(node2);
-    if (videoIndex2?.['record']) {
-      if (isUnavailableVideoRecord(videoIndex2['record'])) return null;
-      const source4 = resolveVideoSource(videoIndex2['record']) || resolveVideoSource(node2);
+    if (videoIndex2?.record) {
+      if (isUnavailableVideoRecord(videoIndex2.record)) return null;
+      const source4 = resolveVideoSource(videoIndex2.record) || resolveVideoSource(node2);
       return source4
         ? {
-            nodeId: normalizeText(node2['id']),
-            videoIndex: videoIndex2['index'],
+            nodeId: normalizeText(node2.id),
+            videoIndex: videoIndex2.index,
             source: source4,
             node: node2,
-            record: videoIndex2['record'],
+            record: videoIndex2.record,
           }
         : null;
     }
@@ -451,7 +451,7 @@ export function resolveCanvasNodePlayableVideoEntry(node2) {
   const source5 = resolveVideoSource(node2);
   return source5
     ? {
-        nodeId: normalizeText(node2['id']),
+        nodeId: normalizeText(node2.id),
         videoIndex: 0,
         source: source5,
         node: node2,
@@ -461,20 +461,20 @@ export function resolveCanvasNodePlayableVideoEntry(node2) {
 }
 
 export function findCanvasVideoElementForEntry(value31, value32) {
-  const enabled9 = value31 || globalThis['document'];
-  if (!enabled9 || typeof enabled9['getElementById'] !== 'function') return null;
-  const el6 = enabled9['getElementById'](normalizeText(value32?.['nodeId']));
-  if (!el6 || typeof el6['querySelector'] !== 'function') return null;
-  const value33 = Math['max'](0, Math['trunc'](Number(value32?.['videoIndex']) || 0));
+  const enabled9 = value31 || globalThis.document;
+  if (!enabled9 || typeof enabled9.getElementById !== 'function') return null;
+  const el6 = enabled9.getElementById(normalizeText(value32?.nodeId));
+  if (!el6 || typeof el6.querySelector !== 'function') return null;
+  const value33 = Math.max(0, Math.trunc(Number(value32?.videoIndex) || 0));
   return (
-    el6['querySelector']('video[data-idx="' + value33 + '"]') ||
-    el6['querySelector']('.video-player') ||
-    el6['querySelector']('video')
+    el6.querySelector('video[data-idx="' + value33 + '"]') ||
+    el6.querySelector('.video-player') ||
+    el6.querySelector('video')
   );
 }
 
 function isSpaceInteraction(event) {
-  return event?.['code'] === 'Space' || event?.['key'] === ' ' || event?.['key'] === 'Space';
+  return event?.code === 'Space' || event?.key === ' ' || event?.key === 'Space';
 }
 
 function beginSyncVideoPlaybackSession({
@@ -485,31 +485,31 @@ function beginSyncVideoPlaybackSession({
   shouldStopOnPointerEvent: shouldStopOnPointerEvent,
 }) {
   const loop2 = loop === true,
-    owner = Object['freeze']({ kind: 'sync-video-playback', id: ++syncVideoPlaybackSessionSequence });
+    owner = Object.freeze({ kind: 'sync-video-playback', id: ++syncVideoPlaybackSessionSequence });
   let value34 = 'preparing',
     enabled10 = false,
-    list7 = targets['filter']((value35) => value35['videoEl']);
+    list7 = targets.filter((value35) => value35.videoEl);
   const map5 = new Map(),
     handler4 = (value36) => {
-      const list8 = map5['get'](value36) || [];
-      map5['delete'](value36);
-      while (list8['length'] > 0) list8['pop']()?.();
+      const list8 = map5.get(value36) || [];
+      map5.delete(value36);
+      while (list8.length > 0) list8.pop()?.();
     },
     handler5 = (value37, { pause: pause = false } = {}) => {
       (handler4(value37),
-        releaseExternalVideoPlayback(value37['videoEl'], owner),
-        value37['cleanupChrome']?.(),
-        (value37['videoEl']['loop'] = false));
-      if (pause) safePause(value37['videoEl']);
-      list7 = list7['filter']((value38) => value38 !== value37);
+        releaseExternalVideoPlayback(value37.videoEl, owner),
+        value37.cleanupChrome?.(),
+        (value37.videoEl.loop = false));
+      if (pause) safePause(value37.videoEl);
+      list7 = list7.filter((value38) => value38 !== value37);
     },
     handler6 = ({ pauseTargets: pauseTargets = true } = {}) => {
       if (enabled10) return false;
       ((enabled10 = true), (value34 = 'stopped'));
       const value39 = activeSyncVideoPlaybackSession === enabled11;
       if (value39) activeSyncVideoPlaybackSession = null;
-      (documentObject?.['removeEventListener']?.('pointerdown', value40, true),
-        windowObject?.['removeEventListener']?.('keydown', value41, true));
+      (documentObject?.removeEventListener?.('pointerdown', value40, true),
+        windowObject?.removeEventListener?.('keydown', value41, true));
       for (const value42 of [...list7]) {
         handler5(value42, { pause: pauseTargets });
       }
@@ -517,10 +517,10 @@ function beginSyncVideoPlaybackSession({
       return true;
     },
     handler7 = (value43, value44, value45) => {
-      value43['videoEl']['addEventListener']?.(value44, value45);
-      const list9 = map5['get'](value43) || [];
-      (list9['push'](() => value43['videoEl']['removeEventListener']?.(value44, value45)),
-        map5['set'](value43, list9));
+      value43.videoEl.addEventListener?.(value44, value45);
+      const list9 = map5.get(value43) || [];
+      (list9.push(() => value43.videoEl.removeEventListener?.(value44, value45)),
+        map5.set(value43, list9));
     },
     enabled11 = {
       owner: owner,
@@ -529,37 +529,37 @@ function beginSyncVideoPlaybackSession({
         return !enabled10 && activeSyncVideoPlaybackSession === enabled11;
       },
       activate(value46) {
-        if (!enabled11['isCurrent']()) return false;
+        if (!enabled11.isCurrent()) return false;
         const map6 = new Set(value46);
         for (const value47 of [...list7]) {
-          if (map6['has'](value47)) continue;
+          if (map6.has(value47)) continue;
           handler5(value47, { pause: true });
         }
         const value48 = loop2 ? 2 : 1;
-        if (list7['length'] < value48) return false;
+        if (list7.length < value48) return false;
         value34 = 'active';
         for (const value49 of list7) {
           const value50 = () => {
-              if (value34 !== 'active' || !enabled11['isCurrent']()) return;
+              if (value34 !== 'active' || !enabled11.isCurrent()) return;
               if (loop2) {
-                enabled11['stop']();
+                enabled11.stop();
                 return;
               }
               handler5(value49);
-              if (list7['length'] === 0) handler6({ pauseTargets: false });
+              if (list7.length === 0) handler6({ pauseTargets: false });
             },
             value51 = loop2 ? ['pause', 'error'] : ['pause', 'ended', 'error'];
           for (const value52 of value51) {
             handler7(value49, value52, value50);
           }
         }
-        const list10 = list7['filter'](
-          (value53) => value53['videoEl']?.['paused'] === true || value53['videoEl']?.['isConnected'] === false,
+        const list10 = list7.filter(
+          (value53) => value53.videoEl?.paused === true || value53.videoEl?.isConnected === false,
         );
-        if (loop2 && list10['length'] > 0) return (enabled11['stop'](), false);
+        if (loop2 && list10.length > 0) return (enabled11.stop(), false);
         for (const value54 of list10) handler5(value54);
-        if (list7['length'] === 0) return (handler6({ pauseTargets: false }), false);
-        return enabled11['isCurrent']();
+        if (list7.length === 0) return (handler6({ pauseTargets: false }), false);
+        return enabled11.isCurrent();
       },
       stop() {
         return handler6({ pauseTargets: true });
@@ -570,29 +570,29 @@ function beginSyncVideoPlaybackSession({
         try {
           if (shouldStopOnPointerEvent(value55) === false) return;
         } catch {}
-      enabled11['stop']();
+      enabled11.stop();
     },
     value41 = (value56) => {
-      if (isSpaceInteraction(value56)) enabled11['stop']();
+      if (isSpaceInteraction(value56)) enabled11.stop();
     };
   activeSyncVideoPlaybackSession = enabled11;
   for (const value57 of list7) {
-    claimExternalVideoPlayback(value57['videoEl'], owner);
+    claimExternalVideoPlayback(value57.videoEl, owner);
   }
   return (
     loop2 &&
-      (documentObject?.['addEventListener']?.('pointerdown', value40, true),
-      windowObject?.['addEventListener']?.('keydown', value41, true)),
+      (documentObject?.addEventListener?.('pointerdown', value40, true),
+      windowObject?.addEventListener?.('keydown', value41, true)),
     notifySyncVideoPlaybackState(),
     enabled11
   );
 }
 
 export function stopActiveSyncVideoPlayback() {
-  return activeSyncVideoPlaybackSession?.['stop']?.() === true;
+  return activeSyncVideoPlaybackSession?.stop?.() === true;
 }
 
 export function stopActiveSyncVideoLoopPlayback() {
-  if (activeSyncVideoPlaybackSession?.['loop'] !== true) return false;
+  if (activeSyncVideoPlaybackSession?.loop !== true) return false;
   return stopActiveSyncVideoPlayback();
 }

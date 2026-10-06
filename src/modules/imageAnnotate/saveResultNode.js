@@ -83,22 +83,22 @@ function imageAnnotateActionText(source, next = {}) {
 }
 
 function resolveAnnotateResultBaseNode(current, entry) {
-  return appStore['getState']()['nodes']?.[current] || entry || {};
+  return appStore.getState().nodes?.[current] || entry || {};
 }
 
 function resolveAnnotateResultLayout(record, payload, handle) {
   const annotateResultBaseNode = resolveAnnotateResultBaseNode(record, payload),
-    state = handle?.['width'] || annotateResultBaseNode['width'] || 260,
-    config = handle?.['height'] || annotateResultBaseNode['height'] || 260,
-    box2 = calcSafeSpawnPosNearNode(appStore['getState']()['nodes'], annotateResultBaseNode, state, config);
-  return { baseNode: annotateResultBaseNode, width: state, height: config, x: box2['x'], y: box2['y'] };
+    state = handle?.width || annotateResultBaseNode.width || 260,
+    config = handle?.height || annotateResultBaseNode.height || 260,
+    box2 = calcSafeSpawnPosNearNode(appStore.getState().nodes, annotateResultBaseNode, state, config);
+  return { baseNode: annotateResultBaseNode, width: state, height: config, x: box2.x, y: box2.y };
 }
 
 export const createPendingAnnotateExportNode = ({
   scene: scene2,
   sourceNodeId: sourceNodeId2,
   baseNode: baseNode2,
-  startedAt: startedAt = Date['now'](),
+  startedAt: startedAt = Date.now(),
   outputSize: outputSize,
 } = {}) => {
   const box3 = resolveAnnotateResultLayout(sourceNodeId2, baseNode2, outputSize),
@@ -106,11 +106,11 @@ export const createPendingAnnotateExportNode = ({
     sourceMediaNodePayload = buildSourceMediaNodePayload({
       id: generateId3,
       type: 'source-image',
-      x: box3['x'],
-      y: box3['y'],
-      width: box3['width'],
-      height: box3['height'],
-      name: getSavedAnnotateNodeName(scene2, box3['baseNode']['name']),
+      x: box3.x,
+      y: box3.y,
+      width: box3.width,
+      height: box3.height,
+      name: getSavedAnnotateNodeName(scene2, box3.baseNode.name),
       src: '',
       outputText: imageAnnotateActionText('saving'),
       ...buildGenerationStartPatch({ startedAt: startedAt }),
@@ -119,7 +119,7 @@ export const createPendingAnnotateExportNode = ({
     });
   return (
     addToolbarPendingResultNodes({ nodes: [sourceMediaNodePayload] }),
-    { newNodeId: generateId3, baseNode: box3['baseNode'], startedAt: startedAt }
+    { newNodeId: generateId3, baseNode: box3.baseNode, startedAt: startedAt }
   );
 };
 
@@ -136,40 +136,40 @@ function buildSavedAnnotateResultPatch({
         ...saveResult,
         localPath: resultLocalPath,
         imageUrl:
-          saveResult?.['displayUrl'] ||
-          saveResult?.['thumbUrl'] ||
+          saveResult?.displayUrl ||
+          saveResult?.thumbUrl ||
           localPathToUrl(resultLocalPath) ||
-          String(saveResult?.['url'] || '')['trim'](),
-        sourceUrl: saveResult?.['originalUrl'] || saveResult?.['url'] || localPathToUrl(resultLocalPath),
-        thumbUrl: saveResult?.['thumbUrl'],
+          String(saveResult?.url || '').trim(),
+        sourceUrl: saveResult?.originalUrl || saveResult?.url || localPathToUrl(resultLocalPath),
+        thumbUrl: saveResult?.thumbUrl,
         fileName: fileName2,
       },
       { includeSrc: true },
     ),
     scope =
-      args['src'] ||
-      args['imageUrl'] ||
+      args.src ||
+      args.imageUrl ||
       localPathToUrl(resultLocalPath) ||
-      String(saveResult?.['url'] || '')['trim'](),
+      String(saveResult?.url || '').trim(),
     args2 =
       buildImageGenerationResultPatch(
         {
           ...saveResult,
           ...args,
-          imageUrl: args['imageUrl'] || scope,
-          sourceUrl: args['sourceUrl'] || scope,
-          thumbUrl: args['thumbUrl'] || scope,
-          localPath: args['localPath'] || resultLocalPath,
+          imageUrl: args.imageUrl || scope,
+          sourceUrl: args.sourceUrl || scope,
+          thumbUrl: args.thumbUrl || scope,
+          localPath: args.localPath || resultLocalPath,
           fileName: fileName2,
         },
         { startedAt: startedAt },
       ) || {};
   return {
-    name: getSavedAnnotateNodeName(scene3, baseNode3?.['name']),
+    name: getSavedAnnotateNodeName(scene3, baseNode3?.name),
     ...args2,
     ...args,
     src: scope,
-    localPath: args['localPath'] || resultLocalPath,
+    localPath: args.localPath || resultLocalPath,
     fileName: fileName2,
     outputText: '',
     fixedSize: true,
@@ -182,12 +182,12 @@ export const markAnnotateExportNodeFailed = ({
   error: error2,
   startedAt: startedAt = 0,
 } = {}) => {
-  const enabled = String(targetNodeId || '')['trim']();
+  const enabled = String(targetNodeId || '').trim();
   if (!enabled) return false;
   const updateToolbarResultNode2 = updateToolbarResultNode(
     enabled,
     buildImageGenerationFailurePatch({
-      error: error2 instanceof Error ? error2['message'] : String(error2 || ''),
+      error: error2 instanceof Error ? error2.message : String(error2 || ''),
       startedAt: startedAt,
     }) || {},
   );

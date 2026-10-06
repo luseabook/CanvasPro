@@ -315,17 +315,17 @@ export function resolveBerniniFunctionForInputMode(value61, value62 = '') {
       videoVideo: ['ads2v'],
     },
     value64 = value63[value61] || [],
-    value65 = String(value62 || '')['trim']();
-  return value64['includes'](value65) ? value65 : value64[0] || '';
+    value65 = String(value62 || '').trim();
+  return value64.includes(value65) ? value65 : value64[0] || '';
 }
 
 export function buildVideoWorkflowReferenceSummaryParamsPatch(options2 = {}, value66 = '', value67 = {}) {
   const runningHubVideoParameterPanelPolicy3 = getRunningHubVideoParameterPanelPolicy(value66),
-    value68 = runningHubVideoParameterPanelPolicy3?.['fixedSlotSummary'],
-    enabled5 = String(value68?.['field'] || '')['trim']();
-  if (!enabled5 || value68?.['resolver'] !== 'berniniVideoReplaceInputMode') return {};
-  const count = Math['max'](0, Number(value67?.['imageCount']) || 0),
-    count2 = Math['max'](0, Number(value67?.['videoCount']) || 0),
+    value68 = runningHubVideoParameterPanelPolicy3?.fixedSlotSummary,
+    enabled5 = String(value68?.field || '').trim();
+  if (!enabled5 || value68?.resolver !== 'berniniVideoReplaceInputMode') return {};
+  const count = Math.max(0, Number(value67?.imageCount) || 0),
+    count2 = Math.max(0, Number(value67?.videoCount) || 0),
     berniniVideoReplaceInputMode = resolveBerniniVideoReplaceInputMode({
       hasSourceVideo: count2 > 0,
       hasRefImage: count > 0,
@@ -334,8 +334,8 @@ export function buildVideoWorkflowReferenceSummaryParamsPatch(options2 = {}, val
     value69 = { [enabled5]: berniniVideoReplaceInputMode },
     berniniFunctionForInputMode = resolveBerniniFunctionForInputMode(
       berniniVideoReplaceInputMode,
-      options2?.['generationParams']?.['rhBerniniFunction'] ?? options2?.['rhBerniniFunction'],
+      options2?.generationParams?.rhBerniniFunction ?? options2?.rhBerniniFunction,
     );
-  if (berniniFunctionForInputMode) value69['rhBerniniFunction'] = berniniFunctionForInputMode;
+  if (berniniFunctionForInputMode) value69.rhBerniniFunction = berniniFunctionForInputMode;
   return value69;
 }

@@ -123,29 +123,29 @@ export function createDuplicateSpawnOffsets({
   sourceNodes: sourceNodes = [],
   copies: copies = 1,
 } = {}) {
-  const args = (Array['isArray'](sourceNodes) ? sourceNodes : [])['filter'](
+  const args = (Array.isArray(sourceNodes) ? sourceNodes : []).filter(
     (value9) => value9 && typeof value9 === 'object',
   );
-  if (args['length'] === 0) return [];
+  if (args.length === 0) return [];
   const nodeSpawnPrefs2 = getNodeSpawnPrefs(),
-    value10 = Math['max'](0, toFiniteNumber(nodeSpawnPrefs2['spacing'], 120)),
-    spawnDirection2 = normalizeSpawnDirection(nodeSpawnPrefs2['direction']),
-    value11 = nodeSpawnPrefs2['avoidOverlap'] !== false,
+    value10 = Math.max(0, toFiniteNumber(nodeSpawnPrefs2.spacing, 120)),
+    spawnDirection2 = normalizeSpawnDirection(nodeSpawnPrefs2.direction),
+    value11 = nodeSpawnPrefs2.avoidOverlap !== false,
     clampPositiveInteger3 = clampPositiveInteger(copies, 1),
-    value12 = Math['min'](...args['map']((box4) => toFiniteNumber(box4['x'], 0))),
-    value13 = Math['min'](...args['map']((box5) => toFiniteNumber(box5['y'], 0))),
-    value14 = Math['max'](
-      ...args['map'](
-        (box6) => toFiniteNumber(box6['x'], 0) + Math['max'](1, toFiniteNumber(box6['width'], 100)),
+    value12 = Math.min(...args.map((box4) => toFiniteNumber(box4.x, 0))),
+    value13 = Math.min(...args.map((box5) => toFiniteNumber(box5.y, 0))),
+    value14 = Math.max(
+      ...args.map(
+        (box6) => toFiniteNumber(box6.x, 0) + Math.max(1, toFiniteNumber(box6.width, 100)),
       ),
     ),
-    value15 = Math['max'](
-      ...args['map'](
-        (box7) => toFiniteNumber(box7['y'], 0) + Math['max'](1, toFiniteNumber(box7['height'], 100)),
+    value15 = Math.max(
+      ...args.map(
+        (box7) => toFiniteNumber(box7.y, 0) + Math.max(1, toFiniteNumber(box7.height, 100)),
       ),
     ),
-    value16 = Math['max'](1, value14 - value12),
-    value17 = Math['max'](1, value15 - value13),
+    value16 = Math.max(1, value14 - value12),
+    value17 = Math.max(1, value15 - value13),
     value18 = value11 ? { ...(nodes || {}) } : {},
     value19 = [];
   for (let value20 = 1; value20 <= clampPositiveInteger3; value20 += 1) {
@@ -166,8 +166,8 @@ export function createDuplicateSpawnOffsets({
         value10,
         spawnDirection2,
       );
-      ((value21 = box8['x']),
-        (value22 = box8['y']),
+      ((value21 = box8.x),
+        (value22 = box8.y),
         (value18['duplicate-spawn-' + value20] = {
           x: value21,
           y: value22,
@@ -175,7 +175,7 @@ export function createDuplicateSpawnOffsets({
           height: value17,
         }));
     }
-    value19['push']({ dx: value21 - value12, dy: value22 - value13 });
+    value19.push({ dx: value21 - value12, dy: value22 - value13 });
   }
   return value19;
 }

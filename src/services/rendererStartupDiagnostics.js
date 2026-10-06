@@ -6,30 +6,30 @@ import {
   readChromeShellStartupMetadata,
 } from './chromeShellStartupReadiness.js';
 export function installRendererStartupDiagnostics({
-  windowObject: windowObject = globalThis['window'],
+  windowObject: windowObject = globalThis.window,
   startup: startup = rendererStartupState,
   report: report = reportRendererStartupFailure,
 } = {}) {
-  if (!windowObject?.['addEventListener']) return () => {};
-  if (startup['snapshot']()['ready']) return () => {};
+  if (!windowObject?.addEventListener) return () => {};
+  if (startup.snapshot().ready) return () => {};
   let evidence;
   const value = (event) => {
-    if (event?.['target'] && event['target'] !== windowObject && event['target']['tagName'] !== 'SCRIPT')
+    if (event?.target && event.target !== windowObject && event.target.tagName !== 'SCRIPT')
       return;
-    if (!startup['snapshot']()['failure']) evidence = collectRendererStartupEvidence(event, windowObject);
-    startup['fail']('entry');
+    if (!startup.snapshot().failure) evidence = collectRendererStartupEvidence(event, windowObject);
+    startup.fail('entry');
   };
   let enabled = false,
     item = false,
     handler = () => {};
-  handler = startup['subscribe']((stage) => {
-    if (stage['ready']) {
+  handler = startup.subscribe((stage) => {
+    if (stage.ready) {
       run();
       return;
     }
-    if (!stage['failure'] || item) return;
+    if (!stage.failure || item) return;
     item = true;
-    const href = String(windowObject['location']?.['href'] || ''),
+    const href = String(windowObject.location?.href || ''),
       args = readChromeShellStartupMetadata(href);
     if (!args) return;
     void (async () => {
@@ -43,12 +43,12 @@ export function installRendererStartupDiagnostics({
             context: {
               href: href,
               ...args,
-              stage: stage['phase'],
-              failure: stage['failure'],
+              stage: stage.phase,
+              failure: stage.failure,
               ...(evidence ? { evidence: evidence } : {}),
             },
           });
-          if (response?.['success']) break;
+          if (response?.success) break;
         } catch {}
       }
     })();
@@ -56,12 +56,12 @@ export function installRendererStartupDiagnostics({
   function run() {
     ((enabled = true),
       handler(),
-      windowObject['removeEventListener']('error', value, true),
-      windowObject['removeEventListener']('pagehide', run));
+      windowObject.removeEventListener('error', value, true),
+      windowObject.removeEventListener('pagehide', run));
   }
   return (
-    windowObject['addEventListener']('error', value, true),
-    windowObject['addEventListener']('pagehide', run, { once: true }),
+    windowObject.addEventListener('error', value, true),
+    windowObject.addEventListener('pagehide', run, { once: true }),
     run
   );
 }

@@ -55,12 +55,12 @@ function resolvePanoramaCharacterNaturalArmPose(data) {
 function rotateBoneLocal(options, target, source, next) {
   const enabled2 = options?.getObjectByName?.(target);
   if (!enabled2) return false;
-  const current = new threeRuntime['Quaternion']().setFromAxisAngle(source, next);
+  const current = new threeRuntime.Quaternion().setFromAxisAngle(source, next);
   return (enabled2.quaternion.multiply(current), true);
 }
 export function applyPanoramaCharacterNaturalArmPose(entry, record) {
   const panoramaCharacterNaturalArmPose = resolvePanoramaCharacterNaturalArmPose(record),
-    payload = new threeRuntime['Vector3'](0, 0, 1);
+    payload = new threeRuntime.Vector3(0, 0, 1);
   return (
     rotateBoneLocal(entry, 'upperarm_l', payload, -panoramaCharacterNaturalArmPose.upperArmDropRadians),
     rotateBoneLocal(entry, 'upperarm_r', payload, panoramaCharacterNaturalArmPose.upperArmDropRadians),
@@ -72,14 +72,14 @@ export function applyPanoramaCharacterNaturalArmPose(entry, record) {
 }
 function normalizeCharacterModel(box, handle) {
   (applyPanoramaCharacterNaturalArmPose(box, handle), box.updateMatrixWorld(true));
-  const state = new threeRuntime['Box3']().setFromObject(box),
-    box2 = new threeRuntime['Vector3']();
+  const state = new threeRuntime.Box3().setFromObject(box),
+    box2 = new threeRuntime.Vector3();
   state.getSize(box2);
   const config = Math.max(0.001, box2.y),
     scope = TARGET_CHARACTER_HEIGHT / config;
   (box.scale.multiplyScalar(scope), box.updateMatrixWorld(true));
-  const input = new threeRuntime['Box3']().setFromObject(box),
-    box3 = new threeRuntime['Vector3']();
+  const input = new threeRuntime.Box3().setFromObject(box),
+    box3 = new threeRuntime.Vector3();
   return (
     input.getCenter(box3),
     (box.position.x -= box3.x),
@@ -104,13 +104,13 @@ export async function createPanoramaCharacterModelInstance(value3) {
 export function capturePanoramaCharacterBoneBase(value4) {
   const value5 = {};
   for (const value6 of PANORAMA_CHARACTER_BONES) {
-    const enabled3 = value4?.['getObjectByName']?.(value6);
-    if (!enabled3?.['quaternion']) continue;
+    const enabled3 = value4?.getObjectByName?.(value6);
+    if (!enabled3?.quaternion) continue;
     value5[value6] = {
-      x: enabled3['quaternion']['x'],
-      y: enabled3['quaternion']['y'],
-      z: enabled3['quaternion']['z'],
-      w: enabled3['quaternion']['w'],
+      x: enabled3.quaternion.x,
+      y: enabled3.quaternion.y,
+      z: enabled3.quaternion.z,
+      w: enabled3.quaternion.w,
     };
   }
   return value5;
@@ -119,16 +119,16 @@ export function capturePanoramaCharacterBoneBase(value4) {
 export function applyPanoramaCharacterBonePose(value7, value8, value9 = {}) {
   const bonePose = normalizeBonePose(value8);
   for (const value10 of PANORAMA_CHARACTER_BONES) {
-    const enabled4 = value7?.['getObjectByName']?.(value10);
-    if (!enabled4?.['quaternion']) continue;
+    const enabled4 = value7?.getObjectByName?.(value10);
+    if (!enabled4?.quaternion) continue;
     const box4 = value9?.[value10];
-    if (box4) enabled4['quaternion']['set'](box4['x'], box4['y'], box4['z'], box4['w']);
+    if (box4) enabled4.quaternion.set(box4.x, box4.y, box4.z, box4.w);
     const box5 = bonePose[value10];
     if (!box5) continue;
-    const value11 = new threeRuntime['Quaternion']()['setFromEuler'](
-      new threeRuntime['Euler'](box5['x'], box5['y'], box5['z'], 'XYZ'),
+    const value11 = new threeRuntime.Quaternion().setFromEuler(
+      new threeRuntime.Euler(box5.x, box5.y, box5.z, 'XYZ'),
     );
-    enabled4['quaternion']['multiply'](value11);
+    enabled4.quaternion.multiply(value11);
   }
-  return (value7?.['updateMatrixWorld']?.(true), value7);
+  return (value7?.updateMatrixWorld?.(true), value7);
 }

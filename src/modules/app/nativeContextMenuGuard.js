@@ -1,12 +1,12 @@
-export function installNativeContextMenuGuard(el = globalThis['window']) {
-  if (!el?.['addEventListener']) return () => {};
+export function installNativeContextMenuGuard(el = globalThis.window) {
+  if (!el?.addEventListener) return () => {};
   const value = (item) => {
-    item?.['preventDefault']?.();
+    item?.preventDefault?.();
   };
   return (
-    el['addEventListener']('contextmenu', value),
+    el.addEventListener('contextmenu', value),
     () => {
-      el['removeEventListener']?.('contextmenu', value);
+      el.removeEventListener?.('contextmenu', value);
     }
   );
 }

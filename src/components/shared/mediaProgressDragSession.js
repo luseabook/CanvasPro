@@ -1,5 +1,5 @@
 export function startMediaProgressDragSession({
-  target: target = globalThis['window'],
+  target: target = globalThis.window,
   pointerId: pointerId = null,
   onMove: onMove,
   onEnd: onEnd,
@@ -8,7 +8,7 @@ export function startMediaProgressDragSession({
 } = {}) {
   let enabled = true;
   const run = (event) =>
-      pointerId == null || event?.['pointerId'] == null || event['pointerId'] === pointerId,
+      pointerId == null || event?.pointerId == null || event.pointerId === pointerId,
     value = (item) => {
       if (!enabled || !run(item)) return;
       onMove?.(item);
@@ -17,10 +17,10 @@ export function startMediaProgressDragSession({
       if (!enabled) return false;
       return (
         (enabled = false),
-        target?.['removeEventListener']?.('pointermove', value, capture),
-        target?.['removeEventListener']?.('pointerup', key, capture),
-        target?.['removeEventListener']?.('pointercancel', cancel, capture),
-        target?.['removeEventListener']?.('blur', cancel, capture),
+        target?.removeEventListener?.('pointermove', value, capture),
+        target?.removeEventListener?.('pointerup', key, capture),
+        target?.removeEventListener?.('pointercancel', cancel, capture),
+        target?.removeEventListener?.('blur', cancel, capture),
         true
       );
     },
@@ -29,15 +29,15 @@ export function startMediaProgressDragSession({
       onEnd?.(index);
     },
     cancel = (result) => {
-      if (result?.['type'] !== 'blur' && !run(result)) return;
+      if (result?.type !== 'blur' && !run(result)) return;
       if (!dispose()) return;
       onCancel?.(result);
     };
   return (
-    target?.['addEventListener']?.('pointermove', value, capture),
-    target?.['addEventListener']?.('pointerup', key, capture),
-    target?.['addEventListener']?.('pointercancel', cancel, capture),
-    target?.['addEventListener']?.('blur', cancel, capture),
+    target?.addEventListener?.('pointermove', value, capture),
+    target?.addEventListener?.('pointerup', key, capture),
+    target?.addEventListener?.('pointercancel', cancel, capture),
+    target?.addEventListener?.('blur', cancel, capture),
     {
       cancel: cancel,
       dispose: dispose,

@@ -8,78 +8,78 @@ import { localPathToUrl, pickResultLocalPath } from '../../utils/localMediaPath.
 const TIMELINE_MATCH_TOLERANCE_SEC = 0.15;
 function toFiniteNumber(value, item = 0) {
   const key = Number(value);
-  return Number['isFinite'](key) ? key : item;
+  return Number.isFinite(key) ? key : item;
 }
 function toPositiveIndex(index) {
   const count = Number(index);
-  if (!Number['isFinite'](count) || count < 1) return 0;
-  return Math['trunc'](count);
+  if (!Number.isFinite(count) || count < 1) return 0;
+  return Math.trunc(count);
 }
 function serializeStageError(error, result) {
   return {
-    stage: String(error?.['stage'] || result || 'unknown'),
-    code: String(error?.['code'] || 'smart_clip_failed'),
-    message: String(error?.['message'] || error || 'Smart clip failed'),
-    jobId: String(error?.['jobId'] || ''),
+    stage: String(error?.stage || result || 'unknown'),
+    code: String(error?.code || 'smart_clip_failed'),
+    message: String(error?.message || error || 'Smart clip failed'),
+    jobId: String(error?.jobId || ''),
   };
 }
 function normalizeSegment(data, sourcePosition) {
   const personDetection = data && typeof data === 'object' ? data : {},
-    start2 = Math['max'](0, toFiniteNumber(personDetection['start'], 0)),
-    count2 = Math['max'](0, toFiniteNumber(personDetection['duration'], 0)),
-    toFiniteNumber2 = toFiniteNumber(personDetection['end'], start2 + count2),
-    end2 = Math['max'](start2, toFiniteNumber2),
-    duration2 = count2 > 0 ? count2 : Math['max'](0, end2 - start2),
+    start2 = Math.max(0, toFiniteNumber(personDetection.start, 0)),
+    count2 = Math.max(0, toFiniteNumber(personDetection.duration, 0)),
+    toFiniteNumber2 = toFiniteNumber(personDetection.end, start2 + count2),
+    end2 = Math.max(start2, toFiniteNumber2),
+    duration2 = count2 > 0 ? count2 : Math.max(0, end2 - start2),
     ref = pickResultLocalPath(personDetection);
   return {
-    sourceIndex: toPositiveIndex(personDetection['index']),
+    sourceIndex: toPositiveIndex(personDetection.index),
     sourcePosition: sourcePosition,
     start: start2,
     end: end2 > start2 ? end2 : start2 + duration2,
     duration: duration2,
-    fps: Math['max'](0, toFiniteNumber(personDetection['fps'], 0)),
-    keyframeIndex: Math['max'](0, Math['trunc'](toFiniteNumber(personDetection['keyframeIndex'], 0))),
-    keyframeTimeSec: Math['max'](start2, toFiniteNumber(personDetection['keyframeTimeSec'], start2)),
+    fps: Math.max(0, toFiniteNumber(personDetection.fps, 0)),
+    keyframeIndex: Math.max(0, Math.trunc(toFiniteNumber(personDetection.keyframeIndex, 0))),
+    keyframeTimeSec: Math.max(start2, toFiniteNumber(personDetection.keyframeTimeSec, start2)),
     personDetection:
-      personDetection['personDetection'] && typeof personDetection['personDetection'] === 'object'
-        ? personDetection['personDetection']
+      personDetection.personDetection && typeof personDetection.personDetection === 'object'
+        ? personDetection.personDetection
         : null,
-    personFound: personDetection['personFound'] === true,
-    keyframeSelectionPolicy: String(personDetection['keyframeSelectionPolicy'] || ''),
+    personFound: personDetection.personFound === true,
+    keyframeSelectionPolicy: String(personDetection.keyframeSelectionPolicy || ''),
     ref: ref,
     url: localPathToUrl(ref),
-    fileName: String(personDetection['fileName'] || ''),
+    fileName: String(personDetection.fileName || ''),
   };
 }
 export function normalizePersonReplacementSmartClipSegments(options) {
-  const list = (Array['isArray'](options) ? options : [])
-      ['map']((target, source) => normalizeSegment(target, source))
-      ['sort'](
+  const list = (Array.isArray(options) ? options : [])
+      .map((target, source) => normalizeSegment(target, source))
+      .sort(
         (next, current) =>
-          next['start'] - current['start'] ||
-          next['end'] - current['end'] ||
-          next['sourceIndex'] - current['sourceIndex'] ||
-          next['sourcePosition'] - current['sourcePosition'],
+          next.start - current.start ||
+          next.end - current.end ||
+          next.sourceIndex - current.sourceIndex ||
+          next.sourcePosition - current.sourcePosition,
       ),
-    map = new Set(list['map']((entry) => entry['sourceIndex'])['filter'](Boolean)),
+    map = new Set(list.map((entry) => entry.sourceIndex).filter(Boolean)),
     map2 = new Set();
   let record = 1;
-  return list['map']((args) => {
-    let index2 = args['sourceIndex'];
-    if (!index2 || map2['has'](index2)) {
-      while (map['has'](record) || map2['has'](record)) {
+  return list.map((args) => {
+    let index2 = args.sourceIndex;
+    if (!index2 || map2.has(index2)) {
+      while (map.has(record) || map2.has(record)) {
         record += 1;
       }
       ((index2 = record), (record += 1));
     }
-    return (map2['add'](index2), { ...args, index: index2 });
+    return (map2.add(index2), { ...args, index: index2 });
   });
 }
 function timelineDiffers(enabled, enabled2) {
   if (!enabled || !enabled2) return false;
   return (
-    Math['abs'](enabled['start'] - enabled2['start']) > TIMELINE_MATCH_TOLERANCE_SEC ||
-    Math['abs'](enabled['end'] - enabled2['end']) > TIMELINE_MATCH_TOLERANCE_SEC
+    Math.abs(enabled.start - enabled2.start) > TIMELINE_MATCH_TOLERANCE_SEC ||
+    Math.abs(enabled.end - enabled2.end) > TIMELINE_MATCH_TOLERANCE_SEC
   );
 }
 function missingRefError(stage, code, message) {
@@ -93,53 +93,53 @@ export function buildPersonReplacementShotBundles({
 } = {}) {
   const list2 = normalizePersonReplacementSmartClipSegments(clipSegments),
     list3 = normalizePersonReplacementSmartClipSegments(keyframeSegments),
-    map3 = new Map(list2['map']((payload) => [payload['index'], payload])),
-    map4 = new Map(list3['map']((handle) => [handle['index'], handle])),
-    list4 = Array['from'](new Set([...map3['keys'](), ...map4['keys']()]))['sort']((state, config) => {
-      const scope = map3['get'](state) || map4['get'](state),
-        input = map3['get'](config) || map4['get'](config);
-      return scope['start'] - input['start'] || scope['end'] - input['end'] || state - config;
+    map3 = new Map(list2.map((payload) => [payload.index, payload])),
+    map4 = new Map(list3.map((handle) => [handle.index, handle])),
+    list4 = Array.from(new Set([...map3.keys(), ...map4.keys()])).sort((state, config) => {
+      const scope = map3.get(state) || map4.get(state),
+        input = map3.get(config) || map4.get(config);
+      return scope.start - input.start || scope.end - input.end || state - config;
     });
-  return list4['map']((sourceIndex, index3) => {
-    const clipRef = map3['get'](sourceIndex) || null,
-      fps = map4['get'](sourceIndex) || null,
+  return list4.map((sourceIndex, index3) => {
+    const clipRef = map3.get(sourceIndex) || null,
+      fps = map4.get(sourceIndex) || null,
       start3 = clipRef || fps || { start: 0, end: 0, duration: 0 },
       errors = [];
     requireClip &&
-      !clipRef?.['ref'] &&
-      errors['push'](
-        stageErrors['videoSegments'] ||
+      !clipRef?.ref &&
+      errors.push(
+        stageErrors.videoSegments ||
           missingRefError('videoSegments', 'missing_clip_ref', 'Video segment output is missing'),
       );
-    !fps?.['ref'] &&
-      errors['push'](
-        stageErrors['keyframes'] ||
+    !fps?.ref &&
+      errors.push(
+        stageErrors.keyframes ||
           missingRefError('keyframes', 'missing_keyframe_ref', 'Keyframe output is missing'),
       );
     timelineDiffers(clipRef, fps) &&
-      errors['push'](
+      errors.push(
         missingRefError('pairing', 'timeline_mismatch', 'Video segment and keyframe timelines do not match'),
       );
-    const output = Boolean(clipRef?.['ref']),
-      value2 = Boolean(fps?.['ref']),
+    const output = Boolean(clipRef?.ref),
+      value2 = Boolean(fps?.ref),
       value3 = !requireClip || output,
       status =
-        value3 && value2 && errors['length'] === 0 ? 'ready' : output || value2 ? 'partial' : 'failed';
+        value3 && value2 && errors.length === 0 ? 'ready' : output || value2 ? 'partial' : 'failed';
     return {
-      id: 'shot-' + String(index3 + 1)['padStart'](3, '0'),
+      id: 'shot-' + String(index3 + 1).padStart(3, '0'),
       index: index3 + 1,
       sourceIndex: sourceIndex,
-      start: start3['start'],
-      end: start3['end'],
-      duration: start3['duration'] || Math['max'](0, start3['end'] - start3['start']),
-      fps: fps?.['fps'] || clipRef?.['fps'] || 0,
-      keyframeIndex: fps?.['keyframeIndex'] || 0,
-      keyframeTimeSec: fps?.['keyframeTimeSec'] || start3['start'],
-      personDetection: fps?.['personDetection'] || null,
-      personFound: fps?.['personFound'] === true,
-      keyframeSelectionPolicy: fps?.['keyframeSelectionPolicy'] || '',
-      clipRef: clipRef?.['ref'] || '',
-      keyframeRef: fps?.['ref'] || '',
+      start: start3.start,
+      end: start3.end,
+      duration: start3.duration || Math.max(0, start3.end - start3.start),
+      fps: fps?.fps || clipRef?.fps || 0,
+      keyframeIndex: fps?.keyframeIndex || 0,
+      keyframeTimeSec: fps?.keyframeTimeSec || start3.start,
+      personDetection: fps?.personDetection || null,
+      personFound: fps?.personFound === true,
+      keyframeSelectionPolicy: fps?.keyframeSelectionPolicy || '',
+      clipRef: clipRef?.ref || '',
+      keyframeRef: fps?.ref || '',
       status: status,
       errors: errors,
     };
@@ -150,19 +150,19 @@ function normalizeSourceRef(value4) {
   return localPathToUrl(resultLocalPath);
 }
 function createStageSuccess(value5) {
-  const status2 = Array['isArray'](value5?.['segments']) ? value5['segments'] : [];
+  const status2 = Array.isArray(value5?.segments) ? value5.segments : [];
   return {
-    status: status2['length'] > 0 ? 'complete' : 'empty',
-    jobId: String(value5?.['jobId'] || ''),
-    count: status2['length'],
+    status: status2.length > 0 ? 'complete' : 'empty',
+    jobId: String(value5?.jobId || ''),
+    count: status2.length,
     error:
-      status2['length'] > 0
+      status2.length > 0
         ? null
         : {
-            stage: String(value5?.['outputMode'] || 'unknown'),
+            stage: String(value5?.outputMode || 'unknown'),
             code: 'no_results',
             message: 'Smart clip stage returned no results',
-            jobId: String(value5?.['jobId'] || ''),
+            jobId: String(value5?.jobId || ''),
           },
   };
 }
@@ -193,11 +193,11 @@ async function runStage({
   } catch (value7) {
     const jobId = serializeStageError(value7, phase2);
     return {
-      result: { segments: [], outputMode: phase2, jobId: jobId['jobId'] },
+      result: { segments: [], outputMode: phase2, jobId: jobId.jobId },
       error: jobId,
       stage: {
-        status: jobId['code'] === 'cancelled' ? 'cancelled' : 'failed',
-        jobId: jobId['jobId'],
+        status: jobId.code === 'cancelled' ? 'cancelled' : 'failed',
+        jobId: jobId.jobId,
         count: 0,
         error: jobId,
       },
@@ -221,13 +221,13 @@ export async function runPersonReplacementSmartClip({
   if (typeof runJob !== 'function') throw new TypeError('Smart clip job runner is required');
   const mode = normalizeSmartClipRunOptions(options3),
     options4 = {
-      mode: mode['mode'],
-      ...(mode['unlimitedSegments'] === true
+      mode: mode.mode,
+      ...(mode.unlimitedSegments === true
         ? { unlimitedSegments: true }
-        : { maxSegments: mode['maxSegments'] }),
-      fps: mode['fps'],
+        : { maxSegments: mode.maxSegments }),
+      fps: mode.fps,
       keyframeSelectionPolicy: 'person',
-      ...(mode['preserveWholeVideo'] === true ? { preserveWholeVideo: true } : {}),
+      ...(mode.preserveWholeVideo === true ? { preserveWholeVideo: true } : {}),
     },
     keyframes = await runStage({
       phase: SMART_CLIP_OUTPUT_MODE_KEYFRAMES,
@@ -238,16 +238,16 @@ export async function runPersonReplacementSmartClip({
       shouldContinue: shouldContinue2,
       signal: signal2,
     }),
-    stageErrors2 = { keyframes: keyframes['error'] || keyframes['stage']['error'] },
+    stageErrors2 = { keyframes: keyframes.error || keyframes.stage.error },
     shotBundles = buildPersonReplacementShotBundles({
-      keyframeSegments: keyframes['result']['segments'],
+      keyframeSegments: keyframes.result.segments,
       stageErrors: stageErrors2,
       requireClip: false,
     }),
-    value8 = keyframes['stage']['status'] !== 'complete',
-    value9 = shotBundles['some']((response) => response['status'] !== 'ready'),
-    enabled3 = shotBundles['some']((response2) => response2['status'] !== 'failed'),
-    ok = shotBundles['length'] === 0 || !enabled3 ? 'failed' : value8 || value9 ? 'partial' : 'ready';
+    value8 = keyframes.stage.status !== 'complete',
+    value9 = shotBundles.some((response) => response.status !== 'ready'),
+    enabled3 = shotBundles.some((response2) => response2.status !== 'failed'),
+    ok = shotBundles.length === 0 || !enabled3 ? 'failed' : value8 || value9 ? 'partial' : 'ready';
   return {
     ok: ok !== 'failed',
     status: ok,
@@ -256,7 +256,7 @@ export async function runPersonReplacementSmartClip({
     shotBundles: shotBundles,
     stages: {
       videoSegments: { status: 'deferred', jobId: '', count: 0, error: null },
-      keyframes: keyframes['stage'],
+      keyframes: keyframes.stage,
     },
   };
 }

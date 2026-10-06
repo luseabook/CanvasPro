@@ -1,29 +1,29 @@
 import { PERSON_REPLACEMENT_MARKER_COLORS } from './personReplacementPromptMode.js';
 const escapeXml = (value) =>
   String(value)
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;');
 export function buildPersonReplacementLocationGuideSvg({ frame: frame = {}, people: people = [] } = {}) {
   const width = 1200,
-    height = Math['max'](
+    height = Math.max(
       1,
-      Math['round']((width * (Number(frame['height']) || 9)) / (Number(frame['width']) || 16)),
+      Math.round((width * (Number(frame.height) || 9)) / (Number(frame.width) || 16)),
     ),
     item = [0.25, 0.5, 0.75]
-      ['map'](
+      .map(
         (key) =>
           '<path d="M' + width * key + ' 0V' + height + ' M0 ' + height * key + 'H' + width + '"/>',
       )
-      ['join'](''),
-    index = people['map'](({ label: label, bbox: bbox, markerIndex: markerIndex }, result) => {
-      const data = Math['round'](bbox['x'] * width),
-        options = Math['round'](bbox['y'] * height),
+      .join(''),
+    index = people.map(({ label: label, bbox: bbox, markerIndex: markerIndex }, result) => {
+      const data = Math.round(bbox.x * width),
+        options = Math.round(bbox.y * height),
         target =
           'var(' +
           PERSON_REPLACEMENT_MARKER_COLORS[
-            (markerIndex ?? result) % PERSON_REPLACEMENT_MARKER_COLORS['length']
+            (markerIndex ?? result) % PERSON_REPLACEMENT_MARKER_COLORS.length
           ] +
           ')';
       return (
@@ -34,9 +34,9 @@ export function buildPersonReplacementLocationGuideSvg({ frame: frame = {}, peop
         '" y="' +
         options +
         '" width="' +
-        Math['round'](bbox['width'] * width) +
+        Math.round(bbox.width * width) +
         '" height="' +
-        Math['round'](bbox['height'] * height) +
+        Math.round(bbox.height * height) +
         '" rx="10" fill="' +
         target +
         '" fill-opacity="0.12" stroke="' +
@@ -55,7 +55,7 @@ export function buildPersonReplacementLocationGuideSvg({ frame: frame = {}, peop
         escapeXml(label) +
         '</text></g>'
       );
-    })['join'](''),
+    }).join(''),
     source =
       '<svg xmlns="http://www.w3.org/2000/svg" width="' +
       width +
@@ -74,16 +74,16 @@ export function buildPersonReplacementLocationGuideSvg({ frame: frame = {}, peop
     dataUrl: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(source),
     width: width,
     height: height,
-    personCount: people['length'],
+    personCount: people.length,
   };
 }
 export function resolvePersonReplacementLocationGuidePreview(list) {
   if (typeof document === 'undefined' || typeof getComputedStyle !== 'function') return list;
-  const computedStyle = getComputedStyle(document['documentElement']),
-    decodeURIComponent2 = decodeURIComponent(list['slice'](list['indexOf'](',') + 1))['replace'](
+  const computedStyle = getComputedStyle(document.documentElement),
+    decodeURIComponent2 = decodeURIComponent(list.slice(list.indexOf(',') + 1)).replace(
       /var\((--[a-z0-9-]+)\)/g,
       (next, current) => {
-        const enabled = computedStyle['getPropertyValue'](current)['trim']();
+        const enabled = computedStyle.getPropertyValue(current).trim();
         if (!enabled) throw new Error('人物定位图颜色未初始化：' + current);
         return escapeXml(enabled);
       },

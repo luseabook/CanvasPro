@@ -43,60 +43,60 @@ import {
 } from './storyPromptModes.js';
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replace'](/&/g, '&amp;')
-    ['replace'](/</g, '&lt;')
-    ['replace'](/>/g, '&gt;')
-    ['replace'](/"/g, '&quot;')
-    ['replace'](/'/g, '&#39;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 function normalizeText(item) {
-  return String(item || '')['trim']();
+  return String(item || '').trim();
 }
 function formatPromptHistorySavedAt(key) {
   const index = new Date(Number(key));
-  if (!Number['isFinite'](index['getTime']()) || Number(key) <= 0) return '时间未记录';
-  const run = (result) => String(result)['padStart'](2, '0');
+  if (!Number.isFinite(index.getTime()) || Number(key) <= 0) return '时间未记录';
+  const run = (result) => String(result).padStart(2, '0');
   return (
-    index['getFullYear']() +
+    index.getFullYear() +
     '-' +
-    run(index['getMonth']() + 1) +
+    run(index.getMonth() + 1) +
     '-' +
-    run(index['getDate']()) +
+    run(index.getDate()) +
     ' ' +
-    run(index['getHours']()) +
+    run(index.getHours()) +
     ':' +
-    run(index['getMinutes']())
+    run(index.getMinutes())
   );
 }
 function getPromptHistoryPreview(data) {
   return normalizeText(
     String(data || '')
-      ['replace'](/<br\s*\/?\s*>/gi, ' ')
-      ['replace'](/<[^>]+>/g, ' ')
-      ['replace'](/&nbsp;/gi, ' ')
-      ['replace'](/&lt;/gi, '<')
-      ['replace'](/&gt;/gi, '>')
-      ['replace'](/&quot;/gi, '"')
-      ['replace'](/&#39;|&apos;/gi, '\'')
-      ['replace'](/&amp;/gi, '&')
-      ['replace'](/\s+/g, ' '),
-  )['slice'](0, 96);
+      .replace(/<br\s*\/?\s*>/gi, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&#39;|&apos;/gi, '\'')
+      .replace(/&amp;/gi, '&')
+      .replace(/\s+/g, ' '),
+  ).slice(0, 96);
 }
 function getVideoResults(options = {}) {
-  return Array['isArray'](options?.['video']?.['results'])
-    ? options['video']['results']['filter']((target) => target && typeof target === 'object')
+  return Array.isArray(options?.video?.results)
+    ? options.video.results.filter((target) => target && typeof target === 'object')
     : [];
 }
 function getActiveVideoResultIndex(options2 = {}, list = getVideoResults(options2)) {
-  if (!list['length']) return 0;
-  const source = Math['trunc'](Number(options2?.['video']?.['activeIndex']) || 0);
-  return Math['max'](0, Math['min'](list['length'] - 1, source));
+  if (!list.length) return 0;
+  const source = Math.trunc(Number(options2?.video?.activeIndex) || 0);
+  return Math.max(0, Math.min(list.length - 1, source));
 }
 function removeVideoResult(clip = {}, next) {
   const results = getVideoResults(clip),
     count = Number(next),
     activeIndex = getActiveVideoResultIndex(clip, results);
-  if (results['length'] < 2 || !Number['isInteger'](count) || count < 0 || count >= results['length'])
+  if (results.length < 2 || !Number.isInteger(count) || count < 0 || count >= results.length)
     return {
       changed: false,
       clip: clip,
@@ -106,53 +106,53 @@ function removeVideoResult(clip = {}, next) {
       direction: '',
     };
   const current = results[activeIndex],
-    results2 = results['filter']((entry, record) => record !== count),
+    results2 = results.filter((entry, record) => record !== count),
     activeIndex2 =
       count < activeIndex
         ? activeIndex - 1
         : count === activeIndex
-          ? Math['min'](count, results2['length'] - 1)
+          ? Math.min(count, results2.length - 1)
           : activeIndex,
     activeResultChanged = results2[activeIndex2] !== current;
   return {
     changed: true,
     clip: {
       ...clip,
-      video: { ...(clip?.['video'] || {}), results: results2, activeIndex: activeIndex2 },
+      video: { ...(clip?.video || {}), results: results2, activeIndex: activeIndex2 },
     },
     results: results2,
     activeIndex: activeIndex2,
     activeResultChanged: activeResultChanged,
     direction:
-      activeResultChanged && count >= results2['length'] ? 'previous' : activeResultChanged ? 'next' : '',
+      activeResultChanged && count >= results2.length ? 'previous' : activeResultChanged ? 'next' : '',
   };
 }
 function resolveVideoResultUrl(response = {}) {
   return (
     [
-      localPathToUrl(response['displayLocalPath']),
-      localPathToUrl(response['localPath']),
-      response['videoUrl'],
-      response['url'],
-      response['displayUrl'],
+      localPathToUrl(response.displayLocalPath),
+      localPathToUrl(response.localPath),
+      response.videoUrl,
+      response.url,
+      response.displayUrl,
     ]
-      ['map']((payload) => normalizeText(payload))
-      ['find'](Boolean) || ''
+      .map((payload) => normalizeText(payload))
+      .find(Boolean) || ''
   );
 }
 function resolveVideoResultPosterUrl(options3 = {}) {
   return (
     [
-      options3['posterUrl'],
-      options3['thumbUrl'],
-      options3['thumbnailUrl'],
-      options3['coverUrl'],
-      localPathToUrl(options3['posterLocalPath']),
-      localPathToUrl(options3['thumbLocalPath']),
-      localPathToUrl(options3['thumbnailLocalPath']),
+      options3.posterUrl,
+      options3.thumbUrl,
+      options3.thumbnailUrl,
+      options3.coverUrl,
+      localPathToUrl(options3.posterLocalPath),
+      localPathToUrl(options3.thumbLocalPath),
+      localPathToUrl(options3.thumbnailLocalPath),
     ]
-      ['map']((handle) => normalizeText(handle))
-      ['find'](Boolean) || ''
+      .map((handle) => normalizeText(handle))
+      .find(Boolean) || ''
   );
 }
 function renderVideoThumbnail(state, { className: className = '', label: label = '视频缩略图' } = {}) {
@@ -182,28 +182,28 @@ function renderVideoThumbnail(state, { className: className = '', label: label =
 }
 function getAdjacentVideoResultIndex(options4 = {}, config = 1) {
   const list2 = getVideoResults(options4);
-  if (list2['length'] < 2) return getActiveVideoResultIndex(options4, list2);
+  if (list2.length < 2) return getActiveVideoResultIndex(options4, list2);
   const activeVideoResultIndex2 = getActiveVideoResultIndex(options4, list2),
     scope = Number(config) < 0 ? -1 : 1;
-  return (activeVideoResultIndex2 + scope + list2['length']) % list2['length'];
+  return (activeVideoResultIndex2 + scope + list2.length) % list2.length;
 }
 function renderVideoHistoryMenu(title = {}) {
   const results3 = getVideoResults(title),
     activeIndex3 = getActiveVideoResultIndex(title, results3);
   return renderStoryMediaHistoryMenu({
-    title: title?.['title'] || '片段视频',
+    title: title?.title || '片段视频',
     results: results3,
     activeIndex: activeIndex3,
-    menuLabel: (title?.['title'] || '片段') + '历史视频',
+    menuLabel: (title?.title || '片段') + '历史视频',
     getItemStatus: (input, output) => (output === activeIndex3 ? '当前播放' : '点击切换'),
     renderMedia: (value2, value3) =>
       renderVideoThumbnail(value2, {
         className: 'story-media-history-thumbnail story-clip-video-history-thumbnail',
-        label: (title?.['title'] || '片段') + ' · 版本 ' + (value3 + 1),
+        label: (title?.title || '片段') + ' · 版本 ' + (value3 + 1),
       }),
     getItemAttributes: (value4, value5) =>
       'data-story-action="select-video-result" data-story-clip-id="' +
-      escapeHtml(title?.['id']) +
+      escapeHtml(title?.id) +
       '" data-story-video-result-index="' +
       value5 +
       '"',
@@ -213,7 +213,7 @@ function renderVideoHistoryMenu(title = {}) {
         ariaLabel: '删除版本 ' + (value7 + 1),
         actionAttributes: {
           'data-story-action': 'delete-video-result',
-          'data-story-clip-id': title?.['id'],
+          'data-story-clip-id': title?.id,
           'data-story-video-result-index': value7,
         },
       }),
@@ -228,44 +228,44 @@ function renderTimelineVideoThumbnail(options5 = {}) {
   return value8
     ? renderVideoThumbnail(value8, {
         className: 'story-clip-card-thumbnail',
-        label: '片段 ' + options5['number'] + ' 视频缩略图',
+        label: '片段 ' + options5.number + ' 视频缩略图',
       })
     : '';
 }
 function getSelectedEpisode(value9) {
-  const list3 = Array['isArray'](value9?.['data']?.['episodes']) ? value9['data']['episodes'] : [];
-  return list3['find']((value10) => value10['id'] === value9?.['selectedEpisodeId']) || list3[0] || null;
+  const list3 = Array.isArray(value9?.data?.episodes) ? value9.data.episodes : [];
+  return list3.find((value10) => value10.id === value9?.selectedEpisodeId) || list3[0] || null;
 }
 function getSelectedClip(value11, value12) {
-  const list4 = Array['isArray'](value12?.['clips']) ? value12['clips'] : [];
-  return list4['find']((value13) => value13['id'] === value11?.['selectedClipId']) || list4[0] || null;
+  const list4 = Array.isArray(value12?.clips) ? value12.clips : [];
+  return list4.find((value13) => value13.id === value11?.selectedClipId) || list4[0] || null;
 }
 function getAdjacentClipId(list5 = [], value14 = '', value15 = 1) {
-  const list6 = (Array['isArray'](list5) ? list5 : [])['filter']((value16) => normalizeText(value16?.['id']));
-  if (!list6['length']) return '';
-  const count2 = list6['findIndex']((value17) => value17['id'] === value14),
+  const list6 = (Array.isArray(list5) ? list5 : []).filter((value16) => normalizeText(value16?.id));
+  if (!list6.length) return '';
+  const count2 = list6.findIndex((value17) => value17.id === value14),
     value18 = count2 >= 0 ? count2 : 0,
     value19 = Number(value15) < 0 ? -1 : 1,
-    value20 = (value18 + value19 + list6['length']) % list6['length'];
-  return list6[value20]['id'];
+    value20 = (value18 + value19 + list6.length) % list6.length;
+  return list6[value20].id;
 }
 function selectBatchTargets(list7 = [], value21 = []) {
   const map = new Set(
-    (Array['isArray'](value21) ? value21 : [])['map']((value22) => normalizeText(value22))['filter'](Boolean),
+    (Array.isArray(value21) ? value21 : []).map((value22) => normalizeText(value22)).filter(Boolean),
   );
-  return (Array['isArray'](list7) ? list7 : [])['filter']((value23) =>
-    map['has'](normalizeText(value23?.['id'])),
+  return (Array.isArray(list7) ? list7 : []).filter((value23) =>
+    map.has(normalizeText(value23?.id)),
   );
 }
 async function runBatch(list8 = [], handler = null, { onProgress: onProgress = null } = {}) {
   if (typeof handler !== 'function') return [];
-  const total2 = Array['isArray'](list8) ? list8 : [];
+  const total2 = Array.isArray(list8) ? list8 : [];
   let completed2 = 0;
-  return Promise['all'](
-    total2['map'](async (target2, index2) => {
+  return Promise.all(
+    total2.map(async (target2, index2) => {
       let result2;
       try {
-        result2 = await handler(target2, { index: index2, total: total2['length'] });
+        result2 = await handler(target2, { index: index2, total: total2.length });
       } catch (error) {
         result2 = { ok: false, error: error };
       }
@@ -273,7 +273,7 @@ async function runBatch(list8 = [], handler = null, { onProgress: onProgress = n
         (completed2 += 1),
         onProgress?.({
           completed: completed2,
-          total: total2['length'],
+          total: total2.length,
           index: index2,
           target: target2,
           result: result2,
@@ -285,62 +285,62 @@ async function runBatch(list8 = [], handler = null, { onProgress: onProgress = n
 }
 function getGeneratingClipIds(options6 = {}, enabled = null) {
   const args = new Set(
-      (Array['isArray'](options6?.['generatingClipIds']) ? options6['generatingClipIds'] : [])
-        ['map']((value24) => normalizeText(value24))
-        ['filter'](Boolean),
+      (Array.isArray(options6?.generatingClipIds) ? options6.generatingClipIds : [])
+        .map((value24) => normalizeText(value24))
+        .filter(Boolean),
     ),
-    text = normalizeText(options6?.['generatingClipId']);
-  if (text) args['add'](text);
+    text = normalizeText(options6?.generatingClipId);
+  if (text) args.add(text);
   const list9 = [...args];
   if (!enabled) return list9;
   const map2 = new Set(
-    (Array['isArray'](enabled?.['clips']) ? enabled['clips'] : [])
-      ['map']((value25) => normalizeText(value25?.['id']))
-      ['filter'](Boolean),
+    (Array.isArray(enabled?.clips) ? enabled.clips : [])
+      .map((value25) => normalizeText(value25?.id))
+      .filter(Boolean),
   );
-  return list9['filter']((value26) => map2['has'](value26));
+  return list9.filter((value26) => map2.has(value26));
 }
 function setClipGenerationRunning(args2, value27, value28 = true) {
   if (!args2 || typeof args2 !== 'object') return [];
   const text2 = normalizeText(value27),
     map3 = new Set(getGeneratingClipIds(args2));
   if (text2) {
-    if (value28) map3['add'](text2);
-    else map3['delete'](text2);
+    if (value28) map3.add(text2);
+    else map3.delete(text2);
   }
   return (
-    (args2['generatingClipIds'] = [...map3]),
-    (args2['generatingClipId'] = args2['generatingClipIds'][0] || ''),
-    [...args2['generatingClipIds']]
+    (args2.generatingClipIds = [...map3]),
+    (args2.generatingClipId = args2.generatingClipIds[0] || ''),
+    [...args2.generatingClipIds]
   );
 }
 function getGenerationState(options7 = {}, value29 = null) {
-  const text3 = normalizeText(value29?.['id']),
-    value30 = options7?.['clipBatchGenerationByEpisode'],
+  const text3 = normalizeText(value29?.id),
+    value30 = options7?.clipBatchGenerationByEpisode,
     isBatchGenerating = Boolean(
       text3 &&
       value30 &&
       typeof value30 === 'object' &&
-      !Array['isArray'](value30) &&
-      Object['hasOwn'](value30, text3),
+      !Array.isArray(value30) &&
+      Object.hasOwn(value30, text3),
     ),
     batchCancelRequested = isBatchGenerating ? value30[text3] : null,
     generatingClipIds2 = getGeneratingClipIds(options7, value29);
   return {
     generatingClipIds: generatingClipIds2,
     isBatchGenerating: isBatchGenerating,
-    batchLabel: normalizeText(batchCancelRequested?.['label']),
-    batchCancelRequested: batchCancelRequested?.['cancelRequested'] === true,
-    busy: isBatchGenerating || generatingClipIds2['length'] > 0,
+    batchLabel: normalizeText(batchCancelRequested?.label),
+    batchCancelRequested: batchCancelRequested?.cancelRequested === true,
+    busy: isBatchGenerating || generatingClipIds2.length > 0,
   };
 }
 function setEpisodeBatchRunning(enabled2, value31, value32 = true, value33 = '', value34 = {}) {
   if (!enabled2 || typeof enabled2 !== 'object') return null;
   const text4 = normalizeText(value31);
   if (!text4) return null;
-  const value35 = enabled2['clipBatchGenerationByEpisode'],
+  const value35 = enabled2.clipBatchGenerationByEpisode,
     value36 = {
-      ...(value35 && typeof value35 === 'object' && !Array['isArray'](value35) ? value35 : {}),
+      ...(value35 && typeof value35 === 'object' && !Array.isArray(value35) ? value35 : {}),
     };
   if (value32)
     value36[text4] = {
@@ -349,101 +349,101 @@ function setEpisodeBatchRunning(enabled2, value31, value32 = true, value33 = '',
       label: normalizeText(value33),
     };
   else delete value36[text4];
-  return ((enabled2['clipBatchGenerationByEpisode'] = value36), value36[text4] || null);
+  return ((enabled2.clipBatchGenerationByEpisode = value36), value36[text4] || null);
 }
 function getClipInputSurface(providerHint, episode2, inputs) {
   if (!inputs) return '';
-  const manifest = resolveModelExecution(providerHint['models']['video'], {
-      providerHint: providerHint['videoProvider'],
+  const manifest = resolveModelExecution(providerHint.models.video, {
+      providerHint: providerHint.videoProvider,
     }),
     storyClipInputSlotViewModel = buildStoryClipInputSlotViewModel({
-      modelId: providerHint['models']['video'],
-      provider: providerHint['videoProvider'],
-      inputs: inputs['inputs'],
+      modelId: providerHint.models.video,
+      provider: providerHint.videoProvider,
+      inputs: inputs.inputs,
     }),
     value37 = {
-      model: providerHint['models']['video'],
-      provider: providerHint['videoProvider'],
-      generationParams: providerHint['videoGenerationParams'],
+      model: providerHint.models.video,
+      provider: providerHint.videoProvider,
+      generationParams: providerHint.videoGenerationParams,
     },
     fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(value37, {
-      manifest: manifest?.['modelManifest'] || null,
+      manifest: manifest?.modelManifest || null,
     }),
     slotOrderByType = shouldHideFixedInputSlots(fixedInputSlotConfigFromManifest)
       ? null
       : fixedInputSlotConfigFromManifest,
-    occupiedSlots = storyClipInputSlotViewModel['slots']['filter']((value38) => value38['input']?.['url']),
-    inputsBySlot = Object['fromEntries'](
-      occupiedSlots['map']((kind) => [kind['id'], { ...kind['input'], kind: kind['kind'] }]),
+    occupiedSlots = storyClipInputSlotViewModel.slots.filter((value38) => value38.input?.url),
+    inputsBySlot = Object.fromEntries(
+      occupiedSlots.map((kind) => [kind.id, { ...kind.input, kind: kind.kind }]),
     ),
     map4 = new Set(
-      occupiedSlots['map'](
-        (value39) => normalizeText(value39['kind']) + ':' + normalizeText(value39['input']?.['url']),
-      )['filter'](Boolean),
+      occupiedSlots.map(
+        (value39) => normalizeText(value39.kind) + ':' + normalizeText(value39.input?.url),
+      ).filter(Boolean),
     ),
-    voiceAssetIds2 = resolveStoryVideoReplicationClipVoiceAssetIds(providerHint?.['data'], inputs),
-    list10 = resolveStoryClipPromptAssetRefs(inputs?.['prompt'] || '', {
-      assets: Array['isArray'](providerHint?.['data']?.['assets']) ? providerHint['data']['assets'] : [],
+    voiceAssetIds2 = resolveStoryVideoReplicationClipVoiceAssetIds(providerHint?.data, inputs),
+    list10 = resolveStoryClipPromptAssetRefs(inputs?.prompt || '', {
+      assets: Array.isArray(providerHint?.data?.assets) ? providerHint.data.assets : [],
       episode: episode2,
-      clipFrames: Array['isArray'](providerHint?.['data']?.['clipFrames'])
-        ? providerHint['data']['clipFrames']
+      clipFrames: Array.isArray(providerHint?.data?.clipFrames)
+        ? providerHint.data.clipFrames
         : [],
       resolveExternalAssetRef: resolveAssetMentionRef,
       voiceAssetIds: voiceAssetIds2,
     })
-      ['map']((error2, value40) => ({
+      .map((error2, value40) => ({
         ...error2,
-        type: normalizeText(error2?.['type'] || error2?.['kind']),
-        kind: normalizeText(error2?.['type'] || error2?.['kind']),
-        url: normalizeText(error2?.['url']),
-        thumbUrl: normalizeText(error2?.['thumbUrl'] || error2?.['url']),
-        name: normalizeText(error2?.['name'] || error2?.['label']) || '素材 ' + (value40 + 1),
-        refSlot: normalizeText(error2?.['refSlot'] || error2?.['slotId']),
+        type: normalizeText(error2?.type || error2?.kind),
+        kind: normalizeText(error2?.type || error2?.kind),
+        url: normalizeText(error2?.url),
+        thumbUrl: normalizeText(error2?.thumbUrl || error2?.url),
+        name: normalizeText(error2?.name || error2?.label) || '素材 ' + (value40 + 1),
+        refSlot: normalizeText(error2?.refSlot || error2?.slotId),
       }))
-      ['filter'](
+      .filter(
         (response2) =>
-          response2['kind'] && response2['url'] && !map4['has'](response2['kind'] + ':' + response2['url']),
+          response2.kind && response2.url && !map4.has(response2.kind + ':' + response2.url),
       );
-  let readOnlyInputs = list10['filter']((value41) => value41['kind'] === 'image');
+  let readOnlyInputs = list10.filter((value41) => value41.kind === 'image');
   const readOnlyFixedInputSlots = [];
-  if (manifest?.['modelManifest']?.['extensions']?.['rhAiApp'] && slotOrderByType) {
+  if (manifest?.modelManifest?.extensions?.rhAiApp && slotOrderByType) {
     const fixedInputAssetSlotMapFromRefs = buildFixedInputAssetSlotMapFromRefs(list10, {
-        slotOrderByType: slotOrderByType['slotOrderByType'],
-        visibleSlots: slotOrderByType['visibleSlots'],
-        occupiedSlots: occupiedSlots['map']((value42) => value42['id']),
-        exclusiveGroups: slotOrderByType['exclusiveGroups'],
-        slotById: slotOrderByType['slotById'],
+        slotOrderByType: slotOrderByType.slotOrderByType,
+        visibleSlots: slotOrderByType.visibleSlots,
+        occupiedSlots: occupiedSlots.map((value42) => value42.id),
+        exclusiveGroups: slotOrderByType.exclusiveGroups,
+        slotById: slotOrderByType.slotById,
       }),
       map5 = new Set();
-    (Object['entries'](fixedInputAssetSlotMapFromRefs)['forEach'](([slotId, response3]) => {
-      if (!response3?.['url']) return;
-      const kind2 = normalizeText(response3['type'] || response3['kind']);
+    (Object.entries(fixedInputAssetSlotMapFromRefs).forEach(([slotId, response3]) => {
+      if (!response3?.url) return;
+      const kind2 = normalizeText(response3.type || response3.kind);
       ((inputsBySlot[slotId] = { ...response3, kind: kind2, slotId: slotId }),
-        readOnlyFixedInputSlots['push'](slotId),
-        map5['add'](kind2 + ':' + normalizeText(response3['url'])));
+        readOnlyFixedInputSlots.push(slotId),
+        map5.add(kind2 + ':' + normalizeText(response3.url)));
     }),
-      (readOnlyInputs = readOnlyInputs['filter'](
-        (response4) => !map5['has'](response4['kind'] + ':' + response4['url']),
+      (readOnlyInputs = readOnlyInputs.filter(
+        (response4) => !map5.has(response4.kind + ':' + response4.url),
       )));
   }
   return {
     fixedInputConfig: slotOrderByType,
     inputsBySlot: inputsBySlot,
-    inputs: occupiedSlots['map']((kind3) => ({
-      ...kind3['input'],
-      kind: kind3['kind'],
-      slotId: kind3['id'],
+    inputs: occupiedSlots.map((kind3) => ({
+      ...kind3.input,
+      kind: kind3.kind,
+      slotId: kind3.id,
     })),
     readOnlyInputs: readOnlyInputs,
     readOnlyFixedInputSlots: readOnlyFixedInputSlots,
   };
 }
 function getInputReferenceCounts(value43) {
-  const value44 = value43?.['inputs'] && typeof value43['inputs'] === 'object' ? value43['inputs'] : {},
+  const value44 = value43?.inputs && typeof value43.inputs === 'object' ? value43.inputs : {},
     imageCount = (value45) =>
-      (Array['isArray'](value44[value45]) ? value44[value45] : [])['filter']((response5) =>
-        normalizeText(response5?.['url']),
-      )['length'];
+      (Array.isArray(value44[value45]) ? value44[value45] : []).filter((response5) =>
+        normalizeText(response5?.url),
+      ).length;
   return {
     imageCount: imageCount('image'),
     videoCount: imageCount('video'),
@@ -462,27 +462,27 @@ function getUsedReferenceCounts(
   const value47 = { imageCount: 0, audioCount: 0, videoCount: 0 },
     map6 = new Set(),
     handler2 = (response6, value48 = '') => {
-      const text5 = normalizeText(response6?.['type'] || response6?.['kind'] || value48),
-        text6 = normalizeText(response6?.['url']);
-      if (!Object['hasOwn'](value47, text5 + 'Count') || !text6) return;
+      const text5 = normalizeText(response6?.type || response6?.kind || value48),
+        text6 = normalizeText(response6?.url);
+      if (!Object.hasOwn(value47, text5 + 'Count') || !text6) return;
       const value49 = text5 + ':' + text6;
-      if (map6['has'](value49)) return;
-      (map6['add'](value49), (value47[text5 + 'Count'] += 1));
+      if (map6.has(value49)) return;
+      (map6.add(value49), (value47[text5 + 'Count'] += 1));
     },
-    value50 = value46?.['inputs'] && typeof value46['inputs'] === 'object' ? value46['inputs'] : {};
+    value50 = value46?.inputs && typeof value46.inputs === 'object' ? value46.inputs : {};
   return (
-    ['image', 'audio', 'video']['forEach']((value51) => {
-      (Array['isArray'](value50[value51]) ? value50[value51] : [])['forEach']((value52) =>
+    ['image', 'audio', 'video'].forEach((value51) => {
+      (Array.isArray(value50[value51]) ? value50[value51] : []).forEach((value52) =>
         handler2(value52, value51),
       );
     }),
-    resolveStoryClipPromptAssetRefs(value46?.['prompt'] || '', {
+    resolveStoryClipPromptAssetRefs(value46?.prompt || '', {
       assets: assets,
       episode: episode,
       clipFrames: clipFrames,
       resolveExternalAssetRef: resolveAssetMentionRef,
       voiceAssetIds: voiceAssetIds,
-    })['forEach']((value53) => handler2(value53)),
+    }).forEach((value53) => handler2(value53)),
     value47
   );
 }
@@ -503,60 +503,60 @@ function renderReferenceSummary(
     }),
     value55 =
       '参考素材，图片 ' +
-      usedReferenceCounts['imageCount'] +
+      usedReferenceCounts.imageCount +
       '，音频 ' +
-      usedReferenceCounts['audioCount'] +
+      usedReferenceCounts.audioCount +
       '，视频 ' +
-      usedReferenceCounts['videoCount'];
+      usedReferenceCounts.videoCount;
   return (
     '<div class="story-clip-reference-summary" data-story-clip-reference-summary role="status" aria-live="polite" aria-label="' +
     value55 +
     '">\n    <span>图片：<strong data-story-reference-count="image">' +
-    usedReferenceCounts['imageCount'] +
+    usedReferenceCounts.imageCount +
     '</strong></span>\n    <span>音频：<strong data-story-reference-count="audio">' +
-    usedReferenceCounts['audioCount'] +
+    usedReferenceCounts.audioCount +
     '</strong></span>\n    <span>视频：<strong data-story-reference-count="video">' +
-    usedReferenceCounts['videoCount'] +
+    usedReferenceCounts.videoCount +
     '</strong></span>\n  </div>'
   );
 }
 function renderSelectionControls(enabled3, value56, value57 = null) {
-  const list11 = Array['isArray'](value56?.['clips']) ? value56['clips'] : [],
-    value58 = Array['isArray'](enabled3?.['selectedClipGenerationIds'])
-      ? enabled3['selectedClipGenerationIds']
+  const list11 = Array.isArray(value56?.clips) ? value56.clips : [],
+    value58 = Array.isArray(enabled3?.selectedClipGenerationIds)
+      ? enabled3.selectedClipGenerationIds
       : [],
     list12 = selectBatchTargets(list11, value58),
-    count3 = list12['length'],
+    count3 = list12.length,
     generationState = getGenerationState(enabled3, value56),
     { generatingClipIds: generatingClipIds3 } = generationState,
     enabled4 = value57 || getSelectedClip(enabled3, value56),
-    value59 = enabled3?.['clipSelectionMode'] ? list12[0] : enabled4,
-    value60 = enabled3?.['clipSelectionMode'] && count3 > 1,
-    value61 = !enabled3?.['clipSelectionMode'] || count3 === 1,
+    value59 = enabled3?.clipSelectionMode ? list12[0] : enabled4,
+    value60 = enabled3?.clipSelectionMode && count3 > 1,
+    value61 = !enabled3?.clipSelectionMode || count3 === 1,
     value62 =
       value61 &&
       Boolean(
         value59 &&
-        (generatingClipIds3['includes'](normalizeText(value59['id'])) ||
+        (generatingClipIds3.includes(normalizeText(value59.id)) ||
           getRecoverableStoryClipVideoTask(value59)),
       ),
-    value63 = enabled3?.['clipSelectionMode']
+    value63 = enabled3?.clipSelectionMode
       ? count3 === 0 ||
-        generationState['isBatchGenerating'] ||
-        (value60 ? generatingClipIds3['length'] > 0 : value62)
-      : !enabled4 || generationState['isBatchGenerating'] || value62,
-    text7 = normalizeText(value59?.['generation']?.['status'])['toLowerCase']() === 'queued',
+        generationState.isBatchGenerating ||
+        (value60 ? generatingClipIds3.length > 0 : value62)
+      : !enabled4 || generationState.isBatchGenerating || value62,
+    text7 = normalizeText(value59?.generation?.status).toLowerCase() === 'queued',
     value64 = '批量生成视频' + (count3 ? ' (' + count3 + ')' : ''),
-    value65 = generationState['isBatchGenerating']
+    value65 = generationState.isBatchGenerating
       ? value64
       : value62
         ? text7
           ? '排队中'
           : '生成中'
-        : enabled3?.['clipSelectionMode'] && count3 > 1
+        : enabled3?.clipSelectionMode && count3 > 1
           ? value64
           : '生成本片段',
-    value66 = Boolean(generationState['isBatchGenerating'] || value62),
+    value66 = Boolean(generationState.isBatchGenerating || value62),
     renderRequestDebugButton2 =
       renderRequestDebugButton('data-story-action="debug-clip-video"') +
       '<button type="button" class="story-workbench-action-button story-main-action-button" data-story-action="generate-clip-video" aria-busy="' +
@@ -567,20 +567,20 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
       (value66 ? renderStoryGenerationSpinner({ button: true }) : '') +
       value65 +
       '</button>',
-    value67 = generationState['isBatchGenerating']
+    value67 = generationState.isBatchGenerating
       ? '<button type="button" class="story-secondary-button" data-story-action="cancel-clip-batch-generation" ' +
-        (generationState['batchCancelRequested'] ? 'disabled' : '') +
+        (generationState.batchCancelRequested ? 'disabled' : '') +
         '>' +
-        (generationState['batchCancelRequested'] ? '正在停止' : '停止批量生成') +
+        (generationState.batchCancelRequested ? '正在停止' : '停止批量生成') +
         '</button>'
       : '',
     value68 =
       '<div class="story-clip-selection-actions">\n        <button type="button" class="story-secondary-button" data-story-action="select-all-clips" aria-pressed="' +
-      (count3 > 0 && count3 === list11['length']) +
+      (count3 > 0 && count3 === list11.length) +
       '" ' +
-      (!list11['length'] ? 'disabled' : '') +
+      (!list11.length ? 'disabled' : '') +
       '>' +
-      (count3 > 0 && count3 === list11['length'] ? '取消全选' : '全选') +
+      (count3 > 0 && count3 === list11.length ? '取消全选' : '全选') +
       '</button>\n        ' +
       value67 +
       '\n        ' +
@@ -589,69 +589,67 @@ function renderSelectionControls(enabled3, value56, value57 = null) {
   return '<div class="story-clip-selection-controls">' + value68 + '</div>';
 }
 function renderAdjustmentBar(value69, value70, value71 = null) {
-  if (value69?.['clipAdjustmentOpen'] !== true) return '';
+  if (value69?.clipAdjustmentOpen !== true) return '';
   const isStoryClipAdjustmentGenerating2 = isStoryClipAdjustmentGenerating(value69, value71, value70),
     storyPromptMode = normalizeStoryPromptMode(
-      value70?.['promptMode'] ||
-        value71?.['promptMode'] ||
-        value69?.['data']?.['project']?.['planning']?.['promptMode'],
+      value70?.promptMode ||
+        value71?.promptMode ||
+        value69?.data?.project?.planning?.promptMode,
       { allowDeveloperModes: true },
     ),
-    storyPromptMode2 = normalizeStoryPromptMode(value69?.['clipAdjustmentPromptMode'] || storyPromptMode, {
+    storyPromptMode2 = normalizeStoryPromptMode(value69?.clipAdjustmentPromptMode || storyPromptMode, {
       allowDeveloperModes: true,
     }),
     canGenerateStoryClipAdjustment2 = canGenerateStoryClipAdjustment(value69, value71, value70);
   return (
     '<div class="story-clip-adjustment-bar" data-story-clip-adjustment-bar>\n    <div class="story-clip-adjustment-selectors">\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="mode">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-haspopup="listbox" aria-expanded="' +
-    (value69?.['clipAdjustmentPromptModeOpen'] === true) +
+    (value69?.clipAdjustmentPromptModeOpen === true) +
     '" ' +
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n        <strong data-story-clip-adjustment-mode-label>' +
     escapeHtml(getStoryPromptModeLabel(storyPromptMode2)) +
     '</strong>\n      </button>\n      <div class="story-clip-adjustment-mode-menu" role="listbox" aria-label="提示词模式" ' +
-    (value69?.['clipAdjustmentPromptModeOpen'] === true ? '' : 'hidden') +
+    (value69?.clipAdjustmentPromptModeOpen === true ? '' : 'hidden') +
     '>\n        ' +
-    STORY_PROMPT_MODE_OPTIONS['map'](
+    STORY_PROMPT_MODE_OPTIONS.map(
       (el) =>
         '<button type="button" class="' +
-        (el['value'] === storyPromptMode2 ? 'is-selected' : '') +
+        (el.value === storyPromptMode2 ? 'is-selected' : '') +
         '" data-story-action="select-clip-adjustment-mode" data-story-clip-adjustment-mode-option="' +
-        escapeHtml(el['value']) +
+        escapeHtml(el.value) +
         '" role="option" aria-selected="' +
-        (el['value'] === storyPromptMode2) +
+        (el.value === storyPromptMode2) +
         '">' +
-        escapeHtml(el['label']) +
+        escapeHtml(el.label) +
         '</button>',
-    )['join']('') +
+    ).join('') +
     '\n      </div>\n    </div>\n    <div class="story-clip-adjustment-mode" data-story-clip-adjustment-mode data-story-adjustment-kind="language">\n      <button type="button" class="story-clip-adjustment-mode-trigger" data-story-action="toggle-clip-adjustment-mode" aria-label="语言转换" aria-haspopup="listbox" aria-expanded="' +
-    (value69?.['clipAdjustmentLanguageOpen'] === true) +
+    (value69?.clipAdjustmentLanguageOpen === true) +
     '" ' +
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n        <strong data-story-clip-adjustment-mode-label>' +
     escapeHtml(
-      STORY_PROMPT_LANGUAGES['find']((el2) => el2['value'] === value69?.['clipAdjustmentLanguage'])?.[
-        'label'
-      ] || '语言转换',
+      STORY_PROMPT_LANGUAGES.find((el2) => el2.value === value69?.clipAdjustmentLanguage)?.label || '语言转换',
     ) +
     '</strong>\n      </button>\n      <div class="story-clip-adjustment-mode-menu" role="listbox" aria-label="语言转换" ' +
-    (value69?.['clipAdjustmentLanguageOpen'] ? '' : 'hidden') +
+    (value69?.clipAdjustmentLanguageOpen ? '' : 'hidden') +
     '>\n        ' +
     [{ value: '', label: '保持当前语言' }, ...STORY_PROMPT_LANGUAGES]
-      ['map'](
+      .map(
         (el3) =>
           '<button type="button" class="' +
-          (el3['value'] === (value69?.['clipAdjustmentLanguage'] || '') ? 'is-selected' : '') +
+          (el3.value === (value69?.clipAdjustmentLanguage || '') ? 'is-selected' : '') +
           '" data-story-action="select-clip-adjustment-mode" data-story-clip-adjustment-mode-option="' +
-          el3['value'] +
+          el3.value +
           '" role="option" aria-selected="' +
-          (el3['value'] === (value69?.['clipAdjustmentLanguage'] || '')) +
+          (el3.value === (value69?.clipAdjustmentLanguage || '')) +
           '">' +
-          el3['label'] +
+          el3.label +
           '</button>',
       )
-      ['join']('') +
+      .join('') +
     '\n      </div>\n    </div></div>\n    <div class="story-clip-adjustment-compose">\n      <input type="text" data-story-clip-adjustment-instruction maxlength="600" value="' +
-    escapeHtml(value69?.['clipAdjustmentInstruction'] || '') +
+    escapeHtml(value69?.clipAdjustmentInstruction || '') +
     '" placeholder="可选：补充这一段还要怎么调整" aria-label="AI 调整说明" ' +
     (isStoryClipAdjustmentGenerating2 ? 'disabled' : '') +
     '>\n      <button type="button" class="story-workbench-action-button" data-story-action="generate-clip-adjustment" ' +
@@ -665,56 +663,56 @@ function renderAdjustmentBar(value69, value70, value71 = null) {
   );
 }
 function shouldCloseAdjustmentOnOutsideClick(value72, el4) {
-  return value72?.['clipAdjustmentOpen'] === true && !el4?.['closest']?.('.story-clip-adjustment-control');
+  return value72?.clipAdjustmentOpen === true && !el4?.closest?.('.story-clip-adjustment-control');
 }
 function shouldClosePromptHistoryOnOutsideClick(value73, el5) {
   return (
-    value73?.['clipPromptHistoryOpen'] === true && !el5?.['closest']?.('[data-story-clip-prompt-history]')
+    value73?.clipPromptHistoryOpen === true && !el5?.closest?.('[data-story-clip-prompt-history]')
   );
 }
 function renderPromptHistoryControl(value74, value75) {
-  const list13 = normalizeStoryClipPromptHistory(value75?.['promptHistory']);
-  if (!list13['length']) return '';
-  const value76 = value74?.['clipPromptHistoryOpen'] === true;
+  const list13 = normalizeStoryClipPromptHistory(value75?.promptHistory);
+  if (!list13.length) return '';
+  const value76 = value74?.clipPromptHistoryOpen === true;
   return (
     '<div class="story-clip-prompt-history" data-story-clip-prompt-history>\n    <button type="button" class="story-clip-prompt-history-trigger" data-story-action="toggle-clip-prompt-history" aria-label="提示词历史" aria-haspopup="dialog" aria-expanded="' +
     value76 +
     '">\n      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3.8 12a8.2 8.2 0 1 0 2.4-5.8L4 8.4M4 4.8v3.6h3.6M12 7.8v4.7l3.1 1.8"/></svg>\n    </button>\n    <section class="story-clip-prompt-history-panel" data-story-clip-prompt-history-panel role="dialog" aria-label="提示词历史" ' +
     (value76 ? '' : 'hidden') +
     '>\n      <header><strong>提示词历史</strong><span>最近 ' +
-    list13['length'] +
+    list13.length +
     ' 个已确认版本</span></header>\n      <div class="story-clip-prompt-history-list">\n        ' +
-    list13['map']((value77) => {
+    list13.map((value77) => {
       const value78 =
-          value77['durationSec'] > 0 ? value77['durationSec']['toFixed'](1) + 's' : '时长未记录',
-        promptHistoryPreview = getPromptHistoryPreview(value77['promptHtml']) || '空提示词';
+          value77.durationSec > 0 ? value77.durationSec.toFixed(1) + 's' : '时长未记录',
+        promptHistoryPreview = getPromptHistoryPreview(value77.promptHtml) || '空提示词';
       return (
         '<button type="button" class="story-clip-prompt-history-item" data-story-action="restore-clip-prompt-history" data-story-clip-prompt-history-id="' +
-        escapeHtml(value77['id']) +
+        escapeHtml(value77.id) +
         '" aria-label="恢复 ' +
-        escapeHtml(getStoryPromptModeLabel(value77['promptMode'])) +
+        escapeHtml(getStoryPromptModeLabel(value77.promptMode)) +
         ' 历史提示词">\n            <span class="story-clip-prompt-history-item-meta"><strong>' +
-        escapeHtml(getStoryPromptModeLabel(value77['promptMode'])) +
+        escapeHtml(getStoryPromptModeLabel(value77.promptMode)) +
         ' · ' +
         value78 +
         '</strong><small>' +
-        escapeHtml(formatPromptHistorySavedAt(value77['savedAt'])) +
+        escapeHtml(formatPromptHistorySavedAt(value77.savedAt)) +
         '</small></span>\n            <span class="story-clip-prompt-history-item-preview">' +
         escapeHtml(promptHistoryPreview) +
         '</span>\n            <span class="story-clip-prompt-history-item-action">恢复</span>\n          </button>'
       );
-    })['join']('') +
+    }).join('') +
     '\n      </div>\n    </section>\n  </div>'
   );
 }
 function renderAdjustmentControl(value79, value80, value81 = null) {
-  if (value80?.['promptAdjustment']?.['candidate']) return '';
+  if (value80?.promptAdjustment?.candidate) return '';
   const isStoryClipAdjustmentGenerating3 = isStoryClipAdjustmentGenerating(value79, value81, value80),
     value82 =
       '<div class="story-clip-adjustment-header">\n    ' +
       renderPromptHistoryControl(value79, value80) +
       '\n    <button type="button" class="story-clip-adjustment-trigger" data-story-action="toggle-clip-adjustment" aria-expanded="' +
-      (value79?.['clipAdjustmentOpen'] === true) +
+      (value79?.clipAdjustmentOpen === true) +
       '" ' +
       (isStoryClipAdjustmentGenerating3 ? 'disabled' : '') +
       '><span aria-hidden="true">✦</span>AI 调整</button>\n  </div>';
@@ -727,32 +725,32 @@ function renderAdjustmentControl(value79, value80, value81 = null) {
   );
 }
 function renderPromptComparison(value83) {
-  const enabled5 = value83?.['promptAdjustment']?.['candidate'];
+  const enabled5 = value83?.promptAdjustment?.candidate;
   if (!enabled5) return '';
   const durationSeconds = normalizeDurationSeconds(
-      enabled5['sourceDurationSeconds'] || value83?.['durationSec'] || value83?.['duration'],
+      enabled5.sourceDurationSeconds || value83?.durationSec || value83?.duration,
     ),
-    durationSeconds2 = normalizeDurationSeconds(enabled5['candidateDurationSeconds'] || durationSeconds),
-    storyPromptMode3 = normalizeStoryPromptMode(enabled5['sourcePromptMode'] || value83?.['promptMode'], {
+    durationSeconds2 = normalizeDurationSeconds(enabled5.candidateDurationSeconds || durationSeconds),
+    storyPromptMode3 = normalizeStoryPromptMode(enabled5.sourcePromptMode || value83?.promptMode, {
       allowDeveloperModes: true,
     }),
-    storyPromptMode4 = normalizeStoryPromptMode(enabled5['targetPromptMode'] || storyPromptMode3, {
+    storyPromptMode4 = normalizeStoryPromptMode(enabled5.targetPromptMode || storyPromptMode3, {
       allowDeveloperModes: true,
     }),
-    handler3 = (count4) => (count4 > 0 ? count4['toFixed'](1) + 's' : '--');
+    handler3 = (count4) => (count4 > 0 ? count4.toFixed(1) + 's' : '--');
   return (
     '<div class="story-clip-prompt-comparison" data-story-clip-prompt-comparison>\n    <header>\n      <span>AI 调整完成</span>\n      <strong>选择这个片段要使用的提示词版本</strong>\n    </header>\n    <div class="story-clip-prompt-comparison-grid">\n      <article>\n        <div class="story-clip-prompt-version-title"><strong>原版本 · ' +
     escapeHtml(getStoryPromptModeLabel(storyPromptMode3)) +
     '</strong><span>总时长 ' +
     handler3(durationSeconds) +
     '</span></div>\n        <div class="story-clip-prompt-version-content">' +
-    sanitizePromptHtmlForCommit(enabled5['sourcePromptHtml']) +
+    sanitizePromptHtmlForCommit(enabled5.sourcePromptHtml) +
     '</div>\n        <button type="button" data-story-action="keep-current-clip-prompt">保留原版本</button>\n      </article>\n      <article class="is-ai-version">\n        <div class="story-clip-prompt-version-title"><strong>AI 调整后 · ' +
     escapeHtml(getStoryPromptModeLabel(storyPromptMode4)) +
     '</strong><span>总时长 ' +
     handler3(durationSeconds2) +
     '</span></div>\n        <div class="story-clip-prompt-version-content">' +
-    sanitizePromptHtmlForCommit(enabled5['promptHtml']) +
+    sanitizePromptHtmlForCommit(enabled5.promptHtml) +
     '</div>\n        <div class="story-clip-prompt-version-actions">\n          <button type="button" class="story-regenerate-button" data-story-action="regenerate-clip-adjustment">重新生成</button>\n          <button type="button" class="story-workbench-action-button" data-story-action="use-ai-clip-prompt">使用 AI 版本</button>\n        </div>\n      </article>\n    </div>\n  </div>'
   );
 }
@@ -761,31 +759,31 @@ function renderPromptSurface(modelId2, episode3, value84) {
     const args3 = getClipInputSurface(modelId2, episode3, value84),
       generationParams2 = resolveStoryClipVideoGenerationParams(
         value84,
-        modelId2['models']['video'],
-        modelId2['videoGenerationParams'],
+        modelId2.models.video,
+        modelId2.videoGenerationParams,
       ),
       generationParamsByModel = {
-        ...(modelId2['videoGenerationParamsByModel'] || {}),
-        [modelId2['models']['video']]: { ...generationParams2 },
+        ...(modelId2.videoGenerationParamsByModel || {}),
+        [modelId2.models.video]: { ...generationParams2 },
       },
       storyPromptMode5 = normalizeStoryPromptMode(
-        value84?.['promptMode'] ||
-          episode3?.['promptMode'] ||
-          modelId2?.['data']?.['project']?.['planning']?.['promptMode'],
+        value84?.promptMode ||
+          episode3?.promptMode ||
+          modelId2?.data?.project?.planning?.promptMode,
         { allowDeveloperModes: true },
       ),
       isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode5)
-        ? normalizeStoryMinimaxH3OfficialTags(value84?.['prompt'] || '')
-        : value84?.['prompt'] || '',
+        ? normalizeStoryMinimaxH3OfficialTags(value84?.prompt || '')
+        : value84?.prompt || '',
       promptHtml = renderStoryClipPromptMentions(isStoryMinimaxH3PromptMode2, {
-        assets: Array['isArray'](modelId2?.['data']?.['assets']) ? modelId2['data']['assets'] : [],
+        assets: Array.isArray(modelId2?.data?.assets) ? modelId2.data.assets : [],
         episode: episode3,
-        clipFrames: Array['isArray'](modelId2?.['data']?.['clipFrames'])
-          ? modelId2['data']['clipFrames']
+        clipFrames: Array.isArray(modelId2?.data?.clipFrames)
+          ? modelId2.data.clipFrames
           : [],
       }),
       isStoryClipAdjustmentGenerating4 = isStoryClipAdjustmentGenerating(modelId2, episode3, value84),
-      value85 = Boolean(value84?.['promptAdjustment']?.['candidate']);
+      value85 = Boolean(value84?.promptAdjustment?.candidate);
     return (
       '<div class="story-video-node-prompt text-prompt-panel" data-story-clip-prompt-surface>\n      ' +
       renderStoryClipQualityNotes(episode3, value84, escapeHtml) +
@@ -807,12 +805,12 @@ function renderPromptSurface(modelId2, episode3, value84) {
             })) +
       '\n      <div class="story-clip-model-bar prompt-panel-footer">\n        ' +
       renderAIGenVideoModelSelectorMarkup({
-        modelId: modelId2['models']['video'],
-        provider: modelId2['videoProvider'],
+        modelId: modelId2.models.video,
+        provider: modelId2.videoProvider,
         generationParams: generationParams2,
         generationParamsByModel: generationParamsByModel,
-        providerProfileId: modelId2['videoProviderProfileId'],
-        providerProfileIdByModel: modelId2['videoProviderProfileIdByModel'],
+        providerProfileId: modelId2.videoProviderProfileId,
+        providerProfileIdByModel: modelId2.videoProviderProfileIdByModel,
         referenceCounts: getInputReferenceCounts(value84),
         showSchemaControls: true,
         className: 'story-clip-video-model-selector',
@@ -825,7 +823,7 @@ function renderPromptSurface(modelId2, episode3, value84) {
   } catch (error3) {
     return (
       '<div class="story-inline-error">' +
-      escapeHtml(error3?.['message'] || '当前模型输入槽不可用') +
+      escapeHtml(error3?.message || '当前模型输入槽不可用') +
       '</div>'
     );
   }
@@ -842,7 +840,7 @@ function renderVideoResultSwitchButton(value86, value87) {
     '" data-story-action="' +
     value89 +
     '" data-story-clip-id="' +
-    escapeHtml(value87?.['id']) +
+    escapeHtml(value87?.id) +
     '" aria-label="' +
     value90 +
     '"><svg class="story-appearance-arrow-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="' +
@@ -851,7 +849,7 @@ function renderVideoResultSwitchButton(value86, value87) {
   );
 }
 function renderVideoPlaybackControls(value93, value94) {
-  const escapeHtml2 = escapeHtml(value93?.['id']);
+  const escapeHtml2 = escapeHtml(value93?.id);
   return renderWorkspaceVideoPlaybackControls({
     label: '视频',
     playLabel: '播放视频',
@@ -887,8 +885,8 @@ function renderVideoPreview(value95, { isGenerating: isGenerating = false } = {}
     activeVideoResultIndex3 = getActiveVideoResultIndex(value95, list14),
     value96 = list14[activeVideoResultIndex3] || {},
     videoResultUrl2 = resolveVideoResultUrl(value96),
-    text8 = normalizeText(value95?.['generation']?.['status'])['toLowerCase'](),
-    value97 = isGenerating || ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](text8);
+    text8 = normalizeText(value95?.generation?.status).toLowerCase(),
+    value97 = isGenerating || ['pending', 'queued', 'recovering', 'running', 'submitting'].includes(text8);
   if (value97)
     return (
       '<div class="story-video-empty story-video-loading" role="status" aria-live="polite" aria-busy="true">\n      ' +
@@ -896,7 +894,7 @@ function renderVideoPreview(value95, { isGenerating: isGenerating = false } = {}
       '\n      <strong>视频生成中</strong>\n      <p>正在等待生成结果，完成后会自动显示。</p>\n      <div class="storyboard-script-loading-bar" aria-hidden="true"><div class="storyboard-script-loading-bar-fill"></div></div>\n    </div>'
     );
   if (videoResultUrl2) {
-    const value98 = list14['length'] > 1;
+    const value98 = list14.length > 1;
     return (
       '<div class="story-video-result" data-story-video-result-index="' +
       activeVideoResultIndex3 +
@@ -911,11 +909,11 @@ function renderVideoPreview(value95, { isGenerating: isGenerating = false } = {}
       '\n      </div>\n      <div class="story-video-result-meta"><strong>视频结果</strong><span>' +
       (activeVideoResultIndex3 + 1) +
       '/' +
-      list14['length'] +
+      list14.length +
       '</span></div>\n    </div>'
     );
   }
-  const value99 = value95?.['generation']?.['error'] || '',
+  const value99 = value95?.generation?.error || '',
     value100 = value99 ? 'story-video-empty story-video-error' : 'story-video-empty';
   return (
     '<div class="' +
@@ -938,55 +936,55 @@ function renderTimeline(
     generationParams: generationParams = {},
   } = {},
 ) {
-  const list15 = Array['isArray'](value101?.['clips']) ? value101['clips'] : [],
+  const list15 = Array.isArray(value101?.clips) ? value101.clips : [],
     map7 = new Set(
-      (Array['isArray'](selectedClipIds) ? selectedClipIds : [])['map']((value103) =>
+      (Array.isArray(selectedClipIds) ? selectedClipIds : []).map((value103) =>
         normalizeText(value103),
       ),
     ),
     map8 = new Set(
-      (Array['isArray'](generatingClipIds) ? generatingClipIds : [])
-        ['map']((value104) => normalizeText(value104))
-        ['filter'](Boolean),
+      (Array.isArray(generatingClipIds) ? generatingClipIds : [])
+        .map((value104) => normalizeText(value104))
+        .filter(Boolean),
     );
   return (
     '<div class="story-clip-timeline ' +
     (selectionMode ? 'is-selection-mode' : '') +
     '">\n    <div class="story-clip-timeline-header">\n      <span>' +
-    escapeHtml(value101?.['duration'] || '--:--') +
+    escapeHtml(value101?.duration || '--:--') +
     '</span>\n      <small>' +
     (selectionMode ? '点击片段选择需要生成的视频' : '点击片段切换提示词和视频结果') +
     '</small>\n    </div>\n    <div class="story-clip-strip" data-story-marquee-surface="clips">\n      ' +
-    list15['map']((value105, value106) => {
-      const text9 = normalizeText(value105['id']),
-        value107 = adjustingClipIds['includes'](text9),
+    list15.map((value105, value106) => {
+      const text9 = normalizeText(value105.id),
+        value107 = adjustingClipIds.includes(text9),
         list16 = getVideoResults(value105),
         renderTimelineVideoThumbnail2 = renderTimelineVideoThumbnail(value105),
-        text10 = normalizeText(value105?.['generation']?.['status'])['toLowerCase'](),
+        text10 = normalizeText(value105?.generation?.status).toLowerCase(),
         enabled6 =
-          map8['has'](text9) ||
-          ['pending', 'queued', 'recovering', 'running', 'submitting']['includes'](text10),
-        value108 = map7['has'](text9),
+          map8.has(text9) ||
+          ['pending', 'queued', 'recovering', 'running', 'submitting'].includes(text10),
+        value108 = map7.has(text9),
         hidden = !enabled6 && normalizeText(pendingDeleteClipId) === text9,
         value109 =
           '<div class="story-clip-card-shell' +
           (enabled6 ? ' is-generating' : '') +
           (hidden ? ' is-delete-confirming' : '') +
           '" data-story-video-history="' +
-          (list16['length'] > 1) +
+          (list16.length > 1) +
           '" data-story-clip-id="' +
-          escapeHtml(value105['id']) +
+          escapeHtml(value105.id) +
           '">\n          <button type="button" class="story-clip-card ' +
-          (value105['id'] === value102 ? 'is-selected' : '') +
+          (value105.id === value102 ? 'is-selected' : '') +
           ' ' +
           (selectionMode ? 'is-selection-mode' : '') +
           ' ' +
           (value108 ? 'is-checked' : '') +
           (renderTimelineVideoThumbnail2 ? ' has-video-thumbnail' : '') +
           '" data-story-clip-id="' +
-          escapeHtml(value105['id']) +
+          escapeHtml(value105.id) +
           '" data-story-marquee-item data-story-marquee-id="' +
-          escapeHtml(value105['id']) +
+          escapeHtml(value105.id) +
           '" aria-pressed="' +
           (selectionMode ? String(value108) : 'false') +
           '" aria-busy="' +
@@ -998,9 +996,9 @@ function renderTimeline(
               '</span>'
             : '') +
           '\n            <span class="story-clip-card-copy"><strong>片段' +
-          escapeHtml(String(value105['number'] || value106 + 1)['padStart'](2, '0')) +
+          escapeHtml(String(value105.number || value106 + 1).padStart(2, '0')) +
           '</strong><small data-story-clip-duration="' +
-          escapeHtml(value105['id']) +
+          escapeHtml(value105.id) +
           '">' +
           escapeHtml(formatStoryClipVideoGenerationDuration(value105, modelId, generationParams)) +
           '</small></span>\n          </button>\n          ' +
@@ -1010,7 +1008,7 @@ function renderTimeline(
           '\n          ' +
           (enabled6
             ? '<span class="story-clip-card-loading generation-loading-surface" role="status" aria-busy="true" aria-label="片段 ' +
-              escapeHtml(value105['number']) +
+              escapeHtml(value105.number) +
               ' 视频生成中">' +
               renderGenerationSpinner() +
               '</span>'
@@ -1018,47 +1016,47 @@ function renderTimeline(
               ? ''
               : renderWorkspaceCardDeleteControl({
                   className: 'story-clip-delete-trigger',
-                  ariaLabel: '删除片段 ' + value105['number'] + '：' + (value105['title'] || '未命名片段'),
+                  ariaLabel: '删除片段 ' + value105.number + '：' + (value105.title || '未命名片段'),
                   actionAttributes: {
                     'data-story-action': 'request-delete-clip',
-                    'data-story-clip-delete-id': value105['id'],
+                    'data-story-clip-delete-id': value105.id,
                     hidden: hidden,
                   },
                 }) +
                 '\n          <div class="story-project-delete-confirm story-clip-delete-confirm" ' +
                 (hidden ? '' : 'hidden') +
                 ' aria-label="确认删除片段 ' +
-                escapeHtml(value105['number']) +
+                escapeHtml(value105.number) +
                 '">\n            <button type="button" class="confirm-btn confirm-cancel" data-story-action="cancel-delete-clip" data-story-clip-delete-id="' +
-                escapeHtml(value105['id']) +
+                escapeHtml(value105.id) +
                 '">取消</button>\n            <button type="button" class="confirm-btn confirm-ok" data-story-action="confirm-delete-clip" data-story-clip-delete-id="' +
-                escapeHtml(value105['id']) +
+                escapeHtml(value105.id) +
                 '">删除</button>\n          </div>') +
           '\n        </div>';
-      if (value106 >= list15['length'] - 1) return value109;
+      if (value106 >= list15.length - 1) return value109;
       const value110 = list15[value106 + 1];
       return (
         value109 +
         '<button type="button" class="story-clip-insert-button" data-story-insert-after-clip-id="' +
-        escapeHtml(value105['id']) +
+        escapeHtml(value105.id) +
         '" aria-label="在片段 ' +
-        escapeHtml(value105['number']) +
+        escapeHtml(value105.number) +
         ' 和片段 ' +
-        escapeHtml(value110?.['number']) +
+        escapeHtml(value110?.number) +
         ' 之间新增片段"><span aria-hidden="true">+</span></button>'
       );
-    })['join']('') +
+    }).join('') +
     '\n    </div>\n  </div>'
   );
 }
 function renderEpisode(selectionMode2 = {}, value111 = null, value112 = null) {
   const episode4 = value111 || getSelectedEpisode(selectionMode2),
     value113 = value112 || getSelectedClip(selectionMode2, episode4),
-    assets2 = Array['isArray'](selectionMode2?.['data']?.['assets']) ? selectionMode2['data']['assets'] : [],
-    clipFrames2 = Array['isArray'](selectionMode2?.['data']?.['clipFrames'])
-      ? selectionMode2['data']['clipFrames']
+    assets2 = Array.isArray(selectionMode2?.data?.assets) ? selectionMode2.data.assets : [],
+    clipFrames2 = Array.isArray(selectionMode2?.data?.clipFrames)
+      ? selectionMode2.data.clipFrames
       : [],
-    voiceAssetIds3 = resolveStoryVideoReplicationClipVoiceAssetIds(selectionMode2?.['data'], value113);
+    voiceAssetIds3 = resolveStoryVideoReplicationClipVoiceAssetIds(selectionMode2?.data, value113);
   return {
     get referenceCounts() {
       return getUsedReferenceCounts(value113, {
@@ -1097,7 +1095,7 @@ function renderEpisode(selectionMode2 = {}, value111 = null, value112 = null) {
     get videoPreview() {
       const isGenerating2 = getGenerationState(selectionMode2, episode4);
       return renderVideoPreview(value113, {
-        isGenerating: isGenerating2['generatingClipIds']['includes'](normalizeText(value113?.['id'])),
+        isGenerating: isGenerating2.generatingClipIds.includes(normalizeText(value113?.id)),
       });
     },
     get videoResults() {
@@ -1114,16 +1112,16 @@ function renderEpisode(selectionMode2 = {}, value111 = null, value112 = null) {
     },
     get timeline() {
       const generatingClipIds4 = getGenerationState(selectionMode2, episode4);
-      return renderTimeline(episode4, value113?.['id'], {
-        selectionMode: selectionMode2?.['clipSelectionMode'],
-        selectedClipIds: selectionMode2?.['selectedClipGenerationIds'],
-        pendingDeleteClipId: selectionMode2?.['pendingDeleteClipId'],
-        generatingClipIds: generatingClipIds4['generatingClipIds'],
-        adjustingClipIds: (episode4?.['clips'] || [])
-          ['filter']((value115) => isStoryClipAdjustmentGenerating(selectionMode2, episode4, value115))
-          ['map']((value116) => value116['id']),
-        modelId: selectionMode2?.['models']?.['video'],
-        generationParams: selectionMode2?.['videoGenerationParams'],
+      return renderTimeline(episode4, value113?.id, {
+        selectionMode: selectionMode2?.clipSelectionMode,
+        selectedClipIds: selectionMode2?.selectedClipGenerationIds,
+        pendingDeleteClipId: selectionMode2?.pendingDeleteClipId,
+        generatingClipIds: generatingClipIds4.generatingClipIds,
+        adjustingClipIds: (episode4?.clips || [])
+          .filter((value115) => isStoryClipAdjustmentGenerating(selectionMode2, episode4, value115))
+          .map((value116) => value116.id),
+        modelId: selectionMode2?.models?.video,
+        generationParams: selectionMode2?.videoGenerationParams,
       });
     },
   };
@@ -1135,21 +1133,21 @@ function createRuntime({
   projectionAdapter: projectionAdapter = {},
 } = {}) {
   if (!state2 || typeof state2 !== 'object') throw new Error('[storyClipProduction] state is required');
-  if (typeof projectAdapter['createToken'] !== 'function')
+  if (typeof projectAdapter.createToken !== 'function')
     throw new Error('[storyClipProduction] projectAdapter.createToken is required');
-  if (typeof generationAdapter['createController'] !== 'function')
+  if (typeof generationAdapter.createController !== 'function')
     throw new Error('[storyClipProduction] generationAdapter.createController is required');
-  const map9 = generationAdapter['controllers'] instanceof Map ? generationAdapter['controllers'] : new Map(),
+  const map9 = generationAdapter.controllers instanceof Map ? generationAdapter.controllers : new Map(),
     map10 = new Map(),
-    handler4 = (value117) => projectAdapter['isLive']?.(value117) !== false,
-    handler5 = (value118) => projectAdapter['isCurrent']?.(value118) !== false,
+    handler4 = (value117) => projectAdapter.isLive?.(value117) !== false,
+    handler5 = (value118) => projectAdapter.isCurrent?.(value118) !== false,
     handler6 = (value119, value120, value121) =>
-      [value119?.['projectId'], value120?.['id'], value121?.['id']]['map'](normalizeText)['join'](':'),
+      [value119?.projectId, value120?.id, value121?.id].map(normalizeText).join(':'),
     handler7 = (value122, value123) =>
-      [value122?.['projectId'], value123?.['id']]['map'](normalizeText)['join'](':'),
+      [value122?.projectId, value123?.id].map(normalizeText).join(':'),
     handler8 = () => {
-      if (projectionAdapter['refreshGeneration']?.() === true) return true;
-      return (projectionAdapter['render']?.(), false);
+      if (projectionAdapter.refreshGeneration?.() === true) return true;
+      return (projectionAdapter.render?.(), false);
     };
   function run2({ episode: episode5, clip: clip2, projectToken: projectToken }) {
     return {
@@ -1157,8 +1155,8 @@ function createRuntime({
       cancelled: true,
       reason: 'batch-cancelled',
       projectToken: projectToken,
-      episodeId: episode5?.['id'] || '',
-      clipId: clip2?.['id'] || '',
+      episodeId: episode5?.id || '',
+      clipId: clip2?.id || '',
     };
   }
   function run3({
@@ -1168,7 +1166,7 @@ function createRuntime({
     projectToken: projectToken2,
   }) {
     const prompt =
-        generationAdapter['resolvePrompt']?.({
+        generationAdapter.resolvePrompt?.({
           state: state2,
           episode: episode6,
           clip: clip3,
@@ -1176,36 +1174,36 @@ function createRuntime({
           projectToken: projectToken2,
         }) || {},
       modelId3 =
-        generationAdapter['resolveSettings']?.({
+        generationAdapter.resolveSettings?.({
           state: state2,
           episode: episode6,
           clip: clip3,
           projectToken: projectToken2,
         }) || {};
     return {
-      projectId: projectToken2['projectId'],
-      episodeId: episode6['id'],
-      modelId: modelId3['modelId'],
-      provider: modelId3['provider'],
-      providerProfileId: modelId3['providerProfileId'],
-      prompt: prompt['prompt'],
-      generationParams: modelId3['generationParams'],
-      inputs: clip3['inputs'],
-      assetInputRefs: prompt['assetInputRefs'],
+      projectId: projectToken2.projectId,
+      episodeId: episode6.id,
+      modelId: modelId3.modelId,
+      provider: modelId3.provider,
+      providerProfileId: modelId3.providerProfileId,
+      prompt: prompt.prompt,
+      generationParams: modelId3.generationParams,
+      inputs: clip3.inputs,
+      assetInputRefs: prompt.assetInputRefs,
     };
   }
   function previewSelection() {
     const episode7 = getSelectedEpisode(state2),
       displayedClip2 = getSelectedClip(state2, episode7),
-      clip4 = state2['clipSelectionMode']
-        ? selectBatchTargets(episode7?.['clips'], state2['selectedClipGenerationIds'])
+      clip4 = state2.clipSelectionMode
+        ? selectBatchTargets(episode7?.clips, state2.selectedClipGenerationIds)
         : [displayedClip2];
     if (!episode7 || !clip4[0]) throw new Error('请先选择片段');
     const value124 = run3({
       episode: episode7,
       clip: clip4[0],
       displayedClip: displayedClip2,
-      projectToken: projectAdapter['createToken'](),
+      projectToken: projectAdapter.createToken(),
     });
     return buildStoryClipVideoPayload(value124);
   }
@@ -1217,15 +1215,15 @@ function createRuntime({
     batch: batch = null,
     batchRun: batchRun = null,
   }) {
-    if (batchRun?.['cancelRequested'])
+    if (batchRun?.cancelRequested)
       return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
     const value125 = handler6(projectToken3, episode8, clip5);
     if (
       !episode8 ||
       !clip5 ||
-      getGenerationState(state2, episode8)['generatingClipIds']['includes'](normalizeText(clip5['id'])) ||
+      getGenerationState(state2, episode8).generatingClipIds.includes(normalizeText(clip5.id)) ||
       getRecoverableStoryClipVideoTask(clip5) ||
-      map9['has'](value125)
+      map9.has(value125)
     )
       return { ok: false, reason: 'unavailable' };
     let enabled7 = null,
@@ -1238,11 +1236,11 @@ function createRuntime({
         displayedClip: displayedClip3,
         projectToken: projectToken3,
       });
-      if (!normalizeText(args4['prompt'])) return { ok: false, reason: 'empty-prompt' };
+      if (!normalizeText(args4.prompt)) return { ok: false, reason: 'empty-prompt' };
       const value126 = args4;
-      ((modelId4 = normalizeText(value126['modelId'])), (provider = normalizeText(value126['provider'])));
+      ((modelId4 = normalizeText(value126.modelId)), (provider = normalizeText(value126.provider)));
       const installId = normalizeText(
-        await generationAdapter['resolveInstallId']?.({
+        await generationAdapter.resolveInstallId?.({
           state: state2,
           episode: episode8,
           clip: clip5,
@@ -1251,57 +1249,57 @@ function createRuntime({
           provider: provider,
         }),
       );
-      if (batchRun?.['cancelRequested'])
+      if (batchRun?.cancelRequested)
         return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
-      enabled7 = generationAdapter['createController']({
+      enabled7 = generationAdapter.createController({
         state: state2,
         episode: episode8,
         clip: clip5,
         projectToken: projectToken3,
         batch: batch,
       });
-      if (!enabled7 || typeof enabled7['generate'] !== 'function')
+      if (!enabled7 || typeof enabled7.generate !== 'function')
         throw new Error('story clip generation controller is unavailable');
-      (map9['set'](value125, enabled7), batchRun?.['controllers']['add'](enabled7));
-      if (batchRun?.['cancelRequested'])
+      (map9.set(value125, enabled7), batchRun?.controllers.add(enabled7));
+      if (batchRun?.cancelRequested)
         return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
-      projectAdapter['register']?.(projectToken3);
-      handler5(projectToken3) && (setClipGenerationRunning(state2, clip5['id'], true), handler8());
-      const result3 = await enabled7['generate']({ ...args4, installId: installId });
+      projectAdapter.register?.(projectToken3);
+      handler5(projectToken3) && (setClipGenerationRunning(state2, clip5.id, true), handler8());
+      const result3 = await enabled7.generate({ ...args4, installId: installId });
       if (!handler4(projectToken3))
         return { ok: false, reason: 'stale-project', modelId: modelId4, provider: provider };
-      const text11 = normalizeText(result3?.['status'])['toLowerCase']();
+      const text11 = normalizeText(result3?.status).toLowerCase();
       if (
-        batchRun?.['cancelRequested'] &&
-        (result3?.['ok'] === false || ['cancelled', 'canceled', 'paused']['includes'](text11))
+        batchRun?.cancelRequested &&
+        (result3?.ok === false || ['cancelled', 'canceled', 'paused'].includes(text11))
       )
         return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
-      if (result3?.['ok'] === false || ['cancelled', 'canceled', 'error', 'failed']['includes'](text11)) {
-        const error4 = result3?.['error'],
+      if (result3?.ok === false || ['cancelled', 'canceled', 'error', 'failed'].includes(text11)) {
+        const error4 = result3?.error,
           error5 =
             error4 instanceof Error
               ? error4
-              : new Error(normalizeText(error4?.['message'] || error4) || '片段视频生成失败');
+              : new Error(normalizeText(error4?.message || error4) || '片段视频生成失败');
         return {
           ok: false,
           type: 'single-failed',
           error: error5,
           projectToken: projectToken3,
-          episodeId: episode8['id'],
-          clipId: clip5['id'],
+          episodeId: episode8.id,
+          clipId: clip5.id,
           modelId: modelId4,
           provider: provider,
         };
       }
       return (
-        await projectionAdapter['persist']?.({ immediate: true }),
+        await projectionAdapter.persist?.({ immediate: true }),
         {
           ok: true,
           type: 'single-complete',
           result: result3,
           projectToken: projectToken3,
-          episodeId: episode8['id'],
-          clipId: clip5['id'],
+          episodeId: episode8.id,
+          clipId: clip5.id,
           modelId: modelId4,
           provider: provider,
         }
@@ -1309,53 +1307,53 @@ function createRuntime({
     } catch (error6) {
       if (!handler4(projectToken3))
         return { ok: false, reason: 'stale-project', modelId: modelId4, provider: provider };
-      if (batchRun?.['cancelRequested'])
+      if (batchRun?.cancelRequested)
         return run2({ episode: episode8, clip: clip5, projectToken: projectToken3 });
       return {
         ok: false,
         type: 'single-failed',
         error: error6,
         projectToken: projectToken3,
-        episodeId: episode8?.['id'] || '',
-        clipId: clip5?.['id'] || '',
+        episodeId: episode8?.id || '',
+        clipId: clip5?.id || '',
         modelId: modelId4,
         provider: provider,
       };
     } finally {
-      enabled7 && map9['get'](value125) === enabled7 && map9['delete'](value125);
-      if (enabled7) batchRun?.['controllers']['delete'](enabled7);
+      enabled7 && map9.get(value125) === enabled7 && map9.delete(value125);
+      if (enabled7) batchRun?.controllers.delete(enabled7);
       enabled7 &&
         handler5(projectToken3) &&
-        (setClipGenerationRunning(state2, clip5?.['id'], false), handler8());
+        (setClipGenerationRunning(state2, clip5?.id, false), handler8());
     }
   }
   async function run5({ episode: episode9, targets: targets, projectToken: projectToken4 }) {
-    const map11 = new Set(targets['map']((value127) => normalizeText(value127?.['id']))['filter'](Boolean)),
-      batch2 = projectAdapter['createBatch']?.('clip-videos', {
-        episodeId: episode9['id'],
-        total: targets['length'],
+    const map11 = new Set(targets.map((value127) => normalizeText(value127?.id)).filter(Boolean)),
+      batch2 = projectAdapter.createBatch?.('clip-videos', {
+        episodeId: episode9.id,
+        total: targets.length,
         completed: 0,
         targetClipIds: [...map11],
         pendingClipIds: [...map11],
-        label: '批量生成 0/' + targets['length'],
+        label: '批量生成 0/' + targets.length,
       }) || {
-        id: 'clip-videos:' + normalizeText(projectToken4?.['projectId']) + ':' + Date['now'](),
+        id: 'clip-videos:' + normalizeText(projectToken4?.projectId) + ':' + Date.now(),
         type: 'clip-videos',
-        episodeId: episode9['id'],
-        total: targets['length'],
+        episodeId: episode9.id,
+        total: targets.length,
         completed: 0,
       },
       batchRun2 = {
         batch: batch2,
         projectToken: projectToken4,
-        episodeId: normalizeText(episode9['id']),
+        episodeId: normalizeText(episode9.id),
         controllers: new Set(),
         cancelRequested: false,
       },
       value128 = handler7(projectToken4, episode9);
-    (map10['set'](value128, batchRun2),
-      setEpisodeBatchRunning(state2, episode9['id'], true, '批量生成 0/' + targets['length'], {
-        batchId: batch2['id'],
+    (map10.set(value128, batchRun2),
+      setEpisodeBatchRunning(state2, episode9.id, true, '批量生成 0/' + targets.length, {
+        batchId: batch2.id,
         cancelRequested: false,
       }));
     let succeeded = 0,
@@ -1379,58 +1377,58 @@ function createRuntime({
         {
           onProgress: ({ completed: completed3, total: total3, target: target3, result: result4 }) => {
             if (!handler4(projectToken4)) return;
-            map11['delete'](normalizeText(target3?.['id']));
-            const label2 = batchRun2['cancelRequested']
+            map11.delete(normalizeText(target3?.id));
+            const label2 = batchRun2.cancelRequested
               ? '正在停止批量生成 · 已结束 ' + completed3 + '/' + total3
               : '批量生成 ' + completed3 + '/' + total3;
-            projectAdapter['syncBatch']?.(projectToken4, batch2, {
+            projectAdapter.syncBatch?.(projectToken4, batch2, {
               completed: completed3,
               pendingClipIds: [...map11],
-              cancelRequested: batchRun2['cancelRequested'],
+              cancelRequested: batchRun2.cancelRequested,
               label: label2,
             });
-            if (result4?.['ok']) succeeded += 1;
+            if (result4?.ok) succeeded += 1;
             else
-              result4?.['cancelled'] || result4?.['reason'] === 'batch-cancelled'
+              result4?.cancelled || result4?.reason === 'batch-cancelled'
                 ? (cancelled += 1)
                 : ((failed += 1),
                   (firstFailure ||= result4),
                   !suppressToast &&
-                    result4?.['error'] &&
+                    result4?.error &&
                     (suppressToast =
-                      projectionAdapter['present']?.({
+                      projectionAdapter.present?.({
                         type: 'provider-error',
-                        error: result4['error'],
-                        modelId: result4['modelId'],
-                        provider: result4['provider'],
+                        error: result4.error,
+                        modelId: result4.modelId,
+                        provider: result4.provider,
                       }) === true));
             handler5(projectToken4) &&
-              (setEpisodeBatchRunning(state2, episode9['id'], true, label2, {
-                batchId: batch2['id'],
-                cancelRequested: batchRun2['cancelRequested'],
+              (setEpisodeBatchRunning(state2, episode9.id, true, label2, {
+                batchId: batch2.id,
+                cancelRequested: batchRun2.cancelRequested,
               }),
               handler8());
           },
         },
       );
     } finally {
-      (map10['get'](value128) === batchRun2 && map10['delete'](value128),
+      (map10.get(value128) === batchRun2 && map10.delete(value128),
         handler5(projectToken4) &&
-          (setEpisodeBatchRunning(state2, episode9['id'], false),
-          await projectionAdapter['persist']?.({ immediate: true }),
+          (setEpisodeBatchRunning(state2, episode9.id, false),
+          await projectionAdapter.persist?.({ immediate: true }),
           handler8()));
     }
     if (!handler4(projectToken4)) return false;
     return (
-      projectionAdapter['present']?.({
+      projectionAdapter.present?.({
         type: 'batch-complete',
         projectToken: projectToken4,
-        episodeId: episode9['id'],
-        clipId: targets[0]?.['id'] || '',
+        episodeId: episode9.id,
+        clipId: targets[0]?.id || '',
         succeeded: succeeded,
         failed: failed,
         cancelled: cancelled,
-        cancelRequested: batchRun2['cancelRequested'],
+        cancelRequested: batchRun2.cancelRequested,
         firstFailure: firstFailure,
         suppressToast: suppressToast,
       }),
@@ -1439,47 +1437,47 @@ function createRuntime({
   }
   async function cancelBatch() {
     const selectedEpisode = getSelectedEpisode(state2),
-      episodeId2 = normalizeText(selectedEpisode?.['id']),
-      projectToken5 = projectAdapter['createToken'](),
+      episodeId2 = normalizeText(selectedEpisode?.id),
+      projectToken5 = projectAdapter.createToken(),
       value129 = handler7(projectToken5, selectedEpisode);
-    let batchId = map10['get'](value129);
+    let batchId = map10.get(value129);
     if (!batchId) {
-      const id2 = state2['clipBatchGenerationByEpisode']?.[episodeId2],
+      const id2 = state2.clipBatchGenerationByEpisode?.[episodeId2],
         value130 = value129 + ':',
         controllers = new Set(
-          [...map9['entries']()]
-            ['filter'](([value131]) => normalizeText(value131)['startsWith'](value130))
-            ['map'](([, value132]) => value132),
+          [...map9.entries()]
+            .filter(([value131]) => normalizeText(value131).startsWith(value130))
+            .map(([, value132]) => value132),
         );
-      if (!id2?.['batchId'] || !controllers['size']) return false;
+      if (!id2?.batchId || !controllers.size) return false;
       batchId = {
-        batch: { id: id2['batchId'], type: 'clip-videos', episodeId: episodeId2 },
+        batch: { id: id2.batchId, type: 'clip-videos', episodeId: episodeId2 },
         projectToken: projectToken5,
         episodeId: episodeId2,
         controllers: controllers,
-        cancelRequested: id2['cancelRequested'] === true,
+        cancelRequested: id2.cancelRequested === true,
       };
     }
-    if (!batchId || batchId['cancelRequested']) return false;
-    batchId['cancelRequested'] = true;
+    if (!batchId || batchId.cancelRequested) return false;
+    batchId.cancelRequested = true;
     const label3 = '正在停止批量生成';
     return (
-      projectAdapter['syncBatch']?.(batchId['projectToken'], batchId['batch'], {
+      projectAdapter.syncBatch?.(batchId.projectToken, batchId.batch, {
         type: 'clip-videos-stopped',
         cancelRequested: true,
         pendingClipIds: [],
         label: label3,
       }),
-      handler5(batchId['projectToken']) &&
+      handler5(batchId.projectToken) &&
         (setEpisodeBatchRunning(state2, episodeId2, true, label3, {
-          batchId: batchId['batch']['id'],
+          batchId: batchId.batch.id,
           cancelRequested: true,
         }),
         handler8()),
-      await Promise['allSettled'](
-        [...batchId['controllers']]['map']((value133) => {
-          if (typeof value133?.['cancel'] === 'function') return value133['cancel']();
-          return value133?.['pause']?.();
+      await Promise.allSettled(
+        [...batchId.controllers].map((value133) => {
+          if (typeof value133?.cancel === 'function') return value133.cancel();
+          return value133?.pause?.();
         }),
       ),
       true
@@ -1488,40 +1486,40 @@ function createRuntime({
   async function generateSelection() {
     const episode10 = getSelectedEpisode(state2),
       generationState2 = getGenerationState(state2, episode10);
-    if (generationState2['isBatchGenerating']) return false;
+    if (generationState2.isBatchGenerating) return false;
     const displayedClip4 = getSelectedClip(state2, episode10),
-      targets2 = state2['clipSelectionMode']
-        ? selectBatchTargets(episode10?.['clips'], state2['selectedClipGenerationIds'])
+      targets2 = state2.clipSelectionMode
+        ? selectBatchTargets(episode10?.clips, state2.selectedClipGenerationIds)
         : [];
-    if (state2['clipSelectionMode'] && targets2['length'] > 1) {
-      if (generationState2['busy']) return false;
+    if (state2.clipSelectionMode && targets2.length > 1) {
+      if (generationState2.busy) return false;
       return run5({
         episode: episode10,
         targets: targets2,
-        projectToken: projectAdapter['createToken'](),
+        projectToken: projectAdapter.createToken(),
       });
     }
-    const clip7 = state2['clipSelectionMode'] ? targets2[0] : displayedClip4;
-    if (!clip7) return (projectionAdapter['present']?.({ type: 'selection-missing' }), false);
-    const projectToken6 = projectAdapter['createToken'](),
+    const clip7 = state2.clipSelectionMode ? targets2[0] : displayedClip4;
+    if (!clip7) return (projectionAdapter.present?.({ type: 'selection-missing' }), false);
+    const projectToken6 = projectAdapter.createToken(),
       response7 = await run4({
         episode: episode10,
         clip: clip7,
         displayedClip: displayedClip4,
         projectToken: projectToken6,
       });
-    if (response7['reason'] === 'empty-prompt')
-      return (projectionAdapter['present']?.({ ...response7, type: 'empty-prompt' }), false);
-    if (response7['type']) projectionAdapter['present']?.(response7);
-    return response7['ok'] === true;
+    if (response7.reason === 'empty-prompt')
+      return (projectionAdapter.present?.({ ...response7, type: 'empty-prompt' }), false);
+    if (response7.type) projectionAdapter.present?.(response7);
+    return response7.ok === true;
   }
-  return Object['freeze']({
+  return Object.freeze({
     generateSelection: generateSelection,
     previewSelection: previewSelection,
     cancelBatch: cancelBatch,
   });
 }
-export const storyClipProduction = Object['freeze']({
+export const storyClipProduction = Object.freeze({
   createRuntime: createRuntime,
   getAdjacentClipId: getAdjacentClipId,
   getInputReferenceCounts: getInputReferenceCounts,

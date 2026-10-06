@@ -32,7 +32,7 @@ export function createRendererPresentationSubscription({
     };
   return {
     connect(options) {
-      (onResume?.(), (index = options['subscribeRaw'](handler)));
+      (onResume?.(), (index = options.subscribeRaw(handler)));
     },
     isActive: () => enabled && !enabled2,
     hasPendingFrame: () => requestFrame2 !== null,

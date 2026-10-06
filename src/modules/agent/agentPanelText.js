@@ -1,8 +1,8 @@
 import { getLocale } from '../../i18n/index.js';
 import { AGENT_SKILL_PANEL_TEXT } from './agentSkillPanelText.js';
-export const AGENT_PANEL_LOCALES = Object['freeze'](['zh-CN', 'en-US']);
-const PANEL_TEXT = Object['freeze']({
-  'zh-CN': Object['freeze']({
+export const AGENT_PANEL_LOCALES = Object.freeze(['zh-CN', 'en-US']);
+const PANEL_TEXT = Object.freeze({
+  'zh-CN': Object.freeze({
     ...AGENT_SKILL_PANEL_TEXT['zh-CN'],
     actionsPrepared: '已完成准备步骤。',
     addReference: '添加画布内容 / 引用参考',
@@ -130,7 +130,7 @@ const PANEL_TEXT = Object['freeze']({
     newConversationNotice: '已新建对话。',
     executionModeSaved: '执行模式已保存；本轮不会改变确认策略。',
   }),
-  'en-US': Object['freeze']({
+  'en-US': Object.freeze({
     ...AGENT_SKILL_PANEL_TEXT['en-US'],
     actionsPrepared: 'Preparation is complete.',
     addReference: 'Add canvas context / references',
@@ -266,8 +266,8 @@ const PANEL_TEXT = Object['freeze']({
 });
 function normalizePanelLocale(locale = getLocale()) {
   return String(locale || '')
-    ['toLowerCase']()
-    ['startsWith']('en')
+    .toLowerCase()
+    .startsWith('en')
     ? 'en-US'
     : 'zh-CN';
 }
@@ -276,7 +276,7 @@ export function agentPanelText(value, locale2 = getLocale()) {
   return PANEL_TEXT[panelLocale]?.[value] || PANEL_TEXT['zh-CN'][value] || value;
 }
 export function formatAgentPanelText(item, key = {}, locale3 = getLocale()) {
-  return agentPanelText(item, locale3)['replace'](/\{(\w+)\}/g, (index, result) =>
+  return agentPanelText(item, locale3).replace(/\{(\w+)\}/g, (index, result) =>
     key[result] == null ? '' : String(key[result]),
   );
 }

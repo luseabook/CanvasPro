@@ -137,17 +137,17 @@ export function getAllProviderIds() {
 
 export function resolveProviderApiRoute(target, source = {}) {
   const next = PROVIDERS_META[target],
-    enabled2 = next?.['apiRoutes'];
+    enabled2 = next?.apiRoutes;
   if (!enabled2) return null;
-  const current = String(source['apiUrl'] || '')
-      ['trim']()
-      ['replace'](/\/+$/, ''),
-    entry = enabled2['find'](
-      (record) => normalizeRouteApiUrl(record['apiUrl']) === normalizeRouteApiUrl(current),
+  const current = String(source.apiUrl || '')
+      .trim()
+      .replace(/\/+$/, ''),
+    entry = enabled2.find(
+      (record) => normalizeRouteApiUrl(record.apiUrl) === normalizeRouteApiUrl(current),
     );
-  if (current) return { apiUrl: current, routeId: entry?.['id'] || '' };
+  if (current) return { apiUrl: current, routeId: entry?.id || '' };
   const payload =
-    enabled2['find']((handle) => handle['id'] === source['routeId']) ||
-    enabled2['find']((state) => state['id'] === next['defaultRouteId']);
-  return { apiUrl: payload['apiUrl'], routeId: payload['id'] };
+    enabled2.find((handle) => handle.id === source.routeId) ||
+    enabled2.find((state) => state.id === next.defaultRouteId);
+  return { apiUrl: payload.apiUrl, routeId: payload.id };
 }

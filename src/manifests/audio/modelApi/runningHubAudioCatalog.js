@@ -9,8 +9,8 @@ const entries = [
   ...runningHubMinimaxAudioEntries,
   ...runningHubMurekaAudioEntries,
 ];
-export const runningHubAudioCatalogModels = Object['freeze'](entries['map']((value) => value['model']));
-export const runningHubAudioCatalogExecutions = Object['freeze']([
-  ...entries['map']((item) => item['execution']),
+export const runningHubAudioCatalogModels = Object.freeze(entries.map((value) => value.model));
+export const runningHubAudioCatalogExecutions = Object.freeze([
+  ...entries.map((item) => item.execution),
   ...runningHubAudioHelperExecutionManifests,
 ]);

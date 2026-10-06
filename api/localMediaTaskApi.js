@@ -354,5 +354,5 @@ const TERMINAL_STATUSES = new Set(['complete', 'failed', 'cancelled']);
 export async function listElectronMediaTasks(options8 = {}) {
   const mediaTaskBridge4 = getMediaTaskBridge();
   if (!mediaTaskBridge4) return { tasks: [] };
-  return await mediaTaskBridge4['list'](options8);
+  return await mediaTaskBridge4.list(options8);
 }

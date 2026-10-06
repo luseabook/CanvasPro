@@ -8,7 +8,7 @@ import {
 } from './sharedImageModelApiFields.js';
 const modelId = 'bailian/qwen-image-3.0',
   executionId = 'bailian.model-api.image.qwen-image-3.v1';
-export const bailianImageModelManifests = Object['freeze']([
+export const bailianImageModelManifests = Object.freeze([
   createImageModelApiManifest({
     modelId: modelId,
     executionId: executionId,
@@ -48,7 +48,7 @@ export const bailianImageModelManifests = Object['freeze']([
     },
   }),
 ]);
-export const bailianImageExecutionManifests = Object['freeze']([
+export const bailianImageExecutionManifests = Object.freeze([
   createModelApiExecutionManifest({
     id: executionId,
     provider: 'bailian',

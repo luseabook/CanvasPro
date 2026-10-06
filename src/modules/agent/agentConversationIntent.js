@@ -9,24 +9,22 @@ const WRITING_SUBJECT =
 export function isAgentWritingRequest(value = '') {
   const item = String(value || '');
   return (
-    (WRITING_SUBJECT['test'](item) || /第[一二三四五六七八九十百\d]+章/u['test'](item)) &&
-    WRITING_REQUEST['test'](item)
+    (WRITING_SUBJECT.test(item) || /第[一二三四五六七八九十百\d]+章/u.test(item)) &&
+    WRITING_REQUEST.test(item)
   );
 }
 export function isAgentConversationContinuation(key = '') {
-  const index = String(key || '')['trim']();
-  return !NEW_TOPIC['test'](index) && CONTINUATION['test'](index);
+  const index = String(key || '').trim();
+  return !NEW_TOPIC.test(index) && CONTINUATION.test(index);
 }
 export function isAgentCustomChoiceAnswer(result = '') {
-  const data = String(result || '')['trim']();
+  const data = String(result || '').trim();
   return (
     Boolean(data) &&
-    !NEW_TOPIC['test'](data) &&
-    !/^(?:请问|什么是|怎么|如何|为什么|解释一下|介绍一下|what\b|why\b|how\b)/iu['test'](data)
+    !NEW_TOPIC.test(data) &&
+    !/^(?:请问|什么是|怎么|如何|为什么|解释一下|介绍一下|what\b|why\b|how\b)/iu.test(data)
   );
 }
 export function isAgentStoryDeliverable(options = '') {
-  return /^(?:(?:请|帮我|给我|麻烦)\s*)?(?:写|创作|生成|续写|改写|扩写).{0,28}(?:故事|小说|剧情|章节)(?!板|视频|图片|节点)|^\s*(?:please\s+)?(?:write|create|generate|continue|rewrite)\b.{0,36}\b(?:story|stories|novel|chapter)\b/iu[
-    'test'
-  ](String(options || ''));
+  return /^(?:(?:请|帮我|给我|麻烦)\s*)?(?:写|创作|生成|续写|改写|扩写).{0,28}(?:故事|小说|剧情|章节)(?!板|视频|图片|节点)|^\s*(?:please\s+)?(?:write|create|generate|continue|rewrite)\b.{0,36}\b(?:story|stories|novel|chapter)\b/iu.test(String(options || ''));
 }

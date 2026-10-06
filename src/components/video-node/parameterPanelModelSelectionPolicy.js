@@ -31,84 +31,84 @@ const APIMART_KLING_V3_OMNI_MODEL_ID = 'apimart/kling-v3-omni',
   ]),
   LEGACY_INPUT_POLICY_FIELD_IDS = new Set(['happyhorse_mode', 'wan27_mode', 'kling_v3_omni_mode']);
 function normalizeRhV54SingleControlPreset(value) {
-  const item = String(value ?? '')['trim']();
+  const item = String(value ?? '').trim();
   return item === 'efficiency' || item === 'stable' || item === 'quality' ? item : 'efficiency';
 }
 function normalizeRhV54SpecialModeValue(key) {
-  const index = String(key ?? '')['trim']();
+  const index = String(key ?? '').trim();
   return index === 'longVideoOverlay' || index === 'cameraMove' ? index : null;
 }
 function normalizeRhV54MaskExpandValue(result) {
   const data = Number(result);
-  return Number['isFinite'](data) ? Math['max'](-9999, Math['min'](9999, Math['trunc'](data))) : 25;
+  return Number.isFinite(data) ? Math.max(-9999, Math.min(9999, Math.trunc(data))) : 25;
 }
 function normalizeRhV54BreastJiggleValue(options) {
   const target = Number(options);
-  if (!Number['isFinite'](target)) return 0;
-  return Math['max'](0, Math['min'](1, Math['round'](target * 20) / 20));
+  if (!Number.isFinite(target)) return 0;
+  return Math.max(0, Math.min(1, Math.round(target * 20) / 20));
 }
 function isApimartPanelModel(options2 = {}, source = '') {
-  const providerHint = String(options2?.['provider'] || '')
-      ['trim']()
-      ['toLowerCase'](),
-    next = String(options2?.['model'] || '')['trim'](),
+  const providerHint = String(options2?.provider || '')
+      .trim()
+      .toLowerCase(),
+    next = String(options2?.model || '').trim(),
     modelExecution =
       resolveModelExecution(next, { providerHint: providerHint }) || resolveModelExecution(next),
     current = String(
-      modelExecution?.['canonicalModelId'] || modelExecution?.['modelManifest']?.['modelId'] || next,
-    )['trim'](),
-    enabled = String(modelExecution?.['modelManifest']?.['provider'] || providerHint)
-      ['trim']()
-      ['toLowerCase']();
+      modelExecution?.canonicalModelId || modelExecution?.modelManifest?.modelId || next,
+    ).trim(),
+    enabled = String(modelExecution?.modelManifest?.provider || providerHint)
+      .trim()
+      .toLowerCase();
   return current === source && (!enabled || enabled === 'apimart');
 }
 export function isHappyHorsePanelModel(options3 = {}) {
-  return isHappyHorseModelApiVideo(options3?.['model'], options3?.['provider']);
+  return isHappyHorseModelApiVideo(options3?.model, options3?.provider);
 }
 export function isWan27PanelModel(options4 = {}) {
-  return isWan27ModelApiVideo(options4?.['model'], options4?.['provider']);
+  return isWan27ModelApiVideo(options4?.model, options4?.provider);
 }
 export function isKlingV3OmniPanelModel(options5 = {}) {
   return isApimartPanelModel(options5, APIMART_KLING_V3_OMNI_MODEL_ID);
 }
 export function getPanelModelManifest(providerHint2 = {}) {
   const customAiAppNodeManifest = resolveCustomAiAppNodeManifest(providerHint2),
-    enabled2 = String(providerHint2?.['model'] || '')['trim']();
+    enabled2 = String(providerHint2?.model || '').trim();
   if (customAiAppNodeManifest || !enabled2) return customAiAppNodeManifest;
   const modelExecution2 =
-    resolveModelExecution(enabled2, { providerHint: providerHint2?.['provider'] }) ||
+    resolveModelExecution(enabled2, { providerHint: providerHint2?.provider }) ||
     resolveModelExecution(enabled2);
-  return modelExecution2?.['modelManifest'] || getModelManifest(enabled2) || null;
+  return modelExecution2?.modelManifest || getModelManifest(enabled2) || null;
 }
 export function isRhAiAppPanelModel(options6 = {}) {
   return isRunningHubAiAppManifest(getPanelModelManifest(options6));
 }
 function normalizeHappyHorsePanelMode(entry) {
   const record = String(entry || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   return record === 'image' || record === 'reference' || record === 'edit' ? record : 'auto';
 }
 function normalizeWan27PanelMode(payload) {
   const handle = String(payload || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   return handle === 'video' || handle === 'reference' || handle === 'edit' ? handle : 'image';
 }
 function normalizeKlingV3OmniPanelMode(state) {
   const config = String(state || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   return config === 'reference' || config === 'edit' ? config : 'image';
 }
 function getPanelInputKind(scope, input) {
   const effectiveInputKind = resolveEffectiveInputKind(scope, input);
   if (effectiveInputKind) return effectiveInputKind;
-  const list = String(scope?.['type'] || '')['toLowerCase']();
-  if (list['includes']('video')) return 'video';
-  if (list['includes']('image')) return 'image';
-  if (list['includes']('audio')) return 'audio';
-  if (list['includes']('text')) return 'text';
+  const list = String(scope?.type || '').toLowerCase();
+  if (list.includes('video')) return 'video';
+  if (list.includes('image')) return 'image';
+  if (list.includes('audio')) return 'audio';
+  if (list.includes('text')) return 'text';
   return '';
 }
 export function getManifestInputPolicyEdgeIdsToRemove({
@@ -120,28 +120,28 @@ export function getManifestInputPolicyEdgeIdsToRemove({
 } = {}) {
   const panelModelManifest = getPanelModelManifest(latest);
   if (
-    !LEGACY_INPUT_POLICY_FIELD_IDS['has'](String(fieldId || '')['trim']()) &&
-    !manifestInputPolicyReferencesField(panelModelManifest?.['inputSlots'], fieldId)
+    !LEGACY_INPUT_POLICY_FIELD_IDS.has(String(fieldId || '').trim()) &&
+    !manifestInputPolicyReferencesField(panelModelManifest?.inputSlots, fieldId)
   )
     return null;
   const output = {
       ...latest,
-      generationParams: { ...getPlainGenerationParams(latest?.['generationParams']), [fieldId]: value2 },
+      generationParams: { ...getPlainGenerationParams(latest?.generationParams), [fieldId]: value2 },
     },
     targetInputPolicy = getTargetInputPolicy(output),
     map = new Set(
-      Array['isArray'](targetInputPolicy?.['allowedKinds']) ? targetInputPolicy['allowedKinds'] : [],
+      Array.isArray(targetInputPolicy?.allowedKinds) ? targetInputPolicy.allowedKinds : [],
     ),
     value3 = {},
     list2 = [];
-  for (const value4 of Array['isArray'](inEdges) ? inEdges : []) {
-    const panelInputKind = getPanelInputKind(nodes?.[value4?.['sourceId']], value4);
+  for (const value4 of Array.isArray(inEdges) ? inEdges : []) {
+    const panelInputKind = getPanelInputKind(nodes?.[value4?.sourceId], value4);
     if (!panelInputKind) continue;
-    const count = Number(targetInputPolicy?.['maxByKind']?.[panelInputKind]),
-      value5 = Number['isFinite'](count) && count >= 0 ? count : Infinity,
+    const count = Number(targetInputPolicy?.maxByKind?.[panelInputKind]),
+      value5 = Number.isFinite(count) && count >= 0 ? count : Infinity,
       value6 = value3[panelInputKind] || 0;
-    if (!map['has'](panelInputKind) || value6 >= value5) {
-      if (value4?.['id']) list2['push'](value4['id']);
+    if (!map.has(panelInputKind) || value6 >= value5) {
+      if (value4?.id) list2.push(value4.id);
       continue;
     }
     value3[panelInputKind] = value6 + 1;
@@ -157,38 +157,38 @@ export function getHappyHorseModeEdgeIdsToRemove({
     list3 = [];
   let count2 = 0,
     count3 = 0;
-  for (const value7 of Array['isArray'](inEdges) ? inEdges : []) {
-    const value8 = nodes?.[value7?.['sourceId']],
+  for (const value7 of Array.isArray(inEdges) ? inEdges : []) {
+    const value8 = nodes?.[value7?.sourceId],
       panelInputKind2 = getPanelInputKind(value8, value7);
     if (panelInputKind2 === 'video') {
       if (happyHorsePanelMode === 'edit' && count3 < 1) count3 += 1;
-      else value7?.['id'] && list3['push'](value7['id']);
+      else value7?.id && list3.push(value7.id);
       continue;
     }
     if (panelInputKind2 === 'image') {
       if (happyHorsePanelMode === 'image') {
         if (count2 < 1) count2 += 1;
         else {
-          if (value7?.['id']) list3['push'](value7['id']);
+          if (value7?.id) list3.push(value7.id);
         }
       } else {
         if (happyHorsePanelMode === 'edit') {
           if (count2 < 5) count2 += 1;
           else {
-            if (value7?.['id']) list3['push'](value7['id']);
+            if (value7?.id) list3.push(value7.id);
           }
         } else {
           if (happyHorsePanelMode === 'reference') {
             if (count2 < 9) count2 += 1;
             else {
-              if (value7?.['id']) list3['push'](value7['id']);
+              if (value7?.id) list3.push(value7.id);
             }
           }
         }
       }
       continue;
     }
-    panelInputKind2 === 'audio' && value7?.['id'] && list3['push'](value7['id']);
+    panelInputKind2 === 'audio' && value7?.id && list3.push(value7.id);
   }
   return list3;
 }
@@ -202,14 +202,14 @@ export function getWan27ModeEdgeIdsToRemove({
   let count4 = 0,
     count5 = 0,
     count6 = 0;
-  for (const value9 of Array['isArray'](inEdges) ? inEdges : []) {
-    const value10 = nodes?.[value9?.['sourceId']],
+  for (const value9 of Array.isArray(inEdges) ? inEdges : []) {
+    const value10 = nodes?.[value9?.sourceId],
       panelInputKind3 = getPanelInputKind(value10, value9);
     if (panelInputKind3 === 'image') {
       if (wan27PanelMode === 'image' && count4 < 2) count4 += 1;
       else {
         if (wan27PanelMode === 'reference' && count4 < 1) count4 += 1;
-        else value9?.['id'] && list4['push'](value9['id']);
+        else value9?.id && list4.push(value9.id);
       }
       continue;
     }
@@ -219,14 +219,14 @@ export function getWan27ModeEdgeIdsToRemove({
         if (wan27PanelMode === 'reference' && count5 < 1) count5 += 1;
         else {
           if (wan27PanelMode === 'edit' && count5 < 2) count5 += 1;
-          else value9?.['id'] && list4['push'](value9['id']);
+          else value9?.id && list4.push(value9.id);
         }
       }
       continue;
     }
     if (panelInputKind3 === 'audio') {
       if ((wan27PanelMode === 'image' || wan27PanelMode === 'reference') && count6 < 1) count6 += 1;
-      else value9?.['id'] && list4['push'](value9['id']);
+      else value9?.id && list4.push(value9.id);
     }
   }
   return list4;
@@ -240,39 +240,39 @@ export function getKlingV3OmniModeEdgeIdsToRemove({
     list5 = [];
   let count7 = 0,
     count8 = 0;
-  for (const value11 of Array['isArray'](inEdges) ? inEdges : []) {
-    const value12 = nodes?.[value11?.['sourceId']],
+  for (const value11 of Array.isArray(inEdges) ? inEdges : []) {
+    const value12 = nodes?.[value11?.sourceId],
       panelInputKind4 = getPanelInputKind(value12, value11);
     if (panelInputKind4 === 'image') {
       if (klingV3OmniPanelMode === 'image' && count7 < 2) count7 += 1;
       else {
         if (klingV3OmniPanelMode === 'reference' && count7 < 1) count7 += 1;
-        else value11?.['id'] && list5['push'](value11['id']);
+        else value11?.id && list5.push(value11.id);
       }
       continue;
     }
     if (panelInputKind4 === 'video') {
       if ((klingV3OmniPanelMode === 'reference' || klingV3OmniPanelMode === 'edit') && count8 < 1)
         count8 += 1;
-      else value11?.['id'] && list5['push'](value11['id']);
+      else value11?.id && list5.push(value11.id);
       continue;
     }
-    panelInputKind4 === 'audio' && value11?.['id'] && list5['push'](value11['id']);
+    panelInputKind4 === 'audio' && value11?.id && list5.push(value11.id);
   }
   return list5;
 }
 function buildSchemaParamsPatch(value13, value14, value15 = {}) {
   const generationParams = {
-      ...getPlainGenerationParams(value13?.['generationParams']),
-      ...getPlainGenerationParams(value15?.['generationParams']),
+      ...getPlainGenerationParams(value13?.generationParams),
+      ...getPlainGenerationParams(value15?.generationParams),
       ...(value14 && typeof value14 === 'object' ? value14 : {}),
     },
     value16 = { generationParams: generationParams },
-    value17 = String(value13?.['model'] || '')['trim']();
+    value17 = String(value13?.model || '').trim();
   return (
     value17 &&
-      (value16['generationParamsByModel'] = {
-        ...getPlainGenerationParams(value13?.['generationParamsByModel']),
+      (value16.generationParamsByModel = {
+        ...getPlainGenerationParams(value13?.generationParamsByModel),
         [value17]: generationParams,
       }),
     value16
@@ -281,9 +281,9 @@ function buildSchemaParamsPatch(value13, value14, value15 = {}) {
 function getUiSchemaFieldIds(value18) {
   const modelManifest = getModelManifest(value18);
   return new Set(
-    (Array['isArray'](modelManifest?.['uiSchema']?.['fields']) ? modelManifest['uiSchema']['fields'] : [])
-      ['map']((value19) => String(value19?.['id'] || '')['trim']())
-      ['filter'](Boolean),
+    (Array.isArray(modelManifest?.uiSchema?.fields) ? modelManifest.uiSchema.fields : [])
+      .map((value19) => String(value19?.id || '').trim())
+      .filter(Boolean),
   );
 }
 function sanitizeVideoModelApiParams(value20, value21 = {}, value22 = {}) {
@@ -300,26 +300,26 @@ export function buildVideoModelApiModelSelectionPatch(
   provider = null,
   value24 = {},
 ) {
-  const modelId = String(value23 || '')['trim']();
+  const modelId = String(value23 || '').trim();
   if (!modelId) return {};
-  const value25 = String(nodeData?.['model'] || '')['trim'](),
-    generationParamsByModel = getPlainGenerationParams(nodeData?.['generationParamsByModel']);
+  const value25 = String(nodeData?.model || '').trim(),
+    generationParamsByModel = getPlainGenerationParams(nodeData?.generationParamsByModel);
   value25 &&
-    (generationParamsByModel[value25] = sanitizeVideoModelApiParams(value25, nodeData?.['generationParams'], {
+    (generationParamsByModel[value25] = sanitizeVideoModelApiParams(value25, nodeData?.generationParams, {
       includeDefaults: false,
     }));
   const list6 = getUiSchemaFieldIds(modelId),
     args = buildModelUiSchemaDefaultParams(modelId),
     args2 = getPlainGenerationParams(generationParamsByModel[modelId]),
-    value26 = Object['prototype']['hasOwnProperty']['call'](value24, 'generationParams'),
-    args3 = value26 ? getPlainGenerationParams(value24['generationParams']) : {},
+    value26 = Object.prototype.hasOwnProperty.call(value24, 'generationParams'),
+    args3 = value26 ? getPlainGenerationParams(value24.generationParams) : {},
     args4 = {};
-  Object['entries'](value24 || {})['forEach'](([value27, value28]) => {
-    if (list6['has'](value27)) args4[value27] = value28;
+  Object.entries(value24 || {}).forEach(([value27, value28]) => {
+    if (list6.has(value27)) args4[value27] = value28;
   });
   const value29 = { ...args, ...args2, ...args3, ...args4 },
-    value30 = Object['fromEntries'](
-      Object['entries'](value29)['filter'](([value31]) => list6['has'](value31)),
+    value30 = Object.fromEntries(
+      Object.entries(value29).filter(([value31]) => list6.has(value31)),
     ),
     generationParams2 = sanitizeVideoModelApiParams(modelId, value30, { includeDefaults: true }),
     args5 = buildGenerationModelSelectionDisplayPatch({
@@ -330,10 +330,10 @@ export function buildVideoModelApiModelSelectionPatch(
     }),
     { generationParams: generationParams3, ...args6 } = value24 || {},
     args7 = { ...args6 };
-  list6['forEach']((value32) => {
+  list6.forEach((value32) => {
     delete args7[value32];
   });
-  const args8 = buildModelProviderProfileSelectionPatch(nodeData, modelId, value24?.['providerProfileId']);
+  const args8 = buildModelProviderProfileSelectionPatch(nodeData, modelId, value24?.providerProfileId);
   return {
     ...args7,
     ...args8,
@@ -345,27 +345,27 @@ export function buildVideoModelApiModelSelectionPatch(
   };
 }
 export function buildRhWorkflowFieldPatch(value33, value34, value35, value36 = {}) {
-  const value37 = String(value34 || '')['trim']();
-  if (RH_WORKFLOW_DISPLAY_FIELD_IDS['has'](value37)) return { [value37]: value35 };
+  const value37 = String(value34 || '').trim();
+  if (RH_WORKFLOW_DISPLAY_FIELD_IDS.has(value37)) return { [value37]: value35 };
   if (value37 === 'rhSingleControlPreset' || value37 === 'rhControlMode') {
-    const value38 = String(value35 || '')['trim'](),
+    const value38 = String(value35 || '').trim(),
       args9 =
         value38 === 'multi'
           ? { rhControlMode: 'multi', rhSingleControlPreset: null }
           : { rhControlMode: 'single', rhSingleControlPreset: normalizeRhV54SingleControlPreset(value38) };
     return { ...buildSchemaParamsPatch(value33, args9, value36), ...args9 };
   }
-  if (RH_WORKFLOW_BOOLEAN_FIELD_IDS['has'](value37)) {
+  if (RH_WORKFLOW_BOOLEAN_FIELD_IDS.has(value37)) {
     const value39 = value35 === true || String(value35) === 'true',
       args10 = { [value37]: value39 };
     return { ...buildSchemaParamsPatch(value33, args10, value36), ...args10 };
   }
   if (value37 === 'rhSpecialMode') {
-    const plainGenerationParams2 = getPlainGenerationParams(value33?.['generationParams']),
+    const plainGenerationParams2 = getPlainGenerationParams(value33?.generationParams),
       rhV54SpecialModeValue = normalizeRhV54SpecialModeValue(
-        plainGenerationParams2['rhSpecialMode'] !== undefined
-          ? plainGenerationParams2['rhSpecialMode']
-          : value33?.['rhSpecialMode'],
+        plainGenerationParams2.rhSpecialMode !== undefined
+          ? plainGenerationParams2.rhSpecialMode
+          : value33?.rhSpecialMode,
       ),
       rhV54SpecialModeValue2 = normalizeRhV54SpecialModeValue(value35),
       rhSpecialMode = rhV54SpecialModeValue === rhV54SpecialModeValue2 ? null : rhV54SpecialModeValue2,

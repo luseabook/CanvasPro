@@ -14,26 +14,26 @@ function normalizeAgentActionArgs(
   { precreateReservation: precreateReservation = false } = {},
 ) {
   const box =
-    args['args'] && typeof args['args'] === 'object' && !Array['isArray'](args['args'])
-      ? { ...args['args'] }
+    args.args && typeof args.args === 'object' && !Array.isArray(args.args)
+      ? { ...args.args }
       : {};
-  if (String(args['type'] || args['commandId'] || '')['trim']() !== 'node.create') {
-    if (String(args['type'] || args['commandId'] || '')['trim']() === 'node.duplicate')
+  if (String(args.type || args.commandId || '').trim() !== 'node.create') {
+    if (String(args.type || args.commandId || '').trim() === 'node.duplicate')
       return (
-        delete box['dx'],
-        delete box['dy'],
+        delete box.dx,
+        delete box.dy,
         { ...box, placement: 'spawn-preferences' }
       );
     return box;
   }
-  (delete box['x'],
-    delete box['y'],
-    delete box['sequenceKey'],
-    delete box['reuseNodeId'],
-    delete box['agentReservation']);
+  (delete box.x,
+    delete box.y,
+    delete box.sequenceKey,
+    delete box.reuseNodeId,
+    delete box.agentReservation);
   const agentPrecreatedNode = normalizeAgentPrecreatedNode(value),
     reuseNodeId =
-      agentPrecreatedNode && String(box['type'] || '')['trim']() === agentPrecreatedNode['type'] ? agentPrecreatedNode['nodeId'] : '';
+      agentPrecreatedNode && String(box.type || '').trim() === agentPrecreatedNode.type ? agentPrecreatedNode.nodeId : '';
   return {
     ...box,
     placement: 'viewport-center-sequence',
@@ -42,8 +42,8 @@ function normalizeAgentActionArgs(
   };
 }
 function readCanvasState(options = {}) {
-  const store = options['store'] || options['graphStore'];
-  return store?.['getStateRaw']?.() ?? store?.['getState']?.() ?? null;
+  const store = options.store || options.graphStore;
+  return store?.getStateRaw?.() ?? store?.getState?.() ?? null;
 }
 function collectCreatedNodeResult(list = [], item = []) {
   const args2 = new Set(),
@@ -51,36 +51,36 @@ function collectCreatedNodeResult(list = [], item = []) {
     args4 = new Set(),
     unresolvedCommandIds = [];
   return (
-    list['forEach']((key, index) => {
-      const result = String(key?.['type'] || key?.['commandId'] || '')['trim']();
-      if (!NODE_CREATING_COMMANDS['has'](result)) return;
+    list.forEach((key, index) => {
+      const result = String(key?.type || key?.commandId || '').trim();
+      if (!NODE_CREATING_COMMANDS.has(result)) return;
       const response = item[index];
-      if (response?.['ok'] !== true) return;
-      const data = response['result'] || {};
-      if (data['reused'] === true) {
-        const target = String(data['nodeId'] || data['node']?.['id'] || '')['trim']();
-        if (target) args4['add'](target);
+      if (response?.ok !== true) return;
+      const data = response.result || {};
+      if (data.reused === true) {
+        const target = String(data.nodeId || data.node?.id || '').trim();
+        if (target) args4.add(target);
       }
       const list2 =
           result === 'node.duplicate'
             ? [
-                ...(Array['isArray'](data['nodeIds']) ? data['nodeIds'] : []),
-                ...(Array['isArray'](data['ids']) ? data['ids'] : []),
+                ...(Array.isArray(data.nodeIds) ? data.nodeIds : []),
+                ...(Array.isArray(data.ids) ? data.ids : []),
               ]
-            : [data['nodeId'], data['node']?.['id']],
-        source = args2['size'];
-      list2['forEach']((next) => {
-        const enabled = String(next || '')['trim']();
+            : [data.nodeId, data.node?.id],
+        source = args2.size;
+      list2.forEach((next) => {
+        const enabled = String(next || '').trim();
         if (!enabled) return;
-        args2['add'](enabled);
-        if (result !== 'node.create') args3['add'](enabled);
+        args2.add(enabled);
+        if (result !== 'node.create') args3.add(enabled);
       });
       result === 'node.duplicate' &&
-        (Array['isArray'](data['sourceIds']) ? data['sourceIds'] : [])['forEach']((current) => {
-          const entry = String(current || '')['trim']();
-          if (entry) args3['add'](entry);
+        (Array.isArray(data.sourceIds) ? data.sourceIds : []).forEach((current) => {
+          const entry = String(current || '').trim();
+          if (entry) args3.add(entry);
         });
-      if (args2['size'] === source) unresolvedCommandIds['push'](result);
+      if (args2.size === source) unresolvedCommandIds.push(result);
     }),
     {
       nodeIds: [...args2],
@@ -91,48 +91,48 @@ function collectCreatedNodeResult(list = [], item = []) {
   );
 }
 function getAgentSidebarViewportInsets(options2 = {}) {
-  const dom = options2['windowObject'] || globalThis['window'],
-    el = dom?.['document']?.['body'];
+  const dom = options2.windowObject || globalThis.window,
+    el = dom?.document?.body;
   if (
-    !el?.['classList']?.['contains']?.('agent-sidebar-open') ||
-    el['classList']['contains']('agent-sidebar-collapsed')
+    !el?.classList?.contains?.('agent-sidebar-open') ||
+    el.classList.contains('agent-sidebar-collapsed')
   )
     return null;
-  const el2 = dom['document']['querySelector']?.('.agent-sidebar.is-open'),
-    right = Number(el2?.['getBoundingClientRect']?.()?.['width']);
-  return Number['isFinite'](right) && right > 0 ? { right: right } : null;
+  const el2 = dom.document.querySelector?.('.agent-sidebar.is-open'),
+    right = Number(el2?.getBoundingClientRect?.()?.width);
+  return Number.isFinite(right) && right > 0 ? { right: right } : null;
 }
 function revealCreatedNodes(options3 = {}, list3 = []) {
-  if (typeof options3['focusNodes'] !== 'function' || list3['length'] === 0) return;
+  if (typeof options3.focusNodes !== 'function' || list3.length === 0) return;
   const viewportInsets = getAgentSidebarViewportInsets(options3),
     handler = () =>
-      options3['focusNodes'](list3, 96, 500, {
+      options3.focusNodes(list3, 96, 500, {
         maxZoom: 1,
         ...(viewportInsets ? { viewportInsets: viewportInsets } : {}),
       });
-  typeof options3['scheduleFrame'] === 'function' ? options3['scheduleFrame'](handler) : handler();
+  typeof options3.scheduleFrame === 'function' ? options3.scheduleFrame(handler) : handler();
 }
 function collectCreatedNodesOutsideVisibleCanvas(options4 = {}, record = {}, list4 = []) {
-  const payload = options4['windowObject'] || globalThis['window'],
-    count = Number(payload?.['innerWidth']),
-    count2 = Number(payload?.['innerHeight']);
+  const payload = options4.windowObject || globalThis.window,
+    count = Number(payload?.innerWidth),
+    count2 = Number(payload?.innerHeight);
   if (!(count > 0) || !(count2 > 0)) return [];
   const box2 = getAgentSidebarViewportInsets(options4) || {},
-    handle = Math['max'](1, count - Math['max'](0, Number(box2['right']) || 0)),
-    box3 = record?.['viewport'] || { x: 0, y: 0, zoom: 1 },
-    state = Math['max'](0.0001, Number(box3['zoom']) || 1),
+    handle = Math.max(1, count - Math.max(0, Number(box2.right) || 0)),
+    box3 = record?.viewport || { x: 0, y: 0, zoom: 1 },
+    state = Math.max(0.0001, Number(box3.zoom) || 1),
     config = 16;
-  return list4['filter']((scope) => {
-    const box4 = record?.['nodes']?.[scope];
+  return list4.filter((scope) => {
+    const box4 = record?.nodes?.[scope];
     if (!box4) return false;
-    const box5 = worldToScreen(Number(box4['x']) || 0, Number(box4['y']) || 0, box3),
-      input = Math['max'](1, Number(box4['width']) || 160) * state,
-      output = Math['max'](1, Number(box4['height']) || 120) * state;
+    const box5 = worldToScreen(Number(box4.x) || 0, Number(box4.y) || 0, box3),
+      input = Math.max(1, Number(box4.width) || 160) * state,
+      output = Math.max(1, Number(box4.height) || 120) * state;
     return (
-      box5['x'] < config ||
-      box5['y'] < config ||
-      box5['x'] + input > handle - config ||
-      box5['y'] + output > count2 - config
+      box5.x < config ||
+      box5.y < config ||
+      box5.x + input > handle - config ||
+      box5.y + output > count2 - config
     );
   });
 }
@@ -149,7 +149,7 @@ export async function executeAgentActions(
     precreateReservation: precreateReservation = false,
   } = {},
 ) {
-  if (!Array['isArray'](list5))
+  if (!Array.isArray(list5))
     return {
       ok: false,
       status: 'failed',
@@ -157,10 +157,10 @@ export async function executeAgentActions(
       message: 'Agent actions must be an array.',
       results: [],
     };
-  const value2 = list5['map']((type) => ({
-      type: type['type'],
-      ...(type['alias'] || type['resultAlias'] || type['as']
-        ? { alias: type['alias'] || type['resultAlias'] || type['as'] }
+  const value2 = list5.map((type) => ({
+      type: type.type,
+      ...(type.alias || type.resultAlias || type.as
+        ? { alias: type.alias || type.resultAlias || type.as }
         : {}),
       args: normalizeAgentActionArgs(type, precreatedNode, {
         precreateReservation: precreateReservation,
@@ -176,16 +176,16 @@ export async function executeAgentActions(
         shouldContinue: shouldContinue,
       }),
     }),
-    results = raw?.['result']?.['actions'] || [],
+    results = raw?.result?.actions || [],
     unresolvedCommandIds2 = collectCreatedNodeResult(value2, results),
-    createdNodeIds = unresolvedCommandIds2['nodeIds'],
+    createdNodeIds = unresolvedCommandIds2.nodeIds,
     canvasState = readCanvasState(commandContext),
-    missingNodeIds = canvasState?.['nodes']
-      ? createdNodeIds['filter']((value3) => !canvasState['nodes'][value3])
+    missingNodeIds = canvasState?.nodes
+      ? createdNodeIds.filter((value3) => !canvasState.nodes[value3])
       : [];
   if (
-    raw['ok'] === true &&
-    (unresolvedCommandIds2['unresolvedCommandIds']['length'] > 0 || missingNodeIds['length'] > 0)
+    raw.ok === true &&
+    (unresolvedCommandIds2.unresolvedCommandIds.length > 0 || missingNodeIds.length > 0)
   )
     return {
       ok: false,
@@ -197,20 +197,20 @@ export async function executeAgentActions(
       raw: raw,
       createdNodeIds: createdNodeIds,
       missingNodeIds: missingNodeIds,
-      unresolvedCommandIds: unresolvedCommandIds2['unresolvedCommandIds'],
+      unresolvedCommandIds: unresolvedCommandIds2.unresolvedCommandIds,
     };
   const args5 = collectCreatedNodesOutsideVisibleCanvas(
     commandContext,
     canvasState,
-    createdNodeIds['filter']((value4) => !unresolvedCommandIds2['reusedNodeIds']['includes'](value4)),
+    createdNodeIds.filter((value4) => !unresolvedCommandIds2.reusedNodeIds.includes(value4)),
   );
   return (
-    revealCreatedNodes(commandContext, [...new Set([...unresolvedCommandIds2['revealNodeIds'], ...args5])]),
+    revealCreatedNodes(commandContext, [...new Set([...unresolvedCommandIds2.revealNodeIds, ...args5])]),
     {
-      ok: raw['ok'] === true,
-      status: raw['ok'] === true ? 'success' : 'failed',
-      errorCode: raw['errorCode'] || '',
-      message: raw['message'] || '',
+      ok: raw.ok === true,
+      status: raw.ok === true ? 'success' : 'failed',
+      errorCode: raw.errorCode || '',
+      message: raw.message || '',
       results: results,
       raw: raw,
       createdNodeIds: createdNodeIds,

@@ -15,10 +15,10 @@ export function createAudioVoiceCloudAsrAdapters({
     transcribeBailianAudio({
       ...rest,
       audio: await openAsBlob(audioAbs, { type: 'audio/mpeg' }),
-      filename: path['basename'](audioAbs),
-      throwIfCancelled: () => queue['throwIfCancelled'](task),
+      filename: path.basename(audioAbs),
+      throwIfCancelled: () => queue.throwIfCancelled(task),
       onProgress: (progress, message) =>
-        queue['emitProgress'](task, progress, message, { stage: 'transcribe' }),
+        queue.emitProgress(task, progress, message, { stage: 'transcribe' }),
     }),
 } = {}) {
   return {
@@ -30,7 +30,7 @@ export function createAudioVoiceCloudAsrAdapters({
     bailian: {
       getConfig: getBailianAsrConfig,
       run: runBailianAsrTranscription,
-      normalize: (result) => result['segments'],
+      normalize: (result) => result.segments,
     },
   };
 }

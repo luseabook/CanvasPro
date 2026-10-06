@@ -4,24 +4,24 @@ function getErrorText(error) {
   if (typeof error === 'string') return error;
   if (!error || typeof error !== 'object') return '';
   return String(
-    error['error']?.['message'] ||
-      error['message'] ||
-      error['errorMessage'] ||
-      error['error_message'] ||
-      error['error'] ||
-      error['reason'] ||
-      error['msg'] ||
+    error.error?.message ||
+      error.message ||
+      error.errorMessage ||
+      error.error_message ||
+      error.error ||
+      error.reason ||
+      error.msg ||
       '',
   );
 }
 function parseModelActivationError(value) {
   if (
-    !/has\s+not\s+activated\s+the\s+model/i['test'](value) ||
-    !/activate\s+the\s+model\s+service/i['test'](value)
+    !/has\s+not\s+activated\s+the\s+model/i.test(value) ||
+    !/activate\s+the\s+model\s+service/i.test(value)
   )
     return null;
-  const item = value['match'](/activated\s+the\s+model\s+([^.,\s]+)/i)?.[1] || '',
-    key = value['match'](/request\s*id\s*:\s*([^\s]+)/i)?.[1] || '',
+  const item = value.match(/activated\s+the\s+model\s+([^.,\s]+)/i)?.[1] || '',
+    key = value.match(/request\s*id\s*:\s*([^\s]+)/i)?.[1] || '',
     index = item ? '「' + item + '」' : '该模型',
     result = key ? ' 请求 ID：' + key : '';
   return (
@@ -32,11 +32,11 @@ function parseModelActivationError(value) {
   );
 }
 export function parseError(raw, status = 0) {
-  const errorText = getErrorText(raw)['trim'](),
+  const errorText = getErrorText(raw).trim(),
     message = parseModelActivationError(errorText);
   if (!message) return null;
   return new ApiError({
-    type: ErrorType['MODEL_UNAVAILABLE'],
+    type: ErrorType.MODEL_UNAVAILABLE,
     provider: PROVIDER,
     status: status,
     raw: raw,

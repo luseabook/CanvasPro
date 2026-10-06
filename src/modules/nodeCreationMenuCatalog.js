@@ -207,5 +207,5 @@ export function getNodeCreationMenuSections(item, { includeDevOnly: includeDevOn
 
 export function isNodeCreationTypeEnabled(key) {
   const index = NODE_CREATION_ITEMS[String(key || '')];
-  return index?.['creationDisabled'] !== true;
+  return index?.creationDisabled !== true;
 }

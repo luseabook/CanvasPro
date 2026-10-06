@@ -1,11 +1,11 @@
 import { createAgentElement } from './agentPanelElements.js';
 export function updateAgentMessageTime(el, value) {
   const item = new Date(Number(value));
-  if (!el || !(Number(value) > 0) || !Number['isFinite'](item['getTime']())) return false;
+  if (!el || !(Number(value) > 0) || !Number.isFinite(item.getTime())) return false;
   return (
-    el['setAttribute']('datetime', item['toISOString']()),
-    (el['textContent'] = item['getHours']() + ':' + String(item['getMinutes']())['padStart'](2, '0')),
-    (el['title'] = item['toLocaleString']()),
+    el.setAttribute('datetime', item.toISOString()),
+    (el.textContent = item.getHours() + ':' + String(item.getMinutes()).padStart(2, '0')),
+    (el.title = item.toLocaleString()),
     true
   );
 }

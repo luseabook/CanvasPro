@@ -31,9 +31,9 @@ function createShellDouble({ throwOnOpen = false } = {}) {
 
 function readyTimeoutError({ causeCode = '', profileRecovery = false } = {}) {
   const error = new Error('renderer timeout');
-  error['code'] = 'CHROME_SHELL_RENDERER_READY_TIMEOUT';
+  error.code = 'CHROME_SHELL_RENDERER_READY_TIMEOUT';
   if (profileRecovery) {
-    error['profileRecoveryError'] = Object.assign(new Error('recovery failed'), {
+    error.profileRecoveryError = Object.assign(new Error('recovery failed'), {
       cause: { code: causeCode },
     });
   }

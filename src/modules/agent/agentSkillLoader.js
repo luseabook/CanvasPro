@@ -3,78 +3,78 @@ export async function refreshInstalledAgentSkills({
   registry: registry,
   bridge: bridge = desktopBridge,
 } = {}) {
-  if (!registry || typeof registry['replaceInstalledPackages'] !== 'function')
+  if (!registry || typeof registry.replaceInstalledPackages !== 'function')
     throw new TypeError('Agent Skill Registry is required.');
-  if (bridge?.['agentSkills']?.['isAvailable']?.() !== true)
+  if (bridge?.agentSkills?.isAvailable?.() !== true)
     return { available: false, loaded: 0, rootPath: '', diagnostics: [] };
   try {
-    const value = await bridge['agentSkills']['list']();
-    return registry['replaceInstalledPackages'](value?.['packages'] || [], value || {});
+    const value = await bridge.agentSkills.list();
+    return registry.replaceInstalledPackages(value?.packages || [], value || {});
   } catch (error) {
-    const item = registry['getState']?.() || {};
+    const item = registry.getState?.() || {};
     return {
       available: false,
-      loaded: Number(item['installedCount'] || 0),
-      rootPath: String(item['rootPath'] || ''),
+      loaded: Number(item.installedCount || 0),
+      rootPath: String(item.rootPath || ''),
       diagnostics: [
         {
           ok: false,
           errorCode: 'SKILL_DISCOVERY_FAILED',
-          message: String(error?.['message'] || error || 'Skill discovery failed')['slice'](0, 300),
+          message: String(error?.message || error || 'Skill discovery failed').slice(0, 300),
         },
       ],
     };
   }
 }
 export async function openInstalledAgentSkillsRoot({ bridge: bridge = desktopBridge } = {}) {
-  if (bridge?.['agentSkills']?.['isAvailable']?.() !== true)
+  if (bridge?.agentSkills?.isAvailable?.() !== true)
     return { success: false, canceled: false, errorCode: 'SKILL_FOLDER_OPEN_UNAVAILABLE' };
-  return bridge['agentSkills']['openRoot']();
+  return bridge.agentSkills.openRoot();
 }
 export async function installAgentSkillFromFolder({
   registry: registry2,
   bridge: bridge = desktopBridge,
 } = {}) {
-  if (!registry2 || typeof registry2['replaceInstalledPackages'] !== 'function')
+  if (!registry2 || typeof registry2.replaceInstalledPackages !== 'function')
     throw new TypeError('Agent Skill Registry is required.');
-  if (bridge?.['agentSkills']?.['isAvailable']?.() !== true)
+  if (bridge?.agentSkills?.isAvailable?.() !== true)
     return { success: false, canceled: false, errorCode: 'SKILL_IMPORT_UNAVAILABLE' };
-  const response = await bridge['agentSkills']['installFromFolder']();
-  if (response?.['success'] !== true) return response;
+  const response = await bridge.agentSkills.installFromFolder();
+  if (response?.success !== true) return response;
   const loaded = await refreshInstalledAgentSkills({ registry: registry2, bridge: bridge });
-  if (loaded['available'] === false)
+  if (loaded.available === false)
     return { ...response, success: false, errorCode: 'SKILL_REFRESH_AFTER_INSTALL_FAILED' };
-  return { ...response, loaded: loaded['loaded'] };
+  return { ...response, loaded: loaded.loaded };
 }
 export async function saveManagedAgentSkill({
   registry: registry3,
   definition: definition,
   bridge: bridge = desktopBridge,
 } = {}) {
-  if (!registry3 || typeof registry3['replaceInstalledPackages'] !== 'function')
+  if (!registry3 || typeof registry3.replaceInstalledPackages !== 'function')
     throw new TypeError('Agent Skill Registry is required.');
-  if (bridge?.['agentSkills']?.['isAvailable']?.() !== true)
+  if (bridge?.agentSkills?.isAvailable?.() !== true)
     return { success: false, canceled: false, errorCode: 'SKILL_SAVE_UNAVAILABLE' };
-  const response2 = await bridge['agentSkills']['saveManaged'](definition || {});
-  if (response2?.['success'] !== true) return response2;
+  const response2 = await bridge.agentSkills.saveManaged(definition || {});
+  if (response2?.success !== true) return response2;
   const loaded2 = await refreshInstalledAgentSkills({ registry: registry3, bridge: bridge });
-  if (loaded2['available'] === false)
+  if (loaded2.available === false)
     return { ...response2, success: false, errorCode: 'SKILL_REFRESH_AFTER_SAVE_FAILED' };
-  return { ...response2, loaded: loaded2['loaded'] };
+  return { ...response2, loaded: loaded2.loaded };
 }
 export async function deleteInstalledAgentSkill({
   registry: registry4,
   request: request,
   bridge: bridge = desktopBridge,
 } = {}) {
-  if (!registry4 || typeof registry4['replaceInstalledPackages'] !== 'function')
+  if (!registry4 || typeof registry4.replaceInstalledPackages !== 'function')
     throw new TypeError('Agent Skill Registry is required.');
-  if (bridge?.['agentSkills']?.['isAvailable']?.() !== true)
+  if (bridge?.agentSkills?.isAvailable?.() !== true)
     return { success: false, canceled: false, errorCode: 'SKILL_DELETE_UNAVAILABLE' };
-  const response3 = await bridge['agentSkills']['deleteInstalled'](request || {});
-  if (response3?.['success'] !== true) return response3;
+  const response3 = await bridge.agentSkills.deleteInstalled(request || {});
+  if (response3?.success !== true) return response3;
   const loaded3 = await refreshInstalledAgentSkills({ registry: registry4, bridge: bridge });
-  if (loaded3['available'] === false)
+  if (loaded3.available === false)
     return { ...response3, success: false, errorCode: 'SKILL_REFRESH_AFTER_DELETE_FAILED' };
-  return { ...response3, loaded: loaded3['loaded'] };
+  return { ...response3, loaded: loaded3.loaded };
 }

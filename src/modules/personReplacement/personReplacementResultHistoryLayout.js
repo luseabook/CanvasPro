@@ -5,28 +5,28 @@ export function createPersonReplacementResultHistoryLayout() {
     value = null;
   const run = (item, enabled = true) => {
       if (!el) return [];
-      if (!enabled) el['classList']['add']('is-results-layout-static');
-      el['style']['setProperty'](SIZE, item + 'px');
-      const key = (el['getAnimations']?.() || [])['filter']((index) => index['transitionProperty'] === SIZE);
-      if (!enabled) el['classList']['remove']('is-results-layout-static');
+      if (!enabled) el.classList.add('is-results-layout-static');
+      el.style.setProperty(SIZE, item + 'px');
+      const key = (el.getAnimations?.() || []).filter((index) => index.transitionProperty === SIZE);
+      if (!enabled) el.classList.remove('is-results-layout-static');
       return key;
     },
     handler = () => {
-      (value?.['disconnect'](), (value = null), (el2 = null));
+      (value?.disconnect(), (value = null), (el2 = null));
     },
     handler2 = () => {
-      const result = el2?.['getBoundingClientRect']?.()['height'];
-      if (Number['isFinite'](result)) run(result);
+      const result = el2?.getBoundingClientRect?.().height;
+      if (Number.isFinite(result)) run(result);
     };
-  return Object['freeze']({
+  return Object.freeze({
     show(el3) {
-      const data = el3?.['closest']?.('.person-replacement-middle-layout');
+      const data = el3?.closest?.('.person-replacement-middle-layout');
       data !== el && (handler(), run(0, false), (el = data));
-      const options = el3?.['querySelector']?.('.person-replacement-result-history-content');
+      const options = el3?.querySelector?.('.person-replacement-result-history-content');
       if (options !== el2) {
         (handler(), (el2 = options));
-        const run2 = el3?.['ownerDocument']?.['defaultView']?.['ResizeObserver'];
-        el2 && run2 && ((value = new run2(handler2)), value['observe'](el2));
+        const run2 = el3?.ownerDocument?.defaultView?.ResizeObserver;
+        el2 && run2 && ((value = new run2(handler2)), value.observe(el2));
       }
       handler2();
     },

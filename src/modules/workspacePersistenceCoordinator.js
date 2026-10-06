@@ -1,9 +1,9 @@
 function normalizeDelay(value, item) {
   const count = Number(value);
-  return Number['isFinite'](count) && count >= 0 ? count : item;
+  return Number.isFinite(count) && count >= 0 ? count : item;
 }
 function getErrorMessage(error2) {
-  return String(error2?.['message'] || error2 || '自动保存失败')['trim']() || '自动保存失败';
+  return String(error2?.message || error2 || '自动保存失败').trim() || '自动保存失败';
 }
 export function createWorkspacePersistenceCoordinator({
   save: save,
@@ -13,8 +13,8 @@ export function createWorkspacePersistenceCoordinator({
   maxWaitMs: maxWaitMs = 0,
   retryBaseMs: retryBaseMs = 1000,
   retryMaxMs: retryMaxMs = 10000,
-  setTimeoutFn: setTimeoutFn = globalThis['setTimeout']?.['bind'](globalThis),
-  clearTimeoutFn: clearTimeoutFn = globalThis['clearTimeout']?.['bind'](globalThis),
+  setTimeoutFn: setTimeoutFn = globalThis.setTimeout?.bind(globalThis),
+  clearTimeoutFn: clearTimeoutFn = globalThis.clearTimeout?.bind(globalThis),
   onStateChange: onStateChange = () => {},
   onError: onError = () => {},
 } = {}) {
@@ -22,7 +22,7 @@ export function createWorkspacePersistenceCoordinator({
     delay = normalizeDelay(debounceMs, 500),
     delay2 = normalizeDelay(maxWaitMs, 0),
     delay3 = normalizeDelay(retryBaseMs, 1000),
-    key = Math['max'](delay3, normalizeDelay(retryMaxMs, 10000));
+    key = Math.max(delay3, normalizeDelay(retryMaxMs, 10000));
   let enabled = ready === true,
     enabled2 = false,
     setTimeoutFn2 = 0,
@@ -39,8 +39,8 @@ export function createWorkspacePersistenceCoordinator({
       return (
         (response = {
           status: status2,
-          error: String(error || '')['trim'](),
-          retryAttempt: Math['max'](0, Math['trunc'](Number(attempt) || 0)),
+          error: String(error || '').trim(),
+          retryAttempt: Math.max(0, Math.trunc(Number(attempt) || 0)),
         }),
         onStateChange({ ...response }),
         response
@@ -62,14 +62,14 @@ export function createWorkspacePersistenceCoordinator({
     handler4 = (target) => {
       ((attempt2 += 1), run('error', { error: getErrorMessage(target), attempt: attempt2 }));
       if (enabled2 || !enabled || !status || setTimeoutFn4 || typeof setTimeoutFn !== 'function') return;
-      const source = Math['min'](delay3 * 2 ** Math['max'](0, attempt2 - 1), key);
+      const source = Math.min(delay3 * 2 ** Math.max(0, attempt2 - 1), key);
       setTimeoutFn4 =
         setTimeoutFn(() => {
-          ((setTimeoutFn4 = 0), void flush()['catch'](onError));
+          ((setTimeoutFn4 = 0), void flush().catch(onError));
         }, source) || 0;
     },
     handler5 = ({ allowStopped: allowStopped = false } = {}) => {
-      if (!enabled || !status || (enabled2 && !allowStopped)) return Promise['resolve'](options);
+      if (!enabled || !status || (enabled2 && !allowStopped)) return Promise.resolve(options);
       (handler3(), handler2());
       if (data) return data;
       const run2 = async () => {
@@ -91,7 +91,7 @@ export function createWorkspacePersistenceCoordinator({
           }
           return options;
         },
-        payload = run2()['finally'](() => {
+        payload = run2().finally(() => {
           if (data === payload) data = null;
         });
       return ((data = payload), payload);
@@ -105,33 +105,33 @@ export function createWorkspacePersistenceCoordinator({
   const run3 = (handle = delay) => {
       if (!enabled || enabled2 || !status || setTimeoutFn4 || typeof setTimeoutFn !== 'function') return;
       if (setTimeoutFn2 && value2 !== null && handle > value2) return;
-      ((value2 = value2 === null ? handle : Math['min'](value2, handle)),
+      ((value2 = value2 === null ? handle : Math.min(value2, handle)),
         handler(),
         (setTimeoutFn2 =
           setTimeoutFn(() => {
-            ((setTimeoutFn2 = 0), void flush()['catch'](onError));
+            ((setTimeoutFn2 = 0), void flush().catch(onError));
           }, value2) || 0),
         !setTimeoutFn3 &&
           delay2 > 0 &&
           (setTimeoutFn3 =
             setTimeoutFn(() => {
-              ((setTimeoutFn3 = 0), void flush()['catch'](onError));
+              ((setTimeoutFn3 = 0), void flush().catch(onError));
             }, delay2) || 0));
     },
     schedule = ({ immediate: immediate = false, delayMs: delayMs = delay } = {}) => {
       if (enabled2) return index;
       index += 1;
-      if (status && !['error', 'saving']['includes'](response['status'])) run('pending');
+      if (status && !['error', 'saving'].includes(response.status)) run('pending');
       if (!enabled || !status) return index;
       return (
-        immediate ? (handler(), void flush()['catch'](onError)) : run3(normalizeDelay(delayMs, delay)),
+        immediate ? (handler(), void flush().catch(onError)) : run3(normalizeDelay(delayMs, delay)),
         index
       );
     },
     setReady = (state = true, { immediate: immediate = false } = {}) => {
       enabled = state === true;
       if (!enabled || enabled2 || index <= result) return;
-      immediate ? void flush()['catch'](onError) : run3();
+      immediate ? void flush().catch(onError) : run3();
     },
     setHydrationError = (config) => {
       ((enabled = false),
@@ -152,7 +152,7 @@ export function createWorkspacePersistenceCoordinator({
         (handler(), handler2());
       }
     };
-  return Object['freeze']({
+  return Object.freeze({
     schedule: schedule,
     flush: flush,
     setReady: setReady,

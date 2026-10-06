@@ -2,7 +2,7 @@ import {
   getGenerationTaskProtocolAdapter,
   inferGenerationTaskProtocol,
 } from './generationTaskProtocolAdapters.js';
-const ADAPTER_TYPE_ALIASES = Object['freeze']({
+const ADAPTER_TYPE_ALIASES = Object.freeze({
   workflow: 'workflow',
   modelapi: 'modelApi',
   model_api: 'modelApi',
@@ -13,20 +13,20 @@ const ADAPTER_TYPE_ALIASES = Object['freeze']({
 });
 function compactIdPart(value, item = '') {
   return String(value || item)
-    ['trim']()
-    ['replace'](/\s+/g, '-');
+    .trim()
+    .replace(/\s+/g, '-');
 }
 function firstTrimmed(...args) {
   for (const key of args) {
-    const index = String(key || '')['trim']();
+    const index = String(key || '').trim();
     if (index) return index;
   }
   return '';
 }
 export function normalizeGenerationAdapterType(result, data = 'modelApi') {
   const options = String(result || data)
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   return ADAPTER_TYPE_ALIASES[options] || data;
 }
 export function resolveGenerationTaskIdentity(options2 = {}) {
@@ -51,22 +51,22 @@ export function resolveGenerationTaskIdentity(options2 = {}) {
     }),
     taskId2 = getGenerationTaskProtocolAdapter(protocol),
     adapterType2 = normalizeGenerationAdapterType(
-      adapterType || node['taskAdapterType'] || node['adapterType'] || taskId2?.['adapterType'],
+      adapterType || node.taskAdapterType || node.adapterType || taskId2?.adapterType,
     ),
     provider2 = firstTrimmed(
       provider,
-      node['taskProvider'],
-      payload?.['provider'],
-      protocol === 'asyncModelApi' ? node['asyncTaskProvider'] : '',
-      node['provider'],
+      node.taskProvider,
+      payload?.provider,
+      protocol === 'asyncModelApi' ? node.asyncTaskProvider : '',
+      node.provider,
       protocol === 'workflow' ? 'runninghubwf' : '',
       protocol === 'dreamina' ? 'dreamina' : '',
       adapterType2,
     ),
-    modelId2 = firstTrimmed(modelId, node['taskModelId'], payload?.['model'], node['model']),
+    modelId2 = firstTrimmed(modelId, node.taskModelId, payload?.model, node.model),
     executionId2 = firstTrimmed(
       executionId,
-      node['taskExecutionId'],
+      node.taskExecutionId,
       buildGenerationExecutionId({
         kind: kind,
         provider: provider2,
@@ -81,11 +81,11 @@ export function resolveGenerationTaskIdentity(options2 = {}) {
     modelId: modelId2,
     executionId: executionId2,
     taskId:
-      taskId2?.['readTaskId'](node, taskId) ||
-      firstTrimmed(taskId, node['rhTaskId'], node['asyncTaskId'], node['dreaminaSubmitId'], node['taskId']),
+      taskId2?.readTaskId(node, taskId) ||
+      firstTrimmed(taskId, node.rhTaskId, node.asyncTaskId, node.dreaminaSubmitId, node.taskId),
     startedAt:
-      taskId2?.['readStartedAt'](node, startedAt) || Number(startedAt || node['generationStartTime'] || 0),
-    async: taskId2?.['async'] === true,
+      taskId2?.readStartedAt(node, startedAt) || Number(startedAt || node.generationStartTime || 0),
+    async: taskId2?.async === true,
   };
 }
 export function buildGenerationExecutionId({
@@ -122,7 +122,7 @@ export function createGenerationExecutionPlan(options3 = {}) {
     adapterType4 = normalizeGenerationAdapterType(adapterType),
     target = adapterType4 === 'workflow',
     async2 = async === true && adapterType4 === 'modelApi',
-    provider4 = compactIdPart(provider || payload2?.['provider'], adapterType4),
+    provider4 = compactIdPart(provider || payload2?.provider, adapterType4),
     protocol3 =
       inferGenerationTaskProtocol({
         taskProtocol: taskProtocol || protocol2,
@@ -130,19 +130,19 @@ export function createGenerationExecutionPlan(options3 = {}) {
         provider: provider4,
         async: async2,
       }) || adapterType4,
-    modelId4 = String(modelId || payload2?.['model'] || '')['trim']();
+    modelId4 = String(modelId || payload2?.model || '').trim();
   return {
     ...args2,
     sourceNodeId: sourceNodeId,
     targetNodeId: targetNodeId,
     trigger: trigger,
-    taskType: String(taskType || kind + '-generation')['trim'](),
+    taskType: String(taskType || kind + '-generation').trim(),
     provider: provider4,
     adapterType: adapterType4,
     protocol: protocol3,
     modelId: modelId4,
     executionId:
-      String(executionId || '')['trim']() ||
+      String(executionId || '').trim() ||
       buildGenerationExecutionId({
         kind: kind,
         provider: provider4,
@@ -187,7 +187,7 @@ function createGenerationPlanFromNode(current, entry = {}) {
       ...kind3
     } = entry || {},
     provider5 = resolveGenerationTaskIdentity({
-      kind: kind3['kind'],
+      kind: kind3.kind,
       node: node,
       payload: payload,
       taskProtocol: taskProtocol,
@@ -200,15 +200,15 @@ function createGenerationPlanFromNode(current, entry = {}) {
     }),
     record = {
       ...kind3,
-      provider: provider5['provider'],
-      adapterType: provider5['adapterType'],
-      modelId: provider5['modelId'],
-      executionId: provider5['executionId'],
+      provider: provider5.provider,
+      adapterType: provider5.adapterType,
+      modelId: provider5.modelId,
+      executionId: provider5.executionId,
       payload: payload,
-      taskId: provider5['taskId'],
-      startedAt: provider5['startedAt'],
-      taskProtocol: provider5['protocol'],
-      async: provider5['async'],
+      taskId: provider5.taskId,
+      startedAt: provider5.startedAt,
+      taskProtocol: provider5.protocol,
+      async: provider5.async,
     };
   if (current === 'resume') return createGenerationResumePlan(record);
   if (current === 'cancel') return createGenerationCancelPlan(record);

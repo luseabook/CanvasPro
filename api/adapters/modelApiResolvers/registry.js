@@ -56,7 +56,7 @@ import { volcengineSeedance2Video } from './volcengineVideoResolvers.js';
 import { binghuoVideo } from './binghuoVideoResolvers.js';
 import { bailianImage, bailianVideo } from './bailianResolvers.js';
 import { volcengineDoubaoAudioGeneration } from './volcengineAudioResolvers.js';
-const BODY_RESOLVERS = Object['freeze']({
+const BODY_RESOLVERS = Object.freeze({
     bailianImage: bailianImage,
     bailianVideo: bailianVideo,
     agnesImage: agnesImage,
@@ -95,7 +95,7 @@ const BODY_RESOLVERS = Object['freeze']({
     apimartWan27Video: apimartWan27Video,
     binghuoVideo: binghuoVideo,
   }),
-  ENDPOINT_RESOLVERS = Object['freeze']({
+  ENDPOINT_RESOLVERS = Object.freeze({
     apimartGrokImagineImageEndpoint: apimartGrokImagineImageEndpoint,
     customProviderGeminiImageEndpoint: customProviderGeminiImageEndpoint,
     runninghubImageEndpoint: runninghubImageEndpoint,
@@ -112,8 +112,8 @@ const BODY_RESOLVERS = Object['freeze']({
     runninghubLlmChatEndpoint: runninghubLlmChatEndpoint,
   });
 export function getModelApiBodyResolver(value) {
-  return BODY_RESOLVERS[String(value || '')['trim']()] || null;
+  return BODY_RESOLVERS[String(value || '').trim()] || null;
 }
 export function getModelApiEndpointResolver(item) {
-  return ENDPOINT_RESOLVERS[String(item || '')['trim']()] || null;
+  return ENDPOINT_RESOLVERS[String(item || '').trim()] || null;
 }

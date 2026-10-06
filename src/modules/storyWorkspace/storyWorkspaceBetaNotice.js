@@ -1,20 +1,20 @@
 import { hasSeenBetaNotice, markBetaNoticeSeen, showWorkspaceBetaNotice } from '../workspaceBetaNotice.js';
 export const STORY_WORKSPACE_BETA_NOTICE_STORAGE_KEY = 'aicanvas.storyWorkspace.betaNoticeSeen.v1';
-export function hasSeenStoryWorkspaceBetaNotice(windowObject2 = globalThis['window']) {
+export function hasSeenStoryWorkspaceBetaNotice(windowObject2 = globalThis.window) {
   return hasSeenBetaNotice({
     windowObject: windowObject2,
     storageKey: STORY_WORKSPACE_BETA_NOTICE_STORAGE_KEY,
   });
 }
-export function markStoryWorkspaceBetaNoticeSeen(windowObject3 = globalThis['window']) {
+export function markStoryWorkspaceBetaNoticeSeen(windowObject3 = globalThis.window) {
   return markBetaNoticeSeen({
     windowObject: windowObject3,
     storageKey: STORY_WORKSPACE_BETA_NOTICE_STORAGE_KEY,
   });
 }
 export function showStoryWorkspaceBetaNotice({
-  documentObject: documentObject = globalThis['document'],
-  windowObject: windowObject = globalThis['window'],
+  documentObject: documentObject = globalThis.document,
+  windowObject: windowObject = globalThis.window,
 } = {}) {
   return showWorkspaceBetaNotice({
     documentObject: documentObject,

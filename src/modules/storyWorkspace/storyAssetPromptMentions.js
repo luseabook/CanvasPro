@@ -2,23 +2,23 @@ import { STORY_ASSET_STYLE_REFERENCE_MENTION } from './storyAssetAppearances.js'
 export const STORY_ASSET_STYLE_REFERENCE_PILL_KIND = 'style-reference';
 const STORY_ASSET_STYLE_REFERENCE_NODE_ID = 'story-style-reference';
 function normalizeText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function escapeHtml(item) {
   return String(item ?? '')
-    ['replace'](/&/g, '&amp;')
-    ['replace'](/</g, '&lt;')
-    ['replace'](/>/g, '&gt;')
-    ['replace'](/"/g, '&quot;')
-    ['replace'](/'/g, '&#39;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 function escapeRegExp(key) {
-  return String(key || '')['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return String(key || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 export function buildStoryAssetStyleReferenceMentionCandidate(options = {}, { query: query = '' } = {}) {
-  const thumbUrl = normalizeText(options['referenceImageUrl']),
-    text = normalizeText(query)['replace'](/^@+/, '')['toLowerCase']();
-  if (!thumbUrl || (text && !'风格参考'['includes'](text))) return null;
+  const thumbUrl = normalizeText(options.referenceImageUrl),
+    text = normalizeText(query).replace(/^@+/, '').toLowerCase();
+  if (!thumbUrl || (text && !'风格参考'.includes(text))) return null;
   return {
     origin: 'node',
     nodeId: STORY_ASSET_STYLE_REFERENCE_NODE_ID,
@@ -36,7 +36,7 @@ export function buildStoryAssetStyleReferenceMentionCandidate(options = {}, { qu
 export function renderStoryAssetPromptMentions(index = '', result = {}) {
   const enabled = String(index || '');
   if (!enabled) return '';
-  const text2 = normalizeText(result['referenceImageUrl']),
+  const text2 = normalizeText(result.referenceImageUrl),
     regExp = new RegExp(escapeRegExp(STORY_ASSET_STYLE_REFERENCE_MENTION), 'g'),
     data =
       '<span class="ref-pill story-asset-style-reference-pill" contenteditable="false" data-label="风格参考" data-ref-origin="node" data-node-id="' +
@@ -53,44 +53,44 @@ export function renderStoryAssetPromptMentions(index = '', result = {}) {
         : '') +
       '<span class="ref-pill-label">风格参考</span></span>';
   return escapeHtml(enabled)
-    ['replace'](regExp, data)
-    ['replace'](/\r\n?|\n/g, '<br>');
+    .replace(regExp, data)
+    .replace(/\r\n?|\n/g, '<br>');
 }
 export function readStoryAssetPromptText(enabled2 = null) {
   if (!enabled2) return '';
   const list = [],
     handler = (target) => {
-      if (target) list['push'](String(target));
+      if (target) list.push(String(target));
     },
     handler2 = (el, { root: root = false } = {}) => {
-      const count = Number(el?.['nodeType']);
+      const count = Number(el?.nodeType);
       if (count === 3) {
-        handler(el['textContent'] || '');
+        handler(el.textContent || '');
         return;
       }
       if (count !== 1 && !root) return;
       if (
         !root &&
-        normalizeText(el?.['dataset']?.['promptPillKind']) === STORY_ASSET_STYLE_REFERENCE_PILL_KIND
+        normalizeText(el?.dataset?.promptPillKind) === STORY_ASSET_STYLE_REFERENCE_PILL_KIND
       ) {
         handler(STORY_ASSET_STYLE_REFERENCE_MENTION);
         return;
       }
-      const source = String(el?.['tagName'] || '')['toUpperCase']();
+      const source = String(el?.tagName || '').toUpperCase();
       if (source === 'BR') {
         handler('\n');
         return;
       }
-      const next = !root && ['DIV', 'P']['includes'](source);
-      if (next && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
-      Array['from'](el?.['childNodes'] || [])['forEach']((current) => handler2(current));
-      if (next && list['length'] && !list['at'](-1)['endsWith']('\n')) handler('\n');
+      const next = !root && ['DIV', 'P'].includes(source);
+      if (next && list.length && !list.at(-1).endsWith('\n')) handler('\n');
+      Array.from(el?.childNodes || []).forEach((current) => handler2(current));
+      if (next && list.length && !list.at(-1).endsWith('\n')) handler('\n');
     };
   return (
     handler2(enabled2, { root: true }),
-    list['join']('')
-      ['replace'](/\u00a0/g, ' ')
-      ['replace'](/\n{3,}/g, '\n\n')
-      ['replace'](/\n$/g, '')
+    list.join('')
+      .replace(/\u00a0/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/\n$/g, '')
   );
 }

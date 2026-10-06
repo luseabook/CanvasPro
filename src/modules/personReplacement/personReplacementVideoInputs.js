@@ -13,50 +13,50 @@ import {
 import { normalizePersonReplacementWorkspaceProject } from './personReplacementProjectSession.js';
 import { updatePersonReplacementVideoGenerationState } from './personReplacementVideoGeneration.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function getStoredVideoInputsBySlot(options = {}) {
-  const item = options?.['replacementVideoInputsBySlot'];
-  return item && typeof item === 'object' && !Array['isArray'](item) ? item : {};
+  const item = options?.replacementVideoInputsBySlot;
+  return item && typeof item === 'object' && !Array.isArray(item) ? item : {};
 }
 function resolveStoredInputUrl(response) {
   if (typeof response === 'string') return normalizeText(response);
   return normalizeText(
-    response?.['url'] ||
-      response?.['localUrl'] ||
-      response?.['imageUrl'] ||
-      response?.['videoUrl'] ||
-      response?.['localPath'],
+    response?.url ||
+      response?.localUrl ||
+      response?.imageUrl ||
+      response?.videoUrl ||
+      response?.localPath,
   );
 }
 function resolveProjectSourceVideoRef(options2 = {}, key = {}) {
-  const text = normalizeText(key?.['sourceId']),
-    index = (Array['isArray'](options2?.['sources']) ? options2['sources'] : [])['find'](
-      (result) => normalizeText(result?.['id']) === text,
+  const text = normalizeText(key?.sourceId),
+    index = (Array.isArray(options2?.sources) ? options2.sources : []).find(
+      (result) => normalizeText(result?.id) === text,
     );
-  return normalizeText(key?.['sourceVideoRef'] || index?.['videoRef']);
+  return normalizeText(key?.sourceVideoRef || index?.videoRef);
 }
 export function appendPersonReplacementVideoResults(options3 = {}, list = []) {
   const args = getPersonReplacementVideoResults(options3),
     results = [...args];
   let activeIndex = -1;
   return (
-    list['forEach']((args2) => {
+    list.forEach((args2) => {
       const personReplacementVideoResultRef = resolvePersonReplacementVideoResultRef(args2);
       if (!personReplacementVideoResultRef) return;
-      const count = results['findIndex'](
+      const count = results.findIndex(
         (data) => resolvePersonReplacementVideoResultRef(data) === personReplacementVideoResultRef,
       );
       if (count >= 0) {
         if (activeIndex < 0) activeIndex = count;
         return;
       }
-      if (activeIndex < 0) activeIndex = results['length'];
-      results['push']({ ...args2 });
+      if (activeIndex < 0) activeIndex = results.length;
+      results.push({ ...args2 });
     }),
     {
       results: results,
-      activeIndex: activeIndex >= 0 ? activeIndex : Math['max'](0, results['length'] - 1),
+      activeIndex: activeIndex >= 0 ? activeIndex : Math.max(0, results.length - 1),
     }
   );
 }
@@ -65,19 +65,19 @@ export function applyPersonReplacementVideoCrop(
   { shotId: shotId = '', cutLocalPath: cutLocalPath = '', videoUrl: videoUrl = '', fps: fps = 0 } = {},
 ) {
   const shots = normalizePersonReplacementWorkspaceProject(options4),
-    shotId2 = normalizeText(shotId || shots['workspace']['selectedShotId']),
+    shotId2 = normalizeText(shotId || shots.workspace.selectedShotId),
     videoIterationInputRef = normalizeText(cutLocalPath || videoUrl);
   if (!shotId2 || !videoIterationInputRef) return shots;
-  const enabled = shots['shots']['find']((target) => target['id'] === shotId2);
+  const enabled = shots.shots.find((target) => target.id === shotId2);
   if (!enabled) return shots;
-  const outputFps = Number(fps) > 0 ? Number(fps) : enabled['outputFps'],
+  const outputFps = Number(fps) > 0 ? Number(fps) : enabled.outputFps,
     source = {
       ...shots,
-      shots: shots['shots']['map']((args3) =>
-        args3['id'] === shotId2
+      shots: shots.shots.map((args3) =>
+        args3.id === shotId2
           ? {
               ...args3,
-              ...(args3['videoIterationReferenceRef']
+              ...(args3.videoIterationReferenceRef
                 ? { videoIterationInputRef: videoIterationInputRef }
                 : { videoRef: videoIterationInputRef, videoRefIsCropped: true }),
               outputFps: outputFps,
@@ -87,7 +87,7 @@ export function applyPersonReplacementVideoCrop(
             }
           : args3,
       ),
-      workspace: updatePersonReplacementVideoGenerationState(shots['workspace'], {
+      workspace: updatePersonReplacementVideoGenerationState(shots.workspace, {
         status: 'idle',
         shotId: shotId2,
         error: '',
@@ -97,25 +97,25 @@ export function applyPersonReplacementVideoCrop(
 }
 export function resolvePersonReplacementVideoSlotState(generationParams2 = {}, thumbUrl = {}) {
   const model = resolvePersonReplacementVideoModelId(
-      generationParams2?.['settings']?.['replacementModelId'] || PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID,
+      generationParams2?.settings?.replacementModelId || PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID,
     ),
     provider = resolveModelProvider(model, '', { allowProviderHint: false, allowPrefixInference: false }),
     fixedInputConfig = getFixedInputSlotConfigFromManifest(
       {
         model: model,
         provider: provider,
-        generationParams: generationParams2?.['settings']?.['replacementVideoGenerationParams'] || {},
+        generationParams: generationParams2?.settings?.replacementVideoGenerationParams || {},
       },
       { includeHiddenSlots: true },
     ),
     inputsBySlot = {},
-    readOnlySlots = ['refImage']['filter']((next) => fixedInputConfig?.['visibleSlots']?.['includes'](next)),
+    readOnlySlots = ['refImage'].filter((next) => fixedInputConfig?.visibleSlots?.includes(next)),
     storedVideoInputsBySlot = getStoredVideoInputsBySlot(thumbUrl);
-  (fixedInputConfig?.['visibleSlots'] || [])['forEach']((current) => {
+  (fixedInputConfig?.visibleSlots || []).forEach((current) => {
     const entry = storedVideoInputsBySlot[current],
-      text2 = normalizeText(entry?.['modelId']),
+      text2 = normalizeText(entry?.modelId),
       url = resolveStoredInputUrl(entry),
-      kind = normalizeText(fixedInputConfig?.['slotKindById']?.[current] || entry?.['kind']);
+      kind = normalizeText(fixedInputConfig?.slotKindById?.[current] || entry?.kind);
     if (!url || (text2 && text2 !== model)) return;
     inputsBySlot[current] = {
       ...(entry && typeof entry === 'object' ? entry : {}),
@@ -126,41 +126,41 @@ export function resolvePersonReplacementVideoSlotState(generationParams2 = {}, t
   const personReplacementVideoSourceRef = resolvePersonReplacementVideoSourceRef(thumbUrl),
     url2 = personReplacementVideoSourceRef || resolveProjectSourceVideoRef(generationParams2, thumbUrl);
   url2 &&
-    fixedInputConfig?.['slotKindById']?.['sourceVideo'] === 'video' &&
-    (!inputsBySlot['sourceVideo'] || thumbUrl?.['videoIterationReferenceRef']) &&
-    ((inputsBySlot['sourceVideo'] = {
+    fixedInputConfig?.slotKindById?.sourceVideo === 'video' &&
+    (!inputsBySlot.sourceVideo || thumbUrl?.videoIterationReferenceRef) &&
+    ((inputsBySlot.sourceVideo = {
       kind: 'video',
       url: url2,
-      thumbUrl: thumbUrl?.['videoIterationReferenceRef']
+      thumbUrl: thumbUrl?.videoIterationReferenceRef
         ? resolveCanvasVideoPosterUrl(
-            getPersonReplacementVideoResults(thumbUrl)['find'](
+            getPersonReplacementVideoResults(thumbUrl).find(
               (record) => resolvePersonReplacementVideoResultRef(record) === personReplacementVideoSourceRef,
             ),
           )
-        : normalizeText(thumbUrl?.['keyframeRef']),
+        : normalizeText(thumbUrl?.keyframeRef),
       pending: !personReplacementVideoSourceRef,
     }),
-    readOnlySlots['push']('sourceVideo'));
+    readOnlySlots.push('sourceVideo'));
   const url3 = resolvePersonReplacementVideoImageInput(generationParams2, thumbUrl);
-  url3['status'] === 'ready' &&
-    fixedInputConfig?.['slotKindById']?.['refImage'] === 'image' &&
-    (inputsBySlot['refImage'] = { kind: 'image', url: url3['imageRef'] });
-  const slotEntries = Object['fromEntries'](
-      Object['entries'](inputsBySlot)
-        ['filter'](
+  url3.status === 'ready' &&
+    fixedInputConfig?.slotKindById?.refImage === 'image' &&
+    (inputsBySlot.refImage = { kind: 'image', url: url3.imageRef });
+  const slotEntries = Object.fromEntries(
+      Object.entries(inputsBySlot)
+        .filter(
           ([payload, response2]) =>
-            fixedInputConfig?.['visibleSlots']?.['includes'](payload) &&
-            normalizeText(response2?.['url']) &&
-            response2?.['pending'] !== true,
+            fixedInputConfig?.visibleSlots?.includes(payload) &&
+            normalizeText(response2?.url) &&
+            response2?.pending !== true,
         )
-        ['map'](([handle, response3]) => [handle, { ...response3, url: normalizeText(response3['url']) }]),
+        .map(([handle, response3]) => [handle, { ...response3, url: normalizeText(response3.url) }]),
     ),
     referenceCounts = { imageCount: 0, videoCount: 0, audioCount: 0 };
   return (
-    Object['entries'](inputsBySlot)['forEach'](([state, config]) => {
-      const text3 = normalizeText(fixedInputConfig?.['slotKindById']?.[state] || config?.['kind']),
+    Object.entries(inputsBySlot).forEach(([state, config]) => {
+      const text3 = normalizeText(fixedInputConfig?.slotKindById?.[state] || config?.kind),
         scope = text3 + 'Count';
-      Object['hasOwn'](referenceCounts, scope) && (referenceCounts[scope] += 1);
+      Object.hasOwn(referenceCounts, scope) && (referenceCounts[scope] += 1);
     }),
     {
       modelId: model,
@@ -181,13 +181,13 @@ export function buildPersonReplacementVideoSlotPayloadPatch({
 } = {}) {
   const model2 = resolvePersonReplacementVideoSlotState(project, shot),
     payloadPatch = buildRunningHubVideoFixedSlotPayloadPatch({
-      model: model2['modelId'],
+      model: model2.modelId,
       nodeData: {
-        model: model2['modelId'],
-        provider: model2['provider'],
+        model: model2.modelId,
+        provider: model2.provider,
         generationParams: generationParams,
       },
-      slotEntries: model2['slotEntries'],
+      slotEntries: model2.slotEntries,
     });
   return { slotState: model2, payloadPatch: payloadPatch };
 }

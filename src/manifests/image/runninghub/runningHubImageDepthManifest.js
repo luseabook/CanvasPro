@@ -4,7 +4,7 @@ import {
 } from '../../shared/runningHubImageManifestShared.js';
 export const RH_IMAGE_DEPTH_MODEL_ID = 'runninghub/image-depth';
 export const RH_IMAGE_DEPTH_EXECUTION_ID = 'runninghub.workflow.image-depth.v1';
-export const rhImageDepthModelManifest = Object['freeze']({
+export const rhImageDepthModelManifest = Object.freeze({
   schemaVersion: '1.0',
   modelId: RH_IMAGE_DEPTH_MODEL_ID,
   executionId: RH_IMAGE_DEPTH_EXECUTION_ID,
@@ -62,7 +62,7 @@ export const rhImageDepthModelManifest = Object['freeze']({
   cancellable: true,
   outputType: 'image',
 });
-export const rhImageDepthExecutionManifest = Object['freeze']({
+export const rhImageDepthExecutionManifest = Object.freeze({
   schemaVersion: '1.0',
   id: RH_IMAGE_DEPTH_EXECUTION_ID,
   provider: 'runninghubwf',

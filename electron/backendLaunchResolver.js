@@ -1,16 +1,16 @@
 import path from 'node:path';
 export function resolveNativeBackendExecutable({
   runtimeRoot: runtimeRoot,
-  platform: platform = process['platform'],
+  platform: platform = process.platform,
 }) {
   const executable = platform === 'win32' ? 'aicanvas-backend.exe' : 'aicanvas-backend';
-  return path['join'](runtimeRoot, 'backend', executable);
+  return path.join(runtimeRoot, 'backend', executable);
 }
 export function resolveBackendLaunchSpec({
   appIsPackaged: appIsPackaged,
   appRoot: appRoot,
   runtimeRoot: runtimeRoot,
-  platform: platform = process['platform'],
+  platform: platform = process.platform,
   existsSync: existsSync,
   pythonCommand: pythonCommand,
 }) {

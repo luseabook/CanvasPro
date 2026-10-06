@@ -270,34 +270,34 @@ export const TEXT_ROTATE_HANDLE_OFFSET = 24;
 export const TEXT_ROTATE_HIT_RADIUS = 13;
 
 const getViewportZoom = (box19) => {
-    const count = Number(box19?.['zoom']);
-    return Number['isFinite'](count) && count > 0 ? count : 1;
+    const count = Number(box19?.zoom);
+    return Number.isFinite(count) && count > 0 ? count : 1;
   },
   getScreenX = (value20, box20) =>
-    ((Number(value20) || 0) - (Number(box20?.['x']) || 0)) * getViewportZoom(box20),
+    ((Number(value20) || 0) - (Number(box20?.x) || 0)) * getViewportZoom(box20),
   getScreenY = (value21, box21) =>
-    ((Number(value21) || 0) - (Number(box21?.['y']) || 0)) * getViewportZoom(box21);
+    ((Number(value21) || 0) - (Number(box21?.y) || 0)) * getViewportZoom(box21);
 
 export const getTextRotationHandles = (value22) => {
-  const list5 = Array['isArray'](value22?.['corners']) ? value22['corners'] : [];
-  if (list5['length'] < 2) return [];
+  const list5 = Array.isArray(value22?.corners) ? value22.corners : [];
+  if (list5.length < 2) return [];
   const [box22, box23] = list5,
-    value23 = box23['x'] - box22['x'],
-    value24 = box23['y'] - box22['y'],
-    value25 = Math['hypot'](value23, value24) || 1,
-    box24 = { x: (box22['x'] + box23['x']) / 2, y: (box22['y'] + box23['y']) / 2 };
+    value23 = box23.x - box22.x,
+    value24 = box23.y - box22.y,
+    value25 = Math.hypot(value23, value24) || 1,
+    box24 = { x: (box22.x + box23.x) / 2, y: (box22.y + box23.y) / 2 };
   return [
     {
       point: {
-        x: box24['x'] + (value24 / value25) * TEXT_ROTATE_HANDLE_OFFSET,
-        y: box24['y'] - (value23 / value25) * TEXT_ROTATE_HANDLE_OFFSET,
+        x: box24.x + (value24 / value25) * TEXT_ROTATE_HANDLE_OFFSET,
+        y: box24.y - (value23 / value25) * TEXT_ROTATE_HANDLE_OFFSET,
       },
       handle: 'rotate',
     },
   ];
 };
 
-export const getTextRotationHandle = (value26) => getTextRotationHandles(value26)[0]?.['point'] || null;
+export const getTextRotationHandle = (value26) => getTextRotationHandles(value26)[0]?.point || null;
 
 export const getTextAnchorForCenter = ({
   centerPx: centerPx,
@@ -314,5 +314,5 @@ export const getTextAnchorForCenter = ({
     },
     rotation2,
   );
-  return { x: Number(centerPx?.['x'] || 0) - box25['x'], y: Number(centerPx?.['y'] || 0) - box25['y'] };
+  return { x: Number(centerPx?.x || 0) - box25.x, y: Number(centerPx?.y || 0) - box25.y };
 };

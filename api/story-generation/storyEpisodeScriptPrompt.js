@@ -12,21 +12,21 @@ export const STORY_EPISODE_SCRIPT_SYSTEM_PROMPT = [
   '不得跳集生成，不得提前完成后续分集的核心事件。',
   '正文完成后必须从本集实际内容提取 continuityFacts 和 endingState；不得在状态字段中添加正文没有发生的事实。',
   '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
-]['join']('\n');
+].join('\n');
 export const STORY_EPISODE_SCRIPT_REPAIR_SYSTEM_PROMPT = [
   '你是短剧分集剧本返回修复助手。',
   '只修复上一次返回，不重新分析或重写整集。',
   '必须完整保留已经返回的场次正文、动作和对白；只补齐缺失结尾、修正字段名称或修复 JSON 语法。',
   '如果上次返回在场次中途截断，从截断位置自然续写到本集既定结尾，不得从头重写。',
   '只返回一个 JSON 对象，不要输出 Markdown、解释、校验报告或原始请求。',
-]['join']('\n');
+].join('\n');
 export const STORY_EPISODE_SCRIPT_CONTENT_REVISION_SYSTEM_PROMPT = [
   '你是短剧单集正文修订编辑。',
   '只修复 timingReview 已定位的重复解释、重复动作、无效描写或改编预算偏离；不得脱离已确认摘要、分集大纲和连续性新增剧情。',
   '必须保留本集核心因果、人物选择、冲突结果和指定结尾。',
   '修订后的台词、动作、人物和场景仍必须受 grounding 中的摘要、分集计划与连续性约束。',
   '只返回与单集剧本相同结构的严格 JSON，不要输出说明、对比稿或 Markdown。',
-]['join']('\n');
+].join('\n');
 export function createStoryEpisodeScriptPromptApi({
   normalizeText: normalizeText,
   normalizeStringArray: normalizeStringArray,
@@ -41,78 +41,78 @@ export function createStoryEpisodeScriptPromptApi({
 } = {}) {
   const value = 800;
   function storyContract(options = {}) {
-    const item = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
+    const item = options && typeof options === 'object' && !Array.isArray(options) ? options : {};
     return {
-      protagonistGoal: normalizeText(item['protagonistGoal']),
-      centralConflict: normalizeText(item['centralConflict']),
-      stakes: normalizeText(item['stakes']),
-      progressionDriver: normalizeText(item['progressionDriver']),
-      constraints: normalizeText(item['constraints']),
-      climax: normalizeText(item['climax']),
-      ending: normalizeText(item['ending']),
+      protagonistGoal: normalizeText(item.protagonistGoal),
+      centralConflict: normalizeText(item.centralConflict),
+      stakes: normalizeText(item.stakes),
+      progressionDriver: normalizeText(item.progressionDriver),
+      constraints: normalizeText(item.constraints),
+      climax: normalizeText(item.climax),
+      ending: normalizeText(item.ending),
     };
   }
   function run(options2 = {}) {
     const enabled = {
-      title: normalizeText(options2?.['title']),
-      storyType: normalizeText(options2?.['storyType']),
-      targetAudience: normalizeText(options2?.['targetAudience']),
-      summary: normalizeText(options2?.['summary'] || options2?.['storySummary']),
-      background: normalizeText(options2?.['background'] || options2?.['storyBackground']),
-      setting: normalizeText(options2?.['setting'] || options2?.['storySetting']),
-      coreHook: normalizeText(options2?.['coreHook']),
-      logline: normalizeText(options2?.['logline']),
-      storyContract: storyContract(options2?.['storyContract']),
-      plotBeats: (Array['isArray'](options2?.['plotBeats']) ? options2['plotBeats'] : [])
-        ['map']((key) => ({
-          ref: normalizeText(key?.['ref']),
-          stage: normalizeText(key?.['stage']),
-          event: normalizeText(key?.['event']),
-          consequence: normalizeText(key?.['consequence']),
+      title: normalizeText(options2?.title),
+      storyType: normalizeText(options2?.storyType),
+      targetAudience: normalizeText(options2?.targetAudience),
+      summary: normalizeText(options2?.summary || options2?.storySummary),
+      background: normalizeText(options2?.background || options2?.storyBackground),
+      setting: normalizeText(options2?.setting || options2?.storySetting),
+      coreHook: normalizeText(options2?.coreHook),
+      logline: normalizeText(options2?.logline),
+      storyContract: storyContract(options2?.storyContract),
+      plotBeats: (Array.isArray(options2?.plotBeats) ? options2.plotBeats : [])
+        .map((key) => ({
+          ref: normalizeText(key?.ref),
+          stage: normalizeText(key?.stage),
+          event: normalizeText(key?.event),
+          consequence: normalizeText(key?.consequence),
         }))
-        ['filter']((index) => index['stage'] || index['event'] || index['consequence']),
+        .filter((index) => index.stage || index.event || index.consequence),
       storyFacts: normalizeStoryContinuityFacts([
-        ...(Array['isArray'](options2?.['continuityFacts']) ? options2['continuityFacts'] : []),
-        ...(Array['isArray'](options2?.['storyFacts']) ? options2['storyFacts'] : []),
+        ...(Array.isArray(options2?.continuityFacts) ? options2.continuityFacts : []),
+        ...(Array.isArray(options2?.storyFacts) ? options2.storyFacts : []),
       ]),
-      characters: (Array['isArray'](options2?.['characters']) ? options2['characters'] : [])
-        ['map'](normalizeStorySummaryCharacter)
-        ['filter'](Boolean)
-        ['map']((ref) => ({
-          ref: ref['ref'],
-          name: ref['name'],
-          roleType: ref['roleType'],
-          fixedTraits: ref['fixedTraits'],
-          coreTags: ref['coreTags'],
-          profile: ref['profile'],
-          motivation: ref['motivation'],
-          relationships: ref['relationships'],
-          personality: ref['personality'],
-          arc: ref['arc'],
+      characters: (Array.isArray(options2?.characters) ? options2.characters : [])
+        .map(normalizeStorySummaryCharacter)
+        .filter(Boolean)
+        .map((ref) => ({
+          ref: ref.ref,
+          name: ref.name,
+          roleType: ref.roleType,
+          fixedTraits: ref.fixedTraits,
+          coreTags: ref.coreTags,
+          profile: ref.profile,
+          motivation: ref.motivation,
+          relationships: ref.relationships,
+          personality: ref.personality,
+          arc: ref.arc,
         })),
     };
-    if (!enabled['title'] || !enabled['summary'] || !enabled['logline'])
+    if (!enabled.title || !enabled.summary || !enabled.logline)
       throw new Error('请先生成剧本摘要。');
     return enabled;
   }
   function previousEpisode2(enabled2, result, data) {
     if (!enabled2) return null;
-    const target = Array['isArray'](enabled2?.['script']?.['scenes']) ? enabled2['script']['scenes'] : [],
-      dom = target['findLast']((dom2) => normalizeText(dom2?.['body'])),
-      list = normalizeText(dom?.['body'] || data),
-      body = list['length'] > value ? list['slice'](-value) : list;
+    const target = Array.isArray(enabled2?.script?.scenes) ? enabled2.script.scenes : [],
+      dom = target.findLast((dom2) => normalizeText(dom2?.body)),
+      list = normalizeText(dom?.body || data),
+      body = list.length > value ? list.slice(-value) : list;
     return {
-      number: Number(enabled2?.['number']) || result - 1,
-      title: normalizeText(enabled2?.['title']),
-      synopsis: normalizeText(enabled2?.['synopsis']),
-      hook: normalizeText(enabled2?.['hook']),
-      continuityFacts: normalizeStoryContinuityFacts(enabled2?.['continuityFacts']),
-      endingState: normalizeStoryContinuityState(enabled2?.['endingState']),
+      number: Number(enabled2?.number) || result - 1,
+      title: normalizeText(enabled2?.title),
+      synopsis: normalizeText(enabled2?.synopsis),
+      hook: normalizeText(enabled2?.hook),
+      continuityFacts: normalizeStoryContinuityFacts(enabled2?.continuityFacts),
+      endingState: normalizeStoryContinuityState(enabled2?.endingState),
       ...(dom
         ? {
             endingScene: {
-              heading: normalizeText(dom?.['heading']),
-              characters: normalizeStringArray(dom?.['characters']),
+              heading: normalizeText(dom?.heading),
+              characters: normalizeStringArray(dom?.characters),
               body: body,
             },
           }
@@ -126,34 +126,34 @@ export function createStoryEpisodeScriptPromptApi({
     nextEpisode: nextEpisode = null,
   } = {}) {
     const storySummary = run(project),
-      scriptMode = normalizeStoryScriptMode(project?.['scriptMode']),
-      number = Math['max'](1, Math['trunc'](Number(episode?.['number']) || 1)),
+      scriptMode = normalizeStoryScriptMode(project?.scriptMode),
+      number = Math.max(1, Math.trunc(Number(episode?.number) || 1)),
       currentEpisode = {
         ref:
-          normalizeText(episode?.['ref'] || episode?.['planningRef'] || episode?.['id']) ||
+          normalizeText(episode?.ref || episode?.planningRef || episode?.id) ||
           'episode-' + number,
         number: number,
-        title: normalizeText(episode?.['title']),
-        synopsis: normalizeText(episode?.['synopsis']),
-        hook: normalizeText(episode?.['hook']),
-        coreBeat: normalizeText(episode?.['coreBeat']),
-        endingEvent: normalizeText(episode?.['endingEvent']),
+        title: normalizeText(episode?.title),
+        synopsis: normalizeText(episode?.synopsis),
+        hook: normalizeText(episode?.hook),
+        coreBeat: normalizeText(episode?.coreBeat),
+        endingEvent: normalizeText(episode?.endingEvent),
         outlineEstimateSeconds:
-          normalizePositiveNumber(episode?.['estimatedDurationSeconds'] || episode?.['durationSeconds']) ||
+          normalizePositiveNumber(episode?.estimatedDurationSeconds || episode?.durationSeconds) ||
           null,
-        continuityFacts: normalizeStoryContinuityFacts(episode?.['continuityFacts']),
-        requiredEndingState: normalizeStoryContinuityState(episode?.['endingState']),
+        continuityFacts: normalizeStoryContinuityFacts(episode?.continuityFacts),
+        requiredEndingState: normalizeStoryContinuityState(episode?.endingState),
       };
-    if (!currentEpisode['title'] || !currentEpisode['synopsis'])
+    if (!currentEpisode.title || !currentEpisode.synopsis)
       throw new Error('当前分集缺少标题或简介，无法生成完整剧本。');
     const enabled3 = normalizeText(
-      previousEpisode?.['script']?.['fullText'] ||
-        previousEpisode?.['fullScript'] ||
-        previousEpisode?.['scriptText'],
+      previousEpisode?.script?.fullText ||
+        previousEpisode?.fullScript ||
+        previousEpisode?.scriptText,
     );
     if (number > 1 && !enabled3)
       throw new Error('必须先完成第 ' + (number - 1) + ' 集剧本，才能生成第 ' + number + ' 集。');
-    return JSON['stringify']({
+    return JSON.stringify({
       task: 'write_story_episode_script',
       schemaVersion: schemaVersion,
       scriptMode: scriptMode,
@@ -164,11 +164,11 @@ export function createStoryEpisodeScriptPromptApi({
         previousEpisode: previousEpisode2(previousEpisode, number, enabled3),
         nextEpisode: nextEpisode
           ? {
-              number: Number(nextEpisode?.['number']) || number + 1,
-              title: normalizeText(nextEpisode?.['title']),
-              synopsis: normalizeText(nextEpisode?.['synopsis']),
-              coreBeat: normalizeText(nextEpisode?.['coreBeat']),
-              continuityFacts: normalizeStoryContinuityFacts(nextEpisode?.['continuityFacts']),
+              number: Number(nextEpisode?.number) || number + 1,
+              title: normalizeText(nextEpisode?.title),
+              synopsis: normalizeText(nextEpisode?.synopsis),
+              coreBeat: normalizeText(nextEpisode?.coreBeat),
+              continuityFacts: normalizeStoryContinuityFacts(nextEpisode?.continuityFacts),
             }
           : null,
       },
@@ -200,11 +200,11 @@ export function createStoryEpisodeScriptPromptApi({
           : ['以人物行动、关系碰撞和对白推进剧情；旁白只用于无法通过表演清晰传达的必要信息。']),
       ],
       outputSchema: {
-        episodeRef: currentEpisode['ref'],
-        title: currentEpisode['title'],
+        episodeRef: currentEpisode.ref,
+        title: currentEpisode.title,
         scenes: [
           {
-            ref: currentEpisode['ref'] + '-scene-1',
+            ref: currentEpisode.ref + '-scene-1',
             heading: '夜 内 故障电梯',
             characters: ['人物名'],
             body:
@@ -229,28 +229,28 @@ export function createStoryEpisodeScriptPromptApi({
     script: script = {},
     timingReview: timingReview = {},
   } = {}) {
-    return JSON['stringify']({
+    return JSON.stringify({
       task: 'revise_story_episode_script_content',
       grounding: {
-        scriptMode: grounding?.['scriptMode'],
-        storySummary: grounding?.['storySummary'],
-        currentEpisode: grounding?.['currentEpisode'],
-        runtimeGuidance: grounding?.['runtimeGuidance'],
-        continuity: grounding?.['continuity'],
+        scriptMode: grounding?.scriptMode,
+        storySummary: grounding?.storySummary,
+        currentEpisode: grounding?.currentEpisode,
+        runtimeGuidance: grounding?.runtimeGuidance,
+        continuity: grounding?.continuity,
       },
       currentScript: {
-        episodeRef: normalizeText(script?.['episodeRef']),
-        title: normalizeText(script?.['title']),
-        scenes: Array['isArray'](script?.['scenes']) ? script['scenes'] : [],
-        continuityFacts: normalizeStoryContinuityFacts(script?.['continuityFacts']),
-        endingState: normalizeStoryContinuityState(script?.['endingState']),
+        episodeRef: normalizeText(script?.episodeRef),
+        title: normalizeText(script?.title),
+        scenes: Array.isArray(script?.scenes) ? script.scenes : [],
+        continuityFacts: normalizeStoryContinuityFacts(script?.continuityFacts),
+        endingState: normalizeStoryContinuityState(script?.endingState),
       },
       timingReview: {
-        verdict: normalizeText(timingReview?.['verdict']),
-        naturalDurationSeconds: normalizePositiveNumber(timingReview?.['naturalDurationSeconds']) || null,
-        reasonableRangeSeconds: timingReview?.['reasonableRangeSeconds'],
-        reason: normalizeText(timingReview?.['reason']),
-        findings: normalizeStringArray(timingReview?.['findings']),
+        verdict: normalizeText(timingReview?.verdict),
+        naturalDurationSeconds: normalizePositiveNumber(timingReview?.naturalDurationSeconds) || null,
+        reasonableRangeSeconds: timingReview?.reasonableRangeSeconds,
+        reason: normalizeText(timingReview?.reason),
+        findings: normalizeStringArray(timingReview?.findings),
       },
       requirements: [
         '逐项修复 timingReview.findings，不得仅改写措辞后保留同一重复功能。',

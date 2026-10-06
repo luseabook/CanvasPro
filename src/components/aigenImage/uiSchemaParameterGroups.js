@@ -3,38 +3,38 @@ export function renderParameterGroups(fields, context, renderContext, renderFiel
   const groups = [],
     groupsById = new Map();
   for (const field of fields) {
-    const groupId = String(field['footerGroup']?.['id'] || '')['trim']();
+    const groupId = String(field.footerGroup?.id || '').trim();
     if (!groupId) {
-      groups['push']({ fields: [field] });
+      groups.push({ fields: [field] });
       continue;
     }
-    if (!groupsById['has'](groupId)) {
+    if (!groupsById.has(groupId)) {
       const group = {
         id: groupId,
-        label: field['footerGroup']['label'] || '参数组',
-        description: field['footerGroup']['description'] || '',
+        label: field.footerGroup.label || '参数组',
+        description: field.footerGroup.description || '',
         fields: [],
       };
-      (groupsById['set'](groupId, group), groups['push'](group));
+      (groupsById.set(groupId, group), groups.push(group));
     }
-    groupsById['get'](groupId)['fields']['push'](field);
+    groupsById.get(groupId).fields.push(field);
   }
-  return groups['map']((group) => {
-    if (!group['id']) return renderField(group['fields'][0], context, renderContext);
-    const menuTriggerId = escapeHtmlAttr('parameter-group:' + group['id']),
-      labelHtml = escapeHtmlAttr(group['label']),
-      infoHtml = group['description']
+  return groups.map((group) => {
+    if (!group.id) return renderField(group.fields[0], context, renderContext);
+    const menuTriggerId = escapeHtmlAttr('parameter-group:' + group.id),
+      labelHtml = escapeHtmlAttr(group.label),
+      infoHtml = group.description
         ? '<span class="rh-tip ui-schema-info-tip" tabindex="0" data-tooltip="' +
-          escapeHtmlAttr(group['description']) +
+          escapeHtmlAttr(group.description) +
           '" aria-label="' +
-          escapeHtmlAttr(group['description']) +
+          escapeHtmlAttr(group.description) +
           '">!</span>'
         : '',
-      fieldsHtml = group['fields']
-        ['map']((field) =>
+      fieldsHtml = group.fields
+        .map((field) =>
           renderField({ ...field, variant: 'groupRow' }, context, { ...renderContext, variant: 'groupRow' }),
         )
-        ['join']('');
+        .join('');
     return (
       '<div class="ui-schema-pill-menu ui-schema-parameter-group" data-ui-schema-composite-field="' +
       menuTriggerId +
@@ -52,5 +52,5 @@ export function renderParameterGroups(fields, context, renderContext, renderFiel
       fieldsHtml +
       '</div>\n    </div>'
     );
-  })['join']('');
+  }).join('');
 }

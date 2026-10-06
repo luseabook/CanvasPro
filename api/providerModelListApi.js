@@ -32,19 +32,19 @@ export async function fetchProviderModelList({
     { method: 'GET', headers: { Authorization: 'Bearer ' + key } },
     timeoutMs,
   );
-  if (!response?.['success'])
+  if (!response?.success)
     return {
       success: false,
-      error: response?.['error'] || 'MODEL_LIST_REQUEST_FAILED',
+      error: response?.error || 'MODEL_LIST_REQUEST_FAILED',
       models: [],
       modelsUrl,
-      status: response?.['status'] || 0,
+      status: response?.status || 0,
     };
   return {
     success: true,
     error: '',
-    models: normalizeProviderModelListPayload(response['data']),
+    models: normalizeProviderModelListPayload(response.data),
     modelsUrl,
-    status: response['status'] || 200,
+    status: response.status || 200,
   };
 }

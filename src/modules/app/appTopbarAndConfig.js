@@ -54,17 +54,17 @@ export function createAppTopbarAndConfig({
     uiPort: { refreshManifestModelNodeUis: refreshManifestModelNodeUis, showError: showError },
   });
   function run() {
-    const el = document['getElementById']('projectNameText');
+    const el = document.getElementById('projectNameText');
     el &&
-      (el['addEventListener']('keydown', (event) => {
-        if (event['key'] !== 'Enter') return;
-        (event['preventDefault'](), el['blur']());
+      (el.addEventListener('keydown', (event) => {
+        if (event.key !== 'Enter') return;
+        (event.preventDefault(), el.blur());
       }),
-      el['addEventListener']('click', () => {
-        el['focus']();
+      el.addEventListener('click', () => {
+        el.focus();
       }));
-    const button = document['getElementById']('userAvatar'),
-      panel = document['getElementById']('avatarMenu');
+    const button = document.getElementById('userAvatar'),
+      panel = document.getElementById('avatarMenu');
     button &&
       panel &&
       registerSidebarSubmenu({
@@ -72,11 +72,11 @@ export function createAppTopbarAndConfig({
         button: button,
         panel: panel,
         openClass: 'open',
-        isOpen: () => panel['classList']['contains']('open'),
+        isOpen: () => panel.classList.contains('open'),
       });
   }
   function init() {
-    (run(), destroy['init']());
+    (run(), destroy.init());
   }
-  return { destroy: destroy['destroy'], init: init };
+  return { destroy: destroy.destroy, init: init };
 }

@@ -19,15 +19,15 @@ export function createStoryAgentComposition({
     enabled = false,
     enabled2 = false;
   function run() {
-    (initAgentPanel2?.['destroy'](),
-      runtime?.['dispose'](),
+    (initAgentPanel2?.destroy(),
+      runtime?.dispose(),
       (initAgentPanel2 = null),
       (runtime = null),
       (value = ''),
       (enabled = false),
       (enabled2 = false));
   }
-  const run2 = collaboration['subscribe'](
+  const run2 = collaboration.subscribe(
     ({
       destroyed: destroyed,
       active: active,
@@ -40,35 +40,35 @@ export function createStoryAgentComposition({
     }) => {
       if (destroyed) return run();
       if (projectId !== value) run();
-      if (active) canvasPanel?.['close']();
+      if (active) canvasPanel?.close();
       if (!active || !enabled3 || !projectId) {
-        ((enabled2 ||= Boolean(initAgentPanel2?.['panel']['classList']['contains']('is-open'))),
-          initAgentPanel2?.['close']());
+        ((enabled2 ||= Boolean(initAgentPanel2?.panel.classList.contains('is-open'))),
+          initAgentPanel2?.close());
         return;
       }
-      const response = collaboration['takeInitialMessage'](projectId);
-      if (response) modelSettings['updateSettings']({ ...response['settings'], generationParams: {} });
+      const response = collaboration.takeInitialMessage(projectId);
+      if (response) modelSettings.updateSettings({ ...response.settings, generationParams: {} });
       if (!initAgentPanel2) {
         value = projectId;
         const sessionStore = createAgentSessionStore({
             conversationStore: createAgentConversationStore({
               getProjectId: () => projectId,
               persistence: {
-                read: () => collaboration['readConversations'](projectId),
-                write: (item) => collaboration['writeConversations'](projectId, item),
+                read: () => collaboration.readConversations(projectId),
+                write: (item) => collaboration.writeConversations(projectId, item),
               },
             }),
           }),
           assistant = createAgentModelRequestRuntime({
             sessionStore: sessionStore,
-            getSettings: () => modelSettings['getSettings'](),
+            getSettings: () => modelSettings.getSettings(),
             requestAssistant: requestAssistant,
             summarizeContext: summarizeContext,
           });
         ((runtime = createAgentTextConversationRuntime({
           sessionStore: sessionStore,
-          assistant: assistant['assistant'],
-          getContext: () => collaboration['context'](projectId),
+          assistant: assistant.assistant,
+          getContext: () => collaboration.context(projectId),
         })),
           (initAgentPanel2 = initAgentPanel({
             runtime: runtime,
@@ -99,19 +99,19 @@ export function createStoryAgentComposition({
               {
                 label: '采用为剧本',
                 className: 'agent-adopt-script',
-                apply: (key) => collaboration['apply'](key, { projectId: projectId }),
+                apply: (key) => collaboration.apply(key, { projectId: projectId }),
               },
               {
                 label: '应用到选中段落',
                 className: 'agent-adopt-selection',
-                apply: (index) => collaboration['apply'](index, { projectId: projectId, selectedOnly: true }),
+                apply: (index) => collaboration.apply(index, { projectId: projectId, selectedOnly: true }),
               },
             ],
           })));
       }
-      if (enabled2 || (editing && !enabled)) initAgentPanel2['open']();
+      if (enabled2 || (editing && !enabled)) initAgentPanel2.open();
       ((enabled2 = false), (enabled = editing));
-      if (response) void initAgentPanel2['sendMessage'](response['text']);
+      if (response) void initAgentPanel2.sendMessage(response.text);
     },
   );
   return {

@@ -1,48 +1,48 @@
 import { positionAnchoredSubmenu } from '../../utils/submenuPosition.js';
 import { beginModalInteraction } from '../../services/modalInteractionScope.js';
 export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose: onClose } = {}) {
-  const el = returnFocus['ownerDocument'],
-    viewportWidth = el['defaultView'];
+  const el = returnFocus.ownerDocument,
+    viewportWidth = el.defaultView;
   let beginModalInteraction2 = null;
-  ((submenu['tabIndex'] = -1),
-    (submenu['hidden'] = true),
-    el['body']['append'](submenu),
-    returnFocus['setAttribute']('aria-expanded', 'false'),
-    returnFocus['setAttribute']('aria-haspopup', 'dialog'));
+  ((submenu.tabIndex = -1),
+    (submenu.hidden = true),
+    el.body.append(submenu),
+    returnFocus.setAttribute('aria-expanded', 'false'),
+    returnFocus.setAttribute('aria-haspopup', 'dialog'));
   const position = () => {
-      if (submenu['hidden']) return;
-      const anchorRect = returnFocus['getBoundingClientRect']();
+      if (submenu.hidden) return;
+      const anchorRect = returnFocus.getBoundingClientRect();
       positionAnchoredSubmenu({
         submenu: submenu,
         anchorRect: anchorRect,
         position: 'fixed',
         horizontalPlacement: 'center',
-        verticalPlacement: anchorRect['top'] > submenu['offsetHeight'] + 20 ? 'above' : 'below',
+        verticalPlacement: anchorRect.top > submenu.offsetHeight + 20 ? 'above' : 'below',
         verticalGap: 8,
-        viewportWidth: viewportWidth['innerWidth'],
-        viewportHeight: viewportWidth['innerHeight'],
+        viewportWidth: viewportWidth.innerWidth,
+        viewportHeight: viewportWidth.innerHeight,
       });
     },
     close = (enabled = false, value = null) => {
-      if (submenu['hidden']) return;
-      ((submenu['hidden'] = true),
-        returnFocus['setAttribute']('aria-expanded', 'false'),
-        returnFocus['classList']['remove']('active'),
+      if (submenu.hidden) return;
+      ((submenu.hidden = true),
+        returnFocus.setAttribute('aria-expanded', 'false'),
+        returnFocus.classList.remove('active'),
         beginModalInteraction2?.({ restoreFocus: false }),
         (beginModalInteraction2 = null),
         onClose?.(value));
-      if (enabled) returnFocus['focus']();
+      if (enabled) returnFocus.focus();
     },
     item = (event) => {
-      event['stopPropagation']();
-      if (!submenu['hidden']) {
+      event.stopPropagation();
+      if (!submenu.hidden) {
         close();
         return;
       }
       (onOpen?.(),
-        (submenu['hidden'] = false),
-        returnFocus['setAttribute']('aria-expanded', 'true'),
-        returnFocus['classList']['add']('active'),
+        (submenu.hidden = false),
+        returnFocus.setAttribute('aria-expanded', 'true'),
+        returnFocus.classList.add('active'),
         position(),
         (beginModalInteraction2 = beginModalInteraction({
           root: submenu,
@@ -51,28 +51,28 @@ export function bindEditPopover(returnFocus, submenu, { onOpen: onOpen, onClose:
         })));
     },
     key = (event2) => {
-      if (!returnFocus['contains'](event2['target']) && !submenu['contains'](event2['target']))
+      if (!returnFocus.contains(event2.target) && !submenu.contains(event2.target))
         close(false, event2);
     },
     index = (event3) => {
-      if (!submenu['contains'](event3['target'])) position();
+      if (!submenu.contains(event3.target)) position();
     };
   return (
-    returnFocus['addEventListener']('click', item),
-    el['addEventListener']('pointerdown', key, true),
-    el['addEventListener']('scroll', index, true),
-    viewportWidth['addEventListener']('resize', position),
+    returnFocus.addEventListener('click', item),
+    el.addEventListener('pointerdown', key, true),
+    el.addEventListener('scroll', index, true),
+    viewportWidth.addEventListener('resize', position),
     {
       panel: submenu,
       position: position,
       close: close,
       destroy() {
         (close(),
-          returnFocus['removeEventListener']('click', item),
-          el['removeEventListener']('pointerdown', key, true),
-          el['removeEventListener']('scroll', index, true),
-          viewportWidth['removeEventListener']('resize', position),
-          submenu['remove']());
+          returnFocus.removeEventListener('click', item),
+          el.removeEventListener('pointerdown', key, true),
+          el.removeEventListener('scroll', index, true),
+          viewportWidth.removeEventListener('resize', position),
+          submenu.remove());
       },
     }
   );

@@ -11,23 +11,23 @@ export function bindVideoVoiceReplaceAction(item) {
       VideoClipController: VideoClipController,
       VideoKeyingController: VideoKeyingController,
     } = item,
-    el = toolbarEl['querySelector']('.act-voice-replace');
+    el = toolbarEl.querySelector('.act-voice-replace');
   if (!el) return;
-  el['addEventListener']('click', (event) => {
-    event['stopPropagation']();
+  el.addEventListener('click', (event) => {
+    event.stopPropagation();
     const key = getStateSnapshot();
-    if (key['videoKeying']?.['active']) {
-      window['showToast']?.(videoToolbarText('exitCurrentEditMode'), 'info');
+    if (key.videoKeying?.active) {
+      window.showToast?.(videoToolbarText('exitCurrentEditMode'), 'info');
       return;
     }
-    if (key['videoClip']?.['active']) {
-      window['showToast']?.(videoToolbarText('exitClipMode'), 'info');
+    if (key.videoClip?.active) {
+      window.showToast?.(videoToolbarText('exitClipMode'), 'info');
       return;
     }
-    (VideoClipController['exit']({ silent: true }),
-      VideoKeyingController['exit']({ silent: true }),
-      window['dispatchEvent'](
-        new CustomEvent(AUDIO_VOICE_PANEL_OPEN_EVENT, { detail: { sourceNodeId: nodeData?.['id'] || '' } }),
+    (VideoClipController.exit({ silent: true }),
+      VideoKeyingController.exit({ silent: true }),
+      window.dispatchEvent(
+        new CustomEvent(AUDIO_VOICE_PANEL_OPEN_EVENT, { detail: { sourceNodeId: nodeData?.id || '' } }),
       ));
   });
 }

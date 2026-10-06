@@ -29,7 +29,7 @@ import { renderWorkspaceVideoDownloadButton } from '../workspaceVideoDownload.js
 import { renderWorkspaceUploadIcon } from '../workspaceActionIcons.js';
 import { normalizePersonReplacementLayout } from './personReplacementProjectSession.js';
 import { renderPersonReplacementPromptHtml } from './personReplacementPromptMentions.js';
-export const PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS = Object['freeze']({
+export const PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS = Object.freeze({
   MISSING_SHOT: 'missing-shot',
   GENERATION_RUNNING: 'generation-running',
   SOURCE_PREPARING: 'source-preparing',
@@ -38,26 +38,26 @@ export const PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS = Object['freeze'
   MISSING_IMAGE_INPUT: 'missing-image-input',
 });
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function resolveVideoResultPosterRef(item, key) {
   const text = normalizeText(
-    item?.['posterLocalPath'] ||
-      item?.['thumbLocalPath'] ||
-      item?.['posterUrl'] ||
-      item?.['thumbUrl'] ||
-      item?.['thumbnailLocalPath'] ||
-      item?.['thumbnailUrl'] ||
-      item?.['coverUrl'],
+    item?.posterLocalPath ||
+      item?.thumbLocalPath ||
+      item?.posterUrl ||
+      item?.thumbUrl ||
+      item?.thumbnailLocalPath ||
+      item?.thumbnailUrl ||
+      item?.coverUrl,
   );
   if (text) return text;
-  return normalizeText(item?.['source'])['toLowerCase']() === 'upload'
+  return normalizeText(item?.source).toLowerCase() === 'upload'
     ? ''
-    : normalizeText(key?.['replacementImageRef'] || key?.['keyframeRef']);
+    : normalizeText(key?.replacementImageRef || key?.keyframeRef);
 }
 function buildVideoStageFrameStyle(options = {}) {
-  const index = Math['max'](1, Number(options?.['frame']?.['width']) || 16),
-    result = Math['max'](1, Number(options?.['frame']?.['height']) || 9);
+  const index = Math.max(1, Number(options?.frame?.width) || 16),
+    result = Math.max(1, Number(options?.frame?.height) || 9);
   return (
     '--frame-aspect:' +
     index +
@@ -68,48 +68,48 @@ function buildVideoStageFrameStyle(options = {}) {
   );
 }
 export function syncPersonReplacementVideoStageFrame(el) {
-  const count = Math['max'](0, Number(el?.['videoWidth']) || 0),
-    count2 = Math['max'](0, Number(el?.['videoHeight']) || 0),
-    el2 = el?.['closest']?.('[data-person-replacement-video-playback-stage]');
-  if (!(count > 0 && count2 > 0) || !el2?.['style']) return false;
+  const count = Math.max(0, Number(el?.videoWidth) || 0),
+    count2 = Math.max(0, Number(el?.videoHeight) || 0),
+    el2 = el?.closest?.('[data-person-replacement-video-playback-stage]');
+  if (!(count > 0 && count2 > 0) || !el2?.style) return false;
   return (
-    el2['style']['setProperty']('--frame-aspect', count + ' / ' + count2),
-    el2['style']['setProperty']('--frame-width', String(count)),
-    el2['style']['setProperty']('--frame-height', String(count2)),
+    el2.style.setProperty('--frame-aspect', count + ' / ' + count2),
+    el2.style.setProperty('--frame-width', String(count)),
+    el2.style.setProperty('--frame-height', String(count2)),
     true
   );
 }
 function normalizeProgress(data) {
   const target = Number(data);
-  if (!Number['isFinite'](target)) return 0;
-  return Math['max'](0, Math['min'](100, target));
+  if (!Number.isFinite(target)) return 0;
+  return Math.max(0, Math.min(100, target));
 }
 function resolveSelectedShot(options2 = {}, source = '') {
-  const list = Array['isArray'](options2?.['shots']) ? options2['shots'] : [],
-    text2 = normalizeText(source || options2?.['workspace']?.['selectedShotId']);
-  return list['find']((next) => normalizeText(next?.['id']) === text2) || list[0] || null;
+  const list = Array.isArray(options2?.shots) ? options2.shots : [],
+    text2 = normalizeText(source || options2?.workspace?.selectedShotId);
+  return list.find((next) => normalizeText(next?.id) === text2) || list[0] || null;
 }
 function buildPreparationPresentation(current, entry, record, enabled) {
-  const payload = current?.['workspace']?.['videoPreparation'],
-    response = payload && typeof payload === 'object' && !Array['isArray'](payload) ? payload : {},
-    status = normalizeText(response['status'])['toLowerCase']() || 'idle',
-    materializationStatus = normalizeText(entry?.['materializationStatus'])['toLowerCase']() || 'idle',
+  const payload = current?.workspace?.videoPreparation,
+    response = payload && typeof payload === 'object' && !Array.isArray(payload) ? payload : {},
+    status = normalizeText(response.status).toLowerCase() || 'idle',
+    materializationStatus = normalizeText(entry?.materializationStatus).toLowerCase() || 'idle',
     sourcePending =
       !enabled &&
-      Boolean(record?.['pending'] === true || materializationStatus === 'running' || status === 'running'),
+      Boolean(record?.pending === true || materializationStatus === 'running' || status === 'running'),
     sourceFailed =
       !enabled &&
       Boolean(
-        materializationStatus === 'failed' || (status === 'failed' && normalizeText(response['error'])),
+        materializationStatus === 'failed' || (status === 'failed' && normalizeText(response.error)),
       ),
     progress =
       materializationStatus === 'running'
-        ? normalizeProgress(entry?.['materializationProgress'])
-        : normalizeProgress(response['progress']);
+        ? normalizeProgress(entry?.materializationProgress)
+        : normalizeProgress(response.progress);
   return {
     status: status,
     progress: progress,
-    error: normalizeText(entry?.['error'] || response['error']),
+    error: normalizeText(entry?.error || response.error),
     materializationStatus: materializationStatus,
     isRunning: status === 'running' || materializationStatus === 'running',
     sourcePending: sourcePending,
@@ -124,46 +124,46 @@ function buildGenerationEligibility({
   imageInput: imageInput,
 }) {
   if (!shot)
-    return { canGenerate: false, reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['MISSING_SHOT'] };
-  if (generation['isActive'])
+    return { canGenerate: false, reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS.MISSING_SHOT };
+  if (generation.isActive)
     return {
       canGenerate: false,
-      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['GENERATION_RUNNING'],
+      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS.GENERATION_RUNNING,
     };
-  if (preparation['sourcePending'])
+  if (preparation.sourcePending)
     return {
       canGenerate: false,
-      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['SOURCE_PREPARING'],
+      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS.SOURCE_PREPARING,
     };
-  if (preparation['sourceFailed'])
+  if (preparation.sourceFailed)
     return {
       canGenerate: false,
-      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['SOURCE_PREPARATION_FAILED'],
+      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS.SOURCE_PREPARATION_FAILED,
     };
   if (!sourceReady)
     return {
       canGenerate: false,
-      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['MISSING_SOURCE_VIDEO'],
+      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS.MISSING_SOURCE_VIDEO,
     };
-  if (imageInput['status'] !== 'ready')
+  if (imageInput.status !== 'ready')
     return {
       canGenerate: false,
-      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS['MISSING_IMAGE_INPUT'],
+      reason: PERSON_REPLACEMENT_VIDEO_GENERATION_BLOCK_REASONS.MISSING_IMAGE_INPUT,
     };
   return { canGenerate: true, reason: '' };
 }
 function buildOutputPresentation(handle, state) {
   const config =
-      handle?.['output'] && typeof handle['output'] === 'object' && !Array['isArray'](handle['output'])
-        ? handle['output']
+      handle?.output && typeof handle.output === 'object' && !Array.isArray(handle.output)
+        ? handle.output
         : {},
-    composeStatus = normalizeText(config['composeStatus'])['toLowerCase']() || 'idle',
-    originalMasterRef = normalizeText(config['originalMasterRef']),
-    visualMasterRef = normalizeText(config['visualMasterRef']),
-    finalVideoRef = normalizeText(config['finalVideoRef']),
-    finalAudioTrack = normalizeText(config['finalAudioTrack']),
-    composedShotIds = Array['isArray'](config['composedShotIds'])
-      ? config['composedShotIds']['map'](normalizeText)['filter'](Boolean)
+    composeStatus = normalizeText(config.composeStatus).toLowerCase() || 'idle',
+    originalMasterRef = normalizeText(config.originalMasterRef),
+    visualMasterRef = normalizeText(config.visualMasterRef),
+    finalVideoRef = normalizeText(config.finalVideoRef),
+    finalAudioTrack = normalizeText(config.finalAudioTrack),
+    composedShotIds = Array.isArray(config.composedShotIds)
+      ? config.composedShotIds.map(normalizeText).filter(Boolean)
       : [],
     previewVideoRef = finalVideoRef || visualMasterRef;
   return {
@@ -176,30 +176,30 @@ function buildOutputPresentation(handle, state) {
     previewVideoRef: previewVideoRef,
     compositionAvailable: Boolean(composeStatus === 'succeeded' && originalMasterRef && previewVideoRef),
     finalVideoAvailable: Boolean(finalVideoRef),
-    selectedShotComposed: Boolean(state && composedShotIds['includes'](state)),
+    selectedShotComposed: Boolean(state && composedShotIds.includes(state)),
   };
 }
 export function buildPersonReplacementVideoPresentation(options3 = {}, { shotId: shotId = '' } = {}) {
   const shot2 = resolveSelectedShot(options3, shotId),
-    shotId2 = normalizeText(shot2?.['id']),
+    shotId2 = normalizeText(shot2?.id),
     imageInput2 = resolvePersonReplacementVideoImageInput(options3, shot2),
     slotState = resolvePersonReplacementVideoSlotState(options3, shot2),
-    args = resolvePersonReplacementVideoGenerationState(options3?.['workspace'], shotId2),
+    args = resolvePersonReplacementVideoGenerationState(options3?.workspace, shotId2),
     generation2 = { ...args, isActive: isPersonReplacementVideoGenerationActive(args) },
     results = getPersonReplacementVideoResults(shot2),
     activeIndex = getPersonReplacementActiveVideoResultIndex(shot2, results),
     activeResult = results[activeIndex] || null,
     resultRef = resolvePersonReplacementVideoResultRef(activeResult),
-    response2 = slotState['inputsBySlot']?.['sourceVideo'] || null,
-    sourceReady2 = Boolean(slotState['slotEntries']?.['sourceVideo']?.['url']),
+    response2 = slotState.inputsBySlot?.sourceVideo || null,
+    sourceReady2 = Boolean(slotState.slotEntries?.sourceVideo?.url),
     sourcePending2 = buildPreparationPresentation(options3, shot2, response2, sourceReady2),
     media = {
-      sourceRef: normalizeText(sourceReady2 ? response2?.['url'] : ''),
-      sourceInputRef: normalizeText(response2?.['url']),
-      sourcePosterRef: normalizeText(response2?.['thumbUrl']),
+      sourceRef: normalizeText(sourceReady2 ? response2?.url : ''),
+      sourceInputRef: normalizeText(response2?.url),
+      sourcePosterRef: normalizeText(response2?.thumbUrl),
       sourceReady: sourceReady2,
-      sourcePending: sourcePending2['sourcePending'],
-      resultRef: resultRef || normalizeText(shot2?.['resultVideoRef']),
+      sourcePending: sourcePending2.sourcePending,
+      resultRef: resultRef || normalizeText(shot2?.resultVideoRef),
       resultPosterRef: resolveVideoResultPosterRef(activeResult, shot2),
     };
   return {
@@ -214,8 +214,8 @@ export function buildPersonReplacementVideoPresentation(options3 = {}, { shotId:
       activeIndex: activeIndex,
       activeResult: activeResult,
       activeResultRef: resultRef,
-      count: results['length'],
-      hasMultipleResults: results['length'] > 1,
+      count: results.length,
+      hasMultipleResults: results.length > 1,
     },
     media: media,
     eligibility: buildGenerationEligibility({
@@ -230,11 +230,11 @@ export function buildPersonReplacementVideoPresentation(options3 = {}, { shotId:
 }
 function escapeHtml(scope) {
   return String(scope ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#39;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
 function normalizeMediaUrl(input) {
   const text3 = normalizeText(input);
@@ -242,7 +242,7 @@ function normalizeMediaUrl(input) {
 }
 function renderVideoInputModeControl(output) {
   const value2 =
-      output['settings']['replacementVideoInputMode'] !==
+      output.settings.replacementVideoInputMode !==
       PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE,
     value3 = value2
       ? PERSON_REPLACEMENT_VIDEO_INPUT_MODE_CHARACTER_REFERENCE
@@ -330,7 +330,7 @@ function renderVideoReplacementPlaybackControls(
       beforeVolume:
         !className && value6 === 'source'
           ? '<button type="button" class="video-snap-btn story-video-snap-btn story-video-clip-btn" data-person-replacement-action="trim-current-video" data-shot-id="' +
-            escapeHtml(options4['id']) +
+            escapeHtml(options4.id) +
             '" aria-label="裁剪当前片段">\n        ' +
             VIDEO_CLIP_ICON_SVG +
             '\n      </button>'
@@ -339,11 +339,11 @@ function renderVideoReplacementPlaybackControls(
   });
 }
 function renderVideoReplacementPreview(value7, value8, value9) {
-  const value10 = value8?.['shot'] || null,
-    enabled2 = value8?.['media'] || {},
-    value11 = Math['max'](0, value7['shots']['indexOf'](value10)),
-    value12 = value10?.['title'] || '片段' + String(value11 + 1)['padStart'](2, '0'),
-    value13 = value7['shots']['length'] > 1,
+  const value10 = value8?.shot || null,
+    enabled2 = value8?.media || {},
+    value11 = Math.max(0, value7.shots.indexOf(value10)),
+    value12 = value10?.title || '片段' + String(value11 + 1).padStart(2, '0'),
+    value13 = value7.shots.length > 1,
     value14 = value13
       ? '' +
         renderPersonReplacementPreviewArrow('previous', {
@@ -362,7 +362,7 @@ function renderVideoReplacementPreview(value7, value8, value9) {
     value15 = value13
       ? ' data-person-replacement-shot-wheel="true" aria-label="滚动鼠标滚轮切换原视频片段"'
       : '';
-  if (!enabled2['sourceReady'])
+  if (!enabled2.sourceReady)
     return (
       '<div class="person-replacement-video-preview-panel person-replacement-middle-preview-slide" aria-label="' +
       escapeHtml(value12 + '原视频片段') +
@@ -374,8 +374,8 @@ function renderVideoReplacementPreview(value7, value8, value9) {
       value14 +
       '</div>\n    </div>'
     );
-  const mediaUrl = normalizeMediaUrl(enabled2['sourceRef']),
-    mediaUrl2 = normalizeMediaUrl(enabled2['sourcePosterRef']),
+  const mediaUrl = normalizeMediaUrl(enabled2.sourceRef),
+    mediaUrl2 = normalizeMediaUrl(enabled2.sourcePosterRef),
     videoStageFrameStyle = buildVideoStageFrameStyle(value10);
   return (
     '<div class="person-replacement-video-preview-panel person-replacement-middle-preview-slide" aria-label="' +
@@ -387,9 +387,9 @@ function renderVideoReplacementPreview(value7, value8, value9) {
     '" data-person-replacement-video-poster="' +
     escapeHtml(mediaUrl2) +
     '" data-person-replacement-video-reversed="' +
-    (value10['materializedIsReversed'] === true) +
+    (value10.materializedIsReversed === true) +
     '" data-person-replacement-video-center-stage data-shot-id="' +
-    escapeHtml(value10['id']) +
+    escapeHtml(value10.id) +
     '" style="' +
     videoStageFrameStyle +
     '">\n        <video data-person-replacement-video-player="source" data-person-replacement-video-center-player data-person-replacement-video-url="' +
@@ -408,12 +408,12 @@ function renderVideoReplacementPreview(value7, value8, value9) {
   );
 }
 function renderVideoReplacementResult(title, { isGenerating: isGenerating = false } = {}) {
-  const enabled3 = title?.['shot'] || null,
-    value16 = title?.['history'] || {},
-    value17 = title?.['media'] || {},
-    value18 = Number(value16['activeIndex']) || 0,
-    text4 = normalizeText(value17['resultRef']),
-    value19 = value16['hasMultipleResults'] === true,
+  const enabled3 = title?.shot || null,
+    value16 = title?.history || {},
+    value17 = title?.media || {},
+    value18 = Number(value16.activeIndex) || 0,
+    text4 = normalizeText(value17.resultRef),
+    value19 = value16.hasMultipleResults === true,
     value20 = value19
       ? '' +
         renderPersonReplacementPreviewArrow('previous', {
@@ -432,16 +432,16 @@ function renderVideoReplacementResult(title, { isGenerating: isGenerating = fals
       : '',
     value22 = isGenerating
       ? renderWorkspaceAssetLoadingOverlay({
-          title: title?.['generation']?.['status'] === 'queued' ? '视频排队中' : '视频生成中',
+          title: title?.generation?.status === 'queued' ? '视频排队中' : '视频生成中',
           description:
-            title?.['generation']?.['status'] === 'queued'
+            title?.generation?.status === 'queued'
               ? 'RunningHub 并发已占满，释放名额后会自动开始。'
               : '正在等待生成结果，完成后会自动显示。',
         })
       : '',
     mediaUrl3 = normalizeMediaUrl(text4),
-    mediaUrl4 = normalizeMediaUrl(value17['resultPosterRef']),
-    value23 = Math['max'](Number(value16['count']) || 0, text4 ? 1 : 0),
+    mediaUrl4 = normalizeMediaUrl(value17.resultPosterRef),
+    value23 = Math.max(Number(value16.count) || 0, text4 ? 1 : 0),
     videoStageFrameStyle2 = buildVideoStageFrameStyle(enabled3),
     value24 = text4
       ? '<div class="story-video-stage person-replacement-video-stage person-replacement-video-result-stage" data-person-replacement-video-playback-stage="result" data-person-replacement-video-url="' +
@@ -449,7 +449,7 @@ function renderVideoReplacementResult(title, { isGenerating: isGenerating = fals
         '" data-person-replacement-video-poster="' +
         escapeHtml(mediaUrl4) +
         '" data-person-replacement-video-center-stage data-shot-id="' +
-        escapeHtml(enabled3?.['id'] || '') +
+        escapeHtml(enabled3?.id || '') +
         '" style="' +
         videoStageFrameStyle2 +
         '">\n        <video data-person-replacement-video-player="result" data-person-replacement-video-center-player data-person-replacement-video-url="' +
@@ -502,22 +502,22 @@ function renderVideoReplacementGenerateButton(
     shotBatchCancelRequested: shotBatchCancelRequested = false,
   } = {},
 ) {
-  const value27 = presentation['shot'] || null,
-    enabled4 = value26['workspace']['shotSelectionMode'] === true,
-    enabled5 = Array['isArray'](value26['workspace']['selectedShotIds'])
-      ? value26['workspace']['selectedShotIds']['length']
+  const value27 = presentation.shot || null,
+    enabled4 = value26.workspace.shotSelectionMode === true,
+    enabled5 = Array.isArray(value26.workspace.selectedShotIds)
+      ? value26.workspace.selectedShotIds.length
       : 0,
     value28 = Boolean(
-      value27?.['id'] &&
-      ((presentation['generation']?.['isActive'] &&
-        normalizeText(presentation['generation']['shotId']) === normalizeText(value27['id'])) ||
-        (Array['isArray'](shotBatchGeneratingShotIds) &&
-          shotBatchGeneratingShotIds['includes'](value27['id']))),
+      value27?.id &&
+      ((presentation.generation?.isActive &&
+        normalizeText(presentation.generation.shotId) === normalizeText(value27.id)) ||
+        (Array.isArray(shotBatchGeneratingShotIds) &&
+          shotBatchGeneratingShotIds.includes(value27.id))),
     ),
     enabled6 = Boolean(
       !enabled4 &&
-      presentation['generation']?.['isActive'] &&
-      normalizeText(presentation['generation']['shotId']) === normalizeText(value27?.['id']),
+      presentation.generation?.isActive &&
+      normalizeText(presentation.generation.shotId) === normalizeText(value27?.id),
     ),
     value29 = enabled5 ? ' (' + enabled5 + ')' : '',
     value30 = enabled4
@@ -533,7 +533,7 @@ function renderVideoReplacementGenerateButton(
           : '生成视频',
     value31 = enabled4
       ? !enabled5 || shotBatchCancelRequested
-      : !enabled6 && (!presentation['eligibility']?.['canGenerate'] || value28);
+      : !enabled6 && (!presentation.eligibility?.canGenerate || value28);
   return (
     '<button type="button" class="story-asset-generate-button" aria-busy="' +
     shotBatchGenerationActive +
@@ -556,57 +556,57 @@ function renderVideoReplacementPage(
 ) {
   const referenceCounts = buildPersonReplacementVideoPresentation(inputMode),
     value32 = buildIdentityView2(inputMode, referenceCounts),
-    value33 = referenceCounts['shot'],
-    value34 = referenceCounts['generation'],
-    response3 = referenceCounts['preparation'],
-    error = referenceCounts['imageInput'],
+    value33 = referenceCounts.shot,
+    value34 = referenceCounts.generation,
+    response3 = referenceCounts.preparation,
+    error = referenceCounts.imageInput,
     isGenerating2 =
-      value34['isActive'] ||
+      value34.isActive ||
       Boolean(
-        Array['isArray'](shotBatchGenerationActive2['shotBatchGeneratingShotIds']) &&
-        shotBatchGenerationActive2['shotBatchGeneratingShotIds']['includes'](value33?.['id']),
+        Array.isArray(shotBatchGenerationActive2.shotBatchGeneratingShotIds) &&
+        shotBatchGenerationActive2.shotBatchGeneratingShotIds.includes(value33?.id),
       ),
     value35 =
-      response3['materializationStatus'] === 'running'
-        ? '正在切片并统一为 ' + (value33['outputFps'] || 24) + ' FPS…'
-        : response3['materializationStatus'] === 'failed'
-          ? response3['error'] || '镜头切片失败'
-          : response3['status'] === 'running'
-            ? '正在准备视频片段 ' + Math['round'](response3['progress']) + '%'
+      response3.materializationStatus === 'running'
+        ? '正在切片并统一为 ' + (value33.outputFps || 24) + ' FPS…'
+        : response3.materializationStatus === 'failed'
+          ? response3.error || '镜头切片失败'
+          : response3.status === 'running'
+            ? '正在准备视频片段 ' + Math.round(response3.progress) + '%'
             : '进入视频替换时生成固定帧率片段',
-    modelId = inputMode['settings']['replacementModelId'] || PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID,
+    modelId = inputMode.settings.replacementModelId || PERSON_REPLACEMENT_DEFAULT_VIDEO_MODEL_ID,
     provider = resolveModelProvider(modelId),
-    modelManifest = getModelManifest(modelId)?.['prompt'],
+    modelManifest = getModelManifest(modelId)?.prompt,
     value36 =
-      value33?.['videoPrompt'] ||
-      (modelManifest?.['emptyPolicy'] === 'allow' ? '' : PERSON_REPLACEMENT_DEFAULT_VIDEO_PROMPT),
-    text5 = normalizeText(modelManifest?.['placeholder']) || '描述视频人物替换效果',
+      value33?.videoPrompt ||
+      (modelManifest?.emptyPolicy === 'allow' ? '' : PERSON_REPLACEMENT_DEFAULT_VIDEO_PROMPT),
+    text5 = normalizeText(modelManifest?.placeholder) || '描述视频人物替换效果',
     value37 = text5 + '；输入 / 选择预设',
     uiSchemaFieldState = resolvePersonReplacementVideoParameterPolicy({
       modelId: modelId,
-      inputMode: inputMode['settings']['replacementVideoInputMode'],
-      generationParams: inputMode['settings']['replacementVideoGenerationParams'],
+      inputMode: inputMode.settings.replacementVideoInputMode,
+      generationParams: inputMode.settings.replacementVideoGenerationParams,
     }),
     generationParams = {
-      ...uiSchemaFieldState['generationParams'],
-      rhVideoFps: resolvePersonReplacementVideoGenerationFps(inputMode['settings']),
+      ...uiSchemaFieldState.generationParams,
+      rhVideoFps: resolvePersonReplacementVideoGenerationFps(inputMode.settings),
     },
     value38 =
-      error['referenceKind'] === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE
+      error.referenceKind === PERSON_REPLACEMENT_VIDEO_REFERENCE_KIND_CHARACTER_IMAGE
         ? '人物参考图'
         : '替换首帧',
-    box = normalizePersonReplacementLayout(inputMode['workspace']['replacementLayout']),
+    box = normalizePersonReplacementLayout(inputMode.workspace.replacementLayout),
     value39 =
       '--person-replacement-left-width:' +
-      box['left'] +
+      box.left +
       '%;' +
-      ('--person-replacement-right-width:' + box['right'] + '%;') +
-      ('--person-replacement-center-top:' + box['centerTop'] + '%;');
+      ('--person-replacement-right-width:' + box.right + '%;') +
+      ('--person-replacement-center-top:' + box.centerTop + '%;');
   return (
     '<div class="person-replacement-production-page">\n    <div class="person-replacement-four-panel-layout" data-person-replacement-layout style="' +
     value39 +
     '">\n      ' +
-    value32['referenceRailHtml'] +
+    value32.referenceRailHtml +
     '\n      ' +
     renderLayoutSplitter2('left', box) +
     '\n      <section class="person-replacement-keyframe-panel person-replacement-middle-layout person-replacement-video-middle-layout">' +
@@ -614,10 +614,10 @@ function renderVideoReplacementPage(
     renderLayoutSplitter2('center', box) +
     renderShotTimeline2(inputMode, {
       timelineMode: 'video',
-      shotBatchGenerationActive: shotBatchGenerationActive2['shotBatchGenerationActive'],
-      shotBatchGenerationLabel: shotBatchGenerationActive2['shotBatchGenerationLabel'],
-      shotBatchGeneratingShotIds: shotBatchGenerationActive2['shotBatchGeneratingShotIds'],
-      shotBatchCancelRequested: shotBatchGenerationActive2['shotBatchCancelRequested'],
+      shotBatchGenerationActive: shotBatchGenerationActive2.shotBatchGenerationActive,
+      shotBatchGenerationLabel: shotBatchGenerationActive2.shotBatchGenerationLabel,
+      shotBatchGeneratingShotIds: shotBatchGenerationActive2.shotBatchGeneratingShotIds,
+      shotBatchCancelRequested: shotBatchGenerationActive2.shotBatchCancelRequested,
     }) +
     '</section>\n      ' +
     renderLayoutSplitter2('right', box) +
@@ -626,30 +626,30 @@ function renderVideoReplacementPage(
     '\n        ' +
     renderLayoutSplitter2('center', box, { label: '调整结果预览与提示词区域高度' }) +
     '\n        <div class="story-asset-detail-copy person-replacement-generation-copy">\n          <div class="story-asset-prompt-field person-replacement-prompt-field">\n            <div class="person-replacement-prompt-field-heading" role="group" aria-label="模型入参"><div class="person-replacement-video-prompt-heading-actions"><div class="person-replacement-prompt-reference-inputs" data-person-replacement-video-reference-inputs>' +
-    value32['referenceInputsHtml'] +
+    value32.referenceInputsHtml +
     '</div>' +
     renderVideoInputModeControl(inputMode) +
     '</div></div>\n            <div class="prompt-input-wrapper is-resizable person-replacement-prompt-input-wrapper"><div class="prompt-textarea custom-textarea story-asset-prompt-editor person-replacement-prompt-editor" contenteditable="true" role="textbox" aria-multiline="true" aria-label="视频替换提示词" spellcheck="false" data-placeholder="' +
     escapeHtml(value37) +
     '" data-person-replacement-field="video-prompt" data-shot-id="' +
-    escapeHtml(value33?.['id'] || '') +
+    escapeHtml(value33?.id || '') +
     '">' +
     renderPersonReplacementPromptHtml(value36) +
     '</div></div>\n          </div>\n          ' +
-    (error['status'] === 'ready'
+    (error.status === 'ready'
       ? ''
       : '<p class="person-replacement-reference-note">' +
-        escapeHtml(value38 + '：' + error['message']) +
+        escapeHtml(value38 + '：' + error.message) +
         '</p>') +
     '\n          <div class="story-asset-generation-bar prompt-panel-footer">' +
     renderAIGenVideoModelSelectorMarkup({
       modelId: modelId,
       provider: provider,
       generationParams: generationParams,
-      uiSchemaFieldState: uiSchemaFieldState['uiSchemaFieldState'],
-      providerProfileId: inputMode['settings']['replacementVideoProviderProfileId'],
-      providerProfileIdByModel: inputMode['settings']['replacementVideoProviderProfileIdByModel'],
-      referenceCounts: referenceCounts['slotState']['referenceCounts'],
+      uiSchemaFieldState: uiSchemaFieldState.uiSchemaFieldState,
+      providerProfileId: inputMode.settings.replacementVideoProviderProfileId,
+      providerProfileIdByModel: inputMode.settings.replacementVideoProviderProfileIdByModel,
+      referenceCounts: referenceCounts.slotState.referenceCounts,
       showSchemaControls: true,
       allowedModelIds: PERSON_REPLACEMENT_VIDEO_MODEL_IDS,
       className: 'person-replacement-video-model-selector',
@@ -660,18 +660,18 @@ function renderVideoReplacementPage(
       ...shotBatchGenerationActive2,
     }) +
     '</div>\n          ' +
-    (value34['error'] ? '<p class="person-replacement-error">' + escapeHtml(value34['error']) + '</p>' : '') +
+    (value34.error ? '<p class="person-replacement-error">' + escapeHtml(value34.error) + '</p>' : '') +
     '\n        </div>\n      </aside>\n    </div>' +
     renderFooter2(inputMode, { nextLabel: '进入声音克隆' }) +
     '\n  </div>'
   );
 }
 function cloneFrozenPresentationValue(list2) {
-  if (Array['isArray'](list2)) return Object['freeze'](list2['map'](cloneFrozenPresentationValue));
+  if (Array.isArray(list2)) return Object.freeze(list2.map(cloneFrozenPresentationValue));
   if (!list2 || typeof list2 !== 'object') return list2;
-  return Object['freeze'](
-    Object['fromEntries'](
-      Object['entries'](list2)['map'](([value40, value41]) => [
+  return Object.freeze(
+    Object.fromEntries(
+      Object.entries(list2).map(([value40, value41]) => [
         value40,
         cloneFrozenPresentationValue(value41),
       ]),
@@ -680,17 +680,17 @@ function cloneFrozenPresentationValue(list2) {
 }
 function buildReadonlyVideoPresentation(value42, value43) {
   const shot3 = buildPersonReplacementVideoPresentation(value42, value43);
-  return Object['freeze']({
-    shot: shot3['shot'] ? cloneFrozenPresentationValue(shot3['shot']) : null,
-    shotId: shot3['shotId'],
-    imageInput: cloneFrozenPresentationValue(shot3['imageInput']),
-    slotState: cloneFrozenPresentationValue(shot3['slotState']),
-    generation: cloneFrozenPresentationValue(shot3['generation']),
-    preparation: cloneFrozenPresentationValue(shot3['preparation']),
-    history: cloneFrozenPresentationValue(shot3['history']),
-    media: cloneFrozenPresentationValue(shot3['media']),
-    eligibility: cloneFrozenPresentationValue(shot3['eligibility']),
-    output: cloneFrozenPresentationValue(shot3['output']),
+  return Object.freeze({
+    shot: shot3.shot ? cloneFrozenPresentationValue(shot3.shot) : null,
+    shotId: shot3.shotId,
+    imageInput: cloneFrozenPresentationValue(shot3.imageInput),
+    slotState: cloneFrozenPresentationValue(shot3.slotState),
+    generation: cloneFrozenPresentationValue(shot3.generation),
+    preparation: cloneFrozenPresentationValue(shot3.preparation),
+    history: cloneFrozenPresentationValue(shot3.history),
+    media: cloneFrozenPresentationValue(shot3.media),
+    eligibility: cloneFrozenPresentationValue(shot3.eligibility),
+    output: cloneFrozenPresentationValue(shot3.output),
   });
 }
 export function createPersonReplacementVideoPresentation({
@@ -699,13 +699,13 @@ export function createPersonReplacementVideoPresentation({
   renderLayoutSplitter: renderLayoutSplitter = () => '',
   renderFooter: renderFooter = () => '',
 } = {}) {
-  const value44 = Object['freeze']({
+  const value44 = Object.freeze({
     buildIdentityView: buildIdentityView,
     renderShotTimeline: renderShotTimeline,
     renderLayoutSplitter: renderLayoutSplitter,
     renderFooter: renderFooter,
   });
-  return Object['freeze']({
+  return Object.freeze({
     build: buildReadonlyVideoPresentation,
     render: (value45, value46 = {}) => renderVideoReplacementPage(value45, value46, value44),
     renderGenerateButton: renderVideoReplacementGenerateButton,

@@ -2,10 +2,10 @@ import { collectSelectedNodeExportItems } from '../nodeBatchExport.js';
 import { createCanvasCommandError } from './commandRegistry.js';
 import { normalizeNodeIds } from './graphCommands.js';
 function getState(context) {
-  return context['store']?.['getStateRaw']?.() || context['store']?.['getState']?.() || {};
+  return context.store?.getStateRaw?.() || context.store?.getState?.() || {};
 }
 function trimText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function firstNonEmpty(...candidates) {
   for (const candidate of candidates) {
@@ -15,28 +15,28 @@ function firstNonEmpty(...candidates) {
   return '';
 }
 function getNodeExportApi(context = {}) {
-  const api = context['nodeExport'] || context['windowObject']?.['electronAPI']?.['nodeExport'] || null;
-  return typeof api?.['exportSelected'] === 'function' ? api : null;
+  const api = context.nodeExport || context.windowObject?.electronAPI?.nodeExport || null;
+  return typeof api?.exportSelected === 'function' ? api : null;
 }
 function normalizeDestinationArgs(args = {}) {
   return {
     directory: firstNonEmpty(
-      args['directory'],
-      args['downloadDir'],
-      args['targetDir'],
-      args['destinationDirectory'],
+      args.directory,
+      args.downloadDir,
+      args.targetDir,
+      args.destinationDirectory,
     ),
-    outputPath: firstNonEmpty(args['outputPath'], args['filePath'], args['path']),
-    filename: firstNonEmpty(args['filename'], args['fileName']),
+    outputPath: firstNonEmpty(args.outputPath, args.filePath, args.path),
+    filename: firstNonEmpty(args.filename, args.fileName),
   };
 }
 function normalizeExportItems(args = {}, context = {}) {
   const ids = normalizeNodeIds(args, context, { min: 1, allowSelection: true }),
     { items: items, skipped: skipped } = collectSelectedNodeExportItems({
-      nodes: getState(context)['nodes'] || {},
+      nodes: getState(context).nodes || {},
       selectedNodeIds: ids,
     });
-  if (items['length'] <= 0)
+  if (items.length <= 0)
     throw createCanvasCommandError(
       'NO_EXPORTABLE_ITEMS',
       'Selected canvas nodes do not contain exportable text or media.',
@@ -45,10 +45,10 @@ function normalizeExportItems(args = {}, context = {}) {
   return { ids: ids, items: items, skipped: skipped };
 }
 function mergeSkipped(...lists) {
-  return lists['flatMap']((list) => (Array['isArray'](list) ? list : []));
+  return lists.flatMap((list) => (Array.isArray(list) ? list : []));
 }
 export function registerNodeExportCommands(registry) {
-  registry['register']({
+  registry.register({
     id: 'node.exportSelected',
     description: 'Export selected canvas node outputs to a ZIP package.',
     riskLevel: 'confirm',
@@ -82,9 +82,9 @@ export function registerNodeExportCommands(registry) {
       } catch (error) {
         return {
           ok: false,
-          errorCode: error['errorCode'] || 'INVALID_NODE_EXPORT_SELECTION',
-          message: error['message'],
-          details: error['details'],
+          errorCode: error.errorCode || 'INVALID_NODE_EXPORT_SELECTION',
+          message: error.message,
+          details: error.details,
         };
       }
     },
@@ -95,24 +95,24 @@ export function registerNodeExportCommands(registry) {
           'NODE_EXPORT_UNAVAILABLE',
           'Node export is unavailable in this environment.',
         );
-      const result = await api['exportSelected']({
-        items: args['items'] || [],
-        directory: args['directory'] || '',
-        outputPath: args['outputPath'] || '',
-        filename: args['filename'] || '',
+      const result = await api.exportSelected({
+        items: args.items || [],
+        directory: args.directory || '',
+        outputPath: args.outputPath || '',
+        filename: args.filename || '',
       });
-      if (result?.['canceled'])
+      if (result?.canceled)
         throw createCanvasCommandError('NODE_EXPORT_CANCELED', 'Node export was canceled.');
-      if (result?.['success'] !== true)
+      if (result?.success !== true)
         throw createCanvasCommandError(
-          result?.['code'] || 'NODE_EXPORT_FAILED',
-          result?.['message'] || result?.['error'] || 'Node export failed.',
+          result?.code || 'NODE_EXPORT_FAILED',
+          result?.message || result?.error || 'Node export failed.',
           result,
         );
       return {
         ...result,
-        ids: args['ids'] || [],
-        skipped: mergeSkipped(args['skipped'], result['skipped']),
+        ids: args.ids || [],
+        skipped: mergeSkipped(args.skipped, result.skipped),
       };
     },
   });

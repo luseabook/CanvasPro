@@ -873,10 +873,10 @@ export async function runDreaminaVideoGeneration(value69, args3 = {}) {
 }
 
 function normalizeDreaminaGenerateNum(options3 = {}) {
-  const value71 = options3?.['generateNum'] ?? options3?.['generate_num'] ?? options3?.['batchSize'] ?? 1,
-    value72 = Number['parseInt'](value71, 10);
-  if (!Number['isFinite'](value72)) return 1;
-  return Math['max'](1, Math['min'](10, value72));
+  const value71 = options3?.generateNum ?? options3?.generate_num ?? options3?.batchSize ?? 1,
+    value72 = Number.parseInt(value71, 10);
+  if (!Number.isFinite(value72)) return 1;
+  return Math.max(1, Math.min(10, value72));
 }
 
 export async function submitDreaminaImageUpscale(value73) {
@@ -884,19 +884,17 @@ export async function submitDreaminaImageUpscale(value73) {
 }
 
 function getDreaminaImageUpscaleInputImage(options4 = {}) {
-  const value74 = String(options4?.['inputUrlsBySlot']?.['image'] || '')['trim']();
+  const value74 = String(options4?.inputUrlsBySlot?.image || '').trim();
   if (value74) return value74;
-  const value75 = String(options4?.['image'] || options4?.['imageUrl'] || options4?.['inputImage'] || '')[
-    'trim'
-  ]();
+  const value75 = String(options4?.image || options4?.imageUrl || options4?.inputImage || '').trim();
   if (value75) return value75;
-  const value76 = Array['isArray'](options4?.['inputUrls']) ? options4['inputUrls'] : [];
-  return String(value76['find']((value77) => String(value77 || '')['trim']()) || '')['trim']();
+  const value76 = Array.isArray(options4?.inputUrls) ? options4.inputUrls : [];
+  return String(value76.find((value77) => String(value77 || '').trim()) || '').trim();
 }
 
 function normalizeDreaminaImageUpscaleResolution(options5 = {}) {
   const resolutionType2 = normalizeResolutionType(
-    options5?.['resolutionType'] ?? options5?.['resolution_type'] ?? options5?.['imageSize'],
+    options5?.resolutionType ?? options5?.resolution_type ?? options5?.imageSize,
   );
   if (resolutionType2 === '4k' || resolutionType2 === '8k') return resolutionType2;
   return '2k';
@@ -915,34 +913,34 @@ export async function runDreaminaImageUpscaleGeneration(value78, args4 = {}) {
   const submitDreaminaImageUpscale2 = await submitDreaminaImageUpscale(
     buildDreaminaImageUpscaleSubmitPayload(value78),
   );
-  if (submitDreaminaImageUpscale2?.['success'] === false)
+  if (submitDreaminaImageUpscale2?.success === false)
     throw new Error(
-      normalizeDreaminaErrorMessage(submitDreaminaImageUpscale2?.['message']) ||
+      normalizeDreaminaErrorMessage(submitDreaminaImageUpscale2?.message) ||
         '即梦图片超清/放大任务提交失败',
     );
-  const enabled8 = String(submitDreaminaImageUpscale2?.['submitId'] || '')['trim']();
+  const enabled8 = String(submitDreaminaImageUpscale2?.submitId || '').trim();
   if (!enabled8) throw new Error('即梦图片超清/放大任务提交失败：未返回 submitId');
-  (args4?.['onTaskMeta']?.({ taskId: enabled8, submitId: enabled8, provider: 'dreamina', kind: 'image' }),
-    args4?.['onTaskId']?.(enabled8));
+  (args4?.onTaskMeta?.({ taskId: enabled8, submitId: enabled8, provider: 'dreamina', kind: 'image' }),
+    args4?.onTaskId?.(enabled8));
   const pollDreaminaUntilDone4 = await pollDreaminaUntilDone(enabled8, { ...args4, taskKind: 'image' }),
     dreaminaTaskSnapshot3 = normalizeDreaminaTaskSnapshot(pollDreaminaUntilDone4, { submitId: enabled8 });
-  if (dreaminaTaskSnapshot3?.['phase'] === 'failed')
+  if (dreaminaTaskSnapshot3?.phase === 'failed')
     throw new Error(
-      normalizeDreaminaErrorMessage(dreaminaTaskSnapshot3?.['failReason']) || '即梦图片超清/放大失败',
+      normalizeDreaminaErrorMessage(dreaminaTaskSnapshot3?.failReason) || '即梦图片超清/放大失败',
     );
-  const enabled9 = Array['isArray'](dreaminaTaskSnapshot3?.['outputs'])
-    ? dreaminaTaskSnapshot3['outputs']
+  const enabled9 = Array.isArray(dreaminaTaskSnapshot3?.outputs)
+    ? dreaminaTaskSnapshot3.outputs
     : [];
-  if (!enabled9['length']) throw new Error('即梦图片超清/放大完成，但没有可用输出');
-  return enabled9['map']((value79) => {
-    const value80 = value79['localUrl'] || value79['url'];
+  if (!enabled9.length) throw new Error('即梦图片超清/放大完成，但没有可用输出');
+  return enabled9.map((value79) => {
+    const value80 = value79.localUrl || value79.url;
     return {
       sourceId: null,
       thumbId: null,
-      sourceUrl: value79['url'] || value80,
+      sourceUrl: value79.url || value80,
       thumbUrl: value80,
       imageUrl: value80,
-      localPath: value79['localPath'] || '',
+      localPath: value79.localPath || '',
       ...(hasImageDerivativeFields(value79) ? buildCanvasLocalImageFields(value79) : {}),
     };
   });

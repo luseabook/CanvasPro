@@ -1,11 +1,11 @@
 export const AGNES_DOMESTIC_PROFILE_ID = 'agnes-domestic';
 export const AGNES_INTERNATIONAL_PROFILE_ID = 'agnes';
-export const AGNES_MODEL_API_PROFILE_IDS = Object['freeze']([
+export const AGNES_MODEL_API_PROFILE_IDS = Object.freeze([
   AGNES_DOMESTIC_PROFILE_ID,
   AGNES_INTERNATIONAL_PROFILE_ID,
 ]);
-export const AGNES_MODEL_API_PROFILES = Object['freeze']({
-  [AGNES_DOMESTIC_PROFILE_ID]: Object['freeze']({
+export const AGNES_MODEL_API_PROFILES = Object.freeze({
+  [AGNES_DOMESTIC_PROFILE_ID]: Object.freeze({
     id: AGNES_DOMESTIC_PROFILE_ID,
     label: 'Agnes AI（国内）',
     shortLabel: '国内',
@@ -14,7 +14,7 @@ export const AGNES_MODEL_API_PROFILES = Object['freeze']({
     region: 'domestic',
     apiUrl: 'https://api.agnes-ai.cn',
   }),
-  [AGNES_INTERNATIONAL_PROFILE_ID]: Object['freeze']({
+  [AGNES_INTERNATIONAL_PROFILE_ID]: Object.freeze({
     id: AGNES_INTERNATIONAL_PROFILE_ID,
     label: 'Agnes AI（国际）',
     shortLabel: '国际',
@@ -25,6 +25,6 @@ export const AGNES_MODEL_API_PROFILES = Object['freeze']({
   }),
 });
 export function getAgnesModelApiProfile(value) {
-  const item = String(value || '')['trim']();
+  const item = String(value || '').trim();
   return AGNES_MODEL_API_PROFILES[item] || AGNES_MODEL_API_PROFILES[AGNES_DOMESTIC_PROFILE_ID];
 }

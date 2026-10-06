@@ -16,13 +16,13 @@ const VERSION_CHECK_TIMEOUT_MS = 5000,
     'if (-not $target) { exit 2 }',
     '$item = Get-Item -LiteralPath $target -ErrorAction Stop',
     '[Console]::Out.Write($item.VersionInfo.ProductVersion)',
-  ]['join']('; ');
+  ].join('; ');
 function parseVersionParts(value) {
-  const match = String(value || '')['match'](/\b(\d+(?:\.\d+){1,3})\b/);
+  const match = String(value || '').match(/\b(\d+(?:\.\d+){1,3})\b/);
   if (!match) return null;
-  const parts = match[1]['split']('.')['map']((part) => Number['parseInt'](part, 10));
-  if (parts['some']((part) => !Number['isFinite'](part) || part < 0)) return null;
-  while (parts['length'] < 4) parts['push'](0);
+  const parts = match[1].split('.').map((part) => Number.parseInt(part, 10));
+  if (parts.some((part) => !Number.isFinite(part) || part < 0)) return null;
+  while (parts.length < 4) parts.push(0);
   return { text: match[1], parts: parts };
 }
 export function compareBrowserVersions(left, right) {
@@ -30,13 +30,13 @@ export function compareBrowserVersions(left, right) {
     rightParsed = parseVersionParts(right);
   if (!leftParsed || !rightParsed) return null;
   for (let index = 0; index < 4; index += 1) {
-    if (leftParsed['parts'][index] < rightParsed['parts'][index]) return -1;
-    if (leftParsed['parts'][index] > rightParsed['parts'][index]) return 1;
+    if (leftParsed.parts[index] < rightParsed.parts[index]) return -1;
+    if (leftParsed.parts[index] > rightParsed.parts[index]) return 1;
   }
   return 0;
 }
 export function identifyChromeShellBrowser(browserPath) {
-  const baseName = path['basename'](String(browserPath || ''))['toLowerCase']();
+  const baseName = path.basename(String(browserPath || '')).toLowerCase();
   if (
     baseName === 'chrome.exe' ||
     baseName === 'chrome' ||
@@ -57,16 +57,16 @@ export function identifyChromeShellBrowser(browserPath) {
   return 'unknown';
 }
 function extractVersionFromProcessResult(result) {
-  if (result?.['status'] !== 0 || result?.['error'] || result?.['signal']) return '';
-  return parseVersionParts(result?.['stdout'])?.['text'] || '';
+  if (result?.status !== 0 || result?.error || result?.signal) return '';
+  return parseVersionParts(result?.stdout)?.text || '';
 }
 export function readBrowserExecutableVersion({
   browserPath: browserPath,
-  env: env = process['env'],
-  platform: platform = process['platform'],
+  env: env = process.env,
+  platform: platform = process.platform,
   spawnProcess: spawnProcess = spawnSync,
 } = {}) {
-  const resolvedPath = String(browserPath || '')['trim']();
+  const resolvedPath = String(browserPath || '').trim();
   if (!resolvedPath) return '';
   try {
     if (platform === 'win32') {
@@ -85,7 +85,7 @@ export function readBrowserExecutableVersion({
           encoding: 'utf8',
           env: {
             ...env,
-            [WINDOWS_BROWSER_PATH_ENV_NAME]: Buffer['from'](resolvedPath, 'utf8')['toString']('base64'),
+            [WINDOWS_BROWSER_PATH_ENV_NAME]: Buffer.from(resolvedPath, 'utf8').toString('base64'),
           },
           timeout: VERSION_CHECK_TIMEOUT_MS,
           windowsHide: true,
@@ -103,14 +103,14 @@ export function readBrowserExecutableVersion({
     return '';
   }
 }
-function resolveMinimumBrowserVersion(browserKind, env = process['env']) {
+function resolveMinimumBrowserVersion(browserKind, env = process.env) {
   const envName =
       browserKind === 'edge'
         ? 'AIC_CHROME_SHELL_MIN_EDGE_VERSION'
         : browserKind === 'chromium'
           ? 'AIC_CHROME_SHELL_MIN_CHROMIUM_VERSION'
           : 'AIC_CHROME_SHELL_MIN_CHROME_VERSION',
-    configuredVersion = parseVersionParts(env?.[envName])?.['text'];
+    configuredVersion = parseVersionParts(env?.[envName])?.text;
   if (configuredVersion) return configuredVersion;
   if (browserKind === 'edge') return DEFAULT_MIN_EDGE_VERSION;
   if (browserKind === 'chromium') return DEFAULT_MIN_CHROMIUM_VERSION;
@@ -124,13 +124,13 @@ function clearRememberedBrowserChoice(preferencePath, unlink = unlinkSync) {
 }
 export function inspectChromeShellBrowserVersion({
   browserPath: browserPath,
-  env: env = process['env'],
-  platform: platform = process['platform'],
+  env: env = process.env,
+  platform: platform = process.platform,
   spawnProcess: spawnProcess = spawnSync,
 } = {}) {
   const browserKind = identifyChromeShellBrowser(browserPath),
     minimumVersion = resolveMinimumBrowserVersion(browserKind, env);
-  if (!SUPPORTED_BROWSER_KINDS['has'](browserKind))
+  if (!SUPPORTED_BROWSER_KINDS.has(browserKind))
     return {
       browserKind: browserKind,
       browserPath: String(browserPath || ''),
@@ -171,8 +171,8 @@ export async function checkChromeShellBrowserVersionBeforeLaunch({
   browserPath: browserPath,
   edgeBrowserPath: edgeBrowserPath = '',
   preferencePath: preferencePath = '',
-  env: env = process['env'],
-  platform: platform = process['platform'],
+  env: env = process.env,
+  platform: platform = process.platform,
   spawnProcess: spawnProcess = spawnSync,
   logEvent: logEvent = null,
   unlink: unlink = unlinkSync,
@@ -186,25 +186,25 @@ export async function checkChromeShellBrowserVersionBeforeLaunch({
   });
   logEvent?.({
     type: 'chrome_shell.browser_version_checked',
-    level: inspection['outdated'] ? 'warn' : 'info',
+    level: inspection.outdated ? 'warn' : 'info',
     source: 'main',
     message:
-      inspection['reason'] === 'version-unavailable'
+      inspection.reason === 'version-unavailable'
         ? 'Browser version could not be verified'
-        : inspection['outdated']
+        : inspection.outdated
           ? 'Browser version is below the supported minimum'
           : 'Browser version check completed',
     context: inspection,
   });
-  if (inspection['checked'] && !inspection['outdated'])
+  if (inspection.checked && !inspection.outdated)
     return {
       continueLaunch: true,
       action: 'continue',
-      browserPath: inspection['browserPath'],
+      browserPath: inspection.browserPath,
       inspection: inspection,
     };
   let fallbackInspection = null;
-  if (edgeBrowserPath && path['resolve'](edgeBrowserPath) !== path['resolve'](inspection['browserPath'])) {
+  if (edgeBrowserPath && path.resolve(edgeBrowserPath) !== path.resolve(inspection.browserPath)) {
     ((fallbackInspection = inspectChromeShellBrowserVersion({
       browserPath: edgeBrowserPath,
       env: env,
@@ -213,12 +213,12 @@ export async function checkChromeShellBrowserVersionBeforeLaunch({
     })),
       logEvent?.({
         type: 'chrome_shell.fallback_browser_version_checked',
-        level: fallbackInspection['checked'] && !fallbackInspection['outdated'] ? 'info' : 'warn',
+        level: fallbackInspection.checked && !fallbackInspection.outdated ? 'info' : 'warn',
         source: 'main',
         message: 'Fallback browser version check completed',
         context: fallbackInspection,
       }));
-    if (fallbackInspection['checked'] && !fallbackInspection['outdated'])
+    if (fallbackInspection.checked && !fallbackInspection.outdated)
       return (
         logEvent?.({
           type: 'chrome_shell.safe_browser_fallback_selected',
@@ -230,7 +230,7 @@ export async function checkChromeShellBrowserVersionBeforeLaunch({
         {
           continueLaunch: true,
           action: 'edge-fallback',
-          browserPath: fallbackInspection['browserPath'],
+          browserPath: fallbackInspection.browserPath,
           inspection: inspection,
           fallbackInspection: fallbackInspection,
         }
@@ -247,7 +247,7 @@ export async function checkChromeShellBrowserVersionBeforeLaunch({
     {
       continueLaunch: false,
       action: 'electron-fallback',
-      browserPath: inspection['browserPath'],
+      browserPath: inspection.browserPath,
       inspection: inspection,
       fallbackInspection: fallbackInspection,
     }

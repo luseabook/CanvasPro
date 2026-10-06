@@ -12,7 +12,7 @@ import {
 } from './vendorVideoModelApiShared.js';
 const frameMode = { field: 'generation_type', value: 'frame' },
   referenceMode = { field: 'generation_type', value: 'reference' };
-export const BAILIAN_VIDEO_MODELS = Object['freeze']([
+export const BAILIAN_VIDEO_MODELS = Object.freeze([
   {
     modelId: 'bailian/wan3.0-video',
     executionId: 'bailian.model-api.video.wan3-0.v1',
@@ -38,7 +38,7 @@ export const BAILIAN_VIDEO_MODELS = Object['freeze']([
       createResolutionField({ defaultValue: '1080P', options: ['480P', '720P', '1080P'] }),
       createAspectRatioField({ options: ['16:9', '4:3', '1:1', '3:4', '9:16'] }),
       createFooterDurationSliderOptionsField({
-        values: [-1, ...Array['from']({ length: 29 }, (value, item) => item + 2)],
+        values: [-1, ...Array.from({ length: 29 }, (value, item) => item + 2)],
         defaultValue: 5,
         optionOverridesByValue: { '-1': { label: '自动', displayLabel: '自动' } },
       }),

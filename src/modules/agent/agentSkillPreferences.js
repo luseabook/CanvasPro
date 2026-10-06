@@ -1,17 +1,17 @@
 export const AGENT_DISABLED_SKILLS_STORAGE_KEY = 'aiCanvas.agentDisabledSkills.v1';
-export function readDisabledAgentSkillIds(value = globalThis['window']) {
+export function readDisabledAgentSkillIds(value = globalThis.window) {
   try {
-    const list = JSON['parse'](
-      value?.['localStorage']?.['getItem']?.(AGENT_DISABLED_SKILLS_STORAGE_KEY) || '[]',
+    const list = JSON.parse(
+      value?.localStorage?.getItem?.(AGENT_DISABLED_SKILLS_STORAGE_KEY) || '[]',
     );
-    return Array['isArray'](list)
+    return Array.isArray(list)
       ? [
           ...new Set(
-            list['map']((item) =>
+            list.map((item) =>
               String(item || '')
-                ['trim']()
-                ['toLowerCase'](),
-            )['filter'](Boolean),
+                .trim()
+                .toLowerCase(),
+            ).filter(Boolean),
           ),
         ]
       : [];
@@ -19,11 +19,11 @@ export function readDisabledAgentSkillIds(value = globalThis['window']) {
     return [];
   }
 }
-export function persistDisabledAgentSkillIds(store, key = globalThis['window']) {
+export function persistDisabledAgentSkillIds(store, key = globalThis.window) {
   try {
-    const index = store?.['getState']?.()['disabledSkillIds'] || [];
+    const index = store?.getState?.().disabledSkillIds || [];
     return (
-      key?.['localStorage']?.['setItem']?.(AGENT_DISABLED_SKILLS_STORAGE_KEY, JSON['stringify'](index)),
+      key?.localStorage?.setItem?.(AGENT_DISABLED_SKILLS_STORAGE_KEY, JSON.stringify(index)),
       true
     );
   } catch {
@@ -32,31 +32,31 @@ export function persistDisabledAgentSkillIds(store, key = globalThis['window']) 
 }
 export function hydrateDisabledAgentSkillIds({
   registry: registry,
-  windowObject: windowObject = globalThis['window'],
+  windowObject: windowObject = globalThis.window,
 } = {}) {
-  return registry?.['setDisabledSkillIds']?.(readDisabledAgentSkillIds(windowObject)) || [];
+  return registry?.setDisabledSkillIds?.(readDisabledAgentSkillIds(windowObject)) || [];
 }
 export function setAgentSkillEnabledPreference({
   registry: registry2,
   skillId: skillId,
   enabled: enabled,
-  windowObject: windowObject = globalThis['window'],
+  windowObject: windowObject = globalThis.window,
 } = {}) {
-  if (registry2?.['setSkillEnabled']?.(skillId, enabled) !== true) return false;
+  if (registry2?.setSkillEnabled?.(skillId, enabled) !== true) return false;
   return (persistDisabledAgentSkillIds(registry2, windowObject), true);
 }
 export function forgetAgentSkillPreference({
   registry: registry3,
   skillId: skillId2,
-  windowObject: windowObject = globalThis['window'],
+  windowObject: windowObject = globalThis.window,
 } = {}) {
   const enabled2 = String(skillId2 || '')
-    ['trim']()
-    ['toLowerCase']();
-  if (!enabled2 || typeof registry3?.['setDisabledSkillIds'] !== 'function') return false;
-  const result = (registry3['getState']?.()['disabledSkillIds'] || [])['filter']((data) => data !== enabled2);
+    .trim()
+    .toLowerCase();
+  if (!enabled2 || typeof registry3?.setDisabledSkillIds !== 'function') return false;
+  const result = (registry3.getState?.().disabledSkillIds || []).filter((data) => data !== enabled2);
   return (
-    registry3['setDisabledSkillIds'](result),
+    registry3.setDisabledSkillIds(result),
     persistDisabledAgentSkillIds(registry3, windowObject),
     true
   );

@@ -32,45 +32,45 @@ export function createAudioVoiceSegmentMergeController({
   if (!session) throw new TypeError('session is required');
   if (typeof composeAudio !== 'function') throw new TypeError('composeAudio is required');
   function getOperations() {
-    return session['listActive']({ kind: 'merge', sourceNodeId: getSourceNodeId() });
+    return session.listActive({ kind: 'merge', sourceNodeId: getSourceNodeId() });
   }
   function run() {
     return getOperations()
-      ['map']((value) => value['payload'])
-      ['filter'](Boolean);
+      .map((value) => value.payload)
+      .filter(Boolean);
   }
   function getProjectedVisibleSegments() {
     return projectAudioVoicePendingSegmentMerges(getVisibleAudioVoiceSegments(getSegments()), run());
   }
   function hasPending() {
-    return getOperations()['length'] > 0;
+    return getOperations().length > 0;
   }
   function isMerging(options = {}) {
-    const enabled = String(options?.['id'] || options || '')['trim']();
+    const enabled = String(options?.id || options || '').trim();
     if (!enabled) return false;
-    return run()['some']((item) => item['currentSegmentId'] === enabled);
+    return run().some((item) => item.currentSegmentId === enabled);
   }
   function isReserved(options2 = {}) {
-    return session['isSegmentReserved'](
+    return session.isSegmentReserved(
       getSourceNodeId(),
-      String(options2?.['id'] || options2 || '')['trim'](),
+      String(options2?.id || options2 || '').trim(),
     );
   }
   async function merge(segmentId) {
-    const sourceNodeId = String(getSourceNodeId() || '')['trim'](),
+    const sourceNodeId = String(getSourceNodeId() || '').trim(),
       segments = getSegments(),
       list = getVisibleAudioVoiceSegments(segments),
-      key = list['findIndex']((index) => index['id'] === segmentId),
+      key = list.findIndex((index) => index.id === segmentId),
       enabled2 = list[key],
       enabled3 = list[key + 1];
     if (!enabled2 || !enabled3) return { status: 'missing' };
     const payload = buildAudioVoicePendingSegmentMerge(enabled2, enabled3);
     if (!payload) return { status: 'missing' };
-    const enabled4 = session['begin']({
+    const enabled4 = session.begin({
       kind: 'merge',
       sourceNodeId: sourceNodeId,
       segmentId: segmentId,
-      segmentIds: [enabled2['id'], enabled3['id']],
+      segmentIds: [enabled2.id, enabled3.id],
       payload: payload,
     });
     if (!enabled4) return (showPending(), { status: 'pending' });
@@ -81,32 +81,32 @@ export function createAudioVoiceSegmentMergeController({
           composeAudio({
             sourceNodeId: sourceNodeId,
             srcs: srcs,
-            durationMs: Number(result['durationMs'] || 0),
+            durationMs: Number(result.durationMs || 0),
           }),
       });
-      if (!session['isCurrent'](enabled4, getSourceNodeId())) return { status: 'stale' };
+      if (!session.isCurrent(enabled4, getSourceNodeId())) return { status: 'stale' };
       const list2 = getSegments();
       if (!isAudioVoicePendingSegmentMergeCurrent(payload, list2))
-        return (session['finish'](enabled4), render(), showStale(), { status: 'stale' });
+        return (session.finish(enabled4), render(), showStale(), { status: 'stale' });
       return (
-        session['finish'](enabled4),
-        markMutation(enabled2['id']),
+        session.finish(enabled4),
+        markMutation(enabled2.id),
         commitSegments(
-          list2['map']((data) => (data['id'] === enabled2['id'] ? merged : data))['filter'](
-            (target) => target['id'] !== enabled3['id'],
+          list2.map((data) => (data.id === enabled2.id ? merged : data)).filter(
+            (target) => target.id !== enabled3.id,
           ),
         ),
         { status: 'success', merged: merged }
       );
     } catch (error) {
-      if (!session['isCurrent'](enabled4, getSourceNodeId())) return { status: 'stale', error: error };
-      return (session['finish'](enabled4), render(), showError(error), { status: 'failed', error: error });
+      if (!session.isCurrent(enabled4, getSourceNodeId())) return { status: 'stale', error: error };
+      return (session.finish(enabled4), render(), showError(error), { status: 'failed', error: error });
     } finally {
-      session['finish'](enabled4) && String(getSourceNodeId() || '')['trim']() === sourceNodeId && render();
+      session.finish(enabled4) && String(getSourceNodeId() || '').trim() === sourceNodeId && render();
     }
   }
   return {
-    blocksGlobalAction: (source) => GLOBAL_BLOCKED_ACTIONS['has'](source),
+    blocksGlobalAction: (source) => GLOBAL_BLOCKED_ACTIONS.has(source),
     getOperations: getOperations,
     getProjectedVisibleSegments: getProjectedVisibleSegments,
     hasPending: hasPending,

@@ -2,51 +2,51 @@ import { resolveCanvasImageSourceUrl } from '../services/canvasMediaLocalService
 import { firstNonEmpty } from '../utils/validators.js';
 const caches = new WeakMap();
 export function getComparisonOriginalKey(value) {
-  const item = Array['isArray'](value?.['images']) ? value['images'][value['mainImageIndex'] || 0] : null,
-    nonEmpty = firstNonEmpty(item?.['sourceId'], value?.['sourceId']),
+  const item = Array.isArray(value?.images) ? value.images[value.mainImageIndex || 0] : null,
+    nonEmpty = firstNonEmpty(item?.sourceId, value?.sourceId),
     canvasImageSourceUrl = resolveCanvasImageSourceUrl(item) || resolveCanvasImageSourceUrl(value);
-  return nonEmpty || canvasImageSourceUrl ? JSON['stringify']([nonEmpty, canvasImageSourceUrl]) : '';
+  return nonEmpty || canvasImageSourceUrl ? JSON.stringify([nonEmpty, canvasImageSourceUrl]) : '';
 }
 export function createComparisonImageCache({
   maxBytes: maxBytes = 256 * 1024 * 1024,
   maxEntries: maxEntries = 4,
   ttlMs: ttlMs = 120000,
-  now: now = Date['now'],
+  now: now = Date.now,
   schedule: schedule = setTimeout,
   cancel: cancel = clearTimeout,
-  revoke: revoke = (key) => URL['revokeObjectURL'](key),
+  revoke: revoke = (key) => URL.revokeObjectURL(key),
 } = {}) {
   const map = new Map();
   let index = 0,
     timer = null,
     result = 0;
   function run(data, options = '') {
-    const response = map['get'](data);
+    const response = map.get(data);
     if (!response) return;
-    (map['delete'](data), (index -= response['bytes']), response['image']['removeAttribute']?.('src'));
-    if (response['revokeUrlOnClose'] && response['url'] !== options) revoke(response['url']);
+    (map.delete(data), (index -= response.bytes), response.image.removeAttribute?.('src'));
+    if (response.revokeUrlOnClose && response.url !== options) revoke(response.url);
   }
   function run2() {
     for (const [target, source] of map) {
-      if (source['expiresAt'] <= now()) run(target);
+      if (source.expiresAt <= now()) run(target);
     }
   }
   function run3() {
     if (timer !== null) cancel(timer);
     timer = null;
-    if (!map['size']) return;
-    const next = Math['min'](...[...map['values']()]['map']((current) => current['expiresAt']));
+    if (!map.size) return;
+    const next = Math.min(...[...map.values()].map((current) => current.expiresAt));
     ((timer = schedule(
       () => {
         (run2(), run3());
       },
-      Math['max'](1, next - now()),
+      Math.max(1, next - now()),
     )),
-      timer?.['unref']?.());
+      timer?.unref?.());
   }
   function clear() {
     result++;
-    for (const entry of map['keys']()) run(entry);
+    for (const entry of map.keys()) run(entry);
     run3();
   }
   return {
@@ -56,35 +56,35 @@ export function createComparisonImageCache({
     clear: clear,
     take(record) {
       run2();
-      const payload = map['get'](record);
-      return (payload && (map['delete'](record), (index -= payload['bytes'])), run3(), payload || null);
+      const payload = map.get(record);
+      return (payload && (map.delete(record), (index -= payload.bytes)), run3(), payload || null);
     },
     put(enabled, args, handle = result) {
       const { image: image, url: url } = args,
-        bytes = Number(image?.['naturalWidth']) * Number(image?.['naturalHeight']) * 4;
+        bytes = Number(image?.naturalWidth) * Number(image?.naturalHeight) * 4;
       if (
         handle !== result ||
         !enabled ||
         !url ||
-        !image?.['complete'] ||
-        !Number['isFinite'](bytes) ||
+        !image?.complete ||
+        !Number.isFinite(bytes) ||
         bytes <= 0 ||
         bytes > maxBytes ||
         maxEntries < 1
       )
         return false;
       run2();
-      if (map['get'](enabled)?.['image'] === image) return true;
-      const response2 = map['get'](enabled),
+      if (map.get(enabled)?.image === image) return true;
+      const response2 = map.get(enabled),
         revokeUrlOnClose =
-          args['revokeUrlOnClose'] || (response2?.['url'] === url && response2['revokeUrlOnClose']);
+          args.revokeUrlOnClose || (response2?.url === url && response2.revokeUrlOnClose);
       run(enabled, url);
-      while (map['size'] && (index + bytes > maxBytes || map['size'] >= maxEntries)) {
-        run(map['keys']()['next']()['value']);
+      while (map.size && (index + bytes > maxBytes || map.size >= maxEntries)) {
+        run(map.keys().next().value);
       }
       return (
-        image['remove']?.(),
-        map['set'](enabled, {
+        image.remove?.(),
+        map.set(enabled, {
           ...args,
           revokeUrlOnClose: revokeUrlOnClose,
           bytes: bytes,
@@ -98,13 +98,13 @@ export function createComparisonImageCache({
   };
 }
 export function getComparisonImageCache(dom) {
-  let map2 = caches['get'](dom);
+  let map2 = caches.get(dom);
   return (
     !map2 &&
       ((map2 = createComparisonImageCache()),
-      caches['set'](dom, map2),
-      dom['defaultView']?.['addEventListener']('aicanvas:active-canvas-changed', map2['clear']),
-      dom['defaultView']?.['addEventListener']('pagehide', map2['clear'])),
+      caches.set(dom, map2),
+      dom.defaultView?.addEventListener('aicanvas:active-canvas-changed', map2.clear),
+      dom.defaultView?.addEventListener('pagehide', map2.clear)),
     map2
   );
 }

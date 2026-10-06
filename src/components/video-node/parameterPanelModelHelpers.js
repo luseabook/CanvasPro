@@ -332,46 +332,46 @@ export function arePlainObjectsEqual(value16, value17) {
 }
 
 function isAllowedVideoModel(value18, value19 = []) {
-  const list4 = (Array['isArray'](value19) ? value19 : [])
-    ['map']((value20) => String(value20 || '')['trim']())
-    ['filter'](Boolean);
-  return !list4['length'] || list4['includes'](String(value18 || '')['trim']());
+  const list4 = (Array.isArray(value19) ? value19 : [])
+    .map((value20) => String(value20 || '').trim())
+    .filter(Boolean);
+  return !list4.length || list4.includes(String(value18 || '').trim());
 }
 
 export function buildRhAiAppVideoMenuItems(value21, { allowedModelIds: allowedModelIds = [] } = {}) {
   const list5 = getModelsByKind('video')
-    ['filter'](
+    .filter(
       (enabled4) =>
-        enabled4?.['provider'] === 'runninghubwf' &&
-        enabled4?.['adapterType'] === 'workflow' &&
-        enabled4?.['extensions']?.['rhAiApp'] !== undefined &&
-        String(enabled4?.['extensions']?.['rhAiApp']?.['appKey'] || '')['trim']() &&
-        isAllowedVideoModel(enabled4?.['modelId'], allowedModelIds) &&
+        enabled4?.provider === 'runninghubwf' &&
+        enabled4?.adapterType === 'workflow' &&
+        enabled4?.extensions?.rhAiApp !== undefined &&
+        String(enabled4?.extensions?.rhAiApp?.appKey || '').trim() &&
+        isAllowedVideoModel(enabled4?.modelId, allowedModelIds) &&
         !(
-          enabled4?.['uiPlacement']?.['includes']('toolbar') &&
-          !enabled4?.['uiPlacement']?.['includes']('modelMenu')
+          enabled4?.uiPlacement?.includes('toolbar') &&
+          !enabled4?.uiPlacement?.includes('modelMenu')
         ),
     )
-    ['sort'](
+    .sort(
       (value22, value23) =>
-        Number(getManifestVideoMenu(value22)?.['order'] || 0) -
-        Number(getManifestVideoMenu(value23)?.['order'] || 0),
+        Number(getManifestVideoMenu(value22)?.order || 0) -
+        Number(getManifestVideoMenu(value23)?.order || 0),
     );
-  return list5['map']((value24) => {
+  return list5.map((value24) => {
     const manifestVideoMenu = getManifestVideoMenu(value24);
     return renderNodeMenuItem(
       {
-        modelId: value24['modelId'],
-        provider: value24['provider'] || 'runninghubwf',
-        label: manifestVideoMenu?.['label'] || value24['displayName'],
-        description: manifestVideoMenu?.['subtitle'] || value24['description'] || '',
-        icon: value24['icon'] || 'images/RH.png',
+        modelId: value24.modelId,
+        provider: value24.provider || 'runninghubwf',
+        label: manifestVideoMenu?.label || value24.displayName,
+        description: manifestVideoMenu?.subtitle || value24.description || '',
+        icon: value24.icon || 'images/RH.png',
         iconAlt: 'runninghub',
-        vip: value24['vip'] === true,
+        vip: value24.vip === true,
       },
       { activeModel: value21 },
     );
-  })['join']('');
+  }).join('');
 }
 
 export function buildMinimaxVideoLogoHTML(value25 = 20) {
@@ -387,16 +387,16 @@ export function buildBinghuoVideoLogoHTML(value27 = 20) {
 }
 
 function getCustomProviderMeta(value29) {
-  const value30 = value29?.['extensions']?.['customProvider'];
+  const value30 = value29?.extensions?.customProvider;
   return value30 && typeof value30 === 'object' ? value30 : null;
 }
 
 export function buildCustomProviderVideoLogoHTML(options2 = {}, value31 = 20) {
-  const value32 = options2?.['extensions'] ? getCustomProviderMeta(options2) : options2,
+  const value32 = options2?.extensions ? getCustomProviderMeta(options2) : options2,
     value33 =
-      String(value32?.['badge'] || 'CP')
-        ['trim']()
-        ['slice'](0, 2) || 'CP',
+      String(value32?.badge || 'CP')
+        .trim()
+        .slice(0, 2) || 'CP',
     count7 = Number(value31) || 20,
     value34 = count7 <= 12 ? 'node-menu-icon-small' : 'node-menu-icon';
   return '<div class="' + value34 + ' node-menu-icon-badge">' + escapeHtml(value33) + '</div>';
@@ -416,48 +416,48 @@ export function buildComfyUiLocalVideoLogoHTML(value37 = 20) {
 }
 
 export function getComfyUiVideoWorkflowIconHtml(options3 = {}, value38 = 20) {
-  const value39 = String(options3?.['iconKind'] || '')['trim']();
+  const value39 = String(options3?.iconKind || '').trim();
   return renderComfyUiWorkflowLogoHtmlFromIconKind(value39, {
     className: getComfyUiVideoWorkflowLogoClassName(value38),
   });
 }
 
 function buildComfyUiVideoWorkflowMenuItems(value40, value41) {
-  const value42 = String(value41 || '')['trim']();
+  const value42 = String(value41 || '').trim();
   return getModelsByKind('video')
-    ['filter']((enabled5) => {
+    .filter((enabled5) => {
       const manifestVideoMenu2 = getManifestVideoMenu(enabled5);
       return (
-        enabled5?.['provider'] === 'comfyui' &&
-        enabled5?.['adapterType'] === 'workflow' &&
-        String(enabled5?.['extensions']?.['comfyUiWorkflow']?.['appKey'] || '')['trim']() &&
-        manifestVideoMenu2?.['group'] === value42 &&
+        enabled5?.provider === 'comfyui' &&
+        enabled5?.adapterType === 'workflow' &&
+        String(enabled5?.extensions?.comfyUiWorkflow?.appKey || '').trim() &&
+        manifestVideoMenu2?.group === value42 &&
         !(
-          enabled5?.['uiPlacement']?.['includes']('toolbar') &&
-          !enabled5?.['uiPlacement']?.['includes']('modelMenu')
+          enabled5?.uiPlacement?.includes('toolbar') &&
+          !enabled5?.uiPlacement?.includes('modelMenu')
         )
       );
     })
-    ['sort'](
+    .sort(
       (value43, value44) =>
-        Number(getManifestVideoMenu(value43)?.['order'] || 0) -
-        Number(getManifestVideoMenu(value44)?.['order'] || 0),
+        Number(getManifestVideoMenu(value43)?.order || 0) -
+        Number(getManifestVideoMenu(value44)?.order || 0),
     )
-    ['map']((value45) => {
+    .map((value45) => {
       const manifestVideoMenu3 = getManifestVideoMenu(value45);
       return renderNodeMenuItem(
         {
-          modelId: value45['modelId'],
-          provider: value45['provider'] || 'comfyui',
-          label: manifestVideoMenu3?.['label'] || value45['displayName'],
-          description: manifestVideoMenu3?.['subtitle'] || value45['description'] || '',
+          modelId: value45.modelId,
+          provider: value45.provider || 'comfyui',
+          label: manifestVideoMenu3?.label || value45.displayName,
+          description: manifestVideoMenu3?.subtitle || value45.description || '',
           iconHtml: getComfyUiVideoWorkflowIconHtml(manifestVideoMenu3),
-          vip: value45['vip'] === true,
+          vip: value45.vip === true,
         },
         { activeModel: value40 },
       );
     })
-    ['join']('');
+    .join('');
 }
 
 export function buildComfyUiCloudVideoWorkflowMenuItems(value46) {
@@ -506,55 +506,55 @@ export function buildComfyUiVideoWorkflowMenuGroups(value48) {
 export function buildCustomProviderVideoMenuGroups(value49) {
   const enabled6 = new Map();
   return (
-    getModelsByKind('video')['forEach']((value50) => {
+    getModelsByKind('video').forEach((value50) => {
       const manifestVideoMenu4 = getManifestVideoMenu(value50),
         customProviderMeta = getCustomProviderMeta(value50);
       if (!manifestVideoMenu4 || !customProviderMeta) return;
-      if (manifestVideoMenu4['role'] && manifestVideoMenu4['role'] !== 'customProviderModel') return;
-      const enabled7 = String(value50?.['provider'] || manifestVideoMenu4['group'] || '')['trim']();
+      if (manifestVideoMenu4.role && manifestVideoMenu4.role !== 'customProviderModel') return;
+      const enabled7 = String(value50?.provider || manifestVideoMenu4.group || '').trim();
       if (!enabled7) return;
-      (!enabled6['has'](enabled7) &&
-        enabled6['set'](enabled7, {
+      (!enabled6.has(enabled7) &&
+        enabled6.set(enabled7, {
           providerId: enabled7,
-          displayName: customProviderMeta['displayName'] || enabled7,
-          subtitle: manifestVideoMenu4['subtitle'] || 'Custom provider',
-          badge: customProviderMeta['badge'] || manifestVideoMenu4['badge'] || 'CP',
+          displayName: customProviderMeta.displayName || enabled7,
+          subtitle: manifestVideoMenu4.subtitle || 'Custom provider',
+          badge: customProviderMeta.badge || manifestVideoMenu4.badge || 'CP',
           items: [],
         }),
-        enabled6['get'](enabled7)['items']['push'](value50));
+        enabled6.get(enabled7).items.push(value50));
     }),
-    Array['from'](enabled6['values']())['map']((value51) => {
-      const value52 = value51['providerId']['replace'](/[^A-Za-z0-9_-]/g, '-'),
-        value53 = { badge: value51['badge'] };
+    Array.from(enabled6.values()).map((value51) => {
+      const value52 = value51.providerId.replace(/[^A-Za-z0-9_-]/g, '-'),
+        value53 = { badge: value51.badge };
       return {
         id: 'custom-provider-video-' + value52,
         headerClass: 'custom-provider-video-group-header custom-provider-video-group-' + value52,
         submenuClass: 'custom-provider-video-submenu-' + value52,
         toggleAttr: 'data-custom-provider-video-toggle',
-        label: value51['displayName'],
-        subtitle: value51['subtitle'],
+        label: value51.displayName,
+        subtitle: value51.subtitle,
         iconHtml: buildCustomProviderVideoLogoHTML(value53),
-        itemsHtml: value51['items']
-          ['sort'](
+        itemsHtml: value51.items
+          .sort(
             (value54, value55) =>
-              Number(getManifestVideoMenu(value54)?.['order'] || 0) -
-              Number(getManifestVideoMenu(value55)?.['order'] || 0),
+              Number(getManifestVideoMenu(value54)?.order || 0) -
+              Number(getManifestVideoMenu(value55)?.order || 0),
           )
-          ['map']((value56) => {
+          .map((value56) => {
             const manifestVideoMenu5 = getManifestVideoMenu(value56);
             return renderNodeMenuItem(
               {
-                modelId: value56['modelId'],
-                provider: value56['provider'],
-                label: manifestVideoMenu5?.['label'] || value56['displayName'],
-                description: manifestVideoMenu5?.['subtitle'] || value56['description'] || '',
+                modelId: value56.modelId,
+                provider: value56.provider,
+                label: manifestVideoMenu5?.label || value56.displayName,
+                description: manifestVideoMenu5?.subtitle || value56.description || '',
                 iconHtml: buildCustomProviderVideoLogoHTML(value56),
-                vip: value56['vip'] === true,
+                vip: value56.vip === true,
               },
               { activeModel: value49 },
             );
           })
-          ['join'](''),
+          .join(''),
       };
     })
   );
@@ -562,67 +562,67 @@ export function buildCustomProviderVideoMenuGroups(value49) {
 
 function getMinimaxVideoModelMenuManifests() {
   return getModelsByKind('video')
-    ['filter']((value57) => {
-      if (value57?.['provider'] !== 'minimax') return false;
-      if (value57?.['adapterType'] !== 'modelApi') return false;
-      return getManifestVideoMenu(value57)?.['role'] === 'minimaxOfficialModel';
+    .filter((value57) => {
+      if (value57?.provider !== 'minimax') return false;
+      if (value57?.adapterType !== 'modelApi') return false;
+      return getManifestVideoMenu(value57)?.role === 'minimaxOfficialModel';
     })
-    ['sort'](
+    .sort(
       (value58, value59) =>
-        Number(getManifestVideoMenu(value58)?.['order'] || 0) -
-        Number(getManifestVideoMenu(value59)?.['order'] || 0),
+        Number(getManifestVideoMenu(value58)?.order || 0) -
+        Number(getManifestVideoMenu(value59)?.order || 0),
     );
 }
 
 function getBinghuoVideoModelMenuManifests() {
   return getModelsByKind('video')
-    ['filter']((value60) => {
-      if (value60?.['provider'] !== 'binghuo') return false;
-      if (value60?.['adapterType'] !== 'modelApi') return false;
-      return getManifestVideoMenu(value60)?.['role'] === 'binghuoModel';
+    .filter((value60) => {
+      if (value60?.provider !== 'binghuo') return false;
+      if (value60?.adapterType !== 'modelApi') return false;
+      return getManifestVideoMenu(value60)?.role === 'binghuoModel';
     })
-    ['sort'](
+    .sort(
       (value61, value62) =>
-        Number(getManifestVideoMenu(value61)?.['order'] || 0) -
-        Number(getManifestVideoMenu(value62)?.['order'] || 0),
+        Number(getManifestVideoMenu(value61)?.order || 0) -
+        Number(getManifestVideoMenu(value62)?.order || 0),
     );
 }
 
 export function buildMinimaxVideoMenuItemsHtml(value63) {
   return getMinimaxVideoModelMenuManifests()
-    ['map']((value64) => {
+    .map((value64) => {
       const manifestVideoMenu6 = getManifestVideoMenu(value64);
       return renderNodeMenuItem(
         {
-          modelId: value64['modelId'],
+          modelId: value64.modelId,
           provider: 'minimax',
-          label: manifestVideoMenu6?.['label'] || value64['displayName'],
-          description: manifestVideoMenu6?.['subtitle'] || value64['description'] || '',
+          label: manifestVideoMenu6?.label || value64.displayName,
+          description: manifestVideoMenu6?.subtitle || value64.description || '',
           iconHtml: buildMinimaxVideoLogoHTML(20),
           badgeHtml: buildModelProviderProfileBadgesHtml(value64),
         },
         { activeModel: value63 },
       );
     })
-    ['join']('');
+    .join('');
 }
 
 export function buildBinghuoVideoMenuItemsHtml(value65) {
   return getBinghuoVideoModelMenuManifests()
-    ['map']((value66) => {
+    .map((value66) => {
       const manifestVideoMenu7 = getManifestVideoMenu(value66);
       return renderNodeMenuItem(
         {
-          modelId: value66['modelId'],
+          modelId: value66.modelId,
           provider: 'binghuo',
-          label: manifestVideoMenu7?.['label'] || value66['displayName'],
-          priceText: manifestVideoMenu7?.['priceText'] || '',
-          description: manifestVideoMenu7?.['subtitle'] || value66['description'] || '',
+          label: manifestVideoMenu7?.label || value66.displayName,
+          priceText: manifestVideoMenu7?.priceText || '',
+          description: manifestVideoMenu7?.subtitle || value66.description || '',
           iconHtml: buildBinghuoVideoLogoHTML(20),
-          disabled: manifestVideoMenu7?.['disabled'] === true,
+          disabled: manifestVideoMenu7?.disabled === true,
         },
         { activeModel: value65 },
       );
     })
-    ['join']('');
+    .join('');
 }

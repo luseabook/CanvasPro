@@ -247,8 +247,8 @@ test('startChromeShellRuntime creates the bridge through startHttpBridge and exp
   assert.equal(calls[0].token, 'session-token');
   assert.equal(calls[0].handlers, handlers);
   assert.equal(typeof calls[0].logEvent, 'function');
-  assert.equal(input.env['AIC_DESKTOP_BRIDGE_URL'], created.url);
-  assert.equal(input.env['AIC_DESKTOP_BRIDGE_TOKEN'], created.token);
+  assert.equal(input.env.AIC_DESKTOP_BRIDGE_URL, created.url);
+  assert.equal(input.env.AIC_DESKTOP_BRIDGE_TOKEN, created.token);
   assert.equal(result.desktopHttpBridge, created);
   assert.equal(created.closeCount, 0);
 });

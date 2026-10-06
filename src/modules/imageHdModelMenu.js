@@ -1,11 +1,11 @@
 import { listModelManifests } from '../manifests/index.js';
 export function getImageHdModelIds() {
   return listModelManifests()
-    ['filter'](
+    .filter(
       (value) =>
-        value['kind'] === 'image' &&
-        value['adapterType'] === 'workflow' &&
-        value['extensions']?.['imageHdMenu']?.['enabled'] === true,
+        value.kind === 'image' &&
+        value.adapterType === 'workflow' &&
+        value.extensions?.imageHdMenu?.enabled === true,
     )
-    ['map']((item) => item['modelId']);
+    .map((item) => item.modelId);
 }

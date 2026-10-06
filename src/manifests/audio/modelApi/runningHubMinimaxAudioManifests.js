@@ -27,17 +27,17 @@ const SAMPLE_RATE = audioSelect('sampleRate', '采样率', ['16000', '24000', '3
     '发音词典',
     '每行一条，最多 20 条。例如：ASAP/As soon as possible',
   );
-export const runningHubMinimaxAudioEntries = Object['freeze']([
+export const runningHubMinimaxAudioEntries = Object.freeze([
   ...[
     ['2.6-hd', 0x1ab6bbe5],
     ['2.6-turbo', 0x1ab6bbe6],
     ['02-hd', 0x1ab6bbeb],
     ['02-turbo', 0x1ab6bbec],
-  ]['map'](([value, docId], item) =>
+  ].map(([value, docId], item) =>
     createRunningHubAudioCatalogEntry({
       id: 'minimax/speech-' + value,
       name:
-        'MiniMax 语音 ' + value['replace']('-', ' ')['replace']('hd', 'HD')['replace']('turbo', 'Turbo'),
+        'MiniMax 语音 ' + value.replace('-', ' ').replace('hd', 'HD').replace('turbo', 'Turbo'),
       endpoint: '/openapi/v2/rhart-audio/text-to-audio/speech-' + value,
       docId: docId,
       order: 220 + item,
@@ -52,8 +52,8 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
         audioToggle('englishNormalization', '英语文本规范化'),
       ],
       mapping: ['voice_id', 'speed', 'volume', 'pitch', 'emotion']
-        ['map']((key) => paramMapping(key))
-        ['concat']([
+        .map((key) => paramMapping(key))
+        .concat([
           paramMapping('pronunciation_dict', 'pronunciationDict', { transform: 'lines' }),
           paramMapping('english_normalization', 'englishNormalization'),
           constantMapping('enable_base64_output', false),
@@ -195,7 +195,7 @@ export const runningHubMinimaxAudioEntries = Object['freeze']([
     },
     preparations: [
       {
-        executionId: RH_AUDIO_HELPER_IDS['coverPreprocess'],
+        executionId: RH_AUDIO_HELPER_IDS.coverPreprocess,
         slot: 'sourceAudio',
         inputField: 'audioUrl',
         targetField: 'coverFeatureId',

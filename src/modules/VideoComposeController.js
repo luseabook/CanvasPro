@@ -188,8 +188,8 @@ function buildAudioVoiceComposedNodePayload(
       needsAutoResize: false,
       fixedSize: true,
     });
-  const value9 = String(result?.['posterLocalPath'] || result?.['thumbLocalPath'] || '')['trim'](),
-    value10 = String(result?.['posterUrl'] || result?.['thumbUrl'] || localPathToUrl(value9))['trim']();
+  const value9 = String(result?.posterLocalPath || result?.thumbLocalPath || '').trim(),
+    value10 = String(result?.posterUrl || result?.thumbUrl || localPathToUrl(value9)).trim();
   return buildSourceMediaNodePayload({
     id: id3,
     type: 'source-video',
@@ -201,14 +201,14 @@ function buildAudioVoiceComposedNodePayload(
     src: url2,
     localPath: localPath3,
     posterLocalPath: value9,
-    thumbLocalPath: String(result?.['thumbLocalPath'] || value9)['trim'](),
+    thumbLocalPath: String(result?.thumbLocalPath || value9).trim(),
     posterUrl: value10,
-    thumbUrl: String(result?.['thumbUrl'] || value10)['trim'](),
-    videoDuration: Number(result?.['videoDuration'] || result?.['duration'] || 0) || 0,
-    videoWidth: Number(result?.['videoWidth'] || result?.['width'] || 0) || 0,
-    videoHeight: Number(result?.['videoHeight'] || result?.['height'] || 0) || 0,
-    videoFps: Number(result?.['videoFps'] || result?.['fps'] || 0) || 0,
-    fps: Number(result?.['fps'] || result?.['videoFps'] || 0) || 0,
+    thumbUrl: String(result?.thumbUrl || value10).trim(),
+    videoDuration: Number(result?.videoDuration || result?.duration || 0) || 0,
+    videoWidth: Number(result?.videoWidth || result?.width || 0) || 0,
+    videoHeight: Number(result?.videoHeight || result?.height || 0) || 0,
+    videoFps: Number(result?.videoFps || result?.fps || 0) || 0,
+    fps: Number(result?.fps || result?.videoFps || 0) || 0,
     needsAutoResize: false,
     fixedSize: true,
   });
@@ -222,52 +222,52 @@ async function composeMediaSourcesNearNode({
 } = {}) {
   const enabled3 = MEDIA_COMPOSE_CONFIG[mediaKind];
   if (!enabled3) return null;
-  const list4 = (Array['isArray'](srcs) ? srcs : [])
-    ['map']((value11) => String(value11 || '')['trim']())
-    ['filter'](Boolean);
-  if (list4['length'] < 2)
-    return (window['showToast']?.(mediaComposeText(enabled3, 'invalidSource'), 'error'), null);
-  triggerEl && ((triggerEl['dataset']['loading'] = 'true'), (triggerEl['disabled'] = true));
-  window['showToast']?.(mediaComposeText(enabled3, 'progress'), 'info');
+  const list4 = (Array.isArray(srcs) ? srcs : [])
+    .map((value11) => String(value11 || '').trim())
+    .filter(Boolean);
+  if (list4.length < 2)
+    return (window.showToast?.(mediaComposeText(enabled3, 'invalidSource'), 'error'), null);
+  triggerEl && ((triggerEl.dataset.loading = 'true'), (triggerEl.disabled = true));
+  window.showToast?.(mediaComposeText(enabled3, 'progress'), 'info');
   try {
     const response2 = await runMediaComposeRequest(enabled3, list4),
       resultLocalPath = pickResultLocalPath(response2);
-    if (!response2['success'] || !resultLocalPath)
-      throw new Error(response2['error'] || response2['message'] || mediaComposeText(enabled3, 'fallback'));
-    const value12 = appStore['getState'](),
-      value13 = value12['nodes'] || {},
+    if (!response2.success || !resultLocalPath)
+      throw new Error(response2.error || response2.message || mediaComposeText(enabled3, 'fallback'));
+    const value12 = appStore.getState(),
+      value13 = value12.nodes || {},
       { width: width4, height: height4 } = getResultNodeSize(mediaKind, anchorNode),
       box2 = calcSafeSpawnPosNearNode(value13, anchorNode || {}, width4, height4),
-      generateId2 = generateId(enabled3['resultIdPrefix']);
+      generateId2 = generateId(enabled3.resultIdPrefix);
     return (
-      appStore['addNode'](
+      appStore.addNode(
         buildComposedNodePayload(mediaKind, enabled3, {
           id: generateId2,
-          x: box2['x'],
-          y: box2['y'],
+          x: box2.x,
+          y: box2.y,
           width: width4,
           height: height4,
           localPath: resultLocalPath,
           result: response2,
         }),
       ),
-      appStore['setSelectedNodes']([generateId2]),
+      appStore.setSelectedNodes([generateId2]),
       commit(),
-      window['_triggerLocalCacheSave']?.(),
-      window['showToast']?.(mediaComposeText(enabled3, 'success'), 'success'),
+      window._triggerLocalCacheSave?.(),
+      window.showToast?.(mediaComposeText(enabled3, 'success'), 'success'),
       { nodeId: generateId2, localPath: resultLocalPath, data: response2 }
     );
   } catch (value14) {
     const value15 =
       value14 instanceof Error
-        ? value14['message']
+        ? value14.message
         : String(value14 || mediaComposeText(enabled3, 'fallback'));
     return (
-      window['showToast']?.(mediaComposeText(enabled3, 'failedWithMessage', { message: value15 }), 'error'),
+      window.showToast?.(mediaComposeText(enabled3, 'failedWithMessage', { message: value15 }), 'error'),
       null
     );
   } finally {
-    triggerEl && ((triggerEl['dataset']['loading'] = 'false'), (triggerEl['disabled'] = false));
+    triggerEl && ((triggerEl.dataset.loading = 'false'), (triggerEl.disabled = false));
   }
 }
 
@@ -293,14 +293,14 @@ export async function composeAudioVoiceTimelineNearNode({
   triggerEl: triggerEl = null,
 } = {}) {
   const value16 = sourceKind === 'audio' ? 'audio' : 'video',
-    enabled4 = String(src || '')['trim'](),
-    value17 = (Array['isArray'](clips) ? clips : [])['filter']((value18) => value18?.['src']);
-  if (!enabled4 || value17['length'] <= 0)
-    return (window['showToast']?.(audioVoiceComposeText('invalidSource'), 'error'), null);
+    enabled4 = String(src || '').trim(),
+    value17 = (Array.isArray(clips) ? clips : []).filter((value18) => value18?.src);
+  if (!enabled4 || value17.length <= 0)
+    return (window.showToast?.(audioVoiceComposeText('invalidSource'), 'error'), null);
   if (!canUseElectronMediaTask())
-    return (window['showToast']?.(audioVoiceComposeText('missingTask'), 'error'), null);
-  triggerEl && ((triggerEl['dataset']['loading'] = 'true'), (triggerEl['disabled'] = true));
-  window['showToast']?.(
+    return (window.showToast?.(audioVoiceComposeText('missingTask'), 'error'), null);
+  triggerEl && ((triggerEl.dataset.loading = 'true'), (triggerEl.disabled = true));
+  window.showToast?.(
     audioVoiceComposeText(value16 === 'video' ? 'videoProgress' : 'audioProgress'),
     'info',
   );
@@ -314,35 +314,35 @@ export async function composeAudioVoiceTimelineNearNode({
         { wait: true, timeout: 600000 },
       ),
       resultLocalPath2 = pickResultLocalPath(enqueueElectronMediaTask2);
-    if (!enqueueElectronMediaTask2?.['success'] || !resultLocalPath2)
+    if (!enqueueElectronMediaTask2?.success || !resultLocalPath2)
       throw new Error(
-        enqueueElectronMediaTask2?.['error'] ||
-          enqueueElectronMediaTask2?.['message'] ||
+        enqueueElectronMediaTask2?.error ||
+          enqueueElectronMediaTask2?.message ||
           audioVoiceComposeText('fallback'),
       );
-    const value19 = appStore['getState'](),
-      value20 = value19['nodes'] || {},
+    const value19 = appStore.getState(),
+      value20 = value19.nodes || {},
       { width: width5, height: height5 } = getResultNodeSize(value16, anchorNode),
       box3 = calcSafeSpawnPosNearNode(value20, anchorNode || {}, width5, height5),
       generateId3 = generateId(
         value16 === 'audio' ? 'source-audio-voice-compose' : 'source-video-voice-compose',
       );
     return (
-      appStore['addNode'](
+      appStore.addNode(
         buildAudioVoiceComposedNodePayload(value16, {
           id: generateId3,
-          x: box3['x'],
-          y: box3['y'],
+          x: box3.x,
+          y: box3.y,
           width: width5,
           height: height5,
           localPath: resultLocalPath2,
           result: enqueueElectronMediaTask2,
         }),
       ),
-      appStore['setSelectedNodes']([generateId3]),
+      appStore.setSelectedNodes([generateId3]),
       commit(),
-      window['_triggerLocalCacheSave']?.(),
-      window['showToast']?.(
+      window._triggerLocalCacheSave?.(),
+      window.showToast?.(
         audioVoiceComposeText(value16 === 'video' ? 'videoSuccess' : 'audioSuccess'),
         'success',
       ),
@@ -350,12 +350,12 @@ export async function composeAudioVoiceTimelineNearNode({
     );
   } catch (value21) {
     const value22 =
-      value21 instanceof Error ? value21['message'] : String(value21 || audioVoiceComposeText('fallback'));
+      value21 instanceof Error ? value21.message : String(value21 || audioVoiceComposeText('fallback'));
     return (
-      window['showToast']?.(audioVoiceComposeText('failedWithMessage', { message: value22 }), 'error'),
+      window.showToast?.(audioVoiceComposeText('failedWithMessage', { message: value22 }), 'error'),
       null
     );
   } finally {
-    triggerEl && ((triggerEl['dataset']['loading'] = 'false'), (triggerEl['disabled'] = false));
+    triggerEl && ((triggerEl.dataset.loading = 'false'), (triggerEl.disabled = false));
   }
 }

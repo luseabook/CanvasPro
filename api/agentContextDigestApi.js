@@ -14,7 +14,7 @@ export const AGENT_CONTEXT_DIGEST_SYSTEM_PROMPT = [
   'Do not invent completion, tool results, preferences, or requirements.',
   'Project memory is separate stable user-approved context. Use it to interpret references, but do not copy it into the conversation digest unless new messages explicitly change the current task.',
   'Return one strict JSON object and no Markdown.',
-]['join']('\n');
+].join('\n');
 function createStructuredOutput() {
   const constraints = { type: 'array', maxItems: 10, items: { type: 'string' } };
   return {
@@ -40,18 +40,18 @@ function buildPrompt({
   projectMemory: projectMemory = null,
   locale: locale = '',
 } = {}) {
-  return JSON['stringify']({
+  return JSON.stringify({
     languagePolicy: String(locale || '')
-      ['toLowerCase']()
-      ['startsWith']('en')
+      .toLowerCase()
+      .startsWith('en')
       ? 'Write digest values in English.'
       : '摘要内容使用简体中文。',
     existingDigest: compactAgentContextDigestForPrompt(existingDigest),
     projectMemory: compactAgentProjectMemoryForPrompt(projectMemory),
-    newMessages: (Array['isArray'](messages) ? messages : [])['map']((response = {}) => ({
-      role: String(response['role'] || 'assistant'),
-      content: String(response['content'] || ''),
-      ...(response['status'] ? { status: String(response['status']) } : {}),
+    newMessages: (Array.isArray(messages) ? messages : []).map((response = {}) => ({
+      role: String(response.role || 'assistant'),
+      content: String(response.content || ''),
+      ...(response.status ? { status: String(response.status) } : {}),
     })),
     outputContract: {
       goal: 'The current primary user goal, or an empty string.',
@@ -65,16 +65,16 @@ function buildPrompt({
 function getResultText(response2) {
   return typeof response2 === 'string'
     ? response2
-    : response2?.['text'] || response2?.['outputText'] || response2?.['content'] || '';
+    : response2?.text || response2?.outputText || response2?.content || '';
 }
 function parseDigestResult(value) {
   const item =
     value &&
     typeof value === 'object' &&
-    !Array['isArray'](value) &&
-    !Object['prototype']['hasOwnProperty']['call'](value, 'text')
+    !Array.isArray(value) &&
+    !Object.prototype.hasOwnProperty.call(value, 'text')
       ? value
-      : JSON['parse'](String(getResultText(value) || '')['trim']());
+      : JSON.parse(String(getResultText(value) || '').trim());
   return normalizeAgentContextDigest(item);
 }
 export async function requestAgentContextDigest({
@@ -86,17 +86,17 @@ export async function requestAgentContextDigest({
   signal: signal = null,
   onTrace: onTrace = null,
 } = {}) {
-  if (!Array['isArray'](messages) || messages['length'] === 0)
+  if (!Array.isArray(messages) || messages.length === 0)
     return normalizeAgentContextDigest(existingDigest);
-  const model = String(settings['model'] || '')['trim'](),
-    provider = String(settings['provider'] || '')['trim'](),
-    providerProfileId = String(settings['providerProfileId'] || '')['trim']();
+  const model = String(settings.model || '').trim(),
+    provider = String(settings.provider || '').trim(),
+    providerProfileId = String(settings.providerProfileId || '').trim();
   if (!model || !provider) throw new Error('Agent model is not configured.');
   const prompt = buildPrompt({
       existingDigest: existingDigest,
       messages: messages,
       projectMemory: projectMemory,
-      locale: settings['locale'],
+      locale: settings.locale,
     }),
     args = {
       model: model,
@@ -116,12 +116,12 @@ export async function requestAgentContextDigest({
   } catch (error) {
     onTrace?.({
       type: 'agent_context_digest_json_retry',
-      reason: String(error?.['message'] || 'invalid JSON')['slice'](0, 160),
+      reason: String(error?.message || 'invalid JSON').slice(0, 160),
     });
     const request3 = await request({
       ...args,
-      prompt: JSON['stringify']({
-        ...JSON['parse'](prompt),
+      prompt: JSON.stringify({
+        ...JSON.parse(prompt),
         retry: {
           previousAttemptRejected: true,
           instruction: 'Return the corrected strict JSON object only.',

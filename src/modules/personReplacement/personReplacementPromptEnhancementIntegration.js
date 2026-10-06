@@ -5,7 +5,7 @@ export function createPersonReplacementPromptEnhancementIntegration({
 } = {}) {
   const getPromptEnhancementModel = () =>
     resolvePersonReplacementPromptEnhancementModel(getSettings?.() || {});
-  return Object['freeze']({
+  return Object.freeze({
     enhancePrompt:
       typeof enhancePrompt === 'function'
         ? (args) => enhancePrompt({ ...args, settings: getSettings?.() || {} })

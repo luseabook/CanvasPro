@@ -162,144 +162,142 @@ const DEFAULT_OPTIMISTIC_PREVIEW_FINALIZE_DELAY_MS = 350;
 const DEFAULT_OPTIMISTIC_PREVIEW_COMMIT_TIMEOUT_MS = 30000;
 
 function shouldReadPreviewUploadNaturalSize(options2 = {}) {
-  return options2['kind'] === 'image';
+  return options2.kind === 'image';
 }
 
 function setToolbarUploadButtonBusy(enabled, next) {
   if (!enabled) return;
-  ((enabled['disabled'] = next === true),
-    enabled['classList']?.['toggle']?.('is-uploading', next === true),
-    enabled['classList']?.['toggle']?.('is-task-running', next === true),
+  ((enabled.disabled = next === true),
+    enabled.classList?.toggle?.('is-uploading', next === true),
+    enabled.classList?.toggle?.('is-task-running', next === true),
     next === true
-      ? enabled['setAttribute']?.('aria-busy', 'true')
-      : enabled['removeAttribute']?.('aria-busy'));
+      ? enabled.setAttribute?.('aria-busy', 'true')
+      : enabled.removeAttribute?.('aria-busy'));
 }
 
 function createToolbarUploadInput(el2) {
-  const enabled2 = el2?.['ownerDocument'] || globalThis['document'] || null;
-  if (!enabled2?.['createElement']) return null;
-  const el3 = enabled2['createElement']('input');
-  ((el3['type'] = 'file'), (el3['hidden'] = true), (el3['className'] = 'node-toolbar-upload-input'));
+  const enabled2 = el2?.ownerDocument || globalThis.document || null;
+  if (!enabled2?.createElement) return null;
+  const el3 = enabled2.createElement('input');
+  ((el3.type = 'file'), (el3.hidden = true), (el3.className = 'node-toolbar-upload-input'));
   const current =
-    el2?.['closest']?.('.node-floating-toolbar') || el2?.['parentNode'] || enabled2['body'] || null;
-  return (current?.['appendChild']?.(el3), el3);
+    el2?.closest?.('.node-floating-toolbar') || el2?.parentNode || enabled2.body || null;
+  return (current?.appendChild?.(el3), el3);
 }
 
 function getUrlApi() {
-  return globalThis['URL'] || globalThis['webkitURL'] || null;
+  return globalThis.URL || globalThis.webkitURL || null;
 }
 
 function safelyCreateObjectUrl(enabled3) {
   const urlApi = getUrlApi();
-  if (!enabled3 || typeof urlApi?.['createObjectURL'] !== 'function') return '';
+  if (!enabled3 || typeof urlApi?.createObjectURL !== 'function') return '';
   try {
-    return String(urlApi['createObjectURL'](enabled3) || '')['trim']();
+    return String(urlApi.createObjectURL(enabled3) || '').trim();
   } catch {
     return '';
   }
 }
 
 function safelyRevokeObjectUrl(enabled4) {
-  if (!enabled4 || !String(enabled4)['startsWith']('blob:')) return;
+  if (!enabled4 || !String(enabled4).startsWith('blob:')) return;
   const urlApi2 = getUrlApi();
   try {
-    urlApi2?.['revokeObjectURL']?.(enabled4);
+    urlApi2?.revokeObjectURL?.(enabled4);
   } catch {}
 }
 
 function getMountedPreviewElement(entry) {
-  const enabled5 = String(entry || '')['trim']();
+  const enabled5 = String(entry || '').trim();
   if (!enabled5) return null;
-  const record = globalThis['window']?.['v2Renderer'];
+  const record = globalThis.window?.v2Renderer;
   try {
-    record?.['hydrateDeferredNodeForImmediateMedia']?.(enabled5);
+    record?.hydrateDeferredNodeForImmediateMedia?.(enabled5);
   } catch {}
   try {
-    const payload = record?.['queryMountedNodeElement']?.(enabled5, '.img-node-preview');
+    const payload = record?.queryMountedNodeElement?.(enabled5, '.img-node-preview');
     if (payload) return payload;
   } catch {}
-  const handle = globalThis['document'],
-    el4 = typeof record?.['getMountedWrapper'] === 'function' ? record['getMountedWrapper'](enabled5) : null;
-  if (el4?.['querySelector']) return el4['querySelector']('.img-node-preview');
-  const state = typeof handle?.['getElementById'] === 'function' ? handle['getElementById'](enabled5) : null;
-  return state?.['querySelector']?.('.img-node-preview') || null;
+  const handle = globalThis.document,
+    el4 = typeof record?.getMountedWrapper === 'function' ? record.getMountedWrapper(enabled5) : null;
+  if (el4?.querySelector) return el4.querySelector('.img-node-preview');
+  const state = typeof handle?.getElementById === 'function' ? handle.getElementById(enabled5) : null;
+  return state?.querySelector?.('.img-node-preview') || null;
 }
 
 function clearExistingOptimisticImagePreview(enabled6) {
   if (!enabled6) return;
-  if (typeof enabled6['_previewUploadOptimisticCleanup'] === 'function') {
-    enabled6['_previewUploadOptimisticCleanup']({ delayMs: 0, force: true });
+  if (typeof enabled6._previewUploadOptimisticCleanup === 'function') {
+    enabled6._previewUploadOptimisticCleanup({ delayMs: 0, force: true });
     return;
   }
-  enabled6['querySelectorAll']?.(OPTIMISTIC_IMAGE_PREVIEW_SELECTOR)?.['forEach']((config) =>
-    config['remove']?.(),
+  enabled6.querySelectorAll?.(OPTIMISTIC_IMAGE_PREVIEW_SELECTOR)?.forEach((config) =>
+    config.remove?.(),
   );
 }
 
 function hasClassName(el5, scope) {
   return (
-    el5?.['classList']?.['contains']?.(scope) ||
-    String(el5?.['className'] || '')
-      ['split'](/\s+/)
-      ['includes'](scope)
+    el5?.classList?.contains?.(scope) ||
+    String(el5?.className || '')
+      .split(/\s+/)
+      .includes(scope)
   );
 }
 
 function getPreviewImageElements(output) {
-  const list2 = Array['from'](output?.['querySelectorAll']?.('img') || []);
-  return list2['filter']((value2) => !hasClassName(value2, 'preview-upload-optimistic-media'));
+  const list2 = Array.from(output?.querySelectorAll?.('img') || []);
+  return list2.filter((value2) => !hasClassName(value2, 'preview-upload-optimistic-media'));
 }
 
 function getImageElementSrc(value3) {
-  return String(value3?.['currentSrc'] || value3?.['src'] || value3?.['getAttribute']?.('src') || '')[
-    'trim'
-  ]();
+  return String(value3?.currentSrc || value3?.src || value3?.getAttribute?.('src') || '').trim();
 }
 
 function getImageElementAttributeSrc(value4) {
-  return String(value4?.['src'] || value4?.['getAttribute']?.('src') || '')['trim']();
+  return String(value4?.src || value4?.getAttribute?.('src') || '').trim();
 }
 
 function normalizeUrlPathForCompare(value5 = '') {
-  const enabled7 = String(value5 || '')['trim']();
+  const enabled7 = String(value5 || '').trim();
   if (!enabled7) return '';
   try {
-    return new URL(enabled7, 'http://aic.local')['pathname']['replace'](/\/+/g, '/');
+    return new URL(enabled7, 'http://aic.local').pathname.replace(/\/+/g, '/');
   } catch {
-    return enabled7['split']('?')[0]['split']('#')[0]['replace'](/\\/g, '/');
+    return enabled7.split('?')[0].split('#')[0].replace(/\\/g, '/');
   }
 }
 
 function imageSrcMatchesExpected(value6 = '', value7 = []) {
   const urlPathForCompare = normalizeUrlPathForCompare(value6);
   if (!urlPathForCompare) return false;
-  const list3 = value7['map']((value8) => normalizeUrlPathForCompare(value8))['filter'](Boolean);
-  if (list3['length'] === 0) return true;
-  return list3['some']((value9) => urlPathForCompare === value9 || urlPathForCompare['endsWith'](value9));
+  const list3 = value7.map((value8) => normalizeUrlPathForCompare(value8)).filter(Boolean);
+  if (list3.length === 0) return true;
+  return list3.some((value9) => urlPathForCompare === value9 || urlPathForCompare.endsWith(value9));
 }
 
 function toUploadedPreviewLocalUrl(value10 = '') {
   const enabled8 = String(value10 || '')
-    ['trim']()
-    ['replace'](/\\/g, '/');
+    .trim()
+    .replace(/\\/g, '/');
   if (!enabled8) return '';
-  if (/^(?:https?:|blob:|data:|aic-local-preview:)/i['test'](enabled8)) return enabled8;
-  return enabled8['startsWith']('/') ? enabled8 : '/' + enabled8;
+  if (/^(?:https?:|blob:|data:|aic-local-preview:)/i.test(enabled8)) return enabled8;
+  return enabled8.startsWith('/') ? enabled8 : '/' + enabled8;
 }
 
 function resolveUploadedPreviewImageExpectedUrls(options3 = {}) {
-  return Array['from'](
+  return Array.from(
     new Set(
       [
-        options3?.['displayUrl'],
-        options3?.['originalUrl'],
-        options3?.['url'],
-        toUploadedPreviewLocalUrl(options3?.['displayLocalPath']),
-        toUploadedPreviewLocalUrl(options3?.['originalLocalPath']),
-        toUploadedPreviewLocalUrl(options3?.['localPath']),
+        options3?.displayUrl,
+        options3?.originalUrl,
+        options3?.url,
+        toUploadedPreviewLocalUrl(options3?.displayLocalPath),
+        toUploadedPreviewLocalUrl(options3?.originalLocalPath),
+        toUploadedPreviewLocalUrl(options3?.localPath),
       ]
-        ['map']((value11) => String(value11 || '')['trim']())
-        ['filter'](Boolean),
+        .map((value11) => String(value11 || '').trim())
+        .filter(Boolean),
     ),
   );
 }
@@ -320,8 +318,8 @@ function waitForUploadedPreviewImageCommit({
   timeoutMs: timeoutMs = DEFAULT_OPTIMISTIC_PREVIEW_COMMIT_TIMEOUT_MS,
   onPoll: onPoll = null,
 } = {}) {
-  const enabled9 = String(nodeId2 || '')['trim']();
-  if (!enabled9) return Promise['resolve'](false);
+  const enabled9 = String(nodeId2 || '').trim();
+  if (!enabled9) return Promise.resolve(false);
   return new Promise((handler2) => {
     let value14 = false,
       setTimeout2 = null,
@@ -333,22 +331,22 @@ function waitForUploadedPreviewImageCommit({
         value14 = true;
         if (setTimeout2 !== null) clearTimeout(setTimeout2);
         if (setTimeout3 !== null) clearTimeout(setTimeout3);
-        for (const run of list4['splice'](0)) run();
+        for (const run of list4.splice(0)) run();
         handler2(value15);
       },
       handler4 = (el6) => {
-        if (!el6?.['addEventListener'] || map['has'](el6)) return;
-        map['add'](el6);
+        if (!el6?.addEventListener || map.has(el6)) return;
+        map.add(el6);
         const value16 =
-          String(el6['currentSrc'] || '')['trim']() ||
+          String(el6.currentSrc || '').trim() ||
           getImageElementAttributeSrc(el6) ||
           getImageElementSrc(el6);
-        if (el6['complete'] && value16 !== previousSrc && imageSrcMatchesExpected(value16, expectedUrls)) {
+        if (el6.complete && value16 !== previousSrc && imageSrcMatchesExpected(value16, expectedUrls)) {
           handler3(true);
           return;
         }
         const value17 = () => {
-            const value18 = String(el6['currentSrc'] || '')['trim']() || getImageElementSrc(el6);
+            const value18 = String(el6.currentSrc || '').trim() || getImageElementSrc(el6);
             value18 !== previousSrc && imageSrcMatchesExpected(value18, expectedUrls) && handler3(true);
           },
           value19 = () => {
@@ -357,10 +355,10 @@ function waitForUploadedPreviewImageCommit({
               imageSrcMatchesExpected(imageElementAttributeSrc, expectedUrls) &&
               handler3(true);
           };
-        (el6['addEventListener']('load', value17, { once: true }),
-          el6['addEventListener']('error', value19, { once: true }),
-          list4['push'](() => {
-            (el6['removeEventListener']?.('load', value17), el6['removeEventListener']?.('error', value19));
+        (el6.addEventListener('load', value17, { once: true }),
+          el6.addEventListener('error', value19, { once: true }),
+          list4.push(() => {
+            (el6.removeEventListener?.('load', value17), el6.removeEventListener?.('error', value19));
           }));
       },
       handler5 = () => {
@@ -380,37 +378,37 @@ function waitForUploadedPreviewImageCommit({
         if (value14 || handler5()) return;
         setTimeout2 = setTimeout(handler6, 80);
       };
-    ((setTimeout3 = setTimeout(() => handler3(false), Math['max'](0, Number(timeoutMs) || 0))), handler6());
+    ((setTimeout3 = setTimeout(() => handler3(false), Math.max(0, Number(timeoutMs) || 0))), handler6());
   });
 }
 
 function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}) {
-  if (!String(file3?.['type'] || '')['startsWith']('image/')) return null;
+  if (!String(file3?.type || '').startsWith('image/')) return null;
   const mountedPreviewElement2 = getMountedPreviewElement(nodeId3),
-    el7 = mountedPreviewElement2?.['ownerDocument'] || globalThis['document'];
-  if (!mountedPreviewElement2?.['appendChild'] || !el7?.['createElement']) return null;
+    el7 = mountedPreviewElement2?.ownerDocument || globalThis.document;
+  if (!mountedPreviewElement2?.appendChild || !el7?.createElement) return null;
   const safelyCreateObjectUrl2 = safelyCreateObjectUrl(file3);
   if (!safelyCreateObjectUrl2) return null;
   clearExistingOptimisticImagePreview(mountedPreviewElement2);
   const mountedPreviewImageSrc = getMountedPreviewImageSrc(mountedPreviewElement2),
-    el8 = el7['createElement']('img');
-  ((el8['className'] = 'preview-upload-optimistic-media'),
-    (el8['draggable'] = false),
-    (el8['alt'] = ''),
-    (el8['dataset']['previewUploadOptimistic'] = 'true'),
-    (el8['src'] = safelyCreateObjectUrl2));
+    el8 = el7.createElement('img');
+  ((el8.className = 'preview-upload-optimistic-media'),
+    (el8.draggable = false),
+    (el8.alt = ''),
+    (el8.dataset.previewUploadOptimistic = 'true'),
+    (el8.src = safelyCreateObjectUrl2));
   let value21 = false,
     setTimeout4 = null,
     value22 = null;
   const run2 = (el9 = getMountedPreviewElement(nodeId3)) => {
-      if (value21 || !el9?.['appendChild']) return false;
+      if (value21 || !el9?.appendChild) return false;
       return (
         value22 &&
           value22 !== el9 &&
-          value22['_previewUploadOptimisticCleanup'] === run3 &&
-          delete value22['_previewUploadOptimisticCleanup'],
-        el8['parentNode'] !== el9 && el9['appendChild'](el8),
-        (el9['_previewUploadOptimisticCleanup'] = run3),
+          value22._previewUploadOptimisticCleanup === run3 &&
+          delete value22._previewUploadOptimisticCleanup,
+        el8.parentNode !== el9 && el9.appendChild(el8),
+        (el9._previewUploadOptimisticCleanup = run3),
         (value22 = el9),
         true
       );
@@ -419,10 +417,10 @@ function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}
       if (value21) return;
       ((value21 = true),
         (setTimeout4 = null),
-        el8['remove']?.(),
+        el8.remove?.(),
         safelyRevokeObjectUrl(safelyCreateObjectUrl2),
-        value22?.['_previewUploadOptimisticCleanup'] === run3 &&
-          delete value22['_previewUploadOptimisticCleanup']);
+        value22?._previewUploadOptimisticCleanup === run3 &&
+          delete value22._previewUploadOptimisticCleanup);
     };
   function run3({ delayMs: delayMs = 0, force: force = false } = {}) {
     if (value21) return;
@@ -430,7 +428,7 @@ function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}
     const run4 = () => {
         handler7();
       },
-      count = Math['max'](0, Number(delayMs) || 0);
+      count = Math.max(0, Number(delayMs) || 0);
     !force && count > 0 && typeof setTimeout === 'function'
       ? (setTimeout4 = setTimeout(run4, count))
       : run4();
@@ -447,10 +445,10 @@ function applyOptimisticImageUploadPreview({ nodeId: nodeId3, file: file3 } = {}
 }
 
 function flushUploadedPreviewNode(value23) {
-  const enabled10 = String(value23 || '')['trim']();
+  const enabled10 = String(value23 || '').trim();
   if (!enabled10) return false;
   try {
-    return globalThis['window']?.['v2Renderer']?.['flushNode']?.(enabled10) === true;
+    return globalThis.window?.v2Renderer?.flushNode?.(enabled10) === true;
   } catch {
     return false;
   }
@@ -470,16 +468,16 @@ export function bindPreviewUploadToolbarAction({
   if (!el10) return () => {};
   const toast3 = getToast(showToast),
     value24 = (value25) => {
-      (value25?.['preventDefault']?.(), value25?.['stopPropagation']?.());
+      (value25?.preventDefault?.(), value25?.stopPropagation?.());
       const response = resolvePreviewUploadTarget(getState(storeApi));
-      if (!response['ok']) {
-        toast3?.(response['message'], 'warn');
+      if (!response.ok) {
+        toast3?.(response.message, 'warn');
         return;
       }
-      ((el10['accept'] = response['accept']), (el10['value'] = ''), el10['click']?.());
+      ((el10.accept = response.accept), (el10.value = ''), el10.click?.());
     },
     async3 = async () => {
-      const enabled11 = el10['files']?.[0];
+      const enabled11 = el10.files?.[0];
       if (!enabled11) return;
       setToolbarUploadButtonBusy(button3, true);
       try {
@@ -493,14 +491,14 @@ export function bindPreviewUploadToolbarAction({
           applyResults: applyResults3,
         });
       } finally {
-        (setToolbarUploadButtonBusy(button3, false), (el10['value'] = ''));
+        (setToolbarUploadButtonBusy(button3, false), (el10.value = ''));
       }
     };
   return (
-    button3['addEventListener']('click', value24),
-    el10['addEventListener']('change', async3),
+    button3.addEventListener('click', value24),
+    el10.addEventListener('change', async3),
     () => {
-      (button3['removeEventListener']?.('click', value24), el10['removeEventListener']?.('change', async3));
+      (button3.removeEventListener?.('click', value24), el10.removeEventListener?.('change', async3));
     }
   );
 }

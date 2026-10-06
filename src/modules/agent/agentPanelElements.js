@@ -1,7 +1,7 @@
 export function createAgentElement(value, item = '', key = '') {
-  const el = document['createElement'](value);
-  if (item) el['className'] = item;
-  if (key) el['textContent'] = key;
+  const el = document.createElement(value);
+  if (item) el.className = item;
+  if (key) el.textContent = key;
   return el;
 }
 export function createAgentButton(
@@ -10,14 +10,14 @@ export function createAgentButton(
   { title: title = '', icon: icon = '', disabled: disabled = false } = {},
 ) {
   const el2 = createAgentElement('button', index);
-  el2['type'] = 'button';
-  title && ((el2['title'] = title), el2['setAttribute']('aria-label', title));
+  el2.type = 'button';
+  title && ((el2.title = title), el2.setAttribute('aria-label', title));
   icon
-    ? ((el2['innerHTML'] = icon),
-      result && el2['appendChild'](createAgentElement('span', 'agent-btn-label', result)))
-    : (el2['textContent'] = result);
-  el2['disabled'] = disabled;
-  if (disabled) el2['setAttribute']('aria-disabled', 'true');
+    ? ((el2.innerHTML = icon),
+      result && el2.appendChild(createAgentElement('span', 'agent-btn-label', result)))
+    : (el2.textContent = result);
+  el2.disabled = disabled;
+  if (disabled) el2.setAttribute('aria-disabled', 'true');
   return el2;
 }
 export function agentIconSvg(data) {

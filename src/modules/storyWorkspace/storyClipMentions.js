@@ -13,61 +13,61 @@ const STORY_ASSET_NODE_PREFIX = 'story-asset:',
   STORY_TIME_ICON_SVG =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 1.5"></path><path d="M9 2h6"></path><path d="M12 2v3"></path></svg>';
 function normalizeText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function escapeHtml(item) {
   return String(item ?? '')
-    ['replace'](/&/g, '&amp;')
-    ['replace'](/</g, '&lt;')
-    ['replace'](/>/g, '&gt;')
-    ['replace'](/"/g, '&quot;')
-    ['replace'](/'/g, '&#39;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 function escapeRegExp(key) {
-  return String(key || '')['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return String(key || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 const STORY_H3_LITERAL_TAG_PATTERN =
   /(?:<|&(?:amp;)*(?:lt;|#0*60;|#x0*3c;)|＜)\s*((?:\/\s*)?d|scenetrans|cutoff|(?:Subject|Picture|Video|Audio)\s+\d+)\s*(?:>|&(?:amp;)*(?:gt;|#0*62;|#x0*3e;)|＞)/giu;
 function normalizeStoryH3LiteralTag(index = '') {
-  const text = normalizeText(index)['replace'](/\s+/gu, ' ');
-  if (/^\/\s*d$/iu['test'](text)) return '</d>';
-  if (/^d$/iu['test'](text)) return '<d>';
-  if (/^(scenetrans|cutoff)$/iu['test'](text)) return '<' + text['toLowerCase']() + '>';
-  const enabled = text['match'](/^(Subject|Picture|Video|Audio)\s+(\d+)$/iu);
+  const text = normalizeText(index).replace(/\s+/gu, ' ');
+  if (/^\/\s*d$/iu.test(text)) return '</d>';
+  if (/^d$/iu.test(text)) return '<d>';
+  if (/^(scenetrans|cutoff)$/iu.test(text)) return '<' + text.toLowerCase() + '>';
+  const enabled = text.match(/^(Subject|Picture|Video|Audio)\s+(\d+)$/iu);
   if (!enabled) return '';
-  const result = '' + enabled[1][0]['toUpperCase']() + enabled[1]['slice'](1)['toLowerCase']();
+  const result = '' + enabled[1][0].toUpperCase() + enabled[1].slice(1).toLowerCase();
   return '<' + result + ' ' + enabled[2] + '>';
 }
 export function protectStoryH3LiteralTags(data = '') {
   const options = [],
-    target = String(data || '')['replace'](STORY_H3_LITERAL_TAG_PATTERN, (source, next) => {
+    target = String(data || '').replace(STORY_H3_LITERAL_TAG_PATTERN, (source, next) => {
       const storyH3LiteralTag = normalizeStoryH3LiteralTag(next);
       if (!storyH3LiteralTag) return source;
-      const current = 'story-h3-tag-' + options['length'] + '';
-      return (options['push']({ token: current, tag: storyH3LiteralTag }), current);
+      const current = 'story-h3-tag-' + options.length + '';
+      return (options.push({ token: current, tag: storyH3LiteralTag }), current);
     });
   return {
     source: target,
     restore: (entry = '') =>
-      options['reduce'](
-        (record, { token: token, tag: tag }) => record['split'](token)['join'](escapeHtml(tag)),
+      options.reduce(
+        (record, { token: token, tag: tag }) => record.split(token).join(escapeHtml(tag)),
         String(entry || ''),
       ),
   };
 }
 export function normalizeStoryClipTimeLabel(payload, handle = '3.0s') {
-  const state = String(payload ?? '')['match'](/-?\d+(?:\.\d+)?/),
+  const state = String(payload ?? '').match(/-?\d+(?:\.\d+)?/),
     count = Number(state?.[0]);
-  if (!Number['isFinite'](count) || count <= 0) return handle;
-  const config = Math['min'](999, Math['max'](0.1, count));
-  return config['toFixed'](1) + 's';
+  if (!Number.isFinite(count) || count <= 0) return handle;
+  const config = Math.min(999, Math.max(0.1, count));
+  return config.toFixed(1) + 's';
 }
 function getStoryAssetMentionAppearance(options2 = {}) {
-  const scope = Array['isArray'](options2['appearances']) ? options2['appearances'] : [],
-    text2 = normalizeText(options2['baseAppearanceId']);
+  const scope = Array.isArray(options2.appearances) ? options2.appearances : [],
+    text2 = normalizeText(options2.baseAppearanceId);
   return (
-    scope['find']((input) => text2 && normalizeText(input?.['id']) === text2) ||
-    scope['find']((output) => normalizeText(output?.['name']) === '基础形象') ||
+    scope.find((input) => text2 && normalizeText(input?.id) === text2) ||
+    scope.find((output) => normalizeText(output?.name) === '基础形象') ||
     scope[0] ||
     null
   );
@@ -83,8 +83,8 @@ function buildStoryAssetMentionId(value2 = '', value3 = '') {
 }
 function parseStoryAssetMentionId(value4 = '') {
   const list = normalizeText(value4);
-  if (!list['startsWith'](STORY_ASSET_NODE_PREFIX)) return null;
-  const [value5 = '', value6 = ''] = list['slice'](STORY_ASSET_NODE_PREFIX['length'])['split'](':');
+  if (!list.startsWith(STORY_ASSET_NODE_PREFIX)) return null;
+  const [value5 = '', value6 = ''] = list.slice(STORY_ASSET_NODE_PREFIX.length).split(':');
   try {
     const decodeURIComponent2 = decodeURIComponent(value5),
       decodeURIComponent3 = decodeURIComponent(value6);
@@ -94,19 +94,19 @@ function parseStoryAssetMentionId(value4 = '') {
   }
 }
 function matchesQuery(options3 = {}, value7 = '') {
-  const text3 = normalizeText(value7)['replace'](/^@+/, '')['toLowerCase']();
+  const text3 = normalizeText(value7).replace(/^@+/, '').toLowerCase();
   if (!text3) return true;
-  const list2 = Array['isArray'](options3['mentionVariants']) ? options3['mentionVariants'] : [];
+  const list2 = Array.isArray(options3.mentionVariants) ? options3.mentionVariants : [];
   return [
-    options3['label'],
-    options3['subtitle'],
-    options3['pillLabel'],
-    options3['assetName'],
-    options3['type'],
-    ...list2['flatMap']((value8) => [value8?.['label'], value8?.['subtitle'], value8?.['pillLabel']]),
+    options3.label,
+    options3.subtitle,
+    options3.pillLabel,
+    options3.assetName,
+    options3.type,
+    ...list2.flatMap((value8) => [value8?.label, value8?.subtitle, value8?.pillLabel]),
   ]
-    ['map']((value9) => normalizeText(value9)['toLowerCase']())
-    ['some']((value10) => value10['includes'](text3));
+    .map((value9) => normalizeText(value9).toLowerCase())
+    .some((value10) => value10.includes(text3));
 }
 function getStoryAssetMentionSection(value11) {
   if (value11 === 'scene') return '场景';
@@ -114,22 +114,22 @@ function getStoryAssetMentionSection(value11) {
   return '角色';
 }
 function getStoryAssetMentionAppearances(options4 = {}) {
-  const args = Array['isArray'](options4['appearances']) ? options4['appearances']['filter'](Boolean) : [],
+  const args = Array.isArray(options4.appearances) ? options4.appearances.filter(Boolean) : [],
     storyAssetMentionAppearance = getStoryAssetMentionAppearance(options4);
-  if (options4['kind'] !== 'character')
+  if (options4.kind !== 'character')
     return storyAssetMentionAppearance ? [storyAssetMentionAppearance] : [];
-  if (!args['length']) return storyAssetMentionAppearance ? [storyAssetMentionAppearance] : [];
-  return [...args]['sort'](
+  if (!args.length) return storyAssetMentionAppearance ? [storyAssetMentionAppearance] : [];
+  return [...args].sort(
     (value12, value13) =>
       Number(value13 === storyAssetMentionAppearance) - Number(value12 === storyAssetMentionAppearance),
   );
 }
 export function getStoryEpisodeMentionAssets(list3 = [], value14 = null) {
-  const value15 = (Array['isArray'](list3) ? list3 : [])['filter'](
-      (value16) => value16 && ['character', 'scene', 'prop']['includes'](value16['kind']),
+  const value15 = (Array.isArray(list3) ? list3 : []).filter(
+      (value16) => value16 && ['character', 'scene', 'prop'].includes(value16.kind),
     ),
     storyEpisodeAssetSummary = deriveStoryEpisodeAssetSummary(value14, value15);
-  return storyEpisodeAssetSummary['assetIds']['length'] ? storyEpisodeAssetSummary['assets'] : value15;
+  return storyEpisodeAssetSummary.assetIds.length ? storyEpisodeAssetSummary.assets : value15;
 }
 function buildStoryClipAssetMentionCandidate({
   asset: asset,
@@ -137,15 +137,15 @@ function buildStoryClipAssetMentionCandidate({
   allowAssetImageFallback: allowAssetImageFallback = false,
   displayAssets: displayAssets = [],
 } = {}) {
-  const text4 = normalizeText(asset?.['name']) || '本集素材',
-    text5 = normalizeText(appearance?.['id']),
-    text6 = normalizeText(appearance?.['name']) || '基础形象',
-    text7 = normalizeText(appearance?.['imageUrl'] || (allowAssetImageFallback ? asset?.['imageUrl'] : ''));
+  const text4 = normalizeText(asset?.name) || '本集素材',
+    text5 = normalizeText(appearance?.id),
+    text6 = normalizeText(appearance?.name) || '基础形象',
+    text7 = normalizeText(appearance?.imageUrl || (allowAssetImageFallback ? asset?.imageUrl : ''));
   return {
     origin: 'asset',
     menuDirect: true,
     suppressTooltip: true,
-    assetId: buildStoryAssetMentionId(asset?.['id'], text5),
+    assetId: buildStoryAssetMentionId(asset?.id, text5),
     assetIndex: 0,
     type: 'image',
     label: text4,
@@ -155,12 +155,12 @@ function buildStoryClipAssetMentionCandidate({
     sourcePillLabel: text4 + ' · ' + text6,
     thumbUrl: text7,
     iconType: 'image',
-    storyAssetId: normalizeText(asset?.['id']),
+    storyAssetId: normalizeText(asset?.id),
     storyAppearanceId: text5,
-    storyAssetKind: normalizeText(asset?.['kind']),
+    storyAssetKind: normalizeText(asset?.kind),
     menuPage: 'assets',
     menuGroup: '本集素材',
-    menuSection: getStoryAssetMentionSection(asset?.['kind']),
+    menuSection: getStoryAssetMentionSection(asset?.kind),
     assetName: '本集素材',
     missingAsset: !text7,
   };
@@ -181,18 +181,18 @@ export function buildStoryClipMentionCandidates({
       ['prop', 2],
     ]),
     args2 = [...getStoryEpisodeMentionAssets(assets, episode)]
-      ['sort'](
+      .sort(
         (value18, value19) =>
-          (value17['get'](value18?.['kind']) ?? 9) - (value17['get'](value19?.['kind']) ?? 9),
+          (value17.get(value18?.kind) ?? 9) - (value17.get(value19?.kind) ?? 9),
       )
-      ['map']((value20) => {
+      .map((value20) => {
         const storyAssetMentionAppearances = getStoryAssetMentionAppearances(value20),
-          list4 = storyAssetMentionAppearances['length']
-            ? storyAssetMentionAppearances['map']((value21) =>
+          list4 = storyAssetMentionAppearances.length
+            ? storyAssetMentionAppearances.map((value21) =>
                 buildStoryClipAssetMentionCandidate({
                   asset: value20,
                   appearance: value21,
-                  displayAssets: episode?.['replication'] ? assets : [],
+                  displayAssets: episode?.replication ? assets : [],
                 }),
               )
             : [
@@ -200,14 +200,14 @@ export function buildStoryClipMentionCandidates({
                   asset: value20,
                   appearance: null,
                   allowAssetImageFallback: true,
-                  displayAssets: episode?.['replication'] ? assets : [],
+                  displayAssets: episode?.replication ? assets : [],
                 }),
               ],
-          text8 = normalizeText(query)['replace'](/^@+/, '')['toLowerCase'](),
+          text8 = normalizeText(query).replace(/^@+/, '').toLowerCase(),
           count2 = text8
-            ? list4['findIndex']((value22) =>
-                [value22['subtitle'], value22['pillLabel']]['some']((value23) =>
-                  normalizeText(value23)['toLowerCase']()['includes'](text8),
+            ? list4.findIndex((value22) =>
+                [value22.subtitle, value22.pillLabel].some((value23) =>
+                  normalizeText(value23).toLowerCase().includes(text8),
                 ),
               )
             : -1,
@@ -215,7 +215,7 @@ export function buildStoryClipMentionCandidates({
           args3 = list4[value24] || list4[0];
         return { ...args3, mentionVariants: list4, mentionVariantIndex: value24 };
       }),
-    args4 = (Array['isArray'](libraryCandidates) ? libraryCandidates : [])['map']((args5) => ({
+    args4 = (Array.isArray(libraryCandidates) ? libraryCandidates : []).map((args5) => ({
       ...args5,
       origin: 'asset',
       menuDirect: true,
@@ -223,10 +223,10 @@ export function buildStoryClipMentionCandidates({
       menuGroup: '全部素材',
       menuSection: '',
       suppressTooltip: true,
-      assetIndex: Number(args5?.['itemIndex'] || 0),
-      label: normalizeText(args5?.['insertLabel'] || args5?.['label'] || args5?.['name']) || '素材库内容',
-      assetName: normalizeText(args5?.['assetName']) || '素材库',
-      iconType: normalizeText(args5?.['type']),
+      assetIndex: Number(args5?.itemIndex || 0),
+      label: normalizeText(args5?.insertLabel || args5?.label || args5?.name) || '素材库内容',
+      assetName: normalizeText(args5?.assetName) || '素材库',
+      iconType: normalizeText(args5?.type),
     })),
     args6 = includeTime
       ? [
@@ -250,27 +250,27 @@ export function buildStoryClipMentionCandidates({
         ]
       : [],
     args7 =
-      includeClipFrames || clipFrames['length']
+      includeClipFrames || clipFrames.length
         ? buildStoryClipFrameMentionCandidates(clipFrames, {
             query: query,
-            clips: episode?.['clips'],
-            episodeId: episode?.['id'],
+            clips: episode?.clips,
+            episodeId: episode?.id,
           })
         : [];
-  return [...args2, ...args4, ...args6, ...args7]['filter']((value25) => matchesQuery(value25, query));
+  return [...args2, ...args4, ...args6, ...args7].filter((value25) => matchesQuery(value25, query));
 }
 function renderStoryAssetMentionPill(value26, list5 = []) {
-  const text9 = normalizeText(value26?.['pillLabel'] || value26?.['label']) || '本集素材',
-    value27 = value26?.['missingAsset'] === true,
-    text10 = normalizeText(value26?.['storyAssetId']),
-    text11 = normalizeText(value26?.['storyAppearanceId']),
-    value28 = list5['find']((value29) => value29['id'] === text10),
-    value30 = value28?.['appearances']?.['find']((value31) => value31['id'] === text11),
+  const text9 = normalizeText(value26?.pillLabel || value26?.label) || '本集素材',
+    value27 = value26?.missingAsset === true,
+    text10 = normalizeText(value26?.storyAssetId),
+    text11 = normalizeText(value26?.storyAppearanceId),
+    value28 = list5.find((value29) => value29.id === text10),
+    value30 = value28?.appearances?.find((value31) => value31.id === text11),
     storyReplicationCharacterDisplayLabel =
       getStoryReplicationCharacterDisplayLabel(value28, value30, list5) || text9,
-    value32 = value26?.['thumbUrl']
+    value32 = value26?.thumbUrl
       ? '<img class="ref-pill-thumb" src="' +
-        escapeHtml(value26['thumbUrl']) +
+        escapeHtml(value26.thumbUrl) +
         '" alt="" draggable="false">'
       : '';
   return (
@@ -279,7 +279,7 @@ function renderStoryAssetMentionPill(value26, list5 = []) {
     '" contenteditable="false" data-label="' +
     escapeHtml(storyReplicationCharacterDisplayLabel) +
     '" data-ref-origin="asset" data-asset-id="' +
-    escapeHtml(value26['assetId']) +
+    escapeHtml(value26.assetId) +
     '" data-asset-index="0" data-ref-type="image"' +
     (text10 ? ' data-story-asset-hover-id="' + escapeHtml(text10) + '"' : '') +
     (text11 ? ' data-story-asset-hover-appearance-id="' + escapeHtml(text11) + '"' : '') +
@@ -305,104 +305,104 @@ function renderStoryTimeMentionPill(value33) {
     '</span></span>'
   );
 }
-export function createStoryClipTimeMentionIcon(value34 = globalThis['document']) {
-  const el = value34?.['createElement']?.('span');
+export function createStoryClipTimeMentionIcon(value34 = globalThis.document) {
+  const el = value34?.createElement?.('span');
   if (!el) return null;
   return (
-    (el['className'] = 'story-time-pill-icon'),
-    el['setAttribute']?.('aria-hidden', 'true'),
-    (el['innerHTML'] = STORY_TIME_ICON_SVG),
+    (el.className = 'story-time-pill-icon'),
+    el.setAttribute?.('aria-hidden', 'true'),
+    (el.innerHTML = STORY_TIME_ICON_SVG),
     el
   );
 }
 export function beginStoryClipTimePillEdit({
   pill: pill,
-  documentObject: documentObject = globalThis['document'],
+  documentObject: documentObject = globalThis.document,
   onCommit: onCommit = null,
 } = {}) {
-  if (!pill || !documentObject?.['createElement']) return null;
-  const value35 = pill['querySelector']?.('.story-time-pill-input');
-  if (value35) return (value35['focus']?.(), value35['select']?.(), value35);
-  const enabled2 = pill['querySelector']?.('.ref-pill-label');
-  if (!enabled2 || typeof pill['replaceChild'] !== 'function') return null;
+  if (!pill || !documentObject?.createElement) return null;
+  const value35 = pill.querySelector?.('.story-time-pill-input');
+  if (value35) return (value35.focus?.(), value35.select?.(), value35);
+  const enabled2 = pill.querySelector?.('.ref-pill-label');
+  if (!enabled2 || typeof pill.replaceChild !== 'function') return null;
   const storyClipTimeLabel2 = normalizeStoryClipTimeLabel(
-      pill['dataset']?.['label'] || enabled2['textContent'],
+      pill.dataset?.label || enabled2.textContent,
     ),
-    el2 = documentObject['createElement']('input');
-  ((el2['className'] = 'story-time-pill-input'),
-    (el2['type'] = 'text'),
-    (el2['inputMode'] = 'decimal'),
-    (el2['value'] = storyClipTimeLabel2['replace'](/s$/i, '')),
-    (el2['autocomplete'] = 'off'),
-    (el2['spellcheck'] = false),
-    (el2['dataset']['promptPillInlineEditor'] = 'true'),
-    el2['setAttribute']?.('aria-label', '片段时间（秒）'));
+    el2 = documentObject.createElement('input');
+  ((el2.className = 'story-time-pill-input'),
+    (el2.type = 'text'),
+    (el2.inputMode = 'decimal'),
+    (el2.value = storyClipTimeLabel2.replace(/s$/i, '')),
+    (el2.autocomplete = 'off'),
+    (el2.spellcheck = false),
+    (el2.dataset.promptPillInlineEditor = 'true'),
+    el2.setAttribute?.('aria-label', '片段时间（秒）'));
   let value36 = false;
   const run = (value37) => {
     if (value36) return;
     value36 = true;
     const value38 = value37
-        ? normalizeStoryClipTimeLabel(el2['value'], storyClipTimeLabel2)
+        ? normalizeStoryClipTimeLabel(el2.value, storyClipTimeLabel2)
         : storyClipTimeLabel2,
-      value39 = documentObject['createElement']('span');
-    ((value39['className'] = 'ref-pill-label'), (value39['textContent'] = value38));
-    if (el2['parentNode'] === pill) pill['replaceChild'](value39, el2);
-    ((pill['dataset']['label'] = value38),
-      pill['classList']?.['remove']?.('is-editing'),
+      value39 = documentObject.createElement('span');
+    ((value39.className = 'ref-pill-label'), (value39.textContent = value38));
+    if (el2.parentNode === pill) pill.replaceChild(value39, el2);
+    ((pill.dataset.label = value38),
+      pill.classList?.remove?.('is-editing'),
       value37 && value38 !== storyClipTimeLabel2 && typeof onCommit === 'function' && onCommit(value38));
   };
   return (
-    el2['addEventListener']?.('keydown', (event) => {
-      if (event['key'] === 'Enter') {
-        (event['preventDefault']?.(), run(true));
+    el2.addEventListener?.('keydown', (event) => {
+      if (event.key === 'Enter') {
+        (event.preventDefault?.(), run(true));
         return;
       }
-      event['key'] === 'Escape' && (event['preventDefault']?.(), run(false));
+      event.key === 'Escape' && (event.preventDefault?.(), run(false));
     }),
-    el2['addEventListener']?.('blur', () => run(true)),
-    pill['replaceChild'](el2, enabled2),
-    pill['classList']?.['add']?.('is-editing'),
-    el2['focus']?.(),
-    el2['select']?.(),
+    el2.addEventListener?.('blur', () => run(true)),
+    pill.replaceChild(el2, enabled2),
+    pill.classList?.add?.('is-editing'),
+    el2.focus?.(),
+    el2.select?.(),
     el2
   );
 }
 export function resolveStoryClipPromptPillPresentation(value40, value41 = [], value42 = []) {
   const text12 = normalizeText(
-      value40?.['dataset']?.['assetId'] || value40?.['getAttribute']?.('data-asset-id'),
+      value40?.dataset?.assetId || value40?.getAttribute?.('data-asset-id'),
     ),
     text13 = normalizeText(
-      value40?.['dataset']?.['promptPillKind'] || value40?.['getAttribute']?.('data-prompt-pill-kind'),
+      value40?.dataset?.promptPillKind || value40?.getAttribute?.('data-prompt-pill-kind'),
     );
   if (text13 === 'time' || text12 === STORY_TIME_MENTION_ASSET_ID)
     return { pillKind: 'time', missingAsset: false };
-  if (text12['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX))
+  if (text12.startsWith(STORY_CLIP_FRAME_MENTION_PREFIX))
     return { pillKind: 'frame', missingAsset: !resolveStoryClipFrameMentionRef(value40, value42) };
-  if (!text12['startsWith'](STORY_ASSET_NODE_PREFIX)) return { pillKind: '', missingAsset: false };
+  if (!text12.startsWith(STORY_ASSET_NODE_PREFIX)) return { pillKind: '', missingAsset: false };
   return { pillKind: '', missingAsset: !resolveStoryClipAssetMentionRef(value40, value41) };
 }
 export function syncStoryClipPromptPillPresentation(el3, value43 = [], value44 = []) {
-  el3?.['querySelectorAll']?.('.ref-pill')?.['forEach']?.((el4) => {
+  el3?.querySelectorAll?.('.ref-pill')?.forEach?.((el4) => {
     syncStoryClipPromptPillHoverTarget(el4);
     const storyClipPromptPillPresentation = resolveStoryClipPromptPillPresentation(el4, value43, value44);
-    storyClipPromptPillPresentation['pillKind'] === 'time' &&
-      ((el4['dataset']['promptPillKind'] = 'time'), el4['classList']?.['add']?.('story-time-pill'));
-    if (storyClipPromptPillPresentation['missingAsset']) {
-      ((el4['dataset']['refUnresolved'] = 'true'),
-        el4['classList']?.['add']?.('ref-pill--unresolved'),
-        el4['setAttribute']?.('data-tooltip', '缺少图片素材'),
-        el4['removeAttribute']?.('title'));
+    storyClipPromptPillPresentation.pillKind === 'time' &&
+      ((el4.dataset.promptPillKind = 'time'), el4.classList?.add?.('story-time-pill'));
+    if (storyClipPromptPillPresentation.missingAsset) {
+      ((el4.dataset.refUnresolved = 'true'),
+        el4.classList?.add?.('ref-pill--unresolved'),
+        el4.setAttribute?.('data-tooltip', '缺少图片素材'),
+        el4.removeAttribute?.('title'));
       return;
     }
-    const text14 = normalizeText(el4?.['dataset']?.['assetId']);
-    (text14['startsWith'](STORY_ASSET_NODE_PREFIX) ||
-      text14['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX)) &&
-      (delete el4['dataset']['refUnresolved'],
-      el4['classList']?.['remove']?.('ref-pill--unresolved'),
-      el4['removeAttribute']?.('data-tooltip'),
-      el4['removeAttribute']?.('data-native-title'),
-      el4['removeAttribute']?.('data-tooltip-source'),
-      el4['removeAttribute']?.('title'));
+    const text14 = normalizeText(el4?.dataset?.assetId);
+    (text14.startsWith(STORY_ASSET_NODE_PREFIX) ||
+      text14.startsWith(STORY_CLIP_FRAME_MENTION_PREFIX)) &&
+      (delete el4.dataset.refUnresolved,
+      el4.classList?.remove?.('ref-pill--unresolved'),
+      el4.removeAttribute?.('data-tooltip'),
+      el4.removeAttribute?.('data-native-title'),
+      el4.removeAttribute?.('data-tooltip-source'),
+      el4.removeAttribute?.('title'));
   });
 }
 export function renderStoryClipPromptMentions(
@@ -410,35 +410,35 @@ export function renderStoryClipPromptMentions(
   { assets: assets = [], episode: episode = null, clipFrames: clipFrames = [] } = {},
 ) {
   const ctx = protectStoryH3LiteralTags(value45),
-    ctx2 = protectStoryPromptPills(ctx['source']),
-    value46 = episode?.['replication'] ? assets : [];
-  for (const value47 of ctx2['pills']) {
+    ctx2 = protectStoryPromptPills(ctx.source),
+    value46 = episode?.replication ? assets : [];
+  for (const value47 of ctx2.pills) {
     const storyAssetMentionId = parseStoryAssetMentionId(
-        value47['html']['match'](/\bdata-asset-id="([^"]+)"/u)?.[1],
+        value47.html.match(/\bdata-asset-id="([^"]+)"/u)?.[1],
       ),
       value48 =
-        storyAssetMentionId && assets['find']((value49) => value49['id'] === storyAssetMentionId['assetId']),
-      value50 = value48?.['appearances']?.['find'](
-        (value51) => value51['id'] === storyAssetMentionId['appearanceId'],
+        storyAssetMentionId && assets.find((value49) => value49.id === storyAssetMentionId.assetId),
+      value50 = value48?.appearances?.find(
+        (value51) => value51.id === storyAssetMentionId.appearanceId,
       );
     if (value50) {
-      const text15 = normalizeText(value50['imageUrl']);
-      ((value47['html'] = value47['html']['replace'](/<img\b[^>]*class="ref-pill-thumb"[^>]*>/gu, '')),
-        (value47['html'] = value47['html']['replace'](/^<span\b[^>]*>/u, (value52) => {
-          let value53 = value52['replace'](/\sdata-ref-unresolved="[^"]*"/u, '')
-            ['replace'](/\sdata-tooltip="缺少图片素材"/u, '')
-            ['replace'](
+      const text15 = normalizeText(value50.imageUrl);
+      ((value47.html = value47.html.replace(/<img\b[^>]*class="ref-pill-thumb"[^>]*>/gu, '')),
+        (value47.html = value47.html.replace(/^<span\b[^>]*>/u, (value52) => {
+          let value53 = value52.replace(/\sdata-ref-unresolved="[^"]*"/u, '')
+            .replace(/\sdata-tooltip="缺少图片素材"/u, '')
+            .replace(
               /\bclass="([^"]*)"/u,
               (value54, value55) =>
                 'class="' +
-                value55['split'](/\s+/u)
-                  ['filter']((value56) => value56 !== 'ref-pill--unresolved')
-                  ['join'](' ') +
+                value55.split(/\s+/u)
+                  .filter((value56) => value56 !== 'ref-pill--unresolved')
+                  .join(' ') +
                 (text15 ? '' : ' ref-pill--unresolved') +
                 '"',
             );
           if (!text15)
-            value53 = value53['replace'](/>$/u, ' data-ref-unresolved="true" data-tooltip="缺少图片素材">');
+            value53 = value53.replace(/>$/u, ' data-ref-unresolved="true" data-tooltip="缺少图片素材">');
           return (
             value53 +
             (text15
@@ -447,20 +447,20 @@ export function renderStoryClipPromptMentions(
           );
         })));
     }
-    const value57 = value46['length'] && getStoryReplicationCharacterDisplayLabel(value48, value50, assets);
+    const value57 = value46.length && getStoryReplicationCharacterDisplayLabel(value48, value50, assets);
     value57 &&
-      ((value47['html'] = value47['html']['replace'](
+      ((value47.html = value47.html.replace(
         /\bdata-label="[^"]*"/u,
         'data-label="' + escapeHtml(value57) + '"',
       )),
-      (value47['html'] = /class="ref-pill-label"/u['test'](value47['html'])
-        ? value47['html']['replace'](
+      (value47.html = /class="ref-pill-label"/u.test(value47.html)
+        ? value47.html.replace(
             /(<span\b[^>]*class="ref-pill-label"[^>]*>)[\s\S]*?(<\/span>)/u,
             (value58, value59, value60) => '' + value59 + escapeHtml(value57) + value60,
           )
-        : value47['html']['replace'](/>[^<>]*<\/span>$/u, '>' + escapeHtml(value57) + '</span>')));
+        : value47.html.replace(/>[^<>]*<\/span>$/u, '>' + escapeHtml(value57) + '</span>')));
   }
-  const enabled3 = ctx2['source'];
+  const enabled3 = ctx2.source;
   if (!enabled3) return enabled3;
   const storyClipMentionCandidates = buildStoryClipMentionCandidates({
       assets: assets,
@@ -468,47 +468,47 @@ export function renderStoryClipPromptMentions(
       clipFrames: clipFrames,
     }),
     args8 = new Map();
-  storyClipMentionCandidates['forEach']((value61) => {
-    const text16 = normalizeText(value61['label']);
-    text16 && !args8['has'](text16) && args8['set'](text16, value61);
-    const value62 = Array['isArray'](value61['mentionVariants']) ? value61['mentionVariants'] : [];
-    value62['forEach']((value63) => {
-      const text17 = normalizeText(value63?.['pillLabel'] || value63?.['label']);
-      if (text17) args8['set'](text17, value63);
-      if (value63?.['sourcePillLabel']) args8['set'](value63['sourcePillLabel'], value63);
+  storyClipMentionCandidates.forEach((value61) => {
+    const text16 = normalizeText(value61.label);
+    text16 && !args8.has(text16) && args8.set(text16, value61);
+    const value62 = Array.isArray(value61.mentionVariants) ? value61.mentionVariants : [];
+    value62.forEach((value63) => {
+      const text17 = normalizeText(value63?.pillLabel || value63?.label);
+      if (text17) args8.set(text17, value63);
+      if (value63?.sourcePillLabel) args8.set(value63.sourcePillLabel, value63);
     });
   });
-  const list6 = [...args8['keys']()]
-      ['filter'](Boolean)
-      ['sort']((value64, value65) => value65['length'] - value64['length']),
-    value66 = list6['length'] ? '@(?:' + list6['map'](escapeRegExp)['join']('|') + ')' : '(?!)',
+  const list6 = [...args8.keys()]
+      .filter(Boolean)
+      .sort((value64, value65) => value65.length - value64.length),
+    value66 = list6.length ? '@(?:' + list6.map(escapeRegExp).join('|') + ')' : '(?!)',
     regExp = new RegExp('(' + value66 + ')|(⏱\\s*-?\\d+(?:\\.\\d+)?\\s*(?:s|秒))', 'gi'),
     handler = (list7, { escapeText: escapeText = true } = {}) => {
-      regExp['lastIndex'] = 0;
+      regExp.lastIndex = 0;
       let value67 = 0,
         value68 = '',
         value69 = null;
       const run2 = (value70) => (escapeText ? escapeHtml(value70) : value70);
-      while ((value69 = regExp['exec'](list7))) {
-        value68 += run2(list7['slice'](value67, value69['index']));
+      while ((value69 = regExp.exec(list7))) {
+        value68 += run2(list7.slice(value67, value69.index));
         if (value69[1]) {
-          const value71 = value69[1]['slice'](1),
-            value72 = args8['get'](value71);
+          const value71 = value69[1].slice(1),
+            value72 = args8.get(value71);
           value68 += value72 ? renderStoryAssetMentionPill(value72, value46) : run2(value69[0]);
         } else value68 += renderStoryTimeMentionPill(value69[2]);
-        value67 = value69['index'] + value69[0]['length'];
+        value67 = value69.index + value69[0].length;
       }
-      return ((value68 += run2(list7['slice'](value67))), value68);
+      return ((value68 += run2(list7.slice(value67))), value68);
     };
-  if (ctx2['pills']['length'] || /<[a-z][\s\S]*>/i['test'](enabled3))
-    return ctx['restore'](
-      ctx2['restore'](
-        enabled3['split'](/(<[^>]+>)/gu)
-          ['map']((value73) => (value73['startsWith']('<') ? value73 : handler(value73, { escapeText: false })))
-          ['join'](''),
+  if (ctx2.pills.length || /<[a-z][\s\S]*>/i.test(enabled3))
+    return ctx.restore(
+      ctx2.restore(
+        enabled3.split(/(<[^>]+>)/gu)
+          .map((value73) => (value73.startsWith('<') ? value73 : handler(value73, { escapeText: false })))
+          .join(''),
       ),
     );
-  return ctx['restore'](ctx2['restore'](handler(enabled3)));
+  return ctx.restore(ctx2.restore(handler(enabled3)));
 }
 export function resolveStoryClipPromptAssetRefs(
   value74,
@@ -527,34 +527,34 @@ export function resolveStoryClipPromptAssetRefs(
     }),
     value75 = /<span\b[^>]*\bclass\s*=\s*(["'])[^"']*\bref-pill\b[^"']*\1[^>]*>/gi,
     handler2 = (value76, value77) => {
-      const value78 = value76['match'](
+      const value78 = value76.match(
         new RegExp('\\b' + value77 + '\\s*=\\s*(["\'])(.*?)\\1', 'i'),
       );
       return normalizeText(value78?.[2])
-        ['replace'](/&quot;/gi, '"')
-        ['replace'](/&#39;|&apos;/gi, '\'')
-        ['replace'](/&lt;/gi, '<')
-        ['replace'](/&gt;/gi, '>')
-        ['replace'](/&amp;/gi, '&');
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;|&apos;/gi, '\'')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&amp;/gi, '&');
     },
     list8 = [],
     value79 = new Set(),
     enabled4 =
-      voiceAssetIds == null ? null : new Set([...voiceAssetIds]['map'](normalizeText)['filter'](Boolean));
+      voiceAssetIds == null ? null : new Set([...voiceAssetIds].map(normalizeText).filter(Boolean));
   let value80 = null;
-  while ((value80 = value75['exec'](renderStoryClipPromptMentions2))) {
+  while ((value80 = value75.exec(renderStoryClipPromptMentions2))) {
     const value81 = value80[0],
       enabled5 = handler2(value81, 'data-asset-id');
     if (!enabled5) continue;
     const storyAssetIdFromMentionNodeId = getStoryAssetIdFromMentionNodeId(enabled5),
-      value82 = enabled5['startsWith'](STORY_ASSET_NODE_PREFIX)
+      value82 = enabled5.startsWith(STORY_ASSET_NODE_PREFIX)
         ? resolveStoryClipAssetMentionRefs({ dataset: { assetId: enabled5 } }, assets, {
             voiceEnabled:
-              enabled4 && !enabled4['has'](storyAssetIdFromMentionNodeId)
+              enabled4 && !enabled4.has(storyAssetIdFromMentionNodeId)
                 ? false
                 : getStoryEpisodeCharacterVoiceEnabled(episode, storyAssetIdFromMentionNodeId),
           })
-        : enabled5['startsWith'](STORY_CLIP_FRAME_MENTION_PREFIX)
+        : enabled5.startsWith(STORY_CLIP_FRAME_MENTION_PREFIX)
           ? resolveStoryClipFrameMentionRef({ dataset: { assetId: enabled5 } }, clipFrames)
           : typeof resolveExternalAssetRef === 'function'
             ? resolveExternalAssetRef({
@@ -562,110 +562,110 @@ export function resolveStoryClipPromptAssetRefs(
                 itemIndex: Number(handler2(value81, 'data-asset-index')),
               })
             : null;
-    (Array['isArray'](value82) ? value82 : [value82])['filter'](Boolean)['forEach']((value83) => {
-      const text18 = normalizeText(value83?.['type'] || value83?.['kind']),
-        text19 = normalizeText(value83?.['url']);
+    (Array.isArray(value82) ? value82 : [value82]).filter(Boolean).forEach((value83) => {
+      const text18 = normalizeText(value83?.type || value83?.kind),
+        text19 = normalizeText(value83?.url);
       if (!text18 || !text19) return;
       const value84 = text18 + ':' + text19;
-      if (value79['has'](value84)) return;
-      (value79['add'](value84), list8['push'](value83));
+      if (value79.has(value84)) return;
+      (value79.add(value84), list8.push(value83));
     });
   }
   return list8;
 }
 export function getStoryAssetIdFromMentionNodeId(value85 = '') {
-  return parseStoryAssetMentionId(value85)?.['assetId'] || '';
+  return parseStoryAssetMentionId(value85)?.assetId || '';
 }
 export function getStoryEpisodeCharacterVoiceEnabled(options5 = {}, value86 = '') {
   const text20 = normalizeText(value86),
-    enabled6 = options5?.['characterVoiceEnabledByAssetId'];
+    enabled6 = options5?.characterVoiceEnabledByAssetId;
   if (
     !text20 ||
     !enabled6 ||
     typeof enabled6 !== 'object' ||
-    Array['isArray'](enabled6) ||
+    Array.isArray(enabled6) ||
     typeof enabled6[text20] !== 'boolean'
   )
     return undefined;
   return enabled6[text20];
 }
 export function setStoryEpisodeCharacterVoiceEnabled(enabled7 = {}, value87 = '', value88 = false) {
-  if (!enabled7 || typeof enabled7 !== 'object' || Array['isArray'](enabled7)) return false;
+  if (!enabled7 || typeof enabled7 !== 'object' || Array.isArray(enabled7)) return false;
   const text21 = normalizeText(value87);
   if (!text21) return false;
-  const args9 = enabled7['characterVoiceEnabledByAssetId'];
+  const args9 = enabled7.characterVoiceEnabledByAssetId;
   return (
-    (enabled7['characterVoiceEnabledByAssetId'] = {
-      ...(args9 && typeof args9 === 'object' && !Array['isArray'](args9) ? args9 : {}),
+    (enabled7.characterVoiceEnabledByAssetId = {
+      ...(args9 && typeof args9 === 'object' && !Array.isArray(args9) ? args9 : {}),
       [text21]: value88 === true,
     }),
     true
   );
 }
 export function syncStoryClipPromptPillHoverTarget(el5) {
-  if (!el5?.['dataset']) return '';
-  const storyAssetMentionId2 = parseStoryAssetMentionId(el5['dataset']['assetId']),
-    value89 = storyAssetMentionId2?.['assetId'] || '',
+  if (!el5?.dataset) return '';
+  const storyAssetMentionId2 = parseStoryAssetMentionId(el5.dataset.assetId),
+    value89 = storyAssetMentionId2?.assetId || '',
     value90 =
-      storyAssetMentionId2?.['appearanceId'] === '__asset__'
+      storyAssetMentionId2?.appearanceId === '__asset__'
         ? ''
-        : storyAssetMentionId2?.['appearanceId'] || '';
-  if (value89) el5['dataset']['storyAssetHoverId'] = value89;
-  else delete el5['dataset']['storyAssetHoverId'];
+        : storyAssetMentionId2?.appearanceId || '';
+  if (value89) el5.dataset.storyAssetHoverId = value89;
+  else delete el5.dataset.storyAssetHoverId;
   return (
     value90
-      ? (el5['dataset']['storyAssetHoverAppearanceId'] = value90)
-      : delete el5['dataset']['storyAssetHoverAppearanceId'],
+      ? (el5.dataset.storyAssetHoverAppearanceId = value90)
+      : delete el5.dataset.storyAssetHoverAppearanceId,
     value89
   );
 }
 export function resolveStoryClipAssetMentionRef(value91, value92 = []) {
-  const storyAssetMentionId3 = parseStoryAssetMentionId(value91?.['dataset']?.['assetId']);
+  const storyAssetMentionId3 = parseStoryAssetMentionId(value91?.dataset?.assetId);
   if (!storyAssetMentionId3) return null;
-  const error = (Array['isArray'](value92) ? value92 : [])['find'](
-    (value93) => normalizeText(value93?.['id']) === storyAssetMentionId3['assetId'],
+  const error = (Array.isArray(value92) ? value92 : []).find(
+    (value93) => normalizeText(value93?.id) === storyAssetMentionId3.assetId,
   );
   if (!error) return null;
   const enabled8 =
-    storyAssetMentionId3['appearanceId'] === '__asset__'
+    storyAssetMentionId3.appearanceId === '__asset__'
       ? null
-      : (Array['isArray'](error['appearances']) ? error['appearances'] : [])['find'](
-          (value94) => normalizeText(value94?.['id']) === storyAssetMentionId3['appearanceId'],
+      : (Array.isArray(error.appearances) ? error.appearances : []).find(
+          (value94) => normalizeText(value94?.id) === storyAssetMentionId3.appearanceId,
         );
-  if (storyAssetMentionId3['appearanceId'] !== '__asset__' && !enabled8) return null;
+  if (storyAssetMentionId3.appearanceId !== '__asset__' && !enabled8) return null;
   const enabled9 =
-    storyAssetMentionId3['appearanceId'] === '__asset__'
-      ? normalizeText(error['imageUrl'])
-      : normalizeText(enabled8?.['imageUrl']);
+    storyAssetMentionId3.appearanceId === '__asset__'
+      ? normalizeText(error.imageUrl)
+      : normalizeText(enabled8?.imageUrl);
   if (!enabled9) return null;
   return {
     origin: 'asset',
-    assetId: normalizeText(value91?.['dataset']?.['assetId']),
-    storyAssetId: storyAssetMentionId3['assetId'],
-    appearanceId: storyAssetMentionId3['appearanceId'],
+    assetId: normalizeText(value91?.dataset?.assetId),
+    storyAssetId: storyAssetMentionId3.assetId,
+    appearanceId: storyAssetMentionId3.appearanceId,
     itemIndex: 0,
     type: 'image',
-    name: normalizeText(error['name']) || '本集素材',
-    label: normalizeText(error['name']) || '本集素材',
+    name: normalizeText(error.name) || '本集素材',
+    label: normalizeText(error.name) || '本集素材',
     url: enabled9,
     thumbUrl: enabled9,
     nodeData: { type: 'source-image', imageUrl: enabled9 },
   };
 }
 export function getStoryClipMentionVoiceState(value95, value96 = [], { voiceEnabled: voiceEnabled } = {}) {
-  const storyAssetMentionId4 = parseStoryAssetMentionId(value95?.['dataset']?.['assetId']),
+  const storyAssetMentionId4 = parseStoryAssetMentionId(value95?.dataset?.assetId),
     value97 = storyAssetMentionId4
-      ? (Array['isArray'](value96) ? value96 : [])['find'](
-          (value98) => normalizeText(value98?.['id']) === storyAssetMentionId4['assetId'],
+      ? (Array.isArray(value96) ? value96 : []).find(
+          (value98) => normalizeText(value98?.id) === storyAssetMentionId4.assetId,
         )
       : null,
     value99 =
-      value97?.['kind'] === 'character'
-        ? normalizeStoryCharacterVoiceReference(value97?.['voiceReference'])
+      value97?.kind === 'character'
+        ? normalizeStoryCharacterVoiceReference(value97?.voiceReference)
         : null,
-    text22 = normalizeText(value99?.['audioUrl'] || value99?.['localPath']),
+    text22 = normalizeText(value99?.audioUrl || value99?.localPath),
     value100 = Boolean(value97 && text22),
-    text23 = normalizeText(value95?.['dataset']?.['storyVoiceEnabled']),
+    text23 = normalizeText(value95?.dataset?.storyVoiceEnabled),
     value101 = typeof voiceEnabled === 'boolean' ? voiceEnabled : text23 !== 'false';
   return {
     available: value100,
@@ -676,14 +676,14 @@ export function getStoryClipMentionVoiceState(value95, value96 = [], { voiceEnab
   };
 }
 export function setStoryClipMentionVoiceEnabled(el6, value102 = [], value103 = false) {
-  if (!el6?.['dataset']) return getStoryClipMentionVoiceState(el6, value102);
+  if (!el6?.dataset) return getStoryClipMentionVoiceState(el6, value102);
   const storyClipMentionVoiceState = getStoryClipMentionVoiceState(el6, value102);
-  if (storyClipMentionVoiceState['available'] && value103 === true)
-    el6['dataset']['storyVoiceEnabled'] = 'true';
+  if (storyClipMentionVoiceState.available && value103 === true)
+    el6.dataset.storyVoiceEnabled = 'true';
   else
-    storyClipMentionVoiceState['available']
-      ? (el6['dataset']['storyVoiceEnabled'] = 'false')
-      : (delete el6['dataset']['storyVoiceEnabled'], el6['removeAttribute']?.('data-story-voice-enabled'));
+    storyClipMentionVoiceState.available
+      ? (el6.dataset.storyVoiceEnabled = 'false')
+      : (delete el6.dataset.storyVoiceEnabled, el6.removeAttribute?.('data-story-voice-enabled'));
   return getStoryClipMentionVoiceState(el6, value102);
 }
 export function resolveStoryClipAssetMentionRefs(
@@ -697,37 +697,37 @@ export function resolveStoryClipAssetMentionRefs(
 ) {
   const storyClipFrameMentionRef = resolveStoryClipFrameMentionRef(value104, clipFrames);
   if (storyClipFrameMentionRef) return storyClipFrameMentionRef;
-  const text24 = normalizeText(value104?.['dataset']?.['assetId']);
-  if (!text24['startsWith'](STORY_ASSET_NODE_PREFIX) && typeof resolveExternalAssetRef === 'function')
+  const text24 = normalizeText(value104?.dataset?.assetId);
+  if (!text24.startsWith(STORY_ASSET_NODE_PREFIX) && typeof resolveExternalAssetRef === 'function')
     return resolveExternalAssetRef({
       assetId: text24,
-      itemIndex: Number(value104?.['dataset']?.['assetIndex'] || 0),
+      itemIndex: Number(value104?.dataset?.assetIndex || 0),
     });
   const list9 = [],
     storyClipAssetMentionRef = resolveStoryClipAssetMentionRef(value104, value105);
-  if (storyClipAssetMentionRef) list9['push'](storyClipAssetMentionRef);
+  if (storyClipAssetMentionRef) list9.push(storyClipAssetMentionRef);
   const response = getStoryClipMentionVoiceState(value104, value105, { voiceEnabled: voiceEnabled2 });
-  if (response['enabled']) {
-    const text25 = normalizeText(response['asset']?.['id']);
-    list9['push']({
+  if (response.enabled) {
+    const text25 = normalizeText(response.asset?.id);
+    list9.push({
       origin: 'asset',
       assetId: '' + STORY_CHARACTER_VOICE_NODE_PREFIX + encodeURIComponent(text25),
       storyAssetId: text25,
       itemIndex: 0,
       type: 'audio',
-      name: (normalizeText(response['asset']?.['name']) || '角色') + ' · 声音参考',
-      label: normalizeText(response['asset']?.['name']) || '角色声音',
-      url: response['url'],
-      audioUrl: response['url'],
-      localPath: normalizeText(response['voiceReference']?.['localPath']),
+      name: (normalizeText(response.asset?.name) || '角色') + ' · 声音参考',
+      label: normalizeText(response.asset?.name) || '角色声音',
+      url: response.url,
+      audioUrl: response.url,
+      localPath: normalizeText(response.voiceReference?.localPath),
       placeholderTypeLabel: '声音',
       nodeData: {
         type: 'source-audio',
-        audioUrl: response['url'],
-        localPath: normalizeText(response['voiceReference']?.['localPath']),
+        audioUrl: response.url,
+        localPath: normalizeText(response.voiceReference?.localPath),
       },
     });
   }
-  if (list9['length'] === 0) return null;
-  return list9['length'] === 1 ? list9[0] : list9;
+  if (list9.length === 0) return null;
+  return list9.length === 1 ? list9[0] : list9;
 }

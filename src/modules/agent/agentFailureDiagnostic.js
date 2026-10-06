@@ -1,6 +1,6 @@
 const MAX_DRAFT_CHARS = 4000,
-  DIAGNOSTIC_COPY = Object['freeze']({
-    'zh-CN': Object['freeze']({
+  DIAGNOSTIC_COPY = Object.freeze({
+    'zh-CN': Object.freeze({
       planning: '规划阶段',
       execution: '执行阶段',
       PLANNER_AUTH_ERROR: ['模型服务鉴权失败', '请检查当前文本模型的密钥或服务配置，然后从检查点继续。'],
@@ -17,7 +17,7 @@ const MAX_DRAFT_CHARS = 4000,
       editRequest: '修改需求',
       changeModel: '换模型',
     }),
-    'en-US': Object['freeze']({
+    'en-US': Object.freeze({
       planning: 'Planning',
       execution: 'Execution',
       PLANNER_AUTH_ERROR: [
@@ -67,17 +67,17 @@ const MAX_DRAFT_CHARS = 4000,
   });
 function normalizeLocale(value = '') {
   return String(value || '')
-    ['toLowerCase']()
-    ['startsWith']('en')
+    .toLowerCase()
+    .startsWith('en')
     ? 'en-US'
     : 'zh-CN';
 }
 function normalizeErrorCode(item = '', key = '') {
   const index = String(item || '')
-    ['trim']()
-    ['toUpperCase']()
-    ['replace'](/[^A-Z0-9_.-]/g, '_')
-    ['slice'](0, 80);
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_.-]/g, '_')
+    .slice(0, 80);
   return index || key;
 }
 function classifyPlannerFailure({
@@ -86,27 +86,27 @@ function classifyPlannerFailure({
   reason: reason = '',
 } = {}) {
   if (reason === 'no_action') return 'PLANNER_NO_ACTION';
-  const errorCode = normalizeErrorCode(validation?.['errorCode']);
+  const errorCode = normalizeErrorCode(validation?.errorCode);
   if (errorCode === 'AGENT_PLAN_FAILED') return 'PLANNER_REPORTED_FAILURE';
-  if (['UNKNOWN_AGENT_ACTION', 'DEFERRED_AGENT_ACTION', 'BLOCKED_AGENT_ACTION']['includes'](errorCode))
+  if (['UNKNOWN_AGENT_ACTION', 'DEFERRED_AGENT_ACTION', 'BLOCKED_AGENT_ACTION'].includes(errorCode))
     return 'PLANNER_UNSUPPORTED_ACTION';
   if (errorCode) return 'PLANNER_INVALID_ACTION';
-  const result = String(cause || '')['toLowerCase']();
-  if (/\b(?:401|403)\b|unauthori[sz]ed|forbidden|api[ _-]?key|authentication/['test'](result))
+  const result = String(cause || '').toLowerCase();
+  if (/\b(?:401|403)\b|unauthori[sz]ed|forbidden|api[ _-]?key|authentication/.test(result))
     return 'PLANNER_AUTH_ERROR';
-  if (/\b429\b|rate.?limit|too many requests|quota/['test'](result)) return 'PLANNER_RATE_LIMITED';
-  if (/timeout|timed out|deadline/['test'](result)) return 'PLANNER_TIMEOUT';
-  if (/fetch|network|econn|enotfound|socket|offline|connection/['test'](result))
+  if (/\b429\b|rate.?limit|too many requests|quota/.test(result)) return 'PLANNER_RATE_LIMITED';
+  if (/timeout|timed out|deadline/.test(result)) return 'PLANNER_TIMEOUT';
+  if (/fetch|network|econn|enotfound|socket|offline|connection/.test(result))
     return 'PLANNER_NETWORK_ERROR';
   return 'PLANNER_REQUEST_ERROR';
 }
 function getDiagnosticCopy(data, options, target) {
   const phaseLabel = DIAGNOSTIC_COPY[normalizeLocale(data)],
-    [summary, detail] = phaseLabel[target] || phaseLabel['PLANNER_REQUEST_ERROR'];
-  return { phaseLabel: phaseLabel[options] || phaseLabel['planning'], summary: summary, detail: detail };
+    [summary, detail] = phaseLabel[target] || phaseLabel.PLANNER_REQUEST_ERROR;
+  return { phaseLabel: phaseLabel[options] || phaseLabel.planning, summary: summary, detail: detail };
 }
 function countCompletedSteps(list = []) {
-  return (Array['isArray'](list) ? list : [])['filter']((response) => response?.['ok'] === true)['length'];
+  return (Array.isArray(list) ? list : []).filter((response) => response?.ok === true).length;
 }
 export function buildAgentPlannerDiagnostic({
   loopState: loopState = {},
@@ -117,21 +117,21 @@ export function buildAgentPlannerDiagnostic({
 } = {}) {
   const errorCode2 = classifyPlannerFailure({ validation: validation, cause: cause, reason: reason }),
     phaseLabel2 = getDiagnosticCopy(locale, 'planning', errorCode2),
-    source = Array['isArray'](loopState['validationFeedback'])
-      ? loopState['validationFeedback']['at'](-1)
+    source = Array.isArray(loopState.validationFeedback)
+      ? loopState.validationFeedback.at(-1)
       : null;
   return {
     phase: 'planning',
-    phaseLabel: phaseLabel2['phaseLabel'],
-    summary: phaseLabel2['summary'],
-    detail: phaseLabel2['detail'],
+    phaseLabel: phaseLabel2.phaseLabel,
+    summary: phaseLabel2.summary,
+    detail: phaseLabel2.detail,
     errorCode: errorCode2,
-    sourceErrorCode: normalizeErrorCode(validation?.['errorCode'] || source?.['errorCode']),
-    commandId: String(validation?.['plan']?.['actions']?.[0]?.['type'] || source?.['commandId'] || '')
-      ['trim']()
-      ['slice'](0, 120),
-    step: Math['max'](1, Math['trunc'](Number(loopState['step'] || 0)) + 1),
-    completedSteps: countCompletedSteps(loopState['toolResults']),
+    sourceErrorCode: normalizeErrorCode(validation?.errorCode || source?.errorCode),
+    commandId: String(validation?.plan?.actions?.[0]?.type || source?.commandId || '')
+      .trim()
+      .slice(0, 120),
+    step: Math.max(1, Math.trunc(Number(loopState.step || 0)) + 1),
+    completedSteps: countCompletedSteps(loopState.toolResults),
     retryable: true,
   };
 }
@@ -143,28 +143,28 @@ export function buildAgentExecutionDiagnostic({
   locale: locale = 'zh-CN',
 } = {}) {
   const errorCode3 = normalizeErrorCode(
-      execution['errorCode'] || execution['raw']?.['errorCode'],
+      execution.errorCode || execution.raw?.errorCode,
       'EXECUTION_ACTION_FAILED',
     ),
     phaseLabel3 = getDiagnosticCopy(locale, 'execution', 'EXECUTION_ACTION_FAILED'),
-    next = (Array['isArray'](execution['results']) ? execution['results'] : [])['filter'](
-      (response2) => response2?.['ok'] !== false,
-    )['length'],
+    next = (Array.isArray(execution.results) ? execution.results : []).filter(
+      (response2) => response2?.ok !== false,
+    ).length,
     completedSteps2 =
-      completedSteps != null && Number['isFinite'](Number(completedSteps))
-        ? Math['max'](0, Math['trunc'](Number(completedSteps)))
+      completedSteps != null && Number.isFinite(Number(completedSteps))
+        ? Math.max(0, Math.trunc(Number(completedSteps)))
         : next;
   return {
     phase: 'execution',
-    phaseLabel: phaseLabel3['phaseLabel'],
-    summary: phaseLabel3['summary'],
-    detail: phaseLabel3['detail'],
+    phaseLabel: phaseLabel3.phaseLabel,
+    summary: phaseLabel3.summary,
+    detail: phaseLabel3.detail,
     errorCode: errorCode3,
     sourceErrorCode: '',
-    commandId: String(recovery?.['failedAction']?.['type'] || '')
-      ['trim']()
-      ['slice'](0, 120),
-    step: Math['max'](1, Math['trunc'](Number(step || 0)) + 1),
+    commandId: String(recovery?.failedAction?.type || '')
+      .trim()
+      .slice(0, 120),
+    step: Math.max(1, Math.trunc(Number(step || 0)) + 1),
     completedSteps: completedSteps2,
     retryable: Boolean(recovery),
   };
@@ -177,19 +177,19 @@ export function buildAgentPlannerRecovery({
   return {
     kind: 'planner',
     options: [
-      { id: 'retryPlanner', label: label['retryPlanner'] },
+      { id: 'retryPlanner', label: label.retryPlanner },
       {
         id: 'editRequest',
-        label: label['editRequest'],
+        label: label.editRequest,
         draft: String(originalMessage || '')
-          ['trim']()
-          ['slice'](0, MAX_DRAFT_CHARS),
+          .trim()
+          .slice(0, MAX_DRAFT_CHARS),
       },
-      { id: 'changeModel', label: label['changeModel'] },
+      { id: 'changeModel', label: label.changeModel },
     ],
   };
 }
-export const agentFailureDiagnosticInternals = Object['freeze']({
+export const agentFailureDiagnosticInternals = Object.freeze({
   classifyPlannerFailure: classifyPlannerFailure,
   normalizeErrorCode: normalizeErrorCode,
 });

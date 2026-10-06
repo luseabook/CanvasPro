@@ -38,29 +38,29 @@ export const STORYBOARD_3D_GENERATION_SYSTEM_PROMPT = [
   '若是吃饭或聚餐场景，layout.kind 必须为 dining，participantCount 必须等于明确提及的用餐人数；每位人物需要对应座位。',
   '镜头需要完整给出 position、target 和 focalLength，并保证能看见主要主体。',
   '只返回严格 JSON，不要输出 Markdown、代码块、注释或额外说明。',
-]['join']('\n');
+].join('\n');
 function normalizeText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function clampNumber(item, key, index, result) {
   const data = Number(item);
-  if (!Number['isFinite'](data)) return key;
-  return Math['min'](result, Math['max'](index, data));
+  if (!Number.isFinite(data)) return key;
+  return Math.min(result, Math.max(index, data));
 }
 function normalizeVector3(options, target, source, next) {
-  const current = Array['isArray'](options) ? options : [];
-  return target['map']((entry, record) => clampNumber(current[record], entry, source[record], next[record]));
+  const current = Array.isArray(options) ? options : [];
+  return target.map((entry, record) => clampNumber(current[record], entry, source[record], next[record]));
 }
 function getResultText(response) {
   if (typeof response === 'string') return response;
-  return response?.['text'] || response?.['outputText'] || response?.['content'] || '';
+  return response?.text || response?.outputText || response?.content || '';
 }
 function parseStrictJson(payload, handle) {
-  if (payload && typeof payload === 'object' && !Array['isArray'](payload)) return payload;
+  if (payload && typeof payload === 'object' && !Array.isArray(payload)) return payload;
   const text = normalizeText(payload);
   if (!text) throw new Error(handle);
   try {
-    return JSON['parse'](text);
+    return JSON.parse(text);
   } catch {
     throw new Error('场景 Agent 未返回有效的 JSON。');
   }
@@ -68,25 +68,25 @@ function parseStrictJson(payload, handle) {
 export function getStoryboard3DGenerationAssetFamilies(listSceneAssets2 = listSceneAssets()) {
   const args = new Map();
   return (
-    (Array['isArray'](listSceneAssets2) ? listSceneAssets2 : [])['forEach']((state) => {
-      const text2 = normalizeText(state?.['familyId']);
-      if (!text2 || args['has'](text2)) return;
-      args['set'](text2, {
+    (Array.isArray(listSceneAssets2) ? listSceneAssets2 : []).forEach((state) => {
+      const text2 = normalizeText(state?.familyId);
+      if (!text2 || args.has(text2)) return;
+      args.set(text2, {
         familyId: text2,
-        category: normalizeText(state?.['category']),
+        category: normalizeText(state?.category),
         tags: [
           ...new Set(
-            (state?.['tags'] || [])
-              ['map'](normalizeText)
-              ['filter']((config) => config && !ASSET_SIZES['has'](config) && !ASSET_COLORS['has'](config)),
+            (state?.tags || [])
+              .map(normalizeText)
+              .filter((config) => config && !ASSET_SIZES.has(config) && !ASSET_COLORS.has(config)),
           ),
         ]
-          ['slice'](0, ASSET_CATALOG_TAG_LIMIT)
-          ['map']((scope) => scope['slice'](0, ASSET_CATALOG_TEXT_LIMIT)),
+          .slice(0, ASSET_CATALOG_TAG_LIMIT)
+          .map((scope) => scope.slice(0, ASSET_CATALOG_TEXT_LIMIT)),
         spatial: resolveStoryboard3DAssetSpatialMetadata(state),
       });
     }),
-    [...args['values']()]
+    [...args.values()]
   );
 }
 export function buildStoryboard3DGenerationPrompt({
@@ -94,27 +94,27 @@ export function buildStoryboard3DGenerationPrompt({
   assetFamilies: assetFamilies = getStoryboard3DGenerationAssetFamilies(),
   inputImageUrls: inputImageUrls = [],
 } = {}) {
-  const text3 = normalizeText(prompt)['slice'](0, STORYBOARD_3D_PROMPT_MAX_CHARACTERS);
+  const text3 = normalizeText(prompt).slice(0, STORYBOARD_3D_PROMPT_MAX_CHARACTERS);
   if (!text3) throw new Error('请先描述要搭建的 3D 场景。');
-  const args2 = Array['isArray'](inputImageUrls) ? inputImageUrls['filter'](Boolean)['length'] : 0,
+  const args2 = Array.isArray(inputImageUrls) ? inputImageUrls.filter(Boolean).length : 0,
     relevantStoryboard3DAssets = selectRelevantStoryboard3DAssets(assetFamilies, text3, {
       limit: STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT,
     });
-  return JSON['stringify']({
+  return JSON.stringify({
     task: 'create_storyboard_3d_project',
     schemaVersion: STORYBOARD_3D_GENERATION_SCHEMA_VERSION,
     userPrompt: text3,
     referenceImageCount: args2,
     assetFamilyColumns: ['familyId', 'category', 'tags', 'spatial'],
-    availableAssetFamilies: relevantStoryboard3DAssets['map']((input) => [
-      normalizeText(input?.['familyId']),
-      normalizeText(input?.['category'])['slice'](0, ASSET_CATALOG_TEXT_LIMIT),
-      (Array['isArray'](input?.['tags']) ? input['tags'] : [])
-        ['map'](normalizeText)
-        ['filter'](Boolean)
-        ['slice'](0, ASSET_CATALOG_TAG_LIMIT)
-        ['map']((output) => output['slice'](0, ASSET_CATALOG_TEXT_LIMIT))
-        ['join'](','),
+    availableAssetFamilies: relevantStoryboard3DAssets.map((input) => [
+      normalizeText(input?.familyId),
+      normalizeText(input?.category).slice(0, ASSET_CATALOG_TEXT_LIMIT),
+      (Array.isArray(input?.tags) ? input.tags : [])
+        .map(normalizeText)
+        .filter(Boolean)
+        .slice(0, ASSET_CATALOG_TAG_LIMIT)
+        .map((output) => output.slice(0, ASSET_CATALOG_TEXT_LIMIT))
+        .join(','),
       describeStoryboard3DAssetSpatialMetadata(input),
     ]),
     requirements: [
@@ -133,8 +133,8 @@ export function buildStoryboard3DGenerationPrompt({
             '只需使用可用轻量资产建立大概空间关系，不要求精细外观或完全还原。',
           ]
         : []),
-      'shotSize 只能是 ' + STORYBOARD_3D_SHOT_SIZES['join']('、') + '。',
-      'shotAngle 只能是 ' + STORYBOARD_3D_SHOT_ANGLES['join']('、') + '。',
+      'shotSize 只能是 ' + STORYBOARD_3D_SHOT_SIZES.join('、') + '。',
+      'shotAngle 只能是 ' + STORYBOARD_3D_SHOT_ANGLES.join('、') + '。',
     ],
     outputSchema: {
       projectName: '项目名称',
@@ -170,111 +170,111 @@ export function parseStoryboard3DGenerationResult(
   { assetFamilies: assetFamilies = getStoryboard3DGenerationAssetFamilies() } = {},
 ) {
   const strictJson = parseStrictJson(getResultText(value2), '场景 Agent 未返回可用的 3D 场景方案。'),
-    text4 = normalizeText(strictJson['projectName']),
-    text5 = normalizeText(strictJson['sceneName']);
+    text4 = normalizeText(strictJson.projectName),
+    text5 = normalizeText(strictJson.sceneName);
   if (!text4) throw new Error('场景 Agent 返回结果缺少项目名称。');
   if (!text5) throw new Error('场景 Agent 返回结果缺少场景名称。');
-  const value3 = new Map(assetFamilies['map']((value4) => [value4['familyId'], value4])),
-    enabled = new Set(value3['keys']()),
-    value5 = (Array['isArray'](strictJson['objects']) ? strictJson['objects'] : [])
-      ['slice'](0, 24)
-      ['map']((value6, value7) => {
-        const args3 = value6?.['kind'] === 'character' ? 'character' : 'asset';
-        if (args3 === 'asset' && !enabled['has'](normalizeText(value6?.['familyId']))) return null;
+  const value3 = new Map(assetFamilies.map((value4) => [value4.familyId, value4])),
+    enabled = new Set(value3.keys()),
+    value5 = (Array.isArray(strictJson.objects) ? strictJson.objects : [])
+      .slice(0, 24)
+      .map((value6, value7) => {
+        const args3 = value6?.kind === 'character' ? 'character' : 'asset';
+        if (args3 === 'asset' && !enabled.has(normalizeText(value6?.familyId))) return null;
         return {
           kind: args3,
-          name: normalizeText(value6?.['name']) || '物体 ' + (value7 + 1),
+          name: normalizeText(value6?.name) || '物体 ' + (value7 + 1),
           ...(args3 === 'asset'
             ? {
-                familyId: normalizeText(value6['familyId']),
-                size: ASSET_SIZES['has'](value6?.['size']) ? value6['size'] : 'medium',
-                color: ASSET_COLORS['has'](value6?.['color']) ? value6['color'] : 'blue',
+                familyId: normalizeText(value6.familyId),
+                size: ASSET_SIZES.has(value6?.size) ? value6.size : 'medium',
+                color: ASSET_COLORS.has(value6?.color) ? value6.color : 'blue',
               }
-            : { gender: CHARACTER_GENDERS['has'](value6?.['gender']) ? value6['gender'] : 'male' }),
+            : { gender: CHARACTER_GENDERS.has(value6?.gender) ? value6.gender : 'male' }),
           position: normalizeVector3(
-            value6?.['position'],
+            value6?.position,
             [0, 0, 0],
             [-20, 0, -20],
             [20, 10, 20],
           ),
           rotation: normalizeVector3(
-            value6?.['rotation'],
+            value6?.rotation,
             [0, 0, 0],
-            [-Math['PI'] * 2, -Math['PI'] * 2, -Math['PI'] * 2],
-            [Math['PI'] * 2, Math['PI'] * 2, Math['PI'] * 2],
+            [-Math.PI * 2, -Math.PI * 2, -Math.PI * 2],
+            [Math.PI * 2, Math.PI * 2, Math.PI * 2],
           ),
-          scale: normalizeVector3(value6?.['scale'], [1, 1, 1], [0.25, 0.25, 0.25], [4, 4, 4]),
+          scale: normalizeVector3(value6?.scale, [1, 1, 1], [0.25, 0.25, 0.25], [4, 4, 4]),
         };
       })
-      ['filter'](Boolean),
-    storyboard3DGeneratedLayout = normalizeStoryboard3DGeneratedLayout(strictJson['layout']),
-    value8 = value5['some'](
+      .filter(Boolean),
+    storyboard3DGeneratedLayout = normalizeStoryboard3DGeneratedLayout(strictJson.layout),
+    value8 = value5.some(
       (value9) =>
-        value9['kind'] === 'asset' &&
-        resolveStoryboard3DAssetSpatialMetadata(value3['get'](value9['familyId']))['roles']['includes'](
+        value9.kind === 'asset' &&
+        resolveStoryboard3DAssetSpatialMetadata(value3.get(value9.familyId)).roles.includes(
           'table',
         ),
     ),
-    count = value5['filter']((value10) => value10['kind'] === 'character')['length'],
+    count = value5.filter((value10) => value10.kind === 'character').length,
     value11 =
-      storyboard3DGeneratedLayout['kind'] === 'dining' || (value8 && count >= 2)
+      storyboard3DGeneratedLayout.kind === 'dining' || (value8 && count >= 2)
         ? {
             kind: 'dining',
-            participantCount: Math['max'](storyboard3DGeneratedLayout['participantCount'], count),
+            participantCount: Math.max(storyboard3DGeneratedLayout.participantCount, count),
           }
         : storyboard3DGeneratedLayout,
-    value12 = strictJson['shot'] && typeof strictJson['shot'] === 'object' ? strictJson['shot'] : {},
-    value13 = value12['camera'] && typeof value12['camera'] === 'object' ? value12['camera'] : {};
+    value12 = strictJson.shot && typeof strictJson.shot === 'object' ? strictJson.shot : {},
+    value13 = value12.camera && typeof value12.camera === 'object' ? value12.camera : {};
   return {
     schemaVersion: STORYBOARD_3D_GENERATION_SCHEMA_VERSION,
     projectName: text4,
     sceneName: text5,
-    environmentType: ENVIRONMENT_TYPES['has'](strictJson['environmentType'])
-      ? strictJson['environmentType']
+    environmentType: ENVIRONMENT_TYPES.has(strictJson.environmentType)
+      ? strictJson.environmentType
       : 'empty',
-    backgroundColor: /^#[0-9a-f]{6}$/i['test'](normalizeText(strictJson['backgroundColor']))
-      ? normalizeText(strictJson['backgroundColor'])
+    backgroundColor: /^#[0-9a-f]{6}$/i.test(normalizeText(strictJson.backgroundColor))
+      ? normalizeText(strictJson.backgroundColor)
       : '',
     layout: value11,
     objects: value5,
     shot: {
-      name: normalizeText(value12['name']) || '主镜头',
-      description: normalizeText(value12['description']),
-      shotSize: SHOT_SIZES['has'](value12['shotSize']) ? value12['shotSize'] : 'MED',
-      shotAngle: SHOT_ANGLES['has'](value12['shotAngle']) ? value12['shotAngle'] : 'eye',
+      name: normalizeText(value12.name) || '主镜头',
+      description: normalizeText(value12.description),
+      shotSize: SHOT_SIZES.has(value12.shotSize) ? value12.shotSize : 'MED',
+      shotAngle: SHOT_ANGLES.has(value12.shotAngle) ? value12.shotAngle : 'eye',
       camera: {
         position: normalizeVector3(
-          value13['position'],
+          value13.position,
           [5, 4, 7],
           [-50, 0.1, -50],
           [50, 30, 50],
         ),
-        target: normalizeVector3(value13['target'], [0, 1.2, 0], [-20, 0, -20], [20, 20, 20]),
-        focalLength: clampNumber(value13['focalLength'], 35, 18, 120),
+        target: normalizeVector3(value13.target, [0, 1.2, 0], [-20, 0, -20], [20, 20, 20]),
+        focalLength: clampNumber(value13.focalLength, 35, 18, 120),
       },
     },
   };
 }
 function resolveSceneAsset(list, value14) {
   return (
-    list['find'](
+    list.find(
       (value15) =>
-        value15['familyId'] === value14['familyId'] &&
-        value15['size'] === value14['size'] &&
-        value15['colorKey'] === value14['color'],
+        value15.familyId === value14.familyId &&
+        value15.size === value14.size &&
+        value15.colorKey === value14.color,
     ) ||
-    list['find'](
+    list.find(
       (value16) =>
-        value16['familyId'] === value14['familyId'] &&
-        value16['size'] === 'medium' &&
-        value16['colorKey'] === 'blue',
+        value16.familyId === value14.familyId &&
+        value16.size === 'medium' &&
+        value16.colorKey === 'blue',
     )
   );
 }
 export function createStoryboard3DProjectFromGeneration(
   args4,
   {
-    now: now = Date['now'](),
+    now: now = Date.now(),
     idFactory: idFactory,
     projectId: projectId,
     assets: assets = listSceneAssets(),
@@ -282,52 +282,52 @@ export function createStoryboard3DProjectFromGeneration(
 ) {
   const storyboard3DProject = createStoryboard3DProject({
       id: projectId,
-      name: args4?.['projectName'],
-      sceneName: args4?.['sceneName'],
-      shotName: args4?.['shot']?.['name'],
-      environmentType: args4?.['environmentType'],
+      name: args4?.projectName,
+      sceneName: args4?.sceneName,
+      shotName: args4?.shot?.name,
+      environmentType: args4?.environmentType,
       now: now,
       idFactory: idFactory,
     }),
-    value17 = storyboard3DProject['scenes'][0];
-  args4?.['backgroundColor'] && (value17['environment']['backgroundColor'] = args4['backgroundColor']);
-  const value18 = (Array['isArray'](args4?.['objects']) ? args4['objects'] : [])
-      ['map']((value19) => {
+    value17 = storyboard3DProject.scenes[0];
+  args4?.backgroundColor && (value17.environment.backgroundColor = args4.backgroundColor);
+  const value18 = (Array.isArray(args4?.objects) ? args4.objects : [])
+      .map((value19) => {
         const value20 = {
-          position: value19['position'],
-          rotation: value19['rotation'],
-          scale: value19['scale'],
+          position: value19.position,
+          rotation: value19.rotation,
+          scale: value19.scale,
         };
-        if (value19['kind'] === 'character')
+        if (value19.kind === 'character')
           return {
             type: 'character',
-            name: value19['name'],
-            bodyPresetId: value19['gender'] === 'female' ? 'adult-female' : 'adult-male',
+            name: value19.name,
+            bodyPresetId: value19.gender === 'female' ? 'adult-female' : 'adult-male',
             transform: value20,
           };
         const sceneAsset = resolveSceneAsset(assets, value19);
         if (!sceneAsset) return null;
-        return { type: 'prop', name: value19['name'], assetId: sceneAsset['id'], transform: value20 };
+        return { type: 'prop', name: value19.name, assetId: sceneAsset.id, transform: value20 };
       })
-      ['filter'](Boolean),
+      .filter(Boolean),
     value21 =
-      args4?.['layout']?.['kind'] === 'dining'
+      args4?.layout?.kind === 'dining'
         ? applyStoryboard3DDiningLayout(value18, {
             assets: assets,
-            participantCount: args4['layout']['participantCount'],
+            participantCount: args4.layout.participantCount,
           })
         : { objects: value18 };
-  value17['objects'] = value21['objects'];
-  const error = value17['shots'][0];
+  value17.objects = value21.objects;
+  const error = value17.shots[0];
   return (
-    (error['name'] = args4?.['shot']?.['name'] || error['name']),
-    (error['description'] = args4?.['shot']?.['description'] || ''),
-    (error['shotSize'] = args4?.['shot']?.['shotSize'] || error['shotSize']),
-    (error['shotAngle'] = args4?.['shot']?.['shotAngle'] || error['shotAngle']),
-    (error['camera'] = { ...error['camera'], ...args4?.['shot']?.['camera'] }),
-    (error['animation'] = upsertStoryboard3DCameraKeyframe(error['animation'], {
+    (error.name = args4?.shot?.name || error.name),
+    (error.description = args4?.shot?.description || ''),
+    (error.shotSize = args4?.shot?.shotSize || error.shotSize),
+    (error.shotAngle = args4?.shot?.shotAngle || error.shotAngle),
+    (error.camera = { ...error.camera, ...args4?.shot?.camera }),
+    (error.animation = upsertStoryboard3DCameraKeyframe(error.animation, {
       time: 0,
-      camera: error['camera'],
+      camera: error.camera,
     })),
     migrateStoryboard3DProject(storyboard3DProject, {
       now: now,
@@ -337,10 +337,10 @@ export function createStoryboard3DProjectFromGeneration(
   );
 }
 function buildRepairPrompt(value22, value23) {
-  return JSON['stringify']({
+  return JSON.stringify({
     task: 'repair_invalid_storyboard_3d_project',
-    originalRequest: JSON['parse'](value22),
-    rejectionReason: normalizeText(value23?.['message']),
+    originalRequest: JSON.parse(value22),
+    rejectionReason: normalizeText(value23?.message),
     instruction: '重新执行原任务，只返回符合原 outputSchema 的严格 JSON 对象。',
   });
 }
@@ -350,7 +350,7 @@ export async function generateStoryboard3DProjectDraft({
   provider: provider = '',
   request: request = generateText,
   onProgress: onProgress = null,
-  now: now = Date['now'](),
+  now: now = Date.now(),
   idFactory: idFactory2,
   projectId: projectId2,
   assets: assets = [],
@@ -359,16 +359,16 @@ export async function generateStoryboard3DProjectDraft({
   const text6 = normalizeText(model),
     text7 = normalizeText(provider);
   if (!text6 || !text7) throw new Error('请先选择可用的文本模型。');
-  if (!Array['isArray'](assets) || assets['length'] === 0)
+  if (!Array.isArray(assets) || assets.length === 0)
     throw new Error('尚未安装 3D 模型包，无法生成场景。');
   const relevantStoryboard3DAssets2 = selectRelevantStoryboard3DAssets(assets, prompt2, {
       limit: STORYBOARD_3D_AI_ASSET_CANDIDATE_LIMIT,
     }),
     storyboard3DGenerationAssetFamilies = getStoryboard3DGenerationAssetFamilies(relevantStoryboard3DAssets2);
-  if (storyboard3DGenerationAssetFamilies['length'] === 0)
+  if (storyboard3DGenerationAssetFamilies.length === 0)
     throw new Error('3D 模型包中没有可供场景 Agent 使用的素材。');
-  const args5 = Array['isArray'](inputImageUrls)
-      ? inputImageUrls['map'](normalizeText)['filter'](Boolean)['slice'](0, 6)
+  const args5 = Array.isArray(inputImageUrls)
+      ? inputImageUrls.map(normalizeText).filter(Boolean).slice(0, 6)
       : [],
     storyboard3DGenerationPrompt = buildStoryboard3DGenerationPrompt({
       prompt: prompt2,
@@ -382,7 +382,7 @@ export async function generateStoryboard3DProjectDraft({
       systemPrompt: STORYBOARD_3D_GENERATION_SYSTEM_PROMPT,
       temperature: 0.35,
       timeoutMs: 240000,
-      ...(args5['length'] > 0 ? { inputImageUrls: args5 } : {}),
+      ...(args5.length > 0 ? { inputImageUrls: args5 } : {}),
     };
   onProgress?.({ stage: 'planning', message: '正在规划场景、物体与镜头' });
   const request2 = await request(args6);

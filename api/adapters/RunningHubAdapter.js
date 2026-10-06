@@ -824,63 +824,63 @@ function getRunningHubWorkflowProfileId(options2 = {}) {
 }
 
 function getRunningHubWorkflowBaseUrl(options3 = {}) {
-  const value105 = String(options3?.['runningHubApiUrl'] || '')['trim']();
-  if (value105) return value105['replace'](/\/+$/, '');
+  const value105 = String(options3?.runningHubApiUrl || '').trim();
+  if (value105) return value105.replace(/\/+$/, '');
   return resolveRunningHubModelApiBaseUrl(getRunningHubWorkflowProfileId(options3));
 }
 
 export function resolveRunningHubWorkflowResourceId(value106, value107 = {}) {
   const runningHubWorkflowProfileId = getRunningHubWorkflowProfileId(value107) || 'runninghub',
-    value108 = value106?.['extensions']?.['providerProfileBindings']?.[runningHubWorkflowProfileId],
-    value109 = value106?.['submitMode'] === 'runninghub-task-create',
+    value108 = value106?.extensions?.providerProfileBindings?.[runningHubWorkflowProfileId],
+    value109 = value106?.submitMode === 'runninghub-task-create',
     value110 = value109
-      ? value108?.['workflowId'] || value108?.['appId']
-      : value108?.['appId'] || value108?.['workflowId'],
+      ? value108?.workflowId || value108?.appId
+      : value108?.appId || value108?.workflowId,
     value111 = value109
-      ? value106?.['workflowId'] || value106?.['appId']
-      : value106?.['appId'] || value106?.['workflowId'];
-  return String(value110 || value111 || '')['trim']();
+      ? value106?.workflowId || value106?.appId
+      : value106?.appId || value106?.workflowId;
+  return String(value110 || value111 || '').trim();
 }
 
 function isImportedRunningHubAiAppManifest(value112) {
   return (
-    Boolean(value112?.['extensions']?.['rhAiApp']) &&
-    value112['extensions']['rhAiApp']['sourceType'] !== 'runninghub-workflow'
+    Boolean(value112?.extensions?.rhAiApp) &&
+    value112.extensions.rhAiApp.sourceType !== 'runninghub-workflow'
   );
 }
 
 function relaxCustomAiAppMediaNodeMappings(args = null, { enabled: enabled = false } = {}) {
-  if (!enabled || !args || typeof args !== 'object' || Array['isArray'](args)) return args;
-  const nodeInfoList5 = Array['isArray'](args['nodeInfoList'])
-    ? args['nodeInfoList']['map']((args2) =>
-        CUSTOM_AI_APP_MEDIA_NODE_SOURCES['has'](String(args2?.['source'] || '')['trim']())
+  if (!enabled || !args || typeof args !== 'object' || Array.isArray(args)) return args;
+  const nodeInfoList5 = Array.isArray(args.nodeInfoList)
+    ? args.nodeInfoList.map((args2) =>
+        CUSTOM_AI_APP_MEDIA_NODE_SOURCES.has(String(args2?.source || '').trim())
           ? { ...args2, required: false }
           : args2,
       )
-    : args['nodeInfoList'];
+    : args.nodeInfoList;
   return { ...args, nodeInfoList: nodeInfoList5 };
 }
 
 function getImageWorkflowLongSideMap(options4 = {}) {
   const value113 =
-    options4?.['longSideByImageSize'] && typeof options4['longSideByImageSize'] === 'object'
-      ? options4['longSideByImageSize']
+    options4?.longSideByImageSize && typeof options4.longSideByImageSize === 'object'
+      ? options4.longSideByImageSize
       : null;
-  return value113 || Object['freeze']({ '1K': 1024, '1.5K': 1536, '2K': 1920 });
+  return value113 || Object.freeze({ '1K': 1024, '1.5K': 1536, '2K': 1920 });
 }
 
 function resolveImageWorkflowQualityKey(value114, value115 = {}) {
   const imageWorkflowLongSideMap = getImageWorkflowLongSideMap(value115),
-    value116 = String(value115?.['defaultImageSize'] || '2K')
-      ['trim']()
-      ['toUpperCase'](),
+    value116 = String(value115?.defaultImageSize || '2K')
+      .trim()
+      .toUpperCase(),
     value117 = String(value114 || value116)
-      ['trim']()
-      ['toUpperCase'](),
-    list15 = Object['keys'](imageWorkflowLongSideMap);
+      .trim()
+      .toUpperCase(),
+    list15 = Object.keys(imageWorkflowLongSideMap);
   return (
-    list15['find']((value118) => String(value118)['trim']()['toUpperCase']() === value117) ||
-    list15['find']((value119) => String(value119)['trim']()['toUpperCase']() === value116) ||
+    list15.find((value118) => String(value118).trim().toUpperCase() === value117) ||
+    list15.find((value119) => String(value119).trim().toUpperCase() === value116) ||
     list15[0] ||
     '2K'
   );
@@ -889,73 +889,73 @@ function resolveImageWorkflowQualityKey(value114, value115 = {}) {
 function resolveImageWorkflowDimensions(value120, value121, value122 = {}) {
   const imageWorkflowQualityKey = resolveImageWorkflowQualityKey(value120, value122),
     value123 = Number(getImageWorkflowLongSideMap(value122)[imageWorkflowQualityKey]) || 1920,
-    value124 = String(value122?.['defaultAspectRatio'] || RUNNINGHUB_WORKFLOW_DEFAULT_RATIO)['trim'](),
+    value124 = String(value122?.defaultAspectRatio || RUNNINGHUB_WORKFLOW_DEFAULT_RATIO).trim(),
     runningHubWorkflowRatio2 = normalizeRunningHubWorkflowRatio(value121, value124),
-    [value125, value126] = runningHubWorkflowRatio2['split'](':'),
-    value127 = Number['parseFloat'](value125) || 1,
-    value128 = Number['parseFloat'](value126) || 1,
+    [value125, value126] = runningHubWorkflowRatio2.split(':'),
+    value127 = Number.parseFloat(value125) || 1,
+    value128 = Number.parseFloat(value126) || 1,
     value129 = value127 >= value128,
     value130 = value129 ? value123 : (value123 * value127) / value128,
     value131 = value129 ? (value123 * value128) / value127 : value123,
-    value132 = Math['max'](1, Number(value122?.['align']) || 64),
-    value133 = Math['max'](1, Number(value122?.['minDimension']) || 512),
+    value132 = Math.max(1, Number(value122?.align) || 64),
+    value133 = Math.max(1, Number(value122?.minDimension) || 512),
     width2 = (value134) =>
-      Math['max'](value133, Math['round'](Number(value134 || 0) / value132) * value132);
+      Math.max(value133, Math.round(Number(value134 || 0) / value132) * value132);
   return { width: width2(value130), height: width2(value131) };
 }
 
 function resolveManifestDimensionsValue(value135, value136, value137, value138) {
   const value139 = [
-    ...(Array['isArray'](value136?.[value137 + 'Fields']) ? value136[value137 + 'Fields'] : []),
+    ...(Array.isArray(value136?.[value137 + 'Fields']) ? value136[value137 + 'Fields'] : []),
     value136?.[value137 + 'Field'],
     value137 === 'imageSize' ? 'imageSize' : 'resolvedRatioLabel',
     value137 === 'imageSize' ? 'generationParams.imageSize' : 'aspectRatio',
     value137 === 'aspectRatio' ? 'generationParams.aspectRatio' : '',
-  ]['filter'](Boolean);
+  ].filter(Boolean);
   return resolveManifestPayloadValue(value135, value139, value138);
 }
 
 function normalizeManifestDimensionNode(description7, value140, description8) {
-  if (description7 && typeof description7 === 'object' && !Array['isArray'](description7))
+  if (description7 && typeof description7 === 'object' && !Array.isArray(description7))
     return {
-      nodeId: String(description7['nodeId'] || '')['trim'](),
-      fieldName: String(description7['fieldName'] || description8)['trim']() || description8,
-      description: description7['description'] || description8,
+      nodeId: String(description7.nodeId || '').trim(),
+      fieldName: String(description7.fieldName || description8).trim() || description8,
+      description: description7.description || description8,
     };
   return {
-    nodeId: String(value140?.['nodeId'] || '')['trim'](),
+    nodeId: String(value140?.nodeId || '').trim(),
     fieldName: String(
       description8 === 'width'
-        ? value140?.['widthFieldName'] || 'width'
-        : value140?.['heightFieldName'] || 'height',
-    )['trim'](),
+        ? value140?.widthFieldName || 'width'
+        : value140?.heightFieldName || 'height',
+    ).trim(),
     description: description8,
   };
 }
 
 function pushManifestDimensionsNodes(list16, value141, box2) {
-  const manifestDimensionNode = normalizeManifestDimensionNode(value141?.['widthNode'], value141, 'width'),
-    manifestDimensionNode2 = normalizeManifestDimensionNode(value141?.['heightNode'], value141, 'height');
+  const manifestDimensionNode = normalizeManifestDimensionNode(value141?.widthNode, value141, 'width'),
+    manifestDimensionNode2 = normalizeManifestDimensionNode(value141?.heightNode, value141, 'height');
   [
-    [manifestDimensionNode, box2['width']],
-    [manifestDimensionNode2, box2['height']],
-  ]['forEach'](([nodeId2, value142]) => {
-    if (!nodeId2['nodeId'] || !nodeId2['fieldName']) return;
-    list16['push']({
-      nodeId: nodeId2['nodeId'],
-      fieldName: nodeId2['fieldName'],
+    [manifestDimensionNode, box2.width],
+    [manifestDimensionNode2, box2.height],
+  ].forEach(([nodeId2, value142]) => {
+    if (!nodeId2.nodeId || !nodeId2.fieldName) return;
+    list16.push({
+      nodeId: nodeId2.nodeId,
+      fieldName: nodeId2.fieldName,
       fieldValue: String(value142),
-      description: nodeId2['description'],
+      description: nodeId2.description,
     });
   });
 }
 
 function buildRunningHubImageResultExtractor() {
   return (response5) => {
-    if (response5['status'] === 'COMPLETED' && Array['isArray'](response5['results']))
-      return response5['results']
-        ['map']((response6) => response6['url'] || response6['imageUrl'])
-        ['filter'](Boolean);
+    if (response5.status === 'COMPLETED' && Array.isArray(response5.results))
+      return response5.results
+        .map((response6) => response6.url || response6.imageUrl)
+        .filter(Boolean);
     return [];
   };
 }
@@ -967,7 +967,7 @@ function buildOpenApiImageWorkflowRequest({
   nodeInfoList: nodeInfoList6,
 }) {
   const instanceType4 = normalizeRunningHubInstanceType(
-      payload10[executionManifest7['instanceType']?.['field']],
+      payload10[executionManifest7.instanceType?.field],
     ),
     runningHubWorkflowResourceId = resolveRunningHubWorkflowResourceId(executionManifest7, payload10);
   return {
@@ -982,8 +982,8 @@ function buildOpenApiImageWorkflowRequest({
       usePersonalQueue: 'false',
     },
     isAsync: true,
-    taskIdPath: executionManifest7['result']?.['taskIdPath'] || 'taskId',
-    adapterTrace: { source: 'manifest', executionId: executionManifest7['id'], modelId: payload10['model'] },
+    taskIdPath: executionManifest7.result?.taskIdPath || 'taskId',
+    adapterTrace: { source: 'manifest', executionId: executionManifest7.id, modelId: payload10.model },
     pollUrlBuilder: () => getRunningHubWorkflowBaseUrl(payload10) + '/openapi/v2/query',
     resultExtractor: buildRunningHubImageResultExtractor(),
   };

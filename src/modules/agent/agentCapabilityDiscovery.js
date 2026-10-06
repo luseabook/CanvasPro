@@ -3,64 +3,64 @@ const DEFAULT_RESULT_LIMIT = 6,
   MAX_RESULT_LIMIT = 12;
 export function normalizeAgentSearchText(value) {
   return String(value || '')
-    ['normalize']('NFKC')
-    ['trim']()
-    ['toLowerCase']();
+    .normalize('NFKC')
+    .trim()
+    .toLowerCase();
 }
 export function normalizeAgentSearchKey(item) {
-  return normalizeAgentSearchText(item)['replace'](/[\s\-_.:/|,，。()（）\[\]【】]+/g, '');
+  return normalizeAgentSearchText(item).replace(/[\s\-_.:/|,，。()（）\[\]【】]+/g, '');
 }
 function normalizeStringArray(list) {
-  return Array['isArray'](list)
-    ? [...new Set(list['map']((key) => String(key || '')['trim']())['filter'](Boolean))]
+  return Array.isArray(list)
+    ? [...new Set(list.map((key) => String(key || '').trim()).filter(Boolean))]
     : [];
 }
 function normalizeLimit(index) {
   const result = Number(index);
-  if (!Number['isFinite'](result)) return DEFAULT_RESULT_LIMIT;
-  return Math['max'](1, Math['min'](MAX_RESULT_LIMIT, Math['trunc'](result)));
+  if (!Number.isFinite(result)) return DEFAULT_RESULT_LIMIT;
+  return Math.max(1, Math.min(MAX_RESULT_LIMIT, Math.trunc(result)));
 }
 function collectSearchTokens(data) {
   return normalizeAgentSearchText(data)
-    ['split'](/[\s,，。:：/|]+/)
-    ['map']((options) => options['trim']())
-    ['filter']((list2) => list2['length'] >= 2);
+    .split(/[\s,，。:：/|]+/)
+    .map((options) => options.trim())
+    .filter((list2) => list2.length >= 2);
 }
 function scoreHaystack(target, source, list3 = []) {
   const list4 = normalizeAgentSearchText(target);
   if (!list4) return 1;
   const list5 = normalizeAgentSearchKey(list4);
   let next = 0;
-  for (const list6 of list3['map'](normalizeAgentSearchText)['filter'](Boolean)) {
+  for (const list6 of list3.map(normalizeAgentSearchText).filter(Boolean)) {
     if (list6 === list4) next += 1000;
     else {
-      if (list4['includes'](list6) || list6['includes'](list4)) next += 220;
+      if (list4.includes(list6) || list6.includes(list4)) next += 220;
     }
     const list7 = normalizeAgentSearchKey(list6);
     if (list5 && list7 === list5) next += 900;
     else
-      list5['length'] >= 3 &&
+      list5.length >= 3 &&
         list7 &&
-        (list5['includes'](list7) || list7['includes'](list5)) &&
+        (list5.includes(list7) || list7.includes(list5)) &&
         (next += 200);
   }
   const list8 = normalizeAgentSearchText(source);
-  if (list8['includes'](list4)) next += 180;
+  if (list8.includes(list4)) next += 180;
   const list9 = normalizeAgentSearchKey(list8);
-  if (list5['length'] >= 3 && list9['includes'](list5)) next += 160;
+  if (list5.length >= 3 && list9.includes(list5)) next += 160;
   for (const current of collectSearchTokens(list4)) {
-    if (list8['includes'](current)) next += 30;
+    if (list8.includes(current)) next += 30;
   }
   return next;
 }
 function summarizeCommand(options2 = {}) {
   return {
-    commandId: String(options2['id'] || ''),
-    description: String(options2['description'] || ''),
-    riskLevel: String(options2['riskLevel'] || 'safe'),
-    reads: normalizeStringArray(options2['capabilitySchema']?.['reads']),
-    writes: normalizeStringArray(options2['capabilitySchema']?.['writes']),
-    argNames: Object['keys'](options2['argsSchema']?.['properties'] || {}),
+    commandId: String(options2.id || ''),
+    description: String(options2.description || ''),
+    riskLevel: String(options2.riskLevel || 'safe'),
+    reads: normalizeStringArray(options2.capabilitySchema?.reads),
+    writes: normalizeStringArray(options2.capabilitySchema?.writes),
+    argNames: Object.keys(options2.argsSchema?.properties || {}),
   };
 }
 export function searchAgentCommands({
@@ -68,35 +68,35 @@ export function searchAgentCommands({
   query: query = '',
   limit: limit,
 } = {}) {
-  const list10 = typeof commandRegistry?.['list'] === 'function' ? commandRegistry['list']() : [],
-    totalMatched = list10['map']((entry, index2) => {
+  const list10 = typeof commandRegistry?.list === 'function' ? commandRegistry.list() : [],
+    totalMatched = list10.map((entry, index2) => {
       const summary = summarizeCommand(entry),
         record = [
-          summary['commandId'],
-          summary['description'],
-          ...summary['reads'],
-          ...summary['writes'],
-          ...summary['argNames'],
-        ]['join'](' ');
+          summary.commandId,
+          summary.description,
+          ...summary.reads,
+          ...summary.writes,
+          ...summary.argNames,
+        ].join(' ');
       return {
         summary: summary,
         index: index2,
-        score: scoreHaystack(query, record, [summary['commandId']]),
+        score: scoreHaystack(query, record, [summary.commandId]),
       };
     })
-      ['filter']((payload) => payload['score'] > 0)
-      ['sort']((handle, state) => state['score'] - handle['score'] || handle['index'] - state['index']),
-    commandIds = totalMatched['slice'](0, normalizeLimit(limit));
+      .filter((payload) => payload.score > 0)
+      .sort((handle, state) => state.score - handle.score || handle.index - state.index),
+    commandIds = totalMatched.slice(0, normalizeLimit(limit));
   return {
-    query: String(query || '')['trim'](),
-    commandIds: commandIds['map']((config) => config['summary']['commandId']),
-    commands: commandIds['map']((scope) => scope['summary']),
-    totalMatched: totalMatched['length'],
+    query: String(query || '').trim(),
+    commandIds: commandIds.map((config) => config.summary.commandId),
+    commands: commandIds.map((scope) => scope.summary),
+    totalMatched: totalMatched.length,
   };
 }
 export function describeAgentCommand({ commandRegistry: commandRegistry2, commandId: commandId = '' } = {}) {
-  const commandId2 = String(commandId || '')['trim'](),
-    commandId3 = commandRegistry2?.['get']?.(commandId2) || null;
+  const commandId2 = String(commandId || '').trim(),
+    commandId3 = commandRegistry2?.get?.(commandId2) || null;
   if (!commandId3)
     return {
       found: false,
@@ -106,68 +106,68 @@ export function describeAgentCommand({ commandRegistry: commandRegistry2, comman
     };
   return {
     found: true,
-    commandId: commandId3['id'],
-    description: String(commandId3['description'] || ''),
-    riskLevel: String(commandId3['riskLevel'] || 'safe'),
-    argsSchema: commandId3['argsSchema'],
-    capabilitySchema: commandId3['capabilitySchema'],
-    returnSchema: commandId3['returnSchema'],
-    returnAliasFields: normalizeStringArray(commandId3['returnSchema']?.['aliasFields']),
+    commandId: commandId3.id,
+    description: String(commandId3.description || ''),
+    riskLevel: String(commandId3.riskLevel || 'safe'),
+    argsSchema: commandId3.argsSchema,
+    capabilitySchema: commandId3.capabilitySchema,
+    returnSchema: commandId3.returnSchema,
+    returnAliasFields: normalizeStringArray(commandId3.returnSchema?.aliasFields),
   };
 }
 function summarizeInputSlots(minItems = {}) {
-  if (!minItems || typeof minItems !== 'object' || Array['isArray'](minItems)) return {};
-  const fixedSlots = (Array['isArray'](minItems['fixedSlots']) ? minItems['fixedSlots'] : [])
-    ['map']((required = {}) => ({
-      id: String(required['id'] || required['slotId'] || ''),
-      kind: String(required['kind'] || required['type'] || ''),
-      required: required['required'] === true,
-      ...(required['showWhen'] ? { showWhen: required['showWhen'] } : {}),
+  if (!minItems || typeof minItems !== 'object' || Array.isArray(minItems)) return {};
+  const fixedSlots = (Array.isArray(minItems.fixedSlots) ? minItems.fixedSlots : [])
+    .map((required = {}) => ({
+      id: String(required.id || required.slotId || ''),
+      kind: String(required.kind || required.type || ''),
+      required: required.required === true,
+      ...(required.showWhen ? { showWhen: required.showWhen } : {}),
     }))
-    ['filter']((input) => input['id']);
+    .filter((input) => input.id);
   return {
-    ...(fixedSlots['length'] > 0 ? { fixedSlots: fixedSlots } : {}),
-    ...(Array['isArray'](minItems['allowedKinds'])
-      ? { allowedKinds: normalizeStringArray(minItems['allowedKinds']) }
+    ...(fixedSlots.length > 0 ? { fixedSlots: fixedSlots } : {}),
+    ...(Array.isArray(minItems.allowedKinds)
+      ? { allowedKinds: normalizeStringArray(minItems.allowedKinds) }
       : {}),
-    ...(minItems['minByKind'] && typeof minItems['minByKind'] === 'object'
-      ? { minByKind: { ...minItems['minByKind'] } }
+    ...(minItems.minByKind && typeof minItems.minByKind === 'object'
+      ? { minByKind: { ...minItems.minByKind } }
       : {}),
-    ...(minItems['maxByKind'] && typeof minItems['maxByKind'] === 'object'
-      ? { maxByKind: { ...minItems['maxByKind'] } }
+    ...(minItems.maxByKind && typeof minItems.maxByKind === 'object'
+      ? { maxByKind: { ...minItems.maxByKind } }
       : {}),
-    ...(minItems['minItems'] != null ? { minItems: minItems['minItems'] } : {}),
-    ...(minItems['maxItems'] != null ? { maxItems: minItems['maxItems'] } : {}),
-    ...(minItems['accepts'] ? { accepts: minItems['accepts'] } : {}),
+    ...(minItems.minItems != null ? { minItems: minItems.minItems } : {}),
+    ...(minItems.maxItems != null ? { maxItems: minItems.maxItems } : {}),
+    ...(minItems.accepts ? { accepts: minItems.accepts } : {}),
   };
 }
 function modelAcceptsInputKind(options3 = {}, output = '') {
   const agentSearchText = normalizeAgentSearchText(output);
   if (!agentSearchText) return true;
-  const map = new Set(normalizeStringArray(options3['allowedKinds'])['map'](normalizeAgentSearchText));
-  if (map['has'](agentSearchText)) return true;
-  if (Number(options3['maxByKind']?.[agentSearchText]) > 0) return true;
-  if (Number(options3['minByKind']?.[agentSearchText]) > 0) return true;
-  return (options3['fixedSlots'] || [])['some'](
-    (value2) => normalizeAgentSearchText(value2['kind']) === agentSearchText,
+  const map = new Set(normalizeStringArray(options3.allowedKinds).map(normalizeAgentSearchText));
+  if (map.has(agentSearchText)) return true;
+  if (Number(options3.maxByKind?.[agentSearchText]) > 0) return true;
+  if (Number(options3.minByKind?.[agentSearchText]) > 0) return true;
+  return (options3.fixedSlots || []).some(
+    (value2) => normalizeAgentSearchText(value2.kind) === agentSearchText,
   );
 }
 function summarizeModelField(required2 = {}) {
   const value3 = {
-    id: String(required2['id'] || required2['key'] || ''),
-    type: String(required2['type'] || ''),
-    required: required2['required'] === true,
+    id: String(required2.id || required2.key || ''),
+    type: String(required2.type || ''),
+    required: required2.required === true,
   };
   for (const value4 of ['label', 'default', 'min', 'max', 'step', 'placeholder', 'showWhen']) {
     if (required2[value4] !== undefined) value3[value4] = required2[value4];
   }
   return (
-    Array['isArray'](required2['options']) &&
-      (value3['options'] = required2['options']['slice'](0, 60)['map']((value5) => {
+    Array.isArray(required2.options) &&
+      (value3.options = required2.options.slice(0, 60).map((value5) => {
         if (!value5 || typeof value5 !== 'object') return value5;
         return {
-          value: value5['value'],
-          ...(value5['label'] !== undefined ? { label: value5['label'] } : {}),
+          value: value5.value,
+          ...(value5.label !== undefined ? { label: value5.label } : {}),
         };
       })),
     value3
@@ -175,19 +175,19 @@ function summarizeModelField(required2 = {}) {
 }
 function summarizeModel(options4 = {}) {
   const fieldCount = (
-    Array['isArray'](options4['uiSchema']?.['fields']) ? options4['uiSchema']['fields'] : []
+    Array.isArray(options4.uiSchema?.fields) ? options4.uiSchema.fields : []
   )
-    ['map'](summarizeModelField)
-    ['filter']((value6) => value6['id']);
+    .map(summarizeModelField)
+    .filter((value6) => value6.id);
   return {
-    modelId: String(options4['modelId'] || ''),
-    provider: String(options4['provider'] || ''),
-    kind: String(options4['kind'] || ''),
-    displayName: String(options4['displayName'] || options4['modelId'] || ''),
-    description: String(options4['description'] || ''),
-    adapterType: String(options4['adapterType'] || ''),
-    inputSlots: summarizeInputSlots(options4['inputSlots']),
-    fieldCount: fieldCount['length'],
+    modelId: String(options4.modelId || ''),
+    provider: String(options4.provider || ''),
+    kind: String(options4.kind || ''),
+    displayName: String(options4.displayName || options4.modelId || ''),
+    description: String(options4.description || ''),
+    adapterType: String(options4.adapterType || ''),
+    inputSlots: summarizeInputSlots(options4.inputSlots),
+    fieldCount: fieldCount.length,
     uiSchema: { fields: fieldCount },
   };
 }
@@ -200,38 +200,38 @@ export function searchAgentModels({
 } = {}) {
   const agentSearchText2 = normalizeAgentSearchText(kind),
     agentSearchText3 = normalizeAgentSearchText(provider),
-    args = new Set(normalizeStringArray(inputKinds)['map'](normalizeAgentSearchText)),
+    args = new Set(normalizeStringArray(inputKinds).map(normalizeAgentSearchText)),
     totalMatched2 = listModelManifests()
-      ['map']((value7, index3) => {
+      .map((value7, index3) => {
         const summary2 = summarizeModel(value7),
-          value8 = [...args]['every']((value9) => modelAcceptsInputKind(summary2['inputSlots'], value9)),
+          value8 = [...args].every((value9) => modelAcceptsInputKind(summary2.inputSlots, value9)),
           score =
-            (!agentSearchText2 || normalizeAgentSearchText(summary2['kind']) === agentSearchText2) &&
-            (!agentSearchText3 || normalizeAgentSearchText(summary2['provider']) === agentSearchText3) &&
-            (args['size'] === 0 || value8),
+            (!agentSearchText2 || normalizeAgentSearchText(summary2.kind) === agentSearchText2) &&
+            (!agentSearchText3 || normalizeAgentSearchText(summary2.provider) === agentSearchText3) &&
+            (args.size === 0 || value8),
           value10 = [
-            summary2['modelId'],
-            summary2['provider'],
-            summary2['kind'],
-            summary2['displayName'],
-            summary2['description'],
-            ...summary2['uiSchema']['fields']['map']((value11) => value11['id']),
-          ]['join'](' ');
+            summary2.modelId,
+            summary2.provider,
+            summary2.kind,
+            summary2.displayName,
+            summary2.description,
+            ...summary2.uiSchema.fields.map((value11) => value11.id),
+          ].join(' ');
         return {
           summary: summary2,
           index: index3,
-          score: score ? scoreHaystack(query, value10, [summary2['modelId'], summary2['displayName']]) : 0,
+          score: score ? scoreHaystack(query, value10, [summary2.modelId, summary2.displayName]) : 0,
         };
       })
-      ['filter']((value12) => value12['score'] > 0)
-      ['sort'](
-        (value13, value14) => value14['score'] - value13['score'] || value13['index'] - value14['index'],
+      .filter((value12) => value12.score > 0)
+      .sort(
+        (value13, value14) => value14.score - value13.score || value13.index - value14.index,
       ),
-    modelIds = totalMatched2['slice'](0, normalizeLimit(limit2));
+    modelIds = totalMatched2.slice(0, normalizeLimit(limit2));
   return {
-    query: String(query || '')['trim'](),
-    modelIds: modelIds['map']((value15) => value15['summary']['modelId']),
-    models: modelIds['map']((value16) => value16['summary']),
-    totalMatched: totalMatched2['length'],
+    query: String(query || '').trim(),
+    modelIds: modelIds.map((value15) => value15.summary.modelId),
+    models: modelIds.map((value16) => value16.summary),
+    totalMatched: totalMatched2.length,
   };
 }

@@ -1601,11 +1601,11 @@ export async function buildImageRequestFromManifest(modelId3, finalPrompt3, ctx3
 
 function pickDefaultConcreteVideoAspectRatio(value270) {
   const videoAspectRatioField2 = findVideoAspectRatioField(value270),
-    value271 = Array['isArray'](videoAspectRatioField2?.['options']) ? videoAspectRatioField2['options'] : [];
+    value271 = Array.isArray(videoAspectRatioField2?.options) ? videoAspectRatioField2.options : [];
   let enabled18 = '';
   for (const value272 of value271) {
-    const list31 = String(value272?.['value'] ?? value272 ?? '')['trim']();
-    if (list31 && list31['includes'](':') && !isAdaptiveRatioLabel(list31)) {
+    const list31 = String(value272?.value ?? value272 ?? '').trim();
+    if (list31 && list31.includes(':') && !isAdaptiveRatioLabel(list31)) {
       if (list31 === '1:1') return list31;
       if (!enabled18) enabled18 = list31;
     }
@@ -1614,33 +1614,33 @@ function pickDefaultConcreteVideoAspectRatio(value270) {
 }
 
 function mergeUiSchemaDefaultsIntoPayload(args11 = {}, value273 = null) {
-  const value274 = Array['isArray'](value273?.['uiSchema']?.['fields']) ? value273['uiSchema']['fields'] : [];
-  if (value274['length'] === 0) return args11;
+  const value274 = Array.isArray(value273?.uiSchema?.fields) ? value273.uiSchema.fields : [];
+  if (value274.length === 0) return args11;
   const value275 =
-    args11?.['generationParams'] &&
-    typeof args11['generationParams'] === 'object' &&
-    !Array['isArray'](args11['generationParams'])
-      ? { ...args11['generationParams'] }
+    args11?.generationParams &&
+    typeof args11.generationParams === 'object' &&
+    !Array.isArray(args11.generationParams)
+      ? { ...args11.generationParams }
       : {};
-  value274['forEach']((value276) => {
-    const enabled19 = String(value276?.['id'] || '')['trim']();
-    if (!enabled19 || Object['prototype']['hasOwnProperty']['call'](value275, enabled19)) return;
-    if (enabled19 === 'aspectRatio' && String(args11?.['resolvedRatioLabel'] || '')['trim']()) {
-      value275[enabled19] = args11['resolvedRatioLabel'];
+  value274.forEach((value276) => {
+    const enabled19 = String(value276?.id || '').trim();
+    if (!enabled19 || Object.prototype.hasOwnProperty.call(value275, enabled19)) return;
+    if (enabled19 === 'aspectRatio' && String(args11?.resolvedRatioLabel || '').trim()) {
+      value275[enabled19] = args11.resolvedRatioLabel;
       return;
     }
-    Object['prototype']['hasOwnProperty']['call'](args11 || {}, enabled19) &&
+    Object.prototype.hasOwnProperty.call(args11 || {}, enabled19) &&
       (value275[enabled19] = args11[enabled19]);
   });
-  const sanitizeModelUiSchemaParams3 = sanitizeModelUiSchemaParams(value273['modelId'], value275, {
+  const sanitizeModelUiSchemaParams3 = sanitizeModelUiSchemaParams(value273.modelId, value275, {
       includeDefaults: true,
     }),
     value277 = { ...args11, generationParams: sanitizeModelUiSchemaParams3 };
   return (
-    value274['forEach']((value278) => {
-      const enabled20 = String(value278?.['id'] || '')['trim']();
-      if (!enabled20 || Object['prototype']['hasOwnProperty']['call'](value277, enabled20)) return;
-      Object['prototype']['hasOwnProperty']['call'](sanitizeModelUiSchemaParams3, enabled20) &&
+    value274.forEach((value278) => {
+      const enabled20 = String(value278?.id || '').trim();
+      if (!enabled20 || Object.prototype.hasOwnProperty.call(value277, enabled20)) return;
+      Object.prototype.hasOwnProperty.call(sanitizeModelUiSchemaParams3, enabled20) &&
         (value277[enabled20] = sanitizeModelUiSchemaParams3[enabled20]);
     }),
     value277
@@ -1650,61 +1650,61 @@ function mergeUiSchemaDefaultsIntoPayload(args11 = {}, value273 = null) {
 function resolveProviderConfig(value279, value280, value281) {
   const runningHubProviderProfileId = getRunningHubProviderProfileId(value280),
     modelProviderProfileId = normalizeModelProviderProfileId(
-      value280?.['model'],
+      value280?.model,
       runningHubProviderProfileId,
     ),
     value282 =
       modelProviderProfileId ||
       (value279 === 'runninghub'
-        ? resolveRunningHubModelApiProfileId(value280?.['model'], runningHubProviderProfileId)
+        ? resolveRunningHubModelApiProfileId(value280?.model, runningHubProviderProfileId)
         : value279),
-    args12 = value281['getProviderConfig'](value282);
+    args12 = value281.getProviderConfig(value282);
   if (value279 !== 'runninghub') return args12;
   return { ...args12, apiUrl: resolveRunningHubModelApiBaseUrl(value282) };
 }
 
 function isCustomProviderId(value283) {
-  return /^custom_[a-z0-9_-]+$/i['test'](String(value283 || '')['trim']());
+  return /^custom_[a-z0-9_-]+$/i.test(String(value283 || '').trim());
 }
 
 const AIC_IMAGE_TASK_PROBE_CONTROL_KEY = '__aicAllowTaskProbe',
   AIC_MODEL_CATALOG_ID_KEY = '__aicModelCatalogId';
 
 function buildModelCatalogIdentity(value284, value285) {
-  const value286 = String(value285?.['modelId'] || '')['trim']();
+  const value286 = String(value285?.modelId || '').trim();
   return value284 === 'binghuo' && value286 ? { [AIC_MODEL_CATALOG_ID_KEY]: value286 } : {};
 }
 
 function supportsManifestImageTaskPolling(value287) {
   return Boolean(
     value287 &&
-    (String(value287['urlTemplate'] || '')['trim']() ||
-      String(value287['mode'] || '')['trim']() === 'comfyui-history'),
+    (String(value287.urlTemplate || '').trim() ||
+      String(value287.mode || '').trim() === 'comfyui-history'),
   );
 }
 
 function isCustomProviderModelManifest(value288) {
-  const value289 = value288?.['extensions']?.['customProvider'];
-  return Boolean(value289 && typeof value289 === 'object' && !Array['isArray'](value289));
+  const value289 = value288?.extensions?.customProvider;
+  return Boolean(value289 && typeof value289 === 'object' && !Array.isArray(value289));
 }
 
 function isSupportedModelApiProvider(value290, value291 = new Set()) {
   const value292 = String(value290 || '')
-    ['trim']()
-    ['toLowerCase']();
-  return value291['has'](value292) || isCustomProviderId(value292);
+    .trim()
+    .toLowerCase();
+  return value291.has(value292) || isCustomProviderId(value292);
 }
 
 function collectRawImageInputUrls(options11 = {}, value293 = null) {
-  const list32 = getOrderedInputSlotEntries(options11?.['inputUrlsBySlot'], value293),
+  const list32 = getOrderedInputSlotEntries(options11?.inputUrlsBySlot, value293),
     list33 =
-      list32['length'] > 0
-        ? list32['map']((value294) => value294['url'])
-        : Array['isArray'](options11?.['inputUrls'])
-          ? options11['inputUrls']
+      list32.length > 0
+        ? list32.map((value294) => value294.url)
+        : Array.isArray(options11?.inputUrls)
+          ? options11.inputUrls
           : [];
-  return Array['from'](
-    new Set(list33['map']((value295) => String(value295 || '')['trim']())['filter'](Boolean)),
+  return Array.from(
+    new Set(list33.map((value295) => String(value295 || '').trim()).filter(Boolean)),
   );
 }
 
@@ -1713,55 +1713,55 @@ function collectResolverOwnedImageInputUrls(options12 = {}, value296 = null) {
     manifestMaxInputCount6 = getManifestMaxInputCount(value296, 'image');
   return manifestMaxInputCount6 === null
     ? rawImageInputUrls
-    : rawImageInputUrls['slice'](0, Math['max'](0, manifestMaxInputCount6));
+    : rawImageInputUrls.slice(0, Math.max(0, manifestMaxInputCount6));
 }
 
 function resolveInputRouteExecutionManifest(args13, value297, value298) {
-  const value299 = args13?.['extensions']?.['inputRoutes'],
+  const value299 = args13?.extensions?.inputRoutes,
     args14 =
-      value299 && typeof value299 === 'object' && !Array['isArray'](value299) ? value299['image'] : null;
+      value299 && typeof value299 === 'object' && !Array.isArray(value299) ? value299.image : null;
   if (
     !args14 ||
     typeof args14 !== 'object' ||
-    Array['isArray'](args14) ||
-    collectRawImageInputUrls(value297, value298)['length'] === 0
+    Array.isArray(args14) ||
+    collectRawImageInputUrls(value297, value298).length === 0
   )
     return args13;
   return {
     ...args13,
     ...args14,
-    extensions: { ...(args13?.['extensions'] || {}), ...(args14['extensions'] || {}) },
+    extensions: { ...(args13?.extensions || {}), ...(args14.extensions || {}) },
   };
 }
 
 function isMultipartFormExecution(value300) {
   return (
-    String(value300?.['requestEncoding'] || '')
-      ['trim']()
-      ['toLowerCase']() === 'multipart/form-data'
+    String(value300?.requestEncoding || '')
+      .trim()
+      .toLowerCase() === 'multipart/form-data'
   );
 }
 
 async function resolveMultipartInputImages(value301, value302, value303) {
-  if (typeof value303['loadInputImageBlob'] !== 'function')
+  if (typeof value303.loadInputImageBlob !== 'function')
     throw new Error('Model API multipart image input loader is not available');
   const list34 = collectRawImageInputUrls(value301, value302),
     manifestMaxInputCount7 = getManifestMaxInputCount(value302, 'image'),
-    value304 = manifestMaxInputCount7 === null ? list34 : list34['slice'](0, manifestMaxInputCount7),
+    value304 = manifestMaxInputCount7 === null ? list34 : list34.slice(0, manifestMaxInputCount7),
     list35 = [];
   for (const value305 of value304) {
-    const value306 = await value303['loadInputImageBlob'](value305);
+    const value306 = await value303.loadInputImageBlob(value305);
     if (typeof Blob === 'undefined' || !(value306 instanceof Blob))
       throw new Error('Model API multipart image input did not resolve to a file');
-    list35['push'](value306);
+    list35.push(value306);
   }
   return list35;
 }
 
 function multipartFileName(value307, value308) {
-  const value309 = String(value307?.['type'] || '')
-      ['trim']()
-      ['toLowerCase'](),
+  const value309 = String(value307?.type || '')
+      .trim()
+      .toLowerCase(),
     value310 =
       value309 === 'image/jpeg'
         ? 'jpg'
@@ -1776,24 +1776,24 @@ function multipartFileName(value307, value308) {
 function appendMultipartValue(value311, value312, list36, value313 = 0) {
   if (list36 === undefined || list36 === null || list36 === '') return;
   if (typeof Blob !== 'undefined' && list36 instanceof Blob) {
-    value311['append'](value312, list36, multipartFileName(list36, value313));
+    value311.append(value312, list36, multipartFileName(list36, value313));
     return;
   }
-  if (Array['isArray'](list36)) {
-    list36['forEach']((value314, value315) => appendMultipartValue(value311, value312, value314, value315));
+  if (Array.isArray(list36)) {
+    list36.forEach((value314, value315) => appendMultipartValue(value311, value312, value314, value315));
     return;
   }
   if (typeof list36 === 'object') {
-    value311['append'](value312, JSON['stringify'](list36));
+    value311.append(value312, JSON.stringify(list36));
     return;
   }
-  value311['append'](value312, String(list36));
+  value311.append(value312, String(list36));
 }
 
 function buildMultipartFormData(options13 = {}) {
   const formData = new FormData();
   return (
-    Object['entries'](options13 || {})['forEach'](([value316, value317]) => {
+    Object.entries(options13 || {}).forEach(([value316, value317]) => {
       appendMultipartValue(formData, value316, value317);
     }),
     formData
@@ -1801,53 +1801,53 @@ function buildMultipartFormData(options13 = {}) {
 }
 
 function resolveCustomProviderAssetUploadApiUrl(value318, value319) {
-  const enabled21 = String(value318 || '')['trim'](),
-    enabled22 = String(value319 || '')['trim']();
-  if (!enabled21 || !enabled22['startsWith']('/'))
+  const enabled21 = String(value318 || '').trim(),
+    enabled22 = String(value319 || '').trim();
+  if (!enabled21 || !enabled22.startsWith('/'))
     throw new Error(
       'Custom provider asset upload manifest is missing a relative endpoint',
     );
   let uRL, uRL2;
   try {
-    ((uRL = new URL(enabled21)), (uRL2 = new URL(enabled22, uRL['origin'])));
+    ((uRL = new URL(enabled21)), (uRL2 = new URL(enabled22, uRL.origin)));
   } catch {
     throw new Error('Custom provider asset upload manifest has an invalid endpoint');
   }
-  if (uRL2['origin'] !== uRL['origin'] || uRL2['search'] || uRL2['hash'])
+  if (uRL2.origin !== uRL.origin || uRL2.search || uRL2.hash)
     throw new Error('Custom provider asset upload endpoint must remain on the provider origin');
-  return uRL2['toString']();
+  return uRL2.toString();
 }
 
 function getCustomProviderAssetUploadOptions(args15, value320) {
   return {
     provider: 'customProviderAsset',
-    apiUrl: resolveCustomProviderAssetUploadApiUrl(value320, args15['endpoint']),
-    multipartField: String(args15['multipartField'] || 'file')['trim']() || 'file',
-    responsePath: String(args15['responsePath'] || 'url')['trim']() || 'url',
-    ...(args15['formFields'] ? { formFields: args15['formFields'] } : {}),
-    forceProviderUpload: args15['forceProviderUpload'] === true,
-    allowedExtensions: Array['isArray'](args15['allowedExtensions']) ? args15['allowedExtensions'] : [],
-    maxBytes: args15['maxBytes'],
-    uploadTimeout: args15['uploadTimeout'],
-    compress: args15['compress'] === true,
-    applyInputQualityProfile: args15['applyInputQualityProfile'] === true,
-    strictUpload: args15['strictUpload'] !== false,
+    apiUrl: resolveCustomProviderAssetUploadApiUrl(value320, args15.endpoint),
+    multipartField: String(args15.multipartField || 'file').trim() || 'file',
+    responsePath: String(args15.responsePath || 'url').trim() || 'url',
+    ...(args15.formFields ? { formFields: args15.formFields } : {}),
+    forceProviderUpload: args15.forceProviderUpload === true,
+    allowedExtensions: Array.isArray(args15.allowedExtensions) ? args15.allowedExtensions : [],
+    maxBytes: args15.maxBytes,
+    uploadTimeout: args15.uploadTimeout,
+    compress: args15.compress === true,
+    applyInputQualityProfile: args15.applyInputQualityProfile === true,
+    strictUpload: args15.strictUpload !== false,
   };
 }
 
 function isApimartPrivateAssetUrl(value321) {
-  return /^asset:\/\//i['test'](String(value321 || '')['trim']());
+  return /^asset:\/\//i.test(String(value321 || '').trim());
 }
 
 function assertNoUnsupportedApimartAssetUrls(value322, value323, value324 = {}, value325 = 'image') {
   if (
     String(value322 || '')
-      ['trim']()
-      ['toLowerCase']() !== 'apimart'
+      .trim()
+      .toLowerCase() !== 'apimart'
   )
     return;
-  if (value324['executionManifest']?.['extensions']?.['allowApimartAssetUrls'] === true) return;
-  const inputList = normalizeInputList(value323)['find'](isApimartPrivateAssetUrl);
+  if (value324.executionManifest?.extensions?.allowApimartAssetUrls === true) return;
+  const inputList = normalizeInputList(value323).find(isApimartPrivateAssetUrl);
   if (!inputList) return;
   const value326 = value325 === 'video' ? '视频' : value325 === 'audio' ? '音频' : '图片';
   throw new Error(
@@ -1860,54 +1860,54 @@ function assertNoUnsupportedApimartAssetUrls(value322, value323, value324 = {}, 
 }
 
 function validateStrictVideoInputCounts(value327, value328, value329) {
-  if (value329?.['extensions']?.['strictInputCounts'] !== true) return;
+  if (value329?.extensions?.strictInputCounts !== true) return;
   const value330 = {
-      image: Array['from'](
+      image: Array.from(
         new Set([...collectRawImageInputUrls(value327, value328), ...collectVideoImageInputUrls(value327)]),
       ),
       video: collectVideoInputUrls(value327),
       audio: collectAudioInputUrls(value327),
     },
     value331 = { image: '参考图', video: '参考视频', audio: '参考音频' };
-  for (const [value332, value333] of Object['entries'](value330)) {
+  for (const [value332, value333] of Object.entries(value330)) {
     const manifestMaxInputCount8 = getManifestMaxInputCount(value328, value332),
-      enabled23 = value328?.['inputSlots']?.['allowedKinds'],
+      enabled23 = value328?.inputSlots?.allowedKinds,
       value334 =
         manifestMaxInputCount8 === null &&
-        Array['isArray'](enabled23) &&
-        !enabled23['map']((value335) => String(value335 || '')['trim']())['includes'](value332)
+        Array.isArray(enabled23) &&
+        !enabled23.map((value335) => String(value335 || '').trim()).includes(value332)
           ? 0
           : manifestMaxInputCount8;
-    if (value334 !== null && value333['length'] > value334)
+    if (value334 !== null && value333.length > value334)
       throw new Error(
-        (value328['displayName'] || '当前模型') +
+        (value328.displayName || '当前模型') +
           '最多支持 ' +
           value334 +
           ' 个' +
           value331[value332] +
           '，当前传入 ' +
-          value333['length'] +
+          value333.length +
           ' 个，请删减后重试',
       );
   }
 }
 
 function resolveStrictUiSchemaFieldLabel(value336) {
-  const value337 = String(value336?.['id'] || '')['trim'](),
+  const value337 = String(value336?.id || '').trim(),
     value338 = { aspectRatio: '比例', batchSize: '生成数量', imageSize: '图片分辨率', qualityLevel: '质量' };
-  return value338[value337] || String(value336?.['label'] || value337 || '参数')['trim']();
+  return value338[value337] || String(value336?.label || value337 || '参数').trim();
 }
 
 function readExplicitUiSchemaValue(value339, value340) {
   const value341 =
-    value339?.['generationParams'] &&
-    typeof value339['generationParams'] === 'object' &&
-    !Array['isArray'](value339['generationParams'])
-      ? value339['generationParams']
+    value339?.generationParams &&
+    typeof value339.generationParams === 'object' &&
+    !Array.isArray(value339.generationParams)
+      ? value339.generationParams
       : {};
-  if (Object['prototype']['hasOwnProperty']['call'](value341, value340))
+  if (Object.prototype.hasOwnProperty.call(value341, value340))
     return { provided: true, value: value341[value340] };
-  if (Object['prototype']['hasOwnProperty']['call'](value339 || {}, value340))
+  if (Object.prototype.hasOwnProperty.call(value339 || {}, value340))
     return { provided: true, value: value339[value340] };
   return { provided: false, value: undefined };
 }
@@ -1916,46 +1916,46 @@ function isSameStrictUiSchemaOption(value342, value343) {
   const value344 = Number(value342),
     value345 = Number(value343);
   if (
-    String(value342 ?? '')['trim']() !== '' &&
-    String(value343 ?? '')['trim']() !== '' &&
-    Number['isFinite'](value344) &&
-    Number['isFinite'](value345)
+    String(value342 ?? '').trim() !== '' &&
+    String(value343 ?? '').trim() !== '' &&
+    Number.isFinite(value344) &&
+    Number.isFinite(value345)
   )
     return value344 === value345;
   return (
     String(value342 ?? '')
-      ['trim']()
-      ['toLowerCase']() ===
+      .trim()
+      .toLowerCase() ===
     String(value343 ?? '')
-      ['trim']()
-      ['toLowerCase']()
+      .trim()
+      .toLowerCase()
   );
 }
 
 function validateStrictModelUiSchemaParams(value346, value347, value348) {
-  if (value348?.['extensions']?.['strictUiSchemaParams'] !== true) return;
-  const value349 = Array['isArray'](value347?.['uiSchema']?.['fields']) ? value347['uiSchema']['fields'] : [],
-    value350 = String(value347?.['displayName'] || value347?.['modelId'] || '当前模型')['trim']();
+  if (value348?.extensions?.strictUiSchemaParams !== true) return;
+  const value349 = Array.isArray(value347?.uiSchema?.fields) ? value347.uiSchema.fields : [],
+    value350 = String(value347?.displayName || value347?.modelId || '当前模型').trim();
   for (const value351 of value349) {
-    const enabled24 = String(value351?.['id'] || '')['trim']();
+    const enabled24 = String(value351?.id || '').trim();
     if (!enabled24) continue;
     const el2 = readExplicitUiSchemaValue(value346, enabled24);
     if (
-      !el2['provided'] ||
-      el2['value'] === undefined ||
-      el2['value'] === null ||
-      String(el2['value'])['trim']() === ''
+      !el2.provided ||
+      el2.value === undefined ||
+      el2.value === null ||
+      String(el2.value).trim() === ''
     )
       continue;
-    const list37 = (Array['isArray'](value351?.['options']) ? value351['options'] : [])['map']((value352) =>
-        value352 && typeof value352 === 'object' && !Array['isArray'](value352)
-          ? value352['value']
+    const list37 = (Array.isArray(value351?.options) ? value351.options : []).map((value352) =>
+        value352 && typeof value352 === 'object' && !Array.isArray(value352)
+          ? value352.value
           : value352,
       ),
       strictUiSchemaFieldLabel = resolveStrictUiSchemaFieldLabel(value351);
     if (
-      list37['length'] > 0 &&
-      !list37['some']((value353) => isSameStrictUiSchemaOption(value353, el2['value']))
+      list37.length > 0 &&
+      !list37.some((value353) => isSameStrictUiSchemaOption(value353, el2.value))
     )
       throw new Error(
         '便宜渠道 ' +
@@ -1963,41 +1963,41 @@ function validateStrictModelUiSchemaParams(value346, value347, value348) {
           ' 的' +
           strictUiSchemaFieldLabel +
           '不支持“' +
-          el2['value'] +
+          el2.value +
           '”，可选：' +
-          list37['join'](' / '),
+          list37.join(' / '),
       );
-    const value354 = String(value351?.['type'] || '')
-      ['trim']()
-      ['toLowerCase']();
+    const value354 = String(value351?.type || '')
+      .trim()
+      .toLowerCase();
     if (value354 === 'toggle') {
-      const value355 = String(el2['value'])['trim']()['toLowerCase']();
+      const value355 = String(el2.value).trim().toLowerCase();
       if (
-        el2['value'] !== true &&
-        el2['value'] !== false &&
-        !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off']['includes'](value355)
+        el2.value !== true &&
+        el2.value !== false &&
+        !['true', 'false', '1', '0', 'yes', 'no', 'on', 'off'].includes(value355)
       )
         throw new Error('便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '只能开启或关闭');
       continue;
     }
-    if (!['slider', 'stepper']['includes'](value354) || list37['length'] > 0) continue;
-    const value356 = Number(el2['value']),
-      value357 = Number(value351?.['min']),
-      value358 = Number(value351?.['max']),
-      count9 = Number(value351?.['step']);
-    if (!Number['isFinite'](value356))
+    if (!['slider', 'stepper'].includes(value354) || list37.length > 0) continue;
+    const value356 = Number(el2.value),
+      value357 = Number(value351?.min),
+      value358 = Number(value351?.max),
+      count9 = Number(value351?.step);
+    if (!Number.isFinite(value356))
       throw new Error('便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '必须是数字');
-    if (Number['isFinite'](value357) && value356 < value357)
+    if (Number.isFinite(value357) && value356 < value357)
       throw new Error('便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '不能小于 ' + value357);
-    if (Number['isFinite'](value358) && value356 > value358)
+    if (Number.isFinite(value358) && value356 > value358)
       throw new Error(
         '便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '不能大于 ' + value358,
       );
     if (
-      Number['isFinite'](count9) &&
+      Number.isFinite(count9) &&
       count9 > 0 &&
-      Number['isFinite'](value357) &&
-      Math['abs']((value356 - value357) / count9 - Math['round']((value356 - value357) / count9)) > 1e-9
+      Number.isFinite(value357) &&
+      Math.abs((value356 - value357) / count9 - Math.round((value356 - value357) / count9)) > 1e-9
     )
       throw new Error(
         '便宜渠道 ' + value350 + ' 的' + strictUiSchemaFieldLabel + '必须按 ' + count9 + ' 递增',
@@ -2006,26 +2006,26 @@ function validateStrictModelUiSchemaParams(value346, value347, value348) {
 }
 
 function validateStrictImageInputCounts(value359, value360, value361) {
-  if (value361?.['extensions']?.['strictInputCounts'] !== true) return;
+  if (value361?.extensions?.strictInputCounts !== true) return;
   const manifestMaxInputCount9 = getManifestMaxInputCount(value360, 'image');
   if (manifestMaxInputCount9 === null) return;
-  const list38 = Array['from'](
+  const list38 = Array.from(
     new Set(
       [
         ...collectRawImageInputUrls(value359, value360),
-        ...(Array['isArray'](value359?.['images']) ? value359['images'] : []),
+        ...(Array.isArray(value359?.images) ? value359.images : []),
       ]
-        ['map']((value362) => String(value362 || '')['trim']())
-        ['filter'](Boolean),
+        .map((value362) => String(value362 || '').trim())
+        .filter(Boolean),
     ),
   );
-  if (list38['length'] <= manifestMaxInputCount9) return;
+  if (list38.length <= manifestMaxInputCount9) return;
   throw new Error(
-    (value360['displayName'] || '当前模型') +
+    (value360.displayName || '当前模型') +
       '最多支持 ' +
       manifestMaxInputCount9 +
       ' 张参考图，当前传入 ' +
-      list38['length'] +
+      list38.length +
       ' 张，请删减后重试',
   );
 }
@@ -2043,7 +2043,7 @@ const IMAGE_MODEL_API_PROVIDERS = new Set([
 const AUDIO_MODEL_API_PROVIDERS = new Set(['volcengine-speech']);
 
 function isVolcengineFileId(value363) {
-  return /^file-[A-Za-z0-9_-]+/['test'](String(value363 || '')['trim']());
+  return /^file-[A-Za-z0-9_-]+/.test(String(value363 || '').trim());
 }
 
 function throwVolcengineFilesApiInputError(value364) {
@@ -2066,7 +2066,7 @@ function resolveVolcengineContentGenerationMediaUrls(value368, value369) {
     list39 = [];
   for (const value370 of normalizeInputList(value368)) {
     if (isVolcengineContentGenerationMediaUrl(value370)) {
-      list39['push'](value370);
+      list39.push(value370);
       continue;
     }
     isVolcengineFileId(value370) && throwVolcengineFilesApiInputError(value369);
@@ -2080,67 +2080,67 @@ function resolveVolcengineContentGenerationMediaUrls(value368, value369) {
 }
 
 function normalizeCustomProviderOpenAiImageSize(value371, { context: context20 } = {}) {
-  const value372 = context20?.['payload'] || {},
+  const value372 = context20?.payload || {},
     value373 = String(
-      value371 || value372?.['generationParams']?.['imageSize'] || value372?.['imageSize'] || '1024x1024',
-    )['trim'](),
-    value374 = value373['match'](/^(\d{2,5})\s*[xX×]\s*(\d{2,5})$/);
+      value371 || value372?.generationParams?.imageSize || value372?.imageSize || '1024x1024',
+    ).trim(),
+    value374 = value373.match(/^(\d{2,5})\s*[xX×]\s*(\d{2,5})$/);
   if (value374) return Number(value374[1]) + 'x' + Number(value374[2]);
   const enabled25 = String(
-    value372?.['generationParams']?.['aspectRatio'] ||
-      value372?.['resolvedRatioLabel'] ||
-      value372?.['aspectRatio'] ||
+    value372?.generationParams?.aspectRatio ||
+      value372?.resolvedRatioLabel ||
+      value372?.aspectRatio ||
       '',
-  )['trim']();
+  ).trim();
   if (!enabled25 || isAdaptiveRatioLabel(enabled25)) return '1024x1024';
   const ratioLabel3 = parseRatioLabel(enabled25);
   if (!ratioLabel3) return '1024x1024';
-  const count10 = ratioLabel3['w'] / ratioLabel3['h'];
-  if (Math['abs'](count10 - 1) < 0.05) return '1024x1024';
+  const count10 = ratioLabel3.w / ratioLabel3.h;
+  if (Math.abs(count10 - 1) < 0.05) return '1024x1024';
   return count10 > 1 ? '1536x1024' : '1024x1536';
 }
 
 function normalizeCustomProviderDocumentedValueMap(value375, { spec: spec5 } = {}) {
-  const value376 = Array['isArray'](spec5?.['values']) ? spec5['values'] : [],
-    enabled26 = value376['find'](
+  const value376 = Array.isArray(spec5?.values) ? spec5.values : [],
+    enabled26 = value376.find(
       (value377) =>
         value377 &&
-        (Object['is'](value377['uiValue'], value375) || String(value377['uiValue']) === String(value375)),
+        (Object.is(value377.uiValue, value375) || String(value377.uiValue) === String(value375)),
     );
-  if (!enabled26 || !Object['prototype']['hasOwnProperty']['call'](enabled26, 'requestValue'))
+  if (!enabled26 || !Object.prototype.hasOwnProperty.call(enabled26, 'requestValue'))
     throw new Error('Custom provider documented value mapping is missing for the selected option');
-  return enabled26['requestValue'];
+  return enabled26.requestValue;
 }
 
 function normalizeCustomProviderDimensionMap(value378, { context: context21, spec: spec6 } = {}) {
-  const value379 = context21?.['payload'] || {},
-    value380 = value379['generationParams'] || {},
-    value381 = value380['imageSize'] ?? value379['imageSize'],
+  const value379 = context21?.payload || {},
+    value380 = value379.generationParams || {},
+    value381 = value380.imageSize ?? value379.imageSize,
     value382 =
-      value378 ?? value380['aspectRatio'] ?? value379['resolvedRatioLabel'] ?? value379['aspectRatio'],
-    list40 = Array['isArray'](spec6?.['values']) ? spec6['values'] : [],
-    enabled27 = list40['find'](
+      value378 ?? value380.aspectRatio ?? value379.resolvedRatioLabel ?? value379.aspectRatio,
+    list40 = Array.isArray(spec6?.values) ? spec6.values : [],
+    enabled27 = list40.find(
       (value383) =>
         value383 &&
-        String(value383['imageSize']) === String(value381) &&
-        String(value383['aspectRatio']) === String(value382),
+        String(value383.imageSize) === String(value381) &&
+        String(value383.aspectRatio) === String(value382),
     );
-  if (!enabled27 || !Object['prototype']['hasOwnProperty']['call'](enabled27, 'requestValue'))
+  if (!enabled27 || !Object.prototype.hasOwnProperty.call(enabled27, 'requestValue'))
     throw new Error(
       'Custom provider documented dimension mapping is missing for the selected resolution and ratio',
     );
-  return enabled27['requestValue'];
+  return enabled27.requestValue;
 }
 
 function normalizeNumberParam(value384) {
-  if (value384 === undefined || value384 === null || String(value384)['trim']() === '') return undefined;
+  if (value384 === undefined || value384 === null || String(value384).trim() === '') return undefined;
   const value385 = Number(value384);
-  return Number['isFinite'](value385) ? value385 : undefined;
+  return Number.isFinite(value385) ? value385 : undefined;
 }
 
 function normalizeIntegerParam(value386) {
   const numberParam = normalizeNumberParam(value386);
-  return Number['isFinite'](numberParam) ? Math['trunc'](numberParam) : undefined;
+  return Number.isFinite(numberParam) ? Math.trunc(numberParam) : undefined;
 }
 
 function normalizeStringParam(value387) {
@@ -2148,64 +2148,64 @@ function normalizeStringParam(value387) {
   return String(value387);
 }
 
-const AGNES_IMAGE_SIZE_SCALE_BY_QUALITY = Object['freeze']({ '1K': 1, '2K': 2, '3K': 3, '4K': 4 });
+const AGNES_IMAGE_SIZE_SCALE_BY_QUALITY = Object.freeze({ '1K': 1, '2K': 2, '3K': 3, '4K': 4 });
 
 function normalizeAgnesImageQuality(value388, value389 = '1K') {
   const value390 = String(value388 || '')
-    ['trim']()
-    ['toUpperCase']();
-  return Object['prototype']['hasOwnProperty']['call'](AGNES_IMAGE_SIZE_SCALE_BY_QUALITY, value390)
+    .trim()
+    .toUpperCase();
+  return Object.prototype.hasOwnProperty.call(AGNES_IMAGE_SIZE_SCALE_BY_QUALITY, value390)
     ? value390
     : value389;
 }
 
 function normalizeAgnesVideoFrameRate(value391, { spec: spec7 } = {}) {
   const value392 = Number(value391),
-    value393 = Number['isFinite'](Number(spec7?.['fallback']))
-      ? Math['trunc'](Number(spec7['fallback']))
+    value393 = Number.isFinite(Number(spec7?.fallback))
+      ? Math.trunc(Number(spec7.fallback))
       : 24,
-    value394 = Number['isFinite'](value392) ? Math['trunc'](value392) : value393,
-    value395 = Number['isFinite'](Number(spec7?.['min'])) ? Math['trunc'](Number(spec7['min'])) : 1,
-    value396 = Number['isFinite'](Number(spec7?.['max'])) ? Math['trunc'](Number(spec7['max'])) : 60;
-  return Math['min'](Math['max'](value394, value395), value396);
+    value394 = Number.isFinite(value392) ? Math.trunc(value392) : value393,
+    value395 = Number.isFinite(Number(spec7?.min)) ? Math.trunc(Number(spec7.min)) : 1,
+    value396 = Number.isFinite(Number(spec7?.max)) ? Math.trunc(Number(spec7.max)) : 60;
+  return Math.min(Math.max(value394, value395), value396);
 }
 
 function resolveAgnesVideoFrameRate(options14 = {}, value397 = {}) {
   const value398 = [
-    options14?.['body']?.['frame_rate'],
-    options14?.['payload']?.['generationParams']?.['frame_rate'],
-    options14?.['payload']?.['generationParams']?.['frameRate'],
-    options14?.['payload']?.['frame_rate'],
-    options14?.['payload']?.['frameRate'],
-    value397?.['frameRate'],
+    options14?.body?.frame_rate,
+    options14?.payload?.generationParams?.frame_rate,
+    options14?.payload?.generationParams?.frameRate,
+    options14?.payload?.frame_rate,
+    options14?.payload?.frameRate,
+    value397?.frameRate,
   ];
   for (const value399 of value398) {
-    if (value399 === undefined || value399 === null || String(value399)['trim']() === '') continue;
+    if (value399 === undefined || value399 === null || String(value399).trim() === '') continue;
     return normalizeAgnesVideoFrameRate(value399, {
       spec: {
-        min: value397?.['frameRateMin'],
-        max: value397?.['frameRateMax'],
-        fallback: value397?.['frameRate'],
+        min: value397?.frameRateMin,
+        max: value397?.frameRateMax,
+        fallback: value397?.frameRate,
       },
     });
   }
   return normalizeAgnesVideoFrameRate(undefined, {
     spec: {
-      min: value397?.['frameRateMin'],
-      max: value397?.['frameRateMax'],
-      fallback: value397?.['frameRate'],
+      min: value397?.frameRateMin,
+      max: value397?.frameRateMax,
+      fallback: value397?.frameRate,
     },
   });
 }
 
 function normalizeRunningHubSeedance25Duration(value400) {
-  const value401 = Math['trunc'](Number(value400));
+  const value401 = Math.trunc(Number(value400));
   if (value401 === -1) return '-1';
-  const value402 = Number['isFinite'](value401) ? value401 : -1;
-  return value402 === -1 ? '-1' : String(Math['min'](30, Math['max'](4, value402)));
+  const value402 = Number.isFinite(value401) ? value401 : -1;
+  return value402 === -1 ? '-1' : String(Math.min(30, Math.max(4, value402)));
 }
 
-const CUSTOM_PROVIDER_TASK_SUCCESS_STATUS_ALIASES = Object['freeze']([
+const CUSTOM_PROVIDER_TASK_SUCCESS_STATUS_ALIASES = Object.freeze([
     'succeeded',
     'success',
     'completed',
@@ -2213,7 +2213,7 @@ const CUSTOM_PROVIDER_TASK_SUCCESS_STATUS_ALIASES = Object['freeze']([
     'done',
     'finished',
   ]),
-  CUSTOM_PROVIDER_TASK_FAILURE_STATUS_ALIASES = Object['freeze']([
+  CUSTOM_PROVIDER_TASK_FAILURE_STATUS_ALIASES = Object.freeze([
     'failed',
     'failure',
     'fail',
@@ -2240,56 +2240,56 @@ const SAFE_MANIFEST_ERROR_RULE_TYPES = new Set([
 ]);
 
 export function resolveManifestErrorRules(options15 = {}) {
-  const value403 = options15?.['extensions']?.['errorRules'];
-  if (!Array['isArray'](value403)) return [];
-  return value403['slice'](0, 12)['flatMap']((enabled28) => {
-    if (!enabled28 || typeof enabled28 !== 'object' || Array['isArray'](enabled28)) return [];
-    const value404 = String(enabled28['phase'] || 'any')
-        ['trim']()
-        ['toLowerCase'](),
-      value405 = String(enabled28['type'] || '')
-        ['trim']()
-        ['toUpperCase'](),
+  const value403 = options15?.extensions?.errorRules;
+  if (!Array.isArray(value403)) return [];
+  return value403.slice(0, 12).flatMap((enabled28) => {
+    if (!enabled28 || typeof enabled28 !== 'object' || Array.isArray(enabled28)) return [];
+    const value404 = String(enabled28.phase || 'any')
+        .trim()
+        .toLowerCase(),
+      value405 = String(enabled28.type || '')
+        .trim()
+        .toUpperCase(),
       args16 = [
         ...new Set(
-          (Array['isArray'](enabled28['httpStatuses']) ? enabled28['httpStatuses'] : [])
-            ['map']((value406) => Number(value406))
-            ['filter']((count11) => Number['isInteger'](count11) && count11 >= 400 && count11 <= 599),
+          (Array.isArray(enabled28.httpStatuses) ? enabled28.httpStatuses : [])
+            .map((value406) => Number(value406))
+            .filter((count11) => Number.isInteger(count11) && count11 >= 400 && count11 <= 599),
         ),
-      ]['slice'](0, 12),
+      ].slice(0, 12),
       list41 = [
         ...new Set(
-          (Array['isArray'](enabled28['messageIncludesAny']) ? enabled28['messageIncludesAny'] : [])
-            ['map']((value407) =>
+          (Array.isArray(enabled28.messageIncludesAny) ? enabled28.messageIncludesAny : [])
+            .map((value407) =>
               String(value407 || '')
-                ['replace'](/\s+/g, ' ')
-                ['trim'](),
+                .replace(/\s+/g, ' ')
+                .trim(),
             )
-            ['filter']((value408) => value408 && value408['length'] <= 240),
+            .filter((value408) => value408 && value408.length <= 240),
         ),
-      ]['slice'](0, 6);
+      ].slice(0, 6);
     if (
-      !['any', 'submit', 'poll']['includes'](value404) ||
-      !SAFE_MANIFEST_ERROR_RULE_TYPES['has'](value405) ||
-      typeof enabled28['retryable'] !== 'boolean' ||
-      (args16['length'] === 0 && list41['length'] === 0)
+      !['any', 'submit', 'poll'].includes(value404) ||
+      !SAFE_MANIFEST_ERROR_RULE_TYPES.has(value405) ||
+      typeof enabled28.retryable !== 'boolean' ||
+      (args16.length === 0 && list41.length === 0)
     )
       return [];
-    const args17 = String(enabled28['userMessage'] || '')
-        ['replace'](/\s+/g, ' ')
-        ['trim']()
-        ['slice'](0, 500),
-      args18 = String(enabled28['hint'] || '')
-        ['replace'](/\s+/g, ' ')
-        ['trim']()
-        ['slice'](0, 500);
+    const args17 = String(enabled28.userMessage || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 500),
+      args18 = String(enabled28.hint || '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, 500);
     return [
       {
         phase: value404,
-        ...(args16['length'] > 0 ? { httpStatuses: args16 } : {}),
-        ...(list41['length'] > 0 ? { messageIncludesAny: list41 } : {}),
+        ...(args16.length > 0 ? { httpStatuses: args16 } : {}),
+        ...(list41.length > 0 ? { messageIncludesAny: list41 } : {}),
         type: value405,
-        retryable: enabled28['retryable'],
+        retryable: enabled28.retryable,
         ...(args17 ? { userMessage: args17 } : {}),
         ...(args18 ? { hint: args18 } : {}),
       },
@@ -2298,94 +2298,94 @@ export function resolveManifestErrorRules(options15 = {}) {
 }
 
 function doesResolverOwnInputResolution(value409) {
-  const value410 = value409?.['extensions'] || {};
+  const value410 = value409?.extensions || {};
   return (
-    value410['resolverOwnsInputs'] === true ||
-    String(value410['inputResolutionMode'] || '')['trim']() === 'resolverOwned'
+    value410.resolverOwnsInputs === true ||
+    String(value410.inputResolutionMode || '').trim() === 'resolverOwned'
   );
 }
 
 function getFixedInputSlotOrderByKind(value411 = null, value412 = '') {
-  const value413 = String(value412 || '')['trim'](),
-    list42 = Array['isArray'](value411?.['inputSlots']?.['fixedSlots'])
-      ? value411['inputSlots']['fixedSlots']
+  const value413 = String(value412 || '').trim(),
+    list42 = Array.isArray(value411?.inputSlots?.fixedSlots)
+      ? value411.inputSlots.fixedSlots
       : [];
-  return list42['filter']((value414) => String(value414?.['kind'] || '')['trim']() === value413)
-    ['map']((value415) => String(value415?.['id'] || '')['trim']())
-    ['filter'](Boolean);
+  return list42.filter((value414) => String(value414?.kind || '').trim() === value413)
+    .map((value415) => String(value415?.id || '').trim())
+    .filter(Boolean);
 }
 
 function getAudioRefUrl(options16 = {}) {
-  return String(options16?.['url'] || options16?.['audioUrl'] || options16?.['src'] || '')['trim']();
+  return String(options16?.url || options16?.audioUrl || options16?.src || '').trim();
 }
 
 function orderAudioRefsByManifestSlots(list43 = [], value416 = null) {
-  const list44 = (Array['isArray'](list43) ? list43 : [])['filter']((value417) => getAudioRefUrl(value417)),
+  const list44 = (Array.isArray(list43) ? list43 : []).filter((value417) => getAudioRefUrl(value417)),
     fixedInputSlotOrderByKind = getFixedInputSlotOrderByKind(value416, 'audio');
-  if (fixedInputSlotOrderByKind['length'] === 0 || list44['length'] <= 1) return list44;
+  if (fixedInputSlotOrderByKind.length === 0 || list44.length <= 1) return list44;
   const enabled29 = new Set(),
     value418 = [];
   return (
-    fixedInputSlotOrderByKind['forEach']((value419) => {
-      const count12 = list44['findIndex'](
+    fixedInputSlotOrderByKind.forEach((value419) => {
+      const count12 = list44.findIndex(
         (value420, value421) =>
-          !enabled29['has'](value421) && String(value420?.['refSlot'] || '')['trim']() === value419,
+          !enabled29.has(value421) && String(value420?.refSlot || '').trim() === value419,
       );
       if (count12 < 0) return;
-      (enabled29['add'](count12), value418['push'](list44[count12]));
+      (enabled29.add(count12), value418.push(list44[count12]));
     }),
-    list44['forEach']((value422, value423) => {
-      if (!enabled29['has'](value423)) value418['push'](value422);
+    list44.forEach((value422, value423) => {
+      if (!enabled29.has(value423)) value418.push(value422);
     }),
     value418
   );
 }
 
 function mergeAudioRefsIntoPayload(args19 = {}, value424 = null) {
-  const value425 = Array['isArray'](args19?.['audioRefs']) ? args19['audioRefs'] : [],
+  const value425 = Array.isArray(args19?.audioRefs) ? args19.audioRefs : [],
     args20 = orderAudioRefsByManifestSlots(value425, value424)
-      ['map']((value426) => getAudioRefUrl(value426))
-      ['filter'](Boolean);
-  if (args20['length'] === 0) return args19;
-  const args21 = normalizeInputList(args19['audioUrls']),
+      .map((value426) => getAudioRefUrl(value426))
+      .filter(Boolean);
+  if (args20.length === 0) return args19;
+  const args21 = normalizeInputList(args19.audioUrls),
     enabled30 = new Set(args20);
   return {
     ...args19,
-    audioUrls: [...args21['filter']((value427) => !enabled30['has'](value427)), ...args20],
+    audioUrls: [...args21.filter((value427) => !enabled30.has(value427)), ...args20],
   };
 }
 
 function createModelApiRequestId() {
-  const value428 = Math['random']()['toString'](16)['slice'](2, 10);
-  return Date['now']() + '-' + value428;
+  const value428 = Math.random().toString(16).slice(2, 10);
+  return Date.now() + '-' + value428;
 }
 
 function buildTaskProxyHeaders(args22, value429, value430) {
   const value431 = { ...(args22 || {}) },
-    value432 = String(value430?.['extensions']?.['apiKeyHeader'] || '')['trim']();
+    value432 = String(value430?.extensions?.apiKeyHeader || '').trim();
   value432 &&
     value429 &&
-    !Object['prototype']['hasOwnProperty']['call'](value431, value432) &&
+    !Object.prototype.hasOwnProperty.call(value431, value432) &&
     (value431[value432] = value429);
-  const value433 = String(value430?.['extensions']?.['requestIdHeader'] || '')['trim']();
+  const value433 = String(value430?.extensions?.requestIdHeader || '').trim();
   value433 &&
-    !Object['keys'](value431)['some'](
-      (value434) => value434['toLowerCase']() === value433['toLowerCase'](),
+    !Object.keys(value431).some(
+      (value434) => value434.toLowerCase() === value433.toLowerCase(),
     ) &&
     (value431[value433] = createModelApiRequestId());
-  const value435 = String(value430?.['extensions']?.['resourceId'] || '')['trim']();
+  const value435 = String(value430?.extensions?.resourceId || '').trim();
   return (
     value435 &&
-      !Object['keys'](value431)['some']((value436) => value436['toLowerCase']() === 'x-api-resource-id') &&
+      !Object.keys(value431).some((value436) => value436.toLowerCase() === 'x-api-resource-id') &&
       (value431['X-Api-Resource-Id'] = value435),
     value431
   );
 }
 
 export async function buildAudioRequestFromManifest(value437, value438, value439, value440 = {}) {
-  const value441 = String(value440['expectedProvider'] || '')
-      ['trim']()
-      ['toLowerCase'](),
+  const value441 = String(value440.expectedProvider || '')
+      .trim()
+      .toLowerCase(),
     requestManifest4 = resolveRequestManifest(value437, value441, 'audio');
   if (!requestManifest4) return null;
   const {
@@ -2408,23 +2408,23 @@ export async function buildAudioRequestFromManifest(value437, value438, value439
       {
         modelManifest: modelManifest5,
         provider: provider11,
-        baseUrl: providerConfig['apiUrl'],
+        baseUrl: providerConfig.apiUrl,
         executionManifest: executionManifest6,
       },
     ),
     value442 =
-      Object['keys'](inputImagesBySlot)['length'] > 0
-        ? Object['values'](inputImagesBySlot)
+      Object.keys(inputImagesBySlot).length > 0
+        ? Object.values(inputImagesBySlot)
         : await resolveInputImages(provider11, uiSchemaDefaultsIntoPayload, apiKey4, value439, {
             modelManifest: modelManifest5,
             provider: provider11,
-            baseUrl: providerConfig['apiUrl'],
+            baseUrl: providerConfig.apiUrl,
             executionManifest: executionManifest6,
           }),
     inputAudios2 = await resolveInputAudios(uiSchemaDefaultsIntoPayload, apiKey4, value439, {
       modelManifest: modelManifest5,
       provider: provider11,
-      baseUrl: providerConfig['apiUrl'],
+      baseUrl: providerConfig.apiUrl,
       executionManifest: executionManifest6,
     }),
     executionModelToken = resolveExecutionModelToken(executionManifest6, uiSchemaDefaultsIntoPayload),
@@ -2443,89 +2443,89 @@ export async function buildAudioRequestFromManifest(value437, value438, value439
     },
     args23 = await buildManifestMappedBody(value443),
     manifestApiUrl = resolveManifestApiUrl(provider11, providerConfig, executionManifest6, value443),
-    value444 = String(executionManifest6['extensions']?.['proxyMode'] || '')
-      ['trim']()
-      ['toLowerCase']();
+    value444 = String(executionManifest6.extensions?.proxyMode || '')
+      .trim()
+      .toLowerCase();
   if (value444 === 'task')
     return {
       url: '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(manifestApiUrl),
       headers: buildTaskProxyHeaders(
-        executionManifest6['headers'] || { 'Content-Type': 'application/json' },
+        executionManifest6.headers || { 'Content-Type': 'application/json' },
         apiKey4,
         executionManifest6,
       ),
       body: args23,
-      responseMapping: executionManifest6['responseMapping'],
+      responseMapping: executionManifest6.responseMapping,
       errorRules: resolveManifestErrorRules(executionManifest6),
       adapterTrace: {
         source: 'manifest',
-        executionId: executionManifest6['id'],
-        modelId: uiSchemaDefaultsIntoPayload['model'],
+        executionId: executionManifest6.id,
+        modelId: uiSchemaDefaultsIntoPayload.model,
       },
       meta: {
         provider: provider11,
         adapterType: 'modelApi',
-        audioWorkflowKey: modelManifest5['modelId'],
-        audioWorkflowLabel: modelManifest5['displayName'] || modelManifest5['modelId'],
-        model: modelManifest5['modelId'],
-        executionId: executionManifest6['id'],
+        audioWorkflowKey: modelManifest5.modelId,
+        audioWorkflowLabel: modelManifest5.displayName || modelManifest5.modelId,
+        model: modelManifest5.modelId,
+        executionId: executionManifest6.id,
         isManifestAudioModelApi: true,
       },
     };
   return {
     url: '/api/v2/proxy/image',
-    headers: executionManifest6['headers'] || { 'Content-Type': 'application/json' },
+    headers: executionManifest6.headers || { 'Content-Type': 'application/json' },
     body: { apiUrl: manifestApiUrl, apiKey: apiKey4, ...args23 },
-    responseMapping: executionManifest6['responseMapping'],
+    responseMapping: executionManifest6.responseMapping,
     errorRules: resolveManifestErrorRules(executionManifest6),
     adapterTrace: {
       source: 'manifest',
-      executionId: executionManifest6['id'],
-      modelId: uiSchemaDefaultsIntoPayload['model'],
+      executionId: executionManifest6.id,
+      modelId: uiSchemaDefaultsIntoPayload.model,
     },
     meta: {
       provider: provider11,
       adapterType: 'modelApi',
-      audioWorkflowKey: modelManifest5['modelId'],
-      audioWorkflowLabel: modelManifest5['displayName'] || modelManifest5['modelId'],
-      model: modelManifest5['modelId'],
-      executionId: executionManifest6['id'],
+      audioWorkflowKey: modelManifest5.modelId,
+      audioWorkflowLabel: modelManifest5.displayName || modelManifest5.modelId,
+      model: modelManifest5.modelId,
+      executionId: executionManifest6.id,
       isManifestAudioModelApi: true,
     },
   };
 }
 
 function normalizeTextMaxOutputTokens(value445) {
-  const count13 = Math['trunc'](Number(value445) || 0);
+  const count13 = Math.trunc(Number(value445) || 0);
   return count13 > 0 ? count13 : 0;
 }
 
 function resolveGeminiNativeVideoApiUrl(value446, value447, value448, value449) {
-  const value450 = value448['extensions']?.['geminiNativeVideo'],
-    enabled31 = String(value450?.['endpointTemplate'] || '')['trim']();
-  if (!enabled31 || !enabled31['includes']('{model}'))
+  const value450 = value448.extensions?.geminiNativeVideo,
+    enabled31 = String(value450?.endpointTemplate || '').trim();
+  if (!enabled31 || !enabled31.includes('{model}'))
     throw new Error('Gemini native video manifest requires an endpointTemplate with {model}');
-  const value451 = enabled31['replace']('{model}', encodeURIComponent(value449['modelToken'])),
+  const value451 = enabled31.replace('{model}', encodeURIComponent(value449.modelToken)),
     defaultApiUrl = resolveDefaultApiUrl(value446, value447, { endpoint: value451 });
   return value446 === 'runninghub'
-    ? remapRunningHubModelApiUrl(defaultApiUrl, value449?.['payload']?.['providerProfileId'])
+    ? remapRunningHubModelApiUrl(defaultApiUrl, value449?.payload?.providerProfileId)
     : defaultApiUrl;
 }
 
 function buildGeminiNativeThinkingConfig(value452, value453) {
-  const value454 = String(value452?.['type'] || '')
-    ['trim']()
-    ['toLowerCase']();
+  const value454 = String(value452?.type || '')
+    .trim()
+    .toLowerCase();
   if (value454 !== 'disabled') return {};
-  const value455 = value453?.['thinkingControl'];
-  if (value455?.['disabledUnsupported'] === true)
+  const value455 = value453?.thinkingControl;
+  if (value455?.disabledUnsupported === true)
     throw new Error('当前 Gemini 模型不支持关闭思考，请改用支持无思考模式的模型');
-  const count14 = Number(value455?.['disabledBudget']);
-  if (!Number['isFinite'](count14) || count14 < 0) return {};
+  const count14 = Number(value455?.disabledBudget);
+  if (!Number.isFinite(count14) || count14 < 0) return {};
   return {
     thinkingConfig: {
-      thinkingBudget: Math['trunc'](count14),
-      includeThoughts: value455?.['includeThoughts'] === true,
+      thinkingBudget: Math.trunc(count14),
+      includeThoughts: value455?.includeThoughts === true,
     },
   };
 }
@@ -2535,6 +2535,6 @@ function buildGeminiNativeGenerationConfig(value456, args24, value457, value458)
   return {
     ...(args24 ? { maxOutputTokens: args24 } : {}),
     ...buildGeminiNativeThinkingConfig(value457, value458),
-    ...(args25 ? { responseMimeType: 'application/json', responseJsonSchema: args25['schema'] } : {}),
+    ...(args25 ? { responseMimeType: 'application/json', responseJsonSchema: args25.schema } : {}),
   };
 }

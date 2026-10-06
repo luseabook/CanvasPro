@@ -3,29 +3,29 @@ const DEFAULT_RETRY_DELAY_MS = 250,
   DEFAULT_IDLE_TIMEOUT_MS = 1500;
 function normalizeDelay(value, item = 0) {
   const count = Number(value);
-  return Number['isFinite'](count) && count >= 0 ? count : item;
+  return Number.isFinite(count) && count >= 0 ? count : item;
 }
 function hasIdleBudget(enabled, key) {
   if (!enabled || typeof enabled !== 'object') return true;
-  if (enabled['didTimeout'] === true) return false;
-  return typeof enabled['timeRemaining'] !== 'function' || Number(enabled['timeRemaining']()) >= key;
+  if (enabled.didTimeout === true) return false;
+  return typeof enabled.timeRemaining !== 'function' || Number(enabled.timeRemaining()) >= key;
 }
 export function isWorkspaceCacheInteractionBusy({
-  documentRef: documentRef = globalThis['document'],
+  documentRef: documentRef = globalThis.document,
   CanvasTabManager: CanvasTabManager = null,
 } = {}) {
-  if (CanvasTabManager?.['_isVisualSnapshotInteractionBusy']?.() === true) return true;
-  const index = documentRef?.['body']?.['classList'],
-    result = documentRef?.['documentElement']?.['classList'],
-    data = documentRef?.['getElementById']?.('v2-canvas')?.['classList'];
+  if (CanvasTabManager?._isVisualSnapshotInteractionBusy?.() === true) return true;
+  const index = documentRef?.body?.classList,
+    result = documentRef?.documentElement?.classList,
+    data = documentRef?.getElementById?.('v2-canvas')?.classList;
   return Boolean(
-    index?.['contains']?.('is-dragging') ||
-    index?.['contains']?.('is-panning') ||
-    index?.['contains']?.('is-zooming') ||
-    index?.['contains']?.('is-viewport-animating') ||
-    index?.['contains']?.('pick-connect-active') ||
-    result?.['contains']?.('is-connecting-mode') ||
-    data?.['contains']?.('is-connecting'),
+    index?.contains?.('is-dragging') ||
+    index?.contains?.('is-panning') ||
+    index?.contains?.('is-zooming') ||
+    index?.contains?.('is-viewport-animating') ||
+    index?.contains?.('pick-connect-active') ||
+    result?.contains?.('is-connecting-mode') ||
+    data?.contains?.('is-connecting'),
   );
 }
 export function createWorkspaceCacheIdleScheduler({
@@ -34,10 +34,10 @@ export function createWorkspaceCacheIdleScheduler({
   retryDelayMs: retryDelayMs = DEFAULT_RETRY_DELAY_MS,
   minIdleBudgetMs: minIdleBudgetMs = DEFAULT_MIN_IDLE_BUDGET_MS,
   idleTimeoutMs: idleTimeoutMs = DEFAULT_IDLE_TIMEOUT_MS,
-  setTimeoutFn: setTimeoutFn = globalThis['setTimeout']?.['bind'](globalThis),
-  clearTimeoutFn: clearTimeoutFn = globalThis['clearTimeout']?.['bind'](globalThis),
-  requestIdleCallbackFn: requestIdleCallbackFn = globalThis['requestIdleCallback']?.['bind'](globalThis),
-  cancelIdleCallbackFn: cancelIdleCallbackFn = globalThis['cancelIdleCallback']?.['bind'](globalThis),
+  setTimeoutFn: setTimeoutFn = globalThis.setTimeout?.bind(globalThis),
+  clearTimeoutFn: clearTimeoutFn = globalThis.clearTimeout?.bind(globalThis),
+  requestIdleCallbackFn: requestIdleCallbackFn = globalThis.requestIdleCallback?.bind(globalThis),
+  cancelIdleCallbackFn: cancelIdleCallbackFn = globalThis.cancelIdleCallback?.bind(globalThis),
   onError: onError = () => {},
 } = {}) {
   const delay = normalizeDelay(retryDelayMs, DEFAULT_RETRY_DELAY_MS),
@@ -62,7 +62,7 @@ export function createWorkspaceCacheIdleScheduler({
     handler3 = () => {
       try {
         const promise = run?.();
-        promise && typeof promise['catch'] === 'function' && void promise['catch'](onError);
+        promise && typeof promise.catch === 'function' && void promise.catch(onError);
       } catch (target) {
         onError(target);
       }
@@ -92,7 +92,7 @@ export function createWorkspaceCacheIdleScheduler({
         ((timer = setTimeoutFn(() => {
           ((timer = null), run4(entry));
         }, 0)),
-          timer?.['unref']?.());
+          timer?.unref?.());
         return;
       }
       run4(entry);
@@ -106,7 +106,7 @@ export function createWorkspaceCacheIdleScheduler({
     ((timer = setTimeoutFn(() => {
       ((timer = null), handler5(payload));
     }, normalizeDelay(handle))),
-      timer?.['unref']?.());
+      timer?.unref?.());
   };
   const cancel = () => {
       ((options += 1), (enabled2 = false), handler2());
@@ -116,7 +116,7 @@ export function createWorkspaceCacheIdleScheduler({
       const state = options;
       return (run3(state, delayMs), state);
     };
-  return Object['freeze']({
+  return Object.freeze({
     schedule: schedule,
     cancel: cancel,
     isPending: () => enabled2,

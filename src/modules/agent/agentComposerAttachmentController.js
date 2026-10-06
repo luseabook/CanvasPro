@@ -1,17 +1,17 @@
 import { AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT, validateAgentDocumentFile } from './agentDocumentInput.js';
 function createHiddenFileInput(documentObject, className, accept, multiple = false) {
-  const input = documentObject['createElement']('input');
+  const input = documentObject.createElement('input');
   return (
-    (input['className'] = className),
-    (input['type'] = 'file'),
-    (input['accept'] = accept),
-    (input['multiple'] = multiple),
-    (input['hidden'] = true),
+    (input.className = className),
+    (input.type = 'file'),
+    (input.accept = accept),
+    (input.multiple = multiple),
+    (input.hidden = true),
     input
   );
 }
 function documentKey(file = {}) {
-  return [file['name'], file['size'], file['lastModified']]['map']((part) => String(part || ''))['join'](':');
+  return [file.name, file.size, file.lastModified].map((part) => String(part || '')).join(':');
 }
 export function createAgentComposerAttachmentController({
   documentObject: documentObject,
@@ -38,13 +38,13 @@ export function createAgentComposerAttachmentController({
   let documentSeq = 0,
     documents = [];
   function getDocumentDisplayRefs() {
-    return documents['map'](({ id: id, file: file }) => ({
+    return documents.map(({ id: id, file: file }) => ({
       id: id,
       nodeId: id,
       type: 'external-document',
       kind: 'document',
-      name: String(file?.['name'] || 'document'),
-      label: String(file?.['name'] || 'document'),
+      name: String(file?.name || 'document'),
+      label: String(file?.name || 'document'),
       source: 'document-upload',
     }));
   }
@@ -54,28 +54,28 @@ export function createAgentComposerAttachmentController({
   }
   function consumeDocuments() {
     const snapshot = {
-      files: documents['map']((entry) => entry['file']),
+      files: documents.map((entry) => entry.file),
       displayRefs: getDocumentDisplayRefs(),
     };
     return ((documents = []), snapshot);
   }
   function removeDocument(id) {
-    const remaining = documents['filter']((entry) => entry['id'] !== String(id || ''));
-    if (remaining['length'] === documents['length']) return false;
+    const remaining = documents.filter((entry) => entry.id !== String(id || ''));
+    if (remaining.length === documents.length) return false;
     return ((documents = remaining), onDocumentChange?.(), true);
   }
   function attachDocuments(files = []) {
-    const knownKeys = new Set(documents['map']((entry) => documentKey(entry['file'])));
+    const knownKeys = new Set(documents.map((entry) => documentKey(entry.file)));
     let addedCount = 0;
-    for (const file of Array['from'](files || [])) {
+    for (const file of Array.from(files || [])) {
       const validation = validateAgentDocumentFile(file, validateDocumentFile);
-      if (!validation['ok']) {
-        setNotice?.(validation['error']);
+      if (!validation.ok) {
+        setNotice?.(validation.error);
         continue;
       }
       const key = documentKey(file);
-      if (knownKeys['has'](key)) continue;
-      if (documents['length'] >= AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT) {
+      if (knownKeys.has(key)) continue;
+      if (documents.length >= AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT) {
         setNotice?.(
           formatText?.('documentLimit', { count: AGENT_EXTERNAL_DOCUMENT_FILE_LIMIT }) ||
             text?.('documentLimit'),
@@ -83,8 +83,8 @@ export function createAgentComposerAttachmentController({
         break;
       }
       ((documentSeq += 1),
-        documents['push']({ id: 'agent-document-' + documentSeq, file: file }),
-        knownKeys['add'](key),
+        documents.push({ id: 'agent-document-' + documentSeq, file: file }),
+        knownKeys.add(key),
         (addedCount += 1));
     }
     return (
@@ -106,25 +106,25 @@ export function createAgentComposerAttachmentController({
     try {
       const uploaded = await uploadMaterial(file);
       if (!isContextCurrent(context)) return;
-      const uploadedList = Array['isArray'](uploaded) ? uploaded : [uploaded],
-        nodes = uploadedList['map'](normalizeMaterialNode)['filter'](Boolean);
-      if (nodes['length'] === 0) {
+      const uploadedList = Array.isArray(uploaded) ? uploaded : [uploaded],
+        nodes = uploadedList.map(normalizeMaterialNode).filter(Boolean);
+      if (nodes.length === 0) {
         setNotice?.(text?.('uploadMaterialFailed'));
         return;
       }
       (addInputRefs?.(nodes), setNotice?.(text?.('uploadMaterialReady')), focusInput?.());
     } catch (error) {
-      if (isContextCurrent(context)) setNotice?.(error?.['message'] || text?.('uploadMaterialFailed'));
+      if (isContextCurrent(context)) setNotice?.(error?.message || text?.('uploadMaterialFailed'));
     } finally {
       if (isContextCurrent(context)) setBusy?.(false);
     }
   }
   return (
-    materialInput['addEventListener']('change', () => {
-      (uploadMaterialFile(materialInput['files']?.[0]), (materialInput['value'] = ''));
+    materialInput.addEventListener('change', () => {
+      (uploadMaterialFile(materialInput.files?.[0]), (materialInput.value = ''));
     }),
-    documentInput['addEventListener']('change', () => {
-      (attachDocuments(documentInput['files']), (documentInput['value'] = ''));
+    documentInput.addEventListener('change', () => {
+      (attachDocuments(documentInput.files), (documentInput.value = ''));
     }),
     {
       materialInput: materialInput,
@@ -134,10 +134,10 @@ export function createAgentComposerAttachmentController({
       clearDocuments: clearDocuments,
       removeDocument: removeDocument,
       openMaterialPicker() {
-        ((materialInput['value'] = ''), materialInput['click']?.(), setNotice?.(text?.('uploadMaterial')));
+        ((materialInput.value = ''), materialInput.click?.(), setNotice?.(text?.('uploadMaterial')));
       },
       openDocumentPicker() {
-        ((documentInput['value'] = ''), documentInput['click']?.(), setNotice?.(text?.('readDocument')));
+        ((documentInput.value = ''), documentInput.click?.(), setNotice?.(text?.('readDocument')));
       },
       uploadMaterialFile: uploadMaterialFile,
     }

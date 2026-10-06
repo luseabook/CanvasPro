@@ -25,15 +25,15 @@ import {
   getPersonReplacementVoiceLibraryBoundCharacters,
 } from './personReplacementVoiceLibrary.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function escapeHtml(item) {
   return String(item ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&apos;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&apos;');
 }
 function normalizeMediaUrl(key) {
   const text = normalizeText(key);
@@ -43,18 +43,18 @@ function normalizeMediaUrl(key) {
 function normalizeProjectAssetMediaForRender(args = {}) {
   return {
     ...args,
-    appearances: getWorkspaceAssetAppearances(args)['map']((args2) => ({
+    appearances: getWorkspaceAssetAppearances(args).map((args2) => ({
       ...args2,
-      imageUrl: normalizeMediaUrl(args2['imageUrl']),
-      referenceImageUrl: normalizeMediaUrl(args2['referenceImageUrl']),
+      imageUrl: normalizeMediaUrl(args2.imageUrl),
+      referenceImageUrl: normalizeMediaUrl(args2.referenceImageUrl),
     })),
   };
 }
 function getCharacterVoiceUrl(options = {}) {
   return normalizeMediaUrl(
-    options['voiceReference']?.['audioUrl'] ||
-      options['voiceReference']?.['localPath'] ||
-      options['voiceRef'],
+    options.voiceReference?.audioUrl ||
+      options.voiceReference?.localPath ||
+      options.voiceRef,
   );
 }
 function renderVoiceReferenceStatus(options2 = {}, index = '') {
@@ -69,114 +69,114 @@ function renderVoiceReferenceStatus(options2 = {}, index = '') {
     '</span>'
   );
 }
-export const PERSON_REPLACEMENT_LIBRARY_TARGETS = Object['freeze']([
+export const PERSON_REPLACEMENT_LIBRARY_TARGETS = Object.freeze([
   { kind: 'character', label: '人物' },
   { kind: 'scene', label: '场景' },
   { kind: 'audio', label: '音频' },
 ]);
 export function getPersonReplacementSelectableAssets(data, target) {
   if (target === 'library')
-    return data['libraryAssets']['filter'](
+    return data.libraryAssets.filter(
       (source) =>
-        (normalizeText(source?.['mediaKind'])['toLowerCase']() === 'image' &&
-          normalizeText(source?.['sourceUrl'] || source?.['imageUrl'])) ||
-        (normalizeText(source?.['mediaKind'])['toLowerCase']() === 'audio' &&
+        (normalizeText(source?.mediaKind).toLowerCase() === 'image' &&
+          normalizeText(source?.sourceUrl || source?.imageUrl)) ||
+        (normalizeText(source?.mediaKind).toLowerCase() === 'audio' &&
           getPersonReplacementLibraryAudioRef(source)),
     );
   if (target === 'audio') return getPersonReplacementProjectAudioAssets(data);
-  return target === 'scene' ? data['scenes'] : data['characters'];
+  return target === 'scene' ? data.scenes : data.characters;
 }
 export function renderPersonReplacementAssetSettingsPage(characters, footerHtml = {}) {
-  const activeTab = ['character', 'scene', 'audio', 'library']['includes'](
-      characters['workspace']['characterAssetTab'],
+  const activeTab = ['character', 'scene', 'audio', 'library'].includes(
+      characters.workspace.characterAssetTab,
     )
-      ? characters['workspace']['characterAssetTab']
+      ? characters.workspace.characterAssetTab
       : 'character',
     previewAppearance = activeTab === 'library',
     readOnly = activeTab === 'scene',
     calloutTitle = activeTab === 'audio',
     map = new Set(
-      Array['isArray'](footerHtml['assetUploadPendingKinds']) ? footerHtml['assetUploadPendingKinds'] : [],
+      Array.isArray(footerHtml.assetUploadPendingKinds) ? footerHtml.assetUploadPendingKinds : [],
     ),
     list = getPersonReplacementProjectAudioAssets(characters),
-    text2 = normalizeText(footerHtml['voiceLibraryTargetCharacterId']),
+    text2 = normalizeText(footerHtml.voiceLibraryTargetCharacterId),
     next = {
       ...characters,
-      characters: characters['characters']['map'](normalizeProjectAssetMediaForRender),
-      scenes: characters['scenes']['map'](normalizeProjectAssetMediaForRender),
+      characters: characters.characters.map(normalizeProjectAssetMediaForRender),
+      scenes: characters.scenes.map(normalizeProjectAssetMediaForRender),
     },
-    error = next['characters']['find']((current) => current['id'] === text2) || null,
+    error = next.characters.find((current) => current.id === text2) || null,
     showVoiceLibraryConfirm = calloutTitle && Boolean(error),
     allowDeleteAssetCard = buildPersonReplacementAssetViewState(next);
   showVoiceLibraryConfirm &&
-    ((allowDeleteAssetCard['selectedAssetIds'] = [allowDeleteAssetCard['selectedAssetId']]),
-    (allowDeleteAssetCard['assetSelectionMode'] = false));
-  allowDeleteAssetCard['isBatchGenerating'] = footerHtml['assetBatchGenerationActive'] === true;
+    ((allowDeleteAssetCard.selectedAssetIds = [allowDeleteAssetCard.selectedAssetId]),
+    (allowDeleteAssetCard.assetSelectionMode = false));
+  allowDeleteAssetCard.isBatchGenerating = footerHtml.assetBatchGenerationActive === true;
   const entry =
-    allowDeleteAssetCard['assetSelectionMode'] && allowDeleteAssetCard['selectedAssetIds']['length'] > 1;
-  ((allowDeleteAssetCard['batchGenerationLabel'] = normalizeText(footerHtml['assetBatchGenerationLabel'])),
-    (allowDeleteAssetCard['batchCancelRequested'] = footerHtml['assetBatchCancelRequested'] === true),
-    (allowDeleteAssetCard['batchGeneratingAssetIds'] = Array['isArray'](
-      footerHtml['assetBatchGeneratingCharacterIds'],
+    allowDeleteAssetCard.assetSelectionMode && allowDeleteAssetCard.selectedAssetIds.length > 1;
+  ((allowDeleteAssetCard.batchGenerationLabel = normalizeText(footerHtml.assetBatchGenerationLabel)),
+    (allowDeleteAssetCard.batchCancelRequested = footerHtml.assetBatchCancelRequested === true),
+    (allowDeleteAssetCard.batchGeneratingAssetIds = Array.isArray(
+      footerHtml.assetBatchGeneratingCharacterIds,
     )
-      ? footerHtml['assetBatchGeneratingCharacterIds']
+      ? footerHtml.assetBatchGeneratingCharacterIds
       : []),
-    (allowDeleteAssetCard['batchCancelAction'] = 'cancel-asset-batch-generation'));
-  const assets = allowDeleteAssetCard['data']['assets'],
-    record = assets['find']((payload) => payload['id'] === allowDeleteAssetCard['selectedAssetId']) || null,
+    (allowDeleteAssetCard.batchCancelAction = 'cancel-asset-batch-generation'));
+  const assets = allowDeleteAssetCard.data.assets,
+    record = assets.find((payload) => payload.id === allowDeleteAssetCard.selectedAssetId) || null,
     list2 = getPersonReplacementSelectableAssets(next, activeTab),
     allSelected =
-      list2['length'] > 0 &&
-      list2['every']((handle) => allowDeleteAssetCard['selectedAssetIds']['includes'](handle['id'])),
+      list2.length > 0 &&
+      list2.every((handle) => allowDeleteAssetCard.selectedAssetIds.includes(handle.id)),
     list3 = previewAppearance
-      ? list2['filter']((state) => allowDeleteAssetCard['selectedAssetIds']['includes'](state['id']))
+      ? list2.filter((state) => allowDeleteAssetCard.selectedAssetIds.includes(state.id))
       : [],
-    config = list3['length'],
-    scope = footerHtml['assetLibraryDisclosure'] || createWorkspaceAssetLibraryDisclosure(),
+    config = list3.length,
+    scope = footerHtml.assetLibraryDisclosure || createWorkspaceAssetLibraryDisclosure(),
     renderAsset = (imageUrl) => {
       const statusText = !previewAppearance && !readOnly && !calloutTitle,
         input = statusText ? getWorkspaceAssetAppearanceStats(imageUrl) : null,
         boundCharacters = getPersonReplacementVoiceLibraryBoundCharacters(characters, imageUrl);
-      if (normalizeText(imageUrl?.['mediaKind'])['toLowerCase']() === 'audio')
+      if (normalizeText(imageUrl?.mediaKind).toLowerCase() === 'audio')
         return renderPersonReplacementAudioAssetCard(
           {
             ...allowDeleteAssetCard,
-            allowDeleteAssetCard: allowDeleteAssetCard['allowDeleteAssetCard'] && !showVoiceLibraryConfirm,
+            allowDeleteAssetCard: allowDeleteAssetCard.allowDeleteAssetCard && !showVoiceLibraryConfirm,
           },
           imageUrl,
           { boundCharacters: boundCharacters, showVoiceLibraryConfirm: showVoiceLibraryConfirm },
         );
       return renderPersonReplacementAssetCard(allowDeleteAssetCard, imageUrl, {
         cardAttributes:
-          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 1
-            ? 'data-story-card-appearance-wheel="' + escapeHtml(imageUrl['id']) + '"'
+          !previewAppearance && getWorkspaceAssetAppearances(imageUrl).length > 1
+            ? 'data-story-card-appearance-wheel="' + escapeHtml(imageUrl.id) + '"'
             : '',
         previewAppearance: previewAppearance
-          ? { ...imageUrl, imageUrl: imageUrl['thumbnailUrl'] || imageUrl['imageUrl'] }
+          ? { ...imageUrl, imageUrl: imageUrl.thumbnailUrl || imageUrl.imageUrl }
           : getWorkspaceAssetAppearances(imageUrl)[
-              allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0
+              allowDeleteAssetCard.assetAppearanceIndexes?.[imageUrl.id] || 0
             ],
         accessoryHtml:
-          !previewAppearance && getWorkspaceAssetAppearances(imageUrl)['length'] > 1
+          !previewAppearance && getWorkspaceAssetAppearances(imageUrl).length > 1
             ? renderWorkspaceCardAppearanceNavigation({
-                attributes: { 'data-story-card-appearance-wheel': imageUrl['id'] },
+                attributes: { 'data-story-card-appearance-wheel': imageUrl.id },
                 previousAttributes: {
                   'data-story-action': 'previous-appearance',
-                  'data-story-card-appearance-id': imageUrl['id'],
+                  'data-story-card-appearance-id': imageUrl.id,
                 },
                 nextAttributes: {
                   'data-story-action': 'next-appearance',
-                  'data-story-card-appearance-id': imageUrl['id'],
+                  'data-story-card-appearance-id': imageUrl.id,
                 },
               })
             : '',
-        fallbackImageUrl: previewAppearance ? imageUrl['sourceUrl'] : '',
+        fallbackImageUrl: previewAppearance ? imageUrl.sourceUrl : '',
         workspaceAssetLibraryImage: previewAppearance,
         statusText: statusText
-          ? (allowDeleteAssetCard['assetAppearanceIndexes']?.[imageUrl['id']] || 0) +
+          ? (allowDeleteAssetCard.assetAppearanceIndexes?.[imageUrl.id] || 0) +
             1 +
             ' / ' +
-            input['total']
+            input.total
           : '',
         cardClassName: statusText
           ? 'person-replacement-character-asset-card workspace-portrait-card'
@@ -189,19 +189,19 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
       });
     },
     cardsHtml = previewAppearance
-      ? scope['render']({ assets: assets, renderAsset: renderAsset })
-      : assets['map'](renderAsset)['join'](''),
+      ? scope.render({ assets: assets, renderAsset: renderAsset })
+      : assets.map(renderAsset).join(''),
     output =
-      list3['length'] && list3['every']((value2) => value2['mediaKind'] === 'audio')
+      list3.length && list3.every((value2) => value2.mediaKind === 'audio')
         ? '<button type="button" class="story-primary-button" data-person-replacement-action="add-library-assets-to-project" data-person-replacement-library-target-kind="audio">加入到音频项目' +
-          (allowDeleteAssetCard['assetSelectionMode'] ? ' (' + config + ')' : '') +
+          (allowDeleteAssetCard.assetSelectionMode ? ' (' + config + ')' : '') +
           '</button>'
         : '<div class="story-asset-batch-menu-wrap story-library-add-menu-wrap person-replacement-library-add-menu-wrap">\n    <button type="button" class="story-primary-button story-asset-batch-trigger" data-person-replacement-action="toggle-library-add-targets" aria-haspopup="menu" aria-expanded="false" ' +
           (config ? '' : 'disabled') +
           '><span class="story-asset-batch-trigger-label">加入到项目' +
-          (allowDeleteAssetCard['assetSelectionMode'] && config ? ' (' + config + ')' : '') +
+          (allowDeleteAssetCard.assetSelectionMode && config ? ' (' + config + ')' : '') +
           '</span></button>\n    <div class="story-asset-batch-menu story-library-add-menu" role="menu" aria-label="选择加入项目的素材分类" aria-hidden="true">\n      ' +
-          PERSON_REPLACEMENT_LIBRARY_TARGETS['map'](
+          PERSON_REPLACEMENT_LIBRARY_TARGETS.map(
             ({ kind: kind, label: label }) =>
               '<button type="button" role="menuitem" data-person-replacement-action="add-library-assets-to-project" data-person-replacement-library-target-kind="' +
               kind +
@@ -210,10 +210,10 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
               '</span><span>' +
               label +
               '</span></button>',
-          )['join']('') +
+          ).join('') +
           '\n    </div>\n  </div>',
     primaryActionHtml = (value3, value4, value5) => {
-      const value6 = map['has'](value3);
+      const value6 = map.has(value3);
       return (
         '<button type="button" class="story-secondary-button" data-person-replacement-action="' +
         value5 +
@@ -227,24 +227,24 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
       );
     },
     args3 = {
-      detailSplitRatio: allowDeleteAssetCard['assetDetailSplitRatio'],
+      detailSplitRatio: allowDeleteAssetCard.assetDetailSplitRatio,
       detailSplitterHtml:
-        typeof footerHtml['renderDetailSplitter'] === 'function'
-          ? footerHtml['renderDetailSplitter'](allowDeleteAssetCard['assetDetailSplitRatio'])
+        typeof footerHtml.renderDetailSplitter === 'function'
+          ? footerHtml.renderDetailSplitter(allowDeleteAssetCard.assetDetailSplitRatio)
           : '',
     },
     calloutActionsHtml = calloutTitle
       ? showVoiceLibraryConfirm
         ? '<button type="button" class="story-secondary-button" data-person-replacement-action="cancel-character-voice-library">取消</button>'
         : renderWorkspaceAssetSelectionActions({
-            selectedCount: allowDeleteAssetCard['selectedAssetIds']['length'],
+            selectedCount: allowDeleteAssetCard.selectedAssetIds.length,
             allSelected: allSelected,
             primaryActionHtml: primaryActionHtml('audio', '音频', 'choose-new-audio-files'),
           })
       : renderWorkspaceAssetSelectionActions({
           compactTrigger: false,
-          selectionMode: allowDeleteAssetCard['assetSelectionMode'],
-          selectedCount: allowDeleteAssetCard['selectedAssetIds']['length'],
+          selectionMode: allowDeleteAssetCard.assetSelectionMode,
+          selectedCount: allowDeleteAssetCard.selectedAssetIds.length,
           allSelected: allSelected,
           primaryActionHtml: previewAppearance
             ? output
@@ -252,7 +252,7 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
               ? entry
                 ? ''
                 : primaryActionHtml('scene', '场景', 'choose-new-scene-images')
-              : entry || allowDeleteAssetCard['isBatchGenerating']
+              : entry || allowDeleteAssetCard.isBatchGenerating
                 ? renderPersonReplacementBatchGenerationControl(allowDeleteAssetCard)
                 : primaryActionHtml('character', '人物', 'choose-new-character-images'),
           selectAllLabel: previewAppearance ? '全选素材' : '全选',
@@ -262,18 +262,18 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
     className: 'person-replacement-assets-page',
     calloutInHeading: true,
     headingInListColumn: true,
-    calloutStatus: allowDeleteAssetCard['assetSelectionMode']
-      ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项'
+    calloutStatus: allowDeleteAssetCard.assetSelectionMode
+      ? '已选择 ' + allowDeleteAssetCard.selectedAssetIds.length + ' 项'
       : '',
     activeTab: activeTab,
     tabCount: 4,
     tabsHtml: [
-      ['character', '人物', characters['characters']['length']],
-      ['scene', '场景', characters['scenes']['length']],
-      ['audio', '音频', list['length']],
-      ['library', '总素材', characters['libraryAssets']['length']],
+      ['character', '人物', characters.characters.length],
+      ['scene', '场景', characters.scenes.length],
+      ['audio', '音频', list.length],
+      ['library', '总素材', characters.libraryAssets.length],
     ]
-      ['map'](
+      .map(
         ([value7, value8, value9]) =>
           '<button type="button" class="' +
           (activeTab === value7 ? 'is-active' : '') +
@@ -291,10 +291,10 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
           value9 +
           '</span></button>',
       )
-      ['join'](''),
+      .join(''),
     calloutTitle: calloutTitle
       ? showVoiceLibraryConfirm
-        ? '为「' + error['name'] + '」添加声音'
+        ? '为「' + error.name + '」添加声音'
         : '音频素材'
       : previewAppearance
         ? '从总素材加入项目'
@@ -306,17 +306,17 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
         ? '请选择音频，再点击「设为角色声音参考」。'
         : '这里只显示已加入当前项目的音频；上传会先保存到总素材再加入项目。'
       : previewAppearance
-        ? allowDeleteAssetCard['assetSelectionMode']
-          ? allowDeleteAssetCard['selectedAssetIds']['length']
-            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项素材'
+        ? allowDeleteAssetCard.assetSelectionMode
+          ? allowDeleteAssetCard.selectedAssetIds.length
+            ? '已选择 ' + allowDeleteAssetCard.selectedAssetIds.length + ' 项素材'
             : '点击图片或音频进行多选，或拖动鼠标框选。'
           : '单击素材可查看详情；点击加入到项目后，选择人物、场景或音频。'
         : readOnly
-          ? allowDeleteAssetCard['assetSelectionMode']
-            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项'
+          ? allowDeleteAssetCard.assetSelectionMode
+            ? '已选择 ' + allowDeleteAssetCard.selectedAssetIds.length + ' 项'
             : '从总素材加入的场景可在图像替换中作为画面参考。'
-          : allowDeleteAssetCard['assetSelectionMode']
-            ? '已选择 ' + allowDeleteAssetCard['selectedAssetIds']['length'] + ' 项'
+          : allowDeleteAssetCard.assetSelectionMode
+            ? '已选择 ' + allowDeleteAssetCard.selectedAssetIds.length + ' 项'
             : '上传的第一张图片作为基础形象；后续生成会新增形象。',
     calloutActionsHtml: calloutActionsHtml,
     cardsHtml: cardsHtml,
@@ -328,19 +328,19 @@ export function renderPersonReplacementAssetSettingsPage(characters, footerHtml 
           ? '请先从总素材加入场景'
           : '请先上传人物基础形象',
     detailHtml:
-      normalizeText(record?.['mediaKind'])['toLowerCase']() === 'audio'
+      normalizeText(record?.mediaKind).toLowerCase() === 'audio'
         ? renderPersonReplacementAudioAssetDetail(record, {
-            characters: characters['characters'],
+            characters: characters.characters,
             isLibrary: previewAppearance,
             boundCharacters: getPersonReplacementVoiceLibraryBoundCharacters(characters, record),
-            selectedCharacterId: showVoiceLibraryConfirm ? error?.['id'] || '' : '',
+            selectedCharacterId: showVoiceLibraryConfirm ? error?.id || '' : '',
           })
         : renderPersonReplacementAssetDetail(allowDeleteAssetCard, record, {
             showEmptyDescription: previewAppearance || readOnly,
             readOnly: readOnly,
             ...args3,
           }),
-    footerHtml: footerHtml['footerHtml'] || '',
-    splitRatio: allowDeleteAssetCard['assetSplitRatio'],
+    footerHtml: footerHtml.footerHtml || '',
+    splitRatio: allowDeleteAssetCard.assetSplitRatio,
   });
 }

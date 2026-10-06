@@ -23,7 +23,7 @@ const COUNT = audioSelect('count', '生成数量', [1, 2, 3], 2, {
       maxLength: 64,
     }),
   prepare = (slot, targetField, purpose, executionId = false) => ({
-    executionId: executionId ? RH_AUDIO_HELPER_IDS['murekaClone'] : RH_AUDIO_HELPER_IDS['murekaUpload'],
+    executionId: executionId ? RH_AUDIO_HELPER_IDS.murekaClone : RH_AUDIO_HELPER_IDS.murekaUpload,
     slot: slot,
     inputField: 'fileUrl',
     targetField: targetField,
@@ -31,12 +31,12 @@ const COUNT = audioSelect('count', '生成数量', [1, 2, 3], 2, {
     resultType: 'id',
   }),
   fileRules = { audioExtensions: ['mp3', 'm4a'], maxAudioBytes: 10 * 1024 * 1024 };
-export const runningHubMurekaAudioEntries = Object['freeze']([
+export const runningHubMurekaAudioEntries = Object.freeze([
   ...[
     ['v7.6', 0x1d7ef044],
     ['v8', 0x1d7ef045],
     ['v9', 0x1d7ef043],
-  ]['map'](([key, docId], index) =>
+  ].map(([key, docId], index) =>
     createRunningHubAudioCatalogEntry({
       id: 'mureka-' + key + '-bgm',
       name: 'Mureka ' + key + ' 伴奏生成',
@@ -59,7 +59,7 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
     ['o2', 0x1d7ef047],
     ['v8', 0x1d7ef048],
     ['v9', 0x1d7ef049],
-  ]['map'](([result, docId2], data) => {
+  ].map(([result, docId2], data) => {
     const supportsVoice = result !== 'o2';
     return createRunningHubAudioCatalogEntry({
       id: 'mureka-' + result + '-song',
@@ -103,7 +103,7 @@ export const runningHubMurekaAudioEntries = Object['freeze']([
   ...[
     ['v7.6', 0x1d7ef04c],
     ['v8', 0x1d7ef04d],
-  ]['map'](([options, docId3], target) =>
+  ].map(([options, docId3], target) =>
     createRunningHubAudioCatalogEntry({
       id: 'mureka-' + options + '-extend',
       name: 'Mureka ' + options + ' 短歌延长',

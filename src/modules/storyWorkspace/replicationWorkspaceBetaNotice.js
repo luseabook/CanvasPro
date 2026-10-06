@@ -1,15 +1,15 @@
 import { hasSeenBetaNotice, showWorkspaceBetaNotice } from '../workspaceBetaNotice.js';
 export const REPLICATION_BETA_NOTICE_STORAGE_KEY =
   'aicanvas.replicationWorkspace.betaNoticeSeen.v1';
-export function hasAcceptedReplicationBetaNotice(windowObject = globalThis['window']) {
+export function hasAcceptedReplicationBetaNotice(windowObject = globalThis.window) {
   return hasSeenBetaNotice({
     windowObject: windowObject,
     storageKey: REPLICATION_BETA_NOTICE_STORAGE_KEY,
   });
 }
 export function showReplicationWorkspaceBetaNotice({
-  documentObject: documentObject = globalThis['document'],
-  windowObject: windowObject = globalThis['window'],
+  documentObject: documentObject = globalThis.document,
+  windowObject: windowObject = globalThis.window,
   onConfirm: onConfirm = null,
 } = {}) {
   return showWorkspaceBetaNotice({

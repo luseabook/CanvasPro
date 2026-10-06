@@ -14,30 +14,28 @@ import {
   updatePersonReplacementVoiceSeparationState,
 } from './personReplacementVoiceSeparationState.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function cloneJson(item) {
-  return item && typeof item === 'object' ? JSON['parse'](JSON['stringify'](item)) : item;
+  return item && typeof item === 'object' ? JSON.parse(JSON.stringify(item)) : item;
 }
 function createRequestId() {
-  const key = globalThis['crypto']?.['randomUUID']?.();
+  const key = globalThis.crypto?.randomUUID?.();
   return (
-    'replacement-voice-separation-' + (key || Date['now']() + '-' + Math['round'](Math['random']() * 100000))
+    'replacement-voice-separation-' + (key || Date.now() + '-' + Math.round(Math.random() * 100000))
   );
 }
 function resolveSeparationResultUrls(options = {}) {
-  const list = Array['isArray'](options?.['audios']) ? options['audios'] : [],
+  const list = Array.isArray(options?.audios) ? options.audios : [],
     vocalsAudioUrl = normalizeText(
-      options['vocalsAudioUrl'] ||
-        list['find']((index) => normalizeText(index?.['role'])['toLowerCase']() === 'vocals')?.['audioUrl'] ||
-        list[0]?.['audioUrl'],
+      options.vocalsAudioUrl ||
+        list.find((index) => normalizeText(index?.role).toLowerCase() === 'vocals')?.audioUrl ||
+        list[0]?.audioUrl,
     ),
     backgroundAudioUrl = normalizeText(
-      options['backgroundAudioUrl'] ||
-        list['find']((result) => normalizeText(result?.['role'])['toLowerCase']() === 'background')?.[
-          'audioUrl'
-        ] ||
-        list[1]?.['audioUrl'],
+      options.backgroundAudioUrl ||
+        list.find((result) => normalizeText(result?.role).toLowerCase() === 'background')?.audioUrl ||
+        list[1]?.audioUrl,
     );
   if (!vocalsAudioUrl || !backgroundAudioUrl) throw new Error('人声分离完成，但返回结果缺少人声或背景声音频');
   return { vocalsAudioUrl: vocalsAudioUrl, backgroundAudioUrl: backgroundAudioUrl };
@@ -45,7 +43,7 @@ function resolveSeparationResultUrls(options = {}) {
 async function persistSeparatedAudio(data, handler, target = {}) {
   const source = await handler(data, target),
     localPath = normalizeLocalPath(pickResultLocalPath(source)),
-    localUrl = normalizeText(source?.['localUrl'] || source?.['audioUrl'] || localPathToUrl(localPath));
+    localUrl = normalizeText(source?.localUrl || source?.audioUrl || localPathToUrl(localPath));
   if (!localPath || !localUrl) throw new Error('清晰人声已生成，但保存到本地失败');
   return { localPath: localPath, localUrl: localUrl };
 }
@@ -54,11 +52,11 @@ async function cancelRemoteSeparationTask({
   providerProfileId: providerProfileId = '',
 } = {}) {
   const apiKey = await resolveRunningHubWorkflowAccess(providerProfileId);
-  if (!apiKey?.['apiKey']) throw new Error('未配置 RunningHub API Key，无法取消远端任务');
+  if (!apiKey?.apiKey) throw new Error('未配置 RunningHub API Key，无法取消远端任务');
   return cancelRunningHubAudioTask({
-    apiKey: apiKey['apiKey'],
+    apiKey: apiKey.apiKey,
     taskId: taskId2,
-    providerProfileId: providerProfileId || apiKey['providerProfileId'],
+    providerProfileId: providerProfileId || apiKey.providerProfileId,
   });
 }
 export function createPersonReplacementVoiceSeparationRuntime({
@@ -71,7 +69,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
   persistNow: persistNow = async () => {},
   onStateChange: onStateChange = () => {},
   showToast: showToast = () => {},
-  now: now = () => new Date()['toISOString'](),
+  now: now = () => new Date().toISOString(),
   createId: createId = createRequestId,
 } = {}) {
   if (typeof getProject !== 'function' || typeof setProject !== 'function')
@@ -80,8 +78,8 @@ export function createPersonReplacementVoiceSeparationRuntime({
   const map = new Map(),
     handler2 = (next, current) => normalizeText(next) + ':' + normalizeText(current),
     handler3 = (entry, record) =>
-      (Array['isArray'](entry?.['sources']) ? entry['sources'] : [])['find'](
-        (payload) => normalizeText(payload?.['id']) === normalizeText(record),
+      (Array.isArray(entry?.sources) ? entry.sources : []).find(
+        (payload) => normalizeText(payload?.id) === normalizeText(record),
       ),
     handler4 = ({
       projectId: projectId,
@@ -97,8 +95,8 @@ export function createPersonReplacementVoiceSeparationRuntime({
         );
       return (
         !enabled &&
-        normalizeText(project?.['id']) === normalizeText(projectId) &&
-        normalizeText(personReplacementVoiceSeparationState['requestId']) === normalizeText(requestId) &&
+        normalizeText(project?.id) === normalizeText(projectId) &&
+        normalizeText(personReplacementVoiceSeparationState.requestId) === normalizeText(requestId) &&
         createPersonReplacementVoiceSeparationRevision({ project: project, source: source2 }) ===
           inputRevision
       );
@@ -106,19 +104,19 @@ export function createPersonReplacementVoiceSeparationRuntime({
     handler5 = (sourceId2, args = {}, { persistIdentity: persistIdentity = false } = {}) => {
       if (!handler4(sourceId2)) return null;
       const args2 = getProject(),
-        args3 = resolvePersonReplacementVoiceSeparationState(args2, sourceId2['sourceId']),
+        args3 = resolvePersonReplacementVoiceSeparationState(args2, sourceId2.sourceId),
         personReplacementVoiceSeparationState2 = normalizePersonReplacementVoiceSeparationState({
           ...args3,
           ...args,
-          sourceId: sourceId2['sourceId'],
-          requestId: sourceId2['requestId'],
-          inputRevision: sourceId2['inputRevision'],
+          sourceId: sourceId2.sourceId,
+          requestId: sourceId2.requestId,
+          inputRevision: sourceId2.inputRevision,
         }),
         handle = setProject(
           {
             ...args2,
             audio: updatePersonReplacementVoiceSeparationState(
-              args2['audio'],
+              args2.audio,
               personReplacementVoiceSeparationState2,
             ),
           },
@@ -126,13 +124,13 @@ export function createPersonReplacementVoiceSeparationRuntime({
         );
       return (
         onStateChange({
-          sourceId: sourceId2['sourceId'],
+          sourceId: sourceId2.sourceId,
           state: cloneJson(personReplacementVoiceSeparationState2),
           project: cloneJson(handle || getProject()),
         }),
         persistIdentity &&
-          personReplacementVoiceSeparationState2['taskId'] !== args3['taskId'] &&
-          void Promise['resolve'](persistNow())['catch'](() => {}),
+          personReplacementVoiceSeparationState2.taskId !== args3.taskId &&
+          void Promise.resolve(persistNow()).catch(() => {}),
         personReplacementVoiceSeparationState2
       );
     },
@@ -142,10 +140,10 @@ export function createPersonReplacementVoiceSeparationRuntime({
       requestId: requestId2,
       inputRevision: inputRevision2,
     }) => {
-      const args4 = resolvePersonReplacementVoiceSeparationState(project2, source3['id']),
+      const args4 = resolvePersonReplacementVoiceSeparationState(project2, source3.id),
         personReplacementVoiceSeparationState3 = normalizePersonReplacementVoiceSeparationState({
           ...args4,
-          sourceId: source3['id'],
+          sourceId: source3.id,
           status: 'submitting',
           requestId: requestId2,
           inputRevision: inputRevision2,
@@ -159,7 +157,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
           {
             ...project2,
             audio: updatePersonReplacementVoiceSeparationState(
-              project2['audio'],
+              project2.audio,
               personReplacementVoiceSeparationState3,
             ),
           },
@@ -167,7 +165,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
         );
       return (
         onStateChange({
-          sourceId: source3['id'],
+          sourceId: source3.id,
           state: cloneJson(personReplacementVoiceSeparationState3),
           project: cloneJson(state || getProject()),
         }),
@@ -196,30 +194,30 @@ export function createPersonReplacementVoiceSeparationRuntime({
             ? await resumeSeparation(
                 taskId,
                 { providerProfileId: providerProfileId },
-                { signal: runtime['abortController']['signal'], pollImmediately: true },
+                { signal: runtime.abortController.signal, pollImmediately: true },
               )
             : await runSeparation(
                 { audioUrl: localPathToUrl(sourceVideoRef) || sourceVideoRef },
                 {
-                  signal: runtime['abortController']['signal'],
+                  signal: runtime.abortController.signal,
                   onTaskMeta: (options2 = {}) => {
-                    ((runtime['taskId'] = normalizeText(options2['taskId'])),
-                      (runtime['providerProfileId'] = normalizeText(options2['providerProfileId'])),
+                    ((runtime.taskId = normalizeText(options2.taskId)),
+                      (runtime.providerProfileId = normalizeText(options2.providerProfileId)),
                       handler5(
                         config,
                         {
                           status: 'running',
-                          taskId: runtime['taskId'],
-                          providerProfileId: runtime['providerProfileId'],
+                          taskId: runtime.taskId,
+                          providerProfileId: runtime.providerProfileId,
                         },
                         { persistIdentity: true },
                       ));
                   },
                   onTaskId: (input) => {
-                    ((runtime['taskId'] = normalizeText(input)),
+                    ((runtime.taskId = normalizeText(input)),
                       handler5(
                         config,
-                        { status: 'running', taskId: runtime['taskId'] },
+                        { status: 'running', taskId: runtime.taskId },
                         { persistIdentity: true },
                       ));
                   },
@@ -227,24 +225,24 @@ export function createPersonReplacementVoiceSeparationRuntime({
               ),
           separationResultUrls = resolveSeparationResultUrls(scope);
         if (!handler4(config)) return null;
-        const [vocalsAudioRef, backgroundAudioRef] = await Promise['all']([
-          persistSeparatedAudio(separationResultUrls['vocalsAudioUrl'], saveAudio, {
-            signal: runtime['abortController']['signal'],
+        const [vocalsAudioRef, backgroundAudioRef] = await Promise.all([
+          persistSeparatedAudio(separationResultUrls.vocalsAudioUrl, saveAudio, {
+            signal: runtime.abortController.signal,
           }),
-          persistSeparatedAudio(separationResultUrls['backgroundAudioUrl'], saveAudio, {
-            signal: runtime['abortController']['signal'],
+          persistSeparatedAudio(separationResultUrls.backgroundAudioUrl, saveAudio, {
+            signal: runtime.abortController.signal,
           }),
         ]);
         if (!handler4(config)) return null;
         const output = handler5(config, {
           status: 'succeeded',
-          taskId: normalizeText(scope?.['taskId'] || runtime['taskId']),
-          providerProfileId: runtime['providerProfileId'] || providerProfileId,
+          taskId: normalizeText(scope?.taskId || runtime.taskId),
+          providerProfileId: runtime.providerProfileId || providerProfileId,
           completedAt: now(),
-          vocalsAudioRef: vocalsAudioRef['localPath'],
-          vocalsAudioUrl: vocalsAudioRef['localUrl'],
-          backgroundAudioRef: backgroundAudioRef['localPath'],
-          backgroundAudioUrl: backgroundAudioRef['localUrl'],
+          vocalsAudioRef: vocalsAudioRef.localPath,
+          vocalsAudioUrl: vocalsAudioRef.localUrl,
+          backgroundAudioRef: backgroundAudioRef.localPath,
+          backgroundAudioUrl: backgroundAudioRef.localUrl,
           error: '',
         });
         try {
@@ -252,55 +250,55 @@ export function createPersonReplacementVoiceSeparationRuntime({
         } catch {}
         return (showToast('清晰人声提取完成，已自动用于声音克隆。', 'success'), output);
       } catch (error) {
-        if (runtime['abortController']['signal']['aborted'] || enabled) return null;
-        const error2 = normalizeText(error?.['message'] || error) || '清晰人声提取失败',
+        if (runtime.abortController.signal.aborted || enabled) return null;
+        const error2 = normalizeText(error?.message || error) || '清晰人声提取失败',
           value2 = handler5(config, { status: 'failed', completedAt: now(), error: error2 });
         return (showToast('清晰人声提取失败：' + error2, 'error'), value2);
       } finally {
         const value3 = handler2(projectId2, sourceId3);
-        if (map['get'](value3) === runtime) map['delete'](value3);
+        if (map.get(value3) === runtime) map.delete(value3);
       }
     },
     handler8 = ({ project: project3, source: source4, state: state2, resume: resume = false }) => {
-      const projectId3 = normalizeText(project3['id']),
-        sourceId4 = normalizeText(source4['id']),
+      const projectId3 = normalizeText(project3.id),
+        sourceId4 = normalizeText(source4.id),
         value4 = handler2(projectId3, sourceId4),
-        value5 = map['get'](value4);
-      if (value5?.['promise']) return value5['promise'];
+        value5 = map.get(value4);
+      if (value5?.promise) return value5.promise;
       const runtime2 = {
         abortController: new AbortController(),
-        taskId: normalizeText(state2['taskId']),
-        providerProfileId: normalizeText(state2['providerProfileId']),
+        taskId: normalizeText(state2.taskId),
+        providerProfileId: normalizeText(state2.providerProfileId),
         promise: null,
       };
       return (
-        (runtime2['promise'] = handler7({
+        (runtime2.promise = handler7({
           projectId: projectId3,
           sourceId: sourceId4,
-          sourceVideoRef: source4['videoRef'],
-          requestId: state2['requestId'],
-          inputRevision: state2['inputRevision'],
-          taskId: state2['taskId'],
-          providerProfileId: state2['providerProfileId'],
+          sourceVideoRef: source4.videoRef,
+          requestId: state2.requestId,
+          inputRevision: state2.inputRevision,
+          taskId: state2.taskId,
+          providerProfileId: state2.providerProfileId,
           resume: resume,
           runtime: runtime2,
         })),
-        map['set'](value4, runtime2),
-        runtime2['promise']
+        map.set(value4, runtime2),
+        runtime2.promise
       );
     },
     extract = (value6 = '') => {
-      if (enabled) return Promise['resolve'](null);
+      if (enabled) return Promise.resolve(null);
       const project4 = getProject(),
         source5 = handler3(project4, value6);
-      if (!source5?.['videoRef'])
-        return (showToast('原始视频不可用，无法提取清晰人声。', 'warn'), Promise['resolve'](null));
+      if (!source5?.videoRef)
+        return (showToast('原始视频不可用，无法提取清晰人声。', 'warn'), Promise.resolve(null));
       const personReplacementVoiceSeparationState4 = resolvePersonReplacementVoiceSeparationState(
         project4,
-        source5['id'],
+        source5.id,
       );
       if (isPersonReplacementVoiceSeparationActive(personReplacementVoiceSeparationState4))
-        return resume2(source5['id']);
+        return resume2(source5.id);
       const requestId4 = normalizeText(createId()),
         inputRevision4 = createPersonReplacementVoiceSeparationRevision({
           project: project4,
@@ -318,18 +316,18 @@ export function createPersonReplacementVoiceSeparationRuntime({
       );
     },
     resume2 = (value7 = '') => {
-      if (enabled) return Promise['resolve'](null);
+      if (enabled) return Promise.resolve(null);
       const project5 = getProject(),
         source6 = handler3(project5, value7),
         state4 = resolvePersonReplacementVoiceSeparationState(project5, value7);
-      if (!source6?.['videoRef'] || !isPersonReplacementVoiceSeparationActive(state4))
-        return Promise['resolve'](null);
+      if (!source6?.videoRef || !isPersonReplacementVoiceSeparationActive(state4))
+        return Promise.resolve(null);
       const inputRevision5 = createPersonReplacementVoiceSeparationRevision({
         project: project5,
         source: source6,
       });
-      if (!state4['taskId'] || state4['inputRevision'] !== inputRevision5) {
-        const value8 = Boolean(state4['inputRevision'] && state4['inputRevision'] !== inputRevision5),
+      if (!state4.taskId || state4.inputRevision !== inputRevision5) {
+        const value8 = Boolean(state4.inputRevision && state4.inputRevision !== inputRevision5),
           personReplacementVoiceSeparationState5 = normalizePersonReplacementVoiceSeparationState({
             ...state4,
             status: 'failed',
@@ -346,7 +344,7 @@ export function createPersonReplacementVoiceSeparationRuntime({
             {
               ...project5,
               audio: updatePersonReplacementVoiceSeparationState(
-                project5['audio'],
+                project5.audio,
                 personReplacementVoiceSeparationState5,
               ),
             },
@@ -354,11 +352,11 @@ export function createPersonReplacementVoiceSeparationRuntime({
           );
         return (
           onStateChange({
-            sourceId: source6['id'],
+            sourceId: source6.id,
             state: cloneJson(personReplacementVoiceSeparationState5),
             project: cloneJson(value9 || getProject()),
           }),
-          Promise['resolve'](null)
+          Promise.resolve(null)
         );
       }
       return handler8({ project: project5, source: source6, state: state4, resume: true });
@@ -370,39 +368,39 @@ export function createPersonReplacementVoiceSeparationRuntime({
         requestId5 = resolvePersonReplacementVoiceSeparationState(projectId4, value10);
       if (!sourceId5 || !isPersonReplacementVoiceSeparationActive(requestId5)) return false;
       const value11 = {
-          projectId: projectId4['id'],
-          sourceId: sourceId5['id'],
-          requestId: requestId5['requestId'],
-          inputRevision: requestId5['inputRevision'],
+          projectId: projectId4.id,
+          sourceId: sourceId5.id,
+          requestId: requestId5.requestId,
+          inputRevision: requestId5.inputRevision,
         },
-        value12 = handler2(projectId4['id'], sourceId5['id']),
-        value13 = map['get'](value12);
-      (value13?.['abortController']?.['abort']?.(),
-        map['delete'](value12),
+        value12 = handler2(projectId4.id, sourceId5.id),
+        value13 = map.get(value12);
+      (value13?.abortController?.abort?.(),
+        map.delete(value12),
         handler5(value11, { status: 'cancelled', completedAt: now(), error: '' }));
-      const taskId3 = normalizeText(requestId5['taskId'] || value13?.['taskId']);
+      const taskId3 = normalizeText(requestId5.taskId || value13?.taskId);
       if (taskId3)
         try {
           await cancelSeparation({
             taskId: taskId3,
-            providerProfileId: requestId5['providerProfileId'] || value13?.['providerProfileId'] || '',
+            providerProfileId: requestId5.providerProfileId || value13?.providerProfileId || '',
           });
         } catch (value14) {
-          console['warn']('[replacementStudio] voice separation cancel failed', value14);
+          console.warn('[replacementStudio] voice separation cancel failed', value14);
           const error3 = '已停止本地等待，但云端任务取消失败，可能仍在运行。请到任务平台确认状态。';
           return (handler5(value11, { error: error3 }), showToast(error3, 'warn'), true);
         }
       return (showToast('已取消清晰人声提取。', 'info'), true);
     };
-  return Object['freeze']({
+  return Object.freeze({
     extract: extract,
     resume: resume2,
     cancel: cancel,
     destroy() {
       if (enabled) return;
       ((enabled = true),
-        map['forEach']((value15) => value15['abortController']?.['abort']?.()),
-        map['clear']());
+        map.forEach((value15) => value15.abortController?.abort?.()),
+        map.clear());
     },
   });
 }

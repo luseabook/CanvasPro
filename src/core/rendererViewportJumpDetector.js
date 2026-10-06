@@ -1,9 +1,9 @@
 function normalizeViewport(box = {}) {
-  const count = Number(box?.['zoom']);
+  const count = Number(box?.zoom);
   return {
-    x: Number['isFinite'](Number(box?.['x'])) ? Number(box['x']) : 0,
-    y: Number['isFinite'](Number(box?.['y'])) ? Number(box['y']) : 0,
-    zoom: Number['isFinite'](count) && count > 0 ? count : 1,
+    x: Number.isFinite(Number(box?.x)) ? Number(box.x) : 0,
+    y: Number.isFinite(Number(box?.y)) ? Number(box.y) : 0,
+    zoom: Number.isFinite(count) && count > 0 ? count : 1,
   };
 }
 export function createRendererViewportJumpDetector({
@@ -18,9 +18,9 @@ export function createRendererViewportJumpDetector({
       value = box2;
       if (!box3) return false;
       return (
-        Math['abs'](box2['x'] - box3['x']) > panThreshold ||
-        Math['abs'](box2['y'] - box3['y']) > panThreshold ||
-        Math['abs'](box2['zoom'] - box3['zoom']) > zoomThreshold
+        Math.abs(box2.x - box3.x) > panThreshold ||
+        Math.abs(box2.y - box3.y) > panThreshold ||
+        Math.abs(box2.zoom - box3.zoom) > zoomThreshold
       );
     },
     reset() {

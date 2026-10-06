@@ -1,8 +1,8 @@
 import { getAudioWorkflowSlots, normalizeAudioWorkflowRefSlots } from './audioWorkflowRefSlots.js';
 function getSlotOrder(list = []) {
-  return (Array['isArray'](list) ? list : [])
-    ['map']((value) => String(value?.['slot'] || '')['trim']())
-    ['filter'](Boolean);
+  return (Array.isArray(list) ? list : [])
+    .map((value) => String(value?.slot || '').trim())
+    .filter(Boolean);
 }
 function createSlotItem(payloadRef = {}, origin = 'node') {
   const item = {
@@ -13,9 +13,9 @@ function createSlotItem(payloadRef = {}, origin = 'node') {
     payloadRef: payloadRef,
   };
   if (origin === 'asset') {
-    const key = String(payloadRef['assetId'] || ''),
-      index = String(payloadRef['assetIndex'] ?? '');
-    item['sourceId'] = 'asset:' + key + ':' + index;
+    const key = String(payloadRef.assetId || ''),
+      index = String(payloadRef.assetIndex ?? '');
+    item.sourceId = 'asset:' + key + ':' + index;
   }
   return item;
 }
@@ -25,13 +25,13 @@ function createAssetAudioPayloadRef(url = {}, refSlot = '') {
     sourceId: '',
     sourceType: 'asset-audio',
     refSlot: refSlot,
-    url: url['url'],
-    assetId: url['assetId'],
-    assetIndex: url['itemIndex'],
+    url: url.url,
+    assetId: url.assetId,
+    assetIndex: url.itemIndex,
   };
 }
 function isUsableAudioAssetRef(response = {}) {
-  return String(response?.['type'] || '') === 'audio' && !!response?.['url'];
+  return String(response?.type || '') === 'audio' && !!response?.url;
 }
 export function buildAudioWorkflowInputPlan({
   workflowKey: workflowKey = '',
@@ -40,40 +40,40 @@ export function buildAudioWorkflowInputPlan({
 } = {}) {
   const slotDefs = getAudioWorkflowSlots(workflowKey),
     slotOrder = getSlotOrder(slotDefs),
-    slotItems = Object['fromEntries'](slotOrder['map']((result) => [result, null])),
+    slotItems = Object.fromEntries(slotOrder.map((result) => [result, null])),
     map = new Set(),
     audioRefs2 = [],
     unassignedAudioRefs = [],
     nodeAudioRefs = normalizeAudioWorkflowRefSlots(audioRefs, workflowKey);
   return (
-    nodeAudioRefs['forEach']((data) => {
-      const options = String(data?.['refSlot'] || '')['trim']();
-      audioRefs2['push'](data);
-      if (!slotOrder['includes'](options) || map['has'](options)) {
-        unassignedAudioRefs['push'](data);
+    nodeAudioRefs.forEach((data) => {
+      const options = String(data?.refSlot || '').trim();
+      audioRefs2.push(data);
+      if (!slotOrder.includes(options) || map.has(options)) {
+        unassignedAudioRefs.push(data);
         return;
       }
-      (map['add'](options), (slotItems[options] = createSlotItem(data, 'node')));
+      (map.add(options), (slotItems[options] = createSlotItem(data, 'node')));
     }),
-    (Array['isArray'](assetInputRefs) ? assetInputRefs : [])['forEach']((assetOccurrence) => {
+    (Array.isArray(assetInputRefs) ? assetInputRefs : []).forEach((assetOccurrence) => {
       if (!isUsableAudioAssetRef(assetOccurrence)) return;
-      const enabled = slotOrder['find']((target) => !map['has'](target)) || '';
+      const enabled = slotOrder.find((target) => !map.has(target)) || '';
       if (!enabled) return;
-      map['add'](enabled);
+      map.add(enabled);
       const args = createAssetAudioPayloadRef(assetOccurrence, enabled);
-      (audioRefs2['push'](args),
+      (audioRefs2.push(args),
         (slotItems[enabled] = createSlotItem(
           {
             ...args,
-            assetOccurrence: assetOccurrence['assetMentionOccurrence'],
-            assetRefSource: assetOccurrence['assetRefSource'] || 'prompt',
+            assetOccurrence: assetOccurrence.assetMentionOccurrence,
+            assetRefSource: assetOccurrence.assetRefSource || 'prompt',
             assetInputRef: assetOccurrence,
           },
           'asset',
         )));
     }),
     {
-      workflowKey: String(workflowKey || '')['trim'](),
+      workflowKey: String(workflowKey || '').trim(),
       slotDefs: slotDefs,
       slotOrder: slotOrder,
       slotItems: slotItems,

@@ -361,15 +361,15 @@ const GENERATION_NODE_HELP_ICON_HTML =
   '<span class="generation-node-help-tip-icon" aria-hidden="true"></span>';
 
 export function attachGenerationNodePromptTools(enabled9, enabled10 = {}) {
-  if (!enabled9 || !enabled10?.['panel']) return null;
+  if (!enabled9 || !enabled10?.panel) return null;
   return (
-    enabled9['_promptPresetTrigger']?.['remove']?.(),
-    (enabled9['_promptPresetTrigger'] = createPromptPresetTriggerController({
-      panel: enabled10['panel'],
-      getPromptEl: () => enabled9['promptEl'],
-      getNodeType: () => enabled9['_data']?.['type'],
-      getNodeId: () => enabled9['nodeId'],
-      onGenerate: (value33, value34) => enabled9['_onGenerate']?.(value33, value34),
+    enabled9._promptPresetTrigger?.remove?.(),
+    (enabled9._promptPresetTrigger = createPromptPresetTriggerController({
+      panel: enabled10.panel,
+      getPromptEl: () => enabled9.promptEl,
+      getNodeType: () => enabled9._data?.type,
+      getNodeId: () => enabled9.nodeId,
+      onGenerate: (value33, value34) => enabled9._onGenerate?.(value33, value34),
     })),
     attachGenerationNodeHelpTip(enabled9, enabled10)
   );

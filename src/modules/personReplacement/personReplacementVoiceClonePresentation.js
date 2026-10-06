@@ -12,15 +12,15 @@ import {
   resolvePersonReplacementVoiceSeparationState,
 } from './personReplacementVoiceSeparationState.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function escapeHtml(item) {
   return String(item ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&apos;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&apos;');
 }
 function normalizeMediaUrl(key) {
   const text = normalizeText(key);
@@ -28,10 +28,10 @@ function normalizeMediaUrl(key) {
   return localPathToUrl(text) || text;
 }
 function formatClock(index) {
-  const result = Math['max'](0, Number(index) || 0),
-    data = Math['floor'](result / 60),
-    options = Math['floor'](result % 60);
-  return String(data)['padStart'](2, '0') + ':' + String(options)['padStart'](2, '0');
+  const result = Math.max(0, Number(index) || 0),
+    data = Math.floor(result / 60),
+    options = Math.floor(result % 60);
+  return String(data).padStart(2, '0') + ':' + String(options).padStart(2, '0');
 }
 function getCharacterAppearance(options2 = {}) {
   const workspaceAssetAppearances = getWorkspaceAssetAppearances(options2);
@@ -39,19 +39,19 @@ function getCharacterAppearance(options2 = {}) {
 }
 function getCharacterVoiceUrl(options3 = {}) {
   return normalizeMediaUrl(
-    options3['voiceReference']?.['audioUrl'] ||
-      options3['voiceReference']?.['localPath'] ||
-      options3['voiceRef'],
+    options3.voiceReference?.audioUrl ||
+      options3.voiceReference?.localPath ||
+      options3.voiceRef,
   );
 }
 export function getPersonReplacementVoiceCloneCharacters(options4 = {}) {
-  return Array['isArray'](options4['characters']) ? options4['characters'] : [];
+  return Array.isArray(options4.characters) ? options4.characters : [];
 }
 export function renderPersonReplacementVoiceCloneCharacterCards(target) {
   const list = getPersonReplacementVoiceCloneCharacters(target);
-  return list['map']((error) => {
+  return list.map((error) => {
     const characterAppearance = getCharacterAppearance(error),
-      mediaUrl = normalizeMediaUrl(characterAppearance?.['imageUrl']),
+      mediaUrl = normalizeMediaUrl(characterAppearance?.imageUrl),
       characterVoiceUrl = getCharacterVoiceUrl(error),
       source = Boolean(characterVoiceUrl),
       renderPersonReplacementVoicePreviewPlayer2 = renderPersonReplacementVoicePreviewPlayer(
@@ -64,19 +64,19 @@ export function renderPersonReplacementVoiceCloneCharacterCards(target) {
       '">\n      <button type="button" class="person-replacement-voice-asset-card' +
       (source ? ' has-audio' : ' is-missing-audio') +
       '" data-person-replacement-action="select-voice-asset" data-person-replacement-voice-asset-id="' +
-      escapeHtml(error['id']) +
+      escapeHtml(error.id) +
       '" data-character-id="' +
-      escapeHtml(error['id']) +
+      escapeHtml(error.id) +
       '" ' +
       (source ? 'draggable="true"' : 'disabled') +
       ' aria-label="' +
-      escapeHtml(source ? '加载' + error['name'] + '的人物音频' : error['name'] + '无音频') +
+      escapeHtml(source ? '加载' + error.name + '的人物音频' : error.name + '无音频') +
       '">\n        <span class="person-replacement-voice-asset-image">' +
       (mediaUrl
-        ? '<img src="' + escapeHtml(mediaUrl) + '" alt="' + escapeHtml(error['name']) + '">'
+        ? '<img src="' + escapeHtml(mediaUrl) + '" alt="' + escapeHtml(error.name) + '">'
         : '<span aria-hidden="true">人</span>') +
       '</span>\n        <span class="person-replacement-voice-asset-copy"><strong>' +
-      escapeHtml(error['name']) +
+      escapeHtml(error.name) +
       '</strong><small>' +
       (source ? '选择人物素材，使用对应声音' : '无音频') +
       '</small></span>\n        <span class="person-replacement-voice-asset-status' +
@@ -87,7 +87,7 @@ export function renderPersonReplacementVoiceCloneCharacterCards(target) {
       renderPersonReplacementVoicePreviewPlayer2 +
       '\n    </article>'
     );
-  })['join']('');
+  }).join('');
 }
 function renderVoiceCloneCharacterAssets(next) {
   const renderPersonReplacementVoiceCloneCharacterCards2 =
@@ -100,24 +100,22 @@ function renderVoiceCloneCharacterAssets(next) {
   );
 }
 export function renderPersonReplacementVoiceCloneSourceCards(current) {
-  const list2 = Array['isArray'](current['sources']) ? current['sources'] : [],
-    list3 = Array['isArray'](current['shots']) ? current['shots'] : [];
-  return list2['map']((entry, record) => {
-    const payload = entry['id'] === current['workspace']['selectedVoiceSourceId'],
+  const list2 = Array.isArray(current.sources) ? current.sources : [],
+    list3 = Array.isArray(current.shots) ? current.shots : [];
+  return list2.map((entry, record) => {
+    const payload = entry.id === current.workspace.selectedVoiceSourceId,
       handle =
-        list3['find']((state) => state?.['sourceId'] === entry['id'] && state?.['keyframeRef'])?.[
-          'keyframeRef'
-        ] || '',
-      mediaUrl2 = normalizeMediaUrl(entry['thumbnailRef'] || handle),
-      mediaUrl3 = normalizeMediaUrl(current['sourcePreviewRefs']?.[entry['id']] || entry['videoRef']),
-      audioUrl = normalizeMediaUrl(entry['videoRef']),
-      response = resolvePersonReplacementVoiceSeparationState(current, entry['id']),
+        list3.find((state) => state?.sourceId === entry.id && state?.keyframeRef)?.keyframeRef || '',
+      mediaUrl2 = normalizeMediaUrl(entry.thumbnailRef || handle),
+      mediaUrl3 = normalizeMediaUrl(current.sourcePreviewRefs?.[entry.id] || entry.videoRef),
+      audioUrl = normalizeMediaUrl(entry.videoRef),
+      response = resolvePersonReplacementVoiceSeparationState(current, entry.id),
       isPersonReplacementVoiceSeparationActive2 = isPersonReplacementVoiceSeparationActive(response),
-      audioUrl2 = normalizeMediaUrl(response['vocalsAudioRef'] || response['vocalsAudioUrl']),
+      audioUrl2 = normalizeMediaUrl(response.vocalsAudioRef || response.vocalsAudioUrl),
       config = Boolean(audioUrl2),
-      scope = entry['fileName'] || '视频 ' + (record + 1),
-      count = Number(entry['durationSec']),
-      input = Number['isFinite'](count) && count > 0 ? formatClock(count) : '完整视频',
+      scope = entry.fileName || '视频 ' + (record + 1),
+      count = Number(entry.durationSec),
+      input = Number.isFinite(count) && count > 0 ? formatClock(count) : '完整视频',
       output = mediaUrl2
         ? '<img src="' +
           escapeHtml(mediaUrl2) +
@@ -134,7 +132,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
         pauseLabel: '暂停' + scope + '的原始声音',
         dataAttributes: {
           'data-person-replacement-voice-track': 'original',
-          'data-person-replacement-voice-track-source-id': entry['id'],
+          'data-person-replacement-voice-track-source-id': entry.id,
         },
       }),
       value2 = config
@@ -145,7 +143,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
             pauseLabel: '暂停' + scope + '的清晰人声',
             dataAttributes: {
               'data-person-replacement-voice-track': 'vocals',
-              'data-person-replacement-voice-track-source-id': entry['id'],
+              'data-person-replacement-voice-track-source-id': entry.id,
             },
           })
         : '',
@@ -153,7 +151,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
         ? '提取清晰人声'
         : config
           ? '已提取清晰人声'
-          : response['status'] === 'failed'
+          : response.status === 'failed'
             ? '重试'
             : '提取清晰人声',
       value4 = isPersonReplacementVoiceSeparationActive2
@@ -163,7 +161,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
         : config
           ? '已自动设为声音克隆输入'
           : '',
-      errorMessage = response['status'] === 'failed' ? response['error'] || '提取失败，请重试' : '',
+      errorMessage = response.status === 'failed' ? response.error || '提取失败，请重试' : '',
       value5 = errorMessage
         ? renderGenerationErrorCardMarkup({
             errorMessage: errorMessage,
@@ -185,11 +183,11 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
       (payload ? ' is-selected' : '') +
       (isPersonReplacementVoiceSeparationActive2 ? ' is-extracting' : '') +
       '" data-person-replacement-voice-source-shell data-source-id="' +
-      escapeHtml(entry['id']) +
+      escapeHtml(entry.id) +
       '">\n      <div class="person-replacement-voice-source-summary">\n        <button type="button" class="person-replacement-voice-source-card' +
       (payload ? ' is-selected' : '') +
       '" data-person-replacement-action="select-voice-source" data-source-id="' +
-      escapeHtml(entry['id']) +
+      escapeHtml(entry.id) +
       '" aria-pressed="' +
       payload +
       '" aria-label="' +
@@ -208,7 +206,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
       '" data-person-replacement-action="' +
       (isPersonReplacementVoiceSeparationActive2 ? 'cancel-voice-separation' : 'extract-clean-voice') +
       '" data-source-id="' +
-      escapeHtml(entry['id']) +
+      escapeHtml(entry.id) +
       '" title="' +
       escapeHtml(value6) +
       '" aria-label="' +
@@ -241,7 +239,7 @@ export function renderPersonReplacementVoiceCloneSourceCards(current) {
         : '') +
       '\n      </div>\n    </article>'
     );
-  })['join']('');
+  }).join('');
 }
 function renderVoiceCloneSources(value8) {
   const renderPersonReplacementVoiceCloneSourceCards2 = renderPersonReplacementVoiceCloneSourceCards(value8);
@@ -254,9 +252,9 @@ function renderVoiceCloneSources(value8) {
 }
 function renderVoiceLayoutSplitter(value9, value10) {
   const value11 = value9 === 'assets',
-    value12 = value11 ? value10['assetsEnd'] : value10['sourcesEnd'],
-    value13 = value11 ? 16 : value10['assetsEnd'] + 16,
-    value14 = value11 ? value10['sourcesEnd'] - 16 : 60,
+    value12 = value11 ? value10.assetsEnd : value10.sourcesEnd,
+    value13 = value11 ? 16 : value10.assetsEnd + 16,
+    value14 = value11 ? value10.sourcesEnd - 16 : 60,
     value15 = value11 ? '调整原始视频栏宽度' : '调整人物素材栏宽度';
   return (
     '<div class="person-replacement-voice-layout-splitter panel-resize-handle panel-resize-handle--transient is-' +
@@ -266,55 +264,55 @@ function renderVoiceLayoutSplitter(value9, value10) {
     '" role="separator" aria-orientation="vertical" aria-label="' +
     value15 +
     '" aria-valuemin="' +
-    Math['round'](value13) +
+    Math.round(value13) +
     '" aria-valuemax="' +
-    Math['round'](value14) +
+    Math.round(value14) +
     '" aria-valuenow="' +
-    Math['round'](value12) +
+    Math.round(value12) +
     '" tabindex="0"></div>'
   );
 }
 export function applyPersonReplacementVoiceLayoutToElement(el, value16) {
   const personReplacementVoiceLayout = normalizePersonReplacementVoiceLayout(value16);
-  (el?.['style']?.['setProperty']?.(
+  (el?.style?.setProperty?.(
     '--person-replacement-voice-assets-end',
-    personReplacementVoiceLayout['assetsEnd'] + '%',
+    personReplacementVoiceLayout.assetsEnd + '%',
   ),
-    el?.['style']?.['setProperty']?.(
+    el?.style?.setProperty?.(
       '--person-replacement-voice-sources-end',
-      personReplacementVoiceLayout['sourcesEnd'] + '%',
+      personReplacementVoiceLayout.sourcesEnd + '%',
     ));
-  const el2 = el?.['querySelector']?.('[data-person-replacement-voice-layout-splitter="assets"]'),
-    el3 = el?.['querySelector']?.('[data-person-replacement-voice-layout-splitter="sources"]');
+  const el2 = el?.querySelector?.('[data-person-replacement-voice-layout-splitter="assets"]'),
+    el3 = el?.querySelector?.('[data-person-replacement-voice-layout-splitter="sources"]');
   return (
-    el2?.['setAttribute']?.(
+    el2?.setAttribute?.(
       'aria-valuemax',
-      String(Math['round'](personReplacementVoiceLayout['sourcesEnd'] - 16)),
+      String(Math.round(personReplacementVoiceLayout.sourcesEnd - 16)),
     ),
-    el2?.['setAttribute']?.(
+    el2?.setAttribute?.(
       'aria-valuenow',
-      String(Math['round'](personReplacementVoiceLayout['assetsEnd'])),
+      String(Math.round(personReplacementVoiceLayout.assetsEnd)),
     ),
-    el3?.['setAttribute']?.(
+    el3?.setAttribute?.(
       'aria-valuemin',
-      String(Math['round'](personReplacementVoiceLayout['assetsEnd'] + 16)),
+      String(Math.round(personReplacementVoiceLayout.assetsEnd + 16)),
     ),
-    el3?.['setAttribute']?.(
+    el3?.setAttribute?.(
       'aria-valuenow',
-      String(Math['round'](personReplacementVoiceLayout['sourcesEnd'])),
+      String(Math.round(personReplacementVoiceLayout.sourcesEnd)),
     ),
     personReplacementVoiceLayout
   );
 }
 export function renderPersonReplacementVoiceClonePage(value17, { footerHtml: footerHtml = '' } = {}) {
   const personReplacementVoiceLayout2 = normalizePersonReplacementVoiceLayout(
-    value17['workspace']['voiceLayout'],
+    value17.workspace.voiceLayout,
   );
   return (
     '<div class="person-replacement-voice-page">\n    <div class="person-replacement-voice-layout" data-person-replacement-voice-layout style="--person-replacement-voice-assets-end:' +
-    personReplacementVoiceLayout2['assetsEnd'] +
+    personReplacementVoiceLayout2.assetsEnd +
     '%;--person-replacement-voice-sources-end:' +
-    personReplacementVoiceLayout2['sourcesEnd'] +
+    personReplacementVoiceLayout2.sourcesEnd +
     '%">\n      ' +
     renderVoiceCloneSources(value17) +
     '\n      ' +

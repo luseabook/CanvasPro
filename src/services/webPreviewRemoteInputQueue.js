@@ -1,5 +1,5 @@
 function isMouseInputType(value, item) {
-  return value?.['kind'] === 'mouse' && value?.['type'] === item;
+  return value?.kind === 'mouse' && value?.type === item;
 }
 
 function mergePendingInput(event, event2) {
@@ -7,8 +7,8 @@ function mergePendingInput(event, event2) {
   if (isMouseInputType(event, 'mouseWheel') && isMouseInputType(event2, 'mouseWheel'))
     return {
       ...event2,
-      deltaX: (Number(event['deltaX']) || 0) + (Number(event2['deltaX']) || 0),
-      deltaY: (Number(event['deltaY']) || 0) + (Number(event2['deltaY']) || 0),
+      deltaX: (Number(event.deltaX) || 0) + (Number(event2.deltaX) || 0),
+      deltaY: (Number(event.deltaY) || 0) + (Number(event2.deltaY) || 0),
     };
   return null;
 }
@@ -22,29 +22,29 @@ export function createWebPreviewRemoteInputQueue({ send: send } = {}) {
     if (key || enabled) return;
     key = true;
     try {
-      while (!enabled && list['length'] > 0) {
-        const index = list['shift']();
+      while (!enabled && list.length > 0) {
+        const index = list.shift();
         try {
           await send(index);
         } catch {}
       }
     } finally {
       key = false;
-      if (!enabled && list['length'] > 0) void run();
+      if (!enabled && list.length > 0) void run();
     }
   };
   return {
     enqueue(args = {}) {
       if (enabled || !args || typeof args !== 'object') return false;
       const result = { ...args },
-        count = list['length'] - 1,
+        count = list.length - 1,
         data = count >= 0 ? mergePendingInput(list[count], result) : null;
       if (data) list[count] = data;
-      else list['push'](result);
+      else list.push(result);
       return (void run(), true);
     },
     dispose() {
-      ((enabled = true), (list['length'] = 0));
+      ((enabled = true), (list.length = 0));
     },
   };
 }

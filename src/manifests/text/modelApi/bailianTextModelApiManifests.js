@@ -1,4 +1,4 @@
-const MODELS = Object['freeze']([
+const MODELS = Object.freeze([
     'qwen3.8-max',
     'qwen3.8-max-0902',
     'qwen3.8-flash',
@@ -14,23 +14,23 @@ const MODELS = Object['freeze']([
     'qwen3.7-flash',
     'qwen3.7-flash-2026-07-15',
   ]),
-  executionId = (value) => 'bailian.model-api.text.' + value['replaceAll']('.', '-') + '.v1',
-  responseMapping = Object['freeze']({ resultPaths: Object['freeze'](['choices[].message.content']) });
-export const BAILIAN_TEXT_OUTPUT_TOKENS_FIELD = Object['freeze']({
+  executionId = (value) => 'bailian.model-api.text.' + value.replaceAll('.', '-') + '.v1',
+  responseMapping = Object.freeze({ resultPaths: Object.freeze(['choices[].message.content']) });
+export const BAILIAN_TEXT_OUTPUT_TOKENS_FIELD = Object.freeze({
   id: 'maxOutputTokens',
   type: 'segmented',
   placement: 'mode',
   variant: 'pillMenu',
   label: '输出上限',
   defaultValue: 8192,
-  options: [4096, 8192, 16384, 32768]['map']((value2) => ({
+  options: [4096, 8192, 16384, 32768].map((value2) => ({
     value: value2,
     label: value2 / 1024 + 'K',
   })),
 });
-export const bailianTextModelManifests = Object['freeze'](
-  MODELS['map']((displayName) =>
-    Object['freeze']({
+export const bailianTextModelManifests = Object.freeze(
+  MODELS.map((displayName) =>
+    Object.freeze({
       schemaVersion: '1.0',
       modelId: 'bailian/' + displayName,
       executionId: executionId(displayName),
@@ -40,14 +40,14 @@ export const bailianTextModelManifests = Object['freeze'](
       displayName: displayName,
       icon: 'images/qwen.svg',
       description: '百炼官方 · 文本、图片与视频画面理解',
-      inputSlots: Object['freeze']({
-        allowedKinds: Object['freeze'](['text', 'image', 'video']),
-        minByKind: Object['freeze']({ text: 0, image: 0 }),
-        maxByKind: Object['freeze']({ image: 8, video: 1, audio: 0 }),
+      inputSlots: Object.freeze({
+        allowedKinds: Object.freeze(['text', 'image', 'video']),
+        minByKind: Object.freeze({ text: 0, image: 0 }),
+        maxByKind: Object.freeze({ image: 8, video: 1, audio: 0 }),
       }),
-      uiSchema: Object['freeze']({
-        fields: Object['freeze']([
-          ...(displayName['startsWith']('qwen3.8')
+      uiSchema: Object.freeze({
+        fields: Object.freeze([
+          ...(displayName.startsWith('qwen3.8')
             ? [
                 {
                   id: 'reasoningEffort',
@@ -76,8 +76,8 @@ export const bailianTextModelManifests = Object['freeze'](
           BAILIAN_TEXT_OUTPUT_TOKENS_FIELD,
         ]),
       }),
-      extensions: Object['freeze']({
-        textMenu: Object['freeze']({
+      extensions: Object.freeze({
+        textMenu: Object.freeze({
           group: 'bailian',
           title: displayName,
           subtitle: '百炼官方 · 图文 / 视频理解',
@@ -90,9 +90,9 @@ export const bailianTextModelManifests = Object['freeze'](
     }),
   ),
 );
-export const bailianTextExecutionManifests = Object['freeze'](
-  MODELS['map']((model) =>
-    Object['freeze']({
+export const bailianTextExecutionManifests = Object.freeze(
+  MODELS.map((model) =>
+    Object.freeze({
       schemaVersion: '1.0',
       id: executionId(model),
       provider: 'bailian',
@@ -102,18 +102,18 @@ export const bailianTextExecutionManifests = Object['freeze'](
       endpointMode: 'chat-completion',
       method: 'POST',
       model: model,
-      headers: Object['freeze']({ 'Content-Type': 'application/json' }),
-      bodyMapping: Object['freeze']({ modelField: 'model', messagesField: 'messages' }),
+      headers: Object.freeze({ 'Content-Type': 'application/json' }),
+      bodyMapping: Object.freeze({ modelField: 'model', messagesField: 'messages' }),
       responseMapping: responseMapping,
-      result: Object['freeze']({ textFields: responseMapping['resultPaths'] }),
-      extensions: Object['freeze']({
+      result: Object.freeze({ textFields: responseMapping.resultPaths }),
+      extensions: Object.freeze({
         chatCompletionInputPolicy: 'image-video',
         strictUpload: true,
         structuredOutputMode: 'json_object',
         streaming: true,
-        chatCompletionBodyMapping: Object['freeze']([
+        chatCompletionBodyMapping: Object.freeze([
           { path: 'enable_search', from: 'param', field: 'generationParams.webSearch' },
-          ...(model['startsWith']('qwen3.8')
+          ...(model.startsWith('qwen3.8')
             ? [{ path: 'reasoning_effort', from: 'param', field: 'generationParams.reasoningEffort' }]
             : [{ path: 'enable_thinking', from: 'param', field: 'generationParams.enableThinking' }]),
         ]),

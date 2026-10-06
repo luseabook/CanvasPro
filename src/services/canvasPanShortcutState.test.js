@@ -33,7 +33,7 @@ test('holding sets the flag, the window hint and the grab cursor', () => {
   const env = makeEnvironment();
   setCanvasPanShortcutHeld(true, env);
   assert.equal(isCanvasPanShortcutHeld(), true);
-  assert.equal(env.windowObject['_spaceHeld'], true);
+  assert.equal(env.windowObject._spaceHeld, true);
   assert.equal(env.element.style.cursor, 'var(--grab-cursor)');
   assert.deepEqual(env.requestedIds, ['v2-wrap']);
 });
@@ -43,7 +43,7 @@ test('releasing clears the flag, the window hint and the cursor', () => {
   setCanvasPanShortcutHeld(true, env);
   setCanvasPanShortcutHeld(false, env);
   assert.equal(isCanvasPanShortcutHeld(), false);
-  assert.equal(env.windowObject['_spaceHeld'], false);
+  assert.equal(env.windowObject._spaceHeld, false);
   assert.equal(env.element.style.cursor, '');
 });
 
@@ -52,7 +52,7 @@ test('releaseCanvasPanShortcut forwards its options and forces release', () => {
   setCanvasPanShortcutHeld(true, env);
   releaseCanvasPanShortcut(env);
   assert.equal(isCanvasPanShortcutHeld(), false);
-  assert.equal(env.windowObject['_spaceHeld'], false);
+  assert.equal(env.windowObject._spaceHeld, false);
   assert.equal(env.element.style.cursor, '');
 });
 
@@ -61,7 +61,7 @@ test('only a strict boolean true holds the shortcut', () => {
   for (const value of [1, 'true', {}, [], 'x', 0, null, undefined]) {
     setCanvasPanShortcutHeld(value, env);
     assert.equal(isCanvasPanShortcutHeld(), false, `value ${JSON.stringify(value)} must not hold`);
-    assert.equal(env.windowObject['_spaceHeld'], false);
+    assert.equal(env.windowObject._spaceHeld, false);
   }
   setCanvasPanShortcutHeld(true, env);
   assert.equal(isCanvasPanShortcutHeld(), true);
@@ -78,7 +78,7 @@ test('a missing document object is tolerated', () => {
   const env = makeEnvironment();
   assert.doesNotThrow(() => setCanvasPanShortcutHeld(true, { windowObject: env.windowObject }));
   assert.equal(isCanvasPanShortcutHeld(), true);
-  assert.equal(env.windowObject['_spaceHeld'], true);
+  assert.equal(env.windowObject._spaceHeld, true);
 });
 
 test('both environment objects missing is tolerated', () => {
@@ -92,7 +92,7 @@ test('a document without getElementById is tolerated', () => {
     setCanvasPanShortcutHeld(true, { windowObject: windowObject, documentObject: {} }),
   );
   assert.equal(isCanvasPanShortcutHeld(), true);
-  assert.equal(windowObject['_spaceHeld'], true);
+  assert.equal(windowObject._spaceHeld, true);
 });
 
 test('a missing canvas wrapper element is tolerated', () => {
@@ -102,7 +102,7 @@ test('a missing canvas wrapper element is tolerated', () => {
     setCanvasPanShortcutHeld(true, { windowObject: env.windowObject, documentObject: documentObject }),
   );
   assert.equal(isCanvasPanShortcutHeld(), true);
-  assert.equal(env.windowObject['_spaceHeld'], true);
+  assert.equal(env.windowObject._spaceHeld, true);
 });
 
 test('unrelated element ids are not touched', () => {

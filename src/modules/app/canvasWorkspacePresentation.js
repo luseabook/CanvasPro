@@ -6,12 +6,12 @@ export function createCanvasWorkspacePresentation({ root: root, renderer: render
   });
   return {
     setPresentationActive(value) {
-      (renderer['setPresentationActive'](value), warmup?.['setPresentationActive']?.(value));
-      if (value) workspacePresentationLifecycle['activate']();
-      else workspacePresentationLifecycle['deactivate']();
+      (renderer.setPresentationActive(value), warmup?.setPresentationActive?.(value));
+      if (value) workspacePresentationLifecycle.activate();
+      else workspacePresentationLifecycle.deactivate();
     },
     destroy() {
-      workspacePresentationLifecycle['dispose']();
+      workspacePresentationLifecycle.dispose();
     },
   };
 }

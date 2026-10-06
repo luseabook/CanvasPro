@@ -11,7 +11,7 @@ function formatCapturedAt(data) {
   const options = new Date(data);
   if (!Number.isFinite(options.getTime())) return '';
   try {
-    return new Intl['DateTimeFormat'](getLocale(), {
+    return new Intl.DateTimeFormat(getLocale(), {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',

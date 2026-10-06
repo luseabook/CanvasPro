@@ -3,103 +3,103 @@ const MAX_EVENT_MESSAGE_CHARS = 320,
   MAX_EVENT_IDS = 24;
 function truncateText(value, item = MAX_EVENT_MESSAGE_CHARS) {
   const list = String(value || '')
-    ['replace'](/\s+/g, ' ')
-    ['trim']();
-  return list['length'] <= item ? list : list['slice'](0, Math['max'](0, item - 3)) + '...';
+    .replace(/\s+/g, ' ')
+    .trim();
+  return list.length <= item ? list : list.slice(0, Math.max(0, item - 3)) + '...';
 }
 function normalizeStringArray(list2) {
-  return Array['isArray'](list2)
-    ? [...new Set(list2['map']((key) => String(key || '')['trim']())['filter'](Boolean))]['slice'](
+  return Array.isArray(list2)
+    ? [...new Set(list2.map((key) => String(key || '').trim()).filter(Boolean))].slice(
         0,
         MAX_EVENT_IDS,
       )
     : [];
 }
-function normalizeTimestamp(index, result = Date['now']()) {
+function normalizeTimestamp(index, result = Date.now()) {
   const count = Number(index);
-  return Number['isFinite'](count) && count > 0 ? count : result;
+  return Number.isFinite(count) && count > 0 ? count : result;
 }
-export function normalizeAgentRunEvent(ok = {}, data = Date['now']()) {
-  const type = String(ok['type'] || '')['trim']();
+export function normalizeAgentRunEvent(ok = {}, data = Date.now()) {
+  const type = String(ok.type || '').trim();
   if (!type) return null;
-  const ts = normalizeTimestamp(ok['ts'], data),
+  const ts = normalizeTimestamp(ok.ts, data),
     options = {
-      id: String(ok['id'] || '')['trim'](),
-      runId: String(ok['runId'] || '')['trim'](),
-      conversationId: String(ok['conversationId'] || '')['trim'](),
-      projectId: String(ok['projectId'] || '')['trim'](),
+      id: String(ok.id || '').trim(),
+      runId: String(ok.runId || '').trim(),
+      conversationId: String(ok.conversationId || '').trim(),
+      projectId: String(ok.projectId || '').trim(),
       type: type,
-      status: String(ok['status'] || '')['trim'](),
-      step: Math['max'](0, Math['trunc'](Number(ok['step'] || 0))),
-      commandId: String(ok['commandId'] || '')['trim'](),
-      ok: ok['ok'] === true ? true : ok['ok'] === false ? false : null,
-      errorCode: String(ok['errorCode'] || '')['trim'](),
-      message: truncateText(ok['message'] || ok['reason'] || ''),
-      channel: String(ok['channel'] || '')
-        ['trim']()
-        ['slice'](0, 80),
+      status: String(ok.status || '').trim(),
+      step: Math.max(0, Math.trunc(Number(ok.step || 0))),
+      commandId: String(ok.commandId || '').trim(),
+      ok: ok.ok === true ? true : ok.ok === false ? false : null,
+      errorCode: String(ok.errorCode || '').trim(),
+      message: truncateText(ok.message || ok.reason || ''),
+      channel: String(ok.channel || '')
+        .trim()
+        .slice(0, 80),
       ts: ts,
     },
-    list3 = normalizeStringArray(ok['commandIds']),
-    list4 = normalizeStringArray(ok['modelIds']);
-  if (list3['length'] > 0) options['commandIds'] = list3;
-  if (list4['length'] > 0) options['modelIds'] = list4;
-  const list5 = normalizeStringArray(ok['skillIds']),
-    list6 = normalizeAgentSkillUsageSnapshots(ok['skillSnapshots']);
-  if (list5['length'] > 0) options['skillIds'] = list5;
-  if (list6['length'] > 0) options['skillSnapshots'] = list6;
-  if (ok['confirmed'] === true) options['confirmed'] = true;
+    list3 = normalizeStringArray(ok.commandIds),
+    list4 = normalizeStringArray(ok.modelIds);
+  if (list3.length > 0) options.commandIds = list3;
+  if (list4.length > 0) options.modelIds = list4;
+  const list5 = normalizeStringArray(ok.skillIds),
+    list6 = normalizeAgentSkillUsageSnapshots(ok.skillSnapshots);
+  if (list5.length > 0) options.skillIds = list5;
+  if (list6.length > 0) options.skillSnapshots = list6;
+  if (ok.confirmed === true) options.confirmed = true;
   return options;
 }
 export function replayAgentRunEvents(list7 = [], { runId: runId = '' } = {}) {
-  const runId2 = String(runId || '')['trim'](),
-    eventCount = (Array['isArray'](list7) ? list7 : [])
-      ['map']((target) => normalizeAgentRunEvent(target))
-      ['filter']((source) => source && (!runId2 || source['runId'] === runId2))
-      ['sort']((next, current) => next['ts'] - current['ts']),
+  const runId2 = String(runId || '').trim(),
+    eventCount = (Array.isArray(list7) ? list7 : [])
+      .map((target) => normalizeAgentRunEvent(target))
+      .filter((source) => source && (!runId2 || source.runId === runId2))
+      .sort((next, current) => next.ts - current.ts),
     startedAt = eventCount[0] || null,
-    endedAt = eventCount['at'](-1) || null,
-    commandSequence = eventCount['filter'](
-      (entry) => entry['type'] === 'tool.completed' && entry['commandId'],
-    )['map']((commandId) => ({
-      commandId: commandId['commandId'],
-      ok: commandId['ok'],
-      step: commandId['step'],
-      confirmed: commandId['confirmed'] === true,
+    endedAt = eventCount.at(-1) || null,
+    commandSequence = eventCount.filter(
+      (entry) => entry.type === 'tool.completed' && entry.commandId,
+    ).map((commandId) => ({
+      commandId: commandId.commandId,
+      ok: commandId.ok,
+      step: commandId.step,
+      confirmed: commandId.confirmed === true,
     })),
-    approvalRequestedCount = eventCount['filter']((record) => record['type']['startsWith']('approval.')),
-    errors = eventCount['filter'](
-      (response) => response['ok'] === false || response['status'] === 'failed' || response['errorCode'],
+    approvalRequestedCount = eventCount.filter((record) => record.type.startsWith('approval.')),
+    errors = eventCount.filter(
+      (response) => response.ok === false || response.status === 'failed' || response.errorCode,
     ),
     status =
       [...eventCount]
-        ['reverse']()
-        ['find']((response2) => response2['type'] === 'run.status' && response2['status'])?.['status'] || '';
+        .reverse()
+        .find((response2) => response2.type === 'run.status' && response2.status)?.status || '';
   return {
-    runId: runId2 || startedAt?.['runId'] || '',
+    runId: runId2 || startedAt?.runId || '',
     status: status,
-    startedAt: startedAt?.['ts'] || 0,
-    endedAt: endedAt?.['ts'] || 0,
-    durationMs: startedAt && endedAt ? Math['max'](0, endedAt['ts'] - startedAt['ts']) : 0,
-    eventCount: eventCount['length'],
+    startedAt: startedAt?.ts || 0,
+    endedAt: endedAt?.ts || 0,
+    durationMs: startedAt && endedAt ? Math.max(0, endedAt.ts - startedAt.ts) : 0,
+    eventCount: eventCount.length,
     commandSequence: commandSequence,
-    toolSuccessCount: commandSequence['filter']((response3) => response3['ok'] === true)['length'],
-    toolFailureCount: commandSequence['filter']((response4) => response4['ok'] === false)['length'],
-    approvalRequestedCount: approvalRequestedCount['filter'](
-      (payload) => payload['type'] === 'approval.requested',
-    )['length'],
-    approvalConfirmedCount: approvalRequestedCount['filter'](
-      (handle) => handle['type'] === 'approval.confirmed',
-    )['length'],
-    approvalCancelledCount: approvalRequestedCount['filter'](
-      (state) => state['type'] === 'approval.cancelled',
-    )['length'],
-    discoveryCount: eventCount['filter']((config) => config['type'] === 'capability.discovered')['length'],
-    errors: errors['map']((type2) => ({
-      type: type2['type'],
-      commandId: type2['commandId'],
-      errorCode: type2['errorCode'],
-      message: type2['message'],
+    toolSuccessCount: commandSequence.filter((response3) => response3.ok === true).length,
+    toolFailureCount: commandSequence.filter((response4) => response4.ok === false).length,
+    approvalRequestedCount: approvalRequestedCount.filter(
+      (payload) => payload.type === 'approval.requested',
+    ).length,
+    approvalConfirmedCount: approvalRequestedCount.filter(
+      (handle) => handle.type === 'approval.confirmed',
+    ).length,
+    approvalCancelledCount: approvalRequestedCount.filter(
+      (state) => state.type === 'approval.cancelled',
+    ).length,
+    discoveryCount: eventCount.filter((config) => config.type === 'capability.discovered').length,
+    errors: errors.map((type2) => ({
+      type: type2.type,
+      commandId: type2.commandId,
+      errorCode: type2.errorCode,
+      message: type2.message,
     })),
     events: eventCount,
   };

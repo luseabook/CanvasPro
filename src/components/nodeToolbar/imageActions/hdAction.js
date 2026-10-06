@@ -16,9 +16,7 @@ export function bindImageHdAction(value) {
       submitHdTask: submitHdTask = submitImageHdTask,
     } = value,
     outputText = (item) => {
-      const outputText2 = (store['getStateRaw']?.() || store['getState']())['nodes']?.[item]?.[
-        'outputText'
-      ];
+      const outputText2 = (store.getStateRaw?.() || store.getState()).nodes?.[item]?.outputText;
       return outputText2
         ? imageHdText('outputTextWithStatus', {
             outputText: outputText2,
@@ -27,9 +25,9 @@ export function bindImageHdAction(value) {
         : imageHdOutputText({ status: imageHdText('status.cancelled') });
     };
   let enabled = false;
-  const button = toolbarEl['querySelector']('.act-hd');
+  const button = toolbarEl.querySelector('.act-hd');
   button &&
-    (_hdTaskMachine['bindButton'](button),
+    (_hdTaskMachine.bindButton(button),
     bindRunningHubToolbarTaskButton({
       button: button,
       getTask: () =>
@@ -40,70 +38,70 @@ export function bindImageHdAction(value) {
         }),
       cancelTask: async (key) => {
         try {
-          if (_hdState['active'] && String(_hdState['outNodeId'] || '') === key['outId'])
+          if (_hdState.active && String(_hdState.outNodeId || '') === key.outId)
             try {
-              await _hdTaskMachine['cancel']();
+              await _hdTaskMachine.cancel();
             } catch (index) {
-              console['warn']('[ImageHD] cancel request failed:', index);
+              console.warn('[ImageHD] cancel request failed:', index);
             }
           return await cancelRunningHubResultTask(key, {
             name: imageHdText('cancelledName'),
-            outputText: outputText(key['outId']),
+            outputText: outputText(key.outId),
             notifyMessage: imageHdText('cancelledToast'),
           });
         } finally {
-          _hdState['active'] &&
-            String(_hdState['outNodeId'] || '') === key['outId'] &&
-            _hdTaskMachine['reset'](button);
+          _hdState.active &&
+            String(_hdState.outNodeId || '') === key.outId &&
+            _hdTaskMachine.reset(button);
         }
       },
       cancelTooltip: imageHdText('cancelTooltip'),
     }),
-    button['addEventListener']('click', async (event) => {
-      (event['stopPropagation'](), event['preventDefault']());
-      if (_hdState['active']) {
+    button.addEventListener('click', async (event) => {
+      (event.stopPropagation(), event.preventDefault());
+      if (_hdState.active) {
         (async () => {
           let result = null;
           try {
-            const data = _hdState['outNodeId']
+            const data = _hdState.outNodeId
               ? {
-                  outId: _hdState['outNodeId'],
-                  targetNodeId: _hdState['outNodeId'],
-                  taskId: _hdState['taskId'],
-                  apiKey: _hdState['apiKey'],
+                  outId: _hdState.outNodeId,
+                  targetNodeId: _hdState.outNodeId,
+                  taskId: _hdState.taskId,
+                  apiKey: _hdState.apiKey,
                   sourceNodeId: nodeId,
                 }
               : null;
             data
               ? await cancelRunningHubResultTask(data, {
                   name: imageHdText('cancelledName'),
-                  outputText: outputText(data['outId']),
+                  outputText: outputText(data.outId),
                   notifyMessage: imageHdText('cancelledToast'),
                 })
-              : (await _hdTaskMachine['cancel'](), window['showToast']?.(imageHdText('taskCancelled'), 'info'));
+              : (await _hdTaskMachine.cancel(), window.showToast?.(imageHdText('taskCancelled'), 'info'));
           } catch (options) {
             result = options;
           }
           try {
-            result && console['warn']('[ImageHD] cancel request failed:', result);
+            result && console.warn('[ImageHD] cancel request failed:', result);
           } finally {
-            _hdTaskMachine['reset'](button);
+            _hdTaskMachine.reset(button);
           }
         })();
         return;
       }
       if (enabled) return;
       enabled = true;
-      const target = window['currentProjectId'];
+      const target = window.currentProjectId;
       let enabled2 = false;
       const source = () => {
           enabled2 = true;
         },
         handler = () =>
           !enabled2 &&
-          window['currentProjectId'] === target &&
-          !!(store['getStateRaw']?.() || store['getState']())['nodes']?.[nodeId];
-      window['addEventListener']('aicanvas:active-canvas-changed', source);
+          window.currentProjectId === target &&
+          !!(store.getStateRaw?.() || store.getState()).nodes?.[nodeId];
+      window.addEventListener('aicanvas:active-canvas-changed', source);
       try {
         closeToolbarMoreMenu?.();
         const openHdPanel2 = await openHdPanel({
@@ -114,9 +112,9 @@ export function bindImageHdAction(value) {
         if (!openHdPanel2 || !handler()) return;
         await submitHdTask(value, openHdPanel2, handler);
       } catch (error) {
-        window['showToast']?.(error?.['message'] || String(error), 'error');
+        window.showToast?.(error?.message || String(error), 'error');
       } finally {
-        ((enabled = false), window['removeEventListener']('aicanvas:active-canvas-changed', source));
+        ((enabled = false), window.removeEventListener('aicanvas:active-canvas-changed', source));
       }
     }));
 }

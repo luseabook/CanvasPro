@@ -2567,65 +2567,65 @@ export function _syncPillLabels(enabled74, value255) {
 }
 
 function _findLastMentionTriggerIndex(value259, value260) {
-  const value261 = Number['isFinite'](value260) ? value260 - 1 : undefined;
-  return Math['max'](
-    String(value259 || '')['lastIndexOf']('@', value261),
-    String(value259 || '')['lastIndexOf']('＠', value261),
+  const value261 = Number.isFinite(value260) ? value260 - 1 : undefined;
+  return Math.max(
+    String(value259 || '').lastIndexOf('@', value261),
+    String(value259 || '').lastIndexOf('＠', value261),
   );
 }
 
 function _getNodeMentionDisplayLabel(options12 = {}, value262 = '') {
   const value263 = [
-    options12?.['name'],
-    options12?.['title'],
-    options12?.['label'],
-    options12?.['displayName'],
+    options12?.name,
+    options12?.title,
+    options12?.label,
+    options12?.displayName,
   ]
-    ['map']((value264) => _stripMentionDisplayMarker(value264))
-    ['find'](Boolean);
+    .map((value264) => _stripMentionDisplayMarker(value264))
+    .find(Boolean);
   return value263 || _stripMentionDisplayMarker(value262);
 }
 
 export function resolveTextReferenceContent(value265) {
-  const value266 = String(value265?.['type'] || '')
-    ['trim']()
-    ['toLowerCase']();
+  const value266 = String(value265?.type || '')
+    .trim()
+    .toLowerCase();
   if (value266 === 'source-text' || value266 === 'text') {
     const value267 =
-      typeof value265?.['content'] === 'string'
-        ? value265['content']
-        : value265?.['text'] || value265?.['outputText'] || value265?.['prompt'] || value265?.['label'] || '';
-    return String(value267)['trim']();
+      typeof value265?.content === 'string'
+        ? value265.content
+        : value265?.text || value265?.outputText || value265?.prompt || value265?.label || '';
+    return String(value267).trim();
   }
   return String(
-    value265?.['outputText'] ||
-      value265?.['text'] ||
-      value265?.['content'] ||
-      value265?.['prompt'] ||
-      value265?.['label'] ||
+    value265?.outputText ||
+      value265?.text ||
+      value265?.content ||
+      value265?.prompt ||
+      value265?.label ||
       '',
-  )['trim']();
+  ).trim();
 }
 
 function _decorateMentionPill(value268, value269, value270 = null) {
-  if (typeof value268?.['decorateMentionPill'] !== 'function') return;
-  value268['decorateMentionPill']({ pill: value269, mention: value270 });
+  if (typeof value268?.decorateMentionPill !== 'function') return;
+  value268.decorateMentionPill({ pill: value269, mention: value270 });
 }
 
 export function createPromptMediaReferenceState(list36 = []) {
   const value271 = { image: 0, video: 0, audio: 0 },
     value272 = new Map();
   for (const response7 of list36) {
-    const promptMentionType = normalizePromptMentionType(response7['type']),
-      enabled76 = String(response7['url'] || '')['trim']();
+    const promptMentionType = normalizePromptMentionType(response7.type),
+      enabled76 = String(response7.url || '').trim();
     if (
       !(promptMentionType in value271) ||
       !enabled76 ||
-      value272['has'](promptMentionType + ':' + enabled76)
+      value272.has(promptMentionType + ':' + enabled76)
     )
       continue;
     ((value271[promptMentionType] += 1),
-      value272['set'](
+      value272.set(
         promptMentionType + ':' + enabled76,
         getMentionPlaceholderLabel(promptMentionType, value271[promptMentionType]),
       ));
@@ -2634,10 +2634,10 @@ export function createPromptMediaReferenceState(list36 = []) {
 }
 
 function _readPromptHtmlForCommit(value273) {
-  const serializeVirtualizedPromptHtml2 = serializeVirtualizedPromptHtml(value273?.['promptEl']),
+  const serializeVirtualizedPromptHtml2 = serializeVirtualizedPromptHtml(value273?.promptEl),
     value274 =
       serializeVirtualizedPromptHtml2 === null
-        ? sanitizePromptHtml(value273?.['promptEl']?.['innerHTML'] || '')
+        ? sanitizePromptHtml(value273?.promptEl?.innerHTML || '')
         : serializeVirtualizedPromptHtml2,
     _isEmptyPromptHtml2 = _isEmptyPromptHtml(value274) ? '' : value274;
   return (rememberVirtualizedPromptCommit(value273, _isEmptyPromptHtml2), _isEmptyPromptHtml2);
@@ -2655,10 +2655,10 @@ export function bindPromptMentionHost(
     closeMenuOnDestroy: closeMenuOnDestroy = true,
   } = {},
 ) {
-  const el75 = value275?.['promptEl'];
-  if (!el75?.['addEventListener']) return null;
+  const el75 = value275?.promptEl;
+  if (!el75?.addEventListener) return null;
   const run3 = (value276) =>
-      ignoreInlineEditor && Boolean(value276?.['target']?.['closest']?.(inlineEditorSelector)),
+      ignoreInlineEditor && Boolean(value276?.target?.closest?.(inlineEditorSelector)),
     value277 = (value278) => {
       if (run3(value278)) return;
       (schedulePromptHtmlCommit(value275), _checkAtTrigger(value275, value278));
@@ -2676,19 +2676,19 @@ export function bindPromptMentionHost(
       if (run3(value283)) return;
       handlePromptPaste(value275, value283);
     };
-  (el75['addEventListener']('input', value277),
-    el75['addEventListener']('blur', value279),
-    el75['addEventListener']('keydown', value280));
-  if (enablePaste) el75['addEventListener']('paste', value282);
+  (el75.addEventListener('input', value277),
+    el75.addEventListener('blur', value279),
+    el75.addEventListener('keydown', value280));
+  if (enablePaste) el75.addEventListener('paste', value282);
   if (rehydrate) _rehydratePromptPills(value275);
   if (
     commitHydratedPrompt &&
-    typeof value275['getPromptHtml'] === 'function' &&
-    typeof value275['commitPromptHtml'] === 'function'
+    typeof value275.getPromptHtml === 'function' &&
+    typeof value275.commitPromptHtml === 'function'
   ) {
     const _readPromptHtmlForCommit2 = _readPromptHtmlForCommit(value275);
-    _readPromptHtmlForCommit2 !== value275['getPromptHtml']() &&
-      value275['commitPromptHtml'](_readPromptHtmlForCommit2);
+    _readPromptHtmlForCommit2 !== value275.getPromptHtml() &&
+      value275.commitPromptHtml(_readPromptHtmlForCommit2);
   }
   let value284 = false;
   return {
@@ -2697,48 +2697,48 @@ export function bindPromptMentionHost(
       value284 = true;
       if (closeMenuOnDestroy) _closeMentionMenu();
       (flushPromptHtmlCommit(value275),
-        el75['removeEventListener']?.('input', value277),
-        el75['removeEventListener']?.('blur', value279),
-        el75['removeEventListener']?.('keydown', value280));
-      if (enablePaste) el75['removeEventListener']?.('paste', value282);
+        el75.removeEventListener?.('input', value277),
+        el75.removeEventListener?.('blur', value279),
+        el75.removeEventListener?.('keydown', value280));
+      if (enablePaste) el75.removeEventListener?.('paste', value282);
     },
   };
 }
 
 function _appendMentionSectionLabel(value285, value286) {
-  const value287 = document['createElement']('div');
+  const value287 = document.createElement('div');
   return (
-    (value287['className'] = 'at-mention-section-label'),
-    (value287['textContent'] = String(value286 || '')),
-    value285['appendChild'](value287),
+    (value287.className = 'at-mention-section-label'),
+    (value287.textContent = String(value286 || '')),
+    value285.appendChild(value287),
     value287
   );
 }
 
 function _appendMentionGroupLabel(el76, value288) {
-  const value289 = document['createElement']('div');
+  const value289 = document.createElement('div');
   return (
-    (value289['className'] = 'at-mention-group-label'),
-    (value289['textContent'] = String(value288 || '')),
-    el76['appendChild'](value289),
+    (value289.className = 'at-mention-group-label'),
+    (value289.textContent = String(value288 || '')),
+    el76.appendChild(value289),
     value289
   );
 }
 
 function _applyMentionPillPresentation(el77, value290 = {}) {
   if (!el77) return;
-  const value291 = String(value290?.['pillKind'] || '')['trim']();
-  if (value291) el77['dataset']['promptPillKind'] = value291;
-  else delete el77['dataset']['promptPillKind'];
-  el77['classList']?.['toggle']?.('story-time-pill', value291 === 'time');
-  const value292 = value290?.['missingAsset'] === true;
-  el77['classList']?.['toggle']?.('ref-pill--unresolved', value292);
-  if (value292) ((el77['dataset']['refUnresolved'] = 'true'), (el77['title'] = '缺少图片素材'));
+  const value291 = String(value290?.pillKind || '').trim();
+  if (value291) el77.dataset.promptPillKind = value291;
+  else delete el77.dataset.promptPillKind;
+  el77.classList?.toggle?.('story-time-pill', value291 === 'time');
+  const value292 = value290?.missingAsset === true;
+  el77.classList?.toggle?.('ref-pill--unresolved', value292);
+  if (value292) ((el77.dataset.refUnresolved = 'true'), (el77.title = '缺少图片素材'));
   else {
-    el77['dataset']?.['refUnresolved'] === 'true' &&
-      value290?.['origin'] === 'asset' &&
-      delete el77['dataset']['refUnresolved'];
-    if (el77['title'] === '缺少图片素材') el77['removeAttribute']?.('title');
+    el77.dataset?.refUnresolved === 'true' &&
+      value290?.origin === 'asset' &&
+      delete el77.dataset.refUnresolved;
+    if (el77.title === '缺少图片素材') el77.removeAttribute?.('title');
   }
 }
 
@@ -2751,9 +2751,9 @@ function _populateMentionMenuTree(
   let value296 = '',
     value297 = '',
     count16 = 0;
-  (value295['nodeItems']['forEach']((value298) => {
-    const value299 = String(value298['menuGroup'] || '')['trim'](),
-      value300 = String(value298['menuSection'] || '')['trim']();
+  (value295.nodeItems.forEach((value298) => {
+    const value299 = String(value298.menuGroup || '').trim(),
+      value300 = String(value298.menuSection || '').trim();
     if (value299 && value299 !== value296) {
       if (count16 > 0) _appendMentionDivider(value293);
       (_appendMentionGroupLabel(value293, value299), (value297 = ''));
@@ -2768,26 +2768,26 @@ function _populateMentionMenuTree(
       }),
       (count16 += 1));
   }),
-    value295['nodeItems']['length'] && value295['assetItems']['length'] && _appendMentionDivider(value293),
-    value295['assetItems']['forEach']((enabled77) => {
+    value295.nodeItems.length && value295.assetItems.length && _appendMentionDivider(value293),
+    value295.assetItems.forEach((enabled77) => {
       const _createMentionMenuItem4 = _createMentionMenuItem({
-          label: enabled77['label'],
-          subtitle: enabled77['subtitle'],
+          label: enabled77.label,
+          subtitle: enabled77.subtitle,
           hasSubmenu: true,
         }),
         _createMentionSubmenu2 = _createMentionSubmenu();
-      if (!enabled77['suppressBulkMention']) {
-        const _getBulkAssetLimitReason2 = _getBulkAssetLimitReason(value294, enabled77['items'], pillToEdit),
+      if (!enabled77.suppressBulkMention) {
+        const _getBulkAssetLimitReason2 = _getBulkAssetLimitReason(value294, enabled77.items, pillToEdit),
           _createMentionMenuItem5 = _createMentionMenuItem({
             label: nodePromptSharedText('useEntireAsset'),
             title: _getBulkAssetLimitReason2,
             disabled: !!_getBulkAssetLimitReason2,
             onSelect: () => {
               if (_getBulkAssetLimitReason2) {
-                globalThis['window']?.['showToast']?.(_getBulkAssetLimitReason2, 'warn');
+                globalThis.window?.showToast?.(_getBulkAssetLimitReason2, 'warn');
                 return;
               }
-              (_insertMentionPills(value294, enabled77['items'], {
+              (_insertMentionPills(value294, enabled77.items, {
                 triggerRange: triggerRange,
                 atIndex: atIndex,
                 pillToEdit: pillToEdit,
@@ -2795,49 +2795,49 @@ function _populateMentionMenuTree(
                 _closeMentionMenu());
             },
           });
-        (_createMentionSubmenu2['appendChild'](_createMentionMenuItem5),
+        (_createMentionSubmenu2.appendChild(_createMentionMenuItem5),
           _appendMentionDivider(_createMentionSubmenu2));
       }
-      (enabled77['items']['forEach']((value301) => {
+      (enabled77.items.forEach((value301) => {
         _appendMentionCandidateItem(_createMentionSubmenu2, value294, value301, {
           triggerRange: triggerRange,
           atIndex: atIndex,
           pillToEdit: pillToEdit,
         });
       }),
-        _createMentionMenuItem4['appendChild'](_createMentionSubmenu2),
-        value293['appendChild'](_createMentionMenuItem4));
+        _createMentionMenuItem4.appendChild(_createMentionSubmenu2),
+        value293.appendChild(_createMentionMenuItem4));
     }));
 }
 
 function _getMentionMenuPages(value302, value303 = []) {
   const list37 =
-    typeof value302?.['getMentionMenuPages'] === 'function'
-      ? value302['getMentionMenuPages']({ candidates: value303 })
+    typeof value302?.getMentionMenuPages === 'function'
+      ? value302.getMentionMenuPages({ candidates: value303 })
       : [];
-  if (!Array['isArray'](list37) || list37['length'] < 2) return [];
+  if (!Array.isArray(list37) || list37.length < 2) return [];
   const value304 = new Set();
-  return list37['map']((value305) => ({
-    id: String(value305?.['id'] || '')['trim'](),
-    label: String(value305?.['label'] || '')['trim'](),
-    icon: ['assets', 'tools']['includes'](String(value305?.['icon'] || '')['trim']())
-      ? String(value305['icon'])['trim']()
+  return list37.map((value305) => ({
+    id: String(value305?.id || '').trim(),
+    label: String(value305?.label || '').trim(),
+    icon: ['assets', 'tools'].includes(String(value305?.icon || '').trim())
+      ? String(value305.icon).trim()
       : '',
-  }))['filter']((enabled78) => {
-    if (!enabled78['id'] || !enabled78['label'] || value304['has'](enabled78['id'])) return false;
-    return (value304['add'](enabled78['id']), true);
+  })).filter((enabled78) => {
+    if (!enabled78.id || !enabled78.label || value304.has(enabled78.id)) return false;
+    return (value304.add(enabled78.id), true);
   });
 }
 
 function _createMentionMenuPageIcon(value306) {
-  const enabled79 = String(value306 || '')['trim']();
+  const enabled79 = String(value306 || '').trim();
   if (!enabled79) return null;
-  const value307 = document['createElement']('span');
+  const value307 = document.createElement('span');
   return (
-    (value307['className'] = 'at-mention-tab-icon'),
-    (value307['dataset']['icon'] = enabled79),
-    value307['setAttribute']('aria-hidden', 'true'),
-    (value307['innerHTML'] =
+    (value307.className = 'at-mention-tab-icon'),
+    (value307.dataset.icon = enabled79),
+    value307.setAttribute('aria-hidden', 'true'),
+    (value307.innerHTML =
       enabled79 === 'tools'
         ? '<svg viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a4 4 0 0 0-5-5L12 3.6 9.6 6 7.3 3.7a4 4 0 0 0 5 5l-7.7 7.7a2 2 0 1 0 2.8 2.8z"/><path d="m16 15 4.5 4.5"/></svg>'
         : '<svg viewBox="0 0 24 24" fill="none"><path d="M4 6.5h6l1.7 2H20v9.5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M4 9h16"/></svg>'),
@@ -2847,84 +2847,84 @@ function _createMentionMenuPageIcon(value306) {
 
 function _appendMentionMenuPages(value308, value309, value310, value311) {
   const _getMentionMenuPages2 = _getMentionMenuPages(value309, value310);
-  if (_getMentionMenuPages2['length'] < 2) return null;
-  const value312 = document['createElement']('div');
-  ((value312['className'] = 'at-mention-tabs'),
-    value312['setAttribute']('role', 'tablist'),
-    value312['setAttribute']('aria-label', '@ 功能分类'),
-    value308['appendChild'](value312));
-  const value313 = document['createElement']('div');
-  value313['className'] = 'at-mention-pages';
-  const value314 = document['createElement']('div');
-  ((value314['className'] = 'at-mention-pages-track'),
-    (value314['style']['width'] = _getMentionMenuPages2['length'] * 100 + '%'),
-    (value314['style']['gridTemplateColumns'] =
-      'repeat(' + _getMentionMenuPages2['length'] + ', minmax(0, 1fr))'),
-    value313['appendChild'](value314),
-    value308['appendChild'](value313));
+  if (_getMentionMenuPages2.length < 2) return null;
+  const value312 = document.createElement('div');
+  ((value312.className = 'at-mention-tabs'),
+    value312.setAttribute('role', 'tablist'),
+    value312.setAttribute('aria-label', '@ 功能分类'),
+    value308.appendChild(value312));
+  const value313 = document.createElement('div');
+  value313.className = 'at-mention-pages';
+  const value314 = document.createElement('div');
+  ((value314.className = 'at-mention-pages-track'),
+    (value314.style.width = _getMentionMenuPages2.length * 100 + '%'),
+    (value314.style.gridTemplateColumns =
+      'repeat(' + _getMentionMenuPages2.length + ', minmax(0, 1fr))'),
+    value313.appendChild(value314),
+    value308.appendChild(value313));
   const value315 = String(
-      value309?.['getMentionMenuDefaultPage']?.({ candidates: value310 }) || _getMentionMenuPages2[0]['id'],
-    )['trim'](),
-    value316 = _getMentionMenuPages2['map']((args2) => {
-      const list38 = value310['filter'](
+      value309?.getMentionMenuDefaultPage?.({ candidates: value310 }) || _getMentionMenuPages2[0].id,
+    ).trim(),
+    value316 = _getMentionMenuPages2.map((args2) => {
+      const list38 = value310.filter(
           (value317) =>
-            String(value317?.['menuPage'] || _getMentionMenuPages2[0]['id'])['trim']() === args2['id'],
+            String(value317?.menuPage || _getMentionMenuPages2[0].id).trim() === args2.id,
         ),
-        el78 = document['createElement']('button');
-      ((el78['type'] = 'button'), (el78['className'] = 'at-mention-tab'));
-      const _createMentionMenuPageIcon2 = _createMentionMenuPageIcon(args2['icon']);
-      if (_createMentionMenuPageIcon2) el78['appendChild'](_createMentionMenuPageIcon2);
-      const value318 = document['createElement']('span');
-      ((value318['className'] = 'at-mention-tab-label'),
-        (value318['textContent'] = args2['label']),
-        el78['appendChild'](value318),
-        (el78['dataset']['mentionPage'] = args2['id']),
-        el78['setAttribute']('role', 'tab'));
-      const el79 = document['createElement']('div');
-      ((el79['className'] = 'at-mention-page'),
-        (el79['dataset']['mentionPagePanel'] = args2['id']),
-        el79['setAttribute']('role', 'tabpanel'));
-      if (list38['length']) _populateMentionMenuTree(el79, value309, _buildMentionMenuTree(list38), value311);
+        el78 = document.createElement('button');
+      ((el78.type = 'button'), (el78.className = 'at-mention-tab'));
+      const _createMentionMenuPageIcon2 = _createMentionMenuPageIcon(args2.icon);
+      if (_createMentionMenuPageIcon2) el78.appendChild(_createMentionMenuPageIcon2);
+      const value318 = document.createElement('span');
+      ((value318.className = 'at-mention-tab-label'),
+        (value318.textContent = args2.label),
+        el78.appendChild(value318),
+        (el78.dataset.mentionPage = args2.id),
+        el78.setAttribute('role', 'tab'));
+      const el79 = document.createElement('div');
+      ((el79.className = 'at-mention-page'),
+        (el79.dataset.mentionPagePanel = args2.id),
+        el79.setAttribute('role', 'tabpanel'));
+      if (list38.length) _populateMentionMenuTree(el79, value309, _buildMentionMenuTree(list38), value311);
       else {
-        const value319 = document['createElement']('div');
-        ((value319['className'] = 'at-mention-empty'),
-          (value319['textContent'] = '没有匹配的内容'),
-          el79['appendChild'](value319));
+        const value319 = document.createElement('div');
+        ((value319.className = 'at-mention-empty'),
+          (value319.textContent = '没有匹配的内容'),
+          el79.appendChild(value319));
       }
       return (
-        value312['appendChild'](el78),
-        value314['appendChild'](el79),
-        { ...args2, button: el78, panel: el79, hasCandidates: list38['length'] > 0 }
+        value312.appendChild(el78),
+        value314.appendChild(el79),
+        { ...args2, button: el78, panel: el79, hasCandidates: list38.length > 0 }
       );
     }),
-    value320 = value316['find']((value321) => value321['id'] === value315);
-  let enabled80 = value320?.['hasCandidates'] ? value320 : null;
-  if (!enabled80) enabled80 = value316['find']((value322) => value322['hasCandidates']);
+    value320 = value316.find((value321) => value321.id === value315);
+  let enabled80 = value320?.hasCandidates ? value320 : null;
+  if (!enabled80) enabled80 = value316.find((value322) => value322.hasCandidates);
   if (!enabled80) enabled80 = value320 || value316[0];
   const run4 = (enabled81, { keyboard: keyboard = false } = {}) => {
     if (!enabled81) return;
-    const value323 = value316['indexOf'](enabled81);
-    (value316['forEach']((event12) => {
+    const value323 = value316.indexOf(enabled81);
+    (value316.forEach((event12) => {
       const enabled82 = event12 === enabled81;
-      (event12['button']['classList']['toggle']('is-active', enabled82),
-        event12['button']['setAttribute']('aria-selected', String(enabled82)),
-        (event12['button']['tabIndex'] = enabled82 ? 0 : -1),
-        event12['panel']['classList']['toggle']('is-active', enabled82),
-        event12['panel']['setAttribute']('aria-hidden', String(!enabled82)),
-        (event12['panel']['inert'] = !enabled82));
+      (event12.button.classList.toggle('is-active', enabled82),
+        event12.button.setAttribute('aria-selected', String(enabled82)),
+        (event12.button.tabIndex = enabled82 ? 0 : -1),
+        event12.panel.classList.toggle('is-active', enabled82),
+        event12.panel.setAttribute('aria-hidden', String(!enabled82)),
+        (event12.panel.inert = !enabled82));
     }),
-      (value314['style']['transform'] = 'translateX(' + -value323 * (100 / value316['length']) + '%)'),
-      (_mentionMenuState['activeMenu'] = enabled81['panel']),
-      _setInitialMentionActiveItem(enabled81['panel'], { keyboard: keyboard }),
+      (value314.style.transform = 'translateX(' + -value323 * (100 / value316.length) + '%)'),
+      (_mentionMenuState.activeMenu = enabled81.panel),
+      _setInitialMentionActiveItem(enabled81.panel, { keyboard: keyboard }),
       _positionMentionMenu());
   };
   return (
-    value316['forEach']((value324) => {
-      value324['button']['addEventListener']('mousedown', (event13) => {
-        (event13['preventDefault'](), event13['stopPropagation'](), run4(value324));
+    value316.forEach((value324) => {
+      value324.button.addEventListener('mousedown', (event13) => {
+        (event13.preventDefault(), event13.stopPropagation(), run4(value324));
       });
     }),
     run4(enabled80),
-    enabled80?.['panel'] || null
+    enabled80?.panel || null
   );
 }

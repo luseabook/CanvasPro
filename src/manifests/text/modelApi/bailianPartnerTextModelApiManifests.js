@@ -8,8 +8,8 @@ const MODELS = [
   ],
   executionId = (value) => 'bailian.model-api.text.' + value + '.v1',
   responseMapping = { resultPaths: ['choices[].message.content'] };
-export const bailianPartnerTextModelManifests = Object['freeze'](
-  MODELS['map'](({ model: model, title: title, image: image, lowEffort: lowEffort }) => ({
+export const bailianPartnerTextModelManifests = Object.freeze(
+  MODELS.map(({ model: model, title: title, image: image, lowEffort: lowEffort }) => ({
     schemaVersion: '1.0',
     modelId: 'bailian/' + model,
     executionId: executionId(model),
@@ -59,8 +59,8 @@ export const bailianPartnerTextModelManifests = Object['freeze'](
     outputType: 'text',
   })),
 );
-export const bailianPartnerTextExecutionManifests = Object['freeze'](
-  MODELS['map'](({ model: model2, image: image2 }) => ({
+export const bailianPartnerTextExecutionManifests = Object.freeze(
+  MODELS.map(({ model: model2, image: image2 }) => ({
     schemaVersion: '1.0',
     id: executionId(model2),
     provider: 'bailian',
@@ -73,7 +73,7 @@ export const bailianPartnerTextExecutionManifests = Object['freeze'](
     headers: { 'Content-Type': 'application/json' },
     bodyMapping: { modelField: 'model', messagesField: 'messages' },
     responseMapping: responseMapping,
-    result: { textFields: responseMapping['resultPaths'] },
+    result: { textFields: responseMapping.resultPaths },
     extensions: {
       chatCompletionInputPolicy: image2 ? 'image-only' : 'text-only',
       strictUpload: true,

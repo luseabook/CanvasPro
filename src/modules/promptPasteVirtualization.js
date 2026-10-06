@@ -7,67 +7,67 @@ const PROMPT_VIRTUAL_CHUNK_SELECTOR = '[data-prompt-virtual-chunk]',
   DANGEROUS_TAGS = new Set(['iframe', 'object', 'embed', 'script', 'style', 'link', 'meta']);
 function escapePromptText(value = '') {
   const item = String(value || '');
-  if (!/[&<>]/['test'](item)) return item;
-  return item['replace'](/&/g, '&amp;')['replace'](/</g, '&lt;')['replace'](/>/g, '&gt;');
+  if (!/[&<>]/.test(item)) return item;
+  return item.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 export function buildVirtualizedPromptPasteHtml(key = '') {
   const list = String(key || '');
   if (!list) return '';
   const list2 = [];
-  for (let index = 0; index < list['length']; index += PROMPT_VIRTUAL_CHUNK_SIZE) {
-    list2['push'](
+  for (let index = 0; index < list.length; index += PROMPT_VIRTUAL_CHUNK_SIZE) {
+    list2.push(
       '<span class="prompt-virtual-chunk" data-prompt-virtual-chunk="true">' +
-        escapePromptText(list['slice'](index, index + PROMPT_VIRTUAL_CHUNK_SIZE)) +
+        escapePromptText(list.slice(index, index + PROMPT_VIRTUAL_CHUNK_SIZE)) +
         '</span>',
     );
   }
   return (
-    list2['push'](
+    list2.push(
       '<span class="prompt-virtual-paste-end" ' + 'data-prompt-virtual-paste-end="true">&#8203;</span>',
     ),
-    list2['join']('')
+    list2.join('')
   );
 }
 export function canVirtualizePromptPaste(
   result,
-  { documentObject: documentObject = globalThis['document'] } = {},
+  { documentObject: documentObject = globalThis.document } = {},
 ) {
-  if (String(result || '')['length'] < PROMPT_VIRTUAL_PASTE_THRESHOLD) return false;
-  if (typeof documentObject?.['execCommand'] !== 'function') return false;
-  const data = documentObject?.['defaultView']?.['CSS'] || globalThis['CSS'];
-  return typeof data?.['supports'] === 'function' && data['supports']('content-visibility', 'auto');
+  if (String(result || '').length < PROMPT_VIRTUAL_PASTE_THRESHOLD) return false;
+  if (typeof documentObject?.execCommand !== 'function') return false;
+  const data = documentObject?.defaultView?.CSS || globalThis.CSS;
+  return typeof data?.supports === 'function' && data.supports('content-visibility', 'auto');
 }
 export function removeVirtualPromptPasteEndMarker(
   el,
-  { documentObject: documentObject = globalThis['document'] } = {},
+  { documentObject: documentObject = globalThis.document } = {},
 ) {
-  const el2 = el?.['querySelector']?.(PROMPT_VIRTUAL_END_SELECTOR);
+  const el2 = el?.querySelector?.(PROMPT_VIRTUAL_END_SELECTOR);
   if (!el2) return;
   try {
-    const options = documentObject?.['createRange']?.(),
+    const options = documentObject?.createRange?.(),
       target =
-        documentObject?.['defaultView']?.['getSelection']?.() || globalThis['window']?.['getSelection']?.();
+        documentObject?.defaultView?.getSelection?.() || globalThis.window?.getSelection?.();
     if (options && target) {
-      (options['setStartBefore'](el2),
-        options['collapse'](true),
-        el2['remove']?.(),
-        target['removeAllRanges']?.(),
-        target['addRange']?.(options));
+      (options.setStartBefore(el2),
+        options.collapse(true),
+        el2.remove?.(),
+        target.removeAllRanges?.(),
+        target.addRange?.(options));
       return;
     }
   } catch {}
-  el2['remove']?.();
+  el2.remove?.();
 }
 export function insertVirtualizedPromptTextAtSelection(
   enabled,
   source,
-  { documentObject: documentObject = globalThis['document'] } = {},
+  { documentObject: documentObject = globalThis.document } = {},
 ) {
   if (!enabled || !canVirtualizePromptPaste(source, { documentObject: documentObject })) return false;
   const virtualizedPromptPasteHtml = buildVirtualizedPromptPasteHtml(source);
   if (!virtualizedPromptPasteHtml) return false;
   try {
-    const enabled2 = documentObject['execCommand']('insertHTML', false, virtualizedPromptPasteHtml);
+    const enabled2 = documentObject.execCommand('insertHTML', false, virtualizedPromptPasteHtml);
     if (!enabled2) return false;
     return (removeVirtualPromptPasteEndMarker(enabled, { documentObject: documentObject }), true);
   } catch {
@@ -75,61 +75,61 @@ export function insertVirtualizedPromptTextAtSelection(
   }
 }
 export function hasVirtualizedPromptChunks(el3) {
-  return Boolean(el3?.['querySelector']?.(PROMPT_VIRTUAL_CHUNK_SELECTOR));
+  return Boolean(el3?.querySelector?.(PROMPT_VIRTUAL_CHUNK_SELECTOR));
 }
 function appendSerializedPromptNode(list3, el4) {
-  const count = Number(el4?.['nodeType']);
+  const count = Number(el4?.nodeType);
   if (count === 3) {
-    list3['push'](escapePromptText(el4['textContent'] || ''));
+    list3.push(escapePromptText(el4.textContent || ''));
     return;
   }
   if (count !== 1) return;
-  if (el4?.['matches']?.(PROMPT_VIRTUAL_END_SELECTOR)) return;
-  const next = String(el4?.['tagName'] || '')['toLowerCase']();
-  if (DANGEROUS_TAGS['has'](next)) return;
+  if (el4?.matches?.(PROMPT_VIRTUAL_END_SELECTOR)) return;
+  const next = String(el4?.tagName || '').toLowerCase();
+  if (DANGEROUS_TAGS.has(next)) return;
   if (next === 'br') {
-    list3['push']('<br>');
+    list3.push('<br>');
     return;
   }
-  if (next === 'span' && el4['classList']?.['contains']?.('ref-pill')) {
-    list3['push'](sanitizePromptHtml(el4['outerHTML'] || ''));
+  if (next === 'span' && el4.classList?.contains?.('ref-pill')) {
+    list3.push(sanitizePromptHtml(el4.outerHTML || ''));
     return;
   }
-  const current = PROMPT_CONTAINER_TAGS['has'](next);
-  if (current) list3['push']('<' + next + '>');
-  Array['from'](el4['childNodes'] || [])['forEach']((entry) => {
+  const current = PROMPT_CONTAINER_TAGS.has(next);
+  if (current) list3.push('<' + next + '>');
+  Array.from(el4.childNodes || []).forEach((entry) => {
     appendSerializedPromptNode(list3, entry);
   });
-  if (current) list3['push']('</' + next + '>');
+  if (current) list3.push('</' + next + '>');
 }
 export function serializeVirtualizedPromptHtml(record) {
   if (!hasVirtualizedPromptChunks(record)) return null;
   const list4 = [];
   return (
-    Array['from'](record?.['childNodes'] || [])['forEach']((payload) => {
+    Array.from(record?.childNodes || []).forEach((payload) => {
       appendSerializedPromptNode(list4, payload);
     }),
-    list4['join']('')
+    list4.join('')
   );
 }
 export function rememberVirtualizedPromptCommit(enabled3, handle = '') {
   if (!enabled3) return;
-  if (!hasVirtualizedPromptChunks(enabled3['promptEl'])) {
-    enabled3['_virtualizedPromptCommitValue'] = null;
+  if (!hasVirtualizedPromptChunks(enabled3.promptEl)) {
+    enabled3._virtualizedPromptCommitValue = null;
     return;
   }
-  ((enabled3['_virtualizedPromptCommitValue'] = String(handle || '')),
+  ((enabled3._virtualizedPromptCommitValue = String(handle || '')),
     '_lastPromptContentSig' in enabled3 &&
-      (enabled3['_lastPromptContentSig'] = enabled3['_virtualizedPromptCommitValue']));
+      (enabled3._lastPromptContentSig = enabled3._virtualizedPromptCommitValue));
 }
 export function isVirtualizedPromptEditorCurrent(state, config = '') {
   return Boolean(
     state &&
-    hasVirtualizedPromptChunks(state['promptEl']) &&
-    state['_virtualizedPromptCommitValue'] === String(config || ''),
+    hasVirtualizedPromptChunks(state.promptEl) &&
+    state._virtualizedPromptCommitValue === String(config || ''),
   );
 }
 export function clearVirtualizedPromptCommit(enabled4) {
   if (!enabled4) return;
-  enabled4['_virtualizedPromptCommitValue'] = null;
+  enabled4._virtualizedPromptCommitValue = null;
 }

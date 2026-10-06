@@ -102,18 +102,18 @@ export function buildFileManagerHistoryEntryKey({
   localPath: localPath = '',
   resultFingerprint: resultFingerprint = '',
 } = {}) {
-  const payload = String(generationRunId || '')['trim']();
+  const payload = String(generationRunId || '').trim();
   if (payload)
     return [
       'generation',
-      String(projectId || '')['trim'](),
-      String(canvasId || '')['trim'](),
+      String(projectId || '').trim(),
+      String(canvasId || '').trim(),
       payload,
       String(mediaKind || '')
-        ['trim']()
-        ['toLowerCase'](),
-      Math['max'](0, Math['trunc'](Number(sourceIndex) || 0)),
-    ]['join'](':');
+        .trim()
+        .toLowerCase(),
+      Math.max(0, Math.trunc(Number(sourceIndex) || 0)),
+    ].join(':');
   return buildFileManagerHistoryMediaKey({
     projectId: projectId,
     canvasId: canvasId,
@@ -124,59 +124,59 @@ export function buildFileManagerHistoryEntryKey({
 }
 
 function defaultHistoryLocalPath(state) {
-  const handle = Array['isArray'](state?.['nodes']) ? state['nodes'][0] : null;
+  const handle = Array.isArray(state?.nodes) ? state.nodes[0] : null;
   return String(
-    state?.['localPath'] ||
-      handle?.['originalLocalPath'] ||
-      handle?.['localPath'] ||
-      handle?.['displayLocalPath'] ||
-      handle?.['imageUrl'] ||
-      handle?.['videoUrl'] ||
-      handle?.['audioUrl'] ||
-      handle?.['src'] ||
+    state?.localPath ||
+      handle?.originalLocalPath ||
+      handle?.localPath ||
+      handle?.displayLocalPath ||
+      handle?.imageUrl ||
+      handle?.videoUrl ||
+      handle?.audioUrl ||
+      handle?.src ||
       '',
-  )['trim']();
+  ).trim();
 }
 
 export function isFileManagerHistoryBackfillRecord(config) {
-  const scope = String(config?.['historyCaptureSource'] || '')['trim']();
+  const scope = String(config?.historyCaptureSource || '').trim();
   if (scope) return scope === 'backfill';
-  if (!String(config?.['generationRunId'] || '')['trim']()) return false;
-  const count = Number(config?.['generationStartedAt'] || 0),
-    input = Number(config?.['createdAt'] || 0),
-    output = Math['max'](0, Math['trunc'](Number(config?.['sourceIndex']) || 0));
-  return Number['isFinite'](count) && count > 0 && Number['isFinite'](input) && input === count + output;
+  if (!String(config?.generationRunId || '').trim()) return false;
+  const count = Number(config?.generationStartedAt || 0),
+    input = Number(config?.createdAt || 0),
+    output = Math.max(0, Math.trunc(Number(config?.sourceIndex) || 0));
+  return Number.isFinite(count) && count > 0 && Number.isFinite(input) && input === count + output;
 }
 
 function buildFileManagerBackfillMatchKey(
   value2,
   {
-    getMediaKind: getMediaKind = (value3) => value3?.['mediaKind'],
+    getMediaKind: getMediaKind = (value3) => value3?.mediaKind,
     getLocalPath: getLocalPath = defaultHistoryLocalPath,
   } = {},
 ) {
-  const enabled2 = String(value2?.['sourceNodeId'] || '')['trim']();
+  const enabled2 = String(value2?.sourceNodeId || '').trim();
   if (!enabled2) return '';
   const fileManagerHistoryMediaKey = buildFileManagerHistoryMediaKey({
-    projectId: value2?.['projectId'],
-    canvasId: value2?.['canvasId'],
+    projectId: value2?.projectId,
+    canvasId: value2?.canvasId,
     mediaKind: getMediaKind(value2),
     localPath: getLocalPath(value2),
-    resultFingerprint: value2?.['resultFingerprint'],
+    resultFingerprint: value2?.resultFingerprint,
   });
   if (!fileManagerHistoryMediaKey) return '';
   return [
     enabled2,
-    Math['max'](0, Math['trunc'](Number(value2?.['sourceIndex']) || 0)),
+    Math.max(0, Math.trunc(Number(value2?.sourceIndex) || 0)),
     fileManagerHistoryMediaKey,
-  ]['join'](':');
+  ].join(':');
 }
 
 export function isFileManagerBackfillDuplicate(
   value4,
   value5,
   {
-    getMediaKind: getMediaKind = (value6) => value6?.['mediaKind'],
+    getMediaKind: getMediaKind = (value6) => value6?.mediaKind,
     getLocalPath: getLocalPath = defaultHistoryLocalPath,
   } = {},
 ) {
@@ -194,40 +194,40 @@ export function isFileManagerBackfillDuplicate(
 
 export function resolveFileManagerBackfillStartedAt(value7) {
   for (const value8 of [
-    value7?.['generationStartTime'],
-    value7?.['rhTaskStartedAt'],
-    value7?.['dreaminaTaskStartedAt'],
-    value7?.['asyncTaskStartedAt'],
-    value7?.['createdAt'],
+    value7?.generationStartTime,
+    value7?.rhTaskStartedAt,
+    value7?.dreaminaTaskStartedAt,
+    value7?.asyncTaskStartedAt,
+    value7?.createdAt,
   ]) {
     const count2 = Number(value8);
-    if (Number['isFinite'](count2) && count2 > 0) return Math['trunc'](count2);
+    if (Number.isFinite(count2) && count2 > 0) return Math.trunc(count2);
   }
-  const value9 = String(value7?.['id'] || '')['match'](/\d{13}/g) || [],
-    count3 = Number(value9[value9['length'] - 1] || 0);
-  return Number['isFinite'](count3) && count3 > 0 ? Math['trunc'](count3) : 1;
+  const value9 = String(value7?.id || '').match(/\d{13}/g) || [],
+    count3 = Number(value9[value9.length - 1] || 0);
+  return Number.isFinite(count3) && count3 > 0 ? Math.trunc(count3) : 1;
 }
 
 export function dedupeFileManagerHistoryRecords(
   value10,
   {
-    getMediaKind: getMediaKind = (value11) => value11?.['mediaKind'],
+    getMediaKind: getMediaKind = (value11) => value11?.mediaKind,
     getLocalPath: getLocalPath = defaultHistoryLocalPath,
   } = {},
 ) {
-  const value12 = [...(Array['isArray'](value10) ? value10 : [])]['sort']((value13, value14) => {
-      const value15 = Number(value13?.['updatedAt'] || value13?.['createdAt'] || 0),
-        value16 = Number(value14?.['updatedAt'] || value14?.['createdAt'] || 0);
+  const value12 = [...(Array.isArray(value10) ? value10 : [])].sort((value13, value14) => {
+      const value15 = Number(value13?.updatedAt || value13?.createdAt || 0),
+        value16 = Number(value14?.updatedAt || value14?.createdAt || 0);
       return value16 - value15;
     }),
-    value17 = value12['filter']((value18) => !isFileManagerHistoryBackfillRecord(value18)),
+    value17 = value12.filter((value18) => !isFileManagerHistoryBackfillRecord(value18)),
     value19 = new Set(),
     map2 = new Set(),
     value20 = [];
   for (const value21 of value12) {
     if (isFileManagerHistoryBackfillRecord(value21)) {
       if (
-        value17['some']((value22) =>
+        value17.some((value22) =>
           isFileManagerBackfillDuplicate(value22, value21, {
             getMediaKind: getMediaKind,
             getLocalPath: getLocalPath,
@@ -239,21 +239,21 @@ export function dedupeFileManagerHistoryRecords(
         getMediaKind: getMediaKind,
         getLocalPath: getLocalPath,
       });
-      if (fileManagerBackfillMatchKey2 && value19['has'](fileManagerBackfillMatchKey2)) continue;
-      if (fileManagerBackfillMatchKey2) value19['add'](fileManagerBackfillMatchKey2);
+      if (fileManagerBackfillMatchKey2 && value19.has(fileManagerBackfillMatchKey2)) continue;
+      if (fileManagerBackfillMatchKey2) value19.add(fileManagerBackfillMatchKey2);
     }
     const fileManagerHistoryEntryKey = buildFileManagerHistoryEntryKey({
-      projectId: value21?.['projectId'],
-      canvasId: value21?.['canvasId'],
-      generationRunId: value21?.['generationRunId'],
+      projectId: value21?.projectId,
+      canvasId: value21?.canvasId,
+      generationRunId: value21?.generationRunId,
       mediaKind: getMediaKind(value21),
-      sourceIndex: value21?.['sourceIndex'],
+      sourceIndex: value21?.sourceIndex,
       localPath: getLocalPath(value21),
-      resultFingerprint: value21?.['resultFingerprint'],
+      resultFingerprint: value21?.resultFingerprint,
     });
-    if (fileManagerHistoryEntryKey && map2['has'](fileManagerHistoryEntryKey)) continue;
-    if (fileManagerHistoryEntryKey) map2['add'](fileManagerHistoryEntryKey);
-    value20['push'](value21);
+    if (fileManagerHistoryEntryKey && map2.has(fileManagerHistoryEntryKey)) continue;
+    if (fileManagerHistoryEntryKey) map2.add(fileManagerHistoryEntryKey);
+    value20.push(value21);
   }
   return value20;
 }

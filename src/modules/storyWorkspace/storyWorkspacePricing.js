@@ -1,6 +1,6 @@
 import { bindWorkspacePrices } from '../../components/shared/workspacePriceBindings.js';
 import { resolveStoryClipVideoGenerationParams } from './storyVideoGenerationSettings.js';
-const actions = (list) => list['map']((value) => '[data-story-action="' + value + '"]')['join'](',');
+const actions = (list) => list.map((value) => '[data-story-action="' + value + '"]').join(',');
 export function bindStoryWorkspacePricing(
   item,
   {
@@ -11,7 +11,7 @@ export function bindStoryWorkspacePricing(
   },
 ) {
   const run = (key) => ({
-    model: state['models'][key],
+    model: state.models[key],
     provider: state[key + 'Provider'],
     providerProfileId: state[key + 'ProviderProfileId'],
     generationParams: state[key + 'GenerationParams'] || {},
@@ -27,13 +27,13 @@ export function bindStoryWorkspacePricing(
         const prompt = getSelectedClip();
         return {
           ...run('video'),
-          prompt: prompt?.['prompt'] || '',
+          prompt: prompt?.prompt || '',
           generationParams: resolveStoryClipVideoGenerationParams(
             prompt,
-            state['models']['video'],
-            state['videoGenerationParams'],
+            state.models.video,
+            state.videoGenerationParams,
           ),
-          hasReferences: Object['values'](getVideoReferenceCounts(prompt) || {})['some'](
+          hasReferences: Object.values(getVideoReferenceCounts(prompt) || {}).some(
             (count) => count > 0,
           ),
         };
@@ -41,7 +41,7 @@ export function bindStoryWorkspacePricing(
     },
     {
       selector: actions(['generate-character-voice']),
-      getData: () => state['characterVoiceEditor']?.['nodeData'] || {},
+      getData: () => state.characterVoiceEditor?.nodeData || {},
     },
   ]);
 }

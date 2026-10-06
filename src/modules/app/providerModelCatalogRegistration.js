@@ -31,16 +31,16 @@ function slugify(value) {
  * 只换 modelId / executionId / 模型名。这样厂商新增一个同系列模型时无需改代码。
  */
 export function findProviderModelTemplate(item, key) {
-  const list = listModelManifests()['filter'](
+  const list = listModelManifests().filter(
     (index) =>
-      index?.['provider'] === item &&
-      index?.['kind'] === key &&
-      Boolean(getExecutionManifest(index?.['executionId'])),
+      index?.provider === item &&
+      index?.kind === key &&
+      Boolean(getExecutionManifest(index?.executionId)),
   );
-  if (list['length'] === 0) return null;
-  return [...list]['sort']((result, data) =>
-    String(result?.['modelId'] || '')['localeCompare'](String(data?.['modelId'] || ''), 'en'),
-  )[list['length'] - 1];
+  if (list.length === 0) return null;
+  return [...list].sort((result, data) =>
+    String(result?.modelId || '').localeCompare(String(data?.modelId || ''), 'en'),
+  )[list.length - 1];
 }
 
 function deepClone(options) {
@@ -55,51 +55,51 @@ export function buildProviderModelCatalogBundle(map) {
     executions = [],
     skipped = [];
   let target = 0;
-  for (const id of map?.['values']?.() || []) {
-    const ownerProviderId = getProviderModelCatalogOwnerProviderId(id?.['providerIds']?.[0]),
-      source = ownerProviderId + '/' + id['id'];
+  for (const id of map?.values?.() || []) {
+    const ownerProviderId = getProviderModelCatalogOwnerProviderId(id?.providerIds?.[0]),
+      source = ownerProviderId + '/' + id.id;
     if (getModelManifest(source)) {
-      skipped['push']({ id: id['id'], reason: 'already-integrated' });
+      skipped.push({ id: id.id, reason: 'already-integrated' });
       continue;
     }
-    const providerModelTemplate = findProviderModelTemplate(ownerProviderId, id['kind']);
+    const providerModelTemplate = findProviderModelTemplate(ownerProviderId, id.kind);
     if (!providerModelTemplate) {
-      skipped['push']({ id: id['id'], reason: 'no-template:' + id['kind'] });
+      skipped.push({ id: id.id, reason: 'no-template:' + id.kind });
       continue;
     }
-    const slugify2 = slugify(id['id']),
-      next = ownerProviderId + '.provider-model-catalog.' + id['kind'] + '.' + slugify2 + '.v1';
+    const slugify2 = slugify(id.id),
+      next = ownerProviderId + '.provider-model-catalog.' + id.kind + '.' + slugify2 + '.v1';
     if (!slugify2 || getExecutionManifest(next)) {
-      skipped['push']({ id: id['id'], reason: 'duplicate-execution' });
+      skipped.push({ id: id.id, reason: 'duplicate-execution' });
       continue;
     }
     target += 1;
     const deepClone2 = deepClone(providerModelTemplate),
-      deepClone3 = deepClone(getExecutionManifest(providerModelTemplate['executionId']));
-    ((deepClone2['modelId'] = source),
-      (deepClone2['executionId'] = next),
-      (deepClone2['displayName'] = id['id']),
-      delete deepClone2['aliases']);
+      deepClone3 = deepClone(getExecutionManifest(providerModelTemplate.executionId));
+    ((deepClone2.modelId = source),
+      (deepClone2.executionId = next),
+      (deepClone2.displayName = id.id),
+      delete deepClone2.aliases);
     const args = {
-      ...(deepClone2['extensions'] || {}),
-      providerProfiles: [...id['providerIds']],
+      ...(deepClone2.extensions || {}),
+      providerProfiles: [...id.providerIds],
       providerModelCatalog: {
-        vendorModelId: id['id'],
+        vendorModelId: id.id,
         ownerProviderId: ownerProviderId,
       },
     };
-    const current = MENU_EXTENSION_BY_KIND[id['kind']];
+    const current = MENU_EXTENSION_BY_KIND[id.kind];
     if (current && args[current])
       args[current] = {
         ...args[current],
-        title: id['id'],
+        title: id.id,
         order: MENU_ORDER_BASE + target,
       };
-    ((deepClone2['extensions'] = args),
-      (deepClone3['id'] = next),
-      (deepClone3['model'] = id['id']),
-      models['push'](deepClone2),
-      executions['push'](deepClone3));
+    ((deepClone2.extensions = args),
+      (deepClone3.id = next),
+      (deepClone3.model = id.id),
+      models.push(deepClone2),
+      executions.push(deepClone3));
   }
   return {
     sourceId: PROVIDER_MODEL_CATALOG_BUNDLE_SOURCE_ID,
@@ -123,7 +123,7 @@ export function createProviderModelCatalogBundleRegistry({
     try {
       unregister(enabled);
     } catch (entry) {
-      console['warn']('[Provider Model Catalog] unregister failed:', entry);
+      console.warn('[Provider Model Catalog] unregister failed:', entry);
     }
     enabled = null;
     return true;
@@ -132,24 +132,24 @@ export function createProviderModelCatalogBundleRegistry({
     sync(record) {
       clear();
       const skipped2 = buildProviderModelCatalogBundle(record);
-      if (skipped2['models']['length'] === 0)
-        return { changed: false, registered: 0, skipped: skipped2['skipped'] };
+      if (skipped2.models.length === 0)
+        return { changed: false, registered: 0, skipped: skipped2.skipped };
       try {
         register(skipped2);
       } catch (error) {
-        console['warn']('[Provider Model Catalog] register failed:', error);
-        return { changed: false, registered: 0, skipped: skipped2['skipped'], error: error };
+        console.warn('[Provider Model Catalog] register failed:', error);
+        return { changed: false, registered: 0, skipped: skipped2.skipped, error: error };
       }
       enabled = skipped2;
       return {
         changed: true,
-        registered: skipped2['models']['length'],
-        skipped: skipped2['skipped'],
+        registered: skipped2.models.length,
+        skipped: skipped2.skipped,
       };
     },
     clear: clear,
     getRegisteredModelIds() {
-      return (enabled?.['models'] || [])['map']((payload) => payload['modelId']);
+      return (enabled?.models || []).map((payload) => payload.modelId);
     },
   };
 }

@@ -362,32 +362,32 @@ const _localMediaStatInflight = new Map(),
   LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS = 3 * 1000;
 
 function isLocalRelativeUrl(value27) {
-  const enabled7 = String(value27 || '')['trim']();
-  return enabled7['startsWith']('/') && !enabled7['startsWith']('//');
+  const enabled7 = String(value27 || '').trim();
+  return enabled7.startsWith('/') && !enabled7.startsWith('//');
 }
 
 function normalizePositiveTimeoutMs(value28, value29) {
   const count3 = Number(value28);
-  return Number['isFinite'](count3) && count3 > 0 ? count3 : value29;
+  return Number.isFinite(count3) && count3 > 0 ? count3 : value29;
 }
 
 function _collectNormalizedLocalPaths(value30) {
   const value31 = new Set();
-  for (const value32 of Array['isArray'](value30) ? value30 : []) {
+  for (const value32 of Array.isArray(value30) ? value30 : []) {
     const localPath4 = normalizeLocalPath(value32);
-    if (localPath4) value31['add'](localPath4);
+    if (localPath4) value31.add(localPath4);
   }
   return value31;
 }
 
 function _evictSavedOutputCacheByLocalPaths(value33) {
   const map4 = _collectNormalizedLocalPaths(value33);
-  if (map4['size'] === 0) return;
-  for (const [value34, response2] of _saveOutputFromUrlCache['entries']()) {
+  if (map4.size === 0) return;
+  for (const [value34, response2] of _saveOutputFromUrlCache.entries()) {
     const localPath5 = normalizeLocalPath(
-      response2?.['localPath'] || response2?.['path'] || response2?.['url'],
+      response2?.localPath || response2?.path || response2?.url,
     );
-    localPath5 && map4['has'](localPath5) && _saveOutputFromUrlCache['delete'](value34);
+    localPath5 && map4.has(localPath5) && _saveOutputFromUrlCache.delete(value34);
   }
 }
 
@@ -395,53 +395,53 @@ function _evictLocalMediaExistsCacheByLocalPaths(value35) {
   const _collectNormalizedLocalPaths2 = _collectNormalizedLocalPaths(value35);
   for (const value36 of _collectNormalizedLocalPaths2) {
     const _localPathToStaticRequestPath2 = _localPathToStaticRequestPath(value36);
-    if (_localPathToStaticRequestPath2) _localMediaStatCache['delete'](_localPathToStaticRequestPath2);
+    if (_localPathToStaticRequestPath2) _localMediaStatCache.delete(_localPathToStaticRequestPath2);
   }
 }
 
 function _readLocalMediaStatCache(value37) {
-  const enabled8 = _localMediaStatCache['get'](value37);
+  const enabled8 = _localMediaStatCache.get(value37);
   if (!enabled8) return undefined;
-  if (Number(enabled8['expiresAt'] || 0) <= Date['now']())
-    return (_localMediaStatCache['delete'](value37), undefined);
-  return enabled8['stat'];
+  if (Number(enabled8.expiresAt || 0) <= Date.now())
+    return (_localMediaStatCache.delete(value37), undefined);
+  return enabled8.stat;
 }
 
 function _rememberLocalMediaStat(enabled9, exists) {
   if (!enabled9) return;
   const stat = {
-      exists: exists?.['exists'] === true,
+      exists: exists?.exists === true,
       sizeBytes:
-        Number['isSafeInteger'](Number(exists?.['sizeBytes'])) && Number(exists['sizeBytes']) >= 0
-          ? Number(exists['sizeBytes'])
+        Number.isSafeInteger(Number(exists?.sizeBytes)) && Number(exists.sizeBytes) >= 0
+          ? Number(exists.sizeBytes)
           : 0,
-      contentType: String(exists?.['contentType'] || '')['trim'](),
-      lastModified: String(exists?.['lastModified'] || '')['trim'](),
+      contentType: String(exists?.contentType || '').trim(),
+      lastModified: String(exists?.lastModified || '').trim(),
     },
-    value38 = stat['exists'] ? LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS : LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS;
-  _localMediaStatCache['set'](enabled9, { stat: stat, expiresAt: Date['now']() + value38 });
-  if (_localMediaStatCache['size'] > LOCAL_MEDIA_EXISTS_CACHE_LIMIT) {
-    const value39 = _localMediaStatCache['keys']()['next']()['value'];
-    if (value39) _localMediaStatCache['delete'](value39);
+    value38 = stat.exists ? LOCAL_MEDIA_EXISTS_TRUE_CACHE_TTL_MS : LOCAL_MEDIA_EXISTS_FALSE_CACHE_TTL_MS;
+  _localMediaStatCache.set(enabled9, { stat: stat, expiresAt: Date.now() + value38 });
+  if (_localMediaStatCache.size > LOCAL_MEDIA_EXISTS_CACHE_LIMIT) {
+    const value39 = _localMediaStatCache.keys().next().value;
+    if (value39) _localMediaStatCache.delete(value39);
   }
   return stat;
 }
 
 function _normalizeLegacyProjectFilename(value40) {
-  const enabled10 = String(value40 || '')['trim']();
+  const enabled10 = String(value40 || '').trim();
   if (!enabled10) return 'default_v2_project.json';
-  return PROJECT_FILE_EXTENSION_RE['test'](enabled10) ? enabled10 : enabled10 + '.json';
+  return PROJECT_FILE_EXTENSION_RE.test(enabled10) ? enabled10 : enabled10 + '.json';
 }
 
 export async function renameV2ProjectOnServer(value41, value42) {
-  const name = String(value42 || '')['trim']();
+  const name = String(value42 || '').trim();
   if (!name) return { success: false };
   const _normalizeProjectFilename4 = _normalizeProjectFilename(value41);
   return await requester({
     url: '/api/v2/projects/' + encodeURIComponent(_normalizeProjectFilename4),
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON['stringify']({ name: name }),
+    body: JSON.stringify({ name: name }),
     provider: 'local',
   });
 }
@@ -453,19 +453,19 @@ export async function saveOutputVideoThumbnailToServer(options6 = {}) {
 export async function fetchAssetCategorySettingsFromServer() {
   try {
     const categories2 = await get(ASSET_CATEGORIES_USER_FILE, { provider: 'local' });
-    if (Array['isArray'](categories2)) return { categories: categories2, displayNames: {}, parents: {} };
+    if (Array.isArray(categories2)) return { categories: categories2, displayNames: {}, parents: {} };
     if (categories2 && typeof categories2 === 'object') {
-      const categories3 = Array['isArray'](categories2['categories'])
-          ? categories2['categories']
-          : Array['isArray'](categories2['items'])
-            ? categories2['items']
+      const categories3 = Array.isArray(categories2.categories)
+          ? categories2.categories
+          : Array.isArray(categories2.items)
+            ? categories2.items
             : [],
         displayNames =
-          categories2['displayNames'] && typeof categories2['displayNames'] === 'object'
-            ? categories2['displayNames']
+          categories2.displayNames && typeof categories2.displayNames === 'object'
+            ? categories2.displayNames
             : {},
         parents =
-          categories2['parents'] && typeof categories2['parents'] === 'object' ? categories2['parents'] : {};
+          categories2.parents && typeof categories2.parents === 'object' ? categories2.parents : {};
       return { categories: categories3, displayNames: displayNames, parents: parents };
     }
     return { categories: [], displayNames: {}, parents: {} };
@@ -476,9 +476,9 @@ export async function fetchAssetCategorySettingsFromServer() {
 
 export async function discardStagedAssetUploadToServer(value43) {
   const stageId = String(value43 || '')
-    ['trim']()
-    ['toLowerCase']();
-  if (!/^[a-f0-9]{32}$/['test'](stageId)) return { success: false, removed: false };
+    .trim()
+    .toLowerCase();
+  if (!/^[a-f0-9]{32}$/.test(stageId)) return { success: false, removed: false };
   return await post(
     '/api/v2/assets/stage/discard',
     { stageId: stageId },
@@ -490,12 +490,12 @@ export async function statLocalMediaOnServer(value44) {
   const value45 =
       typeof value44 === 'string'
         ? value44
-        : String(value44?.['localPath'] || value44?.['path'] || '')['trim'](),
+        : String(value44?.localPath || value44?.path || '').trim(),
     url4 = _localPathToStaticRequestPath(value45);
   if (!url4) return { exists: false, sizeBytes: 0, contentType: '', lastModified: '' };
   const _readLocalMediaStatCache2 = _readLocalMediaStatCache(url4);
   if (_readLocalMediaStatCache2 !== undefined) return _readLocalMediaStatCache2;
-  if (_localMediaStatInflight['has'](url4)) return await _localMediaStatInflight['get'](url4);
+  if (_localMediaStatInflight.has(url4)) return await _localMediaStatInflight.get(url4);
   const promise2 = requester({
     url: url4,
     method: 'HEAD',
@@ -505,20 +505,20 @@ export async function statLocalMediaOnServer(value44) {
     returnMeta: true,
     timeout: 10000,
   })
-    ['then']((response3) => {
-      const count4 = Number(response3?.['status'] || 0),
+    .then((response3) => {
+      const count4 = Number(response3?.status || 0),
         exists2 = count4 >= 200 && count4 < 400,
-        count5 = Number(response3?.['headers']?.['get']?.('content-length') || 0);
+        count5 = Number(response3?.headers?.get?.('content-length') || 0);
       return _rememberLocalMediaStat(url4, {
         exists: exists2,
-        sizeBytes: exists2 && Number['isSafeInteger'](count5) && count5 >= 0 ? count5 : 0,
-        contentType: exists2 ? String(response3?.['headers']?.['get']?.('content-type') || '')['trim']() : '',
+        sizeBytes: exists2 && Number.isSafeInteger(count5) && count5 >= 0 ? count5 : 0,
+        contentType: exists2 ? String(response3?.headers?.get?.('content-type') || '').trim() : '',
         lastModified: exists2
-          ? String(response3?.['headers']?.['get']?.('last-modified') || '')['trim']()
+          ? String(response3?.headers?.get?.('last-modified') || '').trim()
           : '',
       });
     })
-    ['catch'](() => {
+    .catch(() => {
       return _rememberLocalMediaStat(url4, {
         exists: false,
         sizeBytes: 0,
@@ -527,10 +527,10 @@ export async function statLocalMediaOnServer(value44) {
       });
     });
   return (
-    _localMediaStatInflight['set'](url4, promise2),
-    promise2['finally'](() => {
-      _localMediaStatInflight['get'](url4) === promise2 && _localMediaStatInflight['delete'](url4);
-    })['catch'](() => {}),
+    _localMediaStatInflight.set(url4, promise2),
+    promise2.finally(() => {
+      _localMediaStatInflight.get(url4) === promise2 && _localMediaStatInflight.delete(url4);
+    }).catch(() => {}),
     await promise2
   );
 }

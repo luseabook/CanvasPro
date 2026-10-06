@@ -80,11 +80,11 @@ export function buildAudioModelTriggerHtml({ label: label = '' } = {}) {
 }
 
 function isSavedRhAiAppManifest(current) {
-  return Boolean(String(current?.['extensions']?.['rhAiApp']?.['appKey'] || '')['trim']());
+  return Boolean(String(current?.extensions?.rhAiApp?.appKey || '').trim());
 }
 
 function isSavedComfyUiWorkflowManifest(entry) {
-  return Boolean(String(entry?.['extensions']?.['comfyUiWorkflow']?.['appKey'] || '')['trim']());
+  return Boolean(String(entry?.extensions?.comfyUiWorkflow?.appKey || '').trim());
 }
 
 function buildComfyUiAudioWorkflowIconHtml(record) {
@@ -92,15 +92,15 @@ function buildComfyUiAudioWorkflowIconHtml(record) {
 }
 
 function getCustomProviderMeta(payload) {
-  const handle = payload?.['extensions']?.['customProvider'];
+  const handle = payload?.extensions?.customProvider;
   return handle && typeof handle === 'object' ? handle : null;
 }
 
 function buildCustomProviderAudioLogoHtml(options2 = {}, state = 'node-menu-icon') {
   const config =
-    String(options2?.['badge'] || 'CP')
-      ['trim']()
-      ['slice'](0, 2) || 'CP';
+    String(options2?.badge || 'CP')
+      .trim()
+      .slice(0, 2) || 'CP';
   return (
     '<div class="' +
     escapeNodeMenuHtml(state) +
@@ -111,15 +111,15 @@ function buildCustomProviderAudioLogoHtml(options2 = {}, state = 'node-menu-icon
 }
 
 function getAudioMenuIconHtml(options3 = {}) {
-  const scope = String(options3?.['iconKind'] || '')['trim']();
+  const scope = String(options3?.iconKind || '').trim();
   if (scope === 'comfyUiCloudWorkflowBadge' || scope === 'comfyUiLocalWorkflowBadge')
     return buildComfyUiAudioWorkflowIconHtml(scope);
   if (scope === 'customProviderBadge') return buildCustomProviderAudioLogoHtml(options3);
   return '';
 }
 
-const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
-  rhAiApp: Object['freeze']({
+const AUDIO_MENU_GROUP_CONFIG = Object.freeze({
+  rhAiApp: Object.freeze({
     id: 'rhAiApp',
     label: 'RH AI应用',
     subtitle: '自定义 RunningHub AI App',
@@ -127,21 +127,21 @@ const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
     iconAlt: 'runninghub',
     order: 5,
   }),
-  comfyUiCloudWorkflow: Object['freeze']({
+  comfyUiCloudWorkflow: Object.freeze({
     id: 'comfyUiCloudWorkflow',
     label: '云端工作流',
     subtitle: '保存的 ComfyUI 云端工作流',
     iconHtml: renderComfyUiCloudWorkflowLogoHtml({ className: 'node-menu-icon' }),
     order: 6,
   }),
-  comfyUiLocalWorkflow: Object['freeze']({
+  comfyUiLocalWorkflow: Object.freeze({
     id: 'comfyUiLocalWorkflow',
     label: '本地工作流',
     subtitle: '保存的 ComfyUI 本地工作流',
     iconHtml: renderComfyUiLocalWorkflowLogoHtml({ className: 'node-menu-icon' }),
     order: 7,
   }),
-  runninghubWorkflow: Object['freeze']({
+  runninghubWorkflow: Object.freeze({
     id: 'runninghub',
     labelKey: 'runninghub.label',
     subtitleKey: 'runninghub.subtitle',
@@ -149,7 +149,7 @@ const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
     iconAlt: 'runninghub',
     order: 10,
   }),
-  runninghubModel: Object['freeze']({
+  runninghubModel: Object.freeze({
     id: 'runninghubModel',
     label: 'RunningHub模型',
     subtitle: '语音合成 · 音乐创作 · 声音克隆',
@@ -157,7 +157,7 @@ const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
     iconAlt: 'runninghub',
     order: 15,
   }),
-  volcengineSpeech: Object['freeze']({
+  volcengineSpeech: Object.freeze({
     id: 'volcengineSpeech',
     label: '火山语音',
     subtitle: '豆包语音大模型',
@@ -168,9 +168,9 @@ const AUDIO_MENU_GROUP_CONFIG = Object['freeze']({
 });
 
 function getGroupConfig(input) {
-  const output = String(input || '')['trim']();
+  const output = String(input || '').trim();
   if (AUDIO_MENU_GROUP_CONFIG[output]) return AUDIO_MENU_GROUP_CONFIG[output];
-  return Object['freeze']({
+  return Object.freeze({
     id: output || 'other',
     label: output || '其他',
     subtitle: '',
@@ -181,51 +181,51 @@ function getGroupConfig(input) {
 }
 
 function getGroupLabel(value2) {
-  if (value2['labelKey']) return audioModelMenuText(value2['labelKey']);
-  return value2['label'] || value2['id'];
+  if (value2.labelKey) return audioModelMenuText(value2.labelKey);
+  return value2.label || value2.id;
 }
 
 function getGroupSubtitle(value3) {
-  if (value3['subtitleKey']) return audioModelMenuText(value3['subtitleKey']);
-  return value3['subtitle'] || '';
+  if (value3.subtitleKey) return audioModelMenuText(value3.subtitleKey);
+  return value3.subtitle || '';
 }
 
 function groupWorkflowItems(list2 = []) {
   const map = new Map();
   return (
-    list2['forEach']((value4) => {
-      const value5 = String(value4?.['group'] || 'runninghubWorkflow'),
+    list2.forEach((value4) => {
+      const value5 = String(value4?.group || 'runninghubWorkflow'),
         args = getGroupConfig(value5),
-        value6 = !AUDIO_MENU_GROUP_CONFIG[value5] && String(value4?.['providerDisplayName'] || '')['trim']();
-      (!map['has'](args['id']) &&
-        map['set'](args['id'], {
+        value6 = !AUDIO_MENU_GROUP_CONFIG[value5] && String(value4?.providerDisplayName || '').trim();
+      (!map.has(args.id) &&
+        map.set(args.id, {
           ...args,
-          label: value6 ? value4['providerDisplayName'] : getGroupLabel(args),
+          label: value6 ? value4.providerDisplayName : getGroupLabel(args),
           subtitle: value6 ? 'Custom provider' : getGroupSubtitle(args),
           iconHtml: value6
-            ? buildCustomProviderAudioLogoHtml({ badge: value4['providerBadge'] || 'CP' })
-            : args['iconHtml'],
-          icon: value6 ? undefined : args['icon'],
-          iconAlt: value6 ? '' : args['iconAlt'],
-          order: value6 ? 30 : args['order'],
+            ? buildCustomProviderAudioLogoHtml({ badge: value4.providerBadge || 'CP' })
+            : args.iconHtml,
+          icon: value6 ? undefined : args.icon,
+          iconAlt: value6 ? '' : args.iconAlt,
+          order: value6 ? 30 : args.order,
           items: [],
         }),
-        map['get'](args['id'])['items']['push']({
-          modelId: value4['key'],
-          provider: value4['provider'] || '',
-          label: value4['label'],
-          subtitle: value4['subtitle'],
-          iconHtml: value4['iconHtml'] || undefined,
-          icon: value4['icon'] || args['icon'],
-          iconAlt: value4['iconAlt'] || args['iconAlt'],
-          vip: value4['vip'] === true,
-          badgeHtml: buildModelProviderProfileBadgesHtml(value4['key'], { vip: value4['vip'] === true }),
+        map.get(args.id).items.push({
+          modelId: value4.key,
+          provider: value4.provider || '',
+          label: value4.label,
+          subtitle: value4.subtitle,
+          iconHtml: value4.iconHtml || undefined,
+          icon: value4.icon || args.icon,
+          iconAlt: value4.iconAlt || args.iconAlt,
+          vip: value4.vip === true,
+          badgeHtml: buildModelProviderProfileBadgesHtml(value4.key, { vip: value4.vip === true }),
         }));
     }),
-    Array['from'](map['values']())['sort']((value7, value8) => {
-      const value9 = Number(value7['order']),
-        value10 = Number(value8['order']);
-      return (Number['isFinite'](value9) ? value9 : 0) - (Number['isFinite'](value10) ? value10 : 0);
+    Array.from(map.values()).sort((value7, value8) => {
+      const value9 = Number(value7.order),
+        value10 = Number(value8.order);
+      return (Number.isFinite(value9) ? value9 : 0) - (Number.isFinite(value10) ? value10 : 0);
     })
   );
 }

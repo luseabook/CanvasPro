@@ -1,4 +1,4 @@
-export const PERSON_REPLACEMENT_WORKSPACE_INTENTS = Object['freeze']({
+export const PERSON_REPLACEMENT_WORKSPACE_INTENTS = Object.freeze({
   PREVIEW_GENERATION: 'preview-generation',
   GET_PROMPT_ENHANCEMENT_MODEL: 'get-prompt-enhancement-model',
   LIST_LIBRARY_ASSETS: 'list-library-assets',
@@ -63,35 +63,35 @@ export const PERSON_REPLACEMENT_WORKSPACE_INTENTS = Object['freeze']({
   CAN_CLOSE: 'can-close',
   CLOSE: 'close',
 });
-const KNOWN_INTENTS = new Set(Object['values'](PERSON_REPLACEMENT_WORKSPACE_INTENTS));
+const KNOWN_INTENTS = new Set(Object.values(PERSON_REPLACEMENT_WORKSPACE_INTENTS));
 function normalizeIntent(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 export function createPersonReplacementWorkspaceIntentPort({ handlers: handlers = {} } = {}) {
-  if (!handlers || typeof handlers !== 'object' || Array['isArray'](handlers))
+  if (!handlers || typeof handlers !== 'object' || Array.isArray(handlers))
     throw new TypeError(
       'Replacement Studio workspace intent handlers must be an object.',
     );
   const map = new Map();
   return (
-    Object['entries'](handlers)['forEach'](([item, key]) => {
+    Object.entries(handlers).forEach(([item, key]) => {
       const intent = normalizeIntent(item);
-      if (!KNOWN_INTENTS['has'](intent))
+      if (!KNOWN_INTENTS.has(intent))
         throw new TypeError('Unsupported Replacement Studio workspace intent: ' + item);
       if (typeof key !== 'function')
         throw new TypeError('Replacement Studio workspace intent handler must be a function: ' + item);
-      map['set'](intent, key);
+      map.set(intent, key);
     }),
-    Object['freeze']({
+    Object.freeze({
       supports(index) {
         const intent2 = normalizeIntent(index);
-        return KNOWN_INTENTS['has'](intent2) && map['has'](intent2);
+        return KNOWN_INTENTS.has(intent2) && map.has(intent2);
       },
       request(result, ...args) {
         const intent3 = normalizeIntent(result);
-        if (!KNOWN_INTENTS['has'](intent3))
+        if (!KNOWN_INTENTS.has(intent3))
           throw new TypeError('Unsupported Replacement Studio workspace intent: ' + result);
-        return map['get'](intent3)?.(...args);
+        return map.get(intent3)?.(...args);
       },
     })
   );

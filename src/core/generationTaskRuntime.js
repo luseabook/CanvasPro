@@ -730,119 +730,119 @@ function findActiveTaskContext(
   value28,
   { storeLike: storeLike = null, taskCenterTaskId: taskCenterTaskId = '' } = {},
 ) {
-  const enabled12 = String(value28 || '')['trim']();
+  const enabled12 = String(value28 || '').trim();
   if (!enabled12) return null;
-  const enabled13 = String(taskCenterTaskId || '')['trim'](),
-    value29 = Array['from'](activeTasks['values']())['filter'](
+  const enabled13 = String(taskCenterTaskId || '').trim(),
+    value29 = Array.from(activeTasks.values()).filter(
       (value30) =>
-        value30?.['targetNodeId'] === enabled12 &&
-        (!storeLike || value30['store'] === storeLike) &&
-        (!enabled13 || value30['taskCenterTaskId'] === enabled13),
+        value30?.targetNodeId === enabled12 &&
+        (!storeLike || value30.store === storeLike) &&
+        (!enabled13 || value30.taskCenterTaskId === enabled13),
     );
-  return value29['find']((value31) => isContextInFlight(value31)) || value29[0] || null;
+  return value29.find((value31) => isContextInFlight(value31)) || value29[0] || null;
 }
 
 function normalizeCompletionFeedbackOutcome(value32, value33) {
-  if (value32['status'] === 'rejected')
-    return { ok: false, error: String(value32['reason']?.['message'] || value32['reason'] || 'Unknown error') };
-  const response = value32['value'] && typeof value32['value'] === 'object' ? value32['value'] : {};
+  if (value32.status === 'rejected')
+    return { ok: false, error: String(value32.reason?.message || value32.reason || 'Unknown error') };
+  const response = value32.value && typeof value32.value === 'object' ? value32.value : {};
   if (value33 === 'notification')
     return {
-      ok: response['success'] !== false,
-      shown: response['shown'] === true,
-      reason: String(response['reason'] || ''),
-      error: String(response['error'] || ''),
+      ok: response.success !== false,
+      shown: response.shown === true,
+      reason: String(response.reason || ''),
+      error: String(response.error || ''),
     };
   return {
-    ok: response['ok'] === true,
-    native: response['native'] === true,
-    skipped: String(response['skipped'] || ''),
-    error: String(response['error']?.['message'] || response['error'] || ''),
+    ok: response.ok === true,
+    native: response.native === true,
+    skipped: String(response.skipped || ''),
+    error: String(response.error?.message || response.error || ''),
   };
 }
 
 function dispatchGenerationCompletionFeedback(value34, { recovering: recovering = false } = {}) {
-  const stateSnapshot5 = getStateSnapshot(value34['store'])['nodes']?.[value34['targetNodeId']] || {},
-    promise = Promise['allSettled']([
+  const stateSnapshot5 = getStateSnapshot(value34.store).nodes?.[value34.targetNodeId] || {},
+    promise = Promise.allSettled([
       playCompletionSound('generation-success'),
       showGenerationCompleteNotification({
-        nodeId: value34['targetNodeId'],
+        nodeId: value34.targetNodeId,
         navigation: {
           source: 'canvas',
-          nodeId: value34['targetNodeId'],
-          projectId: value34['projectId'],
-          canvasId: value34['taskScopeId'],
+          nodeId: value34.targetNodeId,
+          projectId: value34.projectId,
+          canvasId: value34.taskScopeId,
         },
         node: stateSnapshot5,
         mediaKind:
-          value34['spec']?.['modelManifest']?.['outputType'] ||
-          value34['spec']?.['executionManifest']?.['kind'] ||
-          value34['taskType'] ||
-          stateSnapshot5?.['outputType'] ||
-          stateSnapshot5?.['type'] ||
+          value34.spec?.modelManifest?.outputType ||
+          value34.spec?.executionManifest?.kind ||
+          value34.taskType ||
+          stateSnapshot5?.outputType ||
+          stateSnapshot5?.type ||
           '',
       }),
-    ])['then'](([value35, value36]) => {
+    ]).then(([value35, value36]) => {
       const response2 = normalizeCompletionFeedbackOutcome(value35, 'sound'),
         response3 = normalizeCompletionFeedbackOutcome(value36, 'notification'),
-        value37 = !response2['ok'] && response2['skipped'] !== 'disabled',
-        value38 = !response3['ok'];
+        value37 = !response2.ok && response2.skipped !== 'disabled',
+        value38 = !response3.ok;
       return logDiagnosticEvent({
         type: 'generation.completion_feedback',
         level: value37 || value38 ? 'warn' : 'info',
         source: 'renderer',
         message: 'Generation completion feedback dispatched',
         context: {
-          targetNodeId: value34['targetNodeId'],
-          taskId: value34['taskId'],
-          taskType: value34['taskType'],
-          provider: String(value34['spec']?.['provider'] || ''),
-          modelId: String(value34['spec']?.['modelId'] || ''),
+          targetNodeId: value34.targetNodeId,
+          taskId: value34.taskId,
+          taskType: value34.taskType,
+          provider: String(value34.spec?.provider || ''),
+          modelId: String(value34.spec?.modelId || ''),
           recovering: recovering,
           sound: response2,
           notification: response3,
         },
       });
     });
-  return (void promise['catch'](() => {}), promise);
+  return (void promise.catch(() => {}), promise);
 }
 
 function normalizeProjectId(value39) {
-  return String(value39 || '')['trim']();
+  return String(value39 || '').trim();
 }
 
 function resolveTaskProjectId(options7 = {}, value40 = {}) {
   return normalizeProjectId(
-    value40['projectId'] || options7['projectId'] || globalThis['window']?.['currentProjectId'] || '',
+    value40.projectId || options7.projectId || globalThis.window?.currentProjectId || '',
   );
 }
 
 function isRunningHubWorkflowQueueSpec(args20 = {}) {
   return isRunningHubWorkflowQueueTarget({
-    provider: args20['provider'],
-    adapterType: args20['adapterType'],
+    provider: args20.provider,
+    adapterType: args20.adapterType,
     payload: {
-      ...(args20['payload'] && typeof args20['payload'] === 'object' ? args20['payload'] : {}),
-      model: args20['modelId'],
-      provider: args20['provider'],
-      adapterType: args20['adapterType'],
+      ...(args20.payload && typeof args20.payload === 'object' ? args20.payload : {}),
+      model: args20.modelId,
+      provider: args20.provider,
+      adapterType: args20.adapterType,
     },
   });
 }
 
 function resolveSpecManifestContext(options8 = {}) {
   const value41 =
-      options8['modelManifest'] && typeof options8['modelManifest'] === 'object'
-        ? options8['modelManifest']
+      options8.modelManifest && typeof options8.modelManifest === 'object'
+        ? options8.modelManifest
         : null,
     value42 =
-      options8['executionManifest'] && typeof options8['executionManifest'] === 'object'
-        ? options8['executionManifest']
+      options8.executionManifest && typeof options8.executionManifest === 'object'
+        ? options8.executionManifest
         : null;
   if (value41 && value42) return { modelManifest: value41, executionManifest: value42 };
-  const enabled14 = String(options8['modelId'] || '')['trim']();
+  const enabled14 = String(options8.modelId || '').trim();
   if (!enabled14) return null;
-  const value43 = String(options8['provider'] || '')['trim']();
+  const value43 = String(options8.provider || '').trim();
   let modelExecution = null;
   try {
     modelExecution =
@@ -851,149 +851,149 @@ function resolveSpecManifestContext(options8 = {}) {
   } catch {
     modelExecution = null;
   }
-  if (!modelExecution?.['modelManifest'] || !modelExecution?.['executionManifest']) return null;
-  const value44 = String(options8['executionId'] || '')['trim'](),
-    value45 = String(modelExecution['executionManifest']['id'] || '')['trim']();
+  if (!modelExecution?.modelManifest || !modelExecution?.executionManifest) return null;
+  const value44 = String(options8.executionId || '').trim(),
+    value45 = String(modelExecution.executionManifest.id || '').trim();
   if (value44 && value45 !== value44) return null;
   return {
-    modelManifest: value41 || modelExecution['modelManifest'],
-    executionManifest: value42 || modelExecution['executionManifest'],
+    modelManifest: value41 || modelExecution.modelManifest,
+    executionManifest: value42 || modelExecution.executionManifest,
   };
 }
 
 function hasResultNormalizer(options9 = {}) {
-  return typeof options9['resultBuilder'] === 'function' || !!resolveSpecManifestContext(options9);
+  return typeof options9.resultBuilder === 'function' || !!resolveSpecManifestContext(options9);
 }
 
 function mergeManifestResultPatch(args21, args22) {
   if (!args22 || typeof args22 !== 'object') return args21;
-  if (!args21 || typeof args21 !== 'object' || Array['isArray'](args21)) return args22;
+  if (!args21 || typeof args21 !== 'object' || Array.isArray(args21)) return args22;
   return { ...args22, ...args21 };
 }
 
 function persistResumableTaskState(value46, value47 = {}) {
-  if (value46?.['spec']?.['resumable'] !== true) return;
-  if (typeof value46['persistTaskState'] !== 'function') return;
+  if (value46?.spec?.resumable !== true) return;
+  if (typeof value46.persistTaskState !== 'function') return;
   try {
-    const promise2 = value46['persistTaskState']({
-      sourceNodeId: value46['sourceNodeId'],
-      targetNodeId: value46['targetNodeId'],
-      taskId: value46['taskId'],
-      spec: value46['spec'],
+    const promise2 = value46.persistTaskState({
+      sourceNodeId: value46.sourceNodeId,
+      targetNodeId: value46.targetNodeId,
+      taskId: value46.taskId,
+      spec: value46.spec,
       patch: value47,
     });
-    promise2?.['catch']?.(() => {});
+    promise2?.catch?.(() => {});
   } catch {}
 }
 
 function updateContextNode(value48, value49, value50, value51 = {}) {
-  if (value48?.['background'] !== true && value48?.['isTargetCurrent']?.() === false) return false;
-  const updateTaskNode2 = updateTaskNode(value48['store'], value49, value50, value51);
+  if (value48?.background !== true && value48?.isTargetCurrent?.() === false) return false;
+  const updateTaskNode2 = updateTaskNode(value48.store, value49, value50, value51);
   if (updateTaskNode2) {
-    value49 === value48['targetNodeId'] && persistResumableTaskState(value48, value50);
-    if (typeof value48['mirrorTaskState'] === 'function')
+    value49 === value48.targetNodeId && persistResumableTaskState(value48, value50);
+    if (typeof value48.mirrorTaskState === 'function')
       try {
-        const value52 = value48['mirrorTaskState']({
-          sourceNodeId: value48['sourceNodeId'],
-          targetNodeId: value48['targetNodeId'],
-          taskId: value48['taskId'],
-          taskScopeId: value48['taskScopeId'],
-          spec: value48['spec'],
+        const value52 = value48.mirrorTaskState({
+          sourceNodeId: value48.sourceNodeId,
+          targetNodeId: value48.targetNodeId,
+          taskId: value48.taskId,
+          taskScopeId: value48.taskScopeId,
+          spec: value48.spec,
           patch: value50,
           updatedNodeId: value49,
-          store: value48['store'],
+          store: value48.store,
         });
-        value52?.['catch']?.((value53) => {
-          console['error']('[generationTaskRuntime] Failed to mirror background task state:', value53);
+        value52?.catch?.((value53) => {
+          console.error('[generationTaskRuntime] Failed to mirror background task state:', value53);
         });
       } catch (value54) {
-        console['error']('[generationTaskRuntime] Failed to mirror background task state:', value54);
+        console.error('[generationTaskRuntime] Failed to mirror background task state:', value54);
       }
   }
   return updateTaskNode2;
 }
 
 function updateContextTaskNode(value55, value56, value57 = {}) {
-  return updateContextNode(value55, value55['targetNodeId'], value56, value57);
+  return updateContextNode(value55, value55.targetNodeId, value56, value57);
 }
 
 function getQueuedMessage() {
-  const value58 = String(t('coreUi.generationTask.queued') || '')['trim']();
+  const value58 = String(t('coreUi.generationTask.queued') || '').trim();
   return value58 && value58 !== 'coreUi.generationTask.queued' ? value58 : 'Queued';
 }
 
 function canAbortContextSignal(enabled15) {
-  if (typeof enabled15?.['abortController']?.['abort'] !== 'function') return false;
-  return !enabled15['signal'] || enabled15['signal'] === enabled15['abortController']['signal'];
+  if (typeof enabled15?.abortController?.abort !== 'function') return false;
+  return !enabled15.signal || enabled15.signal === enabled15.abortController.signal;
 }
 
 function cancelContextRemoteTaskOnce(
   enabled16,
   { taskId: taskId5, node: node = null, options: options = {} } = {},
 ) {
-  const enabled17 = String(taskId5 || enabled16?.['taskId'] || '')['trim']();
+  const enabled17 = String(taskId5 || enabled16?.taskId || '').trim();
   if (!enabled16 || !enabled17)
-    return Promise['resolve'](
+    return Promise.resolve(
       cancelRemoteTask(enabled16, { taskId: enabled17, node: node, options: options }),
     );
-  if (enabled16['remoteCancellationTaskId'] === enabled17 && enabled16['remoteCancellationPromise'])
-    return enabled16['remoteCancellationPromise'];
+  if (enabled16.remoteCancellationTaskId === enabled17 && enabled16.remoteCancellationPromise)
+    return enabled16.remoteCancellationPromise;
   return (
-    (enabled16['remoteCancellationTaskId'] = enabled17),
-    (enabled16['remoteCancellationPromise'] = Promise['resolve'](
+    (enabled16.remoteCancellationTaskId = enabled17),
+    (enabled16.remoteCancellationPromise = Promise.resolve(
       cancelRemoteTask(enabled16, { taskId: enabled17, node: node, options: options }),
     )),
-    enabled16['remoteCancellationPromise']
+    enabled16.remoteCancellationPromise
   );
 }
 
 async function pauseTaskContexts(list4, value59, value60 = {}) {
-  const value61 = list4['filter']((value62) => {
-    if (value62?.['spec']?.['resumable'] !== true) return true;
-    if (!String(value62?.['taskId'] || '')['trim']()) return true;
-    if (!shouldPauseOnAbort(value62['spec'], value62)) return true;
+  const value61 = list4.filter((value62) => {
+    if (value62?.spec?.resumable !== true) return true;
+    if (!String(value62?.taskId || '').trim()) return true;
+    if (!shouldPauseOnAbort(value62.spec, value62)) return true;
     return !canAbortContextSignal(value62);
-  })['map']((value63) => ({
-    targetNodeId: value63['targetNodeId'],
-    taskId: String(value63['taskId'] || '')['trim'](),
-    taskType: value63['taskType'],
+  }).map((value63) => ({
+    targetNodeId: value63.targetNodeId,
+    taskId: String(value63.taskId || '').trim(),
+    taskType: value63.taskType,
     reason:
-      value63?.['spec']?.['resumable'] !== true
+      value63?.spec?.resumable !== true
         ? 'not-resumable'
-        : !String(value63?.['taskId'] || '')['trim']()
+        : !String(value63?.taskId || '').trim()
           ? 'missing-task-id'
-          : !shouldPauseOnAbort(value63['spec'], value63)
+          : !shouldPauseOnAbort(value63.spec, value63)
             ? 'pause-not-supported'
             : 'abort-unavailable',
   }));
-  if (value61['length'] > 0)
-    return { ok: false, projectId: value59, activeCount: list4['length'], pausedCount: 0, blockers: value61 };
-  if (value60['dryRun'] === true)
+  if (value61.length > 0)
+    return { ok: false, projectId: value59, activeCount: list4.length, pausedCount: 0, blockers: value61 };
+  if (value60.dryRun === true)
     return {
       ok: true,
       projectId: value59,
-      activeCount: list4['length'],
+      activeCount: list4.length,
       pausedCount: 0,
       blockers: [],
       pausedTasks: [],
     };
   const list5 = [];
-  list4['forEach']((value64) => {
-    (value64['abortController']['signal']?.['aborted'] !== true && value64['abortController']['abort'](),
-      list5['push']({
-        targetNodeId: value64['targetNodeId'],
-        taskId: String(value64['taskId'] || '')['trim'](),
-        taskType: value64['taskType'],
+  list4.forEach((value64) => {
+    (value64.abortController.signal?.aborted !== true && value64.abortController.abort(),
+      list5.push({
+        targetNodeId: value64.targetNodeId,
+        taskId: String(value64.taskId || '').trim(),
+        taskType: value64.taskType,
       }));
   });
-  const value65 = Math['max'](100, Number(value60['timeoutMs']) || 3000);
-  if (list4['length'] > 0) {
+  const value65 = Math.max(100, Number(value60.timeoutMs) || 3000);
+  if (list4.length > 0) {
     let setTimeout2 = null;
     const value66 = new Promise((handler3) => {
-        ((setTimeout2 = setTimeout(() => handler3(false), value65)), setTimeout2?.['unref']?.());
+        ((setTimeout2 = setTimeout(() => handler3(false), value65)), setTimeout2?.unref?.());
       }),
-      enabled18 = await Promise['race']([
-        Promise['all'](list4['map']((value67) => value67['settledPromise']))['then'](() => true),
+      enabled18 = await Promise.race([
+        Promise.all(list4.map((value67) => value67.settledPromise)).then(() => true),
         value66,
       ]);
     if (setTimeout2 !== null) clearTimeout(setTimeout2);
@@ -1001,9 +1001,9 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
       return {
         ok: false,
         projectId: value59,
-        activeCount: list4['length'],
-        pausedCount: list5['length'],
-        blockers: list5['map']((args23) => ({ ...args23, reason: 'pause-timeout' })),
+        activeCount: list4.length,
+        pausedCount: list5.length,
+        blockers: list5.map((args23) => ({ ...args23, reason: 'pause-timeout' })),
         pausedTasks: list5,
       };
     await new Promise((value68) => setTimeout(value68, 0));
@@ -1011,8 +1011,8 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
   return {
     ok: true,
     projectId: value59,
-    activeCount: list4['length'],
-    pausedCount: list5['length'],
+    activeCount: list4.length,
+    pausedCount: list5.length,
     blockers: [],
     pausedTasks: list5,
   };
@@ -1020,14 +1020,14 @@ async function pauseTaskContexts(list4, value59, value60 = {}) {
 
 export async function pauseProjectTasks(value69, value70 = {}) {
   const projectId = normalizeProjectId(value69),
-    value71 = Array['from'](activeTasks['values']())['filter'](
-      (value72) => isContextInFlight(value72) && normalizeProjectId(value72?.['projectId']) === projectId,
+    value71 = Array.from(activeTasks.values()).filter(
+      (value72) => isContextInFlight(value72) && normalizeProjectId(value72?.projectId) === projectId,
     );
   return pauseTaskContexts(value71, projectId, value70);
 }
 
 export async function pauseActiveWorkspaceTasks(options10 = {}) {
-  const value73 = Array['from'](activeTasks['values']())['filter'](isContextInFlight);
+  const value73 = Array.from(activeTasks.values()).filter(isContextInFlight);
   return pauseTaskContexts(value73, 'active-workspace', options10);
 }
 
@@ -1037,23 +1037,23 @@ export function handoffActiveGenerationTasks({
   taskScopeId: taskScopeId,
   mirrorTaskState: mirrorTaskState = null,
 } = {}) {
-  const enabled19 = String(taskScopeId || '')['trim']();
+  const enabled19 = String(taskScopeId || '').trim();
   if (!targetStore2 || !enabled19) return { ok: false, movedCount: 0, taskScopeId: enabled19 };
-  const value74 = Array['from'](activeTasks['values']())['filter'](
-    (value75) => isContextInFlight(value75) && value75['store'] === sourceStore,
+  const value74 = Array.from(activeTasks.values()).filter(
+    (value75) => isContextInFlight(value75) && value75.store === sourceStore,
   );
   return (
-    value74['forEach']((value76) => {
-      ((value76['store'] = targetStore2),
-        (value76['taskScopeId'] = enabled19),
-        (value76['background'] = true),
-        (value76['mirrorTaskState'] = typeof mirrorTaskState === 'function' ? mirrorTaskState : null));
+    value74.forEach((value76) => {
+      ((value76.store = targetStore2),
+        (value76.taskScopeId = enabled19),
+        (value76.background = true),
+        (value76.mirrorTaskState = typeof mirrorTaskState === 'function' ? mirrorTaskState : null));
     }),
     {
       ok: true,
-      movedCount: value74['length'],
+      movedCount: value74.length,
       taskScopeId: enabled19,
-      targetNodeIds: value74['map']((value77) => value77['targetNodeId']),
+      targetNodeIds: value74.map((value77) => value77.targetNodeId),
     }
   );
 }
@@ -1062,48 +1062,48 @@ export function restoreActiveGenerationTasks({
   taskScopeId: taskScopeId2,
   targetStore: targetStore = appStore,
 } = {}) {
-  const value78 = String(taskScopeId2 || '')['trim'](),
-    value79 = Array['from'](activeTasks['values']())['filter'](
-      (value80) => isContextInFlight(value80) && String(value80['taskScopeId'] || '')['trim']() === value78,
+  const value78 = String(taskScopeId2 || '').trim(),
+    value79 = Array.from(activeTasks.values()).filter(
+      (value80) => isContextInFlight(value80) && String(value80.taskScopeId || '').trim() === value78,
     );
   return (
-    value79['forEach']((value81) => {
-      ((value81['store'] = targetStore), (value81['background'] = false), (value81['mirrorTaskState'] = null));
+    value79.forEach((value81) => {
+      ((value81.store = targetStore), (value81.background = false), (value81.mirrorTaskState = null));
     }),
     {
       ok: true,
-      restoredCount: value79['length'],
+      restoredCount: value79.length,
       taskScopeId: value78,
-      targetNodeIds: value79['map']((value82) => value82['targetNodeId']),
+      targetNodeIds: value79.map((value82) => value82.targetNodeId),
     }
   );
 }
 
 export function hasActiveGenerationTasksForStore(value83) {
-  return Array['from'](activeTasks['values']())['some'](
-    (value84) => isContextInFlight(value84) && value84['store'] === value83,
+  return Array.from(activeTasks.values()).some(
+    (value84) => isContextInFlight(value84) && value84.store === value83,
   );
 }
 
 export function hasActiveGenerationTasksForScope(value85) {
-  const enabled20 = String(value85 || '')['trim']();
+  const enabled20 = String(value85 || '').trim();
   if (!enabled20) return false;
-  return Array['from'](activeTasks['values']())['some'](
-    (value86) => isContextInFlight(value86) && String(value86['taskScopeId'] || '')['trim']() === enabled20,
+  return Array.from(activeTasks.values()).some(
+    (value86) => isContextInFlight(value86) && String(value86.taskScopeId || '').trim() === enabled20,
   );
 }
 
 export function shouldPreserveGenerationTaskOnUnmount(value87) {
-  const value88 = String(value87 || '')['trim']();
-  return Array['from'](activeTasks['values']())['some'](
+  const value88 = String(value87 || '').trim();
+  return Array.from(activeTasks.values()).some(
     (value89) =>
-      value89?.['targetNodeId'] === value88 && isContextInFlight(value89) && value89['background'] === true,
+      value89?.targetNodeId === value88 && isContextInFlight(value89) && value89.background === true,
   );
 }
 
 function startTaskContext(value90, args24, { recovering: recovering = false } = {}) {
   const { spec: spec8, startedAt: startedAt6, taskId: taskId6 } = value90;
-  if (value90['cancelRequested'] || value90['signal']?.['aborted']) throw createCancelledError();
+  if (value90.cancelRequested || value90.signal?.aborted) throw createCancelledError();
   updateContextTaskNode(value90, {
     ...buildGenerationStartPatch({ startedAt: startedAt6 }),
     ...buildGenerationProtocolTransitionPatch({ type: 'start', spec: spec8, startedAt: startedAt6 }),
@@ -1123,8 +1123,8 @@ function startTaskContext(value90, args24, { recovering: recovering = false } = 
       if (isContextCancelled(value90)) throw createCancelledError();
       notifyTaskChange(value90, { status: 'running', ...(recovering ? { recovering: true } : {}) });
     },
-    promise3 = typeof spec8['onTaskStart'] === 'function' ? spec8['onTaskStart'](value90) : null;
-  return promise3 && typeof promise3['then'] === 'function'
-    ? Promise['resolve'](promise3)['then'](run3)
+    promise3 = typeof spec8.onTaskStart === 'function' ? spec8.onTaskStart(value90) : null;
+  return promise3 && typeof promise3.then === 'function'
+    ? Promise.resolve(promise3).then(run3)
     : run3();
 }

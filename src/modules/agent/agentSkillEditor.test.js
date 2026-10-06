@@ -229,7 +229,7 @@ test('createAgentSkillEditor：标题与触发词非必填，mode 跟随当前�
 test('createAgentSkillEditor：错误条 role=alert，写入即显示、清空或重开即隐藏', () => {
   const ed = open();
   const box = ed.element.children[6];
-  assert.equal(box.attrs['role'], 'alert');
+  assert.equal(box.attrs.role, 'alert');
   assert.equal(box.hidden, true);
   ed.setError('boom');
   assert.deepEqual([box.textContent, box.hidden], ['boom', false]);

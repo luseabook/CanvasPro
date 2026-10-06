@@ -1,24 +1,24 @@
 export function getRunningHubFieldOptions(value) {
-  if (String(value?.['fieldType'])['toUpperCase']() !== 'LIST') return [];
-  let list = value['fieldData'];
+  if (String(value?.fieldType).toUpperCase() !== 'LIST') return [];
+  let list = value.fieldData;
   try {
-    if (typeof list === 'string') list = JSON['parse'](list);
+    if (typeof list === 'string') list = JSON.parse(list);
   } catch {
     return [];
   }
-  if (!Array['isArray'](list)) return [];
-  return list['filter'](
+  if (!Array.isArray(list)) return [];
+  return list.filter(
     (item) =>
       item &&
-      Object['hasOwn'](item, 'index') &&
-      ['string', 'number', 'boolean']['includes'](typeof item['index']),
-  )['map']((error) => ({
-    value: String(error['index']),
-    label: String(error['name'] ?? error['index']),
+      Object.hasOwn(item, 'index') &&
+      ['string', 'number', 'boolean'].includes(typeof item.index),
+  ).map((error) => ({
+    value: String(error.index),
+    label: String(error.name ?? error.index),
   }));
 }
 export function inferRunningHubFieldMetadata(options = {}) {
-  const key = String(options['fieldType'] || '')['toUpperCase'](),
+  const key = String(options.fieldType || '').toUpperCase(),
     componentKind = { IMAGE: 'image', VIDEO: 'video', AUDIO: 'audio' }[key];
   if (componentKind)
     return {
@@ -30,7 +30,7 @@ export function inferRunningHubFieldMetadata(options = {}) {
       controlTypeOptions: [],
     };
   const list2 = getRunningHubFieldOptions(options);
-  if (list2['length'])
+  if (list2.length)
     return {
       componentKind: 'param',
       componentKindLocked: true,

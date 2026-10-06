@@ -55,7 +55,7 @@ const VOICES = [
     ['Eric', '四川-程川'],
     ['Rocky', '粤语-阿强'],
     ['Kiki', '粤语-阿清'],
-  ]['map'](([value, label]) => ({
+  ].map(([value, label]) => ({
     value: value,
     label: label + ' · ' + value,
     selectedLabel: label,
@@ -101,11 +101,11 @@ const VOICES = [
       ['Korean', '韩语'],
       ['French', '法语'],
       ['Russian', '俄语'],
-    ]['map'](([value2, label2]) => ({ value: value2, label: label2, selectedLabel: label2 })),
+    ].map(([value2, label2]) => ({ value: value2, label: label2, selectedLabel: label2 })),
     'Auto',
   );
-export const runningHubQwenAudioEntries = Object['freeze']([
-  ...[false, true]['map']((docId) =>
+export const runningHubQwenAudioEntries = Object.freeze([
+  ...[false, true].map((docId) =>
     createRunningHubAudioCatalogEntry({
       id: 'qwen3-tts-' + (docId ? 'instruct-flash' : 'flash'),
       name: '千问3 语音合成 ' + (docId ? 'Instruct-Flash' : 'Flash'),
@@ -118,7 +118,7 @@ export const runningHubQwenAudioEntries = Object['freeze']([
         audioSelect(
           'voice',
           '音色',
-          docId ? VOICES['filter']((el) => INSTRUCT_VOICES['has'](el['value'])) : VOICES,
+          docId ? VOICES.filter((el) => INSTRUCT_VOICES.has(el.value)) : VOICES,
           'Cherry',
           { placement: 'mode' },
         ),

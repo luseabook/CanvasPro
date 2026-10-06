@@ -9,7 +9,7 @@ function makeRegistry(results, over = {}) {
   let i = 0;
   return {
     calls,
-    has: (id) => !(over.missing || [])['includes'](id),
+    has: (id) => !(over.missing || []).includes(id),
     execute: (arg) => {
       calls.push(arg);
       const item = Array.isArray(results) ? results[i++] : results;

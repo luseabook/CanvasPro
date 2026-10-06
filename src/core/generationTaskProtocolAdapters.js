@@ -1,4 +1,4 @@
-const PROTOCOL_ALIASES = Object['freeze']({
+const PROTOCOL_ALIASES = Object.freeze({
   workflow: 'workflow',
   runninghub: 'workflow',
   runninghubworkflow: 'workflow',
@@ -12,10 +12,10 @@ const PROTOCOL_ALIASES = Object['freeze']({
   dreamina: 'dreamina',
 });
 function normalizeText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function normalizeAdapterType(item) {
-  return normalizeText(item)['toLowerCase']()['replaceAll'](/[_-]/gu, '');
+  return normalizeText(item).toLowerCase().replaceAll(/[_-]/gu, '');
 }
 function firstText(...args) {
   for (const key of args) {
@@ -27,7 +27,7 @@ function firstText(...args) {
 function positiveTime(...args2) {
   for (const index of args2) {
     const count = Number(index);
-    if (Number['isFinite'](count) && count > 0) return count;
+    if (Number.isFinite(count) && count > 0) return count;
   }
   return 0;
 }
@@ -36,13 +36,13 @@ function normalizeStatus(result, data = 'pending') {
 }
 function normalizeNumber(options, target = 0) {
   const source = Number(options);
-  return Number['isFinite'](source) ? source : target;
+  return Number.isFinite(source) ? source : target;
 }
 function normalizeRecord(next) {
-  return next && typeof next === 'object' && !Array['isArray'](next) ? next : {};
+  return next && typeof next === 'object' && !Array.isArray(next) ? next : {};
 }
-const PROTOCOL_ADAPTERS = Object['freeze']({
-  workflow: Object['freeze']({
+const PROTOCOL_ADAPTERS = Object.freeze({
+  workflow: Object.freeze({
     id: 'workflow',
     adapterType: 'workflow',
     async: false,
@@ -50,9 +50,9 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     statusField: 'rhTaskStatus',
     startedAtField: 'rhTaskStartedAt',
     recoveringField: 'rhTaskRecovering',
-    readTaskId: (options2 = {}, current = '') => firstText(current, options2['rhTaskId']),
+    readTaskId: (options2 = {}, current = '') => firstText(current, options2.rhTaskId),
     readStartedAt: (options3 = {}, entry = 0) =>
-      positiveTime(entry, options3['rhTaskStartedAt'], options3['generationStartTime']),
+      positiveTime(entry, options3.rhTaskStartedAt, options3.generationStartTime),
     buildPatch: ({
       taskId: taskId = '',
       status: status = 'pending',
@@ -67,7 +67,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
       rhTaskUseOpenapiQuery: useOpenapiQuery === true,
     }),
   }),
-  dreamina: Object['freeze']({
+  dreamina: Object.freeze({
     id: 'dreamina',
     adapterType: 'localRuntime',
     async: false,
@@ -75,9 +75,9 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     statusField: 'dreaminaTaskStatus',
     startedAtField: 'dreaminaTaskStartedAt',
     recoveringField: 'dreaminaTaskRecovering',
-    readTaskId: (options4 = {}, record = '') => firstText(record, options4['dreaminaSubmitId']),
+    readTaskId: (options4 = {}, record = '') => firstText(record, options4.dreaminaSubmitId),
     readStartedAt: (options5 = {}, payload = 0) =>
-      positiveTime(payload, options5['dreaminaTaskStartedAt'], options5['generationStartTime']),
+      positiveTime(payload, options5.dreaminaTaskStartedAt, options5.generationStartTime),
     buildPatch: ({
       taskId: taskId = '',
       submitId: submitId = taskId,
@@ -85,7 +85,7 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
       phase: phase = 'generating',
       label: label = '',
       startedAt: startedAt = 0,
-      lastCheckedAt: lastCheckedAt = Date['now'](),
+      lastCheckedAt: lastCheckedAt = Date.now(),
       recovering: recovering = false,
       raw: raw = {},
       defaultLabel: defaultLabel = '',
@@ -97,13 +97,13 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
         dreaminaTaskPhase: normalizeStatus(phase, 'generating'),
         dreaminaTaskLabel: normalizeText(label || text2),
         dreaminaTaskStartedAt: normalizeNumber(startedAt),
-        dreaminaTaskLastCheckedAt: normalizeNumber(lastCheckedAt, Date['now']()),
+        dreaminaTaskLastCheckedAt: normalizeNumber(lastCheckedAt, Date.now()),
         dreaminaTaskRecovering: recovering === true,
         dreaminaTaskLastRaw: normalizeRecord(raw),
       };
     },
   }),
-  asyncModelApi: Object['freeze']({
+  asyncModelApi: Object.freeze({
     id: 'asyncModelApi',
     adapterType: 'modelApi',
     async: true,
@@ -111,9 +111,9 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     statusField: 'asyncTaskStatus',
     startedAtField: 'asyncTaskStartedAt',
     recoveringField: 'asyncTaskRecovering',
-    readTaskId: (options6 = {}, handle = '') => firstText(handle, options6['asyncTaskId']),
+    readTaskId: (options6 = {}, handle = '') => firstText(handle, options6.asyncTaskId),
     readStartedAt: (options7 = {}, state = 0) =>
-      positiveTime(state, options7['asyncTaskStartedAt'], options7['generationStartTime']),
+      positiveTime(state, options7.asyncTaskStartedAt, options7.generationStartTime),
     buildPatch: ({
       provider: provider = '',
       kind: kind = 'generation',
@@ -131,13 +131,13 @@ const PROTOCOL_ADAPTERS = Object['freeze']({
     }),
   }),
 });
-export const GENERATION_TASK_PROTOCOLS = Object['freeze']({
+export const GENERATION_TASK_PROTOCOLS = Object.freeze({
   WORKFLOW: 'workflow',
   DREAMINA: 'dreamina',
   ASYNC_MODEL_API: 'asyncModelApi',
 });
 export function normalizeGenerationTaskProtocol(config) {
-  const text3 = normalizeText(config)['toLowerCase']();
+  const text3 = normalizeText(config).toLowerCase();
   return PROTOCOL_ALIASES[text3] || '';
 }
 export function getGenerationTaskProtocolAdapter(scope) {
@@ -154,27 +154,27 @@ export function inferGenerationTaskProtocol({
   const text4 = normalizeText(taskProtocol),
     input = text4 === 'modelApi' && async !== true ? '' : normalizeGenerationTaskProtocol(text4);
   if (input) return input;
-  const adapterType2 = normalizeAdapterType(adapterType || node['taskAdapterType'] || node['adapterType']);
-  if (adapterType2 === 'workflow') return GENERATION_TASK_PROTOCOLS['WORKFLOW'];
-  if (firstText(node['asyncTaskId'])) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
-  if (firstText(node['dreaminaSubmitId'])) return GENERATION_TASK_PROTOCOLS['DREAMINA'];
-  if (adapterType2 === 'modelapi' && async === true) return GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'];
+  const adapterType2 = normalizeAdapterType(adapterType || node.taskAdapterType || node.adapterType);
+  if (adapterType2 === 'workflow') return GENERATION_TASK_PROTOCOLS.WORKFLOW;
+  if (firstText(node.asyncTaskId)) return GENERATION_TASK_PROTOCOLS.ASYNC_MODEL_API;
+  if (firstText(node.dreaminaSubmitId)) return GENERATION_TASK_PROTOCOLS.DREAMINA;
+  if (adapterType2 === 'modelapi' && async === true) return GENERATION_TASK_PROTOCOLS.ASYNC_MODEL_API;
   if (
     adapterType2 === 'localruntime' &&
-    normalizeText(provider || node['provider'])['toLowerCase']() === 'dreamina'
+    normalizeText(provider || node.provider).toLowerCase() === 'dreamina'
   )
-    return GENERATION_TASK_PROTOCOLS['DREAMINA'];
+    return GENERATION_TASK_PROTOCOLS.DREAMINA;
   return '';
 }
 export function resolveGenerationTaskProtocolAdapter(options8 = {}) {
   return getGenerationTaskProtocolAdapter(inferGenerationTaskProtocol(options8));
 }
 export function listGenerationTaskProtocolAdapters() {
-  return Object['values'](PROTOCOL_ADAPTERS);
+  return Object.values(PROTOCOL_ADAPTERS);
 }
 export function buildGenerationTaskProtocolPatch(output, value2 = {}) {
   const generationTaskProtocolAdapter = getGenerationTaskProtocolAdapter(output);
   if (!generationTaskProtocolAdapter)
     throw new Error('Unknown generation task protocol: ' + normalizeText(output));
-  return generationTaskProtocolAdapter['buildPatch'](value2);
+  return generationTaskProtocolAdapter.buildPatch(value2);
 }

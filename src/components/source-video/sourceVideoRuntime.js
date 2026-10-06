@@ -10,41 +10,41 @@ export function sourceVideoText(value, item = {}) {
   return t('sourceVideoNode.' + value, item);
 }
 export function isDesktopRenderer() {
-  return desktopBridge['isElectron'] || desktopBridge['isChromeShell'];
+  return desktopBridge.isElectron || desktopBridge.isChromeShell;
 }
 export function shouldEagerLoadSourceVideoAtCurrentZoom() {
   let key = 1;
   try {
     const index =
-        typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']?.(),
-      count = Number(index?.['viewport']?.['zoom']);
-    if (Number['isFinite'](count) && count > 0) key = count;
+        typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState?.(),
+      count = Number(index?.viewport?.zoom);
+    if (Number.isFinite(count) && count > 0) key = count;
   } catch {}
-  return key > RENDERER_VIRTUALIZATION_CONFIG['denseLowZoomThreshold'];
+  return key > RENDERER_VIRTUALIZATION_CONFIG.denseLowZoomThreshold;
 }
 export function isClientFetchableMediaUrl(result) {
-  const enabled = String(result || '')['trim']();
+  const enabled = String(result || '').trim();
   return (
-    /^https?:\/\//i['test'](enabled) ||
-    enabled['startsWith']('blob:') ||
-    enabled['startsWith']('data:') ||
-    (enabled['startsWith']('/') && !enabled['startsWith']('//'))
+    /^https?:\/\//i.test(enabled) ||
+    enabled.startsWith('blob:') ||
+    enabled.startsWith('data:') ||
+    (enabled.startsWith('/') && !enabled.startsWith('//'))
   );
 }
 function getSourceVideoSchedulerNow() {
-  return typeof performance !== 'undefined' && typeof performance['now'] === 'function'
-    ? performance['now']()
-    : Date['now']();
+  return typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now();
 }
 export function isSourceVideoInteractionBusy() {
-  return readViewportInteractionState()['isViewportBusy'];
+  return readViewportInteractionState().isViewportBusy;
 }
 export function hasSourceVideoRecoveryWork(options = {}) {
   return !!(
-    String(options?.['rhTaskId'] || '')['trim']() ||
-    String(options?.['asyncTaskId'] || '')['trim']() ||
-    options?.['rhTaskRecovering'] === true ||
-    options?.['asyncTaskRecovering'] === true
+    String(options?.rhTaskId || '').trim() ||
+    String(options?.asyncTaskId || '').trim() ||
+    options?.rhTaskRecovering === true ||
+    options?.asyncTaskRecovering === true
   );
 }
 export function scheduleSourceVideoIdleTask(
@@ -55,8 +55,8 @@ export function scheduleSourceVideoIdleTask(
   let data = false,
     handler2 = () => {};
   const sourceVideoSchedulerNow = getSourceVideoSchedulerNow(),
-    handler3 = globalThis['window']?.['requestIdleCallback'] || globalThis['requestIdleCallback'],
-    handler4 = globalThis['window']?.['cancelIdleCallback'] || globalThis['cancelIdleCallback'];
+    handler3 = globalThis.window?.requestIdleCallback || globalThis.requestIdleCallback,
+    handler4 = globalThis.window?.cancelIdleCallback || globalThis.cancelIdleCallback;
   function run(target) {
     const setTimeout2 = setTimeout(source, target);
     handler2 = () => clearTimeout(setTimeout2);
@@ -83,8 +83,8 @@ export function scheduleSourceVideoIdleTask(
 export function shouldFetchVideoMetaForNodeInfo() {
   try {
     const current =
-      typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
-    return current?.['ui']?.['showVideoMeta'] === true;
+      typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
+    return current?.ui?.showVideoMeta === true;
   } catch {
     return false;
   }

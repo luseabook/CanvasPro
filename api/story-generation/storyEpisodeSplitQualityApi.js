@@ -8,16 +8,16 @@ import { groupStoryEpisodeRepairClips } from './storyEpisodeRepairGrouping.js';
 import { normalizeStoryGenerationAssetReferences } from './storyAssetReferenceContract.js';
 import { applyReplicationSegmentPlan } from '../../src/domain/storyGeneration/videoReplicationSegmentPlan.js';
 function normalizeText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 export function reviewStoryEpisodeSplitQuality(clips = {}) {
-  const assets = normalizeStoryGenerationAssetReferences(clips['assets']),
-    constraints = { ...(clips['project']?.['planning'] || {}), ...(clips['constraints'] || {}) },
-    promptMode = normalizeText(constraints['promptMode']) || 'seedance-2.0';
+  const assets = normalizeStoryGenerationAssetReferences(clips.assets),
+    constraints = { ...(clips.project?.planning || {}), ...(clips.constraints || {}) },
+    promptMode = normalizeText(constraints.promptMode) || 'seedance-2.0';
   return (
-    (constraints['sceneMaxSeconds'] = resolveStoryPromptModeClipMaxSeconds(
+    (constraints.sceneMaxSeconds = resolveStoryPromptModeClipMaxSeconds(
       promptMode,
-      constraints['sceneMaxSeconds'],
+      constraints.sceneMaxSeconds,
     )),
     reviewStoryEpisodeSplitQuality_2({
       ...clips,
@@ -28,43 +28,43 @@ export function reviewStoryEpisodeSplitQuality(clips = {}) {
             parseStoryEpisodeSplitResult(
               {
                 episodeRef: episodeRef,
-                clips: clips['episode']?.['replication']?.['sourceAnalysis']
-                  ? clips2['map']((args) => ({
+                clips: clips.episode?.replication?.sourceAnalysis
+                  ? clips2.map((args) => ({
                       ...args,
-                      replicationContentType: clips['result']?.['clips']?.['find'](
-                        (item) => item['ref'] === sourceClipRef,
-                      )?.['replicationContentType'],
+                      replicationContentType: clips.result?.clips?.find(
+                        (item) => item.ref === sourceClipRef,
+                      )?.replicationContentType,
                     }))
                   : clips2,
               },
               {
                 ...createStoryEpisodeDefaultSplitParseContext({
                   episodeRef: episodeRef,
-                  episode: clips['episode'],
-                  scriptMode: normalizeText(clips['project']?.['scriptMode']),
+                  episode: clips.episode,
+                  scriptMode: normalizeText(clips.project?.scriptMode),
                   constraints: constraints,
                   assets: assets,
-                  clipDurationConstraints: clips['clipDurationConstraints'],
+                  clipDurationConstraints: clips.clipDurationConstraints,
                   promptMode: promptMode,
                 }),
                 enforceMaxDuration: true,
                 repackOverlongClips: false,
                 completeCharacterAssetUsages: false,
-                rejectUnsupportedClipDuration: Boolean(clips['clipDurationConstraints']),
+                rejectUnsupportedClipDuration: Boolean(clips.clipDurationConstraints),
               },
-            )['clips'],
+            ).clips,
             {
               promptMode: promptMode,
-              maxSeconds: constraints['sceneMaxSeconds'],
+              maxSeconds: constraints.sceneMaxSeconds,
               assets: assets,
               rawClips: clips2,
             },
           ),
-          key = clips['episode']?.['replication']?.['segmentPlan']?.['find'](
-            (index) => index['ref'] === sourceClipRef,
+          key = clips.episode?.replication?.segmentPlan?.find(
+            (index) => index.ref === sourceClipRef,
           );
         return key
-          ? applyReplicationSegmentPlan({ clips: clips3 }, { replication: { segmentPlan: [key] } })['clips']
+          ? applyReplicationSegmentPlan({ clips: clips3 }, { replication: { segmentPlan: [key] } }).clips
           : clips3;
       },
     })

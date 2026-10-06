@@ -2935,38 +2935,38 @@ function syncCompositeUiSchemaControls(el116, value471 = {}) {
 const UI_SCHEMA_POPUP_EXIT_MS = 160;
 
 function getUiSchemaValueOptions(value472) {
-  return Array['from'](value472?.['querySelectorAll']?.('[data-ui-schema-value]') || []);
+  return Array.from(value472?.querySelectorAll?.('[data-ui-schema-value]') || []);
 }
 
 function findUiSchemaValueOption(value473, value474) {
   const value475 = String(value474 ?? '');
   return (
-    getUiSchemaValueOptions(value473)['find'](
-      (el117) => String(el117?.['dataset']?.['uiSchemaValue'] ?? '') === value475,
+    getUiSchemaValueOptions(value473).find(
+      (el117) => String(el117?.dataset?.uiSchemaValue ?? '') === value475,
     ) || null
   );
 }
 
 function findFirstEnabledUiSchemaValueOption(value476) {
   return (
-    getUiSchemaValueOptions(value476)['find'](
-      (value477) => value477?.['dataset']?.['uiSchemaDisabled'] !== 'true',
+    getUiSchemaValueOptions(value476).find(
+      (value477) => value477?.dataset?.uiSchemaDisabled !== 'true',
     ) || null
   );
 }
 
 function isFieldDisabledByCondition(enabled34, enabled35) {
   if (!enabled34 || !enabled35) return false;
-  const enabled36 = enabled34?.['disableWhen'];
+  const enabled36 = enabled34?.disableWhen;
   if (!enabled36 || typeof enabled36 !== 'object') return false;
   return optionDisableWhenMatches(enabled36, enabled35);
 }
 
 function isFieldDisabledByUiState(value478, enabled37) {
-  const enabled38 = String(value478?.['id'] || '')['trim']();
+  const enabled38 = String(value478?.id || '').trim();
   if (!enabled38 || !enabled37) return false;
-  const value479 = enabled37?.['uiSchemaFieldState']?.[enabled38];
-  return value479 === true || value479?.['disabled'] === true || value479?.['readOnly'] === true;
+  const value479 = enabled37?.uiSchemaFieldState?.[enabled38];
+  return value479 === true || value479?.disabled === true || value479?.readOnly === true;
 }
 
 function resolveFieldDisabled(enabled39, value480) {
@@ -2978,47 +2978,47 @@ function resolveFieldDisabled(enabled39, value480) {
   );
 }
 
-const BUILTIN_ADAPTIVE_RATIO_OPTION = Object['freeze']({ value: '自适应', label: '自适应' });
+const BUILTIN_ADAPTIVE_RATIO_OPTION = Object.freeze({ value: '自适应', label: '自适应' });
 
 function getRatioOptions(value481, value482 = {}) {
   const args13 = getVisibleOptions(value481, value482);
-  return args13['some']((value483) => isAdaptiveRatioOption(value481, value483))
+  return args13.some((value483) => isAdaptiveRatioOption(value481, value483))
     ? args13
     : [BUILTIN_ADAPTIVE_RATIO_OPTION, ...args13];
 }
 
 function getVoiceCompositeModeField(options4 = {}, value484 = {}) {
   return firstNonEmptyString(
-    options4?.['modeField'],
-    value484?.['modeField'],
-    options4?.['voiceModeField'],
-    value484?.['voiceModeField'],
+    options4?.modeField,
+    value484?.modeField,
+    options4?.voiceModeField,
+    value484?.voiceModeField,
     'voiceMode',
   );
 }
 
 function getVoiceCompositeDefaultModeValue(options5 = {}, value485 = {}) {
   return firstNonEmptyString(
-    options5?.['modeValue'],
-    options5?.['defaultModeValue'],
-    value485?.['defaultModeValue'],
+    options5?.modeValue,
+    options5?.defaultModeValue,
+    value485?.defaultModeValue,
     'default',
   );
 }
 
 function getVoiceCompositeCustomModeValue(options6 = {}, value486 = {}) {
   return firstNonEmptyString(
-    value486?.['modeValue'],
-    value486?.['filledModeValue'],
-    value486?.['customModeValue'],
-    options6?.['customModeValue'],
+    value486?.modeValue,
+    value486?.filledModeValue,
+    value486?.customModeValue,
+    options6?.customModeValue,
     'custom',
   );
 }
 
 function renderVoiceQualityRatioField(value487, value488) {
-  const value489 = (Array['isArray'](value487) ? value487 : [])['filter'](Boolean);
-  if (value489['length'] < 2) return '';
+  const value489 = (Array.isArray(value487) ? value487 : []).filter(Boolean);
+  if (value489.length < 2) return '';
   const value490 = value489[0],
     value491 = value489[1];
   (assertSupportedField(value490), assertSupportedField(value491));
@@ -3026,9 +3026,9 @@ function renderVoiceQualityRatioField(value487, value488) {
     voiceCompositeDefaultModeValue = getVoiceCompositeDefaultModeValue(value490, value491),
     voiceCompositeCustomModeValue = getVoiceCompositeCustomModeValue(value490, value491),
     fieldValue11 = getFieldValue(value488, value490),
-    value492 = String(getFieldValue(value488, value491) || '')['trim'](),
+    value492 = String(getFieldValue(value488, value491) || '').trim(),
     value493 = voiceCompositeModeField
-      ? String(getNodeFieldValue(value488, voiceCompositeModeField, '') || '')['trim']()
+      ? String(getNodeFieldValue(value488, voiceCompositeModeField, '') || '').trim()
       : '',
     optionLabel3 = getOptionLabel(value490, fieldValue11),
     audioVoiceCompositeState = resolveAudioVoiceCompositeState({
@@ -3039,17 +3039,17 @@ function renderVoiceQualityRatioField(value487, value488) {
       defaultModeValue: voiceCompositeDefaultModeValue,
       customModeValue: voiceCompositeCustomModeValue,
     }),
-    value494 = audioVoiceCompositeState['speakerIdValue'],
-    value495 = audioVoiceCompositeState['triggerLabel'],
-    value496 = audioVoiceCompositeState['customAreaClassName'],
-    value497 = audioVoiceCompositeState['defaultAreaClassName'],
-    manifestText25 = manifestText(value491?.['label'] || '自定义音色ID'),
-    value498 = String(value491?.['placeholder'] || '留空使用预设音色')['trim'](),
-    value499 = String(value491?.['helpUrl'] || '')['trim'](),
+    value494 = audioVoiceCompositeState.speakerIdValue,
+    value495 = audioVoiceCompositeState.triggerLabel,
+    value496 = audioVoiceCompositeState.customAreaClassName,
+    value497 = audioVoiceCompositeState.defaultAreaClassName,
+    manifestText25 = manifestText(value491?.label || '自定义音色ID'),
+    value498 = String(value491?.placeholder || '留空使用预设音色').trim(),
+    value499 = String(value491?.helpUrl || '').trim(),
     value500 = value499
       ? '<span class="rh-tip ui-schema-info-tip" data-tooltip="' +
         escapeHtmlAttr(
-          value491?.['description'] ||
+          value491?.description ||
             '填写后覆盖预设音色，默认音色将不可选。点击旁边链接可跳转音色库获取完整音色ID。',
         ) +
         '">!</span><a href="#" class="ui-schema-help-link img-rp-voice-help-link" data-ui-schema-field-help-url="' +
@@ -3060,16 +3060,16 @@ function renderVoiceQualityRatioField(value487, value488) {
       '<div class="img-rp-quality-area img-rp-voice-custom-area' +
       value496 +
       '" data-ui-schema-field="' +
-      escapeHtmlAttr(value491['id']) +
+      escapeHtmlAttr(value491.id) +
       '" data-ui-schema-type="text" data-ui-schema-default="' +
-      escapeHtmlAttr(value491?.['defaultValue'] ?? '') +
+      escapeHtmlAttr(value491?.defaultValue ?? '') +
       '">\n      <div class="img-rp-section-label">' +
       escapeHtmlAttr(manifestText25) +
       value500 +
       '</div>\n      <div class="img-rp-voice-input-wrap">\n        <input type="text" class="img-rp-voice-input" data-ui-schema-input="' +
-      escapeHtmlAttr(value491['id']) +
+      escapeHtmlAttr(value491.id) +
       '" data-ui-schema-field="' +
-      escapeHtmlAttr(value491['id']) +
+      escapeHtmlAttr(value491.id) +
       '" data-ui-schema-value="' +
       escapeHtmlAttr(value494) +
       '" placeholder="' +
@@ -3077,11 +3077,11 @@ function renderVoiceQualityRatioField(value487, value488) {
       '" value="' +
       escapeHtmlAttr(value494) +
       '" />\n      </div>\n    </div>',
-    manifestText26 = manifestText(value490?.['label'] || '默认音色'),
+    manifestText26 = manifestText(value490?.label || '默认音色'),
     visibleOptions = getVisibleOptions(value490, value488),
-    value502 = visibleOptions['map']((value503) => {
+    value502 = visibleOptions.map((value503) => {
       const optionValue5 = getOptionValue(value503),
-        manifestText27 = manifestText(value503?.['label'] ?? optionValue5),
+        manifestText27 = manifestText(value503?.label ?? optionValue5),
         value504 = String(fieldValue11 ?? '') === String(optionValue5);
       return (
         '<button type="button" class="img-rp-ratio-item ui-schema-option ' +
@@ -3094,14 +3094,14 @@ function renderVoiceQualityRatioField(value487, value488) {
         escapeHtmlAttr(manifestText27) +
         '</span></button>'
       );
-    })['join'](''),
+    }).join(''),
     value505 =
       '<div class="img-rp-ratio-area img-rp-voice-default-area' +
       value497 +
       '" data-ui-schema-field="' +
-      escapeHtmlAttr(value490['id']) +
+      escapeHtmlAttr(value490.id) +
       '" data-ui-schema-type="segmented" data-ui-schema-default="' +
-      escapeHtmlAttr(value490?.['defaultValue'] ?? '') +
+      escapeHtmlAttr(value490?.defaultValue ?? '') +
       '">\n      <div class="img-rp-section-label">' +
       escapeHtmlAttr(manifestText26) +
       '</div>\n      <div class="img-rp-ratio-split">\n        <div class="img-rp-ratio-right">\n          ' +
@@ -3109,9 +3109,9 @@ function renderVoiceQualityRatioField(value487, value488) {
       '\n        </div>\n      </div>\n    </div>';
   return (
     '<div class="ui-schema-voice-quality-ratio-pill" data-ui-schema-composite-field="voiceQualityRatio" data-ui-schema-primary-field="' +
-    escapeHtmlAttr(value490['id']) +
+    escapeHtmlAttr(value490.id) +
     '" data-ui-schema-secondary-field="' +
-    escapeHtmlAttr(value491['id']) +
+    escapeHtmlAttr(value491.id) +
     '" data-ui-schema-mode-field="' +
     escapeHtmlAttr(voiceCompositeModeField) +
     '" data-ui-schema-default-mode-value="' +
@@ -3129,11 +3129,11 @@ function renderVoiceQualityRatioField(value487, value488) {
 }
 
 function renderDropdownControl(value506, value507, value508, value509 = {}) {
-  const value510 = String(value506?.['id'] || '')['trim'](),
+  const value510 = String(value506?.id || '').trim(),
     optionLabel4 = getOptionLabel(value506, value507),
-    value511 = value509?.['advanced'] ? ' ui-schema-advanced-dropdown' : '',
-    value512 = String(value509?.['titleHtml'] || ''),
-    value513 = value509?.['advanced']
+    value511 = value509?.advanced ? ' ui-schema-advanced-dropdown' : '',
+    value512 = String(value509?.titleHtml || ''),
+    value513 = value509?.advanced
       ? '<svg class="ui-schema-dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>'
       : '',
     fieldDisabled = resolveFieldDisabled(value506, value508)
@@ -3159,29 +3159,29 @@ function renderDropdownControl(value506, value507, value508, value509 = {}) {
 }
 
 function syncDurationPillField(enabled40, value514) {
-  if (!enabled40?.['classList']?.['contains']('ui-schema-duration-pill')) return;
-  const el118 = enabled40['querySelector']('.ui-schema-duration-label');
+  if (!enabled40?.classList?.contains('ui-schema-duration-pill')) return;
+  const el118 = enabled40.querySelector('.ui-schema-duration-label');
   if (!el118) return;
-  el118['textContent'] = getRangeValueDisplayLabel(enabled40, value514, value514 + 'S');
+  el118.textContent = getRangeValueDisplayLabel(enabled40, value514, value514 + 'S');
 }
 
 function syncResolutionPillField(enabled41, value515) {
-  if (!enabled41?.['classList']?.['contains']('ui-schema-resolution-pill')) return;
-  const value516 = enabled41['querySelector']('.ui-schema-pill-label'),
-    el119 = value516?.['querySelector']('.ui-schema-resolution-value');
+  if (!enabled41?.classList?.contains('ui-schema-resolution-pill')) return;
+  const value516 = enabled41.querySelector('.ui-schema-pill-label'),
+    el119 = value516?.querySelector('.ui-schema-resolution-value');
   if (el119) {
-    el119['textContent'] = String(value515);
+    el119.textContent = String(value515);
     return;
   }
-  const value517 = enabled41['querySelector']('.rh-res-title')?.['textContent'] || 'Resolution';
-  if (value516) value516['textContent'] = value517 + ' ' + value515;
+  const value517 = enabled41.querySelector('.rh-res-title')?.textContent || 'Resolution';
+  if (value516) value516.textContent = value517 + ' ' + value515;
 }
 
 function formatRhAiAppFooterParamLabel(value518, value519) {
   const value520 = String(
-      value518?.['dataset']?.['uiSchemaFooterLabel'] || value518?.['dataset']?.['uiSchemaField'] || '参数',
-    )['trim'](),
-    value521 = String(value518?.['dataset']?.['uiSchemaType'] || '')['trim'](),
+      value518?.dataset?.uiSchemaFooterLabel || value518?.dataset?.uiSchemaField || '参数',
+    ).trim(),
+    value521 = String(value518?.dataset?.uiSchemaType || '').trim(),
     formatRhAiAppFooterParamValue2 = formatRhAiAppFooterParamValue(value521, value519);
   return formatRhAiAppFooterParamValue2 ? value520 + ' · ' + formatRhAiAppFooterParamValue2 : value520;
 }
@@ -3190,35 +3190,35 @@ function isRhAiAppFooterToggleOn(value522) {
   if (value522 === true) return true;
   if (value522 === false) return false;
   const value523 = String(value522 ?? '')
-    ['trim']()
-    ['toLowerCase']();
-  return ['true', '1', 'yes', 'on']['includes'](value523);
+    .trim()
+    .toLowerCase();
+  return ['true', '1', 'yes', 'on'].includes(value523);
 }
 
 function syncRhAiAppFooterParamField(el120, value524) {
-  if (!el120?.['classList']?.['contains']('ui-schema-rh-aiapp-footer-param')) return;
-  const value525 = el120['querySelector']('[data-ui-schema-rh-aiapp-footer-toggle]');
+  if (!el120?.classList?.contains('ui-schema-rh-aiapp-footer-param')) return;
+  const value525 = el120.querySelector('[data-ui-schema-rh-aiapp-footer-toggle]');
   if (value525) {
     const isRhAiAppFooterToggleOn2 = isRhAiAppFooterToggleOn(value524);
-    ((value525['dataset']['uiSchemaValue'] = isRhAiAppFooterToggleOn2 ? 'false' : 'true'),
-      value525['setAttribute']('aria-pressed', String(isRhAiAppFooterToggleOn2)));
-    const value526 = value525['querySelector']('.ui-schema-rh-aiapp-footer-value');
-    if (value526) value526['textContent'] = formatRhAiAppFooterParamValue('toggle', isRhAiAppFooterToggleOn2);
-    const value527 = value525['querySelector']('.ui-schema-pill-label');
+    ((value525.dataset.uiSchemaValue = isRhAiAppFooterToggleOn2 ? 'false' : 'true'),
+      value525.setAttribute('aria-pressed', String(isRhAiAppFooterToggleOn2)));
+    const value526 = value525.querySelector('.ui-schema-rh-aiapp-footer-value');
+    if (value526) value526.textContent = formatRhAiAppFooterParamValue('toggle', isRhAiAppFooterToggleOn2);
+    const value527 = value525.querySelector('.ui-schema-pill-label');
     value527 &&
-      (value527['textContent'] = String(
-        el120?.['dataset']?.['uiSchemaFooterLabel'] || el120?.['dataset']?.['uiSchemaField'] || '参数',
-      )['trim']());
+      (value527.textContent = String(
+        el120?.dataset?.uiSchemaFooterLabel || el120?.dataset?.uiSchemaField || '参数',
+      ).trim());
     return;
   }
-  const enabled42 = el120['querySelector']('.ui-schema-pill-label');
+  const enabled42 = el120.querySelector('.ui-schema-pill-label');
   if (!enabled42) return;
-  enabled42['textContent'] = formatRhAiAppFooterParamLabel(el120, value524);
+  enabled42.textContent = formatRhAiAppFooterParamLabel(el120, value524);
 }
 
 function formatRhAiAppFooterParamValue(value528, value529) {
   if (value528 === 'toggle') return isRhAiAppFooterToggleOn(value529) ? '是' : '否';
-  return String(value529 ?? '')['trim']();
+  return String(value529 ?? '').trim();
 }
 
 function renderRhAiAppFooterDirectNumberField({
@@ -3231,19 +3231,19 @@ function renderRhAiAppFooterDirectNumberField({
   valueTypeAttr: valueTypeAttr,
   nodeData: nodeData11,
 }) {
-  const value531 = String(field?.['valueType'] || field?.['numberMode'] || '')
-      ['trim']()
-      ['toLowerCase'](),
+  const value531 = String(field?.valueType || field?.numberMode || '')
+      .trim()
+      .toLowerCase(),
     value532 = value531 === 'float' || value531 === 'decimal' ? 'decimal' : 'numeric',
     list62 = [];
-  field?.['min'] !== undefined &&
-    field?.['min'] !== null &&
-    list62['push'](' min="' + escapeHtmlAttr(field['min']) + '"');
-  field?.['max'] !== undefined &&
-    field?.['max'] !== null &&
-    list62['push'](' max="' + escapeHtmlAttr(field['max']) + '"');
-  list62['push'](
-    ' step="' + escapeHtmlAttr(field?.['step'] ?? (value532 === 'decimal' ? 'any' : 1)) + '"',
+  field?.min !== undefined &&
+    field?.min !== null &&
+    list62.push(' min="' + escapeHtmlAttr(field.min) + '"');
+  field?.max !== undefined &&
+    field?.max !== null &&
+    list62.push(' max="' + escapeHtmlAttr(field.max) + '"');
+  list62.push(
+    ' step="' + escapeHtmlAttr(field?.step ?? (value532 === 'decimal' ? 'any' : 1)) + '"',
   );
   const fieldDisabled2 = resolveFieldDisabled(field, nodeData11)
     ? ' disabled aria-disabled="true" data-ui-schema-disabled="true"'
@@ -3273,7 +3273,7 @@ function renderRhAiAppFooterDirectNumberField({
     '" aria-label="' +
     escapeHtmlAttr(label8) +
     '"' +
-    list62['join']('') +
+    list62.join('') +
     fieldDisabled2 +
     '>\n    </label>\n  </div>'
   );
@@ -3321,13 +3321,13 @@ function renderRhAiAppFooterToggleField({
 
 function renderRhAiAppFooterParamField(value534, value535) {
   assertSupportedField(value534);
-  const value536 = String(value534?.['id'] || '')['trim'](),
-    controlType6 = normalizeControlType(value534?.['type']),
+  const value536 = String(value534?.id || '').trim(),
+    controlType6 = normalizeControlType(value534?.type),
     fieldValue12 = getFieldValue(value535, value534),
-    manifestText28 = manifestText(value534?.['label'] || value536),
-    value537 = value534?.['defaultValue'] ?? '',
+    manifestText28 = manifestText(value534?.label || value536),
+    value537 = value534?.defaultValue ?? '',
     value538 =
-      typeof value534?.['defaultValue'] === 'boolean'
+      typeof value534?.defaultValue === 'boolean'
         ? ' data-ui-schema-value-type="boolean"'
         : controlType6 === 'stepper'
           ? ' data-ui-schema-value-type="number"'
@@ -3390,19 +3390,19 @@ function renderRhAiAppFooterParamField(value534, value535) {
 }
 
 function isStandaloneResolutionField(value541) {
-  if (value541?.['standaloneInResolution'] === true) return true;
+  if (value541?.standaloneInResolution === true) return true;
   return (
-    String(value541?.['resolutionComposite'] || '')
-      ['trim']()
-      ['toLowerCase']() === 'standalone'
+    String(value541?.resolutionComposite || '')
+      .trim()
+      .toLowerCase() === 'standalone'
   );
 }
 
 export function hasVisibleModelUiSchema(value542, value543 = {}, value544 = {}) {
   const list63 = getUiSchemaFields(value542, value544);
   return (
-    list63['forEach'](assertSupportedField),
-    filterVisibleUiSchemaFields(list63, value543)['length'] > 0
+    list63.forEach(assertSupportedField),
+    filterVisibleUiSchemaFields(list63, value543).length > 0
   );
 }
 
@@ -3413,46 +3413,46 @@ function handleRandomSeedRowBindEvent({
   helpers: helpers = {},
 } = {}) {
   if (eventName !== 'click' || !fieldEl4) return false;
-  const run7 = helpers['commitValue'];
+  const run7 = helpers.commitValue;
   if (typeof run7 !== 'function') return false;
   const run8 =
-      typeof helpers['setRhVideoStepperValueEl'] === 'function'
-        ? helpers['setRhVideoStepperValueEl']
+      typeof helpers.setRhVideoStepperValueEl === 'function'
+        ? helpers.setRhVideoStepperValueEl
         : () => {},
     handler25 =
-      typeof helpers['generateRandomSeedForField'] === 'function'
-        ? helpers['generateRandomSeedForField']
+      typeof helpers.generateRandomSeedForField === 'function'
+        ? helpers.generateRandomSeedForField
         : () => '',
-    el121 = event12?.['target']?.['closest']?.('[data-ui-schema-random-seed-mode]');
-  if (el121 && fieldEl4['contains'](el121)) {
-    (event12['preventDefault']?.(), event12['stopPropagation']?.());
+    el121 = event12?.target?.closest?.('[data-ui-schema-random-seed-mode]');
+  if (el121 && fieldEl4.contains(el121)) {
+    (event12.preventDefault?.(), event12.stopPropagation?.());
     const enabled43 = String(
-        el121['dataset']['uiSchemaRandomSeedModeField'] ||
-          fieldEl4['dataset']?.['uiSchemaRandomSeedModeField'] ||
+        el121.dataset.uiSchemaRandomSeedModeField ||
+          fieldEl4.dataset?.uiSchemaRandomSeedModeField ||
           '',
-      )['trim'](),
-      randomSeedMode3 = normalizeRandomSeedMode(el121['dataset']['uiSchemaRandomSeedMode'], 'fixed');
+      ).trim(),
+      randomSeedMode3 = normalizeRandomSeedMode(el121.dataset.uiSchemaRandomSeedMode, 'fixed');
     if (!enabled43) return true;
     run7(enabled43, randomSeedMode3);
     if (randomSeedMode3 === 'random') {
-      const value545 = String(fieldEl4['dataset']['uiSchemaField'] || '')['trim'](),
+      const value545 = String(fieldEl4.dataset.uiSchemaField || '').trim(),
         value546 = handler25(fieldEl4);
-      fieldEl4['classList']?.['contains']('ui-schema-rh-video-stepper') && run8(fieldEl4, value546);
-      const el122 = fieldEl4['querySelector']('[data-ui-schema-input]');
-      if (el122) el122['value'] = value546;
+      fieldEl4.classList?.contains('ui-schema-rh-video-stepper') && run8(fieldEl4, value546);
+      const el122 = fieldEl4.querySelector('[data-ui-schema-input]');
+      if (el122) el122.value = value546;
       if (value545) run7(value545, value546);
     }
     return true;
   }
-  const value547 = event12?.['target']?.['closest']?.('[data-ui-schema-random-seed]');
-  if (value547 && fieldEl4['contains'](value547)) {
-    (event12['preventDefault']?.(), event12['stopPropagation']?.());
-    const enabled44 = String(fieldEl4?.['dataset']?.['uiSchemaField'] || '')['trim']();
+  const value547 = event12?.target?.closest?.('[data-ui-schema-random-seed]');
+  if (value547 && fieldEl4.contains(value547)) {
+    (event12.preventDefault?.(), event12.stopPropagation?.());
+    const enabled44 = String(fieldEl4?.dataset?.uiSchemaField || '').trim();
     if (!enabled44) return true;
     const value548 = handler25(fieldEl4);
-    fieldEl4['classList']?.['contains']('ui-schema-rh-video-stepper') && run8(fieldEl4, value548);
-    const value549 = fieldEl4['querySelector']('[data-ui-schema-input]');
-    if (value549) value549['value'] = value548;
+    fieldEl4.classList?.contains('ui-schema-rh-video-stepper') && run8(fieldEl4, value548);
+    const value549 = fieldEl4.querySelector('[data-ui-schema-input]');
+    if (value549) value549.value = value548;
     return (run7(enabled44, value548), true);
   }
   return false;

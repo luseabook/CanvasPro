@@ -4,52 +4,52 @@ import {
   inferGenerationTaskProtocol,
 } from './generationTaskProtocolAdapters.js';
 function normalizeStatus(value, item = 'pending') {
-  return String(value || item)['trim']() || item;
+  return String(value || item).trim() || item;
 }
 function normalizeNumber(key, index = 0) {
   const result = Number(key);
-  return Number['isFinite'](result) ? result : index;
+  return Number.isFinite(result) ? result : index;
 }
 const DEFAULT_IMAGE_DREAMINA_TASK_LABEL = '生成中';
 function isWorkflowProtocolSpec(options = {}, data = {}) {
   return (
     inferGenerationTaskProtocol({
-      taskProtocol: options['protocol'],
-      adapterType: options['adapterType'] || data['adapterType'],
-      provider: options['provider'] || data['provider'],
-      async: options['async'],
+      taskProtocol: options.protocol,
+      adapterType: options.adapterType || data.adapterType,
+      provider: options.provider || data.provider,
+      async: options.async,
       node: data,
-    }) === GENERATION_TASK_PROTOCOLS['WORKFLOW']
+    }) === GENERATION_TASK_PROTOCOLS.WORKFLOW
   );
 }
 function isAsyncModelApiProtocolSpec(options2 = {}, target = {}) {
   return (
     inferGenerationTaskProtocol({
-      taskProtocol: options2['protocol'],
-      adapterType: options2['adapterType'] || target['adapterType'],
-      provider: options2['provider'] || target['provider'],
-      async: options2['async'],
+      taskProtocol: options2.protocol,
+      adapterType: options2.adapterType || target.adapterType,
+      provider: options2.provider || target.provider,
+      async: options2.async,
       node: target,
-    }) === GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API']
+    }) === GENERATION_TASK_PROTOCOLS.ASYNC_MODEL_API
   );
 }
 function buildTaskMetaPatch(options3 = {}) {
   const args = String(
-    options3['providerProfileId'] ||
-      options3['payload']?.['providerProfileId'] ||
-      options3['payload']?.['rhProviderProfileId'] ||
+    options3.providerProfileId ||
+      options3.payload?.providerProfileId ||
+      options3.payload?.rhProviderProfileId ||
       '',
-  )['trim']();
+  ).trim();
   return {
-    taskTrigger: String(options3['trigger'] || ''),
-    taskType: String(options3['taskType'] || ''),
-    taskProvider: String(options3['provider'] || ''),
+    taskTrigger: String(options3.trigger || ''),
+    taskType: String(options3.taskType || ''),
+    taskProvider: String(options3.provider || ''),
     ...(args ? { taskProviderProfileId: args } : {}),
-    taskAdapterType: String(options3['adapterType'] || ''),
-    taskModelId: String(options3['modelId'] || ''),
-    taskExecutionId: String(options3['executionId'] || ''),
-    taskCancellable: options3['cancellable'] === true,
-    taskResumable: options3['resumable'] === true,
+    taskAdapterType: String(options3.adapterType || ''),
+    taskModelId: String(options3.modelId || ''),
+    taskExecutionId: String(options3.executionId || ''),
+    taskCancellable: options3.cancellable === true,
+    taskResumable: options3.resumable === true,
   };
 }
 export function buildRunningHubTaskPatch({
@@ -59,7 +59,7 @@ export function buildRunningHubTaskPatch({
   recovering: recovering = false,
   useOpenapiQuery: useOpenapiQuery = false,
 } = {}) {
-  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['WORKFLOW'], {
+  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS.WORKFLOW, {
     taskId: taskId,
     status: status,
     startedAt: startedAt,
@@ -75,7 +75,7 @@ export function buildAsyncTaskPatch({
   startedAt: startedAt = 0,
   recovering: recovering = false,
 } = {}) {
-  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['ASYNC_MODEL_API'], {
+  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS.ASYNC_MODEL_API, {
     provider: provider,
     kind: kind,
     taskId: taskId,
@@ -90,12 +90,12 @@ export function buildDreaminaTaskPatch({
   phase: phase = 'generating',
   label: label = '',
   startedAt: startedAt = 0,
-  lastCheckedAt: lastCheckedAt = Date['now'](),
+  lastCheckedAt: lastCheckedAt = Date.now(),
   recovering: recovering = false,
   raw: raw = {},
   defaultLabel: defaultLabel = '',
 } = {}) {
-  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS['DREAMINA'], {
+  return buildGenerationTaskProtocolPatch(GENERATION_TASK_PROTOCOLS.DREAMINA, {
     submitId: submitId,
     status: status,
     phase: phase,
@@ -116,7 +116,7 @@ export function buildImageGenerationDreaminaTaskPatch({
   phase: phase = 'generating',
   label: label = DEFAULT_IMAGE_DREAMINA_TASK_LABEL,
   startedAt: startedAt = 0,
-  lastCheckedAt: lastCheckedAt = Date['now'](),
+  lastCheckedAt: lastCheckedAt = Date.now(),
   recovering: recovering = false,
   raw: raw = {},
 } = {}) {
@@ -213,8 +213,8 @@ export function buildGenerationProtocolStartPatch(options6 = {}, source = 0) {
         recovering: false,
         useOpenapiQuery: false,
       }),
-      rhSourceNodeId: String(options6['sourceNodeId'] || ''),
-      rhToolbarTaskType: String(options6['taskType'] || ''),
+      rhSourceNodeId: String(options6.sourceNodeId || ''),
+      rhToolbarTaskType: String(options6.taskType || ''),
     };
   if (isAsyncModelApiProtocolSpec(options6))
     return {
@@ -228,7 +228,7 @@ export function buildGenerationProtocolStartPatch(options6 = {}, source = 0) {
   return { ...args2, ...args3 };
 }
 export function buildGenerationProtocolTaskIdPatch(options7 = {}, next = '', current = 0) {
-  const enabled = String(next || '')['trim']();
+  const enabled = String(next || '').trim();
   if (!enabled) return {};
   if (isWorkflowProtocolSpec(options7))
     return buildRunningHubTaskPatch({
@@ -268,8 +268,8 @@ export function buildGenerationProtocolTerminalPatch(options8 = {}, entry = 'idl
   return { generationQueueStatus: 'idle', generationQueueIndex: -1, generationQueueLength: 0 };
 }
 export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, payload = '') {
-  const args4 = String(record?.['taskId'] || '')['trim'](),
-    args5 = String(payload || '')['trim'](),
+  const args4 = String(record?.taskId || '').trim(),
+    args5 = String(payload || '').trim(),
     args6 = {
       isGenerating: true,
       jobStatus: 'running',
@@ -281,7 +281,7 @@ export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, 
     return {
       ...args6,
       ...(args4
-        ? buildGenerationProtocolTaskIdPatch(options9, args4, record['startedAt'])
+        ? buildGenerationProtocolTaskIdPatch(options9, args4, record.startedAt)
         : { rhTaskStatus: 'pending' }),
       rhTaskRecovering: false,
       ...(args5 ? { rhStatusMessage: args5 } : {}),
@@ -290,7 +290,7 @@ export function buildGenerationProtocolPendingPatch(options9 = {}, record = {}, 
     return {
       ...args6,
       ...(args4
-        ? buildGenerationProtocolTaskIdPatch(options9, args4, record['startedAt'])
+        ? buildGenerationProtocolTaskIdPatch(options9, args4, record.startedAt)
         : { asyncTaskStatus: 'pending' }),
       asyncTaskRecovering: false,
     };
@@ -306,7 +306,7 @@ export function buildGenerationProtocolTransitionPatch({
   message: message = '',
   kind: kind = 'generation',
 } = {}) {
-  const handle = String(type || '')['trim']();
+  const handle = String(type || '').trim();
   if (handle === 'start') return buildGenerationProtocolStartPatch(spec, startedAt);
   if (handle === 'taskId') return buildGenerationProtocolTaskIdPatch(spec, taskId, startedAt);
   if (handle === 'pending') return buildGenerationProtocolPendingPatch(spec, context, message);

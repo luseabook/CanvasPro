@@ -1,5 +1,5 @@
 function cloneEditorState(args) {
-  return { ...args, selectedObjectIds: [...args['selectedObjectIds']] };
+  return { ...args, selectedObjectIds: [...args.selectedObjectIds] };
 }
 export function createStoryboard3DEditorStore(args2 = {}) {
   const map = new Set();
@@ -13,16 +13,16 @@ export function createStoryboard3DEditorStore(args2 = {}) {
     flyMode: false,
     ...args2,
   };
-  args3['selectedObjectIds'] = Array['isArray'](args3['selectedObjectIds'])
+  args3.selectedObjectIds = Array.isArray(args3.selectedObjectIds)
     ? [
         ...new Set(
-          args3['selectedObjectIds']['map']((value) => String(value || '')['trim']())['filter'](Boolean),
+          args3.selectedObjectIds.map((value) => String(value || '').trim()).filter(Boolean),
         ),
       ]
     : [];
   function run(reason) {
     const cloneEditorState2 = cloneEditorState(args3);
-    return (map['forEach']((handler) => handler(cloneEditorState2, { reason: reason })), cloneEditorState2);
+    return (map.forEach((handler) => handler(cloneEditorState2, { reason: reason })), cloneEditorState2);
   }
   return {
     getSnapshot() {
@@ -30,14 +30,14 @@ export function createStoryboard3DEditorStore(args2 = {}) {
     },
     subscribe(item) {
       if (typeof item !== 'function') return () => {};
-      return (map['add'](item), () => map['delete'](item));
+      return (map.add(item), () => map.delete(item));
     },
     setSelectedObjects(list) {
       return (
         (args3 = {
           ...args3,
-          selectedObjectIds: Array['isArray'](list)
-            ? [...new Set(list['map']((key) => String(key || '')['trim']())['filter'](Boolean))]
+          selectedObjectIds: Array.isArray(list)
+            ? [...new Set(list.map((key) => String(key || '').trim()).filter(Boolean))]
             : [],
         }),
         run('select-objects')
@@ -47,7 +47,7 @@ export function createStoryboard3DEditorStore(args2 = {}) {
       return (
         (args3 = {
           ...args3,
-          activeTool: ['select', 'move', 'rotate', 'scale']['includes'](index) ? index : 'select',
+          activeTool: ['select', 'move', 'rotate', 'scale'].includes(index) ? index : 'select',
         }),
         run('set-tool')
       );
@@ -65,7 +65,7 @@ export function createStoryboard3DEditorStore(args2 = {}) {
       return (
         (args3 = {
           ...args3,
-          inspectorTab: ['properties', 'shot', 'scene']['includes'](result) ? result : 'properties',
+          inspectorTab: ['properties', 'shot', 'scene'].includes(result) ? result : 'properties',
         }),
         run('set-inspector-tab')
       );
@@ -80,7 +80,7 @@ export function createStoryboard3DEditorStore(args2 = {}) {
       return ((args3 = { ...args3, flyMode: flyMode === true }), run('toggle-fly-mode'));
     },
     destroy() {
-      map['clear']();
+      map.clear();
     },
   };
 }

@@ -1,62 +1,62 @@
 import { resolveMappedImageResponseValues, resolveMappedResponseValues } from './modelApiMappingEngine.js';
 function normalizeOutputType(value = null, item = null) {
   return String(
-    item?.['result']?.['outputType'] || value?.['outputType'] || item?.['kind'] || value?.['kind'] || '',
-  )['trim']();
+    item?.result?.outputType || value?.outputType || item?.kind || value?.kind || '',
+  ).trim();
 }
 function collectResultPaths(key, index = null) {
-  const result = index?.['result'] || {},
-    data = index?.['responseMapping'] || {},
+  const result = index?.result || {},
+    data = index?.responseMapping || {},
     options =
       key === 'image'
-        ? result['imagePaths']
+        ? result.imagePaths
         : key === 'video'
-          ? result['videoPaths']
+          ? result.videoPaths
           : key === 'audio'
-            ? result['audioPaths']
+            ? result.audioPaths
             : key === 'text'
-              ? result['textPaths']
+              ? result.textPaths
               : null;
   return [
-    ...(Array['isArray'](result['paths']) ? result['paths'] : []),
-    ...(Array['isArray'](options) ? options : []),
-    ...(Array['isArray'](data['paths']) ? data['paths'] : []),
-    ...(Array['isArray'](data['resultPaths']) ? data['resultPaths'] : []),
+    ...(Array.isArray(result.paths) ? result.paths : []),
+    ...(Array.isArray(options) ? options : []),
+    ...(Array.isArray(data.paths) ? data.paths : []),
+    ...(Array.isArray(data.resultPaths) ? data.resultPaths : []),
   ];
 }
 function collectFallbackValues(target, response = {}) {
   if (!response || typeof response !== 'object') return [];
   if (target === 'image')
     return [
-      response['outputUrl'],
-      response['imageUrl'],
-      response['image_url'],
-      response['url'],
-      response['fileUrl'],
+      response.outputUrl,
+      response.imageUrl,
+      response.image_url,
+      response.url,
+      response.fileUrl,
     ];
   if (target === 'video')
     return [
-      response['outputVideoUrl'],
-      response['videoUrl'],
-      response['video_url'],
-      response['url'],
-      response['fileUrl'],
+      response.outputVideoUrl,
+      response.videoUrl,
+      response.video_url,
+      response.url,
+      response.fileUrl,
     ];
   if (target === 'audio')
     return [
-      response['outputAudioUrl'],
-      response['audioUrl'],
-      response['audio_url'],
-      response['url'],
-      response['fileUrl'],
+      response.outputAudioUrl,
+      response.audioUrl,
+      response.audio_url,
+      response.url,
+      response.fileUrl,
     ];
   if (target === 'text')
     return [
-      response['outputText'],
-      response['text'],
-      response['output'],
-      response['content'],
-      response['message'],
+      response.outputText,
+      response.text,
+      response.output,
+      response.content,
+      response.message,
     ];
   return [];
 }
@@ -69,14 +69,14 @@ export function resolveManifestResultValues(
     args =
       outputType === 'image'
         ? resolveMappedImageResponseValues(source, {
-            ...(executionManifest?.['responseMapping'] || {}),
+            ...(executionManifest?.responseMapping || {}),
             resultPaths: resultPaths,
           })
         : resolveMappedResponseValues(source, resultPaths),
     args2 = collectFallbackValues(outputType, source)
-      ['map']((next) => String(next ?? '')['trim']())
-      ['filter'](Boolean);
-  return Array['from'](new Set([...args, ...args2]));
+      .map((next) => String(next ?? '').trim())
+      .filter(Boolean);
+  return Array.from(new Set([...args, ...args2]));
 }
 export function buildManifestResultPatch(
   current,

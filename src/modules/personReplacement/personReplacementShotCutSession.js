@@ -10,7 +10,7 @@ import {
 import { togglePersonReplacementShotReverseAtTimelineSec } from './personReplacementShotReverse.js';
 import { createPersonReplacementShotCutPlaybackController } from './personReplacementShotCutPlaybackController.js';
 const DEFAULT_TIMELINE_ZOOM = 1,
-  SHOT_CUT_ACTIONS = Object['freeze']({
+  SHOT_CUT_ACTIONS = Object.freeze({
     'edit-shot-cuts': 'open',
     'toggle-shot-cut-smart-detect': 'toggleSmartDetect',
     'set-shot-cut-smart-detect-mode': 'setSmartDetectMode',
@@ -34,13 +34,13 @@ function clone(value) {
     try {
       return structuredClone(value);
     } catch {}
-  return JSON['parse'](JSON['stringify'](value));
+  return JSON.parse(JSON.stringify(value));
 }
 function normalizeId(item) {
-  return String(item ?? '')['trim']();
+  return String(item ?? '').trim();
 }
 function resolveProjectIdentity(options = {}) {
-  return normalizeId(options['id'] || options['projectId'] || options['sessionId']);
+  return normalizeId(options.id || options.projectId || options.sessionId);
 }
 function createInitialState() {
   return {
@@ -84,7 +84,7 @@ function createInitialState() {
 }
 function clampTimelineSec(key, index) {
   const personReplacementShotCutTotalDuration = getPersonReplacementShotCutTotalDuration(key);
-  return Math['min'](personReplacementShotCutTotalDuration, Math['max'](0, Number(index) || 0));
+  return Math.min(personReplacementShotCutTotalDuration, Math.max(0, Number(index) || 0));
 }
 export function createPersonReplacementShotCutSession({
   initialProject: initialProject = {},
@@ -100,79 +100,79 @@ export function createPersonReplacementShotCutSession({
   let projectIdentity = resolveProjectIdentity(initialProject),
     enabled = false,
     value2 = null,
-    result = Object['freeze']({});
+    result = Object.freeze({});
   const playback = playbackControllerOptions
       ? createPersonReplacementShotCutPlaybackController(playbackControllerOptions)
       : null,
     handler = () => !enabled,
     handler2 = () => {
-      (soundEnabled['openingCleanup']?.(), (soundEnabled['openingCleanup'] = null));
+      (soundEnabled.openingCleanup?.(), (soundEnabled.openingCleanup = null));
     },
     clearMotionTimer = () => {
-      if (!soundEnabled['motionTimer']) return false;
+      if (!soundEnabled.motionTimer) return false;
       return (
-        windowObject?.['clearTimeout']?.(soundEnabled['motionTimer']),
-        (soundEnabled['motionTimer'] = 0),
+        windowObject?.clearTimeout?.(soundEnabled.motionTimer),
+        (soundEnabled.motionTimer = 0),
         true
       );
     },
     stopBoundaryDrag = () => {
-      (soundEnabled['boundaryDrag']?.['cleanup']?.(),
-        (soundEnabled['boundaryDrag'] = null),
+      (soundEnabled.boundaryDrag?.cleanup?.(),
+        (soundEnabled.boundaryDrag = null),
         onBoundaryDragStopped());
     },
     clearPreviewMetadata = () => {
-      (soundEnabled['previewMetadataCleanup']?.(), (soundEnabled['previewMetadataCleanup'] = null));
+      (soundEnabled.previewMetadataCleanup?.(), (soundEnabled.previewMetadataCleanup = null));
     },
     clearBufferedWarmup = () => {
-      (soundEnabled['bufferedWarmupCleanup']?.(), (soundEnabled['bufferedWarmupCleanup'] = null));
+      (soundEnabled.bufferedWarmupCleanup?.(), (soundEnabled.bufferedWarmupCleanup = null));
     },
     cancelHoverPreview = () => {
-      if (soundEnabled['hoverPreviewRaf']) {
+      if (soundEnabled.hoverPreviewRaf) {
         try {
-          windowObject?.['cancelAnimationFrame']?.(soundEnabled['hoverPreviewRaf']);
+          windowObject?.cancelAnimationFrame?.(soundEnabled.hoverPreviewRaf);
         } catch {}
         try {
-          windowObject?.['clearTimeout']?.(soundEnabled['hoverPreviewRaf']);
+          windowObject?.clearTimeout?.(soundEnabled.hoverPreviewRaf);
         } catch {}
-        soundEnabled['hoverPreviewRaf'] = 0;
+        soundEnabled.hoverPreviewRaf = 0;
       }
-      soundEnabled['hoverPreviewRequest'] = null;
+      soundEnabled.hoverPreviewRequest = null;
     },
     releasePreviewBuffer2 = () => {
       (clearBufferedWarmup(), value2?.(), (value2 = null));
-      if (soundEnabled['bufferedVideo'] !== null) {
-        const data = soundEnabled['bufferedVideo'];
+      if (soundEnabled.bufferedVideo !== null) {
+        const data = soundEnabled.bufferedVideo;
         releasePreviewBuffer(data);
         try {
-          data['pause']?.();
+          data.pause?.();
         } catch {}
         try {
-          (data['removeAttribute']?.('src'), data['load']?.());
+          (data.removeAttribute?.('src'), data.load?.());
         } catch {}
         return (
-          (soundEnabled['bufferedVideo'] = null),
-          (soundEnabled['bufferedSourceId'] = ''),
-          (soundEnabled['bufferedMediaRef'] = ''),
+          (soundEnabled.bufferedVideo = null),
+          (soundEnabled.bufferedSourceId = ''),
+          (soundEnabled.bufferedMediaRef = ''),
           true
         );
       }
       return false;
     },
     stopPlayback2 = () => {
-      (playback?.['stop']?.(),
+      (playback?.stop?.(),
         stopPlayback(),
-        (soundEnabled['hoverPreviewActive'] = false),
-        (soundEnabled['hoverPreviewTimeSec'] = null));
+        (soundEnabled.hoverPreviewActive = false),
+        (soundEnabled.hoverPreviewTimeSec = null));
     },
     cancelPreviewFrameWait = () => {
-      const target = soundEnabled['previewFrameCallbackVideo'],
-        source = soundEnabled['previewFrameCallbackId'];
-      if (source != null && target?.['cancelVideoFrameCallback'])
+      const target = soundEnabled.previewFrameCallbackVideo,
+        source = soundEnabled.previewFrameCallbackId;
+      if (source != null && target?.cancelVideoFrameCallback)
         try {
-          target['cancelVideoFrameCallback'](source);
+          target.cancelVideoFrameCallback(source);
         } catch {}
-      ((soundEnabled['previewFrameCallbackId'] = null), (soundEnabled['previewFrameCallbackVideo'] = null));
+      ((soundEnabled.previewFrameCallbackId = null), (soundEnabled.previewFrameCallbackVideo = null));
     },
     handler3 = ({ releaseBuffer: releaseBuffer = true } = {}) => {
       (handler2(),
@@ -183,13 +183,13 @@ export function createPersonReplacementShotCutSession({
         cancelHoverPreview(),
         cancelPreviewFrameWait(),
         stopPlayback2());
-      const bufferedVideo = soundEnabled['bufferedVideo'],
-        bufferedSourceId = soundEnabled['bufferedSourceId'],
-        bufferedMediaRef = soundEnabled['bufferedMediaRef'];
+      const bufferedVideo = soundEnabled.bufferedVideo,
+        bufferedSourceId = soundEnabled.bufferedSourceId,
+        bufferedMediaRef = soundEnabled.bufferedMediaRef;
       if (releaseBuffer) releasePreviewBuffer2();
-      const smartDetectionToken = soundEnabled['smartDetectionToken'] + 1,
-        boundPreviewVideos = soundEnabled['boundPreviewVideos'];
-      Object['assign'](soundEnabled, createInitialState(), {
+      const smartDetectionToken = soundEnabled.smartDetectionToken + 1,
+        boundPreviewVideos = soundEnabled.boundPreviewVideos;
+      Object.assign(soundEnabled, createInitialState(), {
         smartDetectionToken: smartDetectionToken,
         boundPreviewVideos: boundPreviewVideos,
         ...(!releaseBuffer && bufferedVideo
@@ -203,22 +203,22 @@ export function createPersonReplacementShotCutSession({
     },
     open = (next = initialProject, current = null) => {
       if (!handler()) return false;
-      const draft = Array['isArray'](current) ? clone(current) : createPersonReplacementShotCutDraft(next);
-      if (!draft['length']) return false;
+      const draft = Array.isArray(current) ? clone(current) : createPersonReplacementShotCutDraft(next);
+      if (!draft.length) return false;
       ((projectIdentity = resolveProjectIdentity(next)), stopPlayback2());
-      const boundPreviewVideos2 = soundEnabled['boundPreviewVideos'],
-        bufferedVideo2 = soundEnabled['bufferedVideo'],
-        bufferedSourceId2 = soundEnabled['bufferedSourceId'],
-        bufferedMediaRef2 = soundEnabled['bufferedMediaRef'];
+      const boundPreviewVideos2 = soundEnabled.boundPreviewVideos,
+        bufferedVideo2 = soundEnabled.bufferedVideo,
+        bufferedSourceId2 = soundEnabled.bufferedSourceId,
+        bufferedMediaRef2 = soundEnabled.bufferedMediaRef;
       return (
-        Object['assign'](soundEnabled, createInitialState(), {
+        Object.assign(soundEnabled, createInitialState(), {
           isOpen: true,
           draft: draft,
           initialDraft: clone(draft),
-          previewShotId: normalizeId(next?.['workspace']?.['selectedShotId'] || draft[0]?.['shotId']),
-          soundEnabled: soundEnabled['soundEnabled'],
-          timelineZoom: soundEnabled['timelineZoom'],
-          smartDetectionToken: soundEnabled['smartDetectionToken'] + 1,
+          previewShotId: normalizeId(next?.workspace?.selectedShotId || draft[0]?.shotId),
+          soundEnabled: soundEnabled.soundEnabled,
+          timelineZoom: soundEnabled.timelineZoom,
+          smartDetectionToken: soundEnabled.smartDetectionToken + 1,
           boundPreviewVideos: boundPreviewVideos2,
           ...(bufferedVideo2
             ? {
@@ -233,7 +233,7 @@ export function createPersonReplacementShotCutSession({
     },
     close = ({ releaseBuffer: releaseBuffer2 = false } = {}) => {
       if (!handler()) return false;
-      const entry = soundEnabled['isOpen'] || soundEnabled['isOpening'] || Boolean(soundEnabled['motion']);
+      const entry = soundEnabled.isOpen || soundEnabled.isOpening || Boolean(soundEnabled.motion);
       return (handler3({ releaseBuffer: releaseBuffer2 }), entry);
     },
     syncProject = (options2 = {}) => {
@@ -243,192 +243,192 @@ export function createPersonReplacementShotCutSession({
       return ((projectIdentity = projectIdentity2), handler3({ releaseBuffer: true }), true);
     },
     commitDraft = (record, { recordHistory: recordHistory = true } = {}) => {
-      if (!handler() || !soundEnabled['isOpen'] || !Array['isArray'](record)) return false;
-      if (JSON['stringify'](soundEnabled['draft']) === JSON['stringify'](record)) return false;
+      if (!handler() || !soundEnabled.isOpen || !Array.isArray(record)) return false;
+      if (JSON.stringify(soundEnabled.draft) === JSON.stringify(record)) return false;
       if (recordHistory) {
-        soundEnabled['undoStack']['push'](clone(soundEnabled['draft']));
-        if (soundEnabled['undoStack']['length'] > 50) soundEnabled['undoStack']['shift']();
+        soundEnabled.undoStack.push(clone(soundEnabled.draft));
+        if (soundEnabled.undoStack.length > 50) soundEnabled.undoStack.shift();
       }
-      soundEnabled['draft'] = clone(record);
+      soundEnabled.draft = clone(record);
       const map = new Set(
-        soundEnabled['draft']['map']((payload) => normalizeId(payload?.['shotId']))['filter'](Boolean),
+        soundEnabled.draft.map((payload) => normalizeId(payload?.shotId)).filter(Boolean),
       );
       return (
-        (soundEnabled['selectedShotIds'] = soundEnabled['selectedShotIds']['filter']((handle) =>
-          map['has'](handle),
+        (soundEnabled.selectedShotIds = soundEnabled.selectedShotIds.filter((handle) =>
+          map.has(handle),
         )),
-        (soundEnabled['playheadSec'] = clampTimelineSec(soundEnabled['draft'], soundEnabled['playheadSec'])),
+        (soundEnabled.playheadSec = clampTimelineSec(soundEnabled.draft, soundEnabled.playheadSec)),
         true
       );
     },
     undo = () => {
-      if (!handler() || !soundEnabled['isOpen'] || !soundEnabled['undoStack']['length']) return false;
-      ((soundEnabled['draft'] = soundEnabled['undoStack']['pop']()),
-        (soundEnabled['playheadSec'] = clampTimelineSec(soundEnabled['draft'], soundEnabled['playheadSec'])));
+      if (!handler() || !soundEnabled.isOpen || !soundEnabled.undoStack.length) return false;
+      ((soundEnabled.draft = soundEnabled.undoStack.pop()),
+        (soundEnabled.playheadSec = clampTimelineSec(soundEnabled.draft, soundEnabled.playheadSec)));
       const personReplacementShotCutPositionAtTimelineSec = getPersonReplacementShotCutPositionAtTimelineSec(
-        soundEnabled['draft'],
-        soundEnabled['playheadSec'],
+        soundEnabled.draft,
+        soundEnabled.playheadSec,
       );
       return (
-        (soundEnabled['previewShotId'] =
-          personReplacementShotCutPositionAtTimelineSec['shotId'] ||
-          soundEnabled['draft'][0]?.['shotId'] ||
+        (soundEnabled.previewShotId =
+          personReplacementShotCutPositionAtTimelineSec.shotId ||
+          soundEnabled.draft[0]?.shotId ||
           ''),
-        (soundEnabled['selectedShotIds'] = []),
+        (soundEnabled.selectedShotIds = []),
         true
       );
     },
     resetDraft = () => {
-      if (!handler() || !soundEnabled['isOpen']) return false;
-      const state = commitDraft(soundEnabled['initialDraft']);
-      if (state) soundEnabled['selectedShotIds'] = [];
+      if (!handler() || !soundEnabled.isOpen) return false;
+      const state = commitDraft(soundEnabled.initialDraft);
+      if (state) soundEnabled.selectedShotIds = [];
       return state;
     },
     splitAtPlayhead = () => {
-      if (!handler() || !soundEnabled['isOpen']) return false;
+      if (!handler() || !soundEnabled.isOpen) return false;
       const list = splitPersonReplacementShotCutAtTimelineSec(
-        soundEnabled['draft'],
-        soundEnabled['playheadSec'],
+        soundEnabled.draft,
+        soundEnabled.playheadSec,
       );
-      if (list === soundEnabled['draft'] || list['length'] === soundEnabled['draft']['length']) return false;
+      if (list === soundEnabled.draft || list.length === soundEnabled.draft.length) return false;
       const personReplacementShotCutPositionAtTimelineSec2 = getPersonReplacementShotCutPositionAtTimelineSec(
         list,
-        soundEnabled['playheadSec'],
+        soundEnabled.playheadSec,
       );
       return (
         commitDraft(list),
-        (soundEnabled['previewShotId'] =
-          personReplacementShotCutPositionAtTimelineSec2['shotId'] || soundEnabled['previewShotId']),
-        (soundEnabled['selectedShotIds'] = []),
+        (soundEnabled.previewShotId =
+          personReplacementShotCutPositionAtTimelineSec2.shotId || soundEnabled.previewShotId),
+        (soundEnabled.selectedShotIds = []),
         true
       );
     },
     mergeSelectedRanges = () => {
-      if (!handler() || !soundEnabled['isOpen']) return false;
-      const config = soundEnabled['selectedShotIds']
-          ['map']((scope) =>
-            soundEnabled['draft']['findIndex'](
-              (input) => normalizeId(input?.['shotId']) === normalizeId(scope),
+      if (!handler() || !soundEnabled.isOpen) return false;
+      const config = soundEnabled.selectedShotIds
+          .map((scope) =>
+            soundEnabled.draft.findIndex(
+              (input) => normalizeId(input?.shotId) === normalizeId(scope),
             ),
           )
-          ['filter']((count) => count >= 0)
-          ['sort']((output, value3) => output - value3),
+          .filter((count) => count >= 0)
+          .sort((output, value3) => output - value3),
         value4 = config[0],
         personReplacementShotCutRanges = mergePersonReplacementShotCutRanges(
-          soundEnabled['draft'],
-          soundEnabled['selectedShotIds'],
+          soundEnabled.draft,
+          soundEnabled.selectedShotIds,
           {
-            preferredShotId: soundEnabled['previewShotId'],
+            preferredShotId: soundEnabled.previewShotId,
           },
         );
       if (
-        personReplacementShotCutRanges === soundEnabled['draft'] ||
+        personReplacementShotCutRanges === soundEnabled.draft ||
         !commitDraft(personReplacementShotCutRanges)
       )
         return false;
-      const value5 = soundEnabled['draft'][value4];
+      const value5 = soundEnabled.draft[value4];
       return (
-        (soundEnabled['selectedShotIds'] = []),
-        (soundEnabled['previewShotId'] = normalizeId(value5?.['shotId'])),
-        (soundEnabled['playheadSec'] = getPersonReplacementShotCutTimelineSec(
-          soundEnabled['draft'],
-          value5?.['shotId'],
-          value5?.['startSec'],
+        (soundEnabled.selectedShotIds = []),
+        (soundEnabled.previewShotId = normalizeId(value5?.shotId)),
+        (soundEnabled.playheadSec = getPersonReplacementShotCutTimelineSec(
+          soundEnabled.draft,
+          value5?.shotId,
+          value5?.startSec,
         )),
         true
       );
     },
     moveBoundary = (value6, value7, { recordHistory: recordHistory = true } = {}) => {
-      if (!handler() || !soundEnabled['isOpen']) return false;
+      if (!handler() || !soundEnabled.isOpen) return false;
       const movePersonReplacementShotCutBoundary2 = movePersonReplacementShotCutBoundary(
-        soundEnabled['draft'],
+        soundEnabled.draft,
         value6,
         value7,
       );
       return commitDraft(movePersonReplacementShotCutBoundary2, { recordHistory: recordHistory });
     },
-    toggleReverse = async (value8 = soundEnabled['playheadSec']) => {
-      if (!handler() || !soundEnabled['isOpen']) return false;
-      const clone2 = clone(soundEnabled['draft']),
-        shotId = togglePersonReplacementShotReverseAtTimelineSec(soundEnabled['draft'], value8);
-      if (!shotId?.['draft'] || !commitDraft(shotId['draft'])) return false;
-      const originShotId = soundEnabled['draft'][shotId['position']?.['shotIndex']];
+    toggleReverse = async (value8 = soundEnabled.playheadSec) => {
+      if (!handler() || !soundEnabled.isOpen) return false;
+      const clone2 = clone(soundEnabled.draft),
+        shotId = togglePersonReplacementShotReverseAtTimelineSec(soundEnabled.draft, value8);
+      if (!shotId?.draft || !commitDraft(shotId.draft)) return false;
+      const originShotId = soundEnabled.draft[shotId.position?.shotIndex];
       try {
         return (
           await onReverseRequested({
-            shotId: shotId['position']?.['shotId'] || originShotId?.['shotId'] || '',
-            originShotId: originShotId?.['originShotId'] || originShotId?.['shotId'] || '',
-            isReversed: shotId['isReversed'] === true,
+            shotId: shotId.position?.shotId || originShotId?.shotId || '',
+            originShotId: originShotId?.originShotId || originShotId?.shotId || '',
+            isReversed: shotId.isReversed === true,
           }),
           true
         );
       } catch (value9) {
-        ((soundEnabled['draft'] = clone2), soundEnabled['undoStack']['pop']());
+        ((soundEnabled.draft = clone2), soundEnabled.undoStack.pop());
         throw value9;
       }
     },
     beginSmartDetection = async (options3 = {}) => {
-      if (!handler() || !soundEnabled['isOpen'] || soundEnabled['isSmartDetecting']) return false;
-      const value10 = ++soundEnabled['smartDetectionToken'];
-      ((soundEnabled['isSmartDetecting'] = true), (soundEnabled['isSmartDetectOpen'] = false));
+      if (!handler() || !soundEnabled.isOpen || soundEnabled.isSmartDetecting) return false;
+      const value10 = ++soundEnabled.smartDetectionToken;
+      ((soundEnabled.isSmartDetecting = true), (soundEnabled.isSmartDetectOpen = false));
       try {
         const list2 = await onDetectionRequested(options3);
         if (
           enabled ||
-          !soundEnabled['isOpen'] ||
-          value10 !== soundEnabled['smartDetectionToken'] ||
-          !Array['isArray'](list2) ||
-          !list2['length']
+          !soundEnabled.isOpen ||
+          value10 !== soundEnabled.smartDetectionToken ||
+          !Array.isArray(list2) ||
+          !list2.length
         )
           return false;
         return (
           commitDraft(list2),
-          (soundEnabled['playheadSec'] = 0),
-          (soundEnabled['previewShotId'] = list2[0]?.['shotId'] || ''),
-          (soundEnabled['selectedShotIds'] = []),
+          (soundEnabled.playheadSec = 0),
+          (soundEnabled.previewShotId = list2[0]?.shotId || ''),
+          (soundEnabled.selectedShotIds = []),
           true
         );
       } finally {
         !enabled &&
-          value10 === soundEnabled['smartDetectionToken'] &&
-          (soundEnabled['isSmartDetecting'] = false);
+          value10 === soundEnabled.smartDetectionToken &&
+          (soundEnabled.isSmartDetecting = false);
       }
     },
     getPresentation = () => ({
-      isOpen: soundEnabled['isOpen'],
-      isOpening: soundEnabled['isOpening'],
-      motion: soundEnabled['motion'],
-      draft: clone(soundEnabled['draft']),
-      initialDraft: clone(soundEnabled['initialDraft']),
-      canUndo: soundEnabled['undoStack']['length'] > 0,
-      isSubmitting: soundEnabled['isSubmitting'],
-      isKeyframeCapturing: soundEnabled['isKeyframeCapturing'],
-      isSmartDetectOpen: soundEnabled['isSmartDetectOpen'],
-      isSmartDetecting: soundEnabled['isSmartDetecting'],
-      previewShotId: soundEnabled['previewShotId'],
-      playheadSec: soundEnabled['playheadSec'],
-      hoverPreviewActive: soundEnabled['hoverPreviewActive'],
-      hoverPreviewTimeSec: soundEnabled['hoverPreviewTimeSec'],
-      timelineZoom: soundEnabled['timelineZoom'],
-      soundEnabled: soundEnabled['soundEnabled'],
-      selectedShotIds: [...soundEnabled['selectedShotIds']],
+      isOpen: soundEnabled.isOpen,
+      isOpening: soundEnabled.isOpening,
+      motion: soundEnabled.motion,
+      draft: clone(soundEnabled.draft),
+      initialDraft: clone(soundEnabled.initialDraft),
+      canUndo: soundEnabled.undoStack.length > 0,
+      isSubmitting: soundEnabled.isSubmitting,
+      isKeyframeCapturing: soundEnabled.isKeyframeCapturing,
+      isSmartDetectOpen: soundEnabled.isSmartDetectOpen,
+      isSmartDetecting: soundEnabled.isSmartDetecting,
+      previewShotId: soundEnabled.previewShotId,
+      playheadSec: soundEnabled.playheadSec,
+      hoverPreviewActive: soundEnabled.hoverPreviewActive,
+      hoverPreviewTimeSec: soundEnabled.hoverPreviewTimeSec,
+      timelineZoom: soundEnabled.timelineZoom,
+      soundEnabled: soundEnabled.soundEnabled,
+      selectedShotIds: [...soundEnabled.selectedShotIds],
     }),
     getWorkspacePresentation = (args = {}) => ({
-      cutEditorOpen: soundEnabled['isOpen'],
-      cutEditorOpening: soundEnabled['isOpening'],
-      cutEditorMotion: soundEnabled['motion'],
-      cutEditorDraft: soundEnabled['draft'],
-      cutEditorSubmitting: soundEnabled['isSubmitting'],
-      cutEditorKeyframeCapturing: soundEnabled['isKeyframeCapturing'],
-      cutEditorSmartDetectOpen: soundEnabled['isSmartDetectOpen'],
-      cutEditorSmartDetecting: soundEnabled['isSmartDetecting'],
-      cutEditorPreviewShotId: soundEnabled['previewShotId'],
-      cutEditorPlayheadSec: soundEnabled['playheadSec'],
-      cutEditorTimelineZoom: soundEnabled['timelineZoom'],
-      cutEditorSoundEnabled: soundEnabled['soundEnabled'],
-      cutEditorSelectedShotIds: [...soundEnabled['selectedShotIds']],
-      cutEditorBufferedMediaRef: soundEnabled['bufferedVideo'] ? soundEnabled['bufferedMediaRef'] : '',
-      cutEditorCanUndo: soundEnabled['undoStack']['length'] > 0,
+      cutEditorOpen: soundEnabled.isOpen,
+      cutEditorOpening: soundEnabled.isOpening,
+      cutEditorMotion: soundEnabled.motion,
+      cutEditorDraft: soundEnabled.draft,
+      cutEditorSubmitting: soundEnabled.isSubmitting,
+      cutEditorKeyframeCapturing: soundEnabled.isKeyframeCapturing,
+      cutEditorSmartDetectOpen: soundEnabled.isSmartDetectOpen,
+      cutEditorSmartDetecting: soundEnabled.isSmartDetecting,
+      cutEditorPreviewShotId: soundEnabled.previewShotId,
+      cutEditorPlayheadSec: soundEnabled.playheadSec,
+      cutEditorTimelineZoom: soundEnabled.timelineZoom,
+      cutEditorSoundEnabled: soundEnabled.soundEnabled,
+      cutEditorSelectedShotIds: [...soundEnabled.selectedShotIds],
+      cutEditorBufferedMediaRef: soundEnabled.bufferedVideo ? soundEnabled.bufferedMediaRef : '',
+      cutEditorCanUndo: soundEnabled.undoStack.length > 0,
       ...args,
     }),
     dispose = () => {
@@ -437,7 +437,7 @@ export function createPersonReplacementShotCutSession({
     },
     configureActionHandlers = (args2 = {}) => {
       if (!handler()) return false;
-      return ((result = Object['freeze']({ ...args2 })), true);
+      return ((result = Object.freeze({ ...args2 })), true);
     },
     handleAction = (value11, value12 = {}) => {
       if (!handler()) return false;
@@ -447,7 +447,7 @@ export function createPersonReplacementShotCutSession({
       if (typeof run === 'function') run(value12);
       return true;
     };
-  return Object['freeze']({
+  return Object.freeze({
     open: open,
     close: close,
     syncProject: syncProject,
@@ -474,62 +474,62 @@ export function createPersonReplacementShotCutSession({
     cancelHoverPreview: cancelHoverPreview,
     cancelPreviewFrameWait: cancelPreviewFrameWait,
     setOpening(value13) {
-      if (handler()) soundEnabled['isOpening'] = Boolean(value13);
+      if (handler()) soundEnabled.isOpening = Boolean(value13);
     },
     setMotion(value14) {
-      if (handler()) soundEnabled['motion'] = normalizeId(value14);
+      if (handler()) soundEnabled.motion = normalizeId(value14);
     },
     setSubmitting(value15) {
-      if (handler()) soundEnabled['isSubmitting'] = value15 || false;
+      if (handler()) soundEnabled.isSubmitting = value15 || false;
     },
     setKeyframeCapturing(value16) {
-      if (handler()) soundEnabled['isKeyframeCapturing'] = Boolean(value16);
+      if (handler()) soundEnabled.isKeyframeCapturing = Boolean(value16);
     },
     setSmartDetectOpen(value17) {
-      if (handler()) soundEnabled['isSmartDetectOpen'] = Boolean(value17);
+      if (handler()) soundEnabled.isSmartDetectOpen = Boolean(value17);
     },
     setPreviewShotId(value18) {
-      if (handler()) soundEnabled['previewShotId'] = normalizeId(value18);
+      if (handler()) soundEnabled.previewShotId = normalizeId(value18);
     },
     setPlayheadSec(value19) {
-      handler() && (soundEnabled['playheadSec'] = clampTimelineSec(soundEnabled['draft'], value19));
+      handler() && (soundEnabled.playheadSec = clampTimelineSec(soundEnabled.draft, value19));
     },
     setHoverPreview({ active: active = false, timeSec: timeSec = null } = {}) {
       if (!handler()) return;
-      ((soundEnabled['hoverPreviewActive'] = Boolean(active)),
-        (soundEnabled['hoverPreviewTimeSec'] =
-          active && Number['isFinite'](Number(timeSec)) ? Number(timeSec) : null));
+      ((soundEnabled.hoverPreviewActive = Boolean(active)),
+        (soundEnabled.hoverPreviewTimeSec =
+          active && Number.isFinite(Number(timeSec)) ? Number(timeSec) : null));
     },
     setTimelineZoom(value20) {
       handler() &&
-        (soundEnabled['timelineZoom'] = Math['max'](1, Number(value20) || DEFAULT_TIMELINE_ZOOM));
+        (soundEnabled.timelineZoom = Math.max(1, Number(value20) || DEFAULT_TIMELINE_ZOOM));
     },
     setSoundEnabled(value21) {
-      if (handler()) soundEnabled['soundEnabled'] = Boolean(value21);
+      if (handler()) soundEnabled.soundEnabled = Boolean(value21);
     },
     setSelectedShotIds(list3 = []) {
       if (!handler()) return;
       const map2 = new Set(
-        soundEnabled['draft']['map']((value22) => normalizeId(value22?.['shotId']))['filter'](Boolean),
+        soundEnabled.draft.map((value22) => normalizeId(value22?.shotId)).filter(Boolean),
       );
-      soundEnabled['selectedShotIds'] = [
+      soundEnabled.selectedShotIds = [
         ...new Set(
-          (Array['isArray'](list3) ? list3 : [])
-            ['map'](normalizeId)
-            ['filter']((value23) => map2['has'](value23)),
+          (Array.isArray(list3) ? list3 : [])
+            .map(normalizeId)
+            .filter((value23) => map2.has(value23)),
         ),
       ];
     },
     attachPreviewBuffer(value24, value25 = null) {
       if (!handler()) return false;
-      const enabled3 = soundEnabled['bufferedVideo'] !== value24;
+      const enabled3 = soundEnabled.bufferedVideo !== value24;
       if (enabled3) releasePreviewBuffer2();
-      soundEnabled['bufferedVideo'] = value24 || null;
+      soundEnabled.bufferedVideo = value24 || null;
       if (typeof value25 === 'function') {
         if (!enabled3) value2?.();
         value2 = value25;
       } else enabled3 && (value2 = null);
-      return Boolean(soundEnabled['bufferedVideo']);
+      return Boolean(soundEnabled.bufferedVideo);
     },
     releasePreviewBuffer: releasePreviewBuffer2,
   });

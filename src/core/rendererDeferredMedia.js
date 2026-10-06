@@ -160,7 +160,7 @@ export function scheduleRendererVisibleAudioSurfaceHydration({
 } = {}) {
   if (!nodeId) return false;
   if (!isNodeType(node, ['source-audio', 'ai-audio', 'audio'])) return false;
-  component?.['setRendererAudioSurfaceVisible']?.(isVisible === true);
+  component?.setRendererAudioSurfaceVisible?.(isVisible === true);
   if (isVisible !== true) return false;
   if (
     isSelected2 !== true &&
@@ -168,9 +168,9 @@ export function scheduleRendererVisibleAudioSurfaceHydration({
       Number(visibleAudioRank) > MAX_VISIBLE_AUDIO_WARMUP_COUNT)
   )
     return false;
-  if (component?.['prepareRendererVisibleAudioSurface']?.() !== true) return false;
-  if (isSelected2) deferredMedia?.['hydrateNow']?.(nodeId);
-  else deferredMedia?.['enqueue']?.(nodeId, { urgent: true });
+  if (component?.prepareRendererVisibleAudioSurface?.() !== true) return false;
+  if (isSelected2) deferredMedia?.hydrateNow?.(nodeId);
+  else deferredMedia?.enqueue?.(nodeId, { urgent: true });
   return true;
 }
 
@@ -209,11 +209,11 @@ const DEFAULT_VIDEO_HYDRATION_BATCH_SIZE = 1;
 const VIDEO_MEDIA_NODE_TYPES = new Set(['source-video', 'ai-video', 'video']);
 
 function getDeferredMediaComponentType(next) {
-  return String(next?.['_data']?.['type'] || next?.['nodeData']?.['type'] || next?.['data']?.['type'] || '')
-    ['trim']()
-    ['toLowerCase']();
+  return String(next?._data?.type || next?.nodeData?.type || next?.data?.type || '')
+    .trim()
+    .toLowerCase();
 }
 
 function isDeferredVideoMediaComponent(current) {
-  return VIDEO_MEDIA_NODE_TYPES['has'](getDeferredMediaComponentType(current));
+  return VIDEO_MEDIA_NODE_TYPES.has(getDeferredMediaComponentType(current));
 }

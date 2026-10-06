@@ -28,22 +28,22 @@ export const STORY_DOCUMENT_EXTRACT_PATH = '/api/v2/story-workspace/document/ext
 
 export const STORY_DOCUMENT_MAX_FILE_BYTES = 20 * 1024 * 1024;
 
-export const STORY_DOCUMENT_SUPPORTED_EXTENSIONS = Object['freeze'](['txt', 'docx', 'pdf']);
+export const STORY_DOCUMENT_SUPPORTED_EXTENSIONS = Object.freeze(['txt', 'docx', 'pdf']);
 
 function getFileExtension(value) {
-  const item = String(value || '')['trim'](),
-    count = item['lastIndexOf']('.');
-  return count >= 0 ? item['slice'](count + 1)['toLowerCase']() : '';
+  const item = String(value || '').trim(),
+    count = item.lastIndexOf('.');
+  return count >= 0 ? item.slice(count + 1).toLowerCase() : '';
 }
 
 export function validateStoryDocumentFile(enabled) {
   if (!enabled) return { ok: false, error: '请选择剧本文件。' };
-  const fileExtension = getFileExtension(enabled['name']);
+  const fileExtension = getFileExtension(enabled.name);
   if (fileExtension === 'doc')
     return { ok: false, error: '暂不支持旧版 DOC 文件，请先另存为 DOCX、PDF 或 TXT。' };
-  if (!STORY_DOCUMENT_SUPPORTED_EXTENSIONS['includes'](fileExtension))
+  if (!STORY_DOCUMENT_SUPPORTED_EXTENSIONS.includes(fileExtension))
     return { ok: false, error: '仅支持 TXT、DOCX 和文本型 PDF 文件。' };
-  const count2 = Number(enabled['size'] || 0);
+  const count2 = Number(enabled.size || 0);
   if (count2 <= 0) return { ok: false, error: '剧本文件为空。' };
   if (count2 > STORY_DOCUMENT_MAX_FILE_BYTES) return { ok: false, error: '剧本文件不能超过 20 MB。' };
   return { ok: true, extension: fileExtension };
@@ -59,36 +59,36 @@ export const STORY_DOCUMENT_MIME_TYPES = Object.freeze({
 });
 
 function normalizeStoryDocumentResult(response, key, index) {
-  const text = typeof response?.['text'] === 'string' ? response['text'] : '';
-  if (!text['trim']()) throw new Error('文档解析结果没有可用文本。');
+  const text = typeof response?.text === 'string' ? response.text : '';
+  if (!text.trim()) throw new Error('文档解析结果没有可用文本。');
   return {
     ...response,
     text: text,
-    characterCount: Number['isFinite'](response?.['characterCount'])
-      ? response['characterCount']
-      : text['length'],
-    extension: String(response?.['extension'] || key),
-    warnings: Array['isArray'](response?.['warnings']) ? response['warnings'] : index,
+    characterCount: Number.isFinite(response?.characterCount)
+      ? response.characterCount
+      : text.length,
+    extension: String(response?.extension || key),
+    warnings: Array.isArray(response?.warnings) ? response.warnings : index,
   };
 }
 
 export async function extractStoryDocumentText(response2, data = {}) {
   const response3 = validateStoryDocumentFile(response2);
-  if (!response3['ok']) throw new Error(response3['error']);
-  if (response3['extension'] === 'txt') {
-    const text2 = await response2['text']();
-    if (!text2['trim']()) throw new Error('文档解析结果没有可用文本。');
-    return { text: text2, characterCount: text2['length'], extension: 'txt', warnings: [] };
+  if (!response3.ok) throw new Error(response3.error);
+  if (response3.extension === 'txt') {
+    const text2 = await response2.text();
+    if (!text2.trim()) throw new Error('文档解析结果没有可用文本。');
+    return { text: text2, characterCount: text2.length, extension: 'txt', warnings: [] };
   }
-  const enabled2 = STORY_DOCUMENT_MIME_TYPES[response3['extension']];
+  const enabled2 = STORY_DOCUMENT_MIME_TYPES[response3.extension];
   if (!enabled2) throw new Error('仅支持 TXT、DOCX 和文本型 PDF 文件。');
   const post2 = await post(STORY_DOCUMENT_EXTRACT_PATH, response2, {
     provider: 'local',
     headers: { 'Content-Type': enabled2 },
     responseType: 'json',
     retries: 0,
-    signal: data['signal'],
-    timeout: Number(data['timeout']) || 90000,
+    signal: data.signal,
+    timeout: Number(data.timeout) || 90000,
   });
-  return normalizeStoryDocumentResult(post2, response3['extension'], []);
+  return normalizeStoryDocumentResult(post2, response3.extension, []);
 }

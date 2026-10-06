@@ -1,9 +1,9 @@
 const DEFAULT_COMMAND_TIMEOUT_MS = 15000;
 function createProtocolError(error = {}) {
-  const message = String(error?.['message'] || 'Chrome DevTools Protocol command failed'),
+  const message = String(error?.message || 'Chrome DevTools Protocol command failed'),
     protocolError = new Error(message);
-  if (error?.['code'] != null) protocolError['code'] = error['code'];
-  if (error?.['data'] != null) protocolError['data'] = error['data'];
+  if (error?.code != null) protocolError.code = error.code;
+  if (error?.data != null) protocolError.data = error.data;
   return protocolError;
 }
 export function createChromeCdpPipeClient({
@@ -14,9 +14,9 @@ export function createChromeCdpPipeClient({
   clearTimeoutFn: clearTimeoutFn = clearTimeout,
   logEvent: logEvent = null,
 } = {}) {
-  if (!readablePipe || typeof readablePipe['on'] !== 'function')
+  if (!readablePipe || typeof readablePipe.on !== 'function')
     throw new TypeError('Chrome CDP readable pipe is required');
-  if (!writablePipe || typeof writablePipe['write'] !== 'function')
+  if (!writablePipe || typeof writablePipe.write !== 'function')
     throw new TypeError('Chrome CDP writable pipe is required');
   const pending = new Map(),
     eventHandlers = new Set();
@@ -24,24 +24,24 @@ export function createChromeCdpPipeClient({
     buffer = '',
     isClosed = false;
   function settle(id, callback) {
-    const entry = pending['get'](id);
+    const entry = pending.get(id);
     if (!entry) return false;
-    pending['delete'](id);
-    if (entry['timer']) clearTimeoutFn(entry['timer']);
+    pending.delete(id);
+    if (entry.timer) clearTimeoutFn(entry.timer);
     return (callback(entry), true);
   }
   function dispatch(message = {}) {
-    if (message['id'] != null) {
-      settle(message['id'], (entry) => {
-        if (message['error']) {
-          entry['reject'](createProtocolError(message['error']));
+    if (message.id != null) {
+      settle(message.id, (entry) => {
+        if (message.error) {
+          entry.reject(createProtocolError(message.error));
           return;
         }
-        entry['resolve'](message['result'] || {});
+        entry.resolve(message.result || {});
       });
       return;
     }
-    if (!message['method']) return;
+    if (!message.method) return;
     for (const handler of [...eventHandlers]) {
       try {
         handler(message);
@@ -49,15 +49,15 @@ export function createChromeCdpPipeClient({
     }
   }
   function onData(chunk) {
-    buffer += Buffer['isBuffer'](chunk) ? chunk['toString']('utf8') : String(chunk || '');
+    buffer += Buffer.isBuffer(chunk) ? chunk.toString('utf8') : String(chunk || '');
     while (true) {
-      const separatorIndex = buffer['indexOf']('\x00');
+      const separatorIndex = buffer.indexOf('\x00');
       if (separatorIndex < 0) break;
-      const frame = buffer['slice'](0, separatorIndex);
-      buffer = buffer['slice'](separatorIndex + 1);
+      const frame = buffer.slice(0, separatorIndex);
+      buffer = buffer.slice(separatorIndex + 1);
       if (!frame) continue;
       try {
-        dispatch(JSON['parse'](frame));
+        dispatch(JSON.parse(frame));
       } catch (parseError) {
         logEvent?.({
           type: 'chrome_cdp.invalid_message',
@@ -72,16 +72,16 @@ export function createChromeCdpPipeClient({
   function close(reason = 'Chrome CDP pipe closed') {
     if (isClosed) return;
     ((isClosed = true),
-      readablePipe['off']?.('data', onData),
-      readablePipe['off']?.('close', onPipeClosed),
-      readablePipe['off']?.('end', onPipeClosed),
-      readablePipe['off']?.('error', onPipeError),
-      writablePipe['off']?.('close', onPipeClosed),
-      writablePipe['off']?.('error', onPipeError));
-    for (const pendingId of [...pending['keys']()]) {
-      settle(pendingId, (entry) => entry['reject'](new Error(reason)));
+      readablePipe.off?.('data', onData),
+      readablePipe.off?.('close', onPipeClosed),
+      readablePipe.off?.('end', onPipeClosed),
+      readablePipe.off?.('error', onPipeError),
+      writablePipe.off?.('close', onPipeClosed),
+      writablePipe.off?.('error', onPipeError));
+    for (const pendingId of [...pending.keys()]) {
+      settle(pendingId, (entry) => entry.reject(new Error(reason)));
     }
-    eventHandlers['clear']();
+    eventHandlers.clear();
   }
   function onPipeClosed() {
     close();
@@ -94,16 +94,16 @@ export function createChromeCdpPipeClient({
       message: 'Chrome CDP pipe failed',
       error: error,
     }),
-      close(String(error?.['message'] || error || 'Chrome CDP pipe failed')));
+      close(String(error?.message || error || 'Chrome CDP pipe failed')));
   }
-  (readablePipe['on']('data', onData),
-    readablePipe['on']('close', onPipeClosed),
-    readablePipe['on']('end', onPipeClosed),
-    readablePipe['on']('error', onPipeError),
-    writablePipe['on']?.('close', onPipeClosed),
-    writablePipe['on']?.('error', onPipeError));
+  (readablePipe.on('data', onData),
+    readablePipe.on('close', onPipeClosed),
+    readablePipe.on('end', onPipeClosed),
+    readablePipe.on('error', onPipeError),
+    writablePipe.on?.('close', onPipeClosed),
+    writablePipe.on?.('error', onPipeError));
   function send(method, params = {}, sessionId = '') {
-    if (isClosed) return Promise['reject'](new Error('Chrome CDP pipe is closed'));
+    if (isClosed) return Promise.reject(new Error('Chrome CDP pipe is closed'));
     const requestId = ++nextId,
       payload = {
         id: requestId,
@@ -111,27 +111,27 @@ export function createChromeCdpPipeClient({
         params: params && typeof params === 'object' ? params : {},
         ...(sessionId ? { sessionId: String(sessionId) } : {}),
       };
-    if (!payload['method']) return Promise['reject'](new Error('Chrome CDP method is required'));
+    if (!payload.method) return Promise.reject(new Error('Chrome CDP method is required'));
     return new Promise((resolve, reject) => {
-      const delay = Math['max'](0, Number(commandTimeoutMs) || 0),
+      const delay = Math.max(0, Number(commandTimeoutMs) || 0),
         timer =
           delay > 0
             ? setTimeoutFn(() => {
                 settle(requestId, (entry) => {
-                  entry['reject'](new Error('Chrome CDP command timed out: ' + payload['method']));
+                  entry.reject(new Error('Chrome CDP command timed out: ' + payload.method));
                 });
               }, delay)
             : null;
-      pending['set'](requestId, {
+      pending.set(requestId, {
         resolve: resolve,
         reject: reject,
         timer: timer,
-        method: payload['method'],
+        method: payload.method,
       });
       try {
-        writablePipe['write'](JSON['stringify'](payload) + '\x00', 'utf8');
+        writablePipe.write(JSON.stringify(payload) + '\x00', 'utf8');
       } catch (writeError) {
-        settle(requestId, (entry) => entry['reject'](writeError));
+        settle(requestId, (entry) => entry.reject(writeError));
       }
     });
   }
@@ -139,7 +139,7 @@ export function createChromeCdpPipeClient({
     send: send,
     onEvent(handler) {
       if (typeof handler !== 'function' || isClosed) return () => {};
-      return (eventHandlers['add'](handler), () => eventHandlers['delete'](handler));
+      return (eventHandlers.add(handler), () => eventHandlers.delete(handler));
     },
     close: close,
     get closed() {

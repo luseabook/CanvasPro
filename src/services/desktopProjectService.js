@@ -109,9 +109,9 @@ export async function exportDesktopWorkspaceProjectPackage({
   operationId: operationId = '',
 } = {}) {
   const desktopProjectApi6 = getDesktopProjectApi();
-  if (!desktopProjectApi6 || typeof desktopProjectApi6['exportPackage'] !== 'function')
+  if (!desktopProjectApi6 || typeof desktopProjectApi6.exportPackage !== 'function')
     throw new Error('Electron project package export API is unavailable');
-  return await desktopProjectApi6['exportPackage']({
+  return await desktopProjectApi6.exportPackage({
     projectType: projectType,
     projectId: projectId,
     projectName: projectName,
@@ -122,28 +122,28 @@ export async function exportDesktopWorkspaceProjectPackage({
 
 export async function importDesktopWorkspaceProjectPackage(signal = {}) {
   const desktopProjectApi7 = getDesktopProjectApi();
-  if (!desktopProjectApi7 || typeof desktopProjectApi7['importPackage'] !== 'function')
+  if (!desktopProjectApi7 || typeof desktopProjectApi7.importPackage !== 'function')
     throw new Error('Electron project package import API is unavailable');
   let stageProjectPackageFile2 = null;
   try {
-    let path2 = String(signal['path'] || '')['trim']();
+    let path2 = String(signal.path || '').trim();
     !path2 &&
-      signal['file'] &&
-      ((stageProjectPackageFile2 = await stageProjectPackageFile(signal['file'], {
-        signal: signal['signal'],
+      signal.file &&
+      ((stageProjectPackageFile2 = await stageProjectPackageFile(signal.file, {
+        signal: signal.signal,
       })),
-      (path2 = stageProjectPackageFile2['path']));
-    const next = await desktopProjectApi7['importPackage']({
+      (path2 = stageProjectPackageFile2.path));
+    const next = await desktopProjectApi7.importPackage({
       path: path2,
-      operationId: signal['operationId'] || '',
+      operationId: signal.operationId || '',
     });
     return next;
   } finally {
-    if (stageProjectPackageFile2?.['stageId'])
+    if (stageProjectPackageFile2?.stageId)
       try {
-        await discardStagedProjectPackage(stageProjectPackageFile2['stageId']);
+        await discardStagedProjectPackage(stageProjectPackageFile2.stageId);
       } catch (current) {
-        console['warn']('[desktopProjectService] 清理暂存项目包失败:', current);
+        console.warn('[desktopProjectService] 清理暂存项目包失败:', current);
       }
   }
 }

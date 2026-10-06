@@ -10,7 +10,7 @@ import {
   RENDERER_VIRTUALIZATION_CONFIG,
   resolveRendererLowZoomMountLimit,
 } from './rendererVirtualization.js';
-const PRIORITY_MEDIA_TYPES = Object['freeze']([
+const PRIORITY_MEDIA_TYPES = Object.freeze([
     'source-video',
     'video',
     'ai-video',
@@ -18,12 +18,12 @@ const PRIORITY_MEDIA_TYPES = Object['freeze']([
     'audio',
     'ai-audio',
   ]),
-  PRIORITY_VIDEO_TYPES = Object['freeze'](['source-video', 'video', 'ai-video']);
+  PRIORITY_VIDEO_TYPES = Object.freeze(['source-video', 'video', 'ai-video']);
 function hasResolvedVideo(value) {
   if (!isNodeType(value, PRIORITY_VIDEO_TYPES)) return false;
   if (resolveCanvasVideoDisplayUrl(value)) return true;
-  const list = Array['isArray'](value?.['videos']) ? value['videos'] : [];
-  return list['some']((item) => !!resolveCanvasVideoDisplayUrl(item));
+  const list = Array.isArray(value?.videos) ? value.videos : [];
+  return list.some((item) => !!resolveCanvasVideoDisplayUrl(item));
 }
 export function resolveRendererLowZoomRealVideoNodeIds({
   nodes: nodes,
@@ -45,34 +45,34 @@ export function resolveRendererLowZoomRealVideoNodeIds({
     map2 = candidateNodeIds instanceof Set ? candidateNodeIds : new Set(candidateNodeIds || []),
     index =
       selectedNodeIds instanceof Set
-        ? Array['from'](selectedNodeIds)
-        : Array['isArray'](selectedNodeIds)
+        ? Array.from(selectedNodeIds)
+        : Array.isArray(selectedNodeIds)
           ? selectedNodeIds
           : [];
   for (const result of index) {
     const data = key[result];
-    if (!map2['has'](result) || !hasResolvedVideo(data)) continue;
-    map['add'](result);
+    if (!map2.has(result) || !hasResolvedVideo(data)) continue;
+    map.add(result);
   }
   const count = Number(containerWidth),
     count2 = Number(containerHeight);
-  if (!(count > 0) || !(count2 > 0) || map['size'] >= rendererLowZoomMountLimit) return map;
+  if (!(count > 0) || !(count2 > 0) || map.size >= rendererLowZoomMountLimit) return map;
   const options = priorityNodeIds instanceof Set ? priorityNodeIds : new Set(priorityNodeIds || []);
   for (const target of options) {
-    if (map['has'](target) || !map2['has'](target)) continue;
+    if (map.has(target) || !map2.has(target)) continue;
     const source = key[target];
     if (!hasResolvedVideo(source) || !isNodeInsideViewportPadding(source, viewport, count, count2, 0))
       continue;
-    map['add'](target);
-    if (map['size'] >= rendererLowZoomMountLimit) return map;
+    map.add(target);
+    if (map.size >= rendererLowZoomMountLimit) return map;
   }
   for (const next of map2) {
-    if (map['has'](next)) continue;
+    if (map.has(next)) continue;
     const current = key[next];
     if (!hasResolvedVideo(current) || !isNodeInsideViewportPadding(current, viewport, count, count2, 0))
       continue;
-    map['add'](next);
-    if (map['size'] >= rendererLowZoomMountLimit) break;
+    map.add(next);
+    if (map.size >= rendererLowZoomMountLimit) break;
   }
   return map;
 }
@@ -88,33 +88,33 @@ export function syncRendererPendingSourceVideoActivationIds({
     map4 = pendingNodeIds instanceof Set ? pendingNodeIds : new Set();
   if (scanNodes !== false) {
     const map5 = new Set();
-    for (const [enabled, record] of Object['entries'](entry)) {
+    for (const [enabled, record] of Object.entries(entry)) {
       if (!enabled || !isNodeType(record, 'source-video')) continue;
-      map5['add'](enabled);
-      const enabled2 = String(resolveCanvasVideoUrl(record) || '')['trim'](),
-        payload = String(map3['get'](enabled) || '')['trim']();
-      if (enabled2 && enabled2 !== payload) map4['add'](enabled);
-      else !enabled2 && map4['delete'](enabled);
-      map3['set'](enabled, enabled2);
+      map5.add(enabled);
+      const enabled2 = String(resolveCanvasVideoUrl(record) || '').trim(),
+        payload = String(map3.get(enabled) || '').trim();
+      if (enabled2 && enabled2 !== payload) map4.add(enabled);
+      else !enabled2 && map4.delete(enabled);
+      map3.set(enabled, enabled2);
     }
-    for (const handle of map3['keys']()) {
-      if (map5['has'](handle)) continue;
-      (map3['delete'](handle), map4['delete'](handle));
+    for (const handle of map3.keys()) {
+      if (map5.has(handle)) continue;
+      (map3.delete(handle), map4.delete(handle));
     }
   }
   if (typeof isPresented === 'function')
-    for (const state of Array['from'](map4)) {
-      const enabled3 = String(map3['get'](state) || '')['trim']();
-      (!enabled3 || isPresented(state, enabled3) === true) && map4['delete'](state);
+    for (const state of Array.from(map4)) {
+      const enabled3 = String(map3.get(state) || '').trim();
+      (!enabled3 || isPresented(state, enabled3) === true) && map4.delete(state);
     }
   return map4;
 }
 export function applyRendererLowZoomRealVideoCandidates(args, config) {
-  if (!(config instanceof Set) || config['size'] === 0) return args;
-  const mountCandidateIds = new Set(args?.['mountCandidateIds']),
-    parkCandidateIds = new Set(args?.['parkCandidateIds']);
+  if (!(config instanceof Set) || config.size === 0) return args;
+  const mountCandidateIds = new Set(args?.mountCandidateIds),
+    parkCandidateIds = new Set(args?.parkCandidateIds);
   for (const scope of config) {
-    (mountCandidateIds['add'](scope), parkCandidateIds['delete'](scope));
+    (mountCandidateIds.add(scope), parkCandidateIds.delete(scope));
   }
   return { ...args, mountCandidateIds: mountCandidateIds, parkCandidateIds: parkCandidateIds };
 }
@@ -131,20 +131,20 @@ function collectActiveNodeIds({
   const output = new Set(
     selectedNodeIds2 instanceof Set
       ? selectedNodeIds2
-      : Array['isArray'](selectedNodeIds2)
+      : Array.isArray(selectedNodeIds2)
         ? selectedNodeIds2
         : [],
   );
   return (
     [
-      connOverlay?.['srcId'],
-      connOverlay?.['hoverId'],
-      pickConnectMode?.['sourceNodeId'],
-      pickConnectMode?.['srcId'],
-      pickConnectMode?.['hoverNodeId'],
-      pickConnectMode?.['hoverId'],
-    ]['forEach']((value2) => {
-      if (value2) output['add'](value2);
+      connOverlay?.srcId,
+      connOverlay?.hoverId,
+      pickConnectMode?.sourceNodeId,
+      pickConnectMode?.srcId,
+      pickConnectMode?.hoverNodeId,
+      pickConnectMode?.hoverId,
+    ].forEach((value2) => {
+      if (value2) output.add(value2);
     }),
     output
   );
@@ -175,13 +175,13 @@ export function hasRendererPriorityMediaWork({
   const run = (value5) =>
     hasResolvedPriorityMedia(value5) &&
     isNodeInsideViewportPadding(value5, viewport2, count3, count4, viewportPadding);
-  if (candidateNodeIds2 != null && typeof candidateNodeIds2[Symbol['iterator']] === 'function') {
+  if (candidateNodeIds2 != null && typeof candidateNodeIds2[Symbol.iterator] === 'function') {
     for (const value6 of candidateNodeIds2) {
       if (run(value3[value6])) return true;
     }
     return false;
   }
-  return Object['values'](value3)['some'](run);
+  return Object.values(value3).some(run);
 }
 export function shouldDeferInitialVideoMediaOnMount({
   node: node,
@@ -193,9 +193,9 @@ export function shouldDeferInitialVideoMediaOnMount({
   mountCandidateCount: mountCandidateCount = 0,
 } = {}) {
   if (!nodeId || !isNodeType(node, ['source-video', 'video', 'ai-video'])) return false;
-  if (isSelected || isSelectionRelated || dragTargets?.['has']?.(nodeId)) return false;
+  if (isSelected || isSelectionRelated || dragTargets?.has?.(nodeId)) return false;
   return (
-    Number(nodeCount || 0) >= RENDERER_VIRTUALIZATION_CONFIG['veryDenseNodeCount'] ||
+    Number(nodeCount || 0) >= RENDERER_VIRTUALIZATION_CONFIG.veryDenseNodeCount ||
     Number(mountCandidateCount || 0) >= 12
   );
 }

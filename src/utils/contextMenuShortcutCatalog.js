@@ -1,9 +1,9 @@
 import { SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED } from '../config/productFeatures.js';
 
 const createShortcut = (label, group, { hidden: hidden = false, disabled: disabled = false } = {}) =>
-    Object['freeze']({
+    Object.freeze({
       label: label,
-      keys: Object['freeze']([]),
+      keys: Object.freeze([]),
       group: group,
       contextMenuOnly: true,
       ...(hidden ? { hidden: true } : {}),
@@ -20,7 +20,7 @@ const createShortcut = (label, group, { hidden: hidden = false, disabled: disabl
       disabled: !SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED,
     });
 
-export const CONTEXT_MENU_SHORTCUTS = Object['freeze']({
+export const CONTEXT_MENU_SHORTCUTS = Object.freeze({
   'context-canvas-open-add-node-menu': createShortcut('画布：添加节点', CANVAS_GROUP),
   'context-canvas-open-node-section-generation': createShortcut('画布：打开生成节点分类', CANVAS_GROUP),
   'context-canvas-open-node-section-source': createShortcut('画布：打开源节点分类', CANVAS_GROUP),
@@ -146,8 +146,8 @@ export const CONTEXT_MENU_SHORTCUTS = Object['freeze']({
   'context-web-text-to-video-generate': createShortcut('网页预览：文本生成视频', WEB_GROUP),
 });
 
-export const CONTEXT_MENU_SHORTCUT_IDS = Object['freeze'](Object['keys'](CONTEXT_MENU_SHORTCUTS));
+export const CONTEXT_MENU_SHORTCUT_IDS = Object.freeze(Object.keys(CONTEXT_MENU_SHORTCUTS));
 
 export function isContextMenuShortcut(item) {
-  return Object['prototype']['hasOwnProperty']['call'](CONTEXT_MENU_SHORTCUTS, String(item || ''));
+  return Object.prototype.hasOwnProperty.call(CONTEXT_MENU_SHORTCUTS, String(item || ''));
 }

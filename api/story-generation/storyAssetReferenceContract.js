@@ -1,18 +1,18 @@
 import { normalizeStoryAssetReference } from './storyAssetExtractionResult.js';
 export function resolveStoryGenerationAssetRef(options = {}, value = 0) {
   return normalizeStoryAssetReference(
-    options['ref'] || options['planningRef'] || options['id'],
+    options.ref || options.planningRef || options.id,
     'asset-' + (value + 1),
   );
 }
 export function resolveStoryGenerationAppearanceRef(item) {
-  return normalizeStoryAssetReference(item?.['planningRef'] || item?.['ref'] || item?.['id'], '');
+  return normalizeStoryAssetReference(item?.planningRef || item?.ref || item?.id, '');
 }
 export function normalizeStoryGenerationAssetReferences(list = []) {
-  return (Array['isArray'](list) ? list : [])['map']((args, key) => ({
+  return (Array.isArray(list) ? list : []).map((args, key) => ({
     ...args,
     ref: resolveStoryGenerationAssetRef(args, key),
-    appearances: (Array['isArray'](args['appearances']) ? args['appearances'] : [])['map']((args2) => ({
+    appearances: (Array.isArray(args.appearances) ? args.appearances : []).map((args2) => ({
       ...args2,
       ref: resolveStoryGenerationAppearanceRef(args2),
     })),
@@ -24,10 +24,10 @@ export const STORY_ASSET_REFERENCE_RULES = [
   '某资产有可用形象时，按当前剧情从给出的 appearances 中选择；保留已有有效引用，不根据出现时段猜测或新增形象 ID。',
 ];
 export function buildStoryAssetReferenceContract(list2 = []) {
-  return list2['map']((allowedAppearanceRefs) => ({
-    assetRef: String(allowedAppearanceRefs['ref'] || ''),
-    allowedAppearanceRefs: allowedAppearanceRefs['appearances']?.['length']
-      ? allowedAppearanceRefs['appearances']['map']((index) => String(index['ref'] || ''))
+  return list2.map((allowedAppearanceRefs) => ({
+    assetRef: String(allowedAppearanceRefs.ref || ''),
+    allowedAppearanceRefs: allowedAppearanceRefs.appearances?.length
+      ? allowedAppearanceRefs.appearances.map((index) => String(index.ref || ''))
       : [''],
   }));
 }

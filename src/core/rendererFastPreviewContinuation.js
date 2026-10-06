@@ -1,55 +1,55 @@
 function nowContinuationProbeMs() {
-  return typeof globalThis['performance']?.['now'] === 'function'
-    ? globalThis['performance']['now']()
-    : Date['now']();
+  return typeof globalThis.performance?.now === 'function'
+    ? globalThis.performance.now()
+    : Date.now();
 }
 function recordFastPreviewContinuationEvent(type, args = {}) {
-  globalThis['window']?.['__runtimeCompareRecordFastPreviewContinuation']?.({
+  globalThis.window?.__runtimeCompareRecordFastPreviewContinuation?.({
     type: type,
     ...args,
   });
 }
 function buildContinuationProbeContext(deferFullSync2 = {}) {
   return {
-    deferFullSync: deferFullSync2['deferFullSync'] === true,
-    hasPendingStructuralOps: deferFullSync2['hasPendingStructuralOps'] === true,
+    deferFullSync: deferFullSync2.deferFullSync === true,
+    hasPendingStructuralOps: deferFullSync2.hasPendingStructuralOps === true,
   };
 }
 function buildNodeIdSetKey(enabled) {
-  if (!enabled || typeof enabled[Symbol['iterator']] !== 'function') return '';
-  return Array['from'](enabled, (value) => String(value || ''))['join']('\x1f');
+  if (!enabled || typeof enabled[Symbol.iterator] !== 'function') return '';
+  return Array.from(enabled, (value) => String(value || '')).join('\x1f');
 }
 function buildContinuationKey(item, key = {}) {
-  const box = key['viewport'] || {},
-    index = key['connOverlay'] || {},
-    result = key['dragContext'] || {},
+  const box = key.viewport || {},
+    index = key.connOverlay || {},
+    result = key.dragContext || {},
     data =
-      key['keepMountedMediaPreview'] === true ? key['nonMediaLifecycleRevision'] : key['lifecycleRevision'],
-    options = Array['isArray'](index['invalidNodeIds']) ? index['invalidNodeIds']['join']('\x1f') : '';
+      key.keepMountedMediaPreview === true ? key.nonMediaLifecycleRevision : key.lifecycleRevision,
+    options = Array.isArray(index.invalidNodeIds) ? index.invalidNodeIds.join('\x1f') : '';
   return [
     item,
-    box['x'],
-    box['y'],
-    box['zoom'],
-    key['viewportBusy'] === true ? 1 : 0,
-    key['suppressNewMedia'] === true ? 1 : 0,
-    key['deferVisibleMediaSrc'] === true ? 1 : 0,
-    key['suspendNewMediaSrc'] === true ? 1 : 0,
-    key['keepMountedMediaPreview'] === true ? 1 : 0,
-    buildNodeIdSetKey(key['fullEligibleVisibleImageNodeIds']),
-    buildNodeIdSetKey(key['fullEligiblePreviewImageNodeIds']),
-    key['mediaSourceOwnerIds'] == null
+    box.x,
+    box.y,
+    box.zoom,
+    key.viewportBusy === true ? 1 : 0,
+    key.suppressNewMedia === true ? 1 : 0,
+    key.deferVisibleMediaSrc === true ? 1 : 0,
+    key.suspendNewMediaSrc === true ? 1 : 0,
+    key.keepMountedMediaPreview === true ? 1 : 0,
+    buildNodeIdSetKey(key.fullEligibleVisibleImageNodeIds),
+    buildNodeIdSetKey(key.fullEligiblePreviewImageNodeIds),
+    key.mediaSourceOwnerIds == null
       ? 'legacy-media-source-owners'
-      : buildNodeIdSetKey(key['mediaSourceOwnerIds']),
-    key['requiredImmediateMediaSourceOwnerIds'] == null
+      : buildNodeIdSetKey(key.mediaSourceOwnerIds),
+    key.requiredImmediateMediaSourceOwnerIds == null
       ? 'legacy-required-media-source-owners'
-      : buildNodeIdSetKey(key['requiredImmediateMediaSourceOwnerIds']),
+      : buildNodeIdSetKey(key.requiredImmediateMediaSourceOwnerIds),
     Number(data) || 0,
-    index['side'] || '',
+    index.side || '',
     options,
-    result['isCommittingDrag'] === true ? 1 : 0,
-    result['hasMoved'] === true ? 1 : 0,
-  ]['join']('|');
+    result.isCommittingDrag === true ? 1 : 0,
+    result.hasMoved === true ? 1 : 0,
+  ].join('|');
 }
 function requestContinuationFrame(target) {
   if (typeof requestAnimationFrame === 'function') return { kind: 'raf', id: requestAnimationFrame(target) };
@@ -57,11 +57,11 @@ function requestContinuationFrame(target) {
 }
 function cancelContinuationFrame(enabled2) {
   if (!enabled2) return;
-  if (enabled2['kind'] === 'raf' && typeof cancelAnimationFrame === 'function') {
-    cancelAnimationFrame(enabled2['id']);
+  if (enabled2.kind === 'raf' && typeof cancelAnimationFrame === 'function') {
+    cancelAnimationFrame(enabled2.id);
     return;
   }
-  if (enabled2['kind'] === 'timer') clearTimeout(enabled2['id']);
+  if (enabled2.kind === 'timer') clearTimeout(enabled2.id);
 }
 export function createRendererFastPreviewLifecycleTracker() {
   let lifecycleRevision2 = 0,
@@ -69,10 +69,10 @@ export function createRendererFastPreviewLifecycleTracker() {
   return {
     record(source) {
       lifecycleRevision2 += 1;
-      const list = String(source || '')['toLowerCase']();
-      !list['includes']('image') &&
-        !list['includes']('video') &&
-        !list['includes']('media-clip') &&
+      const list = String(source || '').toLowerCase();
+      !list.includes('image') &&
+        !list.includes('video') &&
+        !list.includes('media-clip') &&
         (nonMediaLifecycleRevision2 += 1);
     },
     reset() {
@@ -90,7 +90,7 @@ export function shouldDeferRendererFastPreviewSync({
   hasExistingPreviewSurface: hasExistingPreviewSurface = false,
   dragContext: dragContext = null,
 } = {}) {
-  if (dragContext?.['isDragging'] === true) return false;
+  if (dragContext?.isDragging === true) return false;
   if (hasExistingPreviewSurface !== true) return false;
   return (
     mountedHeavyMediaThisFrame === true ||
@@ -151,26 +151,26 @@ export function syncRendererFastPreviewAfterNodeRender({
       lifecycleRevision: lifecycleRevision,
       nonMediaLifecycleRevision: nonMediaLifecycleRevision,
       keepMountedMediaPreview:
-        nodeCount >= 48 && (viewportBusy || Number(viewport?.['zoom'] || 1) <= 0.45),
+        nodeCount >= 48 && (viewportBusy || Number(viewport?.zoom || 1) <= 0.45),
     },
     deferFullSync3 =
       shouldDeferRendererFastPreviewSync({
         mountedHeavyMediaThisFrame: mountedHeavyMediaThisFrame,
         updatedHeavyMediaThisFrame: updatedHeavyMediaThisFrame,
         hasPendingStructuralVideoMounts: hasPendingStructuralVideoMounts,
-        hasExistingPreviewSurface: layer?.['getStats']?.()['fastPreviewCount'] > 0,
+        hasExistingPreviewSurface: layer?.getStats?.().fastPreviewCount > 0,
         dragContext: dragContext2,
       }) &&
       !(
         requiredImmediateMediaSourceOwnerIds != null &&
-        typeof requiredImmediateMediaSourceOwnerIds?.[Symbol['iterator']] === 'function' &&
-        Array['from'](requiredImmediateMediaSourceOwnerIds)['some'](
-          (next) => layer?.['isNodePreviewReady']?.(next) !== true,
+        typeof requiredImmediateMediaSourceOwnerIds?.[Symbol.iterator] === 'function' &&
+        Array.from(requiredImmediateMediaSourceOwnerIds).some(
+          (next) => layer?.isNodePreviewReady?.(next) !== true,
         )
       );
   return (
-    layer?.['prune']?.(previewCandidateIds),
-    continuation?.['syncIfNeeded']({
+    layer?.prune?.(previewCandidateIds),
+    continuation?.syncIfNeeded({
       canvasEl: canvasEl,
       nodes: nodes,
       previewCandidateIds: previewCandidateIds,
@@ -289,7 +289,7 @@ export function createRendererFastPreviewContinuationController({
       sync?.(canvasEl2, nodes3, previewCandidateIds2, selectedNodeSet2, options4);
     } finally {
       recordFastPreviewContinuationEvent('full-sync-run', {
-        durationMs: Math['max'](0, nowContinuationProbeMs() - nowContinuationProbeMs2),
+        durationMs: Math.max(0, nowContinuationProbeMs() - nowContinuationProbeMs2),
         hasPendingStructuralOps: hasPendingStructuralOps3 === true,
       });
     }
@@ -299,15 +299,15 @@ export function createRendererFastPreviewContinuationController({
     if (!args2) return;
     const map = new Set(payload),
       previewCandidateIds3 = (args4) =>
-        args4 == null ? args4 : new Set([...args4]['filter']((handle) => !map['has'](handle)));
+        args4 == null ? args4 : new Set([...args4].filter((handle) => !map.has(handle)));
     args2 = {
       ...args2,
-      previewCandidateIds: previewCandidateIds3(args2['previewCandidateIds']),
+      previewCandidateIds: previewCandidateIds3(args2.previewCandidateIds),
       options: {
-        ...args2['options'],
-        mediaSourceOwnerIds: previewCandidateIds3(args2['options']?.['mediaSourceOwnerIds']),
+        ...args2.options,
+        mediaSourceOwnerIds: previewCandidateIds3(args2.options?.mediaSourceOwnerIds),
         requiredImmediateMediaSourceOwnerIds: previewCandidateIds3(
-          args2['options']?.['requiredImmediateMediaSourceOwnerIds'],
+          args2.options?.requiredImmediateMediaSourceOwnerIds,
         ),
       },
     };

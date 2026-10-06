@@ -1,5 +1,5 @@
 export function resolveWorkspaceLibraryContextSelection(value, item, list = []) {
-  return item && list['includes'](value) ? [...list] : [value];
+  return item && list.includes(value) ? [...list] : [value];
 }
 export function createWorkspaceAssetLibraryContextMenuItems({
   selectedCount: selectedCount = 0,

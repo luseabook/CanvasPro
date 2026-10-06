@@ -81,6 +81,6 @@ export function formatPrice(count, item = 'USD') {
   return (
     '' +
     key +
-    Number(count)['toLocaleString']('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })
+    Number(count).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 6 })
   );
 }

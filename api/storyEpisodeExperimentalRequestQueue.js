@@ -4,15 +4,15 @@ const pendingRequests = [];
 function drainStoryEpisodeExperimentalRequestQueue() {
   while (
     activeRequestCount < STORY_EPISODE_EXPERIMENTAL_REQUEST_CONCURRENCY_LIMIT &&
-    pendingRequests['length']
+    pendingRequests.length
   ) {
-    const promise = pendingRequests['shift']();
+    const promise = pendingRequests.shift();
     ((activeRequestCount += 1),
       void (async () => {
         try {
-          promise['resolve'](await promise['operation']());
+          promise.resolve(await promise.operation());
         } catch (value) {
-          promise['reject'](value);
+          promise.reject(value);
         } finally {
           ((activeRequestCount -= 1), drainStoryEpisodeExperimentalRequestQueue());
         }
@@ -21,9 +21,9 @@ function drainStoryEpisodeExperimentalRequestQueue() {
 }
 export function enqueueStoryEpisodeExperimentalRequest(operation) {
   if (typeof operation !== 'function')
-    return Promise['reject'](new TypeError('实验分集请求队列需要可执行的请求函数。'));
+    return Promise.reject(new TypeError('实验分集请求队列需要可执行的请求函数。'));
   return new Promise((resolve, reject) => {
-    (pendingRequests['push']({
+    (pendingRequests.push({
       operation: operation,
       resolve: resolve,
       reject: reject,

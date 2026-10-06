@@ -23,31 +23,31 @@ export function createAgentAssistantConversationRuntime({
   handleUserMessage: handleUserMessage,
 } = {}) {
   let value = null;
-  const run = () => sessionStore['getHistory']?.() || [],
+  const run = () => sessionStore.getHistory?.() || [],
     getPendingChoice = () => getAgentPendingAssistantChoice(run()),
-    conversationId = () => String(sessionStore['getActiveConversation']?.()?.['id'] || ''),
-    handler = (item) => sessionStore['emitAssistantStream']?.(item),
+    conversationId = () => String(sessionStore.getActiveConversation?.()?.id || ''),
+    handler = (item) => sessionStore.emitAssistantStream?.(item),
     handler2 = () => ({ ...createStoppedReply(), assistantHandled: true, stale: true }),
     handler3 = (notice) =>
-      createFailedReply(notice?.['message'] || String(notice), {
+      createFailedReply(notice?.message || String(notice), {
         assistantHandled: true,
-        notice: notice?.['message'] || String(notice),
+        notice: notice?.message || String(notice),
         responseChannel: 'assistant.message',
         ...(getPendingChoice() || {}),
       }),
     history = (key) =>
-      conversationId() === key['conversationId'] &&
-      sessionStore['getCurrentRun']?.()?.['id'] === key['runId'],
-    handler4 = (index) => sessionStore['isConversationLoaded']?.(index['conversationId']) ?? history(index),
+      conversationId() === key.conversationId &&
+      sessionStore.getCurrentRun?.()?.id === key.runId,
+    handler4 = (index) => sessionStore.isConversationLoaded?.(index.conversationId) ?? history(index),
     handler5 = (result) => {
       const agentEditableTurn = getAgentEditableTurn(run());
       if (
         value ||
-        sessionStore['getPendingPlan']?.() ||
-        sessionStore['getPendingLoopRun']?.() ||
-        sessionStore['getPendingClarification']?.() ||
+        sessionStore.getPendingPlan?.() ||
+        sessionStore.getPendingLoopRun?.() ||
+        sessionStore.getPendingClarification?.() ||
         !agentEditableTurn ||
-        agentEditableTurn['itemId'] !== result
+        agentEditableTurn.itemId !== result
       )
         return null;
       return agentEditableTurn;
@@ -57,21 +57,21 @@ export function createAgentAssistantConversationRuntime({
     let data = null;
     try {
       if (args && history(content)) {
-        if (content['revision']) {
+        if (content.revision) {
           const list = run(),
             args2 = getAgentEditableTurn(list);
-          if (args2?.['itemId'] !== content['revision']['itemId'])
+          if (args2?.itemId !== content.revision.itemId)
             throw new Error('对话内容已变化，请重新发送消息');
-          const replyVersions = appendAgentReplyVersion(args2, content['message'], args);
-          sessionStore['replaceConversationMessages'](
+          const replyVersions = appendAgentReplyVersion(args2, content.message, args);
+          sessionStore.replaceConversationMessages(
             [
-              ...list['slice'](0, -2),
-              { ...args2['user'], content: content['message'] },
-              { ...args2['assistant'], ...args, replyVersions: replyVersions },
+              ...list.slice(0, -2),
+              { ...args2.user, content: content.message },
+              { ...args2.assistant, ...args, replyVersions: replyVersions },
             ],
-            { conversationId: content['conversationId'] },
+            { conversationId: content.conversationId },
           );
-        } else sessionStore['pushHistory']?.(args);
+        } else sessionStore.pushHistory?.(args);
       }
     } catch (options) {
       data = options;
@@ -80,7 +80,7 @@ export function createAgentAssistantConversationRuntime({
       (value = null),
       handler({
         type: 'end',
-        runId: content['runId'],
+        runId: content.runId,
         history: history(content) ? run() : null,
         discard: !args || Boolean(data),
       }),
@@ -92,12 +92,12 @@ export function createAgentAssistantConversationRuntime({
     if (!content2) return false;
     const error = run2(
       content2,
-      history(content2) && (content2['prose'] || !content2['revision'])
+      history(content2) && (content2.prose || !content2.revision)
         ? {
             role: 'assistant',
             status: 'stopped',
-            content: content2['prose'] || text('runStopped'),
-            assistantContext: { skillIds: content2['skillIds'] },
+            content: content2.prose || text('runStopped'),
+            assistantContext: { skillIds: content2.skillIds },
           }
         : null,
     );
@@ -109,19 +109,19 @@ export function createAgentAssistantConversationRuntime({
     revise({ itemId: itemId, message: message } = {}) {
       const revision = handler5(itemId);
       if (!revision) return createFailedReply(text('noPendingClarification'));
-      if (revision['assistant']['replyVersions']?.['versions']['length'] >= AGENT_REPLY_VERSION_LIMIT)
+      if (revision.assistant.replyVersions?.versions.length >= AGENT_REPLY_VERSION_LIMIT)
         return createFailedReply(agentConversationActionText('limit'));
-      const content3 = String(message ?? revision['user']['content'])['trim']();
+      const content3 = String(message ?? revision.user.content).trim();
       if (!content3) return createFailedReply(text('emptyMessage'));
-      const history2 = [...run()['slice'](0, -2), { ...revision['user'], content: content3 }];
-      return this['handle'](
+      const history2 = [...run().slice(0, -2), { ...revision.user, content: content3 }];
+      return this.handle(
         content3,
         {
           revision: revision,
           history: history2,
           conversationHistory: history2,
           assistantChoice: true,
-          selectedSkillIds: revision['assistant']['assistantContext']['skillIds'] || [],
+          selectedSkillIds: revision.assistant.assistantContext.skillIds || [],
         },
         startRun(),
       );
@@ -132,7 +132,7 @@ export function createAgentAssistantConversationRuntime({
       try {
         if (
           !agentReplyVersion ||
-          !sessionStore['replaceConversationMessages'](agentReplyVersion, {
+          !sessionStore.replaceConversationMessages(agentReplyVersion, {
             conversationId: conversationId(),
           })
         )
@@ -144,10 +144,10 @@ export function createAgentAssistantConversationRuntime({
     },
     answerChoice(source, { questionId: questionId } = {}) {
       const next = getPendingChoice(),
-        enabled = next?.['options']['find']((current) => current['id'] === source);
-      if (!enabled || next['questionId'] !== questionId)
+        enabled = next?.options.find((current) => current.id === source);
+      if (!enabled || next.questionId !== questionId)
         return createFailedReply(text('noPendingClarification'));
-      return handleUserMessage(enabled['label'], { assistantChoice: true });
+      return handleUserMessage(enabled.label, { assistantChoice: true });
     },
     async handle(message2, revision2, runId) {
       const signal = getSignal(),
@@ -155,54 +155,54 @@ export function createAgentAssistantConversationRuntime({
           runId: runId,
           conversationId: conversationId(),
           message: message2,
-          revision: revision2['revision'],
+          revision: revision2.revision,
           prose: '',
-          skillIds: revision2['selectedSkillIds'] || [],
+          skillIds: revision2.selectedSkillIds || [],
         };
-      ((value = text2), handler({ type: 'start', runId: runId, revision: Boolean(text2['revision']) }));
+      ((value = text2), handler({ type: 'start', runId: runId, revision: Boolean(text2.revision) }));
       try {
         const externalInformation = await prepareExternalInformation({
           message: message2,
-          documentFiles: revision2['documentFiles'],
+          documentFiles: revision2.documentFiles,
           signal: signal,
         });
-        if (value !== text2 || !isActiveRun(runId) || signal?.['aborted'] || !history(text2))
+        if (value !== text2 || !isActiveRun(runId) || signal?.aborted || !history(text2))
           return handler2();
         const skillIds = await replyFromMessage(message2, {
           ...revision2,
           externalInformation: externalInformation,
           signal: signal,
           onSkillsSelected: (list2) => {
-            text2['skillIds'] = list2['map']((entry) => entry['id']);
+            text2.skillIds = list2.map((entry) => entry.id);
           },
           onText: (record) => {
-            if (value !== text2 || !isActiveRun(runId) || signal?.['aborted'] || !handler4(text2)) return;
-            ((text2['prose'] = getAgentStreamingProse(record)),
-              handler({ type: 'text', runId: runId, text: text2['prose'] }));
+            if (value !== text2 || !isActiveRun(runId) || signal?.aborted || !handler4(text2)) return;
+            ((text2.prose = getAgentStreamingProse(record)),
+              handler({ type: 'text', runId: runId, text: text2.prose }));
           },
         });
-        if (value !== text2 || !isActiveRun(runId) || signal?.['aborted'] || !history(text2))
+        if (value !== text2 || !isActiveRun(runId) || signal?.aborted || !history(text2))
           return handler2();
         const content4 = normalizeAgentAssistantReply(skillIds);
-        if (!content4['reply']) throw new Error(text('plannerFailed'));
+        if (!content4.reply) throw new Error(text('plannerFailed'));
         const payload = run2(text2, {
           role: 'assistant',
           status: 'chat',
-          content: content4['reply'],
+          content: content4.reply,
           assistantContext: {
-            skillIds: skillIds['selectedSkillIds'] || [],
-            ...(content4['options']
-              ? { choice: { question: content4['question'], options: content4['options'] } }
+            skillIds: skillIds.selectedSkillIds || [],
+            ...(content4.options
+              ? { choice: { question: content4.question, options: content4.options } }
               : {}),
           },
         });
         if (payload)
           return (
-            sessionStore['setCurrentRun']?.({ id: runId, status: 'failed', stopped: false }),
+            sessionStore.setCurrentRun?.({ id: runId, status: 'failed', stopped: false }),
             handler3(payload)
           );
         return (
-          sessionStore['setCurrentRun']?.({ id: runId, status: 'chat', stopped: false }),
+          sessionStore.setCurrentRun?.({ id: runId, status: 'chat', stopped: false }),
           {
             ok: true,
             ...content4,
@@ -212,22 +212,22 @@ export function createAgentAssistantConversationRuntime({
           }
         );
       } catch (error2) {
-        if (value !== text2 || !isActiveRun(runId) || signal?.['aborted'] || !history(text2))
+        if (value !== text2 || !isActiveRun(runId) || signal?.aborted || !history(text2))
           return handler2();
-        const state = error2?.['message'] || text('plannerFailed'),
+        const state = error2?.message || text('plannerFailed'),
           config = run2(
             text2,
-            text2['prose'] || !text2['revision']
+            text2.prose || !text2.revision
               ? {
                   role: 'assistant',
                   status: 'failed',
-                  content: text2['prose'] || state,
-                  assistantContext: { skillIds: text2['skillIds'] },
+                  content: text2.prose || state,
+                  assistantContext: { skillIds: text2.skillIds },
                 }
               : null,
           );
         return (
-          sessionStore['setCurrentRun']?.({ id: runId, status: 'failed', stopped: false }),
+          sessionStore.setCurrentRun?.({ id: runId, status: 'failed', stopped: false }),
           handler3(config || state)
         );
       }

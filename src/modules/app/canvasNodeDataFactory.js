@@ -96,11 +96,11 @@ export function buildAppCanvasNodeData({
     ...extra,
   };
   (type === 'ai-image' || type === 'ai-video') &&
-    !Object['prototype']['hasOwnProperty']['call'](box, 'aspectRatio') &&
-    (box['aspectRatio'] = '自适应');
+    !Object.prototype.hasOwnProperty.call(box, 'aspectRatio') &&
+    (box.aspectRatio = '自适应');
   if (type === 'ai-image' || type === 'ai-video') {
     const box2 = getAIGenerationNodeSize(width, height);
-    ((box['width'] = box2['width']), (box['height'] = box2['height']));
+    ((box.width = box2.width), (box.height = box2.height));
   }
   if (type === 'source-image' || type === 'source-video') return buildSourceMediaNodePayload(box);
   return box;

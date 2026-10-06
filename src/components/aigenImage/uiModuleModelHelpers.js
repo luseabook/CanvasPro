@@ -1167,52 +1167,52 @@ const OPENAI_CLI_LOGO_ICON_HTML = renderOpenAiLogoHtml('node-menu-icon');
 const COMFYUI_CLOUD_WORKFLOW_ICON_HTML = renderComfyUiCloudWorkflowLogoHtml({ className: 'node-menu-icon' });
 const COMFYUI_LOCAL_WORKFLOW_ICON_HTML = renderComfyUiLocalWorkflowLogoHtml({ className: 'node-menu-icon' });
 
-const IMAGE_SIZE_ORDER = Object['freeze'](['1K', '2K', '3K', '4K']);
+const IMAGE_SIZE_ORDER = Object.freeze(['1K', '2K', '3K', '4K']);
 
 function normalizeImageSizeToken(value116) {
   return String(value116 || '')
-    ['trim']()
-    ['toUpperCase']();
+    .trim()
+    .toUpperCase();
 }
 
 function pickSupportedImageSize(value117, value118) {
-  const list14 = (Array['isArray'](value118?.['options']) ? value118['options'] : [])
-      ['map']((value119) => normalizeImageSizeToken(value119?.['value'] ?? value119))
-      ['filter'](Boolean),
+  const list14 = (Array.isArray(value118?.options) ? value118.options : [])
+      .map((value119) => normalizeImageSizeToken(value119?.value ?? value119))
+      .filter(Boolean),
     imageSizeToken = normalizeImageSizeToken(value117);
-  if (!list14['length'] || !imageSizeToken || list14['includes'](imageSizeToken)) return '';
-  const count = IMAGE_SIZE_ORDER['indexOf'](imageSizeToken),
-    value120 = list14['map']((value121) => ({ value: value121, rank: IMAGE_SIZE_ORDER['indexOf'](value121) }))
-      ['filter']((value122) => value122['rank'] >= 0)
-      ['sort']((value123, value124) => value123['rank'] - value124['rank']);
-  if (count >= 0 && value120['length'] > 0) {
-    const el12 = value120['filter']((value125) => value125['rank'] <= count)['at'](-1);
-    return el12?.['value'] || value120[0]['value'];
+  if (!list14.length || !imageSizeToken || list14.includes(imageSizeToken)) return '';
+  const count = IMAGE_SIZE_ORDER.indexOf(imageSizeToken),
+    value120 = list14.map((value121) => ({ value: value121, rank: IMAGE_SIZE_ORDER.indexOf(value121) }))
+      .filter((value122) => value122.rank >= 0)
+      .sort((value123, value124) => value123.rank - value124.rank);
+  if (count >= 0 && value120.length > 0) {
+    const el12 = value120.filter((value125) => value125.rank <= count).at(-1);
+    return el12?.value || value120[0].value;
   }
-  const imageSizeToken2 = normalizeImageSizeToken(value118?.['defaultValue']);
-  return list14['includes'](imageSizeToken2) ? imageSizeToken2 : list14[0];
+  const imageSizeToken2 = normalizeImageSizeToken(value118?.defaultValue);
+  return list14.includes(imageSizeToken2) ? imageSizeToken2 : list14[0];
 }
 
 const BINGHUO_BADGE_ICON_HTML = '<div class="node-menu-icon node-menu-icon-badge">BH</div>';
 
 function isSavedRhAiAppManifest(value126) {
-  return Boolean(String(value126?.['extensions']?.['rhAiApp']?.['appKey'] || '')['trim']());
+  return Boolean(String(value126?.extensions?.rhAiApp?.appKey || '').trim());
 }
 
 function isSavedComfyUiWorkflowManifest(value127) {
-  return Boolean(String(value127?.['extensions']?.['comfyUiWorkflow']?.['appKey'] || '')['trim']());
+  return Boolean(String(value127?.extensions?.comfyUiWorkflow?.appKey || '').trim());
 }
 
 function getCustomProviderMeta(value128) {
-  const value129 = value128?.['extensions']?.['customProvider'];
+  const value129 = value128?.extensions?.customProvider;
   return value129 && typeof value129 === 'object' ? value129 : null;
 }
 
 function getCustomProviderBadgeText(value130, value131 = {}) {
   return (
-    String(getCustomProviderMeta(value130)?.['badge'] || value131['badge'] || 'CP')
-      ['trim']()
-      ['slice'](0, 2) || 'CP'
+    String(getCustomProviderMeta(value130)?.badge || value131.badge || 'CP')
+      .trim()
+      .slice(0, 2) || 'CP'
   );
 }
 
@@ -1220,41 +1220,41 @@ function getCustomProviderImageGroups(value132 = '') {
   const enabled10 = new Map();
   return (
     getModelsByKind('image')
-      ['filter'](isModelManifestPubliclyListed)
-      ['forEach']((value133) => {
+      .filter(isModelManifestPubliclyListed)
+      .forEach((value133) => {
         const imageMenuMeta3 = getImageMenuMeta(value133),
           customProviderMeta = getCustomProviderMeta(value133),
-          enabled11 = String(imageMenuMeta3?.['group'] || value133?.['provider'] || '')['trim']();
+          enabled11 = String(imageMenuMeta3?.group || value133?.provider || '').trim();
         if (!imageMenuMeta3 || !customProviderMeta || !enabled11) return;
-        (!enabled10['has'](enabled11) &&
-          enabled10['set'](enabled11, {
+        (!enabled10.has(enabled11) &&
+          enabled10.set(enabled11, {
             providerId: enabled11,
-            displayName: customProviderMeta['displayName'] || enabled11,
-            subtitle: imageMenuMeta3['subtitle'] || '自定义中转站',
-            badge: customProviderMeta['badge'] || imageMenuMeta3['badge'] || 'CP',
+            displayName: customProviderMeta.displayName || enabled11,
+            subtitle: imageMenuMeta3.subtitle || '自定义中转站',
+            badge: customProviderMeta.badge || imageMenuMeta3.badge || 'CP',
             items: [],
           }),
-          enabled10['get'](enabled11)['items']['push'](value133));
+          enabled10.get(enabled11).items.push(value133));
       }),
-    Array['from'](enabled10['values']())['map']((value134) => {
-      const value135 = value134['providerId']['replace'](/[^A-Za-z0-9_-]/g, '-');
+    Array.from(enabled10.values()).map((value134) => {
+      const value135 = value134.providerId.replace(/[^A-Za-z0-9_-]/g, '-');
       return renderImageMenuGroupHTML({
         headerClass: 'custom-provider-image-group-header custom-provider-image-group-' + value135,
         toggleAttr: 'data-custom-provider-image-toggle',
         submenuClass: 'custom-provider-image-submenu-' + value135,
         iconHtml:
-          '<div class="node-menu-icon node-menu-icon-badge">' + escapeHtmlAttr(value134['badge']) + '</div>',
-        title: value134['displayName'],
-        subtitle: value134['subtitle'],
-        attrs: { 'data-custom-provider-image-group': value134['providerId'] },
-        itemsHtml: value134['items']
-          ['sort'](
+          '<div class="node-menu-icon node-menu-icon-badge">' + escapeHtmlAttr(value134.badge) + '</div>',
+        title: value134.displayName,
+        subtitle: value134.subtitle,
+        attrs: { 'data-custom-provider-image-group': value134.providerId },
+        itemsHtml: value134.items
+          .sort(
             (value136, value137) =>
-              Number(getImageMenuMeta(value136)?.['order'] || 0) -
-              Number(getImageMenuMeta(value137)?.['order'] || 0),
+              Number(getImageMenuMeta(value136)?.order || 0) -
+              Number(getImageMenuMeta(value137)?.order || 0),
           )
-          ['map']((value138) => renderImageManifestMenuItemHTML(value138, value132))
-          ['join'](''),
+          .map((value138) => renderImageManifestMenuItemHTML(value138, value132))
+          .join(''),
       });
     })
   );
@@ -1262,8 +1262,8 @@ function getCustomProviderImageGroups(value132 = '') {
 
 export function buildBinghuoImageMenuGroupHTML(value139) {
   const imageModelMenuManifests = getImageModelMenuManifests('binghuo')
-    ['map']((value140) => renderImageManifestMenuItemHTML(value140, value139))
-    ['join']('');
+    .map((value140) => renderImageManifestMenuItemHTML(value140, value139))
+    .join('');
   if (!imageModelMenuManifests) return '';
   return renderImageMenuGroupHTML({
     headerClass: 'binghuo-image-group-header',
@@ -1278,8 +1278,8 @@ export function buildBinghuoImageMenuGroupHTML(value139) {
 
 function buildOfficialImageMenuGroupHTML(value141, value142, value143, value144, value145) {
   const imageModelMenuManifests2 = getImageModelMenuManifests(value142)
-    ['map']((value146) => renderImageManifestMenuItemHTML(value146, value141))
-    ['join']('');
+    .map((value146) => renderImageManifestMenuItemHTML(value146, value141))
+    .join('');
   return renderImageMenuGroupHTML({
     headerClass: value142 + '-group-header',
     toggleAttr: 'data-' + value142 + '-toggle',
@@ -1294,8 +1294,8 @@ function buildOfficialImageMenuGroupHTML(value141, value142, value143, value144,
 
 export function buildOpenAiCliImageMenuGroupHTML(value147) {
   const imageModelMenuManifests3 = getImageModelMenuManifests('openai-cli')
-    ['map']((value148) => renderImageManifestMenuItemHTML(value148, value147))
-    ['join']('');
+    .map((value148) => renderImageManifestMenuItemHTML(value148, value147))
+    .join('');
   if (!imageModelMenuManifests3) return '';
   return renderImageMenuGroupHTML({
     headerClass: 'openai-cli-image-group-header',
@@ -1310,8 +1310,8 @@ export function buildOpenAiCliImageMenuGroupHTML(value147) {
 
 export function buildRhAiAppImageMenuGroupHTML(value149) {
   const imageModelMenuManifests4 = getImageModelMenuManifests('rhAiApp')
-    ['map']((value150) => renderImageManifestMenuItemHTML(value150, value149))
-    ['join']('');
+    .map((value150) => renderImageManifestMenuItemHTML(value150, value149))
+    .join('');
   if (!imageModelMenuManifests4) return '';
   return renderImageMenuGroupHTML({
     headerClass: 'rh-ai-app-image-group-header',
@@ -1335,8 +1335,8 @@ function buildComfyUiWorkflowImageMenuGroupHTML({
   subtitle: subtitle2,
 } = {}) {
   const imageModelMenuManifests5 = getImageModelMenuManifests(group)
-    ['map']((value151) => renderImageManifestMenuItemHTML(value151, activeModel3))
-    ['join']('');
+    .map((value151) => renderImageManifestMenuItemHTML(value151, activeModel3))
+    .join('');
   if (!imageModelMenuManifests5) return '';
   return renderImageMenuGroupHTML({
     headerClass: headerClass2,
@@ -1376,12 +1376,12 @@ export function buildComfyUiLocalWorkflowImageMenuGroupHTML(value153) {
 }
 
 function createImageTriggerIconFromHTML(value154, value155) {
-  const el13 = value154?.['ownerDocument'] || (typeof document !== 'undefined' ? document : null),
-    enabled12 = el13?.['createElement']?.('template');
+  const el13 = value154?.ownerDocument || (typeof document !== 'undefined' ? document : null),
+    enabled12 = el13?.createElement?.('template');
   if (!enabled12) return null;
   return (
-    (enabled12['innerHTML'] = String(value155 || '')['trim']()),
-    enabled12['content']?.['firstElementChild'] || null
+    (enabled12.innerHTML = String(value155 || '').trim()),
+    enabled12.content?.firstElementChild || null
   );
 }
 
@@ -1395,17 +1395,15 @@ function setOpenAiCliImageModelTriggerIcon(value156) {
 }
 
 function getComfyUiWorkflowIconKind(value157 = '', value158 = null) {
-  const el14 = value158?.['querySelector']?.('.custom-ai-app-logo');
-  if (el14?.['classList']?.['contains']('custom-ai-app-logo--comfyui-cloud'))
+  const el14 = value158?.querySelector?.('.custom-ai-app-logo');
+  if (el14?.classList?.contains('custom-ai-app-logo--comfyui-cloud'))
     return 'comfyUiCloudWorkflowBadge';
-  if (el14?.['classList']?.['contains']('custom-ai-app-logo--comfyui-local'))
+  if (el14?.classList?.contains('custom-ai-app-logo--comfyui-local'))
     return 'comfyUiLocalWorkflowBadge';
   const value159 =
-      String(value157 || '')['trim']() ||
-      String(value158?.['dataset']?.['value'] || value158?.['getAttribute']?.('data-value') || '')['trim'](),
-    value160 = String(getModelManifest(value159)?.['extensions']?.['imageMenu']?.['iconKind'] || '')[
-      'trim'
-    ]();
+      String(value157 || '').trim() ||
+      String(value158?.dataset?.value || value158?.getAttribute?.('data-value') || '').trim(),
+    value160 = String(getModelManifest(value159)?.extensions?.imageMenu?.iconKind || '').trim();
   return value160;
 }
 
@@ -1427,17 +1425,17 @@ function setComfyUiWorkflowTriggerIcon(value162, value163 = null) {
 }
 
 function resolveImageTriggerManifest(value164 = '', value165 = '') {
-  const enabled13 = String(value164 || '')['trim']();
+  const enabled13 = String(value164 || '').trim();
   if (enabled13) {
     const modelManifest4 = getModelManifest(enabled13);
     if (modelManifest4) return modelManifest4;
   }
-  const enabled14 = String(value165 || '')['trim']();
+  const enabled14 = String(value165 || '').trim();
   if (!enabled13 && !enabled14) return null;
   try {
     return (
-      resolveModelExecution(enabled13, { providerHint: enabled14 })?.['modelManifest'] ||
-      resolveModelExecution(enabled13)?.['modelManifest'] ||
+      resolveModelExecution(enabled13, { providerHint: enabled14 })?.modelManifest ||
+      resolveModelExecution(enabled13)?.modelManifest ||
       null
     );
   } catch {
@@ -1457,19 +1455,19 @@ function renderCustomProviderTriggerBadgeHTML(value166, value167 = {}) {
 function setCustomProviderImageModelTriggerIcon(value168, value169, value170 = {}) {
   const imageTriggerIcon4 = createImageTriggerIcon(value168, 'div');
   if (!imageTriggerIcon4) return;
-  ((imageTriggerIcon4['className'] = 'image-model-trigger-icon image-model-trigger-badge'),
-    (imageTriggerIcon4['innerText'] = getCustomProviderBadgeText(value169, value170)),
+  ((imageTriggerIcon4.className = 'image-model-trigger-icon image-model-trigger-badge'),
+    (imageTriggerIcon4.innerText = getCustomProviderBadgeText(value169, value170)),
     replaceImageModelTriggerFirstIcon(value168, imageTriggerIcon4));
 }
 
 export function syncImageModelTriggerIcon(enabled15, enabled16 = {}) {
-  if (!enabled15 || !enabled16?.['model']) return;
+  if (!enabled15 || !enabled16?.model) return;
   const imageTriggerIconFromHTML3 = createImageTriggerIconFromHTML(
       enabled15,
-      renderImageModelTriggerIconHTML({ model: enabled16['model'], provider: enabled16['provider'] }),
+      renderImageModelTriggerIconHTML({ model: enabled16.model, provider: enabled16.provider }),
     ),
-    value171 = enabled15['firstElementChild'];
+    value171 = enabled15.firstElementChild;
   imageTriggerIconFromHTML3 &&
-    value171?.['outerHTML'] !== imageTriggerIconFromHTML3['outerHTML'] &&
-    value171?.['replaceWith']?.(imageTriggerIconFromHTML3);
+    value171?.outerHTML !== imageTriggerIconFromHTML3.outerHTML &&
+    value171?.replaceWith?.(imageTriggerIconFromHTML3);
 }

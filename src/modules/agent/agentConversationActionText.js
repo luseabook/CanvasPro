@@ -22,5 +22,5 @@ const copy = {
   },
 };
 export function agentConversationActionText(value, locale = getLocale()) {
-  return copy[String(locale)['startsWith']('en') ? 'en-US' : 'zh-CN'][value] || value;
+  return copy[String(locale).startsWith('en') ? 'en-US' : 'zh-CN'][value] || value;
 }

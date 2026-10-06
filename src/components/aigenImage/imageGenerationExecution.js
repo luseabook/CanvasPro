@@ -41,11 +41,11 @@ export function installImageGenerationExecution({
         ...dependencies,
       },
     }),
-    handler = registry['registerResolver']('ai-image', (value, item) => resolve['resolve'](value, item));
+    handler = registry.registerResolver('ai-image', (value, item) => resolve.resolve(value, item));
   return {
-    resolve: resolve['resolve'],
+    resolve: resolve.resolve,
     dispose() {
-      (handler(), resolve['dispose']());
+      (handler(), resolve.dispose());
     },
   };
 }

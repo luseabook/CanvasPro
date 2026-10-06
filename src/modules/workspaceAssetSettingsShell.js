@@ -1,10 +1,10 @@
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#039;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#039;');
 }
 export const WORKSPACE_ASSET_SPLIT_RATIO_MIN = 28;
 export const WORKSPACE_ASSET_SPLIT_RATIO_MAX = 72;
@@ -14,21 +14,21 @@ export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MAX = 0x44;
 export const WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT = 50;
 export function normalizeWorkspaceAssetSplitRatio(item) {
   const key = Number(item);
-  return Math['max'](
+  return Math.max(
     WORKSPACE_ASSET_SPLIT_RATIO_MIN,
-    Math['min'](
+    Math.min(
       WORKSPACE_ASSET_SPLIT_RATIO_MAX,
-      Number['isFinite'](key) ? key : WORKSPACE_ASSET_SPLIT_RATIO_DEFAULT,
+      Number.isFinite(key) ? key : WORKSPACE_ASSET_SPLIT_RATIO_DEFAULT,
     ),
   );
 }
 export function normalizeWorkspaceAssetDetailSplitRatio(index) {
   const result = Number(index);
-  return Math['max'](
+  return Math.max(
     WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MIN,
-    Math['min'](
+    Math.min(
       WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_MAX,
-      Number['isFinite'](result) ? result : WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT,
+      Number.isFinite(result) ? result : WORKSPACE_ASSET_DETAIL_SPLIT_RATIO_DEFAULT,
     ),
   );
 }
@@ -40,8 +40,8 @@ export function applyWorkspaceAssetSplitRatioToLayout(
 ) {
   const workspaceAssetSplitRatio = normalizeWorkspaceAssetSplitRatio(data);
   return (
-    el?.['style']?.['setProperty']?.(styleProperty, workspaceAssetSplitRatio + '%'),
-    el2?.['setAttribute']?.('aria-valuenow', String(Math['round'](workspaceAssetSplitRatio))),
+    el?.style?.setProperty?.(styleProperty, workspaceAssetSplitRatio + '%'),
+    el2?.setAttribute?.('aria-valuenow', String(Math.round(workspaceAssetSplitRatio))),
     workspaceAssetSplitRatio
   );
 }
@@ -53,8 +53,8 @@ export function applyWorkspaceAssetDetailSplitRatioToLayout(
 ) {
   const workspaceAssetDetailSplitRatio = normalizeWorkspaceAssetDetailSplitRatio(options);
   return (
-    el3?.['style']?.['setProperty']?.(styleProperty, workspaceAssetDetailSplitRatio + '%'),
-    el4?.['setAttribute']?.('aria-valuenow', String(Math['round'](workspaceAssetDetailSplitRatio))),
+    el3?.style?.setProperty?.(styleProperty, workspaceAssetDetailSplitRatio + '%'),
+    el4?.setAttribute?.('aria-valuenow', String(Math.round(workspaceAssetDetailSplitRatio))),
     workspaceAssetDetailSplitRatio
   );
 }
@@ -77,7 +77,7 @@ export function renderWorkspaceAssetSettingsShell({
   tabCount: tabCount = 1,
 } = {}) {
   const workspaceAssetSplitRatio2 = normalizeWorkspaceAssetSplitRatio(splitRatio),
-    target = Math['max'](1, Math['trunc'](Number(tabCount) || 1)),
+    target = Math.max(1, Math.trunc(Number(tabCount) || 1)),
     source =
       activeTab === 'library'
         ? 'story-asset-grid story-asset-grid--workspace-library'
@@ -129,7 +129,7 @@ export function renderWorkspaceAssetSettingsShell({
     '">\n            ' +
     (cardsHtml || '<div class="story-inline-empty">' + escapeHtml(emptyText) + '</div>') +
     '\n          </div>\n        </section>\n        <div class="story-assets-splitter panel-resize-handle panel-resize-handle--transient" data-story-assets-splitter data-workspace-assets-splitter role="separator" aria-orientation="vertical" aria-label="调整素材列表与详情区域宽度" aria-valuemin="28" aria-valuemax="72" aria-valuenow="' +
-    Math['round'](workspaceAssetSplitRatio2) +
+    Math.round(workspaceAssetSplitRatio2) +
     '" tabindex="0"></div>\n        ' +
     detailHtml +
     '\n      </div>\n      ' +

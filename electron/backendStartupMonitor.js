@@ -1,8 +1,8 @@
 function createBackendStartupError(message, code, { cause: cause = null, details: details = null } = {}) {
   const error = new Error(message);
-  error['code'] = code;
-  if (cause) error['cause'] = cause;
-  if (details) error['details'] = details;
+  error.code = code;
+  if (cause) error.cause = cause;
+  if (details) error.details = details;
   return error;
 }
 function safeNotify(notify, ...args) {
@@ -16,7 +16,7 @@ export function createBackendStartupMonitor({
   onExit: onExit = null,
   onClose: onClose = null,
 } = {}) {
-  if (!child || typeof child['once'] !== 'function')
+  if (!child || typeof child.once !== 'function')
     throw new TypeError('Backend child process is required');
   let ready = false,
     failureSettled = false,
@@ -29,15 +29,15 @@ export function createBackendStartupMonitor({
       return ((failureSettled = true), rejectFailure(error), true);
     };
   return (
-    child['once']('error', (error) => {
+    child.once('error', (error) => {
       const spawnError = createBackendStartupError(
-        'Failed to spawn local backend: ' + (error?.['message'] || error),
+        'Failed to spawn local backend: ' + (error?.message || error),
         'BACKEND_SPAWN_ERROR',
         { cause: error },
       );
       if (settleFailure(spawnError)) safeNotify(onError, error);
     }),
-    child['once']('exit', (exitCode, signal) => {
+    child.once('exit', (exitCode, signal) => {
       (safeNotify(onExit, exitCode, signal),
         settleFailure(
           createBackendStartupError(
@@ -51,7 +51,7 @@ export function createBackendStartupMonitor({
           ),
         ));
     }),
-    child['once']('close', (closeCode, closeSignal) => {
+    child.once('close', (closeCode, closeSignal) => {
       safeNotify(onClose, closeCode, closeSignal);
     }),
     {
@@ -77,7 +77,7 @@ export function launchMonitoredBackendProcess({
     spawnFailed = false;
   const closeLog = () => {
       if (logClosed) return;
-      ((logClosed = true), logStream?.['end']?.());
+      ((logClosed = true), logStream?.end?.());
     },
     handleSpawnError = (error) => {
       ((spawnFailed = true), safeNotify(onSpawnError, error), closeLog());
@@ -88,14 +88,14 @@ export function launchMonitoredBackendProcess({
   } catch (error) {
     handleSpawnError(error);
     throw createBackendStartupError(
-      'Failed to spawn local backend: ' + (error?.['message'] || error),
+      'Failed to spawn local backend: ' + (error?.message || error),
       'BACKEND_SPAWN_ERROR',
       { cause: error },
     );
   }
   logStream &&
-    (child['stdout']?.['pipe']?.(logStream, { end: false }),
-    child['stderr']?.['pipe']?.(logStream, { end: false }));
+    (child.stdout?.pipe?.(logStream, { end: false }),
+    child.stderr?.pipe?.(logStream, { end: false }));
   const monitor = createBackendStartupMonitor({
     child: child,
     onError: handleSpawnError,
@@ -107,7 +107,7 @@ export function launchMonitoredBackendProcess({
   return {
     child: child,
     closeLog: closeLog,
-    failure: monitor['failure'],
-    markReady: monitor['markReady'],
+    failure: monitor.failure,
+    markReady: monitor.markReady,
   };
 }

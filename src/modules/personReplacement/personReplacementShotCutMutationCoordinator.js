@@ -1,9 +1,9 @@
 import { reversePersonReplacementVideoIteration } from './personReplacementVideoIteration.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function cloneJson(item) {
-  return JSON['parse'](JSON['stringify'](item));
+  return JSON.parse(JSON.stringify(item));
 }
 export function createPersonReplacementShotCutMutationCoordinator() {
   let key = 0;
@@ -13,7 +13,7 @@ export function createPersonReplacementShotCutMutationCoordinator() {
     },
     acceptRevision = (index) => {
       const count = Number(index);
-      if (count > 0) return ((key = Math['max'](key, count)), count);
+      if (count > 0) return ((key = Math.max(key, count)), count);
       return invalidate();
     },
     isCurrent = (result) => Number(result) === key,
@@ -21,22 +21,22 @@ export function createPersonReplacementShotCutMutationCoordinator() {
       const data = projectId + '\x00' + shotId,
         options = { projectId: projectId, shotId: shotId, completion: null };
       return (
-        (options['completion'] = Promise['resolve'](completion)['finally'](() => {
-          map['get'](data) === options && map['delete'](data);
+        (options.completion = Promise.resolve(completion).finally(() => {
+          map.get(data) === options && map.delete(data);
         })),
-        map['set'](data, options),
-        options['completion']
+        map.set(data, options),
+        options.completion
       );
     },
     waitForActiveReverse = async ({ projectId: projectId2, shotIds: shotIds = null } = {}) => {
       const map2 = shotIds instanceof Set ? shotIds : null,
-        list = [...map['values']()]
-          ['filter'](
+        list = [...map.values()]
+          .filter(
             (target) =>
-              target['projectId'] === normalizeText(projectId2) && (!map2 || map2['has'](target['shotId'])),
+              target.projectId === normalizeText(projectId2) && (!map2 || map2.has(target.shotId)),
           )
-          ['map']((source) => source['completion']);
-      if (list['length']) await Promise['allSettled'](list);
+          .map((source) => source.completion);
+      if (list.length) await Promise.allSettled(list);
     };
   return {
     acceptRevision: acceptRevision,
@@ -67,10 +67,10 @@ export function createPersonReplacementShotReverseOperation({
   } = {}) {
     const project = getProject(),
       shotId3 = normalizeText(shotId2),
-      shot = project['shots']['find']((next) => normalizeText(next['id']) === shotId3);
+      shot = project.shots.find((next) => normalizeText(next.id) === shotId3);
     if (!shot) throw new Error('未找到需要倒放的片段');
     if (iterationReferenceRef) {
-      if (shot['videoIterationReferenceRef'] !== iterationReferenceRef)
+      if (shot.videoIterationReferenceRef !== iterationReferenceRef)
         throw new Error('当前参考视频已变化，请重新打开裁剪。');
       return reversePersonReplacementVideoIteration({
         project: project,
@@ -84,17 +84,17 @@ export function createPersonReplacementShotReverseOperation({
         isDestroyed: isDestroyed,
       });
     }
-    const projectId3 = normalizeText(project['id']),
+    const projectId3 = normalizeText(project.id),
       isReversed2 = isReversed === true,
-      current = shot['isReversed'] === true,
-      materializedIsReversed = shot['materializedIsReversed'] === true,
-      revision = coordinator['nextRevision'](),
+      current = shot.isReversed === true,
+      materializedIsReversed = shot.materializedIsReversed === true,
+      revision = coordinator.nextRevision(),
       entry = current !== isReversed2,
-      materializationStatus = Boolean(shot['videoRef']) && materializedIsReversed === isReversed2,
+      materializationStatus = Boolean(shot.videoRef) && materializedIsReversed === isReversed2,
       record = {
         ...project,
-        shots: project['shots']['map']((args) =>
-          args['id'] === shotId3
+        shots: project.shots.map((args) =>
+          args.id === shotId3
             ? {
                 ...args,
                 isReversed: isReversed2,
@@ -111,7 +111,7 @@ export function createPersonReplacementShotReverseOperation({
         ...(entry
           ? {
               workspace: {
-                ...project['workspace'],
+                ...project.workspace,
                 imageGeneration: { status: 'idle', shotId: '', error: '' },
                 imageGenerationsByShotId: {},
                 videoGeneration: { status: 'idle', shotId: '', error: '' },
@@ -125,39 +125,39 @@ export function createPersonReplacementShotReverseOperation({
     if (materializationStatus)
       return {
         project: project2,
-        completion: coordinator['trackReverseCompletion']({
+        completion: coordinator.trackReverseCompletion({
           projectId: projectId3,
           shotId: shotId3,
-          completion: Promise['resolve']({ ok: true, project: cloneJson(project2), changedShotCount: 0 }),
+          completion: Promise.resolve({ ok: true, project: cloneJson(project2), changedShotCount: 0 }),
         }),
       };
-    const ranges = project2['shots']['map']((shotId4) => ({
-        shotId: shotId4['id'],
-        sourceId: shotId4['sourceId'],
-        startSec: shotId4['startTimeSec'],
-        endSec: shotId4['endTimeSec'],
-        ...(shotId4['isReversed'] === true ? { isReversed: true } : {}),
+    const ranges = project2.shots.map((shotId4) => ({
+        shotId: shotId4.id,
+        sourceId: shotId4.sourceId,
+        startSec: shotId4.startTimeSec,
+        endSec: shotId4.endTimeSec,
+        ...(shotId4.isReversed === true ? { isReversed: true } : {}),
       })),
       completion2 = updateShotCutRanges({
         ranges: ranges,
-        selectedShotId: project2['workspace']['selectedShotId'] || shotId3,
+        selectedShotId: project2.workspace.selectedShotId || shotId3,
         renderWorkspace: false,
         notify: false,
         revision: revision,
       })
-        ['then']((ok) => ({ ok: ok?.['stale'] !== true, ...ok }))
-        ['catch']((error) => {
-          const error2 = error?.['message'] || '视频倒放失败，请重试。',
+        .then((ok) => ({ ok: ok?.stale !== true, ...ok }))
+        .catch((error) => {
+          const error2 = error?.message || '视频倒放失败，请重试。',
             shots = getProject();
           return (
             !isDestroyed() &&
-              coordinator['isCurrent'](revision) &&
-              normalizeText(shots['id']) === projectId3 &&
+              coordinator.isCurrent(revision) &&
+              normalizeText(shots.id) === projectId3 &&
               (setProject(
                 {
                   ...shots,
-                  shots: shots['shots']['map']((args2) =>
-                    args2['id'] === shotId3
+                  shots: shots.shots.map((args2) =>
+                    args2.id === shotId3
                       ? {
                           ...args2,
                           materializationStatus: 'failed',
@@ -170,12 +170,12 @@ export function createPersonReplacementShotReverseOperation({
                 { renderWorkspace: false },
               ),
               showToast(error2, 'error')),
-            { ok: false, project: snapshot(), error: error2, stale: !coordinator['isCurrent'](revision) }
+            { ok: false, project: snapshot(), error: error2, stale: !coordinator.isCurrent(revision) }
           );
         });
     return {
       project: project2,
-      completion: coordinator['trackReverseCompletion']({
+      completion: coordinator.trackReverseCompletion({
         projectId: projectId3,
         shotId: shotId3,
         completion: completion2,

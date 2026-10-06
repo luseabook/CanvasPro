@@ -2,11 +2,11 @@ import { renderAIGenTextModelSelectorMarkup } from '../../components/aigenText/m
 import { getDisplayModelName } from '../providers.js';
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#39;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
 export function renderStoryPlanningTextModelPicker(
   modelId = {},
@@ -19,9 +19,9 @@ export function renderStoryPlanningTextModelPicker(
     escapeHtml(className) +
     '">\n    ' +
     renderAIGenTextModelSelectorMarkup({
-      modelId: modelId['models']?.['text'],
-      provider: modelId['textProvider'],
-      providerProfileId: modelId['textProviderProfileId'],
+      modelId: modelId.models?.text,
+      provider: modelId.textProvider,
+      providerProfileId: modelId.textProviderProfileId,
       includeRunningHubInternational: true,
       getDisplayModelName: getDisplayModelName,
       className: 'story-planning-text-model-selector',

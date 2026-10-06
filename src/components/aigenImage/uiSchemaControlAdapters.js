@@ -1,83 +1,83 @@
 function normalizeKey(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function normalizeType(item) {
-  return normalizeKey(item)['toLowerCase']();
+  return normalizeKey(item).toLowerCase();
 }
 const CAPABILITY_KEYS = ['render', 'sync', 'bind', 'normalize'];
 function normalizeAdapterCapabilities(options = {}) {
   const key = {};
   return (
-    CAPABILITY_KEYS['forEach']((index) => {
+    CAPABILITY_KEYS.forEach((index) => {
       typeof options[index] === 'function' && (key[index] = options[index]);
     }),
     key
   );
 }
 function createAdapterRegistry(list2 = [], renderer = '') {
-  const list3 = list2['map']((matches) => ({
-    id: normalizeKey(matches['id']),
-    renderer: normalizeKey(matches['renderer']),
-    matches: matches['matches'],
+  const list3 = list2.map((matches) => ({
+    id: normalizeKey(matches.id),
+    renderer: normalizeKey(matches.renderer),
+    matches: matches.matches,
     ...normalizeAdapterCapabilities(matches),
   }));
   return {
     register(matches2 = {}) {
       const enabled = {
-        id: normalizeKey(matches2['id']),
-        renderer: normalizeKey(matches2['renderer']),
-        matches: matches2['matches'],
+        id: normalizeKey(matches2.id),
+        renderer: normalizeKey(matches2.renderer),
+        matches: matches2.matches,
         ...normalizeAdapterCapabilities(matches2),
       };
-      if (!enabled['id']) throw new Error('UI schema adapter id is required');
-      if (list3['some']((result) => result['id'] === enabled['id']))
-        throw new Error('UI schema adapter id is already registered: ' + enabled['id']);
-      if (typeof enabled['matches'] !== 'function')
+      if (!enabled.id) throw new Error('UI schema adapter id is required');
+      if (list3.some((result) => result.id === enabled.id))
+        throw new Error('UI schema adapter id is already registered: ' + enabled.id);
+      if (typeof enabled.matches !== 'function')
         throw new Error('UI schema adapter matcher is required');
       return (
-        list3['unshift'](enabled),
+        list3.unshift(enabled),
         () => {
-          const count = list3['findIndex']((data) => data === enabled);
-          if (count >= 0) list3['splice'](count, 1);
+          const count = list3.findIndex((data) => data === enabled);
+          if (count >= 0) list3.splice(count, 1);
         }
       );
     },
     resolve(options2 = {}) {
-      const target = list3['find']((source) => source['matches'](options2));
-      return target ? target['renderer'] : renderer;
+      const target = list3.find((source) => source.matches(options2));
+      return target ? target.renderer : renderer;
     },
     resolveDefinition(options3 = {}) {
-      const next = list3['find']((current) => current['matches'](options3));
+      const next = list3.find((current) => current.matches(options3));
       if (next) return next;
       return { id: 'fallback', renderer: renderer, matches: () => true };
     },
     get(entry = '') {
       const key2 = normalizeKey(entry);
       if (!key2) return null;
-      return list3['find']((record) => record['id'] === key2) || null;
+      return list3.find((record) => record.id === key2) || null;
     },
     configure(payload = '', handle = {}) {
-      const enabled2 = this['get'](payload);
+      const enabled2 = this.get(payload);
       if (!enabled2) throw new Error('UI schema adapter id is not registered: ' + payload);
       const state = {};
       return (
-        CAPABILITY_KEYS['forEach']((config) => {
+        CAPABILITY_KEYS.forEach((config) => {
           state[config] = enabled2[config];
           if (typeof handle[config] === 'function') enabled2[config] = handle[config];
           else config in handle && delete enabled2[config];
         }),
         () => {
-          CAPABILITY_KEYS['forEach']((scope) => {
+          CAPABILITY_KEYS.forEach((scope) => {
             typeof state[scope] === 'function' ? (enabled2[scope] = state[scope]) : delete enabled2[scope];
           });
         }
       );
     },
     list() {
-      return list3['map']((id) => ({
-        id: id['id'],
-        renderer: id['renderer'],
-        capabilities: CAPABILITY_KEYS['filter']((input) => typeof id[input] === 'function'),
+      return list3.map((id) => ({
+        id: id.id,
+        renderer: id.renderer,
+        capabilities: CAPABILITY_KEYS.filter((input) => typeof id[input] === 'function'),
       }));
     },
   };
@@ -122,8 +122,8 @@ const fieldAdapterRegistry = createAdapterRegistry([
       id: 'field.aspectRatio.segmented',
       renderer: 'renderAspectRatioPillField',
       matches: ({ field: field, type: type }) => {
-        const key3 = normalizeKey(field?.['id'])['toLowerCase'](),
-          key4 = normalizeKey(field?.['displayRole'])['toLowerCase']();
+        const key3 = normalizeKey(field?.id).toLowerCase(),
+          key4 = normalizeKey(field?.displayRole).toLowerCase();
         return type === 'segmented' && (key3 === 'aspectratio' || key4 === 'aspectratio');
       },
     },
@@ -218,27 +218,27 @@ const fieldAdapterRegistry = createAdapterRegistry([
     'renderAssetInputControl',
   );
 export function registerUiSchemaFieldAdapter(output) {
-  return fieldAdapterRegistry['register'](output);
+  return fieldAdapterRegistry.register(output);
 }
 export function registerUiSchemaControlAdapter(value2) {
-  return controlAdapterRegistry['register'](value2);
+  return controlAdapterRegistry.register(value2);
 }
 export function configureUiSchemaFieldAdapter(value3, value4) {
-  return fieldAdapterRegistry['configure'](value3, value4);
+  return fieldAdapterRegistry.configure(value3, value4);
 }
 export function configureUiSchemaControlAdapter(value5, value6) {
-  return controlAdapterRegistry['configure'](value5, value6);
+  return controlAdapterRegistry.configure(value5, value6);
 }
 export function listUiSchemaFieldAdapters() {
-  return fieldAdapterRegistry['list']();
+  return fieldAdapterRegistry.list();
 }
 export function listUiSchemaControlAdapters() {
-  return controlAdapterRegistry['list']();
+  return controlAdapterRegistry.list();
 }
 export function resolveUiSchemaFieldAdapter(field2 = {}, options4 = {}) {
-  const variant17 = normalizeKey(field2?.['variant'] || options4?.['variant']),
-    type18 = normalizeType(options4?.['type'] || field2?.['type']);
-  return fieldAdapterRegistry['resolve']({
+  const variant17 = normalizeKey(field2?.variant || options4?.variant),
+    type18 = normalizeType(options4?.type || field2?.type);
+  return fieldAdapterRegistry.resolve({
     field: field2,
     options: options4,
     variant: variant17,
@@ -246,9 +246,9 @@ export function resolveUiSchemaFieldAdapter(field2 = {}, options4 = {}) {
   });
 }
 export function resolveUiSchemaFieldAdapterDefinition(field3 = {}, options5 = {}) {
-  const variant18 = normalizeKey(field3?.['variant'] || options5?.['variant']),
-    type19 = normalizeType(options5?.['type'] || field3?.['type']);
-  return fieldAdapterRegistry['resolveDefinition']({
+  const variant18 = normalizeKey(field3?.variant || options5?.variant),
+    type19 = normalizeType(options5?.type || field3?.type);
+  return fieldAdapterRegistry.resolveDefinition({
     field: field3,
     options: options5,
     variant: variant18,
@@ -256,11 +256,11 @@ export function resolveUiSchemaFieldAdapterDefinition(field3 = {}, options5 = {}
   });
 }
 export function getUiSchemaFieldAdapterDefinition(value7 = '') {
-  return fieldAdapterRegistry['get'](value7);
+  return fieldAdapterRegistry.get(value7);
 }
 export function resolveUiSchemaControlAdapter(value8 = '') {
-  return controlAdapterRegistry['resolve']({ type: normalizeType(value8) });
+  return controlAdapterRegistry.resolve({ type: normalizeType(value8) });
 }
 export function resolveUiSchemaControlAdapterDefinition(value9 = '') {
-  return controlAdapterRegistry['resolveDefinition']({ type: normalizeType(value9) });
+  return controlAdapterRegistry.resolveDefinition({ type: normalizeType(value9) });
 }

@@ -1,20 +1,20 @@
-const QWEN_MODELS = Object['freeze']([
+const QWEN_MODELS = Object.freeze([
     ['qwen3.8-max', 'Qwen 3.8 Max', true],
     ['qwen3.8-max-0902', 'Qwen 3.8 Max 0902'],
     ['qwen3.8-flash', 'Qwen 3.8 Flash', false, 'enable_thinking'],
     ['qwen3.8-27b', 'Qwen 3.8 27B'],
     ['qwen3.8-2.4t-a95b', 'Qwen 3.8 2.4T A95B'],
   ]),
-  executionId = (value) => 'apimart.model-api.text.' + value['replaceAll']('.', '-') + '.v1',
-  CHAT_RESPONSE_MAPPING = Object['freeze']({ resultPaths: Object['freeze'](['choices[].message.content']) }),
-  CHAT_EXTENSIONS = Object['freeze']({
+  executionId = (value) => 'apimart.model-api.text.' + value.replaceAll('.', '-') + '.v1',
+  CHAT_RESPONSE_MAPPING = Object.freeze({ resultPaths: Object.freeze(['choices[].message.content']) }),
+  CHAT_EXTENSIONS = Object.freeze({
     chatCompletionInputPolicy: 'image-video',
     strictUpload: true,
     structuredOutputMode: 'json_object',
   });
-export const apimartQwenTextModelManifests = Object['freeze'](
-  QWEN_MODELS['map'](([item, displayName, description]) =>
-    Object['freeze']({
+export const apimartQwenTextModelManifests = Object.freeze(
+  QWEN_MODELS.map(([item, displayName, description]) =>
+    Object.freeze({
       schemaVersion: '1.0',
       modelId: 'apimart/' + item,
       executionId: executionId(item),
@@ -26,15 +26,15 @@ export const apimartQwenTextModelManifests = Object['freeze'](
       description: description
         ? '支持图文理解、联网搜索和网页读取；推理始终开启'
         : 'APIMart chat completion model API',
-      inputSlots: Object['freeze']({
-        allowedKinds: Object['freeze'](['text', 'image', 'video']),
-        minByKind: Object['freeze']({ text: 0, image: 0 }),
-        maxByKind: Object['freeze']({ image: 8, video: 1, audio: 0 }),
+      inputSlots: Object.freeze({
+        allowedKinds: Object.freeze(['text', 'image', 'video']),
+        minByKind: Object.freeze({ text: 0, image: 0 }),
+        maxByKind: Object.freeze({ image: 8, video: 1, audio: 0 }),
       }),
       uiSchema: description
-        ? Object['freeze']({
-            fields: Object['freeze']([
-              Object['freeze']({
+        ? Object.freeze({
+            fields: Object.freeze([
+              Object.freeze({
                 id: 'webSearch',
                 type: 'segmented',
                 placement: 'mode',
@@ -42,9 +42,9 @@ export const apimartQwenTextModelManifests = Object['freeze'](
                 label: '联网',
                 defaultValue: false,
                 menuDescription: '开启后允许模型搜索和读取网页，工具按实际调用次数额外计费。',
-                options: Object['freeze']([
-                  Object['freeze']({ value: false, label: '关闭', selectedLabel: '联网：关' }),
-                  Object['freeze']({
+                options: Object.freeze([
+                  Object.freeze({ value: false, label: '关闭', selectedLabel: '联网：关' }),
+                  Object.freeze({
                     value: true,
                     label: '搜索与读取网页',
                     selectedLabel: '联网：开',
@@ -52,7 +52,7 @@ export const apimartQwenTextModelManifests = Object['freeze'](
                   }),
                 ]),
               }),
-              Object['freeze']({
+              Object.freeze({
                 id: 'imageSearch',
                 type: 'segmented',
                 placement: 'mode',
@@ -61,13 +61,13 @@ export const apimartQwenTextModelManifests = Object['freeze'](
                 defaultValue: 'off',
                 menuDescription:
                   '搜索网上已有图片，工具按实际调用次数额外计费；以图搜图需要参考图，耗时较长。',
-                options: Object['freeze']([
-                  Object['freeze']({ value: 'off', label: '关闭', selectedLabel: '搜图：关' }),
-                  Object['freeze']({ value: 'text', label: '文字搜图', selectedLabel: '文字搜图' }),
-                  Object['freeze']({ value: 'image', label: '以图搜图', selectedLabel: '以图搜图' }),
+                options: Object.freeze([
+                  Object.freeze({ value: 'off', label: '关闭', selectedLabel: '搜图：关' }),
+                  Object.freeze({ value: 'text', label: '文字搜图', selectedLabel: '文字搜图' }),
+                  Object.freeze({ value: 'image', label: '以图搜图', selectedLabel: '以图搜图' }),
                 ]),
               }),
-              Object['freeze']({
+              Object.freeze({
                 id: 'maxOutputTokens',
                 type: 'segmented',
                 placement: 'mode',
@@ -75,11 +75,11 @@ export const apimartQwenTextModelManifests = Object['freeze'](
                 label: '输出上限',
                 defaultValue: 8192,
                 menuDescription: '上限包含思考与正文；本模型的思考不可关闭。',
-                options: Object['freeze'](
-                  [4096, 8192, 16384, 32768, 0x10000, 0x20000]['map']((value2) =>
-                    Object['freeze']({
+                options: Object.freeze(
+                  [4096, 8192, 16384, 32768, 0x10000, 0x20000].map((value2) =>
+                    Object.freeze({
                       value: value2,
-                      label: value2['toLocaleString']('en-US') + ' tokens',
+                      label: value2.toLocaleString('en-US') + ' tokens',
                       selectedLabel: '上限：' + value2 / 1024 + 'K',
                     }),
                   ),
@@ -87,9 +87,9 @@ export const apimartQwenTextModelManifests = Object['freeze'](
               }),
             ]),
           })
-        : Object['freeze']({ fields: Object['freeze']([]) }),
-      extensions: Object['freeze']({
-        textMenu: Object['freeze']({
+        : Object.freeze({ fields: Object.freeze([]) }),
+      extensions: Object.freeze({
+        textMenu: Object.freeze({
           group: 'apimart',
           title: displayName,
           subtitle: description ? '图文理解 · 可选联网搜索 / 网页读取' : 'APIMart chat completion model API',
@@ -102,9 +102,9 @@ export const apimartQwenTextModelManifests = Object['freeze'](
     }),
   ),
 );
-export const apimartQwenTextExecutionManifests = Object['freeze'](
-  QWEN_MODELS['map'](([model, , endpoint, thinkingControlMode]) =>
-    Object['freeze']({
+export const apimartQwenTextExecutionManifests = Object.freeze(
+  QWEN_MODELS.map(([model, , endpoint, thinkingControlMode]) =>
+    Object.freeze({
       schemaVersion: '1.0',
       id: executionId(model),
       provider: 'apimart',
@@ -114,48 +114,48 @@ export const apimartQwenTextExecutionManifests = Object['freeze'](
       endpointMode: endpoint ? 'responses' : 'chat-completion',
       method: 'POST',
       model: model,
-      headers: Object['freeze']({ 'Content-Type': 'application/json' }),
-      bodyMapping: Object['freeze'](
+      headers: Object.freeze({ 'Content-Type': 'application/json' }),
+      bodyMapping: Object.freeze(
         endpoint
           ? { modelField: 'model', promptField: 'input' }
           : { modelField: 'model', messagesField: 'messages' },
       ),
       responseMapping: endpoint
-        ? Object['freeze']({
-            resultPaths: Object['freeze'](['output_text', 'output[].content[].text']),
+        ? Object.freeze({
+            resultPaths: Object.freeze(['output_text', 'output[].content[].text']),
             includeSources: true,
             imageResults: 'markdown',
           })
         : CHAT_RESPONSE_MAPPING,
-      result: Object['freeze']({
+      result: Object.freeze({
         textFields: endpoint
-          ? Object['freeze'](['output_text', 'output[].content[].text'])
-          : CHAT_RESPONSE_MAPPING['resultPaths'],
+          ? Object.freeze(['output_text', 'output[].content[].text'])
+          : CHAT_RESPONSE_MAPPING.resultPaths,
       }),
       extensions: endpoint
-        ? Object['freeze']({
+        ? Object.freeze({
             chatCompletionInputPolicy: 'image-video',
             strictUpload: true,
-            videoChatCompletion: Object['freeze']({
+            videoChatCompletion: Object.freeze({
               endpoint: '/v1/chat/completions',
               structuredOutputMode: 'json_object',
               responseMapping: CHAT_RESPONSE_MAPPING,
             }),
             responsesInputFormat: 'image-url',
             maxOutputTokens: 0x20000,
-            webSearchTools: Object['freeze']([
-              Object['freeze']({ type: 'web_search' }),
-              Object['freeze']({ type: 'web_extractor' }),
+            webSearchTools: Object.freeze([
+              Object.freeze({ type: 'web_search' }),
+              Object.freeze({ type: 'web_extractor' }),
             ]),
-            imageSearchTools: Object['freeze']({
-              text: Object['freeze']({ type: 'web_search_image' }),
-              image: Object['freeze']({ type: 'image_search', requiresImage: true }),
+            imageSearchTools: Object.freeze({
+              text: Object.freeze({ type: 'web_search_image' }),
+              image: Object.freeze({ type: 'image_search', requiresImage: true }),
             }),
             imageSearchInstructions:
               'When presenting image search results, use only actual image URLs returned by the search tool. Format each image as [![short description](<image URL>)](<source page URL>), or ![short description](<image URL>) if no source page is provided. Do not invent URLs. If the tool returns no usable image URLs, explain that no images were found. Return at most 24 images.',
           })
         : thinkingControlMode
-          ? Object['freeze']({ ...CHAT_EXTENSIONS, thinkingControlMode: thinkingControlMode })
+          ? Object.freeze({ ...CHAT_EXTENSIONS, thinkingControlMode: thinkingControlMode })
           : CHAT_EXTENSIONS,
     }),
   ),

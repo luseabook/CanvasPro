@@ -4,33 +4,33 @@ import {
 } from './rendererRuntimeDiagnostics.js';
 import { resolveCanvasVideoDisplayUrl } from '../services/canvasMediaLocalService.js';
 export function resolveRendererVideoMediaLeaseKey(value, item = null) {
-  const key = Array['isArray'](value?.['videos']) ? value['videos'] : [],
-    index = Number['isFinite'](Number(value?.['mainVideoIndex']))
-      ? Math['max'](0, Math['trunc'](Number(value['mainVideoIndex'])))
+  const key = Array.isArray(value?.videos) ? value.videos : [],
+    index = Number.isFinite(Number(value?.mainVideoIndex))
+      ? Math.max(0, Math.trunc(Number(value.mainVideoIndex)))
       : 0,
     canvasVideoDisplayUrl =
       resolveCanvasVideoDisplayUrl(key[index] || key[0] || {}) || resolveCanvasVideoDisplayUrl(value);
   return [
-    String(value?.['type'] || ''),
+    String(value?.type || ''),
     index,
     String(canvasVideoDisplayUrl || ''),
-    String(item?.['sourceKey'] || ''),
-    Number(item?.['sourceEpoch'] || 0),
-  ]['join']('|');
+    String(item?.sourceKey || ''),
+    Number(item?.sourceEpoch || 0),
+  ].join('|');
 }
 const DEFAULT_MEDIA_RESIDENCY_SUSPEND_DELAY_MS = 120,
   DEFAULT_PRESENTED_MEDIA_LEASE_MS = 600,
   DEFAULT_MAX_RETAINED_PRESENTED_MEDIA = 3;
 function nowMs() {
-  return typeof performance !== 'undefined' && typeof performance['now'] === 'function'
-    ? performance['now']()
-    : Date['now']();
+  return typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now();
 }
 export function createRendererVideoMediaResidencyController({
   getComponent: getComponent,
   getWrapper: getWrapper,
   isMounted: isMounted,
-  isMediaDeferred: isMediaDeferred = (result, data) => data?.['_rendererMediaDeferred'] === true,
+  isMediaDeferred: isMediaDeferred = (result, data) => data?._rendererMediaDeferred === true,
   isPlaybackActive: isPlaybackActive,
   isRetentionProtected: isRetentionProtected,
   shouldRetainPresentedMedia: shouldRetainPresentedMedia,
@@ -43,20 +43,20 @@ export function createRendererVideoMediaResidencyController({
 } = {}) {
   const map = new Map(),
     map2 = new Map(),
-    options = Math['max'](0, Number(suspendDelayMs) || 0),
-    count = Math['max'](0, Number(presentedMediaLeaseMs) || 0),
-    count2 = Math['max'](0, Math['trunc'](Number(maxRetainedPresentedMedia) || 0)),
+    options = Math.max(0, Number(suspendDelayMs) || 0),
+    count = Math.max(0, Number(presentedMediaLeaseMs) || 0),
+    count2 = Math.max(0, Math.trunc(Number(maxRetainedPresentedMedia) || 0)),
     isRendererRuntimeDiagnosticsEnabled2 = isRendererRuntimeDiagnosticsEnabled();
   function run(enabled) {
-    if (!enabled || enabled['timer'] === null) return;
-    (clearTimeout(enabled['timer']), (enabled['timer'] = null));
+    if (!enabled || enabled.timer === null) return;
+    (clearTimeout(enabled.timer), (enabled.timer = null));
   }
   function run2(enabled2) {
-    if (!enabled2 || enabled2['presentedLeaseTimer'] === null) return;
-    (clearTimeout(enabled2['presentedLeaseTimer']), (enabled2['presentedLeaseTimer'] = null));
+    if (!enabled2 || enabled2.presentedLeaseTimer === null) return;
+    (clearTimeout(enabled2.presentedLeaseTimer), (enabled2.presentedLeaseTimer = null));
   }
   function run3(target) {
-    (run2(map2['get'](target)), map2['delete'](target));
+    (run2(map2.get(target)), map2.delete(target));
   }
   function run4(source, next, current) {
     return (
@@ -65,11 +65,11 @@ export function createRendererVideoMediaResidencyController({
     );
   }
   function run5(nodeId, enabled3) {
-    if (!enabled3 || enabled3['timer'] !== null) return;
-    enabled3['timer'] = setTimeout(() => {
-      enabled3['timer'] = null;
-      if (enabled3['withinResidency']) return;
-      const enabled4 = enabled3['parked'] === true;
+    if (!enabled3 || enabled3.timer !== null) return;
+    enabled3.timer = setTimeout(() => {
+      enabled3.timer = null;
+      if (enabled3.withinResidency) return;
+      const enabled4 = enabled3.parked === true;
       if (!enabled4 && !isMounted?.(nodeId)) return;
       const enabled5 = getComponent?.(nodeId),
         entry = getWrapper?.(nodeId);
@@ -80,7 +80,7 @@ export function createRendererVideoMediaResidencyController({
       }
       run3(nodeId);
       if (enabled4) {
-        (onParkSuspend?.(nodeId, enabled5, entry), map['delete'](nodeId));
+        (onParkSuspend?.(nodeId, enabled5, entry), map.delete(nodeId));
         return;
       }
       const record = isRendererRuntimeDiagnosticsEnabled2 ? nowMs() : 0,
@@ -92,37 +92,37 @@ export function createRendererVideoMediaResidencyController({
           suspended: suspended !== false,
           durationMs: nowMs() - record,
         }),
-        suspended === false && !enabled3['withinResidency'] && isMounted?.(nodeId) && run5(nodeId, enabled3));
+        suspended === false && !enabled3.withinResidency && isMounted?.(nodeId) && run5(nodeId, enabled3));
     }, options);
   }
   function run6() {
-    const enabled6 = map2['keys']()['next']()['value'];
+    const enabled6 = map2.keys().next().value;
     if (!enabled6) return false;
-    const enabled7 = map['get'](enabled6);
+    const enabled7 = map.get(enabled6);
     run3(enabled6);
-    if (!enabled7 || enabled7['withinResidency']) return true;
+    if (!enabled7 || enabled7.withinResidency) return true;
     return (run5(enabled6, enabled7), true);
   }
   function run7() {
-    while (map2['size'] > count2) {
+    while (map2.size > count2) {
       if (!run6()) break;
     }
   }
   function run8(payload, handle) {
     (run(handle),
       run3(payload),
-      map2['set'](payload, handle),
-      (handle['presentedLeaseTimer'] = setTimeout(() => {
-        handle['presentedLeaseTimer'] = null;
-        if (map2['get'](payload) !== handle) return;
-        map2['delete'](payload);
-        if (handle['withinResidency']) return;
+      map2.set(payload, handle),
+      (handle.presentedLeaseTimer = setTimeout(() => {
+        handle.presentedLeaseTimer = null;
+        if (map2.get(payload) !== handle) return;
+        map2.delete(payload);
+        if (handle.withinResidency) return;
         run5(payload, handle);
       }, count)),
       run7());
   }
   function run9(state) {
-    let enabled8 = map['get'](state);
+    let enabled8 = map.get(state);
     return (
       !enabled8 &&
         ((enabled8 = {
@@ -133,7 +133,7 @@ export function createRendererVideoMediaResidencyController({
           parked: false,
           leaseKey: '',
         }),
-        map['set'](state, enabled8)),
+        map.set(state, enabled8)),
       enabled8
     );
   }
@@ -141,15 +141,15 @@ export function createRendererVideoMediaResidencyController({
     if (!nodeId2) return;
     const config = run9(nodeId2),
       scope = String(leaseKey || ''),
-      input = config['initialized'] === true && config['leaseKey'] !== scope;
+      input = config.initialized === true && config.leaseKey !== scope;
     input && (run3(nodeId2), run(config));
-    const output = config['withinResidency'],
-      enabled9 = config['initialized'];
-    ((config['initialized'] = true),
-      (config['parked'] = false),
-      (config['leaseKey'] = scope),
-      (config['withinResidency'] = withinResidency === true));
-    if (config['withinResidency']) {
+    const output = config.withinResidency,
+      enabled9 = config.initialized;
+    ((config.initialized = true),
+      (config.parked = false),
+      (config.leaseKey = scope),
+      (config.withinResidency = withinResidency === true));
+    if (config.withinResidency) {
       (run3(nodeId2), run(config));
       const value2 = getComponent?.(nodeId2);
       if (isMounted?.(nodeId2) && isMediaDeferred(nodeId2, value2)) {
@@ -178,7 +178,7 @@ export function createRendererVideoMediaResidencyController({
       run8(nodeId2, config);
       return;
     }
-    if (map2['has'](nodeId2)) return;
+    if (map2.has(nodeId2)) return;
     run5(nodeId2, config);
   }
   function park(
@@ -189,10 +189,10 @@ export function createRendererVideoMediaResidencyController({
     const value4 = run9(enabled10);
     (run(value4),
       run3(enabled10),
-      (value4['initialized'] = true),
-      (value4['withinResidency'] = false),
-      (value4['parked'] = true),
-      (value4['leaseKey'] = String(leaseKey || '')));
+      (value4.initialized = true),
+      (value4.withinResidency = false),
+      (value4.parked = true),
+      (value4.leaseKey = String(leaseKey || '')));
     const value5 = getComponent?.(enabled10),
       value6 = getWrapper?.(enabled10);
     if (retainPresentedMedia === true && count2 > 0 && count > 0 && !run4(enabled10, value5, value6)) {
@@ -203,34 +203,34 @@ export function createRendererVideoMediaResidencyController({
       run5(enabled10, value4);
       return;
     }
-    (onParkSuspend?.(enabled10, value5, value6), map['delete'](enabled10));
+    (onParkSuspend?.(enabled10, value5, value6), map.delete(enabled10));
   }
   function unpark(value7) {
-    const enabled11 = map['get'](value7);
-    if (!enabled11 || enabled11['parked'] !== true) return;
-    (run(enabled11), run3(value7), (enabled11['parked'] = false));
+    const enabled11 = map.get(value7);
+    if (!enabled11 || enabled11.parked !== true) return;
+    (run(enabled11), run3(value7), (enabled11.parked = false));
   }
   function isHydrationAllowed(value8) {
-    const enabled12 = map['get'](value8);
-    if (!enabled12 || enabled12['withinResidency']) return true;
+    const enabled12 = map.get(value8);
+    if (!enabled12 || enabled12.withinResidency) return true;
     const value9 = getComponent?.(value8),
       value10 = getWrapper?.(value8);
     return run4(value8, value9, value10);
   }
   function forget(value11) {
-    const value12 = map['get'](value11);
-    (run(value12), run3(value11), map['delete'](value11));
+    const value12 = map.get(value11);
+    (run(value12), run3(value11), map.delete(value11));
   }
   function clear() {
-    for (const value13 of map['values']()) {
+    for (const value13 of map.values()) {
       (run(value13), run2(value13));
     }
-    (map2['clear'](), map['clear']());
+    (map2.clear(), map.clear());
   }
   function getRetainedPresentedMediaCount() {
-    return map2['size'];
+    return map2.size;
   }
-  return Object['freeze']({
+  return Object.freeze({
     clear: clear,
     forget: forget,
     getRetainedPresentedMediaCount: getRetainedPresentedMediaCount,
@@ -240,7 +240,7 @@ export function createRendererVideoMediaResidencyController({
     unpark: unpark,
   });
 }
-export const __rendererVideoMediaResidencyForTest = Object['freeze']({
+export const __rendererVideoMediaResidencyForTest = Object.freeze({
   DEFAULT_MEDIA_RESIDENCY_SUSPEND_DELAY_MS: DEFAULT_MEDIA_RESIDENCY_SUSPEND_DELAY_MS,
   DEFAULT_PRESENTED_MEDIA_LEASE_MS: DEFAULT_PRESENTED_MEDIA_LEASE_MS,
   DEFAULT_MAX_RETAINED_PRESENTED_MEDIA: DEFAULT_MAX_RETAINED_PRESENTED_MEDIA,

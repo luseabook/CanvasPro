@@ -12,26 +12,26 @@ import { createCanvasCommandError } from './commandRegistry.js';
 const IMAGE_NODE_TYPES = new Set(['source-image', 'ai-image', 'image']),
   MAX_STORYBOARD_CELLS = 100;
 function getState(value) {
-  return value['store']?.['getStateRaw']?.() || value['store']?.['getState']?.() || {};
+  return value.store?.getStateRaw?.() || value.store?.getState?.() || {};
 }
 function getStore(item) {
-  return item['graphStore'] || item['store'];
+  return item.graphStore || item.store;
 }
 function getNode(key, index) {
-  const result = String(index || '')['trim']();
-  return result ? getState(key)['nodes']?.[result] || null : null;
+  const result = String(index || '').trim();
+  return result ? getState(key).nodes?.[result] || null : null;
 }
 function getSelectedNodeIds(data) {
-  const list = getState(data)['selectedNodeIds'];
-  return Array['isArray'](list)
-    ? list['map']((options) => String(options || '')['trim']())['filter'](Boolean)
+  const list = getState(data).selectedNodeIds;
+  return Array.isArray(list)
+    ? list.map((options) => String(options || '').trim()).filter(Boolean)
     : [];
 }
 function isImageNode(target) {
-  return IMAGE_NODE_TYPES['has'](String(target?.['type'] || '')['trim']());
+  return IMAGE_NODE_TYPES.has(String(target?.type || '').trim());
 }
 function trimString(source) {
-  return typeof source === 'string' ? source['trim']() : '';
+  return typeof source === 'string' ? source.trim() : '';
 }
 function firstString(...args) {
   for (const next of args) {
@@ -43,66 +43,66 @@ function firstString(...args) {
 function positiveNumber(...args2) {
   for (const current of args2) {
     const count = Number(current);
-    if (Number['isFinite'](count) && count > 0) return count;
+    if (Number.isFinite(count) && count > 0) return count;
   }
   return 0;
 }
 function positiveInt(entry, record, { min: min = 1, max: max = 12 } = {}) {
   const payload = Number(entry),
-    handle = Number['isFinite'](payload) ? Math['trunc'](payload) : record;
-  return Math['max'](min, Math['min'](max, handle));
+    handle = Number.isFinite(payload) ? Math.trunc(payload) : record;
+  return Math.max(min, Math.min(max, handle));
 }
 function pickMainImage(options2 = {}) {
-  const list2 = Array['isArray'](options2['images']) ? options2['images'] : [];
-  if (list2['length'] === 0) return null;
-  const state = Math['max'](0, Math['trunc'](Number(options2['mainImageIndex']) || 0));
+  const list2 = Array.isArray(options2.images) ? options2.images : [];
+  if (list2.length === 0) return null;
+  const state = Math.max(0, Math.trunc(Number(options2.mainImageIndex) || 0));
   return list2[state] || list2[0] || null;
 }
 function resolveImageNodeAsset(box = {}) {
   const box2 = pickMainImage(box) || {},
     localPath = firstString(
-      box2['localPath'],
-      box2['originalLocalPath'],
-      box2['displayLocalPath'],
-      box['localPath'],
-      box['originalLocalPath'],
-      box['displayLocalPath'],
+      box2.localPath,
+      box2.originalLocalPath,
+      box2.displayLocalPath,
+      box.localPath,
+      box.originalLocalPath,
+      box.displayLocalPath,
     ),
-    thumbLocalPath = firstString(box2['thumbLocalPath'], box['thumbLocalPath']),
+    thumbLocalPath = firstString(box2.thumbLocalPath, box.thumbLocalPath),
     string = firstString(
-      box2['imageUrl'],
-      box2['url'],
-      box2['sourceUrl'],
-      box2['thumbUrl'],
-      box2['capturePreviewUrl'],
-      box['imageUrl'],
-      box['url'],
-      box['sourceUrl'],
-      box['src'],
-      box['thumbUrl'],
-      box['capturePreviewUrl'],
+      box2.imageUrl,
+      box2.url,
+      box2.sourceUrl,
+      box2.thumbUrl,
+      box2.capturePreviewUrl,
+      box.imageUrl,
+      box.url,
+      box.sourceUrl,
+      box.src,
+      box.thumbUrl,
+      box.capturePreviewUrl,
     ),
     width = positiveNumber(
-      box2['originalWidth'],
-      box2['imageWidth'],
-      box2['width'],
-      box2['naturalWidth'],
-      box['originalWidth'],
-      box['imageWidth'],
-      box['imgWidth'],
-      box['naturalWidth'],
-      box['width'],
+      box2.originalWidth,
+      box2.imageWidth,
+      box2.width,
+      box2.naturalWidth,
+      box.originalWidth,
+      box.imageWidth,
+      box.imgWidth,
+      box.naturalWidth,
+      box.width,
     ),
     height = positiveNumber(
-      box2['originalHeight'],
-      box2['imageHeight'],
-      box2['height'],
-      box2['naturalHeight'],
-      box['originalHeight'],
-      box['imageHeight'],
-      box['imgHeight'],
-      box['naturalHeight'],
-      box['height'],
+      box2.originalHeight,
+      box2.imageHeight,
+      box2.height,
+      box2.naturalHeight,
+      box.originalHeight,
+      box.imageHeight,
+      box.imgHeight,
+      box.naturalHeight,
+      box.height,
     );
   return {
     localPath: localPath,
@@ -114,18 +114,18 @@ function resolveImageNodeAsset(box = {}) {
   };
 }
 function resolveStoryboardSourceIds(options3 = {}, config = {}) {
-  const scope = Array['isArray'](options3['ids']) && options3['ids']['length'] > 0,
-    input = Boolean(String(options3['nodeId'] || '')['trim']()),
+  const scope = Array.isArray(options3.ids) && options3.ids.length > 0,
+    input = Boolean(String(options3.nodeId || '').trim()),
     output = scope
-      ? options3['ids']
+      ? options3.ids
       : input
-        ? [options3['nodeId']]
-        : getSelectedNodeIds(config)['filter']((value2) => isImageNode(getNode(config, value2))),
+        ? [options3.nodeId]
+        : getSelectedNodeIds(config).filter((value2) => isImageNode(getNode(config, value2))),
     count2 = [],
     map = new Set();
   for (const value3 of output) {
-    const nodeId = String(value3 || '')['trim']();
-    if (!nodeId || map['has'](nodeId)) continue;
+    const nodeId = String(value3 || '').trim();
+    if (!nodeId || map.has(nodeId)) continue;
     const nodeType = getNode(config, nodeId);
     if (!nodeType)
       throw createCanvasCommandError('NODE_NOT_FOUND', 'Canvas node not found: ' + nodeId, {
@@ -134,28 +134,28 @@ function resolveStoryboardSourceIds(options3 = {}, config = {}) {
     if (!isImageNode(nodeType))
       throw createCanvasCommandError(
         'UNSUPPORTED_NODE_TYPE',
-        'storyboard.createFromImages does not support node type: ' + (nodeType['type'] || '(unknown)'),
-        { nodeId: nodeId, nodeType: nodeType['type'] },
+        'storyboard.createFromImages does not support node type: ' + (nodeType.type || '(unknown)'),
+        { nodeId: nodeId, nodeType: nodeType.type },
       );
-    (count2['push'](nodeId), map['add'](nodeId));
+    (count2.push(nodeId), map.add(nodeId));
   }
-  if (count2['length'] === 0)
+  if (count2.length === 0)
     throw createCanvasCommandError(
       'MISSING_IMAGE_NODES',
       'storyboard.createFromImages requires image node ids or selected image nodes.',
     );
-  if (count2['length'] > MAX_STORYBOARD_CELLS)
+  if (count2.length > MAX_STORYBOARD_CELLS)
     throw createCanvasCommandError(
       'TOO_MANY_STORYBOARD_CELLS',
       'storyboard.createFromImages supports up to ' + MAX_STORYBOARD_CELLS + ' image nodes.',
-      { count: count2['length'], max: MAX_STORYBOARD_CELLS },
+      { count: count2.length, max: MAX_STORYBOARD_CELLS },
     );
   return count2;
 }
 function normalizeOrder(value4 = '') {
   const value5 = String(value4 || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   if (value5 === 'visual' || value5 === 'grid' || value5 === 'reading') return 'visual';
   if (value5 === 'left-to-right' || value5 === 'x' || value5 === 'horizontal') return 'left-to-right';
   if (value5 === 'top-to-bottom' || value5 === 'y' || value5 === 'vertical') return 'top-to-bottom';
@@ -163,15 +163,15 @@ function normalizeOrder(value4 = '') {
 }
 function sortImageIds(list3 = [], value6 = {}, value7 = 'selection') {
   const order = normalizeOrder(value7);
-  if (order === 'selection' || list3['length'] <= 1) return list3;
-  const state2 = getState(value6)['nodes'] || {};
-  return [...list3]['sort']((value8, value9) => {
+  if (order === 'selection' || list3.length <= 1) return list3;
+  const state2 = getState(value6).nodes || {};
+  return [...list3].sort((value8, value9) => {
     const box3 = state2[value8] || {},
       box4 = state2[value9] || {},
-      value10 = Number(box3['x']) || 0,
-      value11 = Number(box3['y']) || 0,
-      value12 = Number(box4['x']) || 0,
-      value13 = Number(box4['y']) || 0;
+      value10 = Number(box3.x) || 0,
+      value11 = Number(box3.y) || 0,
+      value12 = Number(box4.x) || 0,
+      value13 = Number(box4.y) || 0;
     if (order === 'left-to-right') return value10 - value12 || value11 - value13;
     if (order === 'top-to-bottom') return value11 - value13 || value10 - value12;
     return value11 - value13 || value10 - value12;
@@ -179,48 +179,48 @@ function sortImageIds(list3 = [], value6 = {}, value7 = 'selection') {
 }
 function resolveGrid(options4 = {}, value14 = 1) {
   const value15 =
-      Object['prototype']['hasOwnProperty']['call'](options4, 'cols') ||
-      Object['prototype']['hasOwnProperty']['call'](options4, 'columns'),
-    value16 = Object['prototype']['hasOwnProperty']['call'](options4, 'rows');
-  let cols = value15 ? positiveInt(options4['cols'] ?? options4['columns'], 0) : 0,
-    rows = value16 ? positiveInt(options4['rows'], 0) : 0;
+      Object.prototype.hasOwnProperty.call(options4, 'cols') ||
+      Object.prototype.hasOwnProperty.call(options4, 'columns'),
+    value16 = Object.prototype.hasOwnProperty.call(options4, 'rows');
+  let cols = value15 ? positiveInt(options4.cols ?? options4.columns, 0) : 0,
+    rows = value16 ? positiveInt(options4.rows, 0) : 0;
   if (!cols && !rows)
-    ((cols = Math['max'](1, Math['ceil'](Math['sqrt'](value14)))),
-      (rows = Math['max'](1, Math['ceil'](value14 / cols))));
+    ((cols = Math.max(1, Math.ceil(Math.sqrt(value14)))),
+      (rows = Math.max(1, Math.ceil(value14 / cols))));
   else {
-    if (cols && !rows) rows = Math['max'](1, Math['ceil'](value14 / cols));
+    if (cols && !rows) rows = Math.max(1, Math.ceil(value14 / cols));
     else {
-      if (!cols && rows) cols = Math['max'](1, Math['ceil'](value14 / rows));
-      else cols * rows < value14 && (rows = Math['max'](rows, Math['ceil'](value14 / cols)));
+      if (!cols && rows) cols = Math.max(1, Math.ceil(value14 / rows));
+      else cols * rows < value14 && (rows = Math.max(rows, Math.ceil(value14 / cols)));
     }
   }
   return { cols: cols, rows: rows };
 }
-function buildStoryboardCells(id, list4 = [], value17 = {}, value18 = list4['length']) {
+function buildStoryboardCells(id, list4 = [], value17 = {}, value18 = list4.length) {
   const list5 = [];
   for (let value19 = 0; value19 < value18; value19 += 1) {
     const nodeId2 = list4[value19] || '',
       enabled = nodeId2 ? getNode(value17, nodeId2) : null;
     if (!enabled) {
-      list5['push']({ id: id + '-cell-' + (value19 + 1), url: '', isEmpty: true });
+      list5.push({ id: id + '-cell-' + (value19 + 1), url: '', isEmpty: true });
       continue;
     }
     const localPath2 = resolveImageNodeAsset(enabled);
-    if (!localPath2['hasAsset'])
+    if (!localPath2.hasAsset)
       throw createCanvasCommandError(
         'IMAGE_ASSET_NOT_FOUND',
         'Image node has no usable local path or URL: ' + nodeId2,
         { nodeId: nodeId2 },
       );
-    list5['push']({
+    list5.push({
       id: id + '-cell-' + (value19 + 1),
-      localPath: localPath2['localPath'] || null,
-      thumbLocalPath: localPath2['thumbLocalPath'] || null,
-      url: localPath2['url'],
-      originalWidth: localPath2['width'] || null,
-      originalHeight: localPath2['height'] || null,
-      imageWidth: localPath2['width'] || null,
-      imageHeight: localPath2['height'] || null,
+      localPath: localPath2.localPath || null,
+      thumbLocalPath: localPath2.thumbLocalPath || null,
+      url: localPath2.url,
+      originalWidth: localPath2.width || null,
+      originalHeight: localPath2.height || null,
+      imageWidth: localPath2.width || null,
+      imageHeight: localPath2.height || null,
       storyboardSourceNodeId: nodeId2,
       storyboardExtractedCell: true,
       storyboardLockedCell: true,
@@ -232,31 +232,31 @@ function buildStoryboardCells(id, list4 = [], value17 = {}, value18 = list4['len
 function getFirstAssetSize(list6 = [], value20 = {}) {
   for (const value21 of list6) {
     const width2 = resolveImageNodeAsset(getNode(value20, value21) || {});
-    if (width2['width'] > 0 && width2['height'] > 0)
-      return { width: width2['width'], height: width2['height'] };
+    if (width2.width > 0 && width2.height > 0)
+      return { width: width2.width, height: width2.height };
   }
   return { width: 1, height: 1 };
 }
 function resolveStoryboardPosition(box5 = {}, value22 = {}, box6 = {}, value23 = []) {
-  const x = Number(box5['x']),
-    y = Number(box5['y']);
-  if (Number['isFinite'](x) && Number['isFinite'](y)) return { x: x, y: y };
-  const state3 = getState(value22)['nodes'] || {},
+  const x = Number(box5.x),
+    y = Number(box5.y);
+  if (Number.isFinite(x) && Number.isFinite(y)) return { x: x, y: y };
+  const state3 = getState(value22).nodes || {},
     box7 = getNode(value22, value23[0]) || {},
-    value24 = (Number(box7['x']) || 0) + Math['max'](0, Number(box7['width']) || 0) + 80,
-    value25 = Number(box7['y']) || 0;
+    value24 = (Number(box7.x) || 0) + Math.max(0, Number(box7.width) || 0) + 80,
+    value25 = Number(box7.y) || 0;
   return findAvailablePosition(
     state3,
     value24,
     value25,
-    Math['max'](1, Number(box6['width']) || 1),
-    Math['max'](1, Number(box6['height']) || 1),
+    Math.max(1, Number(box6.width) || 1),
+    Math.max(1, Number(box6.height) || 1),
     40,
     'right',
   );
 }
 export function registerStoryboardCommands(value26) {
-  (value26['register']({
+  (value26.register({
     id: 'storyboard.createFromImages',
     description: 'Create a storyboard node from existing image nodes.',
     riskLevel: 'safe',
@@ -284,72 +284,72 @@ export function registerStoryboardCommands(value26) {
     returnSchema: { aliasFields: ['nodeId', 'node', 'sourceNodeIds', 'cols', 'rows', 'cellCount'] },
     validate(error = {}, value27 = {}) {
       try {
-        const ids = sortImageIds(resolveStoryboardSourceIds(error, value27), value27, error['orderBy']),
-          cols2 = resolveGrid(error, ids['length']);
+        const ids = sortImageIds(resolveStoryboardSourceIds(error, value27), value27, error.orderBy),
+          cols2 = resolveGrid(error, ids.length);
         return {
           args: {
             ...error,
             ids: ids,
-            cols: cols2['cols'],
-            rows: cols2['rows'],
-            name: String(error['name'] || 'Storyboard')['trim']() || 'Storyboard',
+            cols: cols2.cols,
+            rows: cols2.rows,
+            name: String(error.name || 'Storyboard').trim() || 'Storyboard',
           },
         };
       } catch (errorCode) {
         return {
           ok: false,
-          errorCode: errorCode['errorCode'] || 'INVALID_STORYBOARD_IMAGES',
-          message: errorCode['message'] || 'Invalid storyboard image nodes.',
-          details: errorCode['details'],
+          errorCode: errorCode.errorCode || 'INVALID_STORYBOARD_IMAGES',
+          message: errorCode.message || 'Invalid storyboard image nodes.',
+          details: errorCode.details,
         };
       }
     },
     execute(cols3, store) {
       const store2 = getStore(store),
         id2 = generateId('storyboard'),
-        sourceWidth = getFirstAssetSize(cols3['ids'], store),
-        aspectLabel = resolveNearestStoryboardAspect(sourceWidth['width'], sourceWidth['height']),
+        sourceWidth = getFirstAssetSize(cols3.ids, store),
+        aspectLabel = resolveNearestStoryboardAspect(sourceWidth.width, sourceWidth.height),
         width3 = computePreparedStoryboardSize({
           aspectLabel: aspectLabel,
-          cols: cols3['cols'],
-          rows: cols3['rows'],
-          sourceWidth: sourceWidth['width'],
-          sourceHeight: sourceWidth['height'],
+          cols: cols3.cols,
+          rows: cols3.rows,
+          sourceWidth: sourceWidth.width,
+          sourceHeight: sourceWidth.height,
         }),
-        x2 = resolveStoryboardPosition(cols3, store, width3, cols3['ids']),
-        cells = buildStoryboardCells(id2, cols3['ids'], store, cols3['cols'] * cols3['rows']),
+        x2 = resolveStoryboardPosition(cols3, store, width3, cols3.ids),
+        cells = buildStoryboardCells(id2, cols3.ids, store, cols3.cols * cols3.rows),
         node = buildStoryboardNodePayload({
           id: id2,
-          name: cols3['name'],
-          x: x2['x'],
-          y: x2['y'],
-          width: width3['width'],
-          height: width3['height'],
-          cols: cols3['cols'],
-          rows: cols3['rows'],
+          name: cols3.name,
+          x: x2.x,
+          y: x2.y,
+          width: width3.width,
+          height: width3.height,
+          cols: cols3.cols,
+          rows: cols3.rows,
           aspectRatio: aspectLabel,
           cells: cells,
           isEditing: false,
         }),
         handler = () => {
-          (store2?.['addNode']?.(node), store2?.['setSelectedNodes']?.([id2]));
+          (store2?.addNode?.(node), store2?.setSelectedNodes?.([id2]));
         };
-      if (typeof store2?.['batch'] === 'function') store2['batch'](handler);
+      if (typeof store2?.batch === 'function') store2.batch(handler);
       else handler();
       return (
-        store['commit']?.(),
+        store.commit?.(),
         {
           nodeId: id2,
           node: node,
-          sourceNodeIds: [...cols3['ids']],
-          cols: cols3['cols'],
-          rows: cols3['rows'],
-          cellCount: cells['length'],
+          sourceNodeIds: [...cols3.ids],
+          cols: cols3.cols,
+          rows: cols3.rows,
+          cellCount: cells.length,
         }
       );
     },
   }),
-    value26['register']({
+    value26.register({
       id: 'storyboard.createGridFromNode',
       description: 'Create a repeated-image storyboard grid next to one canvas node.',
       riskLevel: 'safe',
@@ -367,7 +367,7 @@ export function registerStoryboardCommands(value26) {
       capabilitySchema: { reads: ['nodes'], writes: ['nodes', 'selection'] },
       returnSchema: { aliasFields: ['nodeId', 'node', 'sourceId', 'cols', 'rows', 'cellCount'] },
       validate(error2 = {}, value28 = {}) {
-        const sourceId = String(error2['sourceId'] || '')['trim'](),
+        const sourceId = String(error2.sourceId || '').trim(),
           node2 = getNode(value28, sourceId);
         if (!sourceId || !node2)
           return {
@@ -385,56 +385,56 @@ export function registerStoryboardCommands(value26) {
           args: {
             ...error2,
             sourceId: sourceId,
-            name: String(error2['name'] || 'Storyboard')['trim']() || 'Storyboard',
-            cols: positiveInt(error2['cols'], 2),
-            rows: positiveInt(error2['rows'], 2),
-            baseShortSide: positiveNumber(error2['baseShortSide'], 400),
+            name: String(error2.name || 'Storyboard').trim() || 'Storyboard',
+            cols: positiveInt(error2.cols, 2),
+            rows: positiveInt(error2.rows, 2),
+            baseShortSide: positiveNumber(error2.baseShortSide, 400),
           },
         };
       },
       execute(baseShortSide, store3) {
         const store4 = getStore(store3),
-          sourceWidth2 = getNode(store3, baseShortSide['sourceId']),
+          sourceWidth2 = getNode(store3, baseShortSide.sourceId),
           imageRef = resolveStoryboardSourceImageRef(sourceWidth2),
           id3 = generateId('storyboard'),
           width4 = computeQuickCreateStoryboardSize({
-            sourceWidth: sourceWidth2['width'],
-            sourceHeight: sourceWidth2['height'],
-            baseShortSide: baseShortSide['baseShortSide'],
+            sourceWidth: sourceWidth2.width,
+            sourceHeight: sourceWidth2.height,
+            baseShortSide: baseShortSide.baseShortSide,
           }),
           x3 = calcSafeSpawnPosNearNode(
-            getState(store3)['nodes'] || {},
+            getState(store3).nodes || {},
             sourceWidth2,
-            width4['width'],
-            width4['height'],
+            width4.width,
+            width4.height,
           ),
           node3 = buildStoryboardNodePayload({
             id: id3,
-            name: baseShortSide['name'],
-            x: x3['x'],
-            y: x3['y'],
-            width: width4['width'],
-            height: width4['height'],
-            cols: baseShortSide['cols'],
-            rows: baseShortSide['rows'],
-            aspectRatio: resolveNearestStoryboardAspect(sourceWidth2['width'], sourceWidth2['height']),
+            name: baseShortSide.name,
+            x: x3.x,
+            y: x3.y,
+            width: width4.width,
+            height: width4.height,
+            cols: baseShortSide.cols,
+            rows: baseShortSide.rows,
+            aspectRatio: resolveNearestStoryboardAspect(sourceWidth2.width, sourceWidth2.height),
             cells: buildQuickCreateStoryboardCells({
-              cols: baseShortSide['cols'],
-              rows: baseShortSide['rows'],
+              cols: baseShortSide.cols,
+              rows: baseShortSide.rows,
               imageRef: imageRef,
             }),
           });
         return (
-          store4?.['addNode']?.(node3),
-          store4?.['setSelectedNodes']?.([id3]),
-          store3['commit']?.(),
+          store4?.addNode?.(node3),
+          store4?.setSelectedNodes?.([id3]),
+          store3.commit?.(),
           {
             nodeId: id3,
             node: node3,
-            sourceId: baseShortSide['sourceId'],
-            cols: baseShortSide['cols'],
-            rows: baseShortSide['rows'],
-            cellCount: node3['cells']['length'],
+            sourceId: baseShortSide.sourceId,
+            cols: baseShortSide.cols,
+            rows: baseShortSide.rows,
+            cellCount: node3.cells.length,
           }
         );
       },

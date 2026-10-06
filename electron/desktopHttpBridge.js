@@ -298,7 +298,7 @@ export function createDesktopHttpBridgeHandlers(context = {}) {
     ['/api/v2/desktop/notification-sound/play', (payload) => context.playNotificationSound?.(payload)],
     [
       '/api/v2/desktop/media-task/enqueue',
-      (payload) => context.getMediaTaskQueue?.()['enqueue'](payload || {}),
+      (payload) => context.getMediaTaskQueue?.().enqueue(payload || {}),
     ],
     [
       '/api/v2/desktop/media-task/cancel',
@@ -311,15 +311,15 @@ export function createDesktopHttpBridgeHandlers(context = {}) {
     ],
     [
       '/api/v2/desktop/media-task/list',
-      (payload) => context.getMediaTaskQueue?.()['list']({ limit: payload?.limit || 100 }),
+      (payload) => context.getMediaTaskQueue?.().list({ limit: payload?.limit || 100 }),
     ],
     [
       '/api/v2/desktop/local-asset-cleanup/scan',
-      (payload) => context.getLocalAssetCleanupManager?.()['scan'](payload || {}),
+      (payload) => context.getLocalAssetCleanupManager?.().scan(payload || {}),
     ],
     [
       '/api/v2/desktop/local-asset-cleanup/trash',
-      (payload) => context.getLocalAssetCleanupManager?.()['trash'](payload || {}),
+      (payload) => context.getLocalAssetCleanupManager?.().trash(payload || {}),
     ],
     [
       '/api/v2/desktop/diagnostics/log-event',

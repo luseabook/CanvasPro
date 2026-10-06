@@ -1,48 +1,48 @@
 function normalizeProgressNumber(value) {
   const item = Number(value);
-  return Number['isFinite'](item) ? Math['max'](0, Math['trunc'](item)) : 0;
+  return Number.isFinite(item) ? Math.max(0, Math.trunc(item)) : 0;
 }
 function normalizeProgressText(key) {
-  return String(key || '')['trim']();
+  return String(key || '').trim();
 }
 function collectStableBatchProgress(list = []) {
-  if (!Array['isArray'](list)) return [];
-  return list['map']((response) => ({
-    id: normalizeProgressText(response?.['id'] || response?.['batchId']),
-    status: normalizeProgressText(response?.['status']),
-    sourceSceneRefs: Array['isArray'](response?.['sourceSceneRefs'])
-      ? response['sourceSceneRefs']['map'](normalizeProgressText)['filter'](Boolean)['sort']()
+  if (!Array.isArray(list)) return [];
+  return list.map((response) => ({
+    id: normalizeProgressText(response?.id || response?.batchId),
+    status: normalizeProgressText(response?.status),
+    sourceSceneRefs: Array.isArray(response?.sourceSceneRefs)
+      ? response.sourceSceneRefs.map(normalizeProgressText).filter(Boolean).sort()
       : [],
-    assetRefs: Array['isArray'](response?.['completedAssetRefs'])
-      ? response['completedAssetRefs']['map'](normalizeProgressText)['filter'](Boolean)['sort']()
+    assetRefs: Array.isArray(response?.completedAssetRefs)
+      ? response.completedAssetRefs.map(normalizeProgressText).filter(Boolean).sort()
       : [],
   }));
 }
 function createStoryAssetExtractionProgressKey(response2) {
-  if (!response2 || typeof response2 !== 'object' || Array['isArray'](response2)) return '';
-  return JSON['stringify']({
-    strategy: normalizeProgressText(response2['strategy']),
-    status: normalizeProgressText(response2['status']),
-    phase: normalizeProgressText(response2['phase']),
+  if (!response2 || typeof response2 !== 'object' || Array.isArray(response2)) return '';
+  return JSON.stringify({
+    strategy: normalizeProgressText(response2.strategy),
+    status: normalizeProgressText(response2.status),
+    phase: normalizeProgressText(response2.phase),
     progress: {
-      stage: normalizeProgressText(response2['progress']?.['stage']),
-      current: normalizeProgressNumber(response2['progress']?.['current']),
-      total: normalizeProgressNumber(response2['progress']?.['total']),
+      stage: normalizeProgressText(response2.progress?.stage),
+      current: normalizeProgressNumber(response2.progress?.current),
+      total: normalizeProgressNumber(response2.progress?.total),
     },
-    inventoryBatches: collectStableBatchProgress(response2['inventoryBatches']),
-    completedAssetRefs: Array['isArray'](response2['completedAssets'])
-      ? response2['completedAssets']
-          ['map']((index) => normalizeProgressText(index?.['ref'] || index?.['id']))
-          ['filter'](Boolean)
-          ['sort']()
+    inventoryBatches: collectStableBatchProgress(response2.inventoryBatches),
+    completedAssetRefs: Array.isArray(response2.completedAssets)
+      ? response2.completedAssets
+          .map((index) => normalizeProgressText(index?.ref || index?.id))
+          .filter(Boolean)
+          .sort()
       : [],
-    detailBatches: collectStableBatchProgress(response2['detailBatches']),
+    detailBatches: collectStableBatchProgress(response2.detailBatches),
   });
 }
 function createExtractionRunnerError(result, data, options) {
   const error = new Error(data);
-  error['type'] = result;
-  if (options) error['cause'] = options;
+  error.type = result;
+  if (options) error.cause = options;
   return error;
 }
 export async function runStoryAssetExtractionToCompletion({
@@ -60,9 +60,9 @@ export async function runStoryAssetExtractionToCompletion({
     try {
       return await execute(target);
     } catch (source) {
-      if (source?.['type'] !== 'ASSET_EXTRACTION_CONTINUE_REQUIRED' || source?.['isContinuation'] !== true)
+      if (source?.type !== 'ASSET_EXTRACTION_CONTINUE_REQUIRED' || source?.isContinuation !== true)
         throw source;
-      const next = source?.['assetExtractionDraft'],
+      const next = source?.assetExtractionDraft,
         storyAssetExtractionProgressKey2 = createStoryAssetExtractionProgressKey(next);
       if (!storyAssetExtractionProgressKey2)
         throw createExtractionRunnerError(

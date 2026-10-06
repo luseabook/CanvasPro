@@ -3,17 +3,17 @@ import {
   repairAudioVoiceLocalAsrRuntime,
 } from './audioVoiceLocalAsrRuntime.js';
 function errorMessage(error, value = '') {
-  return String(error?.['message'] || error || value)['trim']() || value;
+  return String(error?.message || error || value).trim() || value;
 }
 export function getAudioVoiceAnalyzeErrorMessage(
   item,
   { getErrorMessage: getErrorMessage, text: text, authErrorKeys: authErrorKeys = {} },
 ) {
   const key = getErrorMessage(item, text('toasts.analysisFailed'));
-  if (/invalid\s+x-api-key|x-api-key\s+invalid|api\s*key\s+invalid/i['test'](key))
-    return text(authErrorKeys['invalidKey'] || 'toasts.asrApiKeyInvalid');
-  if (/(?:permission|denied|forbid|unauthor|not\s+authorized|no\s+access|无权限|未授权|鉴权)/i['test'](key))
-    return text(authErrorKeys['permissionDenied'] || 'toasts.asrPermissionDenied');
+  if (/invalid\s+x-api-key|x-api-key\s+invalid|api\s*key\s+invalid/i.test(key))
+    return text(authErrorKeys.invalidKey || 'toasts.asrApiKeyInvalid');
+  if (/(?:permission|denied|forbid|unauthor|not\s+authorized|no\s+access|无权限|未授权|鉴权)/i.test(key))
+    return text(authErrorKeys.permissionDenied || 'toasts.asrPermissionDenied');
   return key;
 }
 export function createAudioVoiceInitialAnalysisProgress({ isLocal: isLocal, text: text2 }) {
@@ -38,7 +38,7 @@ export async function recoverAudioVoiceLocalAsrRuntime({
   setAnalysisState: setAnalysisState,
   repair: repair = repairAudioVoiceLocalAsrRuntime,
 }) {
-  const run = (index) => windowObject?.['showToast']?.(index, 'error');
+  const run = (index) => windowObject?.showToast?.(index, 'error');
   if (repairAttempted || !isAudioVoiceLocalAsrRuntimeFailure(error2)) return (run(message), false);
   const enabled = await confirmAction({
     className: 'audio-voice-start-analyze-confirm',
@@ -55,8 +55,8 @@ export async function recoverAudioVoiceLocalAsrRuntime({
       await repair({
         nodeId: nodeId,
         onTaskStarted: (result) => {
-          void analysisSession['trackTask'](operation, result);
-          if (canCommit()) progressTracker['install'](result);
+          void analysisSession.trackTask(operation, result);
+          if (canCommit()) progressTracker.install(result);
         },
       }),
       canCommit()
@@ -64,7 +64,7 @@ export async function recoverAudioVoiceLocalAsrRuntime({
   } catch (data) {
     if (!canCommit()) return false;
     return (
-      progressTracker['clear'](),
+      progressTracker.clear(),
       setAnalysisState('error', null),
       run(
         text3('runtimeRepair.failed', {

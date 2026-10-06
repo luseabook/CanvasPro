@@ -96,16 +96,16 @@ import { bindImageFullscreenAction } from './imageActions/fullscreenAction.js';
 import { bindImageResetSizeAction } from './imageActions/resetSizeAction.js';
 import { bindApimartPrivateAvatarAction } from './apimartPrivateAvatarAction.js';
 const getStateSnapshot = () =>
-  typeof appStore['getStateRaw'] === 'function' ? appStore['getStateRaw']() : appStore['getState']();
+  typeof appStore.getStateRaw === 'function' ? appStore.getStateRaw() : appStore.getState();
 function imageToolbarText(value, item = {}) {
   return t('nodeToolbar.image.' + value, item);
 }
 function createViewportSnapshotTracker() {
-  let args = getStateSnapshot()['viewport'] || {},
+  let args = getStateSnapshot().viewport || {},
     value2 =
-      typeof appStore['subscribeSelector'] === 'function'
-        ? appStore['subscribeSelector'](
-            (key) => key['viewport'],
+      typeof appStore.subscribeSelector === 'function'
+        ? appStore.subscribeSelector(
+            (key) => key.viewport,
             (index) => {
               args = index || {};
             },
@@ -123,36 +123,36 @@ const TOOLBAR_TASK_CANCELLED_MESSAGE = imageToolbarText('taskCancelled'),
   IMAGE_LOCAL_SAVE_FAILURE_MESSAGE = imageToolbarText('localSaveGeneratedFailed');
 function createToolbarCancelledError() {
   const error = new Error(TOOLBAR_TASK_CANCELLED_MESSAGE);
-  return ((error['name'] = 'AbortError'), error);
+  return ((error.name = 'AbortError'), error);
 }
 function isToolbarCancelledError(error2) {
-  const result = String(error2?.['message'] || error2 || '');
+  const result = String(error2?.message || error2 || '');
   return (
-    error2?.['name'] === 'AbortError' ||
+    error2?.name === 'AbortError' ||
     result === TOOLBAR_TASK_CANCELLED_MESSAGE ||
     result === 'CANCELLED' ||
-    result['toLowerCase']()['includes']('aborted')
+    result.toLowerCase().includes('aborted')
   );
 }
 function createLocalSaveFailureError() {
   const error3 = new Error(IMAGE_LOCAL_SAVE_FAILURE_MESSAGE);
-  return ((error3['isLocalSaveFailure'] = true), error3);
+  return ((error3.isLocalSaveFailure = true), error3);
 }
 function isLocalSaveFailure(error4) {
   return (
-    error4?.['isLocalSaveFailure'] === true ||
-    String(error4?.['message'] || error4 || '') === IMAGE_LOCAL_SAVE_FAILURE_MESSAGE
+    error4?.isLocalSaveFailure === true ||
+    String(error4?.message || error4 || '') === IMAGE_LOCAL_SAVE_FAILURE_MESSAGE
   );
 }
 function throwIfToolbarTaskCancelled(data) {
   if (isRunningHubToolbarTaskCancelled(data)) throw createToolbarCancelledError();
 }
 function selectToolbarTaskNode(options) {
-  appStore['setSelectedNodes']([options]);
+  appStore.setSelectedNodes([options]);
 }
 function notifyImageToolbarTaskChange({ sourceNodeId: sourceNodeId, targetNodeId: targetNodeId }) {
   (notifyRunningHubToolbarTasksChanged({ sourceNodeId: sourceNodeId, outId: targetNodeId }),
-    window['_triggerLocalCacheSave']?.());
+    window._triggerLocalCacheSave?.());
 }
 function buildClearedImageMediaFields() {
   return { imageUrl: '', sourceUrl: '', thumbUrl: '', src: '', localPath: '' };
@@ -160,23 +160,23 @@ function buildClearedImageMediaFields() {
 export { IMAGE_TOOLBAR_HTML };
 registerStaticInnerHTML('toolbar:image', IMAGE_TOOLBAR_HTML);
 function getToolbarActionFromButton(el) {
-  if (!el?.['classList']) return '';
-  for (const list of el['classList']) {
-    if (!list['startsWith']('act-')) continue;
-    const target = list['slice'](4);
-    if (IMAGE_TOOLBAR_ACTIONS['includes'](target)) return target;
+  if (!el?.classList) return '';
+  for (const list of el.classList) {
+    if (!list.startsWith('act-')) continue;
+    const target = list.slice(4);
+    if (IMAGE_TOOLBAR_ACTIONS.includes(target)) return target;
   }
   return '';
 }
 export function bindImageToolbarEvents(toolbarEl, source) {
   if (!toolbarEl) return;
-  const nodeId = typeof source === 'string' ? source : source?.['id'];
+  const nodeId = typeof source === 'string' ? source : source?.id;
   if (!nodeId) return;
   const getNodeData = () =>
-    getStateSnapshot()['nodes']?.[nodeId] || (typeof source === 'object' ? source : null);
-  (toolbarEl['addEventListener']('pointerdown', (event) => event['stopPropagation']()),
-    toolbarEl['addEventListener']('dblclick', (event2) => {
-      (event2['preventDefault'](), event2['stopPropagation']());
+    getStateSnapshot().nodes?.[nodeId] || (typeof source === 'object' ? source : null);
+  (toolbarEl.addEventListener('pointerdown', (event) => event.stopPropagation()),
+    toolbarEl.addEventListener('dblclick', (event2) => {
+      (event2.preventDefault(), event2.stopPropagation());
     }));
   const closeToolbarMoreMenu = bindImageToolbarLayoutUi(toolbarEl, {
       store: appStore,
@@ -187,9 +187,9 @@ export function bindImageToolbarEvents(toolbarEl, source) {
       getToolbarActionFromButton: getToolbarActionFromButton,
     }),
     _hdTaskMachine = createRunningHubTaskStateMachine(),
-    _hdState = _hdTaskMachine['state'],
+    _hdState = _hdTaskMachine.state,
     next = {
-      closeToolbarMoreMenu: closeToolbarMoreMenu['closeMoreMenu'],
+      closeToolbarMoreMenu: closeToolbarMoreMenu.closeMoreMenu,
       toolbarEl: toolbarEl,
       nodeId: nodeId,
       mediaKind: 'image',
@@ -210,7 +210,7 @@ export function bindImageToolbarEvents(toolbarEl, source) {
       buildSourceMediaNodePayload: buildSourceMediaNodePayload,
       resolveCanvasImagePreviewUrl: resolveCanvasImagePreviewUrl,
       localPathToUrl: localPathToUrl,
-      saveMediaFile: desktopBridge['nodeExport']['canSaveMedia']() ? saveMediaDownload : null,
+      saveMediaFile: desktopBridge.nodeExport.canSaveMedia() ? saveMediaDownload : null,
       buildImageGenerationFailurePatch: buildImageGenerationFailurePatch,
       buildImageGenerationResultPatch: buildImageGenerationResultPatch,
       buildStoryboardNodePayload: buildStoryboardNodePayload,
@@ -256,7 +256,7 @@ export function bindImageToolbarEvents(toolbarEl, source) {
       buildClearedImageMediaFields: buildClearedImageMediaFields,
       IMAGE_LOCAL_SAVE_FAILURE_MESSAGE: IMAGE_LOCAL_SAVE_FAILURE_MESSAGE,
     };
-  (bindPreviewUploadToolbarAction({ button: toolbarEl['querySelector']('.act-upload') }),
+  (bindPreviewUploadToolbarAction({ button: toolbarEl.querySelector('.act-upload') }),
     bindImageLocalEditAction(next),
     bindImageMattingAction(next),
     bindImageAutoSubjectAction(next),

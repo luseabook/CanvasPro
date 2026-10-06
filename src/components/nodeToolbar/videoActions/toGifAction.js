@@ -10,21 +10,21 @@ export function bindVideoToGifAction(value) {
       _saveRemoteVideoResult: _saveRemoteVideoResult,
       closeToolbarMoreMenu: closeToolbarMoreMenu,
     } = value,
-    el = toolbarEl['querySelector']('.act-to-gif');
+    el = toolbarEl.querySelector('.act-to-gif');
   if (!el) return () => {};
   const item = (event) => {
-    (event['preventDefault'](),
-      event['stopPropagation'](),
+    (event.preventDefault(),
+      event.stopPropagation(),
       closeToolbarMoreMenu?.(),
-      VideoClipController['exit']({ silent: true }),
-      VideoKeyingController['exit']({ silent: true }),
-      VideoGifController['exit']({ silent: true }),
-      VideoGifController['init']({
-        nodeId: nodeData['id'],
+      VideoClipController.exit({ silent: true }),
+      VideoKeyingController.exit({ silent: true }),
+      VideoGifController.exit({ silent: true }),
+      VideoGifController.init({
+        nodeId: nodeData.id,
         sourceUrl: _getCurrentVideoUrl(),
         sourceLocalPath: _getCurrentVideoLocalPath(),
         ensureLocalSource: (key) => _saveRemoteVideoResult(key),
       }));
   };
-  return (el['addEventListener']('click', item), () => el['removeEventListener']('click', item));
+  return (el.addEventListener('click', item), () => el.removeEventListener('click', item));
 }

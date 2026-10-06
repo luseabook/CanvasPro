@@ -521,30 +521,30 @@ async function clearPortBeforeStart(value13 = null) {
   const backendCommand = resolveBackendLaunch();
   return reclaimStartupPort({
     port: PORT,
-    env: process['env'],
+    env: process.env,
     collectListeningPortPids: collectListeningPortPids,
     probePortAvailable: () => probeTcpPortAvailable({ host: HOST, port: PORT }),
     confirmRuntimeIdentity: async ({ pids: pids }) => {
       if (!(await probeServer())) return [];
       return findVerifiedBackendProcessPids({
         pids: pids,
-        appIsPackaged: app['isPackaged'],
+        appIsPackaged: app.isPackaged,
         appRoot: APP_ROOT,
-        backendCommand: backendCommand['command'],
+        backendCommand: backendCommand.command,
         host: HOST,
         port: PORT,
-        platform: process['platform'],
-        env: process['env'],
+        platform: process.platform,
+        env: process.env,
       });
     },
     terminateProcess: (value14) => {
-      if (process['platform'] === 'win32') {
-        const windowsSystemToolPath = resolveWindowsSystemToolPath('taskkill', { env: process['env'] });
+      if (process.platform === 'win32') {
+        const windowsSystemToolPath = resolveWindowsSystemToolPath('taskkill', { env: process.env });
         execFileSync(windowsSystemToolPath, ['/PID', String(value14), '/F', '/T'], {
           stdio: 'ignore',
           windowsHide: true,
         });
-      } else process['kill'](value14, 'SIGTERM');
+      } else process.kill(value14, 'SIGTERM');
     },
     delayFn: delay,
     onReclaim: () =>
@@ -560,7 +560,7 @@ async function clearPortBeforeStart(value13 = null) {
         level: 'warn',
         source: 'main',
         message: 'Startup port listener enumeration failed; the port is free, continuing startup',
-        context: { port: PORT, resolution: 'port-free-continue', ...(error2?.['details'] || {}) },
+        context: { port: PORT, resolution: 'port-free-continue', ...(error2?.details || {}) },
       });
     },
   });
@@ -599,10 +599,10 @@ function resolvePythonCommand() {
 }
 function resolveBackendLaunch() {
   return resolveBackendLaunchSpec({
-    appIsPackaged: app['isPackaged'],
+    appIsPackaged: app.isPackaged,
     appRoot: APP_ROOT,
     runtimeRoot: RUNTIME_ROOT,
-    platform: process['platform'],
+    platform: process.platform,
     existsSync: existsSync,
     pythonCommand: resolvePythonCommand(),
   });
@@ -766,11 +766,11 @@ const { getStableDeviceId } = createDeviceIdentityManager({
       diagnostics: diagnostics,
       logDir: LOG_DIR,
       logDiagnosticEvent: logDiagnosticEvent,
-      showOpenDialog: (options) => foregroundDialogs['showOpenDialog'](options),
+      showOpenDialog: (options) => foregroundDialogs.showOpenDialog(options),
       openFolder: (folderPath) =>
         openShellFolder(folderPath, { shellApi: shell, logEvent: logDiagnosticEvent }),
       getCanvasProjectDir: getCanvasProjectDir,
-      showSaveDialog: (options) => foregroundDialogs['showSaveDialog'](options),
+      showSaveDialog: (options) => foregroundDialogs.showSaveDialog(options),
       getRecoverySnapshotPath: getRecoverySnapshotPath,
       writeRecoverySnapshotFile: (snapshotPath, payload) => writeRecoverySnapshot(snapshotPath, payload),
       getRecoverySnapshotFileInfo: (snapshotPath, options) => getRecoverySnapshotInfo(snapshotPath, options),
@@ -891,7 +891,7 @@ function getAssetCapabilityOperations() {
       getMediaTaskQueue: getMediaTaskQueue,
       createImageFromPath: (value36) => nativeImage.createFromPath(value36),
       createImageDerivatives: createImageDerivativeWorker({ BrowserWindow: BrowserWindow }),
-      probeVideoPlaybackInfo: mediaTaskRuntime['probeVideoPlaybackInfoForImport'],
+      probeVideoPlaybackInfo: mediaTaskRuntime.probeVideoPlaybackInfoForImport,
       publishAssetUpdate: (value37) => {
         assetUpdateEvents.push(value37);
         mainWindow?.webContents?.send('asset:updated', value37);
@@ -927,10 +927,10 @@ const localPreviewProtocolRuntime = createLocalPreviewProtocolRuntime({
   resolveLocalVirtualPath: resolveLocalVirtualPath,
 });
 function createLocalPreviewUrl(options5 = {}) {
-  return localPreviewProtocolRuntime['createUrl'](options5);
+  return localPreviewProtocolRuntime.createUrl(options5);
 }
 function installLocalPreviewProtocol() {
-  localPreviewProtocolRuntime['install']();
+  localPreviewProtocolRuntime.install();
 }
 function resizeImageToMaxEdge(value44, value45) {
   const box5 = value44.getSize(),
@@ -1019,7 +1019,7 @@ const mediaTaskRuntime = createMediaTaskRuntime({
   MediaTaskQueueCtor: MediaTaskQueueWithHistory,
 });
 function getMediaTaskQueue() {
-  return mediaTaskRuntime['getQueue']();
+  return mediaTaskRuntime.getQueue();
 }
 function getRuntimePythonCertificateEnv() {
   return buildRuntimePythonCertificateEnv({
@@ -1220,8 +1220,8 @@ function scheduleServerRestart() {
     return;
   }
   const attempt = serverRestartAttempts + 1,
-    delayMs = Math['min'](
-      SERVER_RESTART_BASE_DELAY_MS * Math['pow'](2, serverRestartAttempts),
+    delayMs = Math.min(
+      SERVER_RESTART_BASE_DELAY_MS * Math.pow(2, serverRestartAttempts),
       SERVER_RESTART_MAX_DELAY_MS,
     );
   serverRestartAttempts = attempt;
@@ -1258,7 +1258,7 @@ function scheduleServerRestart() {
         scheduleServerRestart();
       });
   }, delayMs);
-  if (typeof serverRestartTimer['unref'] === 'function') serverRestartTimer['unref']();
+  if (typeof serverRestartTimer.unref === 'function') serverRestartTimer.unref();
 }
 async function ensureServerRunning(value79 = null) {
   desktopStartupLifecycle.assertStarting();
@@ -1825,7 +1825,7 @@ async function openDesktopProject(options11 = {}) {
     value114 = recentProject2.path;
   } else {
     mkdirSync(getCanvasProjectDir(), { recursive: true });
-    const enabled10 = await foregroundDialogs['showOpenDialog']({
+    const enabled10 = await foregroundDialogs.showOpenDialog({
       title: '打开项目',
       defaultPath: getCanvasProjectDir(),
       properties: ['openFile'],
@@ -1848,7 +1848,7 @@ async function selectDirectory(options12 = {}) {
     dialogOptionText = normalizeDialogOptionText(options12?.defaultPath, '', 1024),
     value118 = { title: title, properties: ['openDirectory', 'createDirectory'] };
   if (dialogOptionText) value118.defaultPath = dialogOptionText;
-  const path4 = await foregroundDialogs['showOpenDialog'](value118);
+  const path4 = await foregroundDialogs.showOpenDialog(value118);
   if (path4.canceled || !path4.filePaths?.[0]) return { success: false, canceled: true };
   return { success: true, canceled: false, path: path4.filePaths[0] };
 }
@@ -1863,7 +1863,7 @@ async function saveDesktopProject(options13 = {}) {
     withJsonProjectExtension2 = value121?.path || buildDefaultProjectPath(getCanvasProjectDir(), name2);
   } else {
     mkdirSync(getCanvasProjectDir(), { recursive: true });
-    const enabled11 = await foregroundDialogs['showSaveDialog']({
+    const enabled11 = await foregroundDialogs.showSaveDialog({
       title: '另存为项目',
       defaultPath: buildDefaultProjectPath(getCanvasProjectDir(), name2),
       filters: getProjectDialogFilters(),

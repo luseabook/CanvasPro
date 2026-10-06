@@ -1,5 +1,5 @@
 import { STORY_SCENE_MAX_SECONDS_OPTIONS, normalizeStoryPlanningConstraints } from './planningContract.js';
-export const STORY_EPISODE_SPLIT_CAMERA_PRESETS = Object['freeze']([
+export const STORY_EPISODE_SPLIT_CAMERA_PRESETS = Object.freeze([
   '中景，平视机位，固定镜头。',
   '近景，平视机位，固定镜头。',
   '特写，平视机位，固定镜头。',
@@ -15,7 +15,7 @@ export const STORY_EPISODE_SPLIT_CAMERA_PRESETS = Object['freeze']([
 ]);
 function normalizePositiveNumber(value) {
   const count = Number(value);
-  return Number['isFinite'](count) && count > 0 ? count : 0;
+  return Number.isFinite(count) && count > 0 ? count : 0;
 }
 function createAssetUsageResponseSchema() {
   return {
@@ -33,7 +33,7 @@ function createShotResponseSchema({
   includeTimeline: includeTimeline = false,
 } = {}) {
   const args = normalizePositiveNumber(maxDurationSeconds),
-    item = Array['isArray'](requiredFields)
+    item = Array.isArray(requiredFields)
       ? requiredFields
       : ['durationSec', 'assetUsages', 'visual', 'camera', 'dialogue', 'voiceover', 'audio'];
   return {
@@ -68,12 +68,12 @@ function createClipResponseSchema({
   includeDirectorContinuity: includeDirectorContinuity = false,
   includeTimeline: includeTimeline = false,
 } = {}) {
-  const key = Math['max'](1, Math['trunc'](Number(minimumShotsPerClip) || 1)),
-    args2 = Math['max'](0, Math['trunc'](Number(maximumShotsPerClip) || 0));
+  const key = Math.max(1, Math.trunc(Number(minimumShotsPerClip) || 1)),
+    args2 = Math.max(0, Math.trunc(Number(maximumShotsPerClip) || 0));
   return {
     type: 'object',
     additionalProperties: false,
-    required: Array['isArray'](requiredClipFields)
+    required: Array.isArray(requiredClipFields)
       ? requiredClipFields
       : compactExperimental
         ? ['ref', 'shots']
@@ -104,9 +104,7 @@ export function buildStoryEpisodeSplitBlueprintResponseSchema({
   includeSceneAssetRef: includeSceneAssetRef = true,
   includeDirectorContinuity: includeDirectorContinuity = false,
 } = {}) {
-  const storyPlanningConstraints = normalizeStoryPlanningConstraints({ sceneMaxSeconds: sceneMaxSeconds })[
-    'sceneMaxSeconds'
-  ];
+  const storyPlanningConstraints = normalizeStoryPlanningConstraints({ sceneMaxSeconds: sceneMaxSeconds }).sceneMaxSeconds;
   return {
     type: 'object',
     additionalProperties: false,
@@ -165,7 +163,7 @@ export function buildStoryEpisodeSplitBatchResponseSchema({
   includeDirectorContinuity: includeDirectorContinuity = false,
   includeTimeline: includeTimeline = false,
 } = {}) {
-  const index = Math['max'](1, Math['trunc'](Number(clipCount) || 1));
+  const index = Math.max(1, Math.trunc(Number(clipCount) || 1));
   return {
     type: 'object',
     additionalProperties: false,
@@ -219,7 +217,7 @@ export function buildStoryEpisodeSplitSingleResponseSchema() {
                   c: {
                     type: 'integer',
                     minimum: 0,
-                    maximum: STORY_EPISODE_SPLIT_CAMERA_PRESETS['length'] - 1,
+                    maximum: STORY_EPISODE_SPLIT_CAMERA_PRESETS.length - 1,
                   },
                   q: { type: 'string' },
                   o: { type: 'string' },

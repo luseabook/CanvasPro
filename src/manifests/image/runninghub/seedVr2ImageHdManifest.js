@@ -4,7 +4,7 @@ import {
 } from '../../shared/runningHubImageManifestShared.js';
 export const SEED_VR2_IMAGE_HD_MODEL_ID = 'runninghub/2098332624828846082';
 export const SEED_VR2_IMAGE_HD_EXECUTION_ID = 'runninghub.workflow.seedvr2-image-hd.v1';
-export const seedVr2ImageHdModelManifest = Object['freeze']({
+export const seedVr2ImageHdModelManifest = Object.freeze({
   schemaVersion: '1.0',
   modelId: SEED_VR2_IMAGE_HD_MODEL_ID,
   executionId: SEED_VR2_IMAGE_HD_EXECUTION_ID,
@@ -36,7 +36,7 @@ export const seedVr2ImageHdModelManifest = Object['freeze']({
         label: '分辨率',
         menuTitle: '分辨率',
         defaultValue: 4096,
-        options: [2048, 4096]['map']((value) => ({
+        options: [2048, 4096].map((value) => ({
           value: value,
           label: String(value),
           selectedLabel: '分辨率' + value,
@@ -49,7 +49,7 @@ export const seedVr2ImageHdModelManifest = Object['freeze']({
   cancellable: true,
   outputType: 'image',
 });
-export const seedVr2ImageHdExecutionManifest = Object['freeze']({
+export const seedVr2ImageHdExecutionManifest = Object.freeze({
   schemaVersion: '1.0',
   id: SEED_VR2_IMAGE_HD_EXECUTION_ID,
   provider: 'runninghubwf',

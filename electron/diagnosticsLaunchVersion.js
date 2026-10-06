@@ -2,26 +2,26 @@ import { readFileSync, writeFileSync, renameSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 function version(list) {
   return typeof list === 'string' &&
-    /^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/['test'](list) &&
-    list['length'] <= 100
+    /^\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?$/.test(list) &&
+    list.length <= 100
     ? list
     : '';
 }
 export function recordDiagnosticsLaunchVersion({ logDir: logDir, app: app } = {}) {
   const version2 = { currentVersion: '', previousVersion: '', versionChanged: null, markerSaved: false },
-    value = path['join'](logDir, 'launch-version.json'),
-    item = value + '.' + process['pid'] + '.tmp';
+    value = path.join(logDir, 'launch-version.json'),
+    item = value + '.' + process.pid + '.tmp';
   try {
-    version2['currentVersion'] = version(app?.['getVersion']?.());
-    if (!version2['currentVersion']) return version2;
+    version2.currentVersion = version(app?.getVersion?.());
+    if (!version2.currentVersion) return version2;
     try {
-      version2['previousVersion'] = version(JSON['parse'](readFileSync(value, 'utf8'))['version']);
+      version2.previousVersion = version(JSON.parse(readFileSync(value, 'utf8')).version);
     } catch {}
-    if (version2['previousVersion'])
-      version2['versionChanged'] = version2['previousVersion'] !== version2['currentVersion'];
-    (writeFileSync(item, JSON['stringify']({ version: version2['currentVersion'] }), 'utf8'),
+    if (version2.previousVersion)
+      version2.versionChanged = version2.previousVersion !== version2.currentVersion;
+    (writeFileSync(item, JSON.stringify({ version: version2.currentVersion }), 'utf8'),
       renameSync(item, value),
-      (version2['markerSaved'] = true));
+      (version2.markerSaved = true));
   } catch {
     try {
       unlinkSync(item);

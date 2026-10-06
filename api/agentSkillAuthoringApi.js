@@ -14,12 +14,12 @@ export const AGENT_SKILL_AUTHORING_SYSTEM_PROMPT = [
   'Choose an id that does not conflict with existingSkills.',
   'For update operations, preserve targetSkill.id exactly and revise only the requested title, description, triggers, or instructions.',
   'For clone operations, keep the source meaning unless the user requests changes and choose a new non-conflicting id.',
-]['join']('\n');
-const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object['freeze']({
+].join('\n');
+const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object.freeze({
   name: 'agent_skill_draft',
   strict: false,
   fallback: 'prompt',
-  schema: Object['freeze']({
+  schema: Object.freeze({
     type: 'object',
     additionalProperties: false,
     required: ['status', 'reply', 'question', 'definition'],
@@ -44,12 +44,12 @@ const AGENT_SKILL_AUTHORING_STRUCTURED_OUTPUT = Object['freeze']({
 });
 function truncateText(value, item = AUTHORING_TEXT_LIMIT) {
   const list = String(value || '');
-  return list['length'] <= item ? list : list['slice'](0, Math['max'](0, item - 3)) + '...';
+  return list.length <= item ? list : list.slice(0, Math.max(0, item - 3)) + '...';
 }
 function normalizeLocale(key = '') {
   return String(key || '')
-    ['toLowerCase']()
-    ['startsWith']('en')
+    .toLowerCase()
+    .startsWith('en')
     ? 'en-US'
     : 'zh-CN';
 }
@@ -73,31 +73,31 @@ function buildPrompt({
     originalRequest: truncateText(originalMessage || message),
     userMessage: truncateText(message),
     clarificationAnswer: truncateText(clarificationAnswer),
-    history: (Array['isArray'](history) ? history : [])
-      ['map']((error = {}) => ({
-        role: String(error['role'] || 'assistant') === 'user' ? 'user' : 'assistant',
-        content: truncateText(error['content'] || error['reply'] || error['message'] || ''),
+    history: (Array.isArray(history) ? history : [])
+      .map((error = {}) => ({
+        role: String(error.role || 'assistant') === 'user' ? 'user' : 'assistant',
+        content: truncateText(error.content || error.reply || error.message || ''),
       }))
-      ['filter']((result) => result['content'])
-      ['slice'](-AUTHORING_HISTORY_LIMIT),
-    existingSkills: (Array['isArray'](existingSkills) ? existingSkills : [])
-      ['map']((options = {}) => ({
-        id: truncateText(options['id'], 64),
-        title: truncateText(options['title'] || options['id'], 120),
+      .filter((result) => result.content)
+      .slice(-AUTHORING_HISTORY_LIMIT),
+    existingSkills: (Array.isArray(existingSkills) ? existingSkills : [])
+      .map((options = {}) => ({
+        id: truncateText(options.id, 64),
+        title: truncateText(options.title || options.id, 120),
       }))
-      ['filter']((data) => data['id'])
-      ['slice'](0, 100),
-    operation: ['create', 'update', 'clone']['includes'](String(operation)) ? String(operation) : 'create',
+      .filter((data) => data.id)
+      .slice(0, 100),
+    operation: ['create', 'update', 'clone'].includes(String(operation)) ? String(operation) : 'create',
     targetSkill:
       targetSkill && typeof targetSkill === 'object'
         ? {
-            id: truncateText(targetSkill['id'], 64),
-            title: truncateText(targetSkill['title'] || targetSkill['id'], 120),
-            description: truncateText(targetSkill['description'], 600),
-            triggers: (Array['isArray'](targetSkill['triggers']) ? targetSkill['triggers'] : [])
-              ['slice'](0, 24)
-              ['map']((target) => truncateText(target, 160)),
-            instructions: truncateText(targetSkill['instructions'], 12000),
+            id: truncateText(targetSkill.id, 64),
+            title: truncateText(targetSkill.title || targetSkill.id, 120),
+            description: truncateText(targetSkill.description, 600),
+            triggers: (Array.isArray(targetSkill.triggers) ? targetSkill.triggers : [])
+              .slice(0, 24)
+              .map((target) => truncateText(target, 160)),
+            instructions: truncateText(targetSkill.instructions, 12000),
           }
         : null,
     outputContract: {
@@ -122,25 +122,25 @@ function buildPrompt({
         }
       : {}),
   };
-  return JSON['stringify'](index)['slice'](0, AUTHORING_PROMPT_LIMIT);
+  return JSON.stringify(index).slice(0, AUTHORING_PROMPT_LIMIT);
 }
 function getResultText(response) {
   return typeof response === 'string'
     ? response
-    : response?.['text'] || response?.['outputText'] || response?.['content'] || '';
+    : response?.text || response?.outputText || response?.content || '';
 }
 function parseResult(source) {
   if (
     source &&
     typeof source === 'object' &&
-    !Array['isArray'](source) &&
-    (Object['prototype']['hasOwnProperty']['call'](source, 'status') || source['definition'])
+    !Array.isArray(source) &&
+    (Object.prototype.hasOwnProperty.call(source, 'status') || source.definition)
   )
     return source;
-  const enabled = String(getResultText(source) || '')['trim']();
+  const enabled = String(getResultText(source) || '').trim();
   if (!enabled) throw new Error('Agent Skill author returned empty text.');
   try {
-    return JSON['parse'](enabled);
+    return JSON.parse(enabled);
   } catch {
     throw new Error('Agent Skill author returned invalid JSON.');
   }
@@ -159,9 +159,9 @@ export async function requestAgentSkillDraft({
   targetSkill: targetSkill = null,
   repairReason: repairReason = '',
 } = {}) {
-  const model = String(settings['model'] || '')['trim'](),
-    provider = String(settings['provider'] || '')['trim'](),
-    providerProfileId = String(settings['providerProfileId'] || '')['trim']();
+  const model = String(settings.model || '').trim(),
+    provider = String(settings.provider || '').trim(),
+    providerProfileId = String(settings.providerProfileId || '').trim();
   if (!model || !provider) throw new Error('Agent model is not configured.');
   onTrace?.({
     type: 'agent_skill_authoring_model_selected',
@@ -180,7 +180,7 @@ export async function requestAgentSkillDraft({
         clarificationAnswer: clarificationAnswer,
         history: history,
         existingSkills: existingSkills,
-        locale: settings['locale'],
+        locale: settings.locale,
         operation: operation,
         targetSkill: targetSkill,
         repairReason: repairReason,
@@ -194,7 +194,7 @@ export async function requestAgentSkillDraft({
   try {
     return parseResult(request2);
   } catch (reason) {
-    onTrace?.({ type: 'agent_skill_authoring_json_retry', reason: reason?.['message'] || 'invalid JSON' });
+    onTrace?.({ type: 'agent_skill_authoring_json_retry', reason: reason?.message || 'invalid JSON' });
     const request3 = await request({
       ...args,
       prompt: buildPrompt({
@@ -203,10 +203,10 @@ export async function requestAgentSkillDraft({
         clarificationAnswer: clarificationAnswer,
         history: history,
         existingSkills: existingSkills,
-        locale: settings['locale'],
+        locale: settings.locale,
         operation: operation,
         targetSkill: targetSkill,
-        retryReason: reason?.['message'],
+        retryReason: reason?.message,
       }),
     });
     return parseResult(request3);

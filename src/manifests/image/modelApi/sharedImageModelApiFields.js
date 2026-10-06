@@ -695,34 +695,34 @@ export function createModelApiExecutionManifest({
   });
 }
 
-export const APIMART_SEEDREAM_5_PRO_IMAGE_SIZE_FIELD = Object['freeze']({
+export const APIMART_SEEDREAM_5_PRO_IMAGE_SIZE_FIELD = Object.freeze({
   ...IMAGE_SIZE_FIELD,
   defaultValue: '2K',
-  options: Object['freeze']([
-    Object['freeze']({ value: '1K', label: '1K' }),
-    Object['freeze']({ value: '2K', label: '2K' }),
+  options: Object.freeze([
+    Object.freeze({ value: '1K', label: '1K' }),
+    Object.freeze({ value: '2K', label: '2K' }),
   ]),
 });
 
 const APIMART_GPT_IMAGE_2_QUALITY_DESCRIPTION =
   'quality\n图片质量\nlow - 快速省钱，轮廓够用\nmedium - 平衡\nhigh - 最高精度（4K + high 耗时 >120s）';
 
-export const GRSAI_NANO_BANANA_1K_IMAGE_SIZE_FIELD = Object['freeze']({
+export const GRSAI_NANO_BANANA_1K_IMAGE_SIZE_FIELD = Object.freeze({
   ...IMAGE_SIZE_FIELD,
   defaultValue: '1K',
-  options: Object['freeze']([
-    Object['freeze']({ value: '1K', label: '1K' }),
-    Object['freeze']({ value: '2K', label: '2K', disabled: true, tooltip: '1K only' }),
-    Object['freeze']({ value: '4K', label: '4K', disabled: true, tooltip: '1K only' }),
+  options: Object.freeze([
+    Object.freeze({ value: '1K', label: '1K' }),
+    Object.freeze({ value: '2K', label: '2K', disabled: true, tooltip: '1K only' }),
+    Object.freeze({ value: '4K', label: '4K', disabled: true, tooltip: '1K only' }),
   ]),
 });
 
-export const GRSAI_NANO_BANANA_2K_IMAGE_SIZE_FIELD = Object['freeze']({
+export const GRSAI_NANO_BANANA_2K_IMAGE_SIZE_FIELD = Object.freeze({
   ...IMAGE_SIZE_FIELD,
   defaultValue: '2K',
-  options: Object['freeze']([
-    Object['freeze']({ value: '1K', label: '1K', disabled: true, tooltip: '2K only' }),
-    Object['freeze']({ value: '2K', label: '2K' }),
-    Object['freeze']({ value: '4K', label: '4K', disabled: true, tooltip: '2K only' }),
+  options: Object.freeze([
+    Object.freeze({ value: '1K', label: '1K', disabled: true, tooltip: '2K only' }),
+    Object.freeze({ value: '2K', label: '2K' }),
+    Object.freeze({ value: '4K', label: '4K', disabled: true, tooltip: '2K only' }),
   ]),
 });

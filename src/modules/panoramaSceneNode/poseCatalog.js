@@ -1,4 +1,4 @@
-export const PANORAMA_CHARACTER_BONES = Object['freeze']([
+export const PANORAMA_CHARACTER_BONES = Object.freeze([
   'root',
   'pelvis',
   'spine_01',
@@ -22,11 +22,11 @@ export const PANORAMA_CHARACTER_BONES = Object['freeze']([
   'foot_r',
 ]);
 const BONE_SET = new Set(PANORAMA_CHARACTER_BONES),
-  PI = Math['PI'];
+  PI = Math.PI;
 function clampRadians(value) {
   const item = Number(value);
-  if (!Number['isFinite'](item)) return 0;
-  return Math['max'](-PI, Math['min'](PI, item));
+  if (!Number.isFinite(item)) return 0;
+  return Math.max(-PI, Math.min(PI, item));
 }
 function rotation(x = 0, y = 0, z = 0) {
   return { x: x, y: y, z: z };
@@ -37,34 +37,34 @@ export function normalizeBonePose(options = {}) {
     const box = options?.[index];
     if (!box || typeof box !== 'object') continue;
     const box2 = {
-      x: clampRadians(box['x']),
-      y: clampRadians(box['y']),
-      z: clampRadians(box['z']),
+      x: clampRadians(box.x),
+      y: clampRadians(box.y),
+      z: clampRadians(box.z),
     };
-    if (Math['abs'](box2['x']) + Math['abs'](box2['y']) + Math['abs'](box2['z']) < 1e-8) continue;
+    if (Math.abs(box2.x) + Math.abs(box2.y) + Math.abs(box2.z) < 1e-8) continue;
     key[index] = box2;
   }
   return key;
 }
 function swapSideName(list) {
-  if (list['endsWith']('_l')) return list['slice'](0, -2) + '_r';
-  if (list['endsWith']('_r')) return list['slice'](0, -2) + '_l';
+  if (list.endsWith('_l')) return list.slice(0, -2) + '_r';
+  if (list.endsWith('_r')) return list.slice(0, -2) + '_l';
   return list;
 }
 function mirrorBonePose(options2 = {}) {
   const result = {};
-  for (const [data, x2] of Object['entries'](normalizeBonePose(options2))) {
-    result[swapSideName(data)] = { x: x2['x'], y: -x2['y'], z: -x2['z'] };
+  for (const [data, x2] of Object.entries(normalizeBonePose(options2))) {
+    result[swapSideName(data)] = { x: x2.x, y: -x2.y, z: -x2.z };
   }
   return result;
 }
 function preset(id2, name2, category2, target, args = []) {
-  return Object['freeze']({
+  return Object.freeze({
     id: id2,
     name: name2,
     category: category2,
-    tags: Object['freeze']([...args]),
-    bones: Object['freeze'](normalizeBonePose(target)),
+    tags: Object.freeze([...args]),
+    bones: Object.freeze(normalizeBonePose(target)),
   });
 }
 const WAVE_LEFT = {
@@ -134,7 +134,7 @@ const WAVE_LEFT = {
     calf_l: rotation(0.62, 0, 0),
     thigh_r: rotation(0.18, -0.08, 0.1),
   },
-  PRESETS = Object['freeze']([
+  PRESETS = Object.freeze([
     preset('neutral', 'Neutral', 'basic', {}, ['stand', 'default']),
     preset(
       'idle-relaxed',
@@ -316,47 +316,47 @@ const WAVE_LEFT = {
       ['tilt'],
     ),
   ]),
-  PRESET_BY_ID = new Map(PRESETS['map']((source) => [source['id'], source]));
+  PRESET_BY_ID = new Map(PRESETS.map((source) => [source.id, source]));
 export const DEFAULT_MANNEQUIN_POSE_ID = 'neutral';
 export function listMannequinPosePresets({ category: category = 'all', query: query = '' } = {}) {
   const next = String(category || 'all')
-      ['trim']()
-      ['toLowerCase'](),
+      .trim()
+      .toLowerCase(),
     enabled = String(query || '')
-      ['trim']()
-      ['toLowerCase']();
-  return PRESETS['filter']((error) => {
-    if (next !== 'all' && error['category'] !== next) return false;
+      .trim()
+      .toLowerCase();
+  return PRESETS.filter((error) => {
+    if (next !== 'all' && error.category !== next) return false;
     if (!enabled) return true;
-    return [error['id'], error['name'], error['category'], ...error['tags']]
-      ['join'](' ')
-      ['toLowerCase']()
-      ['includes'](enabled);
+    return [error.id, error.name, error.category, ...error.tags]
+      .join(' ')
+      .toLowerCase()
+      .includes(enabled);
   });
 }
 export function findMannequinPosePreset(current) {
-  return PRESET_BY_ID['get'](String(current || '')['trim']()) || null;
+  return PRESET_BY_ID.get(String(current || '').trim()) || null;
 }
 export function resolveMannequinPose(entry, record = null) {
-  const payload = String(entry || DEFAULT_MANNEQUIN_POSE_ID)['trim']();
+  const payload = String(entry || DEFAULT_MANNEQUIN_POSE_ID).trim();
   if (payload === 'custom' && record) return normalizeCustomMannequinPose(record);
-  return PRESET_BY_ID['get'](payload) || PRESET_BY_ID['get'](DEFAULT_MANNEQUIN_POSE_ID);
+  return PRESET_BY_ID.get(payload) || PRESET_BY_ID.get(DEFAULT_MANNEQUIN_POSE_ID);
 }
 export function normalizeCustomMannequinPose(error2 = {}) {
   return {
-    id: String(error2['id'] || 'custom')['trim']() || 'custom',
+    id: String(error2.id || 'custom').trim() || 'custom',
     name:
-      String(error2['name'] || 'Custom pose')
-        ['trim']()
-        ['slice'](0, 80) || 'Custom pose',
+      String(error2.name || 'Custom pose')
+        .trim()
+        .slice(0, 80) || 'Custom pose',
     category: 'custom',
-    tags: Array['isArray'](error2['tags'])
-      ? error2['tags']
-          ['map']((handle) => String(handle || '')['trim']())
-          ['filter'](Boolean)
-          ['slice'](0, 12)
+    tags: Array.isArray(error2.tags)
+      ? error2.tags
+          .map((handle) => String(handle || '').trim())
+          .filter(Boolean)
+          .slice(0, 12)
       : [],
-    bones: normalizeBonePose(error2['bones']),
+    bones: normalizeBonePose(error2.bones),
   };
 }
 export function createCustomMannequinPose({
@@ -368,12 +368,12 @@ export function createCustomMannequinPose({
 }
 export function validateCustomMannequinPose(enabled2) {
   const ok = [];
-  if (!enabled2 || typeof enabled2 !== 'object') ok['push']('Pose must be an object.');
-  if (!enabled2?.['bones'] || typeof enabled2['bones'] !== 'object') ok['push']('Pose bones are required.');
-  const list2 = Object['keys'](enabled2?.['bones'] || {})['filter']((state) => !BONE_SET['has'](state));
-  if (list2['length'] > 0) ok['push']('Unknown bones: ' + list2['join'](', '));
+  if (!enabled2 || typeof enabled2 !== 'object') ok.push('Pose must be an object.');
+  if (!enabled2?.bones || typeof enabled2.bones !== 'object') ok.push('Pose bones are required.');
+  const list2 = Object.keys(enabled2?.bones || {}).filter((state) => !BONE_SET.has(state));
+  if (list2.length > 0) ok.push('Unknown bones: ' + list2.join(', '));
   return {
-    ok: ok['length'] === 0,
+    ok: ok.length === 0,
     errors: ok,
     pose: normalizeCustomMannequinPose(enabled2),
   };

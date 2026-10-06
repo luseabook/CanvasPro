@@ -19,25 +19,25 @@ import { getModelManifest } from '../../manifests/index.js';
 import { showProviderApiKeyMissingToast } from '../../modules/providerApiKeyMissingToast.js';
 import { escapeNodeMenuHtml } from './nodeModelMenu.js';
 export function getModelProviderProfileShortLabel(value) {
-  const item = String(value || '')['trim'](),
+  const item = String(value || '').trim(),
     modelProviderProfile = getModelProviderProfile(item);
-  return String(modelProviderProfile?.['shortLabel'] || '')['trim']() || item;
+  return String(modelProviderProfile?.shortLabel || '').trim() || item;
 }
 export function getModelProviderProfileStyleId(key) {
-  const index = String(key || '')['trim'](),
-    modelProviderProfile2 = getModelProviderProfile(index)?.['region'];
+  const index = String(key || '').trim(),
+    modelProviderProfile2 = getModelProviderProfile(index)?.region;
   if (modelProviderProfile2 === 'domestic') return RUNNINGHUB_DOMESTIC_PROFILE_ID;
   if (modelProviderProfile2 === 'international') return RUNNINGHUB_INTERNATIONAL_PROFILE_ID;
   return index;
 }
 export function buildModelProviderProfileBadgesHtml(result, { vip: vip = false } = {}) {
   const list = getModelProviderProfileIds(result);
-  if (!list['length'] && !vip) return '';
-  const data = list['map']((options) => {
+  if (!list.length && !vip) return '';
+  const data = list.map((options) => {
       const modelProviderProfile3 = getModelProviderProfile(options),
-        target = modelProviderProfile3?.['region']
-          ? modelProviderProfile3['region'] === 'international'
-          : options['endsWith']('-international'),
+        target = modelProviderProfile3?.region
+          ? modelProviderProfile3.region === 'international'
+          : options.endsWith('-international'),
         source = target
           ? 'model-provider-profile-badge--international'
           : 'model-provider-profile-badge--domestic';
@@ -48,14 +48,14 @@ export function buildModelProviderProfileBadgesHtml(result, { vip: vip = false }
         escapeNodeMenuHtml(getModelProviderProfileShortLabel(options)) +
         '</span>'
       );
-    })['join'](''),
+    }).join(''),
     next = vip
       ? '<span class="floating-menu-badge floating-menu-badge-inline floating-menu-badge-warning">VIP</span>'
       : '';
   return '<span class="model-provider-profile-badges">' + data + next + '</span>';
 }
 function getProviderProfileAdapterType(current) {
-  return getModelManifest(current)?.['adapterType'] === 'workflow' ? 'workflow' : 'modelApi';
+  return getModelManifest(current)?.adapterType === 'workflow' ? 'workflow' : 'modelApi';
 }
 export function getModelProviderProfileReadiness(modelId, providerProfileId) {
   return getModelGenerationReadiness({
@@ -72,35 +72,35 @@ function ensureProfileReadiness(modelId2, providerProfileId2) {
   });
 }
 function readinessToAvailability(response) {
-  if (response?.['status'] === 'loading') return null;
-  return response?.['ready'] === true;
+  if (response?.status === 'loading') return null;
+  return response?.ready === true;
 }
 export function resolveConfiguredModelProviderProfileId(
   options2 = {},
   handler = getModelProviderProfileReadiness,
 ) {
   const modelProviderProfileId = resolveModelProviderProfileId(options2);
-  return resolveReadyModelProviderProfileId(options2?.['model'], modelProviderProfileId, (entry) =>
-    readinessToAvailability(handler(options2?.['model'], entry)),
+  return resolveReadyModelProviderProfileId(options2?.model, modelProviderProfileId, (entry) =>
+    readinessToAvailability(handler(options2?.model, entry)),
   );
 }
 export function getProfileSwitchConfigurationMessage(record, payload = '') {
   const modelProviderProfile4 = getModelProviderProfile(record),
     handle =
-      String(modelProviderProfile4?.['switchLabel'] || '')['trim']() ||
+      String(modelProviderProfile4?.switchLabel || '').trim() ||
       getModelProviderProfileShortLabel(record) + '线路',
     providerProfileAdapterType =
       getProviderProfileAdapterType(payload) === 'workflow'
         ? '工作流 API Key'
-        : String(modelProviderProfile4?.['credentialLabel'] || '模型 API Key')['trim'](),
-    state = /^[A-Za-z]/['test'](providerProfileAdapterType) ? ' ' : '';
+        : String(modelProviderProfile4?.credentialLabel || '模型 API Key').trim(),
+    state = /^[A-Za-z]/.test(providerProfileAdapterType) ? ' ' : '';
   return '切换到 ' + handle + '需配置' + state + providerProfileAdapterType;
 }
 function showProfileConfigurationRequired(fieldIds, providerId, model) {
   const keyType = getProviderProfileAdapterType(model);
   showProviderApiKeyMissingToast(getProfileSwitchConfigurationMessage(providerId, model), {
     providerId: providerId,
-    fieldIds: fieldIds?.['fieldIds'],
+    fieldIds: fieldIds?.fieldIds,
     keyType: keyType === 'workflow' ? 'workflow' : 'modelApi',
     adapterType: keyType,
     model: model,
@@ -114,13 +114,13 @@ export async function requestModelProviderProfileSelection({
   onChange: onChange,
   onUnavailable: onUnavailable = showProfileConfigurationRequired,
 } = {}) {
-  const enabled = String(nodeData?.['model'] || '')['trim'](),
-    enabled2 = String(targetProfileId || '')['trim']();
+  const enabled = String(nodeData?.model || '').trim(),
+    enabled2 = String(targetProfileId || '').trim();
   if (!enabled || !enabled2) return { changed: false, readiness: null };
   let readiness = getProfileReadiness(enabled, enabled2);
-  readiness?.['status'] === 'loading' &&
-    (readiness = await ensureProfileReady(enabled, enabled2)['catch'](() => readiness));
-  if (!readiness?.['ready'])
+  readiness?.status === 'loading' &&
+    (readiness = await ensureProfileReady(enabled, enabled2).catch(() => readiness));
+  if (!readiness?.ready)
     return (onUnavailable?.(readiness, enabled2, enabled), { changed: false, readiness: readiness });
   const patch = buildModelProviderProfileSelectionPatch(nodeData, enabled, enabled2);
   return (onChange?.(patch), { changed: true, readiness: readiness, patch: patch });
@@ -137,19 +137,19 @@ export function createModelProviderProfileControl({
     el2 = null;
   const run = () => {
       if (!panel) return null;
-      if (el?.['parentNode'] === panel) return el;
-      const config = panel['querySelector']?.('.model-provider-profile-toggle');
+      if (el?.parentNode === panel) return el;
+      const config = panel.querySelector?.('.model-provider-profile-toggle');
       if (config) return ((el = config), el);
-      const el3 = panel['ownerDocument']?.['createElement']?.('button');
+      const el3 = panel.ownerDocument?.createElement?.('button');
       if (!el3) return null;
       return (
-        (el3['type'] = 'button'),
-        (el3['className'] = 'model-provider-profile-toggle'),
-        el3['addEventListener']('pointerdown', (event) => {
-          (event['preventDefault'](), event['stopPropagation']());
+        (el3.type = 'button'),
+        (el3.className = 'model-provider-profile-toggle'),
+        el3.addEventListener('pointerdown', (event) => {
+          (event.preventDefault(), event.stopPropagation());
         }),
-        el3['addEventListener']('click', (event2) => {
-          (event2['preventDefault'](), event2['stopPropagation']());
+        el3.addEventListener('click', (event2) => {
+          (event2.preventDefault(), event2.stopPropagation());
           const nodeData2 = getNodeData?.() || {},
             targetProfileId2 = getNextModelProviderProfileId(nodeData2);
           if (!targetProfileId2) return;
@@ -162,7 +162,7 @@ export function createModelProviderProfileControl({
             onUnavailable: onUnavailable,
           });
         }),
-        panel['appendChild'](el3),
+        panel.appendChild(el3),
         (el = el3),
         el
       );
@@ -170,11 +170,11 @@ export function createModelProviderProfileControl({
     sync = () => {
       if (!panel) return;
       const args = getNodeData?.() || {},
-        list2 = getModelProviderProfileIds(args?.['model']),
-        enabled3 = list2['length'] > 1;
-      panel['classList']?.['toggle']('has-model-provider-profile-toggle', enabled3);
+        list2 = getModelProviderProfileIds(args?.model),
+        enabled3 = list2.length > 1;
+      panel.classList?.toggle('has-model-provider-profile-toggle', enabled3);
       if (!enabled3) {
-        el?.['classList']?.['add']('is-hidden');
+        el?.classList?.add('is-hidden');
         return;
       }
       const el4 = run();
@@ -185,7 +185,7 @@ export function createModelProviderProfileControl({
       if (configuredModelProviderProfileId && configuredModelProviderProfileId !== modelProviderProfileId2) {
         const args2 = buildModelProviderProfileSelectionPatch(
           args,
-          args?.['model'],
+          args?.model,
           configuredModelProviderProfileId,
         );
         (onChange2?.(args2), (scope = { ...args, ...args2 }));
@@ -193,34 +193,34 @@ export function createModelProviderProfileControl({
       const nextModelProviderProfileId = getNextModelProviderProfileId(scope),
         modelProviderProfileShortLabel = getModelProviderProfileShortLabel(configuredModelProviderProfileId),
         modelProviderProfileShortLabel2 = getModelProviderProfileShortLabel(nextModelProviderProfileId),
-        profileReadiness = getProfileReadiness(scope?.['model'], nextModelProviderProfileId),
+        profileReadiness = getProfileReadiness(scope?.model, nextModelProviderProfileId),
         availability = readinessToAvailability(profileReadiness) === false;
-      (el4['classList']['remove']('is-hidden'),
-        (!el2 || el2['parentNode'] !== el4) &&
-          ((el2 = panel['ownerDocument']['createElement']('span')),
-          (el2['className'] = 'button-press-label'),
-          (el4['textContent'] = ''),
-          el4['appendChild'](el2)),
-        (el2['textContent'] = modelProviderProfileShortLabel),
-        (el4['dataset']['providerProfileId'] = getModelProviderProfileStyleId(
+      (el4.classList.remove('is-hidden'),
+        (!el2 || el2.parentNode !== el4) &&
+          ((el2 = panel.ownerDocument.createElement('span')),
+          (el2.className = 'button-press-label'),
+          (el4.textContent = ''),
+          el4.appendChild(el2)),
+        (el2.textContent = modelProviderProfileShortLabel),
+        (el4.dataset.providerProfileId = getModelProviderProfileStyleId(
           configuredModelProviderProfileId,
         )),
-        (el4['dataset']['providerProfileValue'] = configuredModelProviderProfileId),
-        (el4['title'] = availability
-          ? getProfileSwitchConfigurationMessage(nextModelProviderProfileId, scope?.['model'])
+        (el4.dataset.providerProfileValue = configuredModelProviderProfileId),
+        (el4.title = availability
+          ? getProfileSwitchConfigurationMessage(nextModelProviderProfileId, scope?.model)
           : '当前' + modelProviderProfileShortLabel + '线路，点击切换到' + modelProviderProfileShortLabel2),
-        el4['setAttribute']('aria-label', el4['title']));
+        el4.setAttribute('aria-label', el4.title));
     },
     remove = () => {
-      (globalThis['window']?.['removeEventListener']?.(API_CONFIG_CHANGED_EVENT, sync),
-        panel?.['classList']?.['remove']('has-model-provider-profile-toggle'),
-        el?.['remove']?.(),
+      (globalThis.window?.removeEventListener?.(API_CONFIG_CHANGED_EVENT, sync),
+        panel?.classList?.remove('has-model-provider-profile-toggle'),
+        el?.remove?.(),
         (el = null),
         (el2 = null));
     };
   return (
     sync(),
-    globalThis['window']?.['addEventListener']?.(API_CONFIG_CHANGED_EVENT, sync),
+    globalThis.window?.addEventListener?.(API_CONFIG_CHANGED_EVENT, sync),
     { sync: sync, remove: remove }
   );
 }

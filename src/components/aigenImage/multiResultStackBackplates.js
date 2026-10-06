@@ -105,45 +105,45 @@ export const MAX_MULTI_RESULT_VISIBLE_ITEMS = 16;
 
 const EXPANDED_GRID_NODE_ROW = 2,
   EXPANDED_GRID_4X4_NODE_ROW = 3,
-  FOUR_IMAGE_GRID_SLOT_ORDER = Object['freeze']([
-    Object['freeze']({ r: 1, c: 1 }),
-    Object['freeze']({ r: 0, c: 0 }),
-    Object['freeze']({ r: 0, c: 1 }),
+  FOUR_IMAGE_GRID_SLOT_ORDER = Object.freeze([
+    Object.freeze({ r: 1, c: 1 }),
+    Object.freeze({ r: 0, c: 0 }),
+    Object.freeze({ r: 0, c: 1 }),
   ]),
-  EXPANDED_GRID_SLOT_ORDER = Object['freeze']([
-    Object['freeze']({ r: 2, c: 1 }),
-    Object['freeze']({ r: 2, c: 2 }),
-    Object['freeze']({ r: 1, c: 0 }),
-    Object['freeze']({ r: 1, c: 1 }),
-    Object['freeze']({ r: 1, c: 2 }),
-    Object['freeze']({ r: 0, c: 0 }),
-    Object['freeze']({ r: 0, c: 1 }),
-    Object['freeze']({ r: 0, c: 2 }),
-    Object['freeze']({ r: 2, c: 3 }),
-    Object['freeze']({ r: 1, c: 3 }),
-    Object['freeze']({ r: 0, c: 3 }),
+  EXPANDED_GRID_SLOT_ORDER = Object.freeze([
+    Object.freeze({ r: 2, c: 1 }),
+    Object.freeze({ r: 2, c: 2 }),
+    Object.freeze({ r: 1, c: 0 }),
+    Object.freeze({ r: 1, c: 1 }),
+    Object.freeze({ r: 1, c: 2 }),
+    Object.freeze({ r: 0, c: 0 }),
+    Object.freeze({ r: 0, c: 1 }),
+    Object.freeze({ r: 0, c: 2 }),
+    Object.freeze({ r: 2, c: 3 }),
+    Object.freeze({ r: 1, c: 3 }),
+    Object.freeze({ r: 0, c: 3 }),
   ]),
-  EXPANDED_GRID_4X4_SLOT_ORDER = Object['freeze']([
-    Object['freeze']({ r: 3, c: 1 }),
-    Object['freeze']({ r: 3, c: 2 }),
-    Object['freeze']({ r: 3, c: 3 }),
-    Object['freeze']({ r: 2, c: 0 }),
-    Object['freeze']({ r: 2, c: 1 }),
-    Object['freeze']({ r: 2, c: 2 }),
-    Object['freeze']({ r: 2, c: 3 }),
-    Object['freeze']({ r: 1, c: 0 }),
-    Object['freeze']({ r: 1, c: 1 }),
-    Object['freeze']({ r: 1, c: 2 }),
-    Object['freeze']({ r: 1, c: 3 }),
-    Object['freeze']({ r: 0, c: 0 }),
-    Object['freeze']({ r: 0, c: 1 }),
-    Object['freeze']({ r: 0, c: 2 }),
-    Object['freeze']({ r: 0, c: 3 }),
+  EXPANDED_GRID_4X4_SLOT_ORDER = Object.freeze([
+    Object.freeze({ r: 3, c: 1 }),
+    Object.freeze({ r: 3, c: 2 }),
+    Object.freeze({ r: 3, c: 3 }),
+    Object.freeze({ r: 2, c: 0 }),
+    Object.freeze({ r: 2, c: 1 }),
+    Object.freeze({ r: 2, c: 2 }),
+    Object.freeze({ r: 2, c: 3 }),
+    Object.freeze({ r: 1, c: 0 }),
+    Object.freeze({ r: 1, c: 1 }),
+    Object.freeze({ r: 1, c: 2 }),
+    Object.freeze({ r: 1, c: 3 }),
+    Object.freeze({ r: 0, c: 0 }),
+    Object.freeze({ r: 0, c: 1 }),
+    Object.freeze({ r: 0, c: 2 }),
+    Object.freeze({ r: 0, c: 3 }),
   ]);
 
 function normalizeMainIndex(count2, state) {
-  return Number['isFinite'](Number(count2)) && count2 >= 0 && count2 < state
-    ? Math['floor'](Number(count2))
+  return Number.isFinite(Number(count2)) && count2 >= 0 && count2 < state
+    ? Math.floor(Number(count2))
     : 0;
 }
 
@@ -165,19 +165,19 @@ export function buildMultiResultExpandedSlotMap({
     mainIndex2 = normalizeMainIndex(mainIndex, toFiniteCount4),
     config = new Map();
   if (toFiniteCount4 <= 1) return config;
-  const scope = Math['max'](1, Number(previewWidth) || 1),
-    input = Math['max'](1, Number(previewHeight) || 1),
-    output = Math['max'](0, Number(gap) || 0),
+  const scope = Math.max(1, Number(previewWidth) || 1),
+    input = Math.max(1, Number(previewHeight) || 1),
+    output = Math.max(0, Number(gap) || 0),
     { nodeRow: nodeRow, slotOrder: slotOrder } = getExpandedGridLayout(toFiniteCount4);
   let value2 = 0;
   for (let value3 = 0; value3 < toFiniteCount4; value3 += 1) {
     if (value3 === mainIndex2) continue;
     const enabled = slotOrder[value2];
     if (!enabled) break;
-    (config['set'](value3, {
+    (config.set(value3, {
       order: value2,
-      top: (enabled['r'] - nodeRow) * (input + output),
-      left: enabled['c'] * (scope + output),
+      top: (enabled.r - nodeRow) * (input + output),
+      left: enabled.c * (scope + output),
     }),
       (value2 += 1));
   }
@@ -185,17 +185,17 @@ export function buildMultiResultExpandedSlotMap({
 }
 
 export function buildMultiResultCollapsedFrame(value4 = 1) {
-  const value5 = Math['min'](
+  const value5 = Math.min(
       MAX_MULTI_RESULT_BACKPLATES,
-      Math['max'](1, Math['floor'](Number(value4) || 1)),
+      Math.max(1, Math.floor(Number(value4) || 1)),
     ),
     value6 = value5 - 1;
   return {
-    x: Math['min'](10 + value6 * 7, 66),
-    y: Math['min'](value6 * 3, 24),
-    rotate: Math['min'](4 + value6 * 2.2, 18),
-    scale: Math['max'](0.99 - value6 * 0.016, 0.86),
-    opacity: Math['max'](0.58 - value6 * 0.055, 0.18),
+    x: Math.min(10 + value6 * 7, 66),
+    y: Math.min(value6 * 3, 24),
+    rotate: Math.min(4 + value6 * 2.2, 18),
+    scale: Math.max(0.99 - value6 * 0.016, 0.86),
+    opacity: Math.max(0.58 - value6 * 0.055, 0.18),
   };
 }
 
@@ -208,7 +208,7 @@ export function shouldEnableMultiResultLayerDragOut({
   const toFiniteCount5 = toFiniteCount(imageCount);
   if (!isImagesExpanded || toFiniteCount5 <= 1) return false;
   const mainIndex3 = normalizeMainIndex(mainImageIndex, toFiniteCount5),
-    count4 = Number['isFinite'](Number(imageIndex)) ? Math['floor'](Number(imageIndex)) : -1;
+    count4 = Number.isFinite(Number(imageIndex)) ? Math.floor(Number(imageIndex)) : -1;
   return count4 >= 0 && count4 < toFiniteCount5 && count4 !== mainIndex3;
 }
 
@@ -226,17 +226,17 @@ export function resolveMultiResultMainSwap({
 }
 
 export function getMultiResultBackplateIdentityKey(list5 = []) {
-  return (Array['isArray'](list5) ? list5 : [])
-    ['map']((value7, value8) => normalizeBackplateItem(value7, value8)['imageIndex'])
-    ['filter']((value9) => Number['isFinite'](value9))
-    ['sort']((value10, value11) => value10 - value11)
-    ['map']((value12) => '' + value12)
-    ['join'](',');
+  return (Array.isArray(list5) ? list5 : [])
+    .map((value7, value8) => normalizeBackplateItem(value7, value8).imageIndex)
+    .filter((value9) => Number.isFinite(value9))
+    .sort((value10, value11) => value10 - value11)
+    .map((value12) => '' + value12)
+    .join(',');
 }
 
 export function getMultiResultBackplateDomIdentityKey(value13 = null) {
-  const list6 = Array['from'](value13?.['children'] || []);
+  const list6 = Array.from(value13?.children || []);
   return getMultiResultBackplateIdentityKey(
-    list6['map']((value14) => ({ imageIndex: Number(value14?.['dataset']?.['imageIndex']) })),
+    list6.map((value14) => ({ imageIndex: Number(value14?.dataset?.imageIndex) })),
   );
 }

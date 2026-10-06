@@ -18,7 +18,7 @@ const FORMAT = audioSelect('format', '音频格式', ['mp3', 'wav', 'ogg_opus'],
     ...VOLCENGINE_SPEAKER_ID_FIELD,
     description: '填写 RunningHub 支持的音色 ID，留空使用预设音色。',
   };
-export const runningHubDoubaoAudioEntries = Object['freeze']([
+export const runningHubDoubaoAudioEntries = Object.freeze([
   createRunningHubAudioCatalogEntry({
     id: 'doubao-seed-tts-2.0',
     name: '豆包 语音合成 2.0',
@@ -64,7 +64,7 @@ export const runningHubDoubaoAudioEntries = Object['freeze']([
           'fil',
           'ms',
           'ar',
-        ]['map']((value2) => ({ value: value2, label: value2 === 'auto' ? '自动' : value2 })),
+        ].map((value2) => ({ value: value2, label: value2 === 'auto' ? '自动' : value2 })),
         'auto',
       ),
       audioText('dialect', '方言', '使用支持该方言的音色；中文方言填写拼音。'),

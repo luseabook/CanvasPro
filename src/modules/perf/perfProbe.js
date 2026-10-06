@@ -676,160 +676,160 @@ const SCRIPT_FUNCTION_NAME_LIMIT = 160;
 
 function normalizeLifecycleTypeBreakdown(enabled6) {
   if (!enabled6 || typeof enabled6 !== 'object') return [];
-  return Object['entries'](enabled6)
-    ['map'](([value52, value53]) => ({
-      type: String(value52 || 'unknown')['slice'](0, 80),
-      count: toFiniteNumber(value53?.['count'], 0),
-      durationMs: toFiniteNumber(value53?.['durationMs'], 0),
-      maxMs: toFiniteNumber(value53?.['maxMs'], 0),
+  return Object.entries(enabled6)
+    .map(([value52, value53]) => ({
+      type: String(value52 || 'unknown').slice(0, 80),
+      count: toFiniteNumber(value53?.count, 0),
+      durationMs: toFiniteNumber(value53?.durationMs, 0),
+      maxMs: toFiniteNumber(value53?.maxMs, 0),
     }))
-    ['filter']((value54) => value54['count'] > 0 || value54['durationMs'] > 0)
-    ['sort']((value55, value56) => value56['durationMs'] - value55['durationMs'])
-    ['slice'](0, NODE_LIFECYCLE_TYPE_LIMIT);
+    .filter((value54) => value54.count > 0 || value54.durationMs > 0)
+    .sort((value55, value56) => value56.durationMs - value55.durationMs)
+    .slice(0, NODE_LIFECYCLE_TYPE_LIMIT);
 }
 
 function normalizeLifecycleSlowList(list7) {
-  if (!Array['isArray'](list7)) return [];
-  return list7['map']((value57) => {
+  if (!Array.isArray(list7)) return [];
+  return list7.map((value57) => {
     const value58 = {
-        nodeId: String(value57?.['nodeId'] || '')['slice'](0, 120),
-        type: String(value57?.['type'] || 'unknown')['slice'](0, 80),
-        reason: String(value57?.['reason'] || '')['slice'](0, 80),
-        durationMs: toFiniteNumber(value57?.['durationMs'], 0),
+        nodeId: String(value57?.nodeId || '').slice(0, 120),
+        type: String(value57?.type || 'unknown').slice(0, 80),
+        reason: String(value57?.reason || '').slice(0, 80),
+        durationMs: toFiniteNumber(value57?.durationMs, 0),
       },
-      value59 = Array['isArray'](value57?.['breakdown']?.['sections'])
-        ? value57['breakdown']['sections']
-            ['map']((value60) => ({
-              name: String(value60?.['name'] || '')['slice'](0, 80),
-              durationMs: toFiniteNumber(value60?.['durationMs'], 0),
+      value59 = Array.isArray(value57?.breakdown?.sections)
+        ? value57.breakdown.sections
+            .map((value60) => ({
+              name: String(value60?.name || '').slice(0, 80),
+              durationMs: toFiniteNumber(value60?.durationMs, 0),
             }))
-            ['filter']((value61) => value61['name'])
-            ['slice'](0, 12)
+            .filter((value61) => value61.name)
+            .slice(0, 12)
         : [];
     return (
-      value59['length'] &&
-        ((value58['breakdown'] = {
-          totalMs: toFiniteNumber(value57?.['breakdown']?.['totalMs'], 0),
+      value59.length &&
+        ((value58.breakdown = {
+          totalMs: toFiniteNumber(value57?.breakdown?.totalMs, 0),
           sections: value59,
         }),
-        value57?.['breakdown']?.['details'] &&
-          typeof value57['breakdown']['details'] === 'object' &&
-          (value58['breakdown']['details'] = Object['fromEntries'](
-            Object['entries'](value57['breakdown']['details'])
-              ['map'](([value62, value63]) => [
-                String(value62 || '')['slice'](0, 80),
-                String(value63 ?? '')['slice'](0, 500),
+        value57?.breakdown?.details &&
+          typeof value57.breakdown.details === 'object' &&
+          (value58.breakdown.details = Object.fromEntries(
+            Object.entries(value57.breakdown.details)
+              .map(([value62, value63]) => [
+                String(value62 || '').slice(0, 80),
+                String(value63 ?? '').slice(0, 500),
               ])
-              ['filter'](([value64]) => value64),
+              .filter(([value64]) => value64),
           ))),
       value58
     );
   })
-    ['filter']((value65) => value65['durationMs'] >= 0)
-    ['sort']((value66, value67) => value67['durationMs'] - value66['durationMs'])
-    ['slice'](0, NODE_LIFECYCLE_SLOW_LIMIT);
+    .filter((value65) => value65.durationMs >= 0)
+    .sort((value66, value67) => value67.durationMs - value66.durationMs)
+    .slice(0, NODE_LIFECYCLE_SLOW_LIMIT);
 }
 
 function sanitizeScriptSourceURL(value68) {
-  const enabled7 = String(value68 || '')['trim']();
+  const enabled7 = String(value68 || '').trim();
   if (!enabled7) return '';
   try {
-    const uRL = new URL(getGlobalWindow()?.['location']?.['href'] || 'http://127.0.0.1/'),
+    const uRL = new URL(getGlobalWindow()?.location?.href || 'http://127.0.0.1/'),
       uRL2 = new URL(enabled7, uRL);
-    if (uRL2['protocol'] === 'data:' || uRL2['protocol'] === 'blob:') return uRL2['protocol'] + '[redacted]';
-    const value69 = uRL2['pathname']['replace'](/\\/g, '/');
-    if (uRL2['protocol'] === 'file:') {
-      const value70 = value69['split']('/')['filter'](Boolean)['at'](-1) || 'script';
-      return ('file:///[redacted]/' + value70)['slice'](0, SCRIPT_SOURCE_URL_LIMIT);
+    if (uRL2.protocol === 'data:' || uRL2.protocol === 'blob:') return uRL2.protocol + '[redacted]';
+    const value69 = uRL2.pathname.replace(/\\/g, '/');
+    if (uRL2.protocol === 'file:') {
+      const value70 = value69.split('/').filter(Boolean).at(-1) || 'script';
+      return ('file:///[redacted]/' + value70).slice(0, SCRIPT_SOURCE_URL_LIMIT);
     }
-    const value71 = uRL2['origin'] === uRL['origin'] ? value69 : '' + uRL2['origin'] + value69;
-    return value71['slice'](0, SCRIPT_SOURCE_URL_LIMIT);
+    const value71 = uRL2.origin === uRL.origin ? value69 : '' + uRL2.origin + value69;
+    return value71.slice(0, SCRIPT_SOURCE_URL_LIMIT);
   } catch {
-    const value72 = enabled7['split']('?')[0]['split']('#')[0]['replace'](/\\/g, '/');
-    if (/^(?:[a-z]:\/|\/users\/)/i['test'](value72)) {
-      const value73 = value72['split']('/')['filter'](Boolean)['at'](-1) || 'script';
-      return ('[redacted]/' + value73)['slice'](0, SCRIPT_SOURCE_URL_LIMIT);
+    const value72 = enabled7.split('?')[0].split('#')[0].replace(/\\/g, '/');
+    if (/^(?:[a-z]:\/|\/users\/)/i.test(value72)) {
+      const value73 = value72.split('/').filter(Boolean).at(-1) || 'script';
+      return ('[redacted]/' + value73).slice(0, SCRIPT_SOURCE_URL_LIMIT);
     }
-    return value72['slice'](0, SCRIPT_SOURCE_URL_LIMIT);
+    return value72.slice(0, SCRIPT_SOURCE_URL_LIMIT);
   }
 }
 
 function sanitizeScriptFunctionName(value74) {
   return String(value74 || '')
-    ['replace'](/[\u0000-\u001f\u007f]+/g, ' ')
-    ['replace'](/\s+/g, ' ')
-    ['trim']()
-    ['slice'](0, SCRIPT_FUNCTION_NAME_LIMIT);
+    .replace(/[\u0000-\u001f\u007f]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, SCRIPT_FUNCTION_NAME_LIMIT);
 }
 
 function normalizeLongAnimationFrameScript(options4 = {}) {
   return {
-    durationMs: Math['max'](0, toFiniteNumber(options4['duration'], 0)),
-    executionStart: Math['max'](0, toFiniteNumber(options4['executionStart'], 0)),
-    forcedStyleAndLayoutDurationMs: Math['max'](
+    durationMs: Math.max(0, toFiniteNumber(options4.duration, 0)),
+    executionStart: Math.max(0, toFiniteNumber(options4.executionStart, 0)),
+    forcedStyleAndLayoutDurationMs: Math.max(
       0,
-      toFiniteNumber(options4['forcedStyleAndLayoutDuration'], 0),
+      toFiniteNumber(options4.forcedStyleAndLayoutDuration, 0),
     ),
-    sourceURL: sanitizeScriptSourceURL(options4['sourceURL']),
-    functionName: sanitizeScriptFunctionName(options4['sourceFunctionName'] ?? options4['functionName']),
-    charPosition: Math['max'](
+    sourceURL: sanitizeScriptSourceURL(options4.sourceURL),
+    functionName: sanitizeScriptFunctionName(options4.sourceFunctionName ?? options4.functionName),
+    charPosition: Math.max(
       0,
-      Math['trunc'](toFiniteNumber(options4['sourceCharPosition'] ?? options4['charPosition'], 0)),
+      Math.trunc(toFiniteNumber(options4.sourceCharPosition ?? options4.charPosition, 0)),
     ),
   };
 }
 
 function normalizeLongAnimationFrameEntry(options5 = {}) {
-  const count7 = Math['max'](0, toFiniteNumber(options5['duration'], 0));
+  const count7 = Math.max(0, toFiniteNumber(options5.duration, 0));
   if (count7 <= 0) return null;
-  const list8 = Array['isArray'](options5['scripts'])
-      ? options5['scripts']
-          ['map'](normalizeLongAnimationFrameScript)
-          ['sort']((value75, value76) => value76['durationMs'] - value75['durationMs'])
-          ['slice'](0, LONG_ANIMATION_FRAME_SCRIPT_LIMIT)
+  const list8 = Array.isArray(options5.scripts)
+      ? options5.scripts
+          .map(normalizeLongAnimationFrameScript)
+          .sort((value75, value76) => value76.durationMs - value75.durationMs)
+          .slice(0, LONG_ANIMATION_FRAME_SCRIPT_LIMIT)
       : [],
-    value77 = Math['max'](0, toFiniteNumber(options5['startTime'], 0)),
-    value78 = Math['max'](0, toFiniteNumber(options5['renderStart'], 0)),
-    value79 = Math['max'](0, toFiniteNumber(options5['styleAndLayoutStart'], 0)),
-    value80 = list8['reduce']((value81, value82) => value81 + value82['durationMs'], 0),
-    value83 = list8['reduce']((value84, value85) => value84 + value85['forcedStyleAndLayoutDurationMs'], 0);
+    value77 = Math.max(0, toFiniteNumber(options5.startTime, 0)),
+    value78 = Math.max(0, toFiniteNumber(options5.renderStart, 0)),
+    value79 = Math.max(0, toFiniteNumber(options5.styleAndLayoutStart, 0)),
+    value80 = list8.reduce((value81, value82) => value81 + value82.durationMs, 0),
+    value83 = list8.reduce((value84, value85) => value84 + value85.forcedStyleAndLayoutDurationMs, 0);
   return {
     durationMs: count7,
-    blockingDurationMs: Math['max'](0, toFiniteNumber(options5['blockingDuration'], 0)),
+    blockingDurationMs: Math.max(0, toFiniteNumber(options5.blockingDuration, 0)),
     startTime: value77,
     renderStart: value78,
     styleAndLayoutStart: value79,
-    renderStartOffsetMs: Math['max'](0, value78 - value77),
-    styleAndLayoutStartOffsetMs: Math['max'](0, value79 - value77),
+    renderStartOffsetMs: Math.max(0, value78 - value77),
+    styleAndLayoutStartOffsetMs: Math.max(0, value79 - value77),
     scriptDurationMs: value80,
     forcedStyleAndLayoutDurationMs: value83,
-    unattributedDurationMs: Math['max'](0, count7 - value80),
+    unattributedDurationMs: Math.max(0, count7 - value80),
     scripts: list8,
-    at: Date['now'](),
+    at: Date.now(),
   };
 }
 
 function cloneLongAnimationFrameSample(args11 = {}) {
   return {
     ...args11,
-    scripts: Array['isArray'](args11['scripts']) ? args11['scripts']['map']((args12) => ({ ...args12 })) : [],
+    scripts: Array.isArray(args11.scripts) ? args11.scripts.map((args12) => ({ ...args12 })) : [],
   };
 }
 
 function disconnectLongAnimationFrameObserver(value86, value87) {
-  value86?.['__perfProbeLongAnimationFrameObserver']?.['disconnect']?.();
+  value86?.__perfProbeLongAnimationFrameObserver?.disconnect?.();
   value86 &&
-    ((value86['__perfProbeLongAnimationFrameObserver'] = null),
-    (value86['__perfProbeLongAnimationFrameObserverInstalled'] = false),
-    (value86['__perfProbeLongAnimationFrameObserverAttempted'] = false));
-  if (value87) value87['longAnimationFrameObserverActive'] = false;
+    ((value86.__perfProbeLongAnimationFrameObserver = null),
+    (value86.__perfProbeLongAnimationFrameObserverInstalled = false),
+    (value86.__perfProbeLongAnimationFrameObserverAttempted = false));
+  if (value87) value87.longAnimationFrameObserverActive = false;
 }
 
 function detectLongAnimationFrameSupport(value88) {
-  const value89 = value88?.['PerformanceObserver'] || globalThis['PerformanceObserver'];
+  const value89 = value88?.PerformanceObserver || globalThis.PerformanceObserver;
   if (typeof value89 !== 'function') return false;
-  const value90 = value89['supportedEntryTypes'];
-  if (Array['isArray'](value90)) return value90['includes']('long-animation-frame');
+  const value90 = value89.supportedEntryTypes;
+  if (Array.isArray(value90)) return value90.includes('long-animation-frame');
   return null;
 }
 
@@ -838,16 +838,16 @@ function recordLongAnimationFrameEntry(value91) {
   if (!isEnabled(store9)) return;
   const longAnimationFrameEntry = normalizeLongAnimationFrameEntry(value91);
   if (!longAnimationFrameEntry) return;
-  ((store9['maxLongAnimationFrameDurationMs'] = Math['max'](
-    toFiniteNumber(store9['maxLongAnimationFrameDurationMs'], 0),
-    longAnimationFrameEntry['durationMs'],
+  ((store9.maxLongAnimationFrameDurationMs = Math.max(
+    toFiniteNumber(store9.maxLongAnimationFrameDurationMs, 0),
+    longAnimationFrameEntry.durationMs,
   )),
-    (store9['maxLongAnimationFrameBlockingDurationMs'] = Math['max'](
-      toFiniteNumber(store9['maxLongAnimationFrameBlockingDurationMs'], 0),
-      longAnimationFrameEntry['blockingDurationMs'],
+    (store9.maxLongAnimationFrameBlockingDurationMs = Math.max(
+      toFiniteNumber(store9.maxLongAnimationFrameBlockingDurationMs, 0),
+      longAnimationFrameEntry.blockingDurationMs,
     )),
     pushCapped(
-      store9['longAnimationFrameSamples'],
+      store9.longAnimationFrameSamples,
       longAnimationFrameEntry,
       LONG_ANIMATION_FRAME_SAMPLE_LIMIT,
     ));
@@ -860,42 +860,42 @@ function syncLongAnimationFrameObserver(enabled8) {
     disconnectLongAnimationFrameObserver(globalWindow7, enabled8);
     const detectLongAnimationFrameSupport2 = detectLongAnimationFrameSupport(globalWindow7);
     detectLongAnimationFrameSupport2 !== null &&
-      (enabled8['longAnimationFrameSupported'] = detectLongAnimationFrameSupport2);
+      (enabled8.longAnimationFrameSupported = detectLongAnimationFrameSupport2);
     return;
   }
-  if (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] === true) {
-    ((enabled8['longAnimationFrameSupported'] = true), (enabled8['longAnimationFrameObserverActive'] = true));
+  if (globalWindow7.__perfProbeLongAnimationFrameObserverInstalled === true) {
+    ((enabled8.longAnimationFrameSupported = true), (enabled8.longAnimationFrameObserverActive = true));
     return;
   }
-  if (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] === true) return;
-  const run2 = globalWindow7['PerformanceObserver'] || globalThis['PerformanceObserver'];
+  if (globalWindow7.__perfProbeLongAnimationFrameObserverAttempted === true) return;
+  const run2 = globalWindow7.PerformanceObserver || globalThis.PerformanceObserver;
   if (typeof run2 !== 'function') {
-    ((enabled8['longAnimationFrameSupported'] = false),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = true));
+    ((enabled8.longAnimationFrameSupported = false),
+      (globalWindow7.__perfProbeLongAnimationFrameObserverAttempted = true));
     return;
   }
-  const enabled9 = run2['supportedEntryTypes'];
-  if (Array['isArray'](enabled9) && !enabled9['includes']('long-animation-frame')) {
-    ((enabled8['longAnimationFrameSupported'] = false),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = true));
+  const enabled9 = run2.supportedEntryTypes;
+  if (Array.isArray(enabled9) && !enabled9.includes('long-animation-frame')) {
+    ((enabled8.longAnimationFrameSupported = false),
+      (globalWindow7.__perfProbeLongAnimationFrameObserverAttempted = true));
     return;
   }
-  globalWindow7['__perfProbeLongAnimationFrameObserverAttempted'] = true;
+  globalWindow7.__perfProbeLongAnimationFrameObserverAttempted = true;
   try {
     const value92 = new run2((value93) => {
-      const value94 = typeof value93?.['getEntries'] === 'function' ? value93['getEntries']() : [];
+      const value94 = typeof value93?.getEntries === 'function' ? value93.getEntries() : [];
       for (const value95 of value94) recordLongAnimationFrameEntry(value95);
     });
-    (value92['observe']({ type: 'long-animation-frame' }),
-      (globalWindow7['__perfProbeLongAnimationFrameObserver'] = value92),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] = true),
-      (enabled8['longAnimationFrameSupported'] = true),
-      (enabled8['longAnimationFrameObserverActive'] = true));
+    (value92.observe({ type: 'long-animation-frame' }),
+      (globalWindow7.__perfProbeLongAnimationFrameObserver = value92),
+      (globalWindow7.__perfProbeLongAnimationFrameObserverInstalled = true),
+      (enabled8.longAnimationFrameSupported = true),
+      (enabled8.longAnimationFrameObserverActive = true));
   } catch {
-    ((globalWindow7['__perfProbeLongAnimationFrameObserver'] = null),
-      (globalWindow7['__perfProbeLongAnimationFrameObserverInstalled'] = false),
-      (enabled8['longAnimationFrameSupported'] = false),
-      (enabled8['longAnimationFrameObserverActive'] = false));
+    ((globalWindow7.__perfProbeLongAnimationFrameObserver = null),
+      (globalWindow7.__perfProbeLongAnimationFrameObserverInstalled = false),
+      (enabled8.longAnimationFrameSupported = false),
+      (enabled8.longAnimationFrameObserverActive = false));
   }
 }
 
@@ -903,25 +903,25 @@ export function recordFastPreviewSample(value96, value97, value98 = {}) {
   const store10 = ensureStore();
   if (!isEnabled(store10)) return;
   const toFiniteNumber4 = toFiniteNumber(value97, 0);
-  if (!Number['isFinite'](toFiniteNumber4) || toFiniteNumber4 < 0) return;
+  if (!Number.isFinite(toFiniteNumber4) || toFiniteNumber4 < 0) return;
   pushCapped(
-    store10['fastPreviewSamples'],
+    store10.fastPreviewSamples,
     {
       mode: String(value96 || 'unknown'),
       durationMs: toFiniteNumber4,
-      startPerf: toFiniteNumber(value98['startPerf'], 0),
-      endPerf: toFiniteNumber(value98['endPerf'], 0),
-      candidateCount: toFiniteNumber(value98['candidateCount'], 0),
-      createdCount: toFiniteNumber(value98['createdCount'], 0),
-      reusedCount: toFiniteNumber(value98['reusedCount'], 0),
-      removedCount: toFiniteNumber(value98['removedCount'], 0),
-      poolSize: toFiniteNumber(value98['poolSize'], 0),
-      pendingCreateCount: toFiniteNumber(value98['pendingCreateCount'], 0),
-      srcAssignedCount: toFiniteNumber(value98['srcAssignedCount'], 0),
-      pendingMediaSrcCount: toFiniteNumber(value98['pendingMediaSrcCount'], 0),
-      imageCount: toFiniteNumber(value98['imageCount'], 0),
-      zoom: toFiniteNumber(value98['zoom'], 1),
-      at: Date['now'](),
+      startPerf: toFiniteNumber(value98.startPerf, 0),
+      endPerf: toFiniteNumber(value98.endPerf, 0),
+      candidateCount: toFiniteNumber(value98.candidateCount, 0),
+      createdCount: toFiniteNumber(value98.createdCount, 0),
+      reusedCount: toFiniteNumber(value98.reusedCount, 0),
+      removedCount: toFiniteNumber(value98.removedCount, 0),
+      poolSize: toFiniteNumber(value98.poolSize, 0),
+      pendingCreateCount: toFiniteNumber(value98.pendingCreateCount, 0),
+      srcAssignedCount: toFiniteNumber(value98.srcAssignedCount, 0),
+      pendingMediaSrcCount: toFiniteNumber(value98.pendingMediaSrcCount, 0),
+      imageCount: toFiniteNumber(value98.imageCount, 0),
+      zoom: toFiniteNumber(value98.zoom, 1),
+      at: Date.now(),
     },
     FAST_PREVIEW_SAMPLE_LIMIT,
   );
@@ -930,12 +930,12 @@ export function recordFastPreviewSample(value96, value97, value98 = {}) {
 export function recordRendererNodeLifecycleSample(options6 = {}) {
   const store11 = ensureStore();
   if (!isEnabled(store11)) return;
-  const toFiniteNumber5 = toFiniteNumber(options6['createdCount'], 0),
-    toFiniteNumber6 = toFiniteNumber(options6['remountedCount'], 0),
-    toFiniteNumber7 = toFiniteNumber(options6['parkedCount'], 0),
-    toFiniteNumber8 = toFiniteNumber(options6['updateCount'], 0),
-    toFiniteNumber9 = toFiniteNumber(options6['skippedUpdateCount'], 0),
-    toFiniteNumber10 = toFiniteNumber(options6['mountBatchCount'], 0),
+  const toFiniteNumber5 = toFiniteNumber(options6.createdCount, 0),
+    toFiniteNumber6 = toFiniteNumber(options6.remountedCount, 0),
+    toFiniteNumber7 = toFiniteNumber(options6.parkedCount, 0),
+    toFiniteNumber8 = toFiniteNumber(options6.updateCount, 0),
+    toFiniteNumber9 = toFiniteNumber(options6.skippedUpdateCount, 0),
+    toFiniteNumber10 = toFiniteNumber(options6.mountBatchCount, 0),
     enabled10 =
       toFiniteNumber5 > 0 ||
       toFiniteNumber6 > 0 ||
@@ -945,36 +945,36 @@ export function recordRendererNodeLifecycleSample(options6 = {}) {
       toFiniteNumber10 > 0;
   if (!enabled10) return;
   pushCapped(
-    store11['nodeLifecycleSamples'],
+    store11.nodeLifecycleSamples,
     {
-      mode: String(options6['mode'] || 'unknown'),
-      nodeCount: toFiniteNumber(options6['nodeCount'], 0),
-      renderNodeCount: toFiniteNumber(options6['renderNodeCount'], 0),
-      mountCandidateCount: toFiniteNumber(options6['mountCandidateCount'], 0),
-      parkCandidateCount: toFiniteNumber(options6['parkCandidateCount'], 0),
-      viewportBusy: options6['viewportBusy'] === true,
+      mode: String(options6.mode || 'unknown'),
+      nodeCount: toFiniteNumber(options6.nodeCount, 0),
+      renderNodeCount: toFiniteNumber(options6.renderNodeCount, 0),
+      mountCandidateCount: toFiniteNumber(options6.mountCandidateCount, 0),
+      parkCandidateCount: toFiniteNumber(options6.parkCandidateCount, 0),
+      viewportBusy: options6.viewportBusy === true,
       createdCount: toFiniteNumber5,
-      createRuntimeMs: toFiniteNumber(options6['createRuntimeMs'], 0),
-      createRuntimeMaxMs: toFiniteNumber(options6['createRuntimeMaxMs'], 0),
+      createRuntimeMs: toFiniteNumber(options6.createRuntimeMs, 0),
+      createRuntimeMaxMs: toFiniteNumber(options6.createRuntimeMaxMs, 0),
       remountedCount: toFiniteNumber6,
-      remountRuntimeMs: toFiniteNumber(options6['remountRuntimeMs'], 0),
-      remountRuntimeMaxMs: toFiniteNumber(options6['remountRuntimeMaxMs'], 0),
+      remountRuntimeMs: toFiniteNumber(options6.remountRuntimeMs, 0),
+      remountRuntimeMaxMs: toFiniteNumber(options6.remountRuntimeMaxMs, 0),
       parkedCount: toFiniteNumber7,
-      parkRuntimeMs: toFiniteNumber(options6['parkRuntimeMs'], 0),
-      parkRuntimeMaxMs: toFiniteNumber(options6['parkRuntimeMaxMs'], 0),
+      parkRuntimeMs: toFiniteNumber(options6.parkRuntimeMs, 0),
+      parkRuntimeMaxMs: toFiniteNumber(options6.parkRuntimeMaxMs, 0),
       updateCount: toFiniteNumber8,
-      hiddenUpdateCount: toFiniteNumber(options6['hiddenUpdateCount'], 0),
-      updateRuntimeMs: toFiniteNumber(options6['updateRuntimeMs'], 0),
-      updateRuntimeMaxMs: toFiniteNumber(options6['updateRuntimeMaxMs'], 0),
+      hiddenUpdateCount: toFiniteNumber(options6.hiddenUpdateCount, 0),
+      updateRuntimeMs: toFiniteNumber(options6.updateRuntimeMs, 0),
+      updateRuntimeMaxMs: toFiniteNumber(options6.updateRuntimeMaxMs, 0),
       skippedUpdateCount: toFiniteNumber9,
       mountBatchCount: toFiniteNumber10,
-      mountBatchFlushMs: toFiniteNumber(options6['mountBatchFlushMs'], 0),
-      mountBatchFlushMaxMs: toFiniteNumber(options6['mountBatchFlushMaxMs'], 0),
-      createdByType: normalizeLifecycleTypeBreakdown(options6['createdByType']),
-      updatedByType: normalizeLifecycleTypeBreakdown(options6['updatedByType']),
-      slowCreates: normalizeLifecycleSlowList(options6['slowCreates']),
-      slowUpdates: normalizeLifecycleSlowList(options6['slowUpdates']),
-      at: Date['now'](),
+      mountBatchFlushMs: toFiniteNumber(options6.mountBatchFlushMs, 0),
+      mountBatchFlushMaxMs: toFiniteNumber(options6.mountBatchFlushMaxMs, 0),
+      createdByType: normalizeLifecycleTypeBreakdown(options6.createdByType),
+      updatedByType: normalizeLifecycleTypeBreakdown(options6.updatedByType),
+      slowCreates: normalizeLifecycleSlowList(options6.slowCreates),
+      slowUpdates: normalizeLifecycleSlowList(options6.slowUpdates),
+      at: Date.now(),
     },
     NODE_LIFECYCLE_SAMPLE_LIMIT,
   );

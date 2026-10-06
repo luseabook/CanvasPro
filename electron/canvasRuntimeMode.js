@@ -1,8 +1,8 @@
 import { shouldUseChromeShellRuntime } from './chromeShellLauncher.js';
 export function createCanvasRuntimeModeController({
-  env: env = process['env'],
+  env: env = process.env,
   appIsPackaged: appIsPackaged = false,
-  platform: platform = process['platform'],
+  platform: platform = process.platform,
 } = {}) {
   let electronForcedForLaunch = false;
   return {

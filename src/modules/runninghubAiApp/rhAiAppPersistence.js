@@ -3,25 +3,25 @@ export function createRhAiAppPersistence({
   storage: storage,
   onWarning: onWarning,
 }) {
-  let promise = Promise['resolve']();
+  let promise = Promise.resolve();
   return (handler, { saveApps: saveApps = false, onCommitted: onCommitted = () => {} } = {}) => {
-    const promise2 = promise['then'](async () => {
+    const promise2 = promise.then(async () => {
       const value = handler(),
-        enabled = externalBridge?.['isAvailable']?.() === true;
+        enabled = externalBridge?.isAvailable?.() === true;
       if (enabled) {
-        const response = await externalBridge['write'](value);
-        if (response?.['ok'] !== true) throw new Error(response?.['error'] || '模型文件保存失败，请重试');
+        const response = await externalBridge.write(value);
+        if (response?.ok !== true) throw new Error(response?.error || '模型文件保存失败，请重试');
       }
       if (saveApps)
         try {
-          if (!storage?.['setItem']) throw new Error('模型存储不可用');
-          storage['setItem']('aiCanvas.runningHubAiApp.savedApps.v1', JSON['stringify'](value['savedApps']));
+          if (!storage?.setItem) throw new Error('模型存储不可用');
+          storage.setItem('aiCanvas.runningHubAiApp.savedApps.v1', JSON.stringify(value.savedApps));
         } catch (item) {
           if (!enabled) throw item;
           onWarning('[RH AI App] local cache update failed:', item);
         }
       return (onCommitted(), { ok: true });
     });
-    return ((promise = promise2['catch'](() => {})), promise2);
+    return ((promise = promise2.catch(() => {})), promise2);
   };
 }

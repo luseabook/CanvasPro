@@ -1,37 +1,37 @@
 import { runTaskBatchQueue } from '../core/taskBatchExecution.js';
 function normalizeText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 export function createAudioVoiceGenerationOwnerKey(item, key) {
   return (normalizeText(item) || 'source') + '\x1f' + normalizeText(key);
 }
 export function normalizeAudioVoiceBatchConcurrencyLimit(index, result = 1) {
   const count = Number(result),
-    data = Number['isFinite'](count) && count > 0 ? Math['max'](1, Math['floor'](count)) : 1,
+    data = Number.isFinite(count) && count > 0 ? Math.max(1, Math.floor(count)) : 1,
     count2 = Number(index);
-  if (!Number['isFinite'](count2) || count2 <= 0) return data;
-  return Math['max'](1, Math['floor'](count2));
+  if (!Number.isFinite(count2) || count2 <= 0) return data;
+  return Math.max(1, Math.floor(count2));
 }
 export function resolveAudioVoiceProviderBatchConcurrency(options = {}, target = {}, source = 1) {
-  const text = normalizeText(target?.['provider'])['toLowerCase'](),
-    text2 = normalizeText(target?.['adapterType'])['toLowerCase'](),
+  const text = normalizeText(target?.provider).toLowerCase(),
+    text2 = normalizeText(target?.adapterType).toLowerCase(),
     next = text === 'runninghubwf' || (text === 'runninghub' && text2 === 'workflow'),
     current = text === 'runninghub' && text2 === 'modelapi';
   if (next)
     return normalizeAudioVoiceBatchConcurrencyLimit(
-      options['workflowConcurrentLimit'] ??
-        options['runninghubWorkflowConcurrentLimit'] ??
-        options['concurrentLimit'],
+      options.workflowConcurrentLimit ??
+        options.runninghubWorkflowConcurrentLimit ??
+        options.concurrentLimit,
       source,
     );
   if (current)
     return normalizeAudioVoiceBatchConcurrencyLimit(
-      options['modelConcurrentLimit'] ??
-        options['runninghubModelConcurrentLimit'] ??
-        options['concurrentLimit'],
+      options.modelConcurrentLimit ??
+        options.runninghubModelConcurrentLimit ??
+        options.concurrentLimit,
       source,
     );
-  return normalizeAudioVoiceBatchConcurrencyLimit(options['concurrentLimit'], source);
+  return normalizeAudioVoiceBatchConcurrencyLimit(options.concurrentLimit, source);
 }
 export async function resolveAudioVoiceProviderBatchConcurrencyWithProbe(
   options2 = {},
@@ -39,30 +39,30 @@ export async function resolveAudioVoiceProviderBatchConcurrencyWithProbe(
   record = {},
 ) {
   const audioVoiceProviderBatchConcurrency = resolveAudioVoiceProviderBatchConcurrency(options2, entry),
-    text3 = normalizeText(entry?.['provider'])['toLowerCase'](),
-    text4 = normalizeText(entry?.['adapterType'])['toLowerCase'](),
+    text3 = normalizeText(entry?.provider).toLowerCase(),
+    text4 = normalizeText(entry?.adapterType).toLowerCase(),
     enabled = text3 === 'runninghubwf' || (text3 === 'runninghub' && text4 === 'workflow'),
     handler =
-      typeof record['fetchRunningHubWorkflowQueueStatus'] === 'function'
-        ? record['fetchRunningHubWorkflowQueueStatus']
+      typeof record.fetchRunningHubWorkflowQueueStatus === 'function'
+        ? record.fetchRunningHubWorkflowQueueStatus
         : null,
-    text5 = normalizeText(options2?.['apiKey']);
+    text5 = normalizeText(options2?.apiKey);
   if (!enabled || !handler || !text5) return audioVoiceProviderBatchConcurrency;
-  const payload = await handler(options2)['catch'](() => null);
+  const payload = await handler(options2).catch(() => null);
   return normalizeAudioVoiceBatchConcurrencyLimit(
-    payload?.['concurrentLimit'] ?? audioVoiceProviderBatchConcurrency,
+    payload?.concurrentLimit ?? audioVoiceProviderBatchConcurrency,
     audioVoiceProviderBatchConcurrency,
   );
 }
 export async function runAudioVoiceBatchGenerationQueue(list = [], runTarget, concurrency = {}) {
-  const targets = Array['isArray'](list) ? list['filter'](Boolean) : [];
-  if (!targets['length'] || typeof runTarget !== 'function') return [];
+  const targets = Array.isArray(list) ? list.filter(Boolean) : [];
+  if (!targets.length || typeof runTarget !== 'function') return [];
   return runTaskBatchQueue({
     targets: targets,
-    concurrency: concurrency['concurrency'],
-    shouldStop: concurrency['shouldStop'],
-    onTargetStart: concurrency['onTargetStart'],
-    onTargetSettled: concurrency['onTargetSettled'],
+    concurrency: concurrency.concurrency,
+    shouldStop: concurrency.shouldStop,
+    onTargetStart: concurrency.onTargetStart,
+    onTargetSettled: concurrency.onTargetSettled,
     runTarget: runTarget,
   });
 }
@@ -86,7 +86,7 @@ export function createAudioVoiceGenerationTaskStoreAdapter({
   function run2() {
     if (run()) return readCurrentSegment(text7) || {};
     const persistedSnapshot = readPersistedSnapshot(text6);
-    return persistedSnapshot?.['segments']?.['find']((state) => normalizeText(state?.['id']) === text7) || {};
+    return persistedSnapshot?.segments?.find((state) => normalizeText(state?.id) === text7) || {};
   }
   return {
     getState() {
@@ -99,12 +99,12 @@ export function createAudioVoiceGenerationTaskStoreAdapter({
         return;
       }
       const segments = readPersistedSnapshot(text6);
-      if (!segments || !Array['isArray'](segments['segments'])) return;
-      const count3 = segments['segments']['findIndex']((scope) => normalizeText(scope?.['id']) === text7);
+      if (!segments || !Array.isArray(segments.segments)) return;
+      const count3 = segments.segments.findIndex((scope) => normalizeText(scope?.id) === text7);
       if (count3 < 0) return;
       writePersistedSnapshot(text6, {
         ...segments,
-        segments: segments['segments']['map']((args2, input) =>
+        segments: segments.segments.map((args2, input) =>
           input === count3 ? { ...args2, ...args } : args2,
         ),
       });
@@ -119,9 +119,9 @@ export function createAudioVoiceGenerationTaskOrchestration({ createStore: creat
     map2 = new Map();
   let output = 0;
   function run3(options3 = {}) {
-    const sourceNodeId2 = normalizeText(options3['sourceNodeId']),
-      segmentId2 = normalizeText(options3['segmentId']),
-      targetNodeId2 = normalizeText(options3['targetNodeId']);
+    const sourceNodeId2 = normalizeText(options3.sourceNodeId),
+      segmentId2 = normalizeText(options3.segmentId),
+      targetNodeId2 = normalizeText(options3.targetNodeId);
     return {
       sourceNodeId: sourceNodeId2,
       segmentId: segmentId2,
@@ -131,17 +131,17 @@ export function createAudioVoiceGenerationTaskOrchestration({ createStore: creat
   }
   function run4(options4 = {}) {
     const event = run3(options4),
-      value2 = map['get'](event['key']);
+      value2 = map.get(event.key);
     if (value2) return value2;
     const event2 = { ...event, store: null };
-    return ((event2['store'] = createStore(event2)), map['set'](event2['key'], event2), event2);
+    return ((event2.store = createStore(event2)), map.set(event2.key, event2), event2);
   }
   function getStore(options5 = {}) {
-    return run4(options5)['store'];
+    return run4(options5).store;
   }
   function begin(options6 = {}, { abortController: abortController = null } = {}) {
     const event3 = run4(options6),
-      value3 = map2['get'](event3['key']);
+      value3 = map2.get(event3.key);
     if (value3) return value3;
     const value4 = {
       ...event3,
@@ -151,22 +151,22 @@ export function createAudioVoiceGenerationTaskOrchestration({ createStore: creat
       cancelInFlight: false,
       cancelRequested: false,
     };
-    return (map2['set'](event3['key'], value4), value4);
+    return (map2.set(event3.key, value4), value4);
   }
   function getRun(value5, value6) {
-    return map2['get'](createAudioVoiceGenerationOwnerKey(value5, value6)) || null;
+    return map2.get(createAudioVoiceGenerationOwnerKey(value5, value6)) || null;
   }
   function isCurrent(event4) {
-    return !!event4 && map2['get'](event4['key']) === event4;
+    return !!event4 && map2.get(event4.key) === event4;
   }
   function finish(event5) {
     if (!isCurrent(event5)) return false;
-    return (map2['delete'](event5['key']), true);
+    return (map2.delete(event5.key), true);
   }
   function setCancelInFlight(value7, value8) {
     if (!isCurrent(value7)) return false;
-    value7['cancelInFlight'] = value8 === true;
-    if (value7['cancelInFlight']) value7['cancelRequested'] = true;
+    value7.cancelInFlight = value8 === true;
+    if (value7.cancelInFlight) value7.cancelRequested = true;
     return true;
   }
   return {
@@ -174,7 +174,7 @@ export function createAudioVoiceGenerationTaskOrchestration({ createStore: creat
     finish: finish,
     getRun: getRun,
     getStore: getStore,
-    isCancelInFlight: (value9, value10) => getRun(value9, value10)?.['cancelInFlight'] === true,
+    isCancelInFlight: (value9, value10) => getRun(value9, value10)?.cancelInFlight === true,
     isCurrent: isCurrent,
     setCancelInFlight: setCancelInFlight,
   };

@@ -46,41 +46,41 @@ const IMAGE_MEDIA_TYPES = new Set(['source-image', 'image', 'ai-image']);
 function getFirstPositiveDimension(...args) {
   for (const target of args) {
     const count = Number(target);
-    if (Number['isFinite'](count) && count > 0) return count;
+    if (Number.isFinite(count) && count > 0) return count;
   }
   return 0;
 }
 
 export function prepareAssetNodeForRestore(source, box3) {
   if (!box3 || typeof box3 !== 'object') return box3;
-  if (!String(source?.['packageKey'] || '')['trim']()) return box3;
-  if (!IMAGE_MEDIA_TYPES['has'](String(box3['type'] || ''))) return box3;
+  if (!String(source?.packageKey || '').trim()) return box3;
+  if (!IMAGE_MEDIA_TYPES.has(String(box3.type || ''))) return box3;
   const firstPositiveDimension = getFirstPositiveDimension(
-      box3['originalWidth'],
-      box3['imageWidth'],
-      box3['naturalWidth'],
-      box3['metadata']?.['width'],
-      box3['width'],
-      box3['w'],
+      box3.originalWidth,
+      box3.imageWidth,
+      box3.naturalWidth,
+      box3.metadata?.width,
+      box3.width,
+      box3.w,
     ),
     firstPositiveDimension2 = getFirstPositiveDimension(
-      box3['originalHeight'],
-      box3['imageHeight'],
-      box3['naturalHeight'],
-      box3['metadata']?.['height'],
-      box3['height'],
-      box3['h'],
+      box3.originalHeight,
+      box3.imageHeight,
+      box3.naturalHeight,
+      box3.metadata?.height,
+      box3.height,
+      box3.h,
     );
   if (!(firstPositiveDimension > 0 && firstPositiveDimension2 > 0)) return box3;
   const box4 = getAutoMediaSizeByShortSide(firstPositiveDimension, firstPositiveDimension2);
-  if (getNodeWidth(box3) === box4['width'] && getNodeHeight(box3) === box4['height']) return box3;
-  return { ...box3, width: box4['width'], height: box4['height'] };
+  if (getNodeWidth(box3) === box4.width && getNodeHeight(box3) === box4.height) return box3;
+  return { ...box3, width: box4.width, height: box4.height };
 }
 
 export function prepareAssetNodesForRestore(next, current = 24) {
-  const entry = Array['isArray'](next?.['nodes']) ? next['nodes'] : [],
-    record = entry['map']((payload) => prepareAssetNodeForRestore(next, payload));
-  return shouldTopAlignRestoredAsset(record, next?.['edges'])
+  const entry = Array.isArray(next?.nodes) ? next.nodes : [],
+    record = entry.map((payload) => prepareAssetNodeForRestore(next, payload));
+  return shouldTopAlignRestoredAsset(record, next?.edges)
     ? createTopAlignedAssetNodes(record, current)
     : record;
 }

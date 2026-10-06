@@ -13,19 +13,19 @@ export function createStartupHelpers({
     });
   function escapeHtml(value) {
     return String(value ?? '')
-      ['replace'](/&/g, '&amp;')
-      ['replace'](/</g, '&lt;')
-      ['replace'](/>/g, '&gt;')
-      ['replace'](/"/g, '&quot;')
-      ['replace'](/'/g, '&#39;');
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
   }
   function createStartupHtml(options = {}) {
-    const kind = String(options['kind'] || 'loading'),
+    const kind = String(options.kind || 'loading'),
       title = escapeHtml(
-        options['title'] || (typeof appDisplayName === 'function' ? appDisplayName() : appDisplayName) + ' 正在启动',
+        options.title || (typeof appDisplayName === 'function' ? appDisplayName() : appDisplayName) + ' 正在启动',
       ),
-      detail = escapeHtml(options['detail'] || ''),
-      hint = escapeHtml(options['hint'] || ''),
+      detail = escapeHtml(options.detail || ''),
+      hint = escapeHtml(options.hint || ''),
       isError = kind === 'error';
     return (
       '<!doctype html>\n<html>\n<head>\n  <meta charset="utf-8">\n  <title>' +
@@ -45,14 +45,14 @@ export function createStartupHelpers({
   }
   function loadStartupStatus(status) {
     const targetWindow = getMainWindow();
-    if (!targetWindow || targetWindow['isDestroyed']()) return;
+    if (!targetWindow || targetWindow.isDestroyed()) return;
     const html = createStartupHtml(status);
-    void targetWindow['loadURL']('data:text/html;charset=utf-8,' + encodeURIComponent(html));
+    void targetWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
   }
   function isLocalAppUrl(rawUrl) {
     try {
       const parsed = new URL(rawUrl);
-      return parsed['origin'] === appOrigin;
+      return parsed.origin === appOrigin;
     } catch {
       return false;
     }
@@ -71,7 +71,7 @@ export function createStartupHelpers({
         { ok: false, error: '不允许打开该外部链接' }
       );
     return (
-      void shellApi['openExternal'](url),
+      void shellApi.openExternal(url),
       logDiagnosticEvent({
         type: 'external_link.opened',
         level: 'info',

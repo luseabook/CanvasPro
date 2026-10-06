@@ -2341,63 +2341,63 @@ const AIGEN_IMAGE_BACKPLATE_MEDIA_HIDE_CLEAR_DELAY_MS = 180;
 
 export function shouldShowImagePromptInput(enabled36) {
   if (!enabled36 || typeof enabled36 !== 'object') return true;
-  if (enabled36?.['prompt']?.['visible'] === false) return false;
-  if (enabled36?.['prompt']?.['hidden'] === true) return false;
+  if (enabled36?.prompt?.visible === false) return false;
+  if (enabled36?.prompt?.hidden === true) return false;
   return true;
 }
 
 function getRhAiAppImageResultMediaKey(options3 = {}) {
-  const value192 = Array['isArray'](options3?.['images']) ? options3['images'] : [],
-    value193 = Number(options3?.['mainImageIndex']),
-    value194 = Number['isFinite'](value193) ? Math['max'](0, Math['trunc'](value193)) : 0,
-    value195 = value192[Math['min'](value194, Math['max'](0, value192['length'] - 1))] || {};
+  const value192 = Array.isArray(options3?.images) ? options3.images : [],
+    value193 = Number(options3?.mainImageIndex),
+    value194 = Number.isFinite(value193) ? Math.max(0, Math.trunc(value193)) : 0,
+    value195 = value192[Math.min(value194, Math.max(0, value192.length - 1))] || {};
   return (
     [
-      value195['displayLocalPath'],
-      value195['localPath'],
-      value195['originalLocalPath'],
-      value195['imageUrl'],
-      value195['sourceUrl'],
-      value195['thumbUrl'],
-      value195['thumbId'],
-      options3?.['imageUrl'],
-      options3?.['sourceUrl'],
-      options3?.['thumbUrl'],
+      value195.displayLocalPath,
+      value195.localPath,
+      value195.originalLocalPath,
+      value195.imageUrl,
+      value195.sourceUrl,
+      value195.thumbUrl,
+      value195.thumbId,
+      options3?.imageUrl,
+      options3?.sourceUrl,
+      options3?.thumbUrl,
     ]
-      ['map']((value196) => String(value196 || '')['trim']())
-      ['find'](Boolean) || ''
+      .map((value196) => String(value196 || '').trim())
+      .find(Boolean) || ''
   );
 }
 
 export function resolveUploadedImageReferenceUrl(options4 = {}) {
   const imageNodeStorageFields = buildImageNodeStorageFields(options4);
   return (
-    String(options4?.['displayUrl'] || '')['trim']() ||
-    String(options4?.['originalUrl'] || '')['trim']() ||
-    String(options4?.['url'] || '')['trim']() ||
+    String(options4?.displayUrl || '').trim() ||
+    String(options4?.originalUrl || '').trim() ||
+    String(options4?.url || '').trim() ||
     toLocalPathUrl(
-      imageNodeStorageFields['displayLocalPath'] ||
-        imageNodeStorageFields['originalLocalPath'] ||
-        imageNodeStorageFields['localPath'],
+      imageNodeStorageFields.displayLocalPath ||
+        imageNodeStorageFields.originalLocalPath ||
+        imageNodeStorageFields.localPath,
     )
   );
 }
 
 function flushAIGenImageReferenceUploadNodes(list21 = []) {
-  const value197 = Array['from'](
-    new Set(list21['map']((value198) => String(value198 || '')['trim']())['filter'](Boolean)),
+  const value197 = Array.from(
+    new Set(list21.map((value198) => String(value198 || '').trim()).filter(Boolean)),
   );
-  if (value197['length'] === 0) return false;
-  const value199 = globalThis['window']?.['v2Renderer'];
-  if (typeof value199?.['flushNodes'] === 'function')
+  if (value197.length === 0) return false;
+  const value199 = globalThis.window?.v2Renderer;
+  if (typeof value199?.flushNodes === 'function')
     try {
-      if (value199['flushNodes'](value197) === true) return true;
+      if (value199.flushNodes(value197) === true) return true;
     } catch {}
-  if (typeof value199?.['flushNode'] !== 'function') return false;
+  if (typeof value199?.flushNode !== 'function') return false;
   let value200 = false;
   for (const value201 of value197) {
     try {
-      value200 = value199['flushNode'](value201) === true || value200;
+      value200 = value199.flushNode(value201) === true || value200;
     } catch {}
   }
   return value200;
@@ -2411,32 +2411,32 @@ function collectSubmitButtonInputRecords({
 } = {}) {
   const targetInputPolicy2 = getTargetInputPolicy({
       ...latestNode,
-      type: latestNode?.['type'] || 'ai-image',
+      type: latestNode?.type || 'ai-image',
     }),
-    value202 = String(imageInputGate?.['kind'] || '')['trim'](),
+    value202 = String(imageInputGate?.kind || '').trim(),
     value203 = [];
   return (
     value202 === 'image' &&
       getImageInputGateUploadedUrl(latestNode, imageInputGate) &&
-      value203['push']({ kind: 'image', refSlot: '' }),
-    (Array['isArray'](inEdges) ? inEdges : [])['forEach']((value204) => {
-      const response5 = nodes?.[value204?.['sourceId']];
+      value203.push({ kind: 'image', refSlot: '' }),
+    (Array.isArray(inEdges) ? inEdges : []).forEach((value204) => {
+      const response5 = nodes?.[value204?.sourceId];
       if (!response5) return;
       const effectiveInputKind2 = resolveEffectiveInputKind(response5, value204);
       if (!effectiveInputKind2 || !isInputKindAllowed(targetInputPolicy2, effectiveInputKind2)) return;
       if (value202 && effectiveInputKind2 !== value202) return;
       if (effectiveInputKind2 === 'text') {
         const enabled37 = String(
-          response5['outputText'] ||
-            response5['text'] ||
-            response5['content'] ||
-            response5['prompt'] ||
-            response5['label'] ||
+          response5.outputText ||
+            response5.text ||
+            response5.content ||
+            response5.prompt ||
+            response5.label ||
             '',
-        )['trim']();
+        ).trim();
         if (!enabled37) return;
       }
-      value203['push']({ kind: effectiveInputKind2, refSlot: value204?.['refSlot'] || '' });
+      value203.push({ kind: effectiveInputKind2, refSlot: value204?.refSlot || '' });
     }),
     value203
   );

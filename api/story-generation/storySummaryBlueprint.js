@@ -15,12 +15,12 @@ export const STORY_SUMMARY_SYSTEM_PROMPT = [
   '输入 scriptMode 只决定后续剧本的叙事载体：plot 以人物行动与对白推进，narration 以第三人称旁白推进；当前摘要仍使用客观梗概表达。',
   '所有输出使用简体中文，只返回严格 JSON，不要输出 Markdown、注释或说明。',
   'JSON 必须且只能包含 title、storyType、targetAudience、storySummary、storyBackground、storySetting、coreHook、logline、storyContract、plotBeats、continuityFacts、characters 十二个字段。',
-]['join']('\n');
+].join('\n');
 function normalizeText(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function normalizeStringArray(list) {
-  return Array['isArray'](list) ? [...new Set(list['map'](normalizeText)['filter'](Boolean))] : [];
+  return Array.isArray(list) ? [...new Set(list.map(normalizeText).filter(Boolean))] : [];
 }
 function createStorySummaryResponseSchema(maxItems) {
   return {
@@ -133,43 +133,43 @@ export function createStorySummaryBlueprint({
   if (typeof validateStoryPlanningConstraints !== 'function')
     throw new TypeError('Story Summary Blueprint 需要规划约束校验函数。');
   function normalizeStorySummaryCharacter(error = {}, item = 0) {
-    const name = normalizeText(error?.['name']);
+    const name = normalizeText(error?.name);
     if (!name) return null;
     return {
-      ref: normalizeText(error?.['ref']) || 'character-' + (item + 1),
+      ref: normalizeText(error?.ref) || 'character-' + (item + 1),
       name: name,
-      roleType: normalizeText(error?.['roleType'] || error?.['role']) || '其他角色',
-      fixedTraits: normalizeText(error?.['fixedTraits']),
-      visualAppearance: normalizeText(error?.['visualAppearance']),
-      voiceDescription: normalizeText(error?.['voiceDescription']),
-      coreTags: normalizeStringArray(error?.['coreTags']),
-      profile: normalizeText(error?.['profile']),
-      motivation: normalizeText(error?.['motivation']),
-      relationships: normalizeText(error?.['relationships']),
-      personality: normalizeText(error?.['personality']),
-      arc: normalizeText(error?.['arc']),
+      roleType: normalizeText(error?.roleType || error?.role) || '其他角色',
+      fixedTraits: normalizeText(error?.fixedTraits),
+      visualAppearance: normalizeText(error?.visualAppearance),
+      voiceDescription: normalizeText(error?.voiceDescription),
+      coreTags: normalizeStringArray(error?.coreTags),
+      profile: normalizeText(error?.profile),
+      motivation: normalizeText(error?.motivation),
+      relationships: normalizeText(error?.relationships),
+      personality: normalizeText(error?.personality),
+      arc: normalizeText(error?.arc),
     };
   }
   function storyContract(options = {}) {
-    const key = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
+    const key = options && typeof options === 'object' && !Array.isArray(options) ? options : {};
     return {
-      protagonistGoal: normalizeText(key['protagonistGoal']),
-      centralConflict: normalizeText(key['centralConflict']),
-      stakes: normalizeText(key['stakes']),
-      progressionDriver: normalizeText(key['progressionDriver']),
-      constraints: normalizeText(key['constraints']),
-      climax: normalizeText(key['climax']),
-      ending: normalizeText(key['ending']),
+      protagonistGoal: normalizeText(key.protagonistGoal),
+      centralConflict: normalizeText(key.centralConflict),
+      stakes: normalizeText(key.stakes),
+      progressionDriver: normalizeText(key.progressionDriver),
+      constraints: normalizeText(key.constraints),
+      climax: normalizeText(key.climax),
+      ending: normalizeText(key.ending),
     };
   }
   function normalizeStoryPlotBeat(options2 = {}, index = 0) {
-    const result = options2 && typeof options2 === 'object' && !Array['isArray'](options2) ? options2 : {},
-      stage = normalizeText(result['stage']),
-      event = normalizeText(result['event']),
-      consequence = normalizeText(result['consequence']);
+    const result = options2 && typeof options2 === 'object' && !Array.isArray(options2) ? options2 : {},
+      stage = normalizeText(result.stage),
+      event = normalizeText(result.event),
+      consequence = normalizeText(result.consequence);
     if (!stage && !event && !consequence) return null;
     return {
-      ref: normalizeText(result['ref']) || 'plot-beat-' + (index + 1),
+      ref: normalizeText(result.ref) || 'plot-beat-' + (index + 1),
       stage: stage,
       event: event,
       consequence: consequence,
@@ -179,30 +179,30 @@ export function createStorySummaryBlueprint({
     const strictJson = parseStrictJson(getResultText(data), 'Agent 未返回剧本摘要。'),
       enabled = {
         schemaVersion: STORY_SUMMARY_SCHEMA_VERSION,
-        title: normalizeText(strictJson['title']),
-        storyType: normalizeText(strictJson['storyType']),
-        targetAudience: normalizeText(strictJson['targetAudience']),
-        storySummary: normalizeText(strictJson['storySummary']),
-        storyBackground: normalizeText(strictJson['storyBackground']),
-        storySetting: normalizeText(strictJson['storySetting']),
-        coreHook: normalizeText(strictJson['coreHook']),
-        logline: normalizeText(strictJson['logline']),
-        storyContract: storyContract(strictJson['storyContract']),
-        plotBeats: Array['isArray'](strictJson['plotBeats'])
-          ? strictJson['plotBeats']
-              ['map'](normalizeStoryPlotBeat)
-              ['filter'](Boolean)
-              ['slice'](0, STORY_SUMMARY_MAX_PLOT_BEATS)
+        title: normalizeText(strictJson.title),
+        storyType: normalizeText(strictJson.storyType),
+        targetAudience: normalizeText(strictJson.targetAudience),
+        storySummary: normalizeText(strictJson.storySummary),
+        storyBackground: normalizeText(strictJson.storyBackground),
+        storySetting: normalizeText(strictJson.storySetting),
+        coreHook: normalizeText(strictJson.coreHook),
+        logline: normalizeText(strictJson.logline),
+        storyContract: storyContract(strictJson.storyContract),
+        plotBeats: Array.isArray(strictJson.plotBeats)
+          ? strictJson.plotBeats
+              .map(normalizeStoryPlotBeat)
+              .filter(Boolean)
+              .slice(0, STORY_SUMMARY_MAX_PLOT_BEATS)
           : [],
-        continuityFacts: normalizeStringArray(strictJson['continuityFacts'])['slice'](
+        continuityFacts: normalizeStringArray(strictJson.continuityFacts).slice(
           0,
           continuityMaxFacts,
         ),
-        characters: Array['isArray'](strictJson['characters'])
-          ? strictJson['characters']
-              ['map'](normalizeStorySummaryCharacter)
-              ['filter'](Boolean)
-              ['slice'](0, STORY_SUMMARY_MAX_CORE_CHARACTERS)
+        characters: Array.isArray(strictJson.characters)
+          ? strictJson.characters
+              .map(normalizeStorySummaryCharacter)
+              .filter(Boolean)
+              .slice(0, STORY_SUMMARY_MAX_CORE_CHARACTERS)
           : [],
       },
       target = [
@@ -218,19 +218,19 @@ export function createStorySummaryBlueprint({
     for (const [source, next] of target) {
       if (!enabled[source]) throw new Error('Agent 返回结果缺少' + next + '。');
     }
-    const current = Object['entries'](enabled['storyContract'])['find'](([, enabled2]) => !enabled2);
+    const current = Object.entries(enabled.storyContract).find(([, enabled2]) => !enabled2);
     if (current) throw new Error('Agent 返回结果缺少故事契约字段：' + current[0] + '。');
-    if (enabled['plotBeats']['length'] < 4) throw new Error('Agent 返回结果缺少完整的因果剧情节点。');
-    const entry = enabled['plotBeats']['find'](
-      (enabled3) => !enabled3['stage'] || !enabled3['event'] || !enabled3['consequence'],
+    if (enabled.plotBeats.length < 4) throw new Error('Agent 返回结果缺少完整的因果剧情节点。');
+    const entry = enabled.plotBeats.find(
+      (enabled3) => !enabled3.stage || !enabled3.event || !enabled3.consequence,
     );
     if (entry) throw new Error('Agent 返回的剧情节点缺少阶段、事件或结果。');
-    if (!enabled['continuityFacts']['length']) throw new Error('Agent 返回结果缺少连续性事实。');
-    if (!enabled['characters']['length']) throw new Error('Agent 返回结果缺少人物小传。');
-    const error2 = enabled['characters']['find'](
-      (enabled4) => !enabled4['fixedTraits'] || !enabled4['coreTags']['length'],
+    if (!enabled.continuityFacts.length) throw new Error('Agent 返回结果缺少连续性事实。');
+    if (!enabled.characters.length) throw new Error('Agent 返回结果缺少人物小传。');
+    const error2 = enabled.characters.find(
+      (enabled4) => !enabled4.fixedTraits || !enabled4.coreTags.length,
     );
-    if (error2) throw new Error('Agent 返回的人物“' + error2['name'] + '”缺少剧情固定特征或核心标签。');
+    if (error2) throw new Error('Agent 返回的人物“' + error2.name + '”缺少剧情固定特征或核心标签。');
     return enabled;
   }
   function buildStorySummaryPrompt({
@@ -250,18 +250,18 @@ export function createStorySummaryBlueprint({
       sourceText2 = normalizeText(sourceText),
       rewriteInstruction2 = normalizeText(rewriteInstruction),
       selectedStyle = normalizeText(visualStyle),
-      sourceDigests2 = Array['isArray'](sourceDigests) ? sourceDigests : [],
+      sourceDigests2 = Array.isArray(sourceDigests) ? sourceDigests : [],
       episodeLimit = validateStoryPlanningConstraints(planning);
     if (mode2 === 'generate' && !idea2) throw new Error('请先输入故事设定。');
-    if (mode2 !== 'generate' && !sourceText2 && !sourceDigests2['length'])
+    if (mode2 !== 'generate' && !sourceText2 && !sourceDigests2.length)
       throw new Error('没有可供整理的剧本文本。');
     if (mode2 === 'rewrite' && !rewriteInstruction2) throw new Error('请先填写改写要求。');
-    return JSON['stringify']({
+    return JSON.stringify({
       task: 'create_story_summary',
       schemaVersion: STORY_SUMMARY_SCHEMA_VERSION,
       mode: mode2,
       scriptMode: scriptMode2,
-      episodeLimit: episodeLimit['episodeCount'],
+      episodeLimit: episodeLimit.episodeCount,
       creativeDirection: {
         selectedStyle: selectedStyle,
         instruction: selectedStyle
@@ -300,7 +300,7 @@ export function createStorySummaryBlueprint({
         '人物小传需写明角色类型、剧情固定特征、3 至 5 个核心标签、身份、动机、关系、性格和成长弧。',
         '本阶段禁止生成服装、发型、图片提示词和声音设定；这些制作资料在分集正文确认后的资产提取阶段生成。',
         '后续最多规划 ' +
-          episodeLimit['episodeCount'] +
+          episodeLimit.episodeCount +
           ' 集；摘要应完整承载故事，但不得为了凑满上限注水。本次禁止输出分集。',
         scriptMode2 === 'narration'
           ? '后续采用解说模式：摘要要形成可由第三人称旁白串联的清晰因果链，避免让核心冲突只能依靠大段人物对白成立。'
@@ -368,7 +368,7 @@ export function createStorySummaryBlueprint({
       fallback: 'prompt',
     };
   }
-  return Object['freeze']({
+  return Object.freeze({
     buildStorySummaryPrompt: buildStorySummaryPrompt,
     createStructuredOutput: createStructuredOutput,
     normalizeStoryContract: storyContract,

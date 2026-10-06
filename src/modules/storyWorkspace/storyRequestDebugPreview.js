@@ -3,14 +3,14 @@ import { maskDebugPayloadSecrets } from '../../utils/debugRequestMasking.js';
 import { buildDebugJsonPreview } from '../../utils/debugImagePreview.js';
 const STORY_REQUEST_CAPTURE_CODE = 'STORY_REQUEST_DEBUG_CAPTURED';
 function cloneSerializableValue(value) {
-  return JSON['parse'](JSON['stringify'](value));
+  return JSON.parse(JSON.stringify(value));
 }
 function countCharacters(item = '') {
-  return [...String(item || '')]['length'];
+  return [...String(item || '')].length;
 }
 function parsePromptObject(key = '') {
   try {
-    const index = JSON['parse'](String(key || ''));
+    const index = JSON.parse(String(key || ''));
     return index && typeof index === 'object' ? index : null;
   } catch {
     return null;
@@ -18,14 +18,14 @@ function parsePromptObject(key = '') {
 }
 function formatPromptForPreview(result = '') {
   const promptObject = parsePromptObject(result);
-  return promptObject ? JSON['stringify'](promptObject, null, 2) : String(result || '');
+  return promptObject ? JSON.stringify(promptObject, null, 2) : String(result || '');
 }
 function getPromptSectionCharacters(enabled) {
   if (!enabled || typeof enabled !== 'object') return {};
-  return Object['fromEntries'](
-    Object['entries'](enabled)['map'](([data, options]) => [
+  return Object.fromEntries(
+    Object.entries(enabled).map(([data, options]) => [
       data,
-      countCharacters(JSON['stringify'](options)),
+      countCharacters(JSON.stringify(options)),
     ]),
   );
 }
@@ -35,7 +35,7 @@ export async function captureStoryRequestPayload(handler) {
   const async2 = async (options2 = {}) => {
     if (!cloneSerializableValue2) cloneSerializableValue2 = cloneSerializableValue(options2);
     const error = new Error('调试请求已在发送前截获。');
-    error['code'] = STORY_REQUEST_CAPTURE_CODE;
+    error.code = STORY_REQUEST_CAPTURE_CODE;
     throw error;
   };
   try {
@@ -52,14 +52,14 @@ export function buildStoryRequestDebugPreviewModel(
   { title: title = '剧本工作室请求调试', subtitle: subtitle = '' } = {},
 ) {
   const maskDebugPayloadSecrets2 = maskDebugPayloadSecrets(cloneSerializableValue(options3 || {})),
-    source = String(maskDebugPayloadSecrets2?.['prompt'] || ''),
-    content = String(maskDebugPayloadSecrets2?.['systemPrompt'] || ''),
+    source = String(maskDebugPayloadSecrets2?.prompt || ''),
+    content = String(maskDebugPayloadSecrets2?.systemPrompt || ''),
     promptObject2 = parsePromptObject(source),
-    task = String(promptObject2?.['task'] || ''),
-    batchIndex = Math['max'](0, Math['trunc'](Number(promptObject2?.['batch']?.['index']) || 0)),
-    batchTotal = Math['max'](0, Math['trunc'](Number(promptObject2?.['batch']?.['total']) || 0)),
-    clipCount = Array['isArray'](promptObject2?.['batch']?.['clipPlans'])
-      ? promptObject2['batch']['clipPlans']['length']
+    task = String(promptObject2?.task || ''),
+    batchIndex = Math.max(0, Math.trunc(Number(promptObject2?.batch?.index) || 0)),
+    batchTotal = Math.max(0, Math.trunc(Number(promptObject2?.batch?.total) || 0)),
+    clipCount = Array.isArray(promptObject2?.batch?.clipPlans)
+      ? promptObject2.batch.clipPlans.length
       : 0;
   return {
     title: title,
@@ -68,13 +68,13 @@ export function buildStoryRequestDebugPreviewModel(
     batchIndex: batchIndex,
     batchTotal: batchTotal,
     clipCount: clipCount,
-    model: String(maskDebugPayloadSecrets2?.['model'] || ''),
-    provider: String(maskDebugPayloadSecrets2?.['provider'] || ''),
-    structuredOutputName: String(maskDebugPayloadSecrets2?.['structuredOutput']?.['name'] || ''),
+    model: String(maskDebugPayloadSecrets2?.model || ''),
+    provider: String(maskDebugPayloadSecrets2?.provider || ''),
+    structuredOutputName: String(maskDebugPayloadSecrets2?.structuredOutput?.name || ''),
     metrics: {
       promptCharacters: countCharacters(source),
       systemPromptCharacters: countCharacters(content),
-      requestCharacters: countCharacters(JSON['stringify'](maskDebugPayloadSecrets2)),
+      requestCharacters: countCharacters(JSON.stringify(maskDebugPayloadSecrets2)),
     },
     promptSectionCharacters: getPromptSectionCharacters(promptObject2),
     tabs: [
@@ -84,9 +84,9 @@ export function buildStoryRequestDebugPreviewModel(
       {
         id: 'sections',
         label: '区块字符统计',
-        content: JSON['stringify'](
-          Object['fromEntries'](
-            Object['entries'](getPromptSectionCharacters(promptObject2))['sort'](
+        content: JSON.stringify(
+          Object.fromEntries(
+            Object.entries(getPromptSectionCharacters(promptObject2)).sort(
               (next, current) => current[1] - next[1],
             ),
           ),
@@ -97,17 +97,17 @@ export function buildStoryRequestDebugPreviewModel(
     ],
   };
 }
-export function closeStoryRequestDebugPreview(entry = globalThis['document']) {
+export function closeStoryRequestDebugPreview(entry = globalThis.document) {
   closeDebugRequestWindow(entry);
 }
 export function openStoryRequestDebugPreview(args = {}) {
-  if (args['preparePayload'])
+  if (args.preparePayload)
     return openDebugRequestWindow({
       ...args,
       prepare: async () => ({
-        tabs: buildStoryRequestDebugPreviewModel(await args['preparePayload'](), args)['tabs'],
+        tabs: buildStoryRequestDebugPreviewModel(await args.preparePayload(), args).tabs,
       }),
     });
-  const tabs = buildStoryRequestDebugPreviewModel(args['payload'], args);
-  return openDebugRequestWindow({ ...args, tabs: tabs['tabs'] });
+  const tabs = buildStoryRequestDebugPreviewModel(args.payload, args);
+  return openDebugRequestWindow({ ...args, tabs: tabs.tabs });
 }

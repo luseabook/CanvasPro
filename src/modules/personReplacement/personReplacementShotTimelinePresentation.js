@@ -57,14 +57,14 @@ import {
 import { resolveShotCutSubmissionUi } from './personReplacementShotReverse.js';
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#39;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
 function normalizeText(item, key = '') {
-  const index = String(item ?? '')['trim']();
+  const index = String(item ?? '').trim();
   return index || key;
 }
 function normalizeMediaUrl(result) {
@@ -73,34 +73,34 @@ function normalizeMediaUrl(result) {
 }
 function clamp(data, options, target, source = options) {
   const next = Number(data);
-  return Number['isFinite'](next) ? Math['min'](target, Math['max'](options, next)) : source;
+  return Number.isFinite(next) ? Math.min(target, Math.max(options, next)) : source;
 }
 function formatClock(current) {
-  const entry = Math['max'](0, Number(current) || 0),
-    record = Math['floor'](entry / 60),
-    payload = Math['floor'](entry % 60);
-  return String(record)['padStart'](2, '0') + ':' + String(payload)['padStart'](2, '0');
+  const entry = Math.max(0, Number(current) || 0),
+    record = Math.floor(entry / 60),
+    payload = Math.floor(entry % 60);
+  return String(record).padStart(2, '0') + ':' + String(payload).padStart(2, '0');
 }
 function formatPreciseClock(handle) {
-  const state = Math['max'](0, Number(handle) || 0),
-    config = Math['floor'](state / 60),
+  const state = Math.max(0, Number(handle) || 0),
+    config = Math.floor(state / 60),
     scope = state - config * 60;
-  return String(config)['padStart'](2, '0') + ':' + scope['toFixed'](2)['padStart'](5, '0');
+  return String(config).padStart(2, '0') + ':' + scope.toFixed(2).padStart(5, '0');
 }
 function resolvePersonReplacementVideoResultPosterRef(enabled = {}) {
-  if (!enabled || typeof enabled !== 'object' || Array['isArray'](enabled)) return '';
+  if (!enabled || typeof enabled !== 'object' || Array.isArray(enabled)) return '';
   return (
     [
-      enabled['posterUrl'],
-      enabled['thumbUrl'],
-      enabled['thumbnailUrl'],
-      enabled['coverUrl'],
-      enabled['posterLocalPath'],
-      enabled['thumbLocalPath'],
-      enabled['thumbnailLocalPath'],
+      enabled.posterUrl,
+      enabled.thumbUrl,
+      enabled.thumbnailUrl,
+      enabled.coverUrl,
+      enabled.posterLocalPath,
+      enabled.thumbLocalPath,
+      enabled.thumbnailLocalPath,
     ]
-      ['map']((input) => normalizeText(input))
-      ['find'](Boolean) || ''
+      .map((input) => normalizeText(input))
+      .find(Boolean) || ''
   );
 }
 function renderShotTimelineVideoMedia({
@@ -110,10 +110,10 @@ function renderShotTimelineVideoMedia({
   resultPosterRef: resultPosterRef = '',
 } = {}) {
   const text2 = normalizeText(resultRef),
-    enabled2 = text2 || normalizeText(shot['videoRef']) || normalizeText(shot['sourceVideoRef']);
+    enabled2 = text2 || normalizeText(shot.videoRef) || normalizeText(shot.sourceVideoRef);
   if (!enabled2) return '';
   const output = text2 ? 'result' : 'source',
-    value2 = text2 ? normalizeText(resultPosterRef) : normalizeText(shot['keyframeRef']),
+    value2 = text2 ? normalizeText(resultPosterRef) : normalizeText(shot.keyframeRef),
     mediaUrl = normalizeMediaUrl(enabled2),
     mediaUrl2 = normalizeMediaUrl(value2),
     value3 = output === 'result' ? title + '替换视频结果' : title + '原视频片段';
@@ -140,7 +140,7 @@ function renderReplacementResultReferenceButton(options2 = {}, value4 = 0, value
   const value9 =
       enabled3 ===
       normalizeText(
-        value6 ? options2?.['videoIterationReferenceRef'] : options2?.['imageIterationReferenceRef'],
+        value6 ? options2?.videoIterationReferenceRef : options2?.imageIterationReferenceRef,
       ),
     value10 = value6 ? '视频' : '图片',
     value11 = value9
@@ -157,7 +157,7 @@ function renderReplacementResultReferenceButton(options2 = {}, value4 = 0, value
     '" data-story-action="set-replacement-' +
     value5 +
     '-reference" data-shot-id="' +
-    escapeHtml(options2?.['id']) +
+    escapeHtml(options2?.id) +
     '" data-replacement-' +
     value5 +
     '-result-index="' +
@@ -185,7 +185,7 @@ function renderReplacementImageHistoryMenu(
     results: results,
     activeIndex: activeIndex,
     minimumItemCount: allowSingleResult ? 1 : 2,
-    countLabel: results['length'] + ' 张图片',
+    countLabel: results.length + ' 张图片',
     menuLabel: title2 + '替换图片',
     getItemLabel: (value13, value14) => '图片 ' + (value14 + 1),
     getItemStatus: (value15, value16) => (value16 === activeIndex ? '当前使用' : '点击切换'),
@@ -201,20 +201,20 @@ function renderReplacementImageHistoryMenu(
     },
     getItemAttributes: (value19, value20) =>
       'data-story-action="select-replacement-image-result" data-shot-id="' +
-      escapeHtml(options3?.['id']) +
+      escapeHtml(options3?.id) +
       '" data-replacement-image-result-index="' +
       value20 +
       '"',
     renderItemAction: (value21, value22) =>
       '' +
       renderReplacementResultReferenceButton(options3, value22) +
-      (results['length'] > 1
+      (results.length > 1
         ? renderWorkspaceCardDeleteControl({
             className: 'story-media-history-delete',
             ariaLabel: '删除图片 ' + (value22 + 1),
             actionAttributes: {
               'data-story-action': 'delete-replacement-image-result',
-              'data-shot-id': options3?.['id'],
+              'data-shot-id': options3?.id,
               'data-replacement-image-result-index': value22,
             },
           })
@@ -233,7 +233,7 @@ function renderReplacementVideoHistoryMenu(
     results: results2,
     activeIndex: activeIndex2,
     minimumItemCount: allowSingleResult ? 1 : 2,
-    countLabel: results2['length'] + ' 个视频',
+    countLabel: results2.length + ' 个视频',
     menuLabel: title3 + '替换结果视频',
     getItemLabel: (value23, value24) => '视频 ' + (value24 + 1),
     getItemStatus: (value25, value26) => (value26 === activeIndex2 ? '当前播放' : '点击切换'),
@@ -258,20 +258,20 @@ function renderReplacementVideoHistoryMenu(
     },
     getItemAttributes: (value29, value30) =>
       'data-story-action="select-replacement-video-result" data-shot-id="' +
-      escapeHtml(options4?.['id']) +
+      escapeHtml(options4?.id) +
       '" data-replacement-video-result-index="' +
       value30 +
       '"',
     renderItemAction: (value31, value32) =>
       '' +
       renderReplacementResultReferenceButton(options4, value32, 'video') +
-      (results2['length'] > 1
+      (results2.length > 1
         ? renderWorkspaceCardDeleteControl({
             className: 'story-media-history-delete',
             ariaLabel: '删除视频 ' + (value32 + 1),
             actionAttributes: {
               'data-story-action': 'delete-replacement-video-result',
-              'data-shot-id': options4?.['id'],
+              'data-shot-id': options4?.id,
               'data-replacement-video-result-index': value32,
             },
           })
@@ -289,8 +289,8 @@ function renderShotTimeline(
   } = {},
 ) {
   const name = mode === 'video',
-    list = Array['isArray'](selectedAssetId['shots']) ? selectedAssetId['shots'] : [],
-    value33 = list['reduce'](
+    list = Array.isArray(selectedAssetId.shots) ? selectedAssetId.shots : [],
+    value33 = list.reduce(
       (value34, value35) => value34 + getPersonReplacementShotDurationSec(value35),
       0,
     ),
@@ -301,42 +301,40 @@ function renderShotTimeline(
     value36 =
       countEditablePersonReplacementShotCuts2 > 0 ||
       hasSplittablePersonReplacementShotCut(personReplacementShotCutDraft),
-    selectedAssetIds = selectedAssetId['workspace']['selectedShotIds'],
-    value37 = list['length'] > 0 && list['every']((value38) => selectedAssetIds['includes'](value38['id'])),
+    selectedAssetIds = selectedAssetId.workspace.selectedShotIds,
+    value37 = list.length > 0 && list.every((value38) => selectedAssetIds.includes(value38.id)),
     args = name
-      ? list['filter']((value39) =>
+      ? list.filter((value39) =>
           isPersonReplacementVideoGenerationActive(
-            resolvePersonReplacementVideoGenerationState(selectedAssetId['workspace'], value39['id']),
+            resolvePersonReplacementVideoGenerationState(selectedAssetId.workspace, value39.id),
           ),
-        )['map']((value40) => normalizeText(value40['id']))
-      : list['filter'](
+        ).map((value40) => normalizeText(value40.id))
+      : list.filter(
           (value41) =>
-            resolvePersonReplacementImageGenerationState(selectedAssetId['workspace'], value41['id'])[
-              'status'
-            ] === 'running',
-        )['map']((value42) => normalizeText(value42['id'])),
+            resolvePersonReplacementImageGenerationState(selectedAssetId.workspace, value41.id).status === 'running',
+        ).map((value42) => normalizeText(value42.id)),
     generatingAppearanceKeys = [
       ...new Set(
-        [...(Array['isArray'](batchGeneratingShotIds) ? batchGeneratingShotIds : []), ...args]
-          ['map'](normalizeText)
-          ['filter'](Boolean),
+        [...(Array.isArray(batchGeneratingShotIds) ? batchGeneratingShotIds : []), ...args]
+          .map(normalizeText)
+          .filter(Boolean),
       ),
     ],
     batchGenerationActionLabel = name
-      ? selectedAssetIds['length'] > 1
+      ? selectedAssetIds.length > 1
         ? '批量生成视频'
         : '生成视频'
-      : selectedAssetIds['length'] > 1
+      : selectedAssetIds.length > 1
         ? '批量生成替换图'
         : '生成替换图',
     value43 = {
       data: { assets: [], project: {} },
       assetFilter: 'scene',
-      selectedAssetId: selectedAssetId['workspace']['selectedShotId'],
+      selectedAssetId: selectedAssetId.workspace.selectedShotId,
       selectedAssetIds: selectedAssetIds,
-      assetSelectionMode: selectedAssetId['workspace']['shotSelectionMode'],
+      assetSelectionMode: selectedAssetId.workspace.shotSelectionMode,
       assetAppearanceIndexes: {},
-      generatingAppearanceKeys: generatingAppearanceKeys['map']((value44) => value44 + ':keyframe'),
+      generatingAppearanceKeys: generatingAppearanceKeys.map((value44) => value44 + ':keyframe'),
       isBatchGenerating: isBatchGenerating,
       batchGenerationActionLabel: batchGenerationActionLabel,
       batchCancelAction: 'cancel-shot-batch-generation',
@@ -358,15 +356,15 @@ function renderShotTimeline(
       '<button type="button" class="story-secondary-button" data-story-action="toggle-all-shots" aria-pressed="' +
       value37 +
       '" ' +
-      (list['length'] ? '' : 'disabled') +
+      (list.length ? '' : 'disabled') +
       '>' +
       (value37 ? '取消全选' : '全选') +
       '</button>' +
-      (selectedAssetId['workspace']['shotSelectionMode'] || isBatchGenerating
+      (selectedAssetId.workspace.shotSelectionMode || isBatchGenerating
         ? renderPersonReplacementBatchGenerationControl(value43)
         : ''),
-    value46 = list['map']((shot2, value47) => {
-      const title4 = '片段' + String(value47 + 1)['padStart'](2, '0'),
+    value46 = list.map((shot2, value47) => {
+      const title4 = '片段' + String(value47 + 1).padStart(2, '0'),
         list2 = getPersonReplacementImageResults(shot2),
         personReplacementActiveImageResultIndex = getPersonReplacementActiveImageResultIndex(shot2, list2),
         personReplacementImageResultRef2 = resolvePersonReplacementImageResultRef(
@@ -376,12 +374,12 @@ function renderShotTimeline(
         value48 = name ? getPersonReplacementActiveVideoResultIndex(shot2, list3) : 0,
         value49 = list3[value48] || null,
         resultRef2 =
-          resolvePersonReplacementVideoResultRef(value49) || normalizeText(shot2['resultVideoRef']),
+          resolvePersonReplacementVideoResultRef(value49) || normalizeText(shot2.resultVideoRef),
         resultPosterRef2 = resolvePersonReplacementVideoResultPosterRef(value49),
         imageUrl = normalizeMediaUrl(
           name
-            ? resultPosterRef2 || shot2['keyframeRef']
-            : personReplacementImageResultRef2 || shot2['keyframeRef'],
+            ? resultPosterRef2 || shot2.keyframeRef
+            : personReplacementImageResultRef2 || shot2.keyframeRef,
         ),
         cardMediaHtml = name
           ? renderShotTimelineVideoMedia({
@@ -391,21 +389,21 @@ function renderShotTimeline(
               resultPosterRef: resultPosterRef2,
             })
           : '',
-        formatClock2 = formatClock(shot2['startTimeSec']) + '–' + formatClock(shot2['endTimeSec']),
-        value50 = name ? resultRef2 : shot2['replacementImageRef'],
+        formatClock2 = formatClock(shot2.startTimeSec) + '–' + formatClock(shot2.endTimeSec),
+        value50 = name ? resultRef2 : shot2.replacementImageRef,
         statusText = value50 ? formatClock2 + ' · 已生成' : formatClock2,
-        count = (name ? list3 : list2)['length'],
+        count = (name ? list3 : list2).length,
         value51 = name
-          ? 'data-person-replacement-video-history="' + (list3['length'] > 1) + '"'
-          : 'data-person-replacement-image-history="' + (list2['length'] > 1) + '"',
+          ? 'data-person-replacement-video-history="' + (list3.length > 1) + '"'
+          : 'data-person-replacement-image-history="' + (list2.length > 1) + '"',
         accessoryHtml =
-          !selectedAssetId['workspace']['shotSelectionMode'] && (name ? list3 : list2)['length'] === 1
+          !selectedAssetId.workspace.shotSelectionMode && (name ? list3 : list2).length === 1
             ? renderReplacementResultReferenceButton(shot2, 0, name ? 'video' : 'image')
             : '',
         value52 =
           count > 1
             ? '<button type="button" class="person-replacement-shot-result-count" data-person-replacement-result-history-toggle data-shot-id="' +
-              escapeHtml(shot2['id']) +
+              escapeHtml(shot2.id) +
               '" data-result-count="' +
               count +
               '" aria-expanded="false" aria-label="展开' +
@@ -413,7 +411,7 @@ function renderShotTimeline(
               ' 个结果" title="查看 ' +
               count +
               ' 个生成结果"' +
-              (selectedAssetId['workspace']['shotSelectionMode'] ? ' disabled' : '') +
+              (selectedAssetId.workspace.shotSelectionMode ? ' disabled' : '') +
               '>' +
               renderWorkspaceActionIcon('results') +
               '<span>' +
@@ -423,7 +421,7 @@ function renderShotTimeline(
       return renderPersonReplacementAssetCard(
         value43,
         {
-          id: shot2['id'],
+          id: shot2.id,
           kind: 'scene',
           name: title4,
           description: '',
@@ -438,18 +436,18 @@ function renderShotTimeline(
           cardClassName: 'person-replacement-shot-card',
           cardAttributes:
             'data-person-replacement-shot-card="true" data-shot-id="' +
-            escapeHtml(shot2['id']) +
+            escapeHtml(shot2.id) +
             '" ' +
             value51 +
             ' aria-current="' +
-            (shot2['id'] === selectedAssetId['workspace']['selectedShotId'] ? 'true' : 'false') +
+            (shot2.id === selectedAssetId.workspace.selectedShotId ? 'true' : 'false') +
             '" aria-label="' +
             escapeHtml(
               title4 +
                 '，' +
-                formatClock(shot2['startTimeSec']) +
+                formatClock(shot2.startTimeSec) +
                 ' 到 ' +
-                formatClock(shot2['endTimeSec']) +
+                formatClock(shot2.endTimeSec) +
                 (value50 ? (name ? '，替换视频已生成' : '，替换图已生成') : ''),
             ) +
             '"',
@@ -458,21 +456,21 @@ function renderShotTimeline(
             accessoryHtml ? 'has-reference-control' : '',
             value52 ? 'has-result-count-control' : '',
           ]
-            ['filter'](Boolean)
-            ['join'](' '),
+            .filter(Boolean)
+            .join(' '),
           accessoryHtml: accessoryHtml + value52,
           preserveShell: true,
         },
       );
-    })['join'](''),
-    value53 = selectedAssetId['workspace']['shotSelectionMode']
-      ? '已选择 ' + selectedAssetIds['length'] + ' 项'
+    }).join(''),
+    value53 = selectedAssetId.workspace.shotSelectionMode
+      ? '已选择 ' + selectedAssetIds.length + ' 项'
       : '',
     value54 = value53 ? '<small>' + value53 + '</small>' : '',
     value55 = 'data-story-marquee-surface="shots" tabindex="0"';
   return (
     '<section class="person-replacement-shot-timeline" aria-label="镜头片段网格">\n    <section class="person-replacement-result-history-panel" data-person-replacement-result-history-menu aria-label="片段生成结果" aria-hidden="true" hidden></section>\n    <header class="person-replacement-shot-timeline-header"><div><strong>镜头片段</strong><span>' +
-    list['length'] +
+    list.length +
     ' 个片段 · ' +
     formatClock(value33) +
     '</span></div><div class="person-replacement-shot-timeline-actions">' +
@@ -502,12 +500,12 @@ function renderShotCutEditor(
   } = {},
   handler = () => '',
 ) {
-  const map = new Map((value56['shots'] || [])['map']((value57) => [value57['id'], value57])),
+  const map = new Map((value56.shots || []).map((value57) => [value57.id, value57])),
     durationSec = getPersonReplacementShotCutTotalDuration(list4),
     personReplacementShotCutDisplayDuration = getPersonReplacementShotCutDisplayDuration(list4),
     countEditablePersonReplacementShotCuts3 = countEditablePersonReplacementShotCuts(list4),
     hasPersonReplacementShotCutUpdateChanges2 = hasPersonReplacementShotCutUpdateChanges(
-      value56['shots'],
+      value56.shots,
       list4,
     ),
     title5 = resolveShotCutSubmissionUi(submitting, smartDetecting),
@@ -515,8 +513,8 @@ function renderShotCutEditor(
     value58 = editorBusy || keyframeCapturing,
     value59 = editorBusy
       ? renderWorkspaceAssetLoadingOverlay({
-          title: title5['loadingTitle'],
-          description: title5['loadingDescription'],
+          title: title5.loadingTitle,
+          description: title5.loadingDescription,
         })
       : '',
     trackWidthPx = getMediaClipTimelineTrackWidthPx({
@@ -529,18 +527,18 @@ function renderShotCutEditor(
       list4,
       clamp2,
     ),
-    isReversed = list4[personReplacementShotCutPositionAtTimelineSec['shotIndex']] || null,
+    isReversed = list4[personReplacementShotCutPositionAtTimelineSec.shotIndex] || null,
     map2 = new Set(
-      (Array['isArray'](selectedShotIds) ? selectedShotIds : [])['map'](normalizeText)['filter'](Boolean),
+      (Array.isArray(selectedShotIds) ? selectedShotIds : []).map(normalizeText).filter(Boolean),
     ),
-    value60 = map2['size'] === 2,
+    value60 = map2.size === 2,
     enabled4 = value60 && canMergePersonReplacementShotCutRanges(list4, [...map2]),
     enabled5 = Boolean(
       isReversed &&
       canSplitPersonReplacementShotCutRange(
         isReversed,
-        personReplacementShotCutPositionAtTimelineSec['sourceTimeSec'] -
-          (Number(isReversed['startSec']) || 0),
+        personReplacementShotCutPositionAtTimelineSec.sourceTimeSec -
+          (Number(isReversed.startSec) || 0),
       ),
     ),
     renderPersonReplacementShotCutRulerTicks2 = renderPersonReplacementShotCutRulerTicks(
@@ -552,9 +550,9 @@ function renderShotCutEditor(
   let endSec = 0;
   const list5 = [],
     list6 = [],
-    value61 = list4['map']((value62, count2) => {
-      const value63 = map['get'](value62['shotId']) || map['get'](value62['originShotId']) || {},
-        value64 = Math['max'](PERSON_REPLACEMENT_CUT_MIN_SEC, value62['durationSec']),
+    value61 = list4.map((value62, count2) => {
+      const value63 = map.get(value62.shotId) || map.get(value62.originShotId) || {},
+        value64 = Math.max(PERSON_REPLACEMENT_CUT_MIN_SEC, value62.durationSec),
         startSec = endSec;
       endSec += value64;
       const mediaClipTimelineRangeRect = getMediaClipTimelineRangeRect({
@@ -564,23 +562,23 @@ function renderShotCutEditor(
           trackWidthPx: trackWidthPx,
           minWidthPct: 0,
         }),
-        value65 = '片段' + String(count2 + 1)['padStart'](2, '0');
-      list5['push'](
+        value65 = '片段' + String(count2 + 1).padStart(2, '0');
+      list5.push(
         '<span class="person-replacement-shot-cut-segment-label" data-person-replacement-cut-segment-label="' +
           count2 +
           '" style="left:' +
-          mediaClipTimelineRangeRect['leftPct']['toFixed'](5) +
+          mediaClipTimelineRangeRect.leftPct.toFixed(5) +
           '%;width:' +
-          mediaClipTimelineRangeRect['widthPct']['toFixed'](5) +
+          mediaClipTimelineRangeRect.widthPct.toFixed(5) +
           '%" aria-hidden="true">' +
           value65 +
           '</span>',
       );
-      if (value62['keyframeManuallySelected'] === true && normalizeText(value62['keyframeRef'])) {
+      if (value62.keyframeManuallySelected === true && normalizeText(value62.keyframeRef)) {
         const personReplacementShotCutTimelineSec = getPersonReplacementShotCutTimelineSec(
             list4,
-            value62['shotId'],
-            value62['keyframeTimeSec'],
+            value62.shotId,
+            value62.keyframeTimeSec,
           ),
           clamp3 = clamp(
             (personReplacementShotCutTimelineSec / personReplacementShotCutDisplayDuration) * 100,
@@ -590,13 +588,13 @@ function renderShotCutEditor(
           ),
           value66 = clamp3 < 5 ? ' is-start' : clamp3 > 95 ? ' is-end' : '',
           value67 = value65 + ' 关键帧';
-        list6['push'](
+        list6.push(
           '<div class="person-replacement-shot-cut-keyframe-marker' +
             value66 +
             '" data-person-replacement-keyframe-marker="' +
             count2 +
             '" style="left:' +
-            clamp3['toFixed'](5) +
+            clamp3.toFixed(5) +
             '%" role="note" aria-label="' +
             value67 +
             '"><span aria-hidden="true">' +
@@ -604,24 +602,24 @@ function renderShotCutEditor(
             '</span></div>',
         );
       }
-      const value68 = count2 > 0 && list4[count2 - 1]?.['sourceId'] !== value62['sourceId'],
-        text3 = normalizeText(previewShotId) === normalizeText(value62['shotId']),
-        value69 = map2['has'](normalizeText(value62['shotId'])),
+      const value68 = count2 > 0 && list4[count2 - 1]?.sourceId !== value62.sourceId,
+        text3 = normalizeText(previewShotId) === normalizeText(value62.shotId),
+        value69 = map2.has(normalizeText(value62.shotId)),
         value70 = list4[count2 - 1],
         value71 = list4[count2 + 1],
-        value72 = Boolean(value70 && value70['sourceId'] && value70['sourceId'] === value62['sourceId']),
-        value73 = Boolean(value71 && value71['sourceId'] && value71['sourceId'] === value62['sourceId']),
+        value72 = Boolean(value70 && value70.sourceId && value70.sourceId === value62.sourceId),
+        value73 = Boolean(value71 && value71.sourceId && value71.sourceId === value62.sourceId),
         value74 = value72
           ? '<button type="button" class="person-replacement-shot-cut-boundary media-clip-trim media-clip-trim-left" data-person-replacement-cut-boundary-index="' +
             count2 +
             '" data-person-replacement-cut-boundary-side="left" role="slider" aria-label="调整片段 ' +
             (count2 + 1) +
             ' 的左切口" aria-valuemin="' +
-            (value70['startSec'] + getPersonReplacementShotCutFrameSec(value70, value62))['toFixed'](4) +
+            (value70.startSec + getPersonReplacementShotCutFrameSec(value70, value62)).toFixed(4) +
             '" aria-valuemax="' +
-            (value62['endSec'] - getPersonReplacementShotCutFrameSec(value70, value62))['toFixed'](4) +
+            (value62.endSec - getPersonReplacementShotCutFrameSec(value70, value62)).toFixed(4) +
             '" aria-valuenow="' +
-            value62['startSec']['toFixed'](4) +
+            value62.startSec.toFixed(4) +
             '"><span class="media-clip-trim-visual" aria-hidden="true"></span></button>'
           : '',
         value75 = value73
@@ -630,11 +628,11 @@ function renderShotCutEditor(
             '" data-person-replacement-cut-boundary-side="right" role="slider" aria-label="调整片段 ' +
             (count2 + 1) +
             ' 的右切口" aria-valuemin="' +
-            (value62['startSec'] + getPersonReplacementShotCutFrameSec(value62, value71))['toFixed'](4) +
+            (value62.startSec + getPersonReplacementShotCutFrameSec(value62, value71)).toFixed(4) +
             '" aria-valuemax="' +
-            (value71['endSec'] - getPersonReplacementShotCutFrameSec(value62, value71))['toFixed'](4) +
+            (value71.endSec - getPersonReplacementShotCutFrameSec(value62, value71)).toFixed(4) +
             '" aria-valuenow="' +
-            value62['endSec']['toFixed'](4) +
+            value62.endSec.toFixed(4) +
             '"><span class="media-clip-trim-visual" aria-hidden="true"></span></button>'
           : '';
       return (
@@ -645,45 +643,45 @@ function renderShotCutEditor(
         ' ' +
         (value68 ? 'is-source-start' : '') +
         ' ' +
-        (value62['isReversed'] === true ? 'is-reversed' : '') +
+        (value62.isReversed === true ? 'is-reversed' : '') +
         '" style="left:' +
-        mediaClipTimelineRangeRect['leftPct']['toFixed'](5) +
+        mediaClipTimelineRangeRect.leftPct.toFixed(5) +
         '%;width:' +
-        mediaClipTimelineRangeRect['widthPct']['toFixed'](5) +
+        mediaClipTimelineRangeRect.widthPct.toFixed(5) +
         '%" data-person-replacement-action="preview-shot-cut" data-person-replacement-shot-cut-selectable data-story-marquee-item data-story-marquee-id="' +
-        escapeHtml(value62['shotId']) +
+        escapeHtml(value62.shotId) +
         '" data-person-replacement-cut-shot-index="' +
         count2 +
         '" data-clip-index="' +
         count2 +
         '" data-media-kind="video" data-shot-id="' +
-        escapeHtml(value62['shotId']) +
+        escapeHtml(value62.shotId) +
         '" ' +
         (text3 ? 'data-selected-clip="true"' : '') +
         ' ' +
         (value69 ? 'data-person-replacement-cut-merge-selected="true"' : '') +
         ' ' +
-        (value62['isReversed'] === true ? 'data-person-replacement-cut-reversed="true"' : '') +
+        (value62.isReversed === true ? 'data-person-replacement-cut-reversed="true"' : '') +
         ' role="button" tabindex="0" aria-pressed="' +
         text3 +
         '" aria-label="' +
         escapeHtml(
-          (value63['title'] || '片段 ' + (count2 + 1)) +
+          (value63.title || '片段 ' + (count2 + 1)) +
             '，' +
-            formatClock(value62['startSec']) +
+            formatClock(value62.startSec) +
             ' 到 ' +
-            formatClock(value62['endSec']) +
-            (value62['isReversed'] === true ? '，已设为倒放' : '') +
+            formatClock(value62.endSec) +
+            (value62.isReversed === true ? '，已设为倒放' : '') +
             (value69 ? '，已框选' : ''),
         ) +
         '">\n      ' +
-        renderPersonReplacementShotCutFilmstrip(value63, trackWidthPx, value62['keyframeRef']) +
+        renderPersonReplacementShotCutFilmstrip(value63, trackWidthPx, value62.keyframeRef) +
         '\n      <div class="media-clip-material-selection v2-video-clipselection person-replacement-shot-cut-selection" style="left:0%;width:100%" aria-hidden="true"><div class="media-clip-material-label v2-video-cliplabel" data-person-replacement-cut-duration="' +
         count2 +
         '">' +
         formatDurationLabel(value64) +
         '</div></div>\n      ' +
-        (value62['isReversed'] === true
+        (value62.isReversed === true
           ? '<span class="person-replacement-shot-cut-reverse-badge" aria-hidden="true">倒放</span>'
           : '') +
         '\n      ' +
@@ -691,17 +689,17 @@ function renderShotCutEditor(
         value75 +
         '\n    </div>'
       );
-    })['join'](''),
+    }).join(''),
     mediaClipReverseControlState = resolveMediaClipReverseControlState({
-      isReversed: isReversed?.['isReversed'] === true,
+      isReversed: isReversed?.isReversed === true,
       pending: reversePending,
     }),
-    value76 = mediaClipReverseControlState['isReversed'];
+    value76 = mediaClipReverseControlState.isReversed;
   return (
     '<section class="person-replacement-shot-cut-editor" data-person-replacement-shot-cut-editor tabindex="-1" aria-label="调整全部镜头切口" aria-busy="' +
     editorBusy +
     '">\n    <header class="person-replacement-shot-timeline-header">\n      <div><strong>调整全部切口</strong><span>' +
-    list4['length'] +
+    list4.length +
     ' 个片段 · ' +
     countEditablePersonReplacementShotCuts3 +
     ' 个可调切口</span><span class="person-replacement-shot-cut-clock"><output data-person-replacement-shot-cut-current-time>' +
@@ -753,16 +751,16 @@ function renderShotCutEditor(
     'px;--media-clip-timeline-content-width:' +
     trackWidthPx +
     'px;--media-clip-track-axis-width:0px;--cut-total-duration:' +
-    durationSec['toFixed'](5) +
+    durationSec.toFixed(5) +
     '">\n            <div class="media-clip-ruler person-replacement-shot-cut-ruler" aria-hidden="true">' +
     renderPersonReplacementShotCutRulerTicks2 +
     '</div>\n            <div class="media-clip-timeline-lane">\n              <div class="media-clip-timeline-tracks">\n                <div class="person-replacement-shot-cut-track media-clip-track media-clip-track-video is-active" data-person-replacement-shot-cut-track>' +
     (value61 || '<div class="person-replacement-shot-timeline-empty-state">暂无可调整的镜头切口</div>') +
     '</div>\n              </div>\n            </div>\n            <div class="person-replacement-shot-cut-annotations">' +
-    list5['join']('') +
-    list6['join']('') +
+    list5.join('') +
+    list6.join('') +
     '</div>\n            <div class="media-clip-timeline-cursors person-replacement-shot-cut-cursors" aria-hidden="true">\n              <div class="media-clip-playhead media-clip-timeline-cursor media-clip-timeline-cursor-fixed person-replacement-shot-cut-playhead" data-person-replacement-shot-cut-playhead style="left:' +
-    ((clamp2 / personReplacementShotCutDisplayDuration) * 100)['toFixed'](4) +
+    ((clamp2 / personReplacementShotCutDisplayDuration) * 100).toFixed(4) +
     '%"></div>\n              <div class="media-clip-hover-playhead media-clip-timeline-cursor media-clip-timeline-cursor-hover person-replacement-shot-cut-hover-playhead" data-person-replacement-shot-cut-hover-playhead hidden></div>\n            </div>\n          </div>\n        </div>\n      </div>\n      ' +
     value59 +
     '\n    </div>\n    <div class="person-replacement-shot-cut-primary-actions" aria-label="片段编辑工具">\n      <button type="button" class="person-replacement-shot-cut-action is-icon-only ' +
@@ -774,7 +772,7 @@ function renderShotCutEditor(
     '" aria-busy="' +
     keyframeCapturing +
     '" ' +
-    (editorBusy || keyframeCapturing || personReplacementShotCutPositionAtTimelineSec['shotIndex'] < 0
+    (editorBusy || keyframeCapturing || personReplacementShotCutPositionAtTimelineSec.shotIndex < 0
       ? 'disabled'
       : '') +
     '>' +
@@ -786,15 +784,15 @@ function renderShotCutEditor(
     '</button>\n      <button type="button" class="person-replacement-shot-cut-action person-replacement-shot-cut-reverse is-icon-only ' +
     (reversePending ? 'is-loading' : value76 ? 'is-active' : '') +
     '" data-person-replacement-action="toggle-shot-cut-reverse" data-tooltip="' +
-    mediaClipReverseControlState['label'] +
+    mediaClipReverseControlState.label +
     '" aria-label="' +
-    mediaClipReverseControlState['label'] +
+    mediaClipReverseControlState.label +
     '" aria-busy="' +
-    mediaClipReverseControlState['ariaBusy'] +
+    mediaClipReverseControlState.ariaBusy +
     '" aria-pressed="' +
-    mediaClipReverseControlState['ariaPressed'] +
+    mediaClipReverseControlState.ariaPressed +
     '" ' +
-    (value58 || personReplacementShotCutPositionAtTimelineSec['shotIndex'] < 0 ? 'disabled' : '') +
+    (value58 || personReplacementShotCutPositionAtTimelineSec.shotIndex < 0 ? 'disabled' : '') +
     '>' +
     handler('reverse') +
     '</button>\n      ' +
@@ -899,7 +897,7 @@ function renderShotTimelineStage(
 }
 export function createPersonReplacementShotTimelinePresentation({ renderIcon: renderIcon = () => '' } = {}) {
   const value83 = typeof renderIcon === 'function' ? renderIcon : () => '';
-  return Object['freeze']({
+  return Object.freeze({
     renderHistoryMenu({
       kind: kind = 'image',
       shot: shot = {},

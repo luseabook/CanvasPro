@@ -2,10 +2,10 @@ import { createMissingModelCredentialError } from '../../services/modelGeneratio
 import { guardModelGenerationCredentials } from '../modelCredentialUi.js';
 function buildStoryModelCredentialOptions(modelId = {}) {
   return {
-    modelId: modelId['model'] || modelId['modelId'],
-    provider: modelId['provider'],
-    providerProfileId: modelId['providerProfileId'] || modelId['rhProviderProfileId'],
-    adapterType: modelId['adapterType'],
+    modelId: modelId.model || modelId.modelId,
+    provider: modelId.provider,
+    providerProfileId: modelId.providerProfileId || modelId.rhProviderProfileId,
+    adapterType: modelId.adapterType,
     payload: modelId,
   };
 }
@@ -20,9 +20,9 @@ export async function requireStoryModelCredentials(
     ...buildStoryModelCredentialOptions(options),
     waitForConfig: true,
   });
-  if (guardCredentials2?.['ready'] !== false) return guardCredentials2;
+  if (guardCredentials2?.ready !== false) return guardCredentials2;
   const credentialError = createCredentialError(guardCredentials2);
-  credentialError['credentialPromptShown'] = true;
+  credentialError.credentialPromptShown = true;
   throw credentialError;
 }
 export function guardStoryModelTaskCredentials(handler, value) {

@@ -1,5 +1,5 @@
-export const AGENT_SKILL_PANEL_TEXT = Object['freeze']({
-  'zh-CN': Object['freeze']({
+export const AGENT_SKILL_PANEL_TEXT = Object.freeze({
+  'zh-CN': Object.freeze({
     skillPanelTitle: 'Skills',
     skillPanelDesc: '通过 Agent 对话创建技能；这里用于导入、启用、编辑和删除。',
     skillManage: '管理 Skills',
@@ -52,7 +52,7 @@ export const AGENT_SKILL_PANEL_TEXT = Object['freeze']({
     skillSaveReadOnly: '这个 Skill 来自外部，只能在文件夹中编辑。',
     skillSaveRefreshFailed: 'Skill 已保存，但列表刷新失败；请点击刷新。',
   }),
-  'en-US': Object['freeze']({
+  'en-US': Object.freeze({
     skillPanelTitle: 'Skills',
     skillPanelDesc: 'Create Skills through Agent conversation; import, enable, edit, or delete them here.',
     skillManage: 'Manage Skills',

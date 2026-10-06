@@ -30,12 +30,12 @@ const PROMPT_PRESET_TRIGGER_MODES = new Set([
   PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
 ]);
 function applyPromptPresetLeafTriggerMode(data, options) {
-  return (Array['isArray'](data) ? data : [])['map']((args) => {
+  return (Array.isArray(data) ? data : []).map((args) => {
     const target = { ...args };
     return (
-      Array['isArray'](args?.['subItems'])
-        ? (target['subItems'] = applyPromptPresetLeafTriggerMode(args['subItems'], options))
-        : (target['triggerMode'] = options),
+      Array.isArray(args?.subItems)
+        ? (target.subItems = applyPromptPresetLeafTriggerMode(args.subItems, options))
+        : (target.triggerMode = options),
       target
     );
   });
@@ -179,40 +179,40 @@ function localizePromptPresetTemplate(args2, source = '') {
   if (typeof args2 === 'string') return next || args2;
   if (!args2 || typeof args2 !== 'object') return args2;
   const response = { ...args2 };
-  next && response['type'] === PROMPT_PRESET_TEMPLATE_TYPE_STATIC && (response['text'] = next);
-  if (response['type'] === PROMPT_PRESET_TEMPLATE_TYPE_CONDITIONAL_BY_IMAGE_INPUT) {
+  next && response.type === PROMPT_PRESET_TEMPLATE_TYPE_STATIC && (response.text = next);
+  if (response.type === PROMPT_PRESET_TEMPLATE_TYPE_CONDITIONAL_BY_IMAGE_INPUT) {
     const current = source
         ? optionalPromptPresetsText('presets.' + source + '.imageInputTemplate')
         : '',
       entry = source ? optionalPromptPresetsText('presets.' + source + '.textInputTemplate') : '';
-    (current && (response['imageInputTemplate'] = current),
-      entry && (response['textInputTemplate'] = entry));
+    (current && (response.imageInputTemplate = current),
+      entry && (response.textInputTemplate = entry));
   }
-  const record = String(response['emptyInputMessage'] || '');
+  const record = String(response.emptyInputMessage || '');
   if (record === IMAGE_PRESET_EMPTY_INPUT_MESSAGE)
-    response['emptyInputMessage'] = promptPresetsText('emptyInput.image');
+    response.emptyInputMessage = promptPresetsText('emptyInput.image');
   else
-    record === TEMPLATES['Panorama360Seamless']['emptyInputMessage'] &&
-      (response['emptyInputMessage'] = promptPresetsText('emptyInput.panorama'));
+    record === TEMPLATES.Panorama360Seamless.emptyInputMessage &&
+      (response.emptyInputMessage = promptPresetsText('emptyInput.panorama'));
   return response;
 }
 function localizePromptPresetItem(args3 = {}) {
-  const payload = String(args3?.['title'] || ''),
+  const payload = String(args3?.title || ''),
     handle = PROMPT_PRESET_TITLE_I18N_KEYS[payload] || '',
     state = { ...args3 };
-  if (payload) state['title'] = getLocalizedPresetTitle(payload);
+  if (payload) state.title = getLocalizedPresetTitle(payload);
   return (
-    Object['prototype']['hasOwnProperty']['call'](args3, 'desc') &&
-      (state['desc'] = getLocalizedPresetDesc(payload, args3['desc'])),
-    Array['isArray'](args3['subItems']) &&
-      (state['subItems'] = args3['subItems']['map'](localizePromptPresetItem)),
-    Object['prototype']['hasOwnProperty']['call'](args3, 'template') &&
-      (state['template'] = localizePromptPresetTemplate(args3['template'], handle)),
+    Object.prototype.hasOwnProperty.call(args3, 'desc') &&
+      (state.desc = getLocalizedPresetDesc(payload, args3.desc)),
+    Array.isArray(args3.subItems) &&
+      (state.subItems = args3.subItems.map(localizePromptPresetItem)),
+    Object.prototype.hasOwnProperty.call(args3, 'template') &&
+      (state.template = localizePromptPresetTemplate(args3.template, handle)),
     state
   );
 }
 function localizePromptPresetItems(list = []) {
-  return (Array['isArray'](list) ? list : [])['map'](localizePromptPresetItem);
+  return (Array.isArray(list) ? list : []).map(localizePromptPresetItem);
 }
 export const PROMPT_PRESETS = {
   'ai-image': [
@@ -225,19 +225,19 @@ export const PROMPT_PRESETS = {
           icon: '📐',
           title: '场景四视图',
           desc: '一键生成场景多视图',
-          template: staticPromptTemplate(TEMPLATES['SceneReference']),
+          template: staticPromptTemplate(TEMPLATES.SceneReference),
         },
         {
           icon: '▦',
           title: '场景九视图',
           desc: '同一场景的 9 个连续多视角设定图',
-          template: staticPromptTemplate(TEMPLATES['SceneNineView']),
+          template: staticPromptTemplate(TEMPLATES.SceneNineView),
         },
         {
           icon: '🌐',
           title: '360°无缝全景图',
           desc: '生成适合 VR 查看的一张无缝 360° 全景图',
-          template: TEMPLATES['Panorama360Seamless'],
+          template: TEMPLATES.Panorama360Seamless,
         },
       ],
     },
@@ -250,25 +250,25 @@ export const PROMPT_PRESETS = {
           icon: '🧍',
           title: '人物三视图',
           desc: '纯正的三向视图展示',
-          template: staticPromptTemplate(TEMPLATES['characterRef3View']),
+          template: staticPromptTemplate(TEMPLATES.characterRef3View),
         },
         {
           icon: '🧍',
           title: '人物三视图+脸部',
           desc: '带脸部特写的三视图',
-          template: staticPromptTemplate(TEMPLATES['characterRef3ViewFace']),
+          template: staticPromptTemplate(TEMPLATES.characterRef3ViewFace),
         },
         {
           icon: '🧍',
           title: '前后视图+脸部',
           desc: '脸部特写与无头前后全身视图',
-          template: staticPromptTemplate(TEMPLATES['characterFrontBackViewFace']),
+          template: staticPromptTemplate(TEMPLATES.characterFrontBackViewFace),
         },
         {
           icon: '🧍',
           title: '人设解析图',
           desc: '包含细节拆解的设定集',
-          template: staticPromptTemplate(TEMPLATES['characterRefAnalysis']),
+          template: staticPromptTemplate(TEMPLATES.characterRefAnalysis),
         },
       ],
     },
@@ -281,25 +281,25 @@ export const PROMPT_PRESETS = {
           icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>',
           title: '4宫格',
           desc: '起承转合更清晰，适合一句话剧情',
-          template: staticPromptTemplate(TEMPLATES['multiGrid4']),
+          template: staticPromptTemplate(TEMPLATES.multiGrid4),
         },
         {
           icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><rect x="3" y="3" width="4" height="4"></rect><rect x="10" y="3" width="4" height="4"></rect><rect x="17" y="3" width="4" height="4"></rect><rect x="3" y="10" width="4" height="4"></rect><rect x="10" y="10" width="4" height="4"></rect><rect x="17" y="10" width="4" height="4"></rect><rect x="3" y="17" width="4" height="4"></rect><rect x="10" y="17" width="4" height="4"></rect><rect x="17" y="17" width="4" height="4"></rect></svg>',
           title: '9宫格',
           desc: '3x3 更细动作与情绪递进',
-          template: staticPromptTemplate(TEMPLATES['multiGrid9']),
+          template: staticPromptTemplate(TEMPLATES.multiGrid9),
         },
         {
           icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M3 3h18v18H3z"></path><path d="M7.5 3v18"></path><path d="M12 3v18"></path><path d="M16.5 3v18"></path><path d="M3 7.5h18"></path><path d="M3 12h18"></path><path d="M3 16.5h18"></path></svg>',
           title: '16宫格',
           desc: '4x4 更密的节奏推进与镜头切换',
-          template: staticPromptTemplate(TEMPLATES['multiGrid16']),
+          template: staticPromptTemplate(TEMPLATES.multiGrid16),
         },
         {
           icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M3 3h18v18H3z"></path><path d="M6.6 3v18"></path><path d="M10.2 3v18"></path><path d="M13.8 3v18"></path><path d="M17.4 3v18"></path><path d="M3 6.6h18"></path><path d="M3 10.2h18"></path><path d="M3 13.8h18"></path><path d="M3 17.4h18"></path></svg>',
           title: '25宫格',
           desc: '5x5 长连续剧情，适合完整片段',
-          template: staticPromptTemplate(TEMPLATES['multiGrid25']),
+          template: staticPromptTemplate(TEMPLATES.multiGrid25),
         },
       ],
     },
@@ -312,27 +312,27 @@ export const PROMPT_PRESETS = {
           icon: '🎬',
           title: '竖版故事分镜',
           desc: '竖版分镜，从上到下推进',
-          template: staticPromptTemplate(TEMPLATES['storyboardVertical']),
+          template: staticPromptTemplate(TEMPLATES.storyboardVertical),
         },
         {
           icon: '🎬',
           title: '竖版故事分镜+场景',
           desc: '竖版分镜，包含场景设定参考',
-          template: staticPromptTemplate(TEMPLATES['storyboardVerticalScene']),
+          template: staticPromptTemplate(TEMPLATES.storyboardVerticalScene),
         },
         {
           icon: '🎬',
           title: '横版故事分镜',
           desc: '横版分镜，从左到右推进',
-          template: staticPromptTemplate(TEMPLATES['storyboardHorizontal']),
+          template: staticPromptTemplate(TEMPLATES.storyboardHorizontal),
         },
         {
           icon: '🎬',
           title: '横版故事分镜+场景',
           desc: '横版分镜，包含场景设定参考',
-          template: staticPromptTemplate(TEMPLATES['storyboardHorizontalScene']),
+          template: staticPromptTemplate(TEMPLATES.storyboardHorizontalScene),
         },
-        ...STORYBOARD_INSERT_PROMPT_PRESETS['map'](storyboardInsertPromptPreset),
+        ...STORYBOARD_INSERT_PROMPT_PRESETS.map(storyboardInsertPromptPreset),
       ],
     },
   ],
@@ -344,12 +344,12 @@ export const PROMPT_PRESETS = {
       triggerMode: PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
       template: REVERSE_IMAGE_PROMPT_PRESET_PROMPT,
     },
-    { icon: '📝', title: '长篇精缩V1', desc: '一键把长篇内容精缩成短篇', template: TEMPLATES['longToShort'] },
+    { icon: '📝', title: '长篇精缩V1', desc: '一键把长篇内容精缩成短篇', template: TEMPLATES.longToShort },
     {
       icon: '📝',
       title: '提取人物场景道具信息',
       desc: '提取文本中的人物、场景、道具信息',
-      template: TEMPLATES['extractInfo'],
+      template: TEMPLATES.extractInfo,
     },
     {
       icon: '🧍',
@@ -360,19 +360,19 @@ export const PROMPT_PRESETS = {
           icon: '📝',
           title: '影视级叙事分镜脚本',
           desc: '将小说一键转化为标准戏剧化脚本，专为AI短剧视频量身定制',
-          template: TEMPLATES['Storyboard1'],
+          template: TEMPLATES.Storyboard1,
         },
         {
           icon: '📝',
           title: '影视级叙事分镜脚本-秒级',
           desc: '精确到秒的光影渲染、运镜与音效控制，专为AI短剧视频量身定制',
-          template: TEMPLATES['Storyboard2'],
+          template: TEMPLATES.Storyboard2,
         },
         {
           icon: '🎬',
           title: 'Seedance2.0视频格式',
           desc: '按用户秒数或默认15秒输出 Seedance 2.0 秒级视频提示词',
-          template: TEMPLATES['Seedance2VideoFormat'],
+          template: TEMPLATES.Seedance2VideoFormat,
         },
       ],
     },
@@ -543,14 +543,14 @@ const SUPPORTED_PRESET_NODE_TYPES = new Set([
     },
   ],
   USER_INPUT_PLACEHOLDER = PROMPT_PRESET_USER_INPUT_PLACEHOLDER,
-  NODE_TYPE_I18N_KEYS = Object['freeze']({
+  NODE_TYPE_I18N_KEYS = Object.freeze({
     'ai-image': 'image',
     'ai-text': 'text',
     'ai-video': 'video',
     'ai-audio': 'audio',
     'storyboard-script': 'storyboardScript',
   }),
-  PROMPT_PRESET_TITLE_I18N_KEYS = Object['freeze']({
+  PROMPT_PRESET_TITLE_I18N_KEYS = Object.freeze({
     场景参考: 'sceneReferenceGroup',
     场景四视图: 'sceneFourView',
     场景九视图: 'sceneNineView',
@@ -639,7 +639,7 @@ function getPresetNodeTypeLabel(config) {
   return scope ? promptPresetsText('nodeTypes.' + scope) : promptPresetsText('nodeTypes.node');
 }
 function getPresetManagerTabLabel(input) {
-  return getPromptPresetCollectionLabel(input?.['nodeType']) || String(input?.['label'] || '');
+  return getPromptPresetCollectionLabel(input?.nodeType) || String(input?.label || '');
 }
 export function getPromptPresetCollectionLabel(output) {
   const value2 = NODE_TYPE_I18N_KEYS[output];
@@ -670,16 +670,16 @@ function getLocalizedPresetDesc(value6, value7) {
   return value8 ? promptPresetsText('presets.' + value8 + '.desc') : value7;
 }
 export function normalizePromptPresetTriggerMode(value9) {
-  const value10 = String(value9 || '')['trim']();
-  return PROMPT_PRESET_TRIGGER_MODES['has'](value10) ? value10 : PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT;
+  const value10 = String(value9 || '').trim();
+  return PROMPT_PRESET_TRIGGER_MODES.has(value10) ? value10 : PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT;
 }
 export function shouldInsertPromptForPreset(options2 = {}) {
   return (
-    normalizePromptPresetTriggerMode(options2?.['triggerMode']) === PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT
+    normalizePromptPresetTriggerMode(options2?.triggerMode) === PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT
   );
 }
 export function isPromptPresetNodeTypeSupported(value11) {
-  return SUPPORTED_PRESET_NODE_TYPES['has'](String(value11 || '')['trim']());
+  return SUPPORTED_PRESET_NODE_TYPES.has(String(value11 || '').trim());
 }
 function getPromptPresetTriggerModeLabel(options3 = {}) {
   return shouldInsertPromptForPreset(options3)
@@ -688,10 +688,10 @@ function getPromptPresetTriggerModeLabel(options3 = {}) {
 }
 export async function loadCustomPresets() {
   try {
-    const [value12] = await Promise['all']([fetchPromptPresetsFromServer(), loadPromptPresetSettings()]);
+    const [value12] = await Promise.all([fetchPromptPresetsFromServer(), loadPromptPresetSettings()]);
     customPresets = value12;
   } catch (value13) {
-    console['warn'](
+    console.warn(
       '[promptPresets] No custom presets found or load failed.',
       value13,
     );
@@ -703,20 +703,20 @@ export function getPromptPresets(value14) {
   return [...localizePromptPresetItems(value15), ...args4];
 }
 function normalizePresetNodeType(value16) {
-  const value17 = String(value16 || '')['trim']();
-  return SUPPORTED_PRESET_NODE_TYPES['has'](value17) ? value17 : 'ai-image';
+  const value17 = String(value16 || '').trim();
+  return SUPPORTED_PRESET_NODE_TYPES.has(value17) ? value17 : 'ai-image';
 }
 function normalizePresetManagerNodeType(value18) {
-  const value19 = String(value18 || '')['trim']();
-  return PRESET_MANAGER_TABS['some']((value20) => value20['nodeType'] === value19)
+  const value19 = String(value18 || '').trim();
+  return PRESET_MANAGER_TABS.some((value20) => value20.nodeType === value19)
     ? value19
     : 'ai-text';
 }
 function normalizePromptPresetSettings(options4 = {}) {
-  const value21 = String(options4?.['defaultQuickCaptureNodeType'] || '')['trim']();
+  const value21 = String(options4?.defaultQuickCaptureNodeType || '').trim();
   return {
-    defaultQuickCaptureNodeType: PRESET_MANAGER_TABS['some'](
-      (value22) => value22['nodeType'] === value21,
+    defaultQuickCaptureNodeType: PRESET_MANAGER_TABS.some(
+      (value22) => value22.nodeType === value21,
     )
       ? value21
       : '',
@@ -732,9 +732,9 @@ export async function loadPromptPresetSettings({ force: force = false } = {}) {
       (promptPresetSettingsLoaded = true),
       { ...promptPresetSettings }
     );
-  })()['catch']((value24) => {
+  })().catch((value24) => {
     return (
-      console['warn']('[promptPresets] Failed to load preset settings.', value24),
+      console.warn('[promptPresets] Failed to load preset settings.', value24),
       (promptPresetSettingsLoaded = true),
       { ...promptPresetSettings }
     );
@@ -747,11 +747,11 @@ export async function loadPromptPresetSettings({ force: force = false } = {}) {
   }
 }
 export function getDefaultQuickCapturePresetNodeType() {
-  return promptPresetSettings['defaultQuickCaptureNodeType'] || '';
+  return promptPresetSettings.defaultQuickCaptureNodeType || '';
 }
 export async function setDefaultQuickCapturePresetNodeType(value25) {
-  const defaultQuickCaptureNodeType = String(value25 || '')['trim']();
-  if (!PRESET_MANAGER_TABS['some']((value26) => value26['nodeType'] === defaultQuickCaptureNodeType))
+  const defaultQuickCaptureNodeType = String(value25 || '').trim();
+  if (!PRESET_MANAGER_TABS.some((value26) => value26.nodeType === defaultQuickCaptureNodeType))
     throw new Error('Invalid quick capture preset node type');
   return (
     await savePromptPresetSettingsToServer({ defaultQuickCaptureNodeType: defaultQuickCaptureNodeType }),
@@ -762,13 +762,13 @@ export async function setDefaultQuickCapturePresetNodeType(value25) {
 }
 export function getCustomPromptPresets(value27) {
   const presetNodeType = normalizePresetNodeType(value27);
-  return Array['isArray'](customPresets[presetNodeType]) ? [...customPresets[presetNodeType]] : [];
+  return Array.isArray(customPresets[presetNodeType]) ? [...customPresets[presetNodeType]] : [];
 }
 export function getSlashPromptPresetEntries(value28) {
   const value29 = PROMPT_PRESETS[value28] || [],
     subItems = getCustomPromptPresets(value28),
     args5 = localizePromptPresetItems(value29);
-  if (subItems['length'] === 0) return args5;
+  if (subItems.length === 0) return args5;
   return [
     ...args5,
     {
@@ -788,111 +788,111 @@ export function __setPromptPresetSettingsForTest(options5 = {}) {
 }
 function escapePresetTemplateHtml(value30) {
   return String(value30 ?? '')
-    ['replace'](/&/g, '&amp;')
-    ['replace'](/</g, '&lt;')
-    ['replace'](/>/g, '&gt;')
-    ['replace'](/"/g, '&quot;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 }
 export function renderPresetTemplateEditorHtml(value31 = '') {
   return String(value31 ?? '')
-    ['split'](USER_INPUT_PLACEHOLDER)
-    ['map']((value32) => escapePresetTemplateHtml(value32)['replace'](/\r?\n/g, '<br>'))
-    ['join'](getUserInputPillHtml());
+    .split(USER_INPUT_PLACEHOLDER)
+    .map((value32) => escapePresetTemplateHtml(value32).replace(/\r?\n/g, '<br>'))
+    .join(getUserInputPillHtml());
 }
 export function serializePresetTemplateEditorHtml(value33 = '') {
   const value34 = '__AIC_USER_INPUT_PLACEHOLDER__',
     value35 = String(value33 ?? '')
-      ['replace'](
+      .replace(
         /<span\b[^>]*\bdata-preset-placeholder=["']user-input["'][^>]*>[\s\S]*?<\/span>/gi,
         value34,
       )
-      ['replace'](/<br\b[^>]*\/?>/gi, '\n')
-      ['replace'](/<\/(div|p)>/gi, '\n')
-      ['replace'](/<[^>]+>/g, '');
-  if (typeof document === 'undefined' || typeof document['createElement'] !== 'function')
-    return value35['replace'](/&nbsp;/g, ' ')
-      ['replace'](/&lt;/g, '<')
-      ['replace'](/&gt;/g, '>')
-      ['replace'](/&quot;/g, '"')
-      ['replace'](/&#39;/g, '\'')
-      ['replace'](/&amp;/g, '&')
-      ['replace'](new RegExp(value34, 'g'), USER_INPUT_PLACEHOLDER)
-      ['replace'](/\n{3,}/g, '\n\n')
-      ['trim']();
-  const el = document['createElement']('textarea');
+      .replace(/<br\b[^>]*\/?>/gi, '\n')
+      .replace(/<\/(div|p)>/gi, '\n')
+      .replace(/<[^>]+>/g, '');
+  if (typeof document === 'undefined' || typeof document.createElement !== 'function')
+    return value35.replace(/&nbsp;/g, ' ')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, '\'')
+      .replace(/&amp;/g, '&')
+      .replace(new RegExp(value34, 'g'), USER_INPUT_PLACEHOLDER)
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  const el = document.createElement('textarea');
   return (
-    (el['innerHTML'] = value35),
-    el['value']
-      ['replace'](new RegExp(value34, 'g'), USER_INPUT_PLACEHOLDER)
-      ['replace'](/\u00a0/g, ' ')
-      ['replace'](/\n{3,}/g, '\n\n')
-      ['trim']()
+    (el.innerHTML = value35),
+    el.value
+      .replace(new RegExp(value34, 'g'), USER_INPUT_PLACEHOLDER)
+      .replace(/\u00a0/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim()
   );
 }
 function editorHasUserInputPill(el2) {
-  return !!el2?.['querySelector']?.('[data-preset-placeholder="user-input"]');
+  return !!el2?.querySelector?.('[data-preset-placeholder="user-input"]');
 }
 function moveCaretAfterNode(value36) {
-  const enabled = window['getSelection']?.();
+  const enabled = window.getSelection?.();
   if (!enabled) return;
-  const value37 = document['createRange']();
-  (value37['setStartAfter'](value36),
-    value37['collapse'](true),
-    enabled['removeAllRanges'](),
-    enabled['addRange'](value37));
+  const value37 = document.createRange();
+  (value37.setStartAfter(value36),
+    value37.collapse(true),
+    enabled.removeAllRanges(),
+    enabled.addRange(value37));
 }
 function insertUserInputPill(el3) {
   if (editorHasUserInputPill(el3))
     return (showPresetManagerToast(promptPresetsText('editor.duplicateUserInput'), 'warn'), false);
-  const el4 = document['createElement']('span');
-  el4['innerHTML'] = getUserInputPillHtml();
-  const value38 = el4['firstElementChild'],
-    value39 = document['createTextNode'](' '),
-    value40 = window['getSelection']?.(),
+  const el4 = document.createElement('span');
+  el4.innerHTML = getUserInputPillHtml();
+  const value38 = el4.firstElementChild,
+    value39 = document.createTextNode(' '),
+    value40 = window.getSelection?.(),
     value41 =
-      value40?.['rangeCount'] &&
-      el3['contains'](value40['getRangeAt'](0)['commonAncestorContainer'])
-        ? value40['getRangeAt'](0)
+      value40?.rangeCount &&
+      el3.contains(value40.getRangeAt(0).commonAncestorContainer)
+        ? value40.getRangeAt(0)
         : null;
   return (
     value41
-      ? (value41['deleteContents'](),
-        value41['insertNode'](value39),
-        value41['insertNode'](value38))
-      : (el3['appendChild'](value38), el3['appendChild'](value39)),
+      ? (value41.deleteContents(),
+        value41.insertNode(value39),
+        value41.insertNode(value38))
+      : (el3.appendChild(value38), el3.appendChild(value39)),
     moveCaretAfterNode(value39),
-    el3['focus'](),
+    el3.focus(),
     true
   );
 }
 function buildPresetModalButton(value42, value43) {
-  const el5 = document['createElement']('button');
+  const el5 = document.createElement('button');
   return (
-    (el5['type'] = 'button'),
-    (el5['className'] = value43),
-    (el5['textContent'] = value42),
+    (el5.type = 'button'),
+    (el5.className = value43),
+    (el5.textContent = value42),
     el5
   );
 }
 function buildPresetTriggerModeControl(value44) {
   let promptPresetTriggerMode = normalizePromptPresetTriggerMode(value44);
-  const element = document['createElement']('div');
-  ((element['className'] = 'preset-manager-trigger-modes'),
-    element['setAttribute']('role', 'group'),
-    element['setAttribute']('aria-label', promptPresetsText('triggerModes.aria')));
-  const el6 = document['createElement']('span');
-  ((el6['className'] = 'preset-manager-trigger-mode-label'),
-    (el6['textContent'] = promptPresetsText('triggerModes.label')),
-    element['appendChild'](el6));
+  const element = document.createElement('div');
+  ((element.className = 'preset-manager-trigger-modes'),
+    element.setAttribute('role', 'group'),
+    element.setAttribute('aria-label', promptPresetsText('triggerModes.aria')));
+  const el6 = document.createElement('span');
+  ((el6.className = 'preset-manager-trigger-mode-label'),
+    (el6.textContent = promptPresetsText('triggerModes.label')),
+    element.appendChild(el6));
   const run = (value45, value46) => {
       const el7 = buildPresetModalButton(value46, 'preset-manager-trigger-mode');
       return (
-        (el7['dataset']['triggerMode'] = value45),
-        el7['setAttribute']('aria-pressed', 'false'),
-        el7['addEventListener']('click', () => {
+        (el7.dataset.triggerMode = value45),
+        el7.setAttribute('aria-pressed', 'false'),
+        el7.addEventListener('click', () => {
           ((promptPresetTriggerMode = value45), run2());
         }),
-        element['appendChild'](el7),
+        element.appendChild(el7),
         el7
       );
     },
@@ -902,131 +902,131 @@ function buildPresetTriggerModeControl(value44) {
       promptPresetsText('triggerModes.insertPrompt'),
     );
   function run2() {
-    [value47, value48]['forEach']((el8) => {
-      const value49 = el8['dataset']['triggerMode'] === promptPresetTriggerMode;
-      (el8['classList']['toggle']('is-active', value49),
-        el8['setAttribute']('aria-pressed', value49 ? 'true' : 'false'));
+    [value47, value48].forEach((el8) => {
+      const value49 = el8.dataset.triggerMode === promptPresetTriggerMode;
+      (el8.classList.toggle('is-active', value49),
+        el8.setAttribute('aria-pressed', value49 ? 'true' : 'false'));
     });
   }
   return (run2(), { element: element, getValue: () => promptPresetTriggerMode });
 }
 function buildPresetManagerIcon(value50) {
-  const el9 = document['createElement']('span');
+  const el9 = document.createElement('span');
   return (
-    (el9['className'] = 'preset-manager-list-icon preset-manager-list-icon--' + value50),
-    el9['setAttribute']('aria-hidden', 'true'),
+    (el9.className = 'preset-manager-list-icon preset-manager-list-icon--' + value50),
+    el9.setAttribute('aria-hidden', 'true'),
     el9
   );
 }
 export function getPromptPresetThumbSrc(value51) {
-  const value52 = String(value51?.['thumbnailDataUrl'] || '')['trim']();
+  const value52 = String(value51?.thumbnailDataUrl || '').trim();
   if (value52) return value52;
   const value53 = String(
-    value51?.['thumbUrl'] ||
-      value51?.['thumbnailUrl'] ||
-      value51?.['posterUrl'] ||
-      value51?.['coverUrl'] ||
+    value51?.thumbUrl ||
+      value51?.thumbnailUrl ||
+      value51?.posterUrl ||
+      value51?.coverUrl ||
       '',
-  )['trim']();
+  ).trim();
   if (value53) return value53;
   const value54 = String(
-    value51?.['thumbLocalPath'] ||
-      value51?.['thumbnailLocalPath'] ||
-      value51?.['posterLocalPath'] ||
-      value51?.['coverLocalPath'] ||
+    value51?.thumbLocalPath ||
+      value51?.thumbnailLocalPath ||
+      value51?.posterLocalPath ||
+      value51?.coverLocalPath ||
       '',
-  )['trim']();
-  return value54 ? '/' + value54['replace'](/^\/+/, '') : '';
+  ).trim();
+  return value54 ? '/' + value54.replace(/^\/+/, '') : '';
 }
 function readPresetThumbnailFile(enabled2) {
   return new Promise((handler, handler2) => {
-    if (!enabled2 || !String(enabled2['type'] || '')['startsWith']('image/')) {
+    if (!enabled2 || !String(enabled2.type || '').startsWith('image/')) {
       handler2(new Error(promptPresetsText('thumbnail.chooseImage')));
       return;
     }
     const fileReader = new FileReader();
-    ((fileReader['onload'] = () => handler(String(fileReader['result'] || ''))),
-      (fileReader['onerror'] = () => handler2(new Error(promptPresetsText('thumbnail.readFailed')))),
-      fileReader['readAsDataURL'](enabled2));
+    ((fileReader.onload = () => handler(String(fileReader.result || ''))),
+      (fileReader.onerror = () => handler2(new Error(promptPresetsText('thumbnail.readFailed')))),
+      fileReader.readAsDataURL(enabled2));
   });
 }
 function buildPresetThumbnailControl({ preset: preset2, onUpload: onUpload }) {
-  const el10 = document['createElement']('label');
-  ((el10['className'] = 'preset-manager-list-thumb'),
-    (el10['title'] = promptPresetsText('thumbnail.upload')),
-    el10['addEventListener']('click', (event) => event['stopPropagation']()));
+  const el10 = document.createElement('label');
+  ((el10.className = 'preset-manager-list-thumb'),
+    (el10.title = promptPresetsText('thumbnail.upload')),
+    el10.addEventListener('click', (event) => event.stopPropagation()));
   const promptPresetThumbSrc = getPromptPresetThumbSrc(preset2);
   if (promptPresetThumbSrc) {
-    const value55 = document['createElement']('img');
-    ((value55['className'] = 'preset-manager-list-thumb-img'),
-      (value55['src'] = promptPresetThumbSrc),
-      (value55['alt'] = ''),
-      el10['appendChild'](value55));
+    const value55 = document.createElement('img');
+    ((value55.className = 'preset-manager-list-thumb-img'),
+      (value55.src = promptPresetThumbSrc),
+      (value55.alt = ''),
+      el10.appendChild(value55));
   } else {
-    const el11 = document['createElement']('span');
-    ((el11['className'] = 'preset-manager-list-thumb-plus'),
-      (el11['textContent'] = '+'),
-      el10['appendChild'](el11));
+    const el11 = document.createElement('span');
+    ((el11.className = 'preset-manager-list-thumb-plus'),
+      (el11.textContent = '+'),
+      el10.appendChild(el11));
   }
-  const el12 = document['createElement']('input');
+  const el12 = document.createElement('input');
   return (
-    (el12['className'] = 'preset-manager-thumb-input'),
-    (el12['type'] = 'file'),
-    (el12['accept'] = 'image/*'),
-    el12['addEventListener']('click', (event2) => event2['stopPropagation']()),
-    el12['addEventListener']('change', async () => {
-      const enabled3 = el12['files']?.[0];
+    (el12.className = 'preset-manager-thumb-input'),
+    (el12.type = 'file'),
+    (el12.accept = 'image/*'),
+    el12.addEventListener('click', (event2) => event2.stopPropagation()),
+    el12.addEventListener('change', async () => {
+      const enabled3 = el12.files?.[0];
       if (!enabled3) return;
       try {
         const presetThumbnailFile = await readPresetThumbnailFile(enabled3);
         onUpload?.(presetThumbnailFile);
       } catch (error) {
         showPresetManagerToast(
-          error?.['message'] || promptPresetsText('thumbnail.uploadFailed'),
+          error?.message || promptPresetsText('thumbnail.uploadFailed'),
           'error',
         );
       } finally {
-        el12['value'] = '';
+        el12.value = '';
       }
     }),
-    el10['appendChild'](el12),
+    el10.appendChild(el12),
     el10
   );
 }
 function buildPresetEditorPlaceholder() {
-  const el13 = document['createElement']('div');
-  ((el13['className'] = 'preset-manager-editor-placeholder'),
-    el13['setAttribute']('aria-hidden', 'true'),
-    el13['appendChild'](document['createTextNode'](getPresetTemplatePlaceholderText() + ' ')));
-  const el14 = document['createElement']('span');
+  const el13 = document.createElement('div');
+  ((el13.className = 'preset-manager-editor-placeholder'),
+    el13.setAttribute('aria-hidden', 'true'),
+    el13.appendChild(document.createTextNode(getPresetTemplatePlaceholderText() + ' ')));
+  const el14 = document.createElement('span');
   return (
-    (el14['innerHTML'] = getUserInputPillHtml()),
-    el13['appendChild'](el14['firstElementChild']),
+    (el14.innerHTML = getUserInputPillHtml()),
+    el13.appendChild(el14.firstElementChild),
     el13
   );
 }
 function isPresetTemplateEditorEmpty(el15) {
-  return !serializePresetTemplateEditorHtml(el15?.['innerHTML'] || '');
+  return !serializePresetTemplateEditorHtml(el15?.innerHTML || '');
 }
 function syncPresetEditorPlaceholder(value56, el16) {
-  el16['hidden'] = !isPresetTemplateEditorEmpty(value56);
+  el16.hidden = !isPresetTemplateEditorEmpty(value56);
 }
 function buildPresetManagerTabIcon(value57) {
-  const el17 = document['createElementNS']('http://www.w3.org/2000/svg', 'svg');
-  (el17['setAttribute']('class', 'preset-manager-tab-icon'),
-    el17['setAttribute']('width', '16'),
-    el17['setAttribute']('height', '16'),
-    el17['setAttribute']('viewBox', '0 0 24 24'),
-    el17['setAttribute']('fill', 'none'),
-    el17['setAttribute']('stroke', 'currentColor'),
-    el17['setAttribute']('stroke-width', '2'),
-    el17['setAttribute']('aria-hidden', 'true'));
+  const el17 = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  (el17.setAttribute('class', 'preset-manager-tab-icon'),
+    el17.setAttribute('width', '16'),
+    el17.setAttribute('height', '16'),
+    el17.setAttribute('viewBox', '0 0 24 24'),
+    el17.setAttribute('fill', 'none'),
+    el17.setAttribute('stroke', 'currentColor'),
+    el17.setAttribute('stroke-width', '2'),
+    el17.setAttribute('aria-hidden', 'true'));
   const run3 = (value58, value59) => {
-    const el18 = document['createElementNS']('http://www.w3.org/2000/svg', value58);
-    (Object['entries'](value59)['forEach'](([value60, value61]) =>
-      el18['setAttribute'](value60, value61),
+    const el18 = document.createElementNS('http://www.w3.org/2000/svg', value58);
+    (Object.entries(value59).forEach(([value60, value61]) =>
+      el18.setAttribute(value60, value61),
     ),
-      el17['appendChild'](el18));
+      el17.appendChild(el18));
   };
   if (value57 === 'text')
     return (
@@ -1059,27 +1059,27 @@ function buildPresetManagerTabIcon(value57) {
 }
 function getUniqueDraftTitle(value62) {
   const map = new Set(
-    (value62 || [])['map']((value63) => String(value63?.['title'] || '')['trim']()),
+    (value62 || []).map((value63) => String(value63?.title || '').trim()),
   );
   let index2 = 1,
     customPresetFallbackTitle = getCustomPresetFallbackTitle();
-  while (map['has'](customPresetFallbackTitle)) {
+  while (map.has(customPresetFallbackTitle)) {
     ((index2 += 1),
       (customPresetFallbackTitle = promptPresetsText('customPresetFallbackWithIndex', { index: index2 })));
   }
   return customPresetFallbackTitle;
 }
 function showPresetManagerToast(value64, value65 = 'info') {
-  window['showToast']?.(value64, value65);
+  window.showToast?.(value64, value65);
 }
 function showPresetButtonPending(el19, value66) {
-  ((el19['disabled'] = true),
-    el19['setAttribute']('aria-busy', 'true'),
-    (el19['textContent'] = value66));
-  const el20 = document['createElement']('span');
-  ((el20['className'] = 'project-package-loading-spinner preset-manager-action-spinner'),
-    el20['setAttribute']('aria-hidden', 'true'),
-    el19['appendChild'](el20));
+  ((el19.disabled = true),
+    el19.setAttribute('aria-busy', 'true'),
+    (el19.textContent = value66));
+  const el20 = document.createElement('span');
+  ((el20.className = 'project-package-loading-spinner preset-manager-action-spinner'),
+    el20.setAttribute('aria-hidden', 'true'),
+    el19.appendChild(el20));
 }
 function createPresetEditor({
   nodeType: nodeType,
@@ -1087,74 +1087,74 @@ function createPresetEditor({
   isDraft: isDraft = false,
   onSaved: onSaved,
 }) {
-  const element2 = document['createElement']('div');
-  element2['className'] = 'preset-manager-detail';
-  let originalTitle = isDraft ? '' : String(preset?.['title'] || '')['trim']();
-  const value67 = String(preset?.['title'] || '')['trim'](),
-    el21 = document['createElement']('label');
-  el21['className'] = 'preset-manager-field';
-  const el22 = document['createElement']('span');
-  ((el22['className'] = 'preset-manager-label'),
-    (el22['textContent'] = promptPresetsText('editor.name')));
-  const el23 = document['createElement']('input');
-  ((el23['className'] = 'preset-manager-input'),
-    (el23['type'] = 'text'),
-    (el23['placeholder'] = promptPresetsText('editor.namePlaceholder')),
-    (el23['value'] = value67),
-    el21['appendChild'](el22),
-    el21['appendChild'](el23));
-  const el24 = document['createElement']('label');
-  el24['className'] = 'preset-manager-field';
-  const el25 = document['createElement']('span');
-  ((el25['className'] = 'preset-manager-label'),
-    (el25['textContent'] = promptPresetsText('editor.desc')));
-  const desc2 = document['createElement']('input');
-  ((desc2['className'] = 'preset-manager-input'),
-    (desc2['type'] = 'text'),
-    (desc2['placeholder'] = promptPresetsText('editor.descPlaceholder')),
-    (desc2['value'] = String(preset?.['desc'] || '')['trim']()),
-    el24['appendChild'](el25),
-    el24['appendChild'](desc2));
-  const el26 = document['createElement']('div');
-  el26['className'] = 'preset-manager-template-tools';
-  const el27 = document['createElement']('span');
-  ((el27['className'] = 'preset-manager-label'),
-    (el27['textContent'] = promptPresetsText('editor.template')));
+  const element2 = document.createElement('div');
+  element2.className = 'preset-manager-detail';
+  let originalTitle = isDraft ? '' : String(preset?.title || '').trim();
+  const value67 = String(preset?.title || '').trim(),
+    el21 = document.createElement('label');
+  el21.className = 'preset-manager-field';
+  const el22 = document.createElement('span');
+  ((el22.className = 'preset-manager-label'),
+    (el22.textContent = promptPresetsText('editor.name')));
+  const el23 = document.createElement('input');
+  ((el23.className = 'preset-manager-input'),
+    (el23.type = 'text'),
+    (el23.placeholder = promptPresetsText('editor.namePlaceholder')),
+    (el23.value = value67),
+    el21.appendChild(el22),
+    el21.appendChild(el23));
+  const el24 = document.createElement('label');
+  el24.className = 'preset-manager-field';
+  const el25 = document.createElement('span');
+  ((el25.className = 'preset-manager-label'),
+    (el25.textContent = promptPresetsText('editor.desc')));
+  const desc2 = document.createElement('input');
+  ((desc2.className = 'preset-manager-input'),
+    (desc2.type = 'text'),
+    (desc2.placeholder = promptPresetsText('editor.descPlaceholder')),
+    (desc2.value = String(preset?.desc || '').trim()),
+    el24.appendChild(el25),
+    el24.appendChild(desc2));
+  const el26 = document.createElement('div');
+  el26.className = 'preset-manager-template-tools';
+  const el27 = document.createElement('span');
+  ((el27.className = 'preset-manager-label'),
+    (el27.textContent = promptPresetsText('editor.template')));
   const el28 = buildPresetModalButton(
     promptPresetsText('editor.insertPrompt'),
     'preset-modal-btn-secondary preset-manager-insert-btn',
   );
-  (el26['appendChild'](el27), el26['appendChild'](el28));
-  const el29 = document['createElement']('div');
-  el29['className'] = 'preset-manager-editor-wrap';
-  const el30 = document['createElement']('div');
-  ((el30['className'] = 'preset-manager-textarea preset-manager-editor'),
-    (el30['contentEditable'] = 'true'),
-    (el30['spellcheck'] = false),
-    (el30['innerHTML'] = renderPresetTemplateEditorHtml(preset?.['template'] || '')),
-    el28['addEventListener']('click', () => insertUserInputPill(el30)));
+  (el26.appendChild(el27), el26.appendChild(el28));
+  const el29 = document.createElement('div');
+  el29.className = 'preset-manager-editor-wrap';
+  const el30 = document.createElement('div');
+  ((el30.className = 'preset-manager-textarea preset-manager-editor'),
+    (el30.contentEditable = 'true'),
+    (el30.spellcheck = false),
+    (el30.innerHTML = renderPresetTemplateEditorHtml(preset?.template || '')),
+    el28.addEventListener('click', () => insertUserInputPill(el30)));
   const presetEditorPlaceholder = buildPresetEditorPlaceholder();
-  (el30['addEventListener']('input', () => syncPresetEditorPlaceholder(el30, presetEditorPlaceholder)),
-    el30['addEventListener']('blur', () => syncPresetEditorPlaceholder(el30, presetEditorPlaceholder)),
-    el29['addEventListener']('click', () => {
-      el30['focus']();
+  (el30.addEventListener('input', () => syncPresetEditorPlaceholder(el30, presetEditorPlaceholder)),
+    el30.addEventListener('blur', () => syncPresetEditorPlaceholder(el30, presetEditorPlaceholder)),
+    el29.addEventListener('click', () => {
+      el30.focus();
     }),
-    el29['appendChild'](el30),
-    el29['appendChild'](presetEditorPlaceholder),
+    el29.appendChild(el30),
+    el29.appendChild(presetEditorPlaceholder),
     syncPresetEditorPlaceholder(el30, presetEditorPlaceholder));
-  const triggerMode = buildPresetTriggerModeControl(preset?.['triggerMode']),
+  const triggerMode = buildPresetTriggerModeControl(preset?.triggerMode),
     saveButton = buildPresetModalButton(promptPresetsText('editor.save'), 'preset-modal-btn-primary');
   return (
-    saveButton['addEventListener']('click', async () => {
-      if (saveButton['disabled']) return;
-      const title2 = el23['value']['trim'](),
-        template = serializePresetTemplateEditorHtml(el30['innerHTML']);
+    saveButton.addEventListener('click', async () => {
+      if (saveButton.disabled) return;
+      const title2 = el23.value.trim(),
+        template = serializePresetTemplateEditorHtml(el30.innerHTML);
       if (!title2) {
-        (showPresetManagerToast(promptPresetsText('editor.titleRequired'), 'warn'), el23['focus']());
+        (showPresetManagerToast(promptPresetsText('editor.titleRequired'), 'warn'), el23.focus());
         return;
       }
       if (!template) {
-        (showPresetManagerToast(promptPresetsText('editor.templateRequired'), 'warn'), el30['focus']());
+        (showPresetManagerToast(promptPresetsText('editor.templateRequired'), 'warn'), el30.focus());
         return;
       }
       showPresetButtonPending(saveButton, promptPresetsText('editor.saving'));
@@ -1162,33 +1162,33 @@ function createPresetEditor({
         (await savePromptPresetToServer({
           nodeType: nodeType,
           title: title2,
-          desc: desc2['value']['trim'](),
+          desc: desc2.value.trim(),
           template: template,
-          triggerMode: triggerMode['getValue'](),
-          thumbnailDataUrl: String(preset?.['thumbnailDataUrl'] || '')['trim'](),
-          thumbLocalPath: String(preset?.['thumbLocalPath'] || '')['trim'](),
+          triggerMode: triggerMode.getValue(),
+          thumbnailDataUrl: String(preset?.thumbnailDataUrl || '').trim(),
+          thumbLocalPath: String(preset?.thumbLocalPath || '').trim(),
           originalTitle: originalTitle,
-          installId: String(window['__aicInstallId'] || globalThis['__aicInstallId'] || '')['trim'](),
+          installId: String(window.__aicInstallId || globalThis.__aicInstallId || '').trim(),
         }),
           await loadCustomPresets(),
           (originalTitle = title2),
           showPresetManagerToast(promptPresetsText('editor.saved'), 'success'),
           onSaved?.({ title: title2 }));
       } catch (error2) {
-        showPresetManagerToast(error2?.['message'] || promptPresetsText('editor.saveFailed'), 'error');
+        showPresetManagerToast(error2?.message || promptPresetsText('editor.saveFailed'), 'error');
       } finally {
-        ((saveButton['disabled'] = false),
-          saveButton['removeAttribute']('aria-busy'),
-          (saveButton['textContent'] = promptPresetsText('editor.save')));
+        ((saveButton.disabled = false),
+          saveButton.removeAttribute('aria-busy'),
+          (saveButton.textContent = promptPresetsText('editor.save')));
       }
     }),
-    element2['appendChild'](el21),
-    element2['appendChild'](el24),
-    element2['appendChild'](el26),
-    element2['appendChild'](el29),
+    element2.appendChild(el21),
+    element2.appendChild(el24),
+    element2.appendChild(el26),
+    element2.appendChild(el29),
     {
       element: element2,
-      triggerModeControl: triggerMode['element'],
+      triggerModeControl: triggerMode.element,
       saveButton: saveButton,
       updatePreset: (value68) => {
         preset = value68;
@@ -1201,76 +1201,76 @@ export function openCustomPresetsManager({
   sourceNodeId: sourceNodeId = '',
   initialDraftTemplate: initialDraftTemplate = '',
 } = {}) {
-  const template2 = String(initialDraftTemplate || '')['trim']();
+  const template2 = String(initialDraftTemplate || '').trim();
   let nodeType3 = normalizePresetManagerNodeType(nodeType2 || getDefaultQuickCapturePresetNodeType());
-  const enabled4 = String(sourceNodeId || '')['trim']();
+  const enabled4 = String(sourceNodeId || '').trim();
   closeActivePresetManager?.();
-  const root = document['createElement']('div');
-  root['className'] = 'preset-modal-overlay';
+  const root = document.createElement('div');
+  root.className = 'preset-modal-overlay';
   let beginModalInteraction2 = null,
     mutationObserver = null,
     value69 = false;
   const onClose = () => {
       ((value69 = true),
-        mutationObserver?.['disconnect'](),
-        root['remove'](),
+        mutationObserver?.disconnect(),
+        root.remove(),
         beginModalInteraction2?.(),
         activePresetManagerOverlay === root &&
           ((activePresetManagerOverlay = null), (closeActivePresetManager = null)));
     },
-    el31 = document['createElement']('div');
-  ((el31['className'] = 'preset-modal preset-modal--manager'),
-    el31['addEventListener']('click', (event3) => event3['stopPropagation']()));
-  const el32 = document['createElement']('div');
-  el32['className'] = 'preset-manager-title-row';
-  const el33 = document['createElement']('div');
-  el33['className'] = 'preset-manager-title-group';
-  const el34 = document['createElement']('div');
-  ((el34['textContent'] = promptPresetsText('manager.title')),
-    (el34['className'] = 'preset-modal-title'));
-  const el35 = document['createElement']('div');
-  ((el35['className'] = 'preset-modal-desc'),
-    (el35['textContent'] = getPresetManagerDesc(nodeType3)),
-    el33['appendChild'](el34),
-    el33['appendChild'](el35));
+    el31 = document.createElement('div');
+  ((el31.className = 'preset-modal preset-modal--manager'),
+    el31.addEventListener('click', (event3) => event3.stopPropagation()));
+  const el32 = document.createElement('div');
+  el32.className = 'preset-manager-title-row';
+  const el33 = document.createElement('div');
+  el33.className = 'preset-manager-title-group';
+  const el34 = document.createElement('div');
+  ((el34.textContent = promptPresetsText('manager.title')),
+    (el34.className = 'preset-modal-title'));
+  const el35 = document.createElement('div');
+  ((el35.className = 'preset-modal-desc'),
+    (el35.textContent = getPresetManagerDesc(nodeType3)),
+    el33.appendChild(el34),
+    el33.appendChild(el35));
   const el36 = buildPresetModalButton('×', 'preset-manager-close-btn');
-  (el36['setAttribute']('aria-label', promptPresetsText('manager.close')),
-    el36['addEventListener']('click', onClose),
-    el32['appendChild'](el33),
-    el32['appendChild'](el36));
-  const el37 = document['createElement']('div');
-  ((el37['className'] = 'preset-manager-tabs'), el37['setAttribute']('role', 'tablist'));
+  (el36.setAttribute('aria-label', promptPresetsText('manager.close')),
+    el36.addEventListener('click', onClose),
+    el32.appendChild(el33),
+    el32.appendChild(el36));
+  const el37 = document.createElement('div');
+  ((el37.className = 'preset-manager-tabs'), el37.setAttribute('role', 'tablist'));
   const list2 = new Map();
   let value70 = false;
-  PRESET_MANAGER_TABS['forEach']((defaultQuickCaptureNodeType2) => {
+  PRESET_MANAGER_TABS.forEach((defaultQuickCaptureNodeType2) => {
     const button = buildPresetModalButton('', 'preset-manager-tab');
-    (button['setAttribute']('role', 'tab'),
-      (button['dataset']['nodeType'] = defaultQuickCaptureNodeType2['nodeType']),
-      button['appendChild'](buildPresetManagerTabIcon(defaultQuickCaptureNodeType2['icon'])));
-    const el38 = document['createElement']('span');
-    ((el38['textContent'] = getPresetManagerTabLabel(defaultQuickCaptureNodeType2)), button['appendChild'](el38));
-    const star = document['createElement']('span');
-    ((star['className'] = 'preset-manager-tab-star'),
-      (star['textContent'] = '★'),
-      star['setAttribute']('aria-hidden', 'true'),
-      button['appendChild'](star),
-      button['addEventListener']('click', () => {
-        if (nodeType3 === defaultQuickCaptureNodeType2['nodeType']) return;
-        ((nodeType3 = defaultQuickCaptureNodeType2['nodeType']), run4());
+    (button.setAttribute('role', 'tab'),
+      (button.dataset.nodeType = defaultQuickCaptureNodeType2.nodeType),
+      button.appendChild(buildPresetManagerTabIcon(defaultQuickCaptureNodeType2.icon)));
+    const el38 = document.createElement('span');
+    ((el38.textContent = getPresetManagerTabLabel(defaultQuickCaptureNodeType2)), button.appendChild(el38));
+    const star = document.createElement('span');
+    ((star.className = 'preset-manager-tab-star'),
+      (star.textContent = '★'),
+      star.setAttribute('aria-hidden', 'true'),
+      button.appendChild(star),
+      button.addEventListener('click', () => {
+        if (nodeType3 === defaultQuickCaptureNodeType2.nodeType) return;
+        ((nodeType3 = defaultQuickCaptureNodeType2.nodeType), run4());
       }),
-      button['addEventListener']('contextmenu', async (event4) => {
-        (event4['preventDefault'](), event4['stopPropagation']());
+      button.addEventListener('contextmenu', async (event4) => {
+        (event4.preventDefault(), event4.stopPropagation());
         if (value70) return;
         const defaultQuickCaptureNodeType3 = getDefaultQuickCapturePresetNodeType();
-        if (defaultQuickCaptureNodeType3 === defaultQuickCaptureNodeType2['nodeType']) return;
+        if (defaultQuickCaptureNodeType3 === defaultQuickCaptureNodeType2.nodeType) return;
         ((value70 = true),
           (promptPresetSettings = {
             ...promptPresetSettings,
-            defaultQuickCaptureNodeType: defaultQuickCaptureNodeType2['nodeType'],
+            defaultQuickCaptureNodeType: defaultQuickCaptureNodeType2.nodeType,
           }),
           run4());
         try {
-          (await setDefaultQuickCapturePresetNodeType(defaultQuickCaptureNodeType2['nodeType']),
+          (await setDefaultQuickCapturePresetNodeType(defaultQuickCaptureNodeType2.nodeType),
             showPresetManagerToast(
               promptPresetsText('manager.quickCaptureDefaultSet', {
                 preset: getPresetManagerTabLabel(defaultQuickCaptureNodeType2),
@@ -1281,34 +1281,34 @@ export function openCustomPresetsManager({
           ((promptPresetSettings = { ...promptPresetSettings, defaultQuickCaptureNodeType: defaultQuickCaptureNodeType3 }),
             run4(),
             showPresetManagerToast(
-              error3?.['message'] || promptPresetsText('manager.quickCaptureDefaultFailed'),
+              error3?.message || promptPresetsText('manager.quickCaptureDefaultFailed'),
               'error',
             ));
         } finally {
           value70 = false;
         }
       }),
-      list2['set'](defaultQuickCaptureNodeType2['nodeType'], { button: button, star: star }),
-      el37['appendChild'](button));
+      list2.set(defaultQuickCaptureNodeType2.nodeType, { button: button, star: star }),
+      el37.appendChild(button));
   });
-  const el39 = document['createElement']('div');
-  el39['className'] = 'preset-manager-shell';
-  const el40 = document['createElement']('div');
-  el40['className'] = 'preset-manager-sidebar';
+  const el39 = document.createElement('div');
+  el39.className = 'preset-manager-shell';
+  const el40 = document.createElement('div');
+  el40.className = 'preset-manager-sidebar';
   const el41 = buildPresetModalButton(promptPresetsText('manager.new'), 'preset-manager-new-btn'),
-    el42 = document['createElement']('div');
-  ((el42['className'] = 'preset-manager-list'),
-    el40['appendChild'](el41),
-    el40['appendChild'](el42));
-  const value71 = document['createElement']('div');
-  ((value71['className'] = 'preset-manager-detail-pane'),
-    el39['appendChild'](el40),
-    el39['appendChild'](value71));
-  const value72 = document['createElement']('div');
-  value72['className'] = 'preset-modal-actions';
+    el42 = document.createElement('div');
+  ((el42.className = 'preset-manager-list'),
+    el40.appendChild(el41),
+    el40.appendChild(el42));
+  const value71 = document.createElement('div');
+  ((value71.className = 'preset-manager-detail-pane'),
+    el39.appendChild(el40),
+    el39.appendChild(value71));
+  const value72 = document.createElement('div');
+  value72.className = 'preset-modal-actions';
   const map2 = new Map(
-    PRESET_MANAGER_TABS['map']((value73) => [
-      value73['nodeType'],
+    PRESET_MANAGER_TABS.map((value73) => [
+      value73.nodeType,
       {
         selectedKey: '',
         draftPreset: null,
@@ -1321,31 +1321,31 @@ export function openCustomPresetsManager({
     ]),
   );
   if (template2) {
-    const id = map2['get'](nodeType3);
-    ((id['draftCounter'] = 1),
-      (id['draftPreset'] = {
-        id: id['draftCounter'],
+    const id = map2.get(nodeType3);
+    ((id.draftCounter = 1),
+      (id.draftPreset = {
+        id: id.draftCounter,
         title: getUniqueDraftTitle(getCustomPromptPresets(nodeType3)),
         desc: '',
         template: template2,
         triggerMode: PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
       }),
-      (id['selectedKey'] = 'draft:' + id['draftPreset']['id']));
+      (id.selectedKey = 'draft:' + id.draftPreset.id));
   }
   const run5 = (value74) =>
-      map2['get'](value74) || { selectedKey: '', draftPreset: null, draftCounter: 0 },
-    key2 = (value75) => 'saved:' + String(value75?.['title'] || ''),
-    key3 = (value76) => (value76 ? 'draft:' + value76['id'] : '');
+      map2.get(value74) || { selectedKey: '', draftPreset: null, draftCounter: 0 },
+    key2 = (value75) => 'saved:' + String(value75?.title || ''),
+    key3 = (value76) => (value76 ? 'draft:' + value76.id : '');
   let value77 = null,
     value78 = null;
   const run4 = () => {
       if (value69) return;
-      if (value77) value77['scrollTop'] = el42['scrollTop'];
-      ((el35['textContent'] = getPresetManagerDesc(nodeType3)),
-        list2['forEach'](({ button: button2, star: star2 }, value79) => {
+      if (value77) value77.scrollTop = el42.scrollTop;
+      ((el35.textContent = getPresetManagerDesc(nodeType3)),
+        list2.forEach(({ button: button2, star: star2 }, value79) => {
           const value80 = value79 === nodeType3,
             enabled5 = value79 === getDefaultQuickCapturePresetNodeType(),
-            value81 = PRESET_MANAGER_TABS['find']((value82) => value82['nodeType'] === value79),
+            value81 = PRESET_MANAGER_TABS.find((value82) => value82.nodeType === value79),
             value83 = enabled5
               ? promptPresetsText('manager.quickCaptureDefaultAria', {
                   preset: getPresetManagerTabLabel(value81),
@@ -1353,199 +1353,199 @@ export function openCustomPresetsManager({
               : promptPresetsText('manager.quickCaptureSetAria', {
                   preset: getPresetManagerTabLabel(value81),
                 });
-          (button2['classList']['toggle']('is-active', value80),
-            button2['classList']['toggle']('is-quick-capture-default', enabled5),
-            button2['setAttribute']('aria-selected', value80 ? 'true' : 'false'),
-            button2['setAttribute']('aria-label', value83),
-            (button2['title'] = value83),
-            (star2['hidden'] = !enabled5));
+          (button2.classList.toggle('is-active', value80),
+            button2.classList.toggle('is-quick-capture-default', enabled5),
+            button2.setAttribute('aria-selected', value80 ? 'true' : 'false'),
+            button2.setAttribute('aria-label', value83),
+            (button2.title = value83),
+            (star2.hidden = !enabled5));
         }));
       const preset3 = run5(nodeType3);
       value77 = preset3;
       const list3 = getCustomPromptPresets(nodeType3),
         list4 = [];
-      preset3['draftPreset'] &&
-        list4['push']({
-          key: key3(preset3['draftPreset']),
-          preset: preset3['draftPreset'],
+      preset3.draftPreset &&
+        list4.push({
+          key: key3(preset3.draftPreset),
+          preset: preset3.draftPreset,
           isDraft: true,
         });
-      list3['forEach']((preset4) => {
-        list4['push']({ key: key2(preset4), preset: preset4, isDraft: false });
+      list3.forEach((preset4) => {
+        list4.push({ key: key2(preset4), preset: preset4, isDraft: false });
       });
-      !preset3['selectedKey'] &&
-        list4['length'] > 0 &&
-        (preset3['selectedKey'] = list4[0]['key']);
-      preset3['selectedKey'] &&
-        list4['length'] > 0 &&
-        !list4['some']((event5) => event5['key'] === preset3['selectedKey']) &&
-        (preset3['selectedKey'] = list4[0]['key']);
+      !preset3.selectedKey &&
+        list4.length > 0 &&
+        (preset3.selectedKey = list4[0].key);
+      preset3.selectedKey &&
+        list4.length > 0 &&
+        !list4.some((event5) => event5.key === preset3.selectedKey) &&
+        (preset3.selectedKey = list4[0].key);
       const list5 = [],
-        map3 = new Set(list4['map'](({ key: key4 }) => key4));
-      for (const value84 of preset3['rows']['keys']()) {
-        if (!map3['has'](value84)) preset3['rows']['delete'](value84);
+        map3 = new Set(list4.map(({ key: key4 }) => key4));
+      for (const value84 of preset3.rows.keys()) {
+        if (!map3.has(value84)) preset3.rows.delete(value84);
       }
-      if (list4['length'] === 0) {
-        const el43 = document['createElement']('div');
-        ((el43['className'] = 'preset-manager-empty'),
-          (el43['textContent'] = promptPresetsText('manager.emptyList')),
-          list5['push'](el43));
+      if (list4.length === 0) {
+        const el43 = document.createElement('div');
+        ((el43.className = 'preset-manager-empty'),
+          (el43.textContent = promptPresetsText('manager.emptyList')),
+          list5.push(el43));
       }
-      list4['forEach'](({ key: key5, preset: preset5, isDraft: isDraft2 }) => {
-        const signature = JSON['stringify']([
+      list4.forEach(({ key: key5, preset: preset5, isDraft: isDraft2 }) => {
+        const signature = JSON.stringify([
             preset5,
             isDraft2,
-            preset3['deletingKeys']['has'](key5),
+            preset3.deletingKeys.has(key5),
           ]),
-          value85 = preset3['rows']['get'](key5);
-        if (value85?.['signature'] === signature) {
-          (value85['updatePreset'](preset5),
-            value85['element']['classList']['toggle']('is-active', key5 === preset3['selectedKey']),
-            list5['push'](value85['element']));
+          value85 = preset3.rows.get(key5);
+        if (value85?.signature === signature) {
+          (value85.updatePreset(preset5),
+            value85.element.classList.toggle('is-active', key5 === preset3.selectedKey),
+            list5.push(value85.element));
           return;
         }
         const nodeType4 = nodeType3,
-          element3 = document['createElement']('div');
-        (element3['setAttribute']('role', 'button'),
-          (element3['tabIndex'] = 0),
-          (element3['className'] = 'preset-manager-list-item'),
-          element3['classList']['toggle']('is-active', key5 === preset3['selectedKey']),
-          element3['classList']['toggle']('has-trigger-badge', !isDraft2),
-          element3['appendChild'](
+          element3 = document.createElement('div');
+        (element3.setAttribute('role', 'button'),
+          (element3.tabIndex = 0),
+          (element3.className = 'preset-manager-list-item'),
+          element3.classList.toggle('is-active', key5 === preset3.selectedKey),
+          element3.classList.toggle('has-trigger-badge', !isDraft2),
+          element3.appendChild(
             buildPresetThumbnailControl({
               preset: preset5,
               onUpload: (value86) => {
-                ((preset5['thumbnailDataUrl'] = value86),
-                  (preset5['thumbLocalPath'] = ''),
-                  (preset5['thumbUrl'] = ''),
-                  (preset3['selectedKey'] = key5),
+                ((preset5.thumbnailDataUrl = value86),
+                  (preset5.thumbLocalPath = ''),
+                  (preset5.thumbUrl = ''),
+                  (preset3.selectedKey = key5),
                   showPresetManagerToast(promptPresetsText('thumbnail.updated'), 'success'),
                   run4());
               },
             }),
           ));
-        const el44 = document['createElement']('span');
-        el44['className'] = 'preset-manager-list-text';
-        const el45 = document['createElement']('span');
-        ((el45['className'] = 'preset-manager-list-title'),
-          (el45['textContent'] = preset5?.['title'] || getCustomPresetFallbackTitle()));
-        const el46 = document['createElement']('span');
-        ((el46['className'] = 'preset-manager-list-desc'),
-          (el46['textContent'] =
-            preset5?.['desc'] || preset5?.['template'] || promptPresetsText('presetDescFallback')),
-          el44['appendChild'](el45),
-          el44['appendChild'](el46),
-          element3['appendChild'](el44));
+        const el44 = document.createElement('span');
+        el44.className = 'preset-manager-list-text';
+        const el45 = document.createElement('span');
+        ((el45.className = 'preset-manager-list-title'),
+          (el45.textContent = preset5?.title || getCustomPresetFallbackTitle()));
+        const el46 = document.createElement('span');
+        ((el46.className = 'preset-manager-list-desc'),
+          (el46.textContent =
+            preset5?.desc || preset5?.template || promptPresetsText('presetDescFallback')),
+          el44.appendChild(el45),
+          el44.appendChild(el46),
+          element3.appendChild(el44));
         if (!isDraft2) {
-          const el47 = document['createElement']('span');
-          ((el47['className'] = 'preset-manager-list-trigger-badge'),
-            (el47['textContent'] = getPromptPresetTriggerModeLabel(preset5)),
-            element3['appendChild'](el47));
+          const el47 = document.createElement('span');
+          ((el47.className = 'preset-manager-list-trigger-badge'),
+            (el47.textContent = getPromptPresetTriggerModeLabel(preset5)),
+            element3.appendChild(el47));
         }
-        (element3['addEventListener']('click', () => {
-          if (preset3['selectedKey'] === key5) return;
-          ((preset3['selectedKey'] = key5), run4());
+        (element3.addEventListener('click', () => {
+          if (preset3.selectedKey === key5) return;
+          ((preset3.selectedKey = key5), run4());
         }),
-          element3['addEventListener']('keydown', (event6) => {
-            if (event6['target'] !== element3) return;
-            if (event6['key'] !== 'Enter' && event6['key'] !== ' ') return;
-            (event6['preventDefault'](), (preset3['selectedKey'] = key5), run4());
+          element3.addEventListener('keydown', (event6) => {
+            if (event6.target !== element3) return;
+            if (event6.key !== 'Enter' && event6.key !== ' ') return;
+            (event6.preventDefault(), (preset3.selectedKey = key5), run4());
           }));
         const el48 = buildPresetModalButton('×', 'preset-manager-list-delete');
-        el48['setAttribute'](
+        el48.setAttribute(
           'aria-label',
           promptPresetsText('manager.deleteAria', {
-            title: preset5?.['title'] || getCustomPresetFallbackTitle(),
+            title: preset5?.title || getCustomPresetFallbackTitle(),
           }),
         );
-        if (preset3['deletingKeys']['has'](key5)) showPresetButtonPending(el48, '');
-        (el48['addEventListener']('click', async (event7) => {
-          (event7['preventDefault'](), event7['stopPropagation']());
-          if (preset3['deletingKeys']['has'](key5)) return;
+        if (preset3.deletingKeys.has(key5)) showPresetButtonPending(el48, '');
+        (el48.addEventListener('click', async (event7) => {
+          (event7.preventDefault(), event7.stopPropagation());
+          if (preset3.deletingKeys.has(key5)) return;
           if (isDraft2) {
-            (preset3['editors']['delete'](key5), (preset3['draftPreset'] = null));
-            preset3['selectedKey'] === key5 && (preset3['selectedKey'] = '');
+            (preset3.editors.delete(key5), (preset3.draftPreset = null));
+            preset3.selectedKey === key5 && (preset3.selectedKey = '');
             run4();
             return;
           }
-          (preset3['deletingKeys']['add'](key5),
-            preset3['rows']['delete'](key5),
+          (preset3.deletingKeys.add(key5),
+            preset3.rows.delete(key5),
             showPresetButtonPending(el48, ''));
           try {
             (await deletePromptPresetFromServer({
               nodeType: nodeType4,
-              title: String(preset5?.['title'] || ''),
+              title: String(preset5?.title || ''),
             }),
               await loadCustomPresets(),
-              preset3['editors']['delete'](key5),
+              preset3.editors.delete(key5),
               showPresetManagerToast(promptPresetsText('delete.deleted'), 'success'),
-              preset3['selectedKey'] === key5 && (preset3['selectedKey'] = ''));
+              preset3.selectedKey === key5 && (preset3.selectedKey = ''));
           } catch (error4) {
-            showPresetManagerToast(error4?.['message'] || promptPresetsText('delete.failed'), 'error');
+            showPresetManagerToast(error4?.message || promptPresetsText('delete.failed'), 'error');
           } finally {
-            (preset3['deletingKeys']['delete'](key5), run4());
+            (preset3.deletingKeys.delete(key5), run4());
           }
         }),
-          element3['appendChild'](el48),
-          preset3['rows']['set'](key5, {
+          element3.appendChild(el48),
+          preset3.rows.set(key5, {
             signature: signature,
             element: element3,
             updatePreset: (value87) => {
               preset5 = value87;
             },
           }),
-          list5['push'](element3));
+          list5.push(element3));
       });
       const map4 = new Set(list5);
-      for (const el49 of Array['from'](el42['childNodes'])) {
-        if (!map4['has'](el49)) el49['remove']();
+      for (const el49 of Array.from(el42.childNodes)) {
+        if (!map4.has(el49)) el49.remove();
       }
-      let value88 = el42['firstChild'];
+      let value88 = el42.firstChild;
       for (const value89 of list5) {
-        if (value89 !== value88) el42['insertBefore'](value89, value88);
-        value88 = value89['nextSibling'];
+        if (value89 !== value88) el42.insertBefore(value89, value88);
+        value88 = value89.nextSibling;
       }
-      const preset6 = list4['find']((event8) => event8['key'] === preset3['selectedKey']);
+      const preset6 = list4.find((event8) => event8.key === preset3.selectedKey);
       if (preset6) {
-        let presetEditor = preset3['editors']['get'](preset6['key']);
+        let presetEditor = preset3.editors.get(preset6.key);
         if (!presetEditor) {
-          let value90 = preset6['key'];
+          let value90 = preset6.key;
           ((presetEditor = createPresetEditor({
             nodeType: nodeType3,
-            preset: preset6['preset'],
-            isDraft: preset6['isDraft'],
+            preset: preset6.preset,
+            isDraft: preset6.isDraft,
             onSaved: ({ title: title3 } = {}) => {
-              preset6['isDraft'] &&
-                preset3['draftPreset'] === preset6['preset'] &&
-                (preset3['draftPreset'] = null);
-              const value91 = 'saved:' + String(title3 || '')['trim']();
-              (preset3['editors']['delete'](value90), preset3['editors']['set'](value91, presetEditor));
-              if (preset3['selectedKey'] === value90) preset3['selectedKey'] = value91;
+              preset6.isDraft &&
+                preset3.draftPreset === preset6.preset &&
+                (preset3.draftPreset = null);
+              const value91 = 'saved:' + String(title3 || '').trim();
+              (preset3.editors.delete(value90), preset3.editors.set(value91, presetEditor));
+              if (preset3.selectedKey === value90) preset3.selectedKey = value91;
               ((value90 = value91), run4());
             },
           })),
-            preset3['editors']['set'](preset6['key'], presetEditor));
+            preset3.editors.set(preset6.key, presetEditor));
         }
-        (presetEditor['updatePreset'](preset6['preset']),
+        (presetEditor.updatePreset(preset6.preset),
           value78 !== presetEditor &&
-            (value71['replaceChildren'](presetEditor['element']),
-            value72['replaceChildren'](presetEditor['triggerModeControl'], presetEditor['saveButton']),
+            (value71.replaceChildren(presetEditor.element),
+            value72.replaceChildren(presetEditor.triggerModeControl, presetEditor.saveButton),
             (value78 = presetEditor)));
       } else {
-        const el50 = document['createElement']('div');
-        ((el50['className'] = 'preset-manager-detail-empty'),
-          (el50['textContent'] = promptPresetsText('manager.emptyDetail')),
-          value71['replaceChildren'](el50),
-          value72['replaceChildren'](),
+        const el50 = document.createElement('div');
+        ((el50.className = 'preset-manager-detail-empty'),
+          (el50.textContent = promptPresetsText('manager.emptyDetail')),
+          value71.replaceChildren(el50),
+          value72.replaceChildren(),
           (value78 = null));
       }
-      el42['scrollTop'] = preset3['scrollTop'];
+      el42.scrollTop = preset3.scrollTop;
     },
     handler3 = (value92) => {
       if (!enabled4) return null;
-      const enabled6 = appStore['getStateRaw']()['nodes']?.[enabled4];
+      const enabled6 = appStore.getStateRaw().nodes?.[enabled4];
       if (!enabled6 || typeof enabled6 !== 'object') return null;
-      return String(enabled6['type'] || '') === value92 ? enabled6 : null;
+      return String(enabled6.type || '') === value92 ? enabled6 : null;
     },
     handler4 = async ({ nodeType: nodeType5, draftPreset: draftPreset2 }) => {
       const enabled7 = handler3(nodeType5);
@@ -1553,56 +1553,56 @@ export function openCustomPresetsManager({
       const presetDefaultCoverDataUrl = await resolvePresetDefaultCoverDataUrl(enabled7);
       if (!presetDefaultCoverDataUrl) return;
       const value93 = run5(nodeType5);
-      if (value93['draftPreset'] !== draftPreset2) return;
+      if (value93.draftPreset !== draftPreset2) return;
       if (
-        String(draftPreset2['thumbnailDataUrl'] || '')['trim']() ||
-        String(draftPreset2['thumbLocalPath'] || '')['trim']() ||
-        String(draftPreset2['thumbUrl'] || '')['trim']()
+        String(draftPreset2.thumbnailDataUrl || '').trim() ||
+        String(draftPreset2.thumbLocalPath || '').trim() ||
+        String(draftPreset2.thumbUrl || '').trim()
       )
         return;
-      ((draftPreset2['thumbnailDataUrl'] = presetDefaultCoverDataUrl),
-        (draftPreset2['thumbLocalPath'] = ''),
-        (draftPreset2['thumbUrl'] = ''),
+      ((draftPreset2.thumbnailDataUrl = presetDefaultCoverDataUrl),
+        (draftPreset2.thumbLocalPath = ''),
+        (draftPreset2.thumbUrl = ''),
         run4());
     };
   return (
-    el41['addEventListener']('click', () => {
+    el41.addEventListener('click', () => {
       const id2 = run5(nodeType3);
-      if (id2['draftPreset']) {
-        ((id2['selectedKey'] = key3(id2['draftPreset'])), run4());
+      if (id2.draftPreset) {
+        ((id2.selectedKey = key3(id2.draftPreset)), run4());
         return;
       }
-      id2['draftCounter'] += 1;
+      id2.draftCounter += 1;
       const nodeType6 = nodeType3;
-      ((id2['draftPreset'] = {
-        id: id2['draftCounter'],
+      ((id2.draftPreset = {
+        id: id2.draftCounter,
         title: getUniqueDraftTitle(getCustomPromptPresets(nodeType6)),
         desc: '',
         template: '',
         triggerMode: PROMPT_PRESET_TRIGGER_MODE_INSERT_PROMPT,
       }),
-        (id2['selectedKey'] = 'draft:' + id2['draftPreset']['id']),
+        (id2.selectedKey = 'draft:' + id2.draftPreset.id),
         run4(),
-        void handler4({ nodeType: nodeType6, draftPreset: id2['draftPreset'] }));
+        void handler4({ nodeType: nodeType6, draftPreset: id2.draftPreset }));
     }),
-    el31['appendChild'](el32),
-    el31['appendChild'](el37),
-    el31['appendChild'](el39),
-    el31['appendChild'](value72),
-    root['appendChild'](el31),
+    el31.appendChild(el32),
+    el31.appendChild(el37),
+    el31.appendChild(el39),
+    el31.appendChild(value72),
+    root.appendChild(el31),
     run4(),
-    root['addEventListener']('mousedown', (event9) => {
-      event9['target'] === root && onClose();
+    root.addEventListener('mousedown', (event9) => {
+      event9.target === root && onClose();
     }),
-    document['body']['appendChild'](root),
+    document.body.appendChild(root),
     (activePresetManagerOverlay = root),
     (closeActivePresetManager = onClose),
     (beginModalInteraction2 = beginModalInteraction({ root: root, onClose: onClose })),
     typeof MutationObserver === 'function' &&
       ((mutationObserver = new MutationObserver(() => {
-        if (!root['isConnected']) onClose();
+        if (!root.isConnected) onClose();
       })),
-      mutationObserver['observe'](document['body'], { childList: true })),
+      mutationObserver.observe(document.body, { childList: true })),
     root
   );
 }

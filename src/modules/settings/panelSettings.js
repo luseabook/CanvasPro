@@ -6,86 +6,86 @@ let releaseSettingsInteraction = null,
   settingsSearch = null;
 function getSettingsPanelElements() {
   return {
-    settingsOverlay: document['getElementById']('settingsOverlay'),
-    avatarMenu: document['getElementById']('avatarMenu'),
+    settingsOverlay: document.getElementById('settingsOverlay'),
+    avatarMenu: document.getElementById('avatarMenu'),
   };
 }
 function isSettingsPanelOpen(enabled) {
-  return !!enabled && enabled['style']['display'] === 'block';
+  return !!enabled && enabled.style.display === 'block';
 }
 const SETTINGS_FIELD_HIGHLIGHT_CLASS = 'is-settings-field-highlight',
   fieldHighlightTimers = new WeakMap();
 function getTimerHost() {
-  return globalThis['window'] || globalThis;
+  return globalThis.window || globalThis;
 }
 function scheduleTimer(handler, value = 0) {
   const timerHost = getTimerHost();
-  if (typeof timerHost?.['setTimeout'] === 'function') return timerHost['setTimeout'](handler, value);
+  if (typeof timerHost?.setTimeout === 'function') return timerHost.setTimeout(handler, value);
   return (handler(), null);
 }
 function clearScheduledTimer(item) {
   if (item == null) return;
   const timerHost2 = getTimerHost();
-  typeof timerHost2?.['clearTimeout'] === 'function' && timerHost2['clearTimeout'](item);
+  typeof timerHost2?.clearTimeout === 'function' && timerHost2.clearTimeout(item);
 }
 function dispatchWebPreviewSettingsSync(reason) {
-  const enabled2 = globalThis['window'];
-  if (!enabled2 || typeof enabled2['dispatchEvent'] !== 'function') return;
+  const enabled2 = globalThis.window;
+  if (!enabled2 || typeof enabled2.dispatchEvent !== 'function') return;
   const detail = { reason: reason },
     key =
-      typeof globalThis['CustomEvent'] === 'function'
-        ? new globalThis['CustomEvent']('web-preview:force-sync', {
+      typeof globalThis.CustomEvent === 'function'
+        ? new globalThis.CustomEvent('web-preview:force-sync', {
             detail: detail,
           })
         : { type: 'web-preview:force-sync', detail: detail };
-  enabled2['dispatchEvent'](key);
+  enabled2.dispatchEvent(key);
 }
 export function activateSettingsPane(index = 'api-input') {
-  const enabled3 = String(index || '')['trim']();
+  const enabled3 = String(index || '').trim();
   if (!enabled3) return false;
   let result = false;
   return (
-    document['querySelectorAll']?.('.settings-nav-item')?.['forEach']((data) => {
-      const options = data['dataset']?.['pane'] === enabled3;
-      data['classList']['toggle']('active', options);
-      if (options) data['setAttribute']?.('aria-current', 'page');
-      else data['removeAttribute']?.('aria-current');
+    document.querySelectorAll?.('.settings-nav-item')?.forEach((data) => {
+      const options = data.dataset?.pane === enabled3;
+      data.classList.toggle('active', options);
+      if (options) data.setAttribute?.('aria-current', 'page');
+      else data.removeAttribute?.('aria-current');
       result = result || options;
     }),
-    document['querySelectorAll']?.('.settings-pane')?.['forEach']((target) => {
-      target['classList']['toggle']('active', target['id'] === 'pane-' + enabled3);
+    document.querySelectorAll?.('.settings-pane')?.forEach((target) => {
+      target.classList.toggle('active', target.id === 'pane-' + enabled3);
     }),
     result
   );
 }
 export function highlightSettingsField(enabled4, { duration: duration = 4200 } = {}) {
-  if (!enabled4?.['classList']) return false;
-  document['querySelectorAll']?.('.' + SETTINGS_FIELD_HIGHLIGHT_CLASS)?.['forEach']((source) => {
-    if (source !== enabled4) source['classList']['remove'](SETTINGS_FIELD_HIGHLIGHT_CLASS);
+  if (!enabled4?.classList) return false;
+  document.querySelectorAll?.('.' + SETTINGS_FIELD_HIGHLIGHT_CLASS)?.forEach((source) => {
+    if (source !== enabled4) source.classList.remove(SETTINGS_FIELD_HIGHLIGHT_CLASS);
   });
-  const next = fieldHighlightTimers['get'](enabled4);
-  (clearScheduledTimer(next), enabled4['classList']['remove'](SETTINGS_FIELD_HIGHLIGHT_CLASS));
-  typeof enabled4['getBoundingClientRect'] === 'function' && enabled4['getBoundingClientRect']();
-  enabled4['classList']['add'](SETTINGS_FIELD_HIGHLIGHT_CLASS);
+  const next = fieldHighlightTimers.get(enabled4);
+  (clearScheduledTimer(next), enabled4.classList.remove(SETTINGS_FIELD_HIGHLIGHT_CLASS));
+  typeof enabled4.getBoundingClientRect === 'function' && enabled4.getBoundingClientRect();
+  enabled4.classList.add(SETTINGS_FIELD_HIGHLIGHT_CLASS);
   const scheduleTimer2 = scheduleTimer(() => {
-    (enabled4['classList']['remove'](SETTINGS_FIELD_HIGHLIGHT_CLASS),
-      fieldHighlightTimers['delete'](enabled4));
+    (enabled4.classList.remove(SETTINGS_FIELD_HIGHLIGHT_CLASS),
+      fieldHighlightTimers.delete(enabled4));
   }, duration);
-  if (scheduleTimer2 != null) fieldHighlightTimers['set'](enabled4, scheduleTimer2);
+  if (scheduleTimer2 != null) fieldHighlightTimers.set(enabled4, scheduleTimer2);
   return true;
 }
 export function focusSettingsField(current, entry = {}) {
-  const enabled5 = (Array['isArray'](current) ? current : [current])
-    ['map']((record) => String(record || '')['trim']())
-    ['filter'](Boolean);
-  if (!enabled5['length']) return false;
-  const enabled6 = enabled5['map']((payload) => document['getElementById'](payload))['find'](Boolean);
+  const enabled5 = (Array.isArray(current) ? current : [current])
+    .map((record) => String(record || '').trim())
+    .filter(Boolean);
+  if (!enabled5.length) return false;
+  const enabled6 = enabled5.map((payload) => document.getElementById(payload)).find(Boolean);
   if (!enabled6) return false;
   (revealModelServiceSettingsField(enabled6),
-    enabled6['scrollIntoView']?.({ block: 'center', behavior: 'smooth' }),
-    enabled6['focus']?.());
-  if (entry['select'] !== false) enabled6['select']?.();
-  if (entry['highlight'] !== false) highlightSettingsField(enabled6, entry);
+    enabled6.scrollIntoView?.({ block: 'center', behavior: 'smooth' }),
+    enabled6.focus?.());
+  if (entry.select !== false) enabled6.select?.();
+  if (entry.highlight !== false) highlightSettingsField(enabled6, entry);
   return true;
 }
 export function openSettingsPanelToField({
@@ -97,7 +97,7 @@ export function openSettingsPanelToField({
   const openSettingsPanel2 = openSettingsPanel();
   if (!openSettingsPanel2) return false;
   return (
-    settingsSearch?.['clear'](),
+    settingsSearch?.clear(),
     activateSettingsPane(paneName),
     scheduleTimer(() => {
       focusSettingsField(fieldIds, { select: select, highlight: highlight });
@@ -108,19 +108,19 @@ export function openSettingsPanelToField({
 export function openSettingsPanel() {
   const { settingsOverlay: settingsOverlay, avatarMenu: avatarMenu } = getSettingsPanelElements();
   if (!settingsOverlay) return false;
-  ((settingsOverlay['style']['display'] = 'block'), avatarMenu?.['classList']['remove']('open'));
+  ((settingsOverlay.style.display = 'block'), avatarMenu?.classList.remove('open'));
   if (!releaseSettingsInteraction) {
-    const root = settingsOverlay['querySelector']?.('.settings-modal') || settingsOverlay,
+    const root = settingsOverlay.querySelector?.('.settings-modal') || settingsOverlay,
       focusNavigation = createFocusNavigation();
-    focusNavigation['addRoot'](root);
+    focusNavigation.addRoot(root);
     const run = beginModalInteraction({
       root: root,
       onClose: closeSettingsPanel,
-      returnFocus: document['getElementById']('userAvatar'),
+      returnFocus: document.getElementById('userAvatar'),
       preferredSelector: '.settings-nav-item.active',
     });
     releaseSettingsInteraction = () => {
-      (focusNavigation['destroy'](), run());
+      (focusNavigation.destroy(), run());
     };
   }
   return (dispatchWebPreviewSettingsSync('settings-open'), true);
@@ -128,17 +128,17 @@ export function openSettingsPanel() {
 export function closeSettingsPanel() {
   const { settingsOverlay: settingsOverlay2 } = getSettingsPanelElements();
   if (!settingsOverlay2) return false;
-  (settingsSearch?.['clear']({ restore: true }),
-    (settingsOverlay2['style']['display'] = 'none'),
+  (settingsSearch?.clear({ restore: true }),
+    (settingsOverlay2.style.display = 'none'),
     releaseSettingsInteraction?.(),
     (releaseSettingsInteraction = null));
-  const handle = globalThis['window'];
-  if (handle && typeof handle['dispatchEvent'] === 'function') {
+  const handle = globalThis.window;
+  if (handle && typeof handle.dispatchEvent === 'function') {
     const state =
-      typeof globalThis['CustomEvent'] === 'function'
-        ? new globalThis['CustomEvent']('settings-panel-closed')
+      typeof globalThis.CustomEvent === 'function'
+        ? new globalThis.CustomEvent('settings-panel-closed')
         : { type: 'settings-panel-closed' };
-    handle['dispatchEvent'](state);
+    handle.dispatchEvent(state);
   }
   return (dispatchWebPreviewSettingsSync('settings-close'), true);
 }
@@ -148,14 +148,14 @@ export function toggleSettingsPanel() {
   return isSettingsPanelOpen(settingsOverlay3) ? closeSettingsPanel() : openSettingsPanel();
 }
 export function initSettingsPanelEvents() {
-  const enabled7 = document['getElementById']('btnOpenSettings'),
-    config = document['getElementById']('btnSettingsClose'),
-    root2 = document['getElementById']('settingsOverlay');
+  const enabled7 = document.getElementById('btnOpenSettings'),
+    config = document.getElementById('btnSettingsClose'),
+    root2 = document.getElementById('settingsOverlay');
   if (!enabled7 || !root2) return;
-  (enabled7['addEventListener']('click', (scope) => {
-    (scope['stopPropagation'](), openSettingsPanel());
+  (enabled7.addEventListener('click', (scope) => {
+    (scope.stopPropagation(), openSettingsPanel());
   }),
-    config?.['addEventListener']('click', () => {
+    config?.addEventListener('click', () => {
       closeSettingsPanel();
     }));
   let enabled8 = false,
@@ -163,29 +163,29 @@ export function initSettingsPanelEvents() {
   const run2 = () => {
     ((enabled8 = false), (enabled9 = false));
   };
-  (root2['addEventListener']('pointerdown', (input) => {
-    ((enabled8 = input['target'] === root2), (enabled9 = false));
+  (root2.addEventListener('pointerdown', (input) => {
+    ((enabled8 = input.target === root2), (enabled9 = false));
   }),
-    root2['addEventListener']('pointerup', (output) => {
-      enabled9 = enabled8 && output['target'] === root2;
+    root2.addEventListener('pointerup', (output) => {
+      enabled9 = enabled8 && output.target === root2;
     }),
-    root2['addEventListener']('pointercancel', run2),
-    root2['addEventListener']('click', (value2) => {
-      const value3 = value2['target'] === root2 && enabled8 && enabled9;
+    root2.addEventListener('pointercancel', run2),
+    root2.addEventListener('click', (value2) => {
+      const value3 = value2.target === root2 && enabled8 && enabled9;
       (run2(), value3 && closeSettingsPanel());
     }));
-  const value4 = document['querySelectorAll']('.settings-nav-item');
-  (settingsSearch?.['destroy'](),
+  const value4 = document.querySelectorAll('.settings-nav-item');
+  (settingsSearch?.destroy(),
     (settingsSearch = initSettingsSearch({
       root: root2,
       activatePane: activateSettingsPane,
     })),
     activateSettingsPane(
-      document['querySelector']?.('.settings-nav-item.active')?.['dataset']['pane'] || 'general',
+      document.querySelector?.('.settings-nav-item.active')?.dataset.pane || 'general',
     ),
-    value4['forEach']((value5) => {
-      value5['addEventListener']('click', () => {
-        (settingsSearch?.['clear'](), activateSettingsPane(value5['dataset']['pane']));
+    value4.forEach((value5) => {
+      value5.addEventListener('click', () => {
+        (settingsSearch?.clear(), activateSettingsPane(value5.dataset.pane));
       });
     }));
 }

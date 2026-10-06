@@ -84,7 +84,7 @@ test('every icon the panel requests resolves in the repository catalogue', () =>
 });
 
 test('every element id the renderer looks up exists in the panel document', () => {
-  const lookedUp = uniqueMatches(renderer, /getElementById'\]\('([^']+)'\)/g).sort();
+  const lookedUp = uniqueMatches(renderer, /getElementById\('([^']+)'\)/g).sort();
   assert.ok(lookedUp.length >= 12, 'the renderer reads the panel through getElementById');
 
   const declared = uniqueMatches(html, /id="([^"]+)"/g);

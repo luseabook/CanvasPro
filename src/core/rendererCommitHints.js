@@ -1,12 +1,12 @@
 const DEFAULT_HINT_TTL_MS = 1000;
 let nodeDragCommitHintUntil = 0;
 function nowMs() {
-  if (typeof performance !== 'undefined' && typeof performance['now'] === 'function')
-    return performance['now']();
-  return Date['now']();
+  if (typeof performance !== 'undefined' && typeof performance.now === 'function')
+    return performance.now();
+  return Date.now();
 }
 export function markRendererNodeDragCommitHint(value = DEFAULT_HINT_TTL_MS) {
-  const item = Math['max'](0, Number(value) || 0);
+  const item = Math.max(0, Number(value) || 0);
   nodeDragCommitHintUntil = nowMs() + item;
 }
 export function consumeRendererNodeDragCommitHint() {

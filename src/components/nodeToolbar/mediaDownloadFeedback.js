@@ -1,5 +1,5 @@
 import { t } from '../../i18n/index.js';
-const SUCCESS_MESSAGE_KEYS = Object['freeze']({
+const SUCCESS_MESSAGE_KEYS = Object.freeze({
   image: 'nodeToolbar.common.imageSaved',
   video: 'nodeToolbar.common.videoSaved',
   audio: 'nodeToolbar.common.audioSaved',
@@ -7,22 +7,22 @@ const SUCCESS_MESSAGE_KEYS = Object['freeze']({
 function basenameFromPath(value) {
   return (
     String(value || '')
-      ['trim']()
-      ['split'](/[\\/]/)
-      ['filter'](Boolean)
-      ['pop']() || ''
+      .trim()
+      .split(/[\\/]/)
+      .filter(Boolean)
+      .pop() || ''
   );
 }
 export function showMediaSaveSuccessToast({
   result: result,
   kind: kind,
-  showToast: showToast = globalThis['window']?.['showToast'],
+  showToast: showToast = globalThis.window?.showToast,
 } = {}) {
-  const enabled = SUCCESS_MESSAGE_KEYS[String(kind || '')['toLowerCase']()],
-    enabled2 = String(result?.['path'] || '')['trim']();
-  if (result?.['success'] !== true || !enabled2 || !enabled) return false;
+  const enabled = SUCCESS_MESSAGE_KEYS[String(kind || '').toLowerCase()],
+    enabled2 = String(result?.path || '').trim();
+  if (result?.success !== true || !enabled2 || !enabled) return false;
   if (typeof showToast !== 'function') return false;
-  const filename = String(result?.['filename'] || '')['trim']() || basenameFromPath(enabled2);
+  const filename = String(result?.filename || '').trim() || basenameFromPath(enabled2);
   if (!filename) return false;
   return (showToast(t(enabled, { filename: filename }), 'success'), true);
 }

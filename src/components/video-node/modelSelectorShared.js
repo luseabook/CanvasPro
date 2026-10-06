@@ -43,34 +43,34 @@ export function buildVideoModelMenuHTML({
 } = {}) {
   const allowedModelIds2 = [
       ...new Set(
-        (Array['isArray'](allowedModelIds) ? allowedModelIds : [])
-          ['map']((value) => String(value || '')['trim']())
-          ['filter'](Boolean),
+        (Array.isArray(allowedModelIds) ? allowedModelIds : [])
+          .map((value) => String(value || '').trim())
+          .filter(Boolean),
       ),
     ],
-    activeModel2 = allowedModelIds2['includes'](String(activeModel || '')['trim']())
-      ? String(activeModel || '')['trim']()
+    activeModel2 = allowedModelIds2.includes(String(activeModel || '').trim())
+      ? String(activeModel || '').trim()
       : allowedModelIds2[0] ||
-        String(activeModel || '')['trim']() ||
+        String(activeModel || '').trim() ||
         getDefaultRunningHubVideoWorkflowModelId(),
     itemsHtml = buildBinghuoVideoMenuItemsHtml(activeModel2);
-  if (allowedModelIds2['length']) {
-    const list = allowedModelIds2['map']((item) => getModelManifest(item))['filter'](
-        (key) => key?.['kind'] === 'video',
+  if (allowedModelIds2.length) {
+    const list = allowedModelIds2.map((item) => getModelManifest(item)).filter(
+        (key) => key?.kind === 'video',
       ),
-      label = list['every'](
-        (index) => index['provider'] === 'runninghubwf' && index['adapterType'] === 'workflow',
+      label = list.every(
+        (index) => index.provider === 'runninghubwf' && index.adapterType === 'workflow',
       ),
-      result = list['every'](
+      result = list.every(
         (enabled) =>
-          (['dreamina', 'volcengine', 'apimart']['includes'](enabled?.['provider']) &&
-            !!enabled?.['extensions']?.['dreaminaStyleVideo']) ||
-          (enabled?.['provider'] === 'runninghub' &&
-            enabled?.['adapterType'] === 'modelApi' &&
-            enabled?.['extensions']?.['videoMenu']?.['role'] === 'runninghubModel'),
+          (['dreamina', 'volcengine', 'apimart'].includes(enabled?.provider) &&
+            !!enabled?.extensions?.dreaminaStyleVideo) ||
+          (enabled?.provider === 'runninghub' &&
+            enabled?.adapterType === 'modelApi' &&
+            enabled?.extensions?.videoMenu?.role === 'runninghubModel'),
       );
     if (result) {
-      const map = new Set(list['map']((data) => data['provider'])),
+      const map = new Set(list.map((data) => data.provider)),
         itemsHtml2 = buildApimartVideoMenuItemsHtml(activeModel2, provider, {
           allowedModelIds: allowedModelIds2,
         }),
@@ -82,14 +82,14 @@ export function buildVideoModelMenuHTML({
         kind: 'video',
         activeModel: activeModel2,
         items: [
-          ...(map['has']('dreamina')
-            ? buildDreaminaOfficialVideoMenuItems()['map']((args) => ({
+          ...(map.has('dreamina')
+            ? buildDreaminaOfficialVideoMenuItems().map((args) => ({
                 ...args,
                 active:
-                  active?.['provider'] === 'dreamina' && !!active?.['extensions']?.['dreaminaStyleVideo'],
+                  active?.provider === 'dreamina' && !!active?.extensions?.dreaminaStyleVideo,
               }))
             : []),
-          ...(map['has']('volcengine') ? buildVolcengineOfficialVideoMenuItems(activeModel2, provider) : []),
+          ...(map.has('volcengine') ? buildVolcengineOfficialVideoMenuItems(activeModel2, provider) : []),
         ],
         groups: [
           ...(itemsHtml2
@@ -121,14 +121,14 @@ export function buildVideoModelMenuHTML({
         ],
       });
     }
-    const items = list['map']((modelId) => ({
-      modelId: modelId['modelId'],
-      provider: modelId['provider'] || 'runninghubwf',
-      label: modelId['displayName'] || modelId['modelId'],
-      description: modelId['description'] || '',
-      icon: modelId['icon'] || (label ? 'images/RH.png' : ''),
-      iconAlt: modelId['provider'] || 'video',
-      vip: modelId['vip'] === true,
+    const items = list.map((modelId) => ({
+      modelId: modelId.modelId,
+      provider: modelId.provider || 'runninghubwf',
+      label: modelId.displayName || modelId.modelId,
+      description: modelId.description || '',
+      icon: modelId.icon || (label ? 'images/RH.png' : ''),
+      iconAlt: modelId.provider || 'video',
+      vip: modelId.vip === true,
     }));
     return renderNodeModelMenu({
       kind: 'video',
@@ -165,13 +165,13 @@ export function buildVideoModelMenuHTML({
         subtitle: '视频生成模型',
         icon: 'images/grsai.png',
         items: getModelsByKind('video')
-          ['filter']((target) => target['provider'] === 'grsai')
-          ['map']((modelId2) => ({
-            modelId: modelId2['modelId'],
-            provider: modelId2['provider'],
-            label: modelId2['displayName'],
-            description: modelId2['description'],
-            icon: modelId2['icon'],
+          .filter((target) => target.provider === 'grsai')
+          .map((modelId2) => ({
+            modelId: modelId2.modelId,
+            provider: modelId2.provider,
+            label: modelId2.displayName,
+            description: modelId2.description,
+            icon: modelId2.icon,
           })),
       },
       {
@@ -180,13 +180,13 @@ export function buildVideoModelMenuHTML({
         subtitle: '官方视频生成',
         icon: 'images/qwen.svg',
         items: getModelsByKind('video')
-          ['filter']((source) => source['provider'] === 'bailian')
-          ['map']((modelId3) => ({
-            modelId: modelId3['modelId'],
-            provider: modelId3['provider'],
-            label: modelId3['displayName'],
-            description: modelId3['description'],
-            icon: modelId3['icon'],
+          .filter((source) => source.provider === 'bailian')
+          .map((modelId3) => ({
+            modelId: modelId3.modelId,
+            provider: modelId3.provider,
+            label: modelId3.displayName,
+            description: modelId3.description,
+            icon: modelId3.icon,
           })),
       },
       {
@@ -276,27 +276,27 @@ export function bindLazyVideoModelMenu({
   getActiveModel: getActiveModel,
   renderMenuHtml: renderMenuHtml,
   onPrepared: onPrepared,
-  documentObject: documentObject = globalThis['document'],
+  documentObject: documentObject = globalThis.document,
 } = {}) {
   let bindNodeSubmenus2 = null;
   const run = () => {
       if (!menu || typeof renderMenuHtml !== 'function') return null;
-      const next = String(getActiveModel?.() || '')['trim']();
+      const next = String(getActiveModel?.() || '').trim();
       if (
-        menu['dataset']['lazyMounted'] === '1' &&
-        menu['dataset']['lazyModelId'] === next &&
-        menu['childElementCount'] > 0
+        menu.dataset.lazyMounted === '1' &&
+        menu.dataset.lazyModelId === next &&
+        menu.childElementCount > 0
       )
         return menu;
-      const el = documentObject?.['createElement']?.('template');
+      const el = documentObject?.createElement?.('template');
       if (!el) return null;
-      el['innerHTML'] = String(renderMenuHtml(next) || '')['trim']();
-      const el2 = el['content']['firstElementChild'];
+      el.innerHTML = String(renderMenuHtml(next) || '').trim();
+      const el2 = el.content.firstElementChild;
       return (
-        (menu['innerHTML'] = el2?.['innerHTML'] || ''),
-        (menu['dataset']['lazyMounted'] = '1'),
-        (menu['dataset']['lazyModelId'] = next),
-        (menu['dataset']['nodeMenuKind'] = el2?.['dataset']?.['nodeMenuKind'] || 'video'),
+        (menu.innerHTML = el2?.innerHTML || ''),
+        (menu.dataset.lazyMounted = '1'),
+        (menu.dataset.lazyModelId = next),
+        (menu.dataset.nodeMenuKind = el2?.dataset?.nodeMenuKind || 'video'),
         bindNodeSubmenus2?.(),
         (bindNodeSubmenus2 = bindNodeSubmenus(menu)),
         menu
@@ -311,9 +311,9 @@ export function bindLazyVideoModelMenu({
       },
     });
   return {
-    prepareNow: prepareNow['prepareNow'],
+    prepareNow: prepareNow.prepareNow,
     destroy() {
-      (prepareNow['destroy'](), bindNodeSubmenus2?.(), (bindNodeSubmenus2 = null));
+      (prepareNow.destroy(), bindNodeSubmenus2?.(), (bindNodeSubmenus2 = null));
     },
   };
 }
@@ -324,7 +324,7 @@ export function renderVideoModelTriggerIconHTML({
   resolveExecution: resolveExecution = (entry, providerHint) =>
     resolveModelExecution(entry, { providerHint: providerHint }) || resolveModelExecution(entry) || null,
   resolveProviderId: resolveProviderId = (record, payload, handle) =>
-    normalizeProviderId(handle?.['modelManifest']?.['provider']) ||
+    normalizeProviderId(handle?.modelManifest?.provider) ||
     resolveModelProvider(record, payload, { allowPrefixInference: false }) ||
     '',
 } = {}) {
@@ -334,16 +334,16 @@ export function renderVideoModelTriggerIconHTML({
   if (providerId === 'apimart') return buildApimartVideoLogoHTML(12);
   if (providerId === 'binghuo') return buildBinghuoVideoLogoHTML(12);
   if (providerId === 'volcengine') return buildVolcengineVideoLogoHTML(12);
-  if (providerId === 'dreamina' || execution?.['modelManifest']?.['extensions']?.['dreaminaStyleVideo'])
+  if (providerId === 'dreamina' || execution?.modelManifest?.extensions?.dreaminaStyleVideo)
     return buildDreaminaVideoLogoHTML(12);
   if (providerId === 'comfyui')
     return getComfyUiVideoWorkflowIconHtml(
-      execution?.['modelManifest']?.['extensions']?.['videoMenu'] || {},
+      execution?.modelManifest?.extensions?.videoMenu || {},
       12,
     );
-  if (providerId && /^custom_[a-z0-9_-]+$/i['test'](providerId))
-    return buildCustomProviderVideoLogoHTML(execution?.['modelManifest'] || {}, 12);
-  const state = providerId ? providersMeta?.[providerId]?.['logoPath'] : null;
+  if (providerId && /^custom_[a-z0-9_-]+$/i.test(providerId))
+    return buildCustomProviderVideoLogoHTML(execution?.modelManifest || {}, 12);
+  const state = providerId ? providersMeta?.[providerId]?.logoPath : null;
   if (state)
     return (
       '<img src="' +

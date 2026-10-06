@@ -5,7 +5,7 @@ export function requestCanvasMcp(value, signal) {
     provider: 'local',
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON['stringify'](value),
+    body: JSON.stringify(value),
     signal: signal,
     timeout: 25000,
     retries: 0,

@@ -3,27 +3,27 @@ function getErrorText(error) {
   if (typeof error === 'string') return error;
   if (!error || typeof error !== 'object') return '';
   return String(
-    error['message'] ||
-      error['error']?.['message'] ||
-      error['error'] ||
-      error['errorMessage'] ||
-      error['error_message'] ||
-      error['reason'] ||
-      error['msg'] ||
+    error.message ||
+      error.error?.message ||
+      error.error ||
+      error.errorMessage ||
+      error.error_message ||
+      error.reason ||
+      error.msg ||
       '',
   );
 }
 function isAudioGenerationResourceDenied(value) {
   return (
-    /resource[_\s-]*id\s*=\s*volc\.service_type\.10074/i['test'](value) &&
-    /requested\s+resource\s+not\s+granted/i['test'](value)
+    /resource[_\s-]*id\s*=\s*volc\.service_type\.10074/i.test(value) &&
+    /requested\s+resource\s+not\s+granted/i.test(value)
   );
 }
 export function parseError(raw, status = 0) {
-  const errorText = getErrorText(raw)['trim']();
+  const errorText = getErrorText(raw).trim();
   if (isAudioGenerationResourceDenied(errorText))
     return new ApiError({
-      type: ErrorType['FORBIDDEN'],
+      type: ErrorType.FORBIDDEN,
       provider: 'volcengine-speech',
       status: status,
       raw: raw,

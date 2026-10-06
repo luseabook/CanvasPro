@@ -2,10 +2,10 @@ import { normalizeStoryWorkspaceAssetData } from './storyAssetAppearances.js';
 import { createStoryProjectUiState } from './storyProjectSession.js';
 import { isStoryProjectTaskTokenCurrent, isStoryProjectTaskTokenLive } from './storyProjectTaskToken.js';
 import { createStoryWorkspaceSnapshot } from './storyWorkspacePersistence.js';
-const normalizeText = (value) => String(value ?? '')['trim'](),
-  cloneData = (item) => JSON['parse'](JSON['stringify'](item)),
-  getProjectId = (key) => normalizeText(key?.['project']?.['id']),
-  getEntryId = (index) => normalizeText(index?.['id'] || index?.['data']?.['project']?.['id']);
+const normalizeText = (value) => String(value ?? '').trim(),
+  cloneData = (item) => JSON.parse(JSON.stringify(item)),
+  getProjectId = (key) => normalizeText(key?.project?.id),
+  getEntryId = (index) => normalizeText(index?.id || index?.data?.project?.id);
 export function createStoryProjectDataOwner({ state: state } = {}) {
   if (!state || typeof state !== 'object')
     throw new TypeError('Story project data requires workspace state.');
@@ -13,66 +13,66 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
   function run(result) {
     const projectId = getProjectId(result);
     if (!projectId) return false;
-    return (map['set'](projectId, result), true);
+    return (map.set(projectId, result), true);
   }
   function getEntry(data) {
     const text = normalizeText(data);
-    return (state['projects'] || [])['find']((options) => getEntryId(options) === text) || null;
+    return (state.projects || []).find((options) => getEntryId(options) === text) || null;
   }
   function getData(target) {
     const text2 = normalizeText(target);
     if (!text2) return null;
-    if (text2 === getProjectId(state['data'])) return state['data'];
-    if (map['has'](text2)) return map['get'](text2);
+    if (text2 === getProjectId(state.data)) return state.data;
+    if (map.has(text2)) return map.get(text2);
     const enabled = getEntry(text2);
-    if (!enabled?.['data']?.['project']) return null;
-    const storyWorkspaceAssetData = normalizeStoryWorkspaceAssetData(cloneData(enabled['data']));
+    if (!enabled?.data?.project) return null;
+    const storyWorkspaceAssetData = normalizeStoryWorkspaceAssetData(cloneData(enabled.data));
     return (run(storyWorkspaceAssetData), storyWorkspaceAssetData);
   }
   function run2(
     title,
-    { isCurrent: isCurrent = title === state['data'], projectTitleEdited: projectTitleEdited = false } = {},
+    { isCurrent: isCurrent = title === state.data, projectTitleEdited: projectTitleEdited = false } = {},
   ) {
     const id = getProjectId(title);
     if (!id) return false;
     run(title);
-    const list = (state['projects'] ||= []),
-      count = list['findIndex']((source) => getEntryId(source) === id),
+    const list = (state.projects ||= []),
+      count = list.findIndex((source) => getEntryId(source) === id),
       args = count >= 0 ? list[count] : {},
       next = {
         ...args,
         id: id,
-        title: title['project']['title'],
-        createdAt: Number(args['createdAt'] || 0) || Date['now'](),
-        updatedAt: Date['now'](),
+        title: title.project.title,
+        createdAt: Number(args.createdAt || 0) || Date.now(),
+        updatedAt: Date.now(),
         projectTitleEdited: isCurrent
-          ? state['projectTitleEdited'] === true
-          : projectTitleEdited === true || args['projectTitleEdited'] === true,
+          ? state.projectTitleEdited === true
+          : projectTitleEdited === true || args.projectTitleEdited === true,
         ui:
-          isCurrent && state['view'] !== 'home'
+          isCurrent && state.view !== 'home'
             ? createStoryProjectUiState(state)
-            : cloneData(args['ui'] || (isCurrent ? createStoryProjectUiState(state) : {})),
+            : cloneData(args.ui || (isCurrent ? createStoryProjectUiState(state) : {})),
         data: cloneData(title),
       };
     if (count >= 0) list[count] = next;
-    else list['unshift'](next);
+    else list.unshift(next);
     return true;
   }
   function syncCurrentEntry() {
-    return state['hasCreatedProject'] === true && run2(state['data']);
+    return state.hasCreatedProject === true && run2(state.data);
   }
   function registerTaskData(current) {
-    return isStoryProjectTaskTokenLive(state, current) && run(current['data']);
+    return isStoryProjectTaskTokenLive(state, current) && run(current.data);
   }
   function syncTaskEntry(projectTitleEdited2) {
     if (!isStoryProjectTaskTokenLive(state, projectTitleEdited2)) return false;
-    return run2(projectTitleEdited2['data'], {
+    return run2(projectTitleEdited2.data, {
       isCurrent: isStoryProjectTaskTokenCurrent(state, projectTitleEdited2),
-      projectTitleEdited: projectTitleEdited2['projectTitleEdited'],
+      projectTitleEdited: projectTitleEdited2.projectTitleEdited,
     });
   }
   function replaceCurrent(entry) {
-    return ((state['data'] = entry), run(entry), entry);
+    return ((state.data = entry), run(entry), entry);
   }
   function activate(record, { beforeActivate: beforeActivate = () => {} } = {}) {
     if (!getEntry(record)) return null;
@@ -83,68 +83,68 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
   }
   function addEntry(args2) {
     const id2 = getEntryId(args2);
-    if (!id2 || !args2?.['data']?.['project']) return false;
-    const payload = (state['projects'] ||= []);
+    if (!id2 || !args2?.data?.project) return false;
+    const payload = (state.projects ||= []);
     if (getEntry(id2)) return false;
     return (
-      run(args2['data']),
-      payload['unshift']({ ...args2, id: id2, data: cloneData(args2['data']) }),
+      run(args2.data),
+      payload.unshift({ ...args2, id: id2, data: cloneData(args2.data) }),
       true
     );
   }
   function removeEntry(handle) {
     const text3 = normalizeText(handle),
-      list2 = state['projects'] || [];
+      list2 = state.projects || [];
     return (
-      (state['projects'] = list2['filter']((config) => getEntryId(config) !== text3)),
-      map['delete'](text3),
-      state['projects']['length'] !== list2['length']
+      (state.projects = list2.filter((config) => getEntryId(config) !== text3)),
+      map.delete(text3),
+      state.projects.length !== list2.length
     );
   }
   function restoreEntries(scope, { preserveLive: preserveLive = false } = {}) {
-    if (!preserveLive) map['clear']();
-    state['projects'] = (scope || [])['map']((args3) => {
+    if (!preserveLive) map.clear();
+    state.projects = (scope || []).map((args3) => {
       const entryId = getEntryId(args3),
         input = preserveLive
-          ? state['hasCreatedProject'] && entryId === getProjectId(state['data'])
-            ? state['data']
-            : map['get'](entryId)
+          ? state.hasCreatedProject && entryId === getProjectId(state.data)
+            ? state.data
+            : map.get(entryId)
           : null,
-        data2 = input || args3['data'];
+        data2 = input || args3.data;
       return (run(data2), { ...args3, data: data2 ? cloneData(data2) : data2 });
     });
   }
   function getAllData() {
     const args4 = new Set([
-      getProjectId(state['data']),
-      ...map['keys'](),
-      ...(state['projects'] || [])['map'](getEntryId),
+      getProjectId(state.data),
+      ...map.keys(),
+      ...(state.projects || []).map(getEntryId),
     ]);
-    return [...args4]['map'](getData)['filter'](Boolean);
+    return [...args4].map(getData).filter(Boolean);
   }
   function applyChanges(handler) {
     let changed = false,
       currentProjectChanged = false;
     for (const output of getAllData()) {
-      const isCurrent2 = output === state['data'];
+      const isCurrent2 = output === state.data;
       if (!handler(output, { isCurrent: isCurrent2 })) continue;
-      if (!isCurrent2 || state['hasCreatedProject']) run2(output, { isCurrent: isCurrent2 });
+      if (!isCurrent2 || state.hasCreatedProject) run2(output, { isCurrent: isCurrent2 });
       ((changed = true), (currentProjectChanged ||= isCurrent2));
     }
     return { changed: changed, currentProjectChanged: currentProjectChanged };
   }
   return (
-    run(state['data']),
-    Object['freeze']({
+    run(state.data),
+    Object.freeze({
       activate: activate,
       addEntry: addEntry,
       applyChanges: applyChanges,
       createSnapshot() {
         syncCurrentEntry();
-        for (const value2 of state['projects'] || []) {
+        for (const value2 of state.projects || []) {
           const enabled3 = getData(getEntryId(value2));
-          if (!enabled3 || enabled3 === state['data']) continue;
-          ((value2['title'] = enabled3['project']['title']), (value2['data'] = cloneData(enabled3)));
+          if (!enabled3 || enabled3 === state.data) continue;
+          ((value2.title = enabled3.project.title), (value2.data = cloneData(enabled3)));
         }
         return createStoryWorkspaceSnapshot(state);
       },
@@ -152,7 +152,7 @@ export function createStoryProjectDataOwner({ state: state } = {}) {
       getData: getData,
       getEntry: getEntry,
       registerTaskData: registerTaskData,
-      releaseData: (value3) => map['delete'](normalizeText(value3)),
+      releaseData: (value3) => map.delete(normalizeText(value3)),
       removeEntry: removeEntry,
       replaceCurrent: replaceCurrent,
       restoreEntries: restoreEntries,

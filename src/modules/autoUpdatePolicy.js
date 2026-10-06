@@ -1,4 +1,4 @@
-export const AUTO_UPDATE_PRIMARY_ACTIONS = Object['freeze']({
+export const AUTO_UPDATE_PRIMARY_ACTIONS = Object.freeze({
   CLOSE: 'close',
   INSTALL_DESKTOP: 'install-desktop',
   RETRY_DESKTOP: 'retry-desktop',
@@ -10,29 +10,29 @@ export function resolveAutoUpdatePrimaryAction(
   enabled = {},
   { desktopUpdaterAvailable: desktopUpdaterAvailable = false } = {},
 ) {
-  if (enabled['previewOnly'] || !enabled['hasUpdate']) return AUTO_UPDATE_PRIMARY_ACTIONS['CLOSE'];
-  if (enabled['installDownloadedUpdate']) return AUTO_UPDATE_PRIMARY_ACTIONS['INSTALL_DESKTOP'];
-  if (enabled['retryDesktopDownload']) return AUTO_UPDATE_PRIMARY_ACTIONS['RETRY_DESKTOP'];
-  if (enabled['startDesktopDownload'] || desktopUpdaterAvailable)
-    return AUTO_UPDATE_PRIMARY_ACTIONS['DOWNLOAD_DESKTOP'];
-  if (enabled['canHotApply']) return AUTO_UPDATE_PRIMARY_ACTIONS['HOT_APPLY'];
-  return AUTO_UPDATE_PRIMARY_ACTIONS['UNAVAILABLE'];
+  if (enabled.previewOnly || !enabled.hasUpdate) return AUTO_UPDATE_PRIMARY_ACTIONS.CLOSE;
+  if (enabled.installDownloadedUpdate) return AUTO_UPDATE_PRIMARY_ACTIONS.INSTALL_DESKTOP;
+  if (enabled.retryDesktopDownload) return AUTO_UPDATE_PRIMARY_ACTIONS.RETRY_DESKTOP;
+  if (enabled.startDesktopDownload || desktopUpdaterAvailable)
+    return AUTO_UPDATE_PRIMARY_ACTIONS.DOWNLOAD_DESKTOP;
+  if (enabled.canHotApply) return AUTO_UPDATE_PRIMARY_ACTIONS.HOT_APPLY;
+  return AUTO_UPDATE_PRIMARY_ACTIONS.UNAVAILABLE;
 }
 export async function ensureDesktopUpdateAvailable(value) {
-  const item = await value['getUpdateState']();
+  const item = await value.getUpdateState();
   if (
-    item?.['state'] === 'available' ||
-    item?.['state'] === 'downloaded' ||
-    (item?.['state'] === 'error' && item?.['latestInfo'])
+    item?.state === 'available' ||
+    item?.state === 'downloaded' ||
+    (item?.state === 'error' && item?.latestInfo)
   )
     return item;
-  const response = await value['checkForUpdates']();
-  if (response?.['skipped'] || response?.['ok'] === false) throw new Error('desktop updater unavailable');
-  const key = await value['getUpdateState']();
+  const response = await value.checkForUpdates();
+  if (response?.skipped || response?.ok === false) throw new Error('desktop updater unavailable');
+  const key = await value.getUpdateState();
   if (
-    key?.['state'] !== 'available' &&
-    key?.['state'] !== 'downloaded' &&
-    !(key?.['state'] === 'error' && key?.['latestInfo'])
+    key?.state !== 'available' &&
+    key?.state !== 'downloaded' &&
+    !(key?.state === 'error' && key?.latestInfo)
   )
     throw new Error('desktop update not available');
   return key;

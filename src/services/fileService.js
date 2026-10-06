@@ -1400,7 +1400,7 @@ export function readJsonFile(value105) {
 
 export const CANVAS_VIDEO_IMPORT_MAX_BYTES = 300 * 1024 * 1024;
 
-export const CANVAS_VIDEO_IMPORT_MAX_MB = Math['round'](CANVAS_VIDEO_IMPORT_MAX_BYTES / 1024 / 1024);
+export const CANVAS_VIDEO_IMPORT_MAX_MB = Math.round(CANVAS_VIDEO_IMPORT_MAX_BYTES / 1024 / 1024);
 
 const ASSET_MEDIA_TASK_STATUS_RANK = new Map([
   ['waiting', 1],
@@ -1411,45 +1411,45 @@ const ASSET_MEDIA_TASK_STATUS_RANK = new Map([
 ]);
 
 function normalizeAssetUpdatedAt(value108) {
-  const enabled20 = String(value108 || '')['trim']();
+  const enabled20 = String(value108 || '').trim();
   if (!enabled20) return '';
-  const value109 = Date['parse'](enabled20);
-  return Number['isFinite'](value109) ? value109 : '';
+  const value109 = Date.parse(enabled20);
+  return Number.isFinite(value109) ? value109 : '';
 }
 
 function normalizeAssetRevision(value110) {
-  const count7 = Math['trunc'](Number(value110));
-  return Number['isFinite'](count7) && count7 > 0 ? count7 : 0;
+  const count7 = Math.trunc(Number(value110));
+  return Number.isFinite(count7) && count7 > 0 ? count7 : 0;
 }
 
 export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {}) {
-  const assetRevision = normalizeAssetRevision(value111?.['assetRevision']),
-    assetRevision2 = normalizeAssetRevision(options2?.['assetRevision']);
+  const assetRevision = normalizeAssetRevision(value111?.assetRevision),
+    assetRevision2 = normalizeAssetRevision(options2?.assetRevision);
   if (assetRevision > 0 && assetRevision2 > 0) return assetRevision > assetRevision2;
-  const assetUpdatedAt = normalizeAssetUpdatedAt(value111?.['assetUpdatedAt'] || value111?.['updatedAt']),
-    assetUpdatedAt2 = normalizeAssetUpdatedAt(options2?.['assetUpdatedAt']),
+  const assetUpdatedAt = normalizeAssetUpdatedAt(value111?.assetUpdatedAt || value111?.updatedAt),
+    assetUpdatedAt2 = normalizeAssetUpdatedAt(options2?.assetUpdatedAt),
     value112 = assetUpdatedAt !== '' && assetUpdatedAt2 !== '';
   if (value112 && assetUpdatedAt < assetUpdatedAt2) return false;
   const value113 = {
-    taskId: value111?.['mediaTaskId'] || '',
-    kind: value111?.['mediaTaskKind'] || '',
-    status: value111?.['mediaTaskStatus'] || '',
+    taskId: value111?.mediaTaskId || '',
+    kind: value111?.mediaTaskKind || '',
+    status: value111?.mediaTaskStatus || '',
   };
   if (shouldApplyMediaTaskEventToNode(options2, value113)) {
-    const enabled21 = String(value113['taskId'] || '')['trim'](),
-      enabled22 = String(options2?.['mediaTaskId'] || '')['trim']();
+    const enabled21 = String(value113.taskId || '').trim(),
+      enabled22 = String(options2?.mediaTaskId || '').trim();
     if (!enabled21 || !enabled22 || enabled21 === enabled22) {
       const value114 =
-          ASSET_MEDIA_TASK_STATUS_RANK['get'](
-            String(value113['status'] || '')
-              ['trim']()
-              ['toLowerCase'](),
+          ASSET_MEDIA_TASK_STATUS_RANK.get(
+            String(value113.status || '')
+              .trim()
+              .toLowerCase(),
           ) || 0,
         value115 =
-          ASSET_MEDIA_TASK_STATUS_RANK['get'](
-            String(options2?.['mediaTaskStatus'] || '')
-              ['trim']()
-              ['toLowerCase'](),
+          ASSET_MEDIA_TASK_STATUS_RANK.get(
+            String(options2?.mediaTaskStatus || '')
+              .trim()
+              .toLowerCase(),
           ) || 0;
       if (value114 < value115) return false;
     }
@@ -1459,79 +1459,79 @@ export function shouldApplyElectronAssetUpdateToNode(options2 = {}, value111 = {
 }
 
 function assignPositiveNumber(value116, value117, ...args8) {
-  const value118 = args8['map']((value119) => Number(value119))['find'](
-    (count8) => Number['isFinite'](count8) && count8 > 0,
+  const value118 = args8.map((value119) => Number(value119)).find(
+    (count8) => Number.isFinite(count8) && count8 > 0,
   );
   if (value118 !== undefined) value116[value117] = value118;
 }
 
 export function buildElectronAssetNodePatch(response3 = {}) {
-  const enabled23 = String(response3?.['assetId'] || '')['trim']();
+  const enabled23 = String(response3?.assetId || '').trim();
   if (!enabled23) return {};
   const value120 = {
       assetId: enabled23,
-      localPath: response3?.['localPath'] || response3?.['originalLocalPath'] || '',
-      originalLocalPath: response3?.['originalLocalPath'] || response3?.['localPath'] || '',
-      displayLocalPath: response3?.['displayLocalPath'] || '',
-      thumbLocalPath: response3?.['thumbLocalPath'] || response3?.['posterLocalPath'] || '',
-      posterLocalPath: response3?.['posterLocalPath'] || '',
-      waveformLocalPath: response3?.['waveformLocalPath'] || '',
-      derivativeStatus: response3?.['derivativeStatus'] || response3?.['status'] || '',
-      mediaTaskId: response3?.['mediaTaskId'] || '',
-      mediaTaskKind: response3?.['mediaTaskKind'] || '',
-      mediaTaskStatus: response3?.['mediaTaskStatus'] || '',
-      mediaTaskProgress: Number(response3?.['mediaTaskProgress'] || 0) || 0,
-      mediaTaskError: response3?.['mediaTaskError'] || '',
-      videoProxyStatus: response3?.['videoProxyStatus'] || '',
-      videoProxyVersion: response3?.['videoProxyVersion'] || '',
-      videoCodec: response3?.['videoCodec'] || '',
+      localPath: response3?.localPath || response3?.originalLocalPath || '',
+      originalLocalPath: response3?.originalLocalPath || response3?.localPath || '',
+      displayLocalPath: response3?.displayLocalPath || '',
+      thumbLocalPath: response3?.thumbLocalPath || response3?.posterLocalPath || '',
+      posterLocalPath: response3?.posterLocalPath || '',
+      waveformLocalPath: response3?.waveformLocalPath || '',
+      derivativeStatus: response3?.derivativeStatus || response3?.status || '',
+      mediaTaskId: response3?.mediaTaskId || '',
+      mediaTaskKind: response3?.mediaTaskKind || '',
+      mediaTaskStatus: response3?.mediaTaskStatus || '',
+      mediaTaskProgress: Number(response3?.mediaTaskProgress || 0) || 0,
+      mediaTaskError: response3?.mediaTaskError || '',
+      videoProxyStatus: response3?.videoProxyStatus || '',
+      videoProxyVersion: response3?.videoProxyVersion || '',
+      videoCodec: response3?.videoCodec || '',
     },
-    value121 = String(response3?.['assetUpdatedAt'] || response3?.['updatedAt'] || '')['trim'](),
-    assetRevision3 = normalizeAssetRevision(response3?.['assetRevision']);
-  if (assetRevision3 > 0) value120['assetRevision'] = assetRevision3;
-  if (value121) value120['assetUpdatedAt'] = value121;
-  (assignPositiveNumber(value120, 'videoWidth', response3?.['videoWidth'], response3?.['width']),
-    assignPositiveNumber(value120, 'videoHeight', response3?.['videoHeight'], response3?.['height']),
-    assignPositiveNumber(value120, 'videoDuration', response3?.['videoDuration']),
-    assignPositiveNumber(value120, 'videoFps', response3?.['videoFps']));
-  if (response3?.['kind'] === 'image')
-    ((value120['src'] = response3?.['displayUrl'] || response3?.['url'] || ''),
-      (value120['imageUrl'] = response3?.['displayUrl'] || response3?.['url'] || ''),
-      (value120['sourceUrl'] = response3?.['originalUrl'] || ''),
-      (value120['thumbUrl'] = response3?.['thumbUrl'] || ''));
+    value121 = String(response3?.assetUpdatedAt || response3?.updatedAt || '').trim(),
+    assetRevision3 = normalizeAssetRevision(response3?.assetRevision);
+  if (assetRevision3 > 0) value120.assetRevision = assetRevision3;
+  if (value121) value120.assetUpdatedAt = value121;
+  (assignPositiveNumber(value120, 'videoWidth', response3?.videoWidth, response3?.width),
+    assignPositiveNumber(value120, 'videoHeight', response3?.videoHeight, response3?.height),
+    assignPositiveNumber(value120, 'videoDuration', response3?.videoDuration),
+    assignPositiveNumber(value120, 'videoFps', response3?.videoFps));
+  if (response3?.kind === 'image')
+    ((value120.src = response3?.displayUrl || response3?.url || ''),
+      (value120.imageUrl = response3?.displayUrl || response3?.url || ''),
+      (value120.sourceUrl = response3?.originalUrl || ''),
+      (value120.thumbUrl = response3?.thumbUrl || ''));
   else {
-    if (response3?.['kind'] === 'video')
-      ((value120['src'] =
-        response3?.['displayUrl'] || response3?.['url'] || response3?.['originalUrl'] || ''),
-        (value120['videoUrl'] =
-          response3?.['displayUrl'] || response3?.['url'] || response3?.['originalUrl'] || ''),
-        (value120['sourceUrl'] = response3?.['originalUrl'] || response3?.['url'] || ''),
-        (value120['thumbUrl'] = response3?.['posterUrl'] || response3?.['thumbUrl'] || ''));
+    if (response3?.kind === 'video')
+      ((value120.src =
+        response3?.displayUrl || response3?.url || response3?.originalUrl || ''),
+        (value120.videoUrl =
+          response3?.displayUrl || response3?.url || response3?.originalUrl || ''),
+        (value120.sourceUrl = response3?.originalUrl || response3?.url || ''),
+        (value120.thumbUrl = response3?.posterUrl || response3?.thumbUrl || ''));
     else
-      response3?.['kind'] === 'audio' &&
-        ((value120['src'] = response3?.['originalUrl'] || response3?.['url'] || ''),
-        (value120['audioUrl'] = response3?.['originalUrl'] || response3?.['url'] || ''));
+      response3?.kind === 'audio' &&
+        ((value120.src = response3?.originalUrl || response3?.url || ''),
+        (value120.audioUrl = response3?.originalUrl || response3?.url || ''));
   }
   return value120;
 }
 
 export function applyElectronAssetUpdate(options3 = {}, store3 = appStore) {
-  const enabled24 = String(options3?.['assetId'] || '')['trim']();
+  const enabled24 = String(options3?.assetId || '').trim();
   if (!enabled24) return [];
   const value122 =
-      typeof store3?.['getStateRaw'] === 'function' ? store3['getStateRaw']() : store3?.['getState']?.(),
-    value123 = value122?.['nodes'] || {},
+      typeof store3?.getStateRaw === 'function' ? store3.getStateRaw() : store3?.getState?.(),
+    value123 = value122?.nodes || {},
     value124 = [];
   return (
-    Object['values'](value123)['forEach']((value125) => {
-      if (String(value125?.['assetId'] || '')['trim']() !== enabled24) return;
+    Object.values(value123).forEach((value125) => {
+      if (String(value125?.assetId || '').trim() !== enabled24) return;
       if (!shouldApplyElectronAssetUpdateToNode(value125, options3)) return;
       const electronAssetNodePatch = buildElectronAssetNodePatch(options3),
-        enabled25 = Object['entries'](electronAssetNodePatch)['some'](
+        enabled25 = Object.entries(electronAssetNodePatch).some(
           ([value126, value127]) => value125?.[value126] !== value127,
         );
       if (!enabled25) return;
-      (store3['updateNodeData'](value125['id'], electronAssetNodePatch), value124['push'](value125['id']));
+      (store3.updateNodeData(value125.id, electronAssetNodePatch), value124.push(value125.id));
     }),
     value124
   );
@@ -1544,7 +1544,7 @@ export async function resolveImageImportThumbnailData({
 } = {}) {
   if (suppliedThumbnail != null)
     try {
-      const value128 = String((await suppliedThumbnail) || '')['trim']();
+      const value128 = String((await suppliedThumbnail) || '').trim();
       if (value128) return value128;
     } catch {}
   if (canUseLocalImport || typeof generateThumbnailData !== 'function') return null;

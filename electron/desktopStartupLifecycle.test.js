@@ -69,7 +69,7 @@ test('assertStarting throws AIC_DESKTOP_STARTUP_CANCELLED once quitting', () => 
   lifecycle.beginQuit();
   assert.throws(
     () => lifecycle.assertStarting(),
-    (error) => error['code'] === 'AIC_DESKTOP_STARTUP_CANCELLED' && /shutdown/.test(error.message),
+    (error) => error.code === 'AIC_DESKTOP_STARTUP_CANCELLED' && /shutdown/.test(error.message),
   );
 });
 
@@ -179,7 +179,7 @@ test('prepareBackend fails fast when the app is already quitting', async () => {
   lifecycle.beginQuit();
   await assert.rejects(
     () => lifecycle.prepareBackend(),
-    (error) => error['code'] === 'AIC_DESKTOP_STARTUP_CANCELLED',
+    (error) => error.code === 'AIC_DESKTOP_STARTUP_CANCELLED',
   );
   assert.deepEqual(calls, []);
 });
@@ -195,7 +195,7 @@ test('prepareBackend aborts when quitting starts during the probe', async () => 
   });
   await assert.rejects(
     () => lifecycle.prepareBackend(),
-    (error) => error['code'] === 'AIC_DESKTOP_STARTUP_CANCELLED',
+    (error) => error.code === 'AIC_DESKTOP_STARTUP_CANCELLED',
   );
   assert.deepEqual(calls, []);
 });

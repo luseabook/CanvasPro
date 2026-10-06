@@ -15,12 +15,12 @@ export function createGlobalCaptureControllers({
   const selectedTextCapture =
       selectedTextCaptureController ||
       createSelectedTextCaptureController({
-        onKeyReleased: (releasePayload) => shortcutController?.['releaseShortcutKey'](releasePayload),
+        onKeyReleased: (releasePayload) => shortcutController?.releaseShortcutKey(releasePayload),
       }),
     captureWindowController = createGlobalCaptureWindowController({
       dirname: dirname,
       onAction: (capturePayload, dispatchOptions) =>
-        shortcutController?.['dispatchCaptureAction']?.(capturePayload, dispatchOptions) || {
+        shortcutController?.dispatchCaptureAction?.(capturePayload, dispatchOptions) || {
           ok: false,
           reason: 'controller-unavailable',
         },
@@ -29,18 +29,18 @@ export function createGlobalCaptureControllers({
   shortcutController = createGlobalTextPresetShortcutController({
     accelerator: accelerator,
     ...(globalShortcutApi ? { globalShortcutApi: globalShortcutApi } : {}),
-    copySelectedText: selectedTextCapture['capture'],
-    hasKeyReleaseTracking: () => selectedTextCapture['isKeyReleaseTrackingAvailable']?.() === true,
+    copySelectedText: selectedTextCapture.capture,
+    hasKeyReleaseTracking: () => selectedTextCapture.isKeyReleaseTrackingAvailable?.() === true,
     focusCanvas: focusCanvas,
     getMainWindow: getMainWindow,
-    showCapturePanel: captureWindowController['show'],
-    hideCapturePanel: captureWindowController['hide'],
-    isCapturePanelVisible: captureWindowController['isVisible'],
+    showCapturePanel: captureWindowController.show,
+    hideCapturePanel: captureWindowController.hide,
+    isCapturePanelVisible: captureWindowController.isVisible,
     logDiagnosticEvent: logDiagnosticEvent,
   });
   const managedCaptureWindowController = {
     ...captureWindowController,
-    prewarm: () => Promise['all']([captureWindowController['prewarm'](), selectedTextCapture['prewarm']()]),
+    prewarm: () => Promise.all([captureWindowController.prewarm(), selectedTextCapture.prewarm()]),
     destroy: () => runCleanupSteps([
       () => shortcutController.destroy(),
       () => selectedTextCapture.destroy(),

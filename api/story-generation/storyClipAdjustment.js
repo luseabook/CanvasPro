@@ -25,7 +25,7 @@ export const STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT = [
   'scope 为 selection 时，只返回选中文字的替换文本；scope 为 prompt 或 clip 时，返回完整的候选视频提示词。',
   '不要输出 HTML、Markdown、代码块、解释、修改说明或多个方案。MiniMax H3 官方格式要求的 <Subject N>、<Picture N>、<Video N>、<Audio N>、<d>、<scenetrans>、<cutoff> 是提示词文本标签，不是 HTML。',
   '除目标提示词模式必要的英文字段名和官方结构标签外，candidateText 的叙述、对白、画外音、歌词和画面文字全部直接输出简体中文。返回 JSON 前先自行检查并把草稿中的英文正文改写为中文，不要把英文正文交给客户端处理。只返回严格 JSON 对象，且只能包含 candidateText、candidateDurationSeconds 两个字段；无需调整总时长时 candidateDurationSeconds 可以省略。',
-]['join']('\n');
+].join('\n');
 export function createStoryClipAdjustmentApi({
   generateText: generateText,
   parseStrictJson: parseStrictJson,
@@ -38,33 +38,31 @@ export function createStoryClipAdjustmentApi({
   requestTimeoutMs: requestTimeoutMs,
 } = {}) {
   function run(value) {
-    return ['selection', 'prompt', 'clip']['includes'](value) ? value : 'prompt';
+    return ['selection', 'prompt', 'clip'].includes(value) ? value : 'prompt';
   }
   function run2(item) {
-    return [...new Set((Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean))][
-      'slice'
-    ](0, 50);
+    return [...new Set((Array.isArray(item) ? item : []).map(normalizeText).filter(Boolean))].slice(0, 50);
   }
   function run3(options = {}) {
-    const args = options && typeof options === 'object' && !Array['isArray'](options) ? options : {};
+    const args = options && typeof options === 'object' && !Array.isArray(options) ? options : {};
     return {
-      projectTitle: normalizeText(args['projectTitle']),
-      ...(args['sourceMode'] === 'video-replication'
+      projectTitle: normalizeText(args.projectTitle),
+      ...(args.sourceMode === 'video-replication'
         ? {
             audioLanguage: buildVideoReplicationAudioLanguageRule({
-              targetLocale: normalizeText(args['targetLocale']) || 'source',
-              sourceLanguage: normalizeText(args['sourceLanguage']),
+              targetLocale: normalizeText(args.targetLocale) || 'source',
+              sourceLanguage: normalizeText(args.sourceLanguage),
             }),
           }
         : {}),
-      storySummary: normalizeText(args['storySummary']),
-      episodeNumber: Math['max'](1, Math['trunc'](Number(args['episodeNumber']) || 1)),
-      episodeTitle: normalizeText(args['episodeTitle']),
-      episodeSynopsis: normalizeText(args['episodeSynopsis']),
-      clipTitle: normalizeText(args['clipTitle']),
-      clipScript: normalizeText(args['clipScript']),
-      creativeIntent: normalizeText(args['creativeIntent']),
-      transition: normalizeText(args['transition']),
+      storySummary: normalizeText(args.storySummary),
+      episodeNumber: Math.max(1, Math.trunc(Number(args.episodeNumber) || 1)),
+      episodeTitle: normalizeText(args.episodeTitle),
+      episodeSynopsis: normalizeText(args.episodeSynopsis),
+      clipTitle: normalizeText(args.clipTitle),
+      clipScript: normalizeText(args.clipScript),
+      creativeIntent: normalizeText(args.creativeIntent),
+      transition: normalizeText(args.transition),
     };
   }
   function run4({
@@ -91,10 +89,10 @@ export function createStoryClipAdjustmentApi({
       storyPromptMode2 = normalizeStoryPromptMode(targetPromptMode, { allowDeveloperModes: true }),
       args4 = args3
         ? getStoryClipPromptModeRewriteRequirements(storyPromptMode2, {
-            hasAssetRefs: run2(lockedAssetTokens)['length'] > 0,
+            hasAssetRefs: run2(lockedAssetTokens).length > 0,
           })
         : [];
-    return JSON['stringify']({
+    return JSON.stringify({
       task: 'adjust_story_clip_prompt',
       schemaVersion: STORY_CLIP_ADJUSTMENT_SCHEMA_VERSION,
       scope: args2,
@@ -167,46 +165,44 @@ export function createStoryClipAdjustmentApi({
     });
   }
   function run5(index) {
-    const result = String(index ?? '')['match'](/\d+(?:\.\d+)?/),
+    const result = String(index ?? '').match(/\d+(?:\.\d+)?/),
       count2 = Number(result?.[0]);
-    return Number['isFinite'](count2) && count2 > 0 ? Number(count2['toFixed'](1)) : 0;
+    return Number.isFinite(count2) && count2 > 0 ? Number(count2.toFixed(1)) : 0;
   }
   function run6(data) {
     const target = [],
       source = /⏱\s*(\d+(?:\.\d+)?)\s*(?:s|秒)/gi;
     let next = null;
-    while ((next = source['exec'](String(data || '')))) {
+    while ((next = source.exec(String(data || '')))) {
       const count3 = Number(next[1]);
-      if (Number['isFinite'](count3) && count3 > 0) target['push'](count3);
+      if (Number.isFinite(count3) && count3 > 0) target.push(count3);
     }
     return target;
   }
   function run7(current, { allowMinimaxH3Tags: allowMinimaxH3Tags = false } = {}) {
     const entry = [],
       record = (payload) => {
-        const handle = 'story-h3-tag-' + entry['length'] + '';
-        return (entry['push']({ token: handle, tag: payload }), handle);
+        const handle = 'story-h3-tag-' + entry.length + '';
+        return (entry.push({ token: handle, tag: payload }), handle);
       };
     let state = String(current || '');
     return (
       allowMinimaxH3Tags &&
-        (state = state['replace'](
+        (state = state.replace(
           /<\/?d>|<(?:scenetrans|cutoff)>|<(?:Subject|Picture|Video|Audio)\s+\d+>/giu,
           record,
         )),
-      (state = state['replace'](/<!--[\s\S]*?-->/gu, '')
-        ['replace'](
+      (state = state.replace(/<!--[\s\S]*?-->/gu, '')
+        .replace(
           /<\s*(script|style|iframe|object|embed|svg|math|template|noscript)\b[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/giu,
           '',
         )
-        ['replace'](
+        .replace(
           /<\s*\/?\s*(?:script|style|iframe|object|embed|svg|math|template|noscript)\b[^>]*>/giu,
           '',
         )
-        ['replace'](/<\s*\/?\s*[a-z][^>]*>/giu, '')),
-      entry['reduce']((config, { token: token, tag: tag }) => config['split'](token)['join'](tag), state)[
-        'trim'
-      ]()
+        .replace(/<\s*\/?\s*[a-z][^>]*>/giu, '')),
+      entry.reduce((config, { token: token, tag: tag }) => config.split(token).join(tag), state).trim()
     );
   }
   function run8(input, enabled, output, value2 = '') {
@@ -217,29 +213,29 @@ export function createStoryClipAdjustmentApi({
     const storyPromptMode3 = normalizeStoryPromptMode(value2, { allowDeveloperModes: true });
     if (isStorySeedance25PromptMode(storyPromptMode3) || isStoryWan30PromptMode(storyPromptMode3)) {
       const enabled2 = [
-        ...String(input || '')['matchAll'](/(?:\[)?(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)秒(?:\])?/gu),
-      ]['map']((value3) => ({ start: Number(value3[1]), end: Number(value3[2]) }));
-      if (!enabled2['length']) throw new Error('候选提示词没有连续时间区间。');
+        ...String(input || '').matchAll(/(?:\[)?(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)秒(?:\])?/gu),
+      ].map((value3) => ({ start: Number(value3[1]), end: Number(value3[2]) }));
+      if (!enabled2.length) throw new Error('候选提示词没有连续时间区间。');
       let value4 = 0;
-      enabled2['forEach'](({ start: start, end: end }) => {
+      enabled2.forEach(({ start: start, end: end }) => {
         if (start !== value4 || end <= start) throw new Error('候选提示词的时间区间不连续。');
         value4 = end;
       });
-      if (Math['abs'](value4 - enabled) > 0.001)
+      if (Math.abs(value4 - enabled) > 0.001)
         throw new Error('candidateDurationSeconds 必须等于最后一个时间区间的终点。');
       return;
     }
     if (isStoryMinimaxH3PromptMode(storyPromptMode3)) {
-      if (!Number['isInteger'](enabled) || enabled < 4 || enabled > 15)
+      if (!Number.isInteger(enabled) || enabled < 4 || enabled > 15)
         throw new Error('MiniMax H3 候选片段总时长必须为 4 至 15 秒的整数。');
-      if (!/(?:integrated_multimodal_description|detailed_description):/u['test'](input))
+      if (!/(?:integrated_multimodal_description|detailed_description):/u.test(input))
         throw new Error('MiniMax H3 候选提示词缺少官方镜头描述段落。');
-      if (/⏱/u['test'](input)) throw new Error('MiniMax H3 候选提示词不能包含 ⏱ 时长标签。');
+      if (/⏱/u.test(input)) throw new Error('MiniMax H3 候选提示词不能包含 ⏱ 时长标签。');
       const value5 = [
-        ...String(input || '')['matchAll'](/\[Shot\s+\d+\]\s+At\s+(\d{2}):(\d{2}(?:\.\d{3})?)/gu),
-      ]['map']((value6) => Number(value6[1]) * 60 + Number(value6[2]));
+        ...String(input || '').matchAll(/\[Shot\s+\d+\]\s+At\s+(\d{2}):(\d{2}(?:\.\d{3})?)/gu),
+      ].map((value6) => Number(value6[1]) * 60 + Number(value6[2]));
       if (
-        value5['some'](
+        value5.some(
           (count5, count6) =>
             count5 <= 0 || count5 >= enabled || (count6 > 0 && count5 <= value5[count6 - 1]),
         )
@@ -248,13 +244,13 @@ export function createStoryClipAdjustmentApi({
       return;
     }
     const list = run6(input);
-    if (!list['length']) throw new Error('候选提示词没有为每个镜头分配时间标记。');
-    const value7 = list['find'](
-      (count7) => count7 < 0.5 || Math['abs'](count7 * 2 - Math['round'](count7 * 2)) > 0.001,
+    if (!list.length) throw new Error('候选提示词没有为每个镜头分配时间标记。');
+    const value7 = list.find(
+      (count7) => count7 < 0.5 || Math.abs(count7 * 2 - Math.round(count7 * 2)) > 0.001,
     );
     if (value7 !== undefined) throw new Error('候选镜头时长必须至少为 0.5 秒，并按 0.5 秒递增。');
-    const value8 = Number(list['reduce']((value9, value10) => value9 + value10, 0)['toFixed'](1));
-    if (Math['abs'](value8 - enabled) > 0.001)
+    const value8 = Number(list.reduce((value9, value10) => value9 + value10, 0).toFixed(1));
+    if (Math.abs(value8 - enabled) > 0.001)
       throw new Error('candidateDurationSeconds 必须等于所有镜头时间标记之和。');
   }
   function run9(
@@ -266,31 +262,31 @@ export function createStoryClipAdjustmentApi({
     } = {},
   ) {
     const value12 = parseStrictJson(getResultText(value11), 'AI 没有返回候选提示词。');
-    let enabled3 = normalizeText(value12['candidateText']);
+    let enabled3 = normalizeText(value12.candidateText);
     if (!enabled3) throw new Error('AI 返回的候选提示词为空。');
     const storyPromptMode4 = normalizeStoryPromptMode(promptMode, { allowDeveloperModes: true }),
       isStoryMinimaxH3PromptMode2 = isStoryMinimaxH3PromptMode(storyPromptMode4);
     isStoryMinimaxH3PromptMode2 && (enabled3 = normalizeStoryMinimaxH3OfficialTags(enabled3));
     enabled3 = run7(enabled3, { allowMinimaxH3Tags: isStoryMinimaxH3PromptMode2 });
     if (!enabled3) throw new Error('AI 返回的候选提示词为空。');
-    const value13 = run5(value12['candidateDurationSeconds']);
+    const value13 = run5(value12.candidateDurationSeconds);
     return (
       requireDuration && run8(enabled3, value13, maxDurationSeconds, promptMode),
       { candidateText: enabled3, candidateDurationSeconds: value13 }
     );
   }
   function run10(value14, value15) {
-    return String(value14 || '')['split'](value15)['length'] - 1;
+    return String(value14 || '').split(value15).length - 1;
   }
   function run11(value16, value17, value18, value19, { allowCountChange: allowCountChange = false } = {}) {
-    const list2 = run2(value18)['filter']((value20) =>
+    const list2 = run2(value18).filter((value20) =>
       allowCountChange ? run10(value16, value20) < 1 : run10(value16, value20) !== run10(value17, value20),
     );
-    if (list2['length'])
+    if (list2.length)
       throw new Error(
         allowCountChange
-          ? '候选内容缺少' + value19 + '：' + list2['join']('、')
-          : '候选内容没有原样保留' + value19 + '：' + list2['join']('、'),
+          ? '候选内容缺少' + value19 + '：' + list2.join('、')
+          : '候选内容没有原样保留' + value19 + '：' + list2.join('、'),
       );
   }
   async function run12({
@@ -334,10 +330,10 @@ export function createStoryClipAdjustmentApi({
       value24 = 0,
       value25 = 0;
     if (value21 === 'selection') {
-      ((value24 = Math['max'](0, Math['trunc'](Number(selection?.['start']) || 0))),
-        (value25 = Math['max'](value24, Math['trunc'](Number(selection?.['end']) || 0))),
-        (enabled6 = normalizeText(selection?.['text'] || list3['slice'](value24, value25))));
-      if (!enabled6 || list3['slice'](value24, value25) !== enabled6)
+      ((value24 = Math.max(0, Math.trunc(Number(selection?.start) || 0))),
+        (value25 = Math.max(value24, Math.trunc(Number(selection?.end) || 0))),
+        (enabled6 = normalizeText(selection?.text || list3.slice(value24, value25))));
+      if (!enabled6 || list3.slice(value24, value25) !== enabled6)
         throw new Error('选中文字已经变化，请重新选择后再调整。');
     }
     const value26 = run4({
@@ -369,10 +365,10 @@ export function createStoryClipAdjustmentApi({
             STORY_CLIP_ADJUSTMENT_SYSTEM_PROMPT,
             buildStoryPromptLanguageRule(storyPromptLanguage, {
               translateOnly: !enabled4 && (!enabled5 || storyPromptMode6 === storyPromptMode5),
-            }) || run3(context)['audioLanguage'],
+            }) || run3(context).audioLanguage,
           ]
-            ['filter'](Boolean)
-            ['join']('\n'),
+            .filter(Boolean)
+            .join('\n'),
           temperature: 0.45,
           timeoutMs: requestTimeoutMs,
         },
@@ -385,9 +381,9 @@ export function createStoryClipAdjustmentApi({
             value29 =
               value21 === 'selection'
                 ? normalizeText(
-                    '' + list3['slice'](0, value24) + value28['candidateText'] + list3['slice'](value25),
+                    '' + list3.slice(0, value24) + value28.candidateText + list3.slice(value25),
                   )
-                : value28['candidateText'];
+                : value28.candidateText;
           return (
             preserveAssetRefs === true &&
               run11(value29, list3, lockedAssetTokens, '资产引用', { allowCountChange: value22 }),
@@ -398,9 +394,9 @@ export function createStoryClipAdjustmentApi({
               candidateText: value29,
               targetLanguage: storyPromptLanguage,
               candidateDurationSeconds: value22
-                ? value28['candidateDurationSeconds']
-                : value23 || value28['candidateDurationSeconds'],
-              replacementText: value21 === 'selection' ? value28['candidateText'] : '',
+                ? value28.candidateDurationSeconds
+                : value23 || value28.candidateDurationSeconds,
+              replacementText: value21 === 'selection' ? value28.candidateText : '',
               sourcePromptMode: storyPromptMode5,
               targetPromptMode: enabled5 ? storyPromptMode6 : storyPromptMode5,
             }

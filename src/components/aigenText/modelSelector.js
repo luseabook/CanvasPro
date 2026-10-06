@@ -33,12 +33,12 @@ const CARET_HTML =
   FALLBACK_ICON_HTML =
     '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>';
 function resolveModelLabel(value, item) {
-  return item?.(value) || findTextModelMenuItem(value)?.['title'] || value || '选择模型';
+  return item?.(value) || findTextModelMenuItem(value)?.title || value || '选择模型';
 }
 function resolveTriggerIcon(key, index) {
   const textModelSmallIconHTML = buildTextModelSmallIconHTML(key);
   if (textModelSmallIconHTML) return textModelSmallIconHTML;
-  if (['custom', 'openai']['includes'](String(index || '')['toLowerCase']()))
+  if (['custom', 'openai'].includes(String(index || '').toLowerCase()))
     return '<div class="text-model-icon-small text-model-icon-badge">OA</div>';
   return FALLBACK_ICON_HTML;
 }
@@ -46,7 +46,7 @@ export function buildAIGenTextModelMenuMarkup({
   activeModel: activeModel = DEFAULT_AIGEN_TEXT_MODEL_ID,
   allowedModelIds: allowedModelIds,
 } = {}) {
-  const result = Array['isArray'](allowedModelIds),
+  const result = Array.isArray(allowedModelIds),
     data = result
       ? ''
       : '<div class="custom-group-header floating-menu-item node-menu-group-header" data-custom-toggle data-node-menu-submenu=".custom-submenu" data-credential-provider="openai">\n          <div class="text-model-icon text-model-icon-badge">OA</div>\n          <div class="fmi-content">\n            <div class="fmi-title" data-aigen-text-locale="customModelTitle">' +
@@ -76,7 +76,7 @@ export function renderAIGenTextModelSelectorMarkup({
     }),
     options = includeRunningHubInternational
       ? '<button type="button" class="model-provider-profile-selector-toggle' +
-        (getModelProviderProfileIds(model)['length'] > 1 ? '' : ' is-hidden') +
+        (getModelProviderProfileIds(model).length > 1 ? '' : ' is-hidden') +
         '" data-provider-profile-id="' +
         escapeNodeMenuHtml(getModelProviderProfileStyleId(modelProviderProfileId)) +
         '" data-provider-profile-value="' +
@@ -85,7 +85,7 @@ export function renderAIGenTextModelSelectorMarkup({
         escapeNodeMenuHtml(getModelProviderProfileShortLabel(modelProviderProfileId)) +
         '</button>'
       : '',
-    target = ['img-model-pills', 'aigen-text-model-selector', className]['filter'](Boolean)['join'](' ');
+    target = ['img-model-pills', 'aigen-text-model-selector', className].filter(Boolean).join(' ');
   return (
     '<div class="' +
     escapeNodeMenuHtml(target) +
@@ -103,22 +103,22 @@ export function renderAIGenTextModelSelectorMarkup({
   );
 }
 function createCustomModelItem(el, source, next) {
-  const item2 = el['createElement']('div');
-  ((item2['className'] = 'floating-menu-item custom-model-item' + (next === source ? ' active' : '')),
-    (item2['dataset']['value'] = source),
-    (item2['dataset']['provider'] = 'custom'));
-  const el2 = el['createElement']('div');
-  ((el2['className'] = 'text-model-icon text-model-icon-badge custom-model-icon'),
-    (el2['textContent'] = 'OA'));
-  const el3 = el['createElement']('span');
-  ((el3['className'] = 'custom-model-label'), (el3['textContent'] = source));
-  const remove = el['createElement']('span');
+  const item2 = el.createElement('div');
+  ((item2.className = 'floating-menu-item custom-model-item' + (next === source ? ' active' : '')),
+    (item2.dataset.value = source),
+    (item2.dataset.provider = 'custom'));
+  const el2 = el.createElement('div');
+  ((el2.className = 'text-model-icon text-model-icon-badge custom-model-icon'),
+    (el2.textContent = 'OA'));
+  const el3 = el.createElement('span');
+  ((el3.className = 'custom-model-label'), (el3.textContent = source));
+  const remove = el.createElement('span');
   return (
-    (remove['className'] = 'custom-model-del'),
-    (remove['textContent'] = '×'),
-    item2['addEventListener']('mouseenter', () => remove['classList']['add']('show')),
-    item2['addEventListener']('mouseleave', () => remove['classList']['remove']('show')),
-    item2['append'](el2, el3, remove),
+    (remove.className = 'custom-model-del'),
+    (remove.textContent = '×'),
+    item2.addEventListener('mouseenter', () => remove.classList.add('show')),
+    item2.addEventListener('mouseleave', () => remove.classList.remove('show')),
+    item2.append(el2, el3, remove),
     { item: item2, remove: remove }
   );
 }
@@ -134,22 +134,22 @@ export function bindAIGenTextModelSelector(
     getProfileReadiness: getProfileReadiness = getModelProviderProfileReadiness,
     ensureProfileReady: ensureProfileReady,
     onProfileUnavailable: onProfileUnavailable,
-    documentObject: documentObject = globalThis['document'],
+    documentObject: documentObject = globalThis.document,
   } = {},
 ) {
   const current =
-      el4?.['matches']?.('[data-aigen-text-model-selector]') ||
-      el4?.['dataset']?.['aigenTextModelSelector'] !== undefined,
-    root = current ? el4 : el4?.['querySelector']?.('[data-aigen-text-model-selector]');
+      el4?.matches?.('[data-aigen-text-model-selector]') ||
+      el4?.dataset?.aigenTextModelSelector !== undefined,
+    root = current ? el4 : el4?.querySelector?.('[data-aigen-text-model-selector]');
   if (!root || !documentObject) return { destroy() {} };
-  const modelWrap = root['querySelector']('.img-model-wrap'),
-    trigger = root['querySelector']('.img-model-btn-trigger'),
-    menu = root['querySelector']('.img-model-menu'),
-    el5 = root['querySelector']('.img-model-label'),
-    el6 = root['querySelector']('.custom-submenu'),
-    el7 = root['querySelector']('.model-provider-profile-selector-toggle');
+  const modelWrap = root.querySelector('.img-model-wrap'),
+    trigger = root.querySelector('.img-model-btn-trigger'),
+    menu = root.querySelector('.img-model-menu'),
+    el5 = root.querySelector('.img-model-label'),
+    el6 = root.querySelector('.custom-submenu'),
+    el7 = root.querySelector('.model-provider-profile-selector-toggle');
   let model2 = String(modelId || DEFAULT_AIGEN_TEXT_MODEL_ID),
-    provider2 = String(provider || findTextModelMenuItem(model2)?.['provider'] || ''),
+    provider2 = String(provider || findTextModelMenuItem(model2)?.provider || ''),
     providerProfileIdByModel2 =
       providerProfileIdByModel && typeof providerProfileIdByModel === 'object'
         ? { ...providerProfileIdByModel }
@@ -159,23 +159,23 @@ export function bindAIGenTextModelSelector(
       providerProfileId: providerProfileId,
     });
   const list = [],
-    entry = (event) => event['stopPropagation']();
-  (root['addEventListener']('pointerdown', entry),
-    list['push'](() => root['removeEventListener']('pointerdown', entry)));
+    entry = (event) => event.stopPropagation();
+  (root.addEventListener('pointerdown', entry),
+    list.push(() => root.removeEventListener('pointerdown', entry)));
   const run = () => {
-      if (el5) el5['textContent'] = resolveModelLabel(model2, getDisplayModelName2);
+      if (el5) el5.textContent = resolveModelLabel(model2, getDisplayModelName2);
       const triggerIcon = resolveTriggerIcon(model2, provider2),
-        el8 = documentObject['createElement']('template');
-      el8['innerHTML'] = triggerIcon['trim']();
-      const record = el8['content']?.['firstElementChild'],
-        payload = trigger?.['firstElementChild'];
-      if (payload && record) payload['replaceWith'](record);
+        el8 = documentObject.createElement('template');
+      el8.innerHTML = triggerIcon.trim();
+      const record = el8.content?.firstElementChild,
+        payload = trigger?.firstElementChild;
+      if (payload && record) payload.replaceWith(record);
     },
     handler = () => {
       if (!el7) return;
       const list2 = getModelProviderProfileIds(model2),
-        enabled = list2['length'] > 1;
-      el7['classList']['toggle']('is-hidden', !enabled);
+        enabled = list2.length > 1;
+      el7.classList.toggle('is-hidden', !enabled);
       if (!enabled) return;
       const args = {
           model: model2,
@@ -187,27 +187,27 @@ export function bindAIGenTextModelSelector(
       let handle = args;
       if (configuredModelProviderProfileId && configuredModelProviderProfileId !== modelProviderProfileId2) {
         const args2 = buildModelProviderProfileSelectionPatch(args, model2, configuredModelProviderProfileId);
-        ((providerProfileId2 = args2['providerProfileId']),
-          (providerProfileIdByModel2 = args2['providerProfileIdByModel'] || {}),
+        ((providerProfileId2 = args2.providerProfileId),
+          (providerProfileIdByModel2 = args2.providerProfileIdByModel || {}),
           (handle = { ...args, ...args2 }));
       }
       const nextModelProviderProfileId = getNextModelProviderProfileId(handle),
         modelProviderProfileShortLabel = getModelProviderProfileShortLabel(configuredModelProviderProfileId),
         modelProviderProfileShortLabel2 = getModelProviderProfileShortLabel(nextModelProviderProfileId);
-      ((el7['textContent'] = modelProviderProfileShortLabel),
-        (el7['dataset']['providerProfileId'] = getModelProviderProfileStyleId(
+      ((el7.textContent = modelProviderProfileShortLabel),
+        (el7.dataset.providerProfileId = getModelProviderProfileStyleId(
           configuredModelProviderProfileId,
         )),
-        (el7['dataset']['providerProfileValue'] = configuredModelProviderProfileId),
-        (el7['title'] =
+        (el7.dataset.providerProfileValue = configuredModelProviderProfileId),
+        (el7.title =
           '当前' + modelProviderProfileShortLabel + '线路，点击切换到' + modelProviderProfileShortLabel2),
-        el7['setAttribute'](
+        el7.setAttribute(
           'aria-label',
           '当前' + modelProviderProfileShortLabel + '线路，点击切换到' + modelProviderProfileShortLabel2,
         ));
     },
     handler2 = (state, config, scope) => {
-      const enabled2 = String(state || '')['trim']();
+      const enabled2 = String(state || '').trim();
       if (!enabled2) return;
       const modelProviderProfileSelectionPatch = buildModelProviderProfileSelectionPatch(
         {
@@ -219,13 +219,13 @@ export function bindAIGenTextModelSelector(
         scope,
       );
       ((model2 = enabled2),
-        (provider2 = String(config || findTextModelMenuItem(enabled2)?.['provider'] || '')['trim']()),
-        (providerProfileId2 = modelProviderProfileSelectionPatch['providerProfileId']),
-        (providerProfileIdByModel2 = modelProviderProfileSelectionPatch['providerProfileIdByModel'] || {}),
-        menu?.['querySelectorAll']('.floating-menu-item[data-value]')['forEach']((el9) => {
-          el9['classList']['toggle']('active', el9['dataset']['value'] === model2);
+        (provider2 = String(config || findTextModelMenuItem(enabled2)?.provider || '').trim()),
+        (providerProfileId2 = modelProviderProfileSelectionPatch.providerProfileId),
+        (providerProfileIdByModel2 = modelProviderProfileSelectionPatch.providerProfileIdByModel || {}),
+        menu?.querySelectorAll('.floating-menu-item[data-value]').forEach((el9) => {
+          el9.classList.toggle('active', el9.dataset.value === model2);
         }),
-        menu?.['classList']['remove']('show'),
+        menu?.classList.remove('show'),
         run(),
         handler(),
         onChange?.({
@@ -237,75 +237,75 @@ export function bindAIGenTextModelSelector(
     },
     handler3 = () => {
       if (!el6) return;
-      el6['replaceChildren']();
+      el6.replaceChildren();
       const list3 = getCustomTextModels();
-      list3['forEach']((input, output) => {
+      list3.forEach((input, output) => {
         const { item: item3, remove: remove2 } = createCustomModelItem(documentObject, input, model2);
-        (remove2['addEventListener']('click', (event2) => {
-          (event2['preventDefault'](),
-            event2['stopPropagation'](),
-            saveCustomTextModels(list3['filter']((value2, value3) => value3 !== output)),
+        (remove2.addEventListener('click', (event2) => {
+          (event2.preventDefault(),
+            event2.stopPropagation(),
+            saveCustomTextModels(list3.filter((value2, value3) => value3 !== output)),
             handler3());
         }),
-          el6['appendChild'](item3));
+          el6.appendChild(item3));
       });
-      if (list3['length']) {
-        const value4 = documentObject['createElement']('div');
-        ((value4['className'] = 'custom-model-separator'), el6['appendChild'](value4));
+      if (list3.length) {
+        const value4 = documentObject.createElement('div');
+        ((value4.className = 'custom-model-separator'), el6.appendChild(value4));
       }
-      const el10 = documentObject['createElement']('div');
-      ((el10['className'] = 'floating-menu-item custom-model-add'),
-        (el10['innerHTML'] =
+      const el10 = documentObject.createElement('div');
+      ((el10.className = 'floating-menu-item custom-model-add'),
+        (el10.innerHTML =
           '<svg class="custom-model-add-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="custom-model-add-label">' +
           t('aigenText.customModel.addModel') +
           '</span>'),
-        el10['addEventListener']('click', (event3) => {
-          (event3['preventDefault'](),
-            event3['stopPropagation'](),
-            el10['replaceChildren'](),
-            el10['classList']['add']('editing'));
-          const el11 = documentObject['createElement']('input');
-          ((el11['type'] = 'text'),
-            (el11['className'] = 'custom-model-input'),
-            (el11['placeholder'] = t('aigenText.customModel.namePlaceholder')));
-          const el12 = documentObject['createElement']('button');
-          ((el12['type'] = 'button'),
-            (el12['className'] = 'custom-model-confirm'),
-            (el12['textContent'] = t('aigenText.customModel.confirm')));
+        el10.addEventListener('click', (event3) => {
+          (event3.preventDefault(),
+            event3.stopPropagation(),
+            el10.replaceChildren(),
+            el10.classList.add('editing'));
+          const el11 = documentObject.createElement('input');
+          ((el11.type = 'text'),
+            (el11.className = 'custom-model-input'),
+            (el11.placeholder = t('aigenText.customModel.namePlaceholder')));
+          const el12 = documentObject.createElement('button');
+          ((el12.type = 'button'),
+            (el12.className = 'custom-model-confirm'),
+            (el12.textContent = t('aigenText.customModel.confirm')));
           const run2 = () => {
-            const enabled3 = el11['value']['trim']();
+            const enabled3 = el11.value.trim();
             if (!enabled3) return;
             const list4 = getCustomTextModels();
-            if (!list4['includes'](enabled3)) saveCustomTextModels([...list4, enabled3]);
+            if (!list4.includes(enabled3)) saveCustomTextModels([...list4, enabled3]);
             handler3();
           };
-          (el11['addEventListener']('keydown', (event4) => {
-            event4['stopPropagation']();
-            if (event4['key'] === 'Enter') run2();
+          (el11.addEventListener('keydown', (event4) => {
+            event4.stopPropagation();
+            if (event4.key === 'Enter') run2();
           }),
-            el11['addEventListener']('click', (event5) => event5['stopPropagation']()),
-            el12['addEventListener']('click', (event6) => {
-              (event6['stopPropagation'](), run2());
+            el11.addEventListener('click', (event5) => event5.stopPropagation()),
+            el12.addEventListener('click', (event6) => {
+              (event6.stopPropagation(), run2());
             }),
-            el10['append'](el11, el12),
-            el11['focus']());
+            el10.append(el11, el12),
+            el11.focus());
         }),
-        el6['appendChild'](el10));
+        el6.appendChild(el10));
     },
     value5 = (event7) => {
-      const el13 = event7['target']?.['closest']?.('.floating-menu-item[data-value]');
-      if (!el13 || !menu?.['contains'](el13) || el13['dataset']['disabled'] === 'true') return;
-      (event7['stopPropagation'](),
+      const el13 = event7.target?.closest?.('.floating-menu-item[data-value]');
+      if (!el13 || !menu?.contains(el13) || el13.dataset.disabled === 'true') return;
+      (event7.stopPropagation(),
         handler2(
-          el13['dataset']['value'],
-          el13['dataset']['provider'],
-          el13['dataset']['credentialResolvedProviderProfileId'],
+          el13.dataset.value,
+          el13.dataset.provider,
+          el13.dataset.credentialResolvedProviderProfileId,
         ));
     };
-  (menu?.['addEventListener']('click', value5),
-    list['push'](() => menu?.['removeEventListener']('click', value5)));
+  (menu?.addEventListener('click', value5),
+    list.push(() => menu?.removeEventListener('click', value5)));
   const value6 = (event8) => {
-    (event8['preventDefault'](), event8['stopPropagation']());
+    (event8.preventDefault(), event8.stopPropagation());
     const nodeData = {
         model: model2,
         providerProfileId: providerProfileId2,
@@ -320,8 +320,8 @@ export function bindAIGenTextModelSelector(
       ensureProfileReady: ensureProfileReady,
       onUnavailable: onProfileUnavailable,
       onChange: (value7) => {
-        ((providerProfileId2 = value7['providerProfileId']),
-          (providerProfileIdByModel2 = value7['providerProfileIdByModel'] || {}),
+        ((providerProfileId2 = value7.providerProfileId),
+          (providerProfileIdByModel2 = value7.providerProfileIdByModel || {}),
           handler(),
           void syncModelCredentialMenu(menu, {
             documentObject: documentObject,
@@ -336,10 +336,10 @@ export function bindAIGenTextModelSelector(
       },
     });
   };
-  (el7?.['addEventListener']('click', value6),
-    list['push'](() => el7?.['removeEventListener']('click', value6)),
-    list['push'](bindNodeFooterController(root)),
-    list['push'](
+  (el7?.addEventListener('click', value6),
+    list.push(() => el7?.removeEventListener('click', value6)),
+    list.push(bindNodeFooterController(root)),
+    list.push(
       bindNodeModelMenuTrigger({
         root: root,
         trigger: trigger,
@@ -349,21 +349,21 @@ export function bindAIGenTextModelSelector(
       }),
     ));
   const onLocaleChange2 = onLocaleChange(() => {
-    (root['querySelector']('[data-aigen-text-locale="customModelTitle"]')?.['replaceChildren'](
-      documentObject['createTextNode'](t('aigenText.customModelTitle')),
+    (root.querySelector('[data-aigen-text-locale="customModelTitle"]')?.replaceChildren(
+      documentObject.createTextNode(t('aigenText.customModelTitle')),
     ),
-      root['querySelector']('[data-aigen-text-locale="customModelSubtitle"]')?.['replaceChildren'](
-        documentObject['createTextNode'](t('aigenText.customModelSubtitle')),
+      root.querySelector('[data-aigen-text-locale="customModelSubtitle"]')?.replaceChildren(
+        documentObject.createTextNode(t('aigenText.customModelSubtitle')),
       ),
       handler3(),
       run());
   });
-  list['push'](onLocaleChange2);
+  list.push(onLocaleChange2);
   const value8 = () => {
     handler();
   };
-  (globalThis['window']?.['addEventListener']?.(API_CONFIG_CHANGED_EVENT, value8),
-    list['push'](() => globalThis['window']?.['removeEventListener']?.(API_CONFIG_CHANGED_EVENT, value8)),
+  (globalThis.window?.addEventListener?.(API_CONFIG_CHANGED_EVENT, value8),
+    list.push(() => globalThis.window?.removeEventListener?.(API_CONFIG_CHANGED_EVENT, value8)),
     handler3(),
     run(),
     handler());
@@ -389,7 +389,7 @@ export function bindAIGenTextModelSelector(
     } = {}) => {
       const model3 = model2;
       ((model2 = String(modelId2 || model2)),
-        (provider2 = String(provider3 || findTextModelMenuItem(model2)?.['provider'] || provider2)));
+        (provider2 = String(provider3 || findTextModelMenuItem(model2)?.provider || provider2)));
       const modelProviderProfileSelectionPatch2 = buildModelProviderProfileSelectionPatch(
         {
           model: model3,
@@ -399,14 +399,14 @@ export function bindAIGenTextModelSelector(
         model2,
         providerProfileId3,
       );
-      ((providerProfileId2 = modelProviderProfileSelectionPatch2['providerProfileId']),
-        (providerProfileIdByModel2 = modelProviderProfileSelectionPatch2['providerProfileIdByModel'] || {}),
+      ((providerProfileId2 = modelProviderProfileSelectionPatch2.providerProfileId),
+        (providerProfileIdByModel2 = modelProviderProfileSelectionPatch2.providerProfileIdByModel || {}),
         handler3(),
         run(),
         handler());
     },
     destroy() {
-      (bindModelCredentialMenu2?.(), list['forEach']((value9) => value9?.()));
+      (bindModelCredentialMenu2?.(), list.forEach((value9) => value9?.()));
     },
   };
 }

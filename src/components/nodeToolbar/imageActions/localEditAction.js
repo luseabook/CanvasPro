@@ -11,13 +11,13 @@ export function bindImageLocalEditAction(item) {
       cancelRunningHubResultTask: cancelRunningHubResultTask,
       findRunningHubToolbarTaskForNode: findRunningHubToolbarTaskForNode,
     } = item,
-    button = toolbarEl['querySelector']('.act-local-edit');
+    button = toolbarEl.querySelector('.act-local-edit');
   if (!button) return;
   bindRunningHubToolbarTaskButton({
     button: button,
     getTask: () => findRunningHubToolbarTaskForNode(nodeId, { taskTypes: ['image-repaint', 'image-erase'] }),
     cancelTask: (key) => {
-      const index = key['node']?.['rhToolbarTaskType'] === 'image-erase' ? 'erase' : 'repaint';
+      const index = key.node?.rhToolbarTaskType === 'image-erase' ? 'erase' : 'repaint';
       return cancelRunningHubResultTask(key, {
         name: imageToolbarText(index + 'CancelledName'),
         outputText: imageToolbarText(index + 'CancelledOutput'),
@@ -28,14 +28,14 @@ export function bindImageLocalEditAction(item) {
     eventTypes: ['click', 'image-local-edit-open'],
   });
   const result = (event) => {
-    (event['stopPropagation'](), window['v2FocusOnNode']?.(nodeId));
-    const scene = event['detail']?.['scene'];
-    ImageAnnotateController['init'](nodeId, {
+    (event.stopPropagation(), window.v2FocusOnNode?.(nodeId));
+    const scene = event.detail?.scene;
+    ImageAnnotateController.init(nodeId, {
       scene: scene === 'repaint' || scene === 'erase' ? scene : 'local-edit',
       submitLabel: imageToolbarText('generate'),
       submitBusyLabel: imageToolbarText('generating'),
       submitNoop: true,
     });
   };
-  (button['addEventListener']('click', result), button['addEventListener']('image-local-edit-open', result));
+  (button.addEventListener('click', result), button.addEventListener('image-local-edit-open', result));
 }

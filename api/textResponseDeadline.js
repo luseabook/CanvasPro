@@ -12,26 +12,26 @@ export function createTextResponseDeadline(
     setTimeout3 = null;
   const run = (key) => {
       if (item) return;
-      ((item = key), void value['cancel']()['catch'](() => {}));
+      ((item = key), void value.cancel().catch(() => {}));
     },
     handler = (timeoutPhase) =>
       run(
-        Object['assign'](new Error('文本请求' + timeoutPhase + '超时，未提交不完整结果'), {
+        Object.assign(new Error('文本请求' + timeoutPhase + '超时，未提交不完整结果'), {
           type: 'TIMEOUT',
           timeoutPhase: timeoutPhase,
         }),
       ),
-    index = timeoutMs == null ? null : setTimeout(() => handler('总时长'), Math['max'](1, timeoutMs));
+    index = timeoutMs == null ? null : setTimeout(() => handler('总时长'), Math.max(1, timeoutMs));
   if (firstChunkTimeoutMs != null)
-    setTimeout3 = setTimeout(() => handler('首次响应'), Math['max'](1, firstChunkTimeoutMs));
+    setTimeout3 = setTimeout(() => handler('首次响应'), Math.max(1, firstChunkTimeoutMs));
   const run2 = () => run(new DOMException('Request aborted', 'AbortError'));
-  signal?.['addEventListener']('abort', run2, { once: true });
-  if (signal?.['aborted']) run2();
+  signal?.addEventListener('abort', run2, { once: true });
+  if (signal?.aborted) run2();
   return {
     activity() {
       (clearTimeout(setTimeout3), clearTimeout(setTimeout2));
       if (idleTimeoutMs != null)
-        setTimeout2 = setTimeout(() => handler('输出停滞'), Math['max'](1, idleTimeoutMs));
+        setTimeout2 = setTimeout(() => handler('输出停滞'), Math.max(1, idleTimeoutMs));
     },
     check() {
       if (item) throw item;
@@ -40,29 +40,29 @@ export function createTextResponseDeadline(
       (clearTimeout(index),
         clearTimeout(setTimeout3),
         clearTimeout(setTimeout2),
-        signal?.['removeEventListener']('abort', run2));
+        signal?.removeEventListener('abort', run2));
     },
   };
 }
 export async function readTextResponseBody(dom, result = {}) {
-  const enabled = dom['body']?.['getReader']();
+  const enabled = dom.body?.getReader();
   if (!enabled) return '';
   const textResponseDeadline = createTextResponseDeadline(enabled, result),
     textDecoder = new TextDecoder();
   let data = '';
   try {
     while (true) {
-      const { value: value2, done: done } = await enabled['read']();
-      textResponseDeadline['check']();
-      if (done) return data + textDecoder['decode']();
-      (textResponseDeadline['activity'](), (data += textDecoder['decode'](value2, { stream: true })));
+      const { value: value2, done: done } = await enabled.read();
+      textResponseDeadline.check();
+      if (done) return data + textDecoder.decode();
+      (textResponseDeadline.activity(), (data += textDecoder.decode(value2, { stream: true })));
     }
   } catch (options) {
-    options['partialText'] = data;
+    options.partialText = data;
     throw options;
   } finally {
-    (textResponseDeadline['dispose'](),
-      await enabled['cancel']()['catch'](() => {}),
-      enabled['releaseLock']());
+    (textResponseDeadline.dispose(),
+      await enabled.cancel().catch(() => {}),
+      enabled.releaseLock());
   }
 }

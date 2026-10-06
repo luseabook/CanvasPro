@@ -65,31 +65,31 @@ export function buildRendererDragTargetSet({
   return map;
 }
 export function formatRendererNodeLabelText(record) {
-  const list3 = String(record || '')['trim']();
+  const list3 = String(record || '').trim();
   if (!list3) return '';
-  const payload = /^[\x00-\x7F]*$/['test'](list3);
-  return payload && list3['length'] > 20 ? list3['slice'](0, 20) + '...' : list3;
+  const payload = /^[\x00-\x7F]*$/.test(list3);
+  return payload && list3.length > 20 ? list3.slice(0, 20) + '...' : list3;
 }
 export function getRendererGroupColorWithOpacity(handle, state) {
-  const config = String(handle || '')['match'](/var\(--([^)]+)\)/);
+  const config = String(handle || '').match(/var\(--([^)]+)\)/);
   return config ? 'var(--' + config[1] + '-' + state + ')' : handle;
 }
 export function getRendererNodeLabelKind(scope) {
   const refKindByNodeType = getRefKindByNodeType(scope);
-  return ['text', 'image', 'video', 'audio']['includes'](refKindByNodeType) ? refKindByNodeType : '';
+  return ['text', 'image', 'video', 'audio'].includes(refKindByNodeType) ? refKindByNodeType : '';
 }
 export function clearRendererNodeLabelTooltip(el) {
   if (!el) return;
   const run = (input, output = '') => {
-    if (typeof el['removeAttribute'] === 'function') el['removeAttribute'](input);
+    if (typeof el.removeAttribute === 'function') el.removeAttribute(input);
     else
-      el['attributes'] &&
-        typeof el['attributes']['delete'] === 'function' &&
-        el['attributes']['delete'](input);
-    output && el['dataset'] && output in el['dataset'] && delete el['dataset'][output];
+      el.attributes &&
+        typeof el.attributes.delete === 'function' &&
+        el.attributes.delete(input);
+    output && el.dataset && output in el.dataset && delete el.dataset[output];
   };
   run('title');
-  if ('title' in el) el['title'] = '';
+  if ('title' in el) el.title = '';
   (run('data-tooltip', 'tooltip'),
     run('data-tooltip-right', 'tooltipRight'),
     run('data-tooltip-source', 'tooltipSource'),
@@ -104,31 +104,31 @@ export function setRendererNodeLabelContent(
     isBeta: isBeta,
     fullLabelText: fullLabelText,
   },
-  el3 = globalThis['document'],
+  el3 = globalThis.document,
 ) {
   if (!el2) return;
   clearRendererNodeLabelTooltip(el2);
   const list4 = [];
   if (labelKind) {
-    const el4 = el3['createElement']('span');
-    ((el4['className'] = 'node-label-icon'),
-      el4['setAttribute']('aria-hidden', 'true'),
-      (el4['dataset']['labelKind'] = labelKind),
-      (el4['textContent'] = labelKind === 'text' ? 'T' : ''),
-      list4['push'](el4));
+    const el4 = el3.createElement('span');
+    ((el4.className = 'node-label-icon'),
+      el4.setAttribute('aria-hidden', 'true'),
+      (el4.dataset.labelKind = labelKind),
+      (el4.textContent = labelKind === 'text' ? 'T' : ''),
+      list4.push(el4));
   }
-  const el5 = el3['createElement']('span');
-  ((el5['className'] = 'node-label-text'),
-    (el5['textContent'] = displayLabelText || defaultName),
-    list4['push'](el5));
+  const el5 = el3.createElement('span');
+  ((el5.className = 'node-label-text'),
+    (el5.textContent = displayLabelText || defaultName),
+    list4.push(el5));
   if (isBeta) {
-    const el6 = el3['createElement']('span');
-    ((el6['className'] = 'v2-node-beta-pill'),
-      (el6['textContent'] = 'Beta'),
-      list4['push'](el6),
-      (el2['dataset']['betaLabel'] = fullLabelText));
-  } else 'betaLabel' in el2['dataset'] && delete el2['dataset']['betaLabel'];
-  el2['replaceChildren'](...list4);
+    const el6 = el3.createElement('span');
+    ((el6.className = 'v2-node-beta-pill'),
+      (el6.textContent = 'Beta'),
+      list4.push(el6),
+      (el2.dataset.betaLabel = fullLabelText));
+  } else 'betaLabel' in el2.dataset && delete el2.dataset.betaLabel;
+  el2.replaceChildren(...list4);
 }
 export function syncRendererNodeDragTransform(
   el7,
@@ -140,46 +140,46 @@ export function syncRendererNodeDragTransform(
     positionChanged: positionChanged = false,
   } = {},
 ) {
-  if (!el7?.['style'] || !box) return '';
-  const value2 = el7['_dragPreviewTransformActive'] === true;
+  if (!el7?.style || !box) return '';
+  const value2 = el7._dragPreviewTransformActive === true;
   if (active === true) {
     const value3 = Number.isFinite(offsetX) ? offsetX : 0,
       value4 = Number.isFinite(offsetY) ? offsetY : 0,
-      value5 = 'translate(' + (box['x'] + value3) + 'px, ' + (box['y'] + value4) + 'px)';
+      value5 = 'translate(' + (box.x + value3) + 'px, ' + (box.y + value4) + 'px)';
     return (
-      el7['style']['transform'] !== value5 && (el7['style']['transform'] = value5),
-      (el7['_dragPreviewTransformActive'] = true),
+      el7.style.transform !== value5 && (el7.style.transform = value5),
+      (el7._dragPreviewTransformActive = true),
       value5
     );
   }
   if (positionChanged || value2) {
-    const value6 = 'translate(' + box['x'] + 'px, ' + box['y'] + 'px)';
+    const value6 = 'translate(' + box.x + 'px, ' + box.y + 'px)';
     return (
-      el7['style']['transform'] !== value6 && (el7['style']['transform'] = value6),
-      value2 && delete el7['_dragPreviewTransformActive'],
+      el7.style.transform !== value6 && (el7.style.transform = value6),
+      value2 && delete el7._dragPreviewTransformActive,
       value6
     );
   }
-  return el7['style']['transform'] || '';
+  return el7.style.transform || '';
 }
 function getDreaminaTimerPhaseTitle(enabled3) {
   if (!enabled3 || !isNodeType(enabled3, 'ai-video')) return '';
   const modelProvider =
-    resolveModelProvider(enabled3['model'], enabled3['provider'], { allowPrefixInference: false }) ===
+    resolveModelProvider(enabled3.model, enabled3.provider, { allowPrefixInference: false }) ===
     'dreamina';
   if (!modelProvider) return '';
-  const value7 = String(enabled3['dreaminaTaskPhase'] || '')
-      ['trim']()
-      ['toLowerCase'](),
-    value8 = String(enabled3['dreaminaTaskStatus'] || '')
-      ['trim']()
-      ['toLowerCase']();
+  const value7 = String(enabled3.dreaminaTaskPhase || '')
+      .trim()
+      .toLowerCase(),
+    value8 = String(enabled3.dreaminaTaskStatus || '')
+      .trim()
+      .toLowerCase();
   if (value7 === 'failed' || value8 === 'failed') return t('coreUi.renderer.dreaminaPhase.failed');
   if (value7 === 'syncing') return t('coreUi.renderer.dreaminaPhase.syncing');
   if (value7 === 'queued') return t('coreUi.renderer.dreaminaPhase.queued');
   if (value7 === 'generating') return t('coreUi.renderer.dreaminaPhase.generating');
   if (value7 === 'done') return t('coreUi.renderer.dreaminaPhase.done');
-  return String(enabled3['dreaminaTaskLabel'] || '')['trim']();
+  return String(enabled3.dreaminaTaskLabel || '').trim();
 }
 export function formatRendererNodeTimerText(value9, value10) {
   const value11 = Math.max(0, Number(value10) || 0),
@@ -194,85 +194,85 @@ const FAST_PREVIEW_PRESENTATION_OWNER = 'fast-preview',
   FAST_PREVIEW_OWNED_NODE_Z_INDEX = '10';
 
 function normalizeRendererNodeZIndex(value15) {
-  const value16 = String(value15 ?? '')['trim']();
+  const value16 = String(value15 ?? '').trim();
   return value16 || FAST_PREVIEW_OWNED_NODE_Z_INDEX;
 }
 
 function resolveFastPreviewOwnedNodeZIndex(value17) {
-  const value18 = Number['parseInt'](value17, 10),
-    value19 = Number['parseInt'](FAST_PREVIEW_OWNED_NODE_Z_INDEX, 10);
-  if (!Number['isFinite'](value18)) return FAST_PREVIEW_OWNED_NODE_Z_INDEX;
-  return String(Math['min'](value18, value19));
+  const value18 = Number.parseInt(value17, 10),
+    value19 = Number.parseInt(FAST_PREVIEW_OWNED_NODE_Z_INDEX, 10);
+  if (!Number.isFinite(value18)) return FAST_PREVIEW_OWNED_NODE_Z_INDEX;
+  return String(Math.min(value18, value19));
 }
 
 function applyRendererNodePresentationZIndex(el8) {
-  if (!el8?.['dataset'] || !el8?.['style']) return '';
+  if (!el8?.dataset || !el8?.style) return '';
   const rendererNodeZIndex = normalizeRendererNodeZIndex(
-      el8['dataset']['rendererPresentationTargetZIndex'] || el8['style']['zIndex'],
+      el8.dataset.rendererPresentationTargetZIndex || el8.style.zIndex,
     ),
     enabled4 =
-      el8['dataset']['rendererPresentationOwner'] === FAST_PREVIEW_PRESENTATION_OWNER &&
-      Number['parseInt'](rendererNodeZIndex, 10) > Number(FAST_PREVIEW_OWNED_NODE_Z_INDEX) &&
-      !!el8['querySelector']?.('.text-prompt-panel') &&
-      !!el8['querySelector']?.('.img-node-preview');
+      el8.dataset.rendererPresentationOwner === FAST_PREVIEW_PRESENTATION_OWNER &&
+      Number.parseInt(rendererNodeZIndex, 10) > Number(FAST_PREVIEW_OWNED_NODE_Z_INDEX) &&
+      !!el8.querySelector?.('.text-prompt-panel') &&
+      !!el8.querySelector?.('.img-node-preview');
   enabled4
-    ? (el8['dataset']['rendererPresentationUiLifted'] = 'true')
-    : delete el8['dataset']['rendererPresentationUiLifted'];
+    ? (el8.dataset.rendererPresentationUiLifted = 'true')
+    : delete el8.dataset.rendererPresentationUiLifted;
   const value20 =
-    el8['dataset']['rendererPresentationOwner'] === FAST_PREVIEW_PRESENTATION_OWNER && !enabled4
+    el8.dataset.rendererPresentationOwner === FAST_PREVIEW_PRESENTATION_OWNER && !enabled4
       ? resolveFastPreviewOwnedNodeZIndex(rendererNodeZIndex)
       : rendererNodeZIndex;
-  return (el8['style']['zIndex'] !== value20 && (el8['style']['zIndex'] = value20), value20);
+  return (el8.style.zIndex !== value20 && (el8.style.zIndex = value20), value20);
 }
 
 export function syncRendererNodePresentationZIndex(el9, value21) {
-  if (!el9?.['dataset'] || !el9?.['style']) return '';
+  if (!el9?.dataset || !el9?.style) return '';
   const rendererNodeZIndex2 = normalizeRendererNodeZIndex(value21);
   return (
-    el9['dataset']['rendererPresentationTargetZIndex'] !== rendererNodeZIndex2 &&
-      (el9['dataset']['rendererPresentationTargetZIndex'] = rendererNodeZIndex2),
+    el9.dataset.rendererPresentationTargetZIndex !== rendererNodeZIndex2 &&
+      (el9.dataset.rendererPresentationTargetZIndex = rendererNodeZIndex2),
     applyRendererNodePresentationZIndex(el9)
   );
 }
 
 export function liftRendererNodePresentationZIndex(el10, value22) {
-  if (!el10?.['dataset'] || !el10?.['style']) return '';
-  const value23 = Number['parseInt'](
-      el10['dataset']['rendererPresentationTargetZIndex'] || el10['style']['zIndex'],
+  if (!el10?.dataset || !el10?.style) return '';
+  const value23 = Number.parseInt(
+      el10.dataset.rendererPresentationTargetZIndex || el10.style.zIndex,
       10,
     ),
-    value24 = Number['parseInt'](value22, 10);
-  if (!Number['isFinite'](value23) || (Number['isFinite'](value24) && value23 < value24))
+    value24 = Number.parseInt(value22, 10);
+  if (!Number.isFinite(value23) || (Number.isFinite(value24) && value23 < value24))
     return syncRendererNodePresentationZIndex(el10, value22);
   return applyRendererNodePresentationZIndex(el10);
 }
 
 export function syncRendererFastPreviewPresentationOwner(el11, value25) {
-  if (!el11?.['dataset'] || !el11?.['style']) return false;
-  !el11['dataset']['rendererPresentationTargetZIndex'] &&
-    (el11['dataset']['rendererPresentationTargetZIndex'] = normalizeRendererNodeZIndex(
-      el11['style']['zIndex'],
+  if (!el11?.dataset || !el11?.style) return false;
+  !el11.dataset.rendererPresentationTargetZIndex &&
+    (el11.dataset.rendererPresentationTargetZIndex = normalizeRendererNodeZIndex(
+      el11.style.zIndex,
     ));
   if (value25 === true)
-    el11['dataset']['rendererPresentationOwner'] !== FAST_PREVIEW_PRESENTATION_OWNER &&
-      (el11['dataset']['rendererPresentationOwner'] = FAST_PREVIEW_PRESENTATION_OWNER);
+    el11.dataset.rendererPresentationOwner !== FAST_PREVIEW_PRESENTATION_OWNER &&
+      (el11.dataset.rendererPresentationOwner = FAST_PREVIEW_PRESENTATION_OWNER);
   else
-    el11['dataset']['rendererPresentationOwner'] === FAST_PREVIEW_PRESENTATION_OWNER &&
-      delete el11['dataset']['rendererPresentationOwner'];
+    el11.dataset.rendererPresentationOwner === FAST_PREVIEW_PRESENTATION_OWNER &&
+      delete el11.dataset.rendererPresentationOwner;
   return (applyRendererNodePresentationZIndex(el11), true);
 }
 
 export function formatVideoMetaText({ fps: fps, frames: frames, width: width, height: height } = {}) {
   const count = Number(fps),
     count2 = Number(frames);
-  if (!Number['isFinite'](count) || count <= 0 || !Number['isFinite'](count2) || count2 <= 0) return '';
+  if (!Number.isFinite(count) || count <= 0 || !Number.isFinite(count2) || count2 <= 0) return '';
   const value26 =
-      Math['abs'](count - Math['round'](count)) < 0.01
-        ? String(Math['round'](count))
-        : String(Number(count['toFixed'](2))),
+      Math.abs(count - Math.round(count)) < 0.01
+        ? String(Math.round(count))
+        : String(Number(count.toFixed(2))),
     count3 = Number(width),
     count4 = Number(height),
-    value27 = Number['isFinite'](count3) && count3 > 0 && Number['isFinite'](count4) && count4 > 0,
-    t3 = t('coreUi.renderer.videoMeta.framesFps', { frames: Math['round'](count2), fps: value26 });
-  return value27 ? Math['round'](count3) + '×' + Math['round'](count4) + ' · ' + t3 : t3;
+    value27 = Number.isFinite(count3) && count3 > 0 && Number.isFinite(count4) && count4 > 0,
+    t3 = t('coreUi.renderer.videoMeta.framesFps', { frames: Math.round(count2), fps: value26 });
+  return value27 ? Math.round(count3) + '×' + Math.round(count4) + ' · ' + t3 : t3;
 }

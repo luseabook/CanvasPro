@@ -1,16 +1,16 @@
 import { normalizeCanvasLocalPath, resolveCanvasVideoUrl } from '../../services/canvasMediaLocalService.js';
-const NODE_GEOMETRY_KEYS = Object['freeze'](['id', 'x', 'y', 'width', 'height']);
+const NODE_GEOMETRY_KEYS = Object.freeze(['id', 'x', 'y', 'width', 'height']);
 function hasGeometryChange(previous, next) {
-  return NODE_GEOMETRY_KEYS['some']((key) => previous?.[key] !== next?.[key]);
+  return NODE_GEOMETRY_KEYS.some((key) => previous?.[key] !== next?.[key]);
 }
 function getSourceVideoSignature(node) {
-  if (!node || node['type'] !== 'source-video') return '';
-  return JSON['stringify']([
+  if (!node || node.type !== 'source-video') return '';
+  return JSON.stringify([
     'source-video',
     String(resolveCanvasVideoUrl(node) || ''),
-    String(node['videoProxyVersion'] || '')['trim'](),
-    normalizeCanvasLocalPath(node['pendingVideoProxyLocalPath']),
-    String(node['pendingVideoProxyVersion'] || '')['trim'](),
+    String(node.videoProxyVersion || '').trim(),
+    normalizeCanvasLocalPath(node.pendingVideoProxyLocalPath),
+    String(node.pendingVideoProxyVersion || '').trim(),
   ]);
 }
 function hasSourceVideoChange(previous, next) {
@@ -35,9 +35,9 @@ export function createRendererStateRevisionTracker(state) {
     const pending = { nodes: false, geometry: false, sourceVideo: false };
     return {
       patch(previous, next) {
-        ((pending['nodes'] = true),
-          (pending['geometry'] = pending['geometry'] || hasGeometryChange(previous, next)),
-          (pending['sourceVideo'] = pending['sourceVideo'] || hasSourceVideoChange(previous, next)));
+        ((pending.nodes = true),
+          (pending.geometry = pending.geometry || hasGeometryChange(previous, next)),
+          (pending.sourceVideo = pending.sourceVideo || hasSourceVideoChange(previous, next)));
       },
       commit() {
         markRevisions(pending);
@@ -60,13 +60,13 @@ export function createRendererStateRevisionTracker(state) {
       markRevisions({ nodes: true, geometry: true });
     },
     remove(ids) {
-      const removed = (ids || [])['map']((id) => state['nodes']?.[id])['filter'](Boolean);
-      if (removed['length'] === 0) return;
+      const removed = (ids || []).map((id) => state.nodes?.[id]).filter(Boolean);
+      if (removed.length === 0) return;
       markRevisions({
         nodes: true,
         membership: true,
         geometry: true,
-        sourceVideo: removed['some']((node) => node['type'] === 'source-video'),
+        sourceVideo: removed.some((node) => node.type === 'source-video'),
       });
     },
     patch(previous, next) {

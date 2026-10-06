@@ -221,7 +221,7 @@ test('mainIpcSetup reads the four overlay deps off the capture window controller
     ['acknowledgeGlobalCaptureWindowPresentation', 'didPresent'],
   ])
     assert.equal(
-      IPC_SETUP_SOURCE.includes(`${depKey}: ${controller[1]}?.['${member}'],`),
+      IPC_SETUP_SOURCE.includes(`${depKey}: ${controller[1]}?.${member},`),
       true,
       `${depKey} -> ${member}`,
     );

@@ -66,10 +66,10 @@ export function inferProviderModelKind(source, next) {
 
 /** 兼容 {data:[{id}]} / {models:[{id}]} / [{id}] / ['id'] 四种返回形态。 */
 export function normalizeProviderModelListPayload(current) {
-  const entry = Array.isArray(current?.['data'])
-      ? current['data']
-      : Array.isArray(current?.['models'])
-        ? current['models']
+  const entry = Array.isArray(current?.data)
+      ? current.data
+      : Array.isArray(current?.models)
+        ? current.models
         : Array.isArray(current)
           ? current
           : [],
@@ -77,31 +77,31 @@ export function normalizeProviderModelListPayload(current) {
     list2 = [];
   for (const error of entry) {
     const id2 = normalizeText(
-      typeof error === 'string' ? error : error?.['id'] || error?.['model'] || error?.['name'],
+      typeof error === 'string' ? error : error?.id || error?.model || error?.name,
     );
     if (!id2 || map.has(id2)) continue;
     map.add(id2);
-    list2.push({ id: id2, created: Number(error?.['created']) || 0 });
+    list2.push({ id: id2, created: Number(error?.created) || 0 });
   }
   return list2.sort((item2, record) => item2.id.localeCompare(record.id, 'en'));
 }
 
 export function readProviderModelCatalog(payload) {
-  const handle = payload?.['modelCatalog'],
-    state = Array.isArray(handle?.['models']) ? handle['models'] : [],
+  const handle = payload?.modelCatalog,
+    state = Array.isArray(handle?.models) ? handle.models : [],
     map2 = new Set(),
     models = [];
   for (const enabled of state) {
-    const id3 = normalizeText(enabled?.['id']);
+    const id3 = normalizeText(enabled?.id);
     if (!id3 || map2.has(id3)) continue;
     map2.add(id3);
     models.push({
       id: id3,
-      kind: normalizeKind(enabled?.['kind']) || inferProviderModelKind('', id3),
-      enabled: enabled?.['enabled'] === true,
+      kind: normalizeKind(enabled?.kind) || inferProviderModelKind('', id3),
+      enabled: enabled?.enabled === true,
     });
   }
-  return { fetchedAt: normalizeText(handle?.['fetchedAt']), models: models };
+  return { fetchedAt: normalizeText(handle?.fetchedAt), models: models };
 }
 
 /** 重新拉取后合并：已有条目的勾选状态和模态被保留，新条目默认不勾选。 */
@@ -114,20 +114,20 @@ export function mergeProviderModelCatalog(config, models2, scope) {
     const kind2 = map3.get(id4.id);
     return {
       id: id4.id,
-      kind: kind2?.['kind'] || inferProviderModelKind(config, id4.id),
-      enabled: kind2?.['enabled'] === true,
+      kind: kind2?.kind || inferProviderModelKind(config, id4.id),
+      enabled: kind2?.enabled === true,
     };
   });
 }
 
 export function applyProviderModelCatalog(args, modelCatalog) {
   const output = args && typeof args === 'object' ? { ...args } : {};
-  if (!modelCatalog || !Array.isArray(modelCatalog['models']) || modelCatalog['models'].length === 0) {
-    delete output['modelCatalog'];
+  if (!modelCatalog || !Array.isArray(modelCatalog.models) || modelCatalog.models.length === 0) {
+    delete output.modelCatalog;
     return output;
   }
-  output['modelCatalog'] = {
-    fetchedAt: normalizeText(modelCatalog['fetchedAt']) || new Date().toISOString(),
+  output.modelCatalog = {
+    fetchedAt: normalizeText(modelCatalog.fetchedAt) || new Date().toISOString(),
     models: readProviderModelCatalog({ modelCatalog: modelCatalog }).models,
   };
   return output;
@@ -138,7 +138,7 @@ export function applyProviderModelCatalog(args, modelCatalog) {
  * 返回 Map<厂商模型 id, { kind, providerIds: 启用了它的线路 }>。
  */
 export function collectEnabledVendorModels(value2) {
-  const value3 = value2?.['providers'] || {},
+  const value3 = value2?.providers || {},
     map4 = new Map();
   for (const value4 of PROVIDER_MODEL_CATALOG_PROVIDER_IDS) {
     const providerModelCatalog = readProviderModelCatalog(value3[value4]);

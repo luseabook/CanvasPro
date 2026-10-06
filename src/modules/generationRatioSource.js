@@ -158,65 +158,65 @@ export function getGenerationRatioSizeWithDom({
 }
 export function getGenerationMediaItemSize(options3 = {}) {
   const box5 = options3 && typeof options3 === 'object' ? options3 : {},
-    box6 = box5['metadata'] && typeof box5['metadata'] === 'object' ? box5['metadata'] : {},
+    box6 = box5.metadata && typeof box5.metadata === 'object' ? box5.metadata : {},
     width3 = pickPositiveDimension(
-      box5['originalWidth'],
-      box5['imageWidth'],
-      box5['videoWidth'],
-      box5['naturalWidth'],
-      box5['mediaWidth'],
-      box5['width'],
-      box6['originalWidth'],
-      box6['imageWidth'],
-      box6['videoWidth'],
-      box6['width'],
+      box5.originalWidth,
+      box5.imageWidth,
+      box5.videoWidth,
+      box5.naturalWidth,
+      box5.mediaWidth,
+      box5.width,
+      box6.originalWidth,
+      box6.imageWidth,
+      box6.videoWidth,
+      box6.width,
     ),
     height3 = pickPositiveDimension(
-      box5['originalHeight'],
-      box5['imageHeight'],
-      box5['videoHeight'],
-      box5['naturalHeight'],
-      box5['mediaHeight'],
-      box5['height'],
-      box6['originalHeight'],
-      box6['imageHeight'],
-      box6['videoHeight'],
-      box6['height'],
+      box5.originalHeight,
+      box5.imageHeight,
+      box5.videoHeight,
+      box5.naturalHeight,
+      box5.mediaHeight,
+      box5.height,
+      box6.originalHeight,
+      box6.imageHeight,
+      box6.videoHeight,
+      box6.height,
     );
   return width3 > 0 && height3 > 0 ? { width: width3, height: height3 } : null;
 }
 
 export function pickGenerationRatioSourceInput(options4 = {}, value5 = {}) {
-  const value6 = options4 && typeof options4 === 'object' && !Array['isArray'](options4) ? options4 : {},
-    list4 = ['image', 'video']['flatMap']((kind2) => {
+  const value6 = options4 && typeof options4 === 'object' && !Array.isArray(options4) ? options4 : {},
+    list4 = ['image', 'video'].flatMap((kind2) => {
       const value7 = value6[kind2] ?? value6[kind2 + 's'] ?? [],
-        list5 = Array['isArray'](value7) ? value7 : value7 ? [value7] : [];
-      return list5['filter'](Boolean)['map']((item5) => ({ item: item5, kind: kind2 }));
+        list5 = Array.isArray(value7) ? value7 : value7 ? [value7] : [];
+      return list5.filter(Boolean).map((item5) => ({ item: item5, kind: kind2 }));
     });
-  if (list4['length'] === 0) return null;
+  if (list4.length === 0) return null;
   const generationDisplayRatioSourceConfig2 = getGenerationDisplayRatioSourceConfig(value5),
-    list6 = generationDisplayRatioSourceConfig2?.['kind']
-      ? list4['filter'](({ kind: kind3 }) => kind3 === generationDisplayRatioSourceConfig2['kind'])
+    list6 = generationDisplayRatioSourceConfig2?.kind
+      ? list4.filter(({ kind: kind3 }) => kind3 === generationDisplayRatioSourceConfig2.kind)
       : list4,
-    list7 = list6['length'] > 0 ? list6 : list4,
-    value8 = Array['isArray'](generationDisplayRatioSourceConfig2?.['slots'])
-      ? generationDisplayRatioSourceConfig2['slots']
-      : generationDisplayRatioSourceConfig2?.['slot']
-        ? [generationDisplayRatioSourceConfig2['slot']]
+    list7 = list6.length > 0 ? list6 : list4,
+    value8 = Array.isArray(generationDisplayRatioSourceConfig2?.slots)
+      ? generationDisplayRatioSourceConfig2.slots
+      : generationDisplayRatioSourceConfig2?.slot
+        ? [generationDisplayRatioSourceConfig2.slot]
         : [];
   for (const value9 of value8) {
-    const value10 = list7['find'](
-      ({ item: item6 }) => String(item6?.['slotId'] || item6?.['refSlot'] || '')['trim']() === value9,
+    const value10 = list7.find(
+      ({ item: item6 }) => String(item6?.slotId || item6?.refSlot || '').trim() === value9,
     );
-    if (value10) return value10['item'];
+    if (value10) return value10.item;
   }
   const count4 =
-    generationDisplayRatioSourceConfig2?.['inputIndex'] !== undefined
-      ? generationDisplayRatioSourceConfig2['inputIndex']
-      : generationDisplayRatioSourceConfig2?.['fallbackIndex'];
-  if (Number['isInteger'](count4) && count4 >= 0 && count4 < list7['length'])
-    return list7[count4]?.['item'] || null;
-  return list7[0]?.['item'] || null;
+    generationDisplayRatioSourceConfig2?.inputIndex !== undefined
+      ? generationDisplayRatioSourceConfig2.inputIndex
+      : generationDisplayRatioSourceConfig2?.fallbackIndex;
+  if (Number.isInteger(count4) && count4 >= 0 && count4 < list7.length)
+    return list7[count4]?.item || null;
+  return list7[0]?.item || null;
 }
 
 export function getGenerationInputRatioMediaSize(options5 = {}, value11 = {}) {

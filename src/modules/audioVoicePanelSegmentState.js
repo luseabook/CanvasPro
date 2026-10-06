@@ -3,7 +3,7 @@ import { localPathToUrl, normalizeLocalPath } from '../utils/localMediaPath.js';
 const AUDIO_VOICE_HISTORY_LIMIT = 5;
 export function firstNonEmptyString(...args) {
   for (const value of args) {
-    const item = String(value || '')['trim']();
+    const item = String(value || '').trim();
     if (item) return item;
   }
   return '';
@@ -12,88 +12,88 @@ export function resolveSegmentLocalAudioUrl(key, index) {
   return firstNonEmptyString(key, localPathToUrl(index));
 }
 function normalizeAudioVoiceHistoryEntry(options = {}) {
-  const localPath = normalizeLocalPath(options['localPath'] || options['convertedAudioLocalPath'] || ''),
+  const localPath = normalizeLocalPath(options.localPath || options.convertedAudioLocalPath || ''),
     audioUrl = resolveSegmentLocalAudioUrl(
-      firstNonEmptyString(options['audioUrl'], options['src'], options['convertedAudioUrl']),
+      firstNonEmptyString(options.audioUrl, options.src, options.convertedAudioUrl),
       localPath,
     );
   if (!audioUrl && !localPath) return null;
-  const createdAt = Number(options['createdAt'] || 0) || Date['now']();
+  const createdAt = Number(options.createdAt || 0) || Date.now();
   return {
-    id: String(options['id'] || 'audio-voice-history-' + createdAt)['trim'](),
+    id: String(options.id || 'audio-voice-history-' + createdAt).trim(),
     createdAt: createdAt,
-    modelId: String(options['modelId'] || '')['trim'](),
-    modelLabel: String(options['modelLabel'] || '')['trim'](),
+    modelId: String(options.modelId || '').trim(),
+    modelLabel: String(options.modelLabel || '').trim(),
     localPath: localPath,
     audioUrl: audioUrl,
-    audioDuration: pickAudioDurationSec(options['audioDuration'], options['duration']),
+    audioDuration: pickAudioDurationSec(options.audioDuration, options.duration),
   };
 }
 export function normalizeAudioVoiceHistory(list = []) {
   const list2 = [],
     map = new Set();
-  for (const result of Array['isArray'](list) ? list : []) {
+  for (const result of Array.isArray(list) ? list : []) {
     const audioVoiceHistoryEntry = normalizeAudioVoiceHistoryEntry(result);
     if (!audioVoiceHistoryEntry) continue;
-    const data = audioVoiceHistoryEntry['localPath'] + '::' + audioVoiceHistoryEntry['audioUrl'];
-    if (map['has'](data)) continue;
-    (map['add'](data), list2['push'](audioVoiceHistoryEntry));
+    const data = audioVoiceHistoryEntry.localPath + '::' + audioVoiceHistoryEntry.audioUrl;
+    if (map.has(data)) continue;
+    (map.add(data), list2.push(audioVoiceHistoryEntry));
   }
-  return list2['sort'](
-    (target, source) => Number(source['createdAt'] || 0) - Number(target['createdAt'] || 0),
-  )['slice'](0, AUDIO_VOICE_HISTORY_LIMIT);
+  return list2.sort(
+    (target, source) => Number(source.createdAt || 0) - Number(target.createdAt || 0),
+  ).slice(0, AUDIO_VOICE_HISTORY_LIMIT);
 }
 export function buildAudioVoiceHistoryEntry(localPath2 = {}, id = {}) {
-  const createdAt2 = Number(id['createdAt'] || 0) || Date['now']();
+  const createdAt2 = Number(id.createdAt || 0) || Date.now();
   return normalizeAudioVoiceHistoryEntry({
-    id: id['id'] || 'audio-voice-history-' + createdAt2 + '-' + Math['round'](Math['random']() * 1000),
+    id: id.id || 'audio-voice-history-' + createdAt2 + '-' + Math.round(Math.random() * 1000),
     createdAt: createdAt2,
-    modelId: id['modelId'],
-    modelLabel: id['modelLabel'],
-    localPath: localPath2['localPath'],
-    audioUrl: firstNonEmptyString(localPath2['audioUrl'], localPath2['src']),
-    audioDuration: localPath2['audioDuration'],
+    modelId: id.modelId,
+    modelLabel: id.modelLabel,
+    localPath: localPath2.localPath,
+    audioUrl: firstNonEmptyString(localPath2.audioUrl, localPath2.src),
+    audioDuration: localPath2.audioDuration,
   });
 }
 export function prependAudioVoiceHistory(list3 = [], next = null) {
   return prependAudioVoiceHistoryEntries(list3, next);
 }
 export function prependAudioVoiceHistoryEntries(list4 = [], current = []) {
-  const args2 = Array['isArray'](current) ? current : [current];
-  return normalizeAudioVoiceHistory([...args2, ...(Array['isArray'](list4) ? list4 : [])]['filter'](Boolean));
+  const args2 = Array.isArray(current) ? current : [current];
+  return normalizeAudioVoiceHistory([...args2, ...(Array.isArray(list4) ? list4 : [])].filter(Boolean));
 }
 export function createAudioVoicePayloadError(entry) {
   const error = new Error(entry);
-  return ((error['code'] = entry), error);
+  return ((error.code = entry), error);
 }
 export function getVisibleAudioVoiceSegments(list5 = []) {
-  return list5['filter']((response) => response['status'] !== 'removed');
+  return list5.filter((response) => response.status !== 'removed');
 }
 function normalizeAudioVoiceModelSelectionMode(record) {
   const payload = String(record || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   return payload === 'segment' || payload === 'global' ? payload : '';
 }
 function hasAudioVoiceGenerationRecord(response2 = {}, handle = '') {
-  const state = String(handle || '')['trim']();
+  const state = String(handle || '').trim();
   return (
-    response2['isGenerating'] === true ||
-    String(response2['status'] || '')
-      ['trim']()
-      ['toLowerCase']() === 'generating' ||
-    Number(response2['generationStartTime'] || response2['rhTaskStartedAt'] || 0) > 0 ||
-    !!String(response2['rhTaskId'] || '')['trim']() ||
-    (Array['isArray'](response2['convertedAudioHistory']) &&
-      response2['convertedAudioHistory']['some'](
-        (config) => String(config?.['modelId'] || '')['trim']() === state,
+    response2.isGenerating === true ||
+    String(response2.status || '')
+      .trim()
+      .toLowerCase() === 'generating' ||
+    Number(response2.generationStartTime || response2.rhTaskStartedAt || 0) > 0 ||
+    !!String(response2.rhTaskId || '').trim() ||
+    (Array.isArray(response2.convertedAudioHistory) &&
+      response2.convertedAudioHistory.some(
+        (config) => String(config?.modelId || '').trim() === state,
       ))
   );
 }
 export function normalizeAudioVoiceSegmentModelSelection(args3 = {}, scope = '') {
-  const voiceModelId = String(args3['voiceModelId'] || '')['trim'](),
-    taskModelId = String(args3['taskModelId'] || '')['trim'](),
-    voiceModelId2 = normalizeAudioVoiceModelSelectionMode(args3['voiceModelSelectionMode']);
+  const voiceModelId = String(args3.voiceModelId || '').trim(),
+    taskModelId = String(args3.taskModelId || '').trim(),
+    voiceModelId2 = normalizeAudioVoiceModelSelectionMode(args3.voiceModelSelectionMode);
   if (voiceModelId2)
     return {
       ...args3,
@@ -101,7 +101,7 @@ export function normalizeAudioVoiceSegmentModelSelection(args3 = {}, scope = '')
       voiceModelSelectionMode: voiceModelId2,
       taskModelId: taskModelId,
     };
-  const input = String(scope || '')['trim'](),
+  const input = String(scope || '').trim(),
     output =
       !!voiceModelId &&
       voiceModelId === input &&
@@ -122,98 +122,98 @@ export function normalizeAudioVoiceSegmentModelSelection(args3 = {}, scope = '')
   };
 }
 export function cloneAudioVoiceSegment(imitateToneEnabled = {}) {
-  const value2 = String(imitateToneEnabled['voiceModelId'] || '')['trim'](),
+  const value2 = String(imitateToneEnabled.voiceModelId || '').trim(),
     voiceModelId3 =
-      normalizeAudioVoiceModelSelectionMode(imitateToneEnabled['voiceModelSelectionMode']) ||
+      normalizeAudioVoiceModelSelectionMode(imitateToneEnabled.voiceModelSelectionMode) ||
       (value2 ? '' : 'global');
   return {
-    id: String(imitateToneEnabled['id'] || 'segment-' + Date['now']()),
-    startMs: Number(imitateToneEnabled['startMs'] || 0),
-    endMs: Number(imitateToneEnabled['endMs'] || 0),
-    sourceText: String(imitateToneEnabled['sourceText'] || ''),
-    targetText: String(imitateToneEnabled['targetText'] || ''),
-    ...(String(imitateToneEnabled['speakerId'] || '')['trim']()
-      ? { speakerId: String(imitateToneEnabled['speakerId'])['trim']() }
+    id: String(imitateToneEnabled.id || 'segment-' + Date.now()),
+    startMs: Number(imitateToneEnabled.startMs || 0),
+    endMs: Number(imitateToneEnabled.endMs || 0),
+    sourceText: String(imitateToneEnabled.sourceText || ''),
+    targetText: String(imitateToneEnabled.targetText || ''),
+    ...(String(imitateToneEnabled.speakerId || '').trim()
+      ? { speakerId: String(imitateToneEnabled.speakerId).trim() }
       : {}),
-    ...(String(imitateToneEnabled['speaker'] || '')['trim']()
-      ? { speaker: String(imitateToneEnabled['speaker'])['trim']() }
+    ...(String(imitateToneEnabled.speaker || '').trim()
+      ? { speaker: String(imitateToneEnabled.speaker).trim() }
       : {}),
-    sourceAudioLocalPath: normalizeLocalPath(imitateToneEnabled['sourceAudioLocalPath'] || ''),
+    sourceAudioLocalPath: normalizeLocalPath(imitateToneEnabled.sourceAudioLocalPath || ''),
     sourceAudioUrl: resolveSegmentLocalAudioUrl(
-      imitateToneEnabled['sourceAudioUrl'],
-      imitateToneEnabled['sourceAudioLocalPath'],
+      imitateToneEnabled.sourceAudioUrl,
+      imitateToneEnabled.sourceAudioLocalPath,
     ),
     sourceClipBaseAudioLocalPath: normalizeLocalPath(
-      imitateToneEnabled['sourceClipBaseAudioLocalPath'] || '',
+      imitateToneEnabled.sourceClipBaseAudioLocalPath || '',
     ),
     sourceClipBaseAudioUrl: resolveSegmentLocalAudioUrl(
-      imitateToneEnabled['sourceClipBaseAudioUrl'],
-      imitateToneEnabled['sourceClipBaseAudioLocalPath'],
+      imitateToneEnabled.sourceClipBaseAudioUrl,
+      imitateToneEnabled.sourceClipBaseAudioLocalPath,
     ),
-    sourceClipBaseStartMs: Math['max'](
+    sourceClipBaseStartMs: Math.max(
       0,
-      Math['round'](Number(imitateToneEnabled['sourceClipBaseStartMs']) || 0),
+      Math.round(Number(imitateToneEnabled.sourceClipBaseStartMs) || 0),
     ),
-    sourceClipBaseEndMs: Math['max'](
+    sourceClipBaseEndMs: Math.max(
       0,
-      Math['round'](Number(imitateToneEnabled['sourceClipBaseEndMs']) || 0),
+      Math.round(Number(imitateToneEnabled.sourceClipBaseEndMs) || 0),
     ),
-    convertedAudioLocalPath: normalizeLocalPath(imitateToneEnabled['convertedAudioLocalPath'] || ''),
+    convertedAudioLocalPath: normalizeLocalPath(imitateToneEnabled.convertedAudioLocalPath || ''),
     convertedAudioUrl: resolveSegmentLocalAudioUrl(
-      imitateToneEnabled['convertedAudioUrl'],
-      imitateToneEnabled['convertedAudioLocalPath'],
+      imitateToneEnabled.convertedAudioUrl,
+      imitateToneEnabled.convertedAudioLocalPath,
     ),
     convertedAudioDuration: pickAudioDurationSec(
-      imitateToneEnabled['convertedAudioDuration'],
-      imitateToneEnabled['audioDuration'],
+      imitateToneEnabled.convertedAudioDuration,
+      imitateToneEnabled.audioDuration,
     ),
-    voiceRefNodeId: String(imitateToneEnabled['voiceRefNodeId'] || ''),
-    voiceRefAudioLocalPath: normalizeLocalPath(imitateToneEnabled['voiceRefAudioLocalPath'] || ''),
+    voiceRefNodeId: String(imitateToneEnabled.voiceRefNodeId || ''),
+    voiceRefAudioLocalPath: normalizeLocalPath(imitateToneEnabled.voiceRefAudioLocalPath || ''),
     voiceRefAudioUrl: resolveSegmentLocalAudioUrl(
-      imitateToneEnabled['voiceRefAudioUrl'],
-      imitateToneEnabled['voiceRefAudioLocalPath'],
+      imitateToneEnabled.voiceRefAudioUrl,
+      imitateToneEnabled.voiceRefAudioLocalPath,
     ),
-    voiceRefName: String(imitateToneEnabled['voiceRefName'] || ''),
-    voiceRefImageUrl: String(imitateToneEnabled['voiceRefImageUrl'] || ''),
+    voiceRefName: String(imitateToneEnabled.voiceRefName || ''),
+    voiceRefImageUrl: String(imitateToneEnabled.voiceRefImageUrl || ''),
     voiceModelId: voiceModelId3 === 'global' ? '' : value2,
     voiceModelSelectionMode: voiceModelId3,
-    taskModelId: String(imitateToneEnabled['taskModelId'] || '')['trim'](),
-    imitateToneEnabled: imitateToneEnabled['imitateToneEnabled'] === true,
+    taskModelId: String(imitateToneEnabled.taskModelId || '').trim(),
+    imitateToneEnabled: imitateToneEnabled.imitateToneEnabled === true,
     sourceAudioReady:
-      imitateToneEnabled['sourceAudioReady'] === true ||
+      imitateToneEnabled.sourceAudioReady === true ||
       !!resolveSegmentLocalAudioUrl(
-        imitateToneEnabled['sourceAudioUrl'],
-        imitateToneEnabled['sourceAudioLocalPath'],
+        imitateToneEnabled.sourceAudioUrl,
+        imitateToneEnabled.sourceAudioLocalPath,
       ),
-    convertedAudioReady: imitateToneEnabled['convertedAudioReady'] === true,
-    activeAudio: imitateToneEnabled['activeAudio'] === 'converted' ? 'converted' : 'source',
-    status: String(imitateToneEnabled['status'] || 'detected'),
-    needsSourceAudioRecut: imitateToneEnabled['needsSourceAudioRecut'] === true,
-    error: String(imitateToneEnabled['error'] || ''),
-    rhTaskId: String(imitateToneEnabled['rhTaskId'] || ''),
-    rhTaskStatus: String(imitateToneEnabled['rhTaskStatus'] || ''),
-    rhStatusMessage: String(imitateToneEnabled['rhStatusMessage'] || ''),
-    rhTaskStartedAt: Number(imitateToneEnabled['rhTaskStartedAt'] || 0) || 0,
-    rhTaskUseOpenapiQuery: imitateToneEnabled['rhTaskUseOpenapiQuery'] === true,
-    isGenerating: imitateToneEnabled['isGenerating'] === true,
-    jobStatus: String(imitateToneEnabled['jobStatus'] || ''),
-    jobError: imitateToneEnabled['jobError'] == null ? null : String(imitateToneEnabled['jobError'] || ''),
-    generationStartTime: Number(imitateToneEnabled['generationStartTime'] || 0) || 0,
+    convertedAudioReady: imitateToneEnabled.convertedAudioReady === true,
+    activeAudio: imitateToneEnabled.activeAudio === 'converted' ? 'converted' : 'source',
+    status: String(imitateToneEnabled.status || 'detected'),
+    needsSourceAudioRecut: imitateToneEnabled.needsSourceAudioRecut === true,
+    error: String(imitateToneEnabled.error || ''),
+    rhTaskId: String(imitateToneEnabled.rhTaskId || ''),
+    rhTaskStatus: String(imitateToneEnabled.rhTaskStatus || ''),
+    rhStatusMessage: String(imitateToneEnabled.rhStatusMessage || ''),
+    rhTaskStartedAt: Number(imitateToneEnabled.rhTaskStartedAt || 0) || 0,
+    rhTaskUseOpenapiQuery: imitateToneEnabled.rhTaskUseOpenapiQuery === true,
+    isGenerating: imitateToneEnabled.isGenerating === true,
+    jobStatus: String(imitateToneEnabled.jobStatus || ''),
+    jobError: imitateToneEnabled.jobError == null ? null : String(imitateToneEnabled.jobError || ''),
+    generationStartTime: Number(imitateToneEnabled.generationStartTime || 0) || 0,
     generationDuration:
-      imitateToneEnabled['generationDuration'] === null ||
-      imitateToneEnabled['generationDuration'] === undefined
+      imitateToneEnabled.generationDuration === null ||
+      imitateToneEnabled.generationDuration === undefined
         ? null
-        : Math['max'](0, Number(imitateToneEnabled['generationDuration'] || 0) || 0),
-    convertedAudioHistory: normalizeAudioVoiceHistory(imitateToneEnabled['convertedAudioHistory']),
+        : Math.max(0, Number(imitateToneEnabled.generationDuration || 0) || 0),
+    convertedAudioHistory: normalizeAudioVoiceHistory(imitateToneEnabled.convertedAudioHistory),
   };
 }
 export function createAudioVoiceSegmentAfter(options2 = {}, value3 = null) {
-  const startMs = Number(options2['endMs'] || 0),
+  const startMs = Number(options2.endMs || 0),
     endMs = value3
-      ? Math['max'](startMs + 200, Math['round']((startMs + Number(value3['startMs'] || startMs)) / 2))
+      ? Math.max(startMs + 200, Math.round((startMs + Number(value3.startMs || startMs)) / 2))
       : startMs + 1500;
   return {
-    id: 'mock-insert-' + Date['now']() + '-' + Math['round'](Math['random']() * 1000),
+    id: 'mock-insert-' + Date.now() + '-' + Math.round(Math.random() * 1000),
     startMs: startMs,
     endMs: endMs,
     sourceText: '',

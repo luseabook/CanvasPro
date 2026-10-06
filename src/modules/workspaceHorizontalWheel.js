@@ -1,17 +1,17 @@
 function getDominantWheelDelta(wheelEvent) {
-  const deltaX = Number(wheelEvent?.['deltaX']) || 0,
-    deltaY = Number(wheelEvent?.['deltaY']) || 0;
-  return Math['abs'](deltaX) > Math['abs'](deltaY) ? deltaX : deltaY;
+  const deltaX = Number(wheelEvent?.deltaX) || 0,
+    deltaY = Number(wheelEvent?.deltaY) || 0;
+  return Math.abs(deltaX) > Math.abs(deltaY) ? deltaX : deltaY;
 }
 function getWheelDeltaMultiplier(deltaMode, viewportWidth) {
   if (Number(deltaMode) === 1) return 16;
-  if (Number(deltaMode) === 2) return Math['max'](1, Number(viewportWidth) || 1);
+  if (Number(deltaMode) === 2) return Math.max(1, Number(viewportWidth) || 1);
   return 1;
 }
 const SCROLLABLE_OVERFLOW_VALUES = new Set(['auto', 'scroll', 'overlay']);
 function canConsumeWheelDelta(element, event, computedStyle = {}) {
-  const rawDeltaX = Number(event?.['deltaX']) || 0,
-    rawDeltaY = Number(event?.['deltaY']) || 0,
+  const rawDeltaX = Number(event?.deltaX) || 0,
+    rawDeltaY = Number(event?.deltaY) || 0,
     consumesAxis = ({
       delta: delta,
       overflow: overflow,
@@ -19,39 +19,39 @@ function canConsumeWheelDelta(element, event, computedStyle = {}) {
       scrollSize: scrollSize,
       clientSize: clientSize,
     }) => {
-      if (!delta || !SCROLLABLE_OVERFLOW_VALUES['has'](String(overflow || ''))) return false;
-      const scrollRange = Math['max'](0, (Number(scrollSize) || 0) - (Number(clientSize) || 0));
+      if (!delta || !SCROLLABLE_OVERFLOW_VALUES.has(String(overflow || ''))) return false;
+      const scrollRange = Math.max(0, (Number(scrollSize) || 0) - (Number(clientSize) || 0));
       if (!(scrollRange > 0)) return false;
-      const currentOffset = Math['max'](0, Math['min'](scrollRange, Number(scrollPosition) || 0));
+      const currentOffset = Math.max(0, Math.min(scrollRange, Number(scrollPosition) || 0));
       return delta > 0 ? currentOffset < scrollRange : currentOffset > 0;
     };
   return (
     consumesAxis({
       delta: rawDeltaX,
-      overflow: computedStyle['overflowX'],
-      scrollPosition: element?.['scrollLeft'],
-      scrollSize: element?.['scrollWidth'],
-      clientSize: element?.['clientWidth'],
+      overflow: computedStyle.overflowX,
+      scrollPosition: element?.scrollLeft,
+      scrollSize: element?.scrollWidth,
+      clientSize: element?.clientWidth,
     }) ||
     consumesAxis({
       delta: rawDeltaY,
-      overflow: computedStyle['overflowY'],
-      scrollPosition: element?.['scrollTop'],
-      scrollSize: element?.['scrollHeight'],
-      clientSize: element?.['clientHeight'],
+      overflow: computedStyle.overflowY,
+      scrollPosition: element?.scrollTop,
+      scrollSize: element?.scrollHeight,
+      clientSize: element?.clientHeight,
     })
   );
 }
 function hasNestedWheelConsumer(event, boundary, { getComputedStyle: getComputedStyle = null } = {}) {
-  const target = event?.['target'],
+  const target = event?.target,
     readComputedStyle =
       getComputedStyle ||
-      target?.['ownerDocument']?.['defaultView']?.['getComputedStyle']?.['bind'](
-        target['ownerDocument']['defaultView'],
+      target?.ownerDocument?.defaultView?.getComputedStyle?.bind(
+        target.ownerDocument.defaultView,
       ) ||
-      globalThis['getComputedStyle'];
+      globalThis.getComputedStyle;
   if (typeof readComputedStyle !== 'function') return false;
-  for (let candidate = target; candidate && candidate !== boundary; candidate = candidate['parentElement']) {
+  for (let candidate = target; candidate && candidate !== boundary; candidate = candidate.parentElement) {
     if (canConsumeWheelDelta(candidate, event, readComputedStyle(candidate))) return true;
   }
   return false;
@@ -62,17 +62,17 @@ export function scrollElementHorizontallyWithWheel(
   { stopPropagation: stopPropagation = false } = {},
 ) {
   if (!scrollElement) return false;
-  const viewportWidth = Math['max'](0, Number(scrollElement['clientWidth']) || 0),
-    maxScrollLeft = Math['max'](0, (Number(scrollElement['scrollWidth']) || 0) - viewportWidth);
+  const viewportWidth = Math.max(0, Number(scrollElement.clientWidth) || 0),
+    maxScrollLeft = Math.max(0, (Number(scrollElement.scrollWidth) || 0) - viewportWidth);
   if (!maxScrollLeft) return false;
   const dominantDelta = getDominantWheelDelta(wheelEvent);
   if (!dominantDelta) return false;
-  const scrollDelta = dominantDelta * getWheelDeltaMultiplier(wheelEvent?.['deltaMode'], viewportWidth),
-    startOffset = Math['max'](0, Math['min'](maxScrollLeft, Number(scrollElement['scrollLeft']) || 0)),
-    nextOffset = Math['max'](0, Math['min'](maxScrollLeft, startOffset + scrollDelta));
+  const scrollDelta = dominantDelta * getWheelDeltaMultiplier(wheelEvent?.deltaMode, viewportWidth),
+    startOffset = Math.max(0, Math.min(maxScrollLeft, Number(scrollElement.scrollLeft) || 0)),
+    nextOffset = Math.max(0, Math.min(maxScrollLeft, startOffset + scrollDelta));
   if (nextOffset === startOffset) return false;
-  ((scrollElement['scrollLeft'] = nextOffset), wheelEvent?.['preventDefault']?.());
-  if (stopPropagation) wheelEvent?.['stopPropagation']?.();
+  ((scrollElement.scrollLeft = nextOffset), wheelEvent?.preventDefault?.());
+  if (stopPropagation) wheelEvent?.stopPropagation?.();
   return true;
 }
 export function scrollClosestElementHorizontallyWithWheel(
@@ -85,8 +85,8 @@ export function scrollClosestElementHorizontallyWithWheel(
     getComputedStyle: getComputedStyle = null,
   } = {},
 ) {
-  const closestElement = wheelEvent?.['target']?.['closest']?.(selector);
-  if (!closestElement || (boundaryRoot && !boundaryRoot['contains']?.(closestElement))) return false;
+  const closestElement = wheelEvent?.target?.closest?.(selector);
+  if (!closestElement || (boundaryRoot && !boundaryRoot.contains?.(closestElement))) return false;
   if (
     preserveNestedScrollable &&
     hasNestedWheelConsumer(wheelEvent, closestElement, { getComputedStyle: getComputedStyle })

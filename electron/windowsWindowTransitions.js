@@ -3,24 +3,24 @@ import { resolveWindowsSystemToolPath } from './windowsSystemTools.js';
 export async function disableWindowsWindowTransitions(
   targetWindow,
   {
-    platform: platform = process['platform'],
-    ownerPid: ownerPid = process['pid'],
+    platform: platform = process.platform,
+    ownerPid: ownerPid = process.pid,
     execFileFn: execFileFn = execFile,
   } = {},
 ) {
   if (platform !== 'win32') return { ok: true, skipped: true };
-  if (targetWindow?.['isDestroyed']?.()) return { ok: false, reason: 'window-unavailable' };
+  if (targetWindow?.isDestroyed?.()) return { ok: false, reason: 'window-unavailable' };
   let windowHandle;
   try {
-    const rawHandle = targetWindow?.['getNativeWindowHandle']?.();
-    if (!Buffer['isBuffer'](rawHandle) || ![4, 8]['includes'](rawHandle['length']))
+    const rawHandle = targetWindow?.getNativeWindowHandle?.();
+    if (!Buffer.isBuffer(rawHandle) || ![4, 8].includes(rawHandle.length))
       throw new Error('invalid-handle');
     windowHandle =
-      rawHandle['length'] === 8 ? rawHandle['readBigUInt64LE']() : BigInt(rawHandle['readUInt32LE']());
+      rawHandle.length === 8 ? rawHandle.readBigUInt64LE() : BigInt(rawHandle.readUInt32LE());
     if (
       windowHandle <= 0x0n ||
       windowHandle > 0x7fffffffffffffffn ||
-      !Number['isSafeInteger'](ownerPid) ||
+      !Number.isSafeInteger(ownerPid) ||
       ownerPid <= 0
     )
       throw new Error('invalid-handle');
@@ -36,7 +36,7 @@ export async function disableWindowsWindowTransitions(
   return new Promise((resolve) => {
     const handleResult = (error, stdout) =>
       resolve(
-        !error && String(stdout || '')['trim']() === 'APPLIED' && !targetWindow['isDestroyed']?.()
+        !error && String(stdout || '').trim() === 'APPLIED' && !targetWindow.isDestroyed?.()
           ? { ok: true }
           : { ok: false, reason: 'native-transitions-unavailable' },
       );
@@ -50,7 +50,7 @@ export async function disableWindowsWindowTransitions(
           '-ExecutionPolicy',
           'Bypass',
           '-EncodedCommand',
-          Buffer['from'](script, 'utf16le')['toString']('base64'),
+          Buffer.from(script, 'utf16le').toString('base64'),
         ],
         { windowsHide: true, timeout: 5000, maxBuffer: 16384, encoding: 'utf8' },
         handleResult,

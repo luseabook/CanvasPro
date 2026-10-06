@@ -6,25 +6,25 @@ import {
 export const PERSON_REPLACEMENT_PROJECT_PACKAGE_PAYLOAD_VERSION = 1;
 const TRANSIENT_TASK_ID_FIELDS = new Set(['requestId', 'taskId', 'remoteTaskId']);
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function cloneForPackage(item, { stripTaskIds: stripTaskIds = false } = {}) {
-  return JSON['parse'](
-    JSON['stringify'](item, (key, index) => {
-      if (typeof index === 'string' && index['startsWith']('blob:')) return '';
-      if (stripTaskIds && TRANSIENT_TASK_ID_FIELDS['has'](key)) return '';
+  return JSON.parse(
+    JSON.stringify(item, (key, index) => {
+      if (typeof index === 'string' && index.startsWith('blob:')) return '';
+      if (stripTaskIds && TRANSIENT_TASK_ID_FIELDS.has(key)) return '';
       return index;
     }),
   );
 }
 export function canCollectPersonReplacementProject(options = {}) {
   return (
-    Boolean(normalizeText(options?.['id'])) &&
-    getPersonReplacementProjectTaskSummary(options)['activeCount'] === 0
+    Boolean(normalizeText(options?.id)) &&
+    getPersonReplacementProjectTaskSummary(options).activeCount === 0
   );
 }
 export function createPersonReplacementProjectPackagePayload(options2 = {}) {
-  if (!normalizeText(options2?.['id'])) throw new Error('人物替换项目不存在。');
+  if (!normalizeText(options2?.id)) throw new Error('人物替换项目不存在。');
   if (!canCollectPersonReplacementProject(options2)) throw new Error('项目仍有任务处理中，请完成后再收集。');
   return {
     payloadVersion: PERSON_REPLACEMENT_PROJECT_PACKAGE_PAYLOAD_VERSION,
@@ -36,21 +36,21 @@ export function createPersonReplacementProjectPackagePayload(options2 = {}) {
 }
 export function createImportedPersonReplacementProject(
   enabled = {},
-  { projectId: projectId, now: now = new Date()['toISOString']() } = {},
+  { projectId: projectId, now: now = new Date().toISOString() } = {},
 ) {
   if (
-    Number(enabled?.['payloadVersion']) !== PERSON_REPLACEMENT_PROJECT_PACKAGE_PAYLOAD_VERSION ||
-    enabled?.['feature'] !== 'person-replacement' ||
-    !enabled?.['project']
+    Number(enabled?.payloadVersion) !== PERSON_REPLACEMENT_PROJECT_PACKAGE_PAYLOAD_VERSION ||
+    enabled?.feature !== 'person-replacement' ||
+    !enabled?.project
   )
     throw new Error('无效的人物替换项目包内容。');
   const args = normalizeReplacementStudioApplicationProject(
-      cloneForPackage(enabled['project'], { stripTaskIds: true }),
+      cloneForPackage(enabled.project, { stripTaskIds: true }),
       {},
     ),
     id = normalizeText(projectId);
   if (!id) throw new Error('导入项目缺少新的项目标识。');
-  const title = normalizeText(args['title']) || '未命名人物替换项目',
+  const title = normalizeText(args.title) || '未命名人物替换项目',
     replacementStudioApplicationProject = normalizeReplacementStudioApplicationProject(
       {
         ...args,
@@ -59,9 +59,9 @@ export function createImportedPersonReplacementProject(
         archivedAt: 0,
         createdAt: now,
         updatedAt: now,
-        output: { ...(args['output'] || {}), canvasBinding: {} },
+        output: { ...(args.output || {}), canvasBinding: {} },
         workspace: {
-          ...(args['workspace'] || {}),
+          ...(args.workspace || {}),
           view: 'home',
           openProjectMenuId: '',
           pendingDeleteProjectId: '',
@@ -75,6 +75,6 @@ export function createImportedPersonReplacementProject(
         preserveRecoverableTasks: false,
         message: '导入项目不会继续原项目中的任务，请重试。',
       },
-    )['project'];
+    ).project;
   return cloneForPackage(settleInterruptedReplacementStudioProjectTasks2, { stripTaskIds: true });
 }

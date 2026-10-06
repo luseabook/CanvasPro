@@ -5,29 +5,29 @@ import {
   updateAudioModelTriggerIcon,
 } from './audioFooterSchemaSlots.js';
 function getWorkflowKey(event = {}) {
-  return String(event?.['key'] || event?.['modelId'] || '')['trim']();
+  return String(event?.key || event?.modelId || '').trim();
 }
 export function collectAudioWorkflowSchemaSlotElements(modelTrigger) {
   return {
-    modelTrigger: modelTrigger?.['querySelector']?.('.img-model-btn-trigger') || null,
-    modeSlot: modelTrigger?.['querySelector']?.('.ui-schema-mode-slot') || null,
-    instanceSlot: modelTrigger?.['querySelector']?.('.ui-schema-instance-slot') || null,
-    batchSlot: modelTrigger?.['querySelector']?.('.ui-schema-batch-slot') || null,
-    advancedPanel: modelTrigger?.['querySelector']?.('.rh-adv-panel') || null,
-    advancedWrap: modelTrigger?.['querySelector']?.('.rh-adv-wrap') || null,
-    advancedButton: modelTrigger?.['querySelector']?.('.rh-adv-btn') || null,
+    modelTrigger: modelTrigger?.querySelector?.('.img-model-btn-trigger') || null,
+    modeSlot: modelTrigger?.querySelector?.('.ui-schema-mode-slot') || null,
+    instanceSlot: modelTrigger?.querySelector?.('.ui-schema-instance-slot') || null,
+    batchSlot: modelTrigger?.querySelector?.('.ui-schema-batch-slot') || null,
+    advancedPanel: modelTrigger?.querySelector?.('.rh-adv-panel') || null,
+    advancedWrap: modelTrigger?.querySelector?.('.rh-adv-wrap') || null,
+    advancedButton: modelTrigger?.querySelector?.('.rh-adv-btn') || null,
   };
 }
 export function closeAudioWorkflowAdvancedPanel(options = {}) {
-  if (options?.['advancedPanel']?.['classList']?.['contains']?.(RH_AI_APP_PERSISTENT_ADVANCED_CLASS)) {
-    (options['advancedPanel']['classList']['add']('show'),
-      options?.['advancedButton']?.['classList']?.['remove']?.('active'),
-      options?.['advancedButton']?.['setAttribute']?.('aria-expanded', 'true'));
+  if (options?.advancedPanel?.classList?.contains?.(RH_AI_APP_PERSISTENT_ADVANCED_CLASS)) {
+    (options.advancedPanel.classList.add('show'),
+      options?.advancedButton?.classList?.remove?.('active'),
+      options?.advancedButton?.setAttribute?.('aria-expanded', 'true'));
     return;
   }
-  (options?.['advancedPanel']?.['classList']?.['remove']?.('show'),
-    options?.['advancedButton']?.['classList']?.['remove']?.('active'),
-    options?.['advancedButton']?.['setAttribute']?.('aria-expanded', 'false'));
+  (options?.advancedPanel?.classList?.remove?.('show'),
+    options?.advancedButton?.classList?.remove?.('active'),
+    options?.advancedButton?.setAttribute?.('aria-expanded', 'false'));
 }
 export function bindAudioWorkflowSchemaSlotControls({
   footer: footer,
@@ -51,14 +51,14 @@ export function syncAudioWorkflowSchemaSlots({
       (applyAudioWorkflowFooterSchemaControls({
         workflow: workflow,
         nodeData: nodeData,
-        modeSlot: elements?.['modeSlot'],
-        advancedPanel: elements?.['advancedPanel'],
-        advancedWrap: elements?.['advancedWrap'],
-        advancedButton: elements?.['advancedButton'],
-        instanceSlot: elements?.['instanceSlot'],
-        batchSlot: elements?.['batchSlot'],
+        modeSlot: elements?.modeSlot,
+        advancedPanel: elements?.advancedPanel,
+        advancedWrap: elements?.advancedWrap,
+        advancedButton: elements?.advancedButton,
+        instanceSlot: elements?.instanceSlot,
+        batchSlot: elements?.batchSlot,
       }),
-      updateAudioModelTriggerIcon(elements?.['modelTrigger'], workflow)),
+      updateAudioModelTriggerIcon(elements?.modelTrigger, workflow)),
     syncModelUiSchemaControls(root, nodeData),
     { rebuilt: rebuilt, lastRenderedWorkflowKey: rebuilt ? workflowKey : lastRenderedWorkflowKey }
   );

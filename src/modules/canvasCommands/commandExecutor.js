@@ -279,21 +279,21 @@ export function executeCanvasCommandSync(value22, args5 = {}, value23 = {}) {
   const commandId5 = normalizeCommandId(value22);
   if (!commandId5) return buildFailure('', 'MISSING_COMMAND_ID', 'Canvas command id is required.');
   const map7 = getRegistry(value23),
-    message4 = map7?.['get']?.(commandId5) || null;
+    message4 = map7?.get?.(commandId5) || null;
   if (!message4) return buildFailure(commandId5, 'UNKNOWN_COMMAND', 'Unknown canvas command: ' + commandId5);
   try {
-    const args6 = normalizeValidation(commandId5, message4['validate']?.(args5, value23), args5);
-    if (!args6['ok']) return args6;
-    if (message4['execute']?.['constructor']?.['name'] === 'AsyncFunction')
+    const args6 = normalizeValidation(commandId5, message4.validate?.(args5, value23), args5);
+    if (!args6.ok) return args6;
+    if (message4.execute?.constructor?.name === 'AsyncFunction')
       return buildFailure(
         commandId5,
         'ASYNC_COMMAND_UNSUPPORTED',
         commandId5 + ' cannot run through a synchronous command entry.',
       );
-    const result5 = message4['execute'](args6['args'], value23);
-    if (result5 && typeof result5['then'] === 'function')
+    const result5 = message4.execute(args6.args, value23);
+    if (result5 && typeof result5.then === 'function')
       return (
-        Promise['resolve'](result5)['catch'](() => {}),
+        Promise.resolve(result5).catch(() => {}),
         buildFailure(
           commandId5,
           'ASYNC_COMMAND_UNSUPPORTED',
@@ -303,27 +303,27 @@ export function executeCanvasCommandSync(value22, args5 = {}, value23 = {}) {
     const result6 = createCanvasCommandSuccess({
       commandId: commandId5,
       result: result5,
-      message: message4['description'] || commandId5,
-      riskLevel: message4['riskLevel'] || 'safe',
+      message: message4.description || commandId5,
+      riskLevel: message4.riskLevel || 'safe',
     });
     return (
-      value23['recordCommand']?.({
+      value23.recordCommand?.({
         commandId: commandId5,
-        args: args6['args'],
+        args: args6.args,
         result: result6,
-        riskLevel: message4['riskLevel'] || 'safe',
-        ts: Date['now'](),
+        riskLevel: message4.riskLevel || 'safe',
+        ts: Date.now(),
       }),
       result6
     );
   } catch (value24) {
     const result7 = normalizeThrownError(commandId5, value24);
     return (
-      value23['recordCommand']?.({
+      value23.recordCommand?.({
         commandId: commandId5,
         args: args5,
         result: result7,
-        ts: Date['now'](),
+        ts: Date.now(),
       }),
       result7
     );

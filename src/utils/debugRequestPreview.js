@@ -44,7 +44,7 @@ export function formatFinalApiDebugRequest(result, data = {}) {
   );
 }
 
-const LOCAL_PROXY_ONLY_PAYLOAD_KEYS = Object['freeze']([
+const LOCAL_PROXY_ONLY_PAYLOAD_KEYS = Object.freeze([
   '__aicAllowTaskProbe',
   '__aicModelCatalogId',
   'installId',
@@ -55,14 +55,14 @@ const LOCAL_PROXY_ONLY_PAYLOAD_KEYS = Object['freeze']([
 
 export function buildFinalApiDebugPreview(options, target = {}) {
   const formatFinalApiDebugRequest2 = formatFinalApiDebugRequest(options, target),
-    debugJsonPreview = buildDebugJsonPreview(buildFinalApiDebugRequest(options, target)['payload']),
-    source = formatFinalApiDebugRequest2['length'] - debugJsonPreview['content']['length'];
+    debugJsonPreview = buildDebugJsonPreview(buildFinalApiDebugRequest(options, target).payload),
+    source = formatFinalApiDebugRequest2.length - debugJsonPreview.content.length;
   return {
     outputText: formatFinalApiDebugRequest2,
-    images: debugJsonPreview['images']['map']((args2) => ({
+    images: debugJsonPreview.images.map((args2) => ({
       ...args2,
-      start: args2['start'] + source,
-      end: args2['end'] + source,
+      start: args2.start + source,
+      end: args2.end + source,
     })),
   };
 }

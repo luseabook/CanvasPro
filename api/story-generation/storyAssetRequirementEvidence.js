@@ -1,13 +1,13 @@
 export const STORY_ASSET_REQUIREMENT_EVIDENCE_SCHEMA_VERSION = 1;
-const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
+const STORY_ASSET_REQUIREMENT_TIERS = Object.freeze({
     hard: 'hard-required',
     optional: 'optional-candidate',
     ignored: 'ignored',
   }),
-  STORY_ASSET_REQUIREMENT_TIER_PRIORITY = Object['freeze']({
-    [STORY_ASSET_REQUIREMENT_TIERS['ignored']]: 0,
-    [STORY_ASSET_REQUIREMENT_TIERS['optional']]: 1,
-    [STORY_ASSET_REQUIREMENT_TIERS['hard']]: 2,
+  STORY_ASSET_REQUIREMENT_TIER_PRIORITY = Object.freeze({
+    [STORY_ASSET_REQUIREMENT_TIERS.ignored]: 0,
+    [STORY_ASSET_REQUIREMENT_TIERS.optional]: 1,
+    [STORY_ASSET_REQUIREMENT_TIERS.hard]: 2,
   }),
   STORY_TITLE_NUMBER_PATTERN = '(?:\\d+|[零〇一二三四五六七八九十百千万两廿卅]+)',
   STORY_STRUCTURAL_TITLE_PREFIX_PATTERN = new RegExp(
@@ -19,7 +19,7 @@ const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
       '|(?:集|章|章节|幕|场)标题',
       ')',
       '\\s*[：:—\\-·丨|】\\]）)]*\\s*$',
-    ]['join'](''),
+    ].join(''),
     'iu',
   ),
   STORY_PROP_PHYSICAL_ACTION_PATTERN =
@@ -45,7 +45,7 @@ const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
       '^(?:编号|标记|时间戳|坐标)(?:[-_：:]?\\p{L}*\\d*)?$',
       '(?:^|[-_])(?:MID|MARK|MARKER|SCENE|EPISODE|EP)[-_]?\\d+(?:$|[-_])',
       '^G?\\d+[-_](?:MID|MARK)',
-    ]['join']('|'),
+    ].join('|'),
     'iu',
   ),
   STORY_PROP_LEADING_MEASURE_PATTERN =
@@ -65,173 +65,173 @@ const STORY_ASSET_REQUIREMENT_TIERS = Object['freeze']({
       '^(?:握了握|拿了拿|看了看|翻了翻)$',
       '^(?:[\\p{L}\\p{N}·•._-]{1,12}的)?(?:手|手指|手腕|手臂|肩|肩膀|头|脸|眼睛|嘴|腿|脚)$',
       '(?:记忆提|分别)$',
-    ]['join']('|'),
+    ].join('|'),
     'u',
   );
 function normalizeText(value) {
-  return typeof value === 'string' ? value['trim']() : '';
+  return typeof value === 'string' ? value.trim() : '';
 }
 function normalizeNameKey(item) {
-  return normalizeText(item)['normalize']('NFKC')['replace'](/\s+/gu, '')['toLocaleLowerCase']();
+  return normalizeText(item).normalize('NFKC').replace(/\s+/gu, '').toLocaleLowerCase();
 }
 function normalizeStringArray(list = []) {
-  return [...new Set((Array['isArray'](list) ? list : [])['map'](normalizeText)['filter'](Boolean))];
+  return [...new Set((Array.isArray(list) ? list : []).map(normalizeText).filter(Boolean))];
 }
 function getLocalCandidateConfidence(key, index, result) {
-  const list2 = (Array['isArray'](key?.['localEntityEvidence']) ? key['localEntityEvidence'] : [])
-    ['filter']((response) => response?.['kind'] === index && normalizeText(response?.['text']) === result)
-    ['map']((data) => Number(data?.['probability']))
-    ['filter'](Number['isFinite']);
-  return list2['length'] ? Math['max'](...list2) : 0;
+  const list2 = (Array.isArray(key?.localEntityEvidence) ? key.localEntityEvidence : [])
+    .filter((response) => response?.kind === index && normalizeText(response?.text) === result)
+    .map((data) => Number(data?.probability))
+    .filter(Number.isFinite);
+  return list2.length ? Math.max(...list2) : 0;
 }
 function stripLocalCandidateSummary(options = '') {
   return normalizeText(options)
-    ['replace'](/PP-UIE\s*本地候选：[^\r\n]*(?:\r?\n\s*证据原文：)?/giu, '')
-    ['replace'](/证据原文：/gu, '')
-    ['trim']();
+    .replace(/PP-UIE\s*本地候选：[^\r\n]*(?:\r?\n\s*证据原文：)?/giu, '')
+    .replace(/证据原文：/gu, '')
+    .trim();
 }
 function isUsableLocalCandidateName(target, source) {
   const args = normalizeText(source),
-    count = [...args]['length'];
+    count = [...args].length;
   if (
     count < 2 ||
     count > 48 ||
-    /[\r\n]/u['test'](args) ||
-    STORY_ASSET_LOCAL_CANDIDATE_PLACEHOLDER_PATTERN['test'](args)
+    /[\r\n]/u.test(args) ||
+    STORY_ASSET_LOCAL_CANDIDATE_PLACEHOLDER_PATTERN.test(args)
   )
     return false;
   if (target === 'prop' && isNoisyStoryPropCandidateName(args)) return false;
   if (target !== 'character') return true;
   return (
     count <= 8 &&
-    /^[\p{Script=Han}A-Za-z0-9·•._-]+$/u['test'](args) &&
-    !STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](args)
+    /^[\p{Script=Han}A-Za-z0-9·•._-]+$/u.test(args) &&
+    !STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN.test(args)
   );
 }
 function isNoisyStoryPropCandidateName(next = '') {
-  const args2 = normalizeText(next)['replace'](STORY_PROP_LEADING_MEASURE_PATTERN, '')['trim']();
+  const args2 = normalizeText(next).replace(STORY_PROP_LEADING_MEASURE_PATTERN, '').trim();
   if (
-    [...args2]['length'] < 2 ||
-    [...args2]['length'] > 24 ||
-    STORY_PROP_CANDIDATE_NOISE_PATTERN['test'](args2) ||
-    /(?:中段标记|场次标记|剧情标记|唯一标记|核对编号)$/u['test'](args2)
+    [...args2].length < 2 ||
+    [...args2].length > 24 ||
+    STORY_PROP_CANDIDATE_NOISE_PATTERN.test(args2) ||
+    /(?:中段标记|场次标记|剧情标记|唯一标记|核对编号)$/u.test(args2)
   )
     return true;
-  return !/^[\p{L}\p{N}·•._-]+$/u['test'](args2);
+  return !/^[\p{L}\p{N}·•._-]+$/u.test(args2);
 }
 function normalizeStoryPropActionCandidate(current = '') {
   let text = normalizeText(current)
-    ['replace'](STORY_PROP_LEADING_MEASURE_PATTERN, '')
-    ['replace'](/^(?:这|那|该)(?:个|只|把|张|本|册|枚|块|台|部|支|瓶|盒|箱|套|卷|件|份|根|条|沓)?/u, '')
-    ['replace'](/^[《“”"'‘’]+|[》“”"'‘’]+$/gu, '')
-    ['replace'](STORY_PROP_TRAILING_PREDICATE_PATTERN, '')
-    ['trim']();
+    .replace(STORY_PROP_LEADING_MEASURE_PATTERN, '')
+    .replace(/^(?:这|那|该)(?:个|只|把|张|本|册|枚|块|台|部|支|瓶|盒|箱|套|卷|件|份|根|条|沓)?/u, '')
+    .replace(/^[《“”"'‘’]+|[》“”"'‘’]+$/gu, '')
+    .replace(STORY_PROP_TRAILING_PREDICATE_PATTERN, '')
+    .trim();
   for (let count2 = 0; count2 < 3; count2 += 1) {
     const entry = text;
-    text = text['replace'](STORY_PROP_TRAILING_ACTION_FRAGMENT_PATTERN, '')
-      ['replace'](STORY_PROP_LEADING_STATE_PATTERN, '')
-      ['trim']();
+    text = text.replace(STORY_PROP_TRAILING_ACTION_FRAGMENT_PATTERN, '')
+      .replace(STORY_PROP_LEADING_STATE_PATTERN, '')
+      .trim();
     if (text === entry) break;
   }
-  const text2 = normalizeText(text['match'](STORY_PROP_PACKAGING_DESCRIPTION_PATTERN)?.[1] || text);
-  if (!text2 || /[和及、]/u['test'](text2) || STORY_PROP_NON_ASSET_FRAGMENT_PATTERN['test'](text2)) return '';
+  const text2 = normalizeText(text.match(STORY_PROP_PACKAGING_DESCRIPTION_PATTERN)?.[1] || text);
+  if (!text2 || /[和及、]/u.test(text2) || STORY_PROP_NON_ASSET_FRAGMENT_PATTERN.test(text2)) return '';
   return isNoisyStoryPropCandidateName(text2) ? '' : text2;
 }
 function createStoryPropActionEvidence(list3, record, payload) {
-  const count3 = list3['indexOf'](payload, Math['max'](0, record)),
-    handle = count3 >= 0 ? count3 : Math['max'](0, record),
-    state = Math['max'](0, handle - 48);
-  return list3['slice'](
+  const count3 = list3.indexOf(payload, Math.max(0, record)),
+    handle = count3 >= 0 ? count3 : Math.max(0, record),
+    state = Math.max(0, handle - 48);
+  return list3.slice(
     state,
-    Math['min'](list3['length'], state + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
+    Math.min(list3.length, state + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
   )
-    ['replace'](/\s+/gu, ' ')
-    ['trim']();
+    .replace(/\s+/gu, ' ')
+    .trim();
 }
 export function createStoryAssetActionPropCandidates(list4 = []) {
   const map = new Map();
   return (
-    (Array['isArray'](list4) ? list4 : [])['forEach']((dom) => {
-      const args3 = normalizeText(dom?.['body']),
-        text3 = normalizeText(dom?.['ref']),
-        text4 = normalizeText(dom?.['episodeRef']);
+    (Array.isArray(list4) ? list4 : []).forEach((dom) => {
+      const args3 = normalizeText(dom?.body),
+        text3 = normalizeText(dom?.ref),
+        text4 = normalizeText(dom?.episodeRef);
       if (!args3 || !text3) return;
       const list5 = [
-        ...args3['matchAll'](STORY_PROP_DIRECT_OBJECT_ACTION_PATTERN),
-        ...args3['matchAll'](STORY_PROP_BA_ACTION_PATTERN),
-      ]['sort']((config, scope) => (Number(config['index']) || 0) - (Number(scope['index']) || 0));
-      list5['forEach']((input) => {
+        ...args3.matchAll(STORY_PROP_DIRECT_OBJECT_ACTION_PATTERN),
+        ...args3.matchAll(STORY_PROP_BA_ACTION_PATTERN),
+      ].sort((config, scope) => (Number(config.index) || 0) - (Number(scope.index) || 0));
+      list5.forEach((input) => {
         const storyPropActionCandidate = normalizeStoryPropActionCandidate(input[1]);
         if (!storyPropActionCandidate) return;
         const nameKey = normalizeNameKey(storyPropActionCandidate),
-          name = map['get'](nameKey),
-          sourceSceneRefs = normalizeStringArray([...(name?.['sourceSceneRefs'] || []), text3]),
-          sourceChapterIds = normalizeStringArray([...(name?.['sourceChapterIds'] || []), text4]);
-        map['set'](nameKey, {
-          name: name?.['name'] || storyPropActionCandidate,
+          name = map.get(nameKey),
+          sourceSceneRefs = normalizeStringArray([...(name?.sourceSceneRefs || []), text3]),
+          sourceChapterIds = normalizeStringArray([...(name?.sourceChapterIds || []), text4]);
+        map.set(nameKey, {
+          name: name?.name || storyPropActionCandidate,
           evidence:
-            name?.['evidence'] ||
-            createStoryPropActionEvidence(args3, Number(input['index']) || 0, storyPropActionCandidate),
+            name?.evidence ||
+            createStoryPropActionEvidence(args3, Number(input.index) || 0, storyPropActionCandidate),
           sourceSceneRefs: sourceSceneRefs,
           sourceChapterIds: sourceChapterIds,
           confidence: 1,
         });
       });
     }),
-    [...map['values']()]
+    [...map.values()]
   );
 }
 function createLocalCandidateEvidence(dom2, dom3, output, list6) {
-  const list7 = normalizeText(dom3?.['body']) || stripLocalCandidateSummary(dom2?.['body']),
-    value2 = (Array['isArray'](dom2?.['localEntityEvidence']) ? dom2['localEntityEvidence'] : [])['find'](
-      (response2) => response2?.['kind'] === output && normalizeText(response2?.['text']) === list6,
+  const list7 = normalizeText(dom3?.body) || stripLocalCandidateSummary(dom2?.body),
+    value2 = (Array.isArray(dom2?.localEntityEvidence) ? dom2.localEntityEvidence : []).find(
+      (response2) => response2?.kind === output && normalizeText(response2?.text) === list6,
     ),
-    value3 = Math['max'](0, Math['trunc'](Number(value2?.['start']) || 0)),
-    count4 = list7['slice'](value3, value3 + list6['length']) === list6 ? value3 : list7['indexOf'](list6);
+    value3 = Math.max(0, Math.trunc(Number(value2?.start) || 0)),
+    count4 = list7.slice(value3, value3 + list6.length) === list6 ? value3 : list7.indexOf(list6);
   if (count4 < 0) return '';
-  const value4 = Math['max'](0, count4 - 56);
-  return list7['slice'](
+  const value4 = Math.max(0, count4 - 56);
+  return list7.slice(
     value4,
-    Math['min'](list7['length'], value4 + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
+    Math.min(list7.length, value4 + STORY_ASSET_OPTIONAL_CANDIDATE_EVIDENCE_CHARACTERS),
   )
-    ['replace'](/\s+/gu, ' ')
-    ['trim']();
+    .replace(/\s+/gu, ' ')
+    .trim();
 }
 function collectVerifiedLocalCandidates(options2 = {}, value5 = null) {
-  return ['character', 'scene', 'prop']['flatMap']((kind) =>
-    normalizeStringArray(options2?.['localEntityCandidates']?.[kind])
-      ['filter']((value6) => isUsableLocalCandidateName(kind, value6))
-      ['map']((name2) => ({
+  return ['character', 'scene', 'prop'].flatMap((kind) =>
+    normalizeStringArray(options2?.localEntityCandidates?.[kind])
+      .filter((value6) => isUsableLocalCandidateName(kind, value6))
+      .map((name2) => ({
         kind: kind,
         name: name2,
         confidence: getLocalCandidateConfidence(options2, kind, name2),
         evidence: createLocalCandidateEvidence(options2, value5, kind, name2),
       }))
-      ['filter']((value7) => value7['evidence']),
+      .filter((value7) => value7.evidence),
   );
 }
 function resolveStoryAssetCandidateWinnerKindsByName(list8 = []) {
   const map2 = new Map();
   return (
-    list8['forEach'](({ key: key2, kind: kind2, confidence: confidence }) => {
-      const map3 = map2['get'](key2) || new Map();
-      (map3['set'](kind2, Math['max'](Number(map3['get'](kind2)) || 0, Number(confidence) || 0)),
-        map2['set'](key2, map3));
+    list8.forEach(({ key: key2, kind: kind2, confidence: confidence }) => {
+      const map3 = map2.get(key2) || new Map();
+      (map3.set(kind2, Math.max(Number(map3.get(kind2)) || 0, Number(confidence) || 0)),
+        map2.set(key2, map3));
     }),
     new Map(
-      [...map2]['flatMap'](([value8, map4]) => {
-        if (map4['size'] === 1) return [[value8, [...map4['keys']()][0]]];
+      [...map2].flatMap(([value8, map4]) => {
+        if (map4.size === 1) return [[value8, [...map4.keys()][0]]];
         const value9 = [...map4]
-            ['map'](([kind3, confidence2]) => ({ kind: kind3, confidence: confidence2 }))
-            ['sort']((value10, value11) => value11['confidence'] - value10['confidence']),
+            .map(([kind3, confidence2]) => ({ kind: kind3, confidence: confidence2 }))
+            .sort((value10, value11) => value11.confidence - value10.confidence),
           value12 = value9[0],
           value13 = value9[1];
         if (
-          value12['confidence'] >= STORY_ASSET_CROSS_KIND_WINNER_MIN_CONFIDENCE &&
-          value12['confidence'] - value13['confidence'] + Number['EPSILON'] >=
+          value12.confidence >= STORY_ASSET_CROSS_KIND_WINNER_MIN_CONFIDENCE &&
+          value12.confidence - value13.confidence + Number.EPSILON >=
             STORY_ASSET_CROSS_KIND_WINNER_MIN_MARGIN
         )
-          return [[value8, value12['kind']]];
+          return [[value8, value12.kind]];
         return [];
       }),
     )
@@ -241,44 +241,44 @@ function createHardRequiredStoryAssetKindsByName(list9 = [], value14 = null) {
   const storyAssetRequirementEvidencePlan = createStoryAssetRequirementEvidencePlan(list9),
     map5 = new Map();
   return (
-    ['character', 'scene', 'prop']['forEach']((value15) => {
+    ['character', 'scene', 'prop'].forEach((value15) => {
       const list10 = normalizeStringArray([
         ...getHardRequiredStoryAssetNames(storyAssetRequirementEvidencePlan, value15),
-        ...(Array['isArray'](value14?.[value15]) ? value14[value15] : []),
+        ...(Array.isArray(value14?.[value15]) ? value14[value15] : []),
       ]);
-      list10['forEach']((value16) => {
+      list10.forEach((value16) => {
         const nameKey2 = normalizeNameKey(value16),
-          value17 = map5['get'](nameKey2) || new Set();
-        (value17['add'](value15), map5['set'](nameKey2, value17));
+          value17 = map5.get(nameKey2) || new Set();
+        (value17.add(value15), map5.set(nameKey2, value17));
       });
     }),
     map5
   );
 }
 function filterCandidatesByHardRequiredKinds(list11 = [], map6 = new Map()) {
-  return list11['filter']((event) => {
-    const map7 = map6['get'](event['key']);
+  return list11.filter((event) => {
+    const map7 = map6.get(event.key);
     if (!map7) return true;
-    return map7['size'] === 1 && map7['has'](event['kind']);
+    return map7.size === 1 && map7.has(event.kind);
   });
 }
 function createAnchorFirstIndexOrder(value18) {
-  const enabled = Math['max'](0, Math['trunc'](Number(value18) || 0));
+  const enabled = Math.max(0, Math.trunc(Number(value18) || 0));
   if (!enabled) return [];
   const list12 = [],
     map8 = new Set(),
     handler = (value19) => {
-      const value20 = Math['max'](0, Math['min'](enabled - 1, Math['trunc'](value19)));
-      if (map8['has'](value20)) return;
-      (map8['add'](value20), list12['push'](value20));
+      const value20 = Math.max(0, Math.min(enabled - 1, Math.trunc(value19)));
+      if (map8.has(value20)) return;
+      (map8.add(value20), list12.push(value20));
     };
-  (handler(0), handler(Math['floor']((enabled - 1) / 2)), handler(enabled - 1));
-  while (list12['length'] < enabled) {
+  (handler(0), handler(Math.floor((enabled - 1) / 2)), handler(enabled - 1));
+  while (list12.length < enabled) {
     let value21 = -1,
       value22 = -1;
     for (let value23 = 0; value23 < enabled; value23 += 1) {
-      if (map8['has'](value23)) continue;
-      const value24 = Math['min'](...list12['map']((value25) => Math['abs'](value25 - value23)));
+      if (map8.has(value23)) continue;
+      const value24 = Math.min(...list12.map((value25) => Math.abs(value25 - value23)));
       value24 > value22 && ((value21 = value23), (value22 = value24));
     }
     handler(value21);
@@ -286,61 +286,61 @@ function createAnchorFirstIndexOrder(value18) {
   return list12;
 }
 function createFairSourceRefOrder(list13 = [], list14 = []) {
-  const map9 = new Set(list14['flatMap']((value26) => value26['sourceSceneRefs'] || [])),
+  const map9 = new Set(list14.flatMap((value26) => value26.sourceSceneRefs || [])),
     list15 = normalizeStringArray(
-      (Array['isArray'](list13) ? list13 : [])
-        ['map']((value27) => value27?.['ref'])
-        ['filter']((value28) => map9['has'](normalizeText(value28))),
+      (Array.isArray(list13) ? list13 : [])
+        .map((value27) => value27?.ref)
+        .filter((value28) => map9.has(normalizeText(value28))),
     ),
     map10 = new Set(list15);
   return (
-    list14['flatMap']((value29) => value29['sourceSceneRefs'] || [])['forEach']((value30) => {
+    list14.flatMap((value29) => value29.sourceSceneRefs || []).forEach((value30) => {
       const text5 = normalizeText(value30);
-      text5 && !map10['has'](text5) && (map10['add'](text5), list15['push'](text5));
+      text5 && !map10.has(text5) && (map10.add(text5), list15.push(text5));
     }),
-    createAnchorFirstIndexOrder(list15['length'])['map']((value31) => list15[value31])
+    createAnchorFirstIndexOrder(list15.length).map((value31) => list15[value31])
   );
 }
 function selectFairSourceRefs(list16 = [], value32 = [], value33 = 3) {
   const map11 = new Map(
-      (Array['isArray'](value32) ? value32 : [])['map']((value34, value35) => [
-        normalizeText(value34?.['ref']),
+      (Array.isArray(value32) ? value32 : []).map((value34, value35) => [
+        normalizeText(value34?.ref),
         value35,
       ]),
     ),
-    list17 = normalizeStringArray(list16)['sort'](
+    list17 = normalizeStringArray(list16).sort(
       (value36, value37) =>
-        (map11['get'](value36) ?? Number['MAX_SAFE_INTEGER']) -
-        (map11['get'](value37) ?? Number['MAX_SAFE_INTEGER']),
+        (map11.get(value36) ?? Number.MAX_SAFE_INTEGER) -
+        (map11.get(value37) ?? Number.MAX_SAFE_INTEGER),
     );
-  return createAnchorFirstIndexOrder(list17['length'])
-    ['slice'](0, Math['max'](1, Math['trunc'](Number(value33) || 0)))
-    ['map']((value38) => list17[value38]);
+  return createAnchorFirstIndexOrder(list17.length)
+    .slice(0, Math.max(1, Math.trunc(Number(value33) || 0)))
+    .map((value38) => list17[value38]);
 }
 function mergeStoryAssetOptionalCandidates(list18 = [], value39 = []) {
   const map12 = new Map();
   return (
-    list18['forEach']((event2) => {
-      const args4 = map12['get'](event2['key']);
+    list18.forEach((event2) => {
+      const args4 = map12.get(event2.key);
       if (!args4) {
-        map12['set'](event2['key'], {
+        map12.set(event2.key, {
           ...event2,
-          sourceSceneRefs: normalizeStringArray(event2['sourceSceneRefs']),
+          sourceSceneRefs: normalizeStringArray(event2.sourceSceneRefs),
         });
         return;
       }
-      ((args4['sourceSceneRefs'] = normalizeStringArray([
-        ...args4['sourceSceneRefs'],
-        ...(event2['sourceSceneRefs'] || []),
+      ((args4.sourceSceneRefs = normalizeStringArray([
+        ...args4.sourceSceneRefs,
+        ...(event2.sourceSceneRefs || []),
       ])),
-        (Number(event2['confidence']) > Number(args4['confidence']) ||
-          (Number(event2['confidence']) === Number(args4['confidence']) &&
-            String(event2['evidence'] || '')['length'] > String(args4['evidence'] || '')['length'])) &&
-          ((args4['evidence'] = event2['evidence']), (args4['confidence'] = event2['confidence'])));
+        (Number(event2.confidence) > Number(args4.confidence) ||
+          (Number(event2.confidence) === Number(args4.confidence) &&
+            String(event2.evidence || '').length > String(args4.evidence || '').length)) &&
+          ((args4.evidence = event2.evidence), (args4.confidence = event2.confidence)));
     }),
-    [...map12['values']()]['map']((args5) => ({
+    [...map12.values()].map((args5) => ({
       ...args5,
-      sourceSceneRefs: selectFairSourceRefs(args5['sourceSceneRefs'], value39, 3),
+      sourceSceneRefs: selectFairSourceRefs(args5.sourceSceneRefs, value39, 3),
     }))
   );
 }
@@ -349,35 +349,35 @@ function selectBudgetedStoryAssetOptionalCandidates(
   list19 = [],
   value40 = [],
   {
-    maxItems: maxItems = Number['POSITIVE_INFINITY'],
-    maxCharacters: maxCharacters = Number['POSITIVE_INFINITY'],
+    maxItems: maxItems = Number.POSITIVE_INFINITY,
+    maxCharacters: maxCharacters = Number.POSITIVE_INFINITY,
   } = {},
 ) {
-  const value41 = Number['isFinite'](Number(maxItems))
-      ? Math['max'](0, Math['trunc'](Number(maxItems)))
-      : Number['POSITIVE_INFINITY'],
-    value42 = Number['isFinite'](Number(maxCharacters))
-      ? Math['max'](0, Math['trunc'](Number(maxCharacters)))
-      : Number['POSITIVE_INFINITY'];
-  if (!Number['isFinite'](value41) && !Number['isFinite'](value42)) return list19;
+  const value41 = Number.isFinite(Number(maxItems))
+      ? Math.max(0, Math.trunc(Number(maxItems)))
+      : Number.POSITIVE_INFINITY,
+    value42 = Number.isFinite(Number(maxCharacters))
+      ? Math.max(0, Math.trunc(Number(maxCharacters)))
+      : Number.POSITIVE_INFINITY;
+  if (!Number.isFinite(value41) && !Number.isFinite(value42)) return list19;
   const map13 = new Map(
-      (Array['isArray'](value40) ? value40 : [])['map']((value43) => [
-        normalizeText(value43?.['ref']),
-        normalizeText(value43?.['episodeRef']),
+      (Array.isArray(value40) ? value40 : []).map((value43) => [
+        normalizeText(value43?.ref),
+        normalizeText(value43?.episodeRef),
       ]),
     ),
     map14 = new Map();
-  (list19['forEach']((value44) => {
-    const text6 = normalizeText(value44['sourceSceneRefs']?.[0]),
-      list20 = map14['get'](text6) || [];
-    (list20['push'](value44), map14['set'](text6, list20));
+  (list19.forEach((value44) => {
+    const text6 = normalizeText(value44.sourceSceneRefs?.[0]),
+      list20 = map14.get(text6) || [];
+    (list20.push(value44), map14.set(text6, list20));
   }),
-    map14['forEach']((list21) =>
-      list21['sort'](
+    map14.forEach((list21) =>
+      list21.sort(
         (error, error2) =>
-          Number(error2['confidence'] || 0) - Number(error['confidence'] || 0) ||
-          String(error2['evidence'] || '')['length'] - String(error['evidence'] || '')['length'] ||
-          String(error['name'] || '')['localeCompare'](String(error2['name'] || ''), 'zh-CN'),
+          Number(error2.confidence || 0) - Number(error.confidence || 0) ||
+          String(error2.evidence || '').length - String(error.evidence || '').length ||
+          String(error.name || '').localeCompare(String(error2.name || ''), 'zh-CN'),
       ),
     ));
   const fairSourceRefOrder = createFairSourceRefOrder(value40, list19),
@@ -385,26 +385,26 @@ function selectBudgetedStoryAssetOptionalCandidates(
     map15 = new Set();
   let value45 = 2,
     value46 = true;
-  while (value46 && list22['length'] < value41) {
+  while (value46 && list22.length < value41) {
     value46 = false;
     for (const value47 of fairSourceRefOrder) {
-      const value48 = map14['get'](value47) || [],
-        name3 = value48['shift']();
-      if (!name3 || map15['has'](name3['key'])) continue;
+      const value48 = map14.get(value47) || [],
+        name3 = value48.shift();
+      if (!name3 || map15.has(name3.key)) continue;
       value46 = true;
       const value49 = {
           kind: kind4,
-          name: name3['name'],
-          evidence: name3['evidence'],
-          sourceSceneRefs: name3['sourceSceneRefs'],
+          name: name3.name,
+          evidence: name3.evidence,
+          sourceSceneRefs: name3.sourceSceneRefs,
           sourceChapterIds: normalizeStringArray(
-            name3['sourceSceneRefs']['map']((value50) => map13['get'](value50)),
+            name3.sourceSceneRefs.map((value50) => map13.get(value50)),
           ),
         },
-        value51 = JSON['stringify'](value49)['length'] + (list22['length'] ? 1 : 0);
+        value51 = JSON.stringify(value49).length + (list22.length ? 1 : 0);
       if (value45 + value51 > value42) continue;
-      (map15['add'](name3['key']), list22['push'](name3), (value45 += value51));
-      if (list22['length'] >= value41) break;
+      (map15.add(name3.key), list22.push(name3), (value45 += value51));
+      if (list22.length >= value41) break;
     }
   }
   return list22;
@@ -413,165 +413,161 @@ function createEvidenceBuckets() {
   return { hardRequired: [], optionalCandidates: [], ignored: [] };
 }
 function getEvidenceBucketName(value52) {
-  if (value52 === STORY_ASSET_REQUIREMENT_TIERS['hard']) return 'hardRequired';
-  if (value52 === STORY_ASSET_REQUIREMENT_TIERS['optional']) return 'optionalCandidates';
+  if (value52 === STORY_ASSET_REQUIREMENT_TIERS.hard) return 'hardRequired';
+  if (value52 === STORY_ASSET_REQUIREMENT_TIERS.optional) return 'optionalCandidates';
   return 'ignored';
 }
 function getBoundedClausePrefix(list23, value53) {
-  const list24 = list23['slice'](Math['max'](0, value53 - 96), value53);
+  const list24 = list23.slice(Math.max(0, value53 - 96), value53);
   let value54 = -1;
-  for (let count5 = list24['length'] - 1; count5 >= 0; count5 -= 1) {
-    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](list24[count5])) {
+  for (let count5 = list24.length - 1; count5 >= 0; count5 -= 1) {
+    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN.test(list24[count5])) {
       value54 = count5;
       break;
     }
   }
-  return list24['slice'](value54 + 1);
+  return list24.slice(value54 + 1);
 }
 function getBoundedClauseSuffix(list25, value55) {
-  const list26 = list25['slice'](value55, Math['min'](list25['length'], value55 + 64));
-  for (let value56 = 0; value56 < list26['length']; value56 += 1) {
-    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN['test'](list26[value56])) return list26['slice'](0, value56);
+  const list26 = list25.slice(value55, Math.min(list25.length, value55 + 64));
+  for (let value56 = 0; value56 < list26.length; value56 += 1) {
+    if (STORY_PROP_CLAUSE_BOUNDARY_PATTERN.test(list26[value56])) return list26.slice(0, value56);
   }
   return list26;
 }
 function getStoryTitleContext(list27, value57, value58) {
-  return list27['slice'](Math['max'](0, value57 - 48), Math['min'](list27['length'], value58 + 64))[
-    'trim'
-  ]();
+  return list27.slice(Math.max(0, value57 - 48), Math.min(list27.length, value58 + 64)).trim();
 }
 function isStructuralStoryTitle(list28, value59) {
-  const value60 = list28['slice'](Math['max'](0, value59 - 64), value59);
-  return STORY_STRUCTURAL_TITLE_PREFIX_PATTERN['test'](value60);
+  const value60 = list28.slice(Math.max(0, value59 - 64), value59);
+  return STORY_STRUCTURAL_TITLE_PREFIX_PATTERN.test(value60);
 }
 function hasHardStoryPropEvidence(list29, value61, value62) {
   const list30 = getBoundedClausePrefix(list29, value61),
-    list31 = getBoundedClauseSuffix(list29, value62)['replace'](/^[\s，,:：]+/u, '');
+    list31 = getBoundedClauseSuffix(list29, value62).replace(/^[\s，,:：]+/u, '');
   return (
-    STORY_PROP_DECLARATION_PATTERN['test'](list29['slice'](Math['max'](0, value61 - 120), value61)) ||
-    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](list30) ||
-    STORY_PROP_PHYSICAL_ACTION_PATTERN['test'](list31['slice'](0, 32)) ||
-    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list30['slice'](-24)) ||
-    STORY_PROP_MATERIAL_CUE_PATTERN['test'](list31['slice'](0, 24))
+    STORY_PROP_DECLARATION_PATTERN.test(list29.slice(Math.max(0, value61 - 120), value61)) ||
+    STORY_PROP_PHYSICAL_ACTION_PATTERN.test(list30) ||
+    STORY_PROP_PHYSICAL_ACTION_PATTERN.test(list31.slice(0, 32)) ||
+    STORY_PROP_MATERIAL_CUE_PATTERN.test(list30.slice(-24)) ||
+    STORY_PROP_MATERIAL_CUE_PATTERN.test(list31.slice(0, 24))
   );
 }
 function mergeEvidenceEntry(map16, error3) {
-  const kind5 = normalizeText(error3?.['kind']),
-    name4 = normalizeText(error3?.['name']),
-    tier = normalizeText(error3?.['tier']);
+  const kind5 = normalizeText(error3?.kind),
+    name4 = normalizeText(error3?.name),
+    tier = normalizeText(error3?.tier);
   if (!kind5 || !name4 || !(tier in STORY_ASSET_REQUIREMENT_TIER_PRIORITY)) return;
   const value63 = kind5 + ':' + normalizeNameKey(name4),
-    args6 = map16['get'](value63);
+    args6 = map16.get(value63);
   if (!args6) {
-    map16['set'](value63, {
+    map16.set(value63, {
       kind: kind5,
       name: name4,
       tier: tier,
-      sourceSceneRefs: normalizeStringArray(error3?.['sourceSceneRefs']),
+      sourceSceneRefs: normalizeStringArray(error3?.sourceSceneRefs),
       hardSourceSceneRefs:
-        tier === STORY_ASSET_REQUIREMENT_TIERS['hard']
-          ? normalizeStringArray(error3?.['sourceSceneRefs'])
+        tier === STORY_ASSET_REQUIREMENT_TIERS.hard
+          ? normalizeStringArray(error3?.sourceSceneRefs)
           : [],
       optionalSourceSceneRefs:
-        tier === STORY_ASSET_REQUIREMENT_TIERS['optional']
-          ? normalizeStringArray(error3?.['sourceSceneRefs'])
+        tier === STORY_ASSET_REQUIREMENT_TIERS.optional
+          ? normalizeStringArray(error3?.sourceSceneRefs)
           : [],
-      reasonCodes: normalizeStringArray(error3?.['reasonCodes']),
-      contexts: normalizeStringArray(error3?.['contexts']),
+      reasonCodes: normalizeStringArray(error3?.reasonCodes),
+      contexts: normalizeStringArray(error3?.contexts),
     });
     return;
   }
-  STORY_ASSET_REQUIREMENT_TIER_PRIORITY[tier] > STORY_ASSET_REQUIREMENT_TIER_PRIORITY[args6['tier']] &&
-    (args6['tier'] = tier);
-  args6['sourceSceneRefs'] = normalizeStringArray([
-    ...args6['sourceSceneRefs'],
-    ...(error3?.['sourceSceneRefs'] || []),
+  STORY_ASSET_REQUIREMENT_TIER_PRIORITY[tier] > STORY_ASSET_REQUIREMENT_TIER_PRIORITY[args6.tier] &&
+    (args6.tier = tier);
+  args6.sourceSceneRefs = normalizeStringArray([
+    ...args6.sourceSceneRefs,
+    ...(error3?.sourceSceneRefs || []),
   ]);
-  if (tier === STORY_ASSET_REQUIREMENT_TIERS['hard'])
-    args6['hardSourceSceneRefs'] = normalizeStringArray([
-      ...args6['hardSourceSceneRefs'],
-      ...(error3?.['sourceSceneRefs'] || []),
+  if (tier === STORY_ASSET_REQUIREMENT_TIERS.hard)
+    args6.hardSourceSceneRefs = normalizeStringArray([
+      ...args6.hardSourceSceneRefs,
+      ...(error3?.sourceSceneRefs || []),
     ]);
   else
-    tier === STORY_ASSET_REQUIREMENT_TIERS['optional'] &&
-      (args6['optionalSourceSceneRefs'] = normalizeStringArray([
-        ...args6['optionalSourceSceneRefs'],
-        ...(error3?.['sourceSceneRefs'] || []),
+    tier === STORY_ASSET_REQUIREMENT_TIERS.optional &&
+      (args6.optionalSourceSceneRefs = normalizeStringArray([
+        ...args6.optionalSourceSceneRefs,
+        ...(error3?.sourceSceneRefs || []),
       ]));
-  ((args6['reasonCodes'] = normalizeStringArray([
-    ...args6['reasonCodes'],
-    ...(error3?.['reasonCodes'] || []),
+  ((args6.reasonCodes = normalizeStringArray([
+    ...args6.reasonCodes,
+    ...(error3?.reasonCodes || []),
   ])),
-    (args6['contexts'] = normalizeStringArray([...args6['contexts'], ...(error3?.['contexts'] || [])])[
-      'slice'
-    ](0, 3)));
+    (args6.contexts = normalizeStringArray([...args6.contexts, ...(error3?.contexts || [])]).slice(0, 3)));
 }
 export function createStoryAssetRequirementEvidencePlan(list32 = []) {
   const map17 = new Map();
-  (Array['isArray'](list32) ? list32 : [])['forEach']((dom4) => {
-    const text7 = normalizeText(dom4?.['ref']),
-      name5 = normalizeText(dom4?.['assetHeading'] || dom4?.['heading']),
-      tier2 = normalizeText(dom4?.['source']);
+  (Array.isArray(list32) ? list32 : []).forEach((dom4) => {
+    const text7 = normalizeText(dom4?.ref),
+      name5 = normalizeText(dom4?.assetHeading || dom4?.heading),
+      tier2 = normalizeText(dom4?.source);
     name5 &&
       mergeEvidenceEntry(map17, {
         kind: 'scene',
         name: name5,
         tier:
           tier2 === 'upload-fallback'
-            ? STORY_ASSET_REQUIREMENT_TIERS['optional']
-            : STORY_ASSET_REQUIREMENT_TIERS['hard'],
+            ? STORY_ASSET_REQUIREMENT_TIERS.optional
+            : STORY_ASSET_REQUIREMENT_TIERS.hard,
         sourceSceneRefs: [text7],
         reasonCodes: [tier2 === 'upload-fallback' ? 'upload-fallback-heading' : 'structured-scene-heading'],
       });
-    (normalizeStringArray(dom4?.['characters'])['forEach']((name6) => {
+    (normalizeStringArray(dom4?.characters).forEach((name6) => {
       mergeEvidenceEntry(map17, {
         kind: 'character',
         name: name6,
         tier:
           tier2 === 'upload-fallback'
-            ? STORY_ASSET_REQUIREMENT_TIERS['optional']
-            : STORY_ASSET_REQUIREMENT_TIERS['hard'],
+            ? STORY_ASSET_REQUIREMENT_TIERS.optional
+            : STORY_ASSET_REQUIREMENT_TIERS.hard,
         sourceSceneRefs: [text7],
         reasonCodes: [
           tier2 === 'upload-fallback' ? 'upload-fallback-imported-character' : 'structured-scene-character',
         ],
       });
     }),
-      collectVerifiedLocalCandidates(dom4)['forEach'](({ kind: kind6, name: name7 }) => {
+      collectVerifiedLocalCandidates(dom4).forEach(({ kind: kind6, name: name7 }) => {
         mergeEvidenceEntry(map17, {
           kind: kind6,
           name: name7,
-          tier: STORY_ASSET_REQUIREMENT_TIERS['optional'],
+          tier: STORY_ASSET_REQUIREMENT_TIERS.optional,
           sourceSceneRefs: [text7],
           reasonCodes: ['verified-local-entity-candidate'],
         });
       }));
-    const text8 = normalizeText(dom4?.['body']);
-    createStoryAssetActionPropCandidates([dom4])['forEach']((name8) => {
+    const text8 = normalizeText(dom4?.body);
+    createStoryAssetActionPropCandidates([dom4]).forEach((name8) => {
       mergeEvidenceEntry(map17, {
         kind: 'prop',
-        name: name8['name'],
-        tier: STORY_ASSET_REQUIREMENT_TIERS['hard'],
-        sourceSceneRefs: name8['sourceSceneRefs'],
+        name: name8.name,
+        tier: STORY_ASSET_REQUIREMENT_TIERS.hard,
+        sourceSceneRefs: name8.sourceSceneRefs,
         reasonCodes: ['direct-object-physical-action'],
-        contexts: [name8['evidence']],
+        contexts: [name8.evidence],
       });
     });
-    for (const value64 of text8['matchAll'](/《([^》\r\n]{1,48})》/gu)) {
+    for (const value64 of text8.matchAll(/《([^》\r\n]{1,48})》/gu)) {
       const name9 = normalizeText(value64[1]);
       if (!name9) continue;
-      const value65 = Number(value64['index']) || 0,
-        value66 = value65 + String(value64[0] || '')['length'],
+      const value65 = Number(value64.index) || 0,
+        value66 = value65 + String(value64[0] || '').length,
         tier3 = isStructuralStoryTitle(text8, value65),
         value67 = !tier3 && hasHardStoryPropEvidence(text8, value65, value66);
       mergeEvidenceEntry(map17, {
         kind: 'prop',
         name: name9,
         tier: tier3
-          ? STORY_ASSET_REQUIREMENT_TIERS['ignored']
+          ? STORY_ASSET_REQUIREMENT_TIERS.ignored
           : value67
-            ? STORY_ASSET_REQUIREMENT_TIERS['hard']
-            : STORY_ASSET_REQUIREMENT_TIERS['optional'],
+            ? STORY_ASSET_REQUIREMENT_TIERS.hard
+            : STORY_ASSET_REQUIREMENT_TIERS.optional,
         sourceSceneRefs: [text7],
         reasonCodes: [
           tier3 ? 'structural-story-title' : value67 ? 'physical-prop-context' : 'quoted-title-candidate',
@@ -582,27 +578,27 @@ export function createStoryAssetRequirementEvidencePlan(list32 = []) {
   });
   const args7 = createEvidenceBuckets();
   return (
-    [...map17['values']()]['forEach']((value68) => {
-      args7[getEvidenceBucketName(value68['tier'])]['push'](value68);
+    [...map17.values()].forEach((value68) => {
+      args7[getEvidenceBucketName(value68.tier)].push(value68);
     }),
     { schemaVersion: STORY_ASSET_REQUIREMENT_EVIDENCE_SCHEMA_VERSION, ...args7 }
   );
 }
 export function getHardRequiredStoryAssetNames(options3 = {}, value69 = '') {
   return normalizeStringArray(
-    (Array['isArray'](options3?.['hardRequired']) ? options3['hardRequired'] : [])
-      ['filter']((value70) => value70?.['kind'] === value69)
-      ['map']((error4) => error4?.['name']),
+    (Array.isArray(options3?.hardRequired) ? options3.hardRequired : [])
+      .filter((value70) => value70?.kind === value69)
+      .map((error4) => error4?.name),
   );
 }
 export function getHardRequiredStorySceneRefs(options4 = {}) {
   return normalizeStringArray(
-    (Array['isArray'](options4?.['hardRequired']) ? options4['hardRequired'] : [])
-      ['filter']((value71) => value71?.['kind'] === 'scene')
-      ['flatMap']((value72) =>
-        value72?.['hardSourceSceneRefs']?.['length']
-          ? value72['hardSourceSceneRefs']
-          : value72?.['sourceSceneRefs'] || [],
+    (Array.isArray(options4?.hardRequired) ? options4.hardRequired : [])
+      .filter((value71) => value71?.kind === 'scene')
+      .flatMap((value72) =>
+        value72?.hardSourceSceneRefs?.length
+          ? value72.hardSourceSceneRefs
+          : value72?.sourceSceneRefs || [],
       ),
   );
 }
@@ -610,46 +606,46 @@ export function getHardRequiredStoryAssetNamesForScene(options5 = {}, value73 = 
   const text9 = normalizeText(value74);
   if (!text9) return [];
   return normalizeStringArray(
-    (Array['isArray'](options5?.['hardRequired']) ? options5['hardRequired'] : [])
-      ['filter'](
+    (Array.isArray(options5?.hardRequired) ? options5.hardRequired : [])
+      .filter(
         (value75) =>
-          value75?.['kind'] === value73 &&
-          (value75?.['hardSourceSceneRefs']?.['length']
-            ? value75['hardSourceSceneRefs']['includes'](text9)
-            : value75?.['sourceSceneRefs']?.['includes'](text9)),
+          value75?.kind === value73 &&
+          (value75?.hardSourceSceneRefs?.length
+            ? value75.hardSourceSceneRefs.includes(text9)
+            : value75?.sourceSceneRefs?.includes(text9)),
       )
-      ['map']((error5) => error5?.['name']),
+      .map((error5) => error5?.name),
   );
 }
 export function createStoryAssetOptionalCandidatesByKind(
   list33 = [],
   value76 = list33,
   {
-    maxItemsPerKind: maxItemsPerKind = Number['POSITIVE_INFINITY'],
-    maxCharactersPerKind: maxCharactersPerKind = Number['POSITIVE_INFINITY'],
+    maxItemsPerKind: maxItemsPerKind = Number.POSITIVE_INFINITY,
+    maxCharactersPerKind: maxCharactersPerKind = Number.POSITIVE_INFINITY,
     hardRequiredAssetNamesByKind: hardRequiredAssetNamesByKind = null,
   } = {},
 ) {
   const map18 = new Map(
-      (Array['isArray'](value76) ? value76 : [])['map']((value77) => [
-        normalizeText(value77?.['ref']),
+      (Array.isArray(value76) ? value76 : []).map((value77) => [
+        normalizeText(value77?.ref),
         value77,
       ]),
     ),
     map19 = new Map(
-      (Array['isArray'](value76) ? value76 : [])['map']((value78) => [
-        normalizeText(value78?.['ref']),
-        normalizeText(value78?.['episodeRef']),
+      (Array.isArray(value76) ? value76 : []).map((value78) => [
+        normalizeText(value78?.ref),
+        normalizeText(value78?.episodeRef),
       ]),
     ),
-    value79 = ['character', 'scene', 'prop']['flatMap']((value80) =>
-      (Array['isArray'](list33) ? list33 : [])['flatMap']((value81) =>
-        collectVerifiedLocalCandidates(value81, map18['get'](normalizeText(value81?.['ref'])))
-          ['filter']((value82) => value82['kind'] === value80)
-          ['map']((error6) => ({
+    value79 = ['character', 'scene', 'prop'].flatMap((value80) =>
+      (Array.isArray(list33) ? list33 : []).flatMap((value81) =>
+        collectVerifiedLocalCandidates(value81, map18.get(normalizeText(value81?.ref)))
+          .filter((value82) => value82.kind === value80)
+          .map((error6) => ({
             ...error6,
-            key: normalizeNameKey(error6['name']),
-            sourceSceneRefs: normalizeStringArray([value81?.['ref']]),
+            key: normalizeNameKey(error6.name),
+            sourceSceneRefs: normalizeStringArray([value81?.ref]),
           })),
       ),
     ),
@@ -659,10 +655,10 @@ export function createStoryAssetOptionalCandidatesByKind(
     ),
     list34 = filterCandidatesByHardRequiredKinds(value79, hardRequiredStoryAssetKindsByName),
     map20 = resolveStoryAssetCandidateWinnerKindsByName(list34);
-  return Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((value83) => {
+  return Object.fromEntries(
+    ['character', 'scene', 'prop'].map((value83) => {
       const storyAssetOptionalCandidates = mergeStoryAssetOptionalCandidates(
-          list34['filter']((event3) => event3['kind'] === value83 && map20['get'](event3['key']) === value83),
+          list34.filter((event3) => event3.kind === value83 && map20.get(event3.key) === value83),
           list33,
         ),
         list35 = selectBudgetedStoryAssetOptionalCandidates(value83, storyAssetOptionalCandidates, list33, {
@@ -671,11 +667,11 @@ export function createStoryAssetOptionalCandidatesByKind(
         });
       return [
         value83,
-        list35['map'](({ name: name10, evidence: evidence, sourceSceneRefs: sourceSceneRefs2 }) => ({
+        list35.map(({ name: name10, evidence: evidence, sourceSceneRefs: sourceSceneRefs2 }) => ({
           name: name10,
           evidence: evidence,
           sourceSceneRefs: sourceSceneRefs2,
-          sourceChapterIds: normalizeStringArray(sourceSceneRefs2['map']((value84) => map19['get'](value84))),
+          sourceChapterIds: normalizeStringArray(sourceSceneRefs2.map((value84) => map19.get(value84))),
         })),
       ];
     }),
@@ -683,11 +679,11 @@ export function createStoryAssetOptionalCandidatesByKind(
 }
 export function createStoryAssetOptionalCandidateNamesByKind(list36 = [], value85 = list36) {
   const storyAssetOptionalCandidatesByKind = createStoryAssetOptionalCandidatesByKind(list36, value85);
-  return Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((value86) => [
+  return Object.fromEntries(
+    ['character', 'scene', 'prop'].map((value86) => [
       value86,
       normalizeStringArray(
-        (storyAssetOptionalCandidatesByKind[value86] || [])['map']((error7) => error7['name']),
+        (storyAssetOptionalCandidatesByKind[value86] || []).map((error7) => error7.name),
       ),
     ]),
   );
@@ -698,29 +694,29 @@ export function getUntrustedUploadFallbackStoryCharacterNames(
   value88 = value87,
 ) {
   const list37 = [
-      ...(Array['isArray'](options6?.['hardRequired']) ? options6['hardRequired'] : []),
-      ...(Array['isArray'](options6?.['optionalCandidates']) ? options6['optionalCandidates'] : []),
+      ...(Array.isArray(options6?.hardRequired) ? options6.hardRequired : []),
+      ...(Array.isArray(options6?.optionalCandidates) ? options6.optionalCandidates : []),
     ],
     map21 = new Set(
-      createStoryAssetOptionalCandidateNamesByKind(value87, value88)['character']['map'](normalizeNameKey),
+      createStoryAssetOptionalCandidateNamesByKind(value87, value88).character.map(normalizeNameKey),
     );
   return (
-    list37['filter'](
+    list37.filter(
       (value89) =>
-        value89?.['kind'] === 'character' &&
-        value89?.['reasonCodes']?.['includes']('structured-scene-character'),
-    )['forEach']((error8) => map21['add'](normalizeNameKey(error8?.['name']))),
+        value89?.kind === 'character' &&
+        value89?.reasonCodes?.includes('structured-scene-character'),
+    ).forEach((error8) => map21.add(normalizeNameKey(error8?.name))),
     normalizeStringArray(
-      list37['filter'](
+      list37.filter(
         (error9) =>
-          error9?.['kind'] === 'character' &&
-          error9?.['reasonCodes']?.['includes']('upload-fallback-imported-character') &&
-          !map21['has'](normalizeNameKey(error9?.['name'])),
-      )['map']((error10) => error10?.['name']),
+          error9?.kind === 'character' &&
+          error9?.reasonCodes?.includes('upload-fallback-imported-character') &&
+          !map21.has(normalizeNameKey(error9?.name)),
+      ).map((error10) => error10?.name),
     )
   );
 }
 export function isNarrativeStoryCharacterFragment(value90 = '') {
   const args8 = normalizeText(value90);
-  return [...args8]['length'] > 8 || STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN['test'](args8);
+  return [...args8].length > 8 || STORY_CHARACTER_NARRATIVE_FRAGMENT_PATTERN.test(args8);
 }

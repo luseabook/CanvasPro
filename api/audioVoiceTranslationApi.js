@@ -11,7 +11,7 @@ const AUDIO_VOICE_TRANSLATION_SYSTEM_PROMPT = [
   'You are a professional audiovisual dialogue translator.',
   'Translate faithfully while producing concise, natural spoken dialogue for dubbing.',
   'Follow the requested JSON schema exactly and return no commentary.',
-]['join'](' ');
+].join(' ');
 export async function translateAudioVoiceSegments({
   languageId: languageId = '',
   segments: segments = [],

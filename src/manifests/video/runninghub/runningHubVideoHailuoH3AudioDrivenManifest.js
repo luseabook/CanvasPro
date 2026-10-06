@@ -8,28 +8,28 @@ export const RH_VIDEO_HAILUO_H3_AUDIO_DRIVEN_EXECUTION_ID =
   'runninghub.workflow.video-hailuo-h3-audio-driven.v1';
 const RH_HAILUO_H3_AUDIO_DRIVEN_ACCELERATION_FIELD_ID = 'rhHailuoH3AudioDrivenAcceleration',
   RH_HAILUO_H3_AUDIO_DRIVEN_QUALITY_FIELD_ID = 'rhHailuoH3Quality',
-  RH_HAILUO_H3_AUDIO_DRIVEN_ASPECT_RATIO_OPTIONS = Object['freeze']([
-    Object['freeze']({ value: '自适应', label: '自适应' }),
-    Object['freeze']({ value: '1:1', label: '1:1' }),
-    Object['freeze']({ value: '16:9', label: '16:9' }),
-    Object['freeze']({ value: '9:16', label: '9:16' }),
-    Object['freeze']({ value: '4:3', label: '4:3' }),
-    Object['freeze']({ value: '3:4', label: '3:4' }),
-    Object['freeze']({ value: '3:2', label: '3:2' }),
-    Object['freeze']({ value: '2:3', label: '2:3' }),
-    Object['freeze']({ value: '21:9', label: '21:9' }),
-    Object['freeze']({ value: '9:21', label: '9:21' }),
-    Object['freeze']({ value: '5:4', label: '5:4' }),
-    Object['freeze']({ value: '4:5', label: '4:5' }),
-    Object['freeze']({ value: '2:1', label: '2:1' }),
-    Object['freeze']({ value: '1:2', label: '1:2' }),
+  RH_HAILUO_H3_AUDIO_DRIVEN_ASPECT_RATIO_OPTIONS = Object.freeze([
+    Object.freeze({ value: '自适应', label: '自适应' }),
+    Object.freeze({ value: '1:1', label: '1:1' }),
+    Object.freeze({ value: '16:9', label: '16:9' }),
+    Object.freeze({ value: '9:16', label: '9:16' }),
+    Object.freeze({ value: '4:3', label: '4:3' }),
+    Object.freeze({ value: '3:4', label: '3:4' }),
+    Object.freeze({ value: '3:2', label: '3:2' }),
+    Object.freeze({ value: '2:3', label: '2:3' }),
+    Object.freeze({ value: '21:9', label: '21:9' }),
+    Object.freeze({ value: '9:21', label: '9:21' }),
+    Object.freeze({ value: '5:4', label: '5:4' }),
+    Object.freeze({ value: '4:5', label: '4:5' }),
+    Object.freeze({ value: '2:1', label: '2:1' }),
+    Object.freeze({ value: '1:2', label: '1:2' }),
   ]),
-  RH_HAILUO_H3_AUDIO_DRIVEN_QUALITY_OPTIONS = Object['freeze']([
-    Object['freeze']({ value: 'draft', label: '草稿' }),
-    Object['freeze']({ value: 'economy', label: '经济' }),
-    Object['freeze']({ value: 'standard', label: '标准' }),
-    Object['freeze']({ value: 'high', label: '高清' }),
-    Object['freeze']({ value: 'ultra', label: '超清' }),
+  RH_HAILUO_H3_AUDIO_DRIVEN_QUALITY_OPTIONS = Object.freeze([
+    Object.freeze({ value: 'draft', label: '草稿' }),
+    Object.freeze({ value: 'economy', label: '经济' }),
+    Object.freeze({ value: 'standard', label: '标准' }),
+    Object.freeze({ value: 'high', label: '高清' }),
+    Object.freeze({ value: 'ultra', label: '超清' }),
   ]),
   RH_HAILUO_H3_AUDIO_DRIVEN_DESCRIPTION =
     '玩法 1：音频+提示词生成视频；玩法 2：音频+图像生成对口型视频；玩法 3：音频+视频生成指定人物说话视频；玩法 4：音频+图像+视频，生成音频驱动图像对口型并根据视频人物姿势。',
@@ -40,9 +40,9 @@ const RH_HAILUO_H3_AUDIO_DRIVEN_ACCELERATION_FIELD_ID = 'rhHailuoH3AudioDrivenAc
     '[[red:玩法 3]]：音频 + 视频，生成指定人物说话视频。',
     '[[red:玩法 4]]：音频 + 图像 + 视频，驱动图像对口型并跟随视频人物姿势。',
     '生成时长：根据音频时长决定。',
-  ]['join']('\n'),
-  RH_HAILUO_H3_AUDIO_DRIVEN_FIXED_INPUT_SLOTS = Object['freeze']([
-    Object['freeze']({
+  ].join('\n'),
+  RH_HAILUO_H3_AUDIO_DRIVEN_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({
       id: 'audio',
       kind: 'audio',
       label: '音频参考',
@@ -57,21 +57,21 @@ export const rhVideoHailuoH3AudioDrivenModelManifest = createRunningHubVideoMode
   displayName: '海螺H3音频驱动',
   description: RH_HAILUO_H3_AUDIO_DRIVEN_DESCRIPTION,
   vip: true,
-  help: Object['freeze']({ tooltip: RH_HAILUO_H3_AUDIO_DRIVEN_HELP_TOOLTIP }),
-  prompt: Object['freeze']({ emptyPolicy: 'allow', placeholder: '可选：描述人物、动作、镜头或画面要求。' }),
-  extensions: Object['freeze']({
-    providerProfiles: Object['freeze'](['runninghub', 'runninghub-international']),
+  help: Object.freeze({ tooltip: RH_HAILUO_H3_AUDIO_DRIVEN_HELP_TOOLTIP }),
+  prompt: Object.freeze({ emptyPolicy: 'allow', placeholder: '可选：描述人物、动作、镜头或画面要求。' }),
+  extensions: Object.freeze({
+    providerProfiles: Object.freeze(['runninghub', 'runninghub-international']),
   }),
   fixedAssetSlots: ['audio'],
   inputSlots: {
     allowedKinds: ['text', 'image', 'video', 'audio'],
     minByKind: { audio: 1 },
     maxByKind: { image: 4, video: 1, audio: 1 },
-    displayAspectRatioSource: Object['freeze']({ kind: 'video', fallbackIndex: 0 }),
+    displayAspectRatioSource: Object.freeze({ kind: 'video', fallbackIndex: 0 }),
     fixedSlots: RH_HAILUO_H3_AUDIO_DRIVEN_FIXED_INPUT_SLOTS,
   },
   uiFields: [
-    Object['freeze']({
+    Object.freeze({
       id: RH_HAILUO_H3_AUDIO_DRIVEN_QUALITY_FIELD_ID,
       displayRole: 'resolution',
       type: 'segmented',
@@ -84,7 +84,7 @@ export const rhVideoHailuoH3AudioDrivenModelManifest = createRunningHubVideoMode
       qualityRatioLabelOrder: 'fieldFirst',
       options: RH_HAILUO_H3_AUDIO_DRIVEN_QUALITY_OPTIONS,
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'aspectRatio',
       displayRole: 'aspectRatio',
       type: 'segmented',
@@ -93,16 +93,16 @@ export const rhVideoHailuoH3AudioDrivenModelManifest = createRunningHubVideoMode
       defaultValue: '自适应',
       options: RH_HAILUO_H3_AUDIO_DRIVEN_ASPECT_RATIO_OPTIONS,
     }),
-    Object['freeze']({
+    Object.freeze({
       id: RH_HAILUO_H3_AUDIO_DRIVEN_ACCELERATION_FIELD_ID,
       type: 'select',
       placement: 'videoAdvanced',
       variant: 'advancedRow',
       label: '加速方案',
       defaultValue: 'none',
-      options: Object['freeze']([
-        Object['freeze']({ value: 'none', label: '无' }),
-        Object['freeze']({ value: 'turbo', label: 'turbo' }),
+      options: Object.freeze([
+        Object.freeze({ value: 'none', label: '无' }),
+        Object.freeze({ value: 'turbo', label: 'turbo' }),
       ]),
     }),
     RH_INSTANCE_FIELD,
@@ -114,26 +114,26 @@ export const rhVideoHailuoH3AudioDrivenExecutionManifest = createRunningHubVideo
   workflowId: '2092941359513694209',
   submitMode: 'runninghub-task-create',
   queryMode: 'runninghubwf-query',
-  extensions: Object['freeze']({
-    providerProfileBindings: Object['freeze']({
-      'runninghub-international': Object['freeze']({ workflowId: '2093687111078051842' }),
+  extensions: Object.freeze({
+    providerProfileBindings: Object.freeze({
+      'runninghub-international': Object.freeze({ workflowId: '2093687111078051842' }),
     }),
     payloadResolver: 'runninghubHailuoH3AudioDriven',
     collectMediaInputs: true,
-    taskCreate: Object['freeze']({ retainSeconds: 60 }),
+    taskCreate: Object.freeze({ retainSeconds: 60 }),
   }),
   mapping: {
-    promptNode: Object['freeze']({ nodeId: '59', fieldName: 'value' }),
-    widthNode: Object['freeze']({ nodeId: '355', fieldName: 'value' }),
-    heightNode: Object['freeze']({ nodeId: '356', fieldName: 'value' }),
-    accelerationNode: Object['freeze']({
+    promptNode: Object.freeze({ nodeId: '59', fieldName: 'value' }),
+    widthNode: Object.freeze({ nodeId: '355', fieldName: 'value' }),
+    heightNode: Object.freeze({ nodeId: '356', fieldName: 'value' }),
+    accelerationNode: Object.freeze({
       nodeId: '195',
       fieldName: 'value',
       field: RH_HAILUO_H3_AUDIO_DRIVEN_ACCELERATION_FIELD_ID,
       defaultValue: '0',
-      valueMap: Object['freeze']({ none: '0', turbo: '1' }),
+      valueMap: Object.freeze({ none: '0', turbo: '1' }),
     }),
-    qualityLongEdges: Object['freeze']({
+    qualityLongEdges: Object.freeze({
       draft: 608,
       economy: 960,
       standard: 1376,
@@ -143,13 +143,13 @@ export const rhVideoHailuoH3AudioDrivenExecutionManifest = createRunningHubVideo
     defaultQuality: 'economy',
     defaultAspectRatio: '自适应',
     dimensionMultiple: 32,
-    imageLoaderNodes: Object['freeze'](
-      ['60', '72', '128', '129']['map']((nodeId) => Object['freeze']({ nodeId: nodeId, fieldName: 'image' })),
+    imageLoaderNodes: Object.freeze(
+      ['60', '72', '128', '129'].map((nodeId) => Object.freeze({ nodeId: nodeId, fieldName: 'image' })),
     ),
-    videoLoaderNodes: Object['freeze']([Object['freeze']({ nodeId: '68', fieldName: 'video' })]),
-    audioLoaderNodes: Object['freeze']([Object['freeze']({ nodeId: '336', fieldName: 'audio' })]),
-    referenceLimits: Object['freeze']({ image: 4, video: 1, audio: 1 }),
-    referenceNode: Object['freeze']({
+    videoLoaderNodes: Object.freeze([Object.freeze({ nodeId: '68', fieldName: 'video' })]),
+    audioLoaderNodes: Object.freeze([Object.freeze({ nodeId: '336', fieldName: 'audio' })]),
+    referenceLimits: Object.freeze({ image: 4, video: 1, audio: 1 }),
+    referenceNode: Object.freeze({
       nodeId: '121',
       imageFieldPrefix: 'ref_images.ref_image_',
       videoFieldPrefix: 'ref_videos.ref_video_',

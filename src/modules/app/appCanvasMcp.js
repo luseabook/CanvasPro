@@ -15,39 +15,39 @@ export function initCanvasMcp({
   if (enabled !== true) return Object.freeze({ destroy: () => false });
   let owner;
   try {
-    ((owner = windowObject['sessionStorage']['getItem']('aic-canvas-mcp-owner') || crypto['randomUUID']()),
-      windowObject['sessionStorage']['setItem']('aic-canvas-mcp-owner', owner));
+    ((owner = windowObject.sessionStorage.getItem('aic-canvas-mcp-owner') || crypto.randomUUID()),
+      windowObject.sessionStorage.setItem('aic-canvas-mcp-owner', owner));
   } catch {
-    owner = crypto['randomUUID']();
+    owner = crypto.randomUUID();
   }
   const timer = createCanvasMcpAutoConnection({
     allowGeneration,
     getBinding: getCanvasIdentity,
-    isReady: () => windowObject['_isAppLoaded'] === true,
+    isReady: () => windowObject._isAppLoaded === true,
     createSession: (onChange) =>
       createCanvasMcpSession({
         request: requestCanvasMcp,
         registry: canvasCommandRegistry,
         execute: (value, item) =>
           executeCanvasCommand(value, item, { ...commandContext, recordCommand: null }),
-        getBinding: () => (windowObject['_isAppLoaded'] === true ? getCanvasIdentity() : ''),
+        getBinding: () => (windowObject._isAppLoaded === true ? getCanvasIdentity() : ''),
         listModels: listModelManifests,
         owner: owner,
         onChange: onChange,
       }),
   });
-  windowObject['addEventListener']('aicanvas:active-canvas-changed', timer['refresh']);
+  windowObject.addEventListener('aicanvas:active-canvas-changed', timer.refresh);
   const key = () => {
-    void timer['destroy']();
+    void timer.destroy();
   };
   return (
-    windowObject['addEventListener']('pagehide', key),
+    windowObject.addEventListener('pagehide', key),
     {
       destroy() {
         return (
-          windowObject['removeEventListener']('aicanvas:active-canvas-changed', timer['refresh']),
-          windowObject['removeEventListener']('pagehide', key),
-          timer['destroy']()
+          windowObject.removeEventListener('aicanvas:active-canvas-changed', timer.refresh),
+          windowObject.removeEventListener('pagehide', key),
+          timer.destroy()
         );
       },
     }

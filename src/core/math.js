@@ -1393,60 +1393,60 @@ export { projectPointToViewportEdge, spreadViewportBoundaryPoint } from './viewp
 
 export function getViewportScreenBounds(options2 = {}, value303 = 0, value304 = 0) {
   const box50 = getViewportScreenOrigin(options2),
-    value305 = Number['isFinite'](Number(value303)) ? Number(value303) : 0,
-    value306 = Number['isFinite'](Number(value304)) ? Number(value304) : 0,
-    value307 = Math['max'](0, value305 - box50['x']),
-    value308 = Math['max'](0, value306 - box50['y']);
+    value305 = Number.isFinite(Number(value303)) ? Number(value303) : 0,
+    value306 = Number.isFinite(Number(value304)) ? Number(value304) : 0,
+    value307 = Math.max(0, value305 - box50.x),
+    value308 = Math.max(0, value306 - box50.y);
   return {
-    left: box50['x'],
-    top: box50['y'],
-    right: box50['x'] + value307,
-    bottom: box50['y'] + value308,
+    left: box50.x,
+    top: box50.y,
+    right: box50.x + value307,
+    bottom: box50.y + value308,
     width: value307,
     height: value308,
-    centerX: box50['x'] + value307 / 2,
-    centerY: box50['y'] + value308 / 2,
+    centerX: box50.x + value307 / 2,
+    centerY: box50.y + value308 / 2,
   };
 }
 
 export function getViewportScreenCenter(options3 = {}, value309 = 0, value310 = 0) {
   const viewportScreenBounds = getViewportScreenBounds(options3, value309, value310);
-  return { x: viewportScreenBounds['centerX'], y: viewportScreenBounds['centerY'] };
+  return { x: viewportScreenBounds.centerX, y: viewportScreenBounds.centerY };
 }
 
 function _medianLayoutMetric(value311, value312, value313 = 1) {
-  const list27 = (Array['isArray'](value311) ? value311 : [])
-    ['map']((value314) => Math['max'](0, _toFiniteNumber(value314?.[value312], 0)))
-    ['filter']((count12) => count12 > 0)
-    ['sort']((value315, value316) => value315 - value316);
-  if (list27['length'] === 0) return value313;
-  const value317 = Math['floor'](list27['length'] / 2);
-  if (list27['length'] % 2 === 1) return list27[value317];
+  const list27 = (Array.isArray(value311) ? value311 : [])
+    .map((value314) => Math.max(0, _toFiniteNumber(value314?.[value312], 0)))
+    .filter((count12) => count12 > 0)
+    .sort((value315, value316) => value315 - value316);
+  if (list27.length === 0) return value313;
+  const value317 = Math.floor(list27.length / 2);
+  if (list27.length % 2 === 1) return list27[value317];
   return (list27[value317 - 1] + list27[value317]) / 2;
 }
 
 function _sortGridLayoutItems(value318) {
   const _sortLayoutItems2 = _sortLayoutItems(value318);
-  if (_sortLayoutItems2['length'] <= 1) return _sortLayoutItems2;
-  const value319 = Math['max'](8, _medianLayoutMetric(_sortLayoutItems2, 'height', 40) * 0.35),
+  if (_sortLayoutItems2.length <= 1) return _sortLayoutItems2;
+  const value319 = Math.max(8, _medianLayoutMetric(_sortLayoutItems2, 'height', 40) * 0.35),
     value320 = [];
   for (const box51 of _sortLayoutItems2) {
-    const _toFiniteNumber36 = _toFiniteNumber(box51?.['top'] ?? box51?.['y'], 0),
-      value321 = Math['max'](0, _toFiniteNumber(box51?.['height'], 0)),
-      _toFiniteNumber37 = _toFiniteNumber(box51?.['bottom'], _toFiniteNumber36 + value321),
-      _toFiniteNumber38 = _toFiniteNumber(box51?.['cy'], _toFiniteNumber36 + value321 / 2);
+    const _toFiniteNumber36 = _toFiniteNumber(box51?.top ?? box51?.y, 0),
+      value321 = Math.max(0, _toFiniteNumber(box51?.height, 0)),
+      _toFiniteNumber37 = _toFiniteNumber(box51?.bottom, _toFiniteNumber36 + value321),
+      _toFiniteNumber38 = _toFiniteNumber(box51?.cy, _toFiniteNumber36 + value321 / 2);
     let box52 = null,
       value322 = Infinity;
     for (const box53 of value320) {
       const value323 =
-          Math['min'](box53['bottom'], _toFiniteNumber37) - Math['max'](box53['top'], _toFiniteNumber36),
-        value324 = Math['max'](1, Math['min'](box53['bottom'] - box53['top'], value321 || 1)),
-        value325 = Math['abs'](_toFiniteNumber38 - box53['centerY']),
+          Math.min(box53.bottom, _toFiniteNumber37) - Math.max(box53.top, _toFiniteNumber36),
+        value324 = Math.max(1, Math.min(box53.bottom - box53.top, value321 || 1)),
+        value325 = Math.abs(_toFiniteNumber38 - box53.centerY),
         value326 = value323 >= value324 * 0.25 || value325 <= value319;
       value326 && value325 < value322 && ((box52 = box53), (value322 = value325));
     }
     if (!box52) {
-      value320['push']({
+      value320.push({
         top: _toFiniteNumber36,
         bottom: _toFiniteNumber37,
         centerY: _toFiniteNumber38,
@@ -1455,20 +1455,20 @@ function _sortGridLayoutItems(value318) {
       });
       continue;
     }
-    (box52['items']['push'](box51),
-      (box52['top'] = Math['min'](box52['top'], _toFiniteNumber36)),
-      (box52['bottom'] = Math['max'](box52['bottom'], _toFiniteNumber37)),
-      (box52['centerSum'] += _toFiniteNumber38),
-      (box52['centerY'] = box52['centerSum'] / box52['items']['length']));
+    (box52.items.push(box51),
+      (box52.top = Math.min(box52.top, _toFiniteNumber36)),
+      (box52.bottom = Math.max(box52.bottom, _toFiniteNumber37)),
+      (box52.centerSum += _toFiniteNumber38),
+      (box52.centerY = box52.centerSum / box52.items.length));
   }
   return (
-    value320['sort']((value327, box54) => value327['top'] - box54['top']),
-    value320['flatMap']((value328) =>
-      value328['items']['sort']((box55, box56) => {
-        const _toFiniteNumber39 = _toFiniteNumber(box55?.['left'] ?? box55?.['x'], 0),
-          _toFiniteNumber40 = _toFiniteNumber(box56?.['left'] ?? box56?.['x'], 0);
+    value320.sort((value327, box54) => value327.top - box54.top),
+    value320.flatMap((value328) =>
+      value328.items.sort((box55, box56) => {
+        const _toFiniteNumber39 = _toFiniteNumber(box55?.left ?? box55?.x, 0),
+          _toFiniteNumber40 = _toFiniteNumber(box56?.left ?? box56?.x, 0);
         if (_toFiniteNumber39 !== _toFiniteNumber40) return _toFiniteNumber39 - _toFiniteNumber40;
-        return String(box55?.['id'] || '')['localeCompare'](String(box56?.['id'] || ''));
+        return String(box55?.id || '').localeCompare(String(box56?.id || ''));
       }),
     )
   );
@@ -1477,126 +1477,126 @@ function _sortGridLayoutItems(value318) {
 function _resolveGridRelationLayout(value329, value330) {
   const _sortGridLayoutItems2 = _sortGridLayoutItems(value329),
     enabled21 = new Set(
-      _sortGridLayoutItems2['map']((value331) => String(value331?.['id'] || '')['trim']())['filter'](Boolean),
+      _sortGridLayoutItems2.map((value331) => String(value331?.id || '').trim()).filter(Boolean),
     ),
     value332 = [],
     value333 = new Set();
-  for (const value334 of Array['isArray'](value330) ? value330 : []) {
-    const enabled22 = String(value334?.['sourceId'] || '')['trim'](),
-      enabled23 = String(value334?.['targetId'] || '')['trim']();
+  for (const value334 of Array.isArray(value330) ? value330 : []) {
+    const enabled22 = String(value334?.sourceId || '').trim(),
+      enabled23 = String(value334?.targetId || '').trim();
     if (
       !enabled22 ||
       !enabled23 ||
       enabled22 === enabled23 ||
-      !enabled21['has'](enabled22) ||
-      !enabled21['has'](enabled23)
+      !enabled21.has(enabled22) ||
+      !enabled21.has(enabled23)
     )
       continue;
     const value335 = enabled22 + '\x00' + enabled23;
-    if (value333['has'](value335)) continue;
-    (value333['add'](value335), value332['push']({ sourceId: enabled22, targetId: enabled23 }));
+    if (value333.has(value335)) continue;
+    (value333.add(value335), value332.push({ sourceId: enabled22, targetId: enabled23 }));
   }
-  if (value332['length'] === 0) return null;
+  if (value332.length === 0) return null;
   const map4 = new Map(
-      _sortGridLayoutItems2['map']((value336, value337) => [String(value336['id']), value337]),
+      _sortGridLayoutItems2.map((value336, value337) => [String(value336.id), value337]),
     ),
     args3 = new Set(),
     enabled24 = new Map(),
     map5 = new Map(),
     map6 = new Map();
   for (const { sourceId: sourceId, targetId: targetId } of value332) {
-    (args3['add'](sourceId), args3['add'](targetId));
-    if (!enabled24['has'](sourceId)) enabled24['set'](sourceId, []);
-    (enabled24['get'](sourceId)['push'](targetId),
-      map5['set'](targetId, (map5['get'](targetId) || 0) + 1));
-    if (!map5['has'](sourceId)) map5['set'](sourceId, 0);
-    if (!map6['has'](sourceId)) map6['set'](sourceId, 0);
-    if (!map6['has'](targetId)) map6['set'](targetId, 0);
+    (args3.add(sourceId), args3.add(targetId));
+    if (!enabled24.has(sourceId)) enabled24.set(sourceId, []);
+    (enabled24.get(sourceId).push(targetId),
+      map5.set(targetId, (map5.get(targetId) || 0) + 1));
+    if (!map5.has(sourceId)) map5.set(sourceId, 0);
+    if (!map6.has(sourceId)) map6.set(sourceId, 0);
+    if (!map6.has(targetId)) map6.set(targetId, 0);
   }
   const value338 = (value339, value340) =>
-    (map4['get'](value339) ?? Number['MAX_SAFE_INTEGER']) -
-      (map4['get'](value340) ?? Number['MAX_SAFE_INTEGER']) || value339['localeCompare'](value340);
-  let value341 = [...args3]['filter']((value342) => (map5['get'](value342) || 0) === 0)['sort'](value338);
+    (map4.get(value339) ?? Number.MAX_SAFE_INTEGER) -
+      (map4.get(value340) ?? Number.MAX_SAFE_INTEGER) || value339.localeCompare(value340);
+  let value341 = [...args3].filter((value342) => (map5.get(value342) || 0) === 0).sort(value338);
   const enabled25 = new Set();
-  while (value341['length'] > 0) {
+  while (value341.length > 0) {
     const value343 = value341;
     value341 = [];
     for (const value344 of value343) {
-      enabled25['add'](value344);
-      const value345 = map6['get'](value344) || 0;
-      for (const value346 of enabled24['get'](value344) || []) {
-        map6['set'](value346, Math['max'](map6['get'](value346) || 0, value345 + 1));
-        const count13 = (map5['get'](value346) || 0) - 1;
-        map5['set'](value346, count13);
-        if (count13 === 0) value341['push'](value346);
+      enabled25.add(value344);
+      const value345 = map6.get(value344) || 0;
+      for (const value346 of enabled24.get(value344) || []) {
+        map6.set(value346, Math.max(map6.get(value346) || 0, value345 + 1));
+        const count13 = (map5.get(value346) || 0) - 1;
+        map5.set(value346, count13);
+        if (count13 === 0) value341.push(value346);
       }
     }
-    value341['sort'](value338);
+    value341.sort(value338);
   }
-  const value347 = [...args3]['filter']((value348) => !enabled25['has'](value348));
-  if (value347['length'] > 0) {
-    const value349 = value347['reduce'](
-      (value350, value351) => Math['max'](value350, map6['get'](value351) || 0),
+  const value347 = [...args3].filter((value348) => !enabled25.has(value348));
+  if (value347.length > 0) {
+    const value349 = value347.reduce(
+      (value350, value351) => Math.max(value350, map6.get(value351) || 0),
       0,
     );
-    for (const value352 of value347) map6['set'](value352, value349);
+    for (const value352 of value347) map6.set(value352, value349);
   }
-  const value353 = [...args3]['reduce'](
-    (value354, value355) => Math['max'](value354, (map6['get'](value355) || 0) + 1),
+  const value353 = [...args3].reduce(
+    (value354, value355) => Math.max(value354, (map6.get(value355) || 0) + 1),
     1,
   );
   return { connectedIds: args3, layerById: map6, layerCount: value353, relations: value332 };
 }
 
 function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
-  const list29 = Array['from']({ length: value356 }, () => []),
+  const list29 = Array.from({ length: value356 }, () => []),
     map7 = new Map();
-  list28['forEach']((value357, value358) => {
-    const value359 = String(value357['id']);
-    let value360 = enabled26['connectedIds']['has'](value359)
-      ? Math['min'](value356 - 1, enabled26['layerById']['get'](value359) || 0)
+  list28.forEach((value357, value358) => {
+    const value359 = String(value357.id);
+    let value360 = enabled26.connectedIds.has(value359)
+      ? Math.min(value356 - 1, enabled26.layerById.get(value359) || 0)
       : value358 % value356;
-    if (!enabled26['connectedIds']['has'](value359)) {
-      const value361 = Math['min'](...list29['map']((list30) => list30['length']));
+    if (!enabled26.connectedIds.has(value359)) {
+      const value361 = Math.min(...list29.map((list30) => list30.length));
       for (let value362 = 0; value362 < value356; value362 += 1) {
         const value363 = (value360 + value362) % value356;
-        if (list29[value363]['length'] === value361) {
+        if (list29[value363].length === value361) {
           value360 = value363;
           break;
         }
       }
     }
-    (list29[value360]['push'](value357), map7['set'](value359, value360));
+    (list29[value360].push(value357), map7.set(value359, value360));
   });
-  const map8 = new Map(list28['map']((value364) => [String(value364['id']), value364])),
-    map9 = new Map(list28['map']((value365, value366) => [String(value365['id']), value366])),
+  const map8 = new Map(list28.map((value364) => [String(value364.id), value364])),
+    map9 = new Map(list28.map((value365, value366) => [String(value365.id), value366])),
     map10 = new Map();
-  for (const { sourceId: sourceId2, targetId: targetId2 } of enabled26['relations']) {
-    if (map7['get'](sourceId2) === map7['get'](targetId2)) continue;
-    (!map10['has'](sourceId2) && map10['set'](sourceId2, []),
-      !map10['has'](targetId2) && map10['set'](targetId2, []),
-      map10['get'](sourceId2)['push'](targetId2),
-      map10['get'](targetId2)['push'](sourceId2));
+  for (const { sourceId: sourceId2, targetId: targetId2 } of enabled26.relations) {
+    if (map7.get(sourceId2) === map7.get(targetId2)) continue;
+    (!map10.has(sourceId2) && map10.set(sourceId2, []),
+      !map10.has(targetId2) && map10.set(targetId2, []),
+      map10.get(sourceId2).push(targetId2),
+      map10.get(targetId2).push(sourceId2));
   }
   const map11 = new Map(),
     handler6 = (value367) => {
-      list29[value367]['forEach']((value368, value369) => {
-        map11['set'](String(value368['id']), value369);
+      list29[value367].forEach((value368, value369) => {
+        map11.set(String(value368.id), value369);
       });
     };
-  list29['forEach']((value370, value371) => handler6(value371));
+  list29.forEach((value370, value371) => handler6(value371));
   const run = (value372, value373, count14) => {
-      const list31 = (map10['get'](value372) || [])
-        ['filter']((value374) => {
-          const value375 = map7['get'](value374);
+      const list31 = (map10.get(value372) || [])
+        .filter((value374) => {
+          const value375 = map7.get(value374);
           return count14 > 0 ? value375 < value373 : value375 > value373;
         })
-        ['map']((value376) => map11['get'](value376))
-        ['filter'](Number['isFinite'])
-        ['sort']((value377, value378) => value377 - value378);
-      if (list31['length'] === 0) return null;
-      const value379 = Math['floor'](list31['length'] / 2);
-      return list31['length'] % 2 === 1
+        .map((value376) => map11.get(value376))
+        .filter(Number.isFinite)
+        .sort((value377, value378) => value377 - value378);
+      if (list31.length === 0) return null;
+      const value379 = Math.floor(list31.length / 2);
+      return list31.length % 2 === 1
         ? list31[value379]
         : (list31[value379 - 1] + list31[value379]) / 2;
     },
@@ -1605,27 +1605,27 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
         value381 = count15 > 0 ? value356 : -1;
       for (let value382 = value380; value382 !== value381; value382 += count15) {
         const map12 = new Map(
-            list29[value382]['map']((value383, value384) => [String(value383['id']), value384]),
+            list29[value382].map((value383, value384) => [String(value383.id), value384]),
           ),
           value385 = new Map(
-            list29[value382]['map']((value386) => {
-              const value387 = String(value386['id']);
+            list29[value382].map((value386) => {
+              const value387 = String(value386.id);
               return [value387, run(value387, value382, count15)];
             }),
           );
-        (list29[value382]['sort']((value388, value389) => {
-          const value390 = String(value388['id']),
-            value391 = String(value389['id']),
-            value392 = value385['get'](value390),
-            value393 = value385['get'](value391),
-            value394 = value392 ?? map12['get'](value390) ?? 0,
-            value395 = value393 ?? map12['get'](value391) ?? 0;
+        (list29[value382].sort((value388, value389) => {
+          const value390 = String(value388.id),
+            value391 = String(value389.id),
+            value392 = value385.get(value390),
+            value393 = value385.get(value391),
+            value394 = value392 ?? map12.get(value390) ?? 0,
+            value395 = value393 ?? map12.get(value391) ?? 0;
           if (value394 !== value395) return value394 - value395;
           return (
-            (map12['get'](value390) ?? 0) - (map12['get'](value391) ?? 0) ||
-            (map9['get'](value390) ?? Number['MAX_SAFE_INTEGER']) -
-              (map9['get'](value391) ?? Number['MAX_SAFE_INTEGER']) ||
-            value390['localeCompare'](value391)
+            (map12.get(value390) ?? 0) - (map12.get(value391) ?? 0) ||
+            (map9.get(value390) ?? Number.MAX_SAFE_INTEGER) -
+              (map9.get(value391) ?? Number.MAX_SAFE_INTEGER) ||
+            value390.localeCompare(value391)
           );
         }),
           handler6(value382));
@@ -1634,29 +1634,29 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
   for (let count16 = 0; count16 < 2; count16 += 1) {
     (handler7(1), handler7(-1));
   }
-  const value396 = enabled26['relations']['filter'](
-      ({ sourceId: sourceId3, targetId: targetId3 }) => map7['get'](sourceId3) !== map7['get'](targetId3),
+  const value396 = enabled26.relations.filter(
+      ({ sourceId: sourceId3, targetId: targetId3 }) => map7.get(sourceId3) !== map7.get(targetId3),
     ),
     map13 = new Map(),
     value397 = new Map();
   for (const { sourceId: sourceId4, targetId: targetId4 } of value396) {
-    (map13['set'](sourceId4, (map13['get'](sourceId4) || 0) + 1),
-      value397['set'](targetId4, (value397['get'](targetId4) || 0) + 1));
+    (map13.set(sourceId4, (map13.get(sourceId4) || 0) + 1),
+      value397.set(targetId4, (value397.get(targetId4) || 0) + 1));
   }
-  const map14 = new Map(list28['map']((value398) => [String(value398['id']), String(value398['id'])])),
+  const map14 = new Map(list28.map((value398) => [String(value398.id), String(value398.id)])),
     map15 = new Map(
-      list28['map']((value399) => {
-        const value400 = String(value399['id']);
-        return [value400, new Set([map7['get'](value400)])];
+      list28.map((value399) => {
+        const value400 = String(value399.id);
+        return [value400, new Set([map7.get(value400)])];
       }),
     ),
     handler8 = (value401) => {
       let value402 = value401;
-      while (map14['get'](value402) !== value402) value402 = map14['get'](value402);
+      while (map14.get(value402) !== value402) value402 = map14.get(value402);
       let value403 = value401;
-      while (map14['get'](value403) !== value402) {
-        const value404 = map14['get'](value403);
-        (map14['set'](value403, value402), (value403 = value404));
+      while (map14.get(value403) !== value402) {
+        const value404 = map14.get(value403);
+        (map14.set(value403, value402), (value403 = value404));
       }
       return value402;
     },
@@ -1664,115 +1664,115 @@ function _buildGraphAwareGridPlacements(list28, value356, enabled26) {
       const value407 = handler8(value405),
         value408 = handler8(value406);
       if (value407 === value408) return true;
-      const args4 = map15['get'](value407) || new Set(),
-        map16 = map15['get'](value408) || new Set();
-      if ([...args4]['some']((value409) => map16['has'](value409))) return false;
+      const args4 = map15.get(value407) || new Set(),
+        map16 = map15.get(value408) || new Set();
+      if ([...args4].some((value409) => map16.has(value409))) return false;
       const value410 =
-          (map9['get'](value407) ?? Number['MAX_SAFE_INTEGER']) <=
-          (map9['get'](value408) ?? Number['MAX_SAFE_INTEGER']),
+          (map9.get(value407) ?? Number.MAX_SAFE_INTEGER) <=
+          (map9.get(value408) ?? Number.MAX_SAFE_INTEGER),
         value411 = value410 ? value407 : value408,
         value412 = value410 ? value408 : value407;
       return (
-        map14['set'](value412, value411),
-        map15['set'](value411, new Set([...args4, ...map16])),
-        map15['delete'](value412),
+        map14.set(value412, value411),
+        map15.set(value411, new Set([...args4, ...map16])),
+        map15.delete(value412),
         true
       );
     };
-  value396['sort']((value413, value414) => {
+  value396.sort((value413, value414) => {
     const value415 =
-        map13['get'](value413['sourceId']) === 1 && value397['get'](value413['targetId']) === 1,
-      value416 = map13['get'](value414['sourceId']) === 1 && value397['get'](value414['targetId']) === 1;
+        map13.get(value413.sourceId) === 1 && value397.get(value413.targetId) === 1,
+      value416 = map13.get(value414.sourceId) === 1 && value397.get(value414.targetId) === 1;
     if (value415 !== value416) return value415 ? -1 : 1;
     const value417 =
-        map13['get'](value413['sourceId']) === 1 || value397['get'](value413['targetId']) === 1,
-      value418 = map13['get'](value414['sourceId']) === 1 || value397['get'](value414['targetId']) === 1;
+        map13.get(value413.sourceId) === 1 || value397.get(value413.targetId) === 1,
+      value418 = map13.get(value414.sourceId) === 1 || value397.get(value414.targetId) === 1;
     if (value417 !== value418) return value417 ? -1 : 1;
-    const value419 = Math['abs'](map7['get'](value413['sourceId']) - map7['get'](value413['targetId'])),
-      value420 = Math['abs'](map7['get'](value414['sourceId']) - map7['get'](value414['targetId']));
+    const value419 = Math.abs(map7.get(value413.sourceId) - map7.get(value413.targetId)),
+      value420 = Math.abs(map7.get(value414.sourceId) - map7.get(value414.targetId));
     if (value419 !== value420) return value419 - value420;
-    const value421 = Math['abs'](
-        (map11['get'](value413['sourceId']) || 0) - (map11['get'](value413['targetId']) || 0),
+    const value421 = Math.abs(
+        (map11.get(value413.sourceId) || 0) - (map11.get(value413.targetId) || 0),
       ),
-      value422 = Math['abs'](
-        (map11['get'](value414['sourceId']) || 0) - (map11['get'](value414['targetId']) || 0),
+      value422 = Math.abs(
+        (map11.get(value414.sourceId) || 0) - (map11.get(value414.targetId) || 0),
       );
     if (value421 !== value422) return value421 - value422;
-    const value423 = map8['get'](value413['sourceId']),
-      value424 = map8['get'](value413['targetId']),
-      value425 = map8['get'](value414['sourceId']),
-      value426 = map8['get'](value414['targetId']),
-      value427 = Math['abs']((value423?.['cy'] || 0) - (value424?.['cy'] || 0)),
-      value428 = Math['abs']((value425?.['cy'] || 0) - (value426?.['cy'] || 0));
+    const value423 = map8.get(value413.sourceId),
+      value424 = map8.get(value413.targetId),
+      value425 = map8.get(value414.sourceId),
+      value426 = map8.get(value414.targetId),
+      value427 = Math.abs((value423?.cy || 0) - (value424?.cy || 0)),
+      value428 = Math.abs((value425?.cy || 0) - (value426?.cy || 0));
     if (value427 !== value428) return value427 - value428;
-    const count17 = (map9['get'](value413['sourceId']) || 0) - (map9['get'](value414['sourceId']) || 0);
+    const count17 = (map9.get(value413.sourceId) || 0) - (map9.get(value414.sourceId) || 0);
     if (count17 !== 0) return count17;
-    return (map9['get'](value413['targetId']) || 0) - (map9['get'](value414['targetId']) || 0);
-  })['forEach'](({ sourceId: sourceId5, targetId: targetId5 }) => handler9(sourceId5, targetId5));
+    return (map9.get(value413.targetId) || 0) - (map9.get(value414.targetId) || 0);
+  }).forEach(({ sourceId: sourceId5, targetId: targetId5 }) => handler9(sourceId5, targetId5));
   const args5 = new Map();
-  list28['forEach']((value429, value430) => {
-    const value431 = String(value429['id']),
+  list28.forEach((value429, value430) => {
+    const value431 = String(value429.id),
       value432 = handler8(value431);
-    !args5['has'](value432) && args5['set'](value432, { firstIndex: value430, items: [] });
-    const value433 = args5['get'](value432);
-    ((value433['firstIndex'] = Math['min'](value433['firstIndex'], value430)),
-      value433['items']['push'](value429));
+    !args5.has(value432) && args5.set(value432, { firstIndex: value430, items: [] });
+    const value433 = args5.get(value432);
+    ((value433.firstIndex = Math.min(value433.firstIndex, value430)),
+      value433.items.push(value429));
   });
-  const value434 = [...args5['values']()]['sort'](
-    (value435, value436) => value435['firstIndex'] - value436['firstIndex'],
+  const value434 = [...args5.values()].sort(
+    (value435, value436) => value435.firstIndex - value436.firstIndex,
   );
   return {
-    placements: value434['flatMap']((value437, value438) =>
-      value437['items']['map']((value439) => ({
+    placements: value434.flatMap((value437, value438) =>
+      value437.items.map((value439) => ({
         item: value439,
-        col: map7['get'](String(value439['id'])),
+        col: map7.get(String(value439.id)),
         row: value438,
       })),
     ),
-    rowCount: value434['length'],
+    rowCount: value434.length,
   };
 }
 
 export function resolveArrangeGridColumns(list32, value440 = {}) {
-  const list33 = Array['isArray'](list32) ? list32['filter'](Boolean) : [];
-  if (list33['length'] <= 1) return Math['max'](1, list33['length']);
-  const count18 = Number(value440['columns']);
-  if (Number['isFinite'](count18) && count18 > 0) return Math['max'](1, Math['trunc'](count18));
+  const list33 = Array.isArray(list32) ? list32.filter(Boolean) : [];
+  if (list33.length <= 1) return Math.max(1, list33.length);
+  const count18 = Number(value440.columns);
+  if (Number.isFinite(count18) && count18 > 0) return Math.max(1, Math.trunc(count18));
   const selectionBounds3 = computeSelectionBounds(list33),
-    value441 = Math['max'](0, _toFiniteNumber(value440['gapX'] ?? value440['gap'], 40)),
-    value442 = Math['max'](0, _toFiniteNumber(value440['gapY'] ?? value440['gap'], 40)),
+    value441 = Math.max(0, _toFiniteNumber(value440.gapX ?? value440.gap, 40)),
+    value442 = Math.max(0, _toFiniteNumber(value440.gapY ?? value440.gap, 40)),
     _medianLayoutMetric2 = _medianLayoutMetric(list33, 'width', 1),
     _medianLayoutMetric3 = _medianLayoutMetric(list33, 'height', 1),
-    count19 = Number(value440['targetAspect']),
+    count19 = Number(value440.targetAspect),
     value443 =
-      selectionBounds3 && selectionBounds3['height'] > 0
-        ? selectionBounds3['width'] / selectionBounds3['height']
+      selectionBounds3 && selectionBounds3.height > 0
+        ? selectionBounds3.width / selectionBounds3.height
         : 1,
-    value444 = Math['max'](
+    value444 = Math.max(
       0.75,
-      Math['min'](16 / 9, Number['isFinite'](count19) && count19 > 0 ? count19 : value443),
+      Math.min(16 / 9, Number.isFinite(count19) && count19 > 0 ? count19 : value443),
     ),
-    count20 = Number(value440['maxColumns']),
-    value445 = Math['min'](
-      list33['length'],
-      Number['isFinite'](count20) && count20 > 0 ? Math['max'](2, Math['trunc'](count20)) : 6,
+    count20 = Number(value440.maxColumns),
+    value445 = Math.min(
+      list33.length,
+      Number.isFinite(count20) && count20 > 0 ? Math.max(2, Math.trunc(count20)) : 6,
     );
   let value446 = 2,
     value447 = Infinity;
   for (let value448 = 2; value448 <= value445; value448 += 1) {
-    const value449 = Math['ceil'](list33['length'] / value448),
+    const value449 = Math.ceil(list33.length / value448),
       value450 = value448 * _medianLayoutMetric2 + (value448 - 1) * value441,
       value451 = value449 * _medianLayoutMetric3 + (value449 - 1) * value442,
-      value452 = value450 / Math['max'](1, value451),
-      value453 = Math['abs'](Math['log'](value452 / value444)),
-      value454 = (value448 * value449 - list33['length']) / list33['length'],
+      value452 = value450 / Math.max(1, value451),
+      value453 = Math.abs(Math.log(value452 / value444)),
+      value454 = (value448 * value449 - list33.length) / list33.length,
       value455 = value453 + value454 * 0.9;
     value455 < value447 - 1e-9 && ((value447 = value455), (value446 = value448));
   }
-  const _resolveGridRelationLayout2 = _resolveGridRelationLayout(list33, value440['relations']);
+  const _resolveGridRelationLayout2 = _resolveGridRelationLayout(list33, value440.relations);
   return (
     _resolveGridRelationLayout2 &&
-      (value446 = Math['max'](value446, Math['min'](value445, _resolveGridRelationLayout2['layerCount']))),
+      (value446 = Math.max(value446, Math.min(value445, _resolveGridRelationLayout2.layerCount))),
     value446
   );
 }
@@ -1780,31 +1780,31 @@ export function resolveArrangeGridColumns(list32, value440 = {}) {
 function queryNodeSpatialCells(value456, value457, value458, value459, value460) {
   const value461 = new Set(),
     enabled27 =
-      (value458 - value457 + 1) * (value460 - value459 + 1) > Math['max'](64, value456['nodeCount']),
-    value462 = enabled27 ? value456['nodeRects']['keys']() : value456['spanningIds'] || [];
+      (value458 - value457 + 1) * (value460 - value459 + 1) > Math.max(64, value456.nodeCount),
+    value462 = enabled27 ? value456.nodeRects.keys() : value456.spanningIds || [];
   for (const value463 of value462) {
-    const box57 = value456['nodeRects']['get'](value463),
-      value464 = value456['cellSize'];
+    const box57 = value456.nodeRects.get(value463),
+      value464 = value456.cellSize;
     if (
-      Math['floor'](box57['x'] / value464) <= value458 &&
-      Math['floor'](box57['right'] / value464) >= value457 &&
-      Math['floor'](box57['y'] / value464) <= value460 &&
-      Math['floor'](box57['bottom'] / value464) >= value459
+      Math.floor(box57.x / value464) <= value458 &&
+      Math.floor(box57.right / value464) >= value457 &&
+      Math.floor(box57.y / value464) <= value460 &&
+      Math.floor(box57.bottom / value464) >= value459
     )
-      value461['add'](value463);
+      value461.add(value463);
   }
   if (!enabled27)
     for (let value465 = value457; value465 <= value458; value465 += 1) {
       for (let value466 = value459; value466 <= value460; value466 += 1) {
-        const list34 = value456['boundsCells']['get'](getNodeSpatialCellKey(value465, value466));
-        if (!list34 || list34['length'] === 0) continue;
-        for (const value467 of list34) value461['add'](value467);
+        const list34 = value456.boundsCells.get(getNodeSpatialCellKey(value465, value466));
+        if (!list34 || list34.length === 0) continue;
+        for (const value467 of list34) value461.add(value467);
       }
     }
-  if (value461['size'] === 0) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
-  return Array['from'](value461)['sort']((value468, value469) => {
-    const value470 = value456['nodeRects']['get'](value468)?.['order'] ?? Infinity,
-      value471 = value456['nodeRects']['get'](value469)?.['order'] ?? Infinity;
+  if (value461.size === 0) return EMPTY_NODE_SPATIAL_QUERY_RESULT;
+  return Array.from(value461).sort((value468, value469) => {
+    const value470 = value456.nodeRects.get(value468)?.order ?? Infinity,
+      value471 = value456.nodeRects.get(value469)?.order ?? Infinity;
     return value470 - value471;
   });
 }

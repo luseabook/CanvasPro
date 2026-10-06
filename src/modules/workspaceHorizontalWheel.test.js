@@ -302,7 +302,7 @@ test('a container that matches itself never vetoes its own gesture', () => {
 });
 
 test('without any computed-style source the nested check steps aside', () => {
-  assert.equal(typeof globalThis['getComputedStyle'] !== 'function', true);
+  assert.equal(typeof globalThis.getComputedStyle !== 'function', true);
   const container = createScrollable({ scrollWidth: 600, clientWidth: 200, scrollLeft: 100 });
   const nested = createScrollable({
     scrollWidth: 400,

@@ -1,4 +1,4 @@
-export const apimartAdditionalTextModels = Object['freeze'](
+export const apimartAdditionalTextModels = Object.freeze(
   [
     { model: 'gpt-6-astra', displayName: 'GPT-6 Astra', icon: 'oa', reasoningEffortMode: 'openai' },
     { model: 'claude-fable-5.1', displayName: 'Claude Fable 5.1' },
@@ -40,11 +40,11 @@ export const apimartAdditionalTextModels = Object['freeze'](
       icon: 'deepseek',
       mediaPolicy: 'text-only',
     },
-  ]['map']((args, value) =>
-    Object['freeze']({
+  ].map((args, value) =>
+    Object.freeze({
       ...args,
-      modelId: 'apimart/' + args['model'],
-      executionId: 'apimart.model-api.text.' + args['model']['replaceAll']('.', '-') + '.v1',
+      modelId: 'apimart/' + args.model,
+      executionId: 'apimart.model-api.text.' + args.model.replaceAll('.', '-') + '.v1',
       subtitle: 'APIMart chat completion model API',
       order: 90 + value,
     }),

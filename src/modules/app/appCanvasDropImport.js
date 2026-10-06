@@ -20,34 +20,34 @@ export function openAppCanvasFilePicker({
   onError: onError,
 } = {}) {
   if (
-    typeof documentObject?.['createElement'] !== 'function' ||
-    typeof documentObject?.['body']?.['appendChild'] !== 'function'
+    typeof documentObject?.createElement !== 'function' ||
+    typeof documentObject?.body?.appendChild !== 'function'
   )
     return false;
-  const el = documentObject['createElement']('input');
-  ((el['type'] = 'file'),
-    (el['accept'] = 'image/*,video/*,audio/*'),
-    (el['multiple'] = true),
-    (el['style']['position'] = 'fixed'),
-    (el['style']['left'] = '-9999px'),
-    (el['style']['top'] = '-9999px'),
-    (el['style']['opacity'] = '0'));
+  const el = documentObject.createElement('input');
+  ((el.type = 'file'),
+    (el.accept = 'image/*,video/*,audio/*'),
+    (el.multiple = true),
+    (el.style.position = 'fixed'),
+    (el.style.left = '-9999px'),
+    (el.style.top = '-9999px'),
+    (el.style.opacity = '0'));
   let item = false;
   const run = () => {
     if (item) return;
-    ((item = true), el['remove']?.());
+    ((item = true), el.remove?.());
   };
-  (el['addEventListener']?.('cancel', run, { once: true }),
-    el['addEventListener']?.(
+  (el.addEventListener?.('cancel', run, { once: true }),
+    el.addEventListener?.(
       'change',
       (event2) => {
-        const files = Array['from'](event2?.['target']?.['files'] || []);
+        const files = Array.from(event2?.target?.files || []);
         run();
-        if (files['length'] === 0) return;
+        if (files.length === 0) return;
         const event3 = {
           dataTransfer: { files: files },
-          clientX: Number['isFinite'](Number(clientX)) ? Number(clientX) : 0,
-          clientY: Number['isFinite'](Number(clientY)) ? Number(clientY) : 0,
+          clientX: Number.isFinite(Number(clientX)) ? Number(clientX) : 0,
+          clientY: Number.isFinite(Number(clientY)) ? Number(clientY) : 0,
           preventDefault() {},
           stopPropagation() {},
         };
@@ -57,23 +57,23 @@ export function openAppCanvasFilePicker({
           handleFileDrop: handleFileDrop2,
           commit: commit2,
         })
-          ['then']((enabled) => {
+          .then((enabled) => {
             if (!enabled) onUnsupported?.();
           })
-          ['catch']((key) => {
+          .catch((key) => {
             onError?.(key);
           });
       },
       { once: true },
     ));
   try {
-    return (documentObject['body']['appendChild'](el), el['click'](), true);
+    return (documentObject.body.appendChild(el), el.click(), true);
   } catch (index) {
     return (run(), onError?.(index), false);
   }
 }
 function isCanvasDropBlocked(event4) {
-  return Boolean(event4?.['target']?.['closest']?.('[data-ui-stop="1"]'));
+  return Boolean(event4?.target?.closest?.('[data-ui-stop="1"]'));
 }
 export function installAppCanvasDropImport({
   targetEl: targetEl,
@@ -84,12 +84,12 @@ export function installAppCanvasDropImport({
 } = {}) {
   if (!targetEl) return () => {};
   const result = (event5) => {
-      if (hasNodeManagerDragType(event5?.['dataTransfer'])) return;
+      if (hasNodeManagerDragType(event5?.dataTransfer)) return;
       if (isCanvasDropBlocked(event5)) return;
-      event5['preventDefault']();
+      event5.preventDefault();
     },
     async2 = async (event6) => {
-      if (hasNodeManagerDragType(event6?.['dataTransfer'])) return;
+      if (hasNodeManagerDragType(event6?.dataTransfer)) return;
       if (isCanvasDropBlocked(event6)) return;
       const projectId3 = getCurrentProjectId?.() || 'default_v2_project',
         runAppCanvasFileImport2 = await runAppCanvasFileImport({
@@ -103,10 +103,10 @@ export function installAppCanvasDropImport({
       data && commit3?.();
     };
   return (
-    targetEl['addEventListener']('dragover', result),
-    targetEl['addEventListener']('drop', async2),
+    targetEl.addEventListener('dragover', result),
+    targetEl.addEventListener('drop', async2),
     () => {
-      (targetEl['removeEventListener']('dragover', result), targetEl['removeEventListener']('drop', async2));
+      (targetEl.removeEventListener('dragover', result), targetEl.removeEventListener('drop', async2));
     }
   );
 }

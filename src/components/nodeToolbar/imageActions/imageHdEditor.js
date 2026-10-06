@@ -8,7 +8,7 @@ import { getImageHdModelIds } from '../../../modules/imageHdModelMenu.js';
 export function openImageHdEditor(args) {
   const allowedModelIds = getImageHdModelIds();
   return (
-    window['v2FocusOnNode']?.(args['sourceNodeId']),
+    window.v2FocusOnNode?.(args.sourceNodeId),
     openCanvasGenerationEditor({
       ...args,
       modelId: SEED_VR2_IMAGE_HD_MODEL_ID,

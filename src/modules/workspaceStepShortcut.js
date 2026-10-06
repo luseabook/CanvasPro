@@ -7,26 +7,26 @@ const WORKSPACE_STEP_SHORTCUT_EDITABLE_SELECTOR = [
   '[role="textbox"]',
   '[role="dialog"]',
   '[aria-modal="true"]',
-]['join'](',');
+].join(',');
 function isEditableShortcutTarget(el) {
-  return Boolean(el?.['isContentEditable'] || el?.['closest']?.(WORKSPACE_STEP_SHORTCUT_EDITABLE_SELECTOR));
+  return Boolean(el?.isContentEditable || el?.closest?.(WORKSPACE_STEP_SHORTCUT_EDITABLE_SELECTOR));
 }
 export function resolveWorkspaceStepShortcut(event, value) {
   if (
     !event ||
-    event['defaultPrevented'] ||
-    event['isComposing'] ||
-    event['repeat'] ||
-    event['ctrlKey'] ||
-    event['metaKey'] ||
-    event['altKey'] ||
-    event['shiftKey'] ||
-    isEditableShortcutTarget(event['target'])
+    event.defaultPrevented ||
+    event.isComposing ||
+    event.repeat ||
+    event.ctrlKey ||
+    event.metaKey ||
+    event.altKey ||
+    event.shiftKey ||
+    isEditableShortcutTarget(event.target)
   )
     return 0;
-  const item = String(event['key'] || ''),
-    key = /^[1-9]$/['test'](item) ? Number(item) : 0,
-    index = Math['max'](0, Math['trunc'](Number(value) || 0));
+  const item = String(event.key || ''),
+    key = /^[1-9]$/.test(item) ? Number(item) : 0,
+    index = Math.max(0, Math.trunc(Number(value) || 0));
   return key <= index ? key : 0;
 }
 export function handleWorkspaceStepShortcut(
@@ -37,8 +37,8 @@ export function handleWorkspaceStepShortcut(
   const workspaceStepShortcut = resolveWorkspaceStepShortcut(event2, stepCount);
   if (!workspaceStepShortcut) return false;
   return (
-    event2['preventDefault']?.(),
-    event2['stopPropagation']?.(),
+    event2.preventDefault?.(),
+    event2.stopPropagation?.(),
     navigate?.(workspaceStepShortcut),
     true
   );

@@ -6,16 +6,16 @@ import {
   freezeBodyMapping,
 } from './vendorVideoModelApiShared.js';
 import { createMinimaxH3VideoInputSurface } from './minimaxH3VideoModelApiShared.js';
-const RUNNINGHUB_HAILUO_H3_MODE_FIELD = Object['freeze']({
+const RUNNINGHUB_HAILUO_H3_MODE_FIELD = Object.freeze({
   id: 'rh_hailuo_h3_mode',
   type: 'segmented',
   placement: 'mode',
   variant: 'sectionMenu',
   label: '模式选择',
   defaultValue: 'frames',
-  options: Object['freeze']([
-    Object['freeze']({ value: 'frames', label: '首尾帧' }),
-    Object['freeze']({ value: 'reference', label: '多参考' }),
+  options: Object.freeze([
+    Object.freeze({ value: 'frames', label: '首尾帧' }),
+    Object.freeze({ value: 'reference', label: '多参考' }),
   ]),
 });
 function createHailuoH3FixedSlot({
@@ -26,16 +26,16 @@ function createHailuoH3FixedSlot({
   description: description,
   displayOrder: displayOrder,
 }) {
-  return Object['freeze']({
+  return Object.freeze({
     id: id,
     kind: kind,
     label: label,
     description: description,
     displayOrder: displayOrder,
-    showWhen: Object['freeze']({ field: 'rh_hailuo_h3_mode', value: mode }),
+    showWhen: Object.freeze({ field: 'rh_hailuo_h3_mode', value: mode }),
   });
 }
-const RUNNINGHUB_HAILUO_H3_FIXED_INPUT_SLOTS = Object['freeze']([
+const RUNNINGHUB_HAILUO_H3_FIXED_INPUT_SLOTS = Object.freeze([
     createHailuoH3FixedSlot({
       id: 'firstFrame',
       kind: 'image',
@@ -77,50 +77,50 @@ const RUNNINGHUB_HAILUO_H3_FIXED_INPUT_SLOTS = Object['freeze']([
       displayOrder: 50,
     }),
   ]),
-  RUNNINGHUB_HAILUO_H3_INPUT_POLICY_VARIANTS = Object['freeze']([
-    Object['freeze']({
-      when: Object['freeze']({ field: 'rh_hailuo_h3_mode', value: 'frames' }),
-      allowedKinds: Object['freeze'](['text', 'image']),
-      maxByKind: Object['freeze']({ image: 2, video: 0, audio: 0 }),
+  RUNNINGHUB_HAILUO_H3_INPUT_POLICY_VARIANTS = Object.freeze([
+    Object.freeze({
+      when: Object.freeze({ field: 'rh_hailuo_h3_mode', value: 'frames' }),
+      allowedKinds: Object.freeze(['text', 'image']),
+      maxByKind: Object.freeze({ image: 2, video: 0, audio: 0 }),
     }),
   ]),
-  RUNNINGHUB_HAILUO_H3_MEDIA_CONSTRAINTS = Object['freeze']({
-    image: Object['freeze']({
+  RUNNINGHUB_HAILUO_H3_MEDIA_CONSTRAINTS = Object.freeze({
+    image: Object.freeze({
       maxBytes: 30 * 1024 * 1024,
-      allowedExtensions: Object['freeze'](['jpg', 'jpeg', 'png', 'webp']),
+      allowedExtensions: Object.freeze(['jpg', 'jpeg', 'png', 'webp']),
     }),
-    video: Object['freeze']({
+    video: Object.freeze({
       minDurationSeconds: 2,
       maxDurationSeconds: 15,
       maxBytes: 50 * 1024 * 1024,
-      allowedExtensions: Object['freeze'](['mp4', 'mov']),
+      allowedExtensions: Object.freeze(['mp4', 'mov']),
     }),
-    audio: Object['freeze']({
+    audio: Object.freeze({
       minDurationSeconds: 2,
       maxDurationSeconds: 15,
       maxBytes: 15 * 1024 * 1024,
-      allowedExtensions: Object['freeze'](['mp3', 'wav']),
+      allowedExtensions: Object.freeze(['mp3', 'wav']),
     }),
   }),
   RUNNINGHUB_HAILUO_H3_BODY_MAPPING = freezeBodyMapping([
-    Object['freeze']({ path: 'prompt', from: 'prompt' }),
-    Object['freeze']({
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
       path: 'rh_hailuo_h3_mode',
       from: 'param',
-      field: Object['freeze'](['generationParams.rh_hailuo_h3_mode', 'rh_hailuo_h3_mode']),
+      field: Object.freeze(['generationParams.rh_hailuo_h3_mode', 'rh_hailuo_h3_mode']),
       defaultValue: 'frames',
     }),
-    Object['freeze']({ path: 'resolution', from: 'constant', value: '2K' }),
-    Object['freeze']({
+    Object.freeze({ path: 'resolution', from: 'constant', value: '2K' }),
+    Object.freeze({
       path: 'duration',
       from: 'param',
-      field: Object['freeze'](['generationParams.duration', 'duration']),
+      field: Object.freeze(['generationParams.duration', 'duration']),
       defaultValue: 5,
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'ratio',
       from: 'param',
-      field: Object['freeze'](['generationParams.aspectRatio', 'aspectRatio', 'ratio']),
+      field: Object.freeze(['generationParams.aspectRatio', 'aspectRatio', 'ratio']),
       defaultValue: '16:9',
     }),
   ]),
@@ -129,8 +129,8 @@ const RUNNINGHUB_HAILUO_H3_FIXED_INPUT_SLOTS = Object['freeze']([
     '不传图片时生成文生视频；传一张图片时描述画面如何运动；传首尾两帧时描述过渡过程。',
   RUNNINGHUB_HAILUO_H3_REFERENCE_PROMPT_PLACEHOLDER =
     '结合参考图片、视频或音频，描述主体、动作、声音和镜头关系。';
-export const RUNNINGHUB_HAILUO_H3_VIDEO_MODELS = Object['freeze']([
-  Object['freeze']({
+export const RUNNINGHUB_HAILUO_H3_VIDEO_MODELS = Object.freeze([
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/hailuo-h3',
     executionId: 'runninghub.model-api.video.hailuo-h3.v1',
@@ -139,7 +139,7 @@ export const RUNNINGHUB_HAILUO_H3_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub MiniMax-H3（Hailuo-03）2K 视频模型 API',
     model: 'minimax/hailuo-h3',
     endpoint: '/openapi/v2/minimax/hailuo-h3/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_HAILUO_H3_MODE_FIELD,
       createAspectRatioField({
         label: '宽高比',
@@ -165,41 +165,41 @@ export const RUNNINGHUB_HAILUO_H3_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubHailuoH3Video',
       endpointResolver: 'runninghubHailuoH3VideoEndpoint',
     }),
-    ratioPolicy: Object['freeze']({ capability: 'size', preserveAdaptive: true }),
-    prompt: Object['freeze']({
+    ratioPolicy: Object.freeze({ capability: 'size', preserveAdaptive: true }),
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_HAILUO_H3_FRAMES_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_hailuo_h3_mode', value: 'frames' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_hailuo_h3_mode', value: 'frames' }),
           placeholder: RUNNINGHUB_HAILUO_H3_FRAMES_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_hailuo_h3_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_hailuo_h3_mode', value: 'reference' }),
           placeholder: RUNNINGHUB_HAILUO_H3_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
-      tooltip: Object['freeze']([
+    help: Object.freeze({
+      tooltip: Object.freeze([
         'MiniMax-H3（Hailuo-03），固定 2K 输出，支持 5-15 秒。',
         '首尾帧模式：无图片自动文生视频；一张图片自动图生视频；两张图片作为首尾帧。',
         '多参考模式：最多支持 9 张图片、3 个视频和 3 个音频。',
         RUNNINGHUB_HAILUO_H3_TEXT_PROMPT_PLACEHOLDER,
       ]),
     }),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'minimax-h3' }),
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'minimax-h3' }),
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 100,
         label: 'MiniMax-H3',
         subtitle: '2K，文生 / 图生 / 首尾帧 / 多参考',
       }),
-      videoInputSurface: createMinimaxH3VideoInputSurface(RUNNINGHUB_HAILUO_H3_MODE_FIELD['id']),
+      videoInputSurface: createMinimaxH3VideoInputSurface(RUNNINGHUB_HAILUO_H3_MODE_FIELD.id),
     }),
   }),
 ]);

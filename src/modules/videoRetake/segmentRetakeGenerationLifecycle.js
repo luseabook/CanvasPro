@@ -12,41 +12,41 @@ import {
 } from './segmentRetakeModelPolicy.js';
 export { applySegmentRetakeSubmitParameterPolicy, applySegmentRetakeTaskPayload };
 export function clearSegmentRetakeSessionOnSuccess(value, item) {
-  item && value?.['segmentRetake'] && Object['assign'](item, buildSegmentRetakeSessionClearPatch(value));
+  item && value?.segmentRetake && Object.assign(item, buildSegmentRetakeSessionClearPatch(value));
 }
 export function createSegmentRetakeGenerationLifecycle(
   key,
   { nodeData: nodeData = {}, store: store, startLoading: startLoading, stopLoading: stopLoading } = {},
 ) {
   const ok = validateSegmentRetakeSubmitNode(nodeData),
-    index = nodeData?.['segmentRetake']?.['phase'] || '';
+    index = nodeData?.segmentRetake?.phase || '';
   let enabled = false,
     result = false;
   return {
-    ok: ok['ok'],
-    isSegmentRetake: ok['isSegmentRetake'] === true,
+    ok: ok.ok,
+    isSegmentRetake: ok.isSegmentRetake === true,
     reject() {
-      if (ok['ok']) return false;
+      if (ok.ok) return false;
       return (
-        globalThis['window']?.['showToast']?.(
-          t('segmentRetake.errors.' + getSegmentRetakeSubmitErrorKey(ok['reason'])),
+        globalThis.window?.showToast?.(
+          t('segmentRetake.errors.' + getSegmentRetakeSubmitErrorKey(ok.reason)),
           'warn',
         ),
         true
       );
     },
     begin() {
-      if (!ok['isSegmentRetake']) return false;
-      ((key['_segmentRetakePreparing'] = true),
-        (key['_isGenerating'] = true),
-        key['_setGenerateButtonBusyUi']({ cancellable: false }),
-        key['btnEl']?.['setAttribute']?.('aria-busy', 'true'));
+      if (!ok.isSegmentRetake) return false;
+      ((key._segmentRetakePreparing = true),
+        (key._isGenerating = true),
+        key._setGenerateButtonBusyUi({ cancellable: false }),
+        key.btnEl?.setAttribute?.('aria-busy', 'true'));
       const args = buildSegmentRetakePhasePatch(nodeData, SEGMENT_RETAKE_PHASE_SUBMITTED);
       return (
         args &&
-          (store['updateNodeData'](key['nodeId'], args),
-          (key['_data'] = { ...(key['_data'] || {}), ...args })),
-        startLoading(key['previewEl']),
+          (store.updateNodeData(key.nodeId, args),
+          (key._data = { ...(key._data || {}), ...args })),
+        startLoading(key.previewEl),
         (enabled = true),
         true
       );
@@ -56,23 +56,23 @@ export function createSegmentRetakeGenerationLifecycle(
     },
     markTaskStarted() {
       ((result = true),
-        (key['_segmentRetakePreparing'] = false),
-        key['btnEl']?.['removeAttribute']?.('aria-busy'));
+        (key._segmentRetakePreparing = false),
+        key.btnEl?.removeAttribute?.('aria-busy'));
     },
     restoreBeforeTaskStart() {
       if (!enabled || result) return false;
-      ((key['_segmentRetakePreparing'] = false), key['btnEl']?.['removeAttribute']?.('aria-busy'));
-      const data = store['getState']()['nodes']?.[key['nodeId']] || key['_data'] || {},
+      ((key._segmentRetakePreparing = false), key.btnEl?.removeAttribute?.('aria-busy'));
+      const data = store.getState().nodes?.[key.nodeId] || key._data || {},
         args2 = buildSegmentRetakePhasePatch(data, index);
       return (
         args2 &&
-          (store['updateNodeData'](key['nodeId'], args2),
-          (key['_data'] = { ...(key['_data'] || {}), ...args2 })),
-        (key['_isGenerating'] = false),
-        key['_resetGenerateButtonIdleUi']({ cancellable: false }),
-        stopLoading(key['previewEl']),
-        key['_updateSubmitButtonState']?.(),
-        index === 'editing' && globalThis['window']?.['v2Renderer']?.['flushNode']?.(key['nodeId']),
+          (store.updateNodeData(key.nodeId, args2),
+          (key._data = { ...(key._data || {}), ...args2 })),
+        (key._isGenerating = false),
+        key._resetGenerateButtonIdleUi({ cancellable: false }),
+        stopLoading(key.previewEl),
+        key._updateSubmitButtonState?.(),
+        index === 'editing' && globalThis.window?.v2Renderer?.flushNode?.(key.nodeId),
         true
       );
     },

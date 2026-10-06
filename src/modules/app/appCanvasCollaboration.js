@@ -23,45 +23,45 @@ export function initCanvasCollaboration({
   focusNode: focusNode,
   windowObject: windowObject = window,
 }) {
-  const el = document['querySelector']('.header-right');
+  const el = document.querySelector('.header-right');
   if (!el) return null;
   let enabled = false;
-  const el2 = document['createElement']('div');
-  el2['className'] = 'collaboration-controls';
+  const el2 = document.createElement('div');
+  el2.className = 'collaboration-controls';
   const collaborationConnectionIndicator = createCollaborationConnectionIndicator(),
-    el3 = document['createElement']('span');
-  ((el3['className'] = 'collaboration-status'), el3['setAttribute']('role', 'status'));
-  const el4 = document['createElement']('button');
-  ((el4['className'] = 'collaboration-button collaboration-people'), (el4['type'] = 'button'));
-  const anchor = document['createElement']('button');
-  ((anchor['className'] = 'collaboration-button collaboration-entry'),
-    (anchor['type'] = 'button'),
-    anchor['setAttribute']('aria-haspopup', 'dialog'),
-    anchor['setAttribute']('aria-expanded', 'false'));
-  const el5 = document['createElement']('span');
-  (anchor['append'](createSharedProjectIcon(), el5),
-    el2['append'](el3, el4, collaborationConnectionIndicator['element'], anchor),
-    el['insertBefore'](el2, el['querySelector']('#canvasVersionBadge')));
+    el3 = document.createElement('span');
+  ((el3.className = 'collaboration-status'), el3.setAttribute('role', 'status'));
+  const el4 = document.createElement('button');
+  ((el4.className = 'collaboration-button collaboration-people'), (el4.type = 'button'));
+  const anchor = document.createElement('button');
+  ((anchor.className = 'collaboration-button collaboration-entry'),
+    (anchor.type = 'button'),
+    anchor.setAttribute('aria-haspopup', 'dialog'),
+    anchor.setAttribute('aria-expanded', 'false'));
+  const el5 = document.createElement('span');
+  (anchor.append(createSharedProjectIcon(), el5),
+    el2.append(el3, el4, collaborationConnectionIndicator.element, anchor),
+    el.insertBefore(el2, el.querySelector('#canvasVersionBadge')));
   let value = '';
   function run(enabled2) {
-    const map = onlineCollaborationActors(enabled2, getSession['getState']()['actorId']),
-      list = (enabled2?.['members'] || [])['filter']((item) => map['has'](item['id'])),
-      key = JSON['stringify'](list['map']((error) => [error['id'], error['name'], error['colorIndex']]));
-    ((el4['hidden'] = !enabled2),
-      el4['setAttribute']('aria-label', '查看协作成员，' + list['length'] + ' 人在线'));
+    const map = onlineCollaborationActors(enabled2, getSession.getState().actorId),
+      list = (enabled2?.members || []).filter((item) => map.has(item.id)),
+      key = JSON.stringify(list.map((error) => [error.id, error.name, error.colorIndex]));
+    ((el4.hidden = !enabled2),
+      el4.setAttribute('aria-label', '查看协作成员，' + list.length + ' 人在线'));
     if (key === value) return;
-    ((value = key), el4['replaceChildren']());
-    for (const error2 of list['slice'](0, 3)) {
-      const el6 = document['createElement']('span');
-      ((el6['className'] = 'collaboration-avatar'),
-        (el6['textContent'] = error2['name']['slice'](0, 1)),
-        el6['style']['setProperty']('--member-color', collaborationMemberColor(error2)),
-        (el6['title'] = error2['name']),
-        el4['append'](el6));
+    ((value = key), el4.replaceChildren());
+    for (const error2 of list.slice(0, 3)) {
+      const el6 = document.createElement('span');
+      ((el6.className = 'collaboration-avatar'),
+        (el6.textContent = error2.name.slice(0, 1)),
+        el6.style.setProperty('--member-color', collaborationMemberColor(error2)),
+        (el6.title = error2.name),
+        el4.append(el6));
     }
-    if (list['length'] > 3 || !list['length']) {
-      const el7 = document['createElement']('span');
-      ((el7['textContent'] = list['length'] ? '+' + (list['length'] - 3) : '成员'), el4['append'](el7));
+    if (list.length > 3 || !list.length) {
+      const el7 = document.createElement('span');
+      ((el7.textContent = list.length ? '+' + (list.length - 3) : '成员'), el4.append(el7));
     }
   }
   const getSession = createCollaborationApplication({
@@ -70,37 +70,37 @@ export function initCanvasCollaboration({
       ensureInstallId: ensureInstallId,
       ensureDeviceId: ensureDeviceId,
       resetHistory: resetHistory,
-      saveProject: () => windowObject['_v2SaveProjectFromShortcut']?.({ waitForDialog: true }),
+      saveProject: () => windowObject._v2SaveProjectFromShortcut?.({ waitForDialog: true }),
       onNotice: (index) => showToast(index),
       onComment: (result) => run2(result),
       onChange(data) {
         run3();
-        if (['blocked', 'offline']['includes'](data['session']?.['status']))
-          collaborationPanel['feedback'](data['session']['message']);
+        if (['blocked', 'offline'].includes(data.session?.status))
+          collaborationPanel.feedback(data.session.message);
       },
       onPresence(options) {
         !enabled &&
-          (collaborationConnectionIndicator['update'](options),
+          (collaborationConnectionIndicator.update(options),
           run(options),
-          collaborationPanel['renderPresence'](),
-          collaborationPresence['redraw']());
+          collaborationPanel.renderPresence(),
+          collaborationPresence.redraw());
       },
     }),
-    comments = createCollaborationComments({ store: store, getSession: getSession['getSession'] });
+    comments = createCollaborationComments({ store: store, getSession: getSession.getSession });
   function openNode(target, source) {
-    if (!store['getStateRaw']()['nodes'][target]) return;
-    (getSession['getSession']()?.['follow'](''), focusNode?.(target, 96, 500));
-    if (source) comments['open'](target);
+    if (!store.getStateRaw().nodes[target]) return;
+    (getSession.getSession()?.follow(''), focusNode?.(target, 96, 500));
+    if (source) comments.open(target);
   }
   const run2 = createCollaborationCommentNotifications({
-      getSession: getSession['getSession'],
-      hasNode: (next) => !!store['getStateRaw']()['nodes'][next],
-      getNode: (current) => store['getStateRaw']()['nodes'][current],
+      getSession: getSession.getSession,
+      hasNode: (next) => !!store.getStateRaw().nodes[next],
+      getNode: (current) => store.getStateRaw().nodes[current],
       openNode: openNode,
     }),
     chat = createCollaborationChat({
       store: store,
-      getSession: getSession['getSession'],
+      getSession: getSession.getSession,
       openNode: (entry) => openNode(entry, false),
     }),
     handler = bindCollaborationChatInput({
@@ -112,89 +112,89 @@ export function initCanvasCollaboration({
     }),
     collaborationPresence = createCollaborationPresence({
       store: store,
-      getSession: getSession['getSession'],
+      getSession: getSession.getSession,
       drawComments: (args) => drawCollaborationCommentMarkers({ ...args, comments: comments, chat: chat }),
     }),
     handler2 = bindCollaborationEditors({ store: store, windowObject: windowObject });
   function run3() {
     if (enabled) return;
-    const error3 = getSession['getState']()['session'];
-    (collaborationConnectionIndicator['update'](error3),
-      (el5['textContent'] = error3
-        ? '协作中 · ' + (error3['hosting'] ? '房主' : '成员')
-        : isSubscriptionActive(store['getStateRaw']()['subscription'] || {})
+    const error3 = getSession.getState().session;
+    (collaborationConnectionIndicator.update(error3),
+      (el5.textContent = error3
+        ? '协作中 · ' + (error3.hosting ? '房主' : '成员')
+        : isSubscriptionActive(store.getStateRaw().subscription || {})
           ? '开启协作'
           : '协作 · 需激活'),
-      anchor['classList']['toggle']('is-active', !!error3));
-    const enabled3 = error3?.['status'] === 'connecting';
-    (anchor['setAttribute']('aria-busy', String(!!enabled3)),
-      (el3['textContent'] = error3
-        ? error3['status'] === 'online'
+      anchor.classList.toggle('is-active', !!error3));
+    const enabled3 = error3?.status === 'connecting';
+    (anchor.setAttribute('aria-busy', String(!!enabled3)),
+      (el3.textContent = error3
+        ? error3.status === 'online'
           ? ''
-          : error3['status'] === 'offline'
+          : error3.status === 'offline'
             ? '连接中断'
-            : error3['status'] === 'blocked'
+            : error3.status === 'blocked'
               ? '协作已暂停'
               : '连接中'
         : ''),
-      (el3['title'] = error3?.['status'] === 'online' ? '' : error3?.['message'] || ''),
-      (el3['hidden'] = !error3 || error3['status'] === 'online'),
+      (el3.title = error3?.status === 'online' ? '' : error3?.message || ''),
+      (el3.hidden = !error3 || error3.status === 'online'),
       run(error3),
-      collaborationPanel['render'](),
-      collaborationPresence['redraw'](),
-      comments['update'](),
-      chat['update']());
+      collaborationPanel.render(),
+      collaborationPresence.redraw(),
+      comments.update(),
+      chat.update());
   }
   const collaborationPanel = createCollaborationPanel({
     actions: {
-      ...getSession['actions'],
-      activate: () => windowObject['openSubscriptionDialog']?.(),
-      copy: (record) => navigator['clipboard']['writeText'](record),
-      refreshReview: () => getSession['getSession']()?.['review']['refresh'](undefined, true),
-      hasReviewNode: (payload) => !!store['getStateRaw']()['nodes'][payload],
+      ...getSession.actions,
+      activate: () => windowObject.openSubscriptionDialog?.(),
+      copy: (record) => navigator.clipboard.writeText(record),
+      refreshReview: () => getSession.getSession()?.review.refresh(undefined, true),
+      hasReviewNode: (payload) => !!store.getStateRaw().nodes[payload],
       openReviewNode: openNode,
     },
-    getState: getSession['getState'],
+    getState: getSession.getState,
     anchor: anchor,
-    keepOpenOnOutside: (el8) => !!el8['closest']?.('#fabBtn, .agent-sidebar'),
+    keepOpenOnOutside: (el8) => !!el8.closest?.('#fabBtn, .agent-sidebar'),
   });
   function show() {
-    (collaborationPanel['show'](), void getSession['ensureAuthenticated']()['catch'](() => {}));
+    (collaborationPanel.show(), void getSession.ensureAuthenticated().catch(() => {}));
   }
-  (anchor['addEventListener']('click', () => {
-    (collaborationPanel['toggle'](), void getSession['ensureAuthenticated']()['catch'](() => {}));
+  (anchor.addEventListener('click', () => {
+    (collaborationPanel.toggle(), void getSession.ensureAuthenticated().catch(() => {}));
   }),
-    el4['addEventListener']('click', show));
-  const el9 = document['createElement']('button');
-  ((el9['type'] = 'button'),
-    (el9['className'] = 'cpd-new-btn'),
-    (el9['textContent'] = '协作画布'),
-    el9['addEventListener']('click', show),
-    document['querySelector']('.cpd-footer')?.['append'](el9));
-  const run4 = store['subscribeSelector']((handle) => handle['subscription'], run3);
-  windowObject['addEventListener']('aicanvas:active-canvas-changed', getSession['refreshCanvas']);
+    el4.addEventListener('click', show));
+  const el9 = document.createElement('button');
+  ((el9.type = 'button'),
+    (el9.className = 'cpd-new-btn'),
+    (el9.textContent = '协作画布'),
+    el9.addEventListener('click', show),
+    document.querySelector('.cpd-footer')?.append(el9));
+  const run4 = store.subscribeSelector((handle) => handle.subscription, run3);
+  windowObject.addEventListener('aicanvas:active-canvas-changed', getSession.refreshCanvas);
   const state = (event) => {
-    const enabled4 = getSession['getSession']();
-    enabled4 && !enabled4['canDetach']() && (event['preventDefault'](), (event['returnValue'] = ''));
+    const enabled4 = getSession.getSession();
+    enabled4 && !enabled4.canDetach() && (event.preventDefault(), (event.returnValue = ''));
   };
   return (
-    windowObject['addEventListener']('beforeunload', state),
+    windowObject.addEventListener('beforeunload', state),
     run3(),
     {
       show: show,
-      getSession: getSession['getSession'],
+      getSession: getSession.getSession,
       destroy() {
-        ((enabled = true), handler2(), handler(), chat['destroy']());
-        const config = getSession['destroy']();
+        ((enabled = true), handler2(), handler(), chat.destroy());
+        const config = getSession.destroy();
         return (
           run4(),
-          collaborationPanel['destroy'](),
-          collaborationPresence['destroy'](),
-          comments['destroy'](),
-          el2['remove'](),
-          el9['remove'](),
-          windowObject['removeEventListener']('beforeunload', state),
-          windowObject['removeEventListener']('aicanvas:active-canvas-changed', getSession['refreshCanvas']),
+          collaborationPanel.destroy(),
+          collaborationPresence.destroy(),
+          comments.destroy(),
+          el2.remove(),
+          el9.remove(),
+          windowObject.removeEventListener('beforeunload', state),
+          windowObject.removeEventListener('aicanvas:active-canvas-changed', getSession.refreshCanvas),
           config
         );
       },

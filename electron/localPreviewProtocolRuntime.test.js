@@ -61,7 +61,7 @@ function registerNonFile(state, target) {
 }
 
 function handleRequest(harness, url, rangeHeader = null) {
-  return harness.state.handles[0]['handler']({
+  return harness.state.handles[0].handler({
     url: url,
     headers: { get: (name) => (name === 'range' ? rangeHeader : null) },
   });
@@ -164,7 +164,7 @@ test('createUrl registers an absolute file and returns a preview url', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'clip one.mp4'), 2048);
   harness.state.nowValue = 100;
-  const url = harness.runtime['createUrl']({ path: target, type: 'video/mp4' });
+  const url = harness.runtime.createUrl({ path: target, type: 'video/mp4' });
   assert.equal(url, SCHEME + '://preview/token1/clip%20one.mp4');
   assert.equal(harness.state.tokenSeq, 1);
 });
@@ -173,7 +173,7 @@ test('createUrl resolves a virtual path through the injected resolver', () => {
   const harness = createHarness();
   const resolved = path.resolve('/virtual', 'clip.mp4');
   registerFile(harness.state, resolved);
-  const url = harness.runtime['createUrl']({ src: 'clip.mp4' });
+  const url = harness.runtime.createUrl({ src: 'clip.mp4' });
   assert.equal(url, SCHEME + '://preview/token1/clip.mp4');
   assert.equal(url.includes(encodeURIComponent(path.basename(resolved))), true);
 });
@@ -181,7 +181,7 @@ test('createUrl resolves a virtual path through the injected resolver', () => {
 test('createUrl prefers an explicit path over virtual resolution', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'explicit.png'));
-  const url = harness.runtime['createUrl']({ path: target, localPath: 'ignored.png' });
+  const url = harness.runtime.createUrl({ path: target, localPath: 'ignored.png' });
   assert.equal(url, SCHEME + '://preview/token1/explicit.png');
 });
 
@@ -189,14 +189,14 @@ test('createUrl rejects unresolved, relative, non-file and non-media requests', 
   const harness = createHarness();
   registerNonFile(harness.state, path.resolve('/assets'));
   registerFile(harness.state, path.resolve('/assets', 'notes.txt'));
-  assert.throws(() => harness.runtime['createUrl']({}), { message: '缺少文件路径' });
-  assert.throws(() => harness.runtime['createUrl']({ path: 'media/clip.mp4' }), {
+  assert.throws(() => harness.runtime.createUrl({}), { message: '缺少文件路径' });
+  assert.throws(() => harness.runtime.createUrl({ path: 'media/clip.mp4' }), {
     message: '文件路径必须是绝对路径',
   });
-  assert.throws(() => harness.runtime['createUrl']({ path: path.resolve('/assets') }), {
+  assert.throws(() => harness.runtime.createUrl({ path: path.resolve('/assets') }), {
     message: '只支持预览文件',
   });
-  assert.throws(() => harness.runtime['createUrl']({ path: path.resolve('/assets', 'notes.txt') }), {
+  assert.throws(() => harness.runtime.createUrl({ path: path.resolve('/assets', 'notes.txt') }), {
     message: '只支持图片或视频快速预览',
   });
 });
@@ -204,105 +204,105 @@ test('createUrl rejects unresolved, relative, non-file and non-media requests', 
 test('createUrl rejects an empty token', () => {
   const harness = createHarness({ createToken: () => '   ' });
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
-  assert.throws(() => harness.runtime['createUrl']({ path: target }), { message: '无法创建预览令牌' });
+  assert.throws(() => harness.runtime.createUrl({ path: target }), { message: '无法创建预览令牌' });
 });
 
 test('createUrl bumps the url whenever a token is minted', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
-  const first = harness.runtime['createUrl']({ path: target });
-  const second = harness.runtime['createUrl']({ path: target });
+  const first = harness.runtime.createUrl({ path: target });
+  const second = harness.runtime.createUrl({ path: target });
   assert.equal(first, SCHEME + '://preview/token1/a.png');
   assert.equal(second, SCHEME + '://preview/token2/a.png');
 });
 
 test('install registers the scheme once and is idempotent', () => {
   const harness = createHarness();
-  assert.equal(harness.runtime['install'](), true);
-  assert.equal(harness.runtime['install'](), false);
+  assert.equal(harness.runtime.install(), true);
+  assert.equal(harness.runtime.install(), false);
   assert.equal(harness.state.handles.length, 1);
-  assert.equal(harness.state.handles[0]['scheme'], SCHEME);
+  assert.equal(harness.state.handles[0].scheme, SCHEME);
 });
 
 test('clearExpired drops entries exactly at their ttl and keeps earlier ones', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
-  harness.runtime['install']();
-  const url = harness.runtime['createUrl']({ path: target });
+  harness.runtime.install();
+  const url = harness.runtime.createUrl({ path: target });
   harness.state.nowValue = 999;
-  harness.runtime['clearExpired']();
-  assert.equal(handleRequest(harness, url)['init']['status'], 200);
+  harness.runtime.clearExpired();
+  assert.equal(handleRequest(harness, url).init.status, 200);
   harness.state.nowValue = 1000;
-  harness.runtime['clearExpired']();
-  assert.equal(handleRequest(harness, url)['init']['status'], 404);
+  harness.runtime.clearExpired();
+  assert.equal(handleRequest(harness, url).init.status, 404);
 });
 
 test('expired entries are swept when the next url is minted', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
-  harness.runtime['install']();
-  const stale = harness.runtime['createUrl']({ path: target });
+  harness.runtime.install();
+  const stale = harness.runtime.createUrl({ path: target });
   harness.state.nowValue = 1000;
-  const fresh = harness.runtime['createUrl']({ path: target });
-  assert.equal(handleRequest(harness, stale)['init']['status'], 404);
-  assert.equal(handleRequest(harness, fresh)['init']['status'], 200);
+  const fresh = harness.runtime.createUrl({ path: target });
+  assert.equal(handleRequest(harness, stale).init.status, 404);
+  assert.equal(handleRequest(harness, fresh).init.status, 200);
 });
 
 test('the protocol handler streams a full file with cors and cache headers', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'), 64);
-  harness.runtime['install']();
-  const url = harness.runtime['createUrl']({ path: target, type: 'image/png' });
+  harness.runtime.install();
+  const url = harness.runtime.createUrl({ path: target, type: 'image/png' });
   const response = handleRequest(harness, url);
-  assert.equal(response['init']['status'], 200);
-  assert.deepEqual(response['init']['headers'], {
+  assert.equal(response.init.status, 200);
+  assert.deepEqual(response.init.headers, {
     'Content-Type': 'image/png',
     'Accept-Ranges': 'bytes',
     'Access-Control-Allow-Origin': APP_ORIGIN,
     'Cache-Control': 'private, max-age=1, immutable',
     'Content-Length': '64',
   });
-  assert.equal(response['body']['stream']['path'], target);
-  assert.equal(response['body']['stream']['options'], undefined);
+  assert.equal(response.body.stream.path, target);
+  assert.equal(response.body.stream.options, undefined);
 });
 
 test('the protocol handler answers a byte range with 206 and a partial stream', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'a.mp4'), 64);
-  harness.runtime['install']();
-  const url = harness.runtime['createUrl']({ path: target, type: 'video/mp4' });
+  harness.runtime.install();
+  const url = harness.runtime.createUrl({ path: target, type: 'video/mp4' });
   const response = handleRequest(harness, url, 'bytes=8-15');
-  assert.equal(response['init']['status'], 206);
-  assert.equal(response['init']['headers']['Content-Range'], 'bytes 8-15/64');
-  assert.equal(response['init']['headers']['Content-Length'], '8');
-  assert.deepEqual(response['body']['stream']['options'], { start: 8, end: 15 });
+  assert.equal(response.init.status, 206);
+  assert.equal(response.init.headers['Content-Range'], 'bytes 8-15/64');
+  assert.equal(response.init.headers['Content-Length'], '8');
+  assert.deepEqual(response.body.stream.options, { start: 8, end: 15 });
 });
 
 test('the protocol handler floors the cache max-age from the ttl', () => {
   const harness = createHarness({ ttlMs: 0 });
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
-  harness.runtime['install']();
-  const url = harness.runtime['createUrl']({ path: target });
+  harness.runtime.install();
+  const url = harness.runtime.createUrl({ path: target });
   const response = handleRequest(harness, url);
-  assert.equal(response['init']['headers']['Cache-Control'], 'private, max-age=0, immutable');
+  assert.equal(response.init.headers['Cache-Control'], 'private, max-age=0, immutable');
 });
 
 test('the protocol handler returns 404 for an unknown preview token', () => {
   const harness = createHarness();
-  harness.runtime['install']();
+  harness.runtime.install();
   const response = handleRequest(harness, SCHEME + '://preview/missing/a.png');
-  assert.equal(response['init']['status'], 404);
-  assert.equal(response['body'], 'Preview not found');
+  assert.equal(response.init.status, 404);
+  assert.equal(response.body, 'Preview not found');
 });
 
 test('the protocol handler drops an entry whose target stopped being a file', () => {
   const harness = createHarness();
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
-  harness.runtime['install']();
-  const url = harness.runtime['createUrl']({ path: target });
+  harness.runtime.install();
+  const url = harness.runtime.createUrl({ path: target });
   registerNonFile(harness.state, target);
-  assert.equal(handleRequest(harness, url)['init']['status'], 404);
-  assert.equal(handleRequest(harness, url)['init']['status'], 404);
+  assert.equal(handleRequest(harness, url).init.status, 404);
+  assert.equal(handleRequest(harness, url).init.status, 404);
   assert.equal(harness.state.warnings.length, 0);
 });
 
@@ -313,12 +313,12 @@ test('the protocol handler logs and answers 500 when streaming fails', () => {
     },
   });
   const target = registerFile(harness.state, path.resolve('/assets', 'a.png'));
-  harness.runtime['install']();
-  const url = harness.runtime['createUrl']({ path: target });
+  harness.runtime.install();
+  const url = harness.runtime.createUrl({ path: target });
   const response = handleRequest(harness, url);
-  assert.equal(response['init']['status'], 500);
-  assert.equal(response['body'], 'Preview failed');
+  assert.equal(response.init.status, 500);
+  assert.equal(response.body, 'Preview failed');
   assert.equal(harness.state.warnings.length, 1);
   assert.equal(harness.state.warnings[0][0], '[electron] local preview failed:');
-  assert.equal(harness.state.warnings[0][1]['message'], 'boom');
+  assert.equal(harness.state.warnings[0][1].message, 'boom');
 });

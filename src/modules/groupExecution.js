@@ -172,48 +172,48 @@ const DEFAULT_SELECTED_GENERATE_STAGGER_MS = 300;
 let activeSelectedGenerateBatch = null;
 
 export function hasRunningGroupGenerateNodes(value6, value7) {
-  return collectGroupExecutableNodeIds(value6, value7)['some'](
-    (value8) => value6?.[value8]?.['isGenerating'] === true,
+  return collectGroupExecutableNodeIds(value6, value7).some(
+    (value8) => value6?.[value8]?.isGenerating === true,
   );
 }
 
 export function hasRunningSelectedGenerateNodes(value9, value10 = []) {
-  return collectSelectedExecutableNodeIds(value9, value10)['some'](
-    (value11) => value9?.[value11]?.['isGenerating'] === true,
+  return collectSelectedExecutableNodeIds(value9, value10).some(
+    (value11) => value9?.[value11]?.isGenerating === true,
   );
 }
 
 export function cancelGroupGenerateButtons({
   groupId: groupId2,
-  state: state = appStore['getState'](),
-  root: root = globalThis['document'],
-  showToast: showToast = globalThis['window']?.['showToast'],
+  state: state = appStore.getState(),
+  root: root = globalThis.document,
+  showToast: showToast = globalThis.window?.showToast,
 } = {}) {
-  const value12 = state?.['nodes'] || {},
-    groupExecutableNodeIds = collectGroupExecutableNodeIds(value12, groupId2)['filter'](
-      (value13) => value12?.[value13]?.['isGenerating'] === true,
+  const value12 = state?.nodes || {},
+    groupExecutableNodeIds = collectGroupExecutableNodeIds(value12, groupId2).filter(
+      (value13) => value12?.[value13]?.isGenerating === true,
     );
   let count3 = 0;
   for (const value14 of groupExecutableNodeIds) {
     const el4 = findGenerateButtonForNode(root, value14);
-    if (!el4 || el4['disabled']) continue;
-    (el4['click'](), (count3 += 1));
+    if (!el4 || el4.disabled) continue;
+    (el4.click(), (count3 += 1));
   }
   return (
     count3 > 0 && showToast?.(groupExecutionText('groupCancelTriggered', { count: count3 }), 'info'),
-    { clicked: count3, total: groupExecutableNodeIds['length'] }
+    { clicked: count3, total: groupExecutableNodeIds.length }
   );
 }
 
 function normalizeStaggerMs(value15, value16 = DEFAULT_SELECTED_GENERATE_STAGGER_MS) {
   const count4 = Number(value15);
-  if (!Number['isFinite'](count4) || count4 < 0) return value16;
-  return Math['floor'](count4);
+  if (!Number.isFinite(count4) || count4 < 0) return value16;
+  return Math.floor(count4);
 }
 
 function scheduleGenerateButtonClick(enabled7, count5, handler2, handler3 = () => {}) {
   const run = () => {
-    if (!enabled7['disabled']) enabled7['click']();
+    if (!enabled7.disabled) enabled7.click();
     handler3();
   };
   if (count5 > 0 && typeof handler2 === 'function') return handler2(run, count5);
@@ -229,30 +229,30 @@ function cancelActiveSelectedGenerateQueue() {
   if (!enabled8) return false;
   return (
     (activeSelectedGenerateBatch = null),
-    (enabled8['cancelled'] = true),
-    enabled8['timeoutIds']['forEach']((value17) => enabled8['clearScheduledTimeout']?.(value17)),
-    enabled8['timeoutIds']['clear'](),
-    enabled8['onStateChange']?.(false),
+    (enabled8.cancelled = true),
+    enabled8.timeoutIds.forEach((value17) => enabled8.clearScheduledTimeout?.(value17)),
+    enabled8.timeoutIds.clear(),
+    enabled8.onStateChange?.(false),
     true
   );
 }
 
 export function cancelSelectedGenerateButtons({
   selectedIds: selectedIds = [],
-  state: state = appStore['getState'](),
-  root: root = globalThis['document'],
-  showToast: showToast = globalThis['window']?.['showToast'],
+  state: state = appStore.getState(),
+  root: root = globalThis.document,
+  showToast: showToast = globalThis.window?.showToast,
 } = {}) {
   const cancelActiveSelectedGenerateQueue2 = cancelActiveSelectedGenerateQueue(),
-    value18 = state?.['nodes'] || {},
-    selectedExecutableNodeIds = collectSelectedExecutableNodeIds(value18, selectedIds)['filter'](
-      (value19) => value18?.[value19]?.['isGenerating'] === true,
+    value18 = state?.nodes || {},
+    selectedExecutableNodeIds = collectSelectedExecutableNodeIds(value18, selectedIds).filter(
+      (value19) => value18?.[value19]?.isGenerating === true,
     );
   let count6 = 0;
   for (const value20 of selectedExecutableNodeIds) {
     const generateButtonForNode = findGenerateButtonForNode(root, value20);
-    if (!generateButtonForNode || generateButtonForNode['disabled']) continue;
-    (generateButtonForNode['click'](), (count6 += 1));
+    if (!generateButtonForNode || generateButtonForNode.disabled) continue;
+    (generateButtonForNode.click(), (count6 += 1));
   }
   return (
     count6 > 0 && showToast?.(groupExecutionText('selectedCancelTriggered', { count: count6 }), 'info'),

@@ -3,7 +3,7 @@ export function createImageLoadDiagnostics(
   consumer,
   {
     enabled: enabled = canUseDiagnostics(),
-    now: now = () => performance['now'](),
+    now: now = () => performance.now(),
     schedule: schedule = setTimeout,
     cancel: cancel = clearTimeout,
     report: report = logDiagnosticEvent,
@@ -23,7 +23,7 @@ export function createImageLoadDiagnostics(
         consumer: consumer,
         startedAt: startedAt,
         reason: reason,
-        elapsedMs: Math['round'](now() - startedAt),
+        elapsedMs: Math.round(now() - startedAt),
         events: [...list],
       },
     });
@@ -32,12 +32,12 @@ export function createImageLoadDiagnostics(
     (timer = schedule(() => {
       if (!enabled2) run('after-two-seconds');
     }, 2000)),
-    timer?.['unref']?.(),
+    timer?.unref?.(),
     {
       mark(stage, args = {}) {
         if (enabled2) return;
-        if (list['length'] >= 20) list['shift']();
-        list['push']({ stage: stage, elapsedMs: Math['round'](now() - startedAt), ...args });
+        if (list.length >= 20) list.shift();
+        list.push({ stage: stage, elapsedMs: Math.round(now() - startedAt), ...args });
         if (stage === 'paint-opportunity') run(stage);
       },
       finish() {
@@ -48,14 +48,14 @@ export function createImageLoadDiagnostics(
   );
 }
 export function getImageLoadTiming(width) {
-  const resourceDurationMs = globalThis['performance']
-    ?.['getEntriesByName']?.(width['currentSrc'] || width['src'])
-    ?.['at'](-1);
+  const resourceDurationMs = globalThis.performance
+    ?.getEntriesByName?.(width.currentSrc || width.src)
+    ?.at(-1);
   return {
-    width: width['naturalWidth'] || 0,
-    height: width['naturalHeight'] || 0,
-    resourceDurationMs: resourceDurationMs ? Math['round'](resourceDurationMs['duration']) : null,
-    transferBytes: resourceDurationMs?.['transferSize'] ?? null,
-    documentVisible: globalThis['document']?.['visibilityState'] || 'unknown',
+    width: width.naturalWidth || 0,
+    height: width.naturalHeight || 0,
+    resourceDurationMs: resourceDurationMs ? Math.round(resourceDurationMs.duration) : null,
+    transferBytes: resourceDurationMs?.transferSize ?? null,
+    documentVisible: globalThis.document?.visibilityState || 'unknown',
   };
 }

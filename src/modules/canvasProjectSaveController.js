@@ -10,7 +10,7 @@ import { createWorkspacePersistencePresentation } from './workspacePersistencePr
 import { assertCanvasProjectSaveAllowed } from '../services/canvasProjectAccess.js';
 const projectDropdownText = (value, item = {}) => t('projectDropdown.' + value, item);
 export function createCanvasProjectSaveController({
-  windowObject: windowObject = globalThis['window'],
+  windowObject: windowObject = globalThis.window,
   getRoot: getRoot,
   getProjectPackageExportSource: getProjectPackageExportSource,
   getActiveCanvasProjectContext: getActiveCanvasProjectContext,
@@ -31,10 +31,10 @@ export function createCanvasProjectSaveController({
   const run = () => {
     return (
       (enabled += 1),
-      workspacePersistencePresentation['update']({ status: 'saving' }),
+      workspacePersistencePresentation.update({ status: 'saving' }),
       () => {
         enabled -= 1;
-        if (!enabled) workspacePersistencePresentation['update']({ status: 'saved' });
+        if (!enabled) workspacePersistencePresentation.update({ status: 'saved' });
       }
     );
   };
@@ -43,45 +43,45 @@ export function createCanvasProjectSaveController({
     try {
       const exportSource = getProjectPackageExportSource(options);
       ((captureCanvasProjectSaveTransaction2 = captureCanvasProjectSaveTransaction({
-        manager: manager['CanvasTabManager'],
+        manager: manager.CanvasTabManager,
         exportSource: exportSource,
         projectContext: getActiveCanvasProjectContext(),
       })),
-        manager['showGlobalLoading']?.(projectDropdownText('savingLocal')));
+        manager.showGlobalLoading?.(projectDropdownText('savingLocal')));
       const { projectContext: projectContext } = captureCanvasProjectSaveTransaction2,
         filename = await saveDesktopProject(
-          exportSource['projectName'] || getCurrentProjectName(),
-          exportSource['multiData'],
-          { mode: 'saveAs', projectId: projectContext['projectId'], recentId: projectContext['recentId'] },
+          exportSource.projectName || getCurrentProjectName(),
+          exportSource.multiData,
+          { mode: 'saveAs', projectId: projectContext.projectId, recentId: projectContext.recentId },
         );
-      if (!filename || filename['canceled']) return;
+      if (!filename || filename.canceled) return;
       (commitCanvasProjectSave(
         captureCanvasProjectSaveTransaction2,
         buildProjectContextFromLoadResult(filename, {
           ...projectContext,
-          projectName: exportSource['projectName'],
+          projectName: exportSource.projectName,
         }),
       ),
-        showToast(projectDropdownText('saveAsSucceeded', { filename: filename['filename'] })),
+        showToast(projectDropdownText('saveAsSucceeded', { filename: filename.filename })),
         fetchProjects());
     } catch (error) {
-      if (error?.['code'] !== 'PROJECT_SAVE_FORBIDDEN')
-        console['error']('[desktopProject] saveAs failed:', error);
+      if (error?.code !== 'PROJECT_SAVE_FORBIDDEN')
+        console.error('[desktopProject] saveAs failed:', error);
       showToast(
-        error?.['message'] || projectDropdownText('saveAsFailed'),
-        error?.['code'] === 'PROJECT_SAVE_FORBIDDEN' ? 'warn' : 'error',
+        error?.message || projectDropdownText('saveAsFailed'),
+        error?.code === 'PROJECT_SAVE_FORBIDDEN' ? 'warn' : 'error',
       );
     } finally {
       releaseCanvasProjectSave(captureCanvasProjectSaveTransaction2);
-      if (manager['hideGlobalLoading']) manager['hideGlobalLoading']();
+      if (manager.hideGlobalLoading) manager.hideGlobalLoading();
     }
   }
   function run2(projectName, rename = {}) {
     return captureCanvasProjectSaveTransaction({
-      manager: manager['CanvasTabManager'],
+      manager: manager.CanvasTabManager,
       exportSource: getProjectPackageExportSource({ ...rename, projectName: projectName }),
       projectContext: getActiveCanvasProjectContext(),
-      rename: rename['renameActiveCanvas'] === true,
+      rename: rename.renameActiveCanvas === true,
     });
   }
   async function saveProject(projectName2, rename2 = {}, key = null) {
@@ -89,30 +89,30 @@ export function createCanvasProjectSaveController({
     try {
       ((key ||= run2(projectName2, rename2)), (run3 = run()));
       const { exportSource: exportSource2, canvasId: canvasId, projectContext: projectContext2 } = key,
-        index = projectContext2['projectId'],
+        index = projectContext2.projectId,
         projectId =
-          rename2['saveAs'] === true || projectContext2['isTemporary']
+          rename2.saveAs === true || projectContext2.isTemporary
             ? projectName2
-            : projectContext2['projectId'] || projectName2,
-        filename2 = await project['saveProject'](projectId, exportSource2['multiData']);
-      if (filename2?.['canceled']) return false;
-      if (!filename2?.['success']) throw new Error(projectDropdownText('saveFailed'));
-      if (filename2['success']) {
+            : projectContext2.projectId || projectName2,
+        filename2 = await project.saveProject(projectId, exportSource2.multiData);
+      if (filename2?.canceled) return false;
+      if (!filename2?.success) throw new Error(projectDropdownText('saveFailed'));
+      if (filename2.success) {
         const commitCanvasProjectSave2 = commitCanvasProjectSave(
           key,
           buildProjectContextFromLoadResult(filename2, {
             ...projectContext2,
             projectId: projectId,
             projectName: projectName2,
-            filename: filename2['filename'],
+            filename: filename2.filename,
             recentId: '',
             displayPath: '',
             lastModified: 0,
           }),
-          { rename: rename2['renameActiveCanvas'] === true },
+          { rename: rename2.renameActiveCanvas === true },
         );
         return (
-          manager['CanvasTabManager']?.['_activeId'] === canvasId &&
+          manager.CanvasTabManager?._activeId === canvasId &&
             (await reconcileProjectSessionAfterSave(index)),
           playProjectSaveAbsorb(),
           showToast(projectDropdownText('saveSucceeded', { name: projectName2 })),
@@ -121,14 +121,14 @@ export function createCanvasProjectSaveController({
         );
       }
     } catch (error2) {
-      if (error2?.['code'] !== 'PROJECT_SAVE_FORBIDDEN')
-        console['error']('[saveProject] JSON 保存失败:', error2);
+      if (error2?.code !== 'PROJECT_SAVE_FORBIDDEN')
+        console.error('[saveProject] JSON 保存失败:', error2);
       return (
         showToast(
-          error2?.['code'] === 'PROJECT_SAVE_FORBIDDEN'
-            ? error2['message']
+          error2?.code === 'PROJECT_SAVE_FORBIDDEN'
+            ? error2.message
             : projectDropdownText('saveFailed'),
-          error2?.['code'] === 'PROJECT_SAVE_FORBIDDEN' ? 'warn' : 'error',
+          error2?.code === 'PROJECT_SAVE_FORBIDDEN' ? 'warn' : 'error',
         ),
         false
       );
@@ -139,11 +139,11 @@ export function createCanvasProjectSaveController({
   async function saveCurrentProjectFromShortcut({ waitForDialog: waitForDialog = false } = {}) {
     try {
       assertCanvasProjectSaveAllowed(
-        getProjectPackageExportSource()['multiData'],
-        manager['CanvasTabManager'],
+        getProjectPackageExportSource().multiData,
+        manager.CanvasTabManager,
       );
     } catch (error3) {
-      return (showToast(error3['message'], 'warn'), false);
+      return (showToast(error3.message, 'warn'), false);
     }
     const defaultName = getShortcutSaveProjectName();
     if (!defaultName || isAutoGeneratedProjectName(defaultName)) {
@@ -158,13 +158,13 @@ export function createCanvasProjectSaveController({
         enabled2 = await projectNameExistsInProjectList(defaultName);
       } catch (target) {
         return (
-          console['error']('[saveCurrentProjectFromShortcut] 项目列表校验失败:', target),
+          console.error('[saveCurrentProjectFromShortcut] 项目列表校验失败:', target),
           showToast(projectDropdownText('listLoadFailed'), 'error'),
           false
         );
       }
       if (!enabled2) {
-        if (manager['CanvasTabManager']?.['_activeId'] !== data['canvasId']) return false;
+        if (manager.CanvasTabManager?._activeId !== data.canvasId) return false;
         const source = openSaveDialog({ defaultName: defaultName });
         return waitForDialog ? (await source) === true : false;
       }

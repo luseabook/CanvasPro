@@ -1,12 +1,12 @@
-export const SOURCE_TYPES = Object['freeze']({
+export const SOURCE_TYPES = Object.freeze({
   runninghub: 'runninghub-ai-app',
   runninghubWorkflow: 'runninghub-workflow',
   comfyuiLocal: 'comfyui-local-workflow',
   comfyuiCloud: 'comfyui-cloud-workflow',
 });
-export const SOURCE_TYPE_KEYS = Object['freeze'](Object['values'](SOURCE_TYPES));
+export const SOURCE_TYPE_KEYS = Object.freeze(Object.values(SOURCE_TYPES));
 export const COMFYUI_WORKFLOW_STATE_SCOPE = 'comfyui-workflow';
-export const COMFY_UI_WORKFLOW_SHARED_SOURCE_META = Object['freeze']({
+export const COMFY_UI_WORKFLOW_SHARED_SOURCE_META = Object.freeze({
   label: 'ComfyUI 工作流',
   subtitle: '粘贴 ComfyUI API workflow，选择本地或云端运行环境',
   inputLabel: 'ComfyUI 工作流API',
@@ -18,9 +18,9 @@ export const COMFY_UI_WORKFLOW_SHARED_SOURCE_META = Object['freeze']({
   createSuccess: 'ComfyUI 工作流节点已创建',
   createFailed: 'ComfyUI 工作流节点创建失败',
 });
-export const SOURCE_TYPE_META = Object['freeze']({
-  [SOURCE_TYPES['runninghub']]: Object['freeze']({
-    id: SOURCE_TYPES['runninghub'],
+export const SOURCE_TYPE_META = Object.freeze({
+  [SOURCE_TYPES.runninghub]: Object.freeze({
+    id: SOURCE_TYPES.runninghub,
     label: 'RunningHub AI 应用',
     panelLabel: 'RunningHub',
     subtitle: '粘贴链接，自动识别 AI 应用或工作流',
@@ -33,8 +33,8 @@ export const SOURCE_TYPE_META = Object['freeze']({
     createSuccess: 'RH AI应用节点已创建',
     createFailed: 'RH AI应用节点创建失败',
   }),
-  [SOURCE_TYPES['runninghubWorkflow']]: Object['freeze']({
-    id: SOURCE_TYPES['runninghubWorkflow'],
+  [SOURCE_TYPES.runninghubWorkflow]: Object.freeze({
+    id: SOURCE_TYPES.runninghubWorkflow,
     label: 'RunningHub 工作流',
     panelLabel: 'RunningHub',
     subtitle: '粘贴链接，自动识别 AI 应用或工作流',
@@ -44,39 +44,39 @@ export const SOURCE_TYPE_META = Object['freeze']({
     saveSuccess: 'RH 工作流配置已保存',
     createSuccess: 'RH 工作流节点已创建',
   }),
-  [SOURCE_TYPES['comfyuiLocal']]: Object['freeze']({
-    id: SOURCE_TYPES['comfyuiLocal'],
+  [SOURCE_TYPES.comfyuiLocal]: Object.freeze({
+    id: SOURCE_TYPES.comfyuiLocal,
     ...COMFY_UI_WORKFLOW_SHARED_SOURCE_META,
   }),
-  [SOURCE_TYPES['comfyuiCloud']]: Object['freeze']({
-    id: SOURCE_TYPES['comfyuiCloud'],
+  [SOURCE_TYPES.comfyuiCloud]: Object.freeze({
+    id: SOURCE_TYPES.comfyuiCloud,
     ...COMFY_UI_WORKFLOW_SHARED_SOURCE_META,
   }),
 });
 export function normalizeSourceType(value) {
-  const item = String(value || '')['trim']();
-  return SOURCE_TYPE_KEYS['includes'](item) ? item : '';
+  const item = String(value || '').trim();
+  return SOURCE_TYPE_KEYS.includes(item) ? item : '';
 }
 export function getSourceMeta(key) {
   return SOURCE_TYPE_META[normalizeSourceType(key)] || null;
 }
 export function isComfyUiSource(index) {
   const sourceType = normalizeSourceType(index);
-  return sourceType === SOURCE_TYPES['comfyuiLocal'] || sourceType === SOURCE_TYPES['comfyuiCloud'];
+  return sourceType === SOURCE_TYPES.comfyuiLocal || sourceType === SOURCE_TYPES.comfyuiCloud;
 }
 export function getComfyUiBaseUrlMode(result) {
-  return normalizeSourceType(result) === SOURCE_TYPES['comfyuiCloud'] ? 'cloud' : 'local';
+  return normalizeSourceType(result) === SOURCE_TYPES.comfyuiCloud ? 'cloud' : 'local';
 }
 export function getComfyUiSourceTypeFromBaseUrlMode(data) {
   return String(data || '')
-    ['trim']()
-    ['toLowerCase']() === 'cloud'
-    ? SOURCE_TYPES['comfyuiCloud']
-    : SOURCE_TYPES['comfyuiLocal'];
+    .trim()
+    .toLowerCase() === 'cloud'
+    ? SOURCE_TYPES.comfyuiCloud
+    : SOURCE_TYPES.comfyuiLocal;
 }
 export function getComfyUiBaseUrlModeLabel(options) {
   return getComfyUiBaseUrlMode(options) === 'cloud' ? '云端' : '本地';
 }
 export function isRunningHubSource(target) {
-  return target === SOURCE_TYPES['runninghub'] || target === SOURCE_TYPES['runninghubWorkflow'];
+  return target === SOURCE_TYPES.runninghub || target === SOURCE_TYPES.runninghubWorkflow;
 }

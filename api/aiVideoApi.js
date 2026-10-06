@@ -1271,7 +1271,7 @@ function resolveVideoRuntimeProviderKey(options4 = {}, value106 = '') {
   const runningHubTaskProviderProfileId = getRunningHubTaskProviderProfileId(options4),
     videoExecution5 = resolveVideoExecution(options4),
     modelProviderProfileId = normalizeModelProviderProfileId(
-      videoExecution5?.['modelManifest'] || options4?.['model'],
+      videoExecution5?.modelManifest || options4?.model,
       runningHubTaskProviderProfileId,
     );
   if (modelProviderProfileId) return modelProviderProfileId;
@@ -1279,9 +1279,9 @@ function resolveVideoRuntimeProviderKey(options4 = {}, value106 = '') {
     if (runningHubTaskProviderProfileId)
       return normalizeRunningHubModelApiProfileId(runningHubTaskProviderProfileId);
   }
-  return value106 === 'runninghub' && isModelApiModel(options4?.['model'], 'runninghub')
+  return value106 === 'runninghub' && isModelApiModel(options4?.model, 'runninghub')
     ? resolveRunningHubModelApiProfileId(
-        videoExecution5?.['modelManifest']?.['modelId'] || options4?.['model'],
+        videoExecution5?.modelManifest?.modelId || options4?.model,
         runningHubTaskProviderProfileId,
       )
     : value106;
@@ -1298,22 +1298,22 @@ function resolveVideoProviderConfig(options5 = {}, value107 = '') {
 function normalizeVideoSubmitDiagnosticToken(value108) {
   if (value108 === null || value108 === undefined || typeof value108 === 'object') return '';
   return String(value108)
-    ['trim']()
-    ['replace'](/[^a-zA-Z0-9._:-]/g, '')
-    ['slice'](0, 80);
+    .trim()
+    .replace(/[^a-zA-Z0-9._:-]/g, '')
+    .slice(0, 80);
 }
 
 function getVideoSubmitDiagnosticCandidates(value109) {
   return [
     value109,
-    value109?.['data'],
-    value109?.['result'],
-    value109?.['output'],
-    value109?.['response'],
-    value109?.['results'],
+    value109?.data,
+    value109?.result,
+    value109?.output,
+    value109?.response,
+    value109?.results,
   ]
-    ['flatMap']((value110) => (Array['isArray'](value110) ? value110 : [value110]))
-    ['filter']((value111) => value111 && typeof value111 === 'object');
+    .flatMap((value110) => (Array.isArray(value110) ? value110 : [value110]))
+    .filter((value111) => value111 && typeof value111 === 'object');
 }
 
 function getVideoSubmitDiagnosticToken(value112, value113 = []) {
@@ -1328,10 +1328,10 @@ function getVideoSubmitDiagnosticToken(value112, value113 = []) {
 }
 
 function isVideoSubmitSuccessCode(value116) {
-  return ['', '0', '200', '201', '202', 'ok', 'success']['includes'](
+  return ['', '0', '200', '201', '202', 'ok', 'success'].includes(
     String(value116 || '')
-      ['trim']()
-      ['toLowerCase'](),
+      .trim()
+      .toLowerCase(),
   );
 }
 
@@ -1354,18 +1354,18 @@ function hasExplicitVideoSubmitFailureSignal(value117) {
       '处理中',
     ]);
   for (const response15 of videoSubmitDiagnosticCandidates2) {
-    if (response15['success'] === false || response15['ok'] === false) return true;
+    if (response15.success === false || response15.ok === false) return true;
     const value118 = String(
-      response15['status'] || response15['taskStatus'] || response15['task_status'] || '',
+      response15.status || response15.taskStatus || response15.task_status || '',
     )
-      ['trim']()
-      ['toLowerCase']();
-    if (map5['has'](value118)) return true;
+      .trim()
+      .toLowerCase();
+    if (map5.has(value118)) return true;
     const videoSubmitDiagnosticToken2 = normalizeVideoSubmitDiagnosticToken(
-      response15['errorCode'] ?? response15['error_code'],
+      response15.errorCode ?? response15.error_code,
     );
     if (videoSubmitDiagnosticToken2 && videoSubmitDiagnosticToken2 !== '0') return true;
-    const videoSubmitDiagnosticToken3 = normalizeVideoSubmitDiagnosticToken(response15['code']);
+    const videoSubmitDiagnosticToken3 = normalizeVideoSubmitDiagnosticToken(response15.code);
     if (videoSubmitDiagnosticToken3 && !isVideoSubmitSuccessCode(videoSubmitDiagnosticToken3)) return true;
     for (const value119 of [
       'error',
@@ -1379,8 +1379,8 @@ function hasExplicitVideoSubmitFailureSignal(value117) {
       const value120 = response15[value119];
       if (value120 !== null && value120 !== undefined && value120 !== '') return true;
     }
-    const value121 = String(response15['message'] || response15['msg'] || '')['trim']();
-    if (value121 && !enabled17['has'](value121['toLowerCase']())) return true;
+    const value121 = String(response15.message || response15.msg || '').trim();
+    if (value121 && !enabled17.has(value121.toLowerCase())) return true;
   }
   return false;
 }
@@ -1405,22 +1405,22 @@ function buildVideoSubmitMissingResultError(
         ? 'null'
         : value123 === undefined
           ? 'undefined'
-          : Array['isArray'](value123)
-            ? 'array-' + value123['length']
+          : Array.isArray(value123)
+            ? 'array-' + value123.length
             : typeof value123,
     list27 =
-      value123 && typeof value123 === 'object' && !Array['isArray'](value123)
-        ? Object['keys'](value123)
-            ['map']((value126) => normalizeVideoSubmitDiagnosticToken(value126))
-            ['filter'](Boolean)
-            ['slice'](0, 12)
+      value123 && typeof value123 === 'object' && !Array.isArray(value123)
+        ? Object.keys(value123)
+            .map((value126) => normalizeVideoSubmitDiagnosticToken(value126))
+            .filter(Boolean)
+            .slice(0, 12)
         : [],
     list28 = [
       videoSubmitDiagnosticToken4 ? '状态：' + videoSubmitDiagnosticToken4 : '',
       value124 ? '错误码：' + value124 : '',
       '响应类型：' + value125,
-      list27['length'] ? '响应字段：' + list27['join'](',') : '',
-    ]['filter'](Boolean),
+      list27.length ? '响应字段：' + list27.join(',') : '',
+    ].filter(Boolean),
     value127 = expectsTaskId
       ? '任务创建响应异常：服务端未返回任务 ID'
       : '视频生成响应异常：服务端未返回视频结果';
@@ -1428,7 +1428,7 @@ function buildVideoSubmitMissingResultError(
     type: 'PARSE_ERROR',
     provider: value122,
     code: value124 || undefined,
-    message: '' + value127 + (list28['length'] ? '（' + list28['join']('；') + '）' : ''),
+    message: '' + value127 + (list28.length ? '（' + list28.join('；') + '）' : ''),
     raw: value123,
     retryable: false,
   });
@@ -1436,48 +1436,48 @@ function buildVideoSubmitMissingResultError(
 
 function normalizeDreaminaVideoTaskResult(value128, value129, { allowPending: allowPending = false } = {}) {
   const dreaminaTaskSnapshot = normalizeDreaminaTaskSnapshot(value128, { submitId: value129 });
-  if (dreaminaTaskSnapshot?.['phase'] === 'failed') {
+  if (dreaminaTaskSnapshot?.phase === 'failed') {
     const error14 = new Error(
-      dreaminaTaskSnapshot?.['failReason'] || dreaminaTaskSnapshot?.['label'] || '查询失败',
+      dreaminaTaskSnapshot?.failReason || dreaminaTaskSnapshot?.label || '查询失败',
     );
-    error14['dreaminaSnapshot'] = dreaminaTaskSnapshot;
+    error14.dreaminaSnapshot = dreaminaTaskSnapshot;
     throw error14;
   }
-  if (allowPending && dreaminaTaskSnapshot?.['phase'] !== 'done')
+  if (allowPending && dreaminaTaskSnapshot?.phase !== 'done')
     return {
       pending: true,
-      message: dreaminaTaskSnapshot?.['label'] || '',
+      message: dreaminaTaskSnapshot?.label || '',
       dreaminaSnapshot: dreaminaTaskSnapshot,
     };
-  const value130 = Array['isArray'](dreaminaTaskSnapshot?.['outputs']) ? dreaminaTaskSnapshot['outputs'] : [],
-    list29 = value130['map']((value131) => {
+  const value130 = Array.isArray(dreaminaTaskSnapshot?.outputs) ? dreaminaTaskSnapshot.outputs : [],
+    list29 = value130.map((value131) => {
       const resultLocalPath2 = pickResultLocalPath(value131);
       return {
-        videoUrl: localPathToUrl(resultLocalPath2) || value131['localUrl'] || value131['url'],
+        videoUrl: localPathToUrl(resultLocalPath2) || value131.localUrl || value131.url,
         localPath: resultLocalPath2,
       };
     });
   return {
-    isBatch: list29['length'] > 1,
+    isBatch: list29.length > 1,
     dreaminaSnapshot: dreaminaTaskSnapshot,
     videos: list29,
     videoUrl:
       localPathToUrl(pickResultLocalPath(value130[0])) ||
-      value130[0]?.['localUrl'] ||
-      value130[0]?.['url'] ||
+      value130[0]?.localUrl ||
+      value130[0]?.url ||
       '',
     localPath: pickResultLocalPath(value130[0]),
   };
 }
 
 export async function probeDreaminaVideoTask(value132, value133 = {}) {
-  const enabled18 = String(value132 || '')['trim']();
+  const enabled18 = String(value132 || '').trim();
   if (!enabled18) throw new Error('缺少 Dreamina 提交ID，无法核验视频任务');
   const queryDreaminaResult2 = await queryDreaminaResult(enabled18, {
     autoDownload: true,
-    retries: value133?.['retries'],
-    retryDelay: value133?.['retryDelay'],
-    signal: value133?.['signal'],
+    retries: value133?.retries,
+    retryDelay: value133?.retryDelay,
+    signal: value133?.signal,
   });
   return normalizeDreaminaVideoTaskResult(queryDreaminaResult2, enabled18, { allowPending: true });
 }
@@ -1485,15 +1485,15 @@ export async function probeDreaminaVideoTask(value132, value133 = {}) {
 function buildManifestVideoTaskPollUrls(value134, value135) {
   const enabled19 = [],
     handler5 = (value136) => {
-      const enabled20 = String(value136 || '')['trim']();
+      const enabled20 = String(value136 || '').trim();
       if (!enabled20) return;
-      const value137 = enabled20['replace']('{taskId}', encodeURIComponent(String(value134)));
-      if (value137 && !enabled19['includes'](value137)) enabled19['push'](value137);
+      const value137 = enabled20.replace('{taskId}', encodeURIComponent(String(value134)));
+      if (value137 && !enabled19.includes(value137)) enabled19.push(value137);
     };
   return (
-    handler5(value135?.['urlTemplate']),
-    Array['isArray'](value135?.['fallbackUrlTemplates']) &&
-      value135['fallbackUrlTemplates']['forEach'](handler5),
+    handler5(value135?.urlTemplate),
+    Array.isArray(value135?.fallbackUrlTemplates) &&
+      value135.fallbackUrlTemplates.forEach(handler5),
     enabled19
   );
 }
@@ -1510,21 +1510,21 @@ const ASYNC_VIDEO_FAILURE_STATUSES = new Set([
 
 function isAgnesTaskNotExistError(value138) {
   if (!(value138 instanceof ApiError)) return false;
-  const value139 = String(value138['message'] || '')
-    ['trim']()
-    ['toLowerCase']();
+  const value139 = String(value138.message || '')
+    .trim()
+    .toLowerCase();
   return (
-    value139['includes']('task_not_exist') ||
-    value139['includes']('task not exist') ||
-    value139['includes']('task not found') ||
-    value139['includes']('video not found') ||
-    value139['includes']('任务不存在') ||
-    value139['includes']('任务或视频未找到')
+    value139.includes('task_not_exist') ||
+    value139.includes('task not exist') ||
+    value139.includes('task not found') ||
+    value139.includes('video not found') ||
+    value139.includes('任务不存在') ||
+    value139.includes('任务或视频未找到')
   );
 }
 
 function isAgnesVideoId(value140) {
-  return /^video_/i['test'](String(value140 || '')['trim']());
+  return /^video_/i.test(String(value140 || '').trim());
 }
 
 function shouldTryManifestPollFallback({
@@ -1535,87 +1535,87 @@ function shouldTryManifestPollFallback({
   pollUrl: pollUrl,
   taskId: taskId7,
 } = {}) {
-  if (pollIndex >= pollUrls['length'] - 1 || !(err instanceof ApiError)) return false;
+  if (pollIndex >= pollUrls.length - 1 || !(err instanceof ApiError)) return false;
   const value141 = String(providerId2 || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   if (value141 === 'agnes' && isAgnesVideoId(taskId7)) return false;
-  if (Number(err['status'] || err['code'] || 0) === 404) return true;
+  if (Number(err.status || err.code || 0) === 404) return true;
   return (
-    value141 === 'agnes' && String(pollUrl || '')['includes']('/agnesapi?') && isAgnesTaskNotExistError(err)
+    value141 === 'agnes' && String(pollUrl || '').includes('/agnesapi?') && isAgnesTaskNotExistError(err)
   );
 }
 
 function resolveVideoPollIntervalMs(options6 = {}) {
   const value142 = Number(
-    options6?.['taskPolling']?.['pollIntervalMs'] || options6?.['pollIntervalMs'] || 2000,
+    options6?.taskPolling?.pollIntervalMs || options6?.pollIntervalMs || 2000,
   );
-  if (!Number['isFinite'](value142)) return 2000;
-  return Math['min'](30000, Math['max'](1000, Math['trunc'](value142)));
+  if (!Number.isFinite(value142)) return 2000;
+  return Math.min(30000, Math.max(1000, Math.trunc(value142)));
 }
 
 function resolveVideoPollAttempts(options7 = {}, value143 = 2000) {
-  const count10 = Number(options7?.['taskPolling']?.['maxWaitMs'] || options7?.['maxWaitMs']);
-  if (!Number['isFinite'](count10) || count10 <= 0) return 600;
-  const value144 = Math['min'](2 * 60 * 60 * 1000, Math['max'](60 * 1000, Math['trunc'](count10)));
-  return Math['max'](1, Math['ceil'](value144 / Math['max'](1, value143)));
+  const count10 = Number(options7?.taskPolling?.maxWaitMs || options7?.maxWaitMs);
+  if (!Number.isFinite(count10) || count10 <= 0) return 600;
+  const value144 = Math.min(2 * 60 * 60 * 1000, Math.max(60 * 1000, Math.trunc(count10)));
+  return Math.max(1, Math.ceil(value144 / Math.max(1, value143)));
 }
 
 function resolveVideoTransportErrorPolicy(options8 = {}) {
-  const enabled21 = options8?.['taskPolling']?.['transportErrorPolicy'];
-  if (!enabled21 || typeof enabled21 !== 'object' || Array['isArray'](enabled21)) return null;
+  const enabled21 = options8?.taskPolling?.transportErrorPolicy;
+  if (!enabled21 || typeof enabled21 !== 'object' || Array.isArray(enabled21)) return null;
   const run2 = (value145) =>
     new Set(
-      (Array['isArray'](value145) ? value145 : [])
-        ['map']((value146) => Number(value146))
-        ['filter']((count11) => Number['isInteger'](count11) && count11 >= 400 && count11 <= 599),
+      (Array.isArray(value145) ? value145 : [])
+        .map((value146) => Number(value146))
+        .filter((count11) => Number.isInteger(count11) && count11 >= 400 && count11 <= 599),
     );
   return {
-    maxConsecutiveErrors: Math['min'](
+    maxConsecutiveErrors: Math.min(
       10,
-      Math['max'](1, Math['trunc'](Number(enabled21['maxConsecutiveErrors']) || 3)),
+      Math.max(1, Math.trunc(Number(enabled21.maxConsecutiveErrors) || 3)),
     ),
-    retryableStatuses: run2(enabled21['retryableStatuses']),
-    terminalStatuses: run2(enabled21['terminalStatuses']),
-    surfaceLastError: enabled21['surfaceLastError'] !== false,
+    retryableStatuses: run2(enabled21.retryableStatuses),
+    terminalStatuses: run2(enabled21.terminalStatuses),
+    surfaceLastError: enabled21.surfaceLastError !== false,
   };
 }
 
 function getVideoPollingErrorStatus(value147) {
-  const value148 = Number(value147?.['status'] ?? value147?.['code']);
-  return Number['isInteger'](value148) ? value148 : null;
+  const value148 = Number(value147?.status ?? value147?.code);
+  return Number.isInteger(value148) ? value148 : null;
 }
 
 function resolveAsyncVideoTaskStatuses(value149, value150) {
-  const value151 = Array['isArray'](value149)
-    ? value149['map']((value152) =>
+  const value151 = Array.isArray(value149)
+    ? value149.map((value152) =>
         String(value152 || '')
-          ['trim']()
-          ['toLowerCase'](),
-      )['filter']((value153) => /^[a-z][a-z0-9_-]{0,63}$/['test'](value153))
+          .trim()
+          .toLowerCase(),
+      ).filter((value153) => /^[a-z][a-z0-9_-]{0,63}$/.test(value153))
     : [];
-  return value151['length'] > 0 ? new Set(value151) : value150;
+  return value151.length > 0 ? new Set(value151) : value150;
 }
 
 function isAsyncVideoTaskSuccessStatus(value154, value155 = null) {
-  return resolveAsyncVideoTaskStatuses(value155, ASYNC_VIDEO_SUCCESS_STATUSES)['has'](
+  return resolveAsyncVideoTaskStatuses(value155, ASYNC_VIDEO_SUCCESS_STATUSES).has(
     String(value154 || '')
-      ['trim']()
-      ['toLowerCase'](),
+      .trim()
+      .toLowerCase(),
   );
 }
 
 function _isRelativeApiUrl(value156) {
-  const enabled22 = String(value156 || '')['trim']();
-  return enabled22['startsWith']('/') && !enabled22['startsWith']('//');
+  const enabled22 = String(value156 || '').trim();
+  return enabled22.startsWith('/') && !enabled22.startsWith('//');
 }
 
 function _canFetchOutputUrl(value157) {
-  const value158 = String(value157 || '')['trim']();
+  const value158 = String(value157 || '').trim();
   return (
-    /^https?:\/\//i['test'](value158) ||
-    /^data:/i['test'](value158) ||
-    /^blob:/i['test'](value158) ||
+    /^https?:\/\//i.test(value158) ||
+    /^data:/i.test(value158) ||
+    /^blob:/i.test(value158) ||
     _isRelativeApiUrl(value158)
   );
 }
@@ -1651,80 +1651,80 @@ async function resolveVideoResultWithOutputLocalization(value164, value165 = {},
 }
 
 function isComfyUiHistoryPolling(options9 = {}) {
-  return String(options9?.['mode'] || '')['trim']() === 'comfyui-history';
+  return String(options9?.mode || '').trim() === 'comfyui-history';
 }
 
 async function pollComfyUiVideoTask(value167, value168 = {}) {
-  const value169 = String(value167 || '')['trim'](),
-    args13 = value168?.['taskPolling'] || {},
-    args14 = String(args13['baseUrl'] || '')['trim']();
+  const value169 = String(value167 || '').trim(),
+    args13 = value168?.taskPolling || {},
+    args14 = String(args13.baseUrl || '').trim();
   for (let count12 = 0; count12 < 600; count12++) {
-    if (value168?.['signal']?.['aborted']) throw new Error('CANCELLED');
+    if (value168?.signal?.aborted) throw new Error('CANCELLED');
     await new Promise((value170) => setTimeout(value170, 2000));
-    if (value168?.['signal']?.['aborted']) throw new Error('CANCELLED');
+    if (value168?.signal?.aborted) throw new Error('CANCELLED');
     const uRLSearchParams2 = new URLSearchParams({
         promptId: value169,
         ...(args14 ? { baseUrl: args14 } : {}),
-        ...(args13['allowCloudBaseUrl'] ? { allowCloudBaseUrl: '1' } : {}),
+        ...(args13.allowCloudBaseUrl ? { allowCloudBaseUrl: '1' } : {}),
       }),
       requester5 = await requester({
-        url: '/api/v2/comfyui/history?' + uRLSearchParams2['toString'](),
+        url: '/api/v2/comfyui/history?' + uRLSearchParams2.toString(),
         method: 'GET',
         provider: 'comfyui',
         timeout: 30000,
-        signal: value168?.['signal'],
+        signal: value168?.signal,
       }),
       value171 =
-        typeof value168?.['resultExtractor'] === 'function'
-          ? value168['resultExtractor'](requester5)
+        typeof value168?.resultExtractor === 'function'
+          ? value168.resultExtractor(requester5)
           : requester5;
-    if (extractVideoUrls(value171, value168?.['responseMapping'])['length'] > 0) return value171;
-    const asyncVideoTaskStatus2 = resolveAsyncVideoTaskStatus(value171, value168?.['responseMapping']);
-    if (isAsyncVideoTaskFailureStatus(asyncVideoTaskStatus2, value168?.['taskPolling']?.['failedStatuses'])) {
+    if (extractVideoUrls(value171, value168?.responseMapping).length > 0) return value171;
+    const asyncVideoTaskStatus2 = resolveAsyncVideoTaskStatus(value171, value168?.responseMapping);
+    if (isAsyncVideoTaskFailureStatus(asyncVideoTaskStatus2, value168?.taskPolling?.failedStatuses)) {
       const error15 = parseError('comfyui', value171, 200);
       if (error15) throw error15;
-      throw ApiError['taskFailed'](
+      throw ApiError.taskFailed(
         'comfyui',
-        extractAsyncVideoTaskFailureReason(value171, value168?.['responseMapping']) || 'ComfyUI 任务执行失败',
+        extractAsyncVideoTaskFailureReason(value171, value168?.responseMapping) || 'ComfyUI 任务执行失败',
       );
     }
   }
-  throw ApiError['taskTimeout']('comfyui');
+  throw ApiError.taskTimeout('comfyui');
 }
 
 async function generateVideoUnqueued(args15, args16 = {}) {
   const videoExecution6 = resolveVideoExecution(args15),
     videoProviderId = resolveVideoProviderId(args15, videoExecution6),
-    value172 = videoExecution6?.['executionManifest'],
-    value173 = value172?.['adapterType'] === 'workflow';
-  if (value172?.['adapterType'] === 'localRuntime' && value172?.['runtime'] === 'dreaminaVideo') {
-    const value174 = { ...args15, prompt: applyCameraAngleToPrompt(args15['prompt'], args15['cameraAngle']) };
+    value172 = videoExecution6?.executionManifest,
+    value173 = value172?.adapterType === 'workflow';
+  if (value172?.adapterType === 'localRuntime' && value172?.runtime === 'dreaminaVideo') {
+    const value174 = { ...args15, prompt: applyCameraAngleToPrompt(args15.prompt, args15.cameraAngle) };
     return await runDreaminaVideoGeneration(value174, args16);
   }
   const dom = await buildGenerateVideoRequest(args15),
     args17 = String(
-      dom?.['providerProfileId'] ||
-        dom?.['rhProviderProfileId'] ||
-        args15?.['providerProfileId'] ||
-        args15?.['rhProviderProfileId'] ||
+      dom?.providerProfileId ||
+        dom?.rhProviderProfileId ||
+        args15?.providerProfileId ||
+        args15?.rhProviderProfileId ||
         '',
-    )['trim'](),
+    ).trim(),
     value175 =
       videoProviderId === 'runninghubwf' && args17
         ? { ...args15, providerProfileId: args17, rhProviderProfileId: args17 }
         : args15,
-    args18 = dom?.['responseMapping'] || null,
+    args18 = dom?.responseMapping || null,
     args19 = {
       ...(args16 || {}),
       ...(args18 ? { responseMapping: args18 } : {}),
-      ...(dom?.['taskPolling'] ? { taskPolling: dom['taskPolling'] } : {}),
-      ...(Array['isArray'](dom?.['errorRules']) && dom['errorRules']['length'] > 0
-        ? { errorRules: dom['errorRules'] }
+      ...(dom?.taskPolling ? { taskPolling: dom.taskPolling } : {}),
+      ...(Array.isArray(dom?.errorRules) && dom.errorRules.length > 0
+        ? { errorRules: dom.errorRules }
         : {}),
-      ...(typeof dom?.['resultExtractor'] === 'function' ? { resultExtractor: dom['resultExtractor'] } : {}),
+      ...(typeof dom?.resultExtractor === 'function' ? { resultExtractor: dom.resultExtractor } : {}),
     },
-    value176 = { ...(dom['headers'] || {}) },
-    value177 = String(args15?.['installId'] || '')['trim']();
+    value176 = { ...(dom.headers || {}) },
+    value177 = String(args15?.installId || '').trim();
   if (value177) value176['X-AIC-Install-Id'] = value177;
   let error16,
     value178 = '',
@@ -1732,35 +1732,35 @@ async function generateVideoUnqueued(args15, args16 = {}) {
   try {
     if (value173) {
       const requester6 = await requester({
-        url: dom['url'],
+        url: dom.url,
         method: 'POST',
         provider: videoProviderId,
         timeout: GENERATION_TIMEOUT,
-        signal: args16?.['signal'],
+        signal: args16?.signal,
         headers: value176,
-        body: JSON['stringify'](dom['body']),
+        body: JSON.stringify(dom.body),
         responseType: 'text',
         returnMeta: true,
       });
-      ((value178 = String(requester6?.['data'] ?? '')),
-        (value179 = requester6?.['headers'] || null),
+      ((value178 = String(requester6?.data ?? '')),
+        (value179 = requester6?.headers || null),
         (error16 = parseVideoResponseData(value178)));
     } else
       error16 = await requester({
-        url: dom['url'],
+        url: dom.url,
         method: 'POST',
         provider: videoProviderId,
         timeout: GENERATION_TIMEOUT,
-        signal: args16?.['signal'],
+        signal: args16?.signal,
         headers: value176,
-        body: JSON['stringify'](dom['body']),
+        body: JSON.stringify(dom.body),
       });
   } catch (value180) {
     const value181 =
       value180 instanceof ApiError
         ? value180
         : parseNetworkError(videoProviderId, value180, GENERATION_TIMEOUT);
-    throw applyManifestErrorRules(value181, args19['errorRules'], {
+    throw applyManifestErrorRules(value181, args19.errorRules, {
       provider: videoProviderId,
       phase: 'submit',
     });
@@ -1768,16 +1768,16 @@ async function generateVideoUnqueued(args15, args16 = {}) {
   let processVideoTaskResult5 = null,
     args20 = '';
   if (value173) {
-    if (String(error16?.['code'] || '') === 'SUBSCRIPTION_REQUIRED') {
-      const error17 = new Error(error16?.['message'] || '该模型为 VIP，请先激活 CDKEY/订阅');
-      ((error17['code'] = 'SUBSCRIPTION_REQUIRED'),
-        (error17['contactText'] = error16?.['contactText'] || ''),
-        (error17['contactUrl'] = error16?.['contactUrl'] || ''));
+    if (String(error16?.code || '') === 'SUBSCRIPTION_REQUIRED') {
+      const error17 = new Error(error16?.message || '该模型为 VIP，请先激活 CDKEY/订阅');
+      ((error17.code = 'SUBSCRIPTION_REQUIRED'),
+        (error17.contactText = error16?.contactText || ''),
+        (error17.contactUrl = error16?.contactUrl || ''));
       throw error17;
     }
-    const value182 = Number(error16?.['code']),
+    const value182 = Number(error16?.code),
       count13 =
-        error16?.['code'] !== undefined && error16?.['code'] !== null && Number['isFinite'](value182)
+        error16?.code !== undefined && error16?.code !== null && Number.isFinite(value182)
           ? value182
           : null,
       runningHubVideoTaskId2 = resolveRunningHubVideoTaskId(error16, value178, value179, args18) || null,
@@ -1790,7 +1790,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
           type: 'TASK_FAILED',
           provider: videoProviderId,
           code: count13,
-          message: String(error16?.['message'] || error16?.['msg'] || 'RunningHub 任务提交失败'),
+          message: String(error16?.message || error16?.msg || 'RunningHub 任务提交失败'),
           raw: error16,
           retryable: count13 === 421,
         })
@@ -1803,7 +1803,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
     if (runningHubVideoTaskId2) {
       const value183 = String(runningHubVideoTaskId2);
       count13 === 813 &&
-        args16?.['onRunningHubWorkflowQueueChange']?.({
+        args16?.onRunningHubWorkflowQueueChange?.({
           status: 'queued',
           queueIndex: 0,
           queueLength: 1,
@@ -1811,15 +1811,15 @@ async function generateVideoUnqueued(args15, args16 = {}) {
           taskId: value183,
         });
       args20 = resolveVideoRuntimeProviderKey(value175, videoProviderId) + ':video:' + value183;
-      const value184 = dom['useOpenapiQuery'] === true || dom['url'] === '/api/v2/proxy/image';
-      (args16?.['onTaskMeta']?.({
+      const value184 = dom.useOpenapiQuery === true || dom.url === '/api/v2/proxy/image';
+      (args16?.onTaskMeta?.({
         taskId: value183,
         useOpenapiQuery: value184,
         ...(args17 ? { providerProfileId: args17, rhProviderProfileId: args17 } : {}),
       }),
-        args16?.['onTaskId']?.(value183));
+        args16?.onTaskId?.(value183));
       const value185 =
-        videoProviderId === 'comfyui' || isComfyUiHistoryPolling(args19['taskPolling'])
+        videoProviderId === 'comfyui' || isComfyUiHistoryPolling(args19.taskPolling)
           ? await pollComfyUiVideoTask(value183, args19)
           : await pollRunningHubVideoTask(value183, value175, videoProviderId, {
               ...args19,
@@ -1835,19 +1835,19 @@ async function generateVideoUnqueued(args15, args16 = {}) {
       args20 = resolveVideoRuntimeProviderKey(args15, videoProviderId) + ':video:' + value186;
       const videoProviderConfig = resolveVideoProviderConfig(args15, videoProviderId),
         args21 =
-          dom['useOpenapiQuery'] === true ||
-          (videoProviderId === 'runninghub' && dom['url'] === '/api/v2/proxy/image'),
+          dom.useOpenapiQuery === true ||
+          (videoProviderId === 'runninghub' && dom.url === '/api/v2/proxy/image'),
         value187 =
-          args15['apiKey'] ||
-          (videoProviderId === 'runninghub' ? videoProviderConfig['modelApiKey'] : '') ||
-          videoProviderConfig['apiKey'];
-      (args16?.['onTaskMeta']?.({
+          args15.apiKey ||
+          (videoProviderId === 'runninghub' ? videoProviderConfig.modelApiKey : '') ||
+          videoProviderConfig.apiKey;
+      (args16?.onTaskMeta?.({
         taskId: value186,
         provider: videoProviderId,
         kind: 'video',
         ...(args21 ? { useOpenapiQuery: true } : {}),
       }),
-        args16?.['onTaskId']?.(value186));
+        args16?.onTaskId?.(value186));
       if (args21) {
         const pollRunningHubVideoTask6 = await pollRunningHubVideoTask(
           value186,
@@ -1865,7 +1865,7 @@ async function generateVideoUnqueued(args15, args16 = {}) {
       if (hasExplicitVideoSubmitFailureSignal(error16)) {
         const error20 = parseError(videoProviderId, error16, 200);
         if (error20) {
-          error20['message'] = error20['getUserMessage']();
+          error20.message = error20.getUserMessage();
           throw error20;
         }
         const extractAsyncVideoTaskFailureReason2 = extractAsyncVideoTaskFailureReason(error16, args18);
@@ -1881,9 +1881,9 @@ async function generateVideoUnqueued(args15, args16 = {}) {
       throw buildVideoSubmitMissingResultError(videoProviderId, error16, {
         expectsTaskId:
           value173 ||
-          dom?.['isAsync'] === true ||
-          Boolean(args19['taskPolling']) ||
-          Boolean(args18?.['taskIdPath']),
+          dom?.isAsync === true ||
+          Boolean(args19.taskPolling) ||
+          Boolean(args18?.taskIdPath),
       });
     }
     processVideoTaskResult5 = { videoUrl: extractVideoUrls3 };
@@ -1893,8 +1893,8 @@ async function generateVideoUnqueued(args15, args16 = {}) {
     {
       providerId: videoProviderId,
       ...(args20 ? { taskKey: args20 } : {}),
-      signal: args16?.['signal'],
-      saveTimeoutMs: args16?.['saveTimeoutMs'],
+      signal: args16?.signal,
+      saveTimeoutMs: args16?.saveTimeoutMs,
     },
     args16,
   );
@@ -1904,11 +1904,11 @@ function createRunningHubWorkflowQueueChangeEmitter(handler6) {
   if (typeof handler6 !== 'function') return null;
   let value188 = '';
   return (options10 = {}) => {
-    const value189 = String(options10?.['status'] || '')
-        ['trim']()
-        ['toLowerCase'](),
-      value190 = Number(options10?.['queueIndex'] ?? -1),
-      value191 = Number(options10?.['queueLength'] ?? 0),
+    const value189 = String(options10?.status || '')
+        .trim()
+        .toLowerCase(),
+      value190 = Number(options10?.queueIndex ?? -1),
+      value191 = Number(options10?.queueLength ?? 0),
       value192 = value189 + ':' + value190 + ':' + value191;
     if (value192 === value188) return false;
     return ((value188 = value192), handler6(options10), true);

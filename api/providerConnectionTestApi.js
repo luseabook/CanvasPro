@@ -158,7 +158,7 @@ function toFiniteNumber(value5) {
 function formatBalanceNumber(value7) {
   const toFiniteNumber2 = toFiniteNumber(value7);
   if (toFiniteNumber2 === null) return '';
-  return new Intl['NumberFormat']('zh-CN', { maximumFractionDigits: 6 }).format(toFiniteNumber2);
+  return new Intl.NumberFormat('zh-CN', { maximumFractionDigits: 6 }).format(toFiniteNumber2);
 }
 function formatCurrencyLabel(value8) {
   const enabled3 = String(value8 || '')

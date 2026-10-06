@@ -2,11 +2,11 @@ import { positionAnchoredSubmenu } from '../utils/submenuPosition.js';
 export function positionAudioVoiceModelSubmenu(
   value,
   item,
-  { windowObject: windowObject = globalThis['window'], gap: gap = 0, container: container = value } = {},
+  { windowObject: windowObject = globalThis.window, gap: gap = 0, container: container = value } = {},
 ) {
-  const enabled = value?.['getBoundingClientRect']?.();
+  const enabled = value?.getBoundingClientRect?.();
   if (!enabled) return null;
-  const key = container?.['getBoundingClientRect']?.() || enabled;
+  const key = container?.getBoundingClientRect?.() || enabled;
   return positionAnchoredSubmenu({
     submenu: item,
     anchorRect: enabled,
@@ -14,83 +14,83 @@ export function positionAudioVoiceModelSubmenu(
     preferredSide: 'left',
     position: 'absolute',
     gap: gap,
-    viewportWidth: windowObject?.['innerWidth'],
-    viewportHeight: windowObject?.['innerHeight'],
+    viewportWidth: windowObject?.innerWidth,
+    viewportHeight: windowObject?.innerHeight,
   });
 }
 export function bindAudioVoiceModelSubmenuPosition(el, el2, index, args) {
   let result = null;
   const run = () => {
       if (result === null) return;
-      (index?.['clearTimeout']?.(result), (result = null));
+      (index?.clearTimeout?.(result), (result = null));
     },
     data = () => {
       (run(),
-        el?.['classList']?.['add']('is-model-submenu-open'),
-        el2?.['classList']?.['add']('is-model-submenu-open'),
+        el?.classList?.add('is-model-submenu-open'),
+        el2?.classList?.add('is-model-submenu-open'),
         positionAudioVoiceModelSubmenu(el, el2, { windowObject: index, ...args }));
     },
     options = (target) => {
-      if (el?.['contains']?.(target?.['relatedTarget']) || el2?.['contains']?.(target?.['relatedTarget']))
+      if (el?.contains?.(target?.relatedTarget) || el2?.contains?.(target?.relatedTarget))
         return;
       (run(),
-        (result = index?.['setTimeout']?.(() => {
+        (result = index?.setTimeout?.(() => {
           result = null;
-          const source = el?.['ownerDocument']?.['activeElement'];
+          const source = el?.ownerDocument?.activeElement;
           if (
-            el?.['matches']?.(':hover') ||
-            el2?.['matches']?.(':hover') ||
-            el?.['contains']?.(source) ||
-            el2?.['contains']?.(source)
+            el?.matches?.(':hover') ||
+            el2?.matches?.(':hover') ||
+            el?.contains?.(source) ||
+            el2?.contains?.(source)
           )
             return;
-          (el?.['classList']?.['remove']('is-model-submenu-open'),
-            el2?.['classList']?.['remove']('is-model-submenu-open'));
+          (el?.classList?.remove('is-model-submenu-open'),
+            el2?.classList?.remove('is-model-submenu-open'));
         }, 80)));
     };
-  (el?.['addEventListener']?.('mouseenter', data),
-    el?.['addEventListener']?.('mouseleave', options),
-    el?.['addEventListener']?.('focusin', data),
-    el?.['addEventListener']?.('focusout', options),
-    el2?.['addEventListener']?.('mouseenter', data),
-    el2?.['addEventListener']?.('mouseleave', options),
-    el2?.['addEventListener']?.('focusin', data),
-    el2?.['addEventListener']?.('focusout', options));
+  (el?.addEventListener?.('mouseenter', data),
+    el?.addEventListener?.('mouseleave', options),
+    el?.addEventListener?.('focusin', data),
+    el?.addEventListener?.('focusout', options),
+    el2?.addEventListener?.('mouseenter', data),
+    el2?.addEventListener?.('mouseleave', options),
+    el2?.addEventListener?.('focusin', data),
+    el2?.addEventListener?.('focusout', options));
 }
 export function createEl(next, current = '', entry = '') {
-  const el3 = document['createElement'](next);
-  if (current) el3['className'] = current;
-  if (entry) el3['textContent'] = entry;
+  const el3 = document.createElement(next);
+  if (current) el3.className = current;
+  if (entry) el3.textContent = entry;
   return el3;
 }
 export function createButton(record, payload, handle, state = '') {
   const el4 = createEl('button', record),
-    config = String(payload || '')['trim'](),
-    scope = String(state || '')['trim'](),
+    config = String(payload || '').trim(),
+    scope = String(state || '').trim(),
     input = config || scope;
-  el4['type'] = 'button';
-  config && config !== scope && (el4['title'] = config);
-  if (input) el4['setAttribute']('aria-label', input);
+  el4.type = 'button';
+  config && config !== scope && (el4.title = config);
+  if (input) el4.setAttribute('aria-label', input);
   return (
-    (el4['innerHTML'] = iconSvg(handle)),
-    scope && el4['appendChild'](createEl('span', 'audio-voice-btn-label', state)),
+    (el4.innerHTML = iconSvg(handle)),
+    scope && el4.appendChild(createEl('span', 'audio-voice-btn-label', state)),
     el4
   );
 }
 export function createAudioVoiceModelIcon(options2 = {}, output = '') {
-  const enabled2 = String(options2?.['icon'] || '')['trim'](),
-    value2 = String(options2?.['iconName'] || '')['trim'](),
-    value3 = String(options2?.['iconAlt'] || options2?.['label'] || 'model')['trim'](),
+  const enabled2 = String(options2?.icon || '').trim(),
+    value2 = String(options2?.iconName || '').trim(),
+    value3 = String(options2?.iconAlt || options2?.label || 'model').trim(),
     el5 = createEl('span', output || 'audio-voice-global-model-provider');
-  if (value2) return (el5['classList']['add']('has-svg-icon'), (el5['innerHTML'] = iconSvg(value2)), el5);
+  if (value2) return (el5.classList.add('has-svg-icon'), (el5.innerHTML = iconSvg(value2)), el5);
   if (!enabled2)
-    return ((el5['textContent'] = String(options2?.['badgeText'] || 'RH')['trim']() || 'RH'), el5);
+    return ((el5.textContent = String(options2?.badgeText || 'RH').trim() || 'RH'), el5);
   const el6 = createEl('img', 'audio-voice-global-model-icon-img');
   return (
-    (el6['src'] = enabled2),
-    (el6['alt'] = value3),
-    (el6['draggable'] = false),
-    el5['appendChild'](el6),
+    (el6.src = enabled2),
+    (el6.alt = value3),
+    (el6.draggable = false),
+    el5.appendChild(el6),
     el5
   );
 }

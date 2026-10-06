@@ -62,8 +62,8 @@ test('a spawn error rejects the failure promise and notifies onError', async () 
   await assert.rejects(
     () => monitor.failure,
     (error) =>
-      error['code'] === 'BACKEND_SPAWN_ERROR' &&
-      error['cause'] === thrown &&
+      error.code === 'BACKEND_SPAWN_ERROR' &&
+      error.cause === thrown &&
       /Failed to spawn local backend: spawn ENOENT/.test(error.message),
   );
   assert.deepEqual(seen, [thrown]);
@@ -80,9 +80,9 @@ test('an early exit rejects with BACKEND_EXITED_BEFORE_READY and forwards onExit
   await assert.rejects(
     () => monitor.failure,
     (error) =>
-      error['code'] === 'BACKEND_EXITED_BEFORE_READY' &&
-      error['details']['exitCode'] === 3 &&
-      error['details']['signal'] === 'SIGKILL' &&
+      error.code === 'BACKEND_EXITED_BEFORE_READY' &&
+      error.details.exitCode === 3 &&
+      error.details.signal === 'SIGKILL' &&
       /code=3, signal=SIGKILL/.test(error.message),
   );
   assert.deepEqual(seen, [[3, 'SIGKILL']]);
@@ -210,8 +210,8 @@ test('launchMonitoredBackendProcess maps a synchronous spawn throw', () => {
         onSpawnError: (error) => seen.push(error),
       }),
     (error) =>
-      error['code'] === 'BACKEND_SPAWN_ERROR' &&
-      error['cause'] === thrown &&
+      error.code === 'BACKEND_SPAWN_ERROR' &&
+      error.cause === thrown &&
       /Failed to spawn local backend: EACCES/.test(error.message),
   );
   assert.deepEqual(seen, [thrown]);
@@ -232,7 +232,7 @@ test('launchMonitoredBackendProcess maps an asynchronous spawn error and closes 
   fake.emit('close', 1, null);
   await assert.rejects(
     () => launched.failure,
-    (error) => error['code'] === 'BACKEND_SPAWN_ERROR',
+    (error) => error.code === 'BACKEND_SPAWN_ERROR',
   );
   assert.equal(seen.length, 1);
   assert.deepEqual(logStream.calls, ['end']);

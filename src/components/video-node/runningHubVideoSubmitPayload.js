@@ -517,11 +517,11 @@ export async function buildRunningHubVideoWorkflowSubmitPatch(nodeData8 = {}) {
   return { payloadPatch: payloadPatch6, updateData: updateData5?.updateData || {} };
 }
 
-const RH_LTX23_RESOLUTION_OPTIONS = Object['freeze']([1024, 1280, 1440, 1600, 1920]);
+const RH_LTX23_RESOLUTION_OPTIONS = Object.freeze([1024, 1280, 1440, 1600, 1920]);
 
 function normalizeRhLtx23Resolution(value55) {
   const value56 = Number(value55);
-  return RH_LTX23_RESOLUTION_OPTIONS['includes'](value56) ? value56 : 1280;
+  return RH_LTX23_RESOLUTION_OPTIONS.includes(value56) ? value56 : 1280;
 }
 
 export function buildRunningHubVideoFixedSlotPayloadPatch({
@@ -529,28 +529,28 @@ export function buildRunningHubVideoFixedSlotPayloadPatch({
   nodeData: nodeData = {},
   slotEntries: slotEntries = {},
 } = {}) {
-  const value57 = String(model || nodeData?.['model'] || '')['trim'](),
+  const value57 = String(model || nodeData?.model || '').trim(),
     fixedInputSlotConfigFromManifest = getFixedInputSlotConfigFromManifest(
       { ...nodeData, model: value57 },
       { includeHiddenSlots: true },
     );
   if (!fixedInputSlotConfigFromManifest) return {};
   const runningHubVideoParameterPanelPolicy3 =
-      getRunningHubVideoParameterPanelPolicy(value57)?.['fixedSlotSummary']?.['resolver'] ===
+      getRunningHubVideoParameterPanelPolicy(value57)?.fixedSlotSummary?.resolver ===
       'berniniVideoReplaceInputMode',
     args4 = runningHubVideoParameterPanelPolicy3
       ? buildBerniniFixedSlotPayloadPatch(slotEntries)
       : buildGenericFixedSlotPayloadPatchFromEntries(slotEntries, fixedInputSlotConfigFromManifest),
-    value58 = Object['fromEntries'](
-      Object['entries'](slotEntries)
-        ['map'](([value59, value60]) => [
-          String(value59 || '')['trim'](),
-          String(value60?.['url'] || '')['trim'](),
+    value58 = Object.fromEntries(
+      Object.entries(slotEntries)
+        .map(([value59, value60]) => [
+          String(value59 || '').trim(),
+          String(value60?.url || '').trim(),
         ])
-        ['filter'](([value61, value62]) => value61 && value62),
+        .filter(([value61, value62]) => value61 && value62),
     );
   return (
-    Object['keys'](value58)['length'] && (args4['inputUrlsBySlot'] = value58),
+    Object.keys(value58).length && (args4.inputUrlsBySlot = value58),
     {
       ...args4,
       ...buildRunningHubVideoFixedSlotSummaryPatch({
@@ -563,14 +563,14 @@ export function buildRunningHubVideoFixedSlotPayloadPatch({
 }
 
 function buildCollectedMediaPayloadPatch(value63, value64 = {}) {
-  if (value63?.['extensions']?.['collectMediaInputs'] !== true) return {};
+  if (value63?.extensions?.collectMediaInputs !== true) return {};
   const run = (value65) =>
-    (Array['isArray'](value65) ? value65 : [])
-      ['map']((value66) => String(value66 || '')['trim']())
-      ['filter'](Boolean);
+    (Array.isArray(value65) ? value65 : [])
+      .map((value66) => String(value66 || '').trim())
+      .filter(Boolean);
   return {
-    inputImages: run(value64['images']),
-    inputVideos: run(value64['videos']),
-    inputAudios: run(value64['audios']),
+    inputImages: run(value64.images),
+    inputVideos: run(value64.videos),
+    inputAudios: run(value64.audios),
   };
 }

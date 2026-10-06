@@ -1,14 +1,14 @@
 import { renderStoryGenerationSpinner } from './storyAsyncButtonPresentation.js';
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#39;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
 function normalizeText(item) {
-  return String(item ?? '')['trim']();
+  return String(item ?? '').trim();
 }
 function defaultLocalPathToUrl(key) {
   return normalizeText(key);
@@ -47,52 +47,52 @@ export function createStoryClipProductionPresentation({
 } = {}) {
   function run(options = {}) {
     const list = [
-      options['posterUrl'],
-      options['thumbUrl'],
-      options['thumbnailUrl'],
-      options['coverUrl'],
-      localPathToUrl(options['posterLocalPath']),
-      localPathToUrl(options['thumbLocalPath']),
-      localPathToUrl(options['thumbnailLocalPath']),
+      options.posterUrl,
+      options.thumbUrl,
+      options.thumbnailUrl,
+      options.coverUrl,
+      localPathToUrl(options.posterLocalPath),
+      localPathToUrl(options.thumbLocalPath),
+      localPathToUrl(options.thumbnailLocalPath),
     ];
-    return list['map']((result) => normalizeText(result))['find'](isUsableImageUrl) || '';
+    return list.map((result) => normalizeText(result)).find(isUsableImageUrl) || '';
   }
   function run2(options2 = {}) {
-    const list2 = Array['isArray'](options2?.['video']?.['results'])
-      ? options2['video']['results']['filter']((data) => data && typeof data === 'object')
+    const list2 = Array.isArray(options2?.video?.results)
+      ? options2.video.results.filter((data) => data && typeof data === 'object')
       : [];
-    if (!list2['length']) return [];
-    const target = Math['max'](
+    if (!list2.length) return [];
+    const target = Math.max(
       0,
-      Math['min'](list2['length'] - 1, Math['trunc'](Number(options2?.['video']?.['activeIndex']) || 0)),
+      Math.min(list2.length - 1, Math.trunc(Number(options2?.video?.activeIndex) || 0)),
     );
-    return [list2[target], ...list2['filter']((next, current) => current !== target)]['filter'](
-      (entry) => !normalizeText(entry['error']),
+    return [list2[target], ...list2.filter((next, current) => current !== target)].filter(
+      (entry) => !normalizeText(entry.error),
     );
   }
   function resolveEpisodeCardMedia(options3 = {}) {
-    const record = Array['isArray'](options3?.['clips']) ? options3['clips'] : [];
+    const record = Array.isArray(options3?.clips) ? options3.clips : [];
     for (const payload of record) {
       for (const handle of run2(payload)) {
         const url2 = run(handle);
         if (url2) return { kind: 'image', url: url2, source: 'video-result' };
       }
     }
-    const url3 = normalizeText(options3?.['coverUrl']);
+    const url3 = normalizeText(options3?.coverUrl);
     if (isUsableImageUrl(url3)) return { kind: 'image', url: url3, source: 'episode-cover' };
     return { kind: 'empty', url: '', source: 'empty' };
   }
   function run3(options4 = {}) {
-    const response = options4['media'] || { kind: 'empty', url: '', source: 'empty' },
-      alt2 = normalizeText(options4['title']) || '第 ' + (options4['number'] || '') + ' 集';
-    if (response['kind'] === 'image')
+    const response = options4.media || { kind: 'empty', url: '', source: 'empty' },
+      alt2 = normalizeText(options4.title) || '第 ' + (options4.number || '') + ' 集';
+    if (response.kind === 'image')
       return (
         '<img class="story-episode-cover" src="' +
-        escapeHtml(response['url']) +
+        escapeHtml(response.url) +
         '" alt="' +
         escapeHtml(alt2) +
         '" data-story-episode-cover-source="' +
-        escapeHtml(response['source']) +
+        escapeHtml(response.source) +
         '" loading="lazy" decoding="async" draggable="false">'
       );
     return renderImageOrEmpty({ imageUrl: '', alt: alt2, className: 'story-episode-cover' });
@@ -224,7 +224,7 @@ export function createStoryClipProductionPresentation({
           '\n    </div>';
     return (
       '<article class="story-episode-card has-inline-actions ' +
-      (options5['posterLayout'] ? 'story-episode-card--poster' : '') +
+      (options5.posterLayout ? 'story-episode-card--poster' : '') +
       ' ' +
       (input ? 'has-developer-actions' : '') +
       ' ' +
@@ -253,82 +253,82 @@ export function createStoryClipProductionPresentation({
     );
   }
   function renderOverview(options6 = {}) {
-    if (options6['kind'] === 'card') return run4(options6['card']);
-    const list3 = Array['isArray'](options6['cards']) ? options6['cards'] : [],
-      el = options6['batchControl'] || {},
-      value5 = Math['max'](0, Math['trunc'](Number(options6['selectedCount']) || 0)),
-      value6 = el['operation'] === 'splitting-selected',
-      value7 = el['operation'] === 'splitting-all',
+    if (options6.kind === 'card') return run4(options6.card);
+    const list3 = Array.isArray(options6.cards) ? options6.cards : [],
+      el = options6.batchControl || {},
+      value5 = Math.max(0, Math.trunc(Number(options6.selectedCount) || 0)),
+      value6 = el.operation === 'splitting-selected',
+      value7 = el.operation === 'splitting-all',
       value8 = value6 || value7,
       value9 = value8
         ? '<button type="button" class="story-primary-button story-main-action-button" data-story-action="cancel-episode-split-batch" ' +
-          (el['cancelRequested'] ? 'disabled' : '') +
+          (el.cancelRequested ? 'disabled' : '') +
           ' aria-busy="true">' +
           renderStoryGenerationSpinner({ button: true }) +
-          escapeHtml(el['cancelRequested'] ? '正在停止' : '停止批量拆分') +
+          escapeHtml(el.cancelRequested ? '正在停止' : '停止批量拆分') +
           '</button>'
         : '';
     return (
       '<div class="story-episodes-page story-content-page ' +
-      (options6['experimentalMode'] ? 'is-experimental-split-mode' : '') +
+      (options6.experimentalMode ? 'is-experimental-split-mode' : '') +
       '" data-story-marquee-page-surface="episodes" data-story-experimental-mode="' +
-      Boolean(options6['experimentalMode']) +
+      Boolean(options6.experimentalMode) +
       '">\n    <header class="story-page-heading">\n      <div>\n        <span class="story-eyebrow">' +
-      escapeHtml(options6['eyebrow'] || '剧本拆分结果') +
+      escapeHtml(options6.eyebrow || '剧本拆分结果') +
       '</span>\n        <h2>' +
-      escapeHtml(options6['title'] || '分集视频') +
+      escapeHtml(options6.title || '分集视频') +
       '</h2>\n      </div>\n      <div class="story-heading-actions">\n        ' +
-      (options6['experimentalModeToggleMarkup'] || '') +
+      (options6.experimentalModeToggleMarkup || '') +
       '\n        <button type="button" class="story-secondary-button" data-story-action="toggle-all-episodes" aria-pressed="' +
-      Boolean(options6['allEpisodesSelected']) +
+      Boolean(options6.allEpisodesSelected) +
       '" ' +
-      (el['disabled'] || !list3['length'] ? 'disabled' : '') +
+      (el.disabled || !list3.length ? 'disabled' : '') +
       '>' +
-      (options6['allEpisodesSelected'] ? '取消全选' : '全选') +
+      (options6.allEpisodesSelected ? '取消全选' : '全选') +
       '</button>\n        ' +
       (value8
         ? value9
         : '<button type="button" class="story-primary-button story-main-action-button" data-story-action="' +
-          (options6['selectionMode'] ? 'split-selected-episodes' : 'split-all-episodes') +
+          (options6.selectionMode ? 'split-selected-episodes' : 'split-all-episodes') +
           '" ' +
-          (el['disabled'] || !list3['length'] ? 'disabled' : '') +
+          (el.disabled || !list3.length ? 'disabled' : '') +
           ' aria-busy="false">' +
-          (options6['selectionMode'] ? '拆分选中 (' + value5 + ')' : '批量拆分') +
+          (options6.selectionMode ? '拆分选中 (' + value5 + ')' : '批量拆分') +
           '</button>') +
       '\n      </div>\n    </header>\n    ' +
-      (options6['description'] === ''
+      (options6.description === ''
         ? ''
         : '<p class="story-page-description">' +
-          escapeHtml(options6['description'] ?? '每一集会形成一套片段脚本；确认后可创建为新的画布页面。') +
+          escapeHtml(options6.description ?? '每一集会形成一套片段脚本；确认后可创建为新的画布页面。') +
           '</p>') +
       '\n    <div class="story-episode-grid">\n      ' +
-      list3['map'](run4)['join']('') +
+      list3.map(run4).join('') +
       '\n    </div>\n    ' +
-      (options6['footerMarkup'] || '') +
+      (options6.footerMarkup || '') +
       '\n  </div>'
     );
   }
   function run5(error = {}) {
-    if (isUsableImageUrl(error['imageUrl']))
+    if (isUsableImageUrl(error.imageUrl))
       return (
         '<img class="story-episode-asset-image story-episode-library-asset-image" src="' +
-        escapeHtml(error['imageUrl']) +
+        escapeHtml(error.imageUrl) +
         '" alt="' +
-        escapeHtml(error['name']) +
+        escapeHtml(error.name) +
         '" loading="lazy" decoding="async">'
       );
     return (
       '<div class="story-episode-asset-image story-episode-library-asset-fallback" data-media-type="' +
-      escapeHtml(error['mediaKind'] || 'other') +
+      escapeHtml(error.mediaKind || 'other') +
       '" role="img" aria-label="' +
-      escapeHtml(error['name'] + '，' + error['typeLabel'] + '素材') +
+      escapeHtml(error.name + '，' + error.typeLabel + '素材') +
       '"><span>' +
-      escapeHtml(error['typeLabel']) +
+      escapeHtml(error.typeLabel) +
       '</span></div>'
     );
   }
   function run6(count = []) {
-    if (!count['length'])
+    if (!count.length)
       return {
         count: 0,
         markup:
@@ -336,50 +336,50 @@ export function createStoryClipProductionPresentation({
       };
     const map = new Map();
     return (
-      count['forEach']((value10) => {
-        const text = normalizeText(value10['sourceAssetId']) || 'ungrouped';
-        (!map['has'](text) &&
-          map['set'](text, {
-            name: normalizeText(value10['assetName']) || '未分组素材',
+      count.forEach((value10) => {
+        const text = normalizeText(value10.sourceAssetId) || 'ungrouped';
+        (!map.has(text) &&
+          map.set(text, {
+            name: normalizeText(value10.assetName) || '未分组素材',
             assets: [],
           }),
-          map['get'](text)['assets']['push'](value10));
+          map.get(text).assets.push(value10));
       }),
       {
-        count: count['length'],
-        markup: Array['from'](map['entries']())
-          ['map'](
+        count: count.length,
+        markup: Array.from(map.entries())
+          .map(
             ([value11, error2]) =>
               '<section data-story-episode-library-group="' +
               escapeHtml(value11) +
               '">\n      <h3>' +
-              escapeHtml(error2['name']) +
+              escapeHtml(error2.name) +
               ' · ' +
-              error2['assets']['length'] +
+              error2.assets.length +
               ' 项</h3>\n      <div class="story-episode-asset-grid story-episode-library-asset-grid">\n        ' +
-              error2['assets']
-                ['map'](
+              error2.assets
+                .map(
                   (error3) =>
                     '<button type="button" draggable="true" data-story-reference-asset="' +
-                    escapeHtml(error3['sourceAssetId']) +
+                    escapeHtml(error3.sourceAssetId) +
                     '" data-story-reference-asset-index="' +
-                    Math['max'](0, Math['trunc'](Number(error3['sourceItemIndex']) || 0)) +
+                    Math.max(0, Math.trunc(Number(error3.sourceItemIndex) || 0)) +
                     '" data-story-reference-source="library" data-story-reference-media-type="' +
-                    escapeHtml(error3['mediaKind']) +
+                    escapeHtml(error3.mediaKind) +
                     '" aria-label="引用总素材 ' +
-                    escapeHtml(error3['name']) +
+                    escapeHtml(error3.name) +
                     '，仅可拖入提示词">\n          ' +
                     run5(error3) +
                     '\n          <span>' +
-                    escapeHtml(error3['name']) +
+                    escapeHtml(error3.name) +
                     '</span>\n          <small>' +
-                    escapeHtml(error3['role']) +
+                    escapeHtml(error3.role) +
                     '</small>\n        </button>',
                 )
-                ['join']('') +
+                .join('') +
               '\n      </div>\n    </section>',
           )
-          ['join'](''),
+          .join(''),
       }
     );
   }
@@ -399,123 +399,123 @@ export function createStoryClipProductionPresentation({
     );
   }
   function renderAssetRail(options7 = {}) {
-    const list4 = Array['isArray'](options7['assets']) ? options7['assets'] : [],
-      list5 = Array['isArray'](options7['frames']) ? options7['frames'] : [],
-      list6 = Array['isArray'](options7['clips']) ? options7['clips'] : [],
-      value14 = ['assets', 'frames', 'library']['includes'](options7['activeTab'])
-        ? options7['activeTab']
+    const list4 = Array.isArray(options7.assets) ? options7.assets : [],
+      list5 = Array.isArray(options7.frames) ? options7.frames : [],
+      list6 = Array.isArray(options7.clips) ? options7.clips : [],
+      value14 = ['assets', 'frames', 'library'].includes(options7.activeTab)
+        ? options7.activeTab
         : 'assets',
-      value15 = run6(Array['isArray'](options7['libraryAssets']) ? options7['libraryAssets'] : []),
+      value15 = run6(Array.isArray(options7.libraryAssets) ? options7.libraryAssets : []),
       value16 = ['character', 'scene', 'prop']
-        ['map'](
+        .map(
           (value17) =>
             '<section>\n      <h3>' +
-            escapeHtml(options7['assetKindLabels']?.[value17] || value17) +
+            escapeHtml(options7.assetKindLabels?.[value17] || value17) +
             '</h3>\n      <div class="story-episode-asset-grid">\n        ' +
-            list4['filter']((value18) => value18['kind'] === value17)
-              ['map'](
+            list4.filter((value18) => value18.kind === value17)
+              .map(
                 (imageUrl2) =>
                   '<button type="button" draggable="true" data-story-reference-asset="' +
-                  escapeHtml(imageUrl2['id']) +
+                  escapeHtml(imageUrl2.id) +
                   '" aria-label="引用素材 ' +
-                  escapeHtml(imageUrl2['name']) +
+                  escapeHtml(imageUrl2.name) +
                   '，仅可拖入提示词">\n          ' +
                   renderImageOrEmpty({
-                    imageUrl: imageUrl2['imageUrl'],
-                    alt: imageUrl2['name'],
+                    imageUrl: imageUrl2.imageUrl,
+                    alt: imageUrl2.name,
                     className: 'story-episode-asset-image',
                   }) +
                   '\n          <span>' +
-                  escapeHtml(imageUrl2['name']) +
+                  escapeHtml(imageUrl2.name) +
                   '</span>\n        </button>',
               )
-              ['join']('') +
+              .join('') +
             '\n      </div>\n    </section>',
         )
-        ['join'](''),
+        .join(''),
       frames = new Map();
-    list5['forEach']((value19) => {
-      const text2 = normalizeText(value19['clipId']) || 'unassigned';
-      if (!frames['has'](text2)) frames['set'](text2, []);
-      frames['get'](text2)['push'](value19);
+    list5.forEach((value19) => {
+      const text2 = normalizeText(value19.clipId) || 'unassigned';
+      if (!frames.has(text2)) frames.set(text2, []);
+      frames.get(text2).push(value19);
     });
-    const list7 = list6['map']((value20, value21) => {
-        const clipId = normalizeText(value20?.['id']);
+    const list7 = list6.map((value20, value21) => {
+        const clipId = normalizeText(value20?.id);
         return {
           clipId: clipId,
-          label: normalizeText(value20?.['title']) || '片段 ' + (value21 + 1),
-          frames: frames['get'](clipId) || [],
+          label: normalizeText(value20?.title) || '片段 ' + (value21 + 1),
+          frames: frames.get(clipId) || [],
         };
-      })['filter']((value22) => value22['frames']['length'] > 0),
-      map2 = new Set(list7['map']((value23) => value23['clipId']));
-    frames['forEach']((frames2, clipId2) => {
-      if (map2['has'](clipId2)) return;
-      list7['push']({
+      }).filter((value22) => value22.frames.length > 0),
+      map2 = new Set(list7.map((value23) => value23.clipId));
+    frames.forEach((frames2, clipId2) => {
+      if (map2.has(clipId2)) return;
+      list7.push({
         clipId: clipId2,
-        label: normalizeText(frames2[0]?.['clipTitle']) || '其他片段',
+        label: normalizeText(frames2[0]?.clipTitle) || '其他片段',
         frames: frames2,
       });
     });
-    const value24 = list7['length']
-      ? list7['map'](
+    const value24 = list7.length
+      ? list7.map(
           (value25) =>
             '<section class="story-episode-frame-section" data-story-clip-frame-group="' +
-            escapeHtml(value25['clipId']) +
+            escapeHtml(value25.clipId) +
             '">\n        <h3>' +
-            escapeHtml(value25['label']) +
+            escapeHtml(value25.label) +
             ' · ' +
-            value25['frames']['length'] +
+            value25.frames.length +
             ' 项</h3>\n        <div class="story-episode-asset-grid story-episode-frame-grid">\n          ' +
-            value25['frames']
-              ['map']((imageUrl3) => {
-                const value26 = imageUrl3['mediaType'] === 'video',
-                  value27 = '删除' + (value26 ? '视频片段' : '片段帧') + ' ' + imageUrl3['name'],
+            value25.frames
+              .map((imageUrl3) => {
+                const value26 = imageUrl3.mediaType === 'video',
+                  value27 = '删除' + (value26 ? '视频片段' : '片段帧') + ' ' + imageUrl3.name,
                   value28 = value26
                     ? '<div class="story-episode-frame-video-wrap">\n                  <video class="story-episode-asset-image story-episode-frame-video" src="' +
-                      escapeHtml(imageUrl3['mediaUrl']) +
+                      escapeHtml(imageUrl3.mediaUrl) +
                       '"' +
-                      (imageUrl3['imageUrl']
-                        ? ' poster="' + escapeHtml(imageUrl3['imageUrl']) + '"'
+                      (imageUrl3.imageUrl
+                        ? ' poster="' + escapeHtml(imageUrl3.imageUrl) + '"'
                         : '') +
                       ' muted playsinline preload="metadata" aria-label="' +
-                      escapeHtml(imageUrl3['name']) +
+                      escapeHtml(imageUrl3.name) +
                       '"></video>\n                  <span class="story-episode-frame-video-badge" aria-hidden="true">视频</span>\n                </div>'
                     : renderImageOrEmpty({
-                        imageUrl: imageUrl3['imageUrl'],
-                        alt: imageUrl3['name'],
+                        imageUrl: imageUrl3.imageUrl,
+                        alt: imageUrl3.name,
                         className: 'story-episode-asset-image story-episode-frame-image',
                       });
                 return (
                   '<div class="story-episode-frame-card">\n              <button type="button" draggable="true" data-story-reference-asset="' +
-                  escapeHtml(imageUrl3['mentionId']) +
+                  escapeHtml(imageUrl3.mentionId) +
                   '" data-story-reference-frame="' +
-                  escapeHtml(imageUrl3['id']) +
+                  escapeHtml(imageUrl3.id) +
                   '" data-story-reference-media-type="' +
-                  escapeHtml(imageUrl3['mediaType']) +
+                  escapeHtml(imageUrl3.mediaType) +
                   '" aria-label="引用' +
                   (value26 ? '裁剪视频' : '片段帧') +
                   ' ' +
-                  escapeHtml(imageUrl3['name']) +
+                  escapeHtml(imageUrl3.name) +
                   '，仅可拖入提示词" aria-busy="' +
-                  (imageUrl3['captureSavePending'] === true) +
+                  (imageUrl3.captureSavePending === true) +
                   '">\n                ' +
                   value28 +
                   '\n                <span>' +
-                  escapeHtml(imageUrl3['name']) +
+                  escapeHtml(imageUrl3.name) +
                   '</span>\n              </button>\n              <button type="button" class="story-action-icon-button is-danger story-project-delete-trigger story-card-delete-button story-episode-frame-delete-trigger" data-story-action="delete-clip-frame" data-story-clip-frame-id="' +
-                  escapeHtml(imageUrl3['id']) +
+                  escapeHtml(imageUrl3.id) +
                   '" aria-label="' +
                   escapeHtml(value27) +
                   '" ' +
-                  (imageUrl3['captureSavePending'] === true ? 'disabled' : '') +
+                  (imageUrl3.captureSavePending === true ? 'disabled' : '') +
                   '>' +
                   renderDeleteIcon() +
                   '</button>\n            </div>'
                 );
               })
-              ['join']('') +
+              .join('') +
             '\n        </div>\n      </section>',
-        )['join']('')
+        ).join('')
       : '<div class="story-episode-asset-empty">\n        <strong>还没有片段帧</strong>\n        <span>在右侧视频预览中截取当前帧，或点击裁剪按钮提取视频片段。</span>\n      </div>';
     return (
       '<aside class="story-episode-assets" data-story-episode-asset-rail data-active-tab="' +
@@ -527,7 +527,7 @@ export function createStoryClipProductionPresentation({
       '">\n          ' +
       run7('assets') +
       '<span class="story-episode-asset-tab-label">本集素材</span><span class="story-episode-asset-count" data-story-episode-asset-count="assets">' +
-      list4['length'] +
+      list4.length +
       '</span>\n        </button>\n        <button type="button" class="' +
       (value14 === 'frames' ? 'is-active' : '') +
       '" data-story-episode-asset-tab="frames" role="tab" aria-selected="' +
@@ -535,7 +535,7 @@ export function createStoryClipProductionPresentation({
       '">\n          ' +
       run7('frames') +
       '<span class="story-episode-asset-tab-label">片段帧</span><span class="story-episode-asset-count" data-story-episode-asset-count="frames">' +
-      list5['length'] +
+      list5.length +
       '</span>\n        </button>\n        <button type="button" class="' +
       (value14 === 'library' ? 'is-active' : '') +
       '" data-story-episode-asset-tab="library" role="tab" aria-selected="' +
@@ -543,9 +543,9 @@ export function createStoryClipProductionPresentation({
       '">\n          ' +
       run7('library') +
       '<span class="story-episode-asset-tab-label">总素材</span><span class="story-episode-asset-count" data-story-episode-asset-count="library">' +
-      value15['count'] +
+      value15.count +
       '</span>\n        </button>\n      </div>\n      <small data-story-episode-asset-help>' +
-      escapeHtml(options7['helpText']) +
+      escapeHtml(options7.helpText) +
       '</small>\n    </header>\n    <div class="story-episode-asset-rail-viewport">\n      <div class="story-episode-asset-rail-track" data-story-episode-asset-rail-track>\n        <div class="story-episode-asset-rail-page ' +
       (value14 === 'assets' ? 'is-active' : '') +
       '" data-story-episode-asset-panel="assets" role="tabpanel" aria-hidden="' +
@@ -563,50 +563,50 @@ export function createStoryClipProductionPresentation({
       '" data-story-episode-asset-panel="library" role="tabpanel" aria-hidden="' +
       (value14 !== 'library') +
       '">\n          ' +
-      value15['markup'] +
+      value15.markup +
       '\n        </div>\n      </div>\n    </div>\n  </aside>'
     );
   }
   function renderDetail(options8 = {}) {
-    const box = options8['ratios'] || { left: 24, center: 44 },
+    const box = options8.ratios || { left: 24, center: 44 },
       value29 =
         '<div class="story-episode-detail-page">\n    ' +
-        (options8['assetRailMarkup'] || '') +
+        (options8.assetRailMarkup || '') +
         '\n    <div class="story-episode-splitter story-episode-splitter--assets panel-resize-handle panel-resize-handle--transient" data-story-episode-splitter="assets" role="separator" aria-orientation="vertical" aria-label="调整本集素材区域宽度" aria-valuemin="14" aria-valuemax="34" aria-valuenow="' +
-        Math['round'](Number(box['left']) || 0) +
+        Math.round(Number(box.left) || 0) +
         '" tabindex="0"></div>\n    <section class="story-clip-editor">\n      <header>\n        <h2>' +
-        escapeHtml(options8['title'] || '片段脚本') +
+        escapeHtml(options8.title || '片段脚本') +
         '</h2>\n      </header>\n      <div class="story-clip-context-row">\n        <div class="story-clip-meta">\n          ' +
-        (Array['isArray'](options8['clipMeta']) ? options8['clipMeta'] : [])
-          ['map']((value30) => '<span>' + escapeHtml(value30) + '</span>')
-          ['join']('') +
+        (Array.isArray(options8.clipMeta) ? options8.clipMeta : [])
+          .map((value30) => '<span>' + escapeHtml(value30) + '</span>')
+          .join('') +
         '\n        </div>\n        ' +
-        (options8['referenceSummary'] || '') +
+        (options8.referenceSummary || '') +
         '\n      </div>\n      ' +
-        (options8['promptSurface'] || '') +
+        (options8.promptSurface || '') +
         '\n    </section>\n    <div class="story-episode-splitter story-episode-splitter--preview panel-resize-handle panel-resize-handle--transient" data-story-episode-splitter="preview" role="separator" aria-orientation="vertical" aria-label="调整脚本与视频结果区域宽度" aria-valuemin="38" aria-valuemax="76" aria-valuenow="' +
-        Math['round']((Number(box['left']) || 0) + (Number(box['center']) || 0)) +
+        Math.round((Number(box.left) || 0) + (Number(box.center) || 0)) +
         '" tabindex="0"></div>\n    <section class="story-video-preview" data-story-clip-navigation="' +
-        Boolean(options8['hasMultipleClips']) +
+        Boolean(options8.hasMultipleClips) +
         '" ' +
-        (options8['hasMultipleClips']
+        (options8.hasMultipleClips
           ? 'tabindex="0" aria-label="滚动鼠标滚轮或按左右方向键切换上一幕、下一幕"'
           : '') +
         '>\n      ' +
-        (options8['navigationMarkup'] || '') +
+        (options8.navigationMarkup || '') +
         '\n      <div class="story-clip-preview-slide" data-story-clip-preview-slide>\n        ' +
-        (options8['videoPreview'] || '') +
+        (options8.videoPreview || '') +
         '\n      </div>\n    </section>\n    ' +
-        (options8['timeline'] || '') +
+        (options8.timeline || '') +
         '\n  </div>';
-    return options8['episodeRailMarkup']
+    return options8.episodeRailMarkup
       ? '<div class="workspace-episode-production story-replication-episode-production" data-story-replication-episode-production>' +
-          options8['episodeRailMarkup'] +
+          options8.episodeRailMarkup +
           value29 +
           '</div>'
       : value29;
   }
-  return Object['freeze']({
+  return Object.freeze({
     renderAssetRail: renderAssetRail,
     renderDetail: renderDetail,
     renderOverview: renderOverview,

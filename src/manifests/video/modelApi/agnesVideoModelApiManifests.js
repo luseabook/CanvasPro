@@ -264,13 +264,13 @@ const AGNES_VIDEO_FRAME_RATE = 24,
   AGNES_VIDEO_MIN_SECONDS = 2,
   AGNES_VIDEO_MIN_FRAMES = AGNES_VIDEO_MIN_SECONDS * AGNES_VIDEO_FRAME_RATE + 1,
   AGNES_VIDEO_MAX_FRAMES = 441,
-  AGNES_VIDEO_MAX_SECONDS = Number(((AGNES_VIDEO_MAX_FRAMES - 1) / AGNES_VIDEO_FRAME_RATE)['toFixed'](1)),
-  AGNES_VIDEO_DURATION_VALUES = Object['freeze']([
-    ...Array['from'](
-      { length: Math['floor'](AGNES_VIDEO_MAX_SECONDS) - AGNES_VIDEO_MIN_SECONDS + 1 },
+  AGNES_VIDEO_MAX_SECONDS = Number(((AGNES_VIDEO_MAX_FRAMES - 1) / AGNES_VIDEO_FRAME_RATE).toFixed(1)),
+  AGNES_VIDEO_DURATION_VALUES = Object.freeze([
+    ...Array.from(
+      { length: Math.floor(AGNES_VIDEO_MAX_SECONDS) - AGNES_VIDEO_MIN_SECONDS + 1 },
       (value, item) => AGNES_VIDEO_MIN_SECONDS + item,
     ),
-    ...(Number['isInteger'](AGNES_VIDEO_MAX_SECONDS) ? [] : [AGNES_VIDEO_MAX_SECONDS]),
+    ...(Number.isInteger(AGNES_VIDEO_MAX_SECONDS) ? [] : [AGNES_VIDEO_MAX_SECONDS]),
   ]),
   AGNES_VIDEO_HELP_TOOLTIP =
     'Agnes Video 用法\n' +
@@ -280,7 +280,7 @@ const AGNES_VIDEO_FRAME_RATE = 24,
     '上传首帧和尾帧：按开始和结尾自动补出顺滑变化。',
   AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT =
     'low quality, blurry, distorted, deformed, bad anatomy, extra limbs, extra fingers, watermark, text, logo',
-  AGNES_VIDEO_RATIO_FIELD = Object['freeze']({
+  AGNES_VIDEO_RATIO_FIELD = Object.freeze({
     ...createAspectRatioField({ defaultValue: '3:2', options: ['3:2', '16:9', '9:16', '1:1', '4:3', '3:4'] }),
     variant: 'ratioPill',
   }),
@@ -294,13 +294,13 @@ const AGNES_VIDEO_FRAME_RATE = 24,
     defaultValue: 5,
     label: '视频时长',
   }),
-  AGNES_VIDEO_NEGATIVE_PROMPT_FIELD = Object['freeze']({
+  AGNES_VIDEO_NEGATIVE_PROMPT_FIELD = Object.freeze({
     ...VIDEO_NEGATIVE_PROMPT_FIELD,
     defaultValue: AGNES_VIDEO_NEGATIVE_PROMPT_DEFAULT,
     description:
       '默认已填常规排除项，会尽量避开低画质、模糊、变形、水印和多余文字。你也可以改成自己的要求；留空或 none 表示不额外限制。',
   }),
-  AGNES_VIDEO_INFERENCE_STEPS_FIELD = Object['freeze']({
+  AGNES_VIDEO_INFERENCE_STEPS_FIELD = Object.freeze({
     id: 'num_inference_steps',
     type: 'text',
     placement: 'advanced',
@@ -310,7 +310,7 @@ const AGNES_VIDEO_FRAME_RATE = 24,
       '普通用户保持默认就好。想让画面多打磨几轮，可以填整数；数值越高通常越慢。留空或 none 使用模型默认。',
     defaultValue: 'none',
   }),
-  AGNES_VIDEO_FRAME_RATE_FIELD = Object['freeze']({
+  AGNES_VIDEO_FRAME_RATE_FIELD = Object.freeze({
     id: 'frame_rate',
     type: 'stepper',
     placement: 'advanced',
@@ -327,15 +327,15 @@ const AGNES_VIDEO_FRAME_RATE = 24,
     image: 2,
     video: 0,
     audio: 0,
-    fixedSlots: Object['freeze']([
-      Object['freeze']({
+    fixedSlots: Object.freeze([
+      Object.freeze({
         id: 'firstFrame',
         kind: 'image',
         label: '首帧图',
         description: '可选。放入后作为图生视频参考；同时放尾帧时作为开始画面。',
         required: false,
       }),
-      Object['freeze']({
+      Object.freeze({
         id: 'lastFrame',
         kind: 'image',
         label: '尾帧图',
@@ -345,43 +345,43 @@ const AGNES_VIDEO_FRAME_RATE = 24,
     ]),
   }),
   AGNES_VIDEO_BODY_MAPPING = createApimartVideoBodyMapping([
-    Object['freeze']({
+    Object.freeze({
       path: 'width',
       from: 'param',
-      field: Object['freeze'](['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
+      field: Object.freeze(['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
       defaultValue: '3:2',
       transform: 'agnesVideoWidth',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'height',
       from: 'param',
-      field: Object['freeze'](['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
+      field: Object.freeze(['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
       defaultValue: '3:2',
       transform: 'agnesVideoHeight',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'frame_rate',
       from: 'param',
-      field: Object['freeze']([
+      field: Object.freeze([
         'generationParams.frame_rate',
         'generationParams.frameRate',
         'frame_rate',
         'frameRate',
       ]),
       defaultValue: AGNES_VIDEO_FRAME_RATE,
-      transform: Object['freeze']({
+      transform: Object.freeze({
         name: 'agnesVideoFrameRate',
         min: 1,
         max: 60,
         fallback: AGNES_VIDEO_FRAME_RATE,
       }),
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'num_frames',
       from: 'param',
-      field: Object['freeze'](['generationParams.duration', 'duration']),
+      field: Object.freeze(['generationParams.duration', 'duration']),
       defaultValue: 5,
-      transform: Object['freeze']({
+      transform: Object.freeze({
         name: 'agnesVideoNumFrames',
         frameRate: AGNES_VIDEO_FRAME_RATE,
         frameRateMin: 1,
@@ -390,12 +390,12 @@ const AGNES_VIDEO_FRAME_RATE = 24,
         max: AGNES_VIDEO_MAX_FRAMES,
       }),
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'seed',
       from: 'param',
-      field: Object['freeze'](['generationParams.seed', 'seed']),
+      field: Object.freeze(['generationParams.seed', 'seed']),
       defaultValue: '8888',
-      transform: Object['freeze']({
+      transform: Object.freeze({
         name: 'agnesVideoSeed',
         modeField: 'seed_mode',
         defaultMode: 'random',
@@ -404,10 +404,10 @@ const AGNES_VIDEO_FRAME_RATE = 24,
       }),
       omitWhenEmpty: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'negative_prompt',
       from: 'param',
-      field: Object['freeze']([
+      field: Object.freeze([
         'generationParams.negative_prompt',
         'generationParams.negativePrompt',
         'negative_prompt',
@@ -417,10 +417,10 @@ const AGNES_VIDEO_FRAME_RATE = 24,
       transform: 'apimartOptionalText',
       omitWhenEmpty: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'num_inference_steps',
       from: 'param',
-      field: Object['freeze']([
+      field: Object.freeze([
         'generationParams.num_inference_steps',
         'generationParams.numInferenceSteps',
         'num_inference_steps',
@@ -430,15 +430,15 @@ const AGNES_VIDEO_FRAME_RATE = 24,
       transform: 'apimartOptionalInteger',
       omitWhenEmpty: true,
     }),
-    Object['freeze']({ path: 'extra_body.image', from: 'inputImages', omitWhenEmpty: true }),
+    Object.freeze({ path: 'extra_body.image', from: 'inputImages', omitWhenEmpty: true }),
   ]),
-  AGNES_VIDEO_RESPONSE_MAPPING = Object['freeze']({
-    taskIdPath: Object['freeze'](['video_id', 'data.video_id']),
+  AGNES_VIDEO_RESPONSE_MAPPING = Object.freeze({
+    taskIdPath: Object.freeze(['video_id', 'data.video_id']),
     statusPath: 'status',
-    errorPath: Object['freeze'](['error.message', 'message', 'error']),
-    resultPaths: Object['freeze'](['metadata.url']),
+    errorPath: Object.freeze(['error.message', 'message', 'error']),
+    resultPaths: Object.freeze(['metadata.url']),
   }),
-  AGNES_VIDEO_TASK_POLLING = Object['freeze']({
+  AGNES_VIDEO_TASK_POLLING = Object.freeze({
     mode: 'task-proxy',
     method: 'GET',
     pollIntervalMs: 30 * 1000,
@@ -446,31 +446,31 @@ const AGNES_VIDEO_FRAME_RATE = 24,
     continuePollingOnSuccessWithoutResult: true,
     urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=agnes-video-v2.0',
     headersMode: 'bearer',
-    transportErrorPolicy: Object['freeze']({
+    transportErrorPolicy: Object.freeze({
       maxConsecutiveErrors: 3,
-      retryableStatuses: Object['freeze']([
+      retryableStatuses: Object.freeze([
         408, 425, 429, 500, 502, 503, 504, 520, 522, 524,
       ]),
-      terminalStatuses: Object['freeze']([400, 401, 403, 404, 405, 409, 410, 413, 422]),
+      terminalStatuses: Object.freeze([400, 401, 403, 404, 405, 409, 410, 413, 422]),
       surfaceLastError: true,
     }),
   }),
-  AGNES_VIDEO_25_MODE_FIELD = Object['freeze']({
+  AGNES_VIDEO_25_MODE_FIELD = Object.freeze({
     id: 'mode',
     type: 'segmented',
     placement: 'mode',
     variant: 'sectionMenu',
     label: '生成模式',
     defaultValue: 'keyframe',
-    options: Object['freeze']([
-      Object['freeze']({ value: 'keyframe', label: '首尾帧' }),
-      Object['freeze']({ value: 'reference', label: '多模态参考' }),
+    options: Object.freeze([
+      Object.freeze({ value: 'keyframe', label: '首尾帧' }),
+      Object.freeze({ value: 'reference', label: '多模态参考' }),
     ]),
   }),
-  AGNES_VIDEO_25_RATIO_FIELD = Object['freeze']({
+  AGNES_VIDEO_25_RATIO_FIELD = Object.freeze({
     ...VIDEO_RATIO_FIELD,
     defaultValue: '16:9',
-    options: Object['freeze'](['21:9', '16:9', '4:3', '1:1', '3:4', '9:16']['map'](freezeOption)),
+    options: Object.freeze(['21:9', '16:9', '4:3', '1:1', '3:4', '9:16'].map(freezeOption)),
     variant: 'ratioPill',
   }),
   AGNES_VIDEO_25_RESOLUTION_FIELD = createResolutionField({
@@ -496,14 +496,14 @@ function createAgnesVideo25FixedSlot({
   mode: mode,
   displayOrder: displayOrder,
 }) {
-  return Object['freeze']({
+  return Object.freeze({
     id: id,
     kind: kind,
     label: label,
     description: description,
     displayOrder: displayOrder,
     required: false,
-    showWhen: Object['freeze']({ field: 'mode', value: mode }),
+    showWhen: Object.freeze({ field: 'mode', value: mode }),
   });
 }
 function createAgnesVideo25InputSlots({ flash: flash = false } = {}) {
@@ -543,7 +543,7 @@ function createAgnesVideo25InputSlots({ flash: flash = false } = {}) {
   ];
   return (
     !flash &&
-      key['splice'](
+      key.splice(
         3,
         0,
         createAgnesVideo25FixedSlot({
@@ -559,52 +559,52 @@ function createAgnesVideo25InputSlots({ flash: flash = false } = {}) {
       image: flash ? 5 : 9,
       video: flash ? 0 : 3,
       audio: 3,
-      fixedSlots: Object['freeze'](key),
+      fixedSlots: Object.freeze(key),
       cycleFixedInputWhenFull: true,
       preserveHiddenInputsByKind: true,
       preserveHiddenInputsByKindFields: ['mode'],
-      policyVariants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'mode', value: 'keyframe' }),
-          allowedKinds: Object['freeze'](['text', 'image']),
-          maxByKind: Object['freeze']({ image: 2, video: 0, audio: 0 }),
+      policyVariants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'mode', value: 'keyframe' }),
+          allowedKinds: Object.freeze(['text', 'image']),
+          maxByKind: Object.freeze({ image: 2, video: 0, audio: 0 }),
         }),
       ]),
     })
   );
 }
 const AGNES_VIDEO_25_BODY_MAPPING = createApimartVideoBodyMapping([
-  Object['freeze']({
+  Object.freeze({
     path: 'mode',
     from: 'param',
-    field: Object['freeze'](['generationParams.mode', 'mode']),
+    field: Object.freeze(['generationParams.mode', 'mode']),
     defaultValue: 'keyframe',
   }),
-  Object['freeze']({
+  Object.freeze({
     path: 'seconds',
     from: 'param',
-    field: Object['freeze'](['generationParams.duration', 'duration']),
+    field: Object.freeze(['generationParams.duration', 'duration']),
     defaultValue: 5,
     transform: 'stringParam',
   }),
-  Object['freeze']({
+  Object.freeze({
     path: 'size',
     from: 'param',
-    field: Object['freeze'](['generationParams.resolution', 'resolution']),
+    field: Object.freeze(['generationParams.resolution', 'resolution']),
     defaultValue: '720P',
   }),
-  Object['freeze']({
+  Object.freeze({
     path: 'aspect_ratio',
     from: 'param',
-    field: Object['freeze'](['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
+    field: Object.freeze(['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
     defaultValue: '16:9',
   }),
-  Object['freeze']({
+  Object.freeze({
     path: 'seed',
     from: 'param',
-    field: Object['freeze'](['generationParams.seed', 'seed']),
+    field: Object.freeze(['generationParams.seed', 'seed']),
     defaultValue: '8888',
-    transform: Object['freeze']({
+    transform: Object.freeze({
       name: 'agnesVideoSeed',
       modeField: 'seed_mode',
       defaultMode: 'random',
@@ -613,10 +613,10 @@ const AGNES_VIDEO_25_BODY_MAPPING = createApimartVideoBodyMapping([
     }),
     omitWhenEmpty: true,
   }),
-  Object['freeze']({ path: 'n', from: 'constant', value: 1 }),
+  Object.freeze({ path: 'n', from: 'constant', value: 1 }),
 ]);
 function createAgnesVideo25TaskPolling(index) {
-  return Object['freeze']({
+  return Object.freeze({
     ...AGNES_VIDEO_TASK_POLLING,
     pollIntervalMs: 2 * 1000,
     urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=' + index,
@@ -625,7 +625,7 @@ function createAgnesVideo25TaskPolling(index) {
 function createAgnesVideo25Manifest({ flash: flash = false } = {}) {
   const model = flash ? 'agnes-video-2.5-flash' : 'agnes-video-2.5',
     displayName = flash ? 'Agnes Video 2.5 Flash' : 'Agnes Video 2.5';
-  return Object['freeze']({
+  return Object.freeze({
     modelId: 'agnes/' + model,
     executionId: 'agnes.model-api.video.' + model + '.v1',
     displayName: displayName,
@@ -637,7 +637,7 @@ function createAgnesVideo25Manifest({ flash: flash = false } = {}) {
     description: flash
       ? 'Agnes AI fast text, keyframe and multimodal-reference video API'
       : 'Agnes AI text, keyframe and multimodal-reference video API',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       AGNES_VIDEO_25_MODE_FIELD,
       flash ? AGNES_VIDEO_25_FLASH_RESOLUTION_FIELD : AGNES_VIDEO_25_RESOLUTION_FIELD,
       AGNES_VIDEO_25_RATIO_FIELD,
@@ -649,51 +649,51 @@ function createAgnesVideo25Manifest({ flash: flash = false } = {}) {
     responseMapping: AGNES_VIDEO_RESPONSE_MAPPING,
     taskPolling: createAgnesVideo25TaskPolling(model),
     resultTaskIdPath: 'video_id',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'agnesVideo25',
       strictInputCounts: true,
       strictUiSchemaParams: true,
-      agnesVideo25: Object['freeze']({
+      agnesVideo25: Object.freeze({
         maxReferenceImages: flash ? 5 : 9,
         maxReferenceVideos: flash ? 0 : 3,
         maxReferenceAudios: 3,
       }),
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: '不放入图片时直接描述主体、动作、场景和镜头；放入首帧或尾帧时描述画面如何运动或过渡。',
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'mode', value: 'keyframe' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'mode', value: 'keyframe' }),
           placeholder: '描述首帧到尾帧之间的动作、转场和镜头变化。',
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'mode', value: 'reference' }),
           placeholder: flash
             ? '使用 <Picture N> / <Audio N> 说明参考素材的用途。'
             : '使用 <Picture N> / <Audio N> / <Video N> 说明参考素材的用途。',
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: flash
         ? 'Agnes Video 2.5 Flash 支持文生视频、首尾帧与图片/音频参考；固定 720P，参考图最多 5 张。'
         : 'Agnes Video 2.5 支持文生视频、首尾帧以及图片、音频、视频多模态参考；时长 4-12 秒。',
     }),
-    extensions: Object['freeze']({
+    extensions: Object.freeze({
       providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
-      storyWorkspace: Object['freeze']({ defaultGenerationParams: Object['freeze']({ mode: 'reference' }) }),
-      videoMenu: Object['freeze']({
+      storyWorkspace: Object.freeze({ defaultGenerationParams: Object.freeze({ mode: 'reference' }) }),
+      videoMenu: Object.freeze({
         role: 'agnesModel',
         order: flash ? 30 : 20,
         label: displayName,
         subtitle: flash ? '高速 · 720P' : '多模态 · 最高 2K',
       }),
-      videoInputSurface: Object['freeze']({ hideFixedInputSlots: true }),
+      videoInputSurface: Object.freeze({ hideFixedInputSlots: true }),
     }),
   });
 }
-export const AGNES_VIDEO_MODELS = Object['freeze']([
-  Object['freeze']({
+export const AGNES_VIDEO_MODELS = Object.freeze([
+  Object.freeze({
     modelId: 'agnes/agnes-video-v2.0',
     executionId: 'agnes.model-api.video.agnes-video-v2.v1',
     displayName: 'Agnes Video V2.0',
@@ -703,7 +703,7 @@ export const AGNES_VIDEO_MODELS = Object['freeze']([
     endpoint: '/v1/videos',
     endpointMode: 'video-generation',
     description: 'Agnes AI text-to-video and image-to-video model API',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       AGNES_VIDEO_RESOLUTION_FIELD,
       AGNES_VIDEO_RATIO_FIELD,
       AGNES_VIDEO_DURATION_FIELD,
@@ -717,14 +717,14 @@ export const AGNES_VIDEO_MODELS = Object['freeze']([
     responseMapping: AGNES_VIDEO_RESPONSE_MAPPING,
     taskPolling: AGNES_VIDEO_TASK_POLLING,
     resultTaskIdPath: 'video_id',
-    executionExtensions: Object['freeze']({ bodyResolver: 'agnesVideo' }),
-    prompt: Object['freeze']({
+    executionExtensions: Object.freeze({ bodyResolver: 'agnesVideo' }),
+    prompt: Object.freeze({
       placeholder: '写清楚谁或什么、在哪里、做什么、镜头怎么动；放入首帧/尾帧时说明画面如何运动或过渡。',
     }),
-    help: Object['freeze']({ tooltip: AGNES_VIDEO_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
+    help: Object.freeze({ tooltip: AGNES_VIDEO_HELP_TOOLTIP }),
+    extensions: Object.freeze({
       providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
-      videoMenu: Object['freeze']({
+      videoMenu: Object.freeze({
         role: 'agnesModel',
         order: 10,
         label: 'Agnes Video V2.0',

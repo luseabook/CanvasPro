@@ -1,7 +1,7 @@
 import { resolveAssetMentionRef } from './assetMentionRegistry.js';
 import { normalizeInputKind, resolveEffectiveInputKind } from './modelInputPolicy.js';
 import { sanitizePromptHtml } from '../utils/dom.js';
-const PROMPT_MENTION_TYPE_MAP = Object['freeze']({
+const PROMPT_MENTION_TYPE_MAP = Object.freeze({
   text: 'text',
   'source-text': 'text',
   'ai-text': 'text',
@@ -17,40 +17,40 @@ const PROMPT_MENTION_TYPE_MAP = Object['freeze']({
 });
 export const PROMPT_ASSET_INPUT_REFS_FIELD = 'promptAssetInputRefs';
 export function normalizePromptMentionType(value) {
-  const item = String(value || '')['trim']();
+  const item = String(value || '').trim();
   return normalizeInputKind(PROMPT_MENTION_TYPE_MAP[item] || item);
 }
 export function normalizePromptAssetInputRefRecord(enabled = {}) {
   if (!enabled || typeof enabled !== 'object') return null;
-  const assetId = String(enabled['assetId'] || '')['trim'](),
+  const assetId = String(enabled.assetId || '').trim(),
     key =
-      enabled['itemIndex'] !== undefined && enabled['itemIndex'] !== null
-        ? enabled['itemIndex']
-        : enabled['assetIndex'],
+      enabled.itemIndex !== undefined && enabled.itemIndex !== null
+        ? enabled.itemIndex
+        : enabled.assetIndex,
     index = Number(key),
-    type = normalizePromptMentionType(enabled['type']);
-  if (!assetId || !Number['isFinite'](index) || !type || type === 'text') return null;
-  return { assetId: assetId, itemIndex: Math['max'](0, Math['trunc'](index)), type: type };
+    type = normalizePromptMentionType(enabled.type);
+  if (!assetId || !Number.isFinite(index) || !type || type === 'text') return null;
+  return { assetId: assetId, itemIndex: Math.max(0, Math.trunc(index)), type: type };
 }
 export function getPromptAssetInputRefRecords(options = {}) {
   const list = options?.[PROMPT_ASSET_INPUT_REFS_FIELD];
-  if (!Array['isArray'](list)) return [];
-  return list['map']((result) => normalizePromptAssetInputRefRecord(result))['filter'](Boolean);
+  if (!Array.isArray(list)) return [];
+  return list.map((result) => normalizePromptAssetInputRefRecord(result)).filter(Boolean);
 }
 function getPillDatasetValue(el, data, target = '') {
-  const source = String(el?.['dataset']?.[data] || '')['trim']();
+  const source = String(el?.dataset?.[data] || '').trim();
   if (source) return source;
-  if (target && typeof el?.['getAttribute'] === 'function')
-    return String(el['getAttribute'](target) || '')['trim']();
+  if (target && typeof el?.getAttribute === 'function')
+    return String(el.getAttribute(target) || '').trim();
   return '';
 }
 function isRefPillNode(el2) {
   if (!el2) return false;
-  if (typeof el2['classList']?.['contains'] === 'function') return el2['classList']['contains']('ref-pill');
-  return String(el2['className'] || '')
-    ['split'](/\s+/)
-    ['filter'](Boolean)
-    ['includes']('ref-pill');
+  if (typeof el2.classList?.contains === 'function') return el2.classList.contains('ref-pill');
+  return String(el2.className || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .includes('ref-pill');
 }
 function isAssetMentionPill(next) {
   return getPillDatasetValue(next, 'refOrigin', 'data-ref-origin') === 'asset';
@@ -60,12 +60,12 @@ export function getAssetMentionRefFromPillNode(current) {
   const assetId2 = getPillDatasetValue(current, 'assetId', 'data-asset-id'),
     pillDatasetValue = getPillDatasetValue(current, 'assetIndex', 'data-asset-index'),
     itemIndex = Number(pillDatasetValue);
-  if (!assetId2 || !Number['isFinite'](itemIndex)) return null;
+  if (!assetId2 || !Number.isFinite(itemIndex)) return null;
   return resolveAssetMentionRef({ assetId: assetId2, itemIndex: itemIndex });
 }
 function normalizeAllowedMentionTypes(list2 = null) {
-  return Array['isArray'](list2) && list2['length']
-    ? new Set(list2['map']((entry) => normalizePromptMentionType(entry))['filter'](Boolean))
+  return Array.isArray(list2) && list2.length
+    ? new Set(list2.map((entry) => normalizePromptMentionType(entry)).filter(Boolean))
     : null;
 }
 function appendResolvedAssetInputRefFromRecord(
@@ -78,28 +78,28 @@ function appendResolvedAssetInputRefFromRecord(
     promptAssetRefIndex: promptAssetRefIndex = null,
   } = {},
 ) {
-  const assetId3 = String(record?.['assetId'] || '')['trim'](),
+  const assetId3 = String(record?.assetId || '').trim(),
     payload =
-      record?.['itemIndex'] !== undefined && record?.['itemIndex'] !== null
-        ? record['itemIndex']
-        : record?.['assetIndex'],
+      record?.itemIndex !== undefined && record?.itemIndex !== null
+        ? record.itemIndex
+        : record?.assetIndex,
     handle = Number(payload),
-    type2 = resolveEffectiveInputKind(record) || normalizePromptMentionType(record?.['type']);
-  if (!assetId3 || !Number['isFinite'](handle) || !type2 || (allowed && !allowed['has'](type2))) return false;
-  const itemIndex2 = Math['max'](0, Math['trunc'](handle)),
+    type2 = resolveEffectiveInputKind(record) || normalizePromptMentionType(record?.type);
+  if (!assetId3 || !Number.isFinite(handle) || !type2 || (allowed && !allowed.has(type2))) return false;
+  const itemIndex2 = Math.max(0, Math.trunc(handle)),
     response = resolveAssetMentionRef({ assetId: assetId3, itemIndex: itemIndex2 });
   if (!response) return false;
   const effectiveInputKind =
-    resolveEffectiveInputKind(response) || normalizePromptMentionType(response['type'] || type2);
+    resolveEffectiveInputKind(response) || normalizePromptMentionType(response.type || type2);
   if (!effectiveInputKind || effectiveInputKind !== type2) return false;
   if (type2 === 'text') {
-    if (!String(response['content'] || '')['trim']()) return false;
+    if (!String(response.content || '').trim()) return false;
   } else {
-    if (!String(response['url'] || '')['trim']()) return false;
+    if (!String(response.url || '').trim()) return false;
   }
   const state = assetId3 + ':' + itemIndex2 + ':' + type2,
-    assetMentionOccurrence = map['get'](state) || 0;
-  map['set'](state, assetMentionOccurrence + 1);
+    assetMentionOccurrence = map.get(state) || 0;
+  map.set(state, assetMentionOccurrence + 1);
   const config = {
     ...response,
     type: type2,
@@ -107,33 +107,33 @@ function appendResolvedAssetInputRefFromRecord(
     assetRefSource: assetRefSource,
   };
   return (
-    Number['isFinite'](Number(promptAssetRefIndex)) &&
-      (config['promptAssetRefIndex'] = Math['max'](0, Math['trunc'](Number(promptAssetRefIndex)))),
-    list3['push'](config),
+    Number.isFinite(Number(promptAssetRefIndex)) &&
+      (config.promptAssetRefIndex = Math.max(0, Math.trunc(Number(promptAssetRefIndex)))),
+    list3.push(config),
     true
   );
 }
 export function getAssetInputRefsFromPrompt(el3 = null, { allowedTypes: allowedTypes = null } = {}) {
-  if (!el3 || typeof el3['querySelectorAll'] !== 'function') return [];
+  if (!el3 || typeof el3.querySelectorAll !== 'function') return [];
   const map2 = normalizeAllowedMentionTypes(allowedTypes),
     list4 = [],
     map3 = new Map();
   return (
-    el3['querySelectorAll']('.ref-pill')['forEach']((scope) => {
+    el3.querySelectorAll('.ref-pill').forEach((scope) => {
       if (!isAssetMentionPill(scope)) return;
       const response2 = getAssetMentionRefFromPillNode(scope);
       if (!response2) return;
-      const type3 = resolveEffectiveInputKind(response2) || normalizePromptMentionType(response2['type']);
-      if (!type3 || (map2 && !map2['has'](type3))) return;
+      const type3 = resolveEffectiveInputKind(response2) || normalizePromptMentionType(response2.type);
+      if (!type3 || (map2 && !map2.has(type3))) return;
       if (type3 === 'text') {
-        if (!String(response2['content'] || '')['trim']()) return;
+        if (!String(response2.content || '').trim()) return;
       } else {
-        if (!String(response2['url'] || '')['trim']()) return;
+        if (!String(response2.url || '').trim()) return;
       }
-      const input = response2['assetId'] + ':' + response2['itemIndex'] + ':' + type3,
-        assetMentionOccurrence2 = map3['get'](input) || 0;
-      (map3['set'](input, assetMentionOccurrence2 + 1),
-        list4['push']({
+      const input = response2.assetId + ':' + response2.itemIndex + ':' + type3,
+        assetMentionOccurrence2 = map3.get(input) || 0;
+      (map3.set(input, assetMentionOccurrence2 + 1),
+        list4.push({
           ...response2,
           type: type3,
           assetMentionOccurrence: assetMentionOccurrence2,
@@ -145,24 +145,24 @@ export function getAssetInputRefsFromPrompt(el3 = null, { allowedTypes: allowedT
 }
 function decodeHtmlAttrValue(output) {
   return String(output || '')
-    ['replace'](/&quot;/g, '"')
-    ['replace'](/&#39;/g, '\'')
-    ['replace'](/&apos;/g, '\'')
-    ['replace'](/&lt;/g, '<')
-    ['replace'](/&gt;/g, '>')
-    ['replace'](/&amp;/g, '&');
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, '\'')
+    .replace(/&apos;/g, '\'')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
 }
 function getHtmlAttrValue(value2 = '', value3 = '') {
-  const enabled2 = String(value3 || '')['trim']();
+  const enabled2 = String(value3 || '').trim();
   if (!enabled2) return '';
-  const value4 = enabled2['replace'](/[.*+?^${}()|[\]\\]/g, '\\$&'),
+  const value4 = enabled2.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
     regExp = new RegExp(value4 + '\\s*=\\s*(?:"([^"]*)"|\'([^\']*)\'|([^\\s>]+))', 'i'),
-    enabled3 = String(value2 || '')['match'](regExp);
+    enabled3 = String(value2 || '').match(regExp);
   if (!enabled3) return '';
-  return decodeHtmlAttrValue(enabled3[1] ?? enabled3[2] ?? enabled3[3] ?? '')['trim']();
+  return decodeHtmlAttrValue(enabled3[1] ?? enabled3[2] ?? enabled3[3] ?? '').trim();
 }
 function htmlClassAttrContains(value5 = '', value6 = '') {
-  return getHtmlAttrValue(value5, 'class')['split'](/\s+/)['filter'](Boolean)['includes'](value6);
+  return getHtmlAttrValue(value5, 'class').split(/\s+/).filter(Boolean).includes(value6);
 }
 export function getAssetInputRefsFromPromptHtml(value7 = '', { allowedTypes: allowedTypes = null } = {}) {
   const allowed2 = normalizeAllowedMentionTypes(allowedTypes),
@@ -172,7 +172,7 @@ export function getAssetInputRefsFromPromptHtml(value7 = '', { allowedTypes: all
     value9 = new Map(),
     value10 = /<span\b([^>]*)>([\s\S]*?)<\/span>/gi;
   let value11 = null;
-  while ((value11 = value10['exec'](sanitizePromptHtml2))) {
+  while ((value11 = value10.exec(sanitizePromptHtml2))) {
     const value12 = value11[1] || '';
     if (!htmlClassAttrContains(value12, 'ref-pill')) continue;
     if (getHtmlAttrValue(value12, 'data-ref-origin') !== 'asset') continue;
@@ -194,8 +194,8 @@ export function getPromptAssetInputRefsFromNode(options2 = {}, { allowedTypes: a
     value13 = [],
     value14 = new Map();
   return (
-    getPromptAssetInputRefRecords(options2)['forEach']((value15, promptAssetRefIndex2) => {
-      const promptMentionType = normalizePromptMentionType(value15['type']);
+    getPromptAssetInputRefRecords(options2).forEach((value15, promptAssetRefIndex2) => {
+      const promptMentionType = normalizePromptMentionType(value15.type);
       if (!promptMentionType || promptMentionType === 'text') return;
       appendResolvedAssetInputRefFromRecord(value13, value14, value15, {
         allowed: allowed3,
@@ -208,7 +208,7 @@ export function getPromptAssetInputRefsFromNode(options2 = {}, { allowedTypes: a
 }
 export function getAssetInputRefsFromNodeData(options3 = {}, { allowedTypes: allowedTypes = null } = {}) {
   return [
-    ...getAssetInputRefsFromPromptHtml(options3?.['prompt'] || '', { allowedTypes: allowedTypes }),
+    ...getAssetInputRefsFromPromptHtml(options3?.prompt || '', { allowedTypes: allowedTypes }),
     ...getPromptAssetInputRefsFromNode(options3 || {}, { allowedTypes: allowedTypes }),
   ];
 }
@@ -224,9 +224,9 @@ export function getAssetInputRefsFromPromptAndNode(
   const map4 = new Map();
   for (const args of value17) {
     const value18 =
-      args['assetId'] + ':' + args['itemIndex'] + ':' + args['type'] + ':' + args['assetRefSource'];
-    if (map4['has'](value18)) map4['get'](value18)['assetMentionOccurrence'] = -1;
-    else map4['set'](value18, { ...args });
+      args.assetId + ':' + args.itemIndex + ':' + args.type + ':' + args.assetRefSource;
+    if (map4.has(value18)) map4.get(value18).assetMentionOccurrence = -1;
+    else map4.set(value18, { ...args });
   }
-  return [...map4['values']()];
+  return [...map4.values()];
 }

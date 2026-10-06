@@ -388,7 +388,7 @@ test('a closed owner window is dropped and rebuilt on demand', () => {
     screenApi: screen.api,
   });
   const owner = presenter.getDialogParentWindow();
-  owner.handlers['closed']();
+  owner.handlers.closed();
   const rebuilt = presenter.getDialogParentWindow();
   assert.notEqual(rebuilt, owner);
   assert.equal(calls.windows.length, 2);

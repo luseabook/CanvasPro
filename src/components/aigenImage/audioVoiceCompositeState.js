@@ -1,5 +1,5 @@
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 export function resolveAudioVoiceCompositeState({
   voiceTypeValue: voiceTypeValue = '',
@@ -13,8 +13,8 @@ export function resolveAudioVoiceCompositeState({
     voiceModeValue2 = normalizeText(voiceModeValue),
     defaultModeValue2 = normalizeText(defaultModeValue) || 'default',
     customModeValue2 = normalizeText(customModeValue) || 'custom',
-    voiceTypeLabel2 = String(voiceTypeLabel ?? voiceTypeValue ?? '')['trim'](),
-    isCustomMode = voiceModeValue2 ? voiceModeValue2 === customModeValue2 : speakerIdValue2['length'] > 0;
+    voiceTypeLabel2 = String(voiceTypeLabel ?? voiceTypeValue ?? '').trim(),
+    isCustomMode = voiceModeValue2 ? voiceModeValue2 === customModeValue2 : speakerIdValue2.length > 0;
   return {
     voiceTypeValue: voiceTypeValue,
     voiceTypeLabel: voiceTypeLabel2,

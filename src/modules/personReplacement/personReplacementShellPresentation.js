@@ -20,14 +20,14 @@ import { REPLACEMENT_STUDIO_NAME } from './replacementStudioTerminology.js';
 import { reconcileElementTree } from './personReplacementShotSelectionRendering.js';
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#39;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
 function normalizeText(item, key = '') {
-  const index = String(item ?? '')['trim']();
+  const index = String(item ?? '').trim();
   return index || key;
 }
 function normalizeMediaUrl(result) {
@@ -36,8 +36,8 @@ function normalizeMediaUrl(result) {
 }
 function clamp(data, options, target, source = options) {
   const next = Number(data);
-  if (!Number['isFinite'](next)) return source;
-  return Math['max'](options, Math['min'](target, next));
+  if (!Number.isFinite(next)) return source;
+  return Math.max(options, Math.min(target, next));
 }
 function renderVideoIcon() {
   return '<svg class="person-replacement-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="14" height="14" rx="3"/><path d="m17 10 4-2v8l-4-2"/></svg>';
@@ -62,7 +62,7 @@ function renderSmartClipModeOptions(handle) {
     ['balanced', smartClipPanelText('modeBalanced')],
     ['sensitive', smartClipPanelText('modeSensitive')],
   ];
-  return list['map'](
+  return list.map(
     ([state, config]) =>
       '<button type="button" class="person-replacement-smart-clip-option ' +
       (handle === state ? 'is-active' : '') +
@@ -73,11 +73,11 @@ function renderSmartClipModeOptions(handle) {
       '">' +
       escapeHtml(config) +
       '</button>',
-  )['join']('');
+  ).join('');
 }
 function renderSmartClipSettingsPanel(scope) {
-  const input = scope['settings']['smartClipMode'],
-    output = scope['settings']['smartClipFps'];
+  const input = scope.settings.smartClipMode,
+    output = scope.settings.smartClipFps;
   return (
     '<div class="person-replacement-smart-clip-settings-panel" role="dialog" aria-label="' +
     escapeHtml(smartClipPanelText('title')) +
@@ -94,7 +94,7 @@ function renderSmartClipSettingsPanel(scope) {
     '\n      <div class="person-replacement-smart-clip-option-group" role="group" aria-label="' +
     escapeHtml(smartClipPanelText('fps')) +
     '">\n        ' +
-    SMART_CLIP_FPS_OPTIONS['map'](
+    SMART_CLIP_FPS_OPTIONS.map(
       (fps) =>
         '<button type="button" class="person-replacement-smart-clip-option person-replacement-smart-clip-fps-option ' +
         (output === fps ? 'is-active' : '') +
@@ -105,14 +105,14 @@ function renderSmartClipSettingsPanel(scope) {
         '">' +
         escapeHtml(smartClipPanelText('fpsValue', { fps: fps })) +
         '</button>',
-    )['join']('') +
+    ).join('') +
     '\n      </div>\n    </div>\n    <p class="person-replacement-smart-clip-settings-hint">' +
     escapeHtml(smartClipPanelText('hintDefault')) +
     '</p>\n  </div>'
   );
 }
 function renderSmartClipSettings(value2) {
-  const value3 = value2['workspace']['smartClipSettingsOpen'] === true;
+  const value3 = value2.workspace.smartClipSettingsOpen === true;
   return (
     '<div class="person-replacement-smart-clip-settings" data-person-replacement-smart-clip-settings>\n    <button type="button" class="story-secondary-button person-replacement-settings-trigger ' +
     (value3 ? 'is-active' : '') +
@@ -127,75 +127,75 @@ function renderStepNavigation(value4) {
   const personReplacementStepCompletion = getPersonReplacementStepCompletion(value4);
   return (
     '<nav class="story-step-navigation person-replacement-story-steps" data-active-step="' +
-    value4['workspace']['step'] +
+    value4.workspace.step +
     '" aria-label="人物替换流程">\n    ' +
-    PERSON_REPLACEMENT_STEPS['map']((value5) => {
-      const error = getPersonReplacementStepGate(value4, value5['id'], personReplacementStepCompletion),
+    PERSON_REPLACEMENT_STEPS.map((value5) => {
+      const error = getPersonReplacementStepGate(value4, value5.id, personReplacementStepCompletion),
         value6 = [
           'story-step',
-          value4['workspace']['step'] === value5['id'] ? 'is-active' : '',
-          error['allowed'] ? '' : 'is-locked',
+          value4.workspace.step === value5.id ? 'is-active' : '',
+          error.allowed ? '' : 'is-locked',
         ]
-          ['filter'](Boolean)
-          ['join'](' ');
+          .filter(Boolean)
+          .join(' ');
       return (
         '<button type="button" class="' +
         value6 +
         '" data-person-replacement-action="select-step" data-person-replacement-step="' +
-        value5['id'] +
+        value5.id +
         '" aria-current="' +
-        (value4['workspace']['step'] === value5['id'] ? 'step' : 'false') +
+        (value4.workspace.step === value5.id ? 'step' : 'false') +
         '" aria-keyshortcuts="' +
-        value5['id'] +
+        value5.id +
         '" aria-disabled="' +
-        !error['allowed'] +
+        !error.allowed +
         '"' +
-        (error['allowed'] ? '' : ' title="' + escapeHtml(error['message']) + '"') +
+        (error.allowed ? '' : ' title="' + escapeHtml(error.message) + '"') +
         '><span>' +
-        value5['id'] +
+        value5.id +
         '</span>' +
-        escapeHtml(value5['label']) +
+        escapeHtml(value5.label) +
         '</button>'
       );
-    })['join']('') +
+    }).join('') +
     '\n  </nav>'
   );
 }
 function getStepGuidance(value7, handler) {
-  const count = Math['trunc'](clamp(value7['workspace']?.['step'], 1, 5, 1)),
+  const count = Math.trunc(clamp(value7.workspace?.step, 1, 5, 1)),
     personReplacementStepCompletion2 = getPersonReplacementStepCompletion(value7),
-    value8 = (Array['isArray'](value7['characters']) ? value7['characters'] : [])['filter']((value9) =>
+    value8 = (Array.isArray(value7.characters) ? value7.characters : []).filter((value9) =>
       getPersonReplacementCharacterBaseImageRef(value9),
-    )['length'],
-    value10 = (Array['isArray'](value7['scenes']) ? value7['scenes'] : [])['filter']((value11) =>
+    ).length,
+    value10 = (Array.isArray(value7.scenes) ? value7.scenes : []).filter((value11) =>
       getPersonReplacementCharacterBaseImageRef(value11),
-    )['length'],
+    ).length,
     value12 = value8 + value10,
-    list2 = Array['isArray'](value7['shots']) ? value7['shots'] : [],
-    count2 = list2['filter']((value13) => normalizeText(value13?.['resultVideoRef']))['length'],
-    count3 = Math['max'](0, Math['trunc'](Number(handler(value7)) || 0)),
-    value14 = Boolean(normalizeText(value7['audio']?.['replacementAudioRef'])),
+    list2 = Array.isArray(value7.shots) ? value7.shots : [],
+    count2 = list2.filter((value13) => normalizeText(value13?.resultVideoRef)).length,
+    count3 = Math.max(0, Math.trunc(Number(handler(value7)) || 0)),
+    value14 = Boolean(normalizeText(value7.audio?.replacementAudioRef)),
     value15 = Boolean(
-      value7['output']?.['originalMasterRef'] &&
-      (value7['output']?.['finalVideoRef'] || value7['output']?.['visualMasterRef']),
+      value7.output?.originalMasterRef &&
+      (value7.output?.finalVideoRef || value7.output?.visualMasterRef),
     ),
-    enabled = value7['output']?.['composeStatus'] === 'succeeded' && value15,
+    enabled = value7.output?.composeStatus === 'succeeded' && value15,
     value16 = value15 && !enabled;
   if (count === 1)
-    return personReplacementStepCompletion2['assetSettingsComplete']
+    return personReplacementStepCompletion2.assetSettingsComplete
       ? { title: '替换素材已应用', detail: '已应用 ' + value12 + ' 个替换素材，可以继续进入图像替换' }
       : { title: '请添加人物或场景素材', detail: '至少添加 1 个人物或场景素材，才能进入图像替换' };
   if (count === 2)
-    return personReplacementStepCompletion2['imageReplacementComplete']
+    return personReplacementStepCompletion2.imageReplacementComplete
       ? { title: '图像替换输入已应用', detail: '可以继续生成替换图，或进入视频替换' }
       : { title: '请绑定替换人物或场景', detail: '可先进入视频替换；添加人物或场景绑定后才能继续声音克隆' };
   if (count === 3) {
-    if (!personReplacementStepCompletion2['imageReplacementComplete'])
+    if (!personReplacementStepCompletion2.imageReplacementComplete)
       return { title: '请绑定替换人物或场景', detail: '至少绑定 1 个人物或场景，才能进入声音克隆' };
     if (count2 > 0)
       return {
         title: '替换视频已生成',
-        detail: '已生成 ' + count2 + '/' + list2['length'] + ' 个片段，可以继续进入声音克隆',
+        detail: '已生成 ' + count2 + '/' + list2.length + ' 个片段，可以继续进入声音克隆',
       };
     return { title: '视频替换已就绪', detail: '可以生成替换视频，也可以继续进入声音克隆' };
   }
@@ -214,12 +214,12 @@ function getStepGuidance(value7, handler) {
   if (count2 > 0)
     return {
       title: '替换片段可以合成',
-      detail: '已有 ' + count2 + '/' + list2['length'] + ' 个片段可用于合成',
+      detail: '已有 ' + count2 + '/' + list2.length + ' 个片段可用于合成',
     };
   return { title: '请先生成替换视频', detail: '返回视频替换生成至少一个片段后，即可创建合成预览' };
 }
 function getCurrentCanvasSyncMenuCopy(value17) {
-  const value18 = Math['trunc'](Number(value17) || 1),
+  const value18 = Math.trunc(Number(value17) || 1),
     value19 = {
       1: ['同步素材设定到画布', '同步当前人物素材与分组'],
       2: ['同步图像替换到画布', '同步当前关键帧、素材、提示词与替换结果图'],
@@ -231,10 +231,10 @@ function getCurrentCanvasSyncMenuCopy(value17) {
   return { label: label, detail: detail };
 }
 function renderProjectToolbarActions(value20, value21 = {}) {
-  const value22 = value20['workspace']['step'] === 5,
-    currentCanvasSyncMenuCopy = getCurrentCanvasSyncMenuCopy(value20['workspace']['step']),
-    value23 = value21['canvasSyncPending'] === true,
-    value24 = value21['exportOutputPending'] === true,
+  const value22 = value20.workspace.step === 5,
+    currentCanvasSyncMenuCopy = getCurrentCanvasSyncMenuCopy(value20.workspace.step),
+    value23 = value21.canvasSyncPending === true,
+    value24 = value21.exportOutputPending === true,
     value25 =
       '<div class="story-canvas-sync-menu-wrap' +
       (value23 ? ' is-loading' : '') +
@@ -257,9 +257,9 @@ function renderProjectToolbarActions(value20, value21 = {}) {
       '\n    </button>\n    <div class="story-canvas-sync-menu" role="menu" aria-label="同步人物替换项目到画布" aria-hidden="true">\n      <button type="button" class="story-canvas-sync-option" data-person-replacement-output-menu-item data-person-replacement-action="sync-all-clips-to-canvas" role="menuitem"' +
       (value23 ? ' aria-disabled="true" disabled' : '') +
       '>\n        <strong>' +
-      currentCanvasSyncMenuCopy['label'] +
+      currentCanvasSyncMenuCopy.label +
       '</strong><small>' +
-      currentCanvasSyncMenuCopy['detail'] +
+      currentCanvasSyncMenuCopy.detail +
       '</small>\n      </button>\n      <button type="button" class="story-canvas-sync-option" data-person-replacement-output-menu-item data-person-replacement-action="sync-project-to-canvas" role="menuitem"' +
       (value23 ? ' aria-disabled="true" disabled' : '') +
       '>\n        <strong>同步整个项目到画布</strong><small>按当前进度同步素材、图像、视频、音频与合成节点</small>\n      </button>\n    </div>\n  </div>',
@@ -308,7 +308,7 @@ function renderProjectToolbarActions(value20, value21 = {}) {
 function renderHeader(value27, value28 = {}) {
   return (
     '<header class="story-workspace-toolbar"' +
-    (value28['canvasSyncPending'] === true ? ' aria-hidden="true" inert' : '') +
+    (value28.canvasSyncPending === true ? ' aria-hidden="true" inert' : '') +
     '>\n    <div class="story-project-toolbar person-replacement-story-toolbar">\n      <button type="button" class="story-toolbar-back" data-person-replacement-action="back-home" aria-label="返回人物替换项目"><span class="story-toolbar-back-icon" aria-hidden="true"></span><span>人物替换项目</span></button>\n      ' +
     renderStepNavigation(value27) +
     '\n      <div class="person-replacement-toolbar-side">' +
@@ -317,24 +317,24 @@ function renderHeader(value27, value28 = {}) {
   );
 }
 function renderSourceQueue(enabled2) {
-  if (!enabled2['sources']['length']) return '';
+  if (!enabled2.sources.length) return '';
   return (
     '<div class="person-replacement-import-queue workspace-video-import-grid">\n    ' +
-    enabled2['sources']
-      ['map']((value29, value30) => {
+    enabled2.sources
+      .map((value29, value30) => {
         const value31 =
-            value29['processingStatus'] === 'uploading'
+            value29.processingStatus === 'uploading'
               ? '正在上传'
-              : value29['processingStatus'] === 'failed'
+              : value29.processingStatus === 'failed'
                 ? '上传失败'
                 : '已加入',
-          mediaUrl = normalizeMediaUrl(value29['thumbnailRef']),
-          text2 = normalizeText(enabled2['sourcePreviewRefs']?.[value29['id']]),
-          mediaUrl2 = normalizeMediaUrl(text2 || value29['videoRef']),
-          value32 = value29['fileName'] || '视频 ' + (value30 + 1);
+          mediaUrl = normalizeMediaUrl(value29.thumbnailRef),
+          text2 = normalizeText(enabled2.sourcePreviewRefs?.[value29.id]),
+          mediaUrl2 = normalizeMediaUrl(text2 || value29.videoRef),
+          value32 = value29.fileName || '视频 ' + (value30 + 1);
         return (
           '<article class="person-replacement-import-item workspace-video-import-item" data-person-replacement-import-source="' +
-          escapeHtml(value29['id']) +
+          escapeHtml(value29.id) +
           '">\n        <div class="person-replacement-import-thumbnail workspace-video-import-thumbnail">\n          ' +
           (mediaUrl
             ? '<img src="' +
@@ -354,7 +354,7 @@ function renderSourceQueue(enabled2) {
           '\n          <span class="person-replacement-import-status workspace-video-import-status">' +
           escapeHtml(value31) +
           '</span>\n          <button type="button" class="person-replacement-import-remove workspace-video-import-remove" data-person-replacement-action="remove-source" data-source-id="' +
-          escapeHtml(value29['id']) +
+          escapeHtml(value29.id) +
           '" aria-label="删除 ' +
           escapeHtml(value32) +
           '">×</button>\n        </div>\n        <div class="person-replacement-import-copy workspace-video-import-copy"><strong>' +
@@ -362,47 +362,47 @@ function renderSourceQueue(enabled2) {
           '</strong></div>\n      </article>'
         );
       })
-      ['join']('') +
+      .join('') +
     '\n  </div>'
   );
 }
 function normalizeProjectTimestamp(value33) {
   const count4 = Number(value33);
-  if (Number['isFinite'](count4) && count4 > 0) return count4;
-  const value34 = Date['parse'](value33 || '');
-  return Number['isFinite'](value34) ? value34 : 0;
+  if (Number.isFinite(count4) && count4 > 0) return count4;
+  const value34 = Date.parse(value33 || '');
+  return Number.isFinite(value34) ? value34 : 0;
 }
 function buildPersonProjectHomeEntry(personReplacementProject = {}) {
-  const id = normalizeText(personReplacementProject['id']),
-    episodes = Array['isArray'](personReplacementProject['shots']) ? personReplacementProject['shots'] : [];
+  const id = normalizeText(personReplacementProject.id),
+    episodes = Array.isArray(personReplacementProject.shots) ? personReplacementProject.shots : [];
   return {
     id: id,
-    title: normalizeText(personReplacementProject['title'], '未命名人物替换项目'),
-    createdAt: normalizeProjectTimestamp(personReplacementProject['createdAt']),
-    updatedAt: normalizeProjectTimestamp(personReplacementProject['updatedAt']),
-    archivedAt: normalizeProjectTimestamp(personReplacementProject['archivedAt']),
+    title: normalizeText(personReplacementProject.title, '未命名人物替换项目'),
+    createdAt: normalizeProjectTimestamp(personReplacementProject.createdAt),
+    updatedAt: normalizeProjectTimestamp(personReplacementProject.updatedAt),
+    archivedAt: normalizeProjectTimestamp(personReplacementProject.archivedAt),
     data: {
-      project: { id: id, title: normalizeText(personReplacementProject['title'], '未命名人物替换项目') },
+      project: { id: id, title: normalizeText(personReplacementProject.title, '未命名人物替换项目') },
       episodes: episodes,
     },
     personReplacementProject: personReplacementProject,
   };
 }
 function getPersonProjectCoverImageUrls(options2 = {}) {
-  return (Array['isArray'](options2['shots']) ? options2['shots'] : [])
-    ['flatMap']((value35) => [value35?.['replacementImageRef'], value35?.['keyframeRef']])
-    ['map'](normalizeMediaUrl)
-    ['filter']((value36, value37, list3) => value36 && list3['indexOf'](value36) === value37)
-    ['slice'](0, 3);
+  return (Array.isArray(options2.shots) ? options2.shots : [])
+    .flatMap((value35) => [value35?.replacementImageRef, value35?.keyframeRef])
+    .map(normalizeMediaUrl)
+    .filter((value36, value37, list3) => value36 && list3.indexOf(value36) === value37)
+    .slice(0, 3);
 }
 function getHomeProjectPresentation(query) {
-  const list4 = Array['isArray'](query['libraryProjects']) ? query['libraryProjects'] : [],
-    projectEntries = list4['map'](buildPersonProjectHomeEntry)['filter']((value38) => value38['id']),
-    showArchived = query['workspace']['showArchivedProjects'] === true,
-    archivedProjectCount = projectEntries['filter']((value39) => value39['archivedAt'] > 0)['length'],
+  const list4 = Array.isArray(query.libraryProjects) ? query.libraryProjects : [],
+    projectEntries = list4.map(buildPersonProjectHomeEntry).filter((value38) => value38.id),
+    showArchived = query.workspace.showArchivedProjects === true,
+    archivedProjectCount = projectEntries.filter((value39) => value39.archivedAt > 0).length,
     visibleProjects = getWorkspaceProjectHomeEntries(projectEntries, {
-      query: query['workspace']['projectSearchQuery'],
-      sortOrder: query['workspace']['projectSortOrder'],
+      query: query.workspace.projectSearchQuery,
+      sortOrder: query.workspace.projectSortOrder,
       showArchived: showArchived,
     });
   return {
@@ -421,23 +421,23 @@ function renderHomeProjectResults(
     showArchivedProjects: showArchivedProjects,
     visibleProjects: visibleProjects2,
   } = homeProjectPresentation;
-  return projectEntries2['length']
+  return projectEntries2.length
     ? '<div class="story-project-grid">\n      ' +
-        visibleProjects2['map']((itemCount) =>
+        visibleProjects2.map((itemCount) =>
           renderWorkspaceProjectCard(itemCount, {
-            isDeleteConfirming: isDeleteConfirming['workspace']['pendingDeleteProjectId'] === itemCount['id'],
-            isMenuOpen: isDeleteConfirming['workspace']['openProjectMenuId'] === itemCount['id'],
+            isDeleteConfirming: isDeleteConfirming.workspace.pendingDeleteProjectId === itemCount.id,
+            isMenuOpen: isDeleteConfirming.workspace.openProjectMenuId === itemCount.id,
             fallbackTitle: '未命名人物替换项目',
-            itemCount: itemCount['personReplacementProject']?.['shots']?.['length'] || 0,
+            itemCount: itemCount.personReplacementProject?.shots?.length || 0,
             itemLabel: '个片段',
-            coverImageUrls: getPersonProjectCoverImageUrls(itemCount['personReplacementProject']),
+            coverImageUrls: getPersonProjectCoverImageUrls(itemCount.personReplacementProject),
             emptyCoverLabel: '人物替换项目',
             coverAltPrefix: '人物替换项目封面',
-            taskSummary: getPersonReplacementProjectTaskSummary(itemCount['personReplacementProject']),
+            taskSummary: getPersonReplacementProjectTaskSummary(itemCount.personReplacementProject),
           }),
-        )['join']('') +
+        ).join('') +
         '\n      ' +
-        (visibleProjects2['length']
+        (visibleProjects2.length
           ? ''
           : '<div class="story-project-filter-empty"><strong>' +
             (showArchivedProjects ? '没有匹配的归档项目' : '没有匹配的人物替换项目') +
@@ -456,12 +456,12 @@ function renderHome(value40) {
     isPersonReplacementSourceProcessing2 = isPersonReplacementSourceProcessing(value40),
     value41 =
       !isPersonReplacementSourceProcessing2 &&
-      value40['sources']['some']((value42) => normalizeText(value42['videoRef'])),
+      value40.sources.some((value42) => normalizeText(value42.videoRef)),
     value43 = isPersonReplacementSourceProcessing2 ? '' : renderSourceQueue(value40),
     value44 = isPersonReplacementSourceProcessing2 ? ' disabled' : '';
   return (
     '<main class="story-home-page" data-person-replacement-home-project="' +
-    escapeHtml(value40['id']) +
+    escapeHtml(value40.id) +
     '">\n    <section class="story-home-hero">\n      <span class="story-eyebrow">SHUO Canvas · ' +
     REPLACEMENT_STUDIO_NAME +
     '</span>\n      <h1>完整替换视频中的人物与声音</h1>\n      <div class="story-home-composer">\n        <div class="story-home-composer-body">\n          <div class="story-home-composer-panel story-upload-drop workspace-video-import-panel person-replacement-video-drop ' +
@@ -482,9 +482,9 @@ function renderHome(value40) {
     '><span>开始处理</span><span class="story-generate-arrow" aria-hidden="true">→</span></button>\n          </div>\n        </div>\n      </div>\n    </section>\n    <section class="story-projects-section">\n      <div class="story-section-heading">\n        <div><h2>' +
     (showArchivedProjects2 ? '已归档项目' : '我的人物替换项目') +
     '</h2></div>\n        <div class="story-project-list-controls">\n          <button type="button" class="story-project-import-button" data-story-action="import-project" data-person-replacement-action="import-project">导入项目</button>\n          <label class="story-project-search"><span aria-hidden="true">⌕</span><input type="search" data-story-project-search value="' +
-    escapeHtml(value40['workspace']['projectSearchQuery'] || '') +
+    escapeHtml(value40.workspace.projectSearchQuery || '') +
     '" placeholder="搜索项目名称" autocomplete="off" aria-label="搜索人物替换项目"></label>\n          ' +
-    renderWorkspaceProjectSortControl(value40['workspace']['projectSortOrder']) +
+    renderWorkspaceProjectSortControl(value40.workspace.projectSortOrder) +
     '\n          <button type="button" class="story-project-archive-toggle ' +
     (showArchivedProjects2 ? 'is-active' : '') +
     '" data-story-action="toggle-archived-projects" aria-pressed="' +
@@ -497,17 +497,17 @@ function renderHome(value40) {
   );
 }
 function syncHome(el, value45) {
-  const el2 = el?.['querySelector']?.('[data-person-replacement-home-project]');
+  const el2 = el?.querySelector?.('[data-person-replacement-home-project]');
   if (
-    value45['workspace']['view'] !== 'home' ||
+    value45.workspace.view !== 'home' ||
     !el2 ||
-    el2['dataset']['personReplacementHomeProject'] !== String(value45['id'])
+    el2.dataset.personReplacementHomeProject !== String(value45.id)
   )
     return false;
-  const el3 = el2['ownerDocument']['createElement']('template');
+  const el3 = el2.ownerDocument.createElement('template');
   return (
-    (el3['innerHTML'] = renderHome(value45)),
-    reconcileElementTree(el2, el3['content']['firstElementChild'], { preserveChildNodes: true })
+    (el3.innerHTML = renderHome(value45)),
+    reconcileElementTree(el2, el3.content.firstElementChild, { preserveChildNodes: true })
   );
 }
 function renderStepFooter(
@@ -515,16 +515,16 @@ function renderStepFooter(
   value47,
   { nextLabel: nextLabel = '下一步', hidePrevious: hidePrevious = false } = {},
 ) {
-  const error2 = getPersonReplacementStepGate(value46, value46['workspace']['step'] + 1),
-    value48 = value46['workspace']['step'] < PERSON_REPLACEMENT_STEPS['length'] && !error2['allowed'],
+  const error2 = getPersonReplacementStepGate(value46, value46.workspace.step + 1),
+    value48 = value46.workspace.step < PERSON_REPLACEMENT_STEPS.length && !error2.allowed,
     isPersonReplacementSourceProcessing3 = isPersonReplacementSourceProcessing(value46),
     value49 = value48 || isPersonReplacementSourceProcessing3,
     stepGuidance = getStepGuidance(value46, value47);
   return (
     '<footer class="story-page-footer person-replacement-step-footer">\n    <div><strong data-person-replacement-guidance-role="footer-title">' +
-    escapeHtml(stepGuidance['title']) +
+    escapeHtml(stepGuidance.title) +
     '</strong><small data-person-replacement-guidance-role="footer-detail">' +
-    escapeHtml(stepGuidance['detail']) +
+    escapeHtml(stepGuidance.detail) +
     '</small></div>\n    <div class="story-page-footer-actions">\n      ' +
     (hidePrevious
       ? ''
@@ -538,7 +538,7 @@ function renderStepFooter(
     '"' +
     (value49
       ? ' title="' +
-        escapeHtml(isPersonReplacementSourceProcessing3 ? '视频处理中，请稍候' : error2['message']) +
+        escapeHtml(isPersonReplacementSourceProcessing3 ? '视频处理中，请稍候' : error2.message) +
         '"'
       : '') +
     '><span>' +
@@ -551,7 +551,7 @@ function renderStepFooter(
   );
 }
 function renderCanvasSyncLoadingOverlay(options3 = {}) {
-  if (options3['canvasSyncPending'] !== true) return '';
+  if (options3.canvasSyncPending !== true) return '';
   return '<div class="person-replacement-canvas-sync-loading storyboard-script-loading-overlay" data-person-replacement-canvas-sync-loading role="status" aria-live="polite" aria-label="正在加入画布" tabindex="-1">\n    <span class="storyboard-script-loading-spinner person-replacement-canvas-sync-spinner person-replacement-canvas-sync-overlay-spinner" aria-hidden="true"></span>\n    <strong class="storyboard-script-loading-label">正在加入画布</strong>\n    <small>同步完成后将自动跳转到画布</small>\n  </div>';
 }
 function createProjectTaskStatusElement(
@@ -559,13 +559,13 @@ function createProjectTaskStatusElement(
   el4,
   { className: className, dataAttribute: dataAttribute } = {},
 ) {
-  const el5 = value50?.['ownerDocument'];
-  if (!el5?.['createElement'] || !el4?.['appendChild']) return null;
-  const el6 = el5['createElement']('span');
+  const el5 = value50?.ownerDocument;
+  if (!el5?.createElement || !el4?.appendChild) return null;
+  const el6 = el5.createElement('span');
   return (
-    (el6['className'] = className),
-    el6['setAttribute'](dataAttribute, ''),
-    el4['appendChild'](el6),
+    (el6.className = className),
+    el6.setAttribute(dataAttribute, ''),
+    el4.appendChild(el6),
     el6
   );
 }
@@ -573,74 +573,74 @@ function syncStatus(el7, value51, value52) {
   if (!el7) return;
   const isPersonReplacementSourceProcessing4 = isPersonReplacementSourceProcessing(value51),
     stepGuidance2 = getStepGuidance(value51, value52),
-    el8 = el7['querySelector']?.('[data-person-replacement-guidance-role="footer-title"]'),
-    el9 = el7['querySelector']?.('[data-person-replacement-guidance-role="footer-detail"]');
-  if (el8) el8['textContent'] = stepGuidance2['title'];
-  if (el9) el9['textContent'] = stepGuidance2['detail'];
-  const el10 = el7['querySelector']?.('[data-person-replacement-action="next-step"]');
+    el8 = el7.querySelector?.('[data-person-replacement-guidance-role="footer-title"]'),
+    el9 = el7.querySelector?.('[data-person-replacement-guidance-role="footer-detail"]');
+  if (el8) el8.textContent = stepGuidance2.title;
+  if (el9) el9.textContent = stepGuidance2.detail;
+  const el10 = el7.querySelector?.('[data-person-replacement-action="next-step"]');
   if (el10) {
-    const error3 = getPersonReplacementStepGate(value51, value51['workspace']['step'] + 1),
-      value53 = value51['workspace']['step'] < PERSON_REPLACEMENT_STEPS['length'] && !error3['allowed'],
+    const error3 = getPersonReplacementStepGate(value51, value51.workspace.step + 1),
+      value53 = value51.workspace.step < PERSON_REPLACEMENT_STEPS.length && !error3.allowed,
       value54 = value53 || isPersonReplacementSourceProcessing4;
-    (el10['classList']?.['toggle']?.('is-locked', value53 && !isPersonReplacementSourceProcessing4),
-      el10['classList']?.['toggle']?.('is-processing', isPersonReplacementSourceProcessing4),
-      el10['setAttribute']?.('aria-disabled', String(value54)),
-      el10['setAttribute']?.('aria-busy', String(isPersonReplacementSourceProcessing4)),
+    (el10.classList?.toggle?.('is-locked', value53 && !isPersonReplacementSourceProcessing4),
+      el10.classList?.toggle?.('is-processing', isPersonReplacementSourceProcessing4),
+      el10.setAttribute?.('aria-disabled', String(value54)),
+      el10.setAttribute?.('aria-busy', String(isPersonReplacementSourceProcessing4)),
       value54
-        ? el10['setAttribute']?.(
+        ? el10.setAttribute?.(
             'title',
-            isPersonReplacementSourceProcessing4 ? '视频处理中，请稍候' : error3['message'],
+            isPersonReplacementSourceProcessing4 ? '视频处理中，请稍候' : error3.message,
           )
-        : el10['removeAttribute']?.('title'));
+        : el10.removeAttribute?.('title'));
   }
-  const el11 = el7['querySelector']?.('[data-person-replacement-next-indicator="arrow"]'),
-    el12 = el7['querySelector']?.('[data-person-replacement-next-indicator="spinner"]');
-  if (el11) el11['hidden'] = isPersonReplacementSourceProcessing4;
-  if (el12) el12['hidden'] = !isPersonReplacementSourceProcessing4;
-  if (value51['workspace']['view'] !== 'home') return;
-  const el13 = Array['from'](el7['querySelectorAll']?.('[data-workspace-open-project]') || [])['find'](
-    (el14) => normalizeText(el14?.['dataset']?.['workspaceOpenProject']) === normalizeText(value51['id']),
+  const el11 = el7.querySelector?.('[data-person-replacement-next-indicator="arrow"]'),
+    el12 = el7.querySelector?.('[data-person-replacement-next-indicator="spinner"]');
+  if (el11) el11.hidden = isPersonReplacementSourceProcessing4;
+  if (el12) el12.hidden = !isPersonReplacementSourceProcessing4;
+  if (value51.workspace.view !== 'home') return;
+  const el13 = Array.from(el7.querySelectorAll?.('[data-workspace-open-project]') || []).find(
+    (el14) => normalizeText(el14?.dataset?.workspaceOpenProject) === normalizeText(value51.id),
   );
   if (!el13) return;
-  let el15 = el13['querySelector']?.('[data-workspace-project-status]'),
-    el16 = el13['querySelector']?.('[data-workspace-project-inline-status].has-task-error');
+  let el15 = el13.querySelector?.('[data-workspace-project-status]'),
+    el16 = el13.querySelector?.('[data-workspace-project-inline-status].has-task-error');
   const personReplacementProjectTaskSummary = getPersonReplacementProjectTaskSummary(value51),
-    enabled3 = personReplacementProjectTaskSummary['activeCount'] > 0,
-    enabled4 = !enabled3 && personReplacementProjectTaskSummary['failedCount'] > 0;
-  (el13['classList']?.['toggle']?.('is-generating', enabled3),
-    el13['classList']?.['toggle']?.('has-task-error', enabled4));
+    enabled3 = personReplacementProjectTaskSummary.activeCount > 0,
+    enabled4 = !enabled3 && personReplacementProjectTaskSummary.failedCount > 0;
+  (el13.classList?.toggle?.('is-generating', enabled3),
+    el13.classList?.toggle?.('has-task-error', enabled4));
   if (enabled3) {
-    (el16?.['remove']?.(),
+    (el16?.remove?.(),
       (el15 ||= createProjectTaskStatusElement(el13, el13, {
         className: 'story-project-status is-generating',
         dataAttribute: 'data-workspace-project-status',
       })));
     if (!el15) return;
-    (el15['classList']?.['add']?.('is-generating'),
-      (el15['textContent'] = personReplacementProjectTaskSummary['label']),
-      el15['setAttribute']?.('role', 'status'),
-      el15['setAttribute']?.('aria-live', 'polite'));
+    (el15.classList?.add?.('is-generating'),
+      (el15.textContent = personReplacementProjectTaskSummary.label),
+      el15.setAttribute?.('role', 'status'),
+      el15.setAttribute?.('aria-live', 'polite'));
     return;
   }
-  el15?.['remove']?.();
+  el15?.remove?.();
   if (!enabled4) {
-    el16?.['remove']?.();
+    el16?.remove?.();
     return;
   }
-  const value55 = el13['querySelector']?.('.story-project-card-meta');
+  const value55 = el13.querySelector?.('.story-project-card-meta');
   el16 ||= createProjectTaskStatusElement(el13, value55, {
     className: 'story-project-inline-status has-task-error',
     dataAttribute: 'data-workspace-project-inline-status',
   });
   if (!el16) return;
-  ((el16['textContent'] = personReplacementProjectTaskSummary['label']),
-    el16['setAttribute']?.('role', 'status'),
-    el16['setAttribute']?.('aria-live', 'polite'));
+  ((el16.textContent = personReplacementProjectTaskSummary.label),
+    el16.setAttribute?.('role', 'status'),
+    el16.setAttribute?.('aria-live', 'polite'));
 }
 export function createPersonReplacementShellPresentation({
   resolveVoiceReferenceCount: resolveVoiceReferenceCount = () => 0,
 } = {}) {
-  return Object['freeze']({
+  return Object.freeze({
     renderCanvasSyncLoadingOverlay: renderCanvasSyncLoadingOverlay,
     renderHeader: renderHeader,
     renderHome: renderHome,

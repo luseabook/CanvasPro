@@ -44,19 +44,19 @@ export function createStorySummaryGenerationApi({
     const mode2 = normalizeStorySummaryMode(mode);
     let sourceDigests = [],
       sourceText2 = normalizeText(sourceText);
-    if (isSourceBackedMode(mode2) && sourceText2['length'] > sourceChunkCharacters) {
+    if (isSourceBackedMode(mode2) && sourceText2.length > sourceChunkCharacters) {
       const total = splitStorySourceText(sourceText2);
-      for (let current = 0; current < total['length']; current += 1) {
+      for (let current = 0; current < total.length; current += 1) {
         onProgress?.({
           stage: 'digesting',
           current: current + 1,
-          total: total['length'],
+          total: total.length,
           message:
             (mode2 === 'rewrite' ? '正在整理参考剧本' : '正在整理原始剧本') +
             ' ' +
             (current + 1) +
             '/' +
-            total['length'],
+            total.length,
         });
         const args = await requestStrictResult({
           request: request,
@@ -64,7 +64,7 @@ export function createStorySummaryGenerationApi({
             model: normalizeText(model),
             provider: normalizeText(provider),
             ...buildStoryTextProviderProfilePayload(providerProfileId),
-            prompt: buildStorySourceDigestPrompt(total[current], current, total['length']),
+            prompt: buildStorySourceDigestPrompt(total[current], current, total.length),
             systemPrompt: sourceDigestSystemPrompt,
             temperature: 0.1,
             timeoutMs: textRequestTimeoutMs,
@@ -76,12 +76,12 @@ export function createStorySummaryGenerationApi({
             serializeResponse: getResultText,
           }),
         });
-        sourceDigests['push']({ part: current + 1, ...args });
+        sourceDigests.push({ part: current + 1, ...args });
       }
       sourceText2 = '';
     }
     onProgress?.({ stage: 'summarizing', current: 1, total: 1, message: '正在生成剧本摘要' });
-    const prompt = storySummaryBlueprint['buildStorySummaryPrompt']({
+    const prompt = storySummaryBlueprint.buildStorySummaryPrompt({
       mode: mode2,
       scriptMode: scriptMode,
       idea: idea,
@@ -100,13 +100,13 @@ export function createStorySummaryGenerationApi({
         ...buildStoryTextProviderProfilePayload(providerProfileId),
         prompt: prompt,
         systemPrompt: summarySystemPrompt,
-        structuredOutput: storySummaryBlueprint['createStructuredOutput'](),
+        structuredOutput: storySummaryBlueprint.createStructuredOutput(),
         thinking: { type: 'disabled' },
         temperature: mode2 === 'upload' ? 0.25 : mode2 === 'rewrite' ? 0.45 : 0.65,
         timeoutMs: textRequestTimeoutMs,
         maxOutputTokens: textMaxOutputTokens,
       },
-      parse: storySummaryBlueprint['parseStorySummaryResult'],
+      parse: storySummaryBlueprint.parseStorySummaryResult,
       outputContract:
         'title/storyType/targetAudience/storySummary/storyBackground/storySetting/coreHook/logline strings, storyContract{protagonistGoal,centralConflict,stakes,progressionDriver,constraints,climax,ending}, plotBeats[{stage,event,consequence}], continuityFacts[], and characters[{name,roleType,fixedTraits,coreTags[],profile,motivation,relationships,personality,arc}]',
       repairInstruction:
@@ -115,5 +115,5 @@ export function createStorySummaryGenerationApi({
       ...createStoryInvocationLifecycle('summary', onInvocation, { serializeResponse: getResultText }),
     });
   }
-  return Object['freeze']({ generateStorySummary: generateStorySummary });
+  return Object.freeze({ generateStorySummary: generateStorySummary });
 }

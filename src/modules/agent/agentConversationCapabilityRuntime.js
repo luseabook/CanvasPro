@@ -33,21 +33,21 @@ export function createAgentConversationCapabilityRuntime({
       sessionStore: sessionStore,
     });
   return {
-    getPendingSkillConversation: getPendingSkillConversation['getPending'],
+    getPendingSkillConversation: getPendingSkillConversation.getPending,
     async handleCommand({
       message: message,
       pendingSkillConversation: pendingSkillConversation,
       runId: runId,
       signal: signal,
     } = {}) {
-      const value = await getPendingSkillConversation['handle']({
+      const value = await getPendingSkillConversation.handle({
         message: message,
         pending: pendingSkillConversation,
         runId: runId,
         signal: signal,
       });
-      return value || agentProjectMemoryConversationRuntime['handle']({ message: message, runId: runId });
+      return value || agentProjectMemoryConversationRuntime.handle({ message: message, runId: runId });
     },
-    prepareExternalInformation: prepareExternalInformation['prepare'],
+    prepareExternalInformation: prepareExternalInformation.prepare,
   };
 }

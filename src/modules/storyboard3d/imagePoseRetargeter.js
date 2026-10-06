@@ -1,4 +1,4 @@
-export const MEDIAPIPE_POSE_LANDMARK_INDEX = Object['freeze']({
+export const MEDIAPIPE_POSE_LANDMARK_INDEX = Object.freeze({
   nose: 0,
   leftEar: 7,
   rightEar: 8,
@@ -25,18 +25,18 @@ export const MEDIAPIPE_POSE_LANDMARK_INDEX = Object['freeze']({
 });
 export const DEFAULT_IMAGE_POSE_MIN_VISIBILITY = 0.5;
 const EPSILON = 1e-8,
-  IDENTITY_QUATERNION = Object['freeze']([0, 0, 0, 1]),
-  WORLD_UP = Object['freeze']({ x: 0, y: 1, z: 0 }),
-  WORLD_FORWARD = Object['freeze']({ x: 0, y: 0, z: 1 }),
-  LEG_REST_DIRECTION = Object['freeze']({ x: 0, y: -1, z: 0 }),
+  IDENTITY_QUATERNION = Object.freeze([0, 0, 0, 1]),
+  WORLD_UP = Object.freeze({ x: 0, y: 1, z: 0 }),
+  WORLD_FORWARD = Object.freeze({ x: 0, y: 0, z: 1 }),
+  LEG_REST_DIRECTION = Object.freeze({ x: 0, y: -1, z: 0 }),
   NATURAL_ARM_OUTWARD = 0.23,
-  NATURAL_ARM_DOWN = Math['sqrt'](1 - NATURAL_ARM_OUTWARD * NATURAL_ARM_OUTWARD),
-  ARM_REST_DIRECTION = Object['freeze']({
-    left: Object['freeze']({ x: -NATURAL_ARM_OUTWARD, y: -NATURAL_ARM_DOWN, z: 0 }),
-    right: Object['freeze']({ x: NATURAL_ARM_OUTWARD, y: -NATURAL_ARM_DOWN, z: 0 }),
+  NATURAL_ARM_DOWN = Math.sqrt(1 - NATURAL_ARM_OUTWARD * NATURAL_ARM_OUTWARD),
+  ARM_REST_DIRECTION = Object.freeze({
+    left: Object.freeze({ x: -NATURAL_ARM_OUTWARD, y: -NATURAL_ARM_DOWN, z: 0 }),
+    right: Object.freeze({ x: NATURAL_ARM_OUTWARD, y: -NATURAL_ARM_DOWN, z: 0 }),
   }),
-  BONE_ANGLE_LIMITS = Object['freeze']({
-    pelvis: Math['PI'],
+  BONE_ANGLE_LIMITS = Object.freeze({
+    pelvis: Math.PI,
     spine_01: 0.7,
     spine_02: 0.7,
     spine_03: 0.7,
@@ -56,41 +56,41 @@ const EPSILON = 1e-8,
     foot_r: 1.25,
   });
 function clamp(value, item, key) {
-  return Math['max'](item, Math['min'](key, Number(value) || 0));
+  return Math.max(item, Math.min(key, Number(value) || 0));
 }
 function finiteNumber(index) {
   const result = Number(index);
-  return Number['isFinite'](result) ? result : null;
+  return Number.isFinite(result) ? result : null;
 }
 function add(x2, box) {
   return {
-    x: x2['x'] + box['x'],
-    y: x2['y'] + box['y'],
-    z: x2['z'] + box['z'],
+    x: x2.x + box.x,
+    y: x2.y + box.y,
+    z: x2.z + box.z,
   };
 }
 function subtract(x3, box2) {
   return {
-    x: x3['x'] - box2['x'],
-    y: x3['y'] - box2['y'],
-    z: x3['z'] - box2['z'],
+    x: x3.x - box2.x,
+    y: x3.y - box2.y,
+    z: x3.z - box2.z,
   };
 }
 function scaleVector(x4, data) {
-  return { x: x4['x'] * data, y: x4['y'] * data, z: x4['z'] * data };
+  return { x: x4.x * data, y: x4.y * data, z: x4.z * data };
 }
 function dot(box3, box4) {
-  return box3['x'] * box4['x'] + box3['y'] * box4['y'] + box3['z'] * box4['z'];
+  return box3.x * box4.x + box3.y * box4.y + box3.z * box4.z;
 }
 function cross(x5, box5) {
   return {
-    x: x5['y'] * box5['z'] - x5['z'] * box5['y'],
-    y: x5['z'] * box5['x'] - x5['x'] * box5['z'],
-    z: x5['x'] * box5['y'] - x5['y'] * box5['x'],
+    x: x5.y * box5.z - x5.z * box5.y,
+    y: x5.z * box5.x - x5.x * box5.z,
+    z: x5.x * box5.y - x5.y * box5.x,
   };
 }
 function vectorLength(box6) {
-  return Math['hypot'](box6['x'], box6['y'], box6['z']);
+  return Math.hypot(box6.x, box6.y, box6.z);
 }
 function normalizeVector(options) {
   const vectorLength2 = vectorLength(options);
@@ -103,13 +103,13 @@ function segmentDirection(next, current) {
   return next && current ? normalizeVector(subtract(current, next)) : null;
 }
 function normalizeQuaternion(list) {
-  if (!Array['isArray'](list) || list['length'] !== 4) return null;
-  const list2 = list['map'](finiteNumber);
-  if (list2['some']((entry) => entry === null)) return null;
-  const record = Math['hypot'](...list2);
+  if (!Array.isArray(list) || list.length !== 4) return null;
+  const list2 = list.map(finiteNumber);
+  if (list2.some((entry) => entry === null)) return null;
+  const record = Math.hypot(...list2);
   if (record <= EPSILON) return null;
-  const list3 = list2['map']((payload) => payload / record);
-  return list3[3] < 0 ? list3['map']((handle) => -handle) : list3;
+  const list3 = list2.map((payload) => payload / record);
+  return list3[3] < 0 ? list3.map((handle) => -handle) : list3;
 }
 function multiplyQuaternions(state, config) {
   const [scope, input, output, value2] = state,
@@ -141,26 +141,26 @@ function quaternionFromTo(value12, value13) {
     const cross4 = cross(vector, { x: 1, y: 0, z: 0 }),
       cross5 = cross(vector, { x: 0, y: 0, z: 1 }),
       box7 = normalizeVector(vectorLength(cross4) > vectorLength(cross5) ? cross4 : cross5);
-    return box7 ? [box7['x'], box7['y'], box7['z'], 0] : null;
+    return box7 ? [box7.x, box7.y, box7.z, 0] : null;
   }
   const box8 = cross(vector, vector2),
-    value14 = Math['sqrt']((1 + clamp2) * 2);
-  return normalizeQuaternion([box8['x'] / value14, box8['y'] / value14, box8['z'] / value14, value14 / 2]);
+    value14 = Math.sqrt((1 + clamp2) * 2);
+  return normalizeQuaternion([box8.x / value14, box8.y / value14, box8.z / value14, value14 / 2]);
 }
 function quaternionFromBasis(box9, box10, box11) {
-  const value15 = box9['x'],
-    value16 = box10['x'],
-    value17 = box11['x'],
-    value18 = box9['y'],
-    value19 = box10['y'],
-    value20 = box11['y'],
-    value21 = box9['z'],
-    value22 = box10['z'],
-    value23 = box11['z'],
+  const value15 = box9.x,
+    value16 = box10.x,
+    value17 = box11.x,
+    value18 = box9.y,
+    value19 = box10.y,
+    value20 = box11.y,
+    value21 = box9.z,
+    value22 = box10.z,
+    value23 = box11.z,
     count = value15 + value19 + value23;
   let value24;
   if (count > 0) {
-    const value25 = 0.5 / Math['sqrt'](count + 1);
+    const value25 = 0.5 / Math.sqrt(count + 1);
     value24 = [
       (value22 - value20) * value25,
       (value17 - value21) * value25,
@@ -169,7 +169,7 @@ function quaternionFromBasis(box9, box10, box11) {
     ];
   } else {
     if (value15 > value19 && value15 > value23) {
-      const value26 = 2 * Math['sqrt'](1 + value15 - value19 - value23);
+      const value26 = 2 * Math.sqrt(1 + value15 - value19 - value23);
       value24 = [
         0.25 * value26,
         (value16 + value18) / value26,
@@ -178,7 +178,7 @@ function quaternionFromBasis(box9, box10, box11) {
       ];
     } else {
       if (value19 > value23) {
-        const value27 = 2 * Math['sqrt'](1 + value19 - value15 - value23);
+        const value27 = 2 * Math.sqrt(1 + value19 - value15 - value23);
         value24 = [
           (value16 + value18) / value27,
           0.25 * value27,
@@ -186,7 +186,7 @@ function quaternionFromBasis(box9, box10, box11) {
           (value17 - value21) / value27,
         ];
       } else {
-        const value28 = 2 * Math['sqrt'](1 + value23 - value15 - value19);
+        const value28 = 2 * Math.sqrt(1 + value23 - value15 - value19);
         value24 = [
           (value17 + value21) / value28,
           (value20 + value22) / value28,
@@ -213,26 +213,26 @@ function quaternionFraction(value31, value32) {
   const list4 = normalizeQuaternion(value31);
   if (!list4) return null;
   const clamp3 = clamp(list4[3], -1, 1),
-    value33 = 2 * Math['acos'](clamp3);
+    value33 = 2 * Math.acos(clamp3);
   if (value33 <= EPSILON) return [...IDENTITY_QUATERNION];
-  const value34 = Math['sin'](value33 / 2);
-  if (Math['abs'](value34) <= EPSILON) return [...IDENTITY_QUATERNION];
-  const value35 = list4['slice'](0, 3)['map']((value36) => value36 / value34),
+  const value34 = Math.sin(value33 / 2);
+  if (Math.abs(value34) <= EPSILON) return [...IDENTITY_QUATERNION];
+  const value35 = list4.slice(0, 3).map((value36) => value36 / value34),
     value37 = (value33 * clamp(value32, 0, 1)) / 2,
-    value38 = Math['sin'](value37);
+    value38 = Math.sin(value37);
   return normalizeQuaternion([
     value35[0] * value38,
     value35[1] * value38,
     value35[2] * value38,
-    Math['cos'](value37),
+    Math.cos(value37),
   ]);
 }
 function clampQuaternionAngle(value39, value40) {
   const quaternion = normalizeQuaternion(value39);
   if (!quaternion) return null;
-  const value41 = 2 * Math['acos'](clamp(quaternion[3], -1, 1));
-  if (!Number['isFinite'](value40) || value41 <= value40) return quaternion;
-  return quaternionFraction(quaternion, value40 / Math['max'](EPSILON, value41));
+  const value41 = 2 * Math.acos(clamp(quaternion[3], -1, 1));
+  if (!Number.isFinite(value40) || value41 <= value40) return quaternion;
+  return quaternionFraction(quaternion, value40 / Math.max(EPSILON, value41));
 }
 function toStoryboard3DRigQuaternion(value42) {
   const quaternion2 = normalizeQuaternion(value42);
@@ -241,24 +241,24 @@ function toStoryboard3DRigQuaternion(value42) {
 }
 function unwrapLandmarks(value43) {
   let list5 =
-    value43?.['worldLandmarks'] ?? value43?.['poseWorldLandmarks'] ?? value43?.['landmarks'] ?? value43;
-  if (Array['isArray'](list5?.[0])) list5 = list5[0];
-  return Array['isArray'](list5) && list5['length'] >= 33 ? list5 : null;
+    value43?.worldLandmarks ?? value43?.poseWorldLandmarks ?? value43?.landmarks ?? value43;
+  if (Array.isArray(list5?.[0])) list5 = list5[0];
+  return Array.isArray(list5) && list5.length >= 33 ? list5 : null;
 }
 function landmarkVisibility(enabled) {
   if (!enabled || typeof enabled !== 'object') return 0;
-  const finiteNumber2 = finiteNumber(enabled['visibility']),
-    finiteNumber3 = finiteNumber(enabled['presence']);
+  const finiteNumber2 = finiteNumber(enabled.visibility),
+    finiteNumber3 = finiteNumber(enabled.presence);
   if (finiteNumber2 !== null && finiteNumber3 !== null)
-    return clamp(Math['min'](finiteNumber2, finiteNumber3), 0, 1);
+    return clamp(Math.min(finiteNumber2, finiteNumber3), 0, 1);
   if (finiteNumber2 !== null) return clamp(finiteNumber2, 0, 1);
   if (finiteNumber3 !== null) return clamp(finiteNumber3, 0, 1);
   return 1;
 }
 function convertLandmark(box12, { mirrorX: mirrorX2, invertY: invertY2, invertZ: invertZ2 }) {
-  const finiteNumber4 = finiteNumber(box12?.['x']),
-    finiteNumber5 = finiteNumber(box12?.['y']),
-    finiteNumber6 = finiteNumber(box12?.['z']);
+  const finiteNumber4 = finiteNumber(box12?.x),
+    finiteNumber5 = finiteNumber(box12?.y),
+    finiteNumber6 = finiteNumber(box12?.z);
   if (finiteNumber4 === null || finiteNumber5 === null || finiteNumber6 === null) return null;
   return {
     x: mirrorX2 ? -finiteNumber4 : finiteNumber4,
@@ -288,32 +288,32 @@ function normalizationScale(value44) {
       value44[leftHip] && value44[rightHip]
         ? vectorLength(subtract(value44[leftHip], value44[rightHip]))
         : 0,
-    ]['filter']((value46) => value46 > EPSILON),
+    ].filter((value46) => value46 > EPSILON),
     scale2 =
-      list6['length'] > 0
-        ? list6['reduce']((value47, value48) => value47 + value48, 0) / list6['length']
+      list6.length > 0
+        ? list6.reduce((value47, value48) => value47 + value48, 0) / list6.length
         : 0;
   return scale2 > EPSILON ? { origin: origin || { x: 0, y: 0, z: 0 }, scale: scale2 } : null;
 }
 function normalizeLandmarks(list7, value49) {
-  const list8 = list7['map']((value50) => convertLandmark(value50, value49)),
+  const list8 = list7.map((value50) => convertLandmark(value50, value49)),
     box13 = normalizationScale(list8);
   if (!box13) return null;
-  return list8['map'](
+  return list8.map(
     (visibility2) =>
       visibility2 && {
-        ...scaleVector(subtract(visibility2, box13['origin']), 1 / box13['scale']),
-        visibility: visibility2['visibility'],
+        ...scaleVector(subtract(visibility2, box13.origin), 1 / box13.scale),
+        visibility: visibility2.visibility,
       },
   );
 }
 function confidenceFor(value51, value52) {
-  const list9 = [...new Set(value52)]['map']((value53) => value51[value53]?.['visibility'] ?? 0);
-  return list9['length'] > 0 ? Math['min'](...list9) : 0;
+  const list9 = [...new Set(value52)].map((value53) => value51[value53]?.visibility ?? 0);
+  return list9.length > 0 ? Math.min(...list9) : 0;
 }
 function average(list10) {
-  return list10['length'] > 0
-    ? list10['reduce']((value54, value55) => value54 + value55, 0) / list10['length']
+  return list10.length > 0
+    ? list10.reduce((value54, value55) => value54 + value55, 0) / list10.length
     : 0;
 }
 function handTarget(value56, value57) {
@@ -379,10 +379,10 @@ function retargetLeg(value70, value71, value72) {
 }
 function buildBodyFrames(value78) {
   const value79 = MEDIAPIPE_POSE_LANDMARK_INDEX,
-    enabled2 = value78[value79['leftShoulder']],
-    enabled3 = value78[value79['rightShoulder']],
-    enabled4 = value78[value79['leftHip']],
-    enabled5 = value78[value79['rightHip']];
+    enabled2 = value78[value79.leftShoulder],
+    enabled3 = value78[value79.rightShoulder],
+    enabled4 = value78[value79.leftHip],
+    enabled5 = value78[value79.rightHip];
   if (!enabled2 || !enabled3 || !enabled4 || !enabled5) return null;
   const shoulderMid = midpoint(enabled2, enabled3),
     midpoint2 = midpoint(enabled4, enabled5),
@@ -443,47 +443,47 @@ export function retargetMediaPipePoseToStoryboard3D(
       const confidenceFor2 = confidenceFor(landmarks, value83);
       boneConfidence[value82] = confidenceFor2;
       if (confidenceFor2 < threshold) {
-        bones['push'](value82);
+        bones.push(value82);
         return;
       }
       const value84 = handler2(),
         clampQuaternionAngle2 = clampQuaternionAngle(value84, BONE_ANGLE_LIMITS[value82]);
       if (!clampQuaternionAngle2) {
-        bones2['push'](value82);
+        bones2.push(value82);
         return;
       }
       boneOverrides[value82] = toStoryboard3DRigQuaternion(clampQuaternionAngle2);
     },
-    args2 = [value81['leftShoulder'], value81['rightShoulder'], value81['leftHip'], value81['rightHip']],
+    args2 = [value81.leftShoulder, value81.rightShoulder, value81.leftHip, value81.rightHip],
     bodyFrames = buildBodyFrames(landmarks);
-  handler('pelvis', [value81['leftHip'], value81['rightHip']], () => bodyFrames?.['pelvisQuaternion']);
-  const value85 = bodyFrames?.['spineQuaternion']
-    ? quaternionFraction(bodyFrames['spineQuaternion'], 1 / 3)
+  handler('pelvis', [value81.leftHip, value81.rightHip], () => bodyFrames?.pelvisQuaternion);
+  const value85 = bodyFrames?.spineQuaternion
+    ? quaternionFraction(bodyFrames.spineQuaternion, 1 / 3)
     : null;
   for (const value86 of ['spine_01', 'spine_02', 'spine_03']) {
     handler(value86, args2, () => value85);
   }
-  const args3 = [...args2, value81['leftEar'], value81['rightEar']];
+  const args3 = [...args2, value81.leftEar, value81.rightEar];
   let quaternionFromTo6 = null;
   (handler('neck_01', args3, () => {
     if (!bodyFrames) return null;
-    const midpoint3 = midpoint(landmarks[value81['leftEar']], landmarks[value81['rightEar']]),
-      segmentDirection7 = segmentDirection(bodyFrames['shoulderMid'], midpoint3);
+    const midpoint3 = midpoint(landmarks[value81.leftEar], landmarks[value81.rightEar]),
+      segmentDirection7 = segmentDirection(bodyFrames.shoulderMid, midpoint3);
     if (!segmentDirection7) return null;
     const rotateVectorByQuaternion8 = rotateVectorByQuaternion(
       segmentDirection7,
-      invertQuaternion(bodyFrames['torsoQuaternion']),
+      invertQuaternion(bodyFrames.torsoQuaternion),
     );
     return ((quaternionFromTo6 = quaternionFromTo(WORLD_UP, rotateVectorByQuaternion8)), quaternionFromTo6);
   }),
-    handler('Head', [...args3, value81['nose']], () => {
+    handler('Head', [...args3, value81.nose], () => {
       if (!bodyFrames || !quaternionFromTo6) return null;
-      const midpoint4 = midpoint(landmarks[value81['leftEar']], landmarks[value81['rightEar']]),
-        segmentDirection8 = segmentDirection(midpoint4, landmarks[value81['nose']]);
+      const midpoint4 = midpoint(landmarks[value81.leftEar], landmarks[value81.rightEar]),
+        segmentDirection8 = segmentDirection(midpoint4, landmarks[value81.nose]);
       if (!segmentDirection8) return null;
       const rotateVectorByQuaternion9 = rotateVectorByQuaternion(
           segmentDirection8,
-          invertQuaternion(bodyFrames['torsoQuaternion']),
+          invertQuaternion(bodyFrames.torsoQuaternion),
         ),
         quaternionFromTo7 = quaternionFromTo(WORLD_FORWARD, rotateVectorByQuaternion9);
       return quaternionFromTo7
@@ -496,48 +496,48 @@ export function retargetMediaPipePoseToStoryboard3D(
     let retargetArm2 = null;
     const run = () => {
       if (!retargetArm2 && bodyFrames)
-        retargetArm2 = retargetArm(landmarks, value87, bodyFrames['torsoQuaternion']);
+        retargetArm2 = retargetArm(landmarks, value87, bodyFrames.torsoQuaternion);
       return retargetArm2;
     };
-    (handler('upperarm_' + value88, [...args2, value81[value87 + 'Elbow']], () => run()?.['upper']),
-      handler('lowerarm_' + value88, args4, () => run()?.['lower']),
+    (handler('upperarm_' + value88, [...args2, value81[value87 + 'Elbow']], () => run()?.upper),
+      handler('lowerarm_' + value88, args4, () => run()?.lower),
       handler(
         'hand_' + value88,
         [...args4, value81[value87 + 'Pinky'], value81[value87 + 'Index']],
-        () => run()?.['hand'],
+        () => run()?.hand,
       ));
     const args5 = [
-      value81['leftHip'],
-      value81['rightHip'],
+      value81.leftHip,
+      value81.rightHip,
       value81[value87 + 'Knee'],
       value81[value87 + 'Ankle'],
     ];
     let retargetLeg2 = null;
     const run2 = () => {
       if (!retargetLeg2 && bodyFrames)
-        retargetLeg2 = retargetLeg(landmarks, value87, bodyFrames['pelvisQuaternion']);
+        retargetLeg2 = retargetLeg(landmarks, value87, bodyFrames.pelvisQuaternion);
       return retargetLeg2;
     };
     (handler(
       'thigh_' + value88,
-      [value81['leftHip'], value81['rightHip'], value81[value87 + 'Knee']],
-      () => run2()?.['thigh'],
+      [value81.leftHip, value81.rightHip, value81[value87 + 'Knee']],
+      () => run2()?.thigh,
     ),
-      handler('calf_' + value88, args5, () => run2()?.['calf']),
-      handler('foot_' + value88, [...args5, value81[value87 + 'FootIndex']], () => run2()?.['foot']));
+      handler('calf_' + value88, args5, () => run2()?.calf),
+      handler('foot_' + value88, [...args5, value81[value87 + 'FootIndex']], () => run2()?.foot));
   }
   const warnings = [];
   return (
-    bones['length'] > 0 &&
-      warnings['push'](
+    bones.length > 0 &&
+      warnings.push(
         warning(
           'LOW_CONFIDENCE_BONES_SKIPPED',
           'Low-visibility landmarks were not applied to the affected character bones.',
           { bones: bones, threshold: threshold },
         ),
       ),
-    bones2['length'] > 0 &&
-      warnings['push'](
+    bones2.length > 0 &&
+      warnings.push(
         warning(
           'DEGENERATE_POSE_SEGMENTS_SKIPPED',
           'Zero-length or ambiguous pose segments were not applied.',
@@ -546,7 +546,7 @@ export function retargetMediaPipePoseToStoryboard3D(
       ),
     {
       boneOverrides: boneOverrides,
-      confidence: average(Object['values'](boneConfidence)),
+      confidence: average(Object.values(boneConfidence)),
       boneConfidence: boneConfidence,
       warnings: warnings,
     }

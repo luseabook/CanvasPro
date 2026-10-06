@@ -1,14 +1,14 @@
-const COLOR_VARIANTS = Object['freeze']([
-    Object['freeze']({ id: 'blue', label: 'Blue' }),
-    Object['freeze']({ id: 'red', label: 'Red' }),
-    Object['freeze']({ id: 'green', label: 'Green' }),
-    Object['freeze']({ id: 'yellow', label: 'Yellow' }),
-    Object['freeze']({ id: 'purple', label: 'Purple' }),
+const COLOR_VARIANTS = Object.freeze([
+    Object.freeze({ id: 'blue', label: 'Blue' }),
+    Object.freeze({ id: 'red', label: 'Red' }),
+    Object.freeze({ id: 'green', label: 'Green' }),
+    Object.freeze({ id: 'yellow', label: 'Yellow' }),
+    Object.freeze({ id: 'purple', label: 'Purple' }),
   ]),
-  SIZE_VARIANTS = Object['freeze']([
-    Object['freeze']({ id: 'small', label: 'Small', scale: 0.75 }),
-    Object['freeze']({ id: 'medium', label: 'Medium', scale: 1 }),
-    Object['freeze']({ id: 'large', label: 'Large', scale: 1.35 }),
+  SIZE_VARIANTS = Object.freeze([
+    Object.freeze({ id: 'small', label: 'Small', scale: 0.75 }),
+    Object.freeze({ id: 'medium', label: 'Medium', scale: 1 }),
+    Object.freeze({ id: 'large', label: 'Large', scale: 1.35 }),
   ]),
   vector3 = (x = 0, y = 0, z = 0) => ({
     x: x,
@@ -19,34 +19,34 @@ const COLOR_VARIANTS = Object['freeze']([
     primitive: 'box',
     size: { ...args },
     position: { ...args2 },
-    rotation: { ...vector3(), ...(colorKey['rotation'] || {}) },
-    colorKey: colorKey['colorKey'] || null,
+    rotation: { ...vector3(), ...(colorKey.rotation || {}) },
+    colorKey: colorKey.colorKey || null,
   }),
   cylinder = (value, height, args3, radiusTop = {}) => ({
     primitive: 'cylinder',
-    radiusTop: radiusTop['radiusTop'] ?? value,
-    radiusBottom: radiusTop['radiusBottom'] ?? value,
+    radiusTop: radiusTop.radiusTop ?? value,
+    radiusBottom: radiusTop.radiusBottom ?? value,
     height: height,
     position: { ...args3 },
-    rotation: { ...vector3(), ...(radiusTop['rotation'] || {}) },
-    colorKey: radiusTop['colorKey'] || null,
+    rotation: { ...vector3(), ...(radiusTop.rotation || {}) },
+    colorKey: radiusTop.colorKey || null,
   }),
   sphere = (radius, args4, colorKey2 = {}) => ({
     primitive: 'sphere',
     radius: radius,
     position: { ...args4 },
-    rotation: { ...vector3(), ...(colorKey2['rotation'] || {}) },
-    colorKey: colorKey2['colorKey'] || null,
+    rotation: { ...vector3(), ...(colorKey2.rotation || {}) },
+    colorKey: colorKey2.colorKey || null,
   }),
   torus = (radius2, tube, args5, colorKey3 = {}) => ({
     primitive: 'torus',
     radius: radius2,
     tube: tube,
     position: { ...args5 },
-    rotation: { ...vector3(), ...(colorKey3['rotation'] || {}) },
-    colorKey: colorKey3['colorKey'] || null,
+    rotation: { ...vector3(), ...(colorKey3.rotation || {}) },
+    colorKey: colorKey3.colorKey || null,
   }),
-  FAMILY_TEMPLATES = Object['freeze']([
+  FAMILY_TEMPLATES = Object.freeze([
     {
       id: 'building',
       name: 'Building',
@@ -91,7 +91,7 @@ const COLOR_VARIANTS = Object['freeze']([
       name: 'Stairs',
       category: 'architecture',
       tags: ['steps', 'platform'],
-      parts: Array['from']({ length: 5 }, (item, key) =>
+      parts: Array.from({ length: 5 }, (item, key) =>
         box(vector3(2.5, 0.28, 0.65), vector3(0, 0.14 + key * 0.28, key * 0.55)),
       ),
     },
@@ -113,8 +113,8 @@ const COLOR_VARIANTS = Object['freeze']([
       tags: ['desk', 'dining'],
       parts: [
         box(vector3(2.2, 0.16, 1.1), vector3(0, 1.05, 0)),
-        ...[-0.9, 0.9]['flatMap']((index) =>
-          [-0.38, 0.38]['map']((result) => box(vector3(0.14, 1, 0.14), vector3(index, 0.5, result))),
+        ...[-0.9, 0.9].flatMap((index) =>
+          [-0.38, 0.38].map((result) => box(vector3(0.14, 1, 0.14), vector3(index, 0.5, result))),
         ),
       ],
     },
@@ -126,8 +126,8 @@ const COLOR_VARIANTS = Object['freeze']([
       parts: [
         box(vector3(0.85, 0.14, 0.85), vector3(0, 0.72, 0)),
         box(vector3(0.85, 1.05, 0.14), vector3(0, 1.3, 0.36)),
-        ...[-0.32, 0.32]['flatMap']((data) =>
-          [-0.32, 0.32]['map']((options) => box(vector3(0.1, 0.7, 0.1), vector3(data, 0.35, options))),
+        ...[-0.32, 0.32].flatMap((data) =>
+          [-0.32, 0.32].map((options) => box(vector3(0.1, 0.7, 0.1), vector3(data, 0.35, options))),
         ),
       ],
     },
@@ -151,7 +151,7 @@ const COLOR_VARIANTS = Object['freeze']([
       parts: [
         box(vector3(0.16, 2.8, 0.65), vector3(-1.05, 1.4, 0)),
         box(vector3(0.16, 2.8, 0.65), vector3(1.05, 1.4, 0)),
-        ...[0.12, 0.95, 1.78, 2.62]['map']((target) =>
+        ...[0.12, 0.95, 1.78, 2.62].map((target) =>
           box(vector3(2.25, 0.12, 0.65), vector3(0, target, 0)),
         ),
       ],
@@ -191,9 +191,9 @@ const COLOR_VARIANTS = Object['freeze']([
       name: 'Dance Floor',
       category: 'stage',
       tags: ['dance', 'club', 'floor'],
-      parts: Array['from']({ length: 16 }, (source, next) => {
+      parts: Array.from({ length: 16 }, (source, next) => {
         const current = ((next % 4) - 1.5) * 0.82,
-          entry = (Math['floor'](next / 4) - 1.5) * 0.82;
+          entry = (Math.floor(next / 4) - 1.5) * 0.82;
         return box(vector3(0.78, 0.12, 0.78), vector3(current, 0.06, entry), {
           colorKey: ['blue', 'purple', 'cyan', 'yellow'][next % 4],
         });
@@ -207,11 +207,11 @@ const COLOR_VARIANTS = Object['freeze']([
       parts: [
         box(vector3(0.9, 1.65, 0.65), vector3(0, 0.825, 0)),
         cylinder(0.28, 0.08, vector3(0, 0.55, -0.36), {
-          rotation: vector3(Math['PI'] / 2, 0, 0),
+          rotation: vector3(Math.PI / 2, 0, 0),
           colorKey: 'black',
         }),
         cylinder(0.18, 0.08, vector3(0, 1.2, -0.36), {
-          rotation: vector3(Math['PI'] / 2, 0, 0),
+          rotation: vector3(Math.PI / 2, 0, 0),
           colorKey: 'black',
         }),
       ],
@@ -226,7 +226,7 @@ const COLOR_VARIANTS = Object['freeze']([
         cylinder(0.42, 0.65, vector3(0, 1.72, 0), {
           radiusTop: 0.28,
           radiusBottom: 0.46,
-          rotation: vector3(Math['PI'] / 2, 0, 0),
+          rotation: vector3(Math.PI / 2, 0, 0),
         }),
         sphere(0.24, vector3(0, 1.72, -0.35), { colorKey: 'yellow' }),
       ],
@@ -237,10 +237,10 @@ const COLOR_VARIANTS = Object['freeze']([
       category: 'stage',
       tags: ['rig', 'concert', 'frame'],
       parts: [
-        ...[-1.7, 1.7]['flatMap']((record) =>
-          [-0.22, 0.22]['map']((payload) => cylinder(0.06, 3, vector3(record, 1.5, payload))),
+        ...[-1.7, 1.7].flatMap((record) =>
+          [-0.22, 0.22].map((payload) => cylinder(0.06, 3, vector3(record, 1.5, payload))),
         ),
-        ...[-0.22, 0.22]['map']((handle) => box(vector3(3.5, 0.1, 0.1), vector3(0, 2.95, handle))),
+        ...[-0.22, 0.22].map((handle) => box(vector3(3.5, 0.1, 0.1), vector3(0, 2.95, handle))),
       ],
     },
     {
@@ -275,8 +275,8 @@ const COLOR_VARIANTS = Object['freeze']([
       tags: ['drum', 'industrial'],
       parts: [
         cylinder(0.48, 1.2, vector3(0, 0.6, 0), { radiusTop: 0.4, radiusBottom: 0.4 }),
-        torus(0.43, 0.045, vector3(0, 0.2, 0), { rotation: vector3(Math['PI'] / 2, 0, 0) }),
-        torus(0.43, 0.045, vector3(0, 1, 0), { rotation: vector3(Math['PI'] / 2, 0, 0) }),
+        torus(0.43, 0.045, vector3(0, 0.2, 0), { rotation: vector3(Math.PI / 2, 0, 0) }),
+        torus(0.43, 0.045, vector3(0, 1, 0), { rotation: vector3(Math.PI / 2, 0, 0) }),
       ],
     },
     {
@@ -323,107 +323,107 @@ function scalePart(x2, state) {
   const config = {
     ...x2,
     position: {
-      x: x2['position']['x'] * state,
-      y: x2['position']['y'] * state,
-      z: x2['position']['z'] * state,
+      x: x2.position.x * state,
+      y: x2.position.y * state,
+      z: x2.position.z * state,
     },
-    rotation: { ...x2['rotation'] },
+    rotation: { ...x2.rotation },
   };
-  x2['size'] &&
-    (config['size'] = {
-      x: x2['size']['x'] * state,
-      y: x2['size']['y'] * state,
-      z: x2['size']['z'] * state,
+  x2.size &&
+    (config.size = {
+      x: x2.size.x * state,
+      y: x2.size.y * state,
+      z: x2.size.z * state,
     });
   for (const scope of ['radius', 'radiusTop', 'radiusBottom', 'height', 'tube']) {
-    if (Number['isFinite'](x2[scope])) config[scope] = x2[scope] * state;
+    if (Number.isFinite(x2[scope])) config[scope] = x2[scope] * state;
   }
   return config;
 }
-const ASSETS = Object['freeze'](
-    FAMILY_TEMPLATES['flatMap']((id) =>
-      SIZE_VARIANTS['flatMap']((size) =>
-        COLOR_VARIANTS['map']((colorKey4) =>
-          Object['freeze']({
-            id: id['category'] + '-' + id['id'] + '-' + size['id'] + '-' + colorKey4['id'],
-            familyId: id['id'],
-            name: id['name'] + ' ' + size['label'] + ' ' + colorKey4['label'],
-            category: id['category'],
-            tags: Object['freeze']([...id['tags'], size['id'], colorKey4['id']]),
+const ASSETS = Object.freeze(
+    FAMILY_TEMPLATES.flatMap((id) =>
+      SIZE_VARIANTS.flatMap((size) =>
+        COLOR_VARIANTS.map((colorKey4) =>
+          Object.freeze({
+            id: id.category + '-' + id.id + '-' + size.id + '-' + colorKey4.id,
+            familyId: id.id,
+            name: id.name + ' ' + size.label + ' ' + colorKey4.label,
+            category: id.category,
+            tags: Object.freeze([...id.tags, size.id, colorKey4.id]),
             kind: 'procedural',
-            colorKey: colorKey4['id'],
-            size: size['id'],
-            parts: Object['freeze'](
-              id['parts']['map']((input) => Object['freeze'](scalePart(input, size['scale']))),
+            colorKey: colorKey4.id,
+            size: size.id,
+            parts: Object.freeze(
+              id.parts.map((input) => Object.freeze(scalePart(input, size.scale))),
             ),
           }),
         ),
       ),
     ),
   ),
-  ASSET_BY_ID = new Map(ASSETS['map']((output) => [output['id'], output]));
+  ASSET_BY_ID = new Map(ASSETS.map((output) => [output.id, output]));
 export const DEFAULT_SCENE_ASSET_ID = 'props-cube-medium-blue';
-export const SCENE_ASSET_COUNT = ASSETS['length'];
+export const SCENE_ASSET_COUNT = ASSETS.length;
 export function listSceneAssets() {
   return [...ASSETS];
 }
 export function getSceneAssetCategories() {
-  return [...new Set(ASSETS['map']((value2) => value2['category']))];
+  return [...new Set(ASSETS.map((value2) => value2.category))];
 }
 export function findSceneAsset(value3) {
-  return ASSET_BY_ID['get'](String(value3 || '')['trim']()) || null;
+  return ASSET_BY_ID.get(String(value3 || '').trim()) || null;
 }
 function getPartHalfExtents(box2 = {}) {
-  if (box2['primitive'] === 'sphere') {
-    const value4 = Math['max'](0, Number(box2['radius']) || 0);
+  if (box2.primitive === 'sphere') {
+    const value4 = Math.max(0, Number(box2.radius) || 0);
     return vector3(value4, value4, value4);
   }
-  if (box2['primitive'] === 'torus') {
-    const value5 = Math['max'](0, (Number(box2['radius']) || 0) + (Number(box2['tube']) || 0));
+  if (box2.primitive === 'torus') {
+    const value5 = Math.max(0, (Number(box2.radius) || 0) + (Number(box2.tube) || 0));
     return vector3(value5, value5, value5);
   }
-  if (box2['primitive'] === 'cylinder') {
-    const value6 = Math['max'](0, Number(box2['radiusTop']) || 0, Number(box2['radiusBottom']) || 0),
-      value7 = Math['max'](0, (Number(box2['height']) || 0) / 2),
-      value8 = Math['max'](value6, value7);
+  if (box2.primitive === 'cylinder') {
+    const value6 = Math.max(0, Number(box2.radiusTop) || 0, Number(box2.radiusBottom) || 0),
+      value7 = Math.max(0, (Number(box2.height) || 0) / 2),
+      value8 = Math.max(value6, value7);
     return vector3(value8, value8, value8);
   }
   return vector3(
-    Math['max'](0, (Number(box2?.['size']?.['x']) || 0) / 2),
-    Math['max'](0, (Number(box2?.['size']?.['y']) || 0) / 2),
-    Math['max'](0, (Number(box2?.['size']?.['z']) || 0) / 2),
+    Math.max(0, (Number(box2?.size?.x) || 0) / 2),
+    Math.max(0, (Number(box2?.size?.y) || 0) / 2),
+    Math.max(0, (Number(box2?.size?.z) || 0) / 2),
   );
 }
 export function estimateSceneAssetBoundingRadius(value9) {
   const value10 = typeof value9 === 'string' ? findSceneAsset(value9) : value9,
-    list = Array['isArray'](value10?.['parts']) ? value10['parts'] : [];
-  if (list['length'] === 0) return 0.5;
-  const value11 = list['reduce'](
+    list = Array.isArray(value10?.parts) ? value10.parts : [];
+  if (list.length === 0) return 0.5;
+  const value11 = list.reduce(
       (value12, value13) => {
-        const box3 = value13?.['position'] || vector3(),
+        const box3 = value13?.position || vector3(),
           box4 = getPartHalfExtents(value13);
         return (
-          (value12['min']['x'] = Math['min'](value12['min']['x'], (Number(box3['x']) || 0) - box4['x'])),
-          (value12['min']['y'] = Math['min'](value12['min']['y'], (Number(box3['y']) || 0) - box4['y'])),
-          (value12['min']['z'] = Math['min'](value12['min']['z'], (Number(box3['z']) || 0) - box4['z'])),
-          (value12['max']['x'] = Math['max'](value12['max']['x'], (Number(box3['x']) || 0) + box4['x'])),
-          (value12['max']['y'] = Math['max'](value12['max']['y'], (Number(box3['y']) || 0) + box4['y'])),
-          (value12['max']['z'] = Math['max'](value12['max']['z'], (Number(box3['z']) || 0) + box4['z'])),
+          (value12.min.x = Math.min(value12.min.x, (Number(box3.x) || 0) - box4.x)),
+          (value12.min.y = Math.min(value12.min.y, (Number(box3.y) || 0) - box4.y)),
+          (value12.min.z = Math.min(value12.min.z, (Number(box3.z) || 0) - box4.z)),
+          (value12.max.x = Math.max(value12.max.x, (Number(box3.x) || 0) + box4.x)),
+          (value12.max.y = Math.max(value12.max.y, (Number(box3.y) || 0) + box4.y)),
+          (value12.max.z = Math.max(value12.max.z, (Number(box3.z) || 0) + box4.z)),
           value12
         );
       },
       { min: vector3(Infinity, Infinity, Infinity), max: vector3(-Infinity, -Infinity, -Infinity) },
     ),
     box5 = vector3(
-      Math['max'](0.01, (value11['max']['x'] - value11['min']['x']) / 2),
-      Math['max'](0.01, (value11['max']['y'] - value11['min']['y']) / 2),
-      Math['max'](0.01, (value11['max']['z'] - value11['min']['z']) / 2),
+      Math.max(0.01, (value11.max.x - value11.min.x) / 2),
+      Math.max(0.01, (value11.max.y - value11.min.y) / 2),
+      Math.max(0.01, (value11.max.z - value11.min.z) / 2),
     );
-  return Math['max'](0.5, Math['hypot'](box5['x'], box5['y'], box5['z']));
+  return Math.max(0.5, Math.hypot(box5.x, box5.y, box5.z));
 }
 export function resolveSceneAsset(value14, value15 = DEFAULT_SCENE_ASSET_ID) {
-  const value16 = String(value14 || '')['trim']();
-  return ASSET_BY_ID['get'](value16) || ASSET_BY_ID['get'](value15) || ASSETS[0] || null;
+  const value16 = String(value14 || '').trim();
+  return ASSET_BY_ID.get(value16) || ASSET_BY_ID.get(value15) || ASSETS[0] || null;
 }
 export function searchSceneAssets({
   query: query = '',
@@ -432,19 +432,19 @@ export function searchSceneAssets({
   offset: offset = 0,
 } = {}) {
   const enabled = String(query || '')
-      ['trim']()
-      ['toLowerCase'](),
+      .trim()
+      .toLowerCase(),
     value17 = String(category || 'all')
-      ['trim']()
-      ['toLowerCase'](),
-    value18 = Math['max'](0, Math['floor'](Number(offset) || 0)),
-    value19 = Math['max'](1, Math['min'](360, Math['floor'](Number(limit) || 80)));
-  return ASSETS['filter']((error) => {
-    if (value17 !== 'all' && error['category'] !== value17) return false;
+      .trim()
+      .toLowerCase(),
+    value18 = Math.max(0, Math.floor(Number(offset) || 0)),
+    value19 = Math.max(1, Math.min(360, Math.floor(Number(limit) || 80)));
+  return ASSETS.filter((error) => {
+    if (value17 !== 'all' && error.category !== value17) return false;
     if (!enabled) return true;
-    const list2 = [error['id'], error['familyId'], error['name'], error['category'], ...error['tags']]
-      ['join'](' ')
-      ['toLowerCase']();
-    return list2['includes'](enabled);
-  })['slice'](value18, value18 + value19);
+    const list2 = [error.id, error.familyId, error.name, error.category, ...error.tags]
+      .join(' ')
+      .toLowerCase();
+    return list2.includes(enabled);
+  }).slice(value18, value18 + value19);
 }

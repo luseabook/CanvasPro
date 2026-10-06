@@ -8,17 +8,17 @@ function clearRendererViewportMediaPreloadResumeTimer() {
   (clearTimeout(rendererViewportMediaPreloadResumeTimer), (rendererViewportMediaPreloadResumeTimer = 0));
 }
 function isViewportBodyBusy() {
-  const value = typeof document !== 'undefined' ? document?.['body']?.['classList'] : null;
+  const value = typeof document !== 'undefined' ? document?.body?.classList : null;
   return Boolean(
-    value?.['contains']?.('is-panning') ||
-    value?.['contains']?.('is-zooming') ||
-    value?.['contains']?.('is-viewport-animating'),
+    value?.contains?.('is-panning') ||
+    value?.contains?.('is-zooming') ||
+    value?.contains?.('is-viewport-animating'),
   );
 }
 function scheduleRendererViewportMediaPreloadResume(item) {
   clearRendererViewportMediaPreloadResumeTimer();
-  const key = Number['isFinite'](Number(item))
-    ? Math['max'](0, Number(item))
+  const key = Number.isFinite(Number(item))
+    ? Math.max(0, Number(item))
     : DEFAULT_RENDERER_VIEWPORT_MEDIA_PRELOAD_AUTO_RESUME_MS;
   rendererViewportMediaPreloadResumeTimer = setTimeout(() => {
     rendererViewportMediaPreloadResumeTimer = 0;
@@ -32,7 +32,7 @@ function scheduleRendererViewportMediaPreloadResume(item) {
 export function syncRendererViewportMediaPreloadPause(index, result = {}) {
   const data = index === true;
   data
-    ? scheduleRendererViewportMediaPreloadResume(result['autoResumeMs'])
+    ? scheduleRendererViewportMediaPreloadResume(result.autoResumeMs)
     : clearRendererViewportMediaPreloadResumeTimer();
   if (rendererViewportMediaPreloadsPaused === data) return;
   ((rendererViewportMediaPreloadsPaused = data),

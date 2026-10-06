@@ -19,7 +19,7 @@ export function createAgentTextConversationRuntime({
     return (
       (abortController = new AbortController()),
       (id = 'agent-text-' + ++value),
-      sessionStore['setCurrentRun']({ id: id, status: 'planning', stopped: false }),
+      sessionStore.setCurrentRun({ id: id, status: 'planning', stopped: false }),
       id
     );
   }
@@ -27,7 +27,7 @@ export function createAgentTextConversationRuntime({
     sessionStore: sessionStore,
     startRun: startRun,
     isActiveRun: (key) => !enabled && id === key,
-    getSignal: () => abortController?.['signal'],
+    getSignal: () => abortController?.signal,
     createStoppedReply: createStoppedReply,
     createFailedReply: createFailedReply,
     text: (index) =>
@@ -40,7 +40,7 @@ export function createAgentTextConversationRuntime({
         ...history,
         message: message,
         context: getContext(),
-        history: history['history'] || sessionStore['getHistory'](),
+        history: history.history || sessionStore.getHistory(),
       }),
     handleUserMessage: handleUserMessage,
   });
@@ -48,52 +48,52 @@ export function createAgentTextConversationRuntime({
     if (enabled) return createFailedReply('会话已关闭');
     if (
       abortController &&
-      !abortController['signal']['aborted'] &&
-      sessionStore['getCurrentRun']()?.['status'] === 'planning'
+      !abortController.signal.aborted &&
+      sessionStore.getCurrentRun()?.status === 'planning'
     )
       return createFailedReply('请等待当前回复或先停止');
-    const content = String(result || '')['trim']();
+    const content = String(result || '').trim();
     if (!content) return createFailedReply('请输入创作要求');
     return (
-      sessionStore['pushHistory']({ role: 'user', content: content }),
-      getPendingAssistantChoice['handle'](content, {}, startRun())
+      sessionStore.pushHistory({ role: 'user', content: content }),
+      getPendingAssistantChoice.handle(content, {}, startRun())
     );
   }
   function stop() {
-    const notice = getPendingAssistantChoice['stop']();
+    const notice = getPendingAssistantChoice.stop();
     return (
-      abortController?.['abort'](),
+      abortController?.abort(),
       (id = ''),
-      sessionStore['stopCurrentRun'](),
-      { ...createStoppedReply(), ...(notice?.['error'] ? { notice: notice['error']['message'] } : {}) }
+      sessionStore.stopCurrentRun(),
+      { ...createStoppedReply(), ...(notice?.error ? { notice: notice.error.message } : {}) }
     );
   }
   return {
     sessionStore: sessionStore,
     handleUserMessage: handleUserMessage,
     stop: stop,
-    getPendingAssistantChoice: getPendingAssistantChoice['getPendingChoice'],
-    answerAssistantChoice: getPendingAssistantChoice['answerChoice'],
-    reviseAssistantTurn: (data) => getPendingAssistantChoice['revise'](data),
-    selectAssistantVersion: getPendingAssistantChoice['selectVersion'],
-    listConversations: () => sessionStore['listConversations'](),
-    getActiveConversation: () => sessionStore['getActiveConversation'](),
+    getPendingAssistantChoice: getPendingAssistantChoice.getPendingChoice,
+    answerAssistantChoice: getPendingAssistantChoice.answerChoice,
+    reviseAssistantTurn: (data) => getPendingAssistantChoice.revise(data),
+    selectAssistantVersion: getPendingAssistantChoice.selectVersion,
+    listConversations: () => sessionStore.listConversations(),
+    getActiveConversation: () => sessionStore.getActiveConversation(),
     startNewConversation() {
-      return (stop(), sessionStore['startNewConversation']());
+      return (stop(), sessionStore.startNewConversation());
     },
     switchConversation(options) {
-      return (stop(), sessionStore['switchConversation'](options));
+      return (stop(), sessionStore.switchConversation(options));
     },
     deleteConversation(target) {
-      if (String(target || '')['trim']() === sessionStore['getActiveConversation']()?.['id']) stop();
-      return sessionStore['deleteConversation'](target);
+      if (String(target || '').trim() === sessionStore.getActiveConversation()?.id) stop();
+      return sessionStore.deleteConversation(target);
     },
     dispose() {
       try {
         stop();
       } catch {
       } finally {
-        (abortController?.['abort'](), (id = ''), (enabled = true));
+        (abortController?.abort(), (id = ''), (enabled = true));
       }
     },
   };

@@ -265,7 +265,7 @@ import {
   SEEDANCE2_INPUT_MAX_BY_KIND,
   SEEDANCE2_MAX_TOTAL_DURATION_SECONDS_BY_KIND,
 } from '../../../modules/modelMediaInputLimits.js';
-const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
+const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object.freeze([
     VOLCENGINE_SEEDANCE_2_MODE_FIELD,
     VOLCENGINE_SEEDANCE_2_RATIO_FIELD,
     createFooterDurationField({ defaultValue: 5, min: 4, max: 15 }),
@@ -275,50 +275,50 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     VOLCENGINE_SEEDANCE_2_PRIORITY_FIELD,
   ]),
   VOLCENGINE_SEEDANCE_2_INPUT_SLOTS = createVideoInputSlots({
-    image: SEEDANCE2_INPUT_MAX_BY_KIND['image'],
-    video: SEEDANCE2_INPUT_MAX_BY_KIND['video'],
-    audio: SEEDANCE2_INPUT_MAX_BY_KIND['audio'],
+    image: SEEDANCE2_INPUT_MAX_BY_KIND.image,
+    video: SEEDANCE2_INPUT_MAX_BY_KIND.video,
+    audio: SEEDANCE2_INPUT_MAX_BY_KIND.audio,
     maxTotalDurationSecondsByKind: SEEDANCE2_MAX_TOTAL_DURATION_SECONDS_BY_KIND,
   }),
-  VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
+  VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES = Object.freeze([
     -1,
-    ...Array['from']({ length: 27 }, (value, item) => item + 4),
+    ...Array.from({ length: 27 }, (value, item) => item + 4),
   ]),
-  VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE = Object['freeze']({
+  VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE = Object.freeze({
     min: 4,
     max: 30,
     step: 1,
     defaultValue: -1,
     values: VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES,
-    optionLabels: Object['freeze']({ '-1': '自动' }),
+    optionLabels: Object.freeze({ '-1': '自动' }),
   }),
-  VOLCENGINE_SEEDANCE_2_5_DURATION_BY_TASK = Object['freeze']({
+  VOLCENGINE_SEEDANCE_2_5_DURATION_BY_TASK = Object.freeze({
     text2video: VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE,
     image2video: VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE,
     frames2video: VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE,
     multimodal2video: VOLCENGINE_SEEDANCE_2_5_DURATION_RANGE,
   }),
-  VOLCENGINE_SEEDANCE_2_5_OUTPUT_FORMAT_FIELD = Object['freeze']({
+  VOLCENGINE_SEEDANCE_2_5_OUTPUT_FORMAT_FIELD = Object.freeze({
     id: 'outputFormat',
     type: 'segmented',
     placement: 'advanced',
     variant: 'advancedRow',
     label: '输出格式',
     defaultValue: 'mp4',
-    options: Object['freeze']([
-      Object['freeze']({ value: 'mp4', label: 'MP4' }),
-      Object['freeze']({ value: 'mov', label: 'MOV' }),
+    options: Object.freeze([
+      Object.freeze({ value: 'mp4', label: 'MP4' }),
+      Object.freeze({ value: 'mov', label: 'MOV' }),
     ]),
   }),
-  VOLCENGINE_SEEDANCE_2_5_FIELDS = Object['freeze']([
+  VOLCENGINE_SEEDANCE_2_5_FIELDS = Object.freeze([
     VOLCENGINE_SEEDANCE_2_MODE_FIELD,
     createVolcengineSeedance2ResolutionField({ include1080p: false }),
     VOLCENGINE_SEEDANCE_2_RATIO_FIELD,
     createFooterDurationSliderOptionsField({
       values: VOLCENGINE_SEEDANCE_2_5_DURATION_VALUES,
       defaultValue: -1,
-      optionOverridesByValue: Object['freeze']({
-        '-1': Object['freeze']({ label: '自动', displayLabel: '自动' }),
+      optionOverridesByValue: Object.freeze({
+        '-1': Object.freeze({ label: '自动', displayLabel: '自动' }),
       }),
     }),
     VOLCENGINE_SEEDANCE_2_GENERATE_AUDIO_FIELD,
@@ -332,10 +332,10 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     image: 30,
     video: 10,
     audio: 10,
-    maxTotalDurationSecondsByKind: Object['freeze']({ video: 30, audio: 30 }),
-    mediaConstraintsByKind: Object['freeze']({
-      image: Object['freeze']({
-        allowedExtensions: Object['freeze']([
+    maxTotalDurationSecondsByKind: Object.freeze({ video: 30, audio: 30 }),
+    mediaConstraintsByKind: Object.freeze({
+      image: Object.freeze({
+        allowedExtensions: Object.freeze([
           'jpg',
           'jpeg',
           'png',
@@ -349,14 +349,14 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
         ]),
         maxBytes: 30 * 1024 * 1024,
       }),
-      video: Object['freeze']({
-        allowedExtensions: Object['freeze'](['mp4', 'mov']),
+      video: Object.freeze({
+        allowedExtensions: Object.freeze(['mp4', 'mov']),
         minDurationSeconds: 2,
         maxDurationSeconds: 30,
         maxBytes: 200 * 1024 * 1024,
       }),
-      audio: Object['freeze']({
-        allowedExtensions: Object['freeze'](['wav', 'mp3']),
+      audio: Object.freeze({
+        allowedExtensions: Object.freeze(['wav', 'mp3']),
         minDurationSeconds: 2,
         maxDurationSeconds: 30,
         maxBytes: 15 * 1024 * 1024,
@@ -364,13 +364,13 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     }),
   }),
   VOLCENGINE_SEEDANCE_2_5_BODY_MAPPING = freezeBodyMapping([
-    ...VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING['map']((args) =>
-      args['path'] === 'duration' ? Object['freeze']({ ...args, defaultValue: -1 }) : args,
+    ...VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING.map((args) =>
+      args.path === 'duration' ? Object.freeze({ ...args, defaultValue: -1 }) : args,
     ),
-    Object['freeze']({
+    Object.freeze({
       path: 'output_format',
       from: 'param',
-      field: Object['freeze']([
+      field: Object.freeze([
         'generationParams.outputFormat',
         'generationParams.output_format',
         'outputFormat',
@@ -378,16 +378,16 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
       ]),
       defaultValue: 'mp4',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'seed',
       from: 'param',
-      field: Object['freeze'](['generationParams.seed', 'seed']),
+      field: Object.freeze(['generationParams.seed', 'seed']),
       omitWhenEmpty: true,
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'omni_reference_task_type',
       from: 'param',
-      field: Object['freeze']([
+      field: Object.freeze([
         'generationParams.omniReferenceTaskType',
         'generationParams.omni_reference_task_type',
         'omniReferenceTaskType',
@@ -396,14 +396,14 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
       omitWhenEmpty: true,
     }),
   ]),
-  VOLCENGINE_SEEDANCE_2_5_RATIO_POLICY = Object['freeze']({
+  VOLCENGINE_SEEDANCE_2_5_RATIO_POLICY = Object.freeze({
     ...VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
     preserveAdaptiveAtSubmit: true,
   }),
-  VOLCENGINE_SEEDANCE_2_5_VIDEO_POLICY = Object['freeze']({
+  VOLCENGINE_SEEDANCE_2_5_VIDEO_POLICY = Object.freeze({
     defaultRatio: 'adaptive',
     defaultResolution: '720p',
-    allowedResolutions: Object['freeze'](['480p', '720p']),
+    allowedResolutions: Object.freeze(['480p', '720p']),
     defaultDuration: -1,
     minDuration: 4,
     maxDuration: 30,
@@ -420,9 +420,9 @@ const VOLCENGINE_SEEDANCE_2_COMMON_FIELDS = Object['freeze']([
     '火山方舟 Seedance 2.5',
     '支持文生、图生、首尾帧和多模态参考，最长 30 秒。',
     '多模态最多支持 30 张图片、10 个视频和 10 个音频，可仅使用音频参考。',
-  ]['join']('\n');
-export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
-  Object['freeze']({
+  ].join('\n');
+export const VOLCENGINE_VIDEO_MODELS = Object.freeze([
+  Object.freeze({
     provider: 'volcengine',
     modelId: 'volcengine/seedance-2.5',
     executionId: 'volcengine.model-api.video.seedance-2-5.v1',
@@ -442,37 +442,37 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     executionExtensions: createVolcengineSeedanceVideoExecutionExtensions(
       VOLCENGINE_SEEDANCE_2_5_VIDEO_POLICY,
     ),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({ tooltip: VOLCENGINE_SEEDANCE_2_5_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      segmentRetake: Object['freeze']({
+    help: Object.freeze({ tooltip: VOLCENGINE_SEEDANCE_2_5_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      segmentRetake: Object.freeze({
         supported: true,
-        parameterPolicy: Object['freeze']({
-          mode: Object['freeze']({ fieldId: 'dreaminaRouteMode', value: 'multimodal2video' }),
-          duration: Object['freeze']({ fieldId: 'duration', value: -1 }),
+        parameterPolicy: Object.freeze({
+          mode: Object.freeze({ fieldId: 'dreaminaRouteMode', value: 'multimodal2video' }),
+          duration: Object.freeze({ fieldId: 'duration', value: -1 }),
         }),
       }),
-      dreaminaStyleVideo: Object['freeze']({
+      dreaminaStyleVideo: Object.freeze({
         order: 5,
         title: 'Seedance 2.5',
         subtitle: '火山方舟 2.5，支持最长 30 秒和多模态参考素材',
@@ -483,12 +483,12 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'volcengine',
     modelId: 'volcengine/seedance-2.0-fast',
     executionId: 'volcengine.model-api.video.seedance-2-fast.v1',
     displayName: 'Seedance 2.0 Fast',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'volcengine/doubao-seedance-2-0-fast',
       'volcengine/doubao-seedance-2-0-fast-260128',
     ]),
@@ -498,10 +498,10 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     endpoint: '/contents/generations/tasks',
     endpointMode: 'content-generation-task',
     ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
-    fields: Object['freeze']([
+    fields: Object.freeze([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
       createVolcengineSeedance2ResolutionField({ include1080p: false }),
-      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
+      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS.slice(1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
     bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
@@ -511,37 +511,37 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     executionExtensions: createVolcengineSeedanceVideoExecutionExtensions(
       VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY,
     ),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    help: Object.freeze({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'volcengineOfficial',
         order: 10,
         label: '火山方舟',
         subtitle: 'Seedance 2.0 官方 API',
         iconAlt: 'volcengine',
       }),
-      dreaminaStyleVideo: Object['freeze']({
+      dreaminaStyleVideo: Object.freeze({
         order: 10,
         title: 'Seedance 2.0 Fast',
         subtitle: '火山方舟快速版，480p / 720p',
@@ -553,22 +553,22 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'volcengine',
     modelId: 'volcengine/seedance-2.0',
     executionId: 'volcengine.model-api.video.seedance-2.v1',
     displayName: 'Seedance 2.0',
-    aliases: Object['freeze'](['volcengine/doubao-seedance-2-0', 'volcengine/doubao-seedance-2-0-260128']),
+    aliases: Object.freeze(['volcengine/doubao-seedance-2-0', 'volcengine/doubao-seedance-2-0-260128']),
     icon: 'images/volcengine.svg',
     description: '火山方舟 Seedance 2.0 model API',
     model: 'doubao-seedance-2-0-260128',
     endpoint: '/contents/generations/tasks',
     endpointMode: 'content-generation-task',
     ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
-    fields: Object['freeze']([
+    fields: Object.freeze([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
       createVolcengineSeedance2ResolutionField({ include1080p: true, include4k: true }),
-      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
+      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS.slice(1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
     bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
@@ -578,30 +578,30 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     executionExtensions: createVolcengineSeedanceVideoExecutionExtensions(
       VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY,
     ),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      dreaminaStyleVideo: Object['freeze']({
+    help: Object.freeze({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      dreaminaStyleVideo: Object.freeze({
         order: 20,
         title: 'Seedance 2.0',
         subtitle: '火山方舟标准版，支持 1080p / 4k',
@@ -612,7 +612,7 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'volcengine',
     modelId: 'volcengine/seedance-2.0-mini',
     executionId: 'volcengine.model-api.video.seedance-2-mini.v1',
@@ -623,10 +623,10 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     endpoint: '/contents/generations/tasks',
     endpointMode: 'content-generation-task',
     ratioPolicy: VOLCENGINE_SEEDANCE_VIDEO_RATIO_POLICY,
-    fields: Object['freeze']([
+    fields: Object.freeze([
       VOLCENGINE_SEEDANCE_2_MODE_FIELD,
       createVolcengineSeedance2ResolutionField({ include1080p: false }),
-      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS['slice'](1),
+      ...VOLCENGINE_SEEDANCE_2_COMMON_FIELDS.slice(1),
     ]),
     inputSlots: VOLCENGINE_SEEDANCE_2_INPUT_SLOTS,
     bodyMapping: VOLCENGINE_VIDEO_SEEDANCE_2_BODY_MAPPING,
@@ -636,30 +636,30 @@ export const VOLCENGINE_VIDEO_MODELS = Object['freeze']([
     executionExtensions: createVolcengineSeedanceVideoExecutionExtensions(
       VOLCENGINE_SEEDANCE_2_0_VIDEO_POLICY,
     ),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'text2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'image2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'frames2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'volcengine_seedance_2_mode', value: 'multimodal2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      dreaminaStyleVideo: Object['freeze']({
+    help: Object.freeze({ tooltip: VOLCENGINE_SEEDANCE_2_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      dreaminaStyleVideo: Object.freeze({
         order: 30,
         title: 'Seedance 2.0 Mini',
         subtitle: '火山方舟 Mini 版，参数同 Seedance 2.0',

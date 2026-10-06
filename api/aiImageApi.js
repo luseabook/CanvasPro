@@ -1613,11 +1613,11 @@ export async function generateImage(value189, value190) {
 const MAX_MANIFEST_GENERATION_TIMEOUT = 60 * 60 * 1000;
 
 const APIMART_MIDJOURNEY_MODEL_ID = 'apimart/midjourney';
-const APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING = Object['freeze']({
-  taskIdPath: Object['freeze'](['data[].task_id', 'task_id', 'taskId']),
+const APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING = Object.freeze({
+  taskIdPath: Object.freeze(['data[].task_id', 'task_id', 'taskId']),
   statusPath: 'status',
   errorPath: 'error',
-  resultPaths: Object['freeze']([
+  resultPaths: Object.freeze([
     'image_urls[]',
     'image_url',
     'grid_image_url',
@@ -1634,9 +1634,9 @@ const APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING = Object['freeze']({
 });
 
 function resolveGenerationRequestTimeout(value194) {
-  const count9 = Number(value194?.['requestTimeoutMs']);
-  if (!Number['isFinite'](count9) || count9 <= 0) return GENERATION_TIMEOUT;
-  return Math['min'](MAX_MANIFEST_GENERATION_TIMEOUT, Math['max'](30000, Math['trunc'](count9)));
+  const count9 = Number(value194?.requestTimeoutMs);
+  if (!Number.isFinite(count9) || count9 <= 0) return GENERATION_TIMEOUT;
+  return Math.min(MAX_MANIFEST_GENERATION_TIMEOUT, Math.max(30000, Math.trunc(count9)));
 }
 
 function buildApimartMidjourneyTaskPolling(value195 = '') {
@@ -1650,9 +1650,9 @@ function buildApimartMidjourneyTaskPolling(value195 = '') {
 }
 
 function createImageBatchAttemptContext(value196) {
-  const count10 = Number['parseInt'](value196, 10);
-  if (!Number['isFinite'](count10) || count10 <= 1) return null;
-  return { __aicBatchSize: count10, __aicBatchSeedNonce: Math['floor'](Math['random']() * 1000000000) };
+  const count10 = Number.parseInt(value196, 10);
+  if (!Number.isFinite(count10) || count10 <= 1) return null;
+  return { __aicBatchSize: count10, __aicBatchSeedNonce: Math.floor(Math.random() * 1000000000) };
 }
 
 function buildImageBatchAttemptPayload(args9, args10, value197) {
@@ -1661,10 +1661,10 @@ function buildImageBatchAttemptPayload(args9, args10, value197) {
 }
 
 function normalizeDreaminaImageGenerateNum(options2 = {}) {
-  const value198 = options2?.['generateNum'] ?? options2?.['generate_num'] ?? options2?.['batchSize'] ?? 1,
-    value199 = Number['parseInt'](value198, 10);
-  if (!Number['isFinite'](value199)) return 1;
-  return Math['max'](1, Math['min'](10, value199));
+  const value198 = options2?.generateNum ?? options2?.generate_num ?? options2?.batchSize ?? 1,
+    value199 = Number.parseInt(value198, 10);
+  if (!Number.isFinite(value199)) return 1;
+  return Math.max(1, Math.min(10, value199));
 }
 
 function buildDreaminaImageUpscaleSubmitRequest(value200) {
@@ -1675,8 +1675,8 @@ function buildDreaminaImageUpscaleSubmitRequest(value200) {
   };
 }
 
-const LOCAL_IMAGE_RUNTIME_HANDLERS = Object['freeze']({
-  dreaminaImage: Object['freeze']({
+const LOCAL_IMAGE_RUNTIME_HANDLERS = Object.freeze({
+  dreaminaImage: Object.freeze({
     buildSubmitRequest: ({
       payload: payload2,
       finalPrompt: finalPrompt,
@@ -1699,11 +1699,11 @@ const LOCAL_IMAGE_RUNTIME_HANDLERS = Object['freeze']({
       );
     },
   }),
-  dreaminaImageUpscale: Object['freeze']({
+  dreaminaImageUpscale: Object.freeze({
     buildSubmitRequest: ({ payload: payload4 }) => buildDreaminaImageUpscaleSubmitRequest(payload4),
     run: ({ payload: payload5, options: options4 }) => runDreaminaImageUpscaleGeneration(payload5, options4),
   }),
-  openAiCliImage: Object['freeze']({
+  openAiCliImage: Object.freeze({
     buildSubmitRequest: ({
       payload: payload6,
       finalPrompt: finalPrompt2,
@@ -1715,19 +1715,19 @@ const LOCAL_IMAGE_RUNTIME_HANDLERS = Object['freeze']({
 });
 
 function getLocalImageRuntimeHandler(value201) {
-  if (value201?.['adapterType'] !== 'localRuntime') return null;
-  const value202 = String(value201?.['runtime'] || '')['trim']();
+  if (value201?.adapterType !== 'localRuntime') return null;
+  const value202 = String(value201?.runtime || '').trim();
   return LOCAL_IMAGE_RUNTIME_HANDLERS[value202] || null;
 }
 
 function cloneRecordMetadata(args12) {
-  return args12?.['metadata'] && typeof args12['metadata'] === 'object' ? { ...args12['metadata'] } : {};
+  return args12?.metadata && typeof args12.metadata === 'object' ? { ...args12.metadata } : {};
 }
 
 function firstApimartMidjourneySourceValue(...args13) {
   for (const value203 of args13) {
     if (value203 === true || value203 === false) return value203;
-    const value204 = String(value203 ?? '')['trim']();
+    const value204 = String(value203 ?? '').trim();
     if (value204) return value204;
   }
   return '';
@@ -1736,48 +1736,48 @@ function firstApimartMidjourneySourceValue(...args13) {
 function normalizeApimartMidjourneySourceBoolean(value205) {
   if (value205 === true || value205 === false) return value205;
   const enabled25 = String(value205 ?? '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   if (!enabled25) return false;
   return enabled25 === 'true' || enabled25 === '1' || enabled25 === 'yes';
 }
 
 function resolveApimartMidjourneySourceMetadata(options5 = {}) {
   const value206 =
-      options5?.['generationParams'] &&
-      typeof options5['generationParams'] === 'object' &&
-      !Array['isArray'](options5['generationParams'])
-        ? options5['generationParams']
+      options5?.generationParams &&
+      typeof options5.generationParams === 'object' &&
+      !Array.isArray(options5.generationParams)
+        ? options5.generationParams
         : {},
     args14 = String(
       firstApimartMidjourneySourceValue(
-        options5?.['mjModel'],
-        options5?.['midjourneyModel'],
-        options5?.['version'],
-        value206['mjModel'],
-        value206['midjourneyModel'],
-        value206['version'],
+        options5?.mjModel,
+        options5?.midjourneyModel,
+        options5?.version,
+        value206.mjModel,
+        value206.midjourneyModel,
+        value206.version,
       ),
-    )['trim'](),
-    args15 = String(firstApimartMidjourneySourceValue(options5?.['speed'], value206['speed']))
-      ['trim']()
-      ['toLowerCase'](),
-    args16 = String(firstApimartMidjourneySourceValue(options5?.['prompt'], value206['prompt']))['trim'](),
+    ).trim(),
+    args15 = String(firstApimartMidjourneySourceValue(options5?.speed, value206.speed))
+      .trim()
+      .toLowerCase(),
+    args16 = String(firstApimartMidjourneySourceValue(options5?.prompt, value206.prompt)).trim(),
     args17 = String(
       firstApimartMidjourneySourceValue(
-        options5?.['action'],
-        options5?.['mjAction'],
-        value206['action'],
-        value206['mjAction'],
+        options5?.action,
+        options5?.mjAction,
+        value206.action,
+        value206.mjAction,
       ),
     )
-      ['trim']()
-      ['toUpperCase'](),
+      .trim()
+      .toUpperCase(),
     apimartMidjourneySourceValue = firstApimartMidjourneySourceValue(
-      options5?.['hd'],
-      options5?.['isHd'],
-      value206['hd'],
-      value206['isHd'],
+      options5?.hd,
+      options5?.isHd,
+      value206.hd,
+      value206.isHd,
     ),
     value207 = {
       ...(args14 ? { mjModel: args14 } : {}),
@@ -1787,57 +1787,57 @@ function resolveApimartMidjourneySourceMetadata(options5 = {}) {
     };
   return (
     apimartMidjourneySourceValue !== '' &&
-      (value207['hd'] = normalizeApimartMidjourneySourceBoolean(apimartMidjourneySourceValue)),
+      (value207.hd = normalizeApimartMidjourneySourceBoolean(apimartMidjourneySourceValue)),
     value207
   );
 }
 
 function isApimartMidjourneyResponseMapping(value208 = null) {
-  const list31 = Array['isArray'](value208?.['resultPaths']) ? value208['resultPaths'] : [];
-  return list31['includes']('image_urls[]') && list31['includes']('grid_image_url');
+  const list31 = Array.isArray(value208?.resultPaths) ? value208.resultPaths : [];
+  return list31.includes('image_urls[]') && list31.includes('grid_image_url');
 }
 
 function normalizeApimartMidjourneyButtons(value209) {
-  if (!Array['isArray'](value209)) return [];
-  return value209['map']((response20) => {
+  if (!Array.isArray(value209)) return [];
+  return value209.map((response20) => {
     if (!response20 || typeof response20 !== 'object') return null;
     const args18 = String(
-        response20['customId'] || response20['custom_id'] || response20['customID'] || response20['id'] || '',
-      )['trim'](),
+        response20.customId || response20.custom_id || response20.customID || response20.id || '',
+      ).trim(),
       args19 = String(
-        response20['label'] || response20['name'] || response20['text'] || response20['emoji'] || '',
-      )['trim'](),
+        response20.label || response20.name || response20.text || response20.emoji || '',
+      ).trim(),
       value210 = { ...(args18 ? { customId: args18 } : {}), ...(args19 ? { label: args19 } : {}) };
-    return Object['keys'](value210)['length'] > 0 ? value210 : null;
-  })['filter'](Boolean);
+    return Object.keys(value210).length > 0 ? value210 : null;
+  }).filter(Boolean);
 }
 
 function extractApimartMidjourneyImageRecords(args20, value211 = null, value212 = {}) {
   if (!isApimartMidjourneyResponseMapping(value211)) return [];
   const value213 =
-      args20?.['data'] && typeof args20['data'] === 'object' && !Array['isArray'](args20['data'])
-        ? { ...args20, ...args20['data'] }
+      args20?.data && typeof args20.data === 'object' && !Array.isArray(args20.data)
+        ? { ...args20, ...args20.data }
         : args20,
     list32 =
-      Array['isArray'](value213?.['image_urls']) && value213['image_urls']['length'] > 0
-        ? value213['image_urls']
-        : String(value213?.['image_url'] || '')['trim']()
-          ? [value213['image_url']]
+      Array.isArray(value213?.image_urls) && value213.image_urls.length > 0
+        ? value213.image_urls
+        : String(value213?.image_url || '').trim()
+          ? [value213.image_url]
           : [];
-  if (list32['length'] === 0) return [];
+  if (list32.length === 0) return [];
   const value214 = String(
       resolveApimartTaskIdStrict(value213) ||
         resolveAsyncImageTaskId(value213, value211) ||
-        value213?.['id'] ||
+        value213?.id ||
         '',
-    )['trim'](),
-    args21 = String(value213?.['grid_image_url'] || '')['trim'](),
-    value215 = String(value213?.['action'] || '')['trim'](),
-    args22 = normalizeApimartMidjourneyButtons(value213?.['buttons']),
+    ).trim(),
+    args21 = String(value213?.grid_image_url || '').trim(),
+    value215 = String(value213?.action || '').trim(),
+    args22 = normalizeApimartMidjourneyButtons(value213?.buttons),
     args23 = resolveApimartMidjourneySourceMetadata(value212),
-    args24 = value215 || args23['action'] || '';
-  return list32['map']((value216, value217) => {
-    const enabled26 = String(value216 || '')['trim']();
+    args24 = value215 || args23.action || '';
+  return list32.map((value216, value217) => {
+    const enabled26 = String(value216 || '').trim();
     if (!enabled26) return null;
     return {
       sourceUrl: enabled26,
@@ -1851,51 +1851,51 @@ function extractApimartMidjourneyImageRecords(args20, value211 = null, value212 
           ...args23,
           ...(args21 ? { gridImageUrl: args21 } : {}),
           ...(args24 ? { action: args24 } : {}),
-          ...(args22['length'] > 0 ? { buttons: args22 } : {}),
+          ...(args22.length > 0 ? { buttons: args22 } : {}),
         },
       },
     };
-  })['filter'](Boolean);
+  }).filter(Boolean);
 }
 
 function isComfyUiHistoryPolling(options6 = {}) {
-  return String(options6?.['mode'] || '')['trim']() === 'comfyui-history';
+  return String(options6?.mode || '').trim() === 'comfyui-history';
 }
 
 async function pollComfyUiImageTask(value218, value219 = {}) {
-  const value220 = String(value218 || '')['trim'](),
-    args25 = value219?.['taskPolling'] || {},
-    args26 = String(args25['baseUrl'] || '')['trim']();
+  const value220 = String(value218 || '').trim(),
+    args25 = value219?.taskPolling || {},
+    args26 = String(args25.baseUrl || '').trim();
   for (let count11 = 0; count11 < 450; count11++) {
-    if (value219?.['signal']?.['aborted']) throw new Error('CANCELLED');
+    if (value219?.signal?.aborted) throw new Error('CANCELLED');
     await new Promise((value221) => setTimeout(value221, 2000));
-    if (value219?.['signal']?.['aborted']) throw new Error('CANCELLED');
+    if (value219?.signal?.aborted) throw new Error('CANCELLED');
     const uRLSearchParams = new URLSearchParams({
         promptId: value220,
         ...(args26 ? { baseUrl: args26 } : {}),
-        ...(args25['allowCloudBaseUrl'] ? { allowCloudBaseUrl: '1' } : {}),
+        ...(args25.allowCloudBaseUrl ? { allowCloudBaseUrl: '1' } : {}),
       }),
       requester5 = await requester({
-        url: '/api/v2/comfyui/history?' + uRLSearchParams['toString'](),
+        url: '/api/v2/comfyui/history?' + uRLSearchParams.toString(),
         method: 'GET',
         provider: 'comfyui',
         timeout: 30000,
-        signal: value219?.['signal'],
+        signal: value219?.signal,
       }),
       value222 =
-        typeof value219?.['resultExtractor'] === 'function'
-          ? value219['resultExtractor'](requester5)
+        typeof value219?.resultExtractor === 'function'
+          ? value219.resultExtractor(requester5)
           : requester5,
-      hasImageResultOutput4 = hasImageResultOutput(value222, value219?.['responseMapping']);
+      hasImageResultOutput4 = hasImageResultOutput(value222, value219?.responseMapping);
     if (hasImageResultOutput4) return value222;
     const asyncImageTaskStatus2 = resolveAsyncImageTaskStatus(value222);
     if (isAsyncTaskFailureStatus(asyncImageTaskStatus2))
-      throw ApiError['taskFailed'](
+      throw ApiError.taskFailed(
         'comfyui',
-        String(value222?.['error'] || value222?.['message'] || 'ComfyUI 任务执行失败'),
+        String(value222?.error || value222?.message || 'ComfyUI 任务执行失败'),
       );
   }
-  throw ApiError['taskTimeout']('comfyui');
+  throw ApiError.taskTimeout('comfyui');
 }
 
 function resolveRunningHubImageTaskProviderKey(value223, value224 = {}) {
@@ -1904,11 +1904,9 @@ function resolveRunningHubImageTaskProviderKey(value223, value224 = {}) {
     if (runningHubTaskProviderProfileId)
       return normalizeRunningHubModelApiProfileId(runningHubTaskProviderProfileId);
   }
-  if (value223 === 'runninghub' && isModelApiModel(value224?.['model'], 'runninghub'))
+  if (value223 === 'runninghub' && isModelApiModel(value224?.model, 'runninghub'))
     return resolveRunningHubModelApiProfileId(
-      resolveModelExecution(value224?.['model'], { providerHint: 'runninghub' })?.['modelManifest']?.[
-        'modelId'
-      ] || value224?.['model'],
+      resolveModelExecution(value224?.model, { providerHint: 'runninghub' })?.modelManifest?.modelId || value224?.model,
       getRunningHubTaskProviderProfileId(value224),
     );
   return value223;
@@ -1920,31 +1918,31 @@ function buildRunningHubImageTaskKey(value225, value226, value227) {
 
 function normalizeApimartMidjourneyUpscaleSpeed(value228) {
   const value229 = String(value228 || '')
-    ['trim']()
-    ['toLowerCase']();
-  return ['relax', 'fast', 'turbo']['includes'](value229) ? value229 : 'fast';
+    .trim()
+    .toLowerCase();
+  return ['relax', 'fast', 'turbo'].includes(value229) ? value229 : 'fast';
 }
 
 function normalizeApimartMidjourneyUpscaleIndex(value230) {
-  const count12 = Number['parseInt'](value230, 10);
-  if (!Number['isFinite'](count12)) return 0;
+  const count12 = Number.parseInt(value230, 10);
+  if (!Number.isFinite(count12)) return 0;
   return count12 >= 1 && count12 <= 4 ? count12 : 0;
 }
 
 function normalizeApimartMidjourneyVariationMode(value231) {
   const value232 = String(value231 || '')
-    ['trim']()
-    ['toLowerCase']();
-  if (['weak', 'low', 'low-variation']['includes'](value232)) return 'weak';
-  if (['strong', 'high', 'high-variation']['includes'](value232)) return 'strong';
+    .trim()
+    .toLowerCase();
+  if (['weak', 'low', 'low-variation'].includes(value232)) return 'weak';
+  if (['strong', 'high', 'high-variation'].includes(value232)) return 'strong';
   return 'medium';
 }
 
 function normalizeApimartMidjourneyVersion(value233) {
   return String(value233 || '')
-    ['trim']()
-    ['toLowerCase']()
-    ['replace'](/^v/, '');
+    .trim()
+    .toLowerCase()
+    .replace(/^v/, '');
 }
 
 function isApimartMidjourneyRemixVersion(value234) {
@@ -1968,27 +1966,27 @@ function getApimartMidjourneyVariationEndpoint(value235, value236 = '') {
 export async function submitApimartMidjourneyUpscaleRequest(options7 = {}) {
   await ensureConfig();
   const providerConfig5 = getProviderConfig('apimart'),
-    enabled27 = String(options7?.['apiKey'] || providerConfig5?.['apiKey'] || '')['trim']();
+    enabled27 = String(options7?.apiKey || providerConfig5?.apiKey || '').trim();
   if (!enabled27)
-    throw ApiError['authError']('apimart', null, 'APIMart API Key 未配置，无法发起 Midjourney 二次操作');
+    throw ApiError.authError('apimart', null, 'APIMart API Key 未配置，无法发起 Midjourney 二次操作');
   const enabled28 = String(
-    options7?.['taskId'] || options7?.['parentTaskId'] || options7?.['mjTaskId'] || '',
-  )['trim']();
+    options7?.taskId || options7?.parentTaskId || options7?.mjTaskId || '',
+  ).trim();
   if (!enabled28) throw new Error('缺少 APIMart Midjourney task_id');
-  const args27 = String(options7?.['customId'] || options7?.['custom_id'] || '')['trim'](),
-    apimartMidjourneyUpscaleIndex = normalizeApimartMidjourneyUpscaleIndex(options7?.['index']);
+  const args27 = String(options7?.customId || options7?.custom_id || '').trim(),
+    apimartMidjourneyUpscaleIndex = normalizeApimartMidjourneyUpscaleIndex(options7?.index);
   if (!args27 && !apimartMidjourneyUpscaleIndex)
     throw new Error('APIMart Midjourney upscale 需要 index 或 custom_id');
-  const apimartBaseUrl3 = normalizeApimartBaseUrl(providerConfig5?.['apiUrl']),
+  const apimartBaseUrl3 = normalizeApimartBaseUrl(providerConfig5?.apiUrl),
     value237 = {
       apiUrl: apimartBaseUrl3 + '/v1/midjourney/generations/upscale',
       apiKey: enabled27,
       task_id: enabled28,
       ...(args27 ? { custom_id: args27 } : { index: apimartMidjourneyUpscaleIndex }),
-      ...(args27 && String(options7?.['prompt'] || '')['trim']()
-        ? { prompt: String(options7['prompt'] || '')['trim']() }
+      ...(args27 && String(options7?.prompt || '').trim()
+        ? { prompt: String(options7.prompt || '').trim() }
         : {}),
-      ...(args27 ? {} : { speed: normalizeApimartMidjourneyUpscaleSpeed(options7?.['speed']) }),
+      ...(args27 ? {} : { speed: normalizeApimartMidjourneyUpscaleSpeed(options7?.speed) }),
     },
     requester6 = await requester({
       url: '/api/v2/proxy/image',
@@ -1997,9 +1995,9 @@ export async function submitApimartMidjourneyUpscaleRequest(options7 = {}) {
       timeout: GENERATION_TIMEOUT,
       retries: GENERATION_RETRIES,
       retryDelay: GENERATION_RETRY_DELAY,
-      signal: options7?.['signal'],
+      signal: options7?.signal,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON['stringify'](value237),
+      body: JSON.stringify(value237),
       responseType: 'text',
     }),
     value238 = typeof requester6 === 'string' ? parseResponseData(requester6) : requester6 || {},
@@ -2010,7 +2008,7 @@ export async function submitApimartMidjourneyUpscaleRequest(options7 = {}) {
       resolveAsyncImageTaskId(value238, APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING) ||
       extractApimartTaskIdFromRawText(String(requester6 || '')) ||
       '',
-  )['trim']();
+  ).trim();
   if (!enabled29) throw new Error('APIMart Midjourney upscale 未返回 task_id');
   return {
     taskId: enabled29,
@@ -2022,31 +2020,31 @@ export async function submitApimartMidjourneyUpscaleRequest(options7 = {}) {
 export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
   await ensureConfig();
   const providerConfig6 = getProviderConfig('apimart'),
-    enabled30 = String(options8?.['apiKey'] || providerConfig6?.['apiKey'] || '')['trim']();
+    enabled30 = String(options8?.apiKey || providerConfig6?.apiKey || '').trim();
   if (!enabled30)
-    throw ApiError['authError']('apimart', null, 'APIMart API Key 未配置，无法发起 Midjourney 变体操作');
+    throw ApiError.authError('apimart', null, 'APIMart API Key 未配置，无法发起 Midjourney 变体操作');
   const enabled31 = String(
-    options8?.['taskId'] || options8?.['parentTaskId'] || options8?.['mjTaskId'] || '',
-  )['trim']();
+    options8?.taskId || options8?.parentTaskId || options8?.mjTaskId || '',
+  ).trim();
   if (!enabled31) throw new Error('缺少 APIMart Midjourney task_id');
-  const enabled32 = String(options8?.['customId'] || options8?.['custom_id'] || '')['trim'](),
-    apimartMidjourneyUpscaleIndex2 = normalizeApimartMidjourneyUpscaleIndex(options8?.['index']);
+  const enabled32 = String(options8?.customId || options8?.custom_id || '').trim(),
+    apimartMidjourneyUpscaleIndex2 = normalizeApimartMidjourneyUpscaleIndex(options8?.index);
   if (!enabled32 && !apimartMidjourneyUpscaleIndex2)
     throw new Error('APIMart Midjourney variation 需要 index 或 custom_id');
   const apimartMidjourneyVariationMode = normalizeApimartMidjourneyVariationMode(
-      options8?.['variationMode'] || options8?.['mode'] || options8?.['strength'],
+      options8?.variationMode || options8?.mode || options8?.strength,
     ),
     args28 = String(
-      options8?.['mjModel'] ||
-        options8?.['midjourneyModel'] ||
-        options8?.['model'] ||
-        options8?.['version'] ||
+      options8?.mjModel ||
+        options8?.midjourneyModel ||
+        options8?.model ||
+        options8?.version ||
         '',
-    )['trim'](),
+    ).trim(),
     args29 = isApimartMidjourneyRemixVersion(args28);
   if (args29 && !apimartMidjourneyUpscaleIndex2)
     throw new Error('APIMart Midjourney remix 需要 index');
-  const apimartBaseUrl4 = normalizeApimartBaseUrl(providerConfig6?.['apiUrl']),
+  const apimartBaseUrl4 = normalizeApimartBaseUrl(providerConfig6?.apiUrl),
     value239 = {
       apiUrl:
         apimartBaseUrl4 +
@@ -2054,7 +2052,7 @@ export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
         getApimartMidjourneyVariationEndpoint(apimartMidjourneyVariationMode, args28),
       apiKey: enabled30,
       task_id: enabled31,
-      speed: normalizeApimartMidjourneyUpscaleSpeed(options8?.['speed']),
+      speed: normalizeApimartMidjourneyUpscaleSpeed(options8?.speed),
       ...(args29
         ? { index: apimartMidjourneyUpscaleIndex2 }
         : enabled32
@@ -2068,9 +2066,9 @@ export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
       timeout: GENERATION_TIMEOUT,
       retries: GENERATION_RETRIES,
       retryDelay: GENERATION_RETRY_DELAY,
-      signal: options8?.['signal'],
+      signal: options8?.signal,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON['stringify'](value239),
+      body: JSON.stringify(value239),
       responseType: 'text',
     }),
     value240 = typeof requester7 === 'string' ? parseResponseData(requester7) : requester7 || {},
@@ -2081,7 +2079,7 @@ export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
       resolveAsyncImageTaskId(value240, APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING) ||
       extractApimartTaskIdFromRawText(String(requester7 || '')) ||
       '',
-  )['trim']();
+  ).trim();
   if (!enabled33) throw new Error('APIMart Midjourney variation 未返回 task_id');
   return {
     taskId: enabled33,
@@ -2098,7 +2096,7 @@ export async function submitApimartMidjourneyVariationRequest(options8 = {}) {
 
 export async function resumeApimartMidjourneyUpscaleTask(value241, args30 = {}, args31 = {}) {
   await ensureConfig();
-  const enabled34 = String(value241 || '')['trim']();
+  const enabled34 = String(value241 || '').trim();
   if (!enabled34) throw new Error('缺少 APIMart Midjourney 任务ID，无法恢复');
   const providerConfig7 = getProviderConfig('apimart'),
     value242 = {
@@ -2108,22 +2106,22 @@ export async function resumeApimartMidjourneyUpscaleTask(value241, args30 = {}, 
     },
     args32 = {
       ...args31,
-      responseMapping: args31?.['responseMapping'] || APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING,
-      taskPolling: args31?.['taskPolling'] || buildApimartMidjourneyTaskPolling(providerConfig7?.['apiUrl']),
+      responseMapping: args31?.responseMapping || APIMART_MIDJOURNEY_UPSCALE_RESPONSE_MAPPING,
+      taskPolling: args31?.taskPolling || buildApimartMidjourneyTaskPolling(providerConfig7?.apiUrl),
     };
   return runTaskSingleFlight({ provider: 'apimart', kind: 'image', taskId: enabled34 }, async () => {
     const pollAsyncImageTask4 = await pollAsyncImageTask(enabled34, value242, 'apimart', args32);
-    if (pollAsyncImageTask4?.['pending']) return pollAsyncImageTask4;
+    if (pollAsyncImageTask4?.pending) return pollAsyncImageTask4;
     const processTaskResult2 = await processTaskResult(pollAsyncImageTask4, 'apimart', {
       taskKey: 'apimart:image:' + enabled34,
-      responseMapping: args32['responseMapping'],
-      ...(args32['apimartMidjourneySource']
-        ? { apimartMidjourneySource: args32['apimartMidjourneySource'] }
+      responseMapping: args32.responseMapping,
+      ...(args32.apimartMidjourneySource
+        ? { apimartMidjourneySource: args32.apimartMidjourneySource }
         : {}),
     });
-    if (processTaskResult2['length'] === 1 && processTaskResult2[0]?.['error'])
-      throw new Error(processTaskResult2[0]['error'] || 'Midjourney 二次操作恢复失败');
-    return processTaskResult2['length'] === 1
+    if (processTaskResult2.length === 1 && processTaskResult2[0]?.error)
+      throw new Error(processTaskResult2[0].error || 'Midjourney 二次操作恢复失败');
+    return processTaskResult2.length === 1
       ? processTaskResult2[0]
       : { isBatch: true, images: processTaskResult2 };
   });
@@ -2133,41 +2131,41 @@ const IMAGE_LOCAL_SAVE_FAILURE_MESSAGE = '图片已返回，但保存到本地�
 
 function getReadableErrorMessage(enabled35) {
   if (!enabled35) return '';
-  if (typeof enabled35['getUserMessage'] === 'function')
+  if (typeof enabled35.getUserMessage === 'function')
     try {
-      const value243 = String(enabled35['getUserMessage']() || '')['trim']();
+      const value243 = String(enabled35.getUserMessage() || '').trim();
       if (value243) return value243;
     } catch {}
-  if (typeof enabled35 === 'string') return enabled35['trim']();
+  if (typeof enabled35 === 'string') return enabled35.trim();
   const value244 =
-    enabled35?.['message'] ||
-    enabled35?.['errorMessage'] ||
-    enabled35?.['error_message'] ||
-    enabled35?.['reason'] ||
-    enabled35?.['detail'] ||
-    enabled35?.['details'] ||
-    enabled35?.['error'];
+    enabled35?.message ||
+    enabled35?.errorMessage ||
+    enabled35?.error_message ||
+    enabled35?.reason ||
+    enabled35?.detail ||
+    enabled35?.details ||
+    enabled35?.error;
   if (value244 !== undefined && value244 !== null && value244 !== enabled35) {
     const readableErrorMessage = getReadableErrorMessage(value244);
     if (readableErrorMessage) return readableErrorMessage;
   }
   try {
-    return JSON['stringify'](enabled35);
+    return JSON.stringify(enabled35);
   } catch {
-    return String(enabled35 || '')['trim']();
+    return String(enabled35 || '').trim();
   }
 }
 
 function formatLocalSaveFailureMessage(value245) {
   const list33 = getReadableErrorMessage(value245);
   if (!list33) return IMAGE_LOCAL_SAVE_FAILURE_MESSAGE;
-  if (list33['includes']('保存到本地失败')) return list33;
+  if (list33.includes('保存到本地失败')) return list33;
   return IMAGE_LOCAL_SAVE_FAILURE_MESSAGE + '：' + list33;
 }
 
 async function generateImageUnqueued(value246, value247) {
   const providerId4 = getProviderId(value246),
-    imageExecution3 = getImageExecution(value246, providerId4)?.['executionManifest'],
+    imageExecution3 = getImageExecution(value246, providerId4)?.executionManifest,
     imageGenerationBatchSize2 = resolveImageGenerationBatchSize(value246, providerId4),
     shouldSubmitProviderBatchOnce3 = shouldSubmitProviderBatchOnce(
       value246,
@@ -2176,23 +2174,23 @@ async function generateImageUnqueued(value246, value247) {
     ),
     localImageRuntimeHandler = getLocalImageRuntimeHandler(imageExecution3);
   if (localImageRuntimeHandler) {
-    const list34 = await localImageRuntimeHandler['run']({
+    const list34 = await localImageRuntimeHandler.run({
       payload: value246,
       options: value247,
       batchSize: imageGenerationBatchSize2,
       executionManifest: imageExecution3,
     });
-    return list34['length'] === 1 ? list34[0] : { isBatch: true, images: list34 };
+    return list34.length === 1 ? list34[0] : { isBatch: true, images: list34 };
   }
   if (imageGenerationBatchSize2 <= 1 || shouldSubmitProviderBatchOnce3)
     try {
       const doGenerateOnce3 = await doGenerateOnce(value246, providerId4, value247),
-        value248 = Array['isArray'](doGenerateOnce3) ? doGenerateOnce3 : [doGenerateOnce3];
-      if (value248['length'] === 1 && value248[0]['error'])
-        throw new Error(value248[0]['error'], { cause: value248[0]['cause'] });
-      return value248['length'] === 1 ? value248[0] : { isBatch: true, images: value248 };
+        value248 = Array.isArray(doGenerateOnce3) ? doGenerateOnce3 : [doGenerateOnce3];
+      if (value248.length === 1 && value248[0].error)
+        throw new Error(value248[0].error, { cause: value248[0].cause });
+      return value248.length === 1 ? value248[0] : { isBatch: true, images: value248 };
     } catch (value249) {
-      if (value249 instanceof ApiError) throw new Error(value249['getUserMessage'](), { cause: value249 });
+      if (value249 instanceof ApiError) throw new Error(value249.getUserMessage(), { cause: value249 });
       throw value249;
     }
   const list35 = [],
@@ -2204,18 +2202,18 @@ async function generateImageUnqueued(value246, value247) {
         providerId4,
         value247,
       );
-      list35['push'](...args33);
+      list35.push(...args33);
     } catch (value251) {
       value251 instanceof ApiError
-        ? list35['push']({
-            error: value251['getUserMessage'](),
+        ? list35.push({
+            error: value251.getUserMessage(),
             status: 'failed',
-            retryable: value251['retryable'],
+            retryable: value251.retryable,
           })
-        : list35['push']({ error: value251['message'] || '未知错误', status: 'failed', retryable: false });
+        : list35.push({ error: value251.message || '未知错误', status: 'failed', retryable: false });
     }
   }
-  if (list35['length'] === 0) throw new Error('批量生成全部失败');
-  if (list35['length'] === 1) return list35[0];
+  if (list35.length === 0) throw new Error('批量生成全部失败');
+  if (list35.length === 1) return list35[0];
   return { isBatch: true, images: list35 };
 }

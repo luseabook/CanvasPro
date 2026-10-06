@@ -3,24 +3,24 @@ import { saveOutputToServer } from './projectsV2Api.js';
 import { localPathToUrl, pickResultLocalPath } from '../src/utils/localMediaPath.js';
 export async function saveModelApiVideoContent(value, item, provider = {}) {
   const uRL = new URL(value);
-  ((uRL['pathname'] = uRL['pathname']['replace'](/\/$/, '') + '/content'),
-    (uRL['search'] = ''),
-    (uRL['hash'] = ''));
+  ((uRL.pathname = uRL.pathname.replace(/\/$/, '') + '/content'),
+    (uRL.search = ''),
+    (uRL.hash = ''));
   const requester2 = await requester({
-    url: '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(uRL['toString']()),
+    url: '/api/v2/proxy/task?apiUrl=' + encodeURIComponent(uRL.toString()),
     method: 'GET',
     headers: { Authorization: 'Bearer ' + item },
-    provider: provider['providerId'] || 'custom-provider',
+    provider: provider.providerId || 'custom-provider',
     responseType: 'blob',
     timeout: 120000,
-    signal: provider['signal'],
+    signal: provider.signal,
     retries: 0,
   });
   if (
-    !requester2?.['size'] ||
-    !String(requester2['type'] || '')
-      ['toLowerCase']()
-      ['startsWith']('video/')
+    !requester2?.size ||
+    !String(requester2.type || '')
+      .toLowerCase()
+      .startsWith('video/')
   )
     throw new Error('视频下载未返回有效的视频文件');
   const server = await saveOutputToServer(requester2, {

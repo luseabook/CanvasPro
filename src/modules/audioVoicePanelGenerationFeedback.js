@@ -5,26 +5,26 @@ function panelText(value, item = {}) {
   return t('audioVoicePanel.' + value, item);
 }
 export function summarizeAudioVoiceGenerationResults(list = [], key = 0) {
-  const list2 = Array['isArray'](list) ? list : [],
-    total = Math['max'](list2['length'], Math['max'](0, Math['trunc'](Number(key) || 0))),
-    succeeded = list2['filter']((el) => {
-      if (el?.['status'] !== 'fulfilled') return false;
-      const enabled = String(el?.['value']?.['status'] || '')
-        ['trim']()
-        ['toLowerCase']();
+  const list2 = Array.isArray(list) ? list : [],
+    total = Math.max(list2.length, Math.max(0, Math.trunc(Number(key) || 0))),
+    succeeded = list2.filter((el) => {
+      if (el?.status !== 'fulfilled') return false;
+      const enabled = String(el?.value?.status || '')
+        .trim()
+        .toLowerCase();
       return !enabled || enabled === 'success';
-    })['length'];
-  return { total: total, succeeded: succeeded, incomplete: Math['max'](0, total - succeeded) };
+    }).length;
+  return { total: total, succeeded: succeeded, incomplete: Math.max(0, total - succeeded) };
 }
 export function buildAudioVoiceGenerationCompletionMessage(options = {}) {
-  const count = Math['max'](1, Math['trunc'](Number(options?.['total']) || 0)),
-    succeeded2 = Math['max'](0, Math['min'](count, Math['trunc'](Number(options?.['succeeded']) || 0))),
-    incomplete = Math['max'](
+  const count = Math.max(1, Math.trunc(Number(options?.total) || 0)),
+    succeeded2 = Math.max(0, Math.min(count, Math.trunc(Number(options?.succeeded) || 0))),
+    incomplete = Math.max(
       0,
-      Math['min'](
+      Math.min(
         count,
-        Number['isFinite'](Number(options?.['incomplete']))
-          ? Math['trunc'](Number(options['incomplete']))
+        Number.isFinite(Number(options?.incomplete))
+          ? Math.trunc(Number(options.incomplete))
           : count - succeeded2,
       ),
     );
@@ -44,9 +44,9 @@ export function notifyAudioVoiceGenerationComplete(
   const body = buildAudioVoiceGenerationCompletionMessage(options2),
     list3 = [];
   return (
-    Math['max'](0, Number(options2?.['succeeded']) || 0) > 0 &&
-      list3['push'](Promise['resolve']()['then'](() => playSound?.('generation-success'))),
-    list3['push'](Promise['resolve']()['then'](() => showNotification?.({ body: body }))),
-    Promise['allSettled'](list3)
+    Math.max(0, Number(options2?.succeeded) || 0) > 0 &&
+      list3.push(Promise.resolve().then(() => playSound?.('generation-success'))),
+    list3.push(Promise.resolve().then(() => showNotification?.({ body: body }))),
+    Promise.allSettled(list3)
   );
 }

@@ -4,7 +4,7 @@ export function notifyUiSchemaMenuAfterOpen(
   { fieldEl: fieldEl, popup: popup, shouldOpen: shouldOpen } = {},
 ) {
   if (!shouldOpen) return;
-  value['dispatchEvent'](
+  value.dispatchEvent(
     new CustomEvent('ui-schema-menu-after-open', { detail: { fieldEl: fieldEl, popup: popup } }),
   );
 }
@@ -21,34 +21,34 @@ export function bindUiSchemaBindingEvents(
   } = {},
 ) {
   const item = (key) => {
-      const enabled = key?.['detail']?.['nativeEvent'],
-        index = key?.['detail']?.['fieldEl'] || null;
+      const enabled = key?.detail?.nativeEvent,
+        index = key?.detail?.fieldEl || null;
       if (!enabled) return;
-      if (enabled['type'] === 'click') {
+      if (enabled.type === 'click') {
         handleClick(enabled, index);
         return;
       }
-      if (enabled['type'] === 'mousedown') {
+      if (enabled.type === 'mousedown') {
         handleMouseDown(enabled, index);
         return;
       }
-      (enabled['type'] === 'input' || enabled['type'] === 'change') && handleInput(enabled, index);
+      (enabled.type === 'input' || enabled.type === 'change') && handleInput(enabled, index);
     },
-    el2 = el['ownerDocument'] || (typeof document !== 'undefined' ? document : null),
+    el2 = el.ownerDocument || (typeof document !== 'undefined' ? document : null),
     result = (event) => {
-      const data = event['target']?.['closest']?.('.aigen-ui-schema-popup-portal'),
-        enabled2 = data?.['__uiSchemaPortalRoot'] === el;
-      typeof el['contains'] === 'function' &&
-        !el['contains'](event['target']) &&
+      const data = event.target?.closest?.('.aigen-ui-schema-popup-portal'),
+        enabled2 = data?.__uiSchemaPortalRoot === el;
+      typeof el.contains === 'function' &&
+        !el.contains(event.target) &&
         !enabled2 &&
         invalidatePendingMenuRestore();
     };
-  (el['addEventListener']('click', handleClick, true),
-    el['addEventListener']('mousedown', handleMouseDown, true),
-    el['addEventListener']('input', handleInput),
-    el['addEventListener']('change', handleInput),
-    el['addEventListener']('ui-schema-portaled-interaction', item),
-    el2?.['addEventListener']?.('click', result, true));
+  (el.addEventListener('click', handleClick, true),
+    el.addEventListener('mousedown', handleMouseDown, true),
+    el.addEventListener('input', handleInput),
+    el.addEventListener('change', handleInput),
+    el.addEventListener('ui-schema-portaled-interaction', item),
+    el2?.addEventListener?.('click', result, true));
   const run = bindRunningHubInstanceDevMode(el, {
     commitValue: commitValue,
     getNodeData: getNodeData,
@@ -56,11 +56,11 @@ export function bindUiSchemaBindingEvents(
   });
   return () => {
     (run(),
-      el['removeEventListener']('click', handleClick, true),
-      el['removeEventListener']('mousedown', handleMouseDown, true),
-      el['removeEventListener']('input', handleInput),
-      el['removeEventListener']('change', handleInput),
-      el['removeEventListener']('ui-schema-portaled-interaction', item),
-      el2?.['removeEventListener']?.('click', result, true));
+      el.removeEventListener('click', handleClick, true),
+      el.removeEventListener('mousedown', handleMouseDown, true),
+      el.removeEventListener('input', handleInput),
+      el.removeEventListener('change', handleInput),
+      el.removeEventListener('ui-schema-portaled-interaction', item),
+      el2?.removeEventListener?.('click', result, true));
   };
 }

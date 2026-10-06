@@ -31,8 +31,8 @@ export function createAgentModelRequestRuntime({
         }),
     });
   async function run(args, handler) {
-    const projectMemory2 = projectMemoryStore?.['getMemory']?.() || null,
-      contextDigest = await prepareContextDigest['prepare']({ ...args, projectMemory: projectMemory2 });
+    const projectMemory2 = projectMemoryStore?.getMemory?.() || null,
+      contextDigest = await prepareContextDigest.prepare({ ...args, projectMemory: projectMemory2 });
     return handler({
       ...args,
       contextDigest: contextDigest,
@@ -47,6 +47,6 @@ export function createAgentModelRequestRuntime({
     planner(options2 = {}) {
       return run(options2, requestPlanner);
     },
-    prepareContextDigest: prepareContextDigest['prepare'],
+    prepareContextDigest: prepareContextDigest.prepare,
   };
 }

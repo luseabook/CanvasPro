@@ -7,25 +7,25 @@ const CHROME_SHELL_RENDERER_READY_TIMEOUT = 'CHROME_SHELL_RENDERER_READY_TIMEOUT
   RETRYABLE_RENAME_CODES = new Set(['EPERM', 'EACCES', 'EBUSY']);
 function createProfileRecoveryError(message, code, cause = null) {
   const error = new Error(message, cause ? { cause: cause } : undefined);
-  return ((error['code'] = code), error);
+  return ((error.code = code), error);
 }
 function formatRecoveryTimestamp(value) {
   const timestamp = value instanceof Date ? value : new Date(value);
-  if (!Number['isFinite'](timestamp['getTime']()))
+  if (!Number.isFinite(timestamp.getTime()))
     throw createProfileRecoveryError(
       'Chrome shell profile recovery timestamp is invalid',
       'CHROME_SHELL_PROFILE_RECOVERY_TIMESTAMP_INVALID',
     );
-  return timestamp['toISOString']()['replace'](/[-:]/g, '')['replace']('T', '-')['slice'](0, 15);
+  return timestamp.toISOString().replace(/[-:]/g, '').replace('T', '-').slice(0, 15);
 }
 function resolveRecoveryPaths({ sessionDataRoot: sessionDataRoot, profileDir: profileDir } = {}) {
-  const resolvedSessionRoot = path['resolve'](String(sessionDataRoot || '')),
-    resolvedProfileDir = path['resolve'](String(profileDir || ''));
+  const resolvedSessionRoot = path.resolve(String(sessionDataRoot || '')),
+    resolvedProfileDir = path.resolve(String(profileDir || ''));
   if (
-    !String(sessionDataRoot || '')['trim']() ||
-    !String(profileDir || '')['trim']() ||
-    path['dirname'](resolvedProfileDir) !== resolvedSessionRoot ||
-    !PROFILE_DIR_PATTERN['test'](path['basename'](resolvedProfileDir))
+    !String(sessionDataRoot || '').trim() ||
+    !String(profileDir || '').trim() ||
+    path.dirname(resolvedProfileDir) !== resolvedSessionRoot ||
+    !PROFILE_DIR_PATTERN.test(path.basename(resolvedProfileDir))
   )
     throw createProfileRecoveryError(
       'Chrome shell profile recovery path is outside sessionData',
@@ -56,18 +56,18 @@ export function createChromeShellProfileRecovery({
 } = {}) {
   const paths = resolveRecoveryPaths({ sessionDataRoot: sessionDataRoot, profileDir: profileDir });
   function rotate() {
-    if (!exists(paths['profileDir']))
+    if (!exists(paths.profileDir))
       throw createProfileRecoveryError(
         'Chrome shell profile recovery source is missing',
         'CHROME_SHELL_PROFILE_RECOVERY_SOURCE_MISSING',
       );
     const backupDir = resolveAvailableBackupDir({
-      profileDir: paths['profileDir'],
+      profileDir: paths.profileDir,
       exists: exists,
       now: now,
     });
     try {
-      rename(paths['profileDir'], backupDir);
+      rename(paths.profileDir, backupDir);
     } catch (renameError) {
       throw createProfileRecoveryError(
         'Chrome shell profile could not be backed up for recovery',
@@ -75,18 +75,18 @@ export function createChromeShellProfileRecovery({
         renameError,
       );
     }
-    return { rotated: true, profileDir: paths['profileDir'], backupDir: backupDir };
+    return { rotated: true, profileDir: paths.profileDir, backupDir: backupDir };
   }
   async function rotateWhenReleased() {
     for (let attemptIndex = 0; ; attemptIndex += 1) {
       try {
         return { ...rotate(), renameAttempts: attemptIndex + 1 };
       } catch (attemptError) {
-        attemptError['renameAttempts'] = attemptIndex + 1;
+        attemptError.renameAttempts = attemptIndex + 1;
         if (
-          attemptError['code'] !== 'CHROME_SHELL_PROFILE_RECOVERY_RENAME_FAILED' ||
-          !RETRYABLE_RENAME_CODES['has'](attemptError['cause']?.['code']) ||
-          attemptIndex >= RENAME_RETRY_DELAYS_MS['length']
+          attemptError.code !== 'CHROME_SHELL_PROFILE_RECOVERY_RENAME_FAILED' ||
+          !RETRYABLE_RENAME_CODES.has(attemptError.cause?.code) ||
+          attemptIndex >= RENAME_RETRY_DELAYS_MS.length
         )
           throw attemptError;
         await delay(RENAME_RETRY_DELAYS_MS[attemptIndex]);
@@ -96,7 +96,7 @@ export function createChromeShellProfileRecovery({
   return { rotate: rotate, rotateWhenReleased: rotateWhenReleased };
 }
 function isRendererReadyTimeout(error) {
-  return error?.['code'] === CHROME_SHELL_RENDERER_READY_TIMEOUT;
+  return error?.code === CHROME_SHELL_RENDERER_READY_TIMEOUT;
 }
 export async function runChromeShellStartupWithProfileRecovery({
   startAttempt: startAttempt,
@@ -108,7 +108,7 @@ export async function runChromeShellStartupWithProfileRecovery({
     throw new TypeError('Chrome shell startup attempt factory is required');
   if (typeof rotateProfile !== 'function')
     throw new TypeError('Chrome shell profile recovery operation is required');
-  const recoveryLimit = Math['max'](0, Math['min'](1, Math['trunc'](Number(maxRecoveryAttempts) || 0)));
+  const recoveryLimit = Math.max(0, Math.min(1, Math.trunc(Number(maxRecoveryAttempts) || 0)));
   let recoveryCount = 0,
     backupDir = '';
   while (true) {
@@ -124,7 +124,7 @@ export async function runChromeShellStartupWithProfileRecovery({
             level: 'info',
             source: 'main',
             message: 'Chrome shell started with a recovered browser profile',
-            context: { recoveryCount: recoveryCount, backupName: path['basename'](backupDir) },
+            context: { recoveryCount: recoveryCount, backupName: path.basename(backupDir) },
           }),
         {
           runtime: runtime,
@@ -160,7 +160,7 @@ export async function runChromeShellStartupWithProfileRecovery({
       try {
         rotationResult = await rotateProfile({ error: startupError, recoveryCount: recoveryCount });
       } catch (rotationError) {
-        ((startupError['profileRecoveryError'] = rotationError),
+        ((startupError.profileRecoveryError = rotationError),
           logEvent?.({
             type: 'chrome_shell.profile_recovery_failed',
             level: 'error',
@@ -169,22 +169,22 @@ export async function runChromeShellStartupWithProfileRecovery({
             error: rotationError,
             context: {
               recoveryCount: recoveryCount,
-              renameAttempts: rotationError['renameAttempts'] || 1,
-              filesystemCode: rotationError['cause']?.['code'] || '',
+              renameAttempts: rotationError.renameAttempts || 1,
+              filesystemCode: rotationError.cause?.code || '',
             },
           }));
         throw startupError;
       }
-      if (rotationResult?.['rotated'] !== true) {
+      if (rotationResult?.rotated !== true) {
         const notRotatedError = createProfileRecoveryError(
           'Chrome shell browser profile recovery did not rotate the profile',
           'CHROME_SHELL_PROFILE_RECOVERY_NOT_ROTATED',
         );
-        startupError['profileRecoveryError'] = notRotatedError;
+        startupError.profileRecoveryError = notRotatedError;
         throw startupError;
       }
       ((recoveryCount += 1),
-        (backupDir = String(rotationResult['backupDir'] || '')),
+        (backupDir = String(rotationResult.backupDir || '')),
         logEvent?.({
           type: 'chrome_shell.profile_rotated',
           level: 'warn',
@@ -192,8 +192,8 @@ export async function runChromeShellStartupWithProfileRecovery({
           message: 'Chrome shell browser profile was backed up before retry',
           context: {
             recoveryCount: recoveryCount,
-            backupName: path['basename'](backupDir),
-            renameAttempts: rotationResult['renameAttempts'] || 1,
+            backupName: path.basename(backupDir),
+            renameAttempts: rotationResult.renameAttempts || 1,
           },
         }));
     }

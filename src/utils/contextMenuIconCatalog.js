@@ -1,10 +1,10 @@
-const ICON_ALIASES = Object['freeze']({
+const ICON_ALIASES = Object.freeze({
     folder: 'folder-open',
     open: 'folder-open',
     remove: 'delete',
     settings: 'edit',
   }),
-  ICON_SHAPES = Object['freeze']({
+  ICON_SHAPES = Object.freeze({
     comment: [
       [
         'path',
@@ -172,9 +172,9 @@ const ICON_ALIASES = Object['freeze']({
       ['path', { d: 'M17 9l5-3v12l-5-3V9z' }],
     ],
   });
-export const CONTEXT_MENU_ICON_IDS = Object['freeze'](Object['keys'](ICON_SHAPES));
+export const CONTEXT_MENU_ICON_IDS = Object.freeze(Object.keys(ICON_SHAPES));
 export function resolveContextMenuIconDefinition(iconId) {
-  const normalizedId = String(iconId || '')['trim']();
+  const normalizedId = String(iconId || '').trim();
   if (!normalizedId) return null;
   const resolvedId = ICON_ALIASES[normalizedId] || normalizedId,
     shapes = ICON_SHAPES[resolvedId];

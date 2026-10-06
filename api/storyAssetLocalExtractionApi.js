@@ -7,24 +7,24 @@ export const STORY_ASSET_LOCAL_BATCH_SIZE = 8;
 const STORY_ASSET_LOCAL_ENTITY_KINDS = new Set(['character', 'scene', 'prop']),
   STORY_ASSET_LOCAL_EVIDENCE_MAX_CHARACTERS = 900;
 function normalizeText(value) {
-  return typeof value === 'string' ? value['trim']() : '';
+  return typeof value === 'string' ? value.trim() : '';
 }
 function normalizeStringArray(item) {
-  return [...new Set((Array['isArray'](item) ? item : [])['map'](normalizeText)['filter'](Boolean))];
+  return [...new Set((Array.isArray(item) ? item : []).map(normalizeText).filter(Boolean))];
 }
 function normalizeLocalEntityText(key) {
   const args = normalizeText(key)
-    ['replace'](/^[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+/u, '')
-    ['replace'](/[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+$/u, '')
-    ['replace'](/\s+/gu, ' ');
-  if (!args || [...args]['length'] > 48 || /[\r\n]/u['test'](args)) return '';
+    .replace(/^[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+/u, '')
+    .replace(/[\s，。！？；：、,.!?;:'"“”‘’（）()\[\]【】《》]+$/u, '')
+    .replace(/\s+/gu, ' ');
+  if (!args || [...args].length > 48 || /[\r\n]/u.test(args)) return '';
   return args;
 }
 function normalizeLocalEntityTexts(index) {
   return normalizeStringArray(
     normalizeText(index)
-      ['split'](/[,，、;；|\r\n]+/u)
-      ['map'](normalizeLocalEntityText),
+      .split(/[,，、;；|\r\n]+/u)
+      .map(normalizeLocalEntityText),
   );
 }
 export function createStoryAssetLocalExtractionChunks(
@@ -34,27 +34,27 @@ export function createStoryAssetLocalExtractionChunks(
     overlapCharacters: overlapCharacters = STORY_ASSET_LOCAL_CHUNK_OVERLAP,
   } = {},
 ) {
-  const result = Math['max'](300, Math['trunc'](Number(maxChunkCharacters) || 0)),
-    data = Math['min'](result - 1, Math['max'](0, Math['trunc'](Number(overlapCharacters) || 0))),
-    options = Math['max'](1, result - data),
+  const result = Math.max(300, Math.trunc(Number(maxChunkCharacters) || 0)),
+    data = Math.min(result - 1, Math.max(0, Math.trunc(Number(overlapCharacters) || 0))),
+    options = Math.max(1, result - data),
     list2 = [];
   return (
-    (Array['isArray'](list) ? list : [])['forEach']((dom, target) => {
-      const text = normalizeText(dom?.['body']);
+    (Array.isArray(list) ? list : []).forEach((dom, target) => {
+      const text = normalizeText(dom?.body);
       if (!text) return;
       let start = 0,
         source = 0;
-      while (start < text['length']) {
-        const end = Math['min'](text['length'], start + result);
-        list2['push']({
-          id: (normalizeText(dom?.['ref']) || 'scene-' + (target + 1)) + '-chunk-' + (source + 1),
-          sceneRef: normalizeText(dom?.['ref']),
-          episodeRef: normalizeText(dom?.['episodeRef']),
+      while (start < text.length) {
+        const end = Math.min(text.length, start + result);
+        list2.push({
+          id: (normalizeText(dom?.ref) || 'scene-' + (target + 1)) + '-chunk-' + (source + 1),
+          sceneRef: normalizeText(dom?.ref),
+          episodeRef: normalizeText(dom?.episodeRef),
           start: start,
           end: end,
-          text: text['slice'](start, end),
+          text: text.slice(start, end),
         });
-        if (end >= text['length']) break;
+        if (end >= text.length) break;
         ((start += options), (source += 1));
       }
     }),
@@ -65,10 +65,10 @@ export function createStoryAssetLocalExtractionBatches(
   list3 = [],
   { batchSize: batchSize = STORY_ASSET_LOCAL_BATCH_SIZE } = {},
 ) {
-  const next = Math['max'](1, Math['min'](16, Math['trunc'](Number(batchSize) || 0))),
+  const next = Math.max(1, Math.min(16, Math.trunc(Number(batchSize) || 0))),
     list4 = [];
-  for (let current = 0; current < list3['length']; current += next) {
-    list4['push'](list3['slice'](current, current + next));
+  for (let current = 0; current < list3.length; current += next) {
+    list4.push(list3.slice(current, current + next));
   }
   return list4;
 }
@@ -76,16 +76,16 @@ export async function requestStoryAssetMentionsLocal(chunks, signal = {}) {
   return post(
     STORY_ASSET_LOCAL_EXTRACTION_PATH,
     {
-      chunks: chunks['map']((id) => ({
-        id: id['id'],
-        sceneRef: id['sceneRef'],
-        text: id['text'],
+      chunks: chunks.map((id) => ({
+        id: id.id,
+        sceneRef: id.sceneRef,
+        text: id.text,
       })),
     },
     {
       provider: 'local',
-      signal: signal['signal'],
-      timeout: Number(signal['timeout']) || 600000,
+      signal: signal.signal,
+      timeout: Number(signal.timeout) || 600000,
     },
   );
 }
@@ -95,52 +95,52 @@ export async function extractStoryAssetMentionsLocal({
   onProgress: onProgress = null,
 } = {}) {
   const chunks2 = createStoryAssetLocalExtractionChunks(sourceScenes);
-  if (!chunks2['length']) throw new Error('本地 PP-UIE 没有找到可扫描的场次正文。');
+  if (!chunks2.length) throw new Error('本地 PP-UIE 没有找到可扫描的场次正文。');
   const total = createStoryAssetLocalExtractionBatches(chunks2),
-    map = new Map(chunks2['map']((entry) => [entry['id'], entry])),
+    map = new Map(chunks2.map((entry) => [entry.id, entry])),
     list5 = [];
   let args2 = { model: STORY_ASSET_LOCAL_MODEL, device: '', precision: '' };
-  for (let current2 = 0; current2 < total['length']; current2 += 1) {
+  for (let current2 = 0; current2 < total.length; current2 += 1) {
     onProgress?.({
       stage: 'local-entity-extraction',
       current: current2,
-      total: total['length'],
-      message: 'PP-UIE 正在本地扫描证据（' + (current2 + 1) + '/' + total['length'] + '）',
+      total: total.length,
+      message: 'PP-UIE 正在本地扫描证据（' + (current2 + 1) + '/' + total.length + '）',
     });
     const localExtract2 = await localExtract(total[current2]);
     args2 = {
-      model: normalizeText(localExtract2?.['model']) || STORY_ASSET_LOCAL_MODEL,
-      device: normalizeText(localExtract2?.['device']),
-      precision: normalizeText(localExtract2?.['precision']),
+      model: normalizeText(localExtract2?.model) || STORY_ASSET_LOCAL_MODEL,
+      device: normalizeText(localExtract2?.device),
+      precision: normalizeText(localExtract2?.precision),
     };
-    const list6 = Array['isArray'](localExtract2?.['chunks']) ? localExtract2['chunks'] : [];
-    list6['forEach']((record) => {
-      const sceneRef = map['get'](normalizeText(record?.['id']));
+    const list6 = Array.isArray(localExtract2?.chunks) ? localExtract2.chunks : [];
+    list6.forEach((record) => {
+      const sceneRef = map.get(normalizeText(record?.id));
       if (!sceneRef) return;
-      (Array['isArray'](record?.['entities']) ? record['entities'] : [])['forEach']((response) => {
-        const kind = normalizeText(response?.['kind']);
-        if (!STORY_ASSET_LOCAL_ENTITY_KINDS['has'](kind)) return;
-        normalizeLocalEntityTexts(response?.['text'])['forEach']((text2) => {
-          const payload = Number(response?.['start']),
-            handle = Number(response?.['end']),
+      (Array.isArray(record?.entities) ? record.entities : []).forEach((response) => {
+        const kind = normalizeText(response?.kind);
+        if (!STORY_ASSET_LOCAL_ENTITY_KINDS.has(kind)) return;
+        normalizeLocalEntityTexts(response?.text).forEach((text2) => {
+          const payload = Number(response?.start),
+            handle = Number(response?.end),
             state =
-              Number['isFinite'](payload) &&
-              Number['isFinite'](handle) &&
-              Math['trunc'](payload) >= 0 &&
-              Math['trunc'](handle) > Math['trunc'](payload) &&
-              sceneRef['text']['slice'](Math['trunc'](payload), Math['trunc'](handle)) === text2,
-            count = state ? Math['trunc'](payload) : sceneRef['text']['indexOf'](text2);
+              Number.isFinite(payload) &&
+              Number.isFinite(handle) &&
+              Math.trunc(payload) >= 0 &&
+              Math.trunc(handle) > Math.trunc(payload) &&
+              sceneRef.text.slice(Math.trunc(payload), Math.trunc(handle)) === text2,
+            count = state ? Math.trunc(payload) : sceneRef.text.indexOf(text2);
           if (count < 0) return;
-          list5['push']({
+          list5.push({
             kind: kind,
             text: text2,
-            sceneRef: sceneRef['sceneRef'],
-            episodeRef: sceneRef['episodeRef'],
-            start: sceneRef['start'] + count,
-            end: sceneRef['start'] + count + text2['length'],
-            ...(Number['isFinite'](Number(response?.['probability']))
+            sceneRef: sceneRef.sceneRef,
+            episodeRef: sceneRef.episodeRef,
+            start: sceneRef.start + count,
+            end: sceneRef.start + count + text2.length,
+            ...(Number.isFinite(Number(response?.probability))
               ? {
-                  probability: Math['max'](0, Math['min'](1, Number(response['probability']))),
+                  probability: Math.max(0, Math.min(1, Number(response.probability))),
                 }
               : {}),
           });
@@ -150,119 +150,115 @@ export async function extractStoryAssetMentionsLocal({
   }
   const map2 = new Map();
   return (
-    list5['forEach']((response2) => {
+    list5.forEach((response2) => {
       const config =
-        response2['kind'] +
+        response2.kind +
         ':' +
-        response2['text']['toLowerCase']() +
+        response2.text.toLowerCase() +
         ':' +
-        response2['sceneRef'] +
+        response2.sceneRef +
         ':' +
-        response2['start'];
-      if (!map2['has'](config)) map2['set'](config, response2);
+        response2.start;
+      if (!map2.has(config)) map2.set(config, response2);
     }),
     onProgress?.({
       stage: 'local-entity-extraction',
-      current: total['length'],
-      total: total['length'],
-      message: 'PP-UIE 本地扫描完成：发现 ' + map2['size'] + ' 条实体证据',
+      current: total.length,
+      total: total.length,
+      message: 'PP-UIE 本地扫描完成：发现 ' + map2.size + ' 条实体证据',
     }),
-    { ...args2, chunks: chunks2, mentions: [...map2['values']()] }
+    { ...args2, chunks: chunks2, mentions: [...map2.values()] }
   );
 }
 function mergeEvidenceRanges(list7 = [], scope) {
-  const list8 = list7['map'](([input, output]) => [Math['max'](0, input), Math['max'](0, output)])[
-      'sort'
-    ]((value2, value3) => value2[0] - value3[0]),
+  const list8 = list7.map(([input, output]) => [Math.max(0, input), Math.max(0, output)]).sort((value2, value3) => value2[0] - value3[0]),
     list9 = [];
-  list8['forEach'](([value4, value5]) => {
-    const value6 = list9['at'](-1);
+  list8.forEach(([value4, value5]) => {
+    const value6 = list9.at(-1);
     value6 && value4 <= value6[1] + 40
-      ? (value6[1] = Math['max'](value6[1], value5))
-      : list9['push']([value4, value5]);
+      ? (value6[1] = Math.max(value6[1], value5))
+      : list9.push([value4, value5]);
   });
   let count2 = scope;
-  return list9['flatMap'](([value7, value8]) => {
+  return list9.flatMap(([value7, value8]) => {
     if (count2 <= 0) return [];
-    const value9 = Math['min'](count2, Math['max'](0, value8 - value7));
+    const value9 = Math.min(count2, Math.max(0, value8 - value7));
     return ((count2 -= value9), value9 ? [[value7, value7 + value9]] : []);
   });
 }
 export function createStoryAssetLocalEvidenceScenes(list10 = [], value10 = []) {
   const map3 = new Map();
   return (
-    (Array['isArray'](value10) ? value10 : [])['forEach']((value11) => {
-      const text3 = normalizeText(value11?.['sceneRef']);
+    (Array.isArray(value10) ? value10 : []).forEach((value11) => {
+      const text3 = normalizeText(value11?.sceneRef);
       if (!text3) return;
-      const list11 = map3['get'](text3) || [];
-      (list11['push'](value11), map3['set'](text3, list11));
+      const list11 = map3.get(text3) || [];
+      (list11.push(value11), map3.set(text3, list11));
     }),
-    (Array['isArray'](list10) ? list10 : [])['map']((dom2) => {
-      const originalBodyCharacters = normalizeText(dom2?.['body']),
-        localEntityEvidence = map3['get'](normalizeText(dom2?.['ref'])) || [],
-        list12 = localEntityEvidence['map']((value12) => [
-          Math['max'](0, Number(value12['start']) - 90),
-          Math['min'](originalBodyCharacters['length'], Number(value12['end']) + 160),
+    (Array.isArray(list10) ? list10 : []).map((dom2) => {
+      const originalBodyCharacters = normalizeText(dom2?.body),
+        localEntityEvidence = map3.get(normalizeText(dom2?.ref)) || [],
+        list12 = localEntityEvidence.map((value12) => [
+          Math.max(0, Number(value12.start) - 90),
+          Math.min(originalBodyCharacters.length, Number(value12.end) + 160),
         ]);
-      if (!list12['length']) {
-        list12['push']([0, Math['min'](originalBodyCharacters['length'], 280)]);
-        if (originalBodyCharacters['length'] > 280)
-          list12['push']([
-            Math['max'](0, originalBodyCharacters['length'] - 180),
-            originalBodyCharacters['length'],
+      if (!list12.length) {
+        list12.push([0, Math.min(originalBodyCharacters.length, 280)]);
+        if (originalBodyCharacters.length > 280)
+          list12.push([
+            Math.max(0, originalBodyCharacters.length - 180),
+            originalBodyCharacters.length,
           ]);
       }
       const list13 = mergeEvidenceRanges(list12, STORY_ASSET_LOCAL_EVIDENCE_MAX_CHARACTERS),
-        value13 = list13['map'](([value14, value15]) => originalBodyCharacters['slice'](value14, value15))[
-          'join'
-        ]('\n……\n'),
+        value13 = list13.map(([value14, value15]) => originalBodyCharacters.slice(value14, value15)).join('\n……\n'),
         localEntityCandidates = {
           character: normalizeStringArray(
-            localEntityEvidence['filter']((value16) => value16['kind'] === 'character')['map'](
-              (response3) => response3['text'],
+            localEntityEvidence.filter((value16) => value16.kind === 'character').map(
+              (response3) => response3.text,
             ),
           ),
           scene: normalizeStringArray(
-            localEntityEvidence['filter']((value17) => value17['kind'] === 'scene')['map'](
-              (response4) => response4['text'],
+            localEntityEvidence.filter((value17) => value17.kind === 'scene').map(
+              (response4) => response4.text,
             ),
           ),
           prop: normalizeStringArray(
-            localEntityEvidence['filter']((value18) => value18['kind'] === 'prop')['map'](
-              (response5) => response5['text'],
+            localEntityEvidence.filter((value18) => value18.kind === 'prop').map(
+              (response5) => response5.text,
             ),
           ),
         },
         value19 = [
-          localEntityCandidates['character']['length']
-            ? '角色候选：' + localEntityCandidates['character']['join']('、')
+          localEntityCandidates.character.length
+            ? '角色候选：' + localEntityCandidates.character.join('、')
             : '',
-          localEntityCandidates['scene']['length']
-            ? '地点候选：' + localEntityCandidates['scene']['join']('、')
+          localEntityCandidates.scene.length
+            ? '地点候选：' + localEntityCandidates.scene.join('、')
             : '',
-          localEntityCandidates['prop']['length']
-            ? '道具候选：' + localEntityCandidates['prop']['join']('、')
+          localEntityCandidates.prop.length
+            ? '道具候选：' + localEntityCandidates.prop.join('、')
             : '',
         ]
-          ['filter'](Boolean)
-          ['join']('；');
+          .filter(Boolean)
+          .join('；');
       return {
         ...dom2,
-        characters: normalizeStringArray(Array['isArray'](dom2?.['characters']) ? dom2['characters'] : []),
+        characters: normalizeStringArray(Array.isArray(dom2?.characters) ? dom2.characters : []),
         body: [value19 ? 'PP-UIE 本地候选：' + value19 : '', value13]
-          ['filter'](Boolean)
-          ['join']('\n证据原文：'),
+          .filter(Boolean)
+          .join('\n证据原文：'),
         localEntityCandidates: localEntityCandidates,
-        localEntityEvidence: localEntityEvidence['map']((kind2) => ({
-          kind: kind2['kind'],
-          text: kind2['text'],
-          start: kind2['start'],
-          end: kind2['end'],
-          ...(Number['isFinite'](Number(kind2?.['probability']))
-            ? { probability: Number(kind2['probability']) }
+        localEntityEvidence: localEntityEvidence.map((kind2) => ({
+          kind: kind2.kind,
+          text: kind2.text,
+          start: kind2.start,
+          end: kind2.end,
+          ...(Number.isFinite(Number(kind2?.probability))
+            ? { probability: Number(kind2.probability) }
             : {}),
         })),
-        originalBodyCharacters: originalBodyCharacters['length'],
+        originalBodyCharacters: originalBodyCharacters.length,
       };
     })
   );

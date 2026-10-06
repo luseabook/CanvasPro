@@ -1,16 +1,16 @@
 export async function encodeTextMediaInputs(value, item, handler) {
   const list = [];
   for (const key of value) {
-    if (new RegExp('^data:' + item + '/[^;]+;base64,', 'i')['test'](key)) {
-      list['push'](key);
+    if (new RegExp('^data:' + item + '/[^;]+;base64,', 'i').test(key)) {
+      list.push(key);
       continue;
     }
     const enabled = await handler(key);
-    let enabled2 = String(enabled['type'] || '')
-      ['split'](';', 1)[0]
-      ['toLowerCase']();
+    let enabled2 = String(enabled.type || '')
+      .split(';', 1)[0]
+      .toLowerCase();
     if (!enabled2 || enabled2 === 'application/octet-stream') {
-      const index = String(key)['split'](/[?#]/, 1)[0]['split']('.')['pop']()['toLowerCase']();
+      const index = String(key).split(/[?#]/, 1)[0].split('.').pop().toLowerCase();
       enabled2 =
         {
           png: 'image/png',
@@ -30,16 +30,16 @@ export async function encodeTextMediaInputs(value, item, handler) {
           '3gp': 'video/3gpp',
         }[index] || '';
     }
-    if (!enabled['size'] || !enabled2['startsWith'](item + '/'))
+    if (!enabled.size || !enabled2.startsWith(item + '/'))
       throw new Error(
         'Invalid ' + item + ' input: missing media content or MIME type',
       );
-    const list2 = new Uint8Array(await enabled['arrayBuffer']()),
+    const list2 = new Uint8Array(await enabled.arrayBuffer()),
       list3 = [];
-    for (let result = 0; result < list2['length']; result += 32768) {
-      list3['push'](String['fromCharCode'](...list2['subarray'](result, result + 32768)));
+    for (let result = 0; result < list2.length; result += 32768) {
+      list3.push(String.fromCharCode(...list2.subarray(result, result + 32768)));
     }
-    list['push']('data:' + enabled2 + ';base64,' + btoa(list3['join']('')));
+    list.push('data:' + enabled2 + ';base64,' + btoa(list3.join('')));
   }
   return list;
 }

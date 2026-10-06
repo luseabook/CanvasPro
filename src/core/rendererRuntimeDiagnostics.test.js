@@ -40,7 +40,7 @@ test('an unpatched window reports diagnostics disabled and records nothing', () 
     enabled: isRendererRuntimeDiagnosticsEnabled(),
     recorded: recordRendererRuntimeDiagnostic({ kind: 'pan-preview' }),
     installed: installRendererRuntimeDiagnosticAccess(() => ({})),
-    getter: windowLike['__runtimeCompareGetRendererNodeDiagnosticState'],
+    getter: windowLike.__runtimeCompareGetRendererNodeDiagnosticState,
   }));
   assert.equal(result.enabled, false);
   assert.equal(result.recorded, null);
@@ -113,7 +113,7 @@ test('installing the accessor publishes a string-coercing, copy-returning getter
   };
   const result = withWindow(windowLike, () => {
     const installed = installRendererRuntimeDiagnosticAccess(resolver);
-    const getState = windowLike['__runtimeCompareGetRendererNodeDiagnosticState'];
+    const getState = windowLike.__runtimeCompareGetRendererNodeDiagnosticState;
     const state = getState('node-1');
     state.visible = false;
     const coerced = getState(7);
@@ -136,7 +136,7 @@ test('the installed getter returns null when the resolver yields a non-object', 
   const result = withWindow(windowLike, () => {
     let answer = undefined;
     installRendererRuntimeDiagnosticAccess(() => answer);
-    const getState = windowLike['__runtimeCompareGetRendererNodeDiagnosticState'];
+    const getState = windowLike.__runtimeCompareGetRendererNodeDiagnosticState;
     const results = [getState('a')];
     answer = null;
     results.push(getState('b'));
@@ -155,7 +155,7 @@ test('the installed getter returns a shallow copy rather than the resolver objec
   };
   const result = withWindow(windowLike, () => {
     installRendererRuntimeDiagnosticAccess(() => source);
-    const getState = windowLike['__runtimeCompareGetRendererNodeDiagnosticState'];
+    const getState = windowLike.__runtimeCompareGetRendererNodeDiagnosticState;
     const first = getState('n1');
     first.extra = 1;
     return { first, second: getState('n1') };
@@ -172,7 +172,7 @@ test('a non-function resolver is rejected and the getter is not published', () =
   };
   const result = withWindow(windowLike, () => ({
     installed: installRendererRuntimeDiagnosticAccess('not-a-function'),
-    getter: windowLike['__runtimeCompareGetRendererNodeDiagnosticState'],
+    getter: windowLike.__runtimeCompareGetRendererNodeDiagnosticState,
   }));
   assert.equal(result.installed, false);
   assert.equal(result.getter, undefined);
@@ -183,7 +183,7 @@ test('installing is rejected when the diagnostics flag is not exactly true', () 
   const windowLike = { __runtimeCompareRecordRendererDiagnostic: () => null };
   const result = withWindow(windowLike, () => ({
     installed: installRendererRuntimeDiagnosticAccess(resolver),
-    getter: windowLike['__runtimeCompareGetRendererNodeDiagnosticState'],
+    getter: windowLike.__runtimeCompareGetRendererNodeDiagnosticState,
   }));
   assert.equal(result.installed, false);
   assert.equal(result.getter, undefined);

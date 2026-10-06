@@ -3,7 +3,7 @@ import {
   isAgentStoryDeliverable,
   isAgentWritingRequest,
 } from './agentConversationIntent.js';
-const NEGATED_CANVAS_ACTION_PATTERNS = Object['freeze']([
+const NEGATED_CANVAS_ACTION_PATTERNS = Object.freeze([
     /\b(?:do not|don't|dont|please don't)\s+(?:change|edit|modify|touch|move|create|generate|alter)(?:\s+the)?\s+(?:canvas|nodes?)\b/i,
     /(?:不要|别|先不|不用|无需).{0,8}(?:动|修改|改变|编辑|操作|调整).{0,6}(?:画布|节点)/,
   ]),
@@ -31,7 +31,7 @@ const NEGATED_CANVAS_ACTION_PATTERNS = Object['freeze']([
     /^(?:继续(?:写|改|润色|优化)?|再来(?:一版|一个|一些)?|换(?:一版|一个|一种)|更.{0,16}(?:一点|一些))\s*[。.!！]?$/iu,
   IMPLICIT_CANVAS_OPERATION_PATTERN =
     /\b(?:arrange|align|connect|delete|duplicate|select|export|download)\b|重排|横向排列|纵向排列|网格排列|对齐|连线|删除|复制.{0,8}(?:份|个|张)|选中(?!的)|批量下载|批量导出/iu,
-  GENERAL_ACTION_PATTERN = Object['freeze']([
+  GENERAL_ACTION_PATTERN = Object.freeze([
     /\b(create|generate|draw|render|add|insert|modify|change|edit|rename|label|arrange|align|connect|delete|duplicate|select|run|start|continue|execute)\b/i,
     /\bmake\s+(?:an?|the|this|that|it|image|picture|video|clip|node|canvas)\b/i,
     /生成|创建|新建|添加|插入|画图|画(?:一|个|张|幅)|制作|做(?:一个|一张|一段|一版|成|出)|出图|出视频/,
@@ -39,34 +39,26 @@ const NEGATED_CANVAS_ACTION_PATTERNS = Object['freeze']([
   ]);
 function isInformationalQuestion(value) {
   if (
-    /(?:我想了解|讲讲|解释|告诉我|帮我看看).{0,12}(?:如何|怎么).{0,48}(?:生成|创建|制作|修改|切换|使用)/u[
-      'test'
-    ](value)
+    /(?:我想了解|讲讲|解释|告诉我|帮我看看).{0,12}(?:如何|怎么).{0,48}(?:生成|创建|制作|修改|切换|使用)/u.test(value)
   )
     return true;
   if (
-    /^(?:请问)?(?:如何|怎么|为什么|为何|哪些|什么|是否|能否|可否).{0,64}(?:生成|创建|制作|修改|切换|使用|模型|画布|节点|图片|视频)/u[
-      'test'
-    ](value)
+    /^(?:请问)?(?:如何|怎么|为什么|为何|哪些|什么|是否|能否|可否).{0,64}(?:生成|创建|制作|修改|切换|使用|模型|画布|节点|图片|视频)/u.test(value)
   )
     return true;
   if (
-    /^(?:你|这个产品)?(?:支持|能|会|可以).{0,24}(?:生成|创建|制作).{0,16}(?:吗|么)[？?]?$/u['test'](value) &&
-    !/(?:帮我|替我|为我|给我|一张|一幅|一个|一段)/u['test'](value)
+    /^(?:你|这个产品)?(?:支持|能|会|可以).{0,24}(?:生成|创建|制作).{0,16}(?:吗|么)[？?]?$/u.test(value) &&
+    !/(?:帮我|替我|为我|给我|一张|一幅|一个|一段)/u.test(value)
   )
     return true;
   if (
-    /^\s*(?:how|what|why|which|where)\b.{0,80}\b(?:create|generate|make|edit|change|switch|use|model|canvas|node|image|video)\b/iu[
-      'test'
-    ](value)
+    /^\s*(?:how|what|why|which|where)\b.{0,80}\b(?:create|generate|make|edit|change|switch|use|model|canvas|node|image|video)\b/iu.test(value)
   )
     return true;
-  return /^\s*(?:can|could|do)\s+you\s+(?:create|generate|make)\s+(?:images?|pictures?|videos?|audio|music)\s*[?？]?$/iu[
-    'test'
-  ](value);
+  return /^\s*(?:can|could|do)\s+you\s+(?:create|generate|make)\s+(?:images?|pictures?|videos?|audio|music)\s*[?？]?$/iu.test(value);
 }
 function isDiscussionOnly(item) {
-  return DISCUSSION_ONLY_PATTERN['test'](item) && !LATER_EXPLICIT_ACTION_PATTERN['test'](item);
+  return DISCUSSION_ONLY_PATTERN.test(item) && !LATER_EXPLICIT_ACTION_PATTERN.test(item);
 }
 export function routeAgentTurn({
   message: message = '',
@@ -76,48 +68,46 @@ export function routeAgentTurn({
   conversationHistory: conversationHistory = [],
 } = {}) {
   if (clarificationAnswer || pendingPlan) return { channel: 'canvas.tool', reason: 'continuation' };
-  if (intent?.['canvasAction'] === true || intent?.['mutatesCanvas'] === true)
+  if (intent?.canvasAction === true || intent?.mutatesCanvas === true)
     return { channel: 'canvas.tool', reason: 'explicit-intent' };
-  const enabled = String(message || '')['trim']();
+  const enabled = String(message || '').trim();
   if (!enabled) return { channel: 'assistant.message', reason: 'empty' };
-  if (NEGATED_CANVAS_ACTION_PATTERNS['some']((key) => key['test'](enabled)))
+  if (NEGATED_CANVAS_ACTION_PATTERNS.some((key) => key.test(enabled)))
     return { channel: 'assistant.message', reason: 'canvas-action-negated' };
   if (isInformationalQuestion(enabled))
     return { channel: 'assistant.message', reason: 'informational-question' };
   const enabled2 =
-    /(?:放到|放进|写入|写到|写进|填入|保存到).{0,16}(?:画布|节点)|\b(?:put|place|save)\b.{0,24}\b(?:canvas|node)\b/iu[
-      'test'
-    ](enabled);
-  if (isAgentStoryDeliverable(enabled) && !LATER_EXPLICIT_ACTION_PATTERN['test'](enabled) && !enabled2)
+    /(?:放到|放进|写入|写到|写进|填入|保存到).{0,16}(?:画布|节点)|\b(?:put|place|save)\b.{0,24}\b(?:canvas|node)\b/iu.test(enabled);
+  if (isAgentStoryDeliverable(enabled) && !LATER_EXPLICIT_ACTION_PATTERN.test(enabled) && !enabled2)
     return { channel: 'assistant.message', reason: 'story-deliverable' };
   if (
-    CANVAS_TARGET_PATTERN['test'](enabled) &&
-    (CANVAS_TARGET_ACTION_PATTERN['test'](enabled) || CANVAS_TARGETED_WRITE_PATTERN['test'](enabled))
+    CANVAS_TARGET_PATTERN.test(enabled) &&
+    (CANVAS_TARGET_ACTION_PATTERN.test(enabled) || CANVAS_TARGETED_WRITE_PATTERN.test(enabled))
   )
     return { channel: 'canvas.tool', reason: 'canvas-target' };
-  if (EXPLICIT_TEXT_DELIVERABLE_PATTERN['test'](enabled) && !LATER_EXPLICIT_ACTION_PATTERN['test'](enabled))
+  if (EXPLICIT_TEXT_DELIVERABLE_PATTERN.test(enabled) && !LATER_EXPLICIT_ACTION_PATTERN.test(enabled))
     return { channel: 'assistant.message', reason: 'text-deliverable' };
   if (isDiscussionOnly(enabled)) return { channel: 'assistant.message', reason: 'discussion-only' };
-  if (NEGATED_MEDIA_GENERATION_PATTERN['test'](enabled))
+  if (NEGATED_MEDIA_GENERATION_PATTERN.test(enabled))
     return { channel: 'assistant.message', reason: 'media-generation-negated' };
-  if (MEDIA_GENERATION_PATTERN['test'](enabled))
+  if (MEDIA_GENERATION_PATTERN.test(enabled))
     return { channel: 'canvas.tool', reason: 'media-generation' };
-  if (MODEL_CHANGE_PATTERN['test'](enabled)) return { channel: 'canvas.tool', reason: 'model-change' };
-  const index = conversationHistory['findLast'](
-    (enabled3) => enabled3['role'] === 'assistant' && !enabled3['messageType'],
+  if (MODEL_CHANGE_PATTERN.test(enabled)) return { channel: 'canvas.tool', reason: 'model-change' };
+  const index = conversationHistory.findLast(
+    (enabled3) => enabled3.role === 'assistant' && !enabled3.messageType,
   );
   if (
     isAgentWritingRequest(enabled) ||
-    (index?.['assistantContext'] && isAgentConversationContinuation(enabled))
+    (index?.assistantContext && isAgentConversationContinuation(enabled))
   )
     return { channel: 'assistant.message', reason: 'creative-conversation' };
-  if (TEXT_CREATION_PATTERN['test'](enabled))
+  if (TEXT_CREATION_PATTERN.test(enabled))
     return { channel: 'assistant.message', reason: 'text-creation' };
-  if (CONVERSATIONAL_CONTINUATION_PATTERN['test'](enabled))
+  if (CONVERSATIONAL_CONTINUATION_PATTERN.test(enabled))
     return { channel: 'assistant.message', reason: 'conversation-continuation' };
-  if (IMPLICIT_CANVAS_OPERATION_PATTERN['test'](enabled))
+  if (IMPLICIT_CANVAS_OPERATION_PATTERN.test(enabled))
     return { channel: 'canvas.tool', reason: 'canvas-operation' };
-  if (GENERAL_ACTION_PATTERN['some']((result) => result['test'](enabled)))
+  if (GENERAL_ACTION_PATTERN.some((result) => result.test(enabled)))
     return { channel: 'canvas.tool', reason: 'general-action' };
   return { channel: 'assistant.message', reason: 'conversation' };
 }
@@ -125,10 +115,10 @@ export function hasAgentCanvasActionIntent(message2 = '', intent2 = {}) {
   return (
     routeAgentTurn({
       message: message2,
-      intent: intent2?.['intent'],
-      clarificationAnswer: Boolean(intent2?.['clarificationAnswer']),
-      pendingPlan: Boolean(intent2?.['pendingPlan']),
-      conversationHistory: intent2?.['conversationHistory'] || [],
-    })['channel'] === 'canvas.tool'
+      intent: intent2?.intent,
+      clarificationAnswer: Boolean(intent2?.clarificationAnswer),
+      pendingPlan: Boolean(intent2?.pendingPlan),
+      conversationHistory: intent2?.conversationHistory || [],
+    }).channel === 'canvas.tool'
   );
 }

@@ -4,7 +4,7 @@ const STORY_SUMMARY =
     '《重生者的诡异任务》\n\n夜晚九点，教室灯火通明，窗外却像被墨汁吞没。\n\n陈木猛地睁开双眼。讲台上的倒计时只剩四十分钟，他认出这是诡异末世降临前的第五年——也是一切尚未发生的一个月前。\n\n班主任照常批改试卷，同桌正偷偷刷手机。陈木压住呼吸，确认口袋里那枚前世从未拿到的冥府银行凭证仍然存在。\n\n午夜十二点的钟声提前响起，一张带着血迹的任务书落在每个人桌上：前往午夜食堂，完成值夜任务。\n\n同学们惊慌失措，陈木却第一个站起身。他知道，真正的危险不是食堂里的诡异，而是队伍中那个会在第三条规则出现后背叛所有人的人。',
   NARRATION_SCRIPT =
     '夜晚九点，陈木在熟悉的教室里醒来。\n\n他很快意识到，自己回到了诡异末世降临前的一个月。上一世的遗憾、背叛和死亡仍然清晰，而这一世，他终于有机会提前改变命运。\n\n当午夜钟声响起，血红色任务书出现在每个人桌上。教室不再安全，所有人都必须前往午夜食堂。\n\n别人只看见未知的恐惧，陈木却知道那里藏着第一笔足以改变未来的诡异冥币。',
-  DEMO_ASSETS = Object['freeze']([
+  DEMO_ASSETS = Object.freeze([
     {
       id: 'character-chen-mu',
       kind: 'character',
@@ -100,7 +100,7 @@ const STORY_SUMMARY =
       imageUrl: '',
     },
   ]),
-  EPISODES = Object['freeze']([
+  EPISODES = Object.freeze([
     {
       id: 'episode-1',
       number: 1,
@@ -187,7 +187,7 @@ const STORY_SUMMARY =
       clips: [],
     },
   ]);
-export const DEMO_STORY_PROJECTS = Object['freeze']([
+export const DEMO_STORY_PROJECTS = Object.freeze([
   {
     id: 'story-demo-main',
     title: '重生者的诡异任务',
@@ -220,15 +220,15 @@ export function createDemoStoryWorkspaceData() {
       plotScript: PLOT_SCRIPT,
       narrationScript: NARRATION_SCRIPT,
     },
-    assets: DEMO_ASSETS['map']((args) => ({
+    assets: DEMO_ASSETS.map((args) => ({
       ...args,
-      appearances: Array['isArray'](args['appearances'])
-        ? args['appearances']['map']((args2) => ({ ...args2 }))
+      appearances: Array.isArray(args.appearances)
+        ? args.appearances.map((args2) => ({ ...args2 }))
         : undefined,
     })),
-    episodes: EPISODES['map']((clips) => ({
+    episodes: EPISODES.map((clips) => ({
       ...clips,
-      clips: clips['clips']['map']((args3) => ({ ...args3 })),
+      clips: clips.clips.map((args3) => ({ ...args3 })),
     })),
   };
 }

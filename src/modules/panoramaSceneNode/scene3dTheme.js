@@ -31,9 +31,9 @@ function resolveSelectionAccentColor() {
 export function resolveThemeColor(target, source) {
   try {
     const cssColorValue2 = cssColorValue(target, source);
-    return cssColorValue2 ? new threeRuntime['Color'](cssColorValue2) : new threeRuntime['Color']();
+    return cssColorValue2 ? new threeRuntime.Color(cssColorValue2) : new threeRuntime.Color();
   } catch {
-    return new threeRuntime['Color']();
+    return new threeRuntime.Color();
   }
 }
 export function resolveThemeColorValue(next, current) {
@@ -67,10 +67,10 @@ export function applySelectionEmphasis(enabled5, scope, input = 0.2) {
 export function createSelectionRing(output) {
   const color = output?.isColor
       ? output.clone()
-      : new threeRuntime['Color'](output || resolveSelectionAccentColor()),
-    value2 = new threeRuntime['Group'](),
+      : new threeRuntime.Color(output || resolveSelectionAccentColor()),
+    value2 = new threeRuntime.Group(),
     handler = (opacity) =>
-      new threeRuntime['MeshBasicMaterial']({
+      new threeRuntime.MeshBasicMaterial({
         color: color.clone(),
         transparent: true,
         opacity: opacity,
@@ -79,9 +79,9 @@ export function createSelectionRing(output) {
         depthTest: false,
         toneMapped: false,
       }),
-    value3 = new threeRuntime['Mesh'](new threeRuntime['CircleGeometry'](0.62, 40), handler(0.12));
+    value3 = new threeRuntime.Mesh(new threeRuntime.CircleGeometry(0.62, 40), handler(0.12));
   ((value3.rotation.x = -Math.PI / 2), (value3.position.y = 0.016), value2.add(value3));
-  const value4 = new threeRuntime.Mesh(new threeRuntime['RingGeometry'](0.5, 0.62, 40), handler(0.38));
+  const value4 = new threeRuntime.Mesh(new threeRuntime.RingGeometry(0.5, 0.62, 40), handler(0.38));
   ((value4.rotation.x = -Math.PI / 2), (value4.position.y = 0.02), value2.add(value4));
   const value5 = new threeRuntime.Mesh(new threeRuntime.RingGeometry(0.28, 0.38, 40), handler(0.98));
   return (

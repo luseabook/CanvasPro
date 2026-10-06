@@ -10,44 +10,44 @@ import {
   getProviderConnectionFailureDetail,
 } from './providerConnectionAutoVerification.js';
 const CREDENTIAL_FREE_PROVIDERS = new Set(['aicanvas', 'claude-cli']),
-  KNOWN_CONFIGURABLE_PROVIDERS = new Set(Object['keys'](PROVIDERS_META || {})),
+  KNOWN_CONFIGURABLE_PROVIDERS = new Set(Object.keys(PROVIDERS_META || {})),
   CLI_STATUS_REQUESTS = new Map();
 function normalizeAdapterType(value) {
   const item = String(value || '')
-    ['trim']()
-    ['toLowerCase']();
-  if (['modelapi', 'model-api', 'model_api']['includes'](item)) return 'modelApi';
-  if (['localruntime', 'local-runtime', 'local_runtime']['includes'](item)) return 'localRuntime';
+    .trim()
+    .toLowerCase();
+  if (['modelapi', 'model-api', 'model_api'].includes(item)) return 'modelApi';
+  if (['localruntime', 'local-runtime', 'local_runtime'].includes(item)) return 'localRuntime';
   return item === 'workflow' ? 'workflow' : '';
 }
 function normalizeProfileId(key) {
   return String(key || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
 }
 function getResolvedManifestContext(modelManifest = {}) {
-  const modelId = String(modelManifest['modelId'] || modelManifest['model'] || '')['trim'](),
-    providerHint = String(modelManifest['provider'] || '')['trim'](),
+  const modelId = String(modelManifest.modelId || modelManifest.model || '').trim(),
+    providerHint = String(modelManifest.provider || '').trim(),
     modelManifest2 =
-      modelManifest['modelManifest'] && modelManifest['executionManifest']
+      modelManifest.modelManifest && modelManifest.executionManifest
         ? {
-            modelManifest: modelManifest['modelManifest'],
-            executionManifest: modelManifest['executionManifest'],
+            modelManifest: modelManifest.modelManifest,
+            executionManifest: modelManifest.executionManifest,
           }
         : resolveModelExecution(modelId) ||
           (providerHint ? resolveModelExecution(modelId, { providerHint: providerHint }) : null);
   return {
     modelId: modelId,
-    modelManifest: modelManifest2?.['modelManifest'] || modelManifest['modelManifest'] || null,
-    executionManifest: modelManifest2?.['executionManifest'] || modelManifest['executionManifest'] || null,
+    modelManifest: modelManifest2?.modelManifest || modelManifest.modelManifest || null,
+    executionManifest: modelManifest2?.executionManifest || modelManifest.executionManifest || null,
   };
 }
 function resolveProviderId(index, result) {
   return normalizeProviderId(
-    result['modelManifest']?.['provider'] ||
-      result['executionManifest']?.['provider'] ||
-      index['provider'] ||
-      resolveModelProvider(result['modelId']),
+    result.modelManifest?.provider ||
+      result.executionManifest?.provider ||
+      index.provider ||
+      resolveModelProvider(result.modelId),
   );
 }
 function resolveConfigProviderId({
@@ -56,28 +56,28 @@ function resolveConfigProviderId({
   providerProfileId: providerProfileId,
 }) {
   const profileId = normalizeProfileId(providerProfileId);
-  if (profileId && KNOWN_CONFIGURABLE_PROVIDERS['has'](profileId)) return profileId;
+  if (profileId && KNOWN_CONFIGURABLE_PROVIDERS.has(profileId)) return profileId;
   if (providerId === 'runninghub' && (profileId === 'runninghub' || profileId === 'runninghub-international'))
     return profileId;
   if (providerId === 'runninghub-international') return 'runninghub-international';
   if (providerId === 'runninghubwf')
-    return ['runninghub', 'runninghub-international']['includes'](profileId) ? profileId : 'runninghub';
+    return ['runninghub', 'runninghub-international'].includes(profileId) ? profileId : 'runninghub';
   if (adapterType === 'workflow' && providerId === 'runninghub') return profileId || 'runninghub';
   return providerId;
 }
 function getCustomProviderDisplayName(data, options) {
   return String(
-    data?.['extensions']?.['customProvider']?.['displayName'] ||
-      PROVIDERS_META[options]?.['label'] ||
+    data?.extensions?.customProvider?.displayName ||
+      PROVIDERS_META[options]?.label ||
       options ||
       '当前模型服务',
-  )['trim']();
+  ).trim();
 }
 function resolveCliProviderId(target, source) {
-  const providerId2 = normalizeProviderId(source['executionManifest']?.['extensions']?.['cliProvider']);
+  const providerId2 = normalizeProviderId(source.executionManifest?.extensions?.cliProvider);
   if (providerId2) return providerId2;
   if (target === 'dreamina') return 'dreamina';
-  if (['openai-cli', 'codex-cli']['includes'](target)) return 'codex';
+  if (['openai-cli', 'codex-cli'].includes(target)) return 'codex';
   return '';
 }
 function getCliLoginFieldIds(next) {
@@ -102,54 +102,52 @@ function getCredentialFieldIds({
     return credentialField === 'modelApiKey'
       ? ['providerKey-' + configProviderId + '-model', 'providerKey-' + configProviderId]
       : ['providerKey-' + configProviderId, 'providerKey-' + configProviderId + '-model'];
-  if (/^custom_[a-z0-9_-]+$/i['test'](providerId3)) return ['customProviderApiKey'];
+  if (/^custom_[a-z0-9_-]+$/i.test(providerId3)) return ['customProviderApiKey'];
   return ['providerKey-' + (configProviderId || providerId3)];
 }
 function getModelAuthorizationCapability(options2 = {}) {
-  return String(options2['modelManifest']?.['extensions']?.['credentialAuthorization']?.['capability'] || '')[
-    'trim'
-  ]();
+  return String(options2.modelManifest?.extensions?.credentialAuthorization?.capability || '').trim();
 }
 function getComfyUiConnectionCapability(record, payload = {}) {
   if (record !== 'comfyui') return '';
   const handle = String(
-    payload['executionManifest']?.['extensions']?.['comfyui']?.['baseUrlMode'] ||
-      payload['modelManifest']?.['extensions']?.['comfyUiWorkflow']?.['baseUrlMode'] ||
+    payload.executionManifest?.extensions?.comfyui?.baseUrlMode ||
+      payload.modelManifest?.extensions?.comfyUiWorkflow?.baseUrlMode ||
       'local',
   )
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   return handle === 'cloud' ? 'cloud' : 'local';
 }
 export function resolveModelCredentialRequirement(options3 = {}) {
   const modelId2 = getResolvedManifestContext(options3),
     providerId4 = resolveProviderId(options3, modelId2),
     adapterType2 = normalizeAdapterType(
-      options3['adapterType'] ||
-        modelId2['executionManifest']?.['adapterType'] ||
-        modelId2['modelManifest']?.['adapterType'],
+      options3.adapterType ||
+        modelId2.executionManifest?.adapterType ||
+        modelId2.modelManifest?.adapterType,
     ),
-    enabled = Boolean(modelId2['modelManifest'] || modelId2['executionManifest']),
+    enabled = Boolean(modelId2.modelManifest || modelId2.executionManifest),
     profileId2 = normalizeProfileId(
-      options3['providerProfileId'] ||
-        options3['rhProviderProfileId'] ||
-        options3['payload']?.['providerProfileId'] ||
-        options3['payload']?.['rhProviderProfileId'],
+      options3.providerProfileId ||
+        options3.rhProviderProfileId ||
+        options3.payload?.providerProfileId ||
+        options3.payload?.rhProviderProfileId,
     ),
     state =
       profileId2 ||
       (providerId4 === 'runninghubwf' && adapterType2 === 'workflow'
-        ? normalizeProfileId(getProviderConfig('runninghubwf')?.['providerProfileId'])
+        ? normalizeProfileId(getProviderConfig('runninghubwf')?.providerProfileId)
         : ''),
     modelProviderProfileId = normalizeModelProviderProfileId(
-      modelId2['modelManifest'] || modelId2['modelId'],
+      modelId2.modelManifest || modelId2.modelId,
       state,
     ),
     providerProfileId2 =
       modelProviderProfileId ||
       (providerId4 === 'runninghub' && adapterType2 === 'modelApi'
         ? resolveRunningHubModelApiProfileId(
-            modelId2['modelManifest']?.['modelId'] || modelId2['modelId'],
+            modelId2.modelManifest?.modelId || modelId2.modelId,
             state,
           )
         : enabled
@@ -160,16 +158,16 @@ export function resolveModelCredentialRequirement(options3 = {}) {
       adapterType: adapterType2,
       providerProfileId: providerProfileId2,
     }),
-    providerLabel = getCustomProviderDisplayName(modelId2['modelManifest'], configProviderId2 || providerId4),
+    providerLabel = getCustomProviderDisplayName(modelId2.modelManifest, configProviderId2 || providerId4),
     cliProviderId = resolveCliProviderId(providerId4, modelId2);
-  if (options3['credentialRequired'] === false || !providerId4)
+  if (options3.credentialRequired === false || !providerId4)
     return {
       required: false,
       adapterType: adapterType2,
       providerId: providerId4,
       configProviderId: configProviderId2,
       providerLabel: providerLabel,
-      modelId: modelId2['modelId'],
+      modelId: modelId2.modelId,
       credentialField: '',
       fieldIds: [],
     };
@@ -182,38 +180,38 @@ export function resolveModelCredentialRequirement(options3 = {}) {
       configProviderId: '',
       providerLabel: getCliProviderLabel(cliProviderId, providerLabel),
       cliProviderId: cliProviderId,
-      modelId: modelId2['modelId'],
+      modelId: modelId2.modelId,
       credentialField: 'cliLogin',
       keyType: 'cliLogin',
       fieldIds: getCliLoginFieldIds(cliProviderId),
     };
-  if (adapterType2 === 'localRuntime' || CREDENTIAL_FREE_PROVIDERS['has'](providerId4))
+  if (adapterType2 === 'localRuntime' || CREDENTIAL_FREE_PROVIDERS.has(providerId4))
     return {
       required: false,
       adapterType: adapterType2,
       providerId: providerId4,
       configProviderId: configProviderId2,
       providerLabel: providerLabel,
-      modelId: modelId2['modelId'],
+      modelId: modelId2.modelId,
       credentialField: '',
       fieldIds: [],
     };
-  const enabled2 = /^custom_[a-z0-9_-]+$/i['test'](providerId4);
-  if (!enabled && !enabled2 && !KNOWN_CONFIGURABLE_PROVIDERS['has'](providerId4))
+  const enabled2 = /^custom_[a-z0-9_-]+$/i.test(providerId4);
+  if (!enabled && !enabled2 && !KNOWN_CONFIGURABLE_PROVIDERS.has(providerId4))
     return {
       required: false,
       adapterType: adapterType2,
       providerId: providerId4,
       configProviderId: configProviderId2,
       providerLabel: providerLabel,
-      modelId: modelId2['modelId'],
+      modelId: modelId2.modelId,
       credentialField: '',
       fieldIds: [],
     };
   const credentialField2 =
       providerId4 === 'comfyui'
         ? 'apiUrl'
-        : ['runninghub', 'runninghub-international']['includes'](providerId4) && adapterType2 === 'modelApi'
+        : ['runninghub', 'runninghub-international'].includes(providerId4) && adapterType2 === 'modelApi'
           ? 'modelApiKey'
           : 'apiKey',
     keyType =
@@ -234,11 +232,11 @@ export function resolveModelCredentialRequirement(options3 = {}) {
     configProviderId: configProviderId2,
     providerLabel: providerLabel,
     providerProfileId: providerProfileId2,
-    modelId: modelId2['modelId'],
+    modelId: modelId2.modelId,
     credentialField: credentialField2,
     keyType: keyType,
     ...(connectionCapability2 ? { connectionCapability: connectionCapability2 } : {}),
-    verificationRequired: !enabled2 && KNOWN_CONFIGURABLE_PROVIDERS['has'](configProviderId2 || providerId4),
+    verificationRequired: !enabled2 && KNOWN_CONFIGURABLE_PROVIDERS.has(configProviderId2 || providerId4),
     fieldIds: getCredentialFieldIds({
       providerId: providerId4,
       configProviderId: configProviderId2,
@@ -248,50 +246,50 @@ export function resolveModelCredentialRequirement(options3 = {}) {
   };
 }
 function readCredentialValue(config, scope = {}) {
-  const input = scope['payload'] || {},
-    output = scope['providerConfig'] || {};
-  if (config['credentialField'] === 'apiUrl') {
-    const value2 = config['connectionCapability'] === 'cloud' ? output['cloudApiUrl'] : output['apiUrl'],
-      value3 = config['connectionCapability'] === 'cloud' ? '' : PROVIDERS_META?.['comfyui']?.['defaultUrl'];
-    return String(value2 || input['apiUrl'] || input['baseUrl'] || value3 || '')['trim']();
+  const input = scope.payload || {},
+    output = scope.providerConfig || {};
+  if (config.credentialField === 'apiUrl') {
+    const value2 = config.connectionCapability === 'cloud' ? output.cloudApiUrl : output.apiUrl,
+      value3 = config.connectionCapability === 'cloud' ? '' : PROVIDERS_META?.comfyui?.defaultUrl;
+    return String(value2 || input.apiUrl || input.baseUrl || value3 || '').trim();
   }
-  if (config['credentialField'] === 'modelApiKey')
-    return String(output['modelApiKey'] || input['modelApiKey'] || input['apiKey'] || '')['trim']();
-  return String(output['apiKey'] || input['apiKey'] || '')['trim']();
+  if (config.credentialField === 'modelApiKey')
+    return String(output.modelApiKey || input.modelApiKey || input.apiKey || '').trim();
+  return String(output.apiKey || input.apiKey || '').trim();
 }
 function buildMissingCredentialMessage(value4) {
-  if (value4['credentialField'] === 'cliLogin') return '请先登录 ' + value4['providerLabel'];
-  if (value4['credentialField'] === 'apiUrl') return '请先配置 ' + value4['providerLabel'] + ' 服务地址';
-  if (value4['credentialField'] === 'modelApiKey')
-    return '请先配置 ' + value4['providerLabel'] + ' 模型 API Key';
-  if (value4['adapterType'] === 'workflow') return '请先配置 ' + value4['providerLabel'] + ' 工作流 API Key';
-  return '请先配置 ' + value4['providerLabel'] + ' API Key';
+  if (value4.credentialField === 'cliLogin') return '请先登录 ' + value4.providerLabel;
+  if (value4.credentialField === 'apiUrl') return '请先配置 ' + value4.providerLabel + ' 服务地址';
+  if (value4.credentialField === 'modelApiKey')
+    return '请先配置 ' + value4.providerLabel + ' 模型 API Key';
+  if (value4.adapterType === 'workflow') return '请先配置 ' + value4.providerLabel + ' 工作流 API Key';
+  return '请先配置 ' + value4.providerLabel + ' API Key';
 }
 function getProviderConnectionStatus(options4 = {}) {
-  return String(options4?.['connectionVerification']?.['status'] || '')
-    ['trim']()
-    ['toLowerCase']();
+  return String(options4?.connectionVerification?.status || '')
+    .trim()
+    .toLowerCase();
 }
 function isProviderConnectionVerified(options5 = {}) {
   return getProviderConnectionStatus(options5) === 'passed';
 }
 function getProviderConnectionCapability(options6 = {}) {
-  const profileId3 = normalizeProfileId(options6['configProviderId']);
+  const profileId3 = normalizeProfileId(options6.configProviderId);
   if (profileId3 === 'comfyui')
-    return ['local', 'cloud']['includes'](options6['connectionCapability'])
-      ? options6['connectionCapability']
+    return ['local', 'cloud'].includes(options6.connectionCapability)
+      ? options6.connectionCapability
       : 'local';
-  if (!['runninghub', 'runninghub-international']['includes'](profileId3)) return '';
-  return options6['credentialField'] === 'modelApiKey'
+  if (!['runninghub', 'runninghub-international'].includes(profileId3)) return '';
+  return options6.credentialField === 'modelApiKey'
     ? 'modelApi'
-    : options6['credentialField'] === 'apiKey'
+    : options6.credentialField === 'apiKey'
       ? 'workflow'
       : '';
 }
 function getProviderConnectionCapabilityStatus(value5, value6 = {}) {
-  return String(value6?.['connectionVerification']?.['capabilities']?.[value5]?.['status'] || '')
-    ['trim']()
-    ['toLowerCase']();
+  return String(value6?.connectionVerification?.capabilities?.[value5]?.status || '')
+    .trim()
+    .toLowerCase();
 }
 function isProviderConnectionCapabilityVerified(value7, value8 = {}) {
   return getProviderConnectionCapabilityStatus(value7, value8) === 'passed';
@@ -308,30 +306,30 @@ function getConnectionCapabilityLabel(value9 = '') {
           : 'API 连接';
 }
 function buildUnverifiedConnectionMessage(value10, value11 = '') {
-  return '请先验证 ' + value10['providerLabel'] + ' ' + getConnectionCapabilityLabel(value11);
+  return '请先验证 ' + value10.providerLabel + ' ' + getConnectionCapabilityLabel(value11);
 }
 function isModelAuthorizationVerified(value12, value13 = {}) {
-  const enabled3 = String(value12?.['authorizationCapability'] || '')['trim']();
+  const enabled3 = String(value12?.authorizationCapability || '').trim();
   if (!enabled3) return false;
   return (
-    String(value13?.['connectionVerification']?.['capabilities']?.[enabled3]?.['status'] || '')
-      ['trim']()
-      ['toLowerCase']() === 'passed'
+    String(value13?.connectionVerification?.capabilities?.[enabled3]?.status || '')
+      .trim()
+      .toLowerCase() === 'passed'
   );
 }
 function getModelAuthorizationStatus(value14, value15 = {}) {
-  const value16 = String(value14?.['authorizationCapability'] || '')['trim']();
+  const value16 = String(value14?.authorizationCapability || '').trim();
   return value16 ? getProviderConnectionCapabilityStatus(value16, value15) : '';
 }
 export function evaluateModelGenerationReadiness(providerConfig = {}) {
-  const message = providerConfig['requirement'] || resolveModelCredentialRequirement(providerConfig);
-  if (!message['required'])
+  const message = providerConfig.requirement || resolveModelCredentialRequirement(providerConfig);
+  if (!message.required)
     return { ready: true, status: 'ready', reason: 'credential-not-required', ...message, message: '' };
-  if (message['credentialField'] === 'cliLogin') {
-    const enabled4 = providerConfig['cliStatus'];
-    if (!enabled4 || typeof enabled4 !== 'object' || Array['isArray'](enabled4))
+  if (message.credentialField === 'cliLogin') {
+    const enabled4 = providerConfig.cliStatus;
+    if (!enabled4 || typeof enabled4 !== 'object' || Array.isArray(enabled4))
       return { ready: false, status: 'loading', reason: 'cli-status-loading', ...message, message: '' };
-    if (enabled4['loggedIn'] === true)
+    if (enabled4.loggedIn === true)
       return { ready: true, status: 'ready', reason: 'cli-login-present', ...message, message: '' };
     return {
       ready: false,
@@ -342,24 +340,24 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
     };
   }
   if (
-    providerConfig['configLoaded'] === false &&
-    !providerConfig['providerConfig'] &&
-    !providerConfig['payload']
+    providerConfig.configLoaded === false &&
+    !providerConfig.providerConfig &&
+    !providerConfig.payload
   )
     return { ready: false, status: 'loading', reason: 'config-loading', ...message, message: '' };
   const credentialValue = readCredentialValue(message, providerConfig);
   if (credentialValue) {
     const value17 =
-        providerConfig['providerConfig'] &&
-        typeof providerConfig['providerConfig'] === 'object' &&
-        !Array['isArray'](providerConfig['providerConfig']),
+        providerConfig.providerConfig &&
+        typeof providerConfig.providerConfig === 'object' &&
+        !Array.isArray(providerConfig.providerConfig),
       enabled5 = value17
         ? Boolean(
-            readCredentialValue(message, { providerConfig: providerConfig['providerConfig'], payload: {} }),
+            readCredentialValue(message, { providerConfig: providerConfig.providerConfig, payload: {} }),
           )
         : false;
-    if (message['requirementType'] === 'modelAuthorization') {
-      if (value17 && isModelAuthorizationVerified(message, providerConfig['providerConfig']))
+    if (message.requirementType === 'modelAuthorization') {
+      if (value17 && isModelAuthorizationVerified(message, providerConfig.providerConfig))
         return {
           ready: true,
           status: 'ready',
@@ -369,35 +367,35 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
         };
       if (!enabled5)
         return { ready: true, status: 'ready', reason: 'credential-present', ...message, message: '' };
-      if (getModelAuthorizationStatus(message, providerConfig['providerConfig']) === 'failed')
+      if (getModelAuthorizationStatus(message, providerConfig.providerConfig) === 'failed')
         return {
           ready: false,
           status: 'missing',
           reason: 'model-authorization-missing',
           ...message,
-          message: '请在设置中重新测试 ' + message['providerLabel'] + '，确认当前模型服务已开通',
+          message: '请在设置中重新测试 ' + message.providerLabel + '，确认当前模型服务已开通',
         };
       return {
         ready: true,
         status: 'unverified',
         reason: 'model-authorization-unverified',
         ...message,
-        message: message['providerLabel'] + ' 将在首次生成时自动验证',
+        message: message.providerLabel + ' 将在首次生成时自动验证',
       };
     }
     const message2 = getProviderConnectionCapability(message);
-    if (message['verificationRequired'] && value17 && enabled5) {
+    if (message.verificationRequired && value17 && enabled5) {
       const enabled6 = message2
-        ? isProviderConnectionCapabilityVerified(message2, providerConfig['providerConfig'])
-        : isProviderConnectionVerified(providerConfig['providerConfig']);
+        ? isProviderConnectionCapabilityVerified(message2, providerConfig.providerConfig)
+        : isProviderConnectionVerified(providerConfig.providerConfig);
       if (!enabled6) {
         const value18 = message2
-          ? getProviderConnectionCapabilityStatus(message2, providerConfig['providerConfig'])
-          : getProviderConnectionStatus(providerConfig['providerConfig']);
+          ? getProviderConnectionCapabilityStatus(message2, providerConfig.providerConfig)
+          : getProviderConnectionStatus(providerConfig.providerConfig);
         if (value18 === 'failed') {
           if (
-            normalizeProfileId(message['configProviderId']) === 'comfyui' &&
-            ['local', 'cloud']['includes'](message2)
+            normalizeProfileId(message.configProviderId) === 'comfyui' &&
+            ['local', 'cloud'].includes(message2)
           )
             return {
               ready: true,
@@ -412,11 +410,11 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
             reason: 'connection-validation-failed',
             ...message,
             message: message2
-              ? message['providerLabel'] +
+              ? message.providerLabel +
                 ' ' +
                 getConnectionCapabilityLabel(message2) +
                 ' 验证失败，请检查 Key 后重试'
-              : message['providerLabel'] + ' API 验证失败，请检查 Key 后重试',
+              : message.providerLabel + ' API 验证失败，请检查 Key 后重试',
           };
         }
         return {
@@ -432,7 +430,7 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
       ready: true,
       status: 'ready',
       reason:
-        message['verificationRequired'] && value17
+        message.verificationRequired && value17
           ? message2
             ? 'connection-capability-verified'
             : 'connection-verified'
@@ -451,16 +449,16 @@ export function evaluateModelGenerationReadiness(providerConfig = {}) {
 }
 export function getModelGenerationReadiness(args = {}) {
   const requirement = resolveModelCredentialRequirement(args);
-  if (requirement['credentialField'] === 'cliLogin') {
+  if (requirement.credentialField === 'cliLogin') {
     const cliStatus =
-      requirement['cliProviderId'] === 'dreamina'
+      requirement.cliProviderId === 'dreamina'
         ? getCachedDreaminaCliStatus()
-        : getCachedCliProviderStatus(requirement['cliProviderId']);
+        : getCachedCliProviderStatus(requirement.cliProviderId);
     return evaluateModelGenerationReadiness({ ...args, requirement: requirement, cliStatus: cliStatus });
   }
   const configLoaded = isApiConfigLoaded(),
     providerConfig2 = configLoaded
-      ? getProviderConfig(requirement['configProviderId'] || requirement['providerId'])
+      ? getProviderConfig(requirement.configProviderId || requirement.providerId)
       : null;
   return evaluateModelGenerationReadiness({
     ...args,
@@ -472,56 +470,56 @@ export function getModelGenerationReadiness(args = {}) {
 async function ensureCliProviderStatus(value19) {
   const value20 = value19 === 'dreamina' ? getCachedDreaminaCliStatus() : getCachedCliProviderStatus(value19);
   if (value20) return value20;
-  if (CLI_STATUS_REQUESTS['has'](value19)) return CLI_STATUS_REQUESTS['get'](value19);
+  if (CLI_STATUS_REQUESTS.has(value19)) return CLI_STATUS_REQUESTS.get(value19);
   const value21 =
     value19 === 'dreamina'
       ? fetchDreaminaCliStatusFromServer({ refresh: true })
-      : fetchCliProviderStatuses()['then'](() => getCachedCliProviderStatus(value19));
-  CLI_STATUS_REQUESTS['set'](value19, value21);
+      : fetchCliProviderStatuses().then(() => getCachedCliProviderStatus(value19));
+  CLI_STATUS_REQUESTS.set(value19, value21);
   try {
     return await value21;
   } finally {
-    CLI_STATUS_REQUESTS['delete'](value19);
+    CLI_STATUS_REQUESTS.delete(value19);
   }
 }
 export async function ensureModelGenerationReadiness(options7 = {}) {
   const message3 = resolveModelCredentialRequirement(options7);
-  if (message3['credentialField'] === 'cliLogin')
-    return (await ensureCliProviderStatus(message3['cliProviderId']), getModelGenerationReadiness(options7));
+  if (message3.credentialField === 'cliLogin')
+    return (await ensureCliProviderStatus(message3.cliProviderId), getModelGenerationReadiness(options7));
   await ensureConfig();
   const response = getModelGenerationReadiness(options7);
-  if (options7['autoVerify'] !== true || response['status'] !== 'unverified') return response;
+  if (options7.autoVerify !== true || response.status !== 'unverified') return response;
   let validationResult;
   try {
     validationResult = await autoVerifyProviderConnection(message3);
   } catch (error) {
-    validationResult = { ok: false, error: error?.['message'] || 'API 连接验证失败' };
+    validationResult = { ok: false, error: error?.message || 'API 连接验证失败' };
   }
   const response2 = getModelGenerationReadiness(options7);
-  if (response2['ready'] && response2['status'] !== 'unverified') return response2;
+  if (response2.ready && response2.status !== 'unverified') return response2;
   return {
     ...response2,
     ready: false,
     status: 'missing',
     reason: 'connection-validation-failed',
     message:
-      message3['providerLabel'] + ' 自动验证未通过：' + getProviderConnectionFailureDetail(validationResult),
+      message3.providerLabel + ' 自动验证未通过：' + getProviderConnectionFailureDetail(validationResult),
     validationResult: validationResult,
   };
 }
 export function createMissingModelCredentialError(response3) {
   const error2 =
-      response3?.['status'] === 'missing' ? response3 : evaluateModelGenerationReadiness(response3 || {}),
-    error3 = new Error(error2['message'] || '当前模型缺少可用的 API Key');
+      response3?.status === 'missing' ? response3 : evaluateModelGenerationReadiness(response3 || {}),
+    error3 = new Error(error2.message || '当前模型缺少可用的 API Key');
   return (
-    (error3['name'] = 'ModelCredentialMissingError'),
-    (error3['code'] = 'MODEL_CREDENTIAL_MISSING'),
-    (error3['provider'] = error2['providerId']),
-    (error3['providerId'] = error2['configProviderId'] || error2['providerId']),
-    (error3['keyType'] = error2['keyType']),
-    (error3['adapterType'] = error2['adapterType']),
-    (error3['model'] = error2['modelId']),
-    (error3['fieldIds'] = error2['fieldIds']),
+    (error3.name = 'ModelCredentialMissingError'),
+    (error3.code = 'MODEL_CREDENTIAL_MISSING'),
+    (error3.provider = error2.providerId),
+    (error3.providerId = error2.configProviderId || error2.providerId),
+    (error3.keyType = error2.keyType),
+    (error3.adapterType = error2.adapterType),
+    (error3.model = error2.modelId),
+    (error3.fieldIds = error2.fieldIds),
     error3
   );
 }

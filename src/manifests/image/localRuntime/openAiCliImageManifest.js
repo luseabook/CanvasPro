@@ -3,31 +3,31 @@ import {
   BATCH_SIZE_FIELD,
   GPT_IMAGE_2_IMAGE_SIZE_FIELD,
 } from '../modelApi/sharedImageModelApiFields.js';
-const OPENAI_CLI_IMAGE_INPUT_SLOTS = Object['freeze']({
-    allowedKinds: Object['freeze'](['text', 'image']),
-    minByKind: Object['freeze']({ text: 0 }),
-    maxByKind: Object['freeze']({ image: 5, video: 0, audio: 0 }),
+const OPENAI_CLI_IMAGE_INPUT_SLOTS = Object.freeze({
+    allowedKinds: Object.freeze(['text', 'image']),
+    minByKind: Object.freeze({ text: 0 }),
+    maxByKind: Object.freeze({ image: 5, video: 0, audio: 0 }),
   }),
-  OPENAI_CLI_IMAGE_UI_SCHEMA = Object['freeze']({
-    fields: Object['freeze']([
-      Object['freeze']({
+  OPENAI_CLI_IMAGE_UI_SCHEMA = Object.freeze({
+    fields: Object.freeze([
+      Object.freeze({
         ...GPT_IMAGE_2_IMAGE_SIZE_FIELD,
         showInfoTip: true,
         description: '比例和分辨率作为创作要求传给 Codex，实际输出以生成结果为准。',
       }),
       ASPECT_RATIO_FIELD,
-      Object['freeze']({
+      Object.freeze({
         ...BATCH_SIZE_FIELD,
         showInfoTip: true,
         menuTooltip: '逐次生成独立图片，每次均使用 Codex 额度。',
       }),
     ]),
   }),
-  OPENAI_CLI_IMAGE_RESULT = Object['freeze']({ urlFields: Object['freeze'](['imageUrl', 'url']) });
+  OPENAI_CLI_IMAGE_RESULT = Object.freeze({ urlFields: Object.freeze(['imageUrl', 'url']) });
 export const OPENAI_CLI_IMAGE_MODEL_ID = 'openai-cli/image-generation';
 export const OPENAI_CLI_IMAGE_EXECUTION_ID = 'openai-cli.local-runtime.image-generation.v1';
-export const openAiCliImageModelManifests = Object['freeze']([
-  Object['freeze']({
+export const openAiCliImageModelManifests = Object.freeze([
+  Object.freeze({
     schemaVersion: '1.0',
     modelId: OPENAI_CLI_IMAGE_MODEL_ID,
     provider: 'openai-cli',
@@ -42,10 +42,10 @@ export const openAiCliImageModelManifests = Object['freeze']([
     async: false,
     cancellable: false,
     outputType: 'image',
-    extensions: Object['freeze']({
-      imageFunctionMenu: Object['freeze']({ enabled: true }),
-      inputValidation: Object['freeze']({ rejectImageOverflow: true }),
-      imageMenu: Object['freeze']({
+    extensions: Object.freeze({
+      imageFunctionMenu: Object.freeze({ enabled: true }),
+      inputValidation: Object.freeze({ rejectImageOverflow: true }),
+      imageMenu: Object.freeze({
         group: 'openai-cli',
         order: 10,
         title: 'GPT Image 2',
@@ -55,8 +55,8 @@ export const openAiCliImageModelManifests = Object['freeze']([
     }),
   }),
 ]);
-export const openAiCliImageExecutionManifests = Object['freeze']([
-  Object['freeze']({
+export const openAiCliImageExecutionManifests = Object.freeze([
+  Object.freeze({
     schemaVersion: '1.0',
     id: OPENAI_CLI_IMAGE_EXECUTION_ID,
     provider: 'openai-cli',
@@ -64,14 +64,14 @@ export const openAiCliImageExecutionManifests = Object['freeze']([
     adapterType: 'localRuntime',
     runtime: 'openAiCliImage',
     result: OPENAI_CLI_IMAGE_RESULT,
-    extensions: Object['freeze']({
+    extensions: Object.freeze({
       cliProvider: 'codex',
-      promptFields: Object['freeze']([
-        Object['freeze']({ field: 'imageSize', template: 'Requested image resolution tier: {value}.' }),
-        Object['freeze']({
+      promptFields: Object.freeze([
+        Object.freeze({ field: 'imageSize', template: 'Requested image resolution tier: {value}.' }),
+        Object.freeze({
           field: 'aspectRatio',
           template: 'Requested image aspect ratio: {value}.',
-          omitValues: Object['freeze'](['自适应']),
+          omitValues: Object.freeze(['自适应']),
         }),
       ]),
     }),

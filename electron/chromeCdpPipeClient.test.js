@@ -130,8 +130,8 @@ test('a blank method rejects without writing a frame', async () => {
 test('an event frame fans out to every registered handler', async () => {
   const { readable, client } = createHarness();
   const seen = [],
-    off = client.onEvent((message) => seen.push(['first', message['method']])),
-    offSecond = client.onEvent((message) => seen.push(['second', message['method']]));
+    off = client.onEvent((message) => seen.push(['first', message.method])),
+    offSecond = client.onEvent((message) => seen.push(['second', message.method]));
   readable.emit('data', JSON.stringify({ method: 'Page.loadEventFired', params: { ts: 7 } }) + NUL);
   assert.deepEqual(seen, [
     ['first', 'Page.loadEventFired'],
@@ -150,7 +150,7 @@ test('a throwing event handler does not stop the remaining handlers', () => {
   client.onEvent(() => {
     throw new Error('handler exploded');
   });
-  client.onEvent((message) => seen.push(message['method']));
+  client.onEvent((message) => seen.push(message.method));
   readable.emit('data', JSON.stringify({ method: 'Runtime.executionContextCreated' }) + NUL);
   assert.deepEqual(seen, ['Runtime.executionContextCreated']);
 });
@@ -194,7 +194,7 @@ test('a NUL split across two chunks is reassembled before dispatch', async () =>
 test('two frames in one chunk are both dispatched and an empty segment is skipped', async () => {
   const { readable, client } = createHarness();
   const events = [];
-  client.onEvent((message) => events.push(message['method']));
+  client.onEvent((message) => events.push(message.method));
   const promise = client.send('A');
   readable.emit(
     'data',
@@ -376,7 +376,7 @@ test('closing the client rejects every pending request with the reason', async (
 test('closing uses the default reason, is idempotent and stops event delivery', async () => {
   const { readable, client } = createHarness();
   const seen = [];
-  client.onEvent((message) => seen.push(message['method']));
+  client.onEvent((message) => seen.push(message.method));
   const promise = client.send('A');
   client.close();
   assert.equal(client.closed, true);
@@ -442,7 +442,7 @@ test('a non-Error pipe failure falls back to the raw value then to a default rea
 test('unsubscribing an event handler stops delivery', () => {
   const { readable, client } = createHarness();
   const seen = [];
-  const off = client.onEvent((message) => seen.push(message['method']));
+  const off = client.onEvent((message) => seen.push(message.method));
   readable.emit('data', JSON.stringify({ method: 'A' }) + NUL);
   off();
   readable.emit('data', JSON.stringify({ method: 'B' }) + NUL);

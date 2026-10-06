@@ -1,7 +1,7 @@
 import { renderAudioPlaybackSurface } from '../components/audio-node/audioPlaybackSurface.js';
 import { getWorkspaceAssetAppearances } from './workspaceAssetAppearance.js';
 const escape = (value) =>
-  String(value ?? '')['replace'](
+  String(value ?? '').replace(
     /[&<>"']/gu,
     (item) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' })[item],
   );
@@ -21,7 +21,7 @@ export function renderWorkspaceAudioAssetDetail({
   bindAttributes: bindAttributes = '',
   membershipAttributes: membershipAttributes = '',
 }) {
-  const key = Boolean(audioUrl && characters['some']((index) => index['id'] === selectedCharacterId));
+  const key = Boolean(audioUrl && characters.some((index) => index.id === selectedCharacterId));
   return (
     '<aside class="story-asset-detail story-audio-detail ' +
     escape(className) +
@@ -37,24 +37,24 @@ export function renderWorkspaceAudioAssetDetail({
     '\n    </div>\n    <div class="story-asset-detail-copy">\n      <strong>' +
     escape(name) +
     '</strong><p>' +
-    (boundNames['length'] ? '已绑定：' + boundNames['map'](escape)['join']('、') : '未绑定人物') +
+    (boundNames.length ? '已绑定：' + boundNames.map(escape).join('、') : '未绑定人物') +
     '</p>\n      <label>绑定人物<select ' +
     selectAttributes +
     ' aria-label="绑定人物"><option value="">请选择人物</option>' +
-    characters['map'](
+    characters.map(
       (error) =>
         '<option value="' +
-        escape(error['id']) +
+        escape(error.id) +
         '" data-thumbnail-url="' +
         escape(
-          getWorkspaceAssetAppearances(error)['find']((result) => result['imageUrl'])?.['imageUrl'] || '',
+          getWorkspaceAssetAppearances(error).find((result) => result.imageUrl)?.imageUrl || '',
         ) +
         '" ' +
-        (error['id'] === selectedCharacterId ? 'selected' : '') +
+        (error.id === selectedCharacterId ? 'selected' : '') +
         '>' +
-        escape(error['name']) +
+        escape(error.name) +
         '</option>',
-    )['join']('') +
+    ).join('') +
     '</select></label>\n      <button type="button" class="story-secondary-button" ' +
     bindAttributes +
     ' ' +

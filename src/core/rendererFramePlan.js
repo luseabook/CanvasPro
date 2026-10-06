@@ -8,26 +8,26 @@ import {
 import { RENDERER_VIRTUALIZATION_CONFIG } from './rendererVirtualization.js';
 const PRIORITY_MEDIA_VIEWPORT_PADDING = 200;
 function resolveNodeCount(value, item, key) {
-  if (Number['isFinite'](key)) return Number(key);
-  if (Number['isFinite'](value?.['_nodeCount'])) return Number(value['_nodeCount']);
-  return Object['keys'](item || {})['length'];
+  if (Number.isFinite(key)) return Number(key);
+  if (Number.isFinite(value?._nodeCount)) return Number(value._nodeCount);
+  return Object.keys(item || {}).length;
 }
 function resolveGeometryRev(index, result, data) {
-  if (Number['isFinite'](data)) return Number(data);
-  if (Number['isFinite'](index?.['_nodeGeometryRev'])) return Number(index['_nodeGeometryRev']);
-  if (Number['isFinite'](index?.['_persistRev'])) return Number(index['_persistRev']);
+  if (Number.isFinite(data)) return Number(data);
+  if (Number.isFinite(index?._nodeGeometryRev)) return Number(index._nodeGeometryRev);
+  if (Number.isFinite(index?._persistRev)) return Number(index._persistRev);
   return result;
 }
 function normalizeContainerRect(box) {
-  return Object['freeze']({
-    width: Number['isFinite'](box?.['width']) ? box['width'] : 0,
-    height: Number['isFinite'](box?.['height']) ? box['height'] : 0,
+  return Object.freeze({
+    width: Number.isFinite(box?.width) ? box.width : 0,
+    height: Number.isFinite(box?.height) ? box.height : 0,
   });
 }
 export function createRendererFramePlan({
   snapshot: snapshot = null,
-  nodes: nodes = snapshot?.['nodes'] || {},
-  viewport: viewport = snapshot?.['viewport'] || { x: 0, y: 0, zoom: 1 },
+  nodes: nodes = snapshot?.nodes || {},
+  viewport: viewport = snapshot?.viewport || { x: 0, y: 0, zoom: 1 },
   containerRect: containerRect,
   nodeCount: nodeCount,
   geometryRev: geometryRev,
@@ -44,7 +44,7 @@ export function createRendererFramePlan({
       args = getCachedRendererSpatialIndex(nodes, {
         geometryRev: geometryRev2,
         nodeCount: nodeCount2,
-        denseNodeCount: RENDERER_VIRTUALIZATION_CONFIG['denseNodeCount'],
+        denseNodeCount: RENDERER_VIRTUALIZATION_CONFIG.denseNodeCount,
       });
       if (args) args = { ...args, frameQueryCache: new Map() };
       enabled = true;
@@ -58,8 +58,8 @@ export function createRendererFramePlan({
       enabled3,
       screenViewportToWorldBounds({
         viewport: viewport,
-        containerWidth: containerWidth['width'],
-        containerHeight: containerWidth['height'],
+        containerWidth: containerWidth.width,
+        containerHeight: containerWidth.height,
         padding: PRIORITY_MEDIA_VIEWPORT_PADDING,
       }),
     );
@@ -70,12 +70,12 @@ export function createRendererFramePlan({
       !enabled2 &&
         ((hasRendererPriorityMediaWork2 = hasRendererPriorityMediaWork({
           nodes: nodes,
-          selectedNodeIds: snapshot?.['selectedNodeIds'],
-          connOverlay: snapshot?.['connOverlay'],
-          pickConnectMode: snapshot?.['pickConnectMode'],
+          selectedNodeIds: snapshot?.selectedNodeIds,
+          connOverlay: snapshot?.connOverlay,
+          pickConnectMode: snapshot?.pickConnectMode,
           viewport: viewport,
-          containerWidth: containerWidth['width'],
-          containerHeight: containerWidth['height'],
+          containerWidth: containerWidth.width,
+          containerHeight: containerWidth.height,
           viewportPadding: PRIORITY_MEDIA_VIEWPORT_PADDING,
           candidateNodeIds: candidateNodeIds(),
         })),
@@ -83,7 +83,7 @@ export function createRendererFramePlan({
       hasRendererPriorityMediaWork2
     );
   }
-  return Object['freeze']({
+  return Object.freeze({
     nodeCount: nodeCount2,
     viewport: viewport,
     containerRect: containerWidth,

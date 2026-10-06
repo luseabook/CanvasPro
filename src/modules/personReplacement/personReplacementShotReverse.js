@@ -1,15 +1,15 @@
 import { getPersonReplacementShotCutPositionAtTimelineSec } from './personReplacementShotCutModel.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 export function togglePersonReplacementShotReverseAtTimelineSec(draft = [], item = 0) {
   const position = getPersonReplacementShotCutPositionAtTimelineSec(draft, item),
-    enabled = draft[position['shotIndex']];
+    enabled = draft[position.shotIndex];
   if (!enabled) return null;
-  const isReversed = enabled['isReversed'] !== true;
+  const isReversed = enabled.isReversed !== true;
   return {
-    draft: draft['map']((args, key) =>
-      key === position['shotIndex'] ? { ...args, isReversed: isReversed } : args,
+    draft: draft.map((args, key) =>
+      key === position.shotIndex ? { ...args, isReversed: isReversed } : args,
     ),
     position: position,
     isReversed: isReversed,
@@ -50,47 +50,47 @@ export async function materializePersonReplacementShotPlayback({
     throw new Error('镜头片段倒放参数不完整');
   const enabled2 =
       isNewShot ||
-      Math['abs'](Number(range['startSec']) - Number(currentShot['startTimeSec'])) > epsilonSec ||
-      Math['abs'](Number(range['endSec']) - Number(currentShot['endTimeSec'])) > epsilonSec,
+      Math.abs(Number(range.startSec) - Number(currentShot.startTimeSec)) > epsilonSec ||
+      Math.abs(Number(range.endSec) - Number(currentShot.endTimeSec)) > epsilonSec,
     reverseChanged =
-      Boolean(range['isReversed']) !==
+      Boolean(range.isReversed) !==
       Boolean(
-        typeof currentShot['materializedIsReversed'] === 'boolean'
-          ? currentShot['materializedIsReversed']
-          : normalizeText(currentShot['videoRef']) && currentShot['isReversed'],
+        typeof currentShot.materializedIsReversed === 'boolean'
+          ? currentShot.materializedIsReversed
+          : normalizeText(currentShot.videoRef) && currentShot.isReversed,
       ),
     result = Boolean(
-      typeof currentShot['materializedIsReversed'] === 'boolean'
-        ? currentShot['materializedIsReversed']
-        : normalizeText(currentShot['videoRef']) && currentShot['isReversed'],
+      typeof currentShot.materializedIsReversed === 'boolean'
+        ? currentShot.materializedIsReversed
+        : normalizeText(currentShot.videoRef) && currentShot.isReversed,
     );
-  let src = normalizeText(currentShot['videoRef']);
-  const videoRefIsCropped = Boolean(currentShot['videoRefIsCropped'] === true && !enabled2 && src),
+  let src = normalizeText(currentShot.videoRef);
+  const videoRefIsCropped = Boolean(currentShot.videoRefIsCropped === true && !enabled2 && src),
     enabled3 = Boolean(videoRefIsCropped && reverseChanged);
-  if (enabled2 || !src || (result && range['isReversed'] !== true && !enabled3)) {
+  if (enabled2 || !src || (result && range.isReversed !== true && !enabled3)) {
     const error = await enqueueMediaTask(
       {
         kind: 'mediaClipExport',
         src: sourceVideoRef,
-        args: { videoStart: range['startSec'], videoEnd: range['endSec'], fps: outputFps },
+        args: { videoStart: range.startSec, videoEnd: range.endSec, fps: outputFps },
       },
       { wait: true, timeout: 600000 },
     );
     src = resolveMediaRef(error);
-    if (error?.['success'] === false || !src)
-      throw new Error(error?.['error'] || error?.['message'] || '镜头片段导出失败');
+    if (error?.success === false || !src)
+      throw new Error(error?.error || error?.message || '镜头片段导出失败');
   }
   if (
     enabled3 ||
-    (range['isReversed'] === true && (enabled2 || reverseChanged || !normalizeText(currentShot['videoRef'])))
+    (range.isReversed === true && (enabled2 || reverseChanged || !normalizeText(currentShot.videoRef)))
   ) {
     const error2 = await enqueueMediaTask(
       { kind: 'videoReverse', src: src },
       { wait: true, timeout: 600000 },
     );
     src = resolveMediaRef(error2);
-    if (error2?.['success'] === false || !src)
-      throw new Error(error2?.['error'] || error2?.['message'] || '镜头片段倒放失败');
+    if (error2?.success === false || !src)
+      throw new Error(error2?.error || error2?.message || '镜头片段倒放失败');
   }
   return { videoRef: src, reverseChanged: reverseChanged, videoRefIsCropped: videoRefIsCropped };
 }

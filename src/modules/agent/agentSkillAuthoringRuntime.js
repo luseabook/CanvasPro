@@ -5,8 +5,8 @@ import {
   isAgentSkillAuthoringIntent,
   requestNormalizedAgentSkillDraft,
 } from './agentSkillAuthoring.js';
-const TEXT = Object['freeze']({
-  'zh-CN': Object['freeze']({
+const TEXT = Object.freeze({
+  'zh-CN': Object.freeze({
     canceled: '已取消创建 Skill。',
     created: '已创建 Skill「{title}」（${id}）。现在可以直接说“用 ${id} …”来使用。',
     duplicate: 'Skill「${id}」已经存在，我没有覆盖它。可以换一个名称，或在 Skill 管理中编辑现有版本。',
@@ -15,7 +15,7 @@ const TEXT = Object['freeze']({
     failed: 'Skill 创建失败，请重试。',
     stopped: 'Skill 创建已停止。',
   }),
-  'en-US': Object['freeze']({
+  'en-US': Object.freeze({
     canceled: 'Skill creation cancelled.',
     created: 'Created Skill “{title}” (${id}). You can now say “Use ${id} …”.',
     duplicate:
@@ -29,27 +29,27 @@ const TEXT = Object['freeze']({
 });
 function normalizeLocale(value = '') {
   return String(value || '')
-    ['toLowerCase']()
-    ['startsWith']('en')
+    .toLowerCase()
+    .startsWith('en')
     ? 'en-US'
     : 'zh-CN';
 }
 function formatText(item, key = {}, index = 'zh-CN') {
-  return (TEXT[normalizeLocale(index)]?.[item] || TEXT['zh-CN'][item] || item)['replace'](
+  return (TEXT[normalizeLocale(index)]?.[item] || TEXT['zh-CN'][item] || item).replace(
     /\{(\w+)\}/g,
     (result, data) => String(key[data] ?? ''),
   );
 }
 function compactExistingSkills(options) {
-  return (options?.['listSkills']?.() || options?.['listCatalog']?.() || [])
-    ['map']((options2 = {}) => ({
-      id: String(options2['id'] || '')['trim'](),
-      title: String(options2['title'] || options2['id'] || '')
-        ['trim']()
-        ['slice'](0, 120),
+  return (options?.listSkills?.() || options?.listCatalog?.() || [])
+    .map((options2 = {}) => ({
+      id: String(options2.id || '').trim(),
+      title: String(options2.title || options2.id || '')
+        .trim()
+        .slice(0, 120),
     }))
-    ['filter']((target) => target['id'])
-    ['slice'](0, 100);
+    .filter((target) => target.id)
+    .slice(0, 100);
 }
 export function createAgentSkillAuthoringRuntime({
   sessionStore: sessionStore,
@@ -61,17 +61,17 @@ export function createAgentSkillAuthoringRuntime({
 } = {}) {
   const isAvailable = () => typeof author === 'function' && typeof saveSkill === 'function',
     getPending = () => {
-      const source = sessionStore?.['getPendingClarification']?.();
-      return source?.['targetKind'] === AGENT_SKILL_AUTHORING_TARGET_KIND ? source : null;
+      const source = sessionStore?.getPendingClarification?.();
+      return source?.targetKind === AGENT_SKILL_AUTHORING_TARGET_KIND ? source : null;
     },
     handler = (turnId, status, content) => {
-      (sessionStore?.['pushHistory']?.({
+      (sessionStore?.pushHistory?.({
         role: 'assistant',
         status: status,
         content: content,
         turnId: turnId,
       }),
-        sessionStore?.['setCurrentRun']?.({ id: turnId, status: status, stopped: false }));
+        sessionStore?.setCurrentRun?.({ id: turnId, status: status, stopped: false }));
     },
     handler2 = () => ({
       ok: false,
@@ -86,7 +86,7 @@ export function createAgentSkillAuthoringRuntime({
     runId: runId = '',
     signal: signal = null,
   } = {}) {
-    sessionStore?.['recordTrace']?.({
+    sessionStore?.recordTrace?.({
       type: 'agent_turn_routed',
       channel: 'skill.authoring',
       reason: clarificationAnswer ? 'skill-authoring-continuation' : 'skill-authoring-request',
@@ -100,71 +100,71 @@ export function createAgentSkillAuthoringRuntime({
           message: message,
           originalMessage: originalMessage,
           clarificationAnswer: clarificationAnswer,
-          history: sessionStore?.['getHistory']?.() || [],
+          history: sessionStore?.getHistory?.() || [],
           existingSkills: compactExistingSkills(skillRegistry),
           signal: signal,
-          onTrace: (next) => sessionStore?.['recordTrace']?.(next),
+          onTrace: (next) => sessionStore?.recordTrace?.(next),
         },
-        onTrace: (current) => sessionStore?.['recordTrace']?.(current),
+        onTrace: (current) => sessionStore?.recordTrace?.(current),
       });
     } catch (message2) {
       question = {
         ok: false,
         status: 'failed',
         errorCode: 'SKILL_AUTHORING_FAILED',
-        message: message2?.['message'] || formatText('failed', {}, localeProvider?.()),
+        message: message2?.message || formatText('failed', {}, localeProvider?.()),
       };
     }
     if (!isActiveRun(runId)) return handler2();
-    if (question['status'] === 'need_clarification')
+    if (question.status === 'need_clarification')
       return (
-        sessionStore?.['setPendingClarification']?.({
-          originalMessage: String(originalMessage || message)['trim'](),
-          question: question['question'],
-          reply: question['reply'] || question['question'],
-          options: question['options'] || [],
+        sessionStore?.setPendingClarification?.({
+          originalMessage: String(originalMessage || message).trim(),
+          question: question.question,
+          reply: question.reply || question.question,
+          options: question.options || [],
           targetKind: AGENT_SKILL_AUTHORING_TARGET_KIND,
         }),
-        handler(runId, 'need_clarification', question['question']),
+        handler(runId, 'need_clarification', question.question),
         {
           ok: true,
           status: 'need_clarification',
-          reply: question['reply'] || question['question'],
-          question: question['question'],
-          options: question['options'] || [],
+          reply: question.reply || question.question,
+          question: question.question,
+          options: question.options || [],
           responseChannel: 'skill.authoring',
         }
       );
-    if (!question['ok']) {
-      const reply = question['message'] || formatText('failed', {}, localeProvider?.());
+    if (!question.ok) {
+      const reply = question.message || formatText('failed', {}, localeProvider?.());
       return (
         handler(runId, 'failed', reply),
         {
           ok: false,
           status: 'failed',
           reply: reply,
-          errorCode: question['errorCode'],
+          errorCode: question.errorCode,
           responseChannel: 'skill.authoring',
         }
       );
     }
-    const args = compactExistingSkills(skillRegistry)['map']((entry) => entry['id']),
-      skillId = createAvailableAgentSkillId(question['definition']['id'], args);
-    skillId !== question['definition']['id'] &&
-      sessionStore?.['recordTrace']?.({
+    const args = compactExistingSkills(skillRegistry).map((entry) => entry.id),
+      skillId = createAvailableAgentSkillId(question.definition.id, args);
+    skillId !== question.definition.id &&
+      sessionStore?.recordTrace?.({
         type: 'agent_skill_duplicate_id_repaired',
-        requestedId: question['definition']['id'],
+        requestedId: question.definition.id,
         skillId: skillId,
       });
-    let requestedId = { mode: 'create', ...question['definition'], id: skillId },
+    let requestedId = { mode: 'create', ...question.definition, id: skillId },
       response;
     try {
       response = await saveSkill(requestedId);
-      if (response?.['errorCode'] === 'SKILL_ALREADY_INSTALLED') {
-        const skillId2 = createAvailableAgentSkillId(requestedId['id'], [...args, requestedId['id']]);
-        (sessionStore?.['recordTrace']?.({
+      if (response?.errorCode === 'SKILL_ALREADY_INSTALLED') {
+        const skillId2 = createAvailableAgentSkillId(requestedId.id, [...args, requestedId.id]);
+        (sessionStore?.recordTrace?.({
           type: 'agent_skill_duplicate_id_repaired',
-          requestedId: requestedId['id'],
+          requestedId: requestedId.id,
           skillId: skillId2,
           reason: 'save-race',
         }),
@@ -172,20 +172,20 @@ export function createAgentSkillAuthoringRuntime({
           (response = await saveSkill(requestedId)));
       }
     } catch (message3) {
-      response = { success: false, errorCode: 'SKILL_SAVE_FAILED', message: message3?.['message'] };
+      response = { success: false, errorCode: 'SKILL_SAVE_FAILED', message: message3?.message };
     }
     if (!isActiveRun(runId)) return handler2();
-    if (response?.['success'] === true) {
+    if (response?.success === true) {
       const reply2 = formatText(
         'created',
-        { id: requestedId['id'], title: requestedId['title'] || requestedId['id'] },
+        { id: requestedId.id, title: requestedId.title || requestedId.id },
         localeProvider?.(),
       );
       return (
-        sessionStore?.['clearPendingClarification']?.(),
-        sessionStore?.['recordTrace']?.({
+        sessionStore?.clearPendingClarification?.(),
+        sessionStore?.recordTrace?.({
           type: 'agent_skill_created',
-          skillId: requestedId['id'],
+          skillId: requestedId.id,
           source: 'conversation',
         }),
         handler(runId, 'success', reply2),
@@ -198,7 +198,7 @@ export function createAgentSkillAuthoringRuntime({
         }
       );
     }
-    const errorCode = String(response?.['errorCode'] || 'SKILL_SAVE_FAILED'),
+    const errorCode = String(response?.errorCode || 'SKILL_SAVE_FAILED'),
       record =
         errorCode === 'SKILL_ALREADY_INSTALLED'
           ? 'duplicate'
@@ -207,7 +207,7 @@ export function createAgentSkillAuthoringRuntime({
             : errorCode === 'SKILL_REFRESH_AFTER_SAVE_FAILED'
               ? 'refreshFailed'
               : 'failed',
-      reply3 = formatText(record, { id: requestedId['id'] }, localeProvider?.());
+      reply3 = formatText(record, { id: requestedId.id }, localeProvider?.());
     return (
       handler(runId, 'failed', reply3),
       {
@@ -235,7 +235,7 @@ export function createAgentSkillAuthoringRuntime({
     }
     return run({
       message: answer,
-      originalMessage: pending['originalMessage'],
+      originalMessage: pending.originalMessage,
       clarificationAnswer: answer,
       runId: runId,
       signal: signal,

@@ -476,7 +476,7 @@ export function resolveCanvasVideoDisplayUrl(options16 = {}) {
 
 export function buildCanvasVideoProxyPromotionPatch(options17 = {}) {
   const displayLocalPath2 = pickLocalPath(options17, ['pendingVideoProxyLocalPath']),
-    videoProxyVersion = normalizeText(options17?.['pendingVideoProxyVersion']);
+    videoProxyVersion = normalizeText(options17?.pendingVideoProxyVersion);
   if (!displayLocalPath2 || videoProxyVersion !== VIDEO_PROXY_VERSION_V2_1280) return null;
   return {
     ...buildCanvasLocalVideoFields({
@@ -496,8 +496,8 @@ function normalizeRemoteMediaFallback() {
 }
 
 function normalizeAudioCollection(list4) {
-  if (!Array['isArray'](list4)) return list4;
-  return list4['map']((args6) => {
+  if (!Array.isArray(list4)) return list4;
+  return list4.map((args6) => {
     if (!args6 || typeof args6 !== 'object') return args6;
     return {
       ...args6,

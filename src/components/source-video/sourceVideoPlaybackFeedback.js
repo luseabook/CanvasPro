@@ -3,28 +3,28 @@ import { isMediaElementPlaybackSource } from '../../services/desktopMediaBlobSou
 import { playVideoWithRecovery } from '../video-node/mediaPlaybackRecovery.js';
 const pendingPlayback = new WeakMap();
 export function clearSourceVideoPlaybackFeedback(value) {
-  const enabled = pendingPlayback['get'](value);
+  const enabled = pendingPlayback.get(value);
   if (!enabled) return;
-  (pendingPlayback['delete'](value),
-    enabled['card']?.['removeAttribute']?.('aria-busy'),
-    stopLoading(enabled['card']));
+  (pendingPlayback.delete(value),
+    enabled.card?.removeAttribute?.('aria-busy'),
+    stopLoading(enabled.card));
 }
 export async function playSourceVideoWithFeedback(card, playbackIntent, shouldContinue) {
-  const enabled2 = card['_ensureVideoElement']();
+  const enabled2 = card._ensureVideoElement();
   if (!enabled2) return false;
-  (card['_attachPlaybackRecovery'](playbackIntent), clearSourceVideoPlaybackFeedback(card));
-  const item = card['_currentSrc'],
-    key = { card: card['_card'] };
-  (!isMediaElementPlaybackSource(enabled2, item) || Number(enabled2['readyState'] || 0) < 2) &&
-    (pendingPlayback['set'](card, key),
-    key['card']?.['setAttribute']?.('aria-busy', 'true'),
-    startLoading(key['card'], { variant: 'indeterminate' }));
+  (card._attachPlaybackRecovery(playbackIntent), clearSourceVideoPlaybackFeedback(card));
+  const item = card._currentSrc,
+    key = { card: card._card };
+  (!isMediaElementPlaybackSource(enabled2, item) || Number(enabled2.readyState || 0) < 2) &&
+    (pendingPlayback.set(card, key),
+    key.card?.setAttribute?.('aria-busy', 'true'),
+    startLoading(key.card, { variant: 'indeterminate' }));
   try {
     return await playVideoWithRecovery(enabled2, {
-      label: card['_getPlaybackLabel'](playbackIntent),
+      label: card._getPlaybackLabel(playbackIntent),
       playbackIntent: playbackIntent,
       ensureSrc: () =>
-        card['_ensurePlaybackVideoSrc']({
+        card._ensurePlaybackVideoSrc({
           forPlayback: true,
           preload: playbackIntent === 'hover' ? 'metadata' : 'auto',
         }),
@@ -33,11 +33,11 @@ export async function playSourceVideoWithFeedback(card, playbackIntent, shouldCo
       recoveryDebounceMs: playbackIntent === 'hover' ? 150 : undefined,
       recoveryCooldownMs: playbackIntent === 'hover' ? 500 : undefined,
       shouldRecover: () =>
-        card['_video']?.['isConnected'] !== false &&
-        (card['_isHovered'] || card['_isManualControl'] || !card['_video']?.['paused']),
+        card._video?.isConnected !== false &&
+        (card._isHovered || card._isManualControl || !card._video?.paused),
       shouldContinue: shouldContinue,
     });
   } finally {
-    if (pendingPlayback['get'](card) === key) clearSourceVideoPlaybackFeedback(card);
+    if (pendingPlayback.get(card) === key) clearSourceVideoPlaybackFeedback(card);
   }
 }

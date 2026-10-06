@@ -11,14 +11,14 @@ export function createRendererStartupState() {
     handler = () => {
       const item = snapshot();
       for (const run2 of map2) run2(item);
-      if (item['ready'] || failure) run(item);
+      if (item.ready || failure) run(item);
       return item;
     };
   return {
     snapshot: snapshot,
     settled: settled,
     subscribe(handler2) {
-      return (map2['add'](handler2), handler2(snapshot()), () => map2['delete'](handler2));
+      return (map2.add(handler2), handler2(snapshot()), () => map2.delete(handler2));
     },
     setPhase(key) {
       if (failure || phase === 'ready') return;
@@ -26,8 +26,8 @@ export function createRendererStartupState() {
     },
     complete(index) {
       if (failure || phase === 'ready') return;
-      map['add'](index);
-      if (map['has']('entry') && map['has']('project')) phase = 'ready';
+      map.add(index);
+      if (map.has('entry') && map.has('project')) phase = 'ready';
       handler();
     },
     fail(result = 'initialization') {

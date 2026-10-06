@@ -402,7 +402,7 @@ export async function exportProjectPackageToPath({
       warnings: warnings2,
     };
   mkdirSync(path.dirname(path2), { recursive: true });
-  const value26 = new yazl['ZipFile'](),
+  const value26 = new yazl.ZipFile(),
     estimatedBytes = Buffer.from(JSON.stringify(warnings3, null, 2) + '\n', 'utf8'),
     list11 = Buffer.from(JSON.stringify(projectFilePayload, null, 2) + '\n', 'utf8');
   (value26.addBuffer(estimatedBytes, PROJECT_PACKAGE_MANIFEST_NAME),

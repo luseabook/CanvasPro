@@ -5,18 +5,18 @@ function getWindowLike() {
   return typeof window !== 'undefined' ? window : globalThis;
 }
 function defaultNow() {
-  return Number(globalThis['performance']?.['now']?.() || Date['now']());
+  return Number(globalThis.performance?.now?.() || Date.now());
 }
 function defaultRequestFrame(handler) {
   const windowLike = getWindowLike();
-  if (typeof windowLike?.['requestAnimationFrame'] === 'function')
-    return windowLike['requestAnimationFrame'](handler);
+  if (typeof windowLike?.requestAnimationFrame === 'function')
+    return windowLike.requestAnimationFrame(handler);
   return setTimeout(() => handler(defaultNow()), 16);
 }
 function defaultCancelFrame(value) {
   const windowLike2 = getWindowLike();
-  if (typeof windowLike2?.['cancelAnimationFrame'] === 'function') {
-    windowLike2['cancelAnimationFrame'](value);
+  if (typeof windowLike2?.cancelAnimationFrame === 'function') {
+    windowLike2.cancelAnimationFrame(value);
     return;
   }
   clearTimeout(value);
@@ -48,13 +48,13 @@ export function createRendererVideoHydrationBackpressure({
       requestFrame3 = requestFrame(() => {
         requestFrame3 = null;
         const index = Number(now()) || 0,
-          result = Math['max'](0, index - key);
+          result = Math.max(0, index - key);
         key = index;
-        const data = value2 === null ? 0 : Math['max'](0, index - value2);
+        const data = value2 === null ? 0 : Math.max(0, index - value2);
         if (
           index >= item &&
-          (result <= Math['max'](16, Number(longFrameThresholdMs) || 0) ||
-            data >= Math['max'](0, Number(maxNonPriorityBlockMs) || 0))
+          (result <= Math.max(16, Number(longFrameThresholdMs) || 0) ||
+            data >= Math.max(0, Number(maxNonPriorityBlockMs) || 0))
         ) {
           ((enabled2 = true), (enabled3 = true));
           return;
@@ -66,7 +66,7 @@ export function createRendererVideoHydrationBackpressure({
     const options = Number(now()) || 0;
     if (enabled3) return;
     (value2 === null && (value2 = options),
-      (item = Math['max'](item, options + Math['max'](0, Number(priorityCooldownMs) || 0))),
+      (item = Math.max(item, options + Math.max(0, Number(priorityCooldownMs) || 0))),
       (key = options),
       (enabled2 = false),
       handler2());

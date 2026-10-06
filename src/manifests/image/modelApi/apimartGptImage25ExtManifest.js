@@ -24,9 +24,9 @@ export const apimartGptImage25ExtModelManifest = createImageModelApiManifest({
     ASPECT_RATIO_FIELD,
     BATCH_SIZE_FIELD,
   ],
-  extensions: Object['freeze']({
-    imageFunctionMenu: Object['freeze']({ enabled: true }),
-    imageMenu: Object['freeze']({
+  extensions: Object.freeze({
+    imageFunctionMenu: Object.freeze({ enabled: true }),
+    imageMenu: Object.freeze({
       group: 'apimart',
       order: 42,
       title: 'GPT image 2.5 Ext',
@@ -41,47 +41,47 @@ export const apimartGptImage25ExtExecutionManifest = createModelApiExecutionMani
   provider: 'apimart',
   model: 'gpt-image-2.5-ext',
   endpoint: '/v1/images/generations',
-  bodyMapping: Object['freeze']([
-    Object['freeze']({ path: 'model', from: 'model' }),
-    Object['freeze']({ path: 'prompt', from: 'prompt' }),
-    Object['freeze']({
+  bodyMapping: Object.freeze([
+    Object.freeze({ path: 'model', from: 'model' }),
+    Object.freeze({ path: 'prompt', from: 'prompt' }),
+    Object.freeze({
       path: 'version',
       from: 'param',
       field: 'generationParams.mode',
       defaultValue: 'flare',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'n',
       from: 'param',
       field: 'generationParams.batchSize',
       defaultValue: 1,
       transform: 'apimartImageCount',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'resolution',
       from: 'param',
       field: 'generationParams.imageSize',
       defaultValue: '1K',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'size',
       from: 'param',
       field: 'generationParams.aspectRatio',
       omitWhenEmpty: true,
-      when: Object['freeze']([
-        Object['freeze']({
+      when: Object.freeze([
+        Object.freeze({
           field: 'generationParams.aspectRatio',
-          notIn: Object['freeze'](['自适应', 'auto']),
+          notIn: Object.freeze(['自适应', 'auto']),
         }),
-        Object['freeze']({ field: 'suppressAspectRatio', falsy: true }),
+        Object.freeze({ field: 'suppressAspectRatio', falsy: true }),
       ]),
     }),
-    Object['freeze']({ path: 'image_urls', from: 'inputImages', omitWhenEmpty: true }),
+    Object.freeze({ path: 'image_urls', from: 'inputImages', omitWhenEmpty: true }),
   ]),
-  responseMapping: Object['freeze']({
-    ...apimartGptImage25ExecutionManifest['responseMapping'],
-    taskIdPath: Object['freeze'](['data[].task_id', 'data.id']),
+  responseMapping: Object.freeze({
+    ...apimartGptImage25ExecutionManifest.responseMapping,
+    taskIdPath: Object.freeze(['data[].task_id', 'data.id']),
   }),
-  taskPolling: apimartGptImage25ExecutionManifest['extensions']['taskPolling'],
-  extensions: Object['freeze']({ batchSubmitMode: 'providerN', maxBatchSize: 4 }),
+  taskPolling: apimartGptImage25ExecutionManifest.extensions.taskPolling,
+  extensions: Object.freeze({ batchSubmitMode: 'providerN', maxBatchSize: 4 }),
 });

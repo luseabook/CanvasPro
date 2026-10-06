@@ -20,27 +20,27 @@ export function createStoryAssetMarqueeConfig(
   { getVisibleAssets: getVisibleAssets, beforeCommit: beforeCommit, render: render },
 ) {
   return {
-    enabled: enabled['view'] === 'project' && enabled['step'] === 2,
-    selectedIds: enabled['selectedAssetIds'],
+    enabled: enabled.view === 'project' && enabled.step === 2,
+    selectedIds: enabled.selectedAssetIds,
     commit(list) {
       beforeCommit();
       const map = new Set(
         getVisibleAssets(enabled)
-          ['filter'](
+          .filter(
             (value) =>
-              enabled['assetFilter'] !== 'library' ||
-              (['image', 'audio']['includes'](
-                String(value['mediaKind'] || '')
-                  ['trim']()
-                  ['toLowerCase'](),
+              enabled.assetFilter !== 'library' ||
+              (['image', 'audio'].includes(
+                String(value.mediaKind || '')
+                  .trim()
+                  .toLowerCase(),
               ) &&
-                String(value['sourceUrl'] || value['imageUrl'] || '')['trim']()),
+                String(value.sourceUrl || value.imageUrl || '').trim()),
           )
-          ['map']((item) => item['id']),
+          .map((item) => item.id),
       );
-      ((enabled['selectedAssetIds'] = list['filter']((key) => map['has'](key))),
-        (enabled['assetSelectionMode'] = enabled['selectedAssetIds']['length'] > 0),
-        (enabled['selectedAssetId'] = enabled['selectedAssetIds']['at'](-1) || enabled['selectedAssetId']),
+      ((enabled.selectedAssetIds = list.filter((key) => map.has(key))),
+        (enabled.assetSelectionMode = enabled.selectedAssetIds.length > 0),
+        (enabled.selectedAssetId = enabled.selectedAssetIds.at(-1) || enabled.selectedAssetId),
         render());
     },
   };
@@ -48,11 +48,11 @@ export function createStoryAssetMarqueeConfig(
 export function createStoryMarqueeSelectionController(surfaceSelector = {}) {
   return createWorkspaceMarqueeSelectionController({
     ...surfaceSelector,
-    surfaceSelector: surfaceSelector['surfaceSelector'] || STORY_MARQUEE_SURFACE_SELECTOR,
+    surfaceSelector: surfaceSelector.surfaceSelector || STORY_MARQUEE_SURFACE_SELECTOR,
     blockedControlSelector:
-      surfaceSelector['blockedControlSelector'] || STORY_MARQUEE_BLOCKED_CONTROL_SELECTOR,
-    overlayClassName: surfaceSelector['overlayClassName'] || 'story-marquee-selection',
-    itemSelector: surfaceSelector['itemSelector'] || STORY_MARQUEE_ITEM_SELECTOR,
-    getItemId: surfaceSelector['getItemId'] || ((el) => el['dataset']?.['storyMarqueeId']),
+      surfaceSelector.blockedControlSelector || STORY_MARQUEE_BLOCKED_CONTROL_SELECTOR,
+    overlayClassName: surfaceSelector.overlayClassName || 'story-marquee-selection',
+    itemSelector: surfaceSelector.itemSelector || STORY_MARQUEE_ITEM_SELECTOR,
+    getItemId: surfaceSelector.getItemId || ((el) => el.dataset?.storyMarqueeId),
   });
 }

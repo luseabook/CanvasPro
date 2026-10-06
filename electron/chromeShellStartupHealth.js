@@ -9,31 +9,31 @@ const DEFAULT_READY_TIMEOUT_MS = 30000,
   MAX_READY_TIMEOUT_MS = 120000;
 function createStartupHealthError(message, code) {
   const error = new Error(message);
-  return ((error['code'] = code), error);
+  return ((error.code = code), error);
 }
-export function resolveChromeShellStartupReadyTimeoutMs(env = process['env']) {
-  const raw = Number(env?.['AIC_CHROME_SHELL_READY_TIMEOUT_MS']);
-  if (!Number['isFinite'](raw) || raw <= 0) return DEFAULT_READY_TIMEOUT_MS;
-  return Math['max'](MIN_READY_TIMEOUT_MS, Math['min'](MAX_READY_TIMEOUT_MS, Math['round'](raw)));
+export function resolveChromeShellStartupReadyTimeoutMs(env = process.env) {
+  const raw = Number(env?.AIC_CHROME_SHELL_READY_TIMEOUT_MS);
+  if (!Number.isFinite(raw) || raw <= 0) return DEFAULT_READY_TIMEOUT_MS;
+  return Math.max(MIN_READY_TIMEOUT_MS, Math.min(MAX_READY_TIMEOUT_MS, Math.round(raw)));
 }
 export function createChromeShellStartupHealthController({
   setTimeoutFn: setTimeoutFn = setTimeout,
   clearTimeoutFn: clearTimeoutFn = clearTimeout,
-  now: now = () => Date['now'](),
+  now: now = () => Date.now(),
 } = {}) {
   let lastResolved = null,
     pending = null;
   function cancelPending(error) {
     if (!pending) return false;
     const entry = pending;
-    return ((pending = null), clearTimeoutFn(entry['timer']), entry['reject'](error), true);
+    return ((pending = null), clearTimeoutFn(entry.timer), entry.reject(error), true);
   }
   function waitForReady({
     timeoutMs: timeoutMs = DEFAULT_READY_TIMEOUT_MS,
     startupAttemptId: startupAttemptId,
   } = {}) {
     if (!isChromeShellStartupAttemptId(startupAttemptId))
-      return Promise['reject'](
+      return Promise.reject(
         createStartupHealthError(
           'Chrome shell startup attempt ID is invalid',
           'CHROME_SHELL_STARTUP_ATTEMPT_INVALID',
@@ -47,13 +47,13 @@ export function createChromeShellStartupHealthController({
         ),
       ));
     const startedAt = now(),
-      effectiveTimeoutMs = Math['max'](
+      effectiveTimeoutMs = Math.max(
         MIN_READY_TIMEOUT_MS,
-        Math['min'](MAX_READY_TIMEOUT_MS, Math['round'](Number(timeoutMs) || 0)),
+        Math.min(MAX_READY_TIMEOUT_MS, Math.round(Number(timeoutMs) || 0)),
       );
     return new Promise((resolve, reject) => {
       const timer = setTimeoutFn(() => {
-        if (!pending || pending['reject'] !== reject) return;
+        if (!pending || pending.reject !== reject) return;
         ((pending = null),
           reject(
             createStartupHealthError(
@@ -73,22 +73,22 @@ export function createChromeShellStartupHealthController({
     });
   }
   function observeDiagnosticEvent(event = {}) {
-    const isFailure = event?.['type'] === CHROME_SHELL_STARTUP_FAILED_EVENT;
-    if (!isFailure && event?.['type'] !== CHROME_SHELL_STARTUP_READY_EVENT) return false;
-    if (event?.['source'] !== 'renderer') return false;
-    const metadata = readChromeShellStartupMetadata(event?.['context']?.['href']);
+    const isFailure = event?.type === CHROME_SHELL_STARTUP_FAILED_EVENT;
+    if (!isFailure && event?.type !== CHROME_SHELL_STARTUP_READY_EVENT) return false;
+    if (event?.source !== 'renderer') return false;
+    const metadata = readChromeShellStartupMetadata(event?.context?.href);
     if (!metadata) return false;
-    if (event?.['context']?.['startupAttemptId'] !== metadata['startupAttemptId']) return false;
-    if (event?.['context']?.['readyTimeoutMs'] !== metadata['readyTimeoutMs']) return false;
+    if (event?.context?.startupAttemptId !== metadata.startupAttemptId) return false;
+    if (event?.context?.readyTimeoutMs !== metadata.readyTimeoutMs) return false;
     if (!pending) {
       if (isFailure) return false;
       return (
-        lastResolved?.['startupAttemptId'] === metadata['startupAttemptId'] &&
-        lastResolved?.['readyTimeoutMs'] === metadata['readyTimeoutMs']
+        lastResolved?.startupAttemptId === metadata.startupAttemptId &&
+        lastResolved?.readyTimeoutMs === metadata.readyTimeoutMs
       );
     }
-    if (metadata['startupAttemptId'] !== pending['startupAttemptId']) return false;
-    if (metadata['readyTimeoutMs'] !== pending['readyTimeoutMs']) return false;
+    if (metadata.startupAttemptId !== pending.startupAttemptId) return false;
+    if (metadata.readyTimeoutMs !== pending.readyTimeoutMs) return false;
     if (isFailure) {
       const failureError = createStartupHealthError(
           'Canvas renderer initialization failed',
@@ -96,9 +96,9 @@ export function createChromeShellStartupHealthController({
         ),
         knownStages = ['entry', 'initialization', 'storage-migration', 'project-hydration'];
       return (
-        (failureError['details'] = {
-          stage: knownStages['includes'](event['context']['failure'])
-            ? event['context']['failure']
+        (failureError.details = {
+          stage: knownStages.includes(event.context.failure)
+            ? event.context.failure
             : 'initialization',
         }),
         cancelPending(failureError)
@@ -108,15 +108,15 @@ export function createChromeShellStartupHealthController({
     return (
       (pending = null),
       (lastResolved = {
-        readyTimeoutMs: entry['readyTimeoutMs'],
-        startupAttemptId: entry['startupAttemptId'],
+        readyTimeoutMs: entry.readyTimeoutMs,
+        startupAttemptId: entry.startupAttemptId,
       }),
-      clearTimeoutFn(entry['timer']),
-      entry['resolve']({
+      clearTimeoutFn(entry.timer),
+      entry.resolve({
         ready: true,
-        elapsedMs: Math['max'](0, now() - entry['startedAt']),
-        href: String(event?.['context']?.['href'] || ''),
-        startupAttemptId: entry['startupAttemptId'],
+        elapsedMs: Math.max(0, now() - entry.startedAt),
+        href: String(event?.context?.href || ''),
+        startupAttemptId: entry.startupAttemptId,
       }),
       true
     );
@@ -125,7 +125,7 @@ export function createChromeShellStartupHealthController({
     message = 'Chrome shell renderer readiness wait was cancelled',
     { startupAttemptId: startupAttemptId } = {},
   ) {
-    if (startupAttemptId !== undefined && pending?.['startupAttemptId'] !== startupAttemptId) return false;
+    if (startupAttemptId !== undefined && pending?.startupAttemptId !== startupAttemptId) return false;
     return cancelPending(createStartupHealthError(message, 'CHROME_SHELL_RENDERER_READY_CANCELLED'));
   }
   return { cancel: cancel, observeDiagnosticEvent: observeDiagnosticEvent, waitForReady: waitForReady };

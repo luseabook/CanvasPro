@@ -16,7 +16,7 @@ export function bindImageDepthAction(value) {
       cancelRunningHubResultTask: cancelRunningHubResultTask,
       openDepthPanel: openDepthPanel = openCanvasGenerationEditor,
     } = value,
-    button = toolbarEl['querySelector']('.act-depth-image');
+    button = toolbarEl.querySelector('.act-depth-image');
   if (!button) return;
   let enabled = false;
   (bindRunningHubToolbarTaskButton({
@@ -29,20 +29,20 @@ export function bindImageDepthAction(value) {
     cancelTask: (item) => cancelRunningHubResultTask(item, { name: imageDepthText('cancelled') }),
     cancelTooltip: imageDepthText('cancel'),
   }),
-    button['addEventListener']('click', async (event) => {
-      (event['stopPropagation'](), event['preventDefault']());
+    button.addEventListener('click', async (event) => {
+      (event.stopPropagation(), event.preventDefault());
       if (enabled) return;
       enabled = true;
-      const key = globalThis['window']?.['currentProjectId'];
+      const key = globalThis.window?.currentProjectId;
       let enabled2 = false;
       const index = () => {
         enabled2 = true;
       };
-      window['addEventListener']('aicanvas:active-canvas-changed', index);
-      const run = () => (store['getStateRaw']?.() || store['getState']())['nodes']?.[nodeId],
-        handler = () => !enabled2 && globalThis['window']?.['currentProjectId'] === key && !!run();
+      window.addEventListener('aicanvas:active-canvas-changed', index);
+      const run = () => (store.getStateRaw?.() || store.getState()).nodes?.[nodeId],
+        handler = () => !enabled2 && globalThis.window?.currentProjectId === key && !!run();
       try {
-        (closeToolbarMoreMenu?.(), window['v2FocusOnNode']?.(nodeId));
+        (closeToolbarMoreMenu?.(), window.v2FocusOnNode?.(nodeId));
         const openDepthPanel2 = await openDepthPanel({
           store: store,
           sourceNodeId: nodeId,
@@ -55,17 +55,17 @@ export function bindImageDepthAction(value) {
           selectorOptions: { allowedWorkflowModelIds: [RH_IMAGE_DEPTH_MODEL_ID], showSchemaControls: true },
         });
         if (!openDepthPanel2 || !handler()) return;
-        (button['setAttribute']('aria-busy', 'true'),
-          button['querySelector']('svg')?.['classList']['add']('v2-spinning'));
+        (button.setAttribute('aria-busy', 'true'),
+          button.querySelector('svg')?.classList.add('v2-spinning'));
         const response = await submitImageDepthTask(value, openDepthPanel2, run(), handler);
-        if (response?.['status'] === 'failed') throw response['error'];
+        if (response?.status === 'failed') throw response.error;
       } catch (error) {
-        window['showToast']?.(error?.['message'] || String(error), 'error');
+        window.showToast?.(error?.message || String(error), 'error');
       } finally {
         ((enabled = false),
-          button['removeAttribute']('aria-busy'),
-          button['querySelector']('svg')?.['classList']['remove']('v2-spinning'),
-          window['removeEventListener']('aicanvas:active-canvas-changed', index));
+          button.removeAttribute('aria-busy'),
+          button.querySelector('svg')?.classList.remove('v2-spinning'),
+          window.removeEventListener('aicanvas:active-canvas-changed', index));
       }
     }));
 }

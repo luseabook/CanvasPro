@@ -52,7 +52,7 @@ export function resolveRefImageCandidateUrls(next) {
 }
 
 function normalizeIdentityPart(entry) {
-  return String(entry ?? '')['trim']();
+  return String(entry ?? '').trim();
 }
 
 function appendImageIdentityFields(record, payload, handle = {}) {
@@ -71,45 +71,45 @@ function appendImageIdentityFields(record, payload, handle = {}) {
     'thumbLocalPath',
     'fileName',
     'derivativeStatus',
-  ]['forEach']((state) => {
+  ].forEach((state) => {
     const identityPart = normalizeIdentityPart(handle?.[state]);
-    if (identityPart) record['push'](payload + '.' + state + '=' + identityPart);
+    if (identityPart) record.push(payload + '.' + state + '=' + identityPart);
   });
 }
 
 function hashRefImageVersionKey(config = '') {
   const identityPart2 = normalizeIdentityPart(config);
   let scope = 5381;
-  for (let input = 0; input < identityPart2['length']; input += 1) {
-    ((scope = ((scope << 5) + scope) ^ identityPart2['charCodeAt'](input)), (scope >>>= 0));
+  for (let input = 0; input < identityPart2.length; input += 1) {
+    ((scope = ((scope << 5) + scope) ^ identityPart2.charCodeAt(input)), (scope >>>= 0));
   }
-  return scope['toString'](36);
+  return scope.toString(36);
 }
 
 export function resolveRefImageMediaIdentityKey(output, value2 = {}) {
   const aiImagePrimaryItem3 = resolveAiImagePrimaryItem(output),
     list3 = [
-      'node=' + normalizeIdentityPart(output?.['id']),
-      'type=' + normalizeIdentityPart(output?.['type']),
-      '_bizRev=' + normalizeIdentityPart(output?.['_bizRev']),
-      'main=' + normalizeIdentityPart(output?.['mainImageIndex']),
-      'edgeSourceMediaKey=' + normalizeIdentityPart(value2?.['sourceMediaKey']),
+      'node=' + normalizeIdentityPart(output?.id),
+      'type=' + normalizeIdentityPart(output?.type),
+      '_bizRev=' + normalizeIdentityPart(output?._bizRev),
+      'main=' + normalizeIdentityPart(output?.mainImageIndex),
+      'edgeSourceMediaKey=' + normalizeIdentityPart(value2?.sourceMediaKey),
     ];
   return (
     appendImageIdentityFields(list3, 'node', output),
     appendImageIdentityFields(list3, 'primary', aiImagePrimaryItem3),
-    list3['join']('|')
+    list3.join('|')
   );
 }
 
 export function versionRefImageUrl(value3 = '', value4 = '') {
-  const enabled3 = String(value3 || '')['trim'](),
+  const enabled3 = String(value3 || '').trim(),
     identityPart3 = normalizeIdentityPart(value4);
   if (!enabled3 || !identityPart3) return enabled3;
-  if (/^(?:blob:|data:)/i['test'](enabled3)) return enabled3;
-  if (!enabled3['startsWith']('/')) return enabled3;
-  const [value5, value6 = ''] = enabled3['split']('#', 2),
-    value7 = value5['includes']('?') ? '&' : '?',
+  if (/^(?:blob:|data:)/i.test(enabled3)) return enabled3;
+  if (!enabled3.startsWith('/')) return enabled3;
+  const [value5, value6 = ''] = enabled3.split('#', 2),
+    value7 = value5.includes('?') ? '&' : '?',
     hashRefImageVersionKey2 = hashRefImageVersionKey(identityPart3);
   return '' + value5 + value7 + 'aicv=' + hashRefImageVersionKey2 + (value6 ? '#' + value6 : '');
 }

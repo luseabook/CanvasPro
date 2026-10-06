@@ -22,27 +22,27 @@ export function bindImageModelMenuGroups({
 } = {}) {
   const { modelMenu: modelMenu, modelTrigger: modelTrigger } = args,
     list = [];
-  for (const headerEl of modelMenu?.['querySelectorAll']('[data-node-menu-submenu]') || []) {
-    const value = headerEl['dataset']['nodeMenuSubmenu'],
-      submenuEl = modelMenu['querySelector'](value);
+  for (const headerEl of modelMenu?.querySelectorAll('[data-node-menu-submenu]') || []) {
+    const value = headerEl.dataset.nodeMenuSubmenu,
+      submenuEl = modelMenu.querySelector(value);
     if (!submenuEl) continue;
     if (value === '.dreamina-submenu') {
-      list['push'](bindDreaminaImageMenu({ ...args, afterSelect: afterSelect }));
+      list.push(bindDreaminaImageMenu({ ...args, afterSelect: afterSelect }));
       continue;
     }
-    list['push'](
+    list.push(
       bindImageModelMenuSubmenu({
         ...args,
         headerEl: headerEl,
         submenuEl: submenuEl,
         defaultProvider:
-          headerEl['dataset']['customProviderImageGroup'] ||
-          submenuEl['querySelector']('[data-provider]')?.['dataset']['provider'] ||
+          headerEl.dataset.customProviderImageGroup ||
+          submenuEl.querySelector('[data-provider]')?.dataset.provider ||
           '',
-        resolveSelection: SELECTION_RESOLVERS['get'](value),
+        resolveSelection: SELECTION_RESOLVERS.get(value),
         ...(value === '.runninghubwf-submenu' ? workflowSelectionPolicy : {}),
         afterSelect: (item) => {
-          (setImageModelTriggerIcon(modelTrigger, item['provider'], item['item']), afterSelect?.(item));
+          (setImageModelTriggerIcon(modelTrigger, item.provider, item.item), afterSelect?.(item));
         },
       }),
     );

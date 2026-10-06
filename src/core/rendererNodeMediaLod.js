@@ -46,28 +46,28 @@ export function collectFullEligibleVisibleImageNodeIds({
     getNodeMediaLodMode(entry, viewport, getPreviousMode(current), {
       devicePixelRatio: devicePixelRatio,
       interactionBusy: interactionBusy,
-    }) === MEDIA_LOD_MODE_FULL && next['add'](current);
+    }) === MEDIA_LOD_MODE_FULL && next.add(current);
   }
   return next;
 }
 
 export function applyRendererFullEligibleImageCandidates(args, record) {
-  if (!(record instanceof Set) || record['size'] === 0) return args;
-  const payload = new Set(args?.['mountCandidateIds']),
-    handle = new Set(args?.['parkCandidateIds']);
+  if (!(record instanceof Set) || record.size === 0) return args;
+  const payload = new Set(args?.mountCandidateIds),
+    handle = new Set(args?.parkCandidateIds);
   for (const state of record) {
-    (payload['add'](state), handle['delete'](state));
+    (payload.add(state), handle.delete(state));
   }
   return { ...args, mountCandidateIds: payload, parkCandidateIds: handle };
 }
 
 export function prioritizeFullEligibleVisibleImageNodes(config, scope) {
-  if (!Array['isArray'](config) || config['length'] < 2 || !(scope instanceof Set) || scope['size'] === 0)
+  if (!Array.isArray(config) || config.length < 2 || !(scope instanceof Set) || scope.size === 0)
     return config;
   const list = [],
     input = [];
   for (const output of config) {
-    output?.['id'] && scope['has'](output['id']) ? list['push'](output) : input['push'](output);
+    output?.id && scope.has(output.id) ? list.push(output) : input.push(output);
   }
-  return list['length'] ? list['concat'](input) : config;
+  return list.length ? list.concat(input) : config;
 }

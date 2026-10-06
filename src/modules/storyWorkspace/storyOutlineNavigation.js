@@ -1,53 +1,53 @@
 function findOutlineSection(el, value) {
   return (
-    [...el['querySelectorAll']('[data-story-outline-section]')]['find'](
-      (el2) => el2['dataset']['storyOutlineSection'] === value,
+    [...el.querySelectorAll('[data-story-outline-section]')].find(
+      (el2) => el2.dataset.storyOutlineSection === value,
     ) || null
   );
 }
 export function jumpToStoryOutlineSection(
   item,
   key,
-  { windowObject: windowObject = globalThis['window'] } = {},
+  { windowObject: windowObject = globalThis.window } = {},
 ) {
   const outlineSection = findOutlineSection(item, key);
   if (!outlineSection) return false;
-  const run = () => outlineSection['scrollIntoView']?.({ behavior: 'smooth', block: 'start' });
+  const run = () => outlineSection.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
   return (
-    typeof windowObject?.['requestAnimationFrame'] === 'function'
-      ? windowObject['requestAnimationFrame'](run)
+    typeof windowObject?.requestAnimationFrame === 'function'
+      ? windowObject.requestAnimationFrame(run)
       : run(),
     true
   );
 }
-export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = globalThis['window'] } = {}) {
-  const el4 = el3?.['querySelector']?.('[data-story-outline-nav]');
+export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = globalThis.window } = {}) {
+  const el4 = el3?.querySelector?.('[data-story-outline-nav]');
   if (!el4) return null;
-  const el5 = el4['querySelector']('[data-story-outline-nav-toggle]'),
-    dom = el3['ownerDocument'];
+  const el5 = el4.querySelector('[data-story-outline-nav-toggle]'),
+    dom = el3.ownerDocument;
   let enabled = false,
     index = false,
     result = 0,
     enabled2 = 0;
   const run2 = (data) => {
-      el5?.['setAttribute']('aria-expanded', String(data));
+      el5?.setAttribute('aria-expanded', String(data));
     },
     handler = () => {
       if (!enabled2) return;
-      (windowObject['clearTimeout'](enabled2), (enabled2 = 0));
+      (windowObject.clearTimeout(enabled2), (enabled2 = 0));
     },
     handler2 = (options) => {
       ((index = Boolean(options)),
-        el4['classList']['toggle']('is-hover-open', index),
-        run2(index || enabled || el4['contains'](dom['activeElement'])));
+        el4.classList.toggle('is-hover-open', index),
+        run2(index || enabled || el4.contains(dom.activeElement)));
     },
     handler3 = (target) => {
       ((enabled = Boolean(target)),
-        el4['classList']['toggle']('is-pinned', enabled),
-        run2(enabled || index || el4['matches'](':hover') || el4['contains'](dom['activeElement'])));
+        el4.classList.toggle('is-pinned', enabled),
+        run2(enabled || index || el4.matches(':hover') || el4.contains(dom.activeElement)));
     },
     source = (event) => {
-      (event['preventDefault'](), handler3(!enabled));
+      (event.preventDefault(), handler3(!enabled));
     },
     next = () => {
       (handler(), handler2(true));
@@ -55,51 +55,51 @@ export function bindStoryOutlineNavigation(el3, { windowObject: windowObject = g
     current = () => {
       handler();
       if (enabled) return;
-      enabled2 = windowObject['setTimeout'](() => {
+      enabled2 = windowObject.setTimeout(() => {
         ((enabled2 = 0), handler2(false));
       }, 180);
     },
     entry = () => run2(true),
     record = () => {
-      if (result) windowObject['clearTimeout'](result);
-      result = windowObject['setTimeout'](() => {
-        ((result = 0), run2(enabled || el4['contains'](dom['activeElement'])));
+      if (result) windowObject.clearTimeout(result);
+      result = windowObject.setTimeout(() => {
+        ((result = 0), run2(enabled || el4.contains(dom.activeElement)));
       }, 0);
     },
     payload = (event2) => {
-      const el6 = event2['target']['closest']?.('[data-story-outline-nav-target]');
-      if (el6 && el4['contains'](el6)) {
-        (event2['preventDefault'](),
-          jumpToStoryOutlineSection(el3, el6['dataset']['storyOutlineNavTarget'], {
+      const el6 = event2.target.closest?.('[data-story-outline-nav-target]');
+      if (el6 && el4.contains(el6)) {
+        (event2.preventDefault(),
+          jumpToStoryOutlineSection(el3, el6.dataset.storyOutlineNavTarget, {
             windowObject: windowObject,
           }));
         return;
       }
-      !el4['contains'](event2['target']) && (handler(), handler2(false), handler3(false));
+      !el4.contains(event2.target) && (handler(), handler2(false), handler3(false));
     },
     handle = (event3) => {
-      if (event3['key'] !== 'Escape') return;
-      (handler(), handler2(false), handler3(false), dom['activeElement']?.['blur']?.());
+      if (event3.key !== 'Escape') return;
+      (handler(), handler2(false), handler3(false), dom.activeElement?.blur?.());
     };
   return (
-    el5?.['addEventListener']('click', source),
-    el4['addEventListener']('pointerenter', next),
-    el4['addEventListener']('pointerleave', current),
-    el4['addEventListener']('focusin', entry),
-    el4['addEventListener']('focusout', record),
-    el4['addEventListener']('keydown', handle),
-    el3['addEventListener']('click', payload),
+    el5?.addEventListener('click', source),
+    el4.addEventListener('pointerenter', next),
+    el4.addEventListener('pointerleave', current),
+    el4.addEventListener('focusin', entry),
+    el4.addEventListener('focusout', record),
+    el4.addEventListener('keydown', handle),
+    el3.addEventListener('click', payload),
     {
       destroy() {
-        if (result) windowObject['clearTimeout'](result);
+        if (result) windowObject.clearTimeout(result);
         (handler(),
-          el5?.['removeEventListener']('click', source),
-          el4['removeEventListener']('pointerenter', next),
-          el4['removeEventListener']('pointerleave', current),
-          el4['removeEventListener']('focusin', entry),
-          el4['removeEventListener']('focusout', record),
-          el4['removeEventListener']('keydown', handle),
-          el3['removeEventListener']('click', payload));
+          el5?.removeEventListener('click', source),
+          el4.removeEventListener('pointerenter', next),
+          el4.removeEventListener('pointerleave', current),
+          el4.removeEventListener('focusin', entry),
+          el4.removeEventListener('focusout', record),
+          el4.removeEventListener('keydown', handle),
+          el3.removeEventListener('click', payload));
       },
     }
   );

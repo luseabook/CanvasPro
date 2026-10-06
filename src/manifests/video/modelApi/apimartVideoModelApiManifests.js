@@ -279,48 +279,48 @@ import {
   MINIMAX_H3_HELP_TOOLTIP,
 } from './minimaxH3VideoModelApiShared.js';
 const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
-    image: SEEDANCE2_INPUT_MAX_BY_KIND['image'],
-    video: SEEDANCE2_INPUT_MAX_BY_KIND['video'],
-    audio: SEEDANCE2_INPUT_MAX_BY_KIND['audio'],
+    image: SEEDANCE2_INPUT_MAX_BY_KIND.image,
+    video: SEEDANCE2_INPUT_MAX_BY_KIND.video,
+    audio: SEEDANCE2_INPUT_MAX_BY_KIND.audio,
     maxTotalDurationSecondsByKind: SEEDANCE2_MAX_TOTAL_DURATION_SECONDS_BY_KIND,
   }),
-  APIMART_SEEDANCE_2_5_DURATION_VALUES = Object['freeze']([
+  APIMART_SEEDANCE_2_5_DURATION_VALUES = Object.freeze([
     -1,
-    ...Array['from']({ length: 27 }, (value, item) => item + 4),
+    ...Array.from({ length: 27 }, (value, item) => item + 4),
   ]),
-  APIMART_SEEDANCE_2_5_DURATION_RANGE = Object['freeze']({
+  APIMART_SEEDANCE_2_5_DURATION_RANGE = Object.freeze({
     min: 4,
     max: 30,
     step: 1,
     defaultValue: 5,
     values: APIMART_SEEDANCE_2_5_DURATION_VALUES,
-    optionLabels: Object['freeze']({ '-1': '自动' }),
+    optionLabels: Object.freeze({ '-1': '自动' }),
   }),
-  APIMART_SEEDANCE_2_5_DURATION_BY_TASK = Object['freeze']({
+  APIMART_SEEDANCE_2_5_DURATION_BY_TASK = Object.freeze({
     text2video: APIMART_SEEDANCE_2_5_DURATION_RANGE,
     image2video: APIMART_SEEDANCE_2_5_DURATION_RANGE,
     frames2video: APIMART_SEEDANCE_2_5_DURATION_RANGE,
     multimodal2video: APIMART_SEEDANCE_2_5_DURATION_RANGE,
   }),
-  APIMART_SEEDANCE_2_5_GENERATE_AUDIO_FIELD = Object['freeze']({
+  APIMART_SEEDANCE_2_5_GENERATE_AUDIO_FIELD = Object.freeze({
     ...VIDEO_AUDIO_FIELD,
     id: 'generateAudio',
     label: '生成同步音频',
     defaultValue: true,
   }),
-  APIMART_SEEDANCE_2_5_OUTPUT_FORMAT_FIELD = Object['freeze']({
+  APIMART_SEEDANCE_2_5_OUTPUT_FORMAT_FIELD = Object.freeze({
     id: 'outputFormat',
     type: 'segmented',
     placement: 'advanced',
     variant: 'advancedRow',
     label: '输出格式',
     defaultValue: 'mp4',
-    options: Object['freeze']([
-      Object['freeze']({ value: 'mp4', label: 'MP4' }),
-      Object['freeze']({ value: 'mov', label: 'MOV' }),
+    options: Object.freeze([
+      Object.freeze({ value: 'mp4', label: 'MP4' }),
+      Object.freeze({ value: 'mov', label: 'MOV' }),
     ]),
   }),
-  APIMART_SEEDANCE_2_5_WEB_SEARCH_FIELD = Object['freeze']({
+  APIMART_SEEDANCE_2_5_WEB_SEARCH_FIELD = Object.freeze({
     id: 'webSearch',
     type: 'toggle',
     placement: 'advanced',
@@ -328,14 +328,14 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     label: '联网搜索',
     defaultValue: false,
   }),
-  APIMART_SEEDANCE_2_5_FIELDS = Object['freeze']([
+  APIMART_SEEDANCE_2_5_FIELDS = Object.freeze([
     createResolutionField({ defaultValue: '720p', options: ['480p', '720p'] }),
     APIMART_SEEDANCE_RATIO_FIELD,
     createFooterDurationSliderOptionsField({
       values: APIMART_SEEDANCE_2_5_DURATION_VALUES,
       defaultValue: 5,
-      optionOverridesByValue: Object['freeze']({
-        '-1': Object['freeze']({ label: '自动', displayLabel: '自动' }),
+      optionOverridesByValue: Object.freeze({
+        '-1': Object.freeze({ label: '自动', displayLabel: '自动' }),
       }),
     }),
     APIMART_SEEDANCE_2_5_GENERATE_AUDIO_FIELD,
@@ -348,10 +348,10 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     image: 30,
     video: 10,
     audio: 10,
-    maxTotalDurationSecondsByKind: Object['freeze']({ video: 30, audio: 30 }),
-    mediaConstraintsByKind: Object['freeze']({
-      image: Object['freeze']({
-        allowedExtensions: Object['freeze']([
+    maxTotalDurationSecondsByKind: Object.freeze({ video: 30, audio: 30 }),
+    mediaConstraintsByKind: Object.freeze({
+      image: Object.freeze({
+        allowedExtensions: Object.freeze([
           'jpg',
           'jpeg',
           'png',
@@ -365,26 +365,26 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
         ]),
         maxBytes: 30 * 1024 * 1024,
       }),
-      video: Object['freeze']({
-        allowedExtensions: Object['freeze'](['mp4', 'mov']),
+      video: Object.freeze({
+        allowedExtensions: Object.freeze(['mp4', 'mov']),
         minDurationSeconds: 2,
         maxDurationSeconds: 30,
         maxBytes: 200 * 1024 * 1024,
       }),
-      audio: Object['freeze']({
-        allowedExtensions: Object['freeze'](['wav', 'mp3']),
+      audio: Object.freeze({
+        allowedExtensions: Object.freeze(['wav', 'mp3']),
         minDurationSeconds: 2,
         maxDurationSeconds: 30,
         maxBytes: 15 * 1024 * 1024,
       }),
     }),
   }),
-  APIMART_SEEDANCE_2_5_VIDEO_POLICY = Object['freeze']({
+  APIMART_SEEDANCE_2_5_VIDEO_POLICY = Object.freeze({
     ratioField: 'size',
     defaultRatio: 'adaptive',
     preserveAdaptiveRatio: true,
     defaultResolution: '720p',
-    allowedResolutions: Object['freeze'](['480p', '720p']),
+    allowedResolutions: Object.freeze(['480p', '720p']),
     defaultDuration: 5,
     minDuration: 4,
     maxDuration: 30,
@@ -405,40 +405,40 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     supportsWatermarkParam: true,
     supportsOutputFormatParam: true,
     supportsWebSearchParam: true,
-    privateAvatarAssets: Object['freeze']({
+    privateAvatarAssets: Object.freeze({
       enabled: true,
       provider: 'apimart',
       capability: 'seedance2PrivateAvatar',
-      models: Object['freeze'](['doubao-seedance-2.5']),
+      models: Object.freeze(['doubao-seedance-2.5']),
     }),
   }),
   APIMART_MINIMAX_H3_MODE_FIELD_ID = 'apimart_minimax_h3_mode',
   APIMART_MINIMAX_H3_BODY_MAPPING = createApimartVideoBodyMapping([
-    Object['freeze']({
+    Object.freeze({
       path: APIMART_MINIMAX_H3_MODE_FIELD_ID,
       from: 'param',
-      field: Object['freeze']([
+      field: Object.freeze([
         'generationParams.' + APIMART_MINIMAX_H3_MODE_FIELD_ID,
         APIMART_MINIMAX_H3_MODE_FIELD_ID,
       ]),
       defaultValue: 'frames',
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'resolution',
       from: 'param',
-      field: Object['freeze'](['generationParams.resolution', 'resolution']),
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
       defaultValue: '2K',
     }),
     APIMART_VIDEO_DURATION_ENTRY,
     APIMART_VIDEO_ASPECT_RATIO_ENTRY,
     APIMART_VIDEO_WATERMARK_ENTRY,
   ]),
-  APIMART_FLUX_3_AUDIO_FIELD = Object['freeze']({
+  APIMART_FLUX_3_AUDIO_FIELD = Object.freeze({
     ...VIDEO_AUDIO_FIELD,
     label: '生成同步音频',
     defaultValue: true,
   }),
-  APIMART_FLUX_3_SAFETY_TOLERANCE_FIELD = Object['freeze']({
+  APIMART_FLUX_3_SAFETY_TOLERANCE_FIELD = Object.freeze({
     id: 'safety_tolerance',
     type: 'stepper',
     placement: 'advanced',
@@ -451,30 +451,30 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     step: 1,
   }),
   APIMART_FLUX_3_VIDEO_BODY_MAPPING = createApimartVideoBodyMapping([
-    Object['freeze']({
+    Object.freeze({
       ...APIMART_VIDEO_DURATION_ENTRY,
       defaultValue: 5,
-      transform: Object['freeze']({ name: 'integerRange', min: 5, max: 20, fallback: 5 }),
+      transform: Object.freeze({ name: 'integerRange', min: 5, max: 20, fallback: 5 }),
     }),
-    Object['freeze']({
+    Object.freeze({
       path: 'resolution',
       from: 'param',
-      field: Object['freeze'](['generationParams.resolution', 'resolution']),
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
       defaultValue: 'hd',
     }),
     APIMART_VIDEO_ASPECT_RATIO_ENTRY,
     APIMART_VIDEO_IMAGE_URLS_ENTRY,
-    Object['freeze']({ path: 'video_url', from: 'inputVideos', transform: 'first', omitWhenEmpty: true }),
+    Object.freeze({ path: 'video_url', from: 'inputVideos', transform: 'first', omitWhenEmpty: true }),
     APIMART_VIDEO_AUDIO_TRUE_ENTRY,
-    Object['freeze']({
+    Object.freeze({
       path: 'safety_tolerance',
       from: 'param',
-      field: Object['freeze'](['generationParams.safety_tolerance', 'safety_tolerance']),
+      field: Object.freeze(['generationParams.safety_tolerance', 'safety_tolerance']),
       defaultValue: 2,
-      transform: Object['freeze']({ name: 'integerRange', min: 0, max: 4, fallback: 2 }),
+      transform: Object.freeze({ name: 'integerRange', min: 0, max: 4, fallback: 2 }),
     }),
   ]),
-  APIMART_OMNI_FLASH_GENERATION_TYPE_FIELD = Object['freeze']({
+  APIMART_OMNI_FLASH_GENERATION_TYPE_FIELD = Object.freeze({
     id: 'generation_type',
     type: 'segmented',
     placement: 'mode',
@@ -483,12 +483,12 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     description:
       '首帧：接入 1 张图片作为视频首帧。\n参考图：接入 1 张或 3 张图片作为视觉参考，不支持 2 张。',
     defaultValue: 'frame',
-    options: Object['freeze']([
-      Object['freeze']({ value: 'frame', label: '首帧' }),
-      Object['freeze']({ value: 'reference', label: '参考图' }),
+    options: Object.freeze([
+      Object.freeze({ value: 'frame', label: '首帧' }),
+      Object.freeze({ value: 'reference', label: '参考图' }),
     ]),
   }),
-  APIMART_OMNI_FLASH_NSFW_CHECK_FIELD = Object['freeze']({
+  APIMART_OMNI_FLASH_NSFW_CHECK_FIELD = Object.freeze({
     id: 'nsfw_check',
     type: 'toggle',
     placement: 'advanced',
@@ -501,20 +501,20 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     image: 3,
     video: 1,
     audio: 0,
-    policyVariants: Object['freeze']([
-      Object['freeze']({
-        when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
-        allowedKinds: Object['freeze'](['text', 'image', 'video']),
-        maxByKind: Object['freeze']({ image: 1, video: 1, audio: 0 }),
+    policyVariants: Object.freeze([
+      Object.freeze({
+        when: Object.freeze({ field: 'generation_type', value: 'frame' }),
+        allowedKinds: Object.freeze(['text', 'image', 'video']),
+        maxByKind: Object.freeze({ image: 1, video: 1, audio: 0 }),
       }),
-      Object['freeze']({
-        when: Object['freeze']({ field: 'generation_type', value: 'reference' }),
-        allowedKinds: Object['freeze'](['text', 'image', 'video']),
-        maxByKind: Object['freeze']({ image: 3, video: 1, audio: 0 }),
+      Object.freeze({
+        when: Object.freeze({ field: 'generation_type', value: 'reference' }),
+        allowedKinds: Object.freeze(['text', 'image', 'video']),
+        maxByKind: Object.freeze({ image: 3, video: 1, audio: 0 }),
       }),
     ]),
   }),
-  APIMART_WAN_3_GENERATION_TYPE_FIELD = Object['freeze']({
+  APIMART_WAN_3_GENERATION_TYPE_FIELD = Object.freeze({
     id: 'generation_type',
     type: 'segmented',
     placement: 'mode',
@@ -523,60 +523,60 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     description:
       '首尾帧：不接图为文生视频，接 1-2 张图时作为首帧/尾帧。\n多模态参考：图片、视频和音频作为自由参考素材。',
     defaultValue: 'reference',
-    options: Object['freeze']([
-      Object['freeze']({ value: 'frame', label: '首尾帧' }),
-      Object['freeze']({ value: 'reference', label: '多模态参考' }),
+    options: Object.freeze([
+      Object.freeze({ value: 'frame', label: '首尾帧' }),
+      Object.freeze({ value: 'reference', label: '多模态参考' }),
     ]),
   }),
-  APIMART_WAN_3_DURATION_VALUES = Object['freeze']([
+  APIMART_WAN_3_DURATION_VALUES = Object.freeze([
     -1,
-    ...Array['from']({ length: 29 }, (key, index) => index + 2),
+    ...Array.from({ length: 29 }, (key, index) => index + 2),
   ]),
-  APIMART_WAN_3_AUDIO_FIELD = Object['freeze']({
+  APIMART_WAN_3_AUDIO_FIELD = Object.freeze({
     ...VIDEO_AUDIO_FIELD,
     label: '生成同步音频',
     defaultValue: true,
   }),
-  APIMART_WAN_3_FIXED_INPUT_SLOTS = Object['freeze']([
-    Object['freeze']({
+  APIMART_WAN_3_FIXED_INPUT_SLOTS = Object.freeze([
+    Object.freeze({
       id: 'firstFrame',
       kind: 'image',
       label: '首帧',
       description: '首尾帧模式使用的起始图片',
       displayOrder: 10,
-      showWhen: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+      showWhen: Object.freeze({ field: 'generation_type', value: 'frame' }),
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'lastFrame',
       kind: 'image',
       label: '尾帧',
       description: '首尾帧模式可选的结束图片',
       displayOrder: 20,
-      showWhen: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+      showWhen: Object.freeze({ field: 'generation_type', value: 'frame' }),
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'referenceImage',
       kind: 'image',
       label: '参考图',
       description: '多模态参考模式最多支持 10 张图片',
       displayOrder: 30,
-      showWhen: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+      showWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'referenceVideo',
       kind: 'video',
       label: '参考视频',
       description: '多模态参考模式最多支持 5 段、总计不超过 15 秒',
       displayOrder: 40,
-      showWhen: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+      showWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
     }),
-    Object['freeze']({
+    Object.freeze({
       id: 'referenceAudio',
       kind: 'audio',
       label: '参考音频',
       description: '多模态参考模式最多支持 5 段、总计不超过 15 秒',
       displayOrder: 50,
-      showWhen: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+      showWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
     }),
   ]),
   APIMART_WAN_3_INPUT_SLOTS = createVideoInputSlots({
@@ -585,27 +585,27 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     audio: 5,
     fixedSlots: APIMART_WAN_3_FIXED_INPUT_SLOTS,
     cycleFixedInputWhenFull: true,
-    policyVariants: Object['freeze']([
-      Object['freeze']({
-        when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
-        allowedKinds: Object['freeze'](['text', 'image']),
-        maxByKind: Object['freeze']({ image: 2, video: 0, audio: 0 }),
+    policyVariants: Object.freeze([
+      Object.freeze({
+        when: Object.freeze({ field: 'generation_type', value: 'frame' }),
+        allowedKinds: Object.freeze(['text', 'image']),
+        maxByKind: Object.freeze({ image: 2, video: 0, audio: 0 }),
       }),
     ]),
-    maxTotalDurationSecondsByKind: Object['freeze']({ video: 15, audio: 15 }),
-    mediaConstraintsByKind: Object['freeze']({
-      image: Object['freeze']({
-        allowedExtensions: Object['freeze'](['jpg', 'jpeg', 'png', 'bmp', 'webp']),
+    maxTotalDurationSecondsByKind: Object.freeze({ video: 15, audio: 15 }),
+    mediaConstraintsByKind: Object.freeze({
+      image: Object.freeze({
+        allowedExtensions: Object.freeze(['jpg', 'jpeg', 'png', 'bmp', 'webp']),
         maxBytes: 20 * 1024 * 1024,
       }),
-      video: Object['freeze']({
-        allowedExtensions: Object['freeze'](['mp4', 'mov']),
+      video: Object.freeze({
+        allowedExtensions: Object.freeze(['mp4', 'mov']),
         minDurationSeconds: 1,
         maxDurationSeconds: 15,
         maxBytes: 100 * 1024 * 1024,
       }),
-      audio: Object['freeze']({
-        allowedExtensions: Object['freeze'](['wav', 'mp3']),
+      audio: Object.freeze({
+        allowedExtensions: Object.freeze(['wav', 'mp3']),
         minDurationSeconds: 1,
         maxDurationSeconds: 15,
         maxBytes: 15 * 1024 * 1024,
@@ -618,8 +618,8 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     APIMART_VIDEO_SIZE_ENTRY,
     APIMART_VIDEO_DURATION_ENTRY,
     APIMART_VIDEO_IMAGE_URLS_ENTRY,
-    Object['freeze']({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
-    Object['freeze']({ path: 'audio_urls', from: 'inputAudios', omitWhenEmpty: true }),
+    Object.freeze({ path: 'video_urls', from: 'inputVideos', omitWhenEmpty: true }),
+    Object.freeze({ path: 'audio_urls', from: 'inputAudios', omitWhenEmpty: true }),
     APIMART_VIDEO_AUDIO_TRUE_ENTRY,
     APIMART_VIDEO_WATERMARK_ENTRY,
     APIMART_VIDEO_SEED_ENTRY,
@@ -633,26 +633,26 @@ const APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS = createVideoInputSlots({
     '[[red:不接图]]：文生视频。',
     '[[red:接 1 张图]]：首帧生视频。',
     '[[red:接 2 张图]]：首尾帧生视频。',
-  ]['join']('\n'),
+  ].join('\n'),
   APIMART_WAN_3_REFERENCE_HELP_TOOLTIP = [
     'Wan3.0 多模态参考模式',
     '支持图片、视频和音频参考；图片最多 10 张，视频和音频各最多 5 段。',
     '视频与音频各自总时长不超过 15 秒。',
-  ]['join']('\n');
-export const APIMART_VIDEO_MODELS = Object['freeze']([
-  Object['freeze']({
+  ].join('\n');
+export const APIMART_VIDEO_MODELS = Object.freeze([
+  Object.freeze({
     modelId: 'apimart/luma-ray-v2',
     executionId: 'apimart.model-api.video.luma-ray-v2.v1',
     displayName: 'Luma Ray V2',
     model: 'luma-ray-v2',
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/veo3-fast',
     executionId: 'apimart.model-api.video.veo3-fast.v1',
     displayName: 'VEO3',
     model: 'veo3.1-fast',
-    modeModels: Object['freeze']({ fast: 'veo3.1-fast', quality: 'veo3.1-quality' }),
-    fields: Object['freeze']([
+    modeModels: Object.freeze({ fast: 'veo3.1-fast', quality: 'veo3.1-quality' }),
+    fields: Object.freeze([
       VEO3_MODEL_FIELD,
       VEO3_GENERATION_TYPE_FIELD,
       createResolutionField({
@@ -664,9 +664,9 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
           { value: '4k', label: '4K', disableWhen: { field: 'enable_gif', value: true } },
         ],
       }),
-      Object['freeze']({
+      Object.freeze({
         ...createAspectRatioField({ label: '比例', options: ['16:9', '9:16'] }),
-        hideWhen: Object['freeze']({ field: 'generation_type', value: 'extend' }),
+        hideWhen: Object.freeze({ field: 'generation_type', value: 'extend' }),
       }),
       withResolutionPlacement(VEO3_FIXED_DURATION_FIELD),
       VEO3_ENABLE_GIF_FIELD,
@@ -675,73 +675,73 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       image: 3,
       video: 0,
       audio: 0,
-      fixedSlots: Object['freeze']([
-        Object['freeze']({
+      fixedSlots: Object.freeze([
+        Object.freeze({
           id: 'firstFrame',
           kind: 'image',
           label: '首帧图',
-          hideWhen: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+          hideWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
         }),
-        Object['freeze']({
+        Object.freeze({
           id: 'lastFrame',
           kind: 'image',
           label: '尾帧图',
-          hideWhen: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+          hideWhen: Object.freeze({ field: 'generation_type', value: 'reference' }),
         }),
       ]),
     }),
     bodyMapping: APIMART_VIDEO_VEO3_BODY_MAPPING,
-    executionExtensions: Object['freeze']({ bodyResolver: 'apimartVeo3Video' }),
-    prompt: Object['freeze']({
+    executionExtensions: Object.freeze({ bodyResolver: 'apimartVeo3Video' }),
+    prompt: Object.freeze({
       placeholder: VEO3_FRAME_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'frame' }),
           placeholder: VEO3_FRAME_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'reference' }),
           placeholder: VEO3_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: VEO3_FRAME_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'frame' }),
           tooltip: VEO3_FRAME_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'reference' }),
           tooltip: VEO3_REFERENCE_HELP_TOOLTIP,
         }),
       ]),
     }),
     extensions: createVideoMenuExtension(30, 'VEO3.1 Fast / Quality'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/grok-imagine-1.5',
     executionId: 'apimart.model-api.video.grok-imagine-1-5.v1',
     displayName: 'Grok Imagine 1.5',
     model: 'grok-imagine-1.5-video-apimart',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       createAspectRatioField({ defaultValue: '16:9', options: ['16:9', '9:16', '1:1', '3:2', '2:3'] }),
       createFooterDurationField({ defaultValue: 6, min: 6, max: 30 }),
       GROK_IMAGINE_QUALITY_FIELD,
     ]),
     inputSlots: createVideoInputSlots({ image: 7, video: 0, audio: 0 }),
     bodyMapping: APIMART_VIDEO_GROK_IMAGINE_BODY_MAPPING,
-    prompt: Object['freeze']({ placeholder: GROK_IMAGINE_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: GROK_IMAGINE_HELP_TOOLTIP }),
+    prompt: Object.freeze({ placeholder: GROK_IMAGINE_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: GROK_IMAGINE_HELP_TOOLTIP }),
     extensions: createVideoMenuExtension(35, '文生 / 图生，最多 7 张参考图'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/gemini-omni-1.1-flash-ext',
     executionId: 'apimart.model-api.video.gemini-omni-1-1-flash-ext.v1',
     displayName: 'Gemini Omni 1.1 Flash Ext',
     model: 'gemini-omni-1.1-flash-ext',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       APIMART_OMNI_FLASH_GENERATION_TYPE_FIELD,
       createAspectRatioField({ defaultValue: '16:9', options: ['16:9', '9:16'] }),
       createFooterDurationSliderOptionsField({ values: [4, 6, 8, 10], defaultValue: 6 }),
@@ -750,19 +750,19 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     ]),
     inputSlots: APIMART_OMNI_FLASH_INPUT_SLOTS,
     bodyMapping: APIMART_VIDEO_OMNI_FLASH_BODY_MAPPING,
-    prompt: Object['freeze']({ placeholder: GEMINI_OMNI_FLASH_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: GEMINI_OMNI_FLASH_HELP_TOOLTIP }),
+    prompt: Object.freeze({ placeholder: GEMINI_OMNI_FLASH_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: GEMINI_OMNI_FLASH_HELP_TOOLTIP }),
     executionExtensions: APIMART_OMNI_FLASH_VIDEO_RESOLVERS,
     extensions: createVideoMenuExtension(36, '文生 / 首帧 / 参考图 / 参考视频'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/gemini-omni-flash',
     executionId: 'apimart.model-api.video.gemini-omni-flash-preview.v1',
     displayName: 'Gemini Omni Flash Preview',
-    aliases: Object['freeze'](['apimart/gemini-omni-flash-preview']),
+    aliases: Object.freeze(['apimart/gemini-omni-flash-preview']),
     model: 'gemini-omni-flash-preview',
-    fields: Object['freeze']([
-      Object['freeze']({
+    fields: Object.freeze([
+      Object.freeze({
         ...createAspectRatioField({ defaultValue: '16:9', options: ['16:9', '9:16'] }),
         variant: 'ratioPill',
       }),
@@ -770,23 +770,23 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     ]),
     inputSlots: createVideoInputSlots({ image: 16, video: 1, audio: 0 }),
     bodyMapping: APIMART_VIDEO_GEMINI_OMNI_FLASH_PREVIEW_BODY_MAPPING,
-    prompt: Object['freeze']({ placeholder: GEMINI_OMNI_FLASH_PREVIEW_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: GEMINI_OMNI_FLASH_PREVIEW_HELP_TOOLTIP }),
+    prompt: Object.freeze({ placeholder: GEMINI_OMNI_FLASH_PREVIEW_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: GEMINI_OMNI_FLASH_PREVIEW_HELP_TOOLTIP }),
     extensions: createVideoMenuExtension(37, '官方 Gemini Omni Flash Preview，720p / 24fps'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/flux-3-video',
     executionId: 'apimart.model-api.video.flux-3-video.v1',
     displayName: 'FLUX-3-VIDEO',
     model: 'flux-3-video',
-    fields: Object['freeze']([
-      Object['freeze']({
+    fields: Object.freeze([
+      Object.freeze({
         ...createResolutionField({
           label: '视频分辨率',
           defaultValue: 'hd',
           options: [
-            Object['freeze']({ value: 'hd', label: 'HD' }),
-            Object['freeze']({ value: 'fhd', label: 'FHD' }),
+            Object.freeze({ value: 'hd', label: 'HD' }),
+            Object.freeze({ value: 'fhd', label: 'FHD' }),
           ],
         }),
         description: 'HD 为标准清晰度；FHD 清晰度更高、画面细节更多。默认使用 HD。',
@@ -798,10 +798,10 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       APIMART_FLUX_3_SAFETY_TOLERANCE_FIELD,
     ]),
     inputSlots: createVideoInputSlots({ image: 10, video: 1, audio: 0 }),
-    ratioPolicy: Object['freeze']({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
+    ratioPolicy: Object.freeze({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
     bodyMapping: APIMART_FLUX_3_VIDEO_BODY_MAPPING,
-    prompt: Object['freeze']({ placeholder: '描述画面、动作、镜头运动与音效；也可接入关键帧或待续写视频' }),
-    help: Object['freeze']({
+    prompt: Object.freeze({ placeholder: '描述画面、动作、镜头运动与音效；也可接入关键帧或待续写视频' }),
+    help: Object.freeze({
       tooltip: '支持文生视频、1–10 张有序关键帧图生视频与单段视频续写；输出 H.264 + AAC。',
     }),
     extensions: createVideoMenuExtension(
@@ -809,7 +809,7 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       '文生 / 关键帧图生 / 视频续写，5–20 秒，原生音频',
     ),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/minimax-h3',
     executionId: 'apimart.model-api.video.minimax-h3.v1',
     displayName: 'MiniMax-H3',
@@ -818,38 +818,38 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     fields: createMinimaxH3Fields(APIMART_MINIMAX_H3_MODE_FIELD_ID),
     inputSlots: createMinimaxH3InputSlots(APIMART_MINIMAX_H3_MODE_FIELD_ID),
     bodyMapping: APIMART_MINIMAX_H3_BODY_MAPPING,
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'apimartMinimaxH3Video',
       mergeGenericInputImagesWithSlots: true,
     }),
-    ratioPolicy: Object['freeze']({ capability: 'size', preserveAdaptive: true }),
+    ratioPolicy: Object.freeze({ capability: 'size', preserveAdaptive: true }),
     prompt: createMinimaxH3Prompt(APIMART_MINIMAX_H3_MODE_FIELD_ID),
-    help: Object['freeze']({ tooltip: MINIMAX_H3_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'minimax-h3' }),
+    help: Object.freeze({ tooltip: MINIMAX_H3_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'minimax-h3' }),
       ...createVideoMenuExtension(70, '768P / 2K，文生 / 图生 / 首尾帧 / 多参考'),
       videoInputSurface: createMinimaxH3VideoInputSurface(APIMART_MINIMAX_H3_MODE_FIELD_ID),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/minimax-hailuo-2.3',
     executionId: 'apimart.model-api.video.minimax-hailuo-2-3.v1',
     displayName: 'Hailuo 2.3',
     model: 'MiniMax-Hailuo-2.3',
-    modeModels: Object['freeze']({ standard: 'MiniMax-Hailuo-2.3', fast: 'MiniMax-Hailuo-2.3-Fast' }),
-    fields: Object['freeze']([
+    modeModels: Object.freeze({ standard: 'MiniMax-Hailuo-2.3', fast: 'MiniMax-Hailuo-2.3-Fast' }),
+    fields: Object.freeze([
       HAILUO_23_MODEL_FIELD,
       createResolutionField({
         label: '视频分辨率',
         defaultValue: '768p',
-        options: ['768p', Object['freeze']({ value: '1080p', label: '1080p', tooltip: '1080p 仅支持 6 秒' })],
+        options: ['768p', Object.freeze({ value: '1080p', label: '1080p', tooltip: '1080p 仅支持 6 秒' })],
       }),
       createAspectRatioField({ options: [] }),
       createFooterDurationSliderOptionsField({
         values: [6, 10],
         defaultValue: 6,
-        optionOverridesByValue: Object['freeze']({
-          10: Object['freeze']({ disableWhen: Object['freeze']({ field: 'resolution', value: '1080p' }) }),
+        optionOverridesByValue: Object.freeze({
+          10: Object.freeze({ disableWhen: Object.freeze({ field: 'resolution', value: '1080p' }) }),
         }),
       }),
       VIDEO_PROMPT_OPTIMIZER_FIELD,
@@ -860,8 +860,8 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       image: 1,
       video: 0,
       audio: 0,
-      fixedSlots: Object['freeze']([
-        Object['freeze']({
+      fixedSlots: Object.freeze([
+        Object.freeze({
           id: 'firstFrame',
           kind: 'image',
           label: '首帧',
@@ -870,19 +870,19 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       ]),
     }),
     bodyMapping: APIMART_VIDEO_HAILUO_23_BODY_MAPPING,
-    executionExtensions: Object['freeze']({ bodyResolver: 'apimartHailuo23Video' }),
-    prompt: Object['freeze']({
+    executionExtensions: Object.freeze({ bodyResolver: 'apimartHailuo23Video' }),
+    prompt: Object.freeze({
       placeholder: '描述视频内容，支持运镜指令。例如：' + HAILUO_23_PROMPT_EXAMPLE,
     }),
-    help: Object['freeze']({ tooltip: HAILUO_23_HELP_TOOLTIP }),
+    help: Object.freeze({ tooltip: HAILUO_23_HELP_TOOLTIP }),
     extensions: createVideoMenuExtension(80, '标准 / Fast；使用示例：' + HAILUO_23_PROMPT_EXAMPLE),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/happyhorse-1.0',
     executionId: 'apimart.model-api.video.happyhorse-1.v1',
     displayName: 'HappyHorse 1.0',
     model: 'happyhorse-1.0',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       HAPPYHORSE_MODE_FIELD,
       createResolutionField({ label: '视频分辨率', defaultValue: '1080P' }),
       createAspectRatioField(),
@@ -900,54 +900,54 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING,
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'apimartHappyHorseVideo',
       videoFamily: 'happyHorse',
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           placeholder: HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           placeholder: HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
           placeholder: HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: HAPPYHORSE_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           tooltip: HAPPYHORSE_TEXT_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           tooltip: HAPPYHORSE_IMAGE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           tooltip: HAPPYHORSE_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
           tooltip: HAPPYHORSE_EDIT_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'apimartModel',
         order: 20,
         label: 'HappyHorse 1.0',
@@ -955,12 +955,12 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/happyhorse-1.1',
     executionId: 'apimart.model-api.video.happyhorse-1-1.v1',
     displayName: 'HappyHorse 1.1',
     model: 'happyhorse-1.1',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       HAPPYHORSE_11_MODE_FIELD,
       createResolutionField({ label: '视频分辨率', defaultValue: '1080P' }),
       createAspectRatioField(),
@@ -977,47 +977,47 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_HAPPYHORSE_BODY_MAPPING,
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'apimartHappyHorseVideo',
       videoFamily: 'happyHorse',
-      happyHorse: Object['freeze']({ versionLabel: 'HappyHorse 1.1', supportsEdit: false }),
+      happyHorse: Object.freeze({ versionLabel: 'HappyHorse 1.1', supportsEdit: false }),
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           placeholder: HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           placeholder: HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: HAPPYHORSE_11_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           tooltip: HAPPYHORSE_11_TEXT_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           tooltip: HAPPYHORSE_11_IMAGE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           tooltip: HAPPYHORSE_11_REFERENCE_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'apimartModel',
         order: 21,
         label: 'HappyHorse 1.1',
@@ -1025,12 +1025,12 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/wan2.7',
     executionId: 'apimart.model-api.video.wan2-7.v1',
     displayName: 'Wan 2.7',
     model: 'wan2.7',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       WAN27_MODE_FIELD,
       createResolutionField({ defaultValue: '1080P' }),
       createAspectRatioField(),
@@ -1048,58 +1048,58 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_WAN27_BODY_MAPPING,
-    executionExtensions: Object['freeze']({ bodyResolver: 'apimartWan27Video', videoFamily: 'wan27' }),
-    prompt: Object['freeze']({
+    executionExtensions: Object.freeze({ bodyResolver: 'apimartWan27Video', videoFamily: 'wan27' }),
+    prompt: Object.freeze({
       placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
           placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
           placeholder: WAN27_VIDEO_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
           placeholder: WAN27_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
           placeholder: WAN27_EDIT_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: WAN27_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
           tooltip: WAN27_IMAGE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
           tooltip: WAN27_VIDEO_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
           tooltip: WAN27_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
           tooltip: WAN27_EDIT_HELP_TOOLTIP,
         }),
       ]),
     }),
     extensions: createVideoMenuExtension(40, '文生 / 图生 / 参考 / 续写 / 编辑'),
   }),
-  ...[false, true]['map']((modelId) =>
-    Object['freeze']({
+  ...[false, true].map((modelId) =>
+    Object.freeze({
       modelId: modelId ? 'apimart/wan3.0-video-prime' : 'apimart/wan3.0',
       executionId: modelId ? 'apimart.model-api.video.wan3-0-prime.v1' : 'apimart.model-api.video.wan3-0.v1',
       displayName: modelId ? 'Wan 3.0 Prime' : 'Wan 3.0',
       model: modelId ? 'wan3.0-video-prime' : 'wan3.0-video',
-      fields: Object['freeze']([
+      fields: Object.freeze([
         APIMART_WAN_3_GENERATION_TYPE_FIELD,
         createResolutionField({ defaultValue: '1080P', options: ['480P', '720P', '1080P'] }),
         createAspectRatioField({
@@ -1109,8 +1109,8 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
         createFooterDurationSliderOptionsField({
           values: APIMART_WAN_3_DURATION_VALUES,
           defaultValue: 5,
-          optionOverridesByValue: Object['freeze']({
-            '-1': Object['freeze']({ label: '自动', displayLabel: '自动' }),
+          optionOverridesByValue: Object.freeze({
+            '-1': Object.freeze({ label: '自动', displayLabel: '自动' }),
           }),
         }),
         APIMART_WAN_3_AUDIO_FIELD,
@@ -1119,52 +1119,52 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       ]),
       inputSlots: APIMART_WAN_3_INPUT_SLOTS,
       bodyMapping: APIMART_WAN_3_BODY_MAPPING,
-      ratioPolicy: Object['freeze']({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
-      prompt: Object['freeze']({
+      ratioPolicy: Object.freeze({ ...VIDEO_SIZE_RATIO_POLICY, preserveAdaptive: true }),
+      prompt: Object.freeze({
         placeholder: APIMART_WAN_3_FRAME_PROMPT_PLACEHOLDER,
-        variants: Object['freeze']([
-          Object['freeze']({
-            when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'frame' }),
             placeholder: APIMART_WAN_3_FRAME_PROMPT_PLACEHOLDER,
           }),
-          Object['freeze']({
-            when: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'reference' }),
             placeholder: APIMART_WAN_3_REFERENCE_PROMPT_PLACEHOLDER,
           }),
         ]),
       }),
-      help: Object['freeze']({
+      help: Object.freeze({
         tooltip: APIMART_WAN_3_FRAME_HELP_TOOLTIP,
-        variants: Object['freeze']([
-          Object['freeze']({
-            when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+        variants: Object.freeze([
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'frame' }),
             tooltip: APIMART_WAN_3_FRAME_HELP_TOOLTIP,
           }),
-          Object['freeze']({
-            when: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+          Object.freeze({
+            when: Object.freeze({ field: 'generation_type', value: 'reference' }),
             tooltip: APIMART_WAN_3_REFERENCE_HELP_TOOLTIP,
           }),
         ]),
       }),
-      extensions: Object['freeze']({
-        storyWorkspace: Object['freeze']({ promptMode: 'wan-3.0' }),
+      extensions: Object.freeze({
+        storyWorkspace: Object.freeze({ promptMode: 'wan-3.0' }),
         ...createVideoMenuExtension(modelId ? 42 : 41, '文生 / 首尾帧 / 多模态参考'),
-        videoInputSurface: Object['freeze']({ hideFixedInputSlots: true }),
+        videoInputSurface: Object.freeze({ hideFixedInputSlots: true }),
       }),
     }),
   ),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/kling-v1-5',
     executionId: 'apimart.model-api.video.kling-v1-5.v1',
     displayName: 'Kling V1.5',
     model: 'kling-v1-5-gen-video',
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/kling-v3',
     executionId: 'apimart.model-api.video.kling-v3.v1',
     displayName: 'Kling V3',
     model: 'kling-v3',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       KLING_V3_MODE_FIELD,
       createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
       createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
@@ -1177,14 +1177,14 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       image: 2,
       video: 0,
       audio: 0,
-      fixedSlots: Object['freeze']([
-        Object['freeze']({
+      fixedSlots: Object.freeze([
+        Object.freeze({
           id: 'firstFrame',
           kind: 'image',
           label: '首帧',
           description: '图生视频使用的首帧图片',
         }),
-        Object['freeze']({
+        Object.freeze({
           id: 'lastFrame',
           kind: 'image',
           label: '尾帧',
@@ -1193,16 +1193,16 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       ]),
     }),
     bodyMapping: APIMART_VIDEO_KLING_V3_BODY_MAPPING,
-    prompt: Object['freeze']({ placeholder: KLING_V3_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: KLING_V3_HELP_TOOLTIP }),
+    prompt: Object.freeze({ placeholder: KLING_V3_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: KLING_V3_HELP_TOOLTIP }),
     extensions: createVideoMenuExtension(60, 'Kling v3'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/kling-v3-omni',
     executionId: 'apimart.model-api.video.kling-v3-omni.v1',
     displayName: 'Kling V3 Omni',
     model: 'kling-v3-omni',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       KLING_V3_OMNI_MODE_FIELD,
       KLING_V3_MODE_FIELD,
       createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
@@ -1220,49 +1220,49 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       preserveHiddenInputsByKind: true,
     }),
     bodyMapping: APIMART_VIDEO_KLING_V3_BODY_MAPPING,
-    executionExtensions: Object['freeze']({ bodyResolver: 'apimartKlingV3OmniVideo' }),
-    prompt: Object['freeze']({
+    executionExtensions: Object.freeze({ bodyResolver: 'apimartKlingV3OmniVideo' }),
+    prompt: Object.freeze({
       placeholder: KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
           placeholder: KLING_V3_OMNI_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
           placeholder: KLING_V3_OMNI_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
           placeholder: KLING_V3_OMNI_EDIT_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: KLING_V3_OMNI_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
           tooltip: KLING_V3_OMNI_IMAGE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
           tooltip: KLING_V3_OMNI_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
           tooltip: KLING_V3_OMNI_EDIT_HELP_TOOLTIP,
         }),
       ]),
     }),
     extensions: createVideoMenuExtension(50, 'Kling v3 Omni'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/kling-video-o1',
     executionId: 'apimart.model-api.video.kling-o1.v1',
     displayName: 'Kling O1',
     model: 'kling-video-o1',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       KLING_O1_QUALITY_FIELD,
       createAspectRatioField({ options: ['16:9', '9:16', '1:1'] }),
       createFooterDurationSliderOptionsField({ values: [5, 10], defaultValue: 5 }),
@@ -1276,35 +1276,35 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       exclusiveGroups: KLING_O1_VIDEO_EXCLUSIVE_GROUPS,
     }),
     bodyMapping: APIMART_VIDEO_KLING_O1_BODY_MAPPING,
-    executionExtensions: Object['freeze']({ bodyResolver: 'apimartKlingO1Video' }),
-    prompt: Object['freeze']({ placeholder: KLING_O1_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: KLING_O1_HELP_TOOLTIP }),
+    executionExtensions: Object.freeze({ bodyResolver: 'apimartKlingO1Video' }),
+    prompt: Object.freeze({ placeholder: KLING_O1_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: KLING_O1_HELP_TOOLTIP }),
     extensions: createVideoMenuExtension(70, 'Kling O1'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/viduq3',
     executionId: 'apimart.model-api.video.viduq3.v1',
     displayName: 'Vidu Q3',
     model: 'viduq3-turbo',
-    modeModels: Object['freeze']({
+    modeModels: Object.freeze({
       'viduq3-turbo': 'viduq3-turbo',
       'viduq3-pro': 'viduq3-pro',
       viduq3: 'viduq3',
       'viduq3-mix': 'viduq3-mix',
     }),
-    fields: Object['freeze']([
+    fields: Object.freeze([
       VIDU_Q3_MODEL_FIELD,
       VIDU_Q3_GENERATION_MODE_FIELD,
       createResolutionField({
         defaultValue: '720p',
         options: [
-          Object['freeze']({
+          Object.freeze({
             value: '540p',
             label: '540p',
-            disableWhen: Object['freeze']({
-              all: Object['freeze']([
-                Object['freeze']({ field: 'vidu_q3_generation_mode', value: 'reference' }),
-                Object['freeze']({ field: 'mode', value: 'viduq3-mix' }),
+            disableWhen: Object.freeze({
+              all: Object.freeze([
+                Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+                Object.freeze({ field: 'mode', value: 'viduq3-mix' }),
               ]),
             }),
           }),
@@ -1321,46 +1321,46 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       image: 7,
       video: 0,
       audio: 0,
-      fixedSlots: Object['freeze']([
-        Object['freeze']({
+      fixedSlots: Object.freeze([
+        Object.freeze({
           id: 'firstFrame',
           kind: 'image',
           label: '首帧图',
-          hideWhen: Object['freeze']({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+          hideWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
         }),
-        Object['freeze']({
+        Object.freeze({
           id: 'lastFrame',
           kind: 'image',
           label: '尾帧图',
-          hideWhen: Object['freeze']({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+          hideWhen: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
         }),
       ]),
     }),
     bodyMapping: APIMART_VIDEO_VIDU_BODY_MAPPING,
-    executionExtensions: Object['freeze']({ bodyResolver: 'apimartViduQ3Video' }),
-    prompt: Object['freeze']({
+    executionExtensions: Object.freeze({ bodyResolver: 'apimartViduQ3Video' }),
+    prompt: Object.freeze({
       placeholder: VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'vidu_q3_generation_mode', value: 'video' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'video' }),
           placeholder: VIDU_Q3_VIDEO_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'vidu_q3_generation_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'vidu_q3_generation_mode', value: 'reference' }),
           placeholder: VIDU_Q3_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({ tooltip: VIDU_Q3_HELP_TOOLTIP }),
+    help: Object.freeze({ tooltip: VIDU_Q3_HELP_TOOLTIP }),
     extensions: createVideoMenuExtension(100, 'Vidu Q3 Turbo / Pro / Standard / Mix'),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-2.5',
     executionId: 'apimart.model-api.video.doubao-seedance-2-5.v1',
     displayName: 'Seedance 2.5',
     model: 'doubao-seedance-2.5',
     endpointMode: 'seedance-video-generation',
-    ratioPolicy: Object['freeze']({
+    ratioPolicy: Object.freeze({
       ...SEEDANCE_VIDEO_RATIO_POLICY,
       preserveAdaptive: true,
       preserveAdaptiveAtSubmit: true,
@@ -1368,16 +1368,16 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
     fields: APIMART_SEEDANCE_2_5_FIELDS,
     inputSlots: APIMART_SEEDANCE_2_5_VIDEO_INPUT_SLOTS,
     executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_5_VIDEO_POLICY),
-    extensions: Object['freeze']({
-      segmentRetake: Object['freeze']({
+    extensions: Object.freeze({
+      segmentRetake: Object.freeze({
         supported: true,
-        parameterPolicy: Object['freeze']({
-          mode: Object['freeze']({ fieldId: 'dreaminaRouteMode', value: 'multimodal2video' }),
-          duration: Object['freeze']({ fieldId: 'duration', value: -1 }),
+        parameterPolicy: Object.freeze({
+          mode: Object.freeze({ fieldId: 'dreaminaRouteMode', value: 'multimodal2video' }),
+          duration: Object.freeze({ fieldId: 'duration', value: -1 }),
         }),
       }),
-      storyWorkspace: Object['freeze']({ promptMode: 'seedance-2.5' }),
-      dreaminaStyleVideo: Object['freeze']({
+      storyWorkspace: Object.freeze({ promptMode: 'seedance-2.5' }),
+      dreaminaStyleVideo: Object.freeze({
         order: 5,
         title: 'Seedance 2.5',
         counterpartKey: 'seedance2-5',
@@ -1388,30 +1388,30 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-2.0-fast',
     executionId: 'apimart.model-api.video.doubao-seedance-2-fast.v1',
     displayName: 'Seedance 2.0 Fast',
-    aliases: Object['freeze'](['apimart/seedance-2.0-fast']),
+    aliases: Object.freeze(['apimart/seedance-2.0-fast']),
     model: 'doubao-seedance-2.0-fast',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_FAST_FIELDS,
     inputSlots: APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS,
     executionExtensions: createSeedanceVideoExecutionExtensions(
-      Object['freeze']({
+      Object.freeze({
         ...APIMART_SEEDANCE_2_0_VIDEO_POLICY,
-        allowedResolutions: Object['freeze'](['480p', '720p']),
+        allowedResolutions: Object.freeze(['480p', '720p']),
       }),
     ),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'seedance-2.0' }),
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'seedance-2.0' }),
+      videoMenu: Object.freeze({
         role: 'apimartDreaminaEntry',
         order: 10,
         label: '即梦视频',
         subtitle: 'Seedance 系列，文生/图生/首尾帧参考素材',
       }),
-      dreaminaStyleVideo: Object['freeze']({
+      dreaminaStyleVideo: Object.freeze({
         order: 10,
         counterpartKey: 'seedance2-fast',
         title: 'Seedance 2.0 Fast',
@@ -1423,19 +1423,19 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-2.0',
     executionId: 'apimart.model-api.video.doubao-seedance-2.v1',
     displayName: 'Seedance 2.0',
-    aliases: Object['freeze'](['apimart/seedance-2.0']),
+    aliases: Object.freeze(['apimart/seedance-2.0']),
     model: 'doubao-seedance-2.0',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_2_0_FIELDS,
     inputSlots: APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS,
     executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_2_0_VIDEO_POLICY),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'seedance-2.0' }),
-      dreaminaStyleVideo: Object['freeze']({
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'seedance-2.0' }),
+      dreaminaStyleVideo: Object.freeze({
         order: 20,
         counterpartKey: 'seedance2-standard',
         title: 'Seedance 2.0',
@@ -1446,25 +1446,25 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-2.0-mini',
     executionId: 'apimart.model-api.video.doubao-seedance-2-mini.v1',
     displayName: 'Seedance 2.0 Mini',
-    aliases: Object['freeze'](['apimart/seedance-2.0-mini']),
+    aliases: Object.freeze(['apimart/seedance-2.0-mini']),
     model: 'doubao-seedance-2.0-mini',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_FAST_FIELDS,
     inputSlots: APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS,
-    help: Object['freeze']({ tooltip: APIMART_SEEDANCE_2_MINI_HELP_TOOLTIP }),
+    help: Object.freeze({ tooltip: APIMART_SEEDANCE_2_MINI_HELP_TOOLTIP }),
     executionExtensions: createSeedanceVideoExecutionExtensions(
-      Object['freeze']({
+      Object.freeze({
         ...APIMART_SEEDANCE_2_0_VIDEO_POLICY,
-        allowedResolutions: Object['freeze'](['480p', '720p']),
+        allowedResolutions: Object.freeze(['480p', '720p']),
       }),
     ),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'seedance-2.0' }),
-      dreaminaStyleVideo: Object['freeze']({
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'seedance-2.0' }),
+      dreaminaStyleVideo: Object.freeze({
         order: 25,
         counterpartKey: 'seedance2-mini',
         title: 'Seedance 2.0 Mini',
@@ -1475,24 +1475,24 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-2.0-fast-face',
     executionId: 'apimart.model-api.video.doubao-seedance-2-fast-face.v1',
     displayName: 'Seedance 2.0 Fast Face',
-    aliases: Object['freeze'](['apimart/seedance-2.0-fast-face']),
+    aliases: Object.freeze(['apimart/seedance-2.0-fast-face']),
     model: 'doubao-seedance-2.0-fast-face',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_FAST_FIELDS,
     inputSlots: APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS,
     executionExtensions: createSeedanceVideoExecutionExtensions(
-      Object['freeze']({
+      Object.freeze({
         ...APIMART_SEEDANCE_2_0_VIDEO_POLICY,
-        allowedResolutions: Object['freeze'](['480p', '720p']),
+        allowedResolutions: Object.freeze(['480p', '720p']),
       }),
     ),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'seedance-2.0' }),
-      dreaminaStyleVideo: Object['freeze']({
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'seedance-2.0' }),
+      dreaminaStyleVideo: Object.freeze({
         order: 30,
         counterpartKey: 'seedance2-fast',
         title: 'Seedance 2.0 Fast Face',
@@ -1503,24 +1503,24 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-2.0-face',
     executionId: 'apimart.model-api.video.doubao-seedance-2-face.v1',
     displayName: 'Seedance 2.0 Face',
-    aliases: Object['freeze'](['apimart/seedance-2.0-face']),
+    aliases: Object.freeze(['apimart/seedance-2.0-face']),
     model: 'doubao-seedance-2.0-face',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_STANDARD_FIELDS,
     inputSlots: APIMART_SEEDANCE2_VIDEO_INPUT_SLOTS,
     executionExtensions: createSeedanceVideoExecutionExtensions(
-      Object['freeze']({
+      Object.freeze({
         ...APIMART_SEEDANCE_2_0_VIDEO_POLICY,
-        allowedResolutions: Object['freeze'](['480p', '720p', '1080p']),
+        allowedResolutions: Object.freeze(['480p', '720p', '1080p']),
       }),
     ),
-    extensions: Object['freeze']({
-      storyWorkspace: Object['freeze']({ promptMode: 'seedance-2.0' }),
-      dreaminaStyleVideo: Object['freeze']({
+    extensions: Object.freeze({
+      storyWorkspace: Object.freeze({ promptMode: 'seedance-2.0' }),
+      dreaminaStyleVideo: Object.freeze({
         order: 40,
         counterpartKey: 'seedance2-standard',
         title: 'Seedance 2.0 Face',
@@ -1531,17 +1531,17 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-1-5-pro',
     executionId: 'apimart.model-api.video.doubao-seedance-1-5-pro.v1',
     displayName: 'Seedance 1.5 Pro',
-    aliases: Object['freeze'](['apimart/seedance-1.5-pro', 'apimart/seedance-1-5-pro']),
+    aliases: Object.freeze(['apimart/seedance-1.5-pro', 'apimart/seedance-1-5-pro']),
     model: 'doubao-seedance-1-5-pro',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_STANDARD_FIELDS,
     executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_5_VIDEO_POLICY),
-    extensions: Object['freeze']({
-      dreaminaStyleVideo: Object['freeze']({
+    extensions: Object.freeze({
+      dreaminaStyleVideo: Object.freeze({
         order: 50,
         title: 'Seedance 1.5 Pro',
         subtitle: 'APIMart 1.5 Pro，支持文生、图生、首尾帧与生成音频参数',
@@ -1551,17 +1551,17 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-1-0-pro-fast',
     executionId: 'apimart.model-api.video.doubao-seedance-1-pro-fast.v1',
     displayName: 'Seedance 1.0 Pro Fast',
-    aliases: Object['freeze'](['apimart/seedance-1.0-pro-fast', 'apimart/seedance-1-0-pro-fast']),
+    aliases: Object.freeze(['apimart/seedance-1.0-pro-fast', 'apimart/seedance-1-0-pro-fast']),
     model: 'doubao-seedance-1-0-pro-fast',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_STANDARD_FIELDS,
     executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_0_FAST_VIDEO_POLICY),
-    extensions: Object['freeze']({
-      dreaminaStyleVideo: Object['freeze']({
+    extensions: Object.freeze({
+      dreaminaStyleVideo: Object.freeze({
         order: 60,
         title: 'Seedance 1.0 Pro Fast',
         subtitle: 'APIMart 1.0 快速版，适合预览和迭代',
@@ -1571,17 +1571,17 @@ export const APIMART_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     modelId: 'apimart/doubao-seedance-1-0-pro-quality',
     executionId: 'apimart.model-api.video.doubao-seedance-1-pro-quality.v1',
     displayName: 'Seedance 1.0 Pro Quality',
-    aliases: Object['freeze'](['apimart/seedance-1.0-pro-quality', 'apimart/seedance-1-0-pro-quality']),
+    aliases: Object.freeze(['apimart/seedance-1.0-pro-quality', 'apimart/seedance-1-0-pro-quality']),
     model: 'doubao-seedance-1-0-pro-quality',
     endpointMode: 'seedance-video-generation',
     fields: APIMART_SEEDANCE_STANDARD_FIELDS,
     executionExtensions: createSeedanceVideoExecutionExtensions(APIMART_SEEDANCE_1_0_QUALITY_VIDEO_POLICY),
-    extensions: Object['freeze']({
-      dreaminaStyleVideo: Object['freeze']({
+    extensions: Object.freeze({
+      dreaminaStyleVideo: Object.freeze({
         order: 70,
         title: 'Seedance 1.0 Pro Quality',
         subtitle: 'APIMart 1.0 高质量版，支持首尾帧',

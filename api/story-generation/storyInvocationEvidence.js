@@ -1,6 +1,6 @@
 import { withStoryRequestPolicy } from './storyRequestPolicy.js';
 function classifyRequestFailure(value) {
-  return value?.['safeToRetry'] === true || value?.['requestSubmitted'] === false
+  return value?.safeToRetry === true || value?.requestSubmitted === false
     ? 'not-submitted'
     : 'outcome-unknown';
 }
@@ -27,7 +27,7 @@ export function createStoryInvocationLifecycle(
         stepId: stepId,
         attempt: attempt3,
         requestPayload: requestPayload3,
-        error: error?.['message'] || String(error || '模型请求失败'),
+        error: error?.message || String(error || '模型请求失败'),
       }),
   };
 }
@@ -39,7 +39,7 @@ export async function invokeStoryGenerationRequest({
   onInvocation: onInvocation = null,
   allowTruncatedOutput: allowTruncatedOutput = false,
   serializeResponse: serializeResponse = (response2) =>
-    typeof response2 === 'string' ? response2 : (response2?.['text'] ?? JSON['stringify'](response2)),
+    typeof response2 === 'string' ? response2 : (response2?.text ?? JSON.stringify(response2)),
 } = {}) {
   requestPayload4 = withStoryRequestPolicy(requestPayload4);
   if (allowTruncatedOutput) requestPayload4 = { ...requestPayload4, allowTruncatedOutput: true };
@@ -50,30 +50,30 @@ export async function invokeStoryGenerationRequest({
     requestPayload: requestPayload4,
   });
   let key;
-  const index = Date['now']();
+  const index = Date.now();
   let firstTextMs = null,
     streamUpdates = 0;
   const metrics = (result = '') => ({
-    elapsedMs: Date['now']() - index,
+    elapsedMs: Date.now() - index,
     firstTextMs: firstTextMs,
     streamUpdates: streamUpdates,
-    responseCharacters: String(result)['length'],
-    responseBytes: new TextEncoder()['encode'](String(result))['length'],
+    responseCharacters: String(result).length,
+    responseBytes: new TextEncoder().encode(String(result)).length,
   });
   try {
     key = await request({
       ...requestPayload4,
       onText: (data) => {
-        if (String(data)['trim']()) firstTextMs ??= Date['now']() - index;
-        ((streamUpdates += 1), requestPayload4['onText']?.(data));
+        if (String(data).trim()) firstTextMs ??= Date.now() - index;
+        ((streamUpdates += 1), requestPayload4.onText?.(data));
       },
     });
-    const options = String(key?.['finishReason'] || '')['toLowerCase']();
+    const options = String(key?.finishReason || '').toLowerCase();
     if (
-      ['content_filter', 'incomplete']['includes'](options) ||
-      (!allowTruncatedOutput && ['length', 'max_tokens', 'max_output_tokens']['includes'](options))
+      ['content_filter', 'incomplete'].includes(options) ||
+      (!allowTruncatedOutput && ['length', 'max_tokens', 'max_output_tokens'].includes(options))
     )
-      throw Object['assign'](new Error('模型输出未完整结束，已保留返回内容，未提交片段。'), {
+      throw Object.assign(new Error('模型输出未完整结束，已保留返回内容，未提交片段。'), {
         type: 'OUTPUT_TRUNCATED',
         partialText: serializeResponse(key),
       });
@@ -83,9 +83,9 @@ export async function invokeStoryGenerationRequest({
       stepId: stepId2,
       attempt: attempt4,
       requestPayload: requestPayload4,
-      error: error2?.['message'] || String(error2 || '模型请求失败'),
-      rawResponse: error2?.['partialText'] || '',
-      metrics: metrics(error2?.['partialText'] || ''),
+      error: error2?.message || String(error2 || '模型请求失败'),
+      rawResponse: error2?.partialText || '',
+      metrics: metrics(error2?.partialText || ''),
     });
     throw error2;
   }

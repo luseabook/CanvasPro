@@ -1,33 +1,33 @@
 import { resolveRandomSeedModeFromParams } from '../shared/randomSeedPolicy.js';
 function getPlainObject(value) {
-  return value && typeof value === 'object' && !Array['isArray'](value) ? value : {};
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
 }
 export function buildSubmitRandomizedSeedPatch({
   modelManifest: modelManifest = null,
   nodeData: nodeData = {},
   payload: payload = {},
-  random: random = Math['random'],
+  random: random = Math.random,
 } = {}) {
-  const list = Array['isArray'](modelManifest?.['uiSchema']?.['fields'])
-      ? modelManifest['uiSchema']['fields']
+  const list = Array.isArray(modelManifest?.uiSchema?.fields)
+      ? modelManifest.uiSchema.fields
       : [],
-    list2 = list['filter']((item) => {
-      const key = String(item?.['id'] || '')['trim']();
+    list2 = list.filter((item) => {
+      const key = String(item?.id || '').trim();
       return (
-        item?.['randomizeOnSubmit'] === true && key && String(item?.['variant'] || '') === 'randomSeedRow'
+        item?.randomizeOnSubmit === true && key && String(item?.variant || '') === 'randomSeedRow'
       );
     });
-  if (list2['length'] === 0) return null;
+  if (list2.length === 0) return null;
   let generationParams = {
-      ...getPlainObject(nodeData?.['generationParams']),
-      ...getPlainObject(payload?.['generationParams']),
+      ...getPlainObject(nodeData?.generationParams),
+      ...getPlainObject(payload?.generationParams),
     },
     requestParams = null,
     enabled = false;
-  list2['forEach']((index) => {
-    const seedField = String(index?.['id'] || '')['trim'](),
-      modeField = String(index?.['randomSeedModeField'] || '')['trim'](),
-      defaultMode = String(index?.['randomSeedDefaultMode'] || 'fixed')['trim']() || 'fixed',
+  list2.forEach((index) => {
+    const seedField = String(index?.id || '').trim(),
+      modeField = String(index?.randomSeedModeField || '').trim(),
+      defaultMode = String(index?.randomSeedDefaultMode || 'fixed').trim() || 'fixed',
       { mode: mode, hasLegacyNumericSeed: hasLegacyNumericSeed } = resolveRandomSeedModeFromParams(
         generationParams,
         {
@@ -43,13 +43,13 @@ export function buildSubmitRandomizedSeedPatch({
         (enabled = true));
       return;
     }
-    const result = Number(index?.['randomSeedMin'] ?? index?.['min']),
-      data = Number(index?.['randomSeedMax'] ?? index?.['max']),
-      options = Number['isFinite'](result) ? Math['trunc'](result) : 0,
-      target = Number['isFinite'](data) ? Math['trunc'](data) : 0x7fffffff,
-      source = Math['min'](options, target),
-      next = Math['max'](options, target),
-      current = String(source + Math['floor'](random() * (next - source + 1)));
+    const result = Number(index?.randomSeedMin ?? index?.min),
+      data = Number(index?.randomSeedMax ?? index?.max),
+      options = Number.isFinite(result) ? Math.trunc(result) : 0,
+      target = Number.isFinite(data) ? Math.trunc(data) : 0x7fffffff,
+      source = Math.min(options, target),
+      next = Math.max(options, target),
+      current = String(source + Math.floor(random() * (next - source + 1)));
     ((generationParams = {
       ...generationParams,
       [seedField]: current,
@@ -63,14 +63,12 @@ export function buildSubmitRandomizedSeedPatch({
       (enabled = true));
   });
   if (!enabled) return null;
-  const entry = String(payload?.['model'] || nodeData?.['model'] || modelManifest?.['modelId'] || '')[
-      'trim'
-    ](),
+  const entry = String(payload?.model || nodeData?.model || modelManifest?.modelId || '').trim(),
     storePatch = { generationParams: generationParams };
   return (
     entry &&
-      (storePatch['generationParamsByModel'] = {
-        ...getPlainObject(nodeData?.['generationParamsByModel']),
+      (storePatch.generationParamsByModel = {
+        ...getPlainObject(nodeData?.generationParamsByModel),
         [entry]: generationParams,
       }),
     { requestParams: requestParams || generationParams, storePatch: storePatch }

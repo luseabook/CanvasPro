@@ -26,7 +26,7 @@ const ALIGN_HOLD_TRIGGER_MS = 220;
 let _alignHoldTimer = null,
   _alignHoldActive = false,
   _alignHoldKey = '';
-const MODIFIER_ALIAS_MAP = Object['freeze']({
+const MODIFIER_ALIAS_MAP = Object.freeze({
     CTRL: 'Ctrl',
     CONTROL: 'Ctrl',
     CMD: 'Ctrl',
@@ -36,7 +36,7 @@ const MODIFIER_ALIAS_MAP = Object['freeze']({
     ALT: 'Alt',
     OPTION: 'Alt',
   }),
-  NAMED_KEY_ALIAS_MAP = Object['freeze']({
+  NAMED_KEY_ALIAS_MAP = Object.freeze({
     SPACE: 'Space',
     ESC: 'Escape',
     ESCAPE: 'Escape',
@@ -48,43 +48,43 @@ const MODIFIER_ALIAS_MAP = Object['freeze']({
   INTERACTION_MODIFIER_SHORTCUTS = new Set(['cut-edge', 'duplicate-with-edges', 'multi-select']),
   ACTIVE_WHITEBOARD_EDITOR_SELECTOR = '.whiteboard-node-component.is-whiteboard-editing';
 function normalizeShortcutKeyPart(value) {
-  const list = String(value ?? '')['trim']();
+  const list = String(value ?? '').trim();
   if (!list) return '';
   if (list === ' ') return 'Space';
-  const item = list['toUpperCase']();
+  const item = list.toUpperCase();
   if (MODIFIER_ALIAS_MAP[item]) return MODIFIER_ALIAS_MAP[item];
   if (NAMED_KEY_ALIAS_MAP[item]) return NAMED_KEY_ALIAS_MAP[item];
-  if (list['length'] === 1) return list['toUpperCase']();
-  return list[0]['toUpperCase']() + list['slice'](1)['toLowerCase']();
+  if (list.length === 1) return list.toUpperCase();
+  return list[0].toUpperCase() + list.slice(1).toLowerCase();
 }
 function getPanShortcutParts() {
   const key = getShortcuts?.() || {},
-    list2 = key?.['pan-canvas']?.['keys'],
-    list3 = Array['isArray'](list2) && list2['length'] > 0 ? list2 : ['Space'];
-  return new Set(list3['map']((index) => normalizeShortcutKeyPart(index))['filter'](Boolean));
+    list2 = key?.['pan-canvas']?.keys,
+    list3 = Array.isArray(list2) && list2.length > 0 ? list2 : ['Space'];
+  return new Set(list3.map((index) => normalizeShortcutKeyPart(index)).filter(Boolean));
 }
 function shouldReleasePanShortcut(event) {
   if (!isCanvasPanShortcutHeld()) return false;
   const result =
-      event?.['key'] === ' ' || event?.['code'] === 'Space' ? 'Space' : event?.['key'],
+      event?.key === ' ' || event?.code === 'Space' ? 'Space' : event?.key,
     shortcutKeyPart = normalizeShortcutKeyPart(result);
   if (!shortcutKeyPart) return false;
-  return getPanShortcutParts()['has'](shortcutKeyPart);
+  return getPanShortcutParts().has(shortcutKeyPart);
 }
 function isAudioClipModeActive() {
-  const el = document['getElementById']('v2-wrap');
-  return !!el?.['classList']['contains']('is-audio-clip-mode');
+  const el = document.getElementById('v2-wrap');
+  return !!el?.classList.contains('is-audio-clip-mode');
 }
 function isEscFeatureModeActive(enabled) {
   return (
-    !!enabled?.['matting']?.['active'] || !!enabled?.['annotate']?.['active'] || isAudioClipModeActive()
+    !!enabled?.matting?.active || !!enabled?.annotate?.active || isAudioClipModeActive()
   );
 }
 function isCommentNoteShortcutRecording() {
-  return window['__commentNoteShortcutRecording'] === true;
+  return window.__commentNoteShortcutRecording === true;
 }
 function dispatchShortcutAction(detail) {
-  window['dispatchEvent'](new CustomEvent('shortcut-action', { detail: detail }));
+  window.dispatchEvent(new CustomEvent('shortcut-action', { detail: detail }));
 }
 function isRepeatSuppressedShortcut(data) {
   const options = String(data || '');
@@ -92,21 +92,21 @@ function isRepeatSuppressedShortcut(data) {
     options === 'upload-file' ||
     options === 'open-settings' ||
     options === 'panorama-scene-camera-create' ||
-    options['startsWith']('panorama-scene-camera-')
+    options.startsWith('panorama-scene-camera-')
   );
 }
 function isInteractionModifierShortcut(target) {
-  return INTERACTION_MODIFIER_SHORTCUTS['has'](String(target || ''));
+  return INTERACTION_MODIFIER_SHORTCUTS.has(String(target || ''));
 }
 function resolveCommentNoteJumpActionId(enabled2, source) {
-  if (!enabled2 || source?.['repeat']) return null;
+  if (!enabled2 || source?.repeat) return null;
   const jumpShortcutBinding = buildJumpShortcutBinding(parseJumpShortcutFromKeydown(source));
   if (!jumpShortcutBinding) return null;
-  const next = enabled2['nodes'] || {};
-  for (const [current, enabled3] of Object['entries'](next)) {
-    if (!enabled3 || enabled3['type'] !== 'comment-note') continue;
-    const map = normalizeCommentNoteJumpShortcut(enabled3['jumpShortcut']),
-      jumpShortcutBinding2 = buildJumpShortcutBinding(map['keys']);
+  const next = enabled2.nodes || {};
+  for (const [current, enabled3] of Object.entries(next)) {
+    if (!enabled3 || enabled3.type !== 'comment-note') continue;
+    const map = normalizeCommentNoteJumpShortcut(enabled3.jumpShortcut),
+      jumpShortcutBinding2 = buildJumpShortcutBinding(map.keys);
     if (!jumpShortcutBinding2 || jumpShortcutBinding2 !== jumpShortcutBinding) continue;
     return 'comment-note-jump::' + current;
   }
@@ -118,104 +118,104 @@ function _clearAlignHoldState() {
     (_alignHoldKey = ''));
 }
 function isEditingText() {
-  const entry = document['activeElement'],
-    record = entry?.['tagName'];
+  const entry = document.activeElement,
+    record = entry?.tagName;
   return (
     record === 'INPUT' ||
     record === 'TEXTAREA' ||
-    entry?.['contentEditable'] === 'true' ||
-    entry?.['isContentEditable'] === true
+    entry?.contentEditable === 'true' ||
+    entry?.isContentEditable === true
   );
 }
 function handleSettingsKeyDown(event2) {
   if (
-    event2['isComposing'] ||
-    event2['repeat'] ||
+    event2.isComposing ||
+    event2.repeat ||
     isRecording() ||
     isCommentNoteShortcutRecording() ||
     isEditingText()
   )
     return;
   if (resolveShortcutActionForEvent(event2, ['open-settings']) !== 'open-settings') return;
-  (event2['preventDefault'](), event2['stopPropagation'](), dispatchShortcutAction('open-settings'));
+  (event2.preventDefault(), event2.stopPropagation(), dispatchShortcutAction('open-settings'));
 }
 function isPlainCopyShortcut(event3) {
   return (
-    (event3?.['ctrlKey'] || event3?.['metaKey']) &&
-    !event3?.['shiftKey'] &&
-    !event3?.['altKey'] &&
-    (String(event3?.['key'] || '')['toLowerCase']() === 'c' || event3?.['code'] === 'KeyC')
+    (event3?.ctrlKey || event3?.metaKey) &&
+    !event3?.shiftKey &&
+    !event3?.altKey &&
+    (String(event3?.key || '').toLowerCase() === 'c' || event3?.code === 'KeyC')
   );
 }
 function isActiveWhiteboardEditorTarget(event4) {
-  const el2 = event4?.['target'] || document['activeElement'];
-  return Boolean(el2?.['closest']?.(ACTIVE_WHITEBOARD_EDITOR_SELECTOR));
+  const el2 = event4?.target || document.activeElement;
+  return Boolean(el2?.closest?.(ACTIVE_WHITEBOARD_EDITOR_SELECTOR));
 }
 function isDevModeToggleShortcut(event5) {
   if (
-    window['LOCAL_DEV_BUILD'] !== true ||
-    event5?.['repeat'] ||
-    event5?.['ctrlKey'] ||
-    event5?.['metaKey'] ||
-    event5?.['altKey']
+    window.LOCAL_DEV_BUILD !== true ||
+    event5?.repeat ||
+    event5?.ctrlKey ||
+    event5?.metaKey ||
+    event5?.altKey
   )
     return false;
   return (
-    event5?.['code'] === 'Backslash' ||
-    event5?.['key'] === '\\' ||
-    event5?.['key'] === '|' ||
-    event5?.['key'] === '、'
+    event5?.code === 'Backslash' ||
+    event5?.key === '\\' ||
+    event5?.key === '|' ||
+    event5?.key === '、'
   );
 }
 function hasExpandedMediaClipNode(payload) {
-  const handle = payload?.['nodes'] || {};
-  return Object['values'](handle)['some'](
-    (state) => state?.['type'] === 'media-clip' && state?.['mediaClip']?.['expanded'] === true,
+  const handle = payload?.nodes || {};
+  return Object.values(handle).some(
+    (state) => state?.type === 'media-clip' && state?.mediaClip?.expanded === true,
   );
 }
 function buildShortcutContext(mattingActive, { audioClipModeActive: audioClipModeActive = false } = {}) {
-  const list4 = Array['isArray'](mattingActive?.['selectedNodeIds']) ? mattingActive['selectedNodeIds'] : [],
-    selectedNodeType = list4['length'] === 1 ? mattingActive?.['nodes']?.[list4[0]]?.['type'] || '' : '',
-    config = list4['length'] === 1 ? mattingActive?.['nodes']?.[list4[0]] || null : null,
+  const list4 = Array.isArray(mattingActive?.selectedNodeIds) ? mattingActive.selectedNodeIds : [],
+    selectedNodeType = list4.length === 1 ? mattingActive?.nodes?.[list4[0]]?.type || '' : '',
+    config = list4.length === 1 ? mattingActive?.nodes?.[list4[0]] || null : null,
     scope =
       selectedNodeType === 'panorama-360'
-        ? config?.['panorama360Node'] || null
-        : config?.['sceneNode'] || null;
+        ? config?.panorama360Node || null
+        : config?.sceneNode || null;
   return {
-    mattingActive: mattingActive?.['matting']?.['active'],
-    annotateActive: mattingActive?.['annotate']?.['active'],
-    videoKeyingActive: mattingActive?.['videoKeying']?.['active'],
+    mattingActive: mattingActive?.matting?.active,
+    annotateActive: mattingActive?.annotate?.active,
+    videoKeyingActive: mattingActive?.videoKeying?.active,
     featureModeActive:
-      !!mattingActive?.['matting']?.['active'] ||
-      !!mattingActive?.['annotate']?.['active'] ||
-      !!mattingActive?.['videoClip']?.['active'] ||
-      !!mattingActive?.['videoKeying']?.['active'] ||
+      !!mattingActive?.matting?.active ||
+      !!mattingActive?.annotate?.active ||
+      !!mattingActive?.videoClip?.active ||
+      !!mattingActive?.videoKeying?.active ||
       audioClipModeActive,
-    alignFeatureEnabled: mattingActive?.['ui']?.['alignFeatureEnabled'] !== false,
+    alignFeatureEnabled: mattingActive?.ui?.alignFeatureEnabled !== false,
     selectedNodeType: selectedNodeType,
-    selectedSyncPlayableVideoCount: getSelectedSyncPlayableVideoCount(mattingActive?.['nodes'] || {}, list4),
+    selectedSyncPlayableVideoCount: getSelectedSyncPlayableVideoCount(mattingActive?.nodes || {}, list4),
     mediaClipExpandedEditing: hasExpandedMediaClipNode(mattingActive),
     panoramaSceneEditing:
       (selectedNodeType === 'panorama-scene' || selectedNodeType === 'panorama-360') &&
-      scope?.['ui']?.['isEditing'] === true,
+      scope?.ui?.isEditing === true,
     panoramaSceneFlyMode:
       selectedNodeType === 'panorama-scene' &&
-      scope?.['ui']?.['isEditing'] === true &&
-      scope?.['ui']?.['navigationMode'] === 'fly',
+      scope?.ui?.isEditing === true &&
+      scope?.ui?.navigationMode === 'fly',
   };
 }
 function isPanoramaSceneNavigationKey(input, enabled4) {
   if (
-    !enabled4?.['panoramaSceneEditing'] ||
-    input?.['ctrlKey'] ||
-    input?.['metaKey'] ||
-    input?.['altKey']
+    !enabled4?.panoramaSceneEditing ||
+    input?.ctrlKey ||
+    input?.metaKey ||
+    input?.altKey
   )
     return false;
-  if (input?.['code'] === 'KeyF') return true;
+  if (input?.code === 'KeyF') return true;
   return (
-    enabled4['panoramaSceneFlyMode'] === true &&
-    ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE']['includes'](input?.['code'])
+    enabled4.panoramaSceneFlyMode === true &&
+    ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'KeyQ', 'KeyE'].includes(input?.code)
   );
 }
 function handleKeyDown(event6) {
@@ -224,32 +224,32 @@ function handleKeyDown(event6) {
   if (isRecording()) return;
   if (isCommentNoteShortcutRecording()) return;
   if (
-    event6['target']?.['closest']?.('.v2-canvas-ctx-menu') ||
-    globalThis['document']?.['querySelector']?.(
+    event6.target?.closest?.('.v2-canvas-ctx-menu') ||
+    globalThis.document?.querySelector?.(
       '.v2-canvas-ctx-menu, .v2-material-context-menu, .panorama-scene-object-menu.is-visible',
     )
   )
     return;
   if (isDevModeToggleShortcut(event6) && !isEditingText() && !isActiveWhiteboardEditorTarget(event6)) {
-    (event6['preventDefault'](), toggleDevMode());
+    (event6.preventDefault(), toggleDevMode());
     return;
   }
-  if (document['body']?.['classList']?.['contains']?.('storyboard-3d-editor-open')) return;
-  const output = appStore['getStateRaw']();
-  if (event6['code'] === 'Escape' && isEscFeatureModeActive(output)) {
-    (event6['preventDefault'](),
-      event6['stopImmediatePropagation'](),
+  if (document.body?.classList?.contains?.('storyboard-3d-editor-open')) return;
+  const output = appStore.getStateRaw();
+  if (event6.code === 'Escape' && isEscFeatureModeActive(output)) {
+    (event6.preventDefault(),
+      event6.stopImmediatePropagation(),
       dispatchShortcutAction('escape-all'));
     return;
   }
   if (isEditingText()) {
-    if (event6['code'] === 'Escape') {
-      const { pickConnectMode: pickConnectMode } = appStore['getStateRaw']();
+    if (event6.code === 'Escape') {
+      const { pickConnectMode: pickConnectMode } = appStore.getStateRaw();
       pickConnectMode &&
-        pickConnectMode['active'] &&
-        (appStore['setPickConnectMode']({ active: false }),
-        event6['preventDefault'](),
-        event6['stopPropagation']());
+        pickConnectMode.active &&
+        (appStore.setPickConnectMode({ active: false }),
+        event6.preventDefault(),
+        event6.stopPropagation());
     }
     return;
   }
@@ -258,74 +258,74 @@ function handleKeyDown(event6) {
   const audioClipModeActive2 = isAudioClipModeActive();
   if (audioClipModeActive2) return;
   if (
-    (event6['key'] === ' ' || event6['code'] === 'Space') &&
-    !event6['ctrlKey'] &&
-    !event6['metaKey'] &&
-    !event6['altKey'] &&
-    !event6['shiftKey'] &&
-    event6['target']?.['closest']?.('button')
+    (event6.key === ' ' || event6.code === 'Space') &&
+    !event6.ctrlKey &&
+    !event6.metaKey &&
+    !event6.altKey &&
+    !event6.shiftKey &&
+    event6.target?.closest?.('button')
   )
     return;
-  if (output['videoKeying']?.['active'] || output['videoClip']?.['active']) {
-    if (event6['code'] === 'Escape') return;
-    (event6['preventDefault'](), event6['stopPropagation']());
+  if (output.videoKeying?.active || output.videoClip?.active) {
+    if (event6.code === 'Escape') return;
+    (event6.preventDefault(), event6.stopPropagation());
     return;
   }
   if (
-    output['annotate']?.['active'] &&
-    !event6['ctrlKey'] &&
-    !event6['metaKey'] &&
-    !event6['altKey'] &&
-    String(event6['key'] || '')['toUpperCase']() === 'T'
+    output.annotate?.active &&
+    !event6.ctrlKey &&
+    !event6.metaKey &&
+    !event6.altKey &&
+    String(event6.key || '').toUpperCase() === 'T'
   ) {
-    (event6['preventDefault'](),
-      event6['stopPropagation'](),
-      window['dispatchEvent'](new CustomEvent('shortcut-action', { detail: 'editor-tool-text' })));
+    (event6.preventDefault(),
+      event6.stopPropagation(),
+      window.dispatchEvent(new CustomEvent('shortcut-action', { detail: 'editor-tool-text' })));
     return;
   }
-  if (event6['code'] === 'Escape') {
-    const { pickConnectMode: pickConnectMode2 } = appStore['getStateRaw']();
-    if (pickConnectMode2 && pickConnectMode2['active']) {
-      (appStore['setPickConnectMode']({ active: false }),
-        event6['preventDefault'](),
-        event6['stopPropagation']());
+  if (event6.code === 'Escape') {
+    const { pickConnectMode: pickConnectMode2 } = appStore.getStateRaw();
+    if (pickConnectMode2 && pickConnectMode2.active) {
+      (appStore.setPickConnectMode({ active: false }),
+        event6.preventDefault(),
+        event6.stopPropagation());
       return;
     }
   }
-  if (event6['key'] === 'Control') {
-    const el3 = document['getElementById']('pick-connect-overlay');
+  if (event6.key === 'Control') {
+    const el3 = document.getElementById('pick-connect-overlay');
     el3 &&
-      el3['style']['display'] !== 'none' &&
-      (el3['style']['cursor'] = 'var(--connect-cursor)');
+      el3.style.display !== 'none' &&
+      (el3.style.cursor = 'var(--connect-cursor)');
   }
-  const value2 = appStore['getStateRaw'](),
+  const value2 = appStore.getStateRaw(),
     shortcutContext = buildShortcutContext(value2, { audioClipModeActive: audioClipModeActive2 });
   if (isPanoramaSceneNavigationKey(event6, shortcutContext)) {
-    event6['preventDefault']();
+    event6.preventDefault();
     return;
   }
   const detail2 = handleShortcutKeydown(event6, shortcutContext);
-  if (event6['repeat'] && isRepeatSuppressedShortcut(detail2)) {
-    event6['preventDefault']();
+  if (event6.repeat && isRepeatSuppressedShortcut(detail2)) {
+    event6.preventDefault();
     return;
   }
   if (detail2 === 'pan-canvas') {
-    event6['preventDefault']();
-    !event6['repeat'] && setCanvasPanShortcutHeld(true);
+    event6.preventDefault();
+    !event6.repeat && setCanvasPanShortcutHeld(true);
     return;
   }
   if (detail2 === 'align-feature') {
-    const value3 = String(value2['ui']?.['alignFeatureTriggerMode'] || 'click'),
+    const value3 = String(value2.ui?.alignFeatureTriggerMode || 'click'),
       value4 = value3 === 'hold' || value3 === 'click' || value3 === 'off' ? value3 : 'click';
-    if (value4 === 'off' || shortcutContext['alignFeatureEnabled'] === false) return;
-    event6['preventDefault']();
+    if (value4 === 'off' || shortcutContext.alignFeatureEnabled === false) return;
+    event6.preventDefault();
     if (value4 === 'click') {
       dispatchShortcutAction('align-feature-toggle');
       return;
     }
-    if (event6['repeat']) return;
+    if (event6.repeat) return;
     (_clearAlignHoldState(),
-      (_alignHoldKey = (event6['code'] || '') + '|' + (event6['key'] || '')),
+      (_alignHoldKey = (event6.code || '') + '|' + (event6.key || '')),
       (_alignHoldTimer = setTimeout(() => {
         ((_alignHoldTimer = null),
           (_alignHoldActive = true),
@@ -335,43 +335,43 @@ function handleKeyDown(event6) {
   }
   if (isInteractionModifierShortcut(detail2)) return;
   if (detail2) {
-    (event6['preventDefault'](),
-      window['dispatchEvent'](new CustomEvent('shortcut-action', { detail: detail2 })));
+    (event6.preventDefault(),
+      window.dispatchEvent(new CustomEvent('shortcut-action', { detail: detail2 })));
     return;
   }
-  if (!shortcutContext['featureModeActive']) {
+  if (!shortcutContext.featureModeActive) {
     const commentNoteJumpActionId = resolveCommentNoteJumpActionId(value2, event6);
     if (commentNoteJumpActionId) {
-      (event6['preventDefault'](), dispatchShortcutAction(commentNoteJumpActionId));
+      (event6.preventDefault(), dispatchShortcutAction(commentNoteJumpActionId));
       return;
     }
   }
   const value5 =
-    event6['key'] === 'Delete' ||
-    event6['key'] === 'Del' ||
-    event6['key'] === 'Backspace' ||
-    event6['code'] === 'Delete' ||
-    event6['code'] === 'Backspace';
-  !shortcutContext['featureModeActive'] &&
+    event6.key === 'Delete' ||
+    event6.key === 'Del' ||
+    event6.key === 'Backspace' ||
+    event6.code === 'Delete' ||
+    event6.code === 'Backspace';
+  !shortcutContext.featureModeActive &&
     value5 &&
-    (event6['preventDefault'](), event6['stopPropagation'](), event6['stopImmediatePropagation']());
+    (event6.preventDefault(), event6.stopPropagation(), event6.stopImmediatePropagation());
 }
 function handleKeyUp(event7) {
   if (_alignHoldKey) {
-    const value6 = (event7['code'] || '') + '|' + (event7['key'] || ''),
+    const value6 = (event7.code || '') + '|' + (event7.key || ''),
       value7 =
         value6 === _alignHoldKey ||
-        event7['code'] === 'Tab' ||
-        String(event7['key'] || '')['toLowerCase']() === 'tab';
+        event7.code === 'Tab' ||
+        String(event7.key || '').toLowerCase() === 'tab';
     if (value7) {
       const value8 = _alignHoldActive;
       (_clearAlignHoldState(), value8 && dispatchShortcutAction('align-feature-hold-end'));
     }
   }
   shouldReleasePanShortcut(event7) && releaseCanvasPanShortcut();
-  if (event7['key'] === 'Control') {
-    const el4 = document['getElementById']('pick-connect-overlay');
-    el4 && el4['style']['display'] !== 'none' && (el4['style']['cursor'] = '');
+  if (event7.key === 'Control') {
+    const el4 = document.getElementById('pick-connect-overlay');
+    el4 && el4.style.display !== 'none' && (el4.style.cursor = '');
   }
 }
 export function isSpaceHeld() {
@@ -381,30 +381,30 @@ function handleWindowBlur() {
   (_clearAlignHoldState(), releaseCanvasPanShortcut());
 }
 export function addShortcutListener(handler) {
-  _listeners['push'](handler);
-  const value9 = (value10) => handler(value10['detail']);
+  _listeners.push(handler);
+  const value9 = (value10) => handler(value10.detail);
   return (
-    window['addEventListener']('shortcut-action', value9),
+    window.addEventListener('shortcut-action', value9),
     () => {
-      const value11 = _listeners['indexOf'](handler);
-      (value11 > -1 && _listeners['splice'](value11, 1),
-        window['removeEventListener']('shortcut-action', value9));
+      const value11 = _listeners.indexOf(handler);
+      (value11 > -1 && _listeners.splice(value11, 1),
+        window.removeEventListener('shortcut-action', value9));
     }
   );
 }
 export function initKeyboardService() {
-  (window['addEventListener']('keydown', handleKeyDown, true),
-    window['addEventListener']('keyup', handleKeyUp, true),
-    window['addEventListener']('blur', handleWindowBlur),
-    (_settingsShortcutRoot = document['querySelector']?.('#settingsOverlay .settings-modal')),
-    _settingsShortcutRoot?.['addEventListener']('keydown', handleSettingsKeyDown),
+  (window.addEventListener('keydown', handleKeyDown, true),
+    window.addEventListener('keyup', handleKeyUp, true),
+    window.addEventListener('blur', handleWindowBlur),
+    (_settingsShortcutRoot = document.querySelector?.('#settingsOverlay .settings-modal')),
+    _settingsShortcutRoot?.addEventListener('keydown', handleSettingsKeyDown),
     releaseCanvasPanShortcut());
 }
 export function destroyKeyboardService() {
-  (window['removeEventListener']('keydown', handleKeyDown, true),
-    window['removeEventListener']('keyup', handleKeyUp, true),
-    window['removeEventListener']('blur', handleWindowBlur),
-    _settingsShortcutRoot?.['removeEventListener']('keydown', handleSettingsKeyDown),
+  (window.removeEventListener('keydown', handleKeyDown, true),
+    window.removeEventListener('keyup', handleKeyUp, true),
+    window.removeEventListener('blur', handleWindowBlur),
+    _settingsShortcutRoot?.removeEventListener('keydown', handleSettingsKeyDown),
     (_settingsShortcutRoot = null),
     _clearAlignHoldState(),
     releaseCanvasPanShortcut());

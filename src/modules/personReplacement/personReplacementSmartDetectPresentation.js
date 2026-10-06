@@ -1,11 +1,11 @@
 import { t } from '../../i18n/index.js';
 function escapeHtml(value) {
   return String(value ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&apos;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&apos;');
 }
 function panelText(item, key = {}) {
   return t('videoClip.smartPanel.' + item, key);
@@ -27,7 +27,7 @@ function renderModeOptions(data, options = 'set-smart-clip-mode') {
     ['balanced', panelText('modeBalanced')],
     ['sensitive', panelText('modeSensitive')],
   ]
-    ['map'](
+    .map(
       ([target, source]) =>
         '<button type="button" class="person-replacement-smart-clip-option ' +
         (data === target ? 'is-active' : '') +
@@ -41,7 +41,7 @@ function renderModeOptions(data, options = 'set-smart-clip-mode') {
         escapeHtml(source) +
         '</button>',
     )
-    ['join']('');
+    .join('');
 }
 export function createPersonReplacementSmartDetectPresentation({ renderIcon: renderIcon = () => '' } = {}) {
   const renderPanel = (next, { smartDetecting: smartDetecting = false } = {}) =>
@@ -50,7 +50,7 @@ export function createPersonReplacementSmartDetectPresentation({ renderIcon: ren
       '\n        <div class="person-replacement-smart-clip-option-group" role="group" aria-label="' +
       escapeHtml(panelText('mode')) +
       '">\n          ' +
-      renderModeOptions(next['settings']['smartClipMode'], 'set-shot-cut-smart-detect-mode') +
+      renderModeOptions(next.settings.smartClipMode, 'set-shot-cut-smart-detect-mode') +
       '\n        </div>\n      </div>\n      <div class="person-replacement-shot-cut-smart-detect-footer">\n        <button type="button" class="story-primary-button person-replacement-shot-cut-smart-detect-confirm ' +
       (smartDetecting ? 'is-loading' : '') +
       '" data-person-replacement-action="confirm-shot-cut-smart-detect" aria-busy="' +
@@ -84,5 +84,5 @@ export function createPersonReplacementSmartDetectPresentation({ renderIcon: ren
         '</span></button>\n    </span>'
       );
     };
-  return Object['freeze']({ renderPanel: renderPanel, renderTrigger: renderTrigger });
+  return Object.freeze({ renderPanel: renderPanel, renderTrigger: renderTrigger });
 }

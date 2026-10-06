@@ -794,126 +794,126 @@ export function listModelManifests() {
 const ALLOWED_PROMPT_EMPTY_POLICIES = new Set(['block', 'allowWithInput', 'allow']);
 
 function isAspectRatioUiSchemaField(value81) {
-  const registryKey10 = normalizeRegistryKey(value81?.['id'])['toLowerCase'](),
-    registryKey11 = normalizeRegistryKey(value81?.['displayRole'])['toLowerCase'](),
-    registryKey12 = normalizeRegistryKey(value81?.['variant'])['toLowerCase']();
+  const registryKey10 = normalizeRegistryKey(value81?.id).toLowerCase(),
+    registryKey11 = normalizeRegistryKey(value81?.displayRole).toLowerCase(),
+    registryKey12 = normalizeRegistryKey(value81?.variant).toLowerCase();
   return registryKey10 === 'aspectratio' || registryKey11 === 'aspectratio' || registryKey12 === 'ratiopill';
 }
 
 function getUiSchemaFieldOptions(value82) {
-  const args4 = Array['isArray'](value82?.['options']) ? value82['options'] : [],
-    args5 = Array['isArray'](value82?.['developerOptions']) ? value82['developerOptions'] : [];
+  const args4 = Array.isArray(value82?.options) ? value82.options : [],
+    args5 = Array.isArray(value82?.developerOptions) ? value82.developerOptions : [];
   return [...args4, ...args5];
 }
 
 function assertPromptConfig(value83) {
-  if (value83['prompt'] === undefined || value83['prompt'] === null) return;
-  assertPlainObject(value83['prompt'], 'model manifest prompt');
+  if (value83.prompt === undefined || value83.prompt === null) return;
+  assertPlainObject(value83.prompt, 'model manifest prompt');
   if (
-    value83['prompt']['emptyPolicy'] !== undefined &&
-    value83['prompt']['emptyPolicy'] !== null &&
-    !ALLOWED_PROMPT_EMPTY_POLICIES['has'](String(value83['prompt']['emptyPolicy'] || ''))
+    value83.prompt.emptyPolicy !== undefined &&
+    value83.prompt.emptyPolicy !== null &&
+    !ALLOWED_PROMPT_EMPTY_POLICIES.has(String(value83.prompt.emptyPolicy || ''))
   )
     throw new Error(
       '[manifest] model manifest ' +
-        value83['modelId'] +
+        value83.modelId +
         ' prompt.emptyPolicy must be one of: ' +
-        Array['from'](ALLOWED_PROMPT_EMPTY_POLICIES)['join'](', '),
+        Array.from(ALLOWED_PROMPT_EMPTY_POLICIES).join(', '),
     );
-  if (value83['prompt']['minLength'] !== undefined && value83['prompt']['minLength'] !== null) {
-    const count4 = Number(value83['prompt']['minLength']);
-    if (!Number['isInteger'](count4) || count4 < 0)
+  if (value83.prompt.minLength !== undefined && value83.prompt.minLength !== null) {
+    const count4 = Number(value83.prompt.minLength);
+    if (!Number.isInteger(count4) || count4 < 0)
       throw new Error(
         '[manifest] model manifest ' +
-          value83['modelId'] +
+          value83.modelId +
           ' prompt.minLength must be a non-negative integer',
       );
   }
 }
 
 function assertInputPolicyCondition(list20, value84) {
-  if (Array['isArray'](list20)) {
-    if (list20['length'] === 0) throw new Error('[manifest] ' + value84 + ' must not be empty');
-    list20['forEach']((value85, value86) =>
+  if (Array.isArray(list20)) {
+    if (list20.length === 0) throw new Error('[manifest] ' + value84 + ' must not be empty');
+    list20.forEach((value85, value86) =>
       assertInputPolicyCondition(value85, value84 + '[' + value86 + ']'),
     );
     return;
   }
   assertPlainObject(list20, value84);
-  if (Array['isArray'](list20['any']) || Array['isArray'](list20['all'])) {
-    const value87 = Array['isArray'](list20['any']) ? 'any' : 'all';
+  if (Array.isArray(list20.any) || Array.isArray(list20.all)) {
+    const value87 = Array.isArray(list20.any) ? 'any' : 'all';
     assertInputPolicyCondition(list20[value87], value84 + '.' + value87);
     return;
   }
-  if (!normalizeRegistryKey(list20['field'] ?? list20['param']))
+  if (!normalizeRegistryKey(list20.field ?? list20.param))
     throw new Error('[manifest] ' + value84 + ' must declare field or param');
-  if (list20['value'] === undefined && list20['values'] === undefined)
+  if (list20.value === undefined && list20.values === undefined)
     throw new Error('[manifest] ' + value84 + ' must declare value or values');
 }
 
 function assertInputPolicyExtensions(value88) {
-  const value89 = value88['inputSlots'];
+  const value89 = value88.inputSlots;
   if (
-    value89['preserveHiddenInputsByKind'] !== undefined &&
-    typeof value89['preserveHiddenInputsByKind'] !== 'boolean'
+    value89.preserveHiddenInputsByKind !== undefined &&
+    typeof value89.preserveHiddenInputsByKind !== 'boolean'
   )
     throw new Error('[manifest] model manifest inputSlots.preserveHiddenInputsByKind must be a boolean');
-  const list21 = value89['preserveHiddenInputsByKindFields'];
+  const list21 = value89.preserveHiddenInputsByKindFields;
   if (
     list21 !== undefined &&
-    (!Array['isArray'](list21) ||
-      list21['length'] === 0 ||
-      list21['some']((value90) => !String(value90 || '')['trim']()))
+    (!Array.isArray(list21) ||
+      list21.length === 0 ||
+      list21.some((value90) => !String(value90 || '').trim()))
   )
     throw new Error(
       '[manifest] model manifest inputSlots.preserveHiddenInputsByKindFields must be a non-empty string array',
     );
-  if (Array['isArray'](list21) && value89['preserveHiddenInputsByKind'] !== true)
+  if (Array.isArray(list21) && value89.preserveHiddenInputsByKind !== true)
     throw new Error(
       '[manifest] model manifest inputSlots.preserveHiddenInputsByKindFields requires preserveHiddenInputsByKind',
     );
-  const value91 = value89['policyVariants'] || [];
-  if (value91 && !Array['isArray'](value91))
+  const value91 = value89.policyVariants || [];
+  if (value91 && !Array.isArray(value91))
     throw new Error('[manifest] model manifest inputSlots.policyVariants must be an array');
-  (value91 || [])['forEach']((value92, value93) => {
+  (value91 || []).forEach((value92, value93) => {
     const value94 = 'model manifest inputSlots.policyVariants[' + value93 + ']';
-    (assertPlainObject(value92, value94), assertInputPolicyCondition(value92['when'], value94 + '.when'));
-    if (value92['allowedKinds'] !== undefined && !Array['isArray'](value92['allowedKinds']))
+    (assertPlainObject(value92, value94), assertInputPolicyCondition(value92.when, value94 + '.when'));
+    if (value92.allowedKinds !== undefined && !Array.isArray(value92.allowedKinds))
       throw new Error('[manifest] ' + value94 + '.allowedKinds must be an array');
-    if (value92['maxByKind'] !== undefined && !isPlainObject(value92['maxByKind']))
+    if (value92.maxByKind !== undefined && !isPlainObject(value92.maxByKind))
       throw new Error('[manifest] ' + value94 + '.maxByKind must be an object');
-    Object['entries'](value92['maxByKind'] || {})['forEach'](([value95, value96]) => {
+    Object.entries(value92.maxByKind || {}).forEach(([value95, value96]) => {
       const count5 = Number(value96);
-      if (!Number['isFinite'](count5) || count5 < 0)
+      if (!Number.isFinite(count5) || count5 < 0)
         throw new Error(
           '[manifest] ' + value94 + '.maxByKind.' + value95 + ' must be a non-negative number',
         );
     });
   });
-  const value97 = value89['mediaConstraintsByKind'] || {};
+  const value97 = value89.mediaConstraintsByKind || {};
   if (value97 && !isPlainObject(value97))
     throw new Error('[manifest] model manifest inputSlots.mediaConstraintsByKind must be an object');
-  Object['entries'](value97 || {})['forEach'](([value98, value99]) => {
+  Object.entries(value97 || {}).forEach(([value98, value99]) => {
     const value100 = 'model manifest inputSlots.mediaConstraintsByKind.' + value98;
     (assertPlainObject(value99, value100),
-      ['minDurationSeconds', 'maxDurationSeconds', 'maxBytes']['forEach']((value101) => {
+      ['minDurationSeconds', 'maxDurationSeconds', 'maxBytes'].forEach((value101) => {
         if (value99[value101] === undefined) return;
         const count6 = Number(value99[value101]);
-        if (!Number['isFinite'](count6) || count6 <= 0)
+        if (!Number.isFinite(count6) || count6 <= 0)
           throw new Error('[manifest] ' + value100 + '.' + value101 + ' must be positive');
       }));
     if (
-      value99['minDurationSeconds'] !== undefined &&
-      value99['maxDurationSeconds'] !== undefined &&
-      Number(value99['minDurationSeconds']) > Number(value99['maxDurationSeconds'])
+      value99.minDurationSeconds !== undefined &&
+      value99.maxDurationSeconds !== undefined &&
+      Number(value99.minDurationSeconds) > Number(value99.maxDurationSeconds)
     )
       throw new Error(
         '[manifest] ' + value100 + '.minDurationSeconds cannot exceed maxDurationSeconds',
       );
     if (
-      value99['allowedExtensions'] !== undefined &&
-      (!Array['isArray'](value99['allowedExtensions']) ||
-        value99['allowedExtensions']['some']((value102) => !String(value102 || '')['trim']()))
+      value99.allowedExtensions !== undefined &&
+      (!Array.isArray(value99.allowedExtensions) ||
+        value99.allowedExtensions.some((value102) => !String(value102 || '').trim()))
     )
       throw new Error('[manifest] ' + value100 + '.allowedExtensions must be an array of non-empty strings');
   });
@@ -923,16 +923,16 @@ function assertManifestBundle(value103) {
   (assertPlainObject(value103, 'manifest bundle'),
     assertPlainData(value103, 'manifest bundle'),
     assertRequiredFields(value103, ['sourceId'], 'manifest bundle'));
-  if (!normalizeRegistryKey(value103['sourceId']))
+  if (!normalizeRegistryKey(value103.sourceId))
     throw new Error('[manifest] manifest bundle sourceId must be non-empty');
-  if (!Array['isArray'](value103['models']))
+  if (!Array.isArray(value103.models))
     throw new TypeError('[manifest] manifest bundle.models must be an array');
-  if (!Array['isArray'](value103['executions']))
+  if (!Array.isArray(value103.executions))
     throw new TypeError('[manifest] manifest bundle.executions must be an array');
-  const executions = value103['executions'],
-    models = value103['models'];
-  (executions['forEach'](validateExecutionManifest),
-    models['forEach'](validateModelManifest),
+  const executions = value103.executions,
+    models = value103.models;
+  (executions.forEach(validateExecutionManifest),
+    models.forEach(validateModelManifest),
     assertRegistryKeysAvailable(executions, _executions, 'id', 'execution manifest'));
   const manifestKeyMap2 = buildManifestKeyMap(executions, 'id', 'execution manifest');
   return (
@@ -947,22 +947,22 @@ export function validateManifestBundle(value104) {
 }
 
 function removeManifestFromRegistry(value105, map9, value106, value107) {
-  const enabled7 = String(value105?.[value106] || '')['trim']();
+  const enabled7 = String(value105?.[value106] || '').trim();
   if (!enabled7) return;
-  getManifestRegistryKeys(value105, value106, value107)['forEach']((value108) => {
-    const value109 = map9['get'](value108);
-    String(value109?.[value106] || '')['trim']() === enabled7 && map9['delete'](value108);
+  getManifestRegistryKeys(value105, value106, value107).forEach((value108) => {
+    const value109 = map9.get(value108);
+    String(value109?.[value106] || '').trim() === enabled7 && map9.delete(value108);
   });
 }
 
 export function unregisterManifestBundle(value110) {
-  const list22 = Array['isArray'](value110?.['executions']) ? value110['executions'] : [],
-    list23 = Array['isArray'](value110?.['models']) ? value110['models'] : [];
+  const list22 = Array.isArray(value110?.executions) ? value110.executions : [],
+    list23 = Array.isArray(value110?.models) ? value110.models : [];
   return (
-    list22['forEach']((value111) =>
+    list22.forEach((value111) =>
       removeManifestFromRegistry(value111, _executions, 'id', 'execution manifest'),
     ),
-    list23['forEach']((value112) =>
+    list23.forEach((value112) =>
       removeManifestFromRegistry(value112, _models, 'modelId', 'model manifest'),
     ),
     true
@@ -970,12 +970,12 @@ export function unregisterManifestBundle(value110) {
 }
 
 function resolveUniqueModelDisplayName(value113, value114 = '') {
-  const registryKey13 = normalizeRegistryKey(value113)['toLowerCase'](),
+  const registryKey13 = normalizeRegistryKey(value113).toLowerCase(),
     providerId3 = normalizeProviderId(value114);
   if (!registryKey13) return null;
-  const list24 = Array['from'](new Set(_models['values']()))['filter']((value115) => {
-    if (normalizeRegistryKey(value115?.['displayName'])['toLowerCase']() !== registryKey13) return false;
-    return !providerId3 || normalizeProviderId(value115?.['provider']) === providerId3;
+  const list24 = Array.from(new Set(_models.values())).filter((value115) => {
+    if (normalizeRegistryKey(value115?.displayName).toLowerCase() !== registryKey13) return false;
+    return !providerId3 || normalizeProviderId(value115?.provider) === providerId3;
   });
-  return list24['length'] === 1 ? list24[0] : null;
+  return list24.length === 1 ? list24[0] : null;
 }

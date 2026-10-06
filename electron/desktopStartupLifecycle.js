@@ -16,7 +16,7 @@ export function createDesktopStartupLifecycle({
   }
   function assertStarting() {
     if (!quitting) return;
-    throw Object['assign'](new Error('Desktop startup cancelled during shutdown'), {
+    throw Object.assign(new Error('Desktop startup cancelled during shutdown'), {
       code: 'AIC_DESKTOP_STARTUP_CANCELLED',
     });
   }
@@ -24,8 +24,8 @@ export function createDesktopStartupLifecycle({
     requestStart(relaunchArgs) {
       if (quitting) {
         if (!relaunchRequested) {
-          if (relaunchArgs) app['relaunch']({ args: relaunchArgs });
-          else app['relaunch']();
+          if (relaunchArgs) app.relaunch({ args: relaunchArgs });
+          else app.relaunch();
           relaunchRequested = true;
         }
         return false;
@@ -38,7 +38,7 @@ export function createDesktopStartupLifecycle({
       if (!hasUnsavedChanges) return true;
       const quitTimer = setTimer(() => {
         if (pendingQuitTimer !== quitTimer) return;
-        ((pendingQuitTimer = null), app['quit']());
+        ((pendingQuitTimer = null), app.quit());
       }, 1200);
       return ((pendingQuitTimer = quitTimer), false);
     },
@@ -54,9 +54,9 @@ export function createDesktopStartupLifecycle({
           isServerAlive = () =>
             spawnedServer &&
             getSpawnedServer() === spawnedServer &&
-            spawnedServer['exitCode'] === null &&
-            spawnedServer['signalCode'] === null &&
-            !spawnedServer['killed'],
+            spawnedServer.exitCode === null &&
+            spawnedServer.signalCode === null &&
+            !spawnedServer.killed,
           serverResponded = isServerAlive() && (await probeServer());
         assertStarting();
         if (serverResponded && isServerAlive()) return;

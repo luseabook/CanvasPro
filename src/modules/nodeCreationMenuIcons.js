@@ -1,12 +1,12 @@
 const SVG_NS = 'http://www.w3.org/2000/svg',
-  ICON_ALIASES = Object['freeze']({
+  ICON_ALIASES = Object.freeze({
     'source-text': 'ai-text',
     'source-image': 'ai-image',
     'source-video': 'ai-video',
     'source-audio': 'ai-audio',
     'panorama-360': 'panorama-scene',
   }),
-  ICON_SHAPES = Object['freeze']({
+  ICON_SHAPES = Object.freeze({
     'ai-text': [
       ['path', { d: 'M12 20h9' }],
       ['path', { d: 'M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z' }],
@@ -97,33 +97,33 @@ const SVG_NS = 'http://www.w3.org/2000/svg',
     redo: [['path', { d: 'M15 7l5 5-5 5M20 12h-9a7 7 0 0 0-7 7' }]],
   });
 function appendShape(value, el, item, key) {
-  const el2 = value['createElementNS'](SVG_NS, item);
-  (Object['entries'](key)['forEach'](([index, result]) => {
-    el2['setAttribute'](index, String(result));
+  const el2 = value.createElementNS(SVG_NS, item);
+  (Object.entries(key).forEach(([index, result]) => {
+    el2.setAttribute(index, String(result));
   }),
-    el['appendChild'](el2));
+    el.appendChild(el2));
 }
 export function createNodeCreationMenuIcon(
   data,
-  { documentObject: documentObject = globalThis['document'], stroke: stroke = 'currentColor' } = {},
+  { documentObject: documentObject = globalThis.document, stroke: stroke = 'currentColor' } = {},
 ) {
-  if (typeof documentObject?.['createElementNS'] !== 'function') return null;
+  if (typeof documentObject?.createElementNS !== 'function') return null;
   const options = ICON_ALIASES[data] || data,
     list = ICON_SHAPES[options];
   if (!list) return null;
-  const el3 = documentObject['createElementNS'](SVG_NS, 'svg');
+  const el3 = documentObject.createElementNS(SVG_NS, 'svg');
   return (
-    el3['setAttribute']('width', '18'),
-    el3['setAttribute']('height', '18'),
-    el3['setAttribute']('viewBox', '0 0 24 24'),
-    el3['setAttribute']('fill', 'none'),
-    el3['setAttribute']('stroke', stroke),
-    el3['setAttribute']('stroke-width', '1.8'),
-    el3['setAttribute']('stroke-linecap', 'round'),
-    el3['setAttribute']('stroke-linejoin', 'round'),
-    el3['setAttribute']('aria-hidden', 'true'),
-    (el3['dataset']['nodeCreationIcon'] = String(data || '')),
-    list['forEach'](([target, source]) => {
+    el3.setAttribute('width', '18'),
+    el3.setAttribute('height', '18'),
+    el3.setAttribute('viewBox', '0 0 24 24'),
+    el3.setAttribute('fill', 'none'),
+    el3.setAttribute('stroke', stroke),
+    el3.setAttribute('stroke-width', '1.8'),
+    el3.setAttribute('stroke-linecap', 'round'),
+    el3.setAttribute('stroke-linejoin', 'round'),
+    el3.setAttribute('aria-hidden', 'true'),
+    (el3.dataset.nodeCreationIcon = String(data || '')),
+    list.forEach(([target, source]) => {
       appendShape(documentObject, el3, target, source);
     }),
     el3

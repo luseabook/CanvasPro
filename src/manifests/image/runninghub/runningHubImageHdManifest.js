@@ -4,7 +4,7 @@ import {
 } from '../../shared/runningHubImageManifestShared.js';
 export const RH_IMAGE_HD_MODEL_ID = 'runninghub/2012862147813974018';
 export const RH_IMAGE_HD_EXECUTION_ID = 'runninghub.image-hd';
-export const rhImageHdModelManifest = Object['freeze']({
+export const rhImageHdModelManifest = Object.freeze({
   schemaVersion: '1.0',
   modelId: RH_IMAGE_HD_MODEL_ID,
   executionId: RH_IMAGE_HD_EXECUTION_ID,
@@ -36,7 +36,7 @@ export const rhImageHdModelManifest = Object['freeze']({
         label: '分辨率',
         menuTitle: '分辨率',
         defaultValue: 1920,
-        options: [1280, 1920, 2560]['map']((value) => ({
+        options: [1280, 1920, 2560].map((value) => ({
           value: value,
           label: String(value),
           selectedLabel: '分辨率' + value,
@@ -49,7 +49,7 @@ export const rhImageHdModelManifest = Object['freeze']({
   cancellable: true,
   outputType: 'image',
 });
-export const rhImageHdExecutionManifest = Object['freeze']({
+export const rhImageHdExecutionManifest = Object.freeze({
   schemaVersion: '1.0',
   id: RH_IMAGE_HD_EXECUTION_ID,
   provider: 'runninghubwf',

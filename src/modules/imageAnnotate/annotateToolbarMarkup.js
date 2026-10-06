@@ -7,10 +7,10 @@ import { escapeNodeMenuHtml } from '../../components/shared/nodeModelMenu.js';
 function annotateToolbarText(value, item = {}) {
   return t('imageAnnotate.toolbar.' + value, item);
 }
-const ANNOTATE_SCENE_TOOLS = Object['freeze'](['brush', 'rect', 'bucket', 'text', 'eraser', 'number-label']),
-  GENERATION_SCENE_TOOLS = Object['freeze'](['brush', 'eraser']);
+const ANNOTATE_SCENE_TOOLS = Object.freeze(['brush', 'rect', 'bucket', 'text', 'eraser', 'number-label']),
+  GENERATION_SCENE_TOOLS = Object.freeze(['brush', 'eraser']);
 export const getAnnotateToolbarToolsForScene = (key = 'annotate') => {
-  const index = String(key || 'annotate')['trim']();
+  const index = String(key || 'annotate').trim();
   if (index === 'repaint' || index === 'erase') return [...GENERATION_SCENE_TOOLS];
   return [...ANNOTATE_SCENE_TOOLS];
 };
@@ -26,7 +26,7 @@ export const createGenerationToolbarMarkup = ({
     t('imageAnnotate.localEdit.mode') +
     '">\n      ' +
     ['repaint', 'erase']
-      ['map'](
+      .map(
         (result) =>
           '<button type="button"\n        class="v2-annotate-btn' +
           (scene === result ? ' active' : '') +
@@ -38,7 +38,7 @@ export const createGenerationToolbarMarkup = ({
           t('imageAnnotate.localEdit.' + result) +
           '</button>',
       )
-      ['join']('') +
+      .join('') +
     '\n    </div>\n    <div class="v2-annotate-gen-prompt-wrap"' +
     (scene === 'erase' ? ' hidden' : '') +
     '>\n          <input class="v2-annotate-gen-prompt-input" type="text"\n            aria-label="' +

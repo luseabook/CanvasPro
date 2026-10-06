@@ -1,14 +1,14 @@
 export const RUNNINGHUB_DOMESTIC_PROFILE_ID = 'runninghub';
 export const RUNNINGHUB_INTERNATIONAL_PROFILE_ID = 'runninghub-international';
-export const RUNNINGHUB_SITE_PROFILE_IDS = Object['freeze']([
+export const RUNNINGHUB_SITE_PROFILE_IDS = Object.freeze([
   RUNNINGHUB_DOMESTIC_PROFILE_ID,
   RUNNINGHUB_INTERNATIONAL_PROFILE_ID,
 ]);
 export const RUNNINGHUB_MODEL_API_PROFILE_IDS = RUNNINGHUB_SITE_PROFILE_IDS;
 export const RUNNINGHUB_WORKFLOW_SETTINGS_KEY = 'runningHubWorkflow';
 export const RUNNINGHUB_WORKFLOW_DEFAULT_PROFILE_FIELD = 'defaultProviderProfileId';
-const RUNNINGHUB_INTERNATIONAL_ONLY_PROFILE_IDS = Object['freeze']([RUNNINGHUB_INTERNATIONAL_PROFILE_ID]);
-export const RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_IDS = Object['freeze']([
+const RUNNINGHUB_INTERNATIONAL_ONLY_PROFILE_IDS = Object.freeze([RUNNINGHUB_INTERNATIONAL_PROFILE_ID]);
+export const RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_IDS = Object.freeze([
   'runninghub-model/rhart-image-v1',
   'runninghub-model/rhart-image-v1-official',
   'runninghub-model/rhart-image-n-pro',
@@ -41,8 +41,8 @@ export const RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_IDS = Object['freeze']([
   'anthropic/claude-opus-4.7',
 ]);
 const RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_ID_SET = new Set(RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_IDS);
-export const RUNNINGHUB_MODEL_API_PROFILES = Object['freeze']({
-  [RUNNINGHUB_DOMESTIC_PROFILE_ID]: Object['freeze']({
+export const RUNNINGHUB_MODEL_API_PROFILES = Object.freeze({
+  [RUNNINGHUB_DOMESTIC_PROFILE_ID]: Object.freeze({
     id: RUNNINGHUB_DOMESTIC_PROFILE_ID,
     label: 'RunningHUB（国内）',
     shortLabel: '国内',
@@ -50,7 +50,7 @@ export const RUNNINGHUB_MODEL_API_PROFILES = Object['freeze']({
     credentialLabel: '模型 API Key',
     apiUrl: 'https://www.runninghub.cn',
   }),
-  [RUNNINGHUB_INTERNATIONAL_PROFILE_ID]: Object['freeze']({
+  [RUNNINGHUB_INTERNATIONAL_PROFILE_ID]: Object.freeze({
     id: RUNNINGHUB_INTERNATIONAL_PROFILE_ID,
     label: 'RunningHUB（国际）',
     shortLabel: '国际',
@@ -61,32 +61,32 @@ export const RUNNINGHUB_MODEL_API_PROFILES = Object['freeze']({
 });
 export function normalizeRunningHubModelApiProfileId(value) {
   const item = String(value || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   return item === RUNNINGHUB_INTERNATIONAL_PROFILE_ID
     ? RUNNINGHUB_INTERNATIONAL_PROFILE_ID
     : RUNNINGHUB_DOMESTIC_PROFILE_ID;
 }
 export function getRunningHubProviderProfileId(options = {}) {
-  const key = String(options?.['providerProfileId'] || '')['trim']();
+  const key = String(options?.providerProfileId || '').trim();
   return (
     key ||
-    String(options?.['rhProviderProfileId'] || '')['trim']() ||
-    String(options?.['taskProviderProfileId'] || '')['trim']()
+    String(options?.rhProviderProfileId || '').trim() ||
+    String(options?.taskProviderProfileId || '').trim()
   );
 }
 export function getRunningHubTaskProviderProfileId(options2 = {}) {
   return (
-    String(options2?.['taskProviderProfileId'] || '')['trim']() || getRunningHubProviderProfileId(options2)
+    String(options2?.taskProviderProfileId || '').trim() || getRunningHubProviderProfileId(options2)
   );
 }
 export function resolveRunningHubSiteProfileIdFromUrl(index) {
-  const enabled = String(index || '')['match'](/https?:\/\/[^\s'"`\\]+/i);
+  const enabled = String(index || '').match(/https?:\/\/[^\s'"`\\]+/i);
   if (!enabled) return '';
   try {
-    const uRL = new URL(enabled[0])['hostname']['toLowerCase']();
-    if (/(^|\.)runninghub\.ai$/['test'](uRL)) return RUNNINGHUB_INTERNATIONAL_PROFILE_ID;
-    if (/(^|\.)runninghub\.cn$/['test'](uRL)) return RUNNINGHUB_DOMESTIC_PROFILE_ID;
+    const uRL = new URL(enabled[0]).hostname.toLowerCase();
+    if (/(^|\.)runninghub\.ai$/.test(uRL)) return RUNNINGHUB_INTERNATIONAL_PROFILE_ID;
+    if (/(^|\.)runninghub\.cn$/.test(uRL)) return RUNNINGHUB_DOMESTIC_PROFILE_ID;
   } catch {
     return '';
   }
@@ -110,7 +110,7 @@ export function applyRunningHubWorkflowDefaultProfileId(
   };
 }
 export function isRunningHubInternationalOnlyModel(data) {
-  return RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_ID_SET['has'](String(data || '')['trim']());
+  return RUNNINGHUB_INTERNATIONAL_ONLY_MODEL_ID_SET.has(String(data || '').trim());
 }
 export function getRunningHubModelApiProfileIds(target) {
   if (isRunningHubInternationalOnlyModel(target)) return RUNNINGHUB_INTERNATIONAL_ONLY_PROFILE_IDS;
@@ -119,36 +119,36 @@ export function getRunningHubModelApiProfileIds(target) {
 export function resolveRunningHubModelApiProfileId(source, next) {
   const list = getRunningHubModelApiProfileIds(source),
     runningHubModelApiProfileId = normalizeRunningHubModelApiProfileId(next);
-  return list['includes'](runningHubModelApiProfileId) ? runningHubModelApiProfileId : list[0];
+  return list.includes(runningHubModelApiProfileId) ? runningHubModelApiProfileId : list[0];
 }
 export function getRunningHubModelApiProfile(current) {
   return RUNNINGHUB_MODEL_API_PROFILES[normalizeRunningHubModelApiProfileId(current)];
 }
 export function resolveRunningHubModelApiBaseUrl(entry, record = '') {
   const runningHubModelApiProfile = getRunningHubModelApiProfile(entry);
-  return String(record || runningHubModelApiProfile['apiUrl'])
-    ['trim']()
-    ['replace'](/\/+$/, '');
+  return String(record || runningHubModelApiProfile.apiUrl)
+    .trim()
+    .replace(/\/+$/, '');
 }
 export function buildRunningHubModelApiUrl(payload, handle, state = '') {
   const runningHubModelApiBaseUrl = resolveRunningHubModelApiBaseUrl(payload, state),
-    enabled2 = String(handle || '')['trim']();
+    enabled2 = String(handle || '').trim();
   if (!enabled2) return runningHubModelApiBaseUrl;
-  return runningHubModelApiBaseUrl + '/' + enabled2['replace'](/^\/+/, '');
+  return runningHubModelApiBaseUrl + '/' + enabled2.replace(/^\/+/, '');
 }
 export function remapRunningHubModelApiUrl(config, scope, input = '') {
-  const enabled3 = String(config || '')['trim']();
+  const enabled3 = String(config || '').trim();
   if (!enabled3) return '';
   const runningHubModelApiBaseUrl2 = resolveRunningHubModelApiBaseUrl(scope, input);
   try {
     const uRL2 = new URL(enabled3, runningHubModelApiBaseUrl2 + '/'),
-      uRL3 = new URL(runningHubModelApiBaseUrl2)['hostname'];
-    if (/(^|\.)runninghub\.(?:cn|ai)$/i['test'](uRL2['hostname'])) {
-      const output = uRL2['hostname']['replace'](/runninghub\.(?:cn|ai)$/i, ''),
-        value2 = uRL3['endsWith']('.ai') ? 'runninghub.ai' : 'runninghub.cn';
-      uRL2['hostname'] = '' + output + value2;
+      uRL3 = new URL(runningHubModelApiBaseUrl2).hostname;
+    if (/(^|\.)runninghub\.(?:cn|ai)$/i.test(uRL2.hostname)) {
+      const output = uRL2.hostname.replace(/runninghub\.(?:cn|ai)$/i, ''),
+        value2 = uRL3.endsWith('.ai') ? 'runninghub.ai' : 'runninghub.cn';
+      uRL2.hostname = '' + output + value2;
     }
-    return uRL2['toString']()['replace'](/\/$/, '');
+    return uRL2.toString().replace(/\/$/, '');
   } catch {
     return buildRunningHubModelApiUrl(scope, enabled3, input);
   }

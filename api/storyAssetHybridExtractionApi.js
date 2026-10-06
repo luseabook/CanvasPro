@@ -53,15 +53,15 @@ const STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION = 1,
   STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY = 'evidence-batched-api-v2';
 function cloneValue(enabled) {
   if (!enabled || typeof enabled !== 'object') return enabled;
-  return JSON['parse'](JSON['stringify'](enabled));
+  return JSON.parse(JSON.stringify(enabled));
 }
 function hasSameStoryAssetAuthoritativeContent(list, list2) {
-  if (!Array['isArray'](list) || !Array['isArray'](list2)) return false;
-  if (list['length'] !== list2['length']) return false;
+  if (!Array.isArray(list) || !Array.isArray(list2)) return false;
+  if (list.length !== list2.length) return false;
   const list3 = ['ref', 'episodeRef', 'source', 'heading', 'body'];
-  return list['every']((value, item) => {
+  return list.every((value, item) => {
     const key = list2[item];
-    return list3['every']((index) => String(value?.[index] ?? '') === String(key?.[index] ?? ''));
+    return list3.every((index) => String(value?.[index] ?? '') === String(key?.[index] ?? ''));
   });
 }
 function createStoryAssetFocusedContractSnapshot(
@@ -82,26 +82,26 @@ function createStoryAssetFocusedContractSnapshot(
       {
         includeClientKeys: includeClientKeys === 'compact',
       },
-    )['payload'];
+    ).payload;
   return {
     kind: kind,
     responseMode: includeClientKeys,
     responseSchemaVersion:
       includeClientKeys === 'compact' ? STORY_ASSET_COMPACT_RESPONSE_SCHEMA_VERSION : 1,
-    requiredAssets: cloneValue(storyAssetPromptContracts['requiredAssets'] || []),
-    candidateAssets: cloneValue(storyAssetPromptContracts['candidateAssets'] || []),
+    requiredAssets: cloneValue(storyAssetPromptContracts.requiredAssets || []),
+    candidateAssets: cloneValue(storyAssetPromptContracts.candidateAssets || []),
   };
 }
 function compareStoryAssetSceneHeadingContractRows(list4, list5) {
-  if (!Array['isArray'](list4) || !Array['isArray'](list5)) return { compatible: false, changed: false };
-  if (list4['length'] !== list5['length']) return { compatible: false, changed: false };
+  if (!Array.isArray(list4) || !Array.isArray(list5)) return { compatible: false, changed: false };
+  if (list4.length !== list5.length) return { compatible: false, changed: false };
   let changed = false;
-  for (let result = 0; result < list4['length']; result += 1) {
+  for (let result = 0; result < list4.length; result += 1) {
     const error = list4[result],
       error2 = list5[result];
-    if (JSON['stringify'](error) === JSON['stringify'](error2)) continue;
-    const enabled2 = String(error?.['name'] || '')['trim'](),
-      enabled3 = String(error2?.['name'] || '')['trim']();
+    if (JSON.stringify(error) === JSON.stringify(error2)) continue;
+    const enabled2 = String(error?.name || '').trim(),
+      enabled3 = String(error2?.name || '').trim();
     if (
       !enabled2 ||
       !enabled3 ||
@@ -111,8 +111,8 @@ function compareStoryAssetSceneHeadingContractRows(list4, list5) {
       return { compatible: false, changed: false };
     const error3 = cloneValue(error),
       error4 = cloneValue(error2);
-    (delete error3['name'], delete error3['clientKey'], delete error4['name'], delete error4['clientKey']);
-    if (JSON['stringify'](error3) !== JSON['stringify'](error4)) return { compatible: false, changed: false };
+    (delete error3.name, delete error3.clientKey, delete error4.name, delete error4.clientKey);
+    if (JSON.stringify(error3) !== JSON.stringify(error4)) return { compatible: false, changed: false };
     changed = true;
   }
   return { compatible: true, changed: changed };
@@ -120,34 +120,34 @@ function compareStoryAssetSceneHeadingContractRows(list4, list5) {
 function areStoryAssetSceneHeadingContractSnapshotsCompatible(data, options) {
   const cloneValue2 = cloneValue(data),
     cloneValue3 = cloneValue(options);
-  (delete cloneValue2['requiredAssets'],
-    delete cloneValue2['candidateAssets'],
-    delete cloneValue3['requiredAssets'],
-    delete cloneValue3['candidateAssets']);
-  if (JSON['stringify'](cloneValue2) !== JSON['stringify'](cloneValue3)) return false;
+  (delete cloneValue2.requiredAssets,
+    delete cloneValue2.candidateAssets,
+    delete cloneValue3.requiredAssets,
+    delete cloneValue3.candidateAssets);
+  if (JSON.stringify(cloneValue2) !== JSON.stringify(cloneValue3)) return false;
   const compareStoryAssetSceneHeadingContractRows2 = compareStoryAssetSceneHeadingContractRows(
-    data?.['requiredAssets'],
-    options?.['requiredAssets'],
+    data?.requiredAssets,
+    options?.requiredAssets,
   );
-  if (!compareStoryAssetSceneHeadingContractRows2['compatible']) return false;
+  if (!compareStoryAssetSceneHeadingContractRows2.compatible) return false;
   const compareStoryAssetSceneHeadingContractRows3 = compareStoryAssetSceneHeadingContractRows(
-    data?.['candidateAssets'],
-    options?.['candidateAssets'],
+    data?.candidateAssets,
+    options?.candidateAssets,
   );
   return (
-    compareStoryAssetSceneHeadingContractRows3['compatible'] &&
-    (compareStoryAssetSceneHeadingContractRows2['changed'] ||
-      compareStoryAssetSceneHeadingContractRows3['changed'])
+    compareStoryAssetSceneHeadingContractRows3.compatible &&
+    (compareStoryAssetSceneHeadingContractRows2.changed ||
+      compareStoryAssetSceneHeadingContractRows3.changed)
   );
 }
 function getSavedStoryAssetRequiredNamesByKind(target) {
-  const source = target?.['rawResponseContractSnapshotsByKind'] || {};
-  return Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((next) => [
+  const source = target?.rawResponseContractSnapshotsByKind || {};
+  return Object.fromEntries(
+    ['character', 'scene', 'prop'].map((next) => [
       next,
-      (Array['isArray'](source?.[next]?.['requiredAssets']) ? source[next]['requiredAssets'] : [])
-        ['map']((error5) => String(error5?.['name'] || '')['trim']())
-        ['filter'](Boolean),
+      (Array.isArray(source?.[next]?.requiredAssets) ? source[next].requiredAssets : [])
+        .map((error5) => String(error5?.name || '').trim())
+        .filter(Boolean),
     ]),
   );
 }
@@ -159,16 +159,16 @@ function isStoryAssetSceneHeadingContractMigration({
   responseModeByKind: responseModeByKind2,
 } = {}) {
   if (
-    Number(resumeDraft2?.['hybridQualityPolicyVersion']) !== 6 ||
-    resumeDraft2?.['strategy'] !== STORY_ASSET_PARALLEL_DRAFT_STRATEGY ||
-    resumeDraft2?.['status'] !== 'completed' ||
-    resumeDraft2?.['qualityReview']
+    Number(resumeDraft2?.hybridQualityPolicyVersion) !== 6 ||
+    resumeDraft2?.strategy !== STORY_ASSET_PARALLEL_DRAFT_STRATEGY ||
+    resumeDraft2?.status !== 'completed' ||
+    resumeDraft2?.qualityReview
   )
     return false;
-  const enabled4 = resumeDraft2?.['rawResponseContractSnapshotsByKind'];
+  const enabled4 = resumeDraft2?.rawResponseContractSnapshotsByKind;
   if (!enabled4 || typeof enabled4 !== 'object') return false;
-  const current = Object['fromEntries'](
-    ['character', 'scene', 'prop']['map']((entry) => [
+  const current = Object.fromEntries(
+    ['character', 'scene', 'prop'].map((entry) => [
       entry,
       createStoryAssetFocusedContractSnapshot(entry, {
         requiredAssetNamesByKind: requiredAssetNamesByKind2,
@@ -179,21 +179,21 @@ function isStoryAssetSceneHeadingContractMigration({
     ]),
   );
   if (
-    JSON['stringify'](enabled4['character']) !== JSON['stringify'](current['character']) ||
-    JSON['stringify'](enabled4['prop']) !== JSON['stringify'](current['prop'])
+    JSON.stringify(enabled4.character) !== JSON.stringify(current.character) ||
+    JSON.stringify(enabled4.prop) !== JSON.stringify(current.prop)
   )
     return false;
-  if (JSON['stringify'](enabled4['scene']) === JSON['stringify'](current['scene'])) return false;
-  return areStoryAssetSceneHeadingContractSnapshotsCompatible(enabled4['scene'], current['scene']);
+  if (JSON.stringify(enabled4.scene) === JSON.stringify(current.scene)) return false;
+  return areStoryAssetSceneHeadingContractSnapshotsCompatible(enabled4.scene, current.scene);
 }
 function getStoryAssetPaidDraftKinds(record) {
-  return ['character', 'scene', 'prop']['filter']((payload) => {
-    const response = record?.['kindStates']?.[payload];
+  return ['character', 'scene', 'prop'].filter((payload) => {
+    const response = record?.kindStates?.[payload];
     return Boolean(
-      record?.['paidResponseReceivedByKind']?.[payload] ||
-      Object['hasOwn'](record?.['rawResponsesByKind'] || {}, payload) ||
-      (Array['isArray'](record?.['assetsByKind']?.[payload]) && record['assetsByKind'][payload]['length']) ||
-      Math['max'](0, Math['trunc'](Number(response?.['requestCount']) || 0)) > 0 ||
+      record?.paidResponseReceivedByKind?.[payload] ||
+      Object.hasOwn(record?.rawResponsesByKind || {}, payload) ||
+      (Array.isArray(record?.assetsByKind?.[payload]) && record.assetsByKind[payload].length) ||
+      Math.max(0, Math.trunc(Number(response?.requestCount) || 0)) > 0 ||
       [
         'running',
         'succeeded',
@@ -201,28 +201,28 @@ function getStoryAssetPaidDraftKinds(record) {
         'blocked-quality-rerun',
         'blocked-ambiguous-submission',
         'blocked-incompatible',
-      ]['includes'](String(response?.['status'] || '')),
+      ].includes(String(response?.status || '')),
     );
   });
 }
 function isStoryAssetPaidLaneRerunAuthorized(handle, state) {
   return Boolean(
-    handle?.['confirmed'] === true &&
-    Array['isArray'](handle?.['authorizedKinds']) &&
-    handle['authorizedKinds']['includes'](state),
+    handle?.confirmed === true &&
+    Array.isArray(handle?.authorizedKinds) &&
+    handle.authorizedKinds.includes(state),
   );
 }
 function getStoryAssetProtectedPaidBatchKeys(config) {
   const scope =
-    config?.['batchSubmissionRecords'] && typeof config['batchSubmissionRecords'] === 'object'
-      ? config['batchSubmissionRecords']
+    config?.batchSubmissionRecords && typeof config.batchSubmissionRecords === 'object'
+      ? config.batchSubmissionRecords
       : {};
-  return Object['entries'](scope)['flatMap'](([input, response2]) => {
-    const output = String(response2?.['status'] || '')['trim'](),
+  return Object.entries(scope).flatMap(([input, response2]) => {
+    const output = String(response2?.status || '').trim(),
       value2 =
         output !== 'rejected-confirmed' &&
-        (Math['max'](0, Math['trunc'](Number(response2?.['requestCount']) || 0)) > 0 ||
-          Object['hasOwn'](response2 || {}, 'rawResponse') ||
+        (Math.max(0, Math.trunc(Number(response2?.requestCount) || 0)) > 0 ||
+          Object.hasOwn(response2 || {}, 'rawResponse') ||
           [
             'submitted',
             'ambiguous',
@@ -232,15 +232,15 @@ function getStoryAssetProtectedPaidBatchKeys(config) {
             'blocked-quality-rerun',
             'blocked-incompatible',
             'validated',
-          ]['includes'](output));
+          ].includes(output));
     return value2 ? [input] : [];
   });
 }
 function isStoryAssetPaidBatchRerunAuthorized(value3, value4) {
   return Boolean(
-    value3?.['confirmed'] === true &&
-    Array['isArray'](value3?.['authorizedBatchIds']) &&
-    value3['authorizedBatchIds']['includes'](value4),
+    value3?.confirmed === true &&
+    Array.isArray(value3?.authorizedBatchIds) &&
+    value3.authorizedBatchIds.includes(value4),
   );
 }
 function createStoryAssetSourceChangePaidHistoryEntry(
@@ -250,23 +250,23 @@ function createStoryAssetSourceChangePaidHistoryEntry(
   nextSourceFingerprint,
 ) {
   return {
-    archivedAt: Date['now'](),
+    archivedAt: Date.now(),
     reason: 'authorized-authoritative-source-change-rerun',
     previousSourceFingerprint: previousSourceFingerprint,
     nextSourceFingerprint: nextSourceFingerprint,
-    lanes: Object['fromEntries'](
-      list6['map']((value5) => [
+    lanes: Object.fromEntries(
+      list6.map((value5) => [
         value5,
         {
-          rawResponse: Object['hasOwn'](responseMode?.['rawResponsesByKind'] || {}, value5)
-            ? responseMode['rawResponsesByKind'][value5]
+          rawResponse: Object.hasOwn(responseMode?.rawResponsesByKind || {}, value5)
+            ? responseMode.rawResponsesByKind[value5]
             : '',
-          responseMode: responseMode?.['rawResponseModesByKind']?.[value5] || '',
-          contractSnapshot: cloneValue(responseMode?.['rawResponseContractSnapshotsByKind']?.[value5]),
-          decisions: cloneValue(responseMode?.['decisionsByKind']?.[value5]),
-          assets: cloneValue(responseMode?.['assetsByKind']?.[value5] || []),
-          submissionState: cloneValue(responseMode?.['submissionStatesByKind']?.[value5]),
-          kindState: cloneValue(responseMode?.['kindStates']?.[value5]),
+          responseMode: responseMode?.rawResponseModesByKind?.[value5] || '',
+          contractSnapshot: cloneValue(responseMode?.rawResponseContractSnapshotsByKind?.[value5]),
+          decisions: cloneValue(responseMode?.decisionsByKind?.[value5]),
+          assets: cloneValue(responseMode?.assetsByKind?.[value5] || []),
+          submissionState: cloneValue(responseMode?.submissionStatesByKind?.[value5]),
+          kindState: cloneValue(responseMode?.kindStates?.[value5]),
         },
       ]),
     ),
@@ -278,47 +278,47 @@ function createEmptyStoryAssetCandidatesByKind() {
 function mergeStoryAssetContractCandidates(args = [], args2 = []) {
   const map = new Map();
   return (
-    [...args, ...args2]['forEach']((error6) => {
-      const value6 = String(error6?.['name'] || '')['trim'](),
+    [...args, ...args2].forEach((error6) => {
+      const value6 = String(error6?.name || '').trim(),
         storyAssetQualityName = normalizeStoryAssetQualityName(value6);
       if (!storyAssetQualityName) return;
-      const args3 = map['get'](storyAssetQualityName);
+      const args3 = map.get(storyAssetQualityName);
       if (!args3) {
-        map['set'](storyAssetQualityName, cloneValue(error6));
+        map.set(storyAssetQualityName, cloneValue(error6));
         return;
       }
-      map['set'](storyAssetQualityName, {
+      map.set(storyAssetQualityName, {
         ...args3,
         sourceSceneRefs: [
           ...new Set(
             [
-              ...(Array['isArray'](args3?.['sourceSceneRefs']) ? args3['sourceSceneRefs'] : []),
-              ...(Array['isArray'](error6?.['sourceSceneRefs']) ? error6['sourceSceneRefs'] : []),
+              ...(Array.isArray(args3?.sourceSceneRefs) ? args3.sourceSceneRefs : []),
+              ...(Array.isArray(error6?.sourceSceneRefs) ? error6.sourceSceneRefs : []),
             ]
-              ['map']((value7) => String(value7 || '')['trim']())
-              ['filter'](Boolean),
+              .map((value7) => String(value7 || '').trim())
+              .filter(Boolean),
           ),
         ],
         sourceChapterIds: [
           ...new Set(
             [
-              ...(Array['isArray'](args3?.['sourceChapterIds']) ? args3['sourceChapterIds'] : []),
-              ...(Array['isArray'](error6?.['sourceChapterIds']) ? error6['sourceChapterIds'] : []),
+              ...(Array.isArray(args3?.sourceChapterIds) ? args3.sourceChapterIds : []),
+              ...(Array.isArray(error6?.sourceChapterIds) ? error6.sourceChapterIds : []),
             ]
-              ['map']((value8) => String(value8 || '')['trim']())
-              ['filter'](Boolean),
+              .map((value8) => String(value8 || '').trim())
+              .filter(Boolean),
           ),
         ],
-        evidence: String(args3?.['evidence'] || error6?.['evidence'] || '')['trim'](),
+        evidence: String(args3?.evidence || error6?.evidence || '').trim(),
       });
     }),
-    [...map['values']()]
+    [...map.values()]
   );
 }
 function mergeStoryAssetActionPropCandidates(args4 = createEmptyStoryAssetCandidatesByKind(), value9 = []) {
   return {
     ...args4,
-    prop: mergeStoryAssetContractCandidates(args4?.['prop'], createStoryAssetActionPropCandidates(value9)),
+    prop: mergeStoryAssetContractCandidates(args4?.prop, createStoryAssetActionPropCandidates(value9)),
   };
 }
 function createStoryAssetCandidateInventory({
@@ -330,22 +330,22 @@ function createStoryAssetCandidateInventory({
   return {
     schemaVersion: STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION,
     status: status,
-    evidenceScenes: cloneValue(Array['isArray'](evidenceScenes) ? evidenceScenes : []),
+    evidenceScenes: cloneValue(Array.isArray(evidenceScenes) ? evidenceScenes : []),
     localRuntime: localRuntime ? cloneValue(localRuntime) : null,
     sourceFingerprint: String(sourceFingerprint || ''),
   };
 }
 function getReusableStoryAssetCandidateInventory(value10, value11, list7 = []) {
-  const response3 = value10?.['hybridCandidateInventory'],
+  const response3 = value10?.hybridCandidateInventory,
     map2 = new Set([
       String(value11 || ''),
-      ...(Array['isArray'](list7) ? list7['map']((value12) => String(value12 || '')) : []),
+      ...(Array.isArray(list7) ? list7.map((value12) => String(value12 || '')) : []),
     ]);
   if (
-    Number(response3?.['schemaVersion']) !== STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION ||
-    !['ready', 'unavailable', 'disabled']['includes'](response3?.['status']) ||
-    !Array['isArray'](response3?.['evidenceScenes']) ||
-    !map2['has'](String(response3?.['sourceFingerprint'] || ''))
+    Number(response3?.schemaVersion) !== STORY_ASSET_CANDIDATE_INVENTORY_SCHEMA_VERSION ||
+    !['ready', 'unavailable', 'disabled'].includes(response3?.status) ||
+    !Array.isArray(response3?.evidenceScenes) ||
+    !map2.has(String(response3?.sourceFingerprint || ''))
   )
     return null;
   return { ...cloneValue(response3), sourceFingerprint: String(value11 || '') };
@@ -353,52 +353,52 @@ function getReusableStoryAssetCandidateInventory(value10, value11, list7 = []) {
 function reportDiagnostics(value13, value14, level = {}) {
   try {
     const promise =
-      typeof value13?.['info'] === 'function'
-        ? value13['info'](value14, level)
-        : value13?.['logEvent']?.({
+      typeof value13?.info === 'function'
+        ? value13.info(value14, level)
+        : value13?.logEvent?.({
             type:
               'story_asset.' +
               String(value14 || 'hybrid')
-                ['replace'](/^story-asset-?/iu, '')
-                ['replace'](/[^a-z0-9]+/giu, '_'),
-            level: level?.['status'] === 'fallback' ? 'warn' : 'info',
+                .replace(/^story-asset-?/iu, '')
+                .replace(/[^a-z0-9]+/giu, '_'),
+            level: level?.status === 'fallback' ? 'warn' : 'info',
             source: 'renderer',
             message: String(value14 || 'Story asset hybrid extraction event'),
             context: level,
           });
     promise &&
-      typeof promise['then'] === 'function' &&
-      void Promise['resolve'](promise)['catch'](() => undefined);
+      typeof promise.then === 'function' &&
+      void Promise.resolve(promise).catch(() => undefined);
   } catch {}
 }
 function getStoryProjectChapterCharacters(options2 = {}) {
-  return (Array['isArray'](options2?.['chapters']) ? options2['chapters'] : [])['reduce'](
-    (value15, value16) => value15 + String(value16?.['content'] || '')['length'],
+  return (Array.isArray(options2?.chapters) ? options2.chapters : []).reduce(
+    (value15, value16) => value15 + String(value16?.content || '').length,
     0,
   );
 }
 function shouldUseDirectStoryAssetApi(options3 = {}, list8 = []) {
-  const list9 = list8['filter']((value17) => value17?.['source'] === 'upload-fallback');
-  if (list9['length']) {
-    const list10 = list9['flatMap']((value18) =>
-      Array['isArray'](value18?.['characters']) ? value18['characters'] : [],
+  const list9 = list8.filter((value17) => value17?.source === 'upload-fallback');
+  if (list9.length) {
+    const list10 = list9.flatMap((value18) =>
+      Array.isArray(value18?.characters) ? value18.characters : [],
     );
-    if (!list10['some']((value19) => !isNarrativeStoryCharacterFragment(value19))) return false;
+    if (!list10.some((value19) => !isNarrativeStoryCharacterFragment(value19))) return false;
   }
-  const count = list8['reduce']((value20, dom) => value20 + String(dom?.['body'] || '')['length'], 0);
+  const count = list8.reduce((value20, dom) => value20 + String(dom?.body || '').length, 0);
   return count > 0 && count <= STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS;
 }
 function hasCompleteStructuredStorySceneEvidence(list11 = [], value21 = {}) {
-  const list12 = Array['isArray'](list11) ? list11 : [];
-  if (!list12['length']) return false;
+  const list12 = Array.isArray(list11) ? list11 : [];
+  if (!list12.length) return false;
   const map3 = new Set(getHardRequiredStorySceneRefs(value21));
-  return list12['every'](
+  return list12.every(
     (value22) =>
-      value22?.['source'] !== 'upload-fallback' && map3['has'](String(value22?.['ref'] || '')['trim']()),
+      value22?.source !== 'upload-fallback' && map3.has(String(value22?.ref || '').trim()),
   );
 }
 function createMissingLocalStoryAssetEvidenceError(cause = null) {
-  return Object['assign'](
+  return Object.assign(
     new Error(
       '本地实体检索没有得到可验证证据，已在调用远程 API 前安全停止；请检查或重新下载 PP-UIE 组件后再试。',
     ),
@@ -406,54 +406,54 @@ function createMissingLocalStoryAssetEvidenceError(cause = null) {
   );
 }
 function compactStoryAssetQualityText(value23 = '') {
-  return String(value23 || '')['replace'](/\s+/gu, '');
+  return String(value23 || '').replace(/\s+/gu, '');
 }
 function normalizeStoryAssetQualityName(value24 = '') {
   return String(value24 || '')
-    ['normalize']('NFKC')
-    ['replace'](/[（(][^（）()]{0,30}[）)]/gu, '')
-    ['replace'](/[^\p{L}\p{N}]+/gu, '')
-    ['toLowerCase']();
+    .normalize('NFKC')
+    .replace(/[（(][^（）()]{0,30}[）)]/gu, '')
+    .replace(/[^\p{L}\p{N}]+/gu, '')
+    .toLowerCase();
 }
 function createStoryCharacterQualityAliases(value25 = '') {
   const storyAssetQualityName2 = normalizeStoryAssetQualityName(value25);
   if (!storyAssetQualityName2) return [];
-  const value26 = storyAssetQualityName2['replace'](
+  const value26 = storyAssetQualityName2.replace(
     /^(?:房东|编辑|医生|护士|警察|老师|老板|经理|店员|保安|司机|队长|主任|主管)/u,
     '',
   );
-  return [...new Set([storyAssetQualityName2, value26]['filter'](Boolean))];
+  return [...new Set([storyAssetQualityName2, value26].filter(Boolean))];
 }
 function storyCharacterQualityNamesMatch(value27 = '', value28 = '') {
   const list13 = createStoryCharacterQualityAliases(value27),
     list14 = createStoryCharacterQualityAliases(value28);
-  return list13['some']((value29) => list14['includes'](value29));
+  return list13.some((value29) => list14.includes(value29));
 }
 function collectLegacyRequiredStoryCharacterNames(list15 = []) {
   const list16 = [];
   return (
-    (Array['isArray'](list15) ? list15 : [])['forEach']((value30) => {
-      (Array['isArray'](value30?.['characters']) ? value30['characters'] : [])['forEach']((value31) => {
-        !list16['some']((value32) => storyCharacterQualityNamesMatch(value32, value31)) &&
-          list16['push'](String(value31 || '')['trim']());
+    (Array.isArray(list15) ? list15 : []).forEach((value30) => {
+      (Array.isArray(value30?.characters) ? value30.characters : []).forEach((value31) => {
+        !list16.some((value32) => storyCharacterQualityNamesMatch(value32, value31)) &&
+          list16.push(String(value31 || '').trim());
       });
     }),
-    list16['filter'](Boolean)
+    list16.filter(Boolean)
   );
 }
 function collectStorySceneNamesFromHeadings(list17 = []) {
   const list18 = [];
   return (
-    (Array['isArray'](list17) ? list17 : [])['forEach']((value33) => {
+    (Array.isArray(list17) ? list17 : []).forEach((value33) => {
       splitDeterministicStorySceneAssetNames(value33)
-        ['filter'](
-          (value34) => value34 && !/^(?:(?:两个|多个|若干)?房间|室内|室外|同地|原地)$/u['test'](value34),
+        .filter(
+          (value34) => value34 && !/^(?:(?:两个|多个|若干)?房间|室内|室外|同地|原地)$/u.test(value34),
         )
-        ['forEach']((value35) => {
+        .forEach((value35) => {
           const storySceneIdentityKey = getStorySceneIdentityKey(value35);
           storySceneIdentityKey &&
-            !list18['some']((value36) => getStorySceneIdentityKey(value36) === storySceneIdentityKey) &&
-            list18['push'](value35);
+            !list18.some((value36) => getStorySceneIdentityKey(value36) === storySceneIdentityKey) &&
+            list18.push(value35);
         });
     }),
     list18
@@ -464,8 +464,8 @@ function collectRequiredStorySceneNames(options4 = {}) {
 }
 function collectLegacyRequiredStorySceneNames(list19 = []) {
   return collectStorySceneNamesFromHeadings(
-    (Array['isArray'](list19) ? list19 : [])['map'](
-      (value37) => value37?.['assetHeading'] || value37?.['heading'],
+    (Array.isArray(list19) ? list19 : []).map(
+      (value37) => value37?.assetHeading || value37?.heading,
     ),
   );
 }
@@ -473,121 +473,121 @@ function storySceneQualityNamesMatch(value38 = '', value39 = '') {
   const list20 = getStorySceneIdentityKey(value38),
     list21 = getStorySceneIdentityKey(value39);
   return Boolean(
-    list20 && list21 && (list20 === list21 || list20['includes'](list21) || list21['includes'](list20)),
+    list20 && list21 && (list20 === list21 || list20.includes(list21) || list21.includes(list20)),
   );
 }
 function getStorySceneQualitySourceRefs(value40 = '', value41 = []) {
   return new Set(
-    (Array['isArray'](value41) ? value41 : [])
-      ['filter']((value42) =>
-        splitDeterministicStorySceneAssetNames(value42?.['assetHeading'] || value42?.['heading'])['some'](
+    (Array.isArray(value41) ? value41 : [])
+      .filter((value42) =>
+        splitDeterministicStorySceneAssetNames(value42?.assetHeading || value42?.heading).some(
           (value43) => storySceneQualityNamesMatch(value43, value40),
         ),
       )
-      ['map']((value44) => String(value44?.['ref'] || '')['trim']())
-      ['filter'](Boolean),
+      .map((value44) => String(value44?.ref || '').trim())
+      .filter(Boolean),
   );
 }
 function storyPropQualityRequirementMatches(error7 = {}, value45 = '') {
   const args5 = normalizeStoryAssetQualityName(value45);
   if (!args5) return false;
-  if (normalizeStoryAssetQualityName(error7?.['name']) === args5) return true;
-  if ([...args5]['length'] < 3) return false;
+  if (normalizeStoryAssetQualityName(error7?.name) === args5) return true;
+  if ([...args5].length < 3) return false;
   const list22 = normalizeStoryAssetQualityName(
     [
-      error7?.['scriptFacts'],
-      error7?.['description'],
-      ...(Array['isArray'](error7?.['appearances'])
-        ? error7['appearances']['flatMap']((value46) => [value46?.['scriptFacts'], value46?.['description']])
+      error7?.scriptFacts,
+      error7?.description,
+      ...(Array.isArray(error7?.appearances)
+        ? error7.appearances.flatMap((value46) => [value46?.scriptFacts, value46?.description])
         : []),
     ]
-      ['filter'](Boolean)
-      ['join'](' '),
+      .filter(Boolean)
+      .join(' '),
   );
-  return list22['includes'](args5);
+  return list22.includes(args5);
 }
 function mergeStoryAssetCoverageText(list23 = []) {
   return [
     ...new Set(
-      list23['flatMap']((value47) => String(value47 || '')['split'](/[、,，；;]+/u))
-        ['map']((value48) => value48['trim']())
-        ['filter'](Boolean),
+      list23.flatMap((value47) => String(value47 || '').split(/[、,，；;]+/u))
+        .map((value48) => value48.trim())
+        .filter(Boolean),
     ),
-  ]['join']('、');
+  ].join('、');
 }
 function getStoryAssetVisualCompletenessScore(options5 = {}) {
-  const list24 = Array['isArray'](options5?.['appearances']) ? options5['appearances'] : [];
-  return list24['reduce'](
+  const list24 = Array.isArray(options5?.appearances) ? options5.appearances : [];
+  return list24.reduce(
     (value49, value50) =>
       value49 +
-      String(value50?.['prompt'] || '')['trim']()['length'] +
-      String(value50?.['description'] || '')['trim']()['length'],
-    String(options5?.['description'] || '')['trim']()['length'],
+      String(value50?.prompt || '').trim().length +
+      String(value50?.description || '').trim().length,
+    String(options5?.description || '').trim().length,
   );
 }
 export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
-  const list26 = Array['isArray'](args6?.['assets']) ? args6['assets'] : [],
+  const list26 = Array.isArray(args6?.assets) ? args6.assets : [],
     map4 = new Map(),
     list27 = [];
-  list26['forEach']((asset) => {
-    if (asset?.['kind'] !== 'scene') {
-      list27['push']({ type: 'asset', asset: asset });
+  list26.forEach((asset) => {
+    if (asset?.kind !== 'scene') {
+      list27.push({ type: 'asset', asset: asset });
       return;
     }
-    const list28 = list25['filter']((value51) => storySceneQualityNamesMatch(asset?.['name'], value51)),
-      value52 = list28['find'](
-        (value53) => getStorySceneIdentityKey(value53) === getStorySceneIdentityKey(asset?.['name']),
+    const list28 = list25.filter((value51) => storySceneQualityNamesMatch(asset?.name, value51)),
+      value52 = list28.find(
+        (value53) => getStorySceneIdentityKey(value53) === getStorySceneIdentityKey(asset?.name),
       ),
       canonicalName =
-        value52 || (list28['length'] === 1 ? list28[0] : String(asset?.['name'] || '')['trim']()),
+        value52 || (list28.length === 1 ? list28[0] : String(asset?.name || '').trim()),
       key2 = getStorySceneIdentityKey(canonicalName);
-    (!map4['has'](key2) && (map4['set'](key2, []), list27['push']({ type: 'scene', key: key2 })),
-      map4['get'](key2)['push']({ asset: asset, canonicalName: canonicalName }));
+    (!map4.has(key2) && (map4.set(key2, []), list27.push({ type: 'scene', key: key2 })),
+      map4.get(key2).push({ asset: asset, canonicalName: canonicalName }));
   });
-  const assets = list27['flatMap']((event) => {
-    if (event['type'] === 'asset') return [event['asset']];
-    const list29 = map4['get'](event['key']) || [],
-      name = [...list29]['sort'](
+  const assets = list27.flatMap((event) => {
+    if (event.type === 'asset') return [event.asset];
+    const list29 = map4.get(event.key) || [],
+      name = [...list29].sort(
         (value54, value55) =>
-          getStoryAssetVisualCompletenessScore(value55['asset']) -
-          getStoryAssetVisualCompletenessScore(value54['asset']),
+          getStoryAssetVisualCompletenessScore(value55.asset) -
+          getStoryAssetVisualCompletenessScore(value54.asset),
       )[0];
     if (!name) return [];
     const sourceChapterIds = [
         ...new Set(
-          list29['flatMap'](({ asset: asset2 }) =>
-            Array['isArray'](asset2?.['sourceChapterIds']) ? asset2['sourceChapterIds'] : [],
+          list29.flatMap(({ asset: asset2 }) =>
+            Array.isArray(asset2?.sourceChapterIds) ? asset2.sourceChapterIds : [],
           ),
         ),
       ],
       map5 = new Map(),
       list30 = [];
-    list29['forEach'](({ asset: asset3 }) => {
-      (Array['isArray'](asset3?.['appearances']) ? asset3['appearances'] : [])['forEach']((error8) => {
-        const value56 = String(error8?.['name'] || '')
-            ['trim']()
-            ['toLowerCase'](),
-          value57 = value56 || 'appearance-' + (list30['length'] + 1);
-        (!map5['has'](value57) && (map5['set'](value57, []), list30['push'](value57)),
-          map5['get'](value57)['push'](error8));
+    list29.forEach(({ asset: asset3 }) => {
+      (Array.isArray(asset3?.appearances) ? asset3.appearances : []).forEach((error8) => {
+        const value56 = String(error8?.name || '')
+            .trim()
+            .toLowerCase(),
+          value57 = value56 || 'appearance-' + (list30.length + 1);
+        (!map5.has(value57) && (map5.set(value57, []), list30.push(value57)),
+          map5.get(value57).push(error8));
       });
     });
-    const appearances = list30['map']((value58) => {
-      const list31 = map5['get'](value58) || [],
-        args7 = [...list31]['sort'](
+    const appearances = list30.map((value58) => {
+      const list31 = map5.get(value58) || [],
+        args7 = [...list31].sort(
           (value59, value60) =>
-            String(value60?.['prompt'] || '')['trim']()['length'] +
-            String(value60?.['description'] || '')['trim']()['length'] -
-            String(value59?.['prompt'] || '')['trim']()['length'] -
-            String(value59?.['description'] || '')['trim']()['length'],
+            String(value60?.prompt || '').trim().length +
+            String(value60?.description || '').trim().length -
+            String(value59?.prompt || '').trim().length -
+            String(value59?.description || '').trim().length,
         )[0];
       return {
         ...args7,
-        occurrences: mergeStoryAssetCoverageText(list31['map']((value61) => value61?.['occurrences'])),
+        occurrences: mergeStoryAssetCoverageText(list31.map((value61) => value61?.occurrences)),
         sourceChapterIds: [
           ...new Set(
-            list31['flatMap']((value62) =>
-              Array['isArray'](value62?.['sourceChapterIds']) ? value62['sourceChapterIds'] : [],
+            list31.flatMap((value62) =>
+              Array.isArray(value62?.sourceChapterIds) ? value62.sourceChapterIds : [],
             ),
           ),
         ],
@@ -595,10 +595,10 @@ export function consolidateDirectStorySceneAssets(args6 = {}, list25 = []) {
     });
     return [
       {
-        ...name['asset'],
-        name: name['canonicalName'],
+        ...name.asset,
+        name: name.canonicalName,
         occurrences: mergeStoryAssetCoverageText(
-          list29['map'](({ asset: asset4 }) => asset4?.['occurrences']),
+          list29.map(({ asset: asset4 }) => asset4?.occurrences),
         ),
         sourceChapterIds: sourceChapterIds,
         appearances: appearances,
@@ -613,22 +613,20 @@ function collectLegacyQuotedStoryProps(
 ) {
   const list33 = [];
   return (
-    (Array['isArray'](list32) ? list32 : [])['forEach']((dom2) => {
-      const list34 = String(dom2?.['body'] || '');
-      for (const value63 of list34['matchAll'](/《([^》\r\n]{1,24})》/gu)) {
-        const value64 = list34['slice'](
-          Math['max'](0, (value63['index'] || 0) - 40),
-          value63['index'] || 0,
+    (Array.isArray(list32) ? list32 : []).forEach((dom2) => {
+      const list34 = String(dom2?.body || '');
+      for (const value63 of list34.matchAll(/《([^》\r\n]{1,24})》/gu)) {
+        const value64 = list34.slice(
+          Math.max(0, (value63.index || 0) - 40),
+          value63.index || 0,
         );
         if (
           !includeEpisodeTitles &&
-          /(?:第\s*(?:\d+|[零〇一二三四五六七八九十百千万两廿卅]+)\s*集|(?:episode|ep)\s*\d+)\s*[：:—\-·丨|】\]）)]*\s*$/iu[
-            'test'
-          ](value64)
+          /(?:第\s*(?:\d+|[零〇一二三四五六七八九十百千万两廿卅]+)\s*集|(?:episode|ep)\s*\d+)\s*[：:—\-·丨|】\]）)]*\s*$/iu.test(value64)
         )
           continue;
-        const value65 = String(value63[1] || '')['trim']();
-        if (value65 && !list33['includes'](value65)) list33['push'](value65);
+        const value65 = String(value63[1] || '').trim();
+        if (value65 && !list33.includes(value65)) list33.push(value65);
       }
     }),
     list33
@@ -636,7 +634,7 @@ function collectLegacyQuotedStoryProps(
 }
 function createStoryAssetQualityResumeRequirementAliases(enabled5, args8, value66) {
   if (!enabled5) return [];
-  const count2 = Number(enabled5['hybridQualityPolicyVersion']) || 0;
+  const count2 = Number(enabled5.hybridQualityPolicyVersion) || 0;
   if (count2 >= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION) return [];
   const character = collectLegacyRequiredStoryCharacterNames(value66),
     args9 = { ...args8, character: character },
@@ -649,29 +647,29 @@ function createStoryAssetQualityResumeRequirementAliases(enabled5, args8, value6
       ...args10,
       prop: collectLegacyQuotedStoryProps(value66, { includeEpisodeTitles: true }),
     },
-    value68 = JSON['stringify'](args8),
+    value68 = JSON.stringify(args8),
     map6 = new Map();
   return (
-    (count2 >= 3 ? [args9] : count2 >= 2 ? [args10] : [args10, value67])['forEach']((value69) => {
-      const value70 = JSON['stringify'](value69);
-      if (value70 !== value68 && !map6['has'](value70)) map6['set'](value70, value69);
+    (count2 >= 3 ? [args9] : count2 >= 2 ? [args10] : [args10, value67]).forEach((value69) => {
+      const value70 = JSON.stringify(value69);
+      if (value70 !== value68 && !map6.has(value70)) map6.set(value70, value69);
     }),
-    [...map6['values']()]
+    [...map6.values()]
   );
 }
 function promptCopiesStorySource(value71 = '', list35 = []) {
   const list36 = compactStoryAssetQualityText(value71);
-  if (list36['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return false;
-  return list35['some']((dom3) => {
-    const list37 = compactStoryAssetQualityText(dom3?.['body']);
-    if (list37['length'] < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return false;
+  if (list36.length < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return false;
+  return list35.some((dom3) => {
+    const list37 = compactStoryAssetQualityText(dom3?.body);
+    if (list37.length < STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS) return false;
     for (
       let value72 = 0;
-      value72 <= list37['length'] - STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS;
-      value72 += Math['floor'](STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS / 2)
+      value72 <= list37.length - STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS;
+      value72 += Math.floor(STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS / 2)
     ) {
-      const value73 = list37['slice'](value72, value72 + STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS);
-      if (list36['includes'](value73)) return true;
+      const value73 = list37.slice(value72, value72 + STORY_ASSET_SOURCE_COPY_WINDOW_CHARACTERS);
+      if (list36.includes(value73)) return true;
     }
     return false;
   });
@@ -684,250 +682,248 @@ function removeNarrativeUploadFallbackCharacterAssets(
   { requireVerifiedFallbackCharacters: requireVerifiedFallbackCharacters = false } = {},
 ) {
   const list38 = [
-      ...(Array['isArray'](value74?.['hardRequired']) ? value74['hardRequired'] : []),
-      ...(Array['isArray'](value74?.['optionalCandidates']) ? value74['optionalCandidates'] : []),
-    ]['filter'](
+      ...(Array.isArray(value74?.hardRequired) ? value74.hardRequired : []),
+      ...(Array.isArray(value74?.optionalCandidates) ? value74.optionalCandidates : []),
+    ].filter(
       (value77) =>
-        value77?.['kind'] === 'character' &&
-        value77?.['reasonCodes']?.['includes']('upload-fallback-imported-character'),
+        value77?.kind === 'character' &&
+        value77?.reasonCodes?.includes('upload-fallback-imported-character'),
     ),
     list39 = requireVerifiedFallbackCharacters
       ? getUntrustedUploadFallbackStoryCharacterNames(value74, value75, value76)
-      : list38['filter']((error9) => isNarrativeStoryCharacterFragment(error9?.['name']))['map'](
-          (error10) => error10?.['name'],
+      : list38.filter((error9) => isNarrativeStoryCharacterFragment(error9?.name)).map(
+          (error10) => error10?.name,
         ),
-    map7 = new Set(list39['map'](normalizeStoryAssetQualityName)['filter'](Boolean));
-  if (!map7['size']) return args11;
+    map7 = new Set(list39.map(normalizeStoryAssetQualityName).filter(Boolean));
+  if (!map7.size) return args11;
   return {
     ...args11,
-    assets: (Array['isArray'](args11?.['assets']) ? args11['assets'] : [])['filter'](
+    assets: (Array.isArray(args11?.assets) ? args11.assets : []).filter(
       (error11) =>
-        error11?.['kind'] !== 'character' || !map7['has'](normalizeStoryAssetQualityName(error11?.['name'])),
+        error11?.kind !== 'character' || !map7.has(normalizeStoryAssetQualityName(error11?.name)),
     ),
   };
 }
 function createHardAuthoritativeSourceScenes(list40 = [], value78 = {}) {
-  return (Array['isArray'](list40) ? list40 : [])['map']((args12) => ({
+  return (Array.isArray(list40) ? list40 : []).map((args12) => ({
     ...args12,
-    characters: getHardRequiredStoryAssetNamesForScene(value78, 'character', args12?.['ref']),
+    characters: getHardRequiredStoryAssetNamesForScene(value78, 'character', args12?.ref),
   }));
 }
 export function assertStoryAssetPublicResultQuality(options6 = {}, value79 = [], value80 = {}) {
-  const list41 = Array['isArray'](options6?.['assets']) ? options6['assets'] : [];
-  if (!list41['length'])
-    throw Object['assign'](new Error('API 没有返回可用资产；旧资产已保留，未进入下一步。'), {
+  const list41 = Array.isArray(options6?.assets) ? options6.assets : [];
+  if (!list41.length)
+    throw Object.assign(new Error('API 没有返回可用资产；旧资产已保留，未进入下一步。'), {
       type: 'ASSET_VISUAL_RESULT_INCOMPLETE',
       validationDetails: { problems: ['API 没有返回可用资产'], kinds: ['character', 'scene', 'prop'] },
     });
   const problems = [],
     args13 = new Set(),
     handler = (value81, value82) => {
-      problems['push'](value82);
-      if (value81) args13['add'](value81);
+      problems.push(value82);
+      if (value81) args13.add(value81);
     },
-    list42 = list41['filter']((value83) => value83?.['kind'] === 'character'),
-    list43 = list41['filter']((value84) => value84?.['kind'] === 'scene'),
-    list44 = list41['filter']((value85) => value85?.['kind'] === 'prop'),
+    list42 = list41.filter((value83) => value83?.kind === 'character'),
+    list43 = list41.filter((value84) => value84?.kind === 'scene'),
+    list44 = list41.filter((value85) => value85?.kind === 'prop'),
     value86 =
       /客户端|PP-UIE|证据原文|模型细化|统一添加|candidateAssets|本地候选|候选资产|召回候选|召回线索/iu,
     value87 =
       /^(?:(?:时间|时长|地点|目的地|状态|场景|镜头|画面|动作|音效|音乐|字幕|备注|人物|角色|台词|环境|转场)|(?:然后|随后|接着|紧接着|这时|此时)(?:他|她|它)?.*|.*(?:若干|数人|多人|等人))$/u,
     map8 = new Set();
-  list42['forEach']((error12) => {
-    const value88 = String(error12?.['name'] || '')['trim'](),
+  list42.forEach((error12) => {
+    const value88 = String(error12?.name || '').trim(),
       storyAssetQualityName3 = normalizeStoryAssetQualityName(value88);
     storyAssetQualityName3 &&
-      map8['has'](storyAssetQualityName3) &&
+      map8.has(storyAssetQualityName3) &&
       handler('character', '重复角色“' + (value88 || '未命名角色') + '”');
-    if (storyAssetQualityName3) map8['add'](storyAssetQualityName3);
-    (isNarrativeStoryCharacterFragment(value88) || value87['test'](value88)) &&
+    if (storyAssetQualityName3) map8.add(storyAssetQualityName3);
+    (isNarrativeStoryCharacterFragment(value88) || value87.test(value88)) &&
       handler('character', '明显非人物角色“' + (value88 || '未命名角色') + '”');
   });
   const map9 = new Set();
-  list44['forEach']((error13) => {
-    const value89 = String(error13?.['name'] || '')['trim'](),
+  list44.forEach((error13) => {
+    const value89 = String(error13?.name || '').trim(),
       storyAssetQualityName4 = normalizeStoryAssetQualityName(value89);
     storyAssetQualityName4 &&
-      map9['has'](storyAssetQualityName4) &&
+      map9.has(storyAssetQualityName4) &&
       handler('prop', '重复道具“' + (value89 || '未命名道具') + '”');
-    if (storyAssetQualityName4) map9['add'](storyAssetQualityName4);
+    if (storyAssetQualityName4) map9.add(storyAssetQualityName4);
   });
   const map10 = new Set();
-  (list43['forEach']((error14) => {
-    const storySceneIdentityKey2 = getStorySceneIdentityKey(error14?.['name']);
+  (list43.forEach((error14) => {
+    const storySceneIdentityKey2 = getStorySceneIdentityKey(error14?.name);
     storySceneIdentityKey2 &&
-      map10['has'](storySceneIdentityKey2) &&
-      handler('scene', '重复场景“' + (error14?.['name'] || '未命名场景') + '”');
-    if (storySceneIdentityKey2) map10['add'](storySceneIdentityKey2);
+      map10.has(storySceneIdentityKey2) &&
+      handler('scene', '重复场景“' + (error14?.name || '未命名场景') + '”');
+    if (storySceneIdentityKey2) map10.add(storySceneIdentityKey2);
   }),
-    (value80?.['character'] || [])['forEach']((value90) => {
-      !list42['some']((error15) => storyCharacterQualityNamesMatch(error15?.['name'], value90)) &&
+    (value80?.character || []).forEach((value90) => {
+      !list42.some((error15) => storyCharacterQualityNamesMatch(error15?.name, value90)) &&
         handler('character', '缺少原文角色“' + value90 + '”');
     }));
   const map11 = new Map(),
-    list45 = value80?.['scene'] || [],
+    list45 = value80?.scene || [],
     handler2 = (value91, map12) => {
       const value92 = list45[value91],
         map13 = getStorySceneQualitySourceRefs(value92, value79),
-        value93 = list43['map']((asset5, assetIndex) => ({ asset: asset5, assetIndex: assetIndex }))
-          ['filter'](
+        value93 = list43.map((asset5, assetIndex) => ({ asset: asset5, assetIndex: assetIndex }))
+          .filter(
             ({ asset: asset6 }) =>
-              storySceneQualityNamesMatch(asset6?.['name'], value92) ||
-              (Array['isArray'](asset6?.['sourceSceneRefs']) &&
-                asset6['sourceSceneRefs']['some']((value94) => map13['has'](value94))),
+              storySceneQualityNamesMatch(asset6?.name, value92) ||
+              (Array.isArray(asset6?.sourceSceneRefs) &&
+                asset6.sourceSceneRefs.some((value94) => map13.has(value94))),
           )
-          ['sort']((value95, value96) => {
+          .sort((value95, value96) => {
             const storySceneIdentityKey3 =
-                getStorySceneIdentityKey(value95['asset']?.['name']) === getStorySceneIdentityKey(value92),
+                getStorySceneIdentityKey(value95.asset?.name) === getStorySceneIdentityKey(value92),
               storySceneIdentityKey4 =
-                getStorySceneIdentityKey(value96['asset']?.['name']) === getStorySceneIdentityKey(value92);
+                getStorySceneIdentityKey(value96.asset?.name) === getStorySceneIdentityKey(value92);
             return Number(storySceneIdentityKey4) - Number(storySceneIdentityKey3);
           })
-          ['map'](({ assetIndex: assetIndex2 }) => assetIndex2);
+          .map(({ assetIndex: assetIndex2 }) => assetIndex2);
       for (const value97 of value93) {
-        if (map12['has'](value97)) continue;
-        map12['add'](value97);
-        const value98 = map11['get'](value97);
-        if (value98 === undefined || handler2(value98, map12)) return (map11['set'](value97, value91), true);
+        if (map12.has(value97)) continue;
+        map12.add(value97);
+        const value98 = map11.get(value97);
+        if (value98 === undefined || handler2(value98, map12)) return (map11.set(value97, value91), true);
       }
       return false;
     };
-  (list45['forEach']((value99, value100) => {
+  (list45.forEach((value99, value100) => {
     !handler2(value100, new Set()) && handler('scene', '缺少原子场景“' + value99 + '”');
   }),
-    (value80?.['prop'] || [])['forEach']((value101) => {
-      !list44['some']((value102) => storyPropQualityRequirementMatches(value102, value101)) &&
+    (value80?.prop || []).forEach((value101) => {
+      !list44.some((value102) => storyPropQualityRequirementMatches(value102, value101)) &&
         handler('prop', '缺少原文关键道具“' + value101 + '”');
     }),
-    list41['forEach']((error16) => {
-      [error16?.['name'], error16?.['description'], error16?.['voiceDescription'], error16?.['occurrences']][
-        'forEach'
-      ]((value103) => {
-        value86['test'](String(value103 || '')) &&
-          handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '描述泄露了内部处理规则');
+    list41.forEach((error16) => {
+      [error16?.name, error16?.description, error16?.voiceDescription, error16?.occurrences].forEach((value103) => {
+        value86.test(String(value103 || '')) &&
+          handler(error16?.kind, (error16?.name || '未命名资产') + '描述泄露了内部处理规则');
       });
-      error16?.['designStatus'] === 'baseline' &&
-        handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少 API 视觉反推');
-      error16?.['kind'] === 'scene' &&
-        /[/／|｜]/u['test'](String(error16?.['name'] || '')) &&
-        handler('scene', error16['name'] + '仍是复合场景名');
-      const list46 = Array['isArray'](error16?.['appearances']) ? error16['appearances'] : [];
-      (!list46['length'] && handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少形象'),
-        list46['forEach']((error17) => {
-          [error17?.['name'], error17?.['description'], error17?.['occurrences']]['forEach']((value104) => {
-            value86['test'](String(value104 || '')) &&
-              handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '形象描述泄露了内部处理规则');
+      error16?.designStatus === 'baseline' &&
+        handler(error16?.kind, (error16?.name || '未命名资产') + '缺少 API 视觉反推');
+      error16?.kind === 'scene' &&
+        /[/／|｜]/u.test(String(error16?.name || '')) &&
+        handler('scene', error16.name + '仍是复合场景名');
+      const list46 = Array.isArray(error16?.appearances) ? error16.appearances : [];
+      (!list46.length && handler(error16?.kind, (error16?.name || '未命名资产') + '缺少形象'),
+        list46.forEach((error17) => {
+          [error17?.name, error17?.description, error17?.occurrences].forEach((value104) => {
+            value86.test(String(value104 || '')) &&
+              handler(error16?.kind, (error16?.name || '未命名资产') + '形象描述泄露了内部处理规则');
           });
-          const list47 = String(error17?.['prompt'] || '')['trim']();
-          if (!list47) handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '缺少图片提示词');
+          const list47 = String(error17?.prompt || '').trim();
+          if (!list47) handler(error16?.kind, (error16?.name || '未命名资产') + '缺少图片提示词');
           else {
-            if (list47['length'] > STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS)
-              handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '提示词异常过长');
+            if (list47.length > STORY_ASSET_PUBLIC_PROMPT_MAX_CHARACTERS)
+              handler(error16?.kind, (error16?.name || '未命名资产') + '提示词异常过长');
             else {
               if (promptCopiesStorySource(list47, value79))
-                handler(error16?.['kind'], (error16?.['name'] || '未命名资产') + '提示词复制了大段剧情原文');
+                handler(error16?.kind, (error16?.name || '未命名资产') + '提示词复制了大段剧情原文');
               else
-                value86['test'](list47) &&
+                value86.test(list47) &&
                   handler(
-                    error16?.['kind'],
-                    (error16?.['name'] || '未命名资产') + '提示词泄露了内部处理规则',
+                    error16?.kind,
+                    (error16?.name || '未命名资产') + '提示词泄露了内部处理规则',
                   );
             }
           }
         }));
     }));
-  if (!problems['length']) return;
+  if (!problems.length) return;
   const error18 = new Error(
     'API 视觉反推质量校验未通过：' +
-      problems['slice'](0, 3)['join']('；') +
+      problems.slice(0, 3).join('；') +
       '。旧资产已保留，未进入下一步。',
   );
-  ((error18['type'] = 'ASSET_VISUAL_QUALITY'),
-    (error18['validationDetails'] = { problems: problems, kinds: [...args13] }));
+  ((error18.type = 'ASSET_VISUAL_QUALITY'),
+    (error18.validationDetails = { problems: problems, kinds: [...args13] }));
   throw error18;
 }
 async function checkpointStoryAssetQualityFailure(error19, enabled6, value105) {
   if (!enabled6 || typeof enabled6 !== 'object') return;
   const response4 = cloneValue(enabled6);
-  response4['hybridQualityPolicyVersion'] = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION;
-  const list48 = Array['isArray'](error19?.['validationDetails']?.['kinds'])
-      ? error19['validationDetails']['kinds']
+  response4.hybridQualityPolicyVersion = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION;
+  const list48 = Array.isArray(error19?.validationDetails?.kinds)
+      ? error19.validationDetails.kinds
       : [],
-    kinds = list48['length'] ? list48 : ['character', 'scene', 'prop'],
+    kinds = list48.length ? list48 : ['character', 'scene', 'prop'],
     batchIds =
-      response4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+      response4.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
         ? getStoryAssetProtectedPaidBatchKeys(response4)
         : [];
-  ((response4['qualityReview'] = {
+  ((response4.qualityReview = {
     schemaVersion: STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION,
     status: 'blocked',
     policyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
     recoveryMode: STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN,
     kinds: kinds,
-    ...(batchIds['length'] ? { batchIds: batchIds } : {}),
-    problems: Array['isArray'](error19?.['validationDetails']?.['problems'])
-      ? [...error19['validationDetails']['problems']]
+    ...(batchIds.length ? { batchIds: batchIds } : {}),
+    problems: Array.isArray(error19?.validationDetails?.problems)
+      ? [...error19.validationDetails.problems]
       : [],
-    message: String(error19?.['message'] || '结果校验失败'),
-    reviewedAt: Date['now'](),
+    message: String(error19?.message || '结果校验失败'),
+    reviewedAt: Date.now(),
   }),
-    (response4['status'] = 'blocked'),
-    (response4['kindStates'] =
-      response4['kindStates'] && typeof response4['kindStates'] === 'object' ? response4['kindStates'] : {}),
-    kinds['forEach']((kind2) => {
-      response4['kindStates'][kind2] = {
-        ...(response4['kindStates'][kind2] || {}),
+    (response4.status = 'blocked'),
+    (response4.kindStates =
+      response4.kindStates && typeof response4.kindStates === 'object' ? response4.kindStates : {}),
+    kinds.forEach((kind2) => {
+      response4.kindStates[kind2] = {
+        ...(response4.kindStates[kind2] || {}),
         kind: kind2,
         status: 'blocked-quality-rerun',
         errorType: 'quality-rerun-required',
         errorMessage: '已付费结果未通过当前视觉质量合同；需要用户明确授权后重新请求该通道。',
-        finishedAt: Date['now'](),
+        finishedAt: Date.now(),
       };
     }),
-    batchIds['forEach']((value106) => {
-      const response5 = response4['batchSubmissionRecords']?.[value106];
+    batchIds.forEach((value106) => {
+      const response5 = response4.batchSubmissionRecords?.[value106];
       if (!response5) return;
-      ((response5['qualityPreviousStatus'] = response5['status']),
-        (response5['status'] = 'blocked-quality-rerun'),
-        (response5['errorType'] = 'quality-rerun-required'),
-        (response5['errorMessage'] = '已付费结果未通过当前视觉质量合同；需要用户逐批明确授权后重新请求。'),
-        (response5['blockedAt'] = Date['now']()));
+      ((response5.qualityPreviousStatus = response5.status),
+        (response5.status = 'blocked-quality-rerun'),
+        (response5.errorType = 'quality-rerun-required'),
+        (response5.errorMessage = '已付费结果未通过当前视觉质量合同；需要用户逐批明确授权后重新请求。'),
+        (response5.blockedAt = Date.now()));
     }),
-    (response4['completedKinds'] = ['character', 'scene', 'prop']['filter'](
-      (value107) => response4['kindStates']?.[value107]?.['status'] === 'succeeded',
+    (response4.completedKinds = ['character', 'scene', 'prop'].filter(
+      (value107) => response4.kindStates?.[value107]?.status === 'succeeded',
     )),
-    (response4['failures'] = kinds['map']((kind3) => ({
+    (response4.failures = kinds.map((kind3) => ({
       stage: 'quality',
       kind: kind3,
       errorType: 'quality-rerun-required',
       errorMessage: '已付费结果未通过当前视觉质量合同；需要用户明确授权后重新请求。',
     }))),
-    (response4['updatedAt'] = Date['now']()),
-    (error19['assetExtractionDraft'] = cloneValue(response4)),
+    (response4.updatedAt = Date.now()),
+    (error19.assetExtractionDraft = cloneValue(response4)),
     await value105?.(response4));
 }
 function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
   const response6 = cloneValue(value108);
   if (!response6) return value108;
   let enabled7 = false;
-  response6['qualityReview'] && (delete response6['qualityReview'], (enabled7 = true));
+  response6.qualityReview && (delete response6.qualityReview, (enabled7 = true));
   let enabled8 = 0;
-  ['character', 'scene', 'prop']['forEach']((value109) => {
-    const response7 = response6?.['kindStates']?.[value109],
-      assetCount = response6?.['assetsByKind']?.[value109],
-      assetCount2 = Array['isArray'](response6?.['completedAssets'])
-        ? response6['completedAssets']['filter']((value110) => value110?.['kind'] === value109)
+  ['character', 'scene', 'prop'].forEach((value109) => {
+    const response7 = response6?.kindStates?.[value109],
+      assetCount = response6?.assetsByKind?.[value109],
+      assetCount2 = Array.isArray(response6?.completedAssets)
+        ? response6.completedAssets.filter((value110) => value110?.kind === value109)
         : [];
     if (
-      response6?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
-      response7?.['status'] === 'blocked-quality-rerun' &&
-      assetCount2['length']
+      response6?.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
+      response7?.status === 'blocked-quality-rerun' &&
+      assetCount2.length
     ) {
-      ((response6['kindStates'][value109] = {
+      ((response6.kindStates[value109] = {
         ...response7,
         status: 'succeeded',
-        assetCount: assetCount2['length'],
-        totalAssetCount: assetCount2['length'],
+        assetCount: assetCount2.length,
+        totalAssetCount: assetCount2.length,
         errorType: '',
         errorMessage: '',
       }),
@@ -935,15 +931,15 @@ function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
       return;
     }
     if (
-      response7?.['status'] !== 'failed' ||
-      response7?.['errorType'] !== 'validation' ||
-      !Array['isArray'](assetCount)
+      response7?.status !== 'failed' ||
+      response7?.errorType !== 'validation' ||
+      !Array.isArray(assetCount)
     )
       return;
-    ((response6['kindStates'][value109] = {
+    ((response6.kindStates[value109] = {
       ...response7,
       status: 'succeeded',
-      assetCount: assetCount['length'],
+      assetCount: assetCount.length,
       errorType: '',
       errorMessage: '',
     }),
@@ -951,67 +947,67 @@ function prepareLegacyStoryAssetQualityRevalidationDraft(value108) {
   });
   if (!enabled8 && !enabled7) return value108;
   return (
-    (response6['hybridQualityPolicyVersion'] = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION),
-    (response6['completedKinds'] = ['character', 'scene', 'prop']['filter'](
-      (value111) => response6['kindStates']?.[value111]?.['status'] === 'succeeded',
+    (response6.hybridQualityPolicyVersion = STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION),
+    (response6.completedKinds = ['character', 'scene', 'prop'].filter(
+      (value111) => response6.kindStates?.[value111]?.status === 'succeeded',
     )),
-    response6?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-      ? Object['values'](response6['batchSubmissionRecords'] || {})['forEach']((response8) => {
-          response8?.['status'] === 'blocked-quality-rerun' &&
-            String(response8?.['qualityPreviousStatus'] || '')['trim']() &&
-            ((response8['status'] = response8['qualityPreviousStatus']),
-            delete response8['qualityPreviousStatus'],
-            delete response8['errorType'],
-            delete response8['errorMessage'],
-            delete response8['blockedAt']);
+    response6?.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+      ? Object.values(response6.batchSubmissionRecords || {}).forEach((response8) => {
+          response8?.status === 'blocked-quality-rerun' &&
+            String(response8?.qualityPreviousStatus || '').trim() &&
+            ((response8.status = response8.qualityPreviousStatus),
+            delete response8.qualityPreviousStatus,
+            delete response8.errorType,
+            delete response8.errorMessage,
+            delete response8.blockedAt);
         })
-      : (response6['completedAssets'] = ['character', 'scene', 'prop']['flatMap'](
-          (value112) => response6['assetsByKind']?.[value112] || [],
+      : (response6.completedAssets = ['character', 'scene', 'prop'].flatMap(
+          (value112) => response6.assetsByKind?.[value112] || [],
         )),
-    (response6['failures'] = []),
-    (response6['status'] = response6['completedKinds']['length'] === 3 ? 'completed' : 'partial'),
+    (response6.failures = []),
+    (response6.status = response6.completedKinds.length === 3 ? 'completed' : 'partial'),
     response6
   );
 }
 function isCurrentStoryAssetPaidQualityReview(value113) {
   return Boolean(
-    Number(value113?.['qualityReview']?.['schemaVersion']) >= STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION &&
-    Number(value113?.['qualityReview']?.['policyVersion']) === STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
-    value113?.['qualityReview']?.['recoveryMode'] === STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN,
+    Number(value113?.qualityReview?.schemaVersion) >= STORY_ASSET_QUALITY_REVIEW_SCHEMA_VERSION &&
+    Number(value113?.qualityReview?.policyVersion) === STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
+    value113?.qualityReview?.recoveryMode === STORY_ASSET_QUALITY_RECOVERY_PAID_RERUN,
   );
 }
 function archiveAndResetStoryAssetQualityLane(responseMode2, kind4) {
-  responseMode2['paidResponseHistoryByKind'] =
-    responseMode2['paidResponseHistoryByKind'] &&
-    typeof responseMode2['paidResponseHistoryByKind'] === 'object'
-      ? responseMode2['paidResponseHistoryByKind']
+  responseMode2.paidResponseHistoryByKind =
+    responseMode2.paidResponseHistoryByKind &&
+    typeof responseMode2.paidResponseHistoryByKind === 'object'
+      ? responseMode2.paidResponseHistoryByKind
       : {};
-  const list49 = Array['isArray'](responseMode2['paidResponseHistoryByKind'][kind4])
-    ? responseMode2['paidResponseHistoryByKind'][kind4]
+  const list49 = Array.isArray(responseMode2.paidResponseHistoryByKind[kind4])
+    ? responseMode2.paidResponseHistoryByKind[kind4]
     : [];
-  (list49['push']({
-    archivedAt: Date['now'](),
+  (list49.push({
+    archivedAt: Date.now(),
     reason: 'authorized-quality-rerun',
-    rawResponse: Object['hasOwn'](responseMode2?.['rawResponsesByKind'] || {}, kind4)
-      ? responseMode2['rawResponsesByKind'][kind4]
+    rawResponse: Object.hasOwn(responseMode2?.rawResponsesByKind || {}, kind4)
+      ? responseMode2.rawResponsesByKind[kind4]
       : '',
-    responseMode: responseMode2?.['rawResponseModesByKind']?.[kind4] || '',
-    contractSnapshot: cloneValue(responseMode2?.['rawResponseContractSnapshotsByKind']?.[kind4]),
-    decisions: cloneValue(responseMode2?.['decisionsByKind']?.[kind4]),
-    assets: cloneValue(responseMode2?.['assetsByKind']?.[kind4] || []),
-    submissionState: cloneValue(responseMode2?.['submissionStatesByKind']?.[kind4]),
-    kindState: cloneValue(responseMode2?.['kindStates']?.[kind4]),
+    responseMode: responseMode2?.rawResponseModesByKind?.[kind4] || '',
+    contractSnapshot: cloneValue(responseMode2?.rawResponseContractSnapshotsByKind?.[kind4]),
+    decisions: cloneValue(responseMode2?.decisionsByKind?.[kind4]),
+    assets: cloneValue(responseMode2?.assetsByKind?.[kind4] || []),
+    submissionState: cloneValue(responseMode2?.submissionStatesByKind?.[kind4]),
+    kindState: cloneValue(responseMode2?.kindStates?.[kind4]),
   }),
-    (responseMode2['paidResponseHistoryByKind'][kind4] = list49),
-    (responseMode2['assetsByKind'][kind4] = []),
-    delete responseMode2['rawResponsesByKind'][kind4],
-    delete responseMode2['rawResponseModesByKind'][kind4],
-    delete responseMode2['rawResponseContractSnapshotsByKind'][kind4],
-    delete responseMode2['paidResponseReceivedByKind'][kind4],
-    delete responseMode2['decisionsByKind'][kind4],
-    delete responseMode2['submissionStatesByKind'][kind4],
-    (responseMode2['kindStates'][kind4] = {
-      ...(responseMode2['kindStates'][kind4] || {}),
+    (responseMode2.paidResponseHistoryByKind[kind4] = list49),
+    (responseMode2.assetsByKind[kind4] = []),
+    delete responseMode2.rawResponsesByKind[kind4],
+    delete responseMode2.rawResponseModesByKind[kind4],
+    delete responseMode2.rawResponseContractSnapshotsByKind[kind4],
+    delete responseMode2.paidResponseReceivedByKind[kind4],
+    delete responseMode2.decisionsByKind[kind4],
+    delete responseMode2.submissionStatesByKind[kind4],
+    (responseMode2.kindStates[kind4] = {
+      ...(responseMode2.kindStates[kind4] || {}),
       kind: kind4,
       status: 'pending',
       assetCount: 0,
@@ -1021,94 +1017,94 @@ function archiveAndResetStoryAssetQualityLane(responseMode2, kind4) {
     }));
 }
 function archiveAndResetStoryAssetQualityBatches(response9, list50) {
-  ((response9['paidBatchHistory'] =
-    response9['paidBatchHistory'] && typeof response9['paidBatchHistory'] === 'object'
-      ? response9['paidBatchHistory']
+  ((response9.paidBatchHistory =
+    response9.paidBatchHistory && typeof response9.paidBatchHistory === 'object'
+      ? response9.paidBatchHistory
       : {}),
-    list50['forEach']((value114) => {
-      const enabled9 = response9['batchSubmissionRecords']?.[value114];
+    list50.forEach((value114) => {
+      const enabled9 = response9.batchSubmissionRecords?.[value114];
       if (!enabled9) return;
-      const list51 = Array['isArray'](response9['paidBatchHistory'][value114])
-        ? response9['paidBatchHistory'][value114]
+      const list51 = Array.isArray(response9.paidBatchHistory[value114])
+        ? response9.paidBatchHistory[value114]
         : [];
-      (list51['push']({
+      (list51.push({
         ...cloneValue(enabled9),
-        archivedAt: Date['now'](),
+        archivedAt: Date.now(),
         archiveReason: 'authorized-quality-rerun',
       }),
-        (response9['paidBatchHistory'][value114] = list51));
+        (response9.paidBatchHistory[value114] = list51));
     }),
-    (response9['status'] = 'pending'),
-    (response9['phase'] = 'inventory'),
-    (response9['inventoryBatches'] = []),
-    (response9['inventory'] = null),
-    (response9['completedAssets'] = []),
-    (response9['detailBatches'] = []),
-    (response9['batchSubmissionRecords'] = {}),
-    (response9['failures'] = []),
-    (response9['runRequestCount'] = 0),
-    delete response9['kindStates'],
-    delete response9['progress']);
+    (response9.status = 'pending'),
+    (response9.phase = 'inventory'),
+    (response9.inventoryBatches = []),
+    (response9.inventory = null),
+    (response9.completedAssets = []),
+    (response9.detailBatches = []),
+    (response9.batchSubmissionRecords = {}),
+    (response9.failures = []),
+    (response9.runRequestCount = 0),
+    delete response9.kindStates,
+    delete response9.progress);
 }
 function createStoryAssetQualityRerunRequiredError(value115, args14, args15) {
   const error20 = new Error('已付费结果未通过视觉质量合同；未获得精确授权，未自动重新请求。');
   return (
-    (error20['type'] = 'ASSET_VISUAL_QUALITY_RERUN_REQUIRED'),
-    (error20['blockedKinds'] = [...args14]),
-    (error20['blockedBatchIds'] = [...args15]),
-    (error20['assetExtractionDraft'] = cloneValue(value115)),
+    (error20.type = 'ASSET_VISUAL_QUALITY_RERUN_REQUIRED'),
+    (error20.blockedKinds = [...args14]),
+    (error20.blockedBatchIds = [...args15]),
+    (error20.assetExtractionDraft = cloneValue(value115)),
     error20
   );
 }
 async function prepareStoryAssetQualityRecoveryDraft(enabled10, value116, value117) {
-  if (!enabled10?.['qualityReview']) return enabled10;
+  if (!enabled10?.qualityReview) return enabled10;
   if (!isCurrentStoryAssetPaidQualityReview(enabled10))
     return prepareLegacyStoryAssetQualityRevalidationDraft(enabled10);
   const cloneValue4 = cloneValue(enabled10),
     list52 =
-      Array['isArray'](cloneValue4['qualityReview']?.['kinds']) &&
-      cloneValue4['qualityReview']['kinds']['length']
-        ? cloneValue4['qualityReview']['kinds']
+      Array.isArray(cloneValue4.qualityReview?.kinds) &&
+      cloneValue4.qualityReview.kinds.length
+        ? cloneValue4.qualityReview.kinds
         : ['character', 'scene', 'prop'],
     list53 =
-      cloneValue4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-        ? Array['isArray'](cloneValue4['qualityReview']?.['batchIds'])
-          ? cloneValue4['qualityReview']['batchIds']
+      cloneValue4.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+        ? Array.isArray(cloneValue4.qualityReview?.batchIds)
+          ? cloneValue4.qualityReview.batchIds
           : getStoryAssetProtectedPaidBatchKeys(cloneValue4)
         : [],
     list54 =
-      cloneValue4['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
-        ? list52['filter']((value118) => !isStoryAssetPaidLaneRerunAuthorized(value116, value118))
+      cloneValue4.strategy === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
+        ? list52.filter((value118) => !isStoryAssetPaidLaneRerunAuthorized(value116, value118))
         : [],
     list55 =
-      cloneValue4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
-        ? list53['filter']((value119) => !isStoryAssetPaidBatchRerunAuthorized(value116, value119))
+      cloneValue4.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+        ? list53.filter((value119) => !isStoryAssetPaidBatchRerunAuthorized(value116, value119))
         : [];
-  if (list54['length'] || list55['length'])
+  if (list54.length || list55.length)
     throw createStoryAssetQualityRerunRequiredError(
       cloneValue4,
-      list54['length'] ? list54 : list52,
-      list55['length'] ? list55 : list53,
+      list54.length ? list54 : list52,
+      list55.length ? list55 : list53,
     );
-  if (cloneValue4['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY)
-    list52['forEach']((value120) => {
+  if (cloneValue4.strategy === STORY_ASSET_PARALLEL_DRAFT_STRATEGY)
+    list52.forEach((value120) => {
       archiveAndResetStoryAssetQualityLane(cloneValue4, value120);
     });
   else
-    cloneValue4['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
+    cloneValue4.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
       archiveAndResetStoryAssetQualityBatches(cloneValue4, list53);
-  const list56 = Array['isArray'](cloneValue4['qualityReviewHistory'])
-    ? cloneValue4['qualityReviewHistory']
+  const list56 = Array.isArray(cloneValue4.qualityReviewHistory)
+    ? cloneValue4.qualityReviewHistory
     : [];
   return (
-    list56['push']({
-      ...cloneValue(cloneValue4['qualityReview']),
-      recoveredAt: Date['now'](),
+    list56.push({
+      ...cloneValue(cloneValue4.qualityReview),
+      recoveredAt: Date.now(),
       recoveryReason: 'authorized-quality-rerun',
     }),
-    (cloneValue4['qualityReviewHistory'] = list56),
-    delete cloneValue4['qualityReview'],
-    (cloneValue4['updatedAt'] = Date['now']()),
+    (cloneValue4.qualityReviewHistory = list56),
+    delete cloneValue4.qualityReview,
+    (cloneValue4.updatedAt = Date.now()),
     await value117?.(cloneValue(cloneValue4)),
     cloneValue4
   );
@@ -1138,15 +1134,13 @@ export async function extractStoryAssetsHybridExperimental({
       requiredAssetNamesByKind: requiredAssetNamesByKind3,
     }),
     nextSourceFingerprint2 = createStoryAssetAuthoritativeSourceFingerprint(sourceScenes),
-    previousSourceFingerprint2 = String(resumeDraft?.['hybridAuthoritativeSourceFingerprint'] || '')[
-      'trim'
-    ](),
+    previousSourceFingerprint2 = String(resumeDraft?.hybridAuthoritativeSourceFingerprint || '').trim(),
     value121 = Boolean(previousSourceFingerprint2 && previousSourceFingerprint2 !== nextSourceFingerprint2),
     enabled11 = Boolean(
       value121 &&
-      Number(resumeDraft?.['hybridQualityPolicyVersion']) >= 5 &&
-      Number(resumeDraft?.['hybridQualityPolicyVersion']) <= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
-      hasSameStoryAssetAuthoritativeContent(resumeDraft?.['hybridEvidenceScenes'], sourceScenes),
+      Number(resumeDraft?.hybridQualityPolicyVersion) >= 5 &&
+      Number(resumeDraft?.hybridQualityPolicyVersion) <= STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION &&
+      hasSameStoryAssetAuthoritativeContent(resumeDraft?.hybridEvidenceScenes, sourceScenes),
     ),
     value122 = Boolean(value121 && !enabled11);
   enabled11 &&
@@ -1154,25 +1148,25 @@ export async function extractStoryAssetsHybridExperimental({
       status: 'compatibility-migration',
       reason: 'derived-character-normalization-drift',
     });
-  const value123 = args16?.['paidRerunAuthorization'],
+  const value123 = args16?.paidRerunAuthorization,
     paidKinds =
-      value122 && resumeDraft?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
+      value122 && resumeDraft?.strategy === STORY_ASSET_PARALLEL_DRAFT_STRATEGY
         ? getStoryAssetPaidDraftKinds(resumeDraft)
         : [],
     paidBatchKeys =
-      value122 && resumeDraft?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
+      value122 && resumeDraft?.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY
         ? getStoryAssetProtectedPaidBatchKeys(resumeDraft)
         : [],
-    unauthorizedKinds = paidKinds['filter'](
+    unauthorizedKinds = paidKinds.filter(
       (value124) => !isStoryAssetPaidLaneRerunAuthorized(value123, value124),
     ),
-    unauthorizedBatchKeys = paidBatchKeys['filter'](
+    unauthorizedBatchKeys = paidBatchKeys.filter(
       (value125) => !isStoryAssetPaidBatchRerunAuthorized(value123, value125),
     );
-  if (unauthorizedKinds['length'] || unauthorizedBatchKeys['length']) {
+  if (unauthorizedKinds.length || unauthorizedBatchKeys.length) {
     const response10 = cloneValue(resumeDraft);
-    ((response10['status'] = 'blocked'),
-      (response10['hybridSourceChangeReview'] = {
+    ((response10.status = 'blocked'),
+      (response10.hybridSourceChangeReview = {
         status: 'blocked',
         reason: 'authoritative-source-changed',
         previousSourceFingerprint: previousSourceFingerprint2,
@@ -1182,51 +1176,51 @@ export async function extractStoryAssetsHybridExperimental({
         paidBatchKeys: paidBatchKeys,
         unauthorizedBatchKeys: unauthorizedBatchKeys,
       }),
-      (response10['kindStates'] =
-        response10['kindStates'] && typeof response10['kindStates'] === 'object'
-          ? response10['kindStates']
+      (response10.kindStates =
+        response10.kindStates && typeof response10.kindStates === 'object'
+          ? response10.kindStates
           : {}),
-      unauthorizedKinds['forEach']((kind5) => {
-        response10['kindStates'][kind5] = {
-          ...(response10['kindStates'][kind5] || {}),
+      unauthorizedKinds.forEach((kind5) => {
+        response10.kindStates[kind5] = {
+          ...(response10.kindStates[kind5] || {}),
           kind: kind5,
           status: 'blocked-source-changed',
           errorType: 'authoritative-source-changed',
           errorMessage: '剧本权威正文已变化；需要用户明确授权后才能重新提交该付费通道。',
         };
       }),
-      (response10['batchSubmissionRecords'] =
-        response10['batchSubmissionRecords'] && typeof response10['batchSubmissionRecords'] === 'object'
-          ? response10['batchSubmissionRecords']
+      (response10.batchSubmissionRecords =
+        response10.batchSubmissionRecords && typeof response10.batchSubmissionRecords === 'object'
+          ? response10.batchSubmissionRecords
           : {}),
-      unauthorizedBatchKeys['forEach']((value126) => {
-        const response11 = response10['batchSubmissionRecords'][value126];
+      unauthorizedBatchKeys.forEach((value126) => {
+        const response11 = response10.batchSubmissionRecords[value126];
         if (!response11) return;
-        (response11['status'] !== 'blocked-incompatible' &&
-          (response11['incompatiblePreviousStatus'] = response11['status']),
-          (response11['status'] = 'blocked-incompatible'),
-          (response11['errorType'] = 'authoritative-source-changed'),
-          (response11['errorMessage'] = '剧本权威正文已变化；需要逐批明确授权后才能重新提交该付费批次。'),
-          (response11['blockedAt'] = Date['now']()));
+        (response11.status !== 'blocked-incompatible' &&
+          (response11.incompatiblePreviousStatus = response11.status),
+          (response11.status = 'blocked-incompatible'),
+          (response11.errorType = 'authoritative-source-changed'),
+          (response11.errorMessage = '剧本权威正文已变化；需要逐批明确授权后才能重新提交该付费批次。'),
+          (response11.blockedAt = Date.now()));
       }),
-      (response10['failures'] = unauthorizedKinds['map']((kind6) => ({
+      (response10.failures = unauthorizedKinds.map((kind6) => ({
         stage: 'kind',
         kind: kind6,
         errorType: 'authoritative-source-changed',
         errorMessage: '剧本权威正文已变化；需要用户明确授权后才能重新提交该付费通道。',
       }))),
-      (response10['updatedAt'] = Date['now']()),
+      (response10.updatedAt = Date.now()),
       await onCheckpoint?.(response10));
     const error21 = new Error('剧本权威正文已变化；已有付费提交未获得精确授权，未自动重新请求。');
-    ((error21['type'] = 'ASSET_AUTHORITATIVE_SOURCE_CHANGED'),
-      (error21['blockedKinds'] = unauthorizedKinds),
-      (error21['blockedBatchIds'] = unauthorizedBatchKeys),
-      (error21['assetExtractionDraft'] = cloneValue(response10)));
+    ((error21.type = 'ASSET_AUTHORITATIVE_SOURCE_CHANGED'),
+      (error21.blockedKinds = unauthorizedKinds),
+      (error21.blockedBatchIds = unauthorizedBatchKeys),
+      (error21.assetExtractionDraft = cloneValue(response10)));
     throw error21;
   }
-  if (value122 && paidKinds['length']) {
-    const args17 = Array['isArray'](resumeDraft?.['hybridPaidSourceHistory'])
-        ? cloneValue(resumeDraft['hybridPaidSourceHistory'])
+  if (value122 && paidKinds.length) {
+    const args17 = Array.isArray(resumeDraft?.hybridPaidSourceHistory)
+        ? cloneValue(resumeDraft.hybridPaidSourceHistory)
         : [],
       value127 = [
         ...args17,
@@ -1242,13 +1236,13 @@ export async function extractStoryAssetsHybridExperimental({
       await value128?.({ ...args18, hybridPaidSourceHistory: cloneValue(value127) });
     };
   }
-  if (value122 && paidBatchKeys['length']) {
-    const cloneValue5 = cloneValue(resumeDraft?.['paidBatchHistory'] || {});
-    paidBatchKeys['forEach']((value129) => {
-      const list57 = Array['isArray'](cloneValue5[value129]) ? cloneValue5[value129] : [];
-      (list57['push']({
-        ...cloneValue(resumeDraft?.['batchSubmissionRecords']?.[value129]),
-        archivedAt: Date['now'](),
+  if (value122 && paidBatchKeys.length) {
+    const cloneValue5 = cloneValue(resumeDraft?.paidBatchHistory || {});
+    paidBatchKeys.forEach((value129) => {
+      const list57 = Array.isArray(cloneValue5[value129]) ? cloneValue5[value129] : [];
+      (list57.push({
+        ...cloneValue(resumeDraft?.batchSubmissionRecords?.[value129]),
+        archivedAt: Date.now(),
         archiveReason: 'authorized-authoritative-source-change-rerun',
         previousSourceFingerprint: previousSourceFingerprint2,
         nextSourceFingerprint: nextSourceFingerprint2,
@@ -1258,14 +1252,14 @@ export async function extractStoryAssetsHybridExperimental({
     const value130 = onCheckpoint;
     onCheckpoint = async (args19) => {
       const value131 =
-          args19?.['paidBatchHistory'] && typeof args19['paidBatchHistory'] === 'object'
-            ? args19['paidBatchHistory']
+          args19?.paidBatchHistory && typeof args19.paidBatchHistory === 'object'
+            ? args19.paidBatchHistory
             : {},
         paidBatchHistory = cloneValue(cloneValue5);
-      (Object['entries'](value131)['forEach'](([value132, value133]) => {
+      (Object.entries(value131).forEach(([value132, value133]) => {
         paidBatchHistory[value132] = [
-          ...(Array['isArray'](paidBatchHistory[value132]) ? paidBatchHistory[value132] : []),
-          ...(Array['isArray'](value133) ? cloneValue(value133) : []),
+          ...(Array.isArray(paidBatchHistory[value132]) ? paidBatchHistory[value132] : []),
+          ...(Array.isArray(value133) ? cloneValue(value133) : []),
         ];
       }),
         await value130?.({ ...args19, paidBatchHistory: paidBatchHistory }));
@@ -1285,33 +1279,33 @@ export async function extractStoryAssetsHybridExperimental({
       capacityError: capacityError,
     }) => {
       const sourceScenes2 =
-          resumeDraft3?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
-          Array['isArray'](resumeDraft3?.['hybridEvidenceScenes']) &&
-          resumeDraft3['hybridEvidenceScenes']['length']
-            ? cloneValue(resumeDraft3['hybridEvidenceScenes'])
+          resumeDraft3?.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY &&
+          Array.isArray(resumeDraft3?.hybridEvidenceScenes) &&
+          resumeDraft3.hybridEvidenceScenes.length
+            ? cloneValue(resumeDraft3.hybridEvidenceScenes)
             : sourceScenes,
-        resumeDraft4 = Boolean(resumeDraft3?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY),
+        resumeDraft4 = Boolean(resumeDraft3?.strategy === STORY_ASSET_PARALLEL_DRAFT_STRATEGY),
         paidKinds2 = resumeDraft4 ? getStoryAssetPaidDraftKinds(resumeDraft3) : [],
-        unauthorizedKinds2 = paidKinds2['filter'](
+        unauthorizedKinds2 = paidKinds2.filter(
           (value134) => !isStoryAssetPaidLaneRerunAuthorized(value123, value134),
         );
-      if (unauthorizedKinds2['length']) {
+      if (unauthorizedKinds2.length) {
         const response12 = cloneValue(resumeDraft3);
-        ((response12['status'] = 'blocked'),
-          (response12['hybridCapacityReview'] = {
+        ((response12.status = 'blocked'),
+          (response12.hybridCapacityReview = {
             status: 'blocked',
             reason: 'parallel-contract-over-capacity',
             paidKinds: paidKinds2,
             unauthorizedKinds: unauthorizedKinds2,
-            capacityDetails: cloneValue(capacityError?.['capacityDetails']),
+            capacityDetails: cloneValue(capacityError?.capacityDetails),
           }),
-          (response12['kindStates'] =
-            response12['kindStates'] && typeof response12['kindStates'] === 'object'
-              ? response12['kindStates']
+          (response12.kindStates =
+            response12.kindStates && typeof response12.kindStates === 'object'
+              ? response12.kindStates
               : {}),
-          unauthorizedKinds2['forEach']((kind7) => {
-            response12['kindStates'][kind7] = {
-              ...(response12['kindStates']?.[kind7] || {}),
+          unauthorizedKinds2.forEach((kind7) => {
+            response12.kindStates[kind7] = {
+              ...(response12.kindStates?.[kind7] || {}),
               kind: kind7,
               status: 'blocked-incompatible',
               errorType: 'capacity-strategy-incompatible',
@@ -1319,39 +1313,39 @@ export async function extractStoryAssetsHybridExperimental({
                 '当前完整输出合同需要切换到证据分批链；需要用户明确授权后才能重新提交该付费通道。',
             };
           }),
-          (response12['updatedAt'] = Date['now']()),
+          (response12.updatedAt = Date.now()),
           await onCheckpoint?.(response12));
         const error22 = new Error(
           '完整输出合同超过单路安全容量；' +
-            unauthorizedKinds2['join']('、') +
+            unauthorizedKinds2.join('、') +
             '已有付费结果，未自动切换并重新请求。',
         );
-        ((error22['type'] = 'ASSET_CONTRACT_INCOMPATIBLE'),
-          (error22['blockedKinds'] = unauthorizedKinds2),
-          (error22['assetExtractionDraft'] = cloneValue(response12)));
+        ((error22.type = 'ASSET_CONTRACT_INCOMPATIBLE'),
+          (error22.blockedKinds = unauthorizedKinds2),
+          (error22.assetExtractionDraft = cloneValue(response12)));
         throw error22;
       }
       reportDiagnostics(diagnostics, 'story-asset-hybrid-capacity-route', {
         status: 'started',
         extractionMode: extractionMode,
-        ...(capacityError?.['capacityDetails'] || {}),
+        ...(capacityError?.capacityDetails || {}),
         requestLimit: 3,
       });
       const value135 =
-        resumeDraft4 && paidKinds2['length']
+        resumeDraft4 && paidKinds2.length
           ? [
-              ...(Array['isArray'](resumeDraft3?.['hybridPaidStrategyHistory'])
-                ? cloneValue(resumeDraft3['hybridPaidStrategyHistory'])
+              ...(Array.isArray(resumeDraft3?.hybridPaidStrategyHistory)
+                ? cloneValue(resumeDraft3.hybridPaidStrategyHistory)
                 : []),
               {
                 ...createStoryAssetSourceChangePaidHistoryEntry(
                   resumeDraft3,
                   paidKinds2,
-                  resumeDraft3?.['hybridAuthoritativeSourceFingerprint'] || '',
+                  resumeDraft3?.hybridAuthoritativeSourceFingerprint || '',
                   nextSourceFingerprint2,
                 ),
                 reason: 'authorized-capacity-strategy-rerun',
-                capacityDetails: cloneValue(capacityError?.['capacityDetails']),
+                capacityDetails: cloneValue(capacityError?.capacityDetails),
               },
             ]
           : null;
@@ -1364,10 +1358,10 @@ export async function extractStoryAssetsHybridExperimental({
           hybridCapacityFallback: {
             strategy: 'evidence-batched-api',
             requestLimit: 3,
-            capacityDetails: cloneValue(capacityError?.['capacityDetails']),
+            capacityDetails: cloneValue(capacityError?.capacityDetails),
           },
           hybridEvidenceScenes: cloneValue(sourceScenes2),
-          hybridLocalRuntime: localRuntime || args20?.['hybridLocalRuntime'] || null,
+          hybridLocalRuntime: localRuntime || args20?.hybridLocalRuntime || null,
           ...(candidateInventory ? { hybridCandidateInventory: cloneValue(candidateInventory) } : {}),
           ...(value135 ? { hybridPaidStrategyHistory: cloneValue(value135) } : {}),
           hybridAuthoritativeSourceFingerprint: nextSourceFingerprint2,
@@ -1396,18 +1390,18 @@ export async function extractStoryAssetsHybridExperimental({
             'ASSET_SUBMISSION_AMBIGUOUS',
             'ASSET_PAID_RESULT_BLOCKED',
             'ASSET_CONTRACT_INCOMPATIBLE',
-          ]['includes'](value137?.['type']) &&
-          (value137['assetExtractionDraft'] = {
+          ].includes(value137?.type) &&
+          (value137.assetExtractionDraft = {
             ...cloneValue(hybridQualityPolicyVersion),
-            ...cloneValue(value137['assetExtractionDraft'] || {}),
-            hybridQualityPolicyVersion: hybridQualityPolicyVersion['hybridQualityPolicyVersion'],
-            hybridExtractionMode: hybridQualityPolicyVersion['hybridExtractionMode'],
-            hybridCapacityFallback: cloneValue(hybridQualityPolicyVersion['hybridCapacityFallback']),
-            hybridEvidenceScenes: cloneValue(hybridQualityPolicyVersion['hybridEvidenceScenes']),
-            hybridLocalRuntime: cloneValue(hybridQualityPolicyVersion['hybridLocalRuntime']),
-            hybridCandidateInventory: cloneValue(hybridQualityPolicyVersion['hybridCandidateInventory']),
+            ...cloneValue(value137.assetExtractionDraft || {}),
+            hybridQualityPolicyVersion: hybridQualityPolicyVersion.hybridQualityPolicyVersion,
+            hybridExtractionMode: hybridQualityPolicyVersion.hybridExtractionMode,
+            hybridCapacityFallback: cloneValue(hybridQualityPolicyVersion.hybridCapacityFallback),
+            hybridEvidenceScenes: cloneValue(hybridQualityPolicyVersion.hybridEvidenceScenes),
+            hybridLocalRuntime: cloneValue(hybridQualityPolicyVersion.hybridLocalRuntime),
+            hybridCandidateInventory: cloneValue(hybridQualityPolicyVersion.hybridCandidateInventory),
             hybridAuthoritativeSourceFingerprint:
-              hybridQualityPolicyVersion['hybridAuthoritativeSourceFingerprint'],
+              hybridQualityPolicyVersion.hybridAuthoritativeSourceFingerprint,
           });
         throw value137;
       }
@@ -1425,7 +1419,7 @@ export async function extractStoryAssetsHybridExperimental({
       }
       return {
         ...extractionStrategy,
-        extractionStrategy: extractionStrategy['extractionStrategy'],
+        extractionStrategy: extractionStrategy.extractionStrategy,
         extractionMode: extractionMode,
         localRuntime: localRuntime,
       };
@@ -1439,7 +1433,7 @@ export async function extractStoryAssetsHybridExperimental({
       reusableStoryAssetCandidateInventory = getReusableStoryAssetCandidateInventory(
         resumeDraft3,
         nextSourceFingerprint2,
-        enabled11 ? [resumeDraft3?.['hybridAuthoritativeSourceFingerprint']] : [],
+        enabled11 ? [resumeDraft3?.hybridAuthoritativeSourceFingerprint] : [],
       ),
       value139 = Boolean(resumeDraft3 && !reusableStoryAssetCandidateInventory);
     let localRuntime2 = reusableStoryAssetCandidateInventory;
@@ -1462,20 +1456,20 @@ export async function extractStoryAssetsHybridExperimental({
                 ...(typeof localExtract === 'function' ? { localExtract: localExtract } : {}),
                 onProgress: onProgress,
               }),
-              evidenceCharacters = model['mentions']['length']
-                ? createStoryAssetLocalEvidenceScenes(sourceScenes, model['mentions'])
+              evidenceCharacters = model.mentions.length
+                ? createStoryAssetLocalEvidenceScenes(sourceScenes, model.mentions)
                 : [],
               localRuntime3 = {
-                model: model['model'],
-                device: model['device'],
-                precision: model['precision'],
-                mentionCount: model['mentions']['length'],
-                originalCharacters: sourceScenes['reduce'](
-                  (value140, dom4) => value140 + dom4['body']['length'],
+                model: model.model,
+                device: model.device,
+                precision: model.precision,
+                mentionCount: model.mentions.length,
+                originalCharacters: sourceScenes.reduce(
+                  (value140, dom4) => value140 + dom4.body.length,
                   0,
                 ),
-                evidenceCharacters: evidenceCharacters['reduce'](
-                  (value141, dom5) => value141 + dom5['body']['length'],
+                evidenceCharacters: evidenceCharacters.reduce(
+                  (value141, dom5) => value141 + dom5.body.length,
                   0,
                 ),
               };
@@ -1498,7 +1492,7 @@ export async function extractStoryAssetsHybridExperimental({
               reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
                 status: 'fallback',
                 purpose: 'optional-candidate-inventory',
-                errorMessage: String(error23?.['message'] || error23 || ''),
+                errorMessage: String(error23?.message || error23 || ''),
               }));
           }
       }
@@ -1510,8 +1504,8 @@ export async function extractStoryAssetsHybridExperimental({
         bodyCharacterBudget: STORY_ASSET_DIRECT_API_MAX_SOURCE_CHARACTERS,
       }),
       value142 =
-        localRuntime2['status'] === 'ready' && localRuntime2['evidenceScenes']['length']
-          ? createStoryAssetOptionalCandidatesByKind(localRuntime2['evidenceScenes'], sourceScenes, {
+        localRuntime2.status === 'ready' && localRuntime2.evidenceScenes.length
+          ? createStoryAssetOptionalCandidatesByKind(localRuntime2.evidenceScenes, sourceScenes, {
               maxItemsPerKind: STORY_ASSET_CANDIDATE_MAX_ITEMS_PER_KIND,
               maxCharactersPerKind: STORY_ASSET_CANDIDATE_MAX_CHARACTERS_PER_KIND,
               hardRequiredAssetNamesByKind: requiredAssetNamesByKind3,
@@ -1526,19 +1520,19 @@ export async function extractStoryAssetsHybridExperimental({
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
       });
     } catch (capacityError2) {
-      if (capacityError2?.['type'] !== 'ASSET_OUTPUT_CAPACITY') throw capacityError2;
+      if (capacityError2?.type !== 'ASSET_OUTPUT_CAPACITY') throw capacityError2;
       return run({
         extractionMode: 'parallel-api-capacity-batched',
-        localRuntime: localRuntime2['localRuntime'] || null,
+        localRuntime: localRuntime2.localRuntime || null,
         candidateInventory: localRuntime2,
         capacityError: capacityError2,
       });
     }
-    const candidateAssetsByKind4 = responseModeByKind3['candidateAssetsByKind'];
+    const candidateAssetsByKind4 = responseModeByKind3.candidateAssetsByKind;
     (reportDiagnostics(diagnostics, 'story-asset-hybrid-parallel-api', {
       status: 'started',
       chapterCharacters: chapterCharacters,
-      sourceSceneCount: sourceScenes['length'],
+      sourceSceneCount: sourceScenes.length,
     }),
       onProgress?.({
         stage: 'parallel-api-asset-extraction',
@@ -1554,7 +1548,7 @@ export async function extractStoryAssetsHybridExperimental({
         sourceScenes,
       ),
       resumeSourceAliases =
-        resumeDraft3 && Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0) < 5
+        resumeDraft3 && Number(resumeDraft3?.hybridQualityPolicyVersion || 0) < 5
           ? [{ project: project, requiredAssetNamesByKind: requiredAssetNamesByKind3 }]
           : [],
       isStoryAssetSceneHeadingContractMigration2 = isStoryAssetSceneHeadingContractMigration({
@@ -1562,11 +1556,11 @@ export async function extractStoryAssetsHybridExperimental({
         requiredAssetNamesByKind: requiredAssetNamesByKind3,
         requiredAssetsByKind: requiredAssetsByKind3,
         candidateAssetsByKind: candidateAssetsByKind4,
-        responseModeByKind: responseModeByKind3['modeByKind'],
+        responseModeByKind: responseModeByKind3.modeByKind,
       }),
       allowSavedPaidResultContractRevalidation = isStoryAssetSceneHeadingContractMigration2;
     isStoryAssetSceneHeadingContractMigration2 &&
-      (resumeSourceAliases['push']({
+      (resumeSourceAliases.push({
         project: project2,
         requiredAssetNamesByKind: getSavedStoryAssetRequiredNamesByKind(resumeDraft5),
       }),
@@ -1581,7 +1575,7 @@ export async function extractStoryAssetsHybridExperimental({
         requiredAssetNamesByKind: requiredAssetNamesByKind3,
         requiredAssetsByKind: requiredAssetsByKind3,
         candidateAssetsByKind: candidateAssetsByKind4,
-        compactOutputByKind: responseModeByKind3['modeByKind'],
+        compactOutputByKind: responseModeByKind3.modeByKind,
         resumeRequiredAssetNamesByKindAliases: resumeRequiredAssetNamesByKindAliases,
         resumeSourceAliases: resumeSourceAliases,
         resumeSourceFingerprintAliases: [],
@@ -1602,7 +1596,7 @@ export async function extractStoryAssetsHybridExperimental({
           ((cloneValue6 = cloneValue(value143)), await onCheckpoint?.(value143));
         },
         resumeDraft: resumeDraft5,
-        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0),
+        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.hybridQualityPolicyVersion || 0),
         onProgress: onProgress,
       }),
       assetCount3 = removeNarrativeUploadFallbackCharacterAssets(
@@ -1612,7 +1606,7 @@ export async function extractStoryAssetsHybridExperimental({
             requiredAssetsByKind3,
             candidateAssetsByKind4,
           ),
-          requiredAssetNamesByKind3['scene'],
+          requiredAssetNamesByKind3.scene,
         ),
         requirementEvidence,
         sourceScenes,
@@ -1628,29 +1622,29 @@ export async function extractStoryAssetsHybridExperimental({
       reportDiagnostics(diagnostics, 'story-asset-hybrid-parallel-api', {
         status: 'succeeded',
         chapterCharacters: chapterCharacters,
-        assetCount: assetCount3['assets']['length'],
+        assetCount: assetCount3.assets.length,
       }),
-      { ...assetCount3, extractionMode: 'parallel-api', localRuntime: localRuntime2['localRuntime'] || null }
+      { ...assetCount3, extractionMode: 'parallel-api', localRuntime: localRuntime2.localRuntime || null }
     );
   }
   let extractionMode2 = 'api-fallback',
     localRuntime4 = null,
     value145 = false;
   const value146 =
-      resumeDraft3?.['qualityReview']?.['status'] === 'blocked'
-        ? String(resumeDraft3?.['hybridExtractionMode'] || '')['trim']()
+      resumeDraft3?.qualityReview?.status === 'blocked'
+        ? String(resumeDraft3?.hybridExtractionMode || '').trim()
         : '',
     value147 = Boolean(
-      Array['isArray'](resumeDraft3?.['hybridEvidenceScenes']) &&
-      (resumeDraft3?.['hybridExtractionMode'] === 'local-pp-uie' ||
-        resumeDraft3?.['strategy'] === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY),
+      Array.isArray(resumeDraft3?.hybridEvidenceScenes) &&
+      (resumeDraft3?.hybridExtractionMode === 'local-pp-uie' ||
+        resumeDraft3?.strategy === STORY_ASSET_EVIDENCE_BATCHED_DRAFT_STRATEGY),
     );
-  let evidenceCharacters2 = value147 ? cloneValue(resumeDraft3['hybridEvidenceScenes']) : null;
+  let evidenceCharacters2 = value147 ? cloneValue(resumeDraft3.hybridEvidenceScenes) : null;
   if (value146 === 'api-fallback')
     ((value145 =
-      resumeDraft3?.['strategy'] === STORY_ASSET_PARALLEL_DRAFT_STRATEGY &&
-      Array['isArray'](resumeDraft3?.['hybridEvidenceScenes'])),
-      (evidenceCharacters2 = value145 ? cloneValue(resumeDraft3['hybridEvidenceScenes']) : sourceScenes));
+      resumeDraft3?.strategy === STORY_ASSET_PARALLEL_DRAFT_STRATEGY &&
+      Array.isArray(resumeDraft3?.hybridEvidenceScenes)),
+      (evidenceCharacters2 = value145 ? cloneValue(resumeDraft3.hybridEvidenceScenes) : sourceScenes));
   else {
     if (preferLocal && !evidenceCharacters2)
       try {
@@ -1659,21 +1653,21 @@ export async function extractStoryAssetsHybridExperimental({
           ...(typeof localExtract === 'function' ? { localExtract: localExtract } : {}),
           onProgress: onProgress,
         });
-        if (!model2['mentions']['length'] && !hasCompleteStructuredStorySceneEvidence2)
+        if (!model2.mentions.length && !hasCompleteStructuredStorySceneEvidence2)
           throw createMissingLocalStoryAssetEvidenceError();
-        ((evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, model2['mentions'])),
+        ((evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, model2.mentions)),
           (extractionMode2 = 'local-pp-uie'),
           (localRuntime4 = {
-            model: model2['model'],
-            device: model2['device'],
-            precision: model2['precision'],
-            mentionCount: model2['mentions']['length'],
-            originalCharacters: sourceScenes['reduce'](
-              (value148, dom6) => value148 + dom6['body']['length'],
+            model: model2.model,
+            device: model2.device,
+            precision: model2.precision,
+            mentionCount: model2.mentions.length,
+            originalCharacters: sourceScenes.reduce(
+              (value148, dom6) => value148 + dom6.body.length,
               0,
             ),
-            evidenceCharacters: evidenceCharacters2['reduce'](
-              (value149, dom7) => value149 + dom7['body']['length'],
+            evidenceCharacters: evidenceCharacters2.reduce(
+              (value149, dom7) => value149 + dom7.body.length,
               0,
             ),
           }),
@@ -1687,14 +1681,14 @@ export async function extractStoryAssetsHybridExperimental({
             total: 1,
             message:
               'PP-UIE 已把正文压缩为 ' +
-              localRuntime4['evidenceCharacters'] +
+              localRuntime4.evidenceCharacters +
               ' 字证据，正在按资产建立档案并调用 API 核验事实、补全视觉',
           }));
       } catch (error24) {
         if (!hasCompleteStructuredStorySceneEvidence2) {
           reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
             status: 'stopped',
-            errorMessage: String(error24?.['message'] || error24 || ''),
+            errorMessage: String(error24?.message || error24 || ''),
             apiRequestCount: 0,
           });
           throw createMissingLocalStoryAssetEvidenceError(error24);
@@ -1704,7 +1698,7 @@ export async function extractStoryAssetsHybridExperimental({
           (value145 = true),
           reportDiagnostics(diagnostics, 'story-asset-hybrid-local', {
             status: 'fallback',
-            errorMessage: String(error24?.['message'] || error24 || ''),
+            errorMessage: String(error24?.message || error24 || ''),
           }),
           onProgress?.({
             stage: 'local-evidence-fallback',
@@ -1716,8 +1710,8 @@ export async function extractStoryAssetsHybridExperimental({
     else
       evidenceCharacters2
         ? ((extractionMode2 = 'local-pp-uie'),
-          (localRuntime4 = resumeDraft3?.['hybridLocalRuntime']
-            ? cloneValue(resumeDraft3['hybridLocalRuntime'])
+          (localRuntime4 = resumeDraft3?.hybridLocalRuntime
+            ? cloneValue(resumeDraft3.hybridLocalRuntime)
             : null))
         : ((evidenceCharacters2 = createStoryAssetLocalEvidenceScenes(sourceScenes, [])), (value145 = true));
   }
@@ -1731,8 +1725,8 @@ export async function extractStoryAssetsHybridExperimental({
       project3 = createBudgetedStoryAssetEvidenceProject(project, evidenceCharacters2, {
         requirementEvidence: requirementEvidence,
       }),
-      includeAllSceneHeadings = Number(resumeDraft3?.['hybridQualityPolicyVersion']) || 0,
-      resumeSourceAliases2 = resumeRequiredAssetNamesByKindAliases2['map']((requiredAssetNamesByKind4) => ({
+      includeAllSceneHeadings = Number(resumeDraft3?.hybridQualityPolicyVersion) || 0,
+      resumeSourceAliases2 = resumeRequiredAssetNamesByKindAliases2.map((requiredAssetNamesByKind4) => ({
         project: createBudgetedStoryAssetEvidenceProject(
           project,
           evidenceCharacters2,
@@ -1744,12 +1738,12 @@ export async function extractStoryAssetsHybridExperimental({
       }));
     resumeDraft3 &&
       includeAllSceneHeadings < 5 &&
-      resumeSourceAliases2['push']({
+      resumeSourceAliases2.push({
         project: createBudgetedStoryAssetEvidenceProject(project, evidenceCharacters2, {
           requirementEvidence: requirementEvidence,
           includeAllSceneHeadings: includeAllSceneHeadings < 3,
           includeAllSceneCharacters: true,
-          bodyCharacterBudget: Number['MAX_SAFE_INTEGER'],
+          bodyCharacterBudget: Number.MAX_SAFE_INTEGER,
         }),
         requiredAssetNamesByKind: requiredAssetNamesByKind3,
       });
@@ -1769,24 +1763,24 @@ export async function extractStoryAssetsHybridExperimental({
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
       });
     } catch (capacityError3) {
-      if (capacityError3?.['type'] !== 'ASSET_OUTPUT_CAPACITY') throw capacityError3;
+      if (capacityError3?.type !== 'ASSET_OUTPUT_CAPACITY') throw capacityError3;
       return run({
         extractionMode: extractionMode2 + '-capacity-batched',
         localRuntime: localRuntime4,
         capacityError: capacityError3,
       });
     }
-    const candidateAssetsByKind6 = responseModeByKind4['candidateAssetsByKind'],
+    const candidateAssetsByKind6 = responseModeByKind4.candidateAssetsByKind,
       isStoryAssetSceneHeadingContractMigration3 = isStoryAssetSceneHeadingContractMigration({
         resumeDraft: resumeDraft6,
         requiredAssetNamesByKind: requiredAssetNamesByKind3,
         requiredAssetsByKind: requiredAssetsByKind3,
         candidateAssetsByKind: candidateAssetsByKind6,
-        responseModeByKind: responseModeByKind4['modeByKind'],
+        responseModeByKind: responseModeByKind4.modeByKind,
       }),
       allowSavedPaidResultContractRevalidation2 = isStoryAssetSceneHeadingContractMigration3;
     isStoryAssetSceneHeadingContractMigration3 &&
-      (resumeSourceAliases2['push']({
+      (resumeSourceAliases2.push({
         project: project3,
         requiredAssetNamesByKind: getSavedStoryAssetRequiredNamesByKind(resumeDraft6),
       }),
@@ -1810,7 +1804,7 @@ export async function extractStoryAssetsHybridExperimental({
           hybridQualityPolicyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
           hybridExtractionMode: extractionMode2,
           hybridEvidenceScenes: cloneValue(evidenceCharacters2),
-          hybridLocalRuntime: localRuntime4 || args22?.['hybridLocalRuntime'] || null,
+          hybridLocalRuntime: localRuntime4 || args22?.hybridLocalRuntime || null,
           hybridAuthoritativeSourceFingerprint: nextSourceFingerprint2,
         };
         ((cloneValue7 = cloneValue(value150)), await onCheckpoint?.(value150));
@@ -1821,7 +1815,7 @@ export async function extractStoryAssetsHybridExperimental({
         requiredAssetNamesByKind: requiredAssetNamesByKind3,
         requiredAssetsByKind: requiredAssetsByKind3,
         candidateAssetsByKind: candidateAssetsByKind6,
-        compactOutputByKind: responseModeByKind4['modeByKind'],
+        compactOutputByKind: responseModeByKind4.modeByKind,
         resumeRequiredAssetNamesByKindAliases: resumeRequiredAssetNamesByKindAliases2,
         resumeSourceAliases: resumeSourceAliases2,
         resumeSourceFingerprintAliases: [],
@@ -1831,7 +1825,7 @@ export async function extractStoryAssetsHybridExperimental({
         structuredOutputFallback: 'none',
         maxOutputTokens: STORY_ASSET_FOCUSED_MAX_OUTPUT_TOKENS,
         resumeDraft: resumeDraft6,
-        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.['hybridQualityPolicyVersion'] || 0),
+        resumeCompatibilityPolicyVersion: Number(resumeDraft3?.hybridQualityPolicyVersion || 0),
         onProgress: onProgress,
         onCheckpoint: onCheckpoint3,
       }),
@@ -1842,7 +1836,7 @@ export async function extractStoryAssetsHybridExperimental({
             requiredAssetsByKind3,
             candidateAssetsByKind6,
           ),
-          requiredAssetNamesByKind3['scene'],
+          requiredAssetNamesByKind3.scene,
         ),
         requirementEvidence,
         evidenceCharacters2,
@@ -1872,7 +1866,7 @@ export async function extractStoryAssetsHybridExperimental({
         hybridQualityPolicyVersion: STORY_ASSET_HYBRID_QUALITY_POLICY_VERSION,
         hybridExtractionMode: extractionMode2,
         hybridEvidenceScenes: extractionMode2 === 'local-pp-uie' ? cloneValue(evidenceCharacters2) : null,
-        hybridLocalRuntime: localRuntime4 || args24?.['hybridLocalRuntime'] || null,
+        hybridLocalRuntime: localRuntime4 || args24?.hybridLocalRuntime || null,
         hybridAuthoritativeSourceFingerprint: nextSourceFingerprint2,
       };
       ((cloneValue8 = cloneValue(value152)), await onCheckpoint?.(value152));
@@ -1904,7 +1898,7 @@ export async function extractStoryAssetsHybridExperimental({
   }
   return {
     ...extractionStrategy2,
-    extractionStrategy: extractionStrategy2['extractionStrategy'],
+    extractionStrategy: extractionStrategy2.extractionStrategy,
     extractionMode: extractionMode2,
     localRuntime: localRuntime4,
   };

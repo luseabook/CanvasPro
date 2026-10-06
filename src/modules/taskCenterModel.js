@@ -2,10 +2,10 @@ export const ACTIVE_TASK_STATUSES = new Set(['waiting', 'processing']);
 export const TERMINAL_TASK_STATUSES = new Set(['complete', 'failed', 'cancelled', 'untracked']);
 export function normalizeTaskCenterStatus(value) {
   const item = String(value || '')
-    ['trim']()
-    ['toLowerCase']();
+    .trim()
+    .toLowerCase();
   if (item === 'untracked') return item;
-  if (['waiting', 'queued', 'paused']['includes'](item)) return 'waiting';
+  if (['waiting', 'queued', 'paused'].includes(item)) return 'waiting';
   if (
     [
       'processing',
@@ -18,20 +18,20 @@ export function normalizeTaskCenterStatus(value) {
       'extracting-keyframes',
       'detecting',
       'identifying',
-    ]['includes'](item)
+    ].includes(item)
   )
     return 'processing';
-  if (['complete', 'completed', 'success', 'succeeded']['includes'](item)) return 'complete';
-  if (['failed', 'error', 'interrupted']['includes'](item)) return 'failed';
-  if (['cancelled', 'canceled']['includes'](item)) return 'cancelled';
+  if (['complete', 'completed', 'success', 'succeeded'].includes(item)) return 'complete';
+  if (['failed', 'error', 'interrupted'].includes(item)) return 'failed';
+  if (['cancelled', 'canceled'].includes(item)) return 'cancelled';
   return '';
 }
 export function pruneTaskCenterRecords(list, key = 120) {
-  const args = list['filter']((response) => ACTIVE_TASK_STATUSES['has'](response['status'])),
-    list2 = list['filter']((response2) => !ACTIVE_TASK_STATUSES['has'](response2['status']))['sort'](
+  const args = list.filter((response) => ACTIVE_TASK_STATUSES.has(response.status)),
+    list2 = list.filter((response2) => !ACTIVE_TASK_STATUSES.has(response2.status)).sort(
       (index, result) =>
-        Number(result['finishedAt'] || result['createdAt'] || 0) -
-        Number(index['finishedAt'] || index['createdAt'] || 0),
+        Number(result.finishedAt || result.createdAt || 0) -
+        Number(index.finishedAt || index.createdAt || 0),
     );
-  return [...args, ...list2['slice'](0, key)];
+  return [...args, ...list2.slice(0, key)];
 }

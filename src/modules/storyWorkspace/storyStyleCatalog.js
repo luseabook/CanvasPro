@@ -1,12 +1,12 @@
 export const STORY_STYLE_CUSTOM_ID = 'custom';
-export const STORY_STYLE_CATEGORIES = Object['freeze']([
-  Object['freeze']({ id: 'all', label: '全部' }),
-  Object['freeze']({ id: 'live', label: '真人' }),
-  Object['freeze']({ id: '2d', label: '2D' }),
-  Object['freeze']({ id: '3d', label: '3D' }),
+export const STORY_STYLE_CATEGORIES = Object.freeze([
+  Object.freeze({ id: 'all', label: '全部' }),
+  Object.freeze({ id: 'live', label: '真人' }),
+  Object.freeze({ id: '2d', label: '2D' }),
+  Object.freeze({ id: '3d', label: '3D' }),
 ]);
 function createStoryStylePreset(id, label, category) {
-  return Object['freeze']({
+  return Object.freeze({
     id: id,
     label: label,
     category: category,
@@ -14,7 +14,7 @@ function createStoryStylePreset(id, label, category) {
     thumbnail: 'images/story-styles/' + category + '.svg',
   });
 }
-export const STORY_STYLE_PRESETS = Object['freeze']([
+export const STORY_STYLE_PRESETS = Object.freeze([
   createStoryStylePreset('retro-atomic-punk', '复古科幻原子朋克', 'live'),
   createStoryStylePreset('palace-intrigue-cool', '宫斗权谋冷峻风格', 'live'),
   createStoryStylePreset('domestic-suspense-cool', '国产悬疑冷调', 'live'),
@@ -110,9 +110,9 @@ export const STORY_STYLE_PRESETS = Object['freeze']([
   createStoryStylePreset('oriental-ink-wash', '东方水墨画风', '2d'),
   createStoryStylePreset('pixel-art', '像素风', '2d'),
 ]);
-const STORY_STYLE_PRESET_BY_ID = new Map(STORY_STYLE_PRESETS['map']((value) => [value['id'], value]));
+const STORY_STYLE_PRESET_BY_ID = new Map(STORY_STYLE_PRESETS.map((value) => [value.id, value]));
 export function getStoryStylePreset(item) {
-  return STORY_STYLE_PRESET_BY_ID['get'](String(item || '')['trim']()) || null;
+  return STORY_STYLE_PRESET_BY_ID.get(String(item || '').trim()) || null;
 }
 export function resolveStoryStyleSelection({
   styleId: styleId = '',
@@ -121,15 +121,15 @@ export function resolveStoryStyleSelection({
 } = {}) {
   const styleId2 = getStoryStylePreset(styleId);
   if (styleId2)
-    return Object['freeze']({
-      styleId: styleId2['id'],
-      stylePrompt: styleId2['prompt'],
-      label: styleId2['label'],
-      thumbnail: styleId2['thumbnail'],
+    return Object.freeze({
+      styleId: styleId2.id,
+      stylePrompt: styleId2.prompt,
+      label: styleId2.label,
+      thumbnail: styleId2.thumbnail,
       isCustom: false,
     });
-  const stylePrompt2 = String(stylePrompt || videoStyle || '')['trim']();
-  return Object['freeze']({
+  const stylePrompt2 = String(stylePrompt || videoStyle || '').trim();
+  return Object.freeze({
     styleId: STORY_STYLE_CUSTOM_ID,
     stylePrompt: stylePrompt2,
     label: stylePrompt2 || '自定义风格提示词',

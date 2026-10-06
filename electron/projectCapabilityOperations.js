@@ -289,12 +289,12 @@ export function createProjectCapabilityOperations({
       source: 'main',
       logEvent: logDiagnosticEvent,
       context: {
-        mode: payload?.['mode'] === 'saveAs' ? 'saveAs' : operationName,
+        mode: payload?.mode === 'saveAs' ? 'saveAs' : operationName,
         canvasCount: Array.isArray(payload?.multiData?.canvases)
           ? payload.multiData.canvases.length
           : 0,
       },
-    })['run'](() => operations[operationName](payload));
+    }).run(() => operations[operationName](payload));
 
   return Object.freeze({
     ...operations,

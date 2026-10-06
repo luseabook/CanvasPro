@@ -236,42 +236,42 @@ const MAX_CONCURRENT_AUDIO_DECODES = 2,
 
 function _cachePath(value37, enabled10, count2 = 0) {
   if (!enabled10) return;
-  (_cache['delete'](value37),
-    _cache['set'](value37, {
+  (_cache.delete(value37),
+    _cache.set(value37, {
       path: enabled10,
-      duration: Number['isFinite'](count2) && count2 > 0 ? count2 : 0,
+      duration: Number.isFinite(count2) && count2 > 0 ? count2 : 0,
     }));
-  while (_cache['size'] > MAX_WAVEFORM_PATHS) _cache['delete'](_cache['keys']()['next']()['value']);
+  while (_cache.size > MAX_WAVEFORM_PATHS) _cache.delete(_cache.keys().next().value);
 }
 
 function _readWaveformResult(value38, value39) {
-  const count3 = Number(value38?.['duration']);
-  if (Number['isFinite'](count3) && count3 > 0) value39?.(count3);
-  return value38?.['path'] || '';
+  const count3 = Number(value38?.duration);
+  if (Number.isFinite(count3) && count3 > 0) value39?.(count3);
+  return value38?.path || '';
 }
 
 function _queueAudioDecode(handler3, value40) {
   return new Promise((handler4) => {
     const value41 = () => {
-        const count4 = _decodeQueue['indexOf'](handler5);
-        count4 >= 0 && (_decodeQueue['splice'](count4, 1), handler4(null));
+        const count4 = _decodeQueue.indexOf(handler5);
+        count4 >= 0 && (_decodeQueue.splice(count4, 1), handler4(null));
       },
       handler5 = async () => {
-        (value40?.['removeEventListener']('abort', value41), (_activeDecodes += 1));
+        (value40?.removeEventListener('abort', value41), (_activeDecodes += 1));
         try {
-          handler4(value40?.['aborted'] ? null : await handler3());
+          handler4(value40?.aborted ? null : await handler3());
         } catch {
           handler4(null);
         } finally {
           _activeDecodes -= 1;
-          while (_activeDecodes < MAX_CONCURRENT_AUDIO_DECODES && _decodeQueue['length']) {
-            void _decodeQueue['shift']()();
+          while (_activeDecodes < MAX_CONCURRENT_AUDIO_DECODES && _decodeQueue.length) {
+            void _decodeQueue.shift()();
           }
         }
       };
-    if (value40?.['aborted']) return handler4(null);
+    if (value40?.aborted) return handler4(null);
     if (_activeDecodes < MAX_CONCURRENT_AUDIO_DECODES) void handler5();
-    else (_decodeQueue['push'](handler5), value40?.['addEventListener']('abort', value41, { once: true }));
+    else (_decodeQueue.push(handler5), value40?.addEventListener('abort', value41, { once: true }));
   });
 }
 
@@ -279,33 +279,33 @@ function _createDecodedAudioBufferJob(value42, value43) {
   const value44 = typeof AbortController === 'function' ? new AbortController() : null,
     value45 = { consumers: 0, controller: value44, settled: false, promise: null };
   return (
-    (value45['promise'] = _queueAudioDecode(async () => {
+    (value45.promise = _queueAudioDecode(async () => {
       let enabled11;
       try {
-        const fetchRemoteBlob3 = await fetchRemoteBlob(value42, { signal: value44?.['signal'] });
-        enabled11 = await fetchRemoteBlob3['arrayBuffer']();
+        const fetchRemoteBlob3 = await fetchRemoteBlob(value42, { signal: value44?.signal });
+        enabled11 = await fetchRemoteBlob3.arrayBuffer();
       } catch {
         return null;
       }
-      if (!enabled11 || value44?.['signal']?.['aborted']) return null;
+      if (!enabled11 || value44?.signal?.aborted) return null;
       try {
         const _decodeAudioData3 = await _decodeAudioData(value43, enabled11);
-        return value44?.['signal']?.['aborted'] ? null : _decodeAudioData3 || null;
+        return value44?.signal?.aborted ? null : _decodeAudioData3 || null;
       } catch {
         return null;
       }
-    }, value44?.['signal'])['finally'](() => {
-      value45['settled'] = true;
-      if (_bufferInflight['get'](value42) === value45) _bufferInflight['delete'](value42);
+    }, value44?.signal).finally(() => {
+      value45.settled = true;
+      if (_bufferInflight.get(value42) === value45) _bufferInflight.delete(value42);
     })),
-    _bufferInflight['set'](value42, value45),
+    _bufferInflight.set(value42, value45),
     value45
   );
 }
 
 async function _waitForDecodedAudioBufferJob(enabled12, value46) {
-  if (!enabled12 || value46?.['aborted']) return null;
-  enabled12['consumers'] += 1;
+  if (!enabled12 || value46?.aborted) return null;
+  enabled12.consumers += 1;
   let value47 = false,
     value48 = null;
   const value49 = value46
@@ -313,47 +313,47 @@ async function _waitForDecodedAudioBufferJob(enabled12, value46) {
         ((value48 = () => {
           ((value47 = true), handler6(null));
         }),
-          value46['addEventListener']('abort', value48, { once: true }));
+          value46.addEventListener('abort', value48, { once: true }));
       })
     : null;
   try {
-    return await (value49 ? Promise['race']([enabled12['promise'], value49]) : enabled12['promise']);
+    return await (value49 ? Promise.race([enabled12.promise, value49]) : enabled12.promise);
   } finally {
-    if (value46 && value48) value46['removeEventListener']('abort', value48);
-    ((enabled12['consumers'] = Math['max'](0, enabled12['consumers'] - 1)),
+    if (value46 && value48) value46.removeEventListener('abort', value48);
+    ((enabled12.consumers = Math.max(0, enabled12.consumers - 1)),
       value47 &&
-        !enabled12['settled'] &&
-        enabled12['consumers'] === 0 &&
-        enabled12['controller']?.['abort']());
+        !enabled12.settled &&
+        enabled12.consumers === 0 &&
+        enabled12.controller?.abort());
   }
 }
 
 export async function getAudioNodeWaveformPath(value50, value51, args = {}) {
-  if (args['signal']?.['aborted']) return '';
-  const value52 = JSON['stringify']([
+  if (args.signal?.aborted) return '';
+  const value52 = JSON.stringify([
       'audio-node',
       value50,
       value51,
-      args['width'],
-      args['height'],
-      args['samples'],
+      args.width,
+      args.height,
+      args.samples,
     ]),
-    value53 = _cache['get'](value52);
-  if (value53 && (value53['duration'] > 0 || !args['onDuration']))
-    return _readWaveformResult(value53, args['onDuration']);
+    value53 = _cache.get(value52);
+  if (value53 && (value53.duration > 0 || !args.onDuration))
+    return _readWaveformResult(value53, args.onDuration);
   const value54 = value51 ? await getWaveformBarsPathFromPersistedUrl(value51, args) : '';
-  if (args['signal']?.['aborted']) return '';
+  if (args.signal?.aborted) return '';
   let audioDurationFromUrl = 0;
   if (value54) {
-    args['onDuration'] &&
+    args.onDuration &&
       (audioDurationFromUrl = await getAudioDurationFromUrl(value50, {
-        signal: args['signal'],
+        signal: args.signal,
         cacheBuffer: false,
       }));
-    if (args['signal']?.['aborted']) return '';
+    if (args.signal?.aborted) return '';
     return (
       _cachePath(value52, value54, audioDurationFromUrl),
-      _readWaveformResult({ path: value54, duration: audioDurationFromUrl }, args['onDuration'])
+      _readWaveformResult({ path: value54, duration: audioDurationFromUrl }, args.onDuration)
     );
   }
   const waveformBarsPathFromUrl = await getWaveformBarsPathFromUrl(value50, {
@@ -363,9 +363,9 @@ export async function getAudioNodeWaveformPath(value50, value51, args = {}) {
       audioDurationFromUrl = value55;
     },
   });
-  if (args['signal']?.['aborted']) return '';
+  if (args.signal?.aborted) return '';
   return (
     _cachePath(value52, waveformBarsPathFromUrl, audioDurationFromUrl),
-    _readWaveformResult({ path: waveformBarsPathFromUrl, duration: audioDurationFromUrl }, args['onDuration'])
+    _readWaveformResult({ path: waveformBarsPathFromUrl, duration: audioDurationFromUrl }, args.onDuration)
   );
 }

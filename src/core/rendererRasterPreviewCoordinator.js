@@ -10,70 +10,70 @@ import { RENDERER_VIRTUALIZATION_CONFIG } from './rendererVirtualization.js';
 const DENSE_RASTER_MEDIA_DEFER_NODE_COUNT = 320;
 function toIdSet(value) {
   if (value instanceof Set) return new Set(value);
-  if (Array['isArray'](value)) return new Set(value);
+  if (Array.isArray(value)) return new Set(value);
   return new Set();
 }
 function defaultSupportsRasterPreview(item) {
-  const key = String(item?.['type'] || '')
-    ['trim']()
-    ['toLowerCase']();
-  return !['web-preview', 'source-audio', 'ai-audio', 'audio']['includes'](key);
+  const key = String(item?.type || '')
+    .trim()
+    .toLowerCase();
+  return !['web-preview', 'source-audio', 'ai-audio', 'audio'].includes(key);
 }
 function getNode(map, index) {
-  if (map instanceof Map) return map['get'](index) || null;
+  if (map instanceof Map) return map.get(index) || null;
   return map?.[index] || null;
 }
 function isVisualMediaNode(result) {
-  const rendererNodeLabelKind = getRendererNodeLabelKind(result?.['type']);
+  const rendererNodeLabelKind = getRendererNodeLabelKind(result?.type);
   if (rendererNodeLabelKind) return rendererNodeLabelKind === 'image' || rendererNodeLabelKind === 'video';
-  const list = String(result?.['type'] || '')
-    ['trim']()
-    ['toLowerCase']();
-  return list['includes']('image') || list['includes']('video') || list['includes']('media-clip');
+  const list = String(result?.type || '')
+    .trim()
+    .toLowerCase();
+  return list.includes('image') || list.includes('video') || list.includes('media-clip');
 }
 function resolveRenderScale(box, data) {
-  const count = Number(box?.['zoom']),
+  const count = Number(box?.zoom),
     count2 = Number(data);
   return (
-    (Number['isFinite'](count) && count > 0 ? count : 1) *
-    (Number['isFinite'](count2) && count2 > 0 ? count2 : 1)
+    (Number.isFinite(count) && count > 0 ? count : 1) *
+    (Number.isFinite(count2) && count2 > 0 ? count2 : 1)
   );
 }
 function buildRasterVisualStateSignature(options, map2) {
-  return [...toIdSet(options?.['invalidNodeIds'])]
-    ['filter']((target) => map2['has'](target))
-    ['map'](String)
-    ['sort']()
-    ['join']('\x1f');
+  return [...toIdSet(options?.invalidNodeIds)]
+    .filter((target) => map2.has(target))
+    .map(String)
+    .sort()
+    .join('\x1f');
 }
 function buildRasterPresentationIdentity(enabled, handler = resolveRendererPreviewNodePresentation) {
   if (!enabled || typeof enabled !== 'object') return '';
   const response = handler(enabled, { displayFirst: true }),
-    box2 = response['geometry'] || {};
+    box2 = response.geometry || {};
   return [
-    response['kind'],
-    response['text'],
-    Number['isFinite'](Number(box2['x'])) ? Number(box2['x']) : 0,
-    Number['isFinite'](Number(box2['y'])) ? Number(box2['y']) : 0,
-    Math['max'](1, Number(box2['width']) || 1),
-    Math['max'](1, Number(box2['height']) || 1),
-    ...response['sources'],
-  ]['join']('\x1f');
+    response.kind,
+    response.text,
+    Number.isFinite(Number(box2.x)) ? Number(box2.x) : 0,
+    Number.isFinite(Number(box2.y)) ? Number(box2.y) : 0,
+    Math.max(1, Number(box2.width) || 1),
+    Math.max(1, Number(box2.height) || 1),
+    ...response.sources,
+  ].join('\x1f');
 }
 function buildRasterPresentationIdentityCacheKey(box3) {
-  const source = Number(box3?.['_bizRev']);
-  if (!Number['isFinite'](source)) return null;
+  const source = Number(box3?._bizRev);
+  if (!Number.isFinite(source)) return null;
   const run = (next, current) => {
     const entry = Number(next);
-    return Number['isFinite'](entry) ? entry : current;
+    return Number.isFinite(entry) ? entry : current;
   };
   return [
     source,
-    run(box3?.['x'], 0),
-    run(box3?.['y'], 0),
-    Math['max'](1, run(box3?.['width'], 160)),
-    Math['max'](1, run(box3?.['height'], 120)),
-  ]['join']('\x1f');
+    run(box3?.x, 0),
+    run(box3?.y, 0),
+    Math.max(1, run(box3?.width, 160)),
+    Math.max(1, run(box3?.height, 120)),
+  ].join('\x1f');
 }
 function collectExplicitDomRequiredIds({
   selectedNodeIds: selectedNodeIds,
@@ -93,29 +93,29 @@ function collectExplicitDomRequiredIds({
     activeMediaNodeIds,
     domRequiredNodeIds,
   ]) {
-    for (const handle of toIdSet(payload)) record['add'](handle);
+    for (const handle of toIdSet(payload)) record.add(handle);
   }
   for (const state of [
     hoverNodeId,
-    connOverlay?.['srcId'],
-    connOverlay?.['hoverId'],
-    pickConnectMode?.['active'] ? pickConnectMode['sourceNodeId'] : null,
-    pickConnectMode?.['active'] ? pickConnectMode['srcId'] : null,
-    pickConnectMode?.['active'] ? pickConnectMode['hoverNodeId'] : null,
-    pickConnectMode?.['active'] ? pickConnectMode['hoverId'] : null,
+    connOverlay?.srcId,
+    connOverlay?.hoverId,
+    pickConnectMode?.active ? pickConnectMode.sourceNodeId : null,
+    pickConnectMode?.active ? pickConnectMode.srcId : null,
+    pickConnectMode?.active ? pickConnectMode.hoverNodeId : null,
+    pickConnectMode?.active ? pickConnectMode.hoverId : null,
   ]) {
-    if (state != null && state !== '') record['add'](state);
+    if (state != null && state !== '') record.add(state);
   }
   for (const config of [
-    connOverlay?.['activeNodeIds'],
-    pickConnectMode?.['active'] ? pickConnectMode['activeNodeIds'] : null,
+    connOverlay?.activeNodeIds,
+    pickConnectMode?.active ? pickConnectMode.activeNodeIds : null,
   ]) {
-    for (const scope of toIdSet(config)) record['add'](scope);
+    for (const scope of toIdSet(config)) record.add(scope);
   }
   return record;
 }
 export function resolveRendererRasterPreviewSources(input) {
-  return resolveRendererPreviewNodePresentation(input, { displayFirst: false })['sources'];
+  return resolveRendererPreviewNodePresentation(input, { displayFirst: false }).sources;
 }
 export function createRendererRasterPreviewCoordinator({
   layer: layer = null,
@@ -148,16 +148,16 @@ export function createRendererRasterPreviewCoordinator({
   function onMediaPresented2(value4) {
     const state2 = value3,
       list2 = state2
-        ? (value4?.['nodeIds'] || [])['filter'](
+        ? (value4?.nodeIds || []).filter(
             (value5) =>
-              state2['identities']['has'](value5) &&
-              state2['identities']['get'](value5) ===
-                buildRasterPresentationIdentity(getNode(state2['nodes'], value5), resolvePresentation),
+              state2.identities.has(value5) &&
+              state2.identities.get(value5) ===
+                buildRasterPresentationIdentity(getNode(state2.nodes, value5), resolvePresentation),
           )
         : [];
-    if (list2['length']) {
+    if (list2.length) {
       for (const value6 of list2) {
-        (map5['add'](value6), previousRasterIds['add'](value6), map3['delete'](value6));
+        (map5.add(value6), previousRasterIds.add(value6), map3.delete(value6));
       }
       onRasterMediaClaimed?.(list2);
     }
@@ -165,11 +165,11 @@ export function createRendererRasterPreviewCoordinator({
   }
   function run3(value7, value8) {
     const cacheKey = buildRasterPresentationIdentityCacheKey(value8),
-      value9 = map7['get'](value7);
-    if (cacheKey !== null && value9?.['cacheKey'] === cacheKey) return value9['identity'];
+      value9 = map7.get(value7);
+    if (cacheKey !== null && value9?.cacheKey === cacheKey) return value9.identity;
     const identity = buildRasterPresentationIdentity(value8, resolvePresentation);
-    if (cacheKey === null) map7['delete'](value7);
-    else map7['set'](value7, { cacheKey: cacheKey, identity: identity });
+    if (cacheKey === null) map7.delete(value7);
+    else map7.set(value7, { cacheKey: cacheKey, identity: identity });
     return identity;
   }
   function sync({
@@ -193,39 +193,39 @@ export function createRendererRasterPreviewCoordinator({
     lockRasterParticipation: lockRasterParticipation = false,
     deferInitialPlanning: deferInitialPlanning = false,
     releaseFullSurface: releaseFullSurface,
-    devicePixelRatio: devicePixelRatio = typeof window !== 'undefined' ? window['devicePixelRatio'] : 1,
+    devicePixelRatio: devicePixelRatio = typeof window !== 'undefined' ? window.devicePixelRatio : 1,
   } = {}) {
     ((value3 = null), (mediaLoadingBusy2 = mediaLoadingBusy === true));
     const enabled3 =
-      box4 && viewport?.['zoom'] === box4['zoom']
+      box4 && viewport?.zoom === box4.zoom
         ? {
             active: true,
-            dx: (box4['x'] - viewport['x']) / viewport['zoom'],
-            dy: (box4['y'] - viewport['y']) / viewport['zoom'],
+            dx: (box4.x - viewport.x) / viewport.zoom,
+            dy: (box4.y - viewport.y) / viewport.zoom,
           }
         : { active: false };
-    if (!enabled3['dx'] && !enabled3['dy']) enabled3['active'] = false;
-    if (enabled3['active'] || !viewportBusy || viewport?.['zoom'] !== box4?.['zoom'])
+    if (!enabled3.dx && !enabled3.dy) enabled3.active = false;
+    if (enabled3.active || !viewportBusy || viewport?.zoom !== box4?.zoom)
       previewMotion = enabled3;
     box4 = viewport ? { ...viewport } : null;
-    const fullSurfaceIds = toIdSet(scenePlan?.['fullSurfaceIds']),
-      proxyCount = toIdSet(scenePlan?.['proxySurfaceIds']),
-      args = toIdSet(scenePlan?.['fullSurfaceReleaseIds']),
-      exactVisibleCount = toIdSet(scenePlan?.['exactVisibleIds']),
+    const fullSurfaceIds = toIdSet(scenePlan?.fullSurfaceIds),
+      proxyCount = toIdSet(scenePlan?.proxySurfaceIds),
+      args = toIdSet(scenePlan?.fullSurfaceReleaseIds),
+      exactVisibleCount = toIdSet(scenePlan?.exactVisibleIds),
       value10 =
         mediaLoadingBusy2 &&
-        proxyCount['size'] >= DENSE_RASTER_MEDIA_DEFER_NODE_COUNT &&
-        map4['size'] === 0;
-    if (map4['size'] === 0 && (deferInitialPlanning === true || value10)) {
+        proxyCount.size >= DENSE_RASTER_MEDIA_DEFER_NODE_COUNT &&
+        map4.size === 0;
+    if (map4.size === 0 && (deferInitialPlanning === true || value10)) {
       const rasterIds = new Set(),
-        domProxyIds = new Set([...exactVisibleCount]['filter']((value11) => !fullSurfaceIds['has'](value11))),
+        domProxyIds = new Set([...exactVisibleCount].filter((value11) => !fullSurfaceIds.has(value11))),
         domPreviewCandidateIds = new Set([...fullSurfaceIds, ...domProxyIds]),
         domPreviewMediaSourceOwnerIds = new Set(
-          [...domPreviewCandidateIds]['filter']((value12) => exactVisibleCount['has'](value12)),
+          [...domPreviewCandidateIds].filter((value12) => exactVisibleCount.has(value12)),
         ),
         releasableFullSurfaceIds = new Set(
-          [...args]['filter'](
-            (value13) => !exactVisibleCount['has'](value13) || !isVisualMediaNode(getNode(nodes, value13)),
+          [...args].filter(
+            (value13) => !exactVisibleCount.has(value13) || !isVisualMediaNode(getNode(nodes, value13)),
           ),
         );
       if (typeof releaseFullSurface === 'function')
@@ -233,7 +233,7 @@ export function createRendererRasterPreviewCoordinator({
           releaseFullSurface(value14);
         }
       ((previousRasterIds = rasterIds), (map3 = new Set(domPreviewMediaSourceOwnerIds)));
-      const signature = 'deferred-initial:' + fullSurfaceIds['size'] + ':' + domProxyIds['size'],
+      const signature = 'deferred-initial:' + fullSurfaceIds.size + ':' + domProxyIds.size,
         policy = {
           active: false,
           rasterIds: rasterIds,
@@ -242,20 +242,20 @@ export function createRendererRasterPreviewCoordinator({
           signature: signature,
           coverageSignature: signature,
           stats: {
-            scenePressure: Number(scenePlan?.['pressure']) || 0,
+            scenePressure: Number(scenePlan?.pressure) || 0,
             proxyPressure: 0,
             activationSignal: 0,
             activationFloor: 0,
             rasterShare: 0,
-            proxyCount: proxyCount['size'],
+            proxyCount: proxyCount.size,
             rasterCandidateCount: 0,
             rasterCount: 0,
-            domProxyCount: domProxyIds['size'],
+            domProxyCount: domProxyIds.size,
             interactiveDomCount: 0,
             unsupportedDomCount: 0,
             projectedDomCount: 0,
-            exactVisibleCount: exactVisibleCount['size'],
-            exactVisibleCoveredCount: exactVisibleCount['size'],
+            exactVisibleCount: exactVisibleCount.size,
+            exactVisibleCoveredCount: exactVisibleCount.size,
             exactVisibleMissingCount: 0,
           },
         };
@@ -273,17 +273,17 @@ export function createRendererRasterPreviewCoordinator({
       };
     }
     const rasterSupportedNodeIds = new Set(
-        [...proxyCount]['filter']((value15) => {
+        [...proxyCount].filter((value15) => {
           const node = getNode(nodes, value15);
           if (!isRasterSupportedNode(node, value15)) return false;
-          return !(value10 && exactVisibleCount['has'](value15) && isVisualMediaNode(node));
+          return !(value10 && exactVisibleCount.has(value15) && isVisualMediaNode(node));
         }),
       ),
       policy2 = planRendererRasterProxies({
         nodes: nodes,
         fullSurfaceIds: fullSurfaceIds,
         proxySurfaceIds: proxyCount,
-        exactVisibleIds: scenePlan?.['exactVisibleIds'],
+        exactVisibleIds: scenePlan?.exactVisibleIds,
         rasterSupportedNodeIds: rasterSupportedNodeIds,
         previousRasterIds: previousRasterIds,
         selectedNodeIds: selectedNodeIds2,
@@ -295,7 +295,7 @@ export function createRendererRasterPreviewCoordinator({
         activeMediaNodeIds: activeMediaNodeIds2,
         domRequiredNodeIds: domRequiredNodeIds2,
         viewport: viewport,
-        scenePressure: scenePlan?.['pressure'],
+        scenePressure: scenePlan?.pressure,
       }),
       map8 = collectExplicitDomRequiredIds({
         selectedNodeIds: selectedNodeIds2,
@@ -309,37 +309,37 @@ export function createRendererRasterPreviewCoordinator({
       }),
       map9 = new Set(),
       map10 = new Set();
-    if (typeof output['captureNodeFrame'] === 'function' && typeof onRasterHandoffFrame === 'function')
+    if (typeof output.captureNodeFrame === 'function' && typeof onRasterHandoffFrame === 'function')
       for (const value16 of map5) {
-        if (!map8['has'](value16) || !exactVisibleCount['has'](value16)) continue;
+        if (!map8.has(value16) || !exactVisibleCount.has(value16)) continue;
         const node2 = getNode(nodes, value16);
-        if (!node2 || map6['get'](value16) !== run3(value16, node2)) continue;
+        if (!node2 || map6.get(value16) !== run3(value16, node2)) continue;
         let value17 = false;
         try {
           value17 = isDomMediaPresented?.(value16, node2) === true;
         } catch {}
         if (value17) continue;
-        map9['add'](value16);
-        const enabled4 = output['captureNodeFrame'](value16);
+        map9.add(value16);
+        const enabled4 = output.captureNodeFrame(value16);
         if (!enabled4) continue;
         try {
-          (onRasterHandoffFrame(value16, enabled4), map10['add'](value16));
+          (onRasterHandoffFrame(value16, enabled4), map10.add(value16));
         } catch {}
       }
     const args2 = new Set(
-        [...map5]['filter']((value18) => {
-          const value19 = map8['has'](value18);
+        [...map5].filter((value18) => {
+          const value19 = map8.has(value18);
           if (
             typeof isDomMediaPresented !== 'function' ||
-            policy2['rasterIds']['has'](value18) ||
-            !exactVisibleCount['has'](value18) ||
-            (value19 && !map9['has'](value18)) ||
-            map10['has'](value18)
+            policy2.rasterIds.has(value18) ||
+            !exactVisibleCount.has(value18) ||
+            (value19 && !map9.has(value18)) ||
+            map10.has(value18)
           )
             return false;
           const node3 = getNode(nodes, value18);
           if (!node3 || !isVisualMediaNode(node3)) return false;
-          if (map6['get'](value18) !== run3(value18, node3)) return false;
+          if (map6.get(value18) !== run3(value18, node3)) return false;
           try {
             return isDomMediaPresented?.(value18, node3) !== true;
           } catch {
@@ -348,22 +348,22 @@ export function createRendererRasterPreviewCoordinator({
         }),
       ),
       value20 = lockRasterParticipation === true && freezeRasterSurface === true && viewportBusy === true,
-      map11 = value20 && map4['size'] === 0 ? new Set() : policy2['rasterIds'],
+      map11 = value20 && map4.size === 0 ? new Set() : policy2.rasterIds,
       map12 = new Set([...map11, ...args2]),
-      list3 = [...map11]['filter']((value21) => exactVisibleCount['has'](value21)),
-      value22 = [...map4]['some']((value23) => !map12['has'](value23)),
-      rasterVisualStateSignature = buildRasterVisualStateSignature(connOverlay2, policy2['rasterIds']),
+      list3 = [...map11].filter((value21) => exactVisibleCount.has(value21)),
+      value22 = [...map4].some((value23) => !map12.has(value23)),
+      rasterVisualStateSignature = buildRasterVisualStateSignature(connOverlay2, policy2.rasterIds),
       enabled5 = rasterVisualStateSignature !== value2,
-      enabled6 = [...map4]['some']((value24) => {
+      enabled6 = [...map4].some((value24) => {
         const node4 = getNode(nodes, value24);
-        return !node4 || map6['get'](value24) !== run3(value24, node4);
+        return !node4 || map6.get(value24) !== run3(value24, node4);
       }),
-      enabled7 = [...map4]['some']((value25) => map8['has'](value25)),
+      enabled7 = [...map4].some((value25) => map8.has(value25)),
       reuseWhileBusy =
         freezeRasterSurface === true &&
         viewportBusy &&
-        map4['size'] > 0 &&
-        (map11['size'] > 0 || value20) &&
+        map4.size > 0 &&
+        (map11.size > 0 || value20) &&
         !enabled5 &&
         !enabled6 &&
         !enabled7,
@@ -373,61 +373,61 @@ export function createRendererRasterPreviewCoordinator({
       nodes: nodes,
       identities: new Map(
         [...args3]
-          ['filter']((value26) => !map8['has'](value26) && map11['has'](value26))
-          ['map']((value27) => [value27, run3(value27, getNode(nodes, value27))]),
+          .filter((value26) => !map8.has(value26) && map11.has(value26))
+          .map((value27) => [value27, run3(value27, getNode(nodes, value27))]),
       ),
     };
-    const layerStats = output['sync'](canvasEl, nodes, args3, {
+    const layerStats = output.sync(canvasEl, nodes, args3, {
         forceRender: forceRender,
         reuseWhileBusy:
           reuseWhileBusy ||
-          (viewportBusy && !forceRender && list3['every']((value28) => previousRasterIds['has'](value28))),
+          (viewportBusy && !forceRender && list3.every((value28) => previousRasterIds.has(value28))),
         renderScale: resolveRenderScale(viewport, devicePixelRatio),
         mediaLoadNodeIds: exactVisibleCount,
         viewport: viewport,
         viewportBusy: viewportBusy,
         mediaLoadingBusy: mediaLoadingBusy2 || enabled2,
-        invalidNodeIds: connOverlay2?.['invalidNodeIds'],
-        sourceNodeId: connOverlay2?.['srcId'],
+        invalidNodeIds: connOverlay2?.invalidNodeIds,
+        sourceNodeId: connOverlay2?.srcId,
         hoverNodeId:
-          connOverlay2?.['hoverId'] ||
-          (pickConnectMode2?.['active'] ? pickConnectMode2['hoverNodeId'] : null),
+          connOverlay2?.hoverId ||
+          (pickConnectMode2?.active ? pickConnectMode2.hoverNodeId : null),
       }),
       map13 =
-        layerStats?.['supported'] === true && layerStats?.['active'] === true
-          ? toIdSet(layerStats['drawnNodeIds'])
+        layerStats?.supported === true && layerStats?.active === true
+          ? toIdSet(layerStats.drawnNodeIds)
           : new Set(),
       map14 =
-        layerStats?.['supported'] === true && layerStats?.['active'] === true
-          ? toIdSet(layerStats['drawnMediaNodeIds'])
+        layerStats?.supported === true && layerStats?.active === true
+          ? toIdSet(layerStats.drawnMediaNodeIds)
           : new Set();
     ((map4 = map13),
       (map5 = map14),
-      (map6 = new Map([...map13]['map']((value29) => [value29, run3(value29, getNode(nodes, value29))]))));
-    for (const value30 of map7['keys']()) {
-      !map13['has'](value30) && map7['delete'](value30);
+      (map6 = new Map([...map13].map((value29) => [value29, run3(value29, getNode(nodes, value29))]))));
+    for (const value30 of map7.keys()) {
+      !map13.has(value30) && map7.delete(value30);
     }
     value2 = rasterVisualStateSignature;
     const active = new Set(
-        [...(reuseWhileBusy ? map13 : map11)]['filter'](
+        [...(reuseWhileBusy ? map13 : map11)].filter(
           (value31) =>
-            map13['has'](value31) &&
+            map13.has(value31) &&
             (!isVisualMediaNode(getNode(nodes, value31)) ||
-              map14['has'](value31) ||
+              map14.has(value31) ||
               (reuseWhileBusy &&
-                viewport?.['zoom'] <= RENDERER_VIRTUALIZATION_CONFIG['veryDenseLowZoomThreshold'] &&
+                viewport?.zoom <= RENDERER_VIRTUALIZATION_CONFIG.veryDenseLowZoomThreshold &&
                 !isRendererFastPreviewMediaReadable(getNode(nodes, value31), { viewport: viewport }) &&
-                !map3['has'](value31))) &&
+                !map3.has(value31))) &&
             getNode(nodes, value31) &&
-            !map8['has'](value31),
+            !map8.has(value31),
         ),
       ),
-      domProxyIds2 = new Set(policy2['domProxyIds']),
+      domProxyIds2 = new Set(policy2.domProxyIds),
       map15 = viewportBusy
         ? selectRendererMotionAheadMediaIds(
-            [...policy2['rasterIds']]
-              ['filter']((value32) => !active['has'](value32) && isVisualMediaNode(getNode(nodes, value32)))
-              ['map']((nodeId) => ({ nodeId: nodeId, geometry: getNode(nodes, nodeId) })),
+            [...policy2.rasterIds]
+              .filter((value32) => !active.has(value32) && isVisualMediaNode(getNode(nodes, value32)))
+              .map((nodeId) => ({ nodeId: nodeId, geometry: getNode(nodes, nodeId) })),
             {
               viewport: viewport,
               previewMotion: previewMotion,
@@ -436,45 +436,45 @@ export function createRendererRasterPreviewCoordinator({
             },
           )
         : new Set();
-    for (const value33 of policy2['rasterIds']) {
-      !active['has'](value33) &&
-        (layerStats?.['active'] !== true || exactVisibleCount['has'](value33) || map15['has'](value33)) &&
-        domProxyIds2['add'](value33);
+    for (const value33 of policy2.rasterIds) {
+      !active.has(value33) &&
+        (layerStats?.active !== true || exactVisibleCount.has(value33) || map15.has(value33)) &&
+        domProxyIds2.add(value33);
     }
     previousRasterIds = active;
     const domPreviewCandidateIds2 = new Set([...fullSurfaceIds, ...domProxyIds2]);
     for (const value34 of active) {
-      (domPreviewCandidateIds2['delete'](value34), domProxyIds2['delete'](value34));
+      (domPreviewCandidateIds2.delete(value34), domProxyIds2.delete(value34));
     }
     const map16 = new Set(
-        reuseWhileBusy ? [...policy2['rasterIds']]['filter']((value35) => !active['has'](value35)) : [],
+        reuseWhileBusy ? [...policy2.rasterIds].filter((value35) => !active.has(value35)) : [],
       ),
       domPreviewMediaSourceOwnerIds2 = new Set(
-        [...domPreviewCandidateIds2]['filter'](
-          (value36) => (exactVisibleCount['has'](value36) && !map16['has'](value36)) || map15['has'](value36),
+        [...domPreviewCandidateIds2].filter(
+          (value36) => (exactVisibleCount.has(value36) && !map16.has(value36)) || map15.has(value36),
         ),
       );
     if (reuseWhileBusy)
       for (const value37 of map3) {
-        domPreviewCandidateIds2['has'](value37) &&
-          exactVisibleCount['has'](value37) &&
-          !map14['has'](value37) &&
-          domPreviewMediaSourceOwnerIds2['add'](value37);
+        domPreviewCandidateIds2.has(value37) &&
+          exactVisibleCount.has(value37) &&
+          !map14.has(value37) &&
+          domPreviewMediaSourceOwnerIds2.add(value37);
       }
     if (value20)
       for (const value38 of map3) {
-        if (map14['has'](value38) || !getNode(nodes, value38)) continue;
-        (domPreviewCandidateIds2['add'](value38),
-          domProxyIds2['add'](value38),
-          domPreviewMediaSourceOwnerIds2['add'](value38));
+        if (map14.has(value38) || !getNode(nodes, value38)) continue;
+        (domPreviewCandidateIds2.add(value38),
+          domProxyIds2.add(value38),
+          domPreviewMediaSourceOwnerIds2.add(value38));
       }
     map3 = new Set(domPreviewMediaSourceOwnerIds2);
     const releasableFullSurfaceIds2 = new Set(
-      [...args]['filter'](
+      [...args].filter(
         (value39) =>
-          !exactVisibleCount['has'](value39) ||
+          !exactVisibleCount.has(value39) ||
           !isVisualMediaNode(getNode(nodes, value39)) ||
-          active['has'](value39),
+          active.has(value39),
       ),
     );
     if (typeof releaseFullSurface === 'function')
@@ -482,7 +482,7 @@ export function createRendererRasterPreviewCoordinator({
         releaseFullSurface(value40);
       }
     return {
-      active: active['size'] > 0,
+      active: active.size > 0,
       rasterIds: active,
       domProxyIds: domProxyIds2,
       domPreviewCandidateIds: domPreviewCandidateIds2,
@@ -492,11 +492,11 @@ export function createRendererRasterPreviewCoordinator({
       layerStats: layerStats,
       freezeActive: reuseWhileBusy,
       signature:
-        policy2['signature'] +
+        policy2.signature +
         '|claimed:' +
-        [...active]['join']('\x1f') +
+        [...active].join('\x1f') +
         '|handoff:' +
-        [...args2]['join']('\x1f'),
+        [...args2].join('\x1f'),
     };
   }
   function reset() {
@@ -506,41 +506,41 @@ export function createRendererRasterPreviewCoordinator({
       (map4 = new Set()),
       (map5 = new Set()),
       (map6 = new Map()),
-      map7['clear'](),
+      map7.clear(),
       (value2 = ''),
       (mediaLoadingBusy2 = false),
       (enabled2 = false),
       (box4 = null),
       (previewMotion = { active: false }),
-      output['destroy']?.());
+      output.destroy?.());
     if (!layer) output = run2();
   }
   function setMediaLoadingBusy(value41) {
     return (
       (enabled2 = value41 === true),
-      output['setMediaLoadingBusy']?.(mediaLoadingBusy2 || enabled2) || null
+      output.setMediaLoadingBusy?.(mediaLoadingBusy2 || enabled2) || null
     );
   }
   function excludeNode(value42) {
-    const enabled8 = String(value42 || '')['trim']();
+    const enabled8 = String(value42 || '').trim();
     if (!enabled8) return false;
-    const enabled9 = map4['has'](enabled8) || map5['has'](enabled8) || previousRasterIds['has'](enabled8);
-    if (typeof output['excludeNode'] !== 'function') return false;
-    const enabled10 = output['excludeNode'](enabled8) === true;
+    const enabled9 = map4.has(enabled8) || map5.has(enabled8) || previousRasterIds.has(enabled8);
+    if (typeof output.excludeNode !== 'function') return false;
+    const enabled10 = output.excludeNode(enabled8) === true;
     if (!enabled10 && !enabled9) return false;
     return (
-      map4['delete'](enabled8),
-      map5['delete'](enabled8),
-      map6['delete'](enabled8),
-      map7['delete'](enabled8),
-      previousRasterIds['delete'](enabled8),
+      map4.delete(enabled8),
+      map5.delete(enabled8),
+      map6.delete(enabled8),
+      map7.delete(enabled8),
+      previousRasterIds.delete(enabled8),
       true
     );
   }
   function captureNodeFrame(value43) {
-    const enabled11 = String(value43 || '')['trim']();
-    if (!enabled11 || !map4['has'](enabled11)) return null;
-    return output['captureNodeFrame']?.(enabled11) || null;
+    const enabled11 = String(value43 || '').trim();
+    if (!enabled11 || !map4.has(enabled11)) return null;
+    return output.captureNodeFrame?.(enabled11) || null;
   }
   return {
     sync: sync,
@@ -548,6 +548,6 @@ export function createRendererRasterPreviewCoordinator({
     captureNodeFrame: captureNodeFrame,
     excludeNode: excludeNode,
     setMediaLoadingBusy: setMediaLoadingBusy,
-    getStats: () => output['getStats']?.() || null,
+    getStats: () => output.getStats?.() || null,
   };
 }

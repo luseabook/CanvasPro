@@ -1,6 +1,6 @@
 import { getStoryAssetAppearances } from './storyAssetAppearances.js';
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 export function createStoryAssetImageLocalization({
   asset: asset,
@@ -10,21 +10,21 @@ export function createStoryAssetImageLocalization({
   applyResult: applyResult,
   onLocalized: onLocalized = () => {},
 }) {
-  const text = normalizeText(asset?.['id']),
-    text2 = normalizeText(appearance?.['id']);
+  const text = normalizeText(asset?.id),
+    text2 = normalizeText(appearance?.id);
   let enabled = false,
     text3 = '',
     enabled2 = null;
   const run = async (item) => {
     if (!enabled) return ((enabled2 = item), false);
     if (typeof isLive === 'function' && !isLive(projectToken)) return false;
-    const enabled3 = projectToken?.['data']?.['assets']?.['find'](
-        (key) => normalizeText(key?.['id']) === text,
+    const enabled3 = projectToken?.data?.assets?.find(
+        (key) => normalizeText(key?.id) === text,
       ),
-      storyAssetAppearances = getStoryAssetAppearances(enabled3)['find'](
-        (index) => normalizeText(index?.['id']) === text2,
+      storyAssetAppearances = getStoryAssetAppearances(enabled3).find(
+        (index) => normalizeText(index?.id) === text2,
       );
-    if (!enabled3 || !storyAssetAppearances || normalizeText(storyAssetAppearances['imageUrl']) !== text3)
+    if (!enabled3 || !storyAssetAppearances || normalizeText(storyAssetAppearances.imageUrl) !== text3)
       return false;
     return (
       applyResult(enabled3, storyAssetAppearances, item),
@@ -40,10 +40,10 @@ export function createStoryAssetImageLocalization({
       },
     },
     commitRemote() {
-      ((text3 = normalizeText(appearance?.['imageUrl'])), (enabled = true));
+      ((text3 = normalizeText(appearance?.imageUrl)), (enabled = true));
       if (!enabled2) return;
       const result = enabled2;
-      ((enabled2 = null), void run(result)['catch'](() => {}));
+      ((enabled2 = null), void run(result).catch(() => {}));
     },
   };
 }

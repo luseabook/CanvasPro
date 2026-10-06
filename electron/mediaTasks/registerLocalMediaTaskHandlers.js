@@ -5,29 +5,29 @@ import { finalizeVideoPlaybackProxyMigrationResult } from '../videoPlaybackProxy
 const VIDEO_POSTER_TIMEOUT_MS = 60000,
   AUDIO_WAVEFORM_TIMEOUT_MS = 30 * 60 * 1000;
 function runVideoTranscode(deps, task, queue, args, options = {}) {
-  if (typeof deps['runFfmpegTask'] === 'function')
-    return deps['runFfmpegTask'](task, queue, args, options);
-  return queue['runProcess'](task, deps['getRuntimeToolOrFallback']('ffmpeg'), args, options);
+  if (typeof deps.runFfmpegTask === 'function')
+    return deps.runFfmpegTask(task, queue, args, options);
+  return queue.runProcess(task, deps.getRuntimeToolOrFallback('ffmpeg'), args, options);
 }
 function createVideoPosterHandler(deps) {
   return async (task, queue) => {
-    const source = task['payload']['originalLocalPath'] || task['payload']['src'],
-      sourceAbs = deps['resolveMediaTaskSource'](source),
+    const source = task.payload.originalLocalPath || task.payload.src,
+      sourceAbs = deps.resolveMediaTaskSource(source),
       assetKey =
-        String(task['payload']['assetId'] || '')['trim']() ||
-        createHash('sha1')['update'](source)['digest']('hex'),
-      posterDir = path['join'](deps['getAssetsDir'](), 'derived', 'video');
+        String(task.payload.assetId || '').trim() ||
+        createHash('sha1').update(source).digest('hex'),
+      posterDir = path.join(deps.getAssetsDir(), 'derived', 'video');
     mkdirSync(posterDir, { recursive: true });
-    const posterAbs = path['join'](posterDir, assetKey + '.poster.jpg'),
-      posterRel = deps['toAssetLocalPath']('derived', 'video', assetKey + '.poster.jpg'),
+    const posterAbs = path.join(posterDir, assetKey + '.poster.jpg'),
+      posterRel = deps.toAssetLocalPath('derived', 'video', assetKey + '.poster.jpg'),
       migrated = finalizeVideoPlaybackProxyMigrationResult(
-        await deps['ensureAssetVideoPlaybackProxy'](task, queue, sourceAbs, assetKey),
-        { sourceLocalPath: source, targetVersion: task['payload']['videoProxyTargetVersion'] },
+        await deps.ensureAssetVideoPlaybackProxy(task, queue, sourceAbs, assetKey),
+        { sourceLocalPath: source, targetVersion: task.payload.videoProxyTargetVersion },
       );
     !existsSync(posterAbs) &&
-      (await queue['runProcess'](
+      (await queue.runProcess(
         task,
-        deps['getRuntimeToolOrFallback']('ffmpeg'),
+        deps.getRuntimeToolOrFallback('ffmpeg'),
         ['-y', '-ss', '0.1', '-i', sourceAbs, '-frames:v', '1', '-vf', 'scale=640:-2', posterAbs],
         { timeoutMs: VIDEO_POSTER_TIMEOUT_MS },
       ));
@@ -38,86 +38,86 @@ function createVideoPosterHandler(deps) {
       posterUrl: '/' + posterRel,
       thumbUrl: '/' + posterRel,
     };
-    if (task['payload']['assetId']) {
-      const updated = deps['updateAssetRecord'](
-        task['payload']['assetId'],
+    if (task.payload.assetId) {
+      const updated = deps.updateAssetRecord(
+        task.payload.assetId,
         {
           ...result,
           status: 'ready',
           error: '',
-          mediaTaskId: task['id'],
-          mediaTaskKind: task['kind'],
+          mediaTaskId: task.id,
+          mediaTaskKind: task.kind,
           mediaTaskStatus: 'complete',
           mediaTaskProgress: 1,
           mediaTaskError: '',
         },
-        { expectedMediaTaskId: task['id'] },
+        { expectedMediaTaskId: task.id },
       );
-      deps['sendAssetUpdated'](updated);
+      deps.sendAssetUpdated(updated);
     }
     return result;
   };
 }
 function createAudioWaveformHandler(deps) {
   return async (task, queue) => {
-    const source = task['payload']['originalLocalPath'] || task['payload']['src'],
-      sourceAbs = deps['resolveMediaTaskSource'](source),
+    const source = task.payload.originalLocalPath || task.payload.src,
+      sourceAbs = deps.resolveMediaTaskSource(source),
       assetKey =
-        String(task['payload']['assetId'] || '')['trim']() ||
-        createHash('sha1')['update'](source)['digest']('hex'),
-      waveformDir = path['join'](deps['getAssetsDir'](), 'derived', 'audio');
+        String(task.payload.assetId || '').trim() ||
+        createHash('sha1').update(source).digest('hex'),
+      waveformDir = path.join(deps.getAssetsDir(), 'derived', 'audio');
     mkdirSync(waveformDir, { recursive: true });
-    const waveformAbs = path['join'](waveformDir, assetKey + '.waveform.json'),
-      waveformRel = deps['toAssetLocalPath']('derived', 'audio', assetKey + '.waveform.json');
+    const waveformAbs = path.join(waveformDir, assetKey + '.waveform.json'),
+      waveformRel = deps.toAssetLocalPath('derived', 'audio', assetKey + '.waveform.json');
     if (!existsSync(waveformAbs)) {
-      const capture = await queue['runProcess'](
+      const capture = await queue.runProcess(
         task,
-        deps['getRuntimeToolOrFallback']('ffmpeg'),
+        deps.getRuntimeToolOrFallback('ffmpeg'),
         ['-v', 'error', '-i', sourceAbs, '-ac', '1', '-ar', '8000', '-f', 'f32le', 'pipe:1'],
         { timeoutMs: AUDIO_WAVEFORM_TIMEOUT_MS },
       );
       writeFileSync(
         waveformAbs,
-        JSON['stringify'](deps['buildWaveformJsonFromFloat32'](capture['stdout'])) + '\n',
+        JSON.stringify(deps.buildWaveformJsonFromFloat32(capture.stdout)) + '\n',
         'utf8',
       );
     }
     const result = { waveformLocalPath: waveformRel, waveformUrl: '/' + waveformRel };
-    if (task['payload']['assetId']) {
-      const updated = deps['updateAssetRecord'](
-        task['payload']['assetId'],
+    if (task.payload.assetId) {
+      const updated = deps.updateAssetRecord(
+        task.payload.assetId,
         {
           ...result,
           status: 'ready',
           error: '',
-          mediaTaskId: task['id'],
-          mediaTaskKind: task['kind'],
+          mediaTaskId: task.id,
+          mediaTaskKind: task.kind,
           mediaTaskStatus: 'complete',
           mediaTaskProgress: 1,
           mediaTaskError: '',
         },
-        { expectedMediaTaskId: task['id'] },
+        { expectedMediaTaskId: task.id },
       );
-      deps['sendAssetUpdated'](updated);
+      deps.sendAssetUpdated(updated);
     }
     return result;
   };
 }
 function createVideoFirstFrameHandler(deps) {
   return async (task, queue) => {
-    const source = String(task['payload']['src'] || '')['trim'](),
-      sourceAbs = deps['resolveMediaTaskSource'](source),
+    const source = String(task.payload.src || '').trim(),
+      sourceAbs = deps.resolveMediaTaskSource(source),
       stat = statSync(sourceAbs),
-      cacheKey = source['replace'](/^\/+/, '') + '|' + stat['mtimeMs'] + '|' + stat['size'],
-      digest = createHash('sha1')['update'](cacheKey)['digest']('hex')['slice'](0, 12),
-      thumbDir = path['join'](deps['getOutputDir'](), 'VideoThumbs');
+      cacheKey = source.replace(/^\/+/, '') + '|' + stat.mtimeMs + '|' + stat.size,
+      digest = createHash('sha1').update(cacheKey).digest('hex').slice(0, 12),
+      thumbDir = path.join(deps.getOutputDir(), 'VideoThumbs');
     mkdirSync(thumbDir, { recursive: true });
     const filename = 'vthumb_' + digest + '.jpg',
-      thumbAbs = path['join'](thumbDir, filename),
-      thumbRel = deps['toOutputLocalPath']('VideoThumbs', filename);
+      thumbAbs = path.join(thumbDir, filename),
+      thumbRel = deps.toOutputLocalPath('VideoThumbs', filename);
     return (
       !existsSync(thumbAbs) &&
-        (await queue['runProcess'](task, deps['getRuntimeToolOrFallback']('ffmpeg'), [
+        (await queue.runProcess(task, deps.getRuntimeToolOrFallback('ffmpeg'), [
           '-y',
           '-ss',
           '0',
@@ -137,34 +137,34 @@ function createVideoFirstFrameHandler(deps) {
   };
 }
 function readCutRange(task) {
-  const start = Math['max'](
+  const start = Math.max(
       0,
-      Number(task['payload']['args']?.['start'] ?? task['payload']['start'] ?? 0) || 0,
+      Number(task.payload.args?.start ?? task.payload.start ?? 0) || 0,
     ),
-    end = Math['max'](
+    end = Math.max(
       0,
-      Number(task['payload']['args']?.['end'] ?? task['payload']['end'] ?? 0) || 0,
+      Number(task.payload.args?.end ?? task.payload.end ?? 0) || 0,
     );
   return { start: start, end: end };
 }
 function createVideoCutHandler(deps) {
   return async (task, queue) => {
-    const sourceAbs = deps['resolveMediaTaskSource'](task['payload']['src']),
+    const sourceAbs = deps.resolveMediaTaskSource(task.payload.src),
       { start: start, end: end } = readCutRange(task);
     if (!(end > start)) throw new Error('Invalid video cut range');
-    const requestedFps = Math['round'](
+    const requestedFps = Math.round(
         Number(
-          task['payload']['args']?.['fps'] ??
-            task['payload']['fps'] ??
-            task['payload']['frameRate'],
+          task.payload.args?.fps ??
+            task.payload.fps ??
+            task.payload.frameRate,
         ),
       ),
-      fps = [16, 24, 30]['includes'](requestedFps) ? requestedFps : 0,
-      cutDir = path['join'](deps['getOutputDir'](), 'CutVideo');
+      fps = [16, 24, 30].includes(requestedFps) ? requestedFps : 0,
+      cutDir = path.join(deps.getOutputDir(), 'CutVideo');
     mkdirSync(cutDir, { recursive: true });
-    const filename = deps['createOutputFilename']('cut', 'mp4'),
-      outAbs = path['join'](cutDir, filename),
-      outRel = deps['toOutputLocalPath']('CutVideo', filename);
+    const filename = deps.createOutputFilename('cut', 'mp4'),
+      outAbs = path.join(cutDir, filename),
+      outRel = deps.toOutputLocalPath('CutVideo', filename);
     return (
       await runVideoTranscode(
         deps,
@@ -201,18 +201,18 @@ function createVideoCutHandler(deps) {
 }
 function createAudioCutHandler(deps) {
   return async (task, queue) => {
-    const sourceAbs = deps['resolveMediaTaskSource'](task['payload']['src']),
+    const sourceAbs = deps.resolveMediaTaskSource(task.payload.src),
       { start: start, end: end } = readCutRange(task);
     if (!(end > start)) throw new Error('Invalid audio cut range');
-    const cutDir = path['join'](deps['getOutputDir'](), 'CutAudio');
+    const cutDir = path.join(deps.getOutputDir(), 'CutAudio');
     mkdirSync(cutDir, { recursive: true });
-    const filename = deps['createOutputFilename']('cut', 'mp3'),
-      outAbs = path['join'](cutDir, filename),
-      outRel = deps['toOutputLocalPath']('CutAudio', filename);
+    const filename = deps.createOutputFilename('cut', 'mp3'),
+      outAbs = path.join(cutDir, filename),
+      outRel = deps.toOutputLocalPath('CutAudio', filename);
     return (
-      await queue['runProcess'](
+      await queue.runProcess(
         task,
-        deps['getRuntimeToolOrFallback']('ffmpeg'),
+        deps.getRuntimeToolOrFallback('ffmpeg'),
         [
           '-y',
           '-i',
@@ -236,42 +236,42 @@ function createAudioCutHandler(deps) {
 }
 function createVideoAudioSeparateHandler(deps) {
   return async (task, queue) => {
-    const sourceAbs = deps['resolveMediaTaskSource'](task['payload']['src']),
-      meta = await deps['ffprobeVideoMeta'](queue, task, sourceAbs);
-    if (!meta['width'] || !meta['height'])
+    const sourceAbs = deps.resolveMediaTaskSource(task.payload.src),
+      meta = await deps.ffprobeVideoMeta(queue, task, sourceAbs);
+    if (!meta.width || !meta.height)
       throw new Error('Source video has no video stream');
-    if (!(await deps['ffprobeHasAudio'](queue, task, sourceAbs)))
+    if (!(await deps.ffprobeHasAudio(queue, task, sourceAbs)))
       throw new Error('Source video has no audio stream');
-    const videoDir = path['join'](deps['getOutputDir'](), 'SeparateVideo'),
-      audioDir = path['join'](deps['getOutputDir'](), 'SeparateAudio');
+    const videoDir = path.join(deps.getOutputDir(), 'SeparateVideo'),
+      audioDir = path.join(deps.getOutputDir(), 'SeparateAudio');
     (mkdirSync(videoDir, { recursive: true }), mkdirSync(audioDir, { recursive: true }));
-    const videoFilename = deps['createOutputFilename']('video', 'mp4'),
-      audioFilename = deps['createOutputFilename']('audio', 'mp3'),
-      videoAbs = path['join'](videoDir, videoFilename),
-      audioAbs = path['join'](audioDir, audioFilename);
-    (await queue['runProcess'](
+    const videoFilename = deps.createOutputFilename('video', 'mp4'),
+      audioFilename = deps.createOutputFilename('audio', 'mp3'),
+      videoAbs = path.join(videoDir, videoFilename),
+      audioAbs = path.join(audioDir, audioFilename);
+    (await queue.runProcess(
       task,
-      deps['getRuntimeToolOrFallback']('ffmpeg'),
+      deps.getRuntimeToolOrFallback('ffmpeg'),
       ['-y', '-i', sourceAbs, '-map', '0:v:0', '-an', '-c:v', 'copy', videoAbs],
       {
-        durationSec: meta['duration'] || 0,
+        durationSec: meta.duration || 0,
         initialProgress: 0.05,
         progressMessage: 'Extracting video',
       },
     ),
-      queue['emitProgress'](task, 0.55, 'Extracting audio'),
-      await queue['runProcess'](
+      queue.emitProgress(task, 0.55, 'Extracting audio'),
+      await queue.runProcess(
         task,
-        deps['getRuntimeToolOrFallback']('ffmpeg'),
+        deps.getRuntimeToolOrFallback('ffmpeg'),
         ['-y', '-i', sourceAbs, '-map', '0:a:0', '-vn', '-c:a', 'libmp3lame', '-b:a', '192k', audioAbs],
         {
-          durationSec: meta['duration'] || 0,
+          durationSec: meta.duration || 0,
           initialProgress: 0.55,
           progressMessage: 'Extracting audio',
         },
       ));
-    const videoRel = deps['toOutputLocalPath']('SeparateVideo', videoFilename),
-      audioRel = deps['toOutputLocalPath']('SeparateAudio', audioFilename);
+    const videoRel = deps.toOutputLocalPath('SeparateVideo', videoFilename),
+      audioRel = deps.toOutputLocalPath('SeparateAudio', audioFilename);
     return {
       success: true,
       video: { filename: videoFilename, path: videoRel, localPath: videoRel, url: '/' + videoRel },
@@ -281,41 +281,41 @@ function createVideoAudioSeparateHandler(deps) {
 }
 function createVideoComposeHandler(deps) {
   return async (task, queue) => {
-    const srcs = Array['isArray'](task['payload']['srcs'])
-        ? task['payload']['srcs']
-        : Array['isArray'](task['payload']['args']?.['srcs'])
-          ? task['payload']['args']['srcs']
+    const srcs = Array.isArray(task.payload.srcs)
+        ? task.payload.srcs
+        : Array.isArray(task.payload.args?.srcs)
+          ? task.payload.args.srcs
           : [],
-      absList = srcs['map']((src) => deps['resolveMediaTaskSource'](src)),
-      includeAudio = task['payload']['args']?.['includeAudio'] !== false;
-    if (absList['length'] < 1 || (absList['length'] < 2 && includeAudio))
+      absList = srcs.map((src) => deps.resolveMediaTaskSource(src)),
+      includeAudio = task.payload.args?.includeAudio !== false;
+    if (absList.length < 1 || (absList.length < 2 && includeAudio))
       throw new Error('Invalid video compose sources');
-    const meta = await deps['ffprobeVideoMeta'](queue, task, absList[0]);
-    if (!meta['width'] || !meta['height'])
+    const meta = await deps.ffprobeVideoMeta(queue, task, absList[0]);
+    if (!meta.width || !meta.height)
       throw new Error('FFprobe failed: missing width/height');
     const audioFlags = includeAudio
-        ? await Promise['all'](absList['map']((source) => deps['ffprobeHasAudio'](queue, task, source)))
+        ? await Promise.all(absList.map((source) => deps.ffprobeHasAudio(queue, task, source)))
         : [],
-      hasAudio = includeAudio && audioFlags['every'](Boolean),
-      composeDir = path['join'](deps['getOutputDir'](), 'ComposeVideo');
+      hasAudio = includeAudio && audioFlags.every(Boolean),
+      composeDir = path.join(deps.getOutputDir(), 'ComposeVideo');
     mkdirSync(composeDir, { recursive: true });
-    const filename = deps['createOutputFilename']('compose', 'mp4'),
-      outAbs = path['join'](composeDir, filename),
-      outRel = deps['toOutputLocalPath']('ComposeVideo', filename),
-      fps = Math['max'](1, Math['round'](meta['fps'] || 30)),
+    const filename = deps.createOutputFilename('compose', 'mp4'),
+      outAbs = path.join(composeDir, filename),
+      outRel = deps.toOutputLocalPath('ComposeVideo', filename),
+      fps = Math.max(1, Math.round(meta.fps || 30)),
       filters = [];
-    absList['forEach']((_source, index) => {
-      (filters['push'](
+    absList.forEach((_source, index) => {
+      (filters.push(
         '[' +
           index +
           ':v]scale=' +
-          meta['width'] +
+          meta.width +
           ':' +
-          meta['height'] +
+          meta.height +
           ':force_original_aspect_ratio=decrease,pad=' +
-          meta['width'] +
+          meta.width +
           ':' +
-          meta['height'] +
+          meta.height +
           ':(ow-iw)/2:(oh-ih)/2,setsar=1,fps=' +
           fps +
           ',format=yuv420p,setpts=PTS-STARTPTS[v' +
@@ -323,7 +323,7 @@ function createVideoComposeHandler(deps) {
           ']',
       ),
         hasAudio &&
-          filters['push'](
+          filters.push(
             '[' +
               index +
               ':a]aformat=sample_rates=44100:channel_layouts=stereo,asetpts=PTS-STARTPTS[a' +
@@ -332,24 +332,24 @@ function createVideoComposeHandler(deps) {
           ));
     });
     hasAudio
-      ? filters['push'](
-          absList['map']((_source, index) => '[v' + index + '][a' + index + ']')['join']('') +
+      ? filters.push(
+          absList.map((_source, index) => '[v' + index + '][a' + index + ']').join('') +
             'concat=n=' +
-            absList['length'] +
+            absList.length +
             ':v=1:a=1[v][a]',
         )
-      : filters['push'](
-          absList['map']((_source, index) => '[v' + index + ']')['join']('') +
+      : filters.push(
+          absList.map((_source, index) => '[v' + index + ']').join('') +
             'concat=n=' +
-            absList['length'] +
+            absList.length +
             ':v=1:a=0[v]',
         );
     const args = ['-y'];
-    (absList['forEach']((source) => args['push']('-i', source)),
-      args['push']('-filter_complex', filters['join'](';'), '-map', '[v]'));
-    if (hasAudio) args['push']('-map', '[a]');
+    (absList.forEach((source) => args.push('-i', source)),
+      args.push('-filter_complex', filters.join(';'), '-map', '[v]'));
+    if (hasAudio) args.push('-map', '[a]');
     return (
-      args['push'](
+      args.push(
         '-c:v',
         'libx264',
         '-preset',
@@ -361,7 +361,7 @@ function createVideoComposeHandler(deps) {
       ),
       await runVideoTranscode(deps, task, queue, args, {
         durationSec:
-          Number(task['payload']['args']?.['duration'] || 0) || meta['duration'] || 0,
+          Number(task.payload.args?.duration || 0) || meta.duration || 0,
         progressMessage: 'Composing video',
       }),
       { success: true, filename: filename, path: outRel, localPath: outRel, url: '/' + outRel }
@@ -370,20 +370,20 @@ function createVideoComposeHandler(deps) {
 }
 function createVideoAudioMuxHandler(deps) {
   return async (task, queue) => {
-    const payload = task['payload'] || {},
-      args = payload['args'] || {},
-      videoAbs = deps['resolveMediaTaskSource'](payload['src'] || args['src']),
-      audioAbs = deps['resolveMediaTaskSource'](args['audioSrc'] || payload['audioSrc']),
-      meta = await deps['ffprobeVideoMeta'](queue, task, videoAbs);
-    if (!meta['width'] || !meta['height']) throw new Error('Source video has no video stream');
-    if (!(await deps['ffprobeHasAudio'](queue, task, audioAbs)))
+    const payload = task.payload || {},
+      args = payload.args || {},
+      videoAbs = deps.resolveMediaTaskSource(payload.src || args.src),
+      audioAbs = deps.resolveMediaTaskSource(args.audioSrc || payload.audioSrc),
+      meta = await deps.ffprobeVideoMeta(queue, task, videoAbs);
+    if (!meta.width || !meta.height) throw new Error('Source video has no video stream');
+    if (!(await deps.ffprobeHasAudio(queue, task, audioAbs)))
       throw new Error('Source audio has no audio stream');
-    const muxDir = path['join'](deps['getOutputDir'](), 'MuxVideo');
+    const muxDir = path.join(deps.getOutputDir(), 'MuxVideo');
     mkdirSync(muxDir, { recursive: true });
-    const filename = deps['createOutputFilename']('mux', 'mp4'),
-      outAbs = path['join'](muxDir, filename),
-      outRel = deps['toOutputLocalPath']('MuxVideo', filename),
-      durationSec = Math['max'](0, Number(meta['duration']) || 0),
+    const filename = deps.createOutputFilename('mux', 'mp4'),
+      outAbs = path.join(muxDir, filename),
+      outRel = deps.toOutputLocalPath('MuxVideo', filename),
+      durationSec = Math.max(0, Number(meta.duration) || 0),
       ffmpegArgs = [
         '-y',
         '-i',
@@ -406,7 +406,7 @@ function createVideoAudioMuxHandler(deps) {
         outAbs,
       ];
     return (
-      await queue['runProcess'](task, deps['getRuntimeToolOrFallback']('ffmpeg'), ffmpegArgs, {
+      await queue.runProcess(task, deps.getRuntimeToolOrFallback('ffmpeg'), ffmpegArgs, {
         durationSec: durationSec,
         progressMessage: 'Muxing video audio',
       }),
@@ -415,13 +415,13 @@ function createVideoAudioMuxHandler(deps) {
   };
 }
 export function registerLocalMediaTaskHandlers(queue, deps = {}) {
-  if (!queue || typeof queue['setHandler'] !== 'function') return;
-  (queue['setHandler']('videoPoster', createVideoPosterHandler(deps)),
-    queue['setHandler']('audioWaveform', createAudioWaveformHandler(deps)),
-    queue['setHandler']('videoFirstFrame', createVideoFirstFrameHandler(deps)),
-    queue['setHandler']('videoCut', createVideoCutHandler(deps)),
-    queue['setHandler']('audioCut', createAudioCutHandler(deps)),
-    queue['setHandler']('videoAudioSeparate', createVideoAudioSeparateHandler(deps)),
-    queue['setHandler']('videoCompose', createVideoComposeHandler(deps)),
-    queue['setHandler']('videoAudioMux', createVideoAudioMuxHandler(deps)));
+  if (!queue || typeof queue.setHandler !== 'function') return;
+  (queue.setHandler('videoPoster', createVideoPosterHandler(deps)),
+    queue.setHandler('audioWaveform', createAudioWaveformHandler(deps)),
+    queue.setHandler('videoFirstFrame', createVideoFirstFrameHandler(deps)),
+    queue.setHandler('videoCut', createVideoCutHandler(deps)),
+    queue.setHandler('audioCut', createAudioCutHandler(deps)),
+    queue.setHandler('videoAudioSeparate', createVideoAudioSeparateHandler(deps)),
+    queue.setHandler('videoCompose', createVideoComposeHandler(deps)),
+    queue.setHandler('videoAudioMux', createVideoAudioMuxHandler(deps)));
 }

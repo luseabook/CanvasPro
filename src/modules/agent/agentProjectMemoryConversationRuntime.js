@@ -3,8 +3,8 @@ import {
   detectAgentProjectMemoryIntent,
   isAgentProjectMemoryEmpty,
 } from './agentProjectMemory.js';
-const TEXT = Object['freeze']({
-  'zh-CN': Object['freeze']({
+const TEXT = Object.freeze({
+  'zh-CN': Object.freeze({
     empty: '当前项目还没有长期记忆。你可以说“记住：品牌语气年轻直接”。',
     inspect: '当前项目长期记忆：\n{lines}',
     remembered: '已记入当前项目长期记忆：{items}。',
@@ -17,7 +17,7 @@ const TEXT = Object['freeze']({
     namingRules: '命名规则',
     preferences: '其他偏好',
   }),
-  'en-US': Object['freeze']({
+  'en-US': Object.freeze({
     empty: 'This project has no long-term memory yet. Say “Remember: our brand voice is concise and direct.”',
     inspect: 'Long-term memory for this project:\n{lines}',
     remembered: "Saved to this project's long-term memory: {items}.",
@@ -33,13 +33,13 @@ const TEXT = Object['freeze']({
 });
 function localeKey(value = '') {
   return String(value || '')
-    ['toLowerCase']()
-    ['startsWith']('en')
+    .toLowerCase()
+    .startsWith('en')
     ? 'en-US'
     : 'zh-CN';
 }
 function formatText(item, key = {}, index = 'zh-CN') {
-  return (TEXT[localeKey(index)]?.[item] || TEXT['zh-CN'][item] || item)['replace'](
+  return (TEXT[localeKey(index)]?.[item] || TEXT['zh-CN'][item] || item).replace(
     /\{(\w+)\}/g,
     (result, data) => String(key[data] ?? ''),
   );
@@ -51,13 +51,13 @@ export function createAgentProjectMemoryConversationRuntime({
 } = {}) {
   const run = (turnId, content, projectMemory) => {
     return (
-      sessionStore?.['pushHistory']?.({
+      sessionStore?.pushHistory?.({
         role: 'assistant',
         status: 'success',
         content: content,
         turnId: turnId,
       }),
-      sessionStore?.['setCurrentRun']?.({ id: turnId, status: 'success', stopped: false }),
+      sessionStore?.setCurrentRun?.({ id: turnId, status: 'success', stopped: false }),
       {
         ok: true,
         status: 'success',
@@ -68,59 +68,59 @@ export function createAgentProjectMemoryConversationRuntime({
     );
   };
   function run2(options) {
-    const target = projectMemoryStore['getMemory']();
+    const target = projectMemoryStore.getMemory();
     if (isAgentProjectMemoryEmpty(target))
       return run(options, formatText('empty', {}, localeProvider?.()), target);
-    const lines = AGENT_PROJECT_MEMORY_CATEGORIES['filter']((source) => target[source]['length'] > 0)
-      ['map'](
-        (next) => '- ' + formatText(next, {}, localeProvider?.()) + '：' + target[next]['join']('；'),
+    const lines = AGENT_PROJECT_MEMORY_CATEGORIES.filter((source) => target[source].length > 0)
+      .map(
+        (next) => '- ' + formatText(next, {}, localeProvider?.()) + '：' + target[next].join('；'),
       )
-      ['join']('\n');
+      .join('\n');
     return run(options, formatText('inspect', { lines: lines }, localeProvider?.()), target);
   }
   function handle({ message: message = '', runId: runId = '' } = {}) {
     if (!projectMemoryStore) return null;
     const detectAgentProjectMemoryIntent2 = detectAgentProjectMemoryIntent(message);
     if (!detectAgentProjectMemoryIntent2) return null;
-    sessionStore?.['recordTrace']?.({
+    sessionStore?.recordTrace?.({
       type: 'agent_turn_routed',
       channel: 'project.memory',
-      reason: 'project-memory-' + detectAgentProjectMemoryIntent2['operation'],
+      reason: 'project-memory-' + detectAgentProjectMemoryIntent2.operation,
     });
-    if (detectAgentProjectMemoryIntent2['operation'] === 'inspect') return run2(runId);
-    if (detectAgentProjectMemoryIntent2['operation'] === 'remember') {
-      const items = projectMemoryStore['remember'](detectAgentProjectMemoryIntent2['records']),
+    if (detectAgentProjectMemoryIntent2.operation === 'inspect') return run2(runId);
+    if (detectAgentProjectMemoryIntent2.operation === 'remember') {
+      const items = projectMemoryStore.remember(detectAgentProjectMemoryIntent2.records),
         current =
-          items['added']['length'] > 0
+          items.added.length > 0
             ? formatText(
                 'remembered',
                 {
-                  items: items['added']
-                    ['map'](
+                  items: items.added
+                    .map(
                       ({ category: category, value: value2 }) =>
                         formatText(category, {}, localeProvider?.()) + '：' + value2,
                     )
-                    ['join']('；'),
+                    .join('；'),
                 },
                 localeProvider?.(),
               )
             : formatText('unchanged', {}, localeProvider?.());
-      return run(runId, current, items['memory']);
+      return run(runId, current, items.memory);
     }
-    if (detectAgentProjectMemoryIntent2['operation'] === 'forget') {
-      const count = projectMemoryStore['forget'](detectAgentProjectMemoryIntent2);
+    if (detectAgentProjectMemoryIntent2.operation === 'forget') {
+      const count = projectMemoryStore.forget(detectAgentProjectMemoryIntent2);
       return run(
         runId,
         formatText(
-          count['removed'] > 0 ? 'forgotten' : 'notFound',
-          { count: count['removed'] },
+          count.removed > 0 ? 'forgotten' : 'notFound',
+          { count: count.removed },
           localeProvider?.(),
         ),
-        count['memory'],
+        count.memory,
       );
     }
-    const entry = projectMemoryStore['clearMemory']();
-    return run(runId, formatText('cleared', {}, localeProvider?.()), entry['memory']);
+    const entry = projectMemoryStore.clearMemory();
+    return run(runId, formatText('cleared', {}, localeProvider?.()), entry.memory);
   }
   return { handle: handle };
 }

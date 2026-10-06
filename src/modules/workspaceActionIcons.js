@@ -1,4 +1,4 @@
-const WORKSPACE_ACTION_ICON_PATHS = Object['freeze']({
+const WORKSPACE_ACTION_ICON_PATHS = Object.freeze({
   generate:
     '<path d="m4 20 11-11 3 3L7 23z" transform="translate(0 -2)"/><path d="M16 2v4m-2-2h4M6 3v4M4 5h4M20 15v4m-2-2h4"/>',
   addToLibrary:
@@ -15,7 +15,7 @@ const WORKSPACE_ACTION_ICON_PATHS = Object['freeze']({
   upload: '<path d="M12 15V4m0 0L8 8m4-4 4 4"/><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/>',
 });
 export function renderWorkspaceActionIcon(value) {
-  const item = Object['hasOwn'](WORKSPACE_ACTION_ICON_PATHS, value) ? value : 'confirm';
+  const item = Object.hasOwn(WORKSPACE_ACTION_ICON_PATHS, value) ? value : 'confirm';
   return (
     '<svg class="story-action-icon story-' +
     item +

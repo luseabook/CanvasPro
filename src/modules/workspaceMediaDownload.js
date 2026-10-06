@@ -1,7 +1,7 @@
 import { saveMediaDownload } from '../services/downloadSaveService.js';
 import { localPathToUrl, normalizeLocalPath } from '../utils/localMediaPath.js';
-const DEFAULT_MEDIA_EXTENSIONS = Object['freeze']({ image: 'png', video: 'mp4' }),
-  MEDIA_MIME_EXTENSIONS = Object['freeze']({
+const DEFAULT_MEDIA_EXTENSIONS = Object.freeze({ image: 'png', video: 'mp4' }),
+  MEDIA_MIME_EXTENSIONS = Object.freeze({
     'image/avif': 'avif',
     'image/gif': 'gif',
     'image/jpeg': 'jpg',
@@ -13,33 +13,33 @@ const DEFAULT_MEDIA_EXTENSIONS = Object['freeze']({ image: 'png', video: 'mp4' }
     'video/webm': 'webm',
   });
 function normalizeText(value) {
-  return String(value ?? '')['trim']();
+  return String(value ?? '').trim();
 }
 function escapeHtml(item) {
   return String(item ?? '')
-    ['replaceAll']('&', '&amp;')
-    ['replaceAll']('<', '&lt;')
-    ['replaceAll']('>', '&gt;')
-    ['replaceAll']('"', '&quot;')
-    ['replaceAll']('\'', '&#39;');
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll('\'', '&#39;');
 }
 function resolveMediaExtension(key, index) {
   const text = normalizeText(key),
-    result = text['match'](/^data:([^;,]+)/i)?.[1]?.['toLowerCase']();
+    result = text.match(/^data:([^;,]+)/i)?.[1]?.toLowerCase();
   if (result && MEDIA_MIME_EXTENSIONS[result]) return MEDIA_MIME_EXTENSIONS[result];
   return (
-    text['split'](/[?#]/, 1)[0]
-      ['match'](/\.([a-z0-9]{2,5})$/i)?.[1]
-      ?.['toLowerCase']() || DEFAULT_MEDIA_EXTENSIONS[index]
+    text.split(/[?#]/, 1)[0]
+      .match(/\.([a-z0-9]{2,5})$/i)?.[1]
+      ?.toLowerCase() || DEFAULT_MEDIA_EXTENSIONS[index]
   );
 }
 function sanitizeFilenameBase(data, options) {
   return (
     normalizeText(data)
-      ['replace'](/[\\/:*?"<>|]+/g, '-')
-      ['replace'](/-+/g, '-')
-      ['replace'](/[.\s-]+$/g, '')
-      ['slice'](0, 96) || options
+      .replace(/[\\/:*?"<>|]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/[.\s-]+$/g, '')
+      .slice(0, 96) || options
   );
 }
 export function buildWorkspaceMediaDownloadPayload({
@@ -48,7 +48,7 @@ export function buildWorkspaceMediaDownloadPayload({
   filenameBase: filenameBase,
   title: title,
 } = {}) {
-  const kind2 = Object['hasOwn'](DEFAULT_MEDIA_EXTENSIONS, kind) ? kind : '',
+  const kind2 = Object.hasOwn(DEFAULT_MEDIA_EXTENSIONS, kind) ? kind : '',
     text2 = normalizeText(mediaRef);
   if (!kind2 || !text2) return null;
   const localPath = normalizeLocalPath(text2);
@@ -108,19 +108,19 @@ export function renderWorkspaceMediaDownloadButton({
 }
 export async function runWorkspaceMediaDownloadAction(el, handler) {
   if (!el || typeof handler !== 'function') return null;
-  if (el['classList']?.['contains']?.('is-pending')) return null;
-  const current = Boolean(el['disabled']),
-    entry = el['getAttribute']?.('aria-busy');
-  ((el['disabled'] = true),
-    el['classList']?.['add']?.('is-pending'),
-    el['setAttribute']?.('aria-busy', 'true'));
+  if (el.classList?.contains?.('is-pending')) return null;
+  const current = Boolean(el.disabled),
+    entry = el.getAttribute?.('aria-busy');
+  ((el.disabled = true),
+    el.classList?.add?.('is-pending'),
+    el.setAttribute?.('aria-busy', 'true'));
   try {
     return await handler();
   } finally {
-    ((el['disabled'] = current),
-      el['classList']?.['remove']?.('is-pending'),
+    ((el.disabled = current),
+      el.classList?.remove?.('is-pending'),
       entry === null || entry === undefined
-        ? el['removeAttribute']?.('aria-busy')
-        : el['setAttribute']?.('aria-busy', entry));
+        ? el.removeAttribute?.('aria-busy')
+        : el.setAttribute?.('aria-busy', entry));
   }
 }

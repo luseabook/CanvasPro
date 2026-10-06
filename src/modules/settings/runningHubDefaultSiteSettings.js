@@ -6,21 +6,21 @@ import {
 } from '../runningHubProviderProfiles.js';
 const DEFAULT_SITE_BUTTON_SELECTOR = '[data-runninghub-default-site]';
 export function createRunningHubDefaultSiteSettings({
-  root: root = globalThis['document'],
+  root: root = globalThis.document,
   onSelectionChange: onSelectionChange,
 } = {}) {
-  const list = Array['from'](root?.['querySelectorAll']?.(DEFAULT_SITE_BUTTON_SELECTOR) || []);
+  const list = Array.from(root?.querySelectorAll?.(DEFAULT_SITE_BUTTON_SELECTOR) || []);
   let runningHubModelApiProfileId = RUNNINGHUB_DOMESTIC_PROFILE_ID,
     value = false;
   const map = new Map(),
     handler = () => {
-      list['forEach']((el) => {
+      list.forEach((el) => {
         const runningHubModelApiProfileId2 = normalizeRunningHubModelApiProfileId(
-            el?.['dataset']?.['runninghubDefaultSite'],
+            el?.dataset?.runninghubDefaultSite,
           ),
           item = runningHubModelApiProfileId2 === runningHubModelApiProfileId;
-        (el['classList']?.['toggle']('is-active', item),
-          el['setAttribute']?.('aria-pressed', item ? 'true' : 'false'));
+        (el.classList?.toggle('is-active', item),
+          el.setAttribute?.('aria-pressed', item ? 'true' : 'false'));
       });
     },
     setSelectedProfileId = (key) => {
@@ -31,22 +31,22 @@ export function createRunningHubDefaultSiteSettings({
       );
     },
     bind = () => {
-      (list['forEach']((el2) => {
-        if (map['has'](el2)) return;
+      (list.forEach((el2) => {
+        if (map.has(el2)) return;
         const index = () => {
           value = true;
-          const result = setSelectedProfileId(el2?.['dataset']?.['runninghubDefaultSite']);
+          const result = setSelectedProfileId(el2?.dataset?.runninghubDefaultSite);
           onSelectionChange?.(result);
         };
-        (map['set'](el2, index), el2['addEventListener']?.('click', index));
+        (map.set(el2, index), el2.addEventListener?.('click', index));
       }),
         handler());
     },
     destroy = () => {
-      (map['forEach']((data, el3) => {
-        el3['removeEventListener']?.('click', data);
+      (map.forEach((data, el3) => {
+        el3.removeEventListener?.('click', data);
       }),
-        map['clear']());
+        map.clear());
     },
     loadConfig = (options = {}) =>
       value

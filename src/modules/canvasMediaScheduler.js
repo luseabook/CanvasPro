@@ -16,9 +16,9 @@ const DEFAULT_IMAGE_PRELOAD_CONCURRENCY = 6,
 let resolvedCacheTimer = null,
   imagePreloadDrawableEvictions = 0;
 function drawableBytes(value) {
-  return value?.['image']
-    ? Math['max'](0, Number(value['naturalWidth']) || 0) *
-        Math['max'](0, Number(value['naturalHeight']) || 0) *
+  return value?.image
+    ? Math.max(0, Number(value.naturalWidth) || 0) *
+        Math.max(0, Number(value.naturalHeight) || 0) *
         4
     : 0;
 }
@@ -42,7 +42,7 @@ let sharedCanvasImageElements = new WeakSet(),
   imagePreloadPausedBypassPriority = DEFAULT_PAUSED_BYPASS_PRIORITY;
 const imagePreloadPauseSources = new Set();
 function normalizeUrl(item) {
-  return String(item || '')['trim']();
+  return String(item || '').trim();
 }
 function normalizeImagePreloadKey(key) {
   const url = normalizeUrl(key);
@@ -51,94 +51,94 @@ function normalizeImagePreloadKey(key) {
   return localPath ? localPathToUrl(localPath) || url : url;
 }
 function nowMs() {
-  return Date['now']();
+  return Date.now();
 }
 function isLikelyVideoUrl(index) {
-  return /\.(?:mp4|mov|webm|m4v|avi|mkv)(?:[?#].*)?$/i['test'](String(index || '')['trim']());
+  return /\.(?:mp4|mov|webm|m4v|avi|mkv)(?:[?#].*)?$/i.test(String(index || '').trim());
 }
 function isLikelyAudioUrl(result) {
-  return /\.(?:mp3|wav|m4a|aac|flac|ogg|opus|wma)(?:[?#].*)?$/i['test'](String(result || '')['trim']());
+  return /\.(?:mp3|wav|m4a|aac|flac|ogg|opus|wma)(?:[?#].*)?$/i.test(String(result || '').trim());
 }
 function isLikelyNonImageMediaUrl(data) {
-  const options = String(data || '')['trim']();
+  const options = String(data || '').trim();
   return isLikelyVideoUrl(options) || isLikelyAudioUrl(options);
 }
 function configureImage(enabled, { fetchPriority: fetchPriority = 'auto' } = {}) {
   if (!enabled) return;
   try {
-    enabled['decoding'] = 'async';
+    enabled.decoding = 'async';
   } catch {}
   try {
-    if ('fetchPriority' in enabled) enabled['fetchPriority'] = fetchPriority;
+    if ('fetchPriority' in enabled) enabled.fetchPriority = fetchPriority;
   } catch {}
 }
 function normalizePriority(target) {
   const source = Number(target);
-  return Number['isFinite'](source) ? source : 0;
+  return Number.isFinite(source) ? source : 0;
 }
 function getImagePreloadConcurrency() {
-  const count = Number(globalThis['__AIC_CANVAS_IMAGE_PRELOAD_CONCURRENCY__']);
-  if (Number['isFinite'](count) && count > 0) return Math['max'](1, Math['floor'](count));
+  const count = Number(globalThis.__AIC_CANVAS_IMAGE_PRELOAD_CONCURRENCY__);
+  if (Number.isFinite(count) && count > 0) return Math.max(1, Math.floor(count));
   return DEFAULT_IMAGE_PRELOAD_CONCURRENCY;
 }
 function isImagePreloadJobEligible(next) {
   if (!imagePreloadPaused) return true;
-  if (next?.['allowWhenPaused'] === true) return true;
-  if (next?.['deferWhenPaused'] === true) return false;
-  return normalizePriority(next?.['priority']) >= imagePreloadPausedBypassPriority;
+  if (next?.allowWhenPaused === true) return true;
+  if (next?.deferWhenPaused === true) return false;
+  return normalizePriority(next?.priority) >= imagePreloadPausedBypassPriority;
 }
 function isImagePreloadOverflowEligible(current) {
   return (
-    current?.['allowWhenPaused'] === true &&
-    current?.['deferWhenPaused'] !== true &&
-    normalizePriority(current?.['priority']) >= HIGH_PRIORITY_OVERFLOW_THRESHOLD
+    current?.allowWhenPaused === true &&
+    current?.deferWhenPaused !== true &&
+    normalizePriority(current?.priority) >= HIGH_PRIORITY_OVERFLOW_THRESHOLD
   );
 }
 function pickNextImagePreloadJob({ overflowOnly: overflowOnly = false } = {}) {
   let count2 = -1,
     enabled2 = null;
-  for (let entry = 0; entry < imagePreloadQueue['length']; entry += 1) {
+  for (let entry = 0; entry < imagePreloadQueue.length; entry += 1) {
     const record = imagePreloadQueue[entry];
     if (!isImagePreloadJobEligible(record)) continue;
     if (overflowOnly && !isImagePreloadOverflowEligible(record)) continue;
     (!enabled2 ||
-      record['priority'] > enabled2['priority'] ||
-      (record['priority'] === enabled2['priority'] && record['sequence'] < enabled2['sequence'])) &&
+      record.priority > enabled2.priority ||
+      (record.priority === enabled2.priority && record.sequence < enabled2.sequence)) &&
       ((enabled2 = record), (count2 = entry));
   }
   if (count2 < 0) return null;
   return (
-    imagePreloadQueue['splice'](count2, 1),
-    imagePreloadQueuedJobs['delete'](jobCacheKey(enabled2)),
+    imagePreloadQueue.splice(count2, 1),
+    imagePreloadQueuedJobs.delete(jobCacheKey(enabled2)),
     enabled2
   );
 }
 function jobCacheKey(response) {
-  return response?.['cacheKey'] || response?.['url'] || '';
+  return response?.cacheKey || response?.url || '';
 }
 function summarizeImagePreloadJob(allowWhenPaused) {
   if (!allowWhenPaused) return null;
   return {
-    url: String(allowWhenPaused['url'] || ''),
-    cacheKey: String(allowWhenPaused['cacheKey'] || ''),
-    scope: String(allowWhenPaused['scope'] || ''),
-    priority: normalizePriority(allowWhenPaused['priority']),
-    fetchPriority: String(allowWhenPaused['fetchPriority'] || 'auto'),
-    allowWhenPaused: allowWhenPaused['allowWhenPaused'] === true,
-    deferWhenPaused: allowWhenPaused['deferWhenPaused'] === true,
-    decode: allowWhenPaused['decode'] === true,
-    sequence: Number(allowWhenPaused['sequence'] || 0),
+    url: String(allowWhenPaused.url || ''),
+    cacheKey: String(allowWhenPaused.cacheKey || ''),
+    scope: String(allowWhenPaused.scope || ''),
+    priority: normalizePriority(allowWhenPaused.priority),
+    fetchPriority: String(allowWhenPaused.fetchPriority || 'auto'),
+    allowWhenPaused: allowWhenPaused.allowWhenPaused === true,
+    deferWhenPaused: allowWhenPaused.deferWhenPaused === true,
+    decode: allowWhenPaused.decode === true,
+    sequence: Number(allowWhenPaused.sequence || 0),
   };
 }
 function cancelQueuedImagePreloadJob(promise, payload = 'canceled') {
   const jobCacheKey2 = jobCacheKey(promise);
-  if (!promise || !imagePreloadQueuedJobs['has'](jobCacheKey2)) return false;
-  imagePreloadQueuedJobs['delete'](jobCacheKey2);
-  imagePreloadInflight['get'](jobCacheKey2) === promise['promise'] &&
-    imagePreloadInflight['delete'](jobCacheKey2);
+  if (!promise || !imagePreloadQueuedJobs.has(jobCacheKey2)) return false;
+  imagePreloadQueuedJobs.delete(jobCacheKey2);
+  imagePreloadInflight.get(jobCacheKey2) === promise.promise &&
+    imagePreloadInflight.delete(jobCacheKey2);
   imagePreloadCanceled += 1;
   try {
-    promise['reject'](new Error('Image preload ' + payload));
+    promise.reject(new Error('Image preload ' + payload));
   } catch {}
   return true;
 }
@@ -147,8 +147,8 @@ function shouldCancelImagePreloadJob(
   { scope: scope2, hasPriorityLimit: hasPriorityLimit, priorityLimit: priorityLimit },
 ) {
   if (!enabled3) return false;
-  if (scope2 && enabled3['scope'] !== scope2) return false;
-  if (hasPriorityLimit && normalizePriority(enabled3['priority']) >= priorityLimit) return false;
+  if (scope2 && enabled3.scope !== scope2) return false;
+  if (hasPriorityLimit && normalizePriority(enabled3.priority) >= priorityLimit) return false;
   return true;
 }
 export function cancelQueuedCanvasImagePreloads({
@@ -157,12 +157,12 @@ export function cancelQueuedCanvasImagePreloads({
   reason: reason = 'canceled',
   includeActive: includeActive = false,
 } = {}) {
-  const scope3 = String(scope || '')['trim'](),
+  const scope3 = String(scope || '').trim(),
     priorityLimit2 = Number(belowPriority),
     hasPriorityLimit2 =
-      belowPriority !== null && belowPriority !== undefined && Number['isFinite'](priorityLimit2);
+      belowPriority !== null && belowPriority !== undefined && Number.isFinite(priorityLimit2);
   let handle = 0;
-  for (let count3 = imagePreloadQueue['length'] - 1; count3 >= 0; count3 -= 1) {
+  for (let count3 = imagePreloadQueue.length - 1; count3 >= 0; count3 -= 1) {
     const state = imagePreloadQueue[count3];
     if (
       !shouldCancelImagePreloadJob(state, {
@@ -172,11 +172,11 @@ export function cancelQueuedCanvasImagePreloads({
       })
     )
       continue;
-    imagePreloadQueue['splice'](count3, 1);
+    imagePreloadQueue.splice(count3, 1);
     if (cancelQueuedImagePreloadJob(state, reason)) handle += 1;
   }
   if (includeActive === true) {
-    const config = Array['from'](imagePreloadActiveJobs['values']());
+    const config = Array.from(imagePreloadActiveJobs.values());
     for (const input of config) {
       if (
         !shouldCancelImagePreloadJob(input, {
@@ -186,132 +186,132 @@ export function cancelQueuedCanvasImagePreloads({
         })
       )
         continue;
-      typeof input['cancelActive'] === 'function' && input['cancelActive'](reason) && (handle += 1);
+      typeof input.cancelActive === 'function' && input.cancelActive(reason) && (handle += 1);
     }
   }
   return handle;
 }
 export function setCanvasMediaSchedulerPaused(output, value2 = {}) {
   const value3 = output === true,
-    value4 = String(value2['source'] || 'default')['trim']() || 'default';
-  value3 ? imagePreloadPauseSources['add'](value4) : imagePreloadPauseSources['delete'](value4);
-  imagePreloadPaused = imagePreloadPauseSources['size'] > 0;
-  Number['isFinite'](Number(value2['bypassPriority'])) &&
-    (imagePreloadPausedBypassPriority = Number(value2['bypassPriority']));
+    value4 = String(value2.source || 'default').trim() || 'default';
+  value3 ? imagePreloadPauseSources.add(value4) : imagePreloadPauseSources.delete(value4);
+  imagePreloadPaused = imagePreloadPauseSources.size > 0;
+  Number.isFinite(Number(value2.bypassPriority)) &&
+    (imagePreloadPausedBypassPriority = Number(value2.bypassPriority));
   if (!imagePreloadPaused) pumpImagePreloadQueue();
 }
 function promoteQueuedImagePreloadJob(value5, value6 = {}) {
-  const enabled4 = imagePreloadQueuedJobs['get'](normalizeImagePreloadKey(value5));
+  const enabled4 = imagePreloadQueuedJobs.get(normalizeImagePreloadKey(value5));
   if (!enabled4) return false;
-  const priority = normalizePriority(value6['priority']);
+  const priority = normalizePriority(value6.priority);
   let value7 = false;
-  priority > enabled4['priority'] && ((enabled4['priority'] = priority), (value7 = true));
-  value6['fetchPriority'] === 'high' &&
-    enabled4['fetchPriority'] !== 'high' &&
-    ((enabled4['fetchPriority'] = 'high'), (value7 = true));
+  priority > enabled4.priority && ((enabled4.priority = priority), (value7 = true));
+  value6.fetchPriority === 'high' &&
+    enabled4.fetchPriority !== 'high' &&
+    ((enabled4.fetchPriority = 'high'), (value7 = true));
   if (value7) imagePreloadPromoted += 1;
   return value7;
 }
 function pruneResolvedImagePreloadCache(nowMs2 = nowMs()) {
   (clearTimeout(resolvedCacheTimer), (resolvedCacheTimer = null));
   for (const [value8, enabled5] of imagePreloadResolvedCache) {
-    (!enabled5 || Number(enabled5['expiresAt'] || 0) <= nowMs2) &&
-      imagePreloadResolvedCache['delete'](value8);
+    (!enabled5 || Number(enabled5.expiresAt || 0) <= nowMs2) &&
+      imagePreloadResolvedCache.delete(value8);
   }
-  while (imagePreloadResolvedCache['size'] > MAX_IMAGE_PRELOAD_CACHE_ENTRIES) {
-    const enabled6 = imagePreloadResolvedCache['keys']()['next']()['value'];
+  while (imagePreloadResolvedCache.size > MAX_IMAGE_PRELOAD_CACHE_ENTRIES) {
+    const enabled6 = imagePreloadResolvedCache.keys().next().value;
     if (!enabled6) break;
-    imagePreloadResolvedCache['delete'](enabled6);
+    imagePreloadResolvedCache.delete(enabled6);
   }
-  let value9 = Array['from'](imagePreloadResolvedCache['values']())['reduce'](
-    (value10, el) => value10 + drawableBytes(el['value']),
+  let value9 = Array.from(imagePreloadResolvedCache.values()).reduce(
+    (value10, el) => value10 + drawableBytes(el.value),
     0,
   );
-  for (const el2 of imagePreloadResolvedCache['values']()) {
+  for (const el2 of imagePreloadResolvedCache.values()) {
     if (value9 <= MAX_IMAGE_PRELOAD_DRAWABLE_BYTES) break;
-    const drawableBytes2 = drawableBytes(el2['value']);
+    const drawableBytes2 = drawableBytes(el2.value);
     if (!drawableBytes2) continue;
     ((value9 -= drawableBytes2),
-      (el2['value'] = { ...el2['value'], image: null }),
+      (el2.value = { ...el2.value, image: null }),
       imagePreloadDrawableEvictions++);
   }
-  if (imagePreloadResolvedCache['size']) {
-    const value11 = Math['min'](
-      ...Array['from'](imagePreloadResolvedCache['values'](), (value12) => value12['expiresAt']),
+  if (imagePreloadResolvedCache.size) {
+    const value11 = Math.min(
+      ...Array.from(imagePreloadResolvedCache.values(), (value12) => value12.expiresAt),
     );
     ((resolvedCacheTimer = setTimeout(
       () => pruneResolvedImagePreloadCache(),
-      Math['max'](1, value11 - nowMs2),
+      Math.max(1, value11 - nowMs2),
     )),
-      resolvedCacheTimer?.['unref']?.());
+      resolvedCacheTimer?.unref?.());
   }
 }
 function pruneRejectedImagePreloadCache(nowMs3 = nowMs()) {
   for (const [value13, enabled7] of imagePreloadRejectedCache) {
-    (!enabled7 || Number(enabled7['expiresAt'] || 0) <= nowMs3) &&
-      imagePreloadRejectedCache['delete'](value13);
+    (!enabled7 || Number(enabled7.expiresAt || 0) <= nowMs3) &&
+      imagePreloadRejectedCache.delete(value13);
   }
-  while (imagePreloadRejectedCache['size'] > MAX_IMAGE_PRELOAD_CACHE_ENTRIES) {
-    const enabled8 = imagePreloadRejectedCache['keys']()['next']()['value'];
+  while (imagePreloadRejectedCache.size > MAX_IMAGE_PRELOAD_CACHE_ENTRIES) {
+    const enabled8 = imagePreloadRejectedCache.keys().next().value;
     if (!enabled8) break;
-    imagePreloadRejectedCache['delete'](enabled8);
+    imagePreloadRejectedCache.delete(enabled8);
   }
 }
 function getResolvedImagePreloadCacheHit(value14, value15 = {}) {
   const imagePreloadKey = normalizeImagePreloadKey(value14);
   if (!imagePreloadKey) return null;
-  const count4 = Number['isFinite'](Number(value15['ttlMs']))
-    ? Math['max'](0, Number(value15['ttlMs']))
+  const count4 = Number.isFinite(Number(value15.ttlMs))
+    ? Math.max(0, Number(value15.ttlMs))
     : DEFAULT_IMAGE_PRELOAD_CACHE_TTL_MS;
   if (count4 <= 0) return null;
-  const el3 = imagePreloadResolvedCache['get'](imagePreloadKey);
+  const el3 = imagePreloadResolvedCache.get(imagePreloadKey);
   if (!el3) return null;
   const nowMs4 = nowMs();
-  if (Number(el3['expiresAt'] || 0) <= nowMs4)
-    return (imagePreloadResolvedCache['delete'](imagePreloadKey), null);
+  if (Number(el3.expiresAt || 0) <= nowMs4)
+    return (imagePreloadResolvedCache.delete(imagePreloadKey), null);
   return (
-    imagePreloadResolvedCache['delete'](imagePreloadKey),
-    imagePreloadResolvedCache['set'](imagePreloadKey, el3),
-    el3['value'] || null
+    imagePreloadResolvedCache.delete(imagePreloadKey),
+    imagePreloadResolvedCache.set(imagePreloadKey, el3),
+    el3.value || null
   );
 }
 function getRejectedImagePreloadCacheHit(value16, value17 = {}) {
   const imagePreloadKey2 = normalizeImagePreloadKey(value16);
   if (!imagePreloadKey2) return null;
-  const count5 = Number['isFinite'](Number(value17['rejectTtlMs']))
-    ? Math['max'](0, Number(value17['rejectTtlMs']))
+  const count5 = Number.isFinite(Number(value17.rejectTtlMs))
+    ? Math.max(0, Number(value17.rejectTtlMs))
     : DEFAULT_IMAGE_PRELOAD_REJECT_TTL_MS;
   if (count5 <= 0) return null;
-  const enabled9 = imagePreloadRejectedCache['get'](imagePreloadKey2);
+  const enabled9 = imagePreloadRejectedCache.get(imagePreloadKey2);
   if (!enabled9) return null;
   const nowMs5 = nowMs();
-  if (Number(enabled9['expiresAt'] || 0) <= nowMs5)
-    return (imagePreloadRejectedCache['delete'](imagePreloadKey2), null);
-  return enabled9['error'] || new Error('Image preload recently failed');
+  if (Number(enabled9.expiresAt || 0) <= nowMs5)
+    return (imagePreloadRejectedCache.delete(imagePreloadKey2), null);
+  return enabled9.error || new Error('Image preload recently failed');
 }
 function rememberResolvedImagePreload(value18, value19, value20 = {}) {
   const imagePreloadKey3 = normalizeImagePreloadKey(value18);
   if (!imagePreloadKey3 || !value19) return;
-  const count6 = Number['isFinite'](Number(value20['cacheTtlMs']))
-    ? Math['max'](0, Number(value20['cacheTtlMs']))
+  const count6 = Number.isFinite(Number(value20.cacheTtlMs))
+    ? Math.max(0, Number(value20.cacheTtlMs))
     : DEFAULT_IMAGE_PRELOAD_CACHE_TTL_MS;
   if (count6 <= 0) return;
   const expiresAt = nowMs();
-  (imagePreloadRejectedCache['delete'](imagePreloadKey3),
-    imagePreloadResolvedCache['delete'](imagePreloadKey3),
-    imagePreloadResolvedCache['set'](imagePreloadKey3, { expiresAt: expiresAt + count6, value: value19 }),
+  (imagePreloadRejectedCache.delete(imagePreloadKey3),
+    imagePreloadResolvedCache.delete(imagePreloadKey3),
+    imagePreloadResolvedCache.set(imagePreloadKey3, { expiresAt: expiresAt + count6, value: value19 }),
     pruneResolvedImagePreloadCache(expiresAt));
 }
 function rememberRejectedImagePreload(value21, error, value22 = {}) {
   const imagePreloadKey4 = normalizeImagePreloadKey(value21);
   if (!imagePreloadKey4) return;
-  const count7 = Number['isFinite'](Number(value22['rejectTtlMs']))
-    ? Math['max'](0, Number(value22['rejectTtlMs']))
+  const count7 = Number.isFinite(Number(value22.rejectTtlMs))
+    ? Math.max(0, Number(value22.rejectTtlMs))
     : DEFAULT_IMAGE_PRELOAD_REJECT_TTL_MS;
   if (count7 <= 0) return;
   const expiresAt2 = nowMs();
-  (imagePreloadRejectedCache['delete'](imagePreloadKey4),
-    imagePreloadRejectedCache['set'](imagePreloadKey4, {
+  (imagePreloadRejectedCache.delete(imagePreloadKey4),
+    imagePreloadRejectedCache.set(imagePreloadKey4, {
       expiresAt: expiresAt2 + count7,
       error: error instanceof Error ? error : new Error('Image preload failed'),
     }),
@@ -320,15 +320,15 @@ function rememberRejectedImagePreload(value21, error, value22 = {}) {
 function pumpImagePreloadQueue() {
   const imagePreloadConcurrency = getImagePreloadConcurrency(),
     value23 = imagePreloadConcurrency + HIGH_PRIORITY_OVERFLOW_EXTRA_SLOTS;
-  while (imagePreloadActive < value23 && imagePreloadQueue['length'] > 0) {
+  while (imagePreloadActive < value23 && imagePreloadQueue.length > 0) {
     const overflowOnly2 = imagePreloadActive >= imagePreloadConcurrency,
       fetchPriority2 = pickNextImagePreloadJob({ overflowOnly: overflowOnly2 });
     if (!fetchPriority2) return;
     ((imagePreloadActive += 1),
       (imagePreloadStarted += 1),
-      (imagePreloadPeakActive = Math['max'](imagePreloadPeakActive, imagePreloadActive)));
+      (imagePreloadPeakActive = Math.max(imagePreloadPeakActive, imagePreloadActive)));
     const jobCacheKey3 = jobCacheKey(fetchPriority2);
-    imagePreloadActiveJobs['set'](jobCacheKey3, fetchPriority2);
+    imagePreloadActiveJobs.set(jobCacheKey3, fetchPriority2);
     let value24 = false,
       setTimeout2 = null;
     const run = () => {
@@ -339,68 +339,68 @@ function pumpImagePreloadQueue() {
         if (value24) return;
         ((value24 = true),
           run(),
-          imagePreloadActiveJobs['get'](jobCacheKey3) === fetchPriority2 &&
-            imagePreloadActiveJobs['delete'](jobCacheKey3),
-          (imagePreloadActive = Math['max'](0, imagePreloadActive - 1)),
+          imagePreloadActiveJobs.get(jobCacheKey3) === fetchPriority2 &&
+            imagePreloadActiveJobs.delete(jobCacheKey3),
+          (imagePreloadActive = Math.max(0, imagePreloadActive - 1)),
           handler2(value25),
           pumpImagePreloadQueue());
       },
       handler3 = (value26) => {
         if (value24) return;
         ((imagePreloadResolved += 1),
-          rememberResolvedImagePreload(fetchPriority2['url'], value26, fetchPriority2),
-          handler(fetchPriority2['resolve'], value26));
+          rememberResolvedImagePreload(fetchPriority2.url, value26, fetchPriority2),
+          handler(fetchPriority2.resolve, value26));
       },
       handler4 = (value27) => {
         if (value24) return;
         ((imagePreloadRejected += 1),
-          rememberRejectedImagePreload(fetchPriority2['url'], value27, fetchPriority2),
-          handler(fetchPriority2['reject'], value27));
+          rememberRejectedImagePreload(fetchPriority2.url, value27, fetchPriority2),
+          handler(fetchPriority2.reject, value27));
       };
     try {
       const image = new Image(),
         handler5 = () => {
           try {
-            ((image['onload'] = null), (image['onerror'] = null), (image['src'] = ''));
+            ((image.onload = null), (image.onerror = null), (image.src = ''));
           } catch {}
         };
       (typeof setTimeout === 'function' &&
         (setTimeout2 = setTimeout(() => {
           (handler5(), handler4(new Error('Image preload timed out')));
         }, DEFAULT_IMAGE_PRELOAD_TIMEOUT_MS)),
-        configureImage(image, { fetchPriority: fetchPriority2['fetchPriority'] }),
-        (fetchPriority2['cancelActive'] = (value28 = 'canceled') => {
+        configureImage(image, { fetchPriority: fetchPriority2.fetchPriority }),
+        (fetchPriority2.cancelActive = (value28 = 'canceled') => {
           if (value24) return false;
           return (
             (imagePreloadCanceled += 1),
             handler5(),
-            imagePreloadInflight['get'](jobCacheKey3) === fetchPriority2['promise'] &&
-              imagePreloadInflight['delete'](jobCacheKey3),
-            handler(fetchPriority2['reject'], new Error('Image preload ' + value28)),
+            imagePreloadInflight.get(jobCacheKey3) === fetchPriority2.promise &&
+              imagePreloadInflight.delete(jobCacheKey3),
+            handler(fetchPriority2.reject, new Error('Image preload ' + value28)),
             true
           );
         }),
-        (image['onload'] = () => {
-          if (fetchPriority2['decode'] === true && typeof image['decode'] === 'function') return;
+        (image.onload = () => {
+          if (fetchPriority2.decode === true && typeof image.decode === 'function') return;
           handler3({
             image: image,
-            naturalWidth: image['naturalWidth'] || 0,
-            naturalHeight: image['naturalHeight'] || 0,
+            naturalWidth: image.naturalWidth || 0,
+            naturalHeight: image.naturalHeight || 0,
             decoded: false,
           });
         }),
-        (image['onerror'] = () => {
+        (image.onerror = () => {
           handler4(new Error('Image preload failed'));
         }),
-        (image['src'] = fetchPriority2['url']),
-        fetchPriority2['decode'] === true &&
-          typeof image['decode'] === 'function' &&
-          image['decode']()['then'](
+        (image.src = fetchPriority2.url),
+        fetchPriority2.decode === true &&
+          typeof image.decode === 'function' &&
+          image.decode().then(
             () => {
               handler3({
                 image: image,
-                naturalWidth: image['naturalWidth'] || 0,
-                naturalHeight: image['naturalHeight'] || 0,
+                naturalWidth: image.naturalWidth || 0,
+                naturalHeight: image.naturalHeight || 0,
                 decoded: true,
               });
             },
@@ -415,44 +415,44 @@ function pumpImagePreloadQueue() {
 }
 export function preloadCanvasImage(value31, ttlMs = {}) {
   const url2 = normalizeUrl(value31);
-  if (!url2) return Promise['reject'](new Error('Image source is empty'));
+  if (!url2) return Promise.reject(new Error('Image source is empty'));
   if (isLikelyNonImageMediaUrl(url2))
-    return Promise['reject'](new Error('Image preload skipped non-image media source'));
-  if (ttlMs['revalidate'] !== true) {
-    const args = getResolvedImagePreloadCacheHit(url2, { ttlMs: ttlMs['cacheTtlMs'] });
-    if (args && (ttlMs['requireImage'] !== true || args['image'])) {
-      if (ttlMs['decode'] !== true || args['decoded'] === true)
-        return ((imagePreloadCacheHits += 1), Promise['resolve'](args));
-      if (typeof args['image']?.['decode'] === 'function')
+    return Promise.reject(new Error('Image preload skipped non-image media source'));
+  if (ttlMs.revalidate !== true) {
+    const args = getResolvedImagePreloadCacheHit(url2, { ttlMs: ttlMs.cacheTtlMs });
+    if (args && (ttlMs.requireImage !== true || args.image)) {
+      if (ttlMs.decode !== true || args.decoded === true)
+        return ((imagePreloadCacheHits += 1), Promise.resolve(args));
+      if (typeof args.image?.decode === 'function')
         return (
           (imagePreloadCacheHits += 1),
-          args['image']['decode']()['then'](() => {
+          args.image.decode().then(() => {
             const value32 = { ...args, decoded: true };
             return (rememberResolvedImagePreload(url2, value32, ttlMs), value32);
           })
         );
-      if (args['image']) return ((imagePreloadCacheHits += 1), Promise['resolve'](args));
+      if (args.image) return ((imagePreloadCacheHits += 1), Promise.resolve(args));
     }
     const rejectedImagePreloadCacheHit = getRejectedImagePreloadCacheHit(url2, {
-      rejectTtlMs: ttlMs['rejectTtlMs'],
+      rejectTtlMs: ttlMs.rejectTtlMs,
     });
     if (rejectedImagePreloadCacheHit)
-      return ((imagePreloadRejectCacheHits += 1), Promise['reject'](rejectedImagePreloadCacheHit));
+      return ((imagePreloadRejectCacheHits += 1), Promise.reject(rejectedImagePreloadCacheHit));
   }
   const cacheKey = normalizeImagePreloadKey(url2),
-    promise2 = imagePreloadInflight['get'](cacheKey);
+    promise2 = imagePreloadInflight.get(cacheKey);
   if (promise2) {
     imagePreloadDeduped += 1;
     promoteQueuedImagePreloadJob(url2, ttlMs) && pumpImagePreloadQueue();
-    if (ttlMs['decode'] === true)
-      return promise2['then']((args2) => {
-        if (args2?.['decoded'] === true) return args2;
-        if (typeof args2?.['image']?.['decode'] === 'function')
-          return args2['image']['decode']()['then'](() => {
+    if (ttlMs.decode === true)
+      return promise2.then((args2) => {
+        if (args2?.decoded === true) return args2;
+        if (typeof args2?.image?.decode === 'function')
+          return args2.image.decode().then(() => {
             const value33 = { ...args2, decoded: true };
             return (rememberResolvedImagePreload(url2, value33, ttlMs), value33);
           });
-        if (args2?.['image']) return args2;
+        if (args2?.image) return args2;
         return preloadCanvasImage(url2, { ...ttlMs, revalidate: true });
       });
     return promise2;
@@ -465,29 +465,29 @@ export function preloadCanvasImage(value31, ttlMs = {}) {
         resolve: resolve,
         reject: reject,
         promise: null,
-        priority: normalizePriority(ttlMs['priority']),
-        fetchPriority: ttlMs['fetchPriority'] === 'high' ? 'high' : 'auto',
-        scope: String(ttlMs['scope'] || '')['trim'](),
-        allowWhenPaused: ttlMs['allowWhenPaused'] === true,
-        deferWhenPaused: ttlMs['deferWhenPaused'] === true,
-        cacheTtlMs: Number['isFinite'](Number(ttlMs['cacheTtlMs']))
-          ? Number(ttlMs['cacheTtlMs'])
+        priority: normalizePriority(ttlMs.priority),
+        fetchPriority: ttlMs.fetchPriority === 'high' ? 'high' : 'auto',
+        scope: String(ttlMs.scope || '').trim(),
+        allowWhenPaused: ttlMs.allowWhenPaused === true,
+        deferWhenPaused: ttlMs.deferWhenPaused === true,
+        cacheTtlMs: Number.isFinite(Number(ttlMs.cacheTtlMs))
+          ? Number(ttlMs.cacheTtlMs)
           : DEFAULT_IMAGE_PRELOAD_CACHE_TTL_MS,
-        rejectTtlMs: Number['isFinite'](Number(ttlMs['rejectTtlMs']))
-          ? Number(ttlMs['rejectTtlMs'])
+        rejectTtlMs: Number.isFinite(Number(ttlMs.rejectTtlMs))
+          ? Number(ttlMs.rejectTtlMs)
           : DEFAULT_IMAGE_PRELOAD_REJECT_TTL_MS,
-        decode: ttlMs['decode'] === true,
+        decode: ttlMs.decode === true,
         sequence: imagePreloadSequence++,
       };
     }),
-    value35 = promise3['finally'](() => {
-      imagePreloadInflight['get'](cacheKey) === value35 && imagePreloadInflight['delete'](cacheKey);
+    value35 = promise3.finally(() => {
+      imagePreloadInflight.get(cacheKey) === value35 && imagePreloadInflight.delete(cacheKey);
     });
   return (
-    (value34['promise'] = value35),
-    imagePreloadQueue['push'](value34),
-    imagePreloadQueuedJobs['set'](cacheKey, value34),
-    imagePreloadInflight['set'](cacheKey, value35),
+    (value34.promise = value35),
+    imagePreloadQueue.push(value34),
+    imagePreloadQueuedJobs.set(cacheKey, value34),
+    imagePreloadInflight.set(cacheKey, value35),
     pumpImagePreloadQueue(),
     value35
   );
@@ -495,18 +495,18 @@ export function preloadCanvasImage(value31, ttlMs = {}) {
 export function rememberCanvasImagePreloadResolved(value36, decoded = {}, value37 = {}) {
   const url3 = normalizeUrl(value36);
   if (!url3 || isLikelyNonImageMediaUrl(url3)) return false;
-  const image2 = value37['retainImage'] === true ? decoded?.['image'] || null : null;
-  if (image2) sharedCanvasImageElements['add'](image2);
-  const naturalWidth = Math['max'](
+  const image2 = value37.retainImage === true ? decoded?.image || null : null;
+  if (image2) sharedCanvasImageElements.add(image2);
+  const naturalWidth = Math.max(
       0,
-      Math['round'](
-        Number(decoded?.['naturalWidth'] || image2?.['naturalWidth'] || image2?.['width'] || 0) || 0,
+      Math.round(
+        Number(decoded?.naturalWidth || image2?.naturalWidth || image2?.width || 0) || 0,
       ),
     ),
-    naturalHeight = Math['max'](
+    naturalHeight = Math.max(
       0,
-      Math['round'](
-        Number(decoded?.['naturalHeight'] || image2?.['naturalHeight'] || image2?.['height'] || 0) || 0,
+      Math.round(
+        Number(decoded?.naturalHeight || image2?.naturalHeight || image2?.height || 0) || 0,
       ),
     );
   return (
@@ -516,7 +516,7 @@ export function rememberCanvasImagePreloadResolved(value36, decoded = {}, value3
         image: image2,
         naturalWidth: naturalWidth,
         naturalHeight: naturalHeight,
-        decoded: decoded?.['decoded'] === true || value37['decoded'] === true,
+        decoded: decoded?.decoded === true || value37.decoded === true,
       },
       value37,
     ),
@@ -525,24 +525,24 @@ export function rememberCanvasImagePreloadResolved(value36, decoded = {}, value3
   );
 }
 function finishTrackedCanvasImageDisplayLoad(el4) {
-  const enabled10 = imageDisplayLoadByElement['get'](el4);
+  const enabled10 = imageDisplayLoadByElement.get(el4);
   if (!enabled10) return false;
-  (imageDisplayLoadByElement['delete'](el4), enabled10['images']['delete'](el4));
-  if (enabled10['images']['size'] === 0) imageDisplayLoadsByKey['delete'](enabled10['cacheKey']);
+  (imageDisplayLoadByElement.delete(el4), enabled10.images.delete(el4));
+  if (enabled10.images.size === 0) imageDisplayLoadsByKey.delete(enabled10.cacheKey);
   return (
-    el4['removeEventListener']?.('load', enabled10['onLoad']),
-    el4['removeEventListener']?.('error', enabled10['onError']),
+    el4.removeEventListener?.('load', enabled10.onLoad),
+    el4.removeEventListener?.('error', enabled10.onError),
     true
   );
 }
 export function trackCanvasImageDisplayLoad(value38, el5) {
   const cacheKey2 = normalizeImagePreloadKey(value38);
   if (!cacheKey2 || !el5) return false;
-  const value39 = imageDisplayLoadByElement['get'](el5);
-  if (value39?.['cacheKey'] === cacheKey2) return true;
+  const value39 = imageDisplayLoadByElement.get(el5);
+  if (value39?.cacheKey === cacheKey2) return true;
   if (value39) finishTrackedCanvasImageDisplayLoad(el5);
-  let images = imageDisplayLoadsByKey['get'](cacheKey2);
-  !images && ((images = new Set()), imageDisplayLoadsByKey['set'](cacheKey2, images));
+  let images = imageDisplayLoadsByKey.get(cacheKey2);
+  !images && ((images = new Set()), imageDisplayLoadsByKey.set(cacheKey2, images));
   const value40 = {
     cacheKey: cacheKey2,
     images: images,
@@ -550,10 +550,10 @@ export function trackCanvasImageDisplayLoad(value38, el5) {
     onError: () => finishTrackedCanvasImageDisplayLoad(el5),
   };
   return (
-    images['add'](el5),
-    imageDisplayLoadByElement['set'](el5, value40),
-    el5['addEventListener']?.('load', value40['onLoad'], { once: true }),
-    el5['addEventListener']?.('error', value40['onError'], { once: true }),
+    images.add(el5),
+    imageDisplayLoadByElement.set(el5, value40),
+    el5.addEventListener?.('load', value40.onLoad, { once: true }),
+    el5.addEventListener?.('error', value40.onError, { once: true }),
     true
   );
 }
@@ -562,41 +562,41 @@ export function forgetCanvasImageDisplayLoad(value41) {
 }
 export function isCanvasImageDisplayLoadPending(value42) {
   const imagePreloadKey5 = normalizeImagePreloadKey(value42);
-  return !!imagePreloadKey5 && (imageDisplayLoadsByKey['get'](imagePreloadKey5)?.['size'] || 0) > 0;
+  return !!imagePreloadKey5 && (imageDisplayLoadsByKey.get(imagePreloadKey5)?.size || 0) > 0;
 }
 export function isCanvasImageDisplayLoadTracked(enabled11) {
-  return !!enabled11 && imageDisplayLoadByElement['has'](enabled11);
+  return !!enabled11 && imageDisplayLoadByElement.has(enabled11);
 }
 export function isCanvasImagePreloadSharedImage(enabled12) {
-  return !!enabled12 && sharedCanvasImageElements['has'](enabled12);
+  return !!enabled12 && sharedCanvasImageElements.has(enabled12);
 }
 export function isCanvasImagePreloadRecentlyResolved(value43, value44 = {}) {
   const resolvedImagePreloadCacheHit = getResolvedImagePreloadCacheHit(value43, value44);
   return (
     !!resolvedImagePreloadCacheHit &&
-    (value44['requireImage'] !== true || !!resolvedImagePreloadCacheHit['image'])
+    (value44.requireImage !== true || !!resolvedImagePreloadCacheHit.image)
   );
 }
 export function isCanvasImagePreloadPending(value45) {
   const imagePreloadKey6 = normalizeImagePreloadKey(value45);
   if (!imagePreloadKey6) return false;
-  return imagePreloadActiveJobs['has'](imagePreloadKey6) || imagePreloadQueuedJobs['has'](imagePreloadKey6);
+  return imagePreloadActiveJobs.has(imagePreloadKey6) || imagePreloadQueuedJobs.has(imagePreloadKey6);
 }
 export function isCanvasImagePreloadCoolingDown(value46, rejectTtlMs = {}) {
-  return !!getRejectedImagePreloadCacheHit(value46, { rejectTtlMs: rejectTtlMs['rejectTtlMs'] });
+  return !!getRejectedImagePreloadCacheHit(value46, { rejectTtlMs: rejectTtlMs.rejectTtlMs });
 }
 export function getCanvasMediaSchedulerStats() {
-  const imagePreloadActiveJobSamples = Array['from'](imagePreloadActiveJobs['values']())
-      ['map'](summarizeImagePreloadJob)
-      ['filter'](Boolean)
-      ['slice'](0, 24),
-    imagePreloadQueuedJobSamples = imagePreloadQueue['map'](summarizeImagePreloadJob)
-      ['filter'](Boolean)
-      ['slice'](0, 24);
+  const imagePreloadActiveJobSamples = Array.from(imagePreloadActiveJobs.values())
+      .map(summarizeImagePreloadJob)
+      .filter(Boolean)
+      .slice(0, 24),
+    imagePreloadQueuedJobSamples = imagePreloadQueue.map(summarizeImagePreloadJob)
+      .filter(Boolean)
+      .slice(0, 24);
   return {
     imagePreloadActive: imagePreloadActive,
-    imagePreloadQueued: imagePreloadQueue['length'],
-    imagePreloadInflight: imagePreloadInflight['size'],
+    imagePreloadQueued: imagePreloadQueue.length,
+    imagePreloadInflight: imagePreloadInflight.size,
     imagePreloadConcurrency: getImagePreloadConcurrency(),
     imagePreloadStarted: imagePreloadStarted,
     imagePreloadResolved: imagePreloadResolved,
@@ -604,22 +604,22 @@ export function getCanvasMediaSchedulerStats() {
     imagePreloadDeduped: imagePreloadDeduped,
     imagePreloadCacheHits: imagePreloadCacheHits,
     imagePreloadRejectCacheHits: imagePreloadRejectCacheHits,
-    imagePreloadResolvedCacheSize: imagePreloadResolvedCache['size'],
-    imagePreloadDrawableEstimatedBytes: Array['from'](imagePreloadResolvedCache['values']())['reduce'](
-      (value47, el6) => value47 + drawableBytes(el6['value']),
+    imagePreloadResolvedCacheSize: imagePreloadResolvedCache.size,
+    imagePreloadDrawableEstimatedBytes: Array.from(imagePreloadResolvedCache.values()).reduce(
+      (value47, el6) => value47 + drawableBytes(el6.value),
       0,
     ),
     imagePreloadDrawableEvictions: imagePreloadDrawableEvictions,
-    imagePreloadRejectedCacheSize: imagePreloadRejectedCache['size'],
+    imagePreloadRejectedCacheSize: imagePreloadRejectedCache.size,
     imagePreloadPromoted: imagePreloadPromoted,
     imagePreloadPeakActive: imagePreloadPeakActive,
     imagePreloadCanceled: imagePreloadCanceled,
     imagePreloadResolvedCachePrimes: imagePreloadResolvedCachePrimes,
     imagePreloadPaused: imagePreloadPaused,
     imagePreloadPausedBypassPriority: imagePreloadPausedBypassPriority,
-    imagePreloadPauseSourceCount: imagePreloadPauseSources['size'],
-    imageDisplayLoadPending: Array['from'](imageDisplayLoadsByKey['values']())['reduce'](
-      (value48, value49) => value48 + value49['size'],
+    imagePreloadPauseSourceCount: imagePreloadPauseSources.size,
+    imageDisplayLoadPending: Array.from(imageDisplayLoadsByKey.values()).reduce(
+      (value48, value49) => value48 + value49.size,
       0,
     ),
     imagePreloadActiveJobSamples: imagePreloadActiveJobSamples,
@@ -630,13 +630,13 @@ export function resetCanvasMediaSchedulerForTests() {
   (clearTimeout(resolvedCacheTimer),
     (resolvedCacheTimer = null),
     (imagePreloadDrawableEvictions = 0),
-    (imagePreloadQueue['length'] = 0),
-    imagePreloadInflight['clear'](),
-    imagePreloadQueuedJobs['clear'](),
-    imagePreloadActiveJobs['clear'](),
-    imagePreloadResolvedCache['clear'](),
-    imagePreloadRejectedCache['clear'](),
-    imageDisplayLoadsByKey['clear'](),
+    (imagePreloadQueue.length = 0),
+    imagePreloadInflight.clear(),
+    imagePreloadQueuedJobs.clear(),
+    imagePreloadActiveJobs.clear(),
+    imagePreloadResolvedCache.clear(),
+    imagePreloadRejectedCache.clear(),
+    imageDisplayLoadsByKey.clear(),
     (sharedCanvasImageElements = new WeakSet()),
     (imagePreloadActive = 0),
     (imagePreloadSequence = 0),
@@ -651,6 +651,6 @@ export function resetCanvasMediaSchedulerForTests() {
     (imagePreloadCanceled = 0),
     (imagePreloadResolvedCachePrimes = 0),
     (imagePreloadPaused = false),
-    imagePreloadPauseSources['clear'](),
+    imagePreloadPauseSources.clear(),
     (imagePreloadPausedBypassPriority = DEFAULT_PAUSED_BYPASS_PRIORITY));
 }

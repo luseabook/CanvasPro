@@ -173,11 +173,11 @@ export function initDevEntries({ isDevBuild: isDevBuild } = {}) {
 }
 
 export function toggleDevMode() {
-  if (window['LOCAL_DEV_BUILD'] !== true) return null;
-  const value3 = !Boolean(window['DEV_MODE']);
+  if (window.LOCAL_DEV_BUILD !== true) return null;
+  const value3 = !Boolean(window.DEV_MODE);
   return (
-    setDevMode(value3, document['getElementById']('devEntryModeBtn')),
-    window['showToast']?.(value3 ? devEntryText('toasts.devOn') : devEntryText('toasts.devOff')),
+    setDevMode(value3, document.getElementById('devEntryModeBtn')),
+    window.showToast?.(value3 ? devEntryText('toasts.devOn') : devEntryText('toasts.devOff')),
     value3
   );
 }

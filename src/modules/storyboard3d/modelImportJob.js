@@ -1,5 +1,5 @@
 import { detectStoryboard3DModelFormat, importStoryboard3DModelFile } from './modelImport.js';
-export const STORYBOARD_3D_MODEL_IMPORT_JOB_STATUSES = Object['freeze']([
+export const STORYBOARD_3D_MODEL_IMPORT_JOB_STATUSES = Object.freeze([
   'queued',
   'reading',
   'parsing',
@@ -9,19 +9,19 @@ export const STORYBOARD_3D_MODEL_IMPORT_JOB_STATUSES = Object['freeze']([
 ]);
 const TERMINAL_STATUSES = new Set(['completed', 'error', 'cancelled']);
 function text(value) {
-  return String(value || '')['trim']();
+  return String(value || '').trim();
 }
 function createJobId(handler) {
   const item =
-    typeof handler === 'function' ? handler('model-import') : globalThis['crypto']?.['randomUUID']?.();
+    typeof handler === 'function' ? handler('model-import') : globalThis.crypto?.randomUUID?.();
   return (
     text(item) ||
-    'model-import-' + Date['now']() + '-' + Math['random']()['toString'](36)['slice'](2, 9)
+    'model-import-' + Date.now() + '-' + Math.random().toString(36).slice(2, 9)
   );
 }
 function cancellationError(cause, stage2) {
   return new Storyboard3DModelImportJobError(
-    text(cause?.['message'] || cause) || 'Model import was cancelled',
+    text(cause?.message || cause) || 'Model import was cancelled',
     {
       code: 'MODEL_IMPORT_CANCELLED',
       stage: stage2,
@@ -41,30 +41,30 @@ export class Storyboard3DModelImportJobError extends Error {
     } = {},
   ) {
     (super(key, { cause: cause2 }),
-      (this['name'] = 'Storyboard3DModelImportJobError'),
-      (this['code'] = code),
-      (this['stage'] = stage),
-      (this['cancelled'] = cancelled));
+      (this.name = 'Storyboard3DModelImportJobError'),
+      (this.code = code),
+      (this.stage = stage),
+      (this.cancelled = cancelled));
   }
 }
 export function normalizeStoryboard3DModelImportJobError(cause3, { stage: stage = 'queued' } = {}) {
   if (cause3 instanceof Storyboard3DModelImportJobError) return cause3;
-  const index = cause3?.['name'] === 'AbortError' || cause3?.['code'] === 'ABORT_ERR';
+  const index = cause3?.name === 'AbortError' || cause3?.code === 'ABORT_ERR';
   if (index) return cancellationError(cause3, stage);
-  return new Storyboard3DModelImportJobError(text(cause3?.['message']) || 'Model import failed', {
-    code: text(cause3?.['code']) || 'MODEL_IMPORT_FAILED',
+  return new Storyboard3DModelImportJobError(text(cause3?.message) || 'Model import failed', {
+    code: text(cause3?.code) || 'MODEL_IMPORT_FAILED',
     stage: stage,
     cause: cause3 instanceof Error ? cause3 : undefined,
   });
 }
 export function yieldStoryboard3DModelImportStart({
-  windowObject: windowObject = globalThis['window'],
-  setTimeoutFn: setTimeoutFn = globalThis['setTimeout'],
+  windowObject: windowObject = globalThis.window,
+  setTimeoutFn: setTimeoutFn = globalThis.setTimeout,
 } = {}) {
   return new Promise((result) => {
     const data = () => setTimeoutFn(result, 0);
-    if (typeof windowObject?.['requestAnimationFrame'] === 'function') {
-      windowObject['requestAnimationFrame'](data);
+    if (typeof windowObject?.requestAnimationFrame === 'function') {
+      windowObject.requestAnimationFrame(data);
       return;
     }
     setTimeoutFn(result, 0);
@@ -72,39 +72,39 @@ export function yieldStoryboard3DModelImportStart({
 }
 function cachedFileLike(error, size) {
   return {
-    name: text(error?.['name'] || error?.['fileName']),
-    fileName: text(error?.['fileName'] || error?.['name']),
-    type: text(error?.['type']),
-    size: size['byteLength'],
-    lastModified: Math['max'](0, Number(error?.['lastModified']) || 0),
-    webkitRelativePath: text(error?.['webkitRelativePath']),
+    name: text(error?.name || error?.fileName),
+    fileName: text(error?.fileName || error?.name),
+    type: text(error?.type),
+    size: size.byteLength,
+    lastModified: Math.max(0, Number(error?.lastModified) || 0),
+    webkitRelativePath: text(error?.webkitRelativePath),
     async arrayBuffer() {
       return size;
     },
   };
 }
 function eachMaterial(options, target) {
-  (Array['isArray'](options) ? options : [options])['filter'](Boolean)['forEach'](target);
+  (Array.isArray(options) ? options : [options]).filter(Boolean).forEach(target);
 }
 export function disposeCancelledStoryboard3DModelImportResult(source) {
-  const next = source?.['parsed'] || source;
-  next?.['disposeResources']?.();
+  const next = source?.parsed || source;
+  next?.disposeResources?.();
   const list = new Set(
-      [next?.['scene'], ...(Array['isArray'](next?.['scenes']) ? next['scenes'] : [])]['filter'](Boolean),
+      [next?.scene, ...(Array.isArray(next?.scenes) ? next.scenes : [])].filter(Boolean),
     ),
     map = new Set();
-  list['forEach']((current) =>
-    current?.['traverse']?.((entry) => {
-      (entry['geometry'] &&
-        !map['has'](entry['geometry']) &&
-        (map['add'](entry['geometry']), entry['geometry']['dispose']?.()),
-        eachMaterial(entry['material'], (record) => {
-          if (map['has'](record)) return;
-          map['add'](record);
-          for (const payload of Object['values'](record)) {
-            payload?.['isTexture'] && !map['has'](payload) && (map['add'](payload), payload['dispose']?.());
+  list.forEach((current) =>
+    current?.traverse?.((entry) => {
+      (entry.geometry &&
+        !map.has(entry.geometry) &&
+        (map.add(entry.geometry), entry.geometry.dispose?.()),
+        eachMaterial(entry.material, (record) => {
+          if (map.has(record)) return;
+          map.add(record);
+          for (const payload of Object.values(record)) {
+            payload?.isTexture && !map.has(payload) && (map.add(payload), payload.dispose?.());
           }
-          record['dispose']?.();
+          record.dispose?.();
         }));
     }),
   );
@@ -123,153 +123,153 @@ export class Storyboard3DModelImportJob {
     onStateChange: onStateChange,
     onError: onError,
   } = {}) {
-    if (!file || typeof file['arrayBuffer'] !== 'function')
+    if (!file || typeof file.arrayBuffer !== 'function')
       throw new TypeError('A readable model file is required');
     if (typeof importModel !== 'function') throw new TypeError('importModel must be a function');
     if (typeof yieldControl !== 'function')
       throw new TypeError('yieldControl must be a function');
-    ((this['jobId'] = createJobId(idFactory)),
-      (this['file'] = file),
-      (this['relatedFiles'] = Array['isArray'](relatedFiles) ? [...relatedFiles] : []),
-      (this['importOptions'] = { ...importOptions }),
-      (this['importModel'] = importModel),
-      (this['externalSignal'] = signal || null),
-      (this['abortController'] = typeof AbortController === 'function' ? new AbortController() : null),
-      (this['yieldControl'] = yieldControl),
-      (this['disposeResult'] = disposeResult),
-      (this['onProgress'] = onProgress),
-      (this['onStateChange'] = onStateChange),
-      (this['onError'] = onError),
-      (this['status'] = 'queued'),
-      (this['progress'] = 0),
-      (this['result'] = null),
-      (this['error'] = null),
-      (this['cancelReason'] = null),
-      (this['started'] = false),
-      (this['runPromise'] = null),
-      (this['_externalAbortHandler'] = null));
+    ((this.jobId = createJobId(idFactory)),
+      (this.file = file),
+      (this.relatedFiles = Array.isArray(relatedFiles) ? [...relatedFiles] : []),
+      (this.importOptions = { ...importOptions }),
+      (this.importModel = importModel),
+      (this.externalSignal = signal || null),
+      (this.abortController = typeof AbortController === 'function' ? new AbortController() : null),
+      (this.yieldControl = yieldControl),
+      (this.disposeResult = disposeResult),
+      (this.onProgress = onProgress),
+      (this.onStateChange = onStateChange),
+      (this.onError = onError),
+      (this.status = 'queued'),
+      (this.progress = 0),
+      (this.result = null),
+      (this.error = null),
+      (this.cancelReason = null),
+      (this.started = false),
+      (this.runPromise = null),
+      (this._externalAbortHandler = null));
   }
   ['_snapshot']() {
     return {
-      jobId: this['jobId'],
-      status: this['status'],
-      progress: this['progress'],
-      fileName: text(this['file']?.['name'] || this['file']?.['fileName']),
-      format: detectStoryboard3DModelFormat(this['file']),
-      result: this['result'],
-      error: this['error'],
+      jobId: this.jobId,
+      status: this.status,
+      progress: this.progress,
+      fileName: text(this.file?.name || this.file?.fileName),
+      format: detectStoryboard3DModelFormat(this.file),
+      result: this.result,
+      error: this.error,
     };
   }
   ['getSnapshot']() {
-    return { ...this['_snapshot']() };
+    return { ...this._snapshot() };
   }
   ['_transition'](reason, handle, args = {}) {
-    ((this['status'] = reason),
-      (this['progress'] = Math['max'](
-        this['progress'],
-        Math['min'](1, Math['max'](0, Number(handle) || 0)),
+    ((this.status = reason),
+      (this.progress = Math.max(
+        this.progress,
+        Math.min(1, Math.max(0, Number(handle) || 0)),
       )));
-    if (args['result'] !== undefined) this['result'] = args['result'];
-    if (args['error'] !== undefined) this['error'] = args['error'];
-    const args2 = this['_snapshot'](),
+    if (args.result !== undefined) this.result = args.result;
+    if (args.error !== undefined) this.error = args.error;
+    const args2 = this._snapshot(),
       state = { ...args2, ...args };
-    return (this['onStateChange']?.(args2, { reason: reason }), this['onProgress']?.(state), args2);
+    return (this.onStateChange?.(args2, { reason: reason }), this.onProgress?.(state), args2);
   }
   ['_isCancelled']() {
     return (
-      this['status'] === 'cancelled' ||
-      this['cancelReason'] !== null ||
-      this['externalSignal']?.['aborted'] === true ||
-      this['abortController']?.['signal']?.['aborted'] === true
+      this.status === 'cancelled' ||
+      this.cancelReason !== null ||
+      this.externalSignal?.aborted === true ||
+      this.abortController?.signal?.aborted === true
     );
   }
   ['_throwIfCancelled'](config) {
-    if (!this['_isCancelled']()) return;
+    if (!this._isCancelled()) return;
     throw cancellationError(
-      this['cancelReason'] || this['externalSignal']?.['reason'] || 'Model import was cancelled',
+      this.cancelReason || this.externalSignal?.reason || 'Model import was cancelled',
       config,
     );
   }
   ['cancel'](scope = 'Model import was cancelled') {
-    if (TERMINAL_STATUSES['has'](this['status'])) return false;
+    if (TERMINAL_STATUSES.has(this.status)) return false;
     return (
-      (this['cancelReason'] = scope),
-      this['abortController']?.['abort']?.(scope),
-      (this['error'] = cancellationError(scope, this['status'])),
-      this['_transition']('cancelled', this['progress'], { error: this['error'] }),
+      (this.cancelReason = scope),
+      this.abortController?.abort?.(scope),
+      (this.error = cancellationError(scope, this.status)),
+      this._transition('cancelled', this.progress, { error: this.error }),
       true
     );
   }
   ['_bindExternalAbort']() {
-    if (!this['externalSignal']?.['addEventListener']) return;
-    ((this['_externalAbortHandler'] = () => this['cancel'](this['externalSignal']['reason'])),
-      this['externalSignal']['addEventListener']('abort', this['_externalAbortHandler'], { once: true }));
+    if (!this.externalSignal?.addEventListener) return;
+    ((this._externalAbortHandler = () => this.cancel(this.externalSignal.reason)),
+      this.externalSignal.addEventListener('abort', this._externalAbortHandler, { once: true }));
   }
   ['_unbindExternalAbort']() {
-    if (!this['_externalAbortHandler']) return;
-    (this['externalSignal']?.['removeEventListener']?.('abort', this['_externalAbortHandler']),
-      (this['_externalAbortHandler'] = null));
+    if (!this._externalAbortHandler) return;
+    (this.externalSignal?.removeEventListener?.('abort', this._externalAbortHandler),
+      (this._externalAbortHandler = null));
   }
   async ['_run']() {
     let stage3 = 'queued';
-    if (this['status'] !== 'cancelled') this['_transition']('queued', 0);
+    if (this.status !== 'cancelled') this._transition('queued', 0);
     try {
-      (this['_throwIfCancelled'](stage3),
-        await this['yieldControl']({ job: this, stage: stage3 }),
-        this['_throwIfCancelled'](stage3),
+      (this._throwIfCancelled(stage3),
+        await this.yieldControl({ job: this, stage: stage3 }),
+        this._throwIfCancelled(stage3),
         (stage3 = 'reading'),
-        this['_transition']('reading', 0.12));
-      const byteLength = await this['file']['arrayBuffer']();
-      this['_throwIfCancelled'](stage3);
+        this._transition('reading', 0.12));
+      const byteLength = await this.file.arrayBuffer();
+      this._throwIfCancelled(stage3);
       if (!(byteLength instanceof ArrayBuffer))
         throw new Storyboard3DModelImportJobError('Model file did not return an ArrayBuffer', {
           code: 'MODEL_FILE_UNREADABLE',
           stage: stage3,
         });
       ((stage3 = 'parsing'),
-        this['_transition']('parsing', 0.55, { byteLength: byteLength['byteLength'] }),
-        await this['yieldControl']({ job: this, stage: stage3 }),
-        this['_throwIfCancelled'](stage3));
-      const result2 = await this['importModel'](cachedFileLike(this['file'], byteLength), {
-        ...this['importOptions'],
-        relatedFiles: this['relatedFiles'],
-        signal: this['abortController']?.['signal'] || this['externalSignal'],
+        this._transition('parsing', 0.55, { byteLength: byteLength.byteLength }),
+        await this.yieldControl({ job: this, stage: stage3 }),
+        this._throwIfCancelled(stage3));
+      const result2 = await this.importModel(cachedFileLike(this.file, byteLength), {
+        ...this.importOptions,
+        relatedFiles: this.relatedFiles,
+        signal: this.abortController?.signal || this.externalSignal,
         onProgress: (input, parserDetail = {}) => {
-          if (this['_isCancelled']()) return;
-          const parserProgress = Math['max'](0, Math['min'](1, Number(input) || 0));
-          this['_transition']('parsing', 0.55 + parserProgress * 0.4, {
+          if (this._isCancelled()) return;
+          const parserProgress = Math.max(0, Math.min(1, Number(input) || 0));
+          this._transition('parsing', 0.55 + parserProgress * 0.4, {
             parserProgress: parserProgress,
             parserDetail: parserDetail,
           });
         },
       });
       return (
-        this['_isCancelled']() && (this['disposeResult']?.(result2), this['_throwIfCancelled'](stage3)),
-        this['_transition']('completed', 1, { result: result2 }),
+        this._isCancelled() && (this.disposeResult?.(result2), this._throwIfCancelled(stage3)),
+        this._transition('completed', 1, { result: result2 }),
         result2
       );
     } catch (output) {
       const error2 = normalizeStoryboard3DModelImportJobError(output, { stage: stage3 });
-      if (error2['cancelled'] || this['_isCancelled']())
+      if (error2.cancelled || this._isCancelled())
         return (
-          this['status'] !== 'cancelled' &&
-            ((this['cancelReason'] = error2),
-            this['_transition']('cancelled', this['progress'], { error: error2 })),
+          this.status !== 'cancelled' &&
+            ((this.cancelReason = error2),
+            this._transition('cancelled', this.progress, { error: error2 })),
           null
         );
-      ((this['error'] = error2),
-        this['_transition']('error', this['progress'], { error: error2 }),
-        this['onError']?.(error2, this['getSnapshot']()));
+      ((this.error = error2),
+        this._transition('error', this.progress, { error: error2 }),
+        this.onError?.(error2, this.getSnapshot()));
       throw error2;
     } finally {
-      this['_unbindExternalAbort']();
+      this._unbindExternalAbort();
     }
   }
   ['start']() {
-    if (this['runPromise']) return this['runPromise'];
-    ((this['started'] = true), this['_bindExternalAbort']());
-    if (this['externalSignal']?.['aborted']) this['cancel'](this['externalSignal']['reason']);
-    return ((this['runPromise'] = this['_run']()), this['runPromise']);
+    if (this.runPromise) return this.runPromise;
+    ((this.started = true), this._bindExternalAbort());
+    if (this.externalSignal?.aborted) this.cancel(this.externalSignal.reason);
+    return ((this.runPromise = this._run()), this.runPromise);
   }
 }
 export function createStoryboard3DModelImportJob(value2) {

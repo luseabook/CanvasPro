@@ -449,15 +449,15 @@ export function buildRhLipSyncAssetSlotMap(value28 = null, occupiedSlots6 = {}) 
   });
 }
 function getConditionFieldIds(list16, value29 = new Set()) {
-  if (Array['isArray'](list16))
-    return (list16['forEach']((value30) => getConditionFieldIds(value30, value29)), value29);
+  if (Array.isArray(list16))
+    return (list16.forEach((value30) => getConditionFieldIds(value30, value29)), value29);
   if (!list16 || typeof list16 !== 'object') return value29;
-  Array['isArray'](list16['any']) &&
-    list16['any']['forEach']((value31) => getConditionFieldIds(value31, value29));
-  Array['isArray'](list16['all']) &&
-    list16['all']['forEach']((value32) => getConditionFieldIds(value32, value29));
-  const value33 = String(list16['field'] || '')['trim']();
-  if (value33) value29['add'](value33);
+  Array.isArray(list16.any) &&
+    list16.any.forEach((value31) => getConditionFieldIds(value31, value29));
+  Array.isArray(list16.all) &&
+    list16.all.forEach((value32) => getConditionFieldIds(value32, value29));
+  const value33 = String(list16.field || '').trim();
+  if (value33) value29.add(value33);
   return value29;
 }
 
@@ -470,27 +470,27 @@ function getHiddenFixedSlotReasonFields(
   const value37 = new Set();
   return (
     useRhVisibilityFlags &&
-      value35?.['rhSpecialMode'] === 'cameraMove' &&
+      value35?.rhSpecialMode === 'cameraMove' &&
       (value34 === 'firstFrame' || value34 === 'videoMask') &&
-      value37['add']('rhSpecialMode'),
+      value37.add('rhSpecialMode'),
     useRhVisibilityFlags &&
-      value35?.['rhSubtractSubject'] === true &&
+      value35?.rhSubtractSubject === true &&
       (value34 === 'firstFrame' || value34 === 'videoMask') &&
-      value37['add']('rhSubtractSubject'),
-    value36?.['showWhen'] &&
-      !fixedSlotConditionMatches(value36['showWhen'], value35) &&
-      getConditionFieldIds(value36['showWhen'], value37),
-    value36?.['hideWhen'] &&
-      fixedSlotConditionMatches(value36['hideWhen'], value35) &&
-      getConditionFieldIds(value36['hideWhen'], value37),
-    Array['from'](value37)
+      value37.add('rhSubtractSubject'),
+    value36?.showWhen &&
+      !fixedSlotConditionMatches(value36.showWhen, value35) &&
+      getConditionFieldIds(value36.showWhen, value37),
+    value36?.hideWhen &&
+      fixedSlotConditionMatches(value36.hideWhen, value35) &&
+      getConditionFieldIds(value36.hideWhen, value37),
+    Array.from(value37)
   );
 }
 
 export function shouldHideFixedInputSlots(value38 = null, value39 = {}) {
-  if (value38?.['inputSurfaceHidden'] === true) return true;
-  const value40 = value38?.['manifest'] || value38,
-    value41 = value40?.['extensions']?.['videoInputSurface'];
-  if (value41?.['hideFixedInputSlots'] === true) return true;
-  return fixedSlotConditionMatches(value41?.['hideFixedInputSlotsWhen'], value39);
+  if (value38?.inputSurfaceHidden === true) return true;
+  const value40 = value38?.manifest || value38,
+    value41 = value40?.extensions?.videoInputSurface;
+  if (value41?.hideFixedInputSlots === true) return true;
+  return fixedSlotConditionMatches(value41?.hideFixedInputSlotsWhen, value39);
 }

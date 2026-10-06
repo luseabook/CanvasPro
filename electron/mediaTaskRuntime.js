@@ -24,39 +24,39 @@ function requireFunction(value, name) {
   return value;
 }
 function parseFfprobeRatio(value) {
-  const text = String(value || '')['trim']();
+  const text = String(value || '').trim();
   if (!text) return 0;
-  if (!text['includes']('/')) return Number(text) || 0;
-  const [numerator, denominator] = text['split']('/'),
+  if (!text.includes('/')) return Number(text) || 0;
+  const [numerator, denominator] = text.split('/'),
     divisor = Number(denominator);
   if (!divisor) return 0;
   return (Number(numerator) || 0) / divisor;
 }
 export function buildMediaTaskStatePatch(update = {}) {
-  const status = String(update?.['status'] || ''),
+  const status = String(update?.status || ''),
     patch = {
-      mediaTaskId: update?.['taskId'] || '',
-      mediaTaskKind: update?.['kind'] || '',
+      mediaTaskId: update?.taskId || '',
+      mediaTaskKind: update?.kind || '',
       mediaTaskStatus: status,
-      mediaTaskProgress: Number(update?.['progress'] || 0) || 0,
-      mediaTaskError: update?.['error'] || '',
+      mediaTaskProgress: Number(update?.progress || 0) || 0,
+      mediaTaskError: update?.error || '',
     };
   if (status === 'waiting' || status === 'processing')
-    ((patch['isGenerating'] = true), (patch['jobStatus'] = 'running'));
+    ((patch.isGenerating = true), (patch.jobStatus = 'running'));
   else {
-    if (status === 'complete') ((patch['isGenerating'] = false), (patch['jobStatus'] = 'success'));
+    if (status === 'complete') ((patch.isGenerating = false), (patch.jobStatus = 'success'));
     else {
       if (status === 'failed')
-        ((patch['isGenerating'] = false),
-          (patch['jobStatus'] = 'error'),
-          (patch['jobError'] = patch['mediaTaskError'] || 'Media task failed'));
-      else status === 'cancelled' && ((patch['isGenerating'] = false), (patch['jobStatus'] = null));
+        ((patch.isGenerating = false),
+          (patch.jobStatus = 'error'),
+          (patch.jobError = patch.mediaTaskError || 'Media task failed'));
+      else status === 'cancelled' && ((patch.isGenerating = false), (patch.jobStatus = null));
     }
   }
   return patch;
 }
 function getMediaTaskDisplayName(kind) {
-  const normalizedKind = String(kind || '')['trim'](),
+  const normalizedKind = String(kind || '').trim(),
     displayNames = {
       videoPoster: '视频处理',
       audioWaveform: '音频波形',
@@ -75,15 +75,15 @@ function getMediaTaskDisplayName(kind) {
 }
 function formatNotificationBody(message, fallback) {
   const text = String(message || fallback || '')
-    ['replace'](/\s+/g, ' ')
-    ['trim']();
-  if (text['length'] <= 180) return text;
-  return text['slice'](0, 177) + '...';
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (text.length <= 180) return text;
+  return text.slice(0, 177) + '...';
 }
 export function createMediaTaskRuntime({
   appRoot: appRoot,
   platform: platform,
-  env: env = process['env'],
+  env: env = process.env,
   getRuntimeToolOrFallback: getRuntimeToolOrFallback,
   getAssetsDir: getAssetsDir,
   getOutputDir: getOutputDir,
@@ -122,20 +122,20 @@ export function createMediaTaskRuntime({
   let taskQueue = null,
     activity = { activeCount: 0, waitingCount: 0, totalCount: 0, progress: 0, activeTasks: [] };
   function createOutputFilename(purpose, extension) {
-    const safePurpose = String(purpose || 'media')['replace'](/[^a-z0-9_-]/gi, '_') || 'media',
+    const safePurpose = String(purpose || 'media').replace(/[^a-z0-9_-]/gi, '_') || 'media',
       safeExtension =
         String(extension || 'bin')
-          ['replace'](/^\.+/, '')
-          ['replace'](/[^a-z0-9]/gi, '') || 'bin';
+          .replace(/^\.+/, '')
+          .replace(/[^a-z0-9]/gi, '') || 'bin';
     return (
-      safePurpose + '_' + Date['now']() + '_' + randomBytes(3)['toString']('hex') + '.' + safeExtension
+      safePurpose + '_' + Date.now() + '_' + randomBytes(3).toString('hex') + '.' + safeExtension
     );
   }
   function toOutputLocalPath(...segments) {
-    return ['output', ...segments]['filter'](Boolean)['join']('/')['replace'](/\\/g, '/');
+    return ['output', ...segments].filter(Boolean).join('/').replace(/\\/g, '/');
   }
   function toAssetLocalPath(...segments) {
-    return ['data', 'assets', ...segments]['filter'](Boolean)['join']('/')['replace'](/\\/g, '/');
+    return ['data', 'assets', ...segments].filter(Boolean).join('/').replace(/\\/g, '/');
   }
   function resolveLocalMediaSource(localPath) {
     const resolvedPath = resolveVirtualPath(localPath);
@@ -147,22 +147,22 @@ export function createMediaTaskRuntime({
         cwd: appRoot,
         timeoutMs: ASSET_IMPORT_FFPROBE_TIMEOUT_MS,
       }),
-      text = output['toString']('utf8')['trim']();
+      text = output.toString('utf8').trim();
     if (!text) throw new Error(errorMessage);
     try {
-      return JSON['parse'](text);
+      return JSON.parse(text);
     } catch {
       throw new Error(errorMessage);
     }
   }
   async function readQueuedFfprobeJson(queue, task, args, errorMessage = 'FFprobe failed') {
-    const result = await queue['runProcess'](task, resolveRuntimeTool('ffprobe'), args, {
+    const result = await queue.runProcess(task, resolveRuntimeTool('ffprobe'), args, {
         timeoutMs: ASSET_IMPORT_FFPROBE_TIMEOUT_MS,
       }),
-      text = result['stdout']['toString']('utf8')['trim']();
+      text = result.stdout.toString('utf8').trim();
     if (!text) throw new Error(errorMessage);
     try {
-      return JSON['parse'](text);
+      return JSON.parse(text);
     } catch {
       throw new Error(errorMessage);
     }
@@ -179,18 +179,18 @@ export function createMediaTaskRuntime({
         'json',
         sourcePath,
       ]),
-      stream = Array['isArray'](info['streams']) && info['streams'][0] ? info['streams'][0] : {},
-      format = info['format'] || {};
+      stream = Array.isArray(info.streams) && info.streams[0] ? info.streams[0] : {},
+      format = info.format || {};
     return {
-      duration: Number(format['duration'] || 0) || Number(stream['duration'] || 0) || 0,
-      fps: parseFfprobeRatio(stream['avg_frame_rate']) || parseFfprobeRatio(stream['r_frame_rate']) || 0,
-      width: Math['trunc'](Number(stream['width'] || 0)) || 0,
-      height: Math['trunc'](Number(stream['height'] || 0)) || 0,
+      duration: Number(format.duration || 0) || Number(stream.duration || 0) || 0,
+      fps: parseFfprobeRatio(stream.avg_frame_rate) || parseFfprobeRatio(stream.r_frame_rate) || 0,
+      width: Math.trunc(Number(stream.width || 0)) || 0,
+      height: Math.trunc(Number(stream.height || 0)) || 0,
     };
   }
   async function ffprobeHasAudio(queue, task, sourcePath) {
     try {
-      const result = await queue['runProcess'](
+      const result = await queue.runProcess(
         task,
         resolveRuntimeTool('ffprobe'),
         [
@@ -206,7 +206,7 @@ export function createMediaTaskRuntime({
         ],
         { timeoutMs: ASSET_IMPORT_FFPROBE_TIMEOUT_MS },
       );
-      return result['stdout']['toString']('utf8')['toLowerCase']()['includes']('audio');
+      return result.stdout.toString('utf8').toLowerCase().includes('audio');
     } catch {
       return false;
     }
@@ -226,26 +226,26 @@ export function createMediaTaskRuntime({
     return buildVideoPlaybackInfo(info);
   }
   function buildVideoPlaybackInfo(info = {}) {
-    const stream = Array['isArray'](info['streams']) && info['streams'][0] ? info['streams'][0] : {},
-      format = info['format'] || {};
+    const stream = Array.isArray(info.streams) && info.streams[0] ? info.streams[0] : {},
+      format = info.format || {};
     return {
-      codecName: String(stream['codec_name'] || '')
-        ['trim']()
-        ['toLowerCase'](),
-      codecTag: String(stream['codec_tag_string'] || '')
-        ['trim']()
-        ['toLowerCase'](),
-      pixelFormat: String(stream['pix_fmt'] || '')
-        ['trim']()
-        ['toLowerCase'](),
-      profile: String(stream['profile'] || '')['trim'](),
-      formatName: String(format['format_name'] || '')
-        ['trim']()
-        ['toLowerCase'](),
-      duration: Number(format['duration'] || 0) || 0,
-      fps: parseFfprobeRatio(stream['avg_frame_rate']) || parseFfprobeRatio(stream['r_frame_rate']) || 0,
-      width: Math['trunc'](Number(stream['width'] || 0)) || 0,
-      height: Math['trunc'](Number(stream['height'] || 0)) || 0,
+      codecName: String(stream.codec_name || '')
+        .trim()
+        .toLowerCase(),
+      codecTag: String(stream.codec_tag_string || '')
+        .trim()
+        .toLowerCase(),
+      pixelFormat: String(stream.pix_fmt || '')
+        .trim()
+        .toLowerCase(),
+      profile: String(stream.profile || '').trim(),
+      formatName: String(format.format_name || '')
+        .trim()
+        .toLowerCase(),
+      duration: Number(format.duration || 0) || 0,
+      fps: parseFfprobeRatio(stream.avg_frame_rate) || parseFfprobeRatio(stream.r_frame_rate) || 0,
+      width: Math.trunc(Number(stream.width || 0)) || 0,
+      height: Math.trunc(Number(stream.height || 0)) || 0,
     };
   }
   async function probeVideoPlaybackInfoForImport(sourcePath) {
@@ -263,11 +263,11 @@ export function createMediaTaskRuntime({
     return buildVideoPlaybackInfo(info);
   }
   function getVideoProxyPaths(assetId) {
-    const derivedDir = path['join'](resolveAssetsDir(), 'derived', 'video'),
+    const derivedDir = path.join(resolveAssetsDir(), 'derived', 'video'),
       proxyFilename = getVideoPlaybackProxyFilename(assetId);
     return {
       derivedDir: derivedDir,
-      proxyAbs: path['join'](derivedDir, proxyFilename),
+      proxyAbs: path.join(derivedDir, proxyFilename),
       proxyLocalPath: toAssetLocalPath('derived', 'video', proxyFilename),
     };
   }
@@ -279,7 +279,7 @@ export function createMediaTaskRuntime({
         displayUrl: '',
         videoProxyStatus: 'not_required',
         videoProxyVersion: '',
-        videoCodec: playbackInfo['codecName'],
+        videoCodec: playbackInfo.codecName,
       };
     const {
       derivedDir: derivedDir,
@@ -289,12 +289,12 @@ export function createMediaTaskRuntime({
     mkdirSync(derivedDir, { recursive: true });
     let proxyReady = false;
     try {
-      proxyReady = existsSync(proxyAbs) && statSync(proxyAbs)['size'] > 0;
+      proxyReady = existsSync(proxyAbs) && statSync(proxyAbs).size > 0;
     } catch {
       proxyReady = false;
     }
     if (!proxyReady) {
-      const tempPath = proxyAbs + '.' + process['pid'] + '.' + Date['now']() + '.tmp.mp4';
+      const tempPath = proxyAbs + '.' + process.pid + '.' + Date.now() + '.tmp.mp4';
       try {
         (await runFfmpegTask(
           queue,
@@ -306,9 +306,9 @@ export function createMediaTaskRuntime({
             crf: VIDEO_PROXY_TRANSCODE_CRF,
           }),
           {
-            durationSec: playbackInfo['duration'],
+            durationSec: playbackInfo.duration,
             progressMessage: 'Transcoding video',
-            timeoutMs: resolveVideoPlaybackProxyTimeoutMs(playbackInfo['duration']),
+            timeoutMs: resolveVideoPlaybackProxyTimeoutMs(playbackInfo.duration),
           },
         ),
           renameSync(tempPath, proxyAbs));
@@ -324,94 +324,94 @@ export function createMediaTaskRuntime({
       displayUrl: '/' + proxyLocalPath,
       videoProxyStatus: 'generated',
       videoProxyVersion: VIDEO_PLAYBACK_PROXY_VERSION,
-      videoCodec: playbackInfo['codecName'],
+      videoCodec: playbackInfo.codecName,
     };
   }
   function ensureAssetVideoPlaybackProxy(queue, task, sourcePath, assetId) {
     const dedupeKey = [
       VIDEO_PLAYBACK_PROXY_VERSION,
-      String(assetId || '')['trim'](),
-      path['resolve'](sourcePath)['toLowerCase'](),
-    ]['join']('|');
-    return proxyWorkDeduper['run'](dedupeKey, () =>
+      String(assetId || '').trim(),
+      path.resolve(sourcePath).toLowerCase(),
+    ].join('|');
+    return proxyWorkDeduper.run(dedupeKey, () =>
       runAssetVideoPlaybackProxy(queue, task, sourcePath, assetId),
     );
   }
   function buildWaveformJsonFromFloat32(float32Samples, requestedSamples = 190) {
-    const buffer = float32Samples['buffer']['slice'](
-        float32Samples['byteOffset'],
-        float32Samples['byteOffset'] + float32Samples['byteLength'],
+    const buffer = float32Samples.buffer.slice(
+        float32Samples.byteOffset,
+        float32Samples.byteOffset + float32Samples.byteLength,
       ),
-      samples = new Float32Array(buffer, 0, Math['floor'](float32Samples['byteLength'] / 4)),
-      sampleCount = Math['max'](40, Math['min'](400, Number(requestedSamples) || 190)),
-      bucketSize = Math['max'](1, Math['floor'](samples['length'] / sampleCount)),
+      samples = new Float32Array(buffer, 0, Math.floor(float32Samples.byteLength / 4)),
+      sampleCount = Math.max(40, Math.min(400, Number(requestedSamples) || 190)),
+      bucketSize = Math.max(1, Math.floor(samples.length / sampleCount)),
       peaks = [];
     for (let index = 0; index < sampleCount; index += 1) {
       const bucketStart = index * bucketSize,
-        bucketEnd = Math['min'](samples['length'], bucketStart + bucketSize);
+        bucketEnd = Math.min(samples.length, bucketStart + bucketSize);
       let peak = 0;
       for (let cursor = bucketStart; cursor < bucketEnd; cursor += 1) {
-        peak = Math['max'](peak, Math['abs'](Number(samples[cursor]) || 0));
+        peak = Math.max(peak, Math.abs(Number(samples[cursor]) || 0));
       }
-      peaks['push'](Number(Math['min'](1, peak)['toFixed'](4)));
+      peaks.push(Number(Math.min(1, peak).toFixed(4)));
     }
     return { version: 1, samples: sampleCount, peaks: peaks };
   }
   function handleTaskActivity(update = {}) {
     activity = {
-      activeCount: Number(update['activeCount'] || 0) || 0,
-      waitingCount: Number(update['waitingCount'] || 0) || 0,
-      totalCount: Number(update['totalCount'] || 0) || 0,
-      progress: Number(update['progress'] || 0) || 0,
-      activeTasks: Array['isArray'](update['activeTasks']) ? update['activeTasks'] : [],
+      activeCount: Number(update.activeCount || 0) || 0,
+      waitingCount: Number(update.waitingCount || 0) || 0,
+      totalCount: Number(update.totalCount || 0) || 0,
+      progress: Number(update.progress || 0) || 0,
+      activeTasks: Array.isArray(update.activeTasks) ? update.activeTasks : [],
     };
-    const isActive = activity['activeCount'] > 0;
-    (setTaskbarProgressSource?.('media', isActive ? Math['max'](0.01, activity['progress']) : -1),
+    const isActive = activity.activeCount > 0;
+    (setTaskbarProgressSource?.('media', isActive ? Math.max(0.01, activity.progress) : -1),
       setPowerSaveBlocker?.('media', isActive));
   }
   function maybeNotifyLongMediaTask(update = {}) {
-    const status = String(update['status'] || '');
+    const status = String(update.status || '');
     if (status !== 'complete' && status !== 'failed') return;
-    if (String(update['purpose'] || '')['trim']() === PERSON_REPLACEMENT_COMPOSE_TASK_PURPOSE) return;
-    const taskId = String(update['taskId'] || '')['trim']();
-    if (!taskId || notifiedTaskIds['has'](taskId)) return;
-    const startedAt = Number(update['startedAt'] || 0) || 0,
-      finishedAt = Number(update['finishedAt'] || Date['now']()) || Date['now']();
+    if (String(update.purpose || '').trim() === PERSON_REPLACEMENT_COMPOSE_TASK_PURPOSE) return;
+    const taskId = String(update.taskId || '').trim();
+    if (!taskId || notifiedTaskIds.has(taskId)) return;
+    const startedAt = Number(update.startedAt || 0) || 0,
+      finishedAt = Number(update.finishedAt || Date.now()) || Date.now();
     if (!startedAt || finishedAt - startedAt < LONG_MEDIA_TASK_NOTIFICATION_MS) return;
-    if (typeof NotificationCtor?.['isSupported'] === 'function' && !NotificationCtor['isSupported']()) return;
-    notifiedTaskIds['add'](taskId);
-    notifiedTaskIds['size'] > 500 &&
-      notifiedTaskIds['delete'](notifiedTaskIds['values']()['next']()['value']);
-    const displayName = getMediaTaskDisplayName(update['kind']),
+    if (typeof NotificationCtor?.isSupported === 'function' && !NotificationCtor.isSupported()) return;
+    notifiedTaskIds.add(taskId);
+    notifiedTaskIds.size > 500 &&
+      notifiedTaskIds.delete(notifiedTaskIds.values().next().value);
+    const displayName = getMediaTaskDisplayName(update.kind),
       isFailure = status === 'failed';
     try {
       const notification = new NotificationCtor({
         title: '' + displayName + (isFailure ? '失败' : '完成'),
         body: isFailure
-          ? formatNotificationBody(update['error'], '任务处理失败。')
+          ? formatNotificationBody(update.error, '任务处理失败。')
           : formatNotificationBody('', '长时间媒体任务已处理完成。'),
-        silent: String(update['kind'] || '') === 'audioVoiceCompose',
+        silent: String(update.kind || '') === 'audioVoiceCompose',
       });
-      (notification['on']('click', activateMainWindow), notification['show']());
+      (notification.on('click', activateMainWindow), notification.show());
     } catch (error) {
-      console['warn']('[electron] failed to show media task notification:', error);
+      console.warn('[electron] failed to show media task notification:', error);
     }
   }
   function handleTaskUpdate(update) {
-    const status = String(update?.['status'] || '');
-    if (update?.['assetId'] && (status === 'failed' || status === 'cancelled')) {
+    const status = String(update?.status || '');
+    if (update?.assetId && (status === 'failed' || status === 'cancelled')) {
       const updatedAsset = applyAssetRecordUpdate(
-        update['assetId'],
+        update.assetId,
         {
           status: 'partial',
-          error: update['error'] || status,
-          mediaTaskId: update['taskId'] || '',
-          mediaTaskKind: update['kind'] || '',
+          error: update.error || status,
+          mediaTaskId: update.taskId || '',
+          mediaTaskKind: update.kind || '',
           mediaTaskStatus: status,
-          mediaTaskProgress: Number(update['progress'] || 0) || 0,
-          mediaTaskError: update['error'] || '',
+          mediaTaskProgress: Number(update.progress || 0) || 0,
+          mediaTaskError: update.error || '',
         },
-        { expectedMediaTaskId: update['taskId'] },
+        { expectedMediaTaskId: update.taskId },
       );
       publishAssetUpdated(updatedAsset);
     }
@@ -453,9 +453,9 @@ export function createMediaTaskRuntime({
         ffprobeVideoMeta: ffprobeVideoMeta,
         getAsrRuntimeManifestUrl: () =>
           String(
-            env['AIC_ASR_RUNTIME_MANIFEST_URL'] ||
+            env.AIC_ASR_RUNTIME_MANIFEST_URL ||
               'https://modelscope.cn/models/q502892879/asr-runtime/resolve/master/asr-runtime-manifest.json',
-          )['trim'](),
+          ).trim(),
         getDoubaoAsrConfig: getDoubaoAsrConfig,
         getBailianAsrConfig: getBailianAsrConfig,
         getPythonCertificateEnv: getPythonCertificateEnv,
@@ -475,7 +475,7 @@ export function createMediaTaskRuntime({
   }
   return {
     buildStatePatch: buildMediaTaskStatePatch,
-    getActivity: () => ({ ...activity, activeTasks: [...activity['activeTasks']] }),
+    getActivity: () => ({ ...activity, activeTasks: [...activity.activeTasks] }),
     getQueue: getQueue,
     probeVideoPlaybackInfoForImport: probeVideoPlaybackInfoForImport,
   };

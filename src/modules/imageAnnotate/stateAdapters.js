@@ -101,41 +101,41 @@ export const getDefaultGenerationModelState = (generationModelCatalog = buildGen
 export const LOCAL_EDIT_STATE_KEY = 'localEditState';
 
 const LOCAL_EDIT_TOOLS = new Set(['brush', 'eraser']),
-  clampPersistedLocalEditBrushSize = (entry) => Math['max'](1, Math['min'](120, Number(entry) || 40)),
+  clampPersistedLocalEditBrushSize = (entry) => Math.max(1, Math.min(120, Number(entry) || 40)),
   normalizePersistedLocalEditTool = (record) => {
-    const payload = String(record || '')['trim']();
-    return LOCAL_EDIT_TOOLS['has'](payload) ? payload : 'brush';
+    const payload = String(record || '').trim();
+    return LOCAL_EDIT_TOOLS.has(payload) ? payload : 'brush';
   };
 
 export const normalizePersistedLocalEditCommand = (box4) => {
   if (!box4 || typeof box4 !== 'object') return null;
-  const handle = String(box4['type'] || '')['trim']();
+  const handle = String(box4.type || '').trim();
   if (handle === 'brush' || handle === 'eraser') {
-    const state = Array['isArray'](box4['points']) ? box4['points'] : [],
-      enabled3 = state['map']((box5) => ({ x: Number(box5?.['x']), y: Number(box5?.['y']) }))['filter'](
-        (box6) => Number['isFinite'](box6['x']) && Number['isFinite'](box6['y']),
+    const state = Array.isArray(box4.points) ? box4.points : [],
+      enabled3 = state.map((box5) => ({ x: Number(box5?.x), y: Number(box5?.y) })).filter(
+        (box6) => Number.isFinite(box6.x) && Number.isFinite(box6.y),
       ),
-      config = Number(box4['sizeWorld']);
-    if (!enabled3['length'] || !Number['isFinite'](config)) return null;
+      config = Number(box4.sizeWorld);
+    if (!enabled3.length || !Number.isFinite(config)) return null;
     return { type: handle, sizeWorld: config, points: enabled3 };
   }
   if (handle === 'rect') {
-    const scope = Number(box4['x1']),
-      input = Number(box4['y1']),
-      output = Number(box4['x2']),
-      value2 = Number(box4['y2']),
-      value3 = Number(box4['sizeWorld']);
+    const scope = Number(box4.x1),
+      input = Number(box4.y1),
+      output = Number(box4.x2),
+      value2 = Number(box4.y2),
+      value3 = Number(box4.sizeWorld);
     if (
-      !Number['isFinite'](scope) ||
-      !Number['isFinite'](input) ||
-      !Number['isFinite'](output) ||
-      !Number['isFinite'](value2) ||
-      !Number['isFinite'](value3)
+      !Number.isFinite(scope) ||
+      !Number.isFinite(input) ||
+      !Number.isFinite(output) ||
+      !Number.isFinite(value2) ||
+      !Number.isFinite(value3)
     )
       return null;
     return {
       type: handle,
-      color: String(box4['color'] || ''),
+      color: String(box4.color || ''),
       sizeWorld: value3,
       x1: scope,
       y1: input,
@@ -144,10 +144,10 @@ export const normalizePersistedLocalEditCommand = (box4) => {
     };
   }
   if (handle === 'fill') {
-    const value4 = Number(box4['x']),
-      value5 = Number(box4['y']);
-    if (!Number['isFinite'](value4) || !Number['isFinite'](value5)) return null;
-    return { type: handle, x: value4, y: value5, color: String(box4['color'] || '') };
+    const value4 = Number(box4.x),
+      value5 = Number(box4.y);
+    if (!Number.isFinite(value4) || !Number.isFinite(value5)) return null;
+    return { type: handle, x: value4, y: value5, color: String(box4.color || '') };
   }
   return null;
 };
@@ -167,8 +167,8 @@ export const buildLocalEditState = ({
 } = {}) => ({
   scene: scene === 'erase' ? 'erase' : 'repaint',
   promptText: String(promptText || ''),
-  commands: Array['isArray'](commands3)
-    ? commands3['map']((value7) => normalizePersistedLocalEditCommand(value7))['filter'](Boolean)
+  commands: Array.isArray(commands3)
+    ? commands3.map((value7) => normalizePersistedLocalEditCommand(value7)).filter(Boolean)
     : [],
   tool: normalizePersistedLocalEditTool(tool2),
   brushSizePx: clampPersistedLocalEditBrushSize(brushSizePx2),

@@ -271,9 +271,9 @@ import {
   SEEDANCE2_MAX_TOTAL_DURATION_SECONDS_BY_KIND,
 } from '../../../modules/modelMediaInputLimits.js';
 import { RUNNINGHUB_SEEDANCE_2_5_VIDEO_MODEL } from './runningHubSeedance25VideoModelApiManifest.js';
-export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
+export const RUNNINGHUB_VIDEO_MODELS = Object.freeze([
   RUNNINGHUB_SEEDANCE_2_5_VIDEO_MODEL,
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/kling-video-o1',
     executionId: 'runninghub.model-api.video.kling-o1.v1',
@@ -282,7 +282,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub Kling O1 model API',
     model: 'kling-video-o1',
     endpoint: '/openapi/v2/kling-video-o1/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_KLING_O1_GENERATION_MODE_FIELD,
       KLING_O1_QUALITY_FIELD,
       RUNNINGHUB_KLING_O1_RATIO_FIELD,
@@ -300,46 +300,46 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubKlingO1Video',
       endpointResolver: 'runninghubKlingO1VideoEndpoint',
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: 'frame' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'frame' }),
           placeholder: RUNNINGHUB_KLING_O1_FRAME_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'reference' }),
           placeholder: RUNNINGHUB_KLING_O1_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'edit' }),
           placeholder: RUNNINGHUB_KLING_O1_EDIT_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: RUNNINGHUB_KLING_O1_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: 'frame' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'frame' }),
           tooltip: RUNNINGHUB_KLING_O1_FRAME_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'reference' }),
           tooltip: RUNNINGHUB_KLING_O1_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_kling_o1_generation_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_kling_o1_generation_mode', value: 'edit' }),
           tooltip: RUNNINGHUB_KLING_O1_EDIT_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 70,
         label: 'Kling O1',
@@ -347,12 +347,12 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/kling-v3',
     executionId: 'runninghub.model-api.video.kling-v3.v1',
     displayName: 'Kling V3.0',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'runninghub-model/kling-v3.0',
       'runninghub-model/kling-v30',
       'runninghub-model/kling-v3-0',
@@ -361,7 +361,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub Kling V3.0 model API',
     model: 'kling-v3',
     endpoint: '/openapi/v2/kling-v3.0-std/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_KLING_V3_MODEL_FIELD,
       RUNNINGHUB_KLING_V3_RATIO_FIELD,
       createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
@@ -380,14 +380,14 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubKlingV3Video',
       endpointResolver: 'runninghubKlingV3VideoEndpoint',
     }),
-    prompt: Object['freeze']({ placeholder: RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: RUNNINGHUB_KLING_V3_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    prompt: Object.freeze({ placeholder: RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: RUNNINGHUB_KLING_V3_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 60,
         label: 'Kling V3.0',
@@ -395,7 +395,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/kling-v3-turbo-pro',
     executionId: 'runninghub.model-api.video.kling-v3-turbo-pro.v1',
@@ -404,7 +404,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub Kling V3 Turbo Pro model API',
     model: 'kling-v3-turbo-pro',
     endpoint: '/openapi/v2/kling-v3-turbo-pro/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_KLING_V3_RATIO_FIELD,
       createFooterDurationField({ defaultValue: 5, min: 3, max: 15 }),
       KLING_V3_AUDIO_FIELD,
@@ -422,14 +422,14 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubKlingV3Video',
       endpointResolver: 'runninghubKlingV3VideoEndpoint',
     }),
-    prompt: Object['freeze']({ placeholder: RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: RUNNINGHUB_KLING_V3_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    prompt: Object.freeze({ placeholder: RUNNINGHUB_KLING_V3_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: RUNNINGHUB_KLING_V3_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 59,
         label: 'Kling V3 Turbo Pro',
@@ -437,12 +437,12 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/kling-o3',
     executionId: 'runninghub.model-api.video.kling-o3.v1',
     displayName: 'Kling O3',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'runninghub-model/kling-video-o3',
       'runninghub-model/kling-o3-video',
       'runninghub-model/kling-o3-std',
@@ -451,7 +451,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub Kling O3 model API',
     model: 'kling-video-o3',
     endpoint: '/openapi/v2/kling-video-o3-std/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_KLING_O3_MODEL_FIELD,
       RUNNINGHUB_KLING_O3_MODE_FIELD,
       RUNNINGHUB_KLING_O3_RATIO_FIELD,
@@ -472,46 +472,46 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubKlingO3Video',
       endpointResolver: 'runninghubKlingO3VideoEndpoint',
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
           placeholder: RUNNINGHUB_KLING_O3_FRAME_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
           placeholder: RUNNINGHUB_KLING_O3_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
           placeholder: RUNNINGHUB_KLING_O3_EDIT_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: RUNNINGHUB_KLING_O3_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'image' }),
           tooltip: RUNNINGHUB_KLING_O3_FRAME_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'reference' }),
           tooltip: RUNNINGHUB_KLING_O3_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'kling_v3_omni_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'kling_v3_omni_mode', value: 'edit' }),
           tooltip: RUNNINGHUB_KLING_O3_EDIT_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 50,
         label: 'Kling O3',
@@ -519,12 +519,12 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/seedance-2.0',
     executionId: 'runninghub.model-api.video.seedance-2.v1',
     displayName: 'Seedance 2.0',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'runninghub-model/seedance2.0',
       'runninghub-model/seedance-2',
       'runninghub-model/sparkvideo-2.0',
@@ -535,7 +535,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     model: 'rhart-video/sparkvideo-2.0',
     endpoint: '/openapi/v2/rhart-video/sparkvideo-2.0-fast/text-to-video',
     endpointMode: 'seedance-video-generation',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_SEEDANCE_2_MODEL_FIELD,
       RUNNINGHUB_SEEDANCE_2_MODE_FIELD,
       RUNNINGHUB_SEEDANCE_2_RESOLUTION_FIELD,
@@ -550,9 +550,9 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       ...VIDEO_SEED_FIELDS,
     ]),
     inputSlots: createVideoInputSlots({
-      image: SEEDANCE2_INPUT_MAX_BY_KIND['image'],
-      video: SEEDANCE2_INPUT_MAX_BY_KIND['video'],
-      audio: SEEDANCE2_INPUT_MAX_BY_KIND['audio'],
+      image: SEEDANCE2_INPUT_MAX_BY_KIND.image,
+      video: SEEDANCE2_INPUT_MAX_BY_KIND.video,
+      audio: SEEDANCE2_INPUT_MAX_BY_KIND.audio,
       fixedSlots: RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS,
       cycleFixedInputWhenFull: true,
       preserveHiddenInputsByKind: true,
@@ -562,55 +562,55 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubSeedance2Video',
       endpointResolver: 'runninghubSeedance2VideoEndpoint',
       videoFamily: 'seedance2',
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'text2video' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'text2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'image2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'image2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'frames2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'frames2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'multimodal2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'multimodal2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({ tooltip: RUNNINGHUB_SEEDANCE_2_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    help: Object.freeze({ tooltip: RUNNINGHUB_SEEDANCE_2_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 10,
         label: 'Seedance 2.0',
         subtitle: 'Fast / Standard, T2V / I2V / Frames / Multimodal',
       }),
-      videoInputSurface: Object['freeze']({ hideFixedInputSlots: true }),
+      videoInputSurface: Object.freeze({ hideFixedInputSlots: true }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/sparkvideo-2.0-mini',
     executionId: 'runninghub.model-api.video.seedance-2-mini.v1',
     displayName: 'SparkVideo 2.0 Mini',
-    aliases: Object['freeze'](['runninghub-model/seedance-2.0-mini', 'runninghub-model/sparkvideo-2-mini']),
+    aliases: Object.freeze(['runninghub-model/seedance-2.0-mini', 'runninghub-model/sparkvideo-2-mini']),
     icon: 'images/RH.png',
     description: 'RunningHub SparkVideo 2.0 Mini model API',
     model: 'rhart-video/sparkvideo-2.0-mini',
     endpoint: '/openapi/v2/rhart-video/sparkvideo-2.0-mini/text-to-video',
     endpointMode: 'seedance-video-generation',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_SEEDANCE_2_MODE_FIELD,
       RUNNINGHUB_SEEDANCE_2_RESOLUTION_FIELD,
       createAspectRatioField({ options: ['16:9', '4:3', '1:1', '3:4', '9:16', '21:9'] }),
@@ -624,9 +624,9 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       ...VIDEO_SEED_FIELDS,
     ]),
     inputSlots: createVideoInputSlots({
-      image: SEEDANCE2_INPUT_MAX_BY_KIND['image'],
-      video: SEEDANCE2_INPUT_MAX_BY_KIND['video'],
-      audio: SEEDANCE2_INPUT_MAX_BY_KIND['audio'],
+      image: SEEDANCE2_INPUT_MAX_BY_KIND.image,
+      video: SEEDANCE2_INPUT_MAX_BY_KIND.video,
+      audio: SEEDANCE2_INPUT_MAX_BY_KIND.audio,
       fixedSlots: RUNNINGHUB_SEEDANCE_2_FIXED_INPUT_SLOTS,
       cycleFixedInputWhenFull: true,
       preserveHiddenInputsByKind: true,
@@ -636,54 +636,54 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubSeedance2Video',
       endpointResolver: 'runninghubSeedance2VideoEndpoint',
       videoFamily: 'seedance2',
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'text2video' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'text2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'image2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'image2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'frames2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'frames2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_FRAMES_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'rh_seedance_2_mode', value: 'multimodal2video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'rh_seedance_2_mode', value: 'multimodal2video' }),
           placeholder: RUNNINGHUB_SEEDANCE_2_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({ tooltip: APIMART_SEEDANCE_2_MINI_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    help: Object.freeze({ tooltip: APIMART_SEEDANCE_2_MINI_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 9,
         label: 'SparkVideo 2.0 Mini',
         subtitle: 'Mini, T2V / I2V / Frames / Multimodal',
       }),
-      videoInputSurface: Object['freeze']({ hideFixedInputSlots: true }),
+      videoInputSurface: Object.freeze({ hideFixedInputSlots: true }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/happyhorse-1.1',
     executionId: 'runninghub.model-api.video.happyhorse-1-1.v1',
     displayName: 'HappyHorse 1.1',
-    aliases: Object['freeze'](['runninghub-model/alibaba-happyhorse-1.1', 'runninghub-model/happyhorse11']),
+    aliases: Object.freeze(['runninghub-model/alibaba-happyhorse-1.1', 'runninghub-model/happyhorse11']),
     icon: 'images/RH.png',
     description: 'RunningHub Alibaba HappyHorse 1.1 model API',
     model: 'alibaba/happyhorse-1.1',
     endpoint: '/openapi/v2/alibaba/happyhorse-1.1/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       HAPPYHORSE_11_MODE_FIELD,
       createResolutionField({ label: '视频分辨率', defaultValue: '1080P' }),
       createAspectRatioField(),
@@ -703,49 +703,49 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubHappyHorseVideo',
       endpointResolver: 'runninghubHappyHorseVideoEndpoint',
       videoFamily: 'happyHorse',
       maxInputVideoSeconds: 60,
-      happyHorse: Object['freeze']({ versionLabel: 'HappyHorse 1.1', supportsEdit: false }),
+      happyHorse: Object.freeze({ versionLabel: 'HappyHorse 1.1', supportsEdit: false }),
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           placeholder: HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           placeholder: HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: HAPPYHORSE_11_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           tooltip: HAPPYHORSE_11_TEXT_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           tooltip: HAPPYHORSE_11_IMAGE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           tooltip: HAPPYHORSE_11_REFERENCE_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 21,
         label: 'HappyHorse 1.1',
@@ -753,12 +753,12 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/happyhorse-1.0',
     executionId: 'runninghub.model-api.video.happyhorse-1.v1',
     displayName: 'HappyHorse 1.0',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'runninghub-model/happyhorse',
       'runninghub-model/happyhorse-1',
       'runninghub-model/alibaba-happyhorse-1.0',
@@ -767,7 +767,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub Alibaba HappyHorse 1.0 model API',
     model: 'alibaba/happyhorse-1.0',
     endpoint: '/openapi/v2/alibaba/happyhorse-1.0/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       HAPPYHORSE_MODE_FIELD,
       createResolutionField({ label: '视频分辨率', defaultValue: '1080P' }),
       createAspectRatioField(),
@@ -787,56 +787,56 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubHappyHorseVideo',
       endpointResolver: 'runninghubHappyHorseVideoEndpoint',
       videoFamily: 'happyHorse',
       maxInputVideoSeconds: 60,
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           placeholder: HAPPYHORSE_TEXT_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           placeholder: HAPPYHORSE_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           placeholder: HAPPYHORSE_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
           placeholder: HAPPYHORSE_EDIT_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: HAPPYHORSE_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'auto' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'auto' }),
           tooltip: HAPPYHORSE_TEXT_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'image' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'image' }),
           tooltip: HAPPYHORSE_IMAGE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'reference' }),
           tooltip: HAPPYHORSE_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'happyhorse_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'happyhorse_mode', value: 'edit' }),
           tooltip: HAPPYHORSE_EDIT_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 20,
         label: 'HappyHorse 1.0',
@@ -844,12 +844,12 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/veo3',
     executionId: 'runninghub.model-api.video.veo3.v1',
     displayName: 'Veo3',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'runninghub-model/veo3.1',
       'runninghub-model/rhart-video-v3.1',
       'runninghub-model/rhart-video-v31',
@@ -858,7 +858,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub 全能视频 V3.1 / Veo3 model API',
     model: 'rhart-video-v3.1',
     endpoint: '/openapi/v2/rhart-video-v3.1-fast/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_VEO3_CHANNEL_FIELD,
       RUNNINGHUB_VEO3_MODEL_FIELD,
       RUNNINGHUB_VEO3_GENERATION_TYPE_FIELD,
@@ -867,18 +867,18 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
         defaultValue: '720p',
         options: [
           '720p',
-          Object['freeze']({
+          Object.freeze({
             value: '1080p',
             label: '1080p',
-            disableWhen: Object['freeze']({ field: 'rh_veo3_channel', value: 'lowCost' }),
+            disableWhen: Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
           }),
-          Object['freeze']({
+          Object.freeze({
             value: '4k',
             label: '4K',
-            disableWhen: Object['freeze']({
-              any: Object['freeze']([
-                Object['freeze']({ field: 'rh_veo3_channel', value: 'lowCost' }),
-                Object['freeze']({ field: 'mode', value: 'lite' }),
+            disableWhen: Object.freeze({
+              any: Object.freeze([
+                Object.freeze({ field: 'rh_veo3_channel', value: 'lowCost' }),
+                Object.freeze({ field: 'mode', value: 'lite' }),
               ]),
             }),
           }),
@@ -899,46 +899,46 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubVeo3Video',
       endpointResolver: 'runninghubVeo3VideoEndpoint',
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'frame' }),
           placeholder: RUNNINGHUB_VEO3_FRAME_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'reference' }),
           placeholder: RUNNINGHUB_VEO3_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'extend' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'extend' }),
           placeholder: RUNNINGHUB_VEO3_EXTEND_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'frame' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'frame' }),
           tooltip: RUNNINGHUB_VEO3_FRAME_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'reference' }),
           tooltip: RUNNINGHUB_VEO3_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'generation_type', value: 'extend' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'generation_type', value: 'extend' }),
           tooltip: RUNNINGHUB_VEO3_EXTEND_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 30,
         label: 'Veo3',
@@ -946,12 +946,12 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/wan2.7',
     executionId: 'runninghub.model-api.video.wan2-7.v1',
     displayName: 'Wan 2.7',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'runninghub-model/wan27',
       'runninghub-model/wan-2.7',
       'runninghub-model/alibaba-wan-2.7',
@@ -960,7 +960,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub Alibaba Wan 2.7 model API',
     model: 'alibaba/wan-2.7',
     endpoint: '/openapi/v2/alibaba/wan-2.7/text-to-video',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       WAN27_MODE_FIELD,
       createResolutionField({ defaultValue: '720P' }),
       createAspectRatioField(),
@@ -979,55 +979,55 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubWan27Video',
       endpointResolver: 'runninghubWan27VideoEndpoint',
       videoFamily: 'wan27',
     }),
-    prompt: Object['freeze']({
+    prompt: Object.freeze({
       placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
           placeholder: WAN27_IMAGE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
           placeholder: WAN27_VIDEO_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
           placeholder: WAN27_REFERENCE_PROMPT_PLACEHOLDER,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
           placeholder: WAN27_EDIT_PROMPT_PLACEHOLDER,
         }),
       ]),
     }),
-    help: Object['freeze']({
+    help: Object.freeze({
       tooltip: WAN27_HELP_TOOLTIP,
-      variants: Object['freeze']([
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'image' }),
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'image' }),
           tooltip: WAN27_IMAGE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'video' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'video' }),
           tooltip: WAN27_VIDEO_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'reference' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'reference' }),
           tooltip: WAN27_REFERENCE_HELP_TOOLTIP,
         }),
-        Object['freeze']({
-          when: Object['freeze']({ field: 'wan27_mode', value: 'edit' }),
+        Object.freeze({
+          when: Object.freeze({ field: 'wan27_mode', value: 'edit' }),
           tooltip: WAN27_EDIT_HELP_TOOLTIP,
         }),
       ]),
     }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 40,
         label: 'Wan 2.7',
@@ -1035,12 +1035,12 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
       }),
     }),
   }),
-  Object['freeze']({
+  Object.freeze({
     provider: 'runninghub',
     modelId: 'runninghub-model/hailuo-2.3',
     executionId: 'runninghub.model-api.video.hailuo-2-3.v1',
     displayName: 'Hailuo 2.3',
-    aliases: Object['freeze']([
+    aliases: Object.freeze([
       'runninghub-model/hailuo23',
       'runninghub-model/hailuo-23',
       'runninghub-model/minimax-hailuo-2.3',
@@ -1050,7 +1050,7 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     description: 'RunningHub MiniMax Hailuo 2.3 model API',
     model: 'minimax/hailuo-2.3',
     endpoint: '/openapi/v2/minimax/hailuo-2.3/t2v-standard',
-    fields: Object['freeze']([
+    fields: Object.freeze([
       RUNNINGHUB_HAILUO_23_QUALITY_FIELD,
       RUNNINGHUB_HAILUO_23_DURATION_FIELD,
       RUNNINGHUB_HAILUO_23_ENABLE_PROMPT_EXPANSION_FIELD,
@@ -1065,14 +1065,14 @@ export const RUNNINGHUB_VIDEO_MODELS = Object['freeze']([
     responseMapping: RUNNINGHUB_VIDEO_RESPONSE_MAPPING,
     taskPolling: null,
     resultTaskIdPath: 'taskId',
-    executionExtensions: Object['freeze']({
+    executionExtensions: Object.freeze({
       bodyResolver: 'runninghubHailuo23Video',
       endpointResolver: 'runninghubHailuo23VideoEndpoint',
     }),
-    prompt: Object['freeze']({ placeholder: RUNNINGHUB_HAILUO_23_PROMPT_PLACEHOLDER }),
-    help: Object['freeze']({ tooltip: RUNNINGHUB_HAILUO_23_HELP_TOOLTIP }),
-    extensions: Object['freeze']({
-      videoMenu: Object['freeze']({
+    prompt: Object.freeze({ placeholder: RUNNINGHUB_HAILUO_23_PROMPT_PLACEHOLDER }),
+    help: Object.freeze({ tooltip: RUNNINGHUB_HAILUO_23_HELP_TOOLTIP }),
+    extensions: Object.freeze({
+      videoMenu: Object.freeze({
         role: 'runninghubModel',
         order: 80,
         label: 'Hailuo 2.3',
