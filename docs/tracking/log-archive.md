@@ -4,6 +4,11 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-06（177 批·**删除旧版空态胶囊，与 0.8.0 对齐**）：承 176 批发现——上游 0.8.0 没有 `.empty-hint-pills`。
+  实测确认那排「生文本/生图像/生视频」**没有任何 JS 处理器**（`emptyBtnText/Image/Video` 只出现在 index.html），
+  点了本来就没反应，是纯惰性遗留。已删 `index.html` 46 行标记、两份 CSS 里的 `.empty-hint-pills`/`.pill-btn` 规则，
+  并从「可点击光标」共享选择器列表摘掉 `.pill-btn`（另一个类 `.img-pill-btn` 未动）。空态现为引导 + 双击提示 + rail 网格，
+  与上游一致。真机实测：无胶囊、rail 4 卡 grid、无报错。回归 11186/28 零回归。
 - 2026-10-06（176 批·**按 SHUO Canvas 补回快捷模板库样式**）：用户指路 `D:\shuocancas\SHUO Canvas`，
   查出仓库 `styles/canvas.css` **缺开头约 9 KB**：rail 的 grid 布局与 `pointer-events:auto`、`.canvas-shortcut-*` 卡片/徽章/
   图标配色、模板菜单、`has-template-library` 响应式规则都在那一段。已补 62 条规则进两份 CSS；实测 rail 变 grid、卡片 240×56。

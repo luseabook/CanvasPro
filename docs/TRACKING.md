@@ -369,11 +369,11 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-06（177 批·**删除旧版空态胶囊，与 0.8.0 对齐**）：承 176 批发现——上游 0.8.0 没有 `.empty-hint-pills`。
-  实测确认那排「生文本/生图像/生视频」**没有任何 JS 处理器**（`emptyBtnText/Image/Video` 只出现在 index.html），
-  点了本来就没反应，是纯惰性遗留。已删 `index.html` 46 行标记、两份 CSS 里的 `.empty-hint-pills`/`.pill-btn` 规则，
-  并从「可点击光标」共享选择器列表摘掉 `.pill-btn`（另一个类 `.img-pill-btn` 未动）。空态现为引导 + 双击提示 + rail 网格，
-  与上游一致。真机实测：无胶囊、rail 4 卡 grid、无报错。回归 11186/28 零回归。
+- 2026-10-06（178 批·**修复安装版卡在加载页**）：按用户要求安装并实测 `Canvas-Setup-0.4.12-x64.exe` 成功；
+  实测发现**安装版永远停在品牌加载浮层**。根因链：`index.html` 清理卡片**缺两个 div**（`localAssetCleanupDetails`/`Toolbar`）→
+  `initLocalAssetCleanupSettings()` 只对另三个 id 做空判断，`toolbar` 为 null 时 `localAssetCleanupList.js:19` 抛**未捕获 TypeError** →
+  由 `main.js:1095` 的 `SettingsManager.init()` 触发并中断模块求值，致其后 `main.js:1113` 的 `complete('entry')` 永不执行 →
+  启动到不了 ready → 10 秒硬超时锁死浮层。补齐后界面完整。默认端口 8777 与用户正在运行的 SHUO Canvas 冲突。回归 11186/28
 
 ## 12. 变更记录机制（**已冻结**）
 
