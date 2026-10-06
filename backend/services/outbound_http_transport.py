@@ -4,6 +4,7 @@ import ipaddress
 import json
 import os
 import platform
+import socket
 import ssl
 import sys
 import threading
@@ -155,6 +156,89 @@ def is_loopback_http_url(url):
         return ipaddress.ip_address(hostname).is_loopback
     except ValueError:
         return False
+
+
+# CGNAT（RFC6598 运营商级 NAT 共享段，不可公网路由）：is_private 不覆盖，必须显式列出。
+_EXTRA_NON_PUBLIC_IPV4_NETWORKS = (ipaddress.ip_network("100.64.0.0/10"),)
+
+
+def _is_public_ip_address(address):
+    """判断单个已解析的 IP 是否属于可安全访问的公网地址。
+
+    采用正向判定 ``address.is_global``，而不是「排除标志集合」写法：后者会漏掉
+    CGNAT（100.64.0.0/10）等在部分运行时不落入 is_private 的非公网段，故再显式
+    补充 _EXTRA_NON_PUBLIC_IPV4_NETWORKS 做兜底。
+    """
+    if not address.is_global:
+        return False
+    for network in _EXTRA_NON_PUBLIC_IPV4_NETWORKS:
+        if address.version == network.version and address in network:
+            return False
+    return True
+
+
+def unsafe_remote_url_reason(url):
+    """返回该 URL 不安全的中文原因；URL 安全时返回空字符串。
+
+    仅允许 http/https，且不得携带 userinfo，主机解析结果必须全部为公网地址。
+    不维护域名白名单：本仓库支持用户自定义 provider，apiUrl 天然可以是任意域名。
+    """
+    raw_url = getattr(url, "full_url", url)
+    try:
+        parsed = urllib.parse.urlsplit(str(raw_url or "").strip())
+    except (TypeError, ValueError) as exc:
+        return f"URL 解析失败：{exc!r}"
+
+    scheme = parsed.scheme.lower()
+    if scheme not in {"http", "https"}:
+        return f"仅允许 http/https 协议，当前协议为 {parsed.scheme!r}"
+
+    hostname = parsed.hostname
+    if not hostname:
+        return "URL 缺少主机名"
+
+    if parsed.username is not None or parsed.password is not None:
+        return "URL 不允许携带用户信息（userinfo）"
+
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        return f"URL 端口非法：{exc!r}"
+    if port is None:
+        port = 443 if scheme == "https" else 80
+
+    # 主机是 IP 字面量时直接判定，无需再进行 DNS 解析。
+    try:
+        literal_address = ipaddress.ip_address(hostname)
+    except ValueError:
+        literal_address = None
+    if literal_address is not None:
+        if not _is_public_ip_address(literal_address):
+            return f"目标主机 {hostname} 属于非公网地址"
+        return ""
+
+    try:
+        address_infos = socket.getaddrinfo(hostname, port)
+    except Exception as exc:
+        return f"DNS 解析失败：{exc!r}"
+    if not address_infos:
+        return f"DNS 未能解析出 {hostname} 的地址"
+
+    for info in address_infos:
+        resolved = info[4][0] if len(info) >= 5 else ""
+        try:
+            resolved_address = ipaddress.ip_address(resolved)
+        except ValueError:
+            return f"无法识别的解析地址：{resolved!r}"
+        if not _is_public_ip_address(resolved_address):
+            return f"{hostname} 解析到非公网地址 {resolved}"
+
+    return ""
+
+
+def is_public_http_url(url):
+    """URL 安全（http/https + 公网主机 + 无 userinfo）时返回 True。"""
+    return unsafe_remote_url_reason(url) == ""
 
 
 def urlopen(url, data=None, timeout=None, **options):

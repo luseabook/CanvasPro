@@ -3,6 +3,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from backend.services.outbound_http_transport import unsafe_remote_url_reason
+
 
 PUBLIC_UPLOAD_API_URLS = {
     "https://uguu.se/upload",
@@ -151,21 +153,22 @@ class RemoteProxyRouteService:
         if not api_url or not api_key:
             return self._json_err(400, "Missing apiUrl or apiKey")
 
+        # SSRF / 本地文件读取防护：在发起任何网络请求之前校验目标 URL。
+        unsafe_reason = unsafe_remote_url_reason(api_url)
+        if unsafe_reason:
+            return self._json_err(400, unsafe_reason)
+
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Accept": "application/json",
             "User-Agent": "Mozilla/5.0",
         }
         try:
-            try:
-                requests = self._requests_module()
-                resp = requests.get(api_url, headers=headers, timeout=30)
-                return self._proxy_response(resp.status_code, resp.content)
-            except ImportError:
-                pass
-            except Exception:
-                pass
-
+            requests = self._requests_module()
+            resp = requests.get(api_url, headers=headers, timeout=30)
+            return self._proxy_response(resp.status_code, resp.content)
+        except ImportError:
+            # requests 未安装时回落到 urllib 是既有合法行为，保留该分支。
             req = urllib.request.Request(api_url, headers=headers, method="GET")
             try:
                 with urllib.request.urlopen(req, timeout=30) as resp:
@@ -176,6 +179,7 @@ class RemoteProxyRouteService:
             except Exception as exc:
                 return self._json_err(500, f"Urllib polling error: {str(exc)}")
         except Exception as exc:
+            # requests 已在校验后发起却失败时，不再无条件回落 urllib（该回落会放大 SSRF）。
             return self._json_err(500, f"Task proxy global error: {repr(exc)}")
 
     def _handle_upload_proxy(self, handler):
@@ -184,6 +188,11 @@ class RemoteProxyRouteService:
         api_key = self._extract_proxy_api_key(handler, query)
         if not api_url or (not api_key and not self._is_public_upload_api_url(api_url)):
             return self._json_err(400, "Missing apiUrl or apiKey")
+
+        # SSRF / 本地文件读取防护：在发起任何网络请求之前校验目标 URL。
+        unsafe_reason = unsafe_remote_url_reason(api_url)
+        if unsafe_reason:
+            return self._json_err(400, unsafe_reason)
 
         try:
             if "chunked" in str(handler.headers.get("Transfer-Encoding", "") or "").lower():
