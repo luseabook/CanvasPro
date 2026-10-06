@@ -8,12 +8,12 @@ function createState() {
     episodes: [
       {
         id: 'e1',
-        replication: { sourceAnalysis: { revision: 3 } },
+        replication: { sourceAnalysis: { revision: 3, characters: [] } },
         sourceVideo: { videoRef: 'data/uploads/e1.mp4' },
       },
       {
         id: 'e2',
-        replication: { sourceAnalysis: { revision: 5 } },
+        replication: { sourceAnalysis: { revision: 5, characters: [] } },
         sourceVideo: { videoRef: 'data/uploads/e2.mp4' },
       },
     ],

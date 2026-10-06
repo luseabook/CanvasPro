@@ -105,7 +105,6 @@ test('storyVideoReplicationPresentation: synchronizes one card in place', () => 
       return selector === '[data-replication-action-label]' ? actionLabel : null;
     },
   });
-  const number = createNode();
   const title = createNode();
   const duration = createNode();
   const status = createNode();
@@ -119,7 +118,6 @@ test('storyVideoReplicationPresentation: synchronizes one card in place', () => 
   const card = createNode({
     querySelector(selector) {
       if (selector === '[data-replication-loading]') return loading;
-      if (selector === '[data-story-replication-number]') return number;
       if (selector === '[data-story-replication-title]') return title;
       if (selector === '[data-story-replication-duration]') return duration;
       if (selector === '[data-story-replication-status]') return status;
@@ -149,7 +147,7 @@ test('storyVideoReplicationPresentation: synchronizes one card in place', () => 
   assert.equal(card.classList.contains('is-splitting'), true);
   assert.equal(card.getAttribute('aria-busy'), 'true');
   assert.equal(loading.hidden, false);
-  assert.equal(number.textContent, '01');
+  // 0.8.0 起卡片不再由同步函数写入集数编号（该节点已从模板移除）
   assert.equal(title.textContent, 'First');
   assert.equal(duration.textContent, '01:05');
   assert.equal(preview.disabled, false);

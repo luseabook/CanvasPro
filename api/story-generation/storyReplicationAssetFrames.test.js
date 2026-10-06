@@ -96,7 +96,7 @@ test('a null frame records a frame error instead of failing', () => {
 });
 
 test('missing or ambiguous frames abort extraction', () => {
-  const message = '场景或道具缺少原片代表画面信息，请重新提取素材。';
+  const message = '场景或道具的原片来源不明确，请核对素材。';
   assert.throws(() => attachReplicationAssetFrames(makeResult(), JSON.stringify({ assets: [] }), CONTEXT), {
     message,
   });
@@ -122,7 +122,7 @@ test('missing or ambiguous frames abort extraction', () => {
 });
 
 test('frames outside the source video or event window are rejected', () => {
-  const message = '场景或道具的原片代表时间不属于其来源视频或出场片段，请重新提取素材。';
+  const message = '场景或道具的原片代表时间不属于其来源视频或出场片段。';
   const cases = [
     [{ episodeId: 'v9', eventId: 'e1', timeSec: 1 }, {}],
     [{ episodeId: 'v1', eventId: 'e9', timeSec: 1 }, {}],

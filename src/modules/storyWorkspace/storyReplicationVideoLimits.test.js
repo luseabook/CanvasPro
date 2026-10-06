@@ -37,15 +37,15 @@ test('validateStoryReplicationVideoSize：不超过上限时通过，等于上�
 test('validateStoryReplicationVideoSize：超过上限时返回带文件名和上限的提示', () => {
   assert.deepEqual(validateStoryReplicationVideoSize({ name: '原片.mp4', size: 100 * MB + 1 }), {
     ok: false,
-    error: '“原片.mp4”超过当前模型 100MB 上限，请压缩视频或选择支持更大文件的模型。',
+    error: '“原片.mp4”超过 100MB 上限，请压缩视频后重试。',
   });
   assert.equal(
     validateStoryReplicationVideoSize({ size: 100 * MB + 1 }).error,
-    '“原视频”超过当前模型 100MB 上限，请压缩视频或选择支持更大文件的模型。',
+    '“原视频”超过 100MB 上限，请压缩视频后重试。',
   );
   assert.equal(
     validateStoryReplicationVideoSize({ name: 'big.mp4', size: 600 * MB }, 'volcengine/seedance-2.0').error,
-    '“big.mp4”超过当前模型 500MB 上限，请压缩视频或选择支持更大文件的模型。',
+    '“big.mp4”超过 500MB 上限，请压缩视频或选择支持更大文件的模型。',
   );
   assert.equal(validateStoryReplicationVideoSize({ size: 400 * MB }, 'volcengine/seedance-2.0').ok, true);
 });

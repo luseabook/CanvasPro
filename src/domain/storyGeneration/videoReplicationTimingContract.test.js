@@ -62,7 +62,8 @@ test('videoReplicationTimingContract: clip timing derives integer boundaries and
     observedBoundaries: [4],
   });
   assert.deepEqual(buildReplicationTimingContract(project, 'seedance-2.5'), {
-    unit: 'integer-seconds',
+    unit: 'seconds',
+    precision: 0.1,
     origin: 'clip-start',
     clips: [getReplicationClipTiming(clip, project, 'seedance-2.5')],
   });

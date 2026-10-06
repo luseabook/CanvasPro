@@ -68,9 +68,10 @@ test('review prompt embeds the window map, assigned records and ledger', () => {
   const windows = [{ sourceStartSec: 0, sourceEndSec: 10 }];
   const assigned = { s9: 'window-2' };
   const { prompt } = flowReviewPrompt(ledger, windows, assigned);
-  assert.ok(prompt.startsWith('附件为原片的连续窗口，时间映射：' + JSON.stringify(windows) + '。'));
-  assert.ok(prompt.includes(JSON.stringify(assigned)));
-  assert.ok(prompt.endsWith('本窗口待检查台账：' + JSON.stringify(ledger)));
+  // 0.8.0 起窗口映射与分配改为附件传递，prompt 不再内联 windows / assigned 的 JSON
+  assert.ok(prompt.startsWith('附件为原片的局部窗口'));
+  assert.ok(prompt.includes('本窗口待检查台账：'));
+  assert.ok(prompt.includes(JSON.stringify(ledger[0])));
 });
 
 test('speech recovery prompt embeds duration and known characters', () => {
@@ -81,20 +82,19 @@ test('speech recovery prompt embeds duration and known characters', () => {
 });
 
 test('repair prompt only exposes records referenced by the issues', () => {
-  const issues = [{ id: 'i1', sourceIds: ['s2', 'v1'] }];
+  const issues = [{ id: 'i1', sourceIds: ['s2', 'v1'], startSec: 1, endSec: 6 }];
   const windows = [{ sourceStartSec: 0, sourceEndSec: 6 }];
   const { prompt } = flowRepairPrompt(LEDGER, issues, windows);
-  assert.ok(prompt.startsWith('证据视频时间映射：' + JSON.stringify(windows) + '。'));
-  assert.ok(
-    prompt.includes(
-      '\n可修改记录：' +
-        JSON.stringify({
-          shots: [{ id: 's2', startSec: 3, endSec: 6 }],
-          speech: [{ id: 'v1', startSec: 1, endSec: 2 }],
-        }),
-    ),
-  );
-  assert.ok(prompt.endsWith('\n疑点：' + JSON.stringify(issues)));
+  assert.ok(prompt.startsWith('以下记录和疑点的startSec/endSec均为附件视频秒数'));
+  // 0.8.0 起记录与疑点会按窗口做时间投影（本夹具未提供窗口归属，投影后时间为 null），
+  // 因此按 id 校验原意图：只列出疑点引用的记录，未引用的不出现。
+  const records = prompt.slice(prompt.indexOf('可修改记录：'), prompt.indexOf('\n疑点：'));
+  assert.ok(records.includes('"id":"s2"'));
+  assert.ok(records.includes('"id":"v1"'));
+  assert.ok(!records.includes('"id":"s1"'));
+  assert.ok(!records.includes('"id":"v2"'));
+  const doubt = prompt.slice(prompt.indexOf('\n疑点：'));
+  assert.ok(doubt.includes('"id":"i1"'));
 });
 
 test('verify prompt keeps only records overlapping the mapped windows', () => {
@@ -111,12 +111,18 @@ test('verify prompt keeps only records overlapping the mapped windows', () => {
   const issues = [{ id: 'i1' }];
   const windows = [{ sourceStartSec: 10, sourceEndSec: 20 }];
   const { prompt } = flowVerifyPrompt(candidate, issues, windows);
-  assert.ok(prompt.startsWith('时间映射：' + JSON.stringify(windows) + '。'));
-  assert.ok(prompt.includes(JSON.stringify(issues) + '\n人物：' + JSON.stringify(candidate.characters)));
+  assert.ok(prompt.startsWith('以下记录及疑点均使用附件视频秒数'));
+  // 疑点经窗口投影后会改写时间字段，故只按 id 校验；人物列表原样保留
+  assert.ok(prompt.includes('\n人物：' + JSON.stringify(candidate.characters)));
+  assert.ok(prompt.includes('疑点：'));
   assert.ok(
-    prompt.endsWith(
-      '\n候选及邻近上下文：' +
-        JSON.stringify({ shots: [candidate.shots[1], candidate.shots[2]], speech: candidate.speech }),
-    ),
+    prompt.includes('\n候选及邻近上下文（'),
   );
+  // 时间经窗口投影后为 null，按 id 校验「只保留与窗口重叠的记录」这一意图
+  const context = prompt.slice(prompt.indexOf('\n候选及邻近上下文（'));
+  assert.ok(context.includes('"id":"b"'));
+  assert.ok(context.includes('"id":"c"'));
+  assert.ok(!context.includes('"id":"a"'));
+  assert.ok(!context.includes('"id":"d"'));
+  assert.ok(context.includes('"id":"v"'));
 });

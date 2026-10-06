@@ -13,7 +13,10 @@ import {
   projectReplicationPromptEvidence,
   serializeReplicationGenerationPrompt,
 } from './videoReplicationPromptPolicy.js';
-import { REPLICATION_INTEGER_TIMING_RULE } from './videoReplicationTimingContract.js';
+import {
+  REPLICATION_SOURCE_CUT_RULE,
+  REPLICATION_TIMING_RULE,
+} from './videoReplicationTimingContract.js';
 import { REPLICATION_CONTENT_TYPES } from './videoReplicationContentRouting.js';
 
 function makeClip() {
@@ -146,8 +149,10 @@ test('videoReplicationPromptPolicy: 序列化提示词按模式输出时间字�
   assert.equal(legacy.timingContract.unit, 'seconds');
   assert.equal(legacy.promptRoute.contentType, 'story');
   assert.equal(legacy.availableRoutes, undefined);
-  assert.ok(legacy.requirements.includes(REPLICATION_VISUAL_RULE));
-  assert.ok(!legacy.requirements.includes(REPLICATION_INTEGER_TIMING_RULE));
+  // 0.8.0 起 REPLICATION_VISUAL_RULE 只用于审查 criteria，不再进入生成 requirements
+  assert.ok(!legacy.requirements.includes(REPLICATION_VISUAL_RULE));
+  assert.ok(legacy.requirements.includes(REPLICATION_SOURCE_CUT_RULE));
+  assert.ok(!legacy.requirements.includes(REPLICATION_TIMING_RULE));
   assert.doesNotMatch(legacy.outputFormat, /"startSec"/);
   assert.deepEqual(legacy.sourceVideoEvidence.adaptation.replacements, [
     { assetId: 'a1', assetRef: 'r1', targetName: 'T', original: 'O' },
@@ -160,8 +165,8 @@ test('videoReplicationPromptPolicy: 序列化提示词按模式输出时间字�
     ),
   );
   assert.equal(continuous.episode.preparedScript, 'Script');
-  assert.equal(continuous.timingContract.unit, 'integer-seconds');
-  assert.ok(continuous.requirements.includes(REPLICATION_INTEGER_TIMING_RULE));
+  assert.equal(continuous.timingContract.unit, 'seconds');
+  assert.ok(continuous.requirements.includes(REPLICATION_TIMING_RULE));
   assert.match(continuous.outputFormat, /"startSec":局部起秒,"endSec":局部止秒,/);
 
   const unknown = JSON.parse(
@@ -252,7 +257,7 @@ test('videoReplicationPromptPolicy: 审查请求重建路线、时间合同与�
   const parsed = JSON.parse(result.prompt);
   assert.equal(parsed.task, 'review_story_episode_split_quality');
   assert.equal(parsed.episodeRef, 'ep1');
-  assert.equal(parsed.timingContract.unit, 'integer-seconds');
+  assert.equal(parsed.timingContract.unit, 'seconds');
   assert.equal(parsed.timingContract.clips[0].ref, 'c1');
   assert.deepEqual(parsed.sourceVideoEvidence.events, [{ id: 'e1' }]);
   assert.equal(parsed.sourceVideoEvidence.segmentPlan, undefined);
@@ -261,7 +266,7 @@ test('videoReplicationPromptPolicy: 审查请求重建路线、时间合同与�
   assert.equal(parsed.promptRoute.contentType, 'story');
   assert.equal(
     parsed.outputContract,
-    'base contract；复刻 shots 还须原样保留 sceneKey、textElements、spatialStart、spatialEnd。',
+    'base contract；复刻片段保留 creativeIntent，shots 还须原样保留 sourceShotId、shootingContent、sceneKey、sceneVisualStyle、textElements、spatialStart、spatialEnd。',
   );
   assert.equal(parsed.batchRef, 'batch-1');
   assert.equal(parsed.phase, 'review');
@@ -269,7 +274,7 @@ test('videoReplicationPromptPolicy: 审查请求重建路线、时间合同与�
   assert.deepEqual(parsed.localSignals, { tone: 'x' });
   assert.ok(parsed.criteria.includes(REPLICATION_VISUAL_RULE));
   assert.ok(result.systemPrompt.includes('你在核对已识别的原片证据'));
-  assert.ok(result.systemPrompt.includes(REPLICATION_INTEGER_TIMING_RULE));
+  assert.ok(result.systemPrompt.includes(REPLICATION_TIMING_RULE));
   assert.ok(result.systemPrompt.includes('en'));
 });
 
@@ -323,7 +328,7 @@ test('videoReplicationPromptPolicy: 修补请求去掉 timingBudget 并锁定原
   assert.ok(parsed.instruction.includes(REPLICATION_VISUAL_RULE));
   assert.ok(parsed.instruction.includes(REPLICATION_SPEECH_OUTPUT_RULE));
   assert.ok(result.systemPrompt.includes('局部纠错员'));
-  assert.ok(!result.systemPrompt.includes(REPLICATION_INTEGER_TIMING_RULE));
+  assert.ok(!result.systemPrompt.includes(REPLICATION_TIMING_RULE));
 });
 
 test('videoReplicationPromptPolicy: 修补时间校验锁定引用、时长、切点与整数秒', () => {
@@ -410,7 +415,7 @@ test('videoReplicationPromptPolicy: 修补时间校验锁定引用、时长、�
         project,
         { promptMode: 'seedance-2.5' },
       ),
-    /片段局部连续整数秒/,
+    /复刻修补不得移动或删除已有镜头切点/,
   );
   assert.throws(
     () =>

@@ -28,7 +28,7 @@ test('videoReplicationFlowPrompt: resolves mode-specific duration limits', () =>
   );
   assert.throws(
     () => resolveReplicationFlowOptions({ promptMode: 'unsupported' }),
-    /仅支持 Seedance 2\.0 \/ 2\.5/u,
+    /当前复刻草稿编译不支持所选提示词模式/u,
   );
   assert.throws(
     () =>
@@ -93,14 +93,12 @@ test('videoReplicationFlowPrompt: builds a complete prompt from source shots and
   assert.equal(result.promptShots.length, 1);
   assert.deepEqual(result.promptShots[0].sourceShotIds, ['shot-1']);
   assert.equal(result.promptShots[0].speechFragments.length, 1);
-  assert.match(result.prompt, /^生成5\.0秒视频。/u);
   assert.match(result.prompt, /人物：Alice（红大衣）/u);
-  assert.match(result.prompt, /分镜1 ⏱ 5\.0s/u);
-  assert.match(result.prompt, /画面：Alice走入房间/u);
-  assert.match(result.prompt, /镜头：中景固定镜头。/u);
-  assert.match(result.prompt, /环境音：雨声。/u);
-  assert.match(result.prompt, /同期人声（本片段1\.0-2\.0秒）/u);
-  assert.match(result.prompt, /Alice说：“你好”/u);
+  assert.doesNotMatch(result.prompt, /^生成5\.0秒视频。/u);
+  assert.match(result.prompt, /镜头1（0\.0-5\.0秒）：【中景固定镜头】/u);
+  assert.match(result.prompt, /拍摄内容：Alice走入房间/u);
+  assert.match(result.prompt, /<雨声>/u);
+  assert.match(result.prompt, /Alice说：\{你好\}/u);
 });
 
 test('videoReplicationFlowPrompt: integer timing and shot speech keep short prompts readable', () => {
@@ -146,7 +144,7 @@ test('videoReplicationFlowPrompt: integer timing and shot speech keep short prom
     },
   );
 
-  assert.match(result.prompt, /^生成2秒视频。/u);
-  assert.match(result.prompt, /Alice画外音：“出发了”/u);
+  assert.match(result.prompt, /镜头1（0\.0-2\.0秒）：【固定镜头】/u);
+  assert.match(result.prompt, /Alice画外音：\{出发了\}/u);
   assert.doesNotMatch(result.prompt, /同期人声/u);
 });

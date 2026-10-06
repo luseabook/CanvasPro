@@ -79,7 +79,8 @@ test('videoReplicationVisualDelivery projects contiguous observed shots', () => 
   assert.equal(shots.length, 2);
   assert.equal(shots[0].visual, 'Alice enters.');
   assert.equal(shots[1].camera, 'close shot');
-  assert.equal(shots[0].audio, 'wind');
+  // 0.8.0 起观察镜头投影会显式清空 sound（音频改由语音管线提供），此处不再保留 event 级 sound
+  assert.equal(shots[0].audio, '');
   assert.deepEqual(shots[0].replicationSourceShotIds, ['observed-1']);
   assert.deepEqual(shots[0].assetUsages, [
     { assetRef: 'asset-ref-1', appearanceRef: 'appearance-1' },
