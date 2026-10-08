@@ -4,6 +4,8 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-08（180 批·**Agnes 四缺陷修复**）：① `server.py` 按 **host** 豁免 Agnes 同步图像端点（APIMart 共用 path 仍短路）；② `modelProviderProfileSelection.js`/`ModelApiManifestNormalizer.js`/`aiTextApi.js` 让生成按声明档选 provider；③ 视频轮询改官方 `GET /agnesapi?video_id=<VIDEO_ID>`（不是 task_id）；④ 补 `agnes-video-2.5`/`2.5-flash`。另复活 `pollIntervalMs`/`continuePollingOnSuccessWithoutResult` 两处死代码。
+  **验证**：全量 JS **11237/11223/14**（14 例既有失败 `installerSafety` 3 + `deobf-gate` 11，与本改无关）；新增 Python 5 / providerProfile 6 / profileSelection 31 全过；受保护 `freeImageHostApi.js` MD5 未变。已提交 `f834fb27` 并双推 `origin`+`luseabook`。
 - 2026-10-06（179 批·**安装版可用性：根因 + 四件修复**）：**根因**：SHUO Canvas 命令行写明 `--user-data-dir=%APPDATA%\AI Canvas Pro`，与本仓
   production 目录同名；共用即单实例锁互斥，后启动者静默 `exit(0)`（`main.js:244`），其后端占住 8777。**修复**：目录改 `CanvasPro`、
   端口改 8790（`AICANVAS_PORT` 可覆盖）；卸载脚本改用 .NET SHA256（基线红测）；引导 JS+CSS 齐 0.8.0。

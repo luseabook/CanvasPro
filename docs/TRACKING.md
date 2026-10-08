@@ -3,7 +3,7 @@
 > **新对话只读这一份就能接手，不要通读项目。** 本文件体积 ≤45 KB、单行 ≤400 字，一次 `read_files` 就能读完。
 > 入口链：用户只需说「读一下项目文档」→ `README.md` 顶部或 `AGENTS.md` → 本文件。所有文件改动都会自动记录（§12）。
 > **当前状态：跟踪机制已按用户要求暂停（2026-09-29）。不要运行开工、改动或收工登记，也不要恢复自动监视。**
-> 最后更新：2026-10-08（第 180 批·Agnes 四缺陷修复）。跟踪机制自 2026-09-29 起停用；提交与推送状态见 §5。124a–f 曾用的 `port/batches-1-122a` 分支 2026-09-28 经授权本地与远端双删（3c3b3ae 可恢复）。
+> 最后更新：2026-10-08（第 181 批·i2i 与 CSP 修复）。跟踪机制自 2026-09-29 起停用；提交与推送状态见 §5。124a–f 曾用的 `port/batches-1-122a` 分支 2026-09-28 经授权本地与远端双删（3c3b3ae 可恢复）。
 > 第 125k–141 批落首波 135 件 510 例；未落地 771 **已清零**（142 批复算：镜像 0 缺失）。130 发现 `core/math.js` 死循环。见 `docs/b126-reachability.md`。
 > 余 **200 个未接线孤立模块**（现行口径 200/1992；§7.6）。
 > **⚠ 第 158/165 批：代际漂移（未改动源码）**——已安装应用升至 **0.8.0**（镜像 `shuo-deobf-080`）；比 0.7.16 **+184 新增、455 件有变**（165 批 token 口径复算 429 件，184 一致）。**156 批待裁决项作废**；**标尺切换 A/B/C 至今无裁决记录**，而 161–164 批继续按 0.7.16 推进。
@@ -19,7 +19,7 @@
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
 - **进度**：第1–123批已提交推送；124a–f 业务代码与末尾记账（8fafc80、ba8e9b4、3b8fc6e、3c3b3ae）均已推远端移植分支，远端 master 未更新；124g/124h 至 141 共 307 件新模块未提交（工作树 614 个未跟踪 src 文件）。R01–R26 **都没有完成**（§6）；不把模块落地或推送成功误写成功能已完成。
-- **本批（2026-10-08，第 180 批）**：Agnes 四缺陷修复落地，改的是**在用**生成链路：① 后端按 host 豁免 Agnes 同步图像端点；② 生成按声明档选线路；③ 视频轮询改官方 `/agnesapi?video_id=`；④ 补 `agnes-video-2.5`/`2.5-flash`。细节见 `docs/agnes-provider-line-fix.md`；已双推 `origin`+`luseabook`。
+- **本批（2026-10-08，第 181 批）**：真机复跑第 180 批时暴露并修复两个新缺陷（**改在用链路**）：图生图 base64 响应未被提取（提取器不读 `base64Paths`）+ `data:`/`blob:` 本地保存被 CSP 拦截。细节见 `docs/agnes-i2i-and-csp-fix.md`；③ 视频终态 url 因账户余额 ￥0 仍 BLOCKED。
 - **必须清楚的偏差**：第 84 批以来的新增移植多数是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
   - 增量台账（`docs/tracking/orphans.md`）**已实测重算**：现行口径 **200 不可达 / 1992 模块**（断链 0；方法见 `docs/b126-reachability.md`）。旧的 483/1238 是更窄口径，**不可直接相减**。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
@@ -193,7 +193,7 @@ node tools/tracking/track.mjs --status
 | 移植欠账 | 第 127 批实测原欠账 **771**；第 128–141 批落首波 135 件（510 例）。**第 142 批复算已清零**：镜像范围 1754 件仓库 0 缺失、首波闸门 `MISSING_TOTAL=0`。剩余 **200 个未接线孤立模块**（第 150–157 批接 167 件、第 161 批接 1 件），方案见 `docs/porting-closure-and-wiring-plan.md`。**第 161 批实测：逐件接线已到收益极限**（见 `docs/b161-consumer-upgrade-sweep.md`） |
 | 变更记录 | `docs/tracking/changes/2026-09.md`（基线 #0001 纳入 1824 个文件）；最新编号用 `track.mjs --status` 查看 |
 | 台账 | `docs/implementation-handoff.md`，1 325 173 B / 1773 行，**已冻结**（§8 第 3 条） |
-| 第 180 批回归（2026-10-08） | 全量 JS `run-full-tests.mjs --js-only`：**11237/11223/14**，14 例为既有失败（`installerSafety` 3 + `deobf-gate` 11，零引用本改文件）；新增 Python 5 / providerProfile 6 / profileSelection 31 全过；受保护 `freeImageHostApi.js` MD5 未变 |
+| 第 180–181 批回归（2026-10-08） | 全量 JS `run-full-tests.mjs --js-only`：**11242/11228/14**，14 例既有失败（`installerSafety` 3 + `deobf-gate` 11，同 180 批基线失败集）；181 新增 5 例全过；`check-csp` PASS；受保护 `freeImageHostApi.js` MD5 未变 |
 
 ## 6. R01–R26 进度（精简版；原表在台账第 1499–1527 行）
 
@@ -371,8 +371,9 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-08（180 批·**Agnes 四缺陷修复**）：① `server.py` 按 **host** 豁免 Agnes 同步图像端点（APIMart 共用 path 仍短路）；② `modelProviderProfileSelection.js`/`ModelApiManifestNormalizer.js`/`aiTextApi.js` 让生成按声明档选 provider；③ 视频轮询改官方 `GET /agnesapi?video_id=<VIDEO_ID>`（不是 task_id）；④ 补 `agnes-video-2.5`/`2.5-flash`。另复活 `pollIntervalMs`/`continuePollingOnSuccessWithoutResult` 两处死代码。
-  **验证**：全量 JS **11237/11223/14**（14 例既有失败 `installerSafety` 3 + `deobf-gate` 11，与本改无关）；新增 Python 5 / providerProfile 6 / profileSelection 31 全过；受保护 `freeImageHostApi.js` MD5 未变。已提交 `f834fb27` 并双推 `origin`+`luseabook`。
+- 2026-10-08（181 批·**i2i base64 + CSP 本地保存**）：真机复跑 180 批暴露两个新缺陷。**A** `api/aiImageApi.js` 提取器只读 `resultPaths`、**不读 `base64Paths`**（会解码的 `resolveMappedImageResponseValues` 只被未接线的 `ManifestResultRenderer.js` 用）→ 补 manifest 的 `base64Paths`/`base64DefaultMimeType` 并让两处提取器改用它（Agnes i2i 才解得着图）。
+  **B** `index.html` CSP 的 `connect-src` 缺 `data:` → `data:`/`blob:` 本地保存被拦；放行为 `'self' data: blob: http: https:`，`check-csp.mjs` 加断言防回退。
+  **验证**：全量 JS **11242/11228/14**（14 例既有失败与本改无关）；新增 5 例全过；`check-csp` PASS；真机 i2i 端到端 PASS；③ 视频终态 url 仍 BLOCKED（余额 ￥0）。见 `docs/agnes-i2i-and-csp-fix.md`。
 
 ## 12. 变更记录机制（**已冻结**）
 

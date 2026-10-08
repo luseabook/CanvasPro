@@ -26,6 +26,11 @@ const AGNES_IMAGE_INPUT_SLOTS = Object.freeze({
     statusPath: 'status',
     errorPath: Object.freeze(['error.message', 'message', 'error']),
     resultPaths: Object.freeze(['data[].url', 'data.url', 'results[].url', 'results[].imageUrl', 'url']),
+    // Agnes returns a base64 payload when a reference image is supplied (extra_body.response_format
+    // is forced to "b64_json" by the agnesImage body resolver), so the extractor must also be able to
+    // read data[].b64_json and turn it into a usable data URL.
+    base64Paths: Object.freeze(['data[].b64_json']),
+    base64DefaultMimeType: 'image/png',
   }),
   AGNES_IMAGE_MODELS = Object.freeze([
     Object.freeze({

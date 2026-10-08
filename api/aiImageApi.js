@@ -15,7 +15,10 @@ import {
   buildImageRequestFromManifest,
   resolveManifestTaskPolling,
 } from './adapters/ModelApiManifestNormalizer.js';
-import { resolveMappedResponseValue, resolveMappedResponseValues } from './adapters/modelApiMappingEngine.js';
+import {
+  resolveMappedImageResponseValues,
+  resolveMappedResponseValue,
+} from './adapters/modelApiMappingEngine.js';
 import { ensureConfig, getProviderConfig } from './configApi.js';
 import { applyCameraAngleToPrompt } from './cameraPromptApi.js';
 import { processInputImages, processInputImagesPreserveOrder } from './imageUploadApi.js';
@@ -213,7 +216,7 @@ function collectDeepMediaUrls(list5, count3 = 0, map = new WeakSet()) {
   return Array.from(new Set(list6.filter(Boolean)));
 }
 function extractImageUrls(response, value19 = null) {
-  const list7 = resolveMappedResponseValues(response, value19?.resultPaths);
+  const list7 = resolveMappedImageResponseValues(response, value19);
   if (list7.length > 0) return list7;
   const list8 = [];
   if (response.data?.result?.images && Array.isArray(response.data.result.images))
@@ -422,7 +425,7 @@ function extractImageResultRecords(value33, value34 = null) {
     const list11 = list10.map((item8) => normalizeImageResultRecordItem(item8)).filter(Boolean);
     if (list11.length > 0) return list11;
   }
-  const list12 = resolveMappedResponseValues(value33, value34?.resultPaths);
+  const list12 = resolveMappedImageResponseValues(value33, value34);
   if (list12.length > 0) return list12.map((sourceUrl2) => ({ sourceUrl: sourceUrl2, error: '' }));
   return extractImageUrls(value33, value34).map((sourceUrl3) => ({ sourceUrl: sourceUrl3, error: '' }));
 }

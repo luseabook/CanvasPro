@@ -100,6 +100,23 @@ assert(
   "script-src 需包含 'unsafe-hashes' 以配合 sha256 精确放行内联事件处理器",
 );
 
+// connect-src 必须放行 data: 与 blob:。渲染端保存本地图片时，会把已解码的
+// data:image/...;base64,... 交给 fetchRemoteBlob → fetch 去读取（本地保存路径见
+// src/services/projectService.js 的 data:/blob: 分支）。这两个来源都是本地 URL、
+// 无网络外发，与 img-src / media-src 早已放行的来源保持一致；若将来收紧 CSP 漏掉它们，
+// 会静默破坏本地图片保存，故在此钉住。
+const connectSrcDirective = directives.find((part) => /^connect-src\b/i.test(part)) ?? '';
+assert(Boolean(connectSrcDirective), 'CSP 缺少 connect-src 指令');
+const connectSrcSources = connectSrcDirective.replace(/^connect-src\s*/, '');
+assert(
+  /(?:^|\s)data:(?:\s|$)/.test(connectSrcSources),
+  'connect-src 必须包含 data:（本地图片 base64 保存依赖 fetch(data:...)）',
+);
+assert(
+  /(?:^|\s)blob:(?:\s|$)/.test(connectSrcSources),
+  'connect-src 必须包含 blob:（本地 Blob 图片保存依赖 fetch(blob:...)）',
+);
+
 // The meta must precede every external script so the policy applies before load.
 const firstScriptIndex = html.search(/<script\b/i);
 const cspIndex = cspTagMatch ? html.indexOf(cspTagMatch[0]) : -1;
@@ -220,7 +237,7 @@ if (failures.length > 0) {
   process.exitCode = 1;
 } else {
   console.log(
-    `PASS  CSP 静态门禁：script-src 严格（无 'unsafe-inline'），` +
+    `PASS  CSP 静态门禁：script-src 严格（无 'unsafe-inline'），connect-src 放行 data:/blob:，` +
       `index.html 无内联脚本/事件处理器/javascript:，源码无 eval/new Function，` +
       `内联处理器哈希匹配（${computedToken}）；` +
       `覆盖窗口（screenshotOverlay / globalCaptureWindow）均无内联脚本且 script-src 严格。`,
