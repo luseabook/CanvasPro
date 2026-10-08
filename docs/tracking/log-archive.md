@@ -3,6 +3,9 @@
 > 由 `docs/TRACKING.md` §9 第 4 条维护：TRACKING.md §11 只保留最新 10 条，挤出来的旧日志移到这里，最新的在上。
 > 只追加，不改写已有内容。
 
+- 2026-10-08（182 批·**Agnes 视频轮询线路修复 + ③ 结论更正**）：**更正**——第 180 批把 ③ 判为「余额 ￥0 BLOCKED」是误判：￥0 下文本/图像/flash 视频均实测可用，仅非 flash `agnes-video-2.5` 需付费额度。**真缺陷**——清单 `provider` 恒为 `'agnes'`，创建按档取 Key 而轮询用裸 `getProviderConfig('agnes')`，只配国内档时 Bearer 为空，后端回 400（真机创建 200 后 3.1s 失败）。
+  **修法**：`aiVideoApi.js` 轮询改走与创建同一套「按档 + 档位就绪」解析（runninghub / 无档位厂商不变）。**验证**：全量 JS **11244/11230/14**（14 例既有失败同前）；新增 2 例（修复前红：Bearer 空）；视频套件 314/314；真机只配国内档 **③ PASS**（`ok:true,152.4s`）。见 `docs/agnes-video-poll-profile-fix.md`。
+
 
 - 2026-10-08（181 批·**i2i base64 + CSP 本地保存**）：真机复跑 180 批暴露两个新缺陷。**A** `api/aiImageApi.js` 提取器只读 `resultPaths`、**不读 `base64Paths`**（会解码的 `resolveMappedImageResponseValues` 只被未接线的 `ManifestResultRenderer.js` 用）→ 补 manifest 的 `base64Paths`/`base64DefaultMimeType` 并让两处提取器改用它（Agnes i2i 才解得着图）。**B** `index.html` CSP 的 `connect-src` 缺 `data:` → `data:`/`blob:` 本地保存被拦；放行为 `'self' data: blob: http: https:`，`check-csp.mjs` 加断言防回退。
   **验证**：全量 JS **11242/11228/14**（14 例既有失败与本改无关）；新增 5 例全过；`check-csp` PASS；真机 i2i 端到端 PASS。~~③ 视频终态 url 仍 BLOCKED（余额 ￥0）~~ → **该结论是误判**：第 182 批复核为「轮询丢 Key」，已修并真机 PASS。见 `docs/agnes-i2i-and-csp-fix.md`、`docs/agnes-video-poll-profile-fix.md`。

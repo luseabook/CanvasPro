@@ -369,10 +369,9 @@ node tools/tracking/track.mjs --status
 - **工程与保存**：`src/modules/CanvasTabManager.js`、`src/modules/app/projectLifecycle.js`、`src/services/projectService.js`、`src/services/desktopProjectService.js`、`electron/projectPackageService.js`。
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
-## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-08（182 批·**Agnes 视频轮询线路修复 + ③ 结论更正**）：**更正**——第 180 批把 ③ 判为「余额 ￥0 BLOCKED」是误判：￥0 下文本/图像/flash 视频均实测可用，仅非 flash `agnes-video-2.5` 需付费额度。**真缺陷**——清单 `provider` 恒为 `'agnes'`，创建按档取 Key 而轮询用裸 `getProviderConfig('agnes')`，只配国内档时 Bearer 为空，后端回 400（真机创建 200 后 3.1s 失败）。
-  **修法**：`aiVideoApi.js` 轮询改走与创建同一套「按档 + 档位就绪」解析（runninghub / 无档位厂商不变）。**验证**：全量 JS **11244/11230/14**（14 例既有失败同前）；新增 2 例（修复前红：Bearer 空）；视频套件 314/314；真机只配国内档 **③ PASS**（`ok:true,152.4s`）。见 `docs/agnes-video-poll-profile-fix.md`。
+- 2026-10-09（183 批·**管理后台接入客户端 + 换牌残留修复**）：① `tutorialCatalog.js:1` 的 `CONTENT_ORIGIN` 仍是旧域名 `https://api.ashuoai.com`（教程拉不到）→ `https://api.1e1e.cn`，可由后台 `content_sources.tutorialOrigin` 覆盖。② `subscription_client.py` 新增 `normalize_structured_config()`，解析后台 10 个结构化命名空间。③ 新增 `admin_content_gateway.py` + `/api/v2/admin-content/*` + `api/adminContentApi.js`：公告/更新/目录/推广位/门禁/工单/优惠码/事件，TTL 缓存 + 离线降级 + 脏数据裁剪。④ 新增 `brandIdentity.js` + `clientConfigStore.js`；`http_route_dispatcher` 加 `contact_overrides_getter`，后台 brand/contact 优先于硬编码。⑤ `set_remote_subscription_gates()`：后台门禁为权威来源，本地 manifest 退化兜底（FR-2.3）。**验证**：JS **11275/11261/14**（既有失败同前）；后端 219；两门禁 PASS。
 
 ## 12. 变更记录机制（**已冻结**）
 

@@ -7,6 +7,7 @@ import {
   normalizeTutorialCatalog,
   createBundledTutorialCatalog,
   getTutorialPlayback,
+  resolveTutorialOrigin,
 } from './tutorialCatalog.js';
 
 const CATEGORIES = [
@@ -437,4 +438,47 @@ test('normalizeTutorialCatalog enforces the sort cap and the text length caps', 
     () => normalizeTutorialCatalog(baseCatalog({ updates: [update({ notes: 'x'.repeat(12001) })] })),
     /教程内容格式无效/,
   );
+});
+
+test('CONTENT_ORIGIN points at the current brand domain, not the legacy one', () => {
+  // 换牌时这里漏改过一次（曾是 https://api.ashuoai.com），教程因此永远拉不到。
+  assert.equal(CONTENT_ORIGIN, 'https://api.1e1e.cn');
+  assert.ok(!CONTENT_ORIGIN.includes('ashuoai'));
+});
+
+test('resolveTutorialOrigin prefers the admin-configured origin', () => {
+  assert.equal(
+    resolveTutorialOrigin({ content_sources: { tutorialOrigin: 'https://cdn.example.com' } }),
+    'https://cdn.example.com',
+  );
+  // 驼峰别名（本地覆盖文件常见写法）
+  assert.equal(
+    resolveTutorialOrigin({ contentSources: { tutorialOrigin: 'https://cdn.example.com' } }),
+    'https://cdn.example.com',
+  );
+});
+
+test('resolveTutorialOrigin falls back for missing or unsafe values', () => {
+  for (const value of [
+    undefined,
+    null,
+    {},
+    { content_sources: {} },
+    { content_sources: { tutorialOrigin: '' } },
+    { content_sources: { tutorialOrigin: 'http://insecure.example.com' } },
+    { content_sources: { tutorialOrigin: 'https://user:pw@example.com' } },
+    { content_sources: { tutorialOrigin: 'javascript:alert(1)' } },
+    { content_sources: { tutorialOrigin: 42 } },
+  ]) {
+    assert.equal(resolveTutorialOrigin(value), CONTENT_ORIGIN);
+  }
+});
+
+test('tutorialUrl resolves covers against a caller-supplied origin', () => {
+  const cover = '/api/subscription/canvas-content/covers/a.png';
+  assert.equal(tutorialUrl(cover, { cover: true, origin: 'https://cdn.example.com' }),
+    'https://cdn.example.com' + cover);
+  // 非法 origin 退回内置源，而不是打到陌生站点
+  assert.equal(tutorialUrl(cover, { cover: true, origin: 'http://evil.example.com' }),
+    CONTENT_ORIGIN + cover);
 });

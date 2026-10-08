@@ -46,6 +46,7 @@ class HttpRouteDispatcher:
         json_err,
         send_route_response,
         read_body,
+        contact_overrides_getter=None,
     ):
         self.local_version = str(local_version or "")
         self._is_dev_build = is_dev_build
@@ -69,10 +70,30 @@ class HttpRouteDispatcher:
         self._default_sub_contact_text = str(default_sub_contact_text or "")
         self._default_sub_contact_url = str(default_sub_contact_url or "")
         self._default_sub_contact_wechat = str(default_sub_contact_wechat or "")
+        # 后台下发的联系方式（client-config 的 contact 命名空间）优先于环境变量与内置兜底。
+        # 用 getter 而不是构造期快照：配置是运行时才拉得到的，启动时还没有。
+        self._get_contact_overrides = (contact_overrides_getter
+                                       if callable(contact_overrides_getter) else None)
         self._json_ok = json_ok
         self._json_err = json_err
         self._send_route_response = send_route_response
         self._read_body = read_body
+
+    def _contact(self, field):
+        """联系方式取值：后台配置 > 环境变量/内置默认值。"""
+        if self._get_contact_overrides:
+            try:
+                overrides = self._get_contact_overrides() or {}
+            except Exception:
+                overrides = {}
+            value = str(overrides.get(field) or "").strip()
+            if value:
+                return value
+        return {
+            "text": self._default_sub_contact_text,
+            "url": self._default_sub_contact_url,
+            "wechat": self._default_sub_contact_wechat,
+        }.get(field, "")
 
     @classmethod
     def _parse_query(cls, raw_path, *, max_num_fields):
@@ -114,12 +135,12 @@ class HttpRouteDispatcher:
             or target.get("wechat_id")
             or ""
         ).strip()
-        if not has_contact_text and self._default_sub_contact_text:
-            target["contactText"] = self._default_sub_contact_text
-        if not has_contact_url and self._default_sub_contact_url:
-            target["contactUrl"] = self._default_sub_contact_url
-        if not has_contact_wechat and self._default_sub_contact_wechat:
-            target["contactWechat"] = self._default_sub_contact_wechat
+        if not has_contact_text and self._contact("text"):
+            target["contactText"] = self._contact("text")
+        if not has_contact_url and self._contact("url"):
+            target["contactUrl"] = self._contact("url")
+        if not has_contact_wechat and self._contact("wechat"):
+            target["contactWechat"] = self._contact("wechat")
         return result
 
     def _subscription_missing_payload(self, *, message):
@@ -128,9 +149,9 @@ class HttpRouteDispatcher:
             "status": self._sub_status_none,
             "errorCode": self._sub_error_invalid_arguments,
             "message": str(message or ""),
-            "contactText": self._default_sub_contact_text,
-            "contactUrl": self._default_sub_contact_url,
-            "contactWechat": self._default_sub_contact_wechat,
+            "contactText": self._contact("text"),
+            "contactUrl": self._contact("url"),
+            "contactWechat": self._contact("wechat"),
         }
 
     def _subscription_unavailable_payload(self):
@@ -139,9 +160,9 @@ class HttpRouteDispatcher:
             "status": self._sub_status_none,
             "errorCode": "SUBSCRIPTION_SERVICE_UNAVAILABLE",
             "message": SUBSCRIPTION_NETWORK_HELP_MESSAGE,
-            "contactText": self._default_sub_contact_text,
-            "contactUrl": self._default_sub_contact_url,
-            "contactWechat": self._default_sub_contact_wechat,
+            "contactText": self._contact("text"),
+            "contactUrl": self._contact("url"),
+            "contactWechat": self._contact("wechat"),
         }
 
     def _activation_missing_payload(self):
@@ -149,9 +170,9 @@ class HttpRouteDispatcher:
             "success": False,
             "errorCode": self._sub_error_invalid_arguments,
             "message": "Missing installId or cdkey",
-            "contactText": self._default_sub_contact_text,
-            "contactUrl": self._default_sub_contact_url,
-            "contactWechat": self._default_sub_contact_wechat,
+            "contactText": self._contact("text"),
+            "contactUrl": self._contact("url"),
+            "contactWechat": self._contact("wechat"),
         }
 
     def _runtime_info_payload(self):

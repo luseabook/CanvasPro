@@ -1,4 +1,25 @@
-export const CONTENT_ORIGIN = 'https://api.ashuoai.com';
+// 教程/更新说明的内容源。原先这里是换牌前遗留的旧品牌域名 https://api.ashuoai.com，
+// 与授权域名（server.py 的 OFFICIAL_SUBSCRIPTION_API_BASE）不一致，导致教程永远拉不到。
+// 现在与授权域名对齐，并可由后台 client-config 的 content_sources.tutorialOrigin 覆盖
+// ——见 resolveTutorialOrigin()。
+export const CONTENT_ORIGIN = 'https://api.1e1e.cn';
+
+// 只接受「纯 https 源站」：不带路径/查询、不带端口以外的冒号、不含用户信息。
+// 排除 @ 是关键——否则 https://user:pw@evil.example.com 会被当成合法内容源。
+const HTTPS_ORIGIN_PATTERN = /^https:\/\/[^\s/?#@]+(?::\d+)?$/;
+
+/**
+ * 从后台下发的客户端配置里解析教程内容源。
+ *
+ * 后台把 content_sources.tutorialOrigin 校验成「无用户信息的 HTTPS URL」后才下发，
+ * 这里仍然再兜一层：非法的配置一律退回内置源，绝不让脏配置把教程打到陌生站点。
+ */
+export function resolveTutorialOrigin(clientConfig) {
+  const candidate = clientConfig?.content_sources?.tutorialOrigin ?? clientConfig?.contentSources?.tutorialOrigin;
+  if (typeof candidate !== 'string') return CONTENT_ORIGIN;
+  const origin = candidate.trim().replace(/\/+$/, '');
+  return HTTPS_ORIGIN_PATTERN.test(origin) ? origin : CONTENT_ORIGIN;
+}
 const DEFAULT_CATEGORIES = [
   ['guide', 'API 接入指南', 'list'],
   ['basic', '画布基础', 'list'],
@@ -41,19 +62,22 @@ export function normalizeTutorialCategories(list = DEFAULT_CATEGORIES) {
   if (DEFAULT_CATEGORIES.some((value) => !map.has(value.id))) throw new Error('内置分类缺失');
   return list2.sort((list3, list4) => list3.sort - list4.sort);
 }
-export function tutorialUrl(list5, { cover: cover = false } = {}) {
+export function tutorialUrl(list5, { cover: cover = false, origin: origin = CONTENT_ORIGIN } = {}) {
   if (typeof list5 !== 'string' || list5.length > 2048) return '';
+  const base = HTTPS_ORIGIN_PATTERN.test(String(origin || '').trim().replace(/\/+$/, ''))
+    ? origin.trim().replace(/\/+$/, '')
+    : CONTENT_ORIGIN;
   try {
     const uRL = new URL(
       list5,
-      cover && list5.startsWith('/api/subscription/canvas-content/covers/') ? CONTENT_ORIGIN : undefined,
+      cover && list5.startsWith('/api/subscription/canvas-content/covers/') ? base : undefined,
     );
     return uRL.protocol === 'https:' && !uRL.username && !uRL.password ? uRL.href : '';
   } catch {
     return '';
   }
 }
-export function normalizeTutorialCatalog(enabled) {
+export function normalizeTutorialCatalog(enabled, { origin: origin = CONTENT_ORIGIN } = {}) {
   if (
     !enabled ||
     enabled.schemaVersion !== 1 ||
@@ -119,8 +143,10 @@ export function normalizeTutorialCatalog(enabled) {
       map2.add(id3);
       const next = { id: id3, enabled: enabled2.enabled, sort: enabled2.sort };
       if (source !== 'updates') {
-        const videoUrl = tutorialUrl(enabled2.videoUrl),
-          coverUrl = enabled2.coverUrl ? tutorialUrl(enabled2.coverUrl, { cover: true }) : '';
+        const videoUrl = tutorialUrl(enabled2.videoUrl, { origin: origin }),
+          coverUrl = enabled2.coverUrl
+            ? tutorialUrl(enabled2.coverUrl, { cover: true, origin: origin })
+            : '';
         if (
           !videoUrl ||
           (enabled2.coverUrl && !coverUrl) ||

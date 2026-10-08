@@ -1,12 +1,23 @@
-import { CONTENT_ORIGIN, normalizeTutorialCatalog } from '../src/modules/tutorials/tutorialCatalog.js';
-export async function fetchTutorialContent({ signal: signal, timeout: timeout = 8000 } = {}) {
+import {
+  CONTENT_ORIGIN,
+  normalizeTutorialCatalog,
+} from '../src/modules/tutorials/tutorialCatalog.js';
+
+/**
+ * 拉取教程/更新说明目录。
+ *
+ * origin 默认取内置内容源；后台可通过 client-config 的
+ * content_sources.tutorialOrigin 改写（见 resolveTutorialOrigin），
+ * 这样换内容源不用发版。
+ */
+export async function fetchTutorialContent({ signal: signal, timeout: timeout = 8000, origin: origin = CONTENT_ORIGIN } = {}) {
   const signal2 = new AbortController(),
     handler = () => signal2.abort();
   if (signal?.aborted) handler();
   signal?.addEventListener('abort', handler, { once: true });
   const setTimeout2 = setTimeout(handler, timeout);
   try {
-    const response = await fetch(CONTENT_ORIGIN + '/api/subscription/canvas-content', {
+    const response = await fetch(origin + '/api/subscription/canvas-content', {
       cache: 'no-store',
       credentials: 'omit',
       signal: signal2.signal,
@@ -14,7 +25,7 @@ export async function fetchTutorialContent({ signal: signal, timeout: timeout = 
     if (!response.ok) throw new Error('教程加载失败 (' + response.status + ')');
     const list = await response.text();
     if (list.length > 4 * 1024 * 1024) throw new Error('教程内容过大');
-    return normalizeTutorialCatalog(JSON.parse(list));
+    return normalizeTutorialCatalog(JSON.parse(list), { origin: origin });
   } finally {
     (clearTimeout(setTimeout2), signal?.removeEventListener('abort', handler));
   }

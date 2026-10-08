@@ -62,6 +62,7 @@ from backend.services.library_file_route_service import LibraryFileRouteService
 from backend.services.media_file_route_service import MediaFileRouteService
 from backend.services.local_media_processing_route_service import LocalMediaProcessingRouteService
 from backend.services.remote_proxy_route_service import RemoteProxyRouteService
+from backend.services.admin_content_gateway import AdminContentGateway
 from backend.services.subscription_gate_service import SubscriptionGateService
 from backend.services.subscription_gate_manifest import (
     get_runninghub_subscription_workflow_ids,
@@ -69,6 +70,7 @@ from backend.services.subscription_gate_manifest import (
     get_subscription_gate_model_ids,
     get_subscription_gate_model_name_map,
     normalize_subscription_gate_model_id,
+    set_remote_subscription_gates,
 )
 from backend.services.subscription_client import SubscriptionRemoteClient
 from backend.services.dreamina_cli_service import DreaminaCliService
@@ -1071,6 +1073,12 @@ SUBSCRIPTION_GATE_SERVICE = SubscriptionGateService(
     model_id_normalizer=normalize_subscription_gate_model_id,
     success_logger=lambda decision: print("[subscription][vip_gate] first VIP verification passed"),
 )
+# 后台运营内容网关：公告 / 更新检查 / 内容目录 / 推广位 / 门禁 / 工单 / 优惠码 / 事件上报。
+# 复用订阅客户端的远端请求通道（同域名、同一套超时与重试语义），只读结果带 TTL 缓存。
+ADMIN_CONTENT_GATEWAY = AdminContentGateway(
+    request_json=lambda method, path, payload=None, query=None: SUBSCRIPTION_CLIENT._request_json(
+        method, path, payload=payload, query=query),
+)
 os.makedirs(SYSTEM_STATE_DIR, exist_ok=True)
 _startup_system_settings = _read_json_file(SYSTEM_SETTINGS_FILE, {})
 _startup_local_settings = _read_json_file(os.path.join(DEFAULT_USER_DIR, "settings.json"), {})
@@ -1827,6 +1835,48 @@ def _smart_clip_update(job_id, **kwargs):
             job[k] = v
 
 
+def _sync_remote_subscription_gates():
+    """把后台下发的门禁清单（client-config.subscription_gates）灌进门禁解析器。
+
+    后台是门禁的唯一来源；本地 subscriptionGateManifest.json 退化为离线兜底。
+    后台没配（空列表）时保持本地兜底，行为与改动前一致。
+    """
+    try:
+        config = SUBSCRIPTION_CLIENT.get_client_config()
+    except Exception:
+        return False
+    gates = config.get("subscription_gates") if isinstance(config, dict) else None
+    if not isinstance(gates, list):
+        return False
+    set_remote_subscription_gates(gates)
+    return bool(gates)
+
+
+# 启动时先把上次缓存的后台门禁清单灌进解析器，避免首屏那几秒还用着本地旧清单。
+# 放在定义之后、服务装配之前：过早调用会拿到未初始化的名字。
+_sync_remote_subscription_gates()
+
+
+def _admin_contact_overrides():
+    """后台下发的联系方式（client-config 的 contact 命名空间）。
+
+    优先于环境变量与内置兜底，这样换微信/换二维码不用发版也不用改环境变量。
+    取不到就返回空字典，让调用方回落到既有默认值——网络不可用不能让订阅弹窗失去联系方式。
+    """
+    try:
+        contact = SUBSCRIPTION_CLIENT.get_client_config().get("contact") or {}
+    except Exception:
+        return {}
+    if not isinstance(contact, dict):
+        return {}
+    return {
+        "text": str(contact.get("text") or "").strip(),
+        "wechat": str(contact.get("wechat") or "").strip(),
+        # 二维码优先：订阅弹窗里展示的就是二维码，qrUrl 比普通链接更贴切。
+        "url": str(contact.get("qrUrl") or contact.get("url") or "").strip(),
+    }
+
+
 COMFYUI_ROUTE_SERVICE = ComfyUiRouteService(read_body=_read_body)
 STORY_DOCUMENT_ROUTE_SERVICE = StoryDocumentRouteService()
 
@@ -1853,6 +1903,7 @@ HTTP_ROUTE_DISPATCHER = HttpRouteDispatcher(
     default_sub_contact_text=DEFAULT_SUB_CONTACT_TEXT,
     default_sub_contact_url=DEFAULT_SUB_CONTACT_URL,
     default_sub_contact_wechat=DEFAULT_SUB_CONTACT_WECHAT,
+    contact_overrides_getter=_admin_contact_overrides,
     json_ok=_json_ok,
     json_err=_json_err,
     send_route_response=_send_route_response,
@@ -2462,6 +2513,88 @@ def _is_path_within_root(path, root):
         return False
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# 后台运营内容（canvas-admin）本地代理
+#
+# 前端只跟本地服务对话，远端请求统一由 ADMIN_CONTENT_GATEWAY 发出：
+# 复用授权域名与超时语义，离线时静默降级为空结果，不把网络错误抛给界面。
+# ─────────────────────────────────────────────────────────────────────────────
+ADMIN_CONTENT_GET_ROUTES = frozenset({
+    "/api/v2/admin-content/announcements",
+    "/api/v2/admin-content/app-version",
+    "/api/v2/admin-content/catalog",
+    "/api/v2/admin-content/promotions",
+    "/api/v2/admin-content/gates",
+})
+ADMIN_CONTENT_POST_ROUTES = frozenset({
+    "/api/v2/admin-content/feedback",
+    "/api/v2/admin-content/coupon/redeem",
+    "/api/v2/admin-content/events",
+    "/api/v2/admin-content/refresh",
+})
+
+
+def handle_admin_content_get(path, query):
+    """返回响应 dict；路径不属于本组时返回 None。"""
+    if path not in ADMIN_CONTENT_GET_ROUTES:
+        return None
+    gateway = ADMIN_CONTENT_GATEWAY
+    if path == "/api/v2/admin-content/announcements":
+        return {"items": gateway.announcements(
+            plan=query.get("plan", ""), version=query.get("version", ""),
+        )}
+    if path == "/api/v2/admin-content/app-version":
+        return gateway.app_version(
+            current_version=query.get("currentVersion", ""),
+            channel=query.get("channel", "stable"),
+            platform=query.get("platform", "win"),
+            install_id=query.get("installId", ""),
+        )
+    if path == "/api/v2/admin-content/catalog":
+        return {"items": gateway.catalog(kind=query.get("kind", ""))}
+    if path == "/api/v2/admin-content/promotions":
+        return {"items": gateway.promotions()}
+    if path == "/api/v2/admin-content/gates":
+        return {"items": gateway.gates()}
+    return None
+
+
+def handle_admin_content_post(path, payload, handler=None):
+    """返回响应 dict；路径不属于本组时返回 None。"""
+    if path not in ADMIN_CONTENT_POST_ROUTES:
+        return None
+    gateway = ADMIN_CONTENT_GATEWAY
+    data = payload if isinstance(payload, dict) else {}
+    if path == "/api/v2/admin-content/refresh":
+        gateway.invalidate()
+        _sync_remote_subscription_gates()
+        return {"ok": True}
+    # 客户端可以不传 installId：从本地请求上下文补，避免「每台机器都要自己拼 ID」。
+    install_id = str(data.get("installId") or data.get("install_id") or "").strip()
+    if not install_id and handler is not None:
+        try:
+            install_id = str(SUBSCRIPTION_CLIENT.extract_install_id_from_request(handler) or "").strip()
+        except Exception:
+            install_id = ""
+    if path == "/api/v2/admin-content/feedback":
+        return gateway.submit_feedback(
+            install_id=install_id, contact=data.get("contact", ""),
+            category=data.get("category", "other"), content=data.get("content", ""),
+        )
+    if path == "/api/v2/admin-content/coupon/redeem":
+        return gateway.redeem_coupon(
+            code=data.get("code", ""), plan=data.get("plan", ""), install_id=install_id,
+        )
+    if path == "/api/v2/admin-content/events":
+        return gateway.report_event(
+            install_id=install_id, device_id=data.get("deviceId", ""),
+            event=data.get("event", ""), result=data.get("result", "ok"),
+            app_version=data.get("appVersion", ""), os_name=data.get("os", ""),
+            detail=data.get("detail") if isinstance(data.get("detail"), dict) else None,
+        )
+    return None
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
 
     def _resolve_static_file(self, path):
@@ -2617,7 +2750,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if path == "/api/client-config":
             query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
             refresh = (query.get("refresh") or [""])[0].strip().lower() in ("1", "true", "yes")
-            _json_ok(self, SUBSCRIPTION_CLIENT.get_client_config(refresh=refresh))
+            config = SUBSCRIPTION_CLIENT.get_client_config(refresh=refresh)
+            # 后台可能在本次拉取里改了门禁清单，同步到解析器，前后端共用一份。
+            _sync_remote_subscription_gates()
+            _json_ok(self, config)
+            return
+
+        if path in ADMIN_CONTENT_GET_ROUTES:
+            parsed_query = urllib.parse.parse_qs(urllib.parse.urlsplit(self.path).query)
+            flat_query = {key: (values[0] if values else "")
+                          for key, values in parsed_query.items()}
+            _json_ok(self, handle_admin_content_get(path, flat_query))
             return
 
         comfy_response = COMFYUI_ROUTE_SERVICE.handle_get(self, path)
@@ -2658,6 +2801,19 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         path = self.path.split("?")[0]
         if not _enforce_local_api_access(self, path):
+            return
+
+        if path in ADMIN_CONTENT_POST_ROUTES:
+            try:
+                raw = _read_body(self)
+                payload = json.loads(raw.decode("utf-8") or "{}") if raw else {}
+            except ValueError as exc:
+                _json_err(self, 400, str(exc))
+                return
+            except Exception:
+                _json_err(self, 400, "Invalid request")
+                return
+            _json_ok(self, handle_admin_content_post(path, payload, self))
             return
 
         comfy_response = COMFYUI_ROUTE_SERVICE.handle_post(self, path)

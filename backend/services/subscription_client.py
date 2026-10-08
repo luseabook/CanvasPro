@@ -1,3 +1,4 @@
+import copy
 import datetime
 import hashlib
 import hmac
@@ -34,6 +35,344 @@ def _subscription_override_enabled():
 
 def _allow_http_subscription_override():
     return _subscription_override_enabled() and _env_enabled("AIC_DEV_MODE")
+
+
+# 结构化配置命名空间：与 canvas-admin 的 client_config_service.STRUCTURED_KEYS 一一对应。
+# 后台下发这些键后，客户端必须认得，否则「后台改了、客户端没反应」。
+STRUCTURED_CONFIG_KEYS = (
+    "brand", "contact", "providers", "model_visibility", "telemetry",
+    "subscription_gates", "system_params", "content_sources", "feature_flags",
+    "expiry_reminder",
+)
+
+# 结构化项的默认形状。后台默认值见 canvas-admin client_config_service.defaults()，此处保持一致。
+DEFAULT_STRUCTURED_CONFIG = {
+    "brand": {"author": "", "logoUrl": "", "footer": "", "feedbackWechat": "",
+              "feedbackQrUrl": "", "aboutLinks": []},
+    "contact": {"text": "", "wechat": "", "url": "", "qrUrl": "", "locales": {}},
+    "providers": [],
+    "model_visibility": {"hiddenProviders": [], "hiddenModels": [], "allowedSkills": []},
+    "telemetry": {"enabled": False, "productCode": "aicanvas", "endpoint": "", "sampleRate": 1.0},
+    "subscription_gates": [],
+    "system_params": {},
+    "content_sources": {"tutorialOrigin": "", "releaseNotesOrigin": "",
+                        "releaseNotesRepo": "", "updateRepo": ""},
+    "feature_flags": {},
+    "expiry_reminder": {"enabled": True, "days": [7, 3, 1], "message": ""},
+}
+
+
+def _clean_config_text(value, *, max_len=512):
+    """结构化配置里的自由文本：只取字符串、去空白、限长。非字符串一律视为未配置。"""
+    if isinstance(value, bool) or not isinstance(value, (str, int, float)):
+        return ""
+    return str(value).strip()[:max_len]
+
+
+def _clean_config_url(value, *, max_len=2048):
+    """结构化配置里的 URL：必须是无用户信息的 http(s) 地址，否则丢弃（不下发脏数据）。"""
+    text = _clean_config_text(value, max_len=max_len)
+    if not text:
+        return ""
+    try:
+        parsed = urllib.parse.urlsplit(text)
+    except Exception:
+        return ""
+    if parsed.scheme.lower() not in ("http", "https") or not parsed.netloc:
+        return ""
+    if parsed.username or parsed.password:
+        return ""
+    return text
+
+
+def _clean_config_str_list(value, *, max_items=200, item_len=128):
+    """标识符列表（别名/供应商/模型前缀）：只接受字符串，数字等一律丢弃。
+
+    这些值会参与门禁匹配，混入 int 会让「5」与 5 变成两个不同的键，
+    排查起来极费劲，所以入口就收紧。
+    """
+    if not isinstance(value, list) or len(value) > max_items:
+        return []
+    out = []
+    for item in value:
+        if isinstance(item, bool) or not isinstance(item, str):
+            continue
+        text = item.strip()[:item_len]
+        if text:
+            out.append(text)
+    return out
+
+
+def _pick(value, key, *, max_len=512):
+    """只在输入里**显式出现**该字段时才产出——未出现的字段留给默认值补齐，
+    否则后台只改一个字段就会把同命名空间的其他字段洗成空。"""
+    if key not in value:
+        return None
+    return _clean_config_text(value.get(key), max_len=max_len)
+
+
+def _pick_url(value, key):
+    if key not in value:
+        return None
+    return _clean_config_url(value.get(key))
+
+
+def _partial(out):
+    return {key: item for key, item in out.items() if item is not None}
+
+
+def _normalize_brand(value):
+    if not isinstance(value, dict):
+        return {}
+    out = {
+        "author": _pick(value, "author", max_len=80),
+        "logoUrl": _pick_url(value, "logoUrl"),
+        "footer": _pick(value, "footer", max_len=200),
+        "feedbackWechat": _pick(value, "feedbackWechat", max_len=64),
+        "feedbackQrUrl": _pick_url(value, "feedbackQrUrl"),
+    }
+    links = value.get("aboutLinks")
+    if isinstance(links, list) and len(links) <= 20:
+        cleaned = []
+        for item in links:
+            if not isinstance(item, dict):
+                continue
+            url = _clean_config_url(item.get("url"))
+            if not url:
+                continue
+            cleaned.append({
+                "label": _clean_config_text(item.get("label"), max_len=40),
+                "url": url,
+            })
+        out["aboutLinks"] = cleaned
+    return _partial(out)
+
+
+def _normalize_contact(value):
+    if not isinstance(value, dict):
+        return {}
+    out = {
+        "text": _pick(value, "text", max_len=200),
+        "wechat": _pick(value, "wechat", max_len=64),
+        "url": _pick_url(value, "url"),
+        "qrUrl": _pick_url(value, "qrUrl"),
+    }
+    locales = value.get("locales")
+    if isinstance(locales, dict) and len(locales) <= 12:
+        cleaned = {}
+        for locale, item in locales.items():
+            if not isinstance(item, dict) or not isinstance(locale, str):
+                continue
+            key = locale.strip()[:16]
+            if not key:
+                continue
+            cleaned[key] = {
+                "text": _clean_config_text(item.get("text"), max_len=200),
+                "wechat": _clean_config_text(item.get("wechat"), max_len=64),
+                "url": _clean_config_url(item.get("url")),
+            }
+        if cleaned:
+            out["locales"] = cleaned
+    return _partial(out)
+
+
+def _normalize_content_sources(value):
+    if not isinstance(value, dict):
+        return {}
+    out = {
+        "tutorialOrigin": _pick_url(value, "tutorialOrigin"),
+        "releaseNotesOrigin": _pick_url(value, "releaseNotesOrigin"),
+        "releaseNotesRepo": _pick(value, "releaseNotesRepo", max_len=160),
+        "updateRepo": _pick(value, "updateRepo", max_len=160),
+    }
+    return _partial(out)
+
+
+def _normalize_expiry_reminder(value):
+    if not isinstance(value, dict):
+        return {}
+    out = {}
+    if "enabled" in value:
+        out["enabled"] = bool(value.get("enabled"))
+    if "message" in value:
+        out["message"] = _clean_config_text(value.get("message"), max_len=200)
+    if "days" in value:
+        days = []
+        for item in (value.get("days") or []):
+            try:
+                number = int(item)
+            except (TypeError, ValueError):
+                continue
+            if 1 <= number <= 365:
+                days.append(number)
+        if days:
+            out["days"] = sorted(set(days), reverse=True)
+    return _partial(out)
+
+
+def _normalize_subscription_gates(value):
+    """后台下发的门禁清单。每条只保留 key/label/modelId/aliases/providers/modelPrefixes。
+
+    这是消除「前端 subscriptionAccess.js 与后端 manifest 双份手抄」的关键通道：
+    后台一改，前后端同源。本地 subscriptionGateManifest.json 退化为离线兜底。
+    """
+    if not isinstance(value, list) or len(value) > 80:
+        return []
+    out = []
+    seen = set()
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        key = _clean_config_text(item.get("key"), max_len=64)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        out.append({
+            "key": key,
+            "label": _clean_config_text(item.get("label"), max_len=96),
+            "modelId": _clean_config_text(item.get("modelId"), max_len=128),
+            "aliases": _clean_config_str_list(item.get("aliases"), max_items=50),
+            "providers": _clean_config_str_list(item.get("providers"), max_items=20, item_len=48),
+            "modelPrefixes": _clean_config_str_list(item.get("modelPrefixes"), max_items=20),
+        })
+    return out
+
+
+def _normalize_feature_flags(value):
+    if not isinstance(value, dict) or len(value) > 120:
+        return {}
+    out = {}
+    for key, item in value.items():
+        if not isinstance(key, str):
+            continue
+        name = key.strip()[:64]
+        if name:
+            out[name] = bool(item)
+    return out
+
+
+def _normalize_system_params(value):
+    if not isinstance(value, dict) or len(value) > 80:
+        return {}
+    out = {}
+    for key, item in value.items():
+        if not isinstance(key, str):
+            continue
+        name = key.strip()[:64]
+        if not name:
+            continue
+        if isinstance(item, bool):
+            out[name] = item
+        elif isinstance(item, (int, float)):
+            out[name] = item
+        else:
+            out[name] = _clean_config_text(item, max_len=512)
+    return out
+
+
+def _normalize_model_visibility(value):
+    if not isinstance(value, dict):
+        return {}
+    out = {}
+    for key in ("hiddenProviders", "hiddenModels", "allowedSkills"):
+        if key in value:
+            out[key] = _clean_config_str_list(value.get(key), item_len=96)
+    return _partial(out)
+
+
+def _normalize_telemetry(value):
+    if not isinstance(value, dict):
+        return {}
+    out = {
+        "productCode": _pick(value, "productCode", max_len=48),
+        "endpoint": _pick_url(value, "endpoint"),
+    }
+    if "enabled" in value:
+        out["enabled"] = bool(value.get("enabled"))
+    if "sampleRate" in value:
+        try:
+            rate = float(value.get("sampleRate") or 0.0)
+        except (TypeError, ValueError):
+            rate = 0.0
+        out["sampleRate"] = max(0.0, min(rate, 1.0))
+    return _partial(out)
+
+
+def _normalize_providers(value):
+    if not isinstance(value, list) or len(value) > 60:
+        return []
+    out = []
+    for item in value:
+        if not isinstance(item, dict):
+            continue
+        key = _clean_config_text(item.get("key"), max_len=48)
+        if not key:
+            continue
+        out.append({
+            "key": key,
+            "label": _clean_config_text(item.get("label"), max_len=64),
+            "baseUrl": _clean_config_url(item.get("baseUrl")),
+            "uploadCdn": _clean_config_url(item.get("uploadCdn")),
+            "enabled": bool(item.get("enabled", True)),
+        })
+    return out
+
+
+_STRUCTURED_NORMALIZERS = {
+    "brand": _normalize_brand,
+    "contact": _normalize_contact,
+    "providers": _normalize_providers,
+    "model_visibility": _normalize_model_visibility,
+    "telemetry": _normalize_telemetry,
+    "subscription_gates": _normalize_subscription_gates,
+    "system_params": _normalize_system_params,
+    "content_sources": _normalize_content_sources,
+    "feature_flags": _normalize_feature_flags,
+    "expiry_reminder": _normalize_expiry_reminder,
+}
+
+
+def merge_structured_config(base, override):
+    """把清洗后的增量配置合并到默认形状上。
+
+    - 字典型命名空间（brand/contact/...）：逐键覆盖，未出现的字段保留默认，
+      这样后台只改一个字段不会把同命名空间其他字段洗空；
+    - 列表型命名空间（providers/subscription_gates）：整体替换，
+      半合并会让「后台删掉一条」变成删不掉。
+    """
+    out = copy.deepcopy(base)
+    for key, item in (override or {}).items():
+        if isinstance(item, dict) and isinstance(out.get(key), dict):
+            merged = copy.deepcopy(out[key])
+            merged.update(item)
+            out[key] = merged
+        else:
+            out[key] = copy.deepcopy(item)
+    return out
+
+
+def normalize_structured_config(value):
+    """把后台下发的结构化配置清洗成客户端可直接消费的形状。
+
+    只返回**显式出现过且通过校验**的键（其余交给默认值补齐）；
+    每个返回的命名空间都已合并到默认形状，调用方可直接使用。
+    """
+    if not isinstance(value, dict):
+        return {}
+    data = value.get("data") if isinstance(value.get("data"), dict) else value
+    out = {}
+    for key in STRUCTURED_CONFIG_KEYS:
+        if key not in data:
+            continue
+        cleaned = _STRUCTURED_NORMALIZERS[key](data.get(key))
+        # 全空的结构化项视为「未配置」，避免把默认值写成空壳盖掉本地兜底。
+        if not cleaned:
+            continue
+        if isinstance(cleaned, list):
+            out[key] = cleaned
+        else:
+            out[key] = merge_structured_config(DEFAULT_STRUCTURED_CONFIG.get(key, {}), cleaned)
+    return out
 
 
 SUBSCRIPTION_NETWORK_HELP_MESSAGE = (
@@ -176,6 +515,9 @@ class SubscriptionRemoteClient:
         )
         if manifest_url:
             config["update_manifest_url"] = manifest_url
+        # 结构化命名空间（brand / contact / content_sources / ...）：后台配了才下发，
+        # 未配的键不写进结果，由 get_client_config 的默认值补齐。
+        config.update(normalize_structured_config(data))
         return config
 
     def get_client_config(self, *, refresh=False):
@@ -189,6 +531,7 @@ class SubscriptionRemoteClient:
                 "product_display_name": DEFAULT_PRODUCT_DISPLAY_NAME,
                 "update_manifest_url": DEFAULT_UPDATE_MANIFEST_URL,
             }
+            config.update(copy.deepcopy(DEFAULT_STRUCTURED_CONFIG))
             config.update(self._normalize_client_config(self._remote_config))
             allow_http_override = _allow_http_subscription_override()
             local = self._normalize_client_config(

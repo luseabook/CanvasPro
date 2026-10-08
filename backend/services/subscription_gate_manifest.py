@@ -1,4 +1,6 @@
 import json
+import threading
+from collections import OrderedDict
 from pathlib import Path
 
 
@@ -180,16 +182,116 @@ _SUBSCRIPTION_GATE_ALIAS_MAP = _build_alias_map()
 _SUBSCRIPTION_GATE_PREFIX_RULES = _build_prefix_rules()
 
 
+# ---------------------------------------------------------------------------
+# 后台下发的门禁清单（client-config 的 subscription_gates）
+#
+# 目的：消除「前端 subscriptionAccess.js 与后端 manifest 各抄一份」的双份维护。
+# 后台改了门禁之后，客户端以远端清单为准；本地 manifest 退化为**离线兜底**——
+# 拿不到远端（首次启动、断网、后台未配）时行为与今天完全一致。
+# ---------------------------------------------------------------------------
+_REMOTE_GATE_LOCK = threading.Lock()
+_REMOTE_GATES: tuple = ()
+_REMOTE_ALIAS_MAP: dict = {}
+_REMOTE_PREFIX_RULES: tuple = ()
+
+
+def _build_remote_maps(gates):
+    aliases = {}
+    rules = []
+    for item in gates:
+        if not isinstance(item, dict):
+            continue
+        model_id = str(item.get("modelId") or "").strip()
+        key = str(item.get("key") or "").strip()
+        if not model_id:
+            continue
+        aliases[model_id] = model_id
+        for alias in item.get("aliases") or ():
+            text = str(alias or "").strip()
+            if text:
+                aliases[text] = model_id
+        if key:
+            aliases[key] = model_id
+        for prefix in item.get("modelPrefixes") or ():
+            text = str(prefix or "").strip()
+            if text:
+                rules.append((text, model_id))
+    return aliases, tuple(rules)
+
+
+def set_remote_subscription_gates(gates):
+    """用后台下发的门禁清单覆盖解析规则。传空列表/None 表示「回到本地兜底」。
+
+    只接受**已经清洗过**的数据（见 subscription_client._normalize_subscription_gates），
+    这里不再做一次校验——重复校验会掩盖上游的清洗缺口。
+    """
+    global _REMOTE_GATES, _REMOTE_ALIAS_MAP, _REMOTE_PREFIX_RULES
+    # 没有 modelId 的条目无法参与门禁判定，留着只会让「后台配了」变成假阳性。
+    cleaned = tuple(
+        item for item in (gates or ())
+        if isinstance(item, dict) and str(item.get("modelId") or "").strip()
+    )
+    with _REMOTE_GATE_LOCK:
+        _REMOTE_GATES = cleaned
+        if cleaned:
+            _REMOTE_ALIAS_MAP, _REMOTE_PREFIX_RULES = _build_remote_maps(cleaned)
+        else:
+            _REMOTE_ALIAS_MAP, _REMOTE_PREFIX_RULES = {}, ()
+        # 别名解析结果会随门禁清单变化，缓存必须一起失效
+        _REMOTE_NORMALIZE_CACHE.clear()
+
+
+def get_remote_subscription_gates():
+    with _REMOTE_GATE_LOCK:
+        return tuple(dict(item) for item in _REMOTE_GATES)
+
+
+def has_remote_subscription_gates():
+    with _REMOTE_GATE_LOCK:
+        return bool(_REMOTE_GATES)
+
+
+def clear_remote_subscription_gates():
+    set_remote_subscription_gates(())
+
+
+_REMOTE_NORMALIZE_CACHE_MAX = 4096
+_REMOTE_NORMALIZE_CACHE: "OrderedDict[str, str]" = OrderedDict()
+
+
 def normalize_subscription_gate_model_id(value):
     model_id = str(value or "").strip()
     if not model_id:
         return ""
     if model_id in SUBSCRIPTION_GATE_CANONICAL_EXCLUDES:
         return model_id
+    with _REMOTE_GATE_LOCK:
+        remote_alias = _REMOTE_ALIAS_MAP.get(model_id)
+        remote_rules = _REMOTE_PREFIX_RULES
+        remote_active = bool(_REMOTE_GATES)
+    if remote_active:
+        if remote_alias:
+            return remote_alias
+        for prefix, target_model_id in remote_rules:
+            if model_id.startswith(prefix):
+                return target_model_id
+        # 远端清单是权威来源：没匹配上就按原样放行，不再回落到本地清单。
+        # 否则后台「删掉一条门禁」在客户端会删不掉（本地清单仍在）。
+        return model_id
+    cached = _REMOTE_NORMALIZE_CACHE.get(model_id)
+    if cached is not None:
+        _REMOTE_NORMALIZE_CACHE.move_to_end(model_id)
+        return cached
     mapped = _SUBSCRIPTION_GATE_ALIAS_MAP.get(model_id)
     if mapped:
-        return mapped
-    for prefix, target_model_id in _SUBSCRIPTION_GATE_PREFIX_RULES:
-        if model_id.startswith(prefix):
-            return target_model_id
-    return model_id
+        result = mapped
+    else:
+        result = model_id
+        for prefix, target_model_id in _SUBSCRIPTION_GATE_PREFIX_RULES:
+            if model_id.startswith(prefix):
+                result = target_model_id
+                break
+    _REMOTE_NORMALIZE_CACHE[model_id] = result
+    if len(_REMOTE_NORMALIZE_CACHE) > _REMOTE_NORMALIZE_CACHE_MAX:
+        _REMOTE_NORMALIZE_CACHE.popitem(last=False)
+    return result

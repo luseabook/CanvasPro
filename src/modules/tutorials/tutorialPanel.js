@@ -1,7 +1,12 @@
 import { fetchTutorialContent } from '../../../api/tutorialContentApi.js';
 import { beginModalInteraction } from '../../services/modalInteractionScope.js';
 import { openExternalLink } from '../../services/externalLinkService.js';
-import { createBundledTutorialCatalog, getTutorialPlayback } from './tutorialCatalog.js';
+import { loadClientConfig } from '../../services/clientConfigStore.js';
+import {
+  createBundledTutorialCatalog,
+  getTutorialPlayback,
+  resolveTutorialOrigin,
+} from './tutorialCatalog.js';
 import { readTutorialCache, writeTutorialCache } from './tutorialContentCache.js';
 import { createTutorialReleaseNotes } from './tutorialReleaseNotes.js';
 import { createTutorialTabs } from './tutorialTabs.js';
@@ -162,7 +167,12 @@ export function showCanvasTutorialPanel(list = [], value = [], { tutorialId: tut
     const signal = new AbortController();
     ((result = signal), (el4.disabled = true), (el3.textContent = '正在获取最新内容…'));
     try {
-      const fetchTutorialContent2 = await fetchTutorialContent({ signal: signal.signal });
+      // 内容源由后台 content_sources.tutorialOrigin 决定（未配则用内置源）。
+      const tutorialOrigin = resolveTutorialOrigin(await loadClientConfig());
+      const fetchTutorialContent2 = await fetchTutorialContent({
+        signal: signal.signal,
+        origin: tutorialOrigin,
+      });
       if (enabled4 || result !== signal) return;
       ((enabled = fetchTutorialContent2), (item = 'server'));
       if (!enabled2) key = null;
