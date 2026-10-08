@@ -19,7 +19,7 @@
   - R01–R26 全范围不缩减；单批交付只是检查点。
   - 直接实施，不要只分析，也不要每批再问是否开发。
 - **进度**：第1–123批已提交推送；124a–f 业务代码与末尾记账（8fafc80、ba8e9b4、3b8fc6e、3c3b3ae）均已推远端移植分支，远端 master 未更新；124g/124h 至 141 共 307 件新模块未提交（工作树 614 个未跟踪 src 文件）。R01–R26 **都没有完成**（§6）；不把模块落地或推送成功误写成功能已完成。
-- **本批（2026-10-08，第 180 批）**：Agnes 四缺陷修复落地，改的是**在用**生成链路：① 后端按 host 豁免 Agnes 同步图像端点；② 生成按声明档选线路；③ 视频轮询改官方 `/agnesapi?video_id=`；④ 补 `agnes-video-2.5`/`2.5-flash`。细节见 `docs/agnes-provider-line-fix.md`；**未推**，待授权。
+- **本批（2026-10-08，第 180 批）**：Agnes 四缺陷修复落地，改的是**在用**生成链路：① 后端按 host 豁免 Agnes 同步图像端点；② 生成按声明档选线路；③ 视频轮询改官方 `/agnesapi?video_id=`；④ 补 `agnes-video-2.5`/`2.5-flash`。细节见 `docs/agnes-provider-line-fix.md`；已双推 `origin`+`luseabook`。
 - **必须清楚的偏差**：第 84 批以来的新增移植多数是「落地不接线」，即模块和单测进了仓库，但从入口走不到。
   - 增量台账（`docs/tracking/orphans.md`）**已实测重算**：现行口径 **200 不可达 / 1992 模块**（断链 0；方法见 `docs/b126-reachability.md`）。旧的 483/1238 是更窄口径，**不可直接相减**。
   - 总目标要求「实际接入」，所以接线欠账（§7.4）迟早要还。
@@ -372,7 +372,7 @@ node tools/tracking/track.mjs --status
 ## 11. 会话日志（最新在上；为守住 ≤45 KB 体积上限，挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
 - 2026-10-08（180 批·**Agnes 四缺陷修复**）：① `server.py` 按 **host** 豁免 Agnes 同步图像端点（APIMart 共用 path 仍短路）；② `modelProviderProfileSelection.js`/`ModelApiManifestNormalizer.js`/`aiTextApi.js` 让生成按声明档选 provider；③ 视频轮询改官方 `GET /agnesapi?video_id=<VIDEO_ID>`（不是 task_id）；④ 补 `agnes-video-2.5`/`2.5-flash`。另复活 `pollIntervalMs`/`continuePollingOnSuccessWithoutResult` 两处死代码。
-  **验证**：全量 JS **11237/11223/14**（14 例既有失败 `installerSafety` 3 + `deobf-gate` 11，与本改无关）；新增 Python 5 / providerProfile 6 / profileSelection 31 全过；受保护 `freeImageHostApi.js` MD5 未变。**未推**，待授权。
+  **验证**：全量 JS **11237/11223/14**（14 例既有失败 `installerSafety` 3 + `deobf-gate` 11，与本改无关）；新增 Python 5 / providerProfile 6 / profileSelection 31 全过；受保护 `freeImageHostApi.js` MD5 未变。已提交 `f834fb27` 并双推 `origin`+`luseabook`。
 
 ## 12. 变更记录机制（**已冻结**）
 
