@@ -4,6 +4,8 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-08（181 批·**i2i base64 + CSP 本地保存**）：真机复跑 180 批暴露两个新缺陷。**A** `api/aiImageApi.js` 提取器只读 `resultPaths`、**不读 `base64Paths`**（会解码的 `resolveMappedImageResponseValues` 只被未接线的 `ManifestResultRenderer.js` 用）→ 补 manifest 的 `base64Paths`/`base64DefaultMimeType` 并让两处提取器改用它（Agnes i2i 才解得着图）。**B** `index.html` CSP 的 `connect-src` 缺 `data:` → `data:`/`blob:` 本地保存被拦；放行为 `'self' data: blob: http: https:`，`check-csp.mjs` 加断言防回退。
+  **验证**：全量 JS **11242/11228/14**（14 例既有失败与本改无关）；新增 5 例全过；`check-csp` PASS；真机 i2i 端到端 PASS。~~③ 视频终态 url 仍 BLOCKED（余额 ￥0）~~ → **该结论是误判**：第 182 批复核为「轮询丢 Key」，已修并真机 PASS。见 `docs/agnes-i2i-and-csp-fix.md`、`docs/agnes-video-poll-profile-fix.md`。
 - 2026-10-08（180 批·**Agnes 四缺陷修复**）：① `server.py` 按 **host** 豁免 Agnes 同步图像端点（APIMart 共用 path 仍短路）；② `modelProviderProfileSelection.js`/`ModelApiManifestNormalizer.js`/`aiTextApi.js` 让生成按声明档选 provider；③ 视频轮询改官方 `GET /agnesapi?video_id=<VIDEO_ID>`（不是 task_id）；④ 补 `agnes-video-2.5`/`2.5-flash`。另复活 `pollIntervalMs`/`continuePollingOnSuccessWithoutResult` 两处死代码。
   **验证**：全量 JS **11237/11223/14**（14 例既有失败 `installerSafety` 3 + `deobf-gate` 11，与本改无关）；新增 Python 5 / providerProfile 6 / profileSelection 31 全过；受保护 `freeImageHostApi.js` MD5 未变。已提交 `f834fb27` 并双推 `origin`+`luseabook`。
 - 2026-10-06（179 批·**安装版可用性：根因 + 四件修复**）：**根因**：SHUO Canvas 命令行写明 `--user-data-dir=%APPDATA%\AI Canvas Pro`，与本仓

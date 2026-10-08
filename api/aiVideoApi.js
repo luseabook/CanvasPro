@@ -14,6 +14,7 @@ import * as RunningHubAdapter from './adapters/RunningHubAdapter.js';
 import {
   buildVideoRequestFromManifest,
   resolveManifestTaskPolling,
+  resolveProviderProfileConfig,
 } from './adapters/ModelApiManifestNormalizer.js';
 import { resolveMappedResponseValue, resolveMappedResponseValues } from './adapters/modelApiMappingEngine.js';
 import { ensureConfig, getProviderConfig } from './configApi.js';
@@ -1219,7 +1220,7 @@ export async function generateVideo(args10, signal3) {
     if (asyncVideoTaskId2) {
       const taskId6 = String(asyncVideoTaskId2);
       taskKey = provider7 + ':video:' + taskId6;
-      const providerConfig5 = getProviderConfig(provider7),
+      const providerConfig5 = resolveVideoProviderConfig(args10, provider7),
         value105 =
           taskPolling2.useOpenapiQuery === true ||
           (provider7 === 'runninghub' && taskPolling2.url === '/api/v2/proxy/image'),
@@ -1295,12 +1296,23 @@ function resolveVideoRuntimeProviderKey(options4 = {}, value106 = '') {
     : value106;
 }
 
+/**
+ * 轮询阶段要用的厂商配置。
+ *
+ * 清单声明了多条线路时（如 Agnes 国内 / 国际），Key 存在哪个 provider id 取决于用户设置里选了哪条线路。
+ * 创建请求走的是「按声明档」解析，轮询若退回清单里写死的 provider（Agnes 恒为 'agnes'），只配国内档的
+ * 用户就会拿到空 Key，本地代理直接回 400 "Missing apiUrl or apiKey"，任务在创建成功后立刻失败。
+ * 这里与创建请求共用同一套解析；未声明线路的厂商返回结果与原来完全一致。
+ */
+function resolveVideoPollingProviderConfig(options5 = {}, value108 = '') {
+  return resolveProviderProfileConfig(value108, options5, { getProviderConfig: getProviderConfig });
+}
 function resolveVideoProviderConfig(options5 = {}, value107 = '') {
   const videoRuntimeProviderKey = resolveVideoRuntimeProviderKey(options5, value107),
     args12 = getProviderConfig(videoRuntimeProviderKey) || {};
   return value107 === 'runninghub'
     ? { ...args12, apiUrl: resolveRunningHubModelApiBaseUrl(videoRuntimeProviderKey) }
-    : args12;
+    : resolveVideoPollingProviderConfig(options5, value107);
 }
 
 function normalizeVideoSubmitDiagnosticToken(value108) {
