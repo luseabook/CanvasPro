@@ -1,3 +1,4 @@
+import { AGNES_MODEL_API_PROFILE_IDS } from '../../../modules/agnesProviderProfiles.js';
 const VIDEO_DURATION_FIELD = Object.freeze({
     id: 'duration',
     type: 'slider',
@@ -1757,6 +1758,11 @@ function createVideoInputSlots({
   fixedSlots: fixedSlots = null,
   exclusiveGroups: exclusiveGroups = null,
   cycleFixedInputWhenFull: cycleFixedInputWhenFull = false,
+  // 下面三项原先只被调用方传入、并没有落到产物里（等于静默失效），
+  // 而渲染层与归一化层都在读它们，所以这里补上透传。
+  preserveHiddenInputsByKind: preserveHiddenInputsByKind = false,
+  preserveHiddenInputsByKindFields: preserveHiddenInputsByKindFields = null,
+  policyVariants: policyVariants = null,
 } = {}) {
   const list6 = ['text'],
     target = {};
@@ -1787,6 +1793,15 @@ function createVideoInputSlots({
         ),
       )),
     cycleFixedInputWhenFull === true && (source.cycleFixedInputWhenFull = true),
+    preserveHiddenInputsByKind === true && (source.preserveHiddenInputsByKind = true),
+    Array.isArray(preserveHiddenInputsByKindFields) &&
+      preserveHiddenInputsByKindFields.length > 0 &&
+      (source.preserveHiddenInputsByKindFields = Object.freeze(
+        preserveHiddenInputsByKindFields.map((item5) => String(item5 || '').trim()).filter(Boolean),
+      )),
+    Array.isArray(policyVariants) &&
+      policyVariants.length > 0 &&
+      (source.policyVariants = Object.freeze(policyVariants.map((args6) => Object.freeze({ ...args6 })))),
     Object.freeze(source)
   );
 }
@@ -4671,26 +4686,116 @@ const APIMART_VIDEO_MODELS = Object.freeze([
     }),
     Object.freeze({ path: 'extra_body.image', from: 'inputImages', omitWhenEmpty: true }),
   ]),
+  // Agnes 创建任务的响应里 `id`/`task_id` 是任务号，`video_id` 才是查询凭证；
+  // 查询必须用 video_id 打 /agnesapi，用任务号打 /v1/videos/{id} 拿不到成片地址。
   AGNES_VIDEO_RESPONSE_MAPPING = Object.freeze({
-    taskIdPath: Object.freeze(['id', 'task_id', 'data.id']),
+    taskIdPath: Object.freeze(['video_id', 'data.video_id', 'id', 'task_id', 'data.id']),
     statusPath: 'status',
     errorPath: Object.freeze(['error.message', 'message', 'error']),
     resultPaths: Object.freeze([
+      'url',
+      'metadata.url',
       'video_url',
       'data.video_url',
       'result.video_url',
       'output.video',
       'output.video_url',
-      'url',
       'data.url',
     ]),
   }),
+  // 官方查询接口：GET {baseUrl}/agnesapi?video_id=<VIDEO_ID>&model_name=<model>。
+  // 完成响应把成片地址放在顶层 url（metadata.url 为兼容保留）。
   AGNES_VIDEO_TASK_POLLING = Object.freeze({
     mode: 'task-proxy',
     method: 'GET',
-    urlTemplate: '{baseUrl}/v1/videos/{taskId}',
+    pollIntervalMs: 30000,
+    maxWaitMs: 1800000,
+    // Agnes 存在「先 completed、下一轮才带 url」的时序，别在中间态直接判失败。
+    continuePollingOnSuccessWithoutResult: true,
+    urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=agnes-video-v2.0',
     headersMode: 'bearer',
+    transportErrorPolicy: Object.freeze({
+      maxConsecutiveErrors: 3,
+      retryableStatuses: Object.freeze([408, 425, 429, 500, 502, 503, 504, 520, 522, 524]),
+      terminalStatuses: Object.freeze([400, 401, 403, 404, 405, 409, 410, 413, 422]),
+      surfaceLastError: true,
+    }),
   }),
+  // ——— Agnes Video 2.5（国内站主推）———
+  // 与 2.0 是两套不同的请求契约：参数名改成了 size / aspect_ratio / seconds，
+  // 且必须显式给 mode（text / keyframe / reference），参考素材也换成了顶层 images / audios / videos。
+  AGNES_VIDEO_25_MODE_FIELD = Object.freeze({
+    id: 'mode',
+    type: 'segmented',
+    placement: 'mode',
+    variant: 'sectionMenu',
+    label: '生成模式',
+    description:
+      '首尾帧：用首帧/尾帧图约束起止画面，不传图时按文字生成。\n多模态参考：把图片、视频、音频当作内容或风格参考。',
+    defaultValue: 'keyframe',
+    options: Object.freeze([
+      Object.freeze({ value: 'keyframe', label: '首尾帧' }),
+      Object.freeze({ value: 'reference', label: '多模态参考' }),
+    ]),
+  }),
+  AGNES_VIDEO_25_RATIO_FIELD = Object.freeze({
+    ...VIDEO_RATIO_FIELD,
+    defaultValue: '16:9',
+    options: Object.freeze(['21:9', '16:9', '4:3', '1:1', '3:4', '9:16'].map(freezeOption)),
+    variant: 'ratioPill',
+  }),
+  AGNES_VIDEO_25_DURATION_FIELD = createFooterDurationSliderOptionsField({
+    values: Object.freeze([4, 5, 6, 7, 8, 9, 10, 11, 12]),
+    defaultValue: 5,
+    label: '视频时长',
+  }),
+  AGNES_VIDEO_25_BODY_MAPPING = createApimartVideoBodyMapping([
+    Object.freeze({
+      path: 'mode',
+      from: 'param',
+      field: Object.freeze(['generationParams.mode', 'mode']),
+      defaultValue: 'keyframe',
+    }),
+    Object.freeze({
+      path: 'seconds',
+      from: 'param',
+      field: Object.freeze(['generationParams.duration', 'duration']),
+      defaultValue: 5,
+      // 官方要求字符串形式（"4"~"12"），传数字会被判参数非法。
+      transform: 'stringParam',
+    }),
+    Object.freeze({
+      path: 'size',
+      from: 'param',
+      field: Object.freeze(['generationParams.resolution', 'resolution']),
+      defaultValue: '720P',
+    }),
+    Object.freeze({
+      path: 'aspect_ratio',
+      from: 'param',
+      field: Object.freeze(['generationParams.aspectRatio', 'resolvedRatioLabel', 'aspectRatio']),
+      defaultValue: '16:9',
+    }),
+    Object.freeze({
+      path: 'seed',
+      from: 'param',
+      field: Object.freeze(['generationParams.seed', 'seed']),
+      defaultValue: '8888',
+      transform: Object.freeze({
+        name: 'agnesVideoSeed',
+        modeField: 'seed_mode',
+        defaultMode: 'random',
+        min: 0,
+        max: 0x7fffffff,
+      }),
+      omitWhenEmpty: true,
+    }),
+    Object.freeze({ path: 'n', from: 'constant', value: 1 }),
+  ]),
+  AGNES_VIDEO_25_MODELS = Object.freeze([
+    createAgnesVideo25Manifest(),
+    createAgnesVideo25Manifest({ flash: true }),
+  ]),
   AGNES_VIDEO_MODELS = Object.freeze([
     Object.freeze({
       modelId: 'agnes/agnes-video-v2.0',
@@ -4715,7 +4820,7 @@ const APIMART_VIDEO_MODELS = Object.freeze([
       bodyMapping: AGNES_VIDEO_BODY_MAPPING,
       responseMapping: AGNES_VIDEO_RESPONSE_MAPPING,
       taskPolling: AGNES_VIDEO_TASK_POLLING,
-      resultTaskIdPath: 'id',
+      resultTaskIdPath: 'video_id',
       executionExtensions: Object.freeze({ bodyResolver: 'agnesVideo' }),
       prompt: Object.freeze({
         placeholder: '写清楚谁或什么、在哪里、做什么、镜头怎么动；可按 @ 引用图片。',
@@ -4744,6 +4849,8 @@ const APIMART_VIDEO_MODELS = Object.freeze([
         ]),
       }),
       extensions: Object.freeze({
+        // 国内 / 国际两条线路共用这一份契约，具体走哪条由选中线路决定。
+        providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
         videoMenu: Object.freeze({
           role: 'agnesModel',
           order: 10,
@@ -4752,6 +4859,7 @@ const APIMART_VIDEO_MODELS = Object.freeze([
         }),
       }),
     }),
+    ...AGNES_VIDEO_25_MODELS,
   ]),
   VENDOR_VIDEO_MODELS = Object.freeze([
     ...APIMART_VIDEO_MODELS,
@@ -4759,6 +4867,165 @@ const APIMART_VIDEO_MODELS = Object.freeze([
     ...VOLCENGINE_VIDEO_MODELS,
     ...AGNES_VIDEO_MODELS,
   ]);
+// Agnes Video 2.5 的固定素材位。素材位 id 与 bodyResolver「agnesVideo25」一一对应：
+// keyframe 走 firstFrame / lastFrame，reference 走 referenceImage / referenceVideo / referenceAudio。
+function createAgnesVideo25FixedSlot({ id, kind, label, description, mode, displayOrder }) {
+  return Object.freeze({
+    id: id,
+    kind: kind,
+    label: label,
+    description: description,
+    displayOrder: displayOrder,
+    required: false,
+    showWhen: Object.freeze({ field: 'mode', value: mode }),
+  });
+}
+function createAgnesVideo25InputSlots({ flash: flash = false } = {}) {
+  const fixedSlots = [
+    createAgnesVideo25FixedSlot({
+      id: 'firstFrame',
+      kind: 'image',
+      label: '首帧',
+      description: '首尾帧模式使用的起始图片；首帧和尾帧至少放入一张。',
+      mode: 'keyframe',
+      displayOrder: 10,
+    }),
+    createAgnesVideo25FixedSlot({
+      id: 'lastFrame',
+      kind: 'image',
+      label: '尾帧',
+      description: '首尾帧模式使用的结束图片；可单独作为尾帧约束。',
+      mode: 'keyframe',
+      displayOrder: 20,
+    }),
+    createAgnesVideo25FixedSlot({
+      id: 'referenceImage',
+      kind: 'image',
+      label: '参考图',
+      description: flash ? '多模态参考模式最多支持 5 张图片' : '多模态参考模式使用的内容或风格图片',
+      mode: 'reference',
+      displayOrder: 30,
+    }),
+  ];
+  if (!flash)
+    fixedSlots.push(
+      createAgnesVideo25FixedSlot({
+        id: 'referenceVideo',
+        kind: 'video',
+        label: '参考视频',
+        description: '多模态参考模式使用的动作、风格或时序素材，最多 1 个。',
+        mode: 'reference',
+        displayOrder: 40,
+      }),
+    );
+  fixedSlots.push(
+    createAgnesVideo25FixedSlot({
+      id: 'referenceAudio',
+      kind: 'audio',
+      label: '参考音频',
+      description: '多模态参考模式使用的声音或节奏素材，最多 3 段。',
+      mode: 'reference',
+      displayOrder: 50,
+    }),
+  );
+  return createVideoInputSlots({
+    image: flash ? 5 : 8,
+    video: flash ? 0 : 1,
+    audio: 3,
+    fixedSlots: Object.freeze(fixedSlots),
+    cycleFixedInputWhenFull: true,
+    preserveHiddenInputsByKind: true,
+    preserveHiddenInputsByKindFields: Object.freeze(['mode']),
+    policyVariants: Object.freeze([
+      Object.freeze({
+        when: Object.freeze({ field: 'mode', value: 'keyframe' }),
+        allowedKinds: Object.freeze(['text', 'image']),
+        maxByKind: Object.freeze({ image: 2, video: 0, audio: 0 }),
+      }),
+    ]),
+  });
+}
+function createAgnesVideo25TaskPolling(model) {
+  return Object.freeze({
+    ...AGNES_VIDEO_TASK_POLLING,
+    pollIntervalMs: 2000,
+    urlTemplate: '{baseUrl}/agnesapi?video_id={taskId}&model_name=' + model,
+  });
+}
+function createAgnesVideo25Manifest({ flash: flash = false } = {}) {
+  const model = flash ? 'agnes-video-2.5-flash' : 'agnes-video-2.5',
+    displayName = flash ? 'Agnes Video 2.5 Flash' : 'Agnes Video 2.5';
+  return Object.freeze({
+    modelId: 'agnes/' + model,
+    executionId: 'agnes.model-api.video.' + model + '.v1',
+    displayName: displayName,
+    provider: 'agnes',
+    icon: 'AG',
+    model: model,
+    endpoint: '/v1/videos',
+    endpointMode: 'video-generation',
+    description: flash
+      ? 'Agnes AI fast text, keyframe and multimodal-reference video API'
+      : 'Agnes AI text, keyframe and multimodal-reference video API',
+    fields: Object.freeze([
+      AGNES_VIDEO_25_MODE_FIELD,
+      createResolutionField({
+        label: '分辨率',
+        defaultValue: '720P',
+        options: flash ? ['720P'] : ['720P', '1080P', '1K', '2K'],
+      }),
+      AGNES_VIDEO_25_RATIO_FIELD,
+      AGNES_VIDEO_25_DURATION_FIELD,
+      AGNES_VIDEO_SEED_FIELD,
+      AGNES_VIDEO_SEED_MODE_FIELD,
+    ]),
+    inputSlots: createAgnesVideo25InputSlots({ flash: flash }),
+    bodyMapping: AGNES_VIDEO_25_BODY_MAPPING,
+    responseMapping: AGNES_VIDEO_RESPONSE_MAPPING,
+    taskPolling: createAgnesVideo25TaskPolling(model),
+    resultTaskIdPath: 'video_id',
+    executionExtensions: Object.freeze({
+      bodyResolver: 'agnesVideo25',
+      strictInputCounts: true,
+      strictUiSchemaParams: true,
+      agnesVideo25: Object.freeze({
+        maxReferenceImages: flash ? 5 : 8,
+        maxReferenceVideos: flash ? 0 : 1,
+        maxReferenceAudios: 3,
+      }),
+    }),
+    prompt: Object.freeze({
+      placeholder: '不放入图片时直接描述主体、动作、场景和镜头；放入首帧或尾帧时描述画面如何运动或过渡。',
+      variants: Object.freeze([
+        Object.freeze({
+          when: Object.freeze({ field: 'mode', value: 'keyframe' }),
+          placeholder: '描述首帧到尾帧之间的动作、转场和镜头变化。',
+        }),
+        Object.freeze({
+          when: Object.freeze({ field: 'mode', value: 'reference' }),
+          placeholder: flash
+            ? '使用 <Picture N> / <Audio N> 说明参考素材的用途。'
+            : '使用 <Picture N> / <Audio N> / <Video N> 说明参考素材的用途。',
+        }),
+      ]),
+    }),
+    help: Object.freeze({
+      tooltip: flash
+        ? 'Agnes Video 2.5 Flash 支持文生视频、首尾帧与图片/音频参考；固定 720P，参考图最多 5 张。'
+        : 'Agnes Video 2.5 支持文生视频、首尾帧以及图片、音频、视频多模态参考；时长 4-12 秒。',
+    }),
+    extensions: Object.freeze({
+      providerProfiles: AGNES_MODEL_API_PROFILE_IDS,
+      videoMenu: Object.freeze({
+        role: 'agnesModel',
+        order: flash ? 30 : 20,
+        label: displayName,
+        subtitle: flash ? '高速 · 720P' : '多模态 · 最高 2K',
+      }),
+      videoInputSurface: Object.freeze({ hideFixedInputSlots: true }),
+    }),
+  });
+}
 function isSeedanceVideoManifest(record) {
   return (
     record?.endpointMode === 'seedance-video-generation' ||

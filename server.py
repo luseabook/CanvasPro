@@ -3217,10 +3217,30 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             is_grsai_generate_endpoint = bool(
                 re.search(r"/v1/api/generate(?:$|[/?])", api_url, flags=re.IGNORECASE)
             )
+            # Agnes 的图像接口是同步的：响应里同时带 data[].url 和顶层 task_id。
+            # 若命中下面的 task_id 快速探测，真正的图片地址会被丢弃，前端只会收到
+            # {task_id,status:"submitted"}，随后报「无法从服务器响应中提取图片地址」。
+            # 注意不能只按路径豁免——APIMart 也用 /v1/images/generations，但它是异步的，
+            # 必须保留 task_id 快速探测；所以这里按域名精确匹配 Agnes 的两条线路。
+            is_agnes_host = bool(
+                re.search(
+                    r"^https?://(?:api\.agnes-ai\.cn|apihub\.agnes-ai\.com)(?::\d+)?(?:/|$)",
+                    api_url,
+                    flags=re.IGNORECASE,
+                )
+            )
+            is_agnes_sync_image_endpoint = is_agnes_host and bool(
+                re.search(
+                    r"/v1/images/(?:generations|edits)(?:$|[/?])",
+                    api_url,
+                    flags=re.IGNORECASE,
+                )
+            )
             allow_task_probe_short_circuit = not (
                 is_runninghub_query_endpoint
                 or is_grsai_query_endpoint
                 or is_grsai_generate_endpoint
+                or is_agnes_sync_image_endpoint
             )
             if workflow_id in VIDEO_VIP_WORKFLOW_IDS:
                 if not _enforce_vip_subscription_gate(

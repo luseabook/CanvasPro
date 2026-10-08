@@ -4,6 +4,11 @@
 > 只追加，不改写已有内容。
 
 
+- 2026-10-06（179 批·**安装版可用性：根因 + 四件修复**）：**根因**：SHUO Canvas 命令行写明 `--user-data-dir=%APPDATA%\AI Canvas Pro`，与本仓
+  production 目录同名；共用即单实例锁互斥，后启动者静默 `exit(0)`（`main.js:244`），其后端占住 8777。**修复**：目录改 `CanvasPro`、
+  端口改 8790（`AICANVAS_PORT` 可覆盖）；卸载脚本改用 .NET SHA256（基线红测）；引导 JS+CSS 齐 0.8.0。
+  **验证**：11218/11190/27，新增失败 0，闸门 PASS，MD5 未变。**待授权**：重建包、装机实测、推送。
+
 - 2026-10-06（178 批·**修复安装版卡在加载页**）：按用户要求安装并实测 `Canvas-Setup-0.4.12-x64.exe` 成功；
   实测发现**安装版永远停在品牌加载浮层**。根因链：`index.html` 清理卡片**缺两个 div**（`localAssetCleanupDetails`/`Toolbar`）→
   `initLocalAssetCleanupSettings()` 只对另三个 id 做空判断，`toolbar` 为 null 时 `localAssetCleanupList.js:19` 抛**未捕获 TypeError** →

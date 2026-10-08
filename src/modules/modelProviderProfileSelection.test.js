@@ -2,9 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   MODEL_PROVIDER_PROFILE_MEMORY_KEY,
+  getDeclaredModelProviderProfileIds,
   getModelProviderProfileMemoryKey,
   getModelProviderProfileIds,
   normalizeModelProviderProfileId,
+  resolveDeclaredProviderProfileId,
   resolveModelGenerationProviderProfileId,
   resolveReadyModelProviderProfileId,
   sanitizeModelProviderProfileMemory,
@@ -198,6 +200,61 @@ test('buildModelProviderProfileSelectionPatch：null 与空串第三参数不算
   assert.equal(buildModelProviderProfileSelectionPatch(state, WF, null).providerProfileId, SITE[1]);
   assert.equal(buildModelProviderProfileSelectionPatch(state, WF, '   ').providerProfileId, SITE[1]);
   assert.equal(buildModelProviderProfileSelectionPatch(state, WF, undefined).providerProfileId, SITE[1]);
+});
+
+// ——— 生成链路真正用哪条线路 ———
+// 清单声明的 providerProfiles 只影响设置面板显示时，用户切了线路生成却不变，
+// 于是国内档填的 Key 永远用不上。下面锁定「按选中线路解析 provider」的规则。
+
+const AGNES_IMAGE = 'agnes/agnes-image-2.5-flash';
+const AGNES_LINES = ['agnes-domestic', 'agnes'];
+
+test('getDeclaredModelProviderProfileIds：只读显式声明，不吃 RunningHub 的隐式兜底', () => {
+  assert.deepEqual(getDeclaredModelProviderProfileIds(AGNES_IMAGE), AGNES_LINES);
+  // workflow 版没有显式声明，走隐式兜底；两者必须能区分开。
+  assert.deepEqual(getDeclaredModelProviderProfileIds(WF), []);
+  assert.deepEqual(getModelProviderProfileIds(WF), SITE);
+  assert.deepEqual(getDeclaredModelProviderProfileIds('not/a-model'), []);
+});
+
+test('resolveDeclaredProviderProfileId：按声明取线路，未选则用第一条', () => {
+  assert.equal(resolveDeclaredProviderProfileId(AGNES_IMAGE, { model: AGNES_IMAGE }), 'agnes-domestic');
+  assert.equal(
+    resolveDeclaredProviderProfileId(AGNES_IMAGE, { model: AGNES_IMAGE, providerProfileId: 'agnes' }),
+    'agnes',
+  );
+  // 选了不在声明里的值 -> 回落第一条。
+  assert.equal(
+    resolveDeclaredProviderProfileId(AGNES_IMAGE, { model: AGNES_IMAGE, providerProfileId: 'bogus' }),
+    'agnes-domestic',
+  );
+  // 没声明线路的模型：返回空串，调用方按原 provider 处理。
+  assert.equal(resolveDeclaredProviderProfileId(MODEL_API, { model: MODEL_API }), '');
+  // RunningHub 自己管线路，不能被这条通用规则接管。
+  assert.equal(resolveDeclaredProviderProfileId(WF, { model: WF }), '');
+  assert.equal(
+    resolveDeclaredProviderProfileId(WF, { model: WF, providerProfileId: SITE[1] }),
+    '',
+  );
+});
+
+test('resolveDeclaredProviderProfileId：首选线路没配好时让位给可用的另一条', () => {
+  const ready = (id) => id === 'agnes';
+  assert.equal(resolveDeclaredProviderProfileId(AGNES_IMAGE, { model: AGNES_IMAGE }, ready), 'agnes');
+  // 选中的线路已经可用，就不要乱切。
+  assert.equal(
+    resolveDeclaredProviderProfileId(
+      AGNES_IMAGE,
+      { model: AGNES_IMAGE, providerProfileId: 'agnes' },
+      ready,
+    ),
+    'agnes',
+  );
+  // 两条都没配好 -> 保持首选，交给上层报「Key 未配置」。
+  assert.equal(
+    resolveDeclaredProviderProfileId(AGNES_IMAGE, { model: AGNES_IMAGE }, () => false),
+    'agnes-domestic',
+  );
 });
 
 test('getNextModelProviderProfileId：不足两项返回首项或空串，两项时循环切换', () => {

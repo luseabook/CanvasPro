@@ -453,10 +453,14 @@ function shouldRethrowVideoPollingError(value27) {
   );
 }
 async function pollVideoTask(value28, provider5, value29, signal = {}) {
-  const providerConfig4 = getProviderConfig(provider5);
-  for (let count4 = 0; count4 < 600; count4++) {
+  const providerConfig4 = getProviderConfig(provider5),
+    // 轮询节奏来自清单 taskPolling：不同厂商任务耗时差别很大（Agnes 单条约 1~2 分钟），
+    // 不声明时仍是每秒 2 次、最多 600 次的原有行为。
+    pollIntervalMs = resolveVideoPollIntervalMs(signal),
+    pollAttempts = resolveVideoPollAttempts(signal, pollIntervalMs);
+  for (let count4 = 0; count4 < pollAttempts; count4++) {
     if (signal?.signal?.aborted) throw new Error('CANCELLED');
-    await new Promise((value30) => setTimeout(value30, 2000));
+    await new Promise((value30) => setTimeout(value30, pollIntervalMs));
     if (signal?.signal?.aborted) throw new Error('CANCELLED');
     const encodeURIComponent2 = encodeURIComponent(String(value28)),
       value31 =
@@ -484,7 +488,10 @@ async function pollVideoTask(value28, provider5, value29, signal = {}) {
       if (taskError2) throw taskError2;
       const extractVideoUrls2 = extractVideoUrls(raw2, signal?.responseMapping).length > 0;
       if (extractVideoUrls2) return processVideoTaskResult(raw2, provider5, signal);
-      if (ASYNC_VIDEO_SUCCESS_STATUSES.has(asyncVideoTaskStatus))
+      if (ASYNC_VIDEO_SUCCESS_STATUSES.has(asyncVideoTaskStatus)) {
+        // 少数厂商会先把状态置为完成、随后一次轮询才补上成片地址（轮询间隔越长越容易撞上），
+        // 清单用 continuePollingOnSuccessWithoutResult 声明这种时序，此时继续轮询而不是直接报错。
+        if (signal?.taskPolling?.continuePollingOnSuccessWithoutResult === true) continue;
         throw new ApiError({
           type: 'PARSE_ERROR',
           provider: provider5,
@@ -492,6 +499,7 @@ async function pollVideoTask(value28, provider5, value29, signal = {}) {
           raw: raw2,
           retryable: false,
         });
+      }
       if (isAsyncVideoTaskFailureStatus(asyncVideoTaskStatus))
         throw ApiError.taskFailed(provider5, extractAsyncVideoTaskFailureReason(raw2) || '任务状态异常');
     } catch (value32) {

@@ -1,10 +1,14 @@
 import { getModelManifest } from '../manifests/index.js';
 import { getProviderConfig } from '../../api/configApi.js';
 import {
+  getRunningHubProviderProfileId,
   normalizeRunningHubModelApiProfileId,
   RUNNINGHUB_SITE_PROFILE_IDS,
 } from './runningHubProviderProfiles.js';
 export const MODEL_PROVIDER_PROFILE_MEMORY_KEY = 'providerProfileIdByModel';
+// 这些厂商自己管线路：RunningHub 的站点切换走 remapRunningHubModelApiUrl，
+// 不并入下面这条「按 provider id 换线路」的通用规则，避免两套机制互相干扰。
+const SELF_MANAGED_PROVIDER_PROFILE_PROVIDER_IDS = Object.freeze(['runninghub', 'runninghubwf']);
 function isPlainObject(enabled) {
   return !!enabled && typeof enabled === 'object' && !Array.isArray(enabled);
 }
@@ -29,6 +33,40 @@ export function getModelProviderProfileIds(index) {
           ? RUNNINGHUB_SITE_PROFILE_IDS
           : [];
   return [...new Set(list2.map((result) => String(result || '').trim()).filter(Boolean))];
+}
+/**
+ * 只读清单里**显式声明**的线路（providerProfiles）。
+ * 与 getModelProviderProfileIds 的区别：不做 RunningHub 的隐式兜底，
+ * 所以能干净地区分「这家厂商声明了多条线路」和「这家厂商自己管线路」。
+ */
+export function getDeclaredModelProviderProfileIds(value) {
+  const manifest4 = resolveManifest(value),
+    list4 = Array.isArray(manifest4?.extensions?.providerProfiles)
+      ? manifest4.extensions.providerProfiles
+      : [];
+  return [...new Set(list4.map((result) => String(result || '').trim()).filter(Boolean))];
+}
+/**
+ * 解析一次生成请求实际应该走哪条线路（拿它当 provider id 去取 apiUrl / apiKey）。
+ * 返回空串表示「这个模型没有线路切换」，调用方按原来的 provider 处理。
+ * - 入参里选中了某条线路且在声明列表内 -> 用它（用户在模型菜单里切过的线路优先）。
+ * - 没选或选了不存在的 -> 用声明里的第一条（Agnes 是「国内」）。
+ * - 传了 handler 时：当选中的线路没准备好、而同厂商另一条准备好了，让位给可用的那条，
+ *   与设置面板 resolveReadyModelProviderProfileId 的自动切换保持一致。
+ */
+export function resolveDeclaredProviderProfileId(value, options, handler) {
+  const list5 = getDeclaredModelProviderProfileIds(value);
+  if (list5.length === 0) return '';
+  const manifest5 = resolveManifest(value),
+    payload = String(manifest5?.provider || '')
+      .trim()
+      .toLowerCase();
+  if (SELF_MANAGED_PROVIDER_PROFILE_PROVIDER_IDS.includes(payload)) return '';
+  const target = String(getRunningHubProviderProfileId(options) || '').trim(),
+    preferred = target && list5.includes(target) ? target : list5[0];
+  if (typeof handler !== 'function') return preferred;
+  if (handler(preferred) === true) return preferred;
+  return list5.find((output) => handler(output) === true) || preferred;
 }
 export function normalizeModelProviderProfileId(data, options) {
   const manifest3 = resolveManifest(data),

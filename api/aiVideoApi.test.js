@@ -2962,7 +2962,12 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
               assert.equal(value111.apiUrl, 'https://apihub.agnes-ai.com/v1/videos'),
               assert.equal(value111.apiKey, 'k_agnes'),
               assert.equal(value111.model, 'agnes-video-v2.0'),
-              makeJsonResponse({ id: 'agnes-task-1', status: 'queued' })
+              makeJsonResponse({
+                id: 'agnes-task-1',
+                task_id: 'agnes-task-1',
+                video_id: 'video_agnes-1',
+                status: 'queued',
+              })
             );
           }
           if (value110.startsWith('/api/v2/proxy/task?'))
@@ -2986,7 +2991,11 @@ function makeBlobResponse(value38, ok3 = 200, value39 = 'video/mp4') {
         prompt: 'slow camera move',
         generationParams: { aspectRatio: '16:9', duration: 5 },
       });
-      (assert.deepEqual(list9, ['https://apihub.agnes-ai.com/v1/videos/agnes-task-1']),
+      // 查询凭证是创建响应里的 video_id，且必须走官方 /agnesapi 路由（用任务号打
+      // /v1/videos/{id} 只会拿到状态，拿不到成片地址）。
+      (assert.deepEqual(list9, [
+        'https://apihub.agnes-ai.com/agnesapi?video_id=video_agnes-1&model_name=agnes-video-v2.0',
+      ]),
         assert.equal(generateVideo5.videoUrl, '/output/agnes-task-1.mp4'),
         assert.equal(generateVideo5.sourceUrl, video),
         assert.equal(generateVideo5.localPath, 'output/agnes-task-1.mp4'));

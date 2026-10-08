@@ -1,5 +1,8 @@
 import * as PpioAdapter from './adapters/PpioAdapter.js';
-import { buildTextRequestFromManifest } from './adapters/ModelApiManifestNormalizer.js';
+import {
+  buildTextRequestFromManifest,
+  resolveProviderProfileConfig,
+} from './adapters/ModelApiManifestNormalizer.js';
 import { ensureConfig, getProviderConfig } from './configApi.js';
 import { applyCameraAngleToPrompt } from './cameraPromptApi.js';
 import { fetchWithTimeout, buildApiUrl } from './apiBase.js';
@@ -165,6 +168,7 @@ const MANIFEST_REQUIRED_TEXT_PROVIDERS = Object.freeze(
 function formatTextProviderLabel(input) {
   const providerId2 = normalizeProviderId(input);
   if (providerId2 === 'agnes') return 'Agnes AI';
+  if (providerId2 === 'agnes-domestic') return 'Agnes AI（国内）';
   if (providerId2 === 'apimart') return 'APIMart';
   if (providerId2 === 'grsai') return 'GRSAI';
   if (providerId2 === 'ppio') return 'PPIO';
@@ -755,7 +759,13 @@ export async function buildGenerateTextRequest(content2) {
     textExecution = resolveTextExecution(content2, model2),
     expectedProvider = resolveTextProviderId(content2, model2, textExecution);
   assertTextManifestResolution(model2, expectedProvider, textExecution);
-  const providerConfig = getProviderConfig(expectedProvider),
+  // 线路切换（如 Agnes 国内/国际）在这层生效：清单声明的 provider 只是「主线路」，
+  // 实际走哪条要看请求里选中的线路，否则设置面板里填的 Key 永远用不上。
+  const providerConfig = resolveProviderProfileConfig(
+      expectedProvider,
+      { ...content2, model: model2 },
+      { getProviderConfig: getProviderConfig },
+    ),
     list27 = providerConfig.apiUrl.replace(/\/v1\/?$/, ''),
     apiKey = isRunningHubTextModel(expectedProvider, model2)
       ? providerConfig.modelApiKey || content2.apiKey

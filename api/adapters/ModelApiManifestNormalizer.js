@@ -4,7 +4,10 @@ import {
   resolveRunningHubModelApiBaseUrl,
   resolveRunningHubModelApiProfileId,
 } from '../../src/modules/runningHubProviderProfiles.js';
-import { normalizeModelProviderProfileId } from '../../src/modules/modelProviderProfileSelection.js';
+import {
+  normalizeModelProviderProfileId,
+  resolveDeclaredProviderProfileId,
+} from '../../src/modules/modelProviderProfileSelection.js';
 import { parseRatioLabel } from '../imageRatioPolicy.js';
 import { normalizeTextStructuredOutput } from './textStructuredOutput.js';
 import { resolveModelExecution, sanitizeModelUiSchemaParams } from '../../src/manifests/index.js';
@@ -116,13 +119,35 @@ export function resolveExecutionModelToken(config, scope) {
   }
   return input;
 }
-function resolveApiKey(value2, value3, value4) {
-  const value5 = value4.getProviderConfig(value2);
-  if (value2 === 'runninghub') return value5.modelApiKey || value3.apiKey;
-  return value5.apiKey || value3.apiKey;
+function resolveApiKey(value2, value3, value4, value5) {
+  const providerConfig = value5 || value4.getProviderConfig(value2);
+  if (value2 === 'runninghub') return providerConfig.modelApiKey || value3.apiKey;
+  return providerConfig.apiKey || value3.apiKey;
 }
 function throwMissingApiKey(value6) {
   throw ApiError.authError(value6, null, 'API Key 未配置（厂商：' + (value6 || 'unknown') + '）');
+}
+function isProviderProfileReady(providerId, ctx) {
+  try {
+    return Boolean(String(ctx.getProviderConfig(providerId)?.apiKey || '').trim());
+  } catch {
+    return false;
+  }
+}
+/**
+ * 取本次请求实际应该使用的厂商配置。
+ * 清单声明了多条线路（如 Agnes 国内 / 国际）时，按请求里选中的线路取对应的 apiUrl 与 apiKey，
+ * 而不是永远用清单里写死的 provider——否则设置面板里切换的线路对生成毫无影响。
+ * 没声明线路的厂商行为不变（仍等价于 ctx.getProviderConfig(provider)）。
+ */
+export function resolveProviderProfileConfig(provider, payload, ctx) {
+  const base = ctx.getProviderConfig(provider);
+  const providerProfileId = resolveDeclaredProviderProfileId(payload?.model, payload, (entry) =>
+    isProviderProfileReady(entry, ctx),
+  );
+  if (!providerProfileId || providerProfileId === provider) return base;
+  const providerProfileConfig = ctx.getProviderConfig(providerProfileId) || {};
+  return { ...base, ...providerProfileConfig, apiUrl: providerProfileConfig.apiUrl || base.apiUrl };
 }
 function getManifestMaxInputCount(value7, value8) {
   const value9 = Number(value7?.inputSlots?.maxByKind?.[value8]);
@@ -1122,6 +1147,8 @@ function resolveApimartGoogleImageSearch(value244, { context: context19 }) {
   );
 }
 const BODY_MAPPING_TRANSFORMS = Object.freeze({
+  // 有些厂商要求数值型参数以字符串提交（例如 Agnes Video 2.5 的 seconds 只收 "4"~"12"）。
+  stringParam: normalizeStringParam,
   apimartNanoBanana2Resolution: (value247) => normalizeApimartNanoBanana2Resolution(value247),
   apimartGptImage2Resolution: (value248) => normalizeApimartGptImage2Resolution(value248),
   apimartImageCount: normalizeApimartImageCount,
@@ -1309,8 +1336,8 @@ export async function buildVideoRequestFromManifest(modelId2, finalPrompt, ctx, 
       },
       modelManifest2,
     ),
-    baseUrl3 = ctx.getProviderConfig(provider8),
-    apiKey = resolveApiKey(provider8, payload2, ctx);
+    baseUrl3 = resolveProviderProfileConfig(provider8, payload2, ctx),
+    apiKey = resolveApiKey(provider8, payload2, ctx, baseUrl3);
   !apiKey && throwMissingApiKey(provider8);
   const enabled16 = executionManifest3.extensions?.bodyResolver === 'apimartSeedanceVideo',
     finalUrlsBySlot = enabled16
@@ -1400,8 +1427,8 @@ export async function buildTextRequestFromManifest(value259, finalPrompt2, ctx2,
       executionManifest: executionManifest4,
       effectivePayload: effectivePayload3,
     } = requestManifest2,
-    baseUrl4 = ctx2.getProviderConfig(provider9),
-    apiKey2 = resolveApiKey(provider9, effectivePayload3, ctx2) || baseUrl4.apiKey;
+    baseUrl4 = resolveProviderProfileConfig(provider9, effectivePayload3, ctx2),
+    apiKey2 = resolveApiKey(provider9, effectivePayload3, ctx2, baseUrl4) || baseUrl4.apiKey;
   if (!apiKey2) throwMissingApiKey(provider9);
   const modelToken2 = resolveExecutionModelToken(executionManifest4, effectivePayload3),
     value262 = {
@@ -1533,8 +1560,8 @@ export async function buildImageRequestFromManifest(modelId3, finalPrompt3, ctx3
     effectivePayload: effectivePayload4,
   } = requestManifest3;
   if (!['agnes', 'apimart', 'ppio', 'grsai', 'runninghub', 'volcengine'].includes(provider10)) return null;
-  const baseUrl5 = ctx3.getProviderConfig(provider10),
-    apiKey3 = resolveApiKey(provider10, modelId3, ctx3);
+  const baseUrl5 = resolveProviderProfileConfig(provider10, modelId3, ctx3),
+    apiKey3 = resolveApiKey(provider10, modelId3, ctx3, baseUrl5);
   !apiKey3 && throwMissingApiKey(provider10);
   const finalUrlsBySlot2 = await resolveInputImagesBySlot(provider10, effectivePayload4, apiKey3, ctx3, {
       modelManifest: modelManifest4,
