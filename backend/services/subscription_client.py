@@ -24,6 +24,16 @@ DEFAULT_GRACE_SECONDS = 259200
 DEFAULT_PRODUCT_DISPLAY_NAME = "Canvas"
 DEFAULT_UPDATE_MANIFEST_URL = "https://github.com/luseaer-ship-it/CanvasPro/releases/latest/download/latest.json"
 
+# 客户端↔后台契约版本（跨仓对齐）：与 canvas-admin
+# app/services/client_config_service.py 的 CONTRACT_VERSION **同名同义**，由双方代码
+# 各自声明，供 tools/canvas-workspace.mjs 做漂移检测。
+#
+# ⚠️ 这是**系统字段**，不是运营可编辑键：严禁加入 STRUCTURED_CONFIG_KEYS /
+# DEFAULT_STRUCTURED_CONFIG / _STRUCTURED_NORMALIZERS —— 那三处是运营可编辑键的
+# 归一化，语义不同。客户端读取路径见 _normalize_client_config。
+CONTRACT_VERSION_KEY = "contractVersion"
+SUPPORTED_CONTRACT_VERSIONS = ("2026.10",)
+
 
 def _env_enabled(name):
     return str(os.environ.get(name, "") or "").strip().lower() in ("1", "true", "yes", "on")
@@ -518,6 +528,28 @@ class SubscriptionRemoteClient:
         # 结构化命名空间（brand / contact / content_sources / ...）：后台配了才下发，
         # 未配的键不写进结果，由 get_client_config 的默认值补齐。
         config.update(normalize_structured_config(data))
+        # 客户端↔后台契约版本：**单独读取**，绝不并入 STRUCTURED_CONFIG_KEYS（那三处
+        # 是运营可编辑键的归一化，语义不同）。三种情形：
+        #   1) 读到且受支持 → 落入配置结果，供上层/诊断读取；
+        #   2) 读到但不受支持（后台契约已更新）→ 只告警，绝不抛异常、绝不阻断授权流程；
+        #   3) 读不到（旧后台 / 老响应）→ 静默兼容，不告警，按现状工作。
+        contract_version = data.get(CONTRACT_VERSION_KEY)
+        if isinstance(contract_version, str) and contract_version.strip():
+            contract_version = contract_version.strip()
+            if contract_version in SUPPORTED_CONTRACT_VERSIONS:
+                config[CONTRACT_VERSION_KEY] = contract_version
+                _LOGGER.debug(
+                    "后台契约版本 %s 在客户端支持范围 %s 内",
+                    contract_version, SUPPORTED_CONTRACT_VERSIONS,
+                )
+            else:
+                # 刻意**不**写入 config：否则每次 get_client_config() 都会重新归一化
+                # 并重复告警，把日志刷屏。这里只落一条 WARNING，授权流程照常继续。
+                _LOGGER.warning(
+                    "后台契约版本 %s 超出客户端支持范围 %s；"
+                    "授权流程继续按宽限/离线逻辑工作，不阻断。",
+                    contract_version, SUPPORTED_CONTRACT_VERSIONS,
+                )
         return config
 
     def get_client_config(self, *, refresh=False):
