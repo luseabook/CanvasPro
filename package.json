@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "better-sqlite3": "^12.11.1",
-    "electron": "42.4.1",
+    "electron": "42.11.12",
     "knex": "^3.3.0",
     "@playwright/test": "1.63.0",
     "electron-builder": "26.15.3",
