@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "format:check": "prettier --check .",
     "check:reachability": "node tools/check-reachability.mjs",
+    "check:innerhtml": "node tools/check-innerhtml.mjs",
     "test:e2e": "playwright test",
     "web": "venv\\Scripts\\python.exe server.py",
     "desktop": "set \"AICANVAS_PORT=8778\" && electron .",

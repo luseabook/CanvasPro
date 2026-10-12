@@ -55,6 +55,9 @@ jobs:
       - name: Reachability gate
         run: npm run check:reachability
 
+      - name: innerHTML gate
+        run: npm run check:innerhtml
+
       - name: JavaScript unit tests
         run: npm run test:js
 
