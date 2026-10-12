@@ -5,6 +5,7 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import extract_zip from 'extract-zip';
+import { assertSafeZipArchive } from '../zipEntrySafety.js';
 import {
   resolveAsrRuntimeBaseDir,
   resolveAsrRuntimeInstallDir,
@@ -270,6 +271,10 @@ export function createAsrRuntimeInstallMediaTaskHandler({
       if (actualSha256.toLowerCase() !== pkg.sha256)
         throw new Error('ASR runtime checksum verification failed');
     }
+    // Pre-flight validation (see zipEntrySafety.js): reject symlink/path-traversal
+    // entries before handing the archive to extract-zip, and unpack only into the
+    // freshly created, empty extractDir so no pre-existing link can be followed.
+    await assertSafeZipArchive(archivePath);
     (queue.emitProgress(task, 0.68, 'Extracting subtitle component', {
       stage: ASR_RUNTIME_STAGE.EXTRACT,
     }),
