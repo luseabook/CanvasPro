@@ -503,53 +503,24 @@ const STORY_STEPS = Object.freeze([
     { id: 3, label: '分集视频' },
   ]),
   STORY_ASSET_TAB_ORDER = Object.freeze(['character', 'scene', 'prop', 'audio', 'library']);
-function escapeHtml(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-}
-function normalizeText(item) {
-  return String(item || '').trim();
-}
-export function syncStoryClipFrameCardSaveError(el, key = '') {
-  if (!el) return false;
-  const text = normalizeText(key);
-  el.classList?.toggle?.('is-save-error', Boolean(text));
-  if (text) el.setAttribute?.('data-tooltip', text);
-  else el.removeAttribute?.('data-tooltip');
-  return (
-    el.removeAttribute?.('data-native-title'),
-    el.removeAttribute?.('data-tooltip-source'),
-    el.removeAttribute?.('title'),
-    true
-  );
-}
-export function toggleStoryAssetSelectAll(list = [], index = []) {
-  return toggleWorkspaceAssetSelectAll(list, index);
-}
-export function toggleStoryAssetSelection(list2 = [], result = '', data = false) {
-  return toggleWorkspaceAssetSelection(list2, result, data);
-}
-export function updateStoryAssetBatchButtonLabel(el2, options = '') {
-  const el3 = el2?.querySelector?.('.story-asset-batch-trigger-label');
-  if (!el3) return false;
-  return ((el3.textContent = String(options ?? '')), true);
-}
-export function toggleStoryEpisodeSelectAll(list3 = [], target = []) {
-  return toggleStoryAssetSelectAll(list3, target);
-}
-function toModelSearchText(options2 = {}) {
-  return [options2.label, options2.providerLabel, options2.description, options2.modelId]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
-function isUsableImageUrl(source) {
-  return /^(?:https?:|blob:|data:|\/|images\/|assets\/)/i.test(normalizeText(source));
-}
+import {
+  escapeHtml,
+  normalizeText,
+  syncStoryClipFrameCardSaveError,
+  toggleStoryAssetSelectAll,
+  toggleStoryAssetSelection,
+  updateStoryAssetBatchButtonLabel,
+  toggleStoryEpisodeSelectAll,
+  toModelSearchText,
+  isUsableImageUrl,
+} from './storyWorkspaceSharedHelpers.js';
+export {
+  syncStoryClipFrameCardSaveError,
+  toggleStoryAssetSelectAll,
+  toggleStoryAssetSelection,
+  updateStoryAssetBatchButtonLabel,
+  toggleStoryEpisodeSelectAll,
+};
 const storyClipProductionPresentation = createStoryClipProductionPresentation({
     localPathToUrl: localPathToUrl,
     isUsableImageUrl: isUsableImageUrl,
