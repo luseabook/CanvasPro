@@ -72,113 +72,22 @@ const DEFAULT_ASSET_CATEGORIES = DEFAULT_MATERIAL_LIBRARY_CATEGORIES,
   ]),
   ASSET_CATEGORY_LIMIT = MATERIAL_LIBRARY_CATEGORY_LIMIT,
   HIDDEN_ASSET_CATEGORIES = ['出图历史'],
-  HIDDEN_ASSET_KINDS = ['generation-history'],
-  ASSET_CATEGORY_I18N_KEYS = Object.freeze({
-    人物: 'people',
-    场景: 'scenes',
-    物品: 'objects',
-    风格: 'styles',
-    音效: 'soundEffects',
-    Others: 'others',
-    剧本资产: 'storyWorkspace',
-    替换工作室: 'replacementStudio',
-    替换工作室资产: 'replacementStudio',
-    替换工作室入参: 'replacementStudio',
-    出图历史: 'history',
-    自定义: 'custom',
-  });
-function assetManagerText(value, item = {}) {
-  return t('assetManager.' + value, item);
-}
-function _formatAssetCategoryLabel(key) {
-  const index = String(key || '').trim(),
-    result = ASSET_CATEGORY_I18N_KEYS[index];
-  return result ? assetManagerText('categories.' + result) : index;
-}
-function _escapeHtml(data) {
-  return String(data ?? '')
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll('\'', '&#39;');
-}
-function _clonePlain(options, target) {
-  if (options == null) return target;
-  try {
-    return JSON.parse(JSON.stringify(options));
-  } catch (source) {
-    return target;
-  }
-}
-function _normalizeAssetType(next) {
-  const current = String(next || '');
-  if (current === 'text' || current === 'source-text' || current === 'ai-text') return 'text';
-  if (current === 'audio' || current === 'source-audio' || current === 'ai-audio') return 'audio';
-  if (current === 'video' || current === 'source-video' || current === 'ai-video') return 'video';
-  if (current === 'image' || current === 'source-image' || current === 'ai-image') return 'image';
-  return 'other';
-}
-function _formatAssetTypeLabel(entry) {
-  const _normalizeAssetType2 = _normalizeAssetType(entry);
-  return assetManagerText('types.' + _normalizeAssetType2);
-}
-function _resolveNodeStableThumbSrc(enabled) {
-  if (!enabled) return '';
-  const record =
-    enabled.thumbLocalPath ||
-    enabled.displayLocalPath ||
-    enabled.localPath ||
-    enabled.originalLocalPath;
-  if (record)
-    return (
-      localPathToUrl(record) ||
-      (String(record).startsWith('/')
-        ? String(record)
-        : '/' + String(record).replace(/^\/+/, ''))
-    );
-  if (enabled.thumbUrl && typeof enabled.thumbUrl === 'string') return enabled.thumbUrl;
-  return String(enabled.src || enabled.imageUrl || '');
-}
-function _renderAssetIcon(payload) {
-  const _normalizeAssetType3 = _normalizeAssetType(payload);
-  if (_normalizeAssetType3 === 'text') return createReferenceFallbackThumbHtml('text', 'v2-asset-icon');
-  if (_normalizeAssetType3 === 'audio') return createReferenceFallbackThumbHtml('audio', 'v2-asset-icon');
-  if (_normalizeAssetType3 === 'video')
-    return '<div class="v2-asset-icon v2-asset-icon--video" aria-hidden="true">\n      <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">\n        <polygon points="5 3 19 12 5 21 5 3" />\n      </svg>\n    </div>';
-  return '<div class="v2-asset-icon v2-asset-icon--other" aria-hidden="true">\n    <svg class="v2-asset-icon-svg" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">\n      <rect x="3" y="3" width="18" height="18" rx="2" />\n    </svg>\n  </div>';
-}
-function _buildAssetItem(name) {
-  const type = name?.type || 'other',
-    thumbSrc = resolveAssetNodeCoverUrl(name) || _resolveNodeStableThumbSrc(name);
-  return { type: type, name: name?.name || '', thumbSrc: thumbSrc || '', nodeData: name };
-}
-function _resolveMaterialItemThumbSrc(handle) {
-  return String(
-    resolveMaterialItemThumbUrl(handle) || _resolveNodeStableThumbSrc(handle?.nodeData) || '',
-  );
-}
-function _resolveMaterialItemPreviewSrc(state) {
-  return String(resolveMaterialItemPreviewUrl(state) || _resolveMaterialItemThumbSrc(state));
-}
-function _sortAssetsByUpdatedTime(config) {
-  return [...(Array.isArray(config) ? config : [])].sort((scope, input) => {
-    const output = Number(scope?.updatedAt || scope?.createdAt || 0),
-      value2 = Number(input?.updatedAt || input?.createdAt || 0);
-    return value2 - output;
-  });
-}
-function _formatAssetDateTime(value3) {
-  const count2 = Number(value3);
-  if (!Number.isFinite(count2) || count2 <= 0) return assetManagerText('unknownTime');
-  return new Date(count2).toLocaleString(getLocale(), {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
+  HIDDEN_ASSET_KINDS = ['generation-history'];
+import {
+  assetManagerText,
+  _formatAssetCategoryLabel,
+  _escapeHtml,
+  _clonePlain,
+  _normalizeAssetType,
+  _formatAssetTypeLabel,
+  _resolveNodeStableThumbSrc,
+  _renderAssetIcon,
+  _buildAssetItem,
+  _resolveMaterialItemThumbSrc,
+  _resolveMaterialItemPreviewSrc,
+  _sortAssetsByUpdatedTime,
+  _formatAssetDateTime,
+} from './assetManagerHelpers.js';
 class AssetManager {
   constructor() {
     ((this.createPanel = null),
