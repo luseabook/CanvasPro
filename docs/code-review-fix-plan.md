@@ -216,8 +216,8 @@ canvas@0.4.12
 | 批 3 · 未提交改动 | ✅ 完成 | 恢复 `release_notes.txt` / `COMMERCIAL-LICENSE.md`；README/计划提交 `8e5804bd` |
 | 批 4 · lint/覆盖率 | ✅ 完成 | ESLint + Prettier + `test:js:cov` + CI 步骤；提交 `a9f13796` |
 | 批 5 · 孤立模块 | 🟡 前置+门禁完成 | `tools/reachability.mjs` + 基线门禁（实测 scope 2061/可达 1888/孤立 173）；提交 `573a75fc` |
-| 批 6 · 巨型文件/innerHTML | ⬜ 未开始 | — |
-| 批 7 · electron-builder/清理 | ⬜ 未开始 | — |
+| 批 6 · 巨型文件/innerHTML | ⬜ 待选目标 | 需选有测试覆盖的文件（见下） |
+| 批 7 · electron-builder/清理 | ✅ 评估完成（多数"不改"） | 结论见下（无修复版/保持现状） |
 
 ### 逐批门禁结果（本机实测）
 `test:js` 11283 / 0 fail / 1 skip；`check:csp` PASS；`check:obfuscation` PASS；`test:backend` 223 OK（skip 3）；`test:migrations` PASS（17 表）；`check:package` PASS（electron 42.11.12）；`lint` 0 error（52 warn 存量）；`check:reachability` PASS。
@@ -232,3 +232,27 @@ canvas@0.4.12
 | 仅被其它孤立模块引用 | 74 | 需按"孤立簇"整体接线或整体删除，不能单删 |
 
 > **结论**：批 5 的"逐簇清零"不能按列表盲删——先把"约定式入口"补进 `tools/reachability.mjs` 的入口集合并重算基线，再逐簇接线/删除。`electron-builder.win.dev.cjs`、`#` 桶文件等需与 0.7.16 镜像的消费方对照后才能定夺（镜像不在仓库内）。**该步拆为后续专用批次执行。**
+
+### 批 5 补充分析（2026-10-12，第二轮）
+对 173 个孤立模块做"整仓文本引用扫描"（`test-artifacts/orphan-refscan.mjs`）：仅 **14 个**模块的基名在全仓（js/cjs/mjs/html/json）任何位置都不出现。剔除 `eslint.config.mjs`（约定式入口）后，剩余 **13 个全是 `src/modules/storyWorkspace/storyReplication*` 成簇文件**——它们是 0.7.16 移植代码，本仓正处于"落地不接线"的既有状态，**删除会毁掉移植成果**。因此批 5 无可安全删除项，接线需镜像对照，**维持"拆后续专用批次"**。
+
+### 批 7 结论（2026-10-12）
+| 子项 | 结论 | 依据 |
+| --- | --- | --- |
+| electron-builder 升级 | **不改** | 已装 26.15.3 即 latest；26.17.0 仍依赖 `@electron/get@^3`（仍在漏洞区间）；只有 `27.0.0-alpha.10` 可能换代——构建链上 alpha 不可接受 |
+| ASAR | **保持 `asar: false`** | 当前配置使用自定义未打包 Electron + 需从磁盘 spawn Python 运行时，启用 ASAR 属破坏性变更且收益有限 |
+| console.log | **保留** | 实测源码仅 ~10 处，多为 `AIC_DRAG_IMPORT_PROFILING` 门控或性能/历史诊断信息，属可用日志而非噪音；清理收益低于回归风险 |
+| CSS 双轨 | 待定 | 约定见 §2.3，存量不搬迁 |
+
+### 批 6 评估（2026-10-12）
+| 巨型文件 | 行数 | 相关测试覆盖 |
+| --- | --- | --- |
+| `src/modules/storyWorkspace/storyWorkspace.js` | 9495 | 有（storyWorkspaceChromePresentation 等） |
+| `api/storyGenerationApi.js` | 7677 | **无** |
+| `src/modules/personReplacement/personReplacementWorkspace.js` | 7187 | 有 |
+| `src/modules/storyboard3d/editorWorkspace.js` | 6817 | **无** |
+| `src/modules/AssetManager.js` | 4719 | **无** |
+
+> **结论**：搬迁式拆分**只对已有测试覆盖的文件安全**（`storyWorkspace.js` / `personReplacementWorkspace.js`）。其余三个需先补测试。拆分量大，需**逐文件、逐次提交**，每次跑对应 `*.test.js`。
+>
+> **另注**：lint 报出的 3 处 `no-misleading-character-class` 均为**故意的零宽字符检测正则**（ZWJ/ZWNJ/BOM），属误报，已按存量降为 warn。
