@@ -12,6 +12,7 @@
     "test:js:cov": "node --test --experimental-test-coverage \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
     "lint": "eslint .",
     "format:check": "prettier --check .",
+    "check:reachability": "node tools/check-reachability.mjs",
     "test:e2e": "playwright test",
     "web": "venv\\Scripts\\python.exe server.py",
     "desktop": "set \"AICANVAS_PORT=8778\" && electron .",

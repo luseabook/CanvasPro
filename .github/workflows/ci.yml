@@ -52,6 +52,9 @@ jobs:
       - name: ESLint
         run: npm run lint
 
+      - name: Reachability gate
+        run: npm run check:reachability
+
       - name: JavaScript unit tests
         run: npm run test:js
 
