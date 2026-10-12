@@ -270,4 +270,6 @@ canvas@0.4.12
 >
 > 6. 已补剧集拆分段**行为测试** `api/storyGenerationApi.episodeSplit.test.js`（9 项，`abf96a7d`）。**但实测该段仍不可安全切分**：把「剧集拆分清洗/蓝图」簇整段（约 950 行）抽出后，`no-undef` 仍报出 **31 项**依赖（含刚抽出的 `storyGenerationInputHelpers` 与 `normalizeStoryEpisodeSplitSourceBeats` 等跨段引用），实际闭包接近整文件一半。**结论：该文件不宜再按簇切分**，除非接受一次搬走约 3500 行的半文件级改动；建议保持现状。
 >
+> 7. **半文件级搬迁实测失败（已回滚，未提交）**：按 [376..5089] 抽出约 4700 行后，`storyGenerationSplitSupport.js` 自身仅在**模块求值期**就触发 `Cannot access 'STORY_SOURCE_CHUNK_CHARACTERS' before initialization`——因为该区间里混有**模块顶层工厂实例 `const`**（如 `storySummaryGenerationApi = createStorySummaryGenerationApi({... sourceChunkCharacters: STORY_SOURCE_CHUNK_CHARACTERS ...})`），它们在 import/求值阶段就要用到源模块的顶层常量，形成**求值期循环依赖**（function 循环可 hoist 规避，顶层 const 不行）。要消除必须把源模块几乎全部顶层常量/工厂实例一并搬走——等价于搬走整个配置层。**最终判定：`storyGenerationApi.js` 的拆分需要领域级重写，机械搬迁在任何切口都会撞上求值期循环依赖。保持现状。**
+>
 > **另注**：lint 报出的 3 处 `no-misleading-character-class` 均为**故意的零宽字符检测正则**（ZWJ/ZWNJ/BOM），属误报，已按存量降为 warn。
