@@ -216,7 +216,7 @@ canvas@0.4.12
 | 批 3 · 未提交改动 | ✅ 完成 | 恢复 `release_notes.txt` / `COMMERCIAL-LICENSE.md`；README/计划提交 `8e5804bd` |
 | 批 4 · lint/覆盖率 | ✅ 完成 | ESLint + Prettier + `test:js:cov` + CI 步骤；提交 `a9f13796` |
 | 批 5 · 孤立模块 | 🟡 前置+门禁完成 | `tools/reachability.mjs` + 基线门禁（实测 scope 2061/可达 1888/孤立 173）；提交 `573a75fc` |
-| 批 6 · 巨型文件/innerHTML | 🟡 测试安全网已补 | 3 个无测试文件已补测试（`73311883`）；实际搬迁拆分待执行 |
+| 批 6 · 巨型文件/innerHTML | 🟡 editorWorkspace 已拆 | 6817 → 5217 行（抽 2 个模块，`be2cf2d7`/`6aca37cf`）；其余文件待做 |
 | 批 7 · electron-builder/清理 | ✅ 评估完成（多数"不改"） | 结论见下（无修复版/保持现状） |
 
 ### 逐批门禁结果（本机实测）
@@ -255,6 +255,12 @@ canvas@0.4.12
 
 > **结论**：搬迁式拆分**只对已有测试覆盖的文件安全**（`storyWorkspace.js` / `personReplacementWorkspace.js`）。其余三个需先补测试。拆分量大，需**逐文件、逐次提交**，每次跑对应 `*.test.js`。
 >
-> **进度（2026-10-12）**：三个原无测试文件的**安全网已补**（提交 `73311883`）——`api/storyGenerationApi.test.js`（分块/解析边界）、`src/modules/storyboard3d/editorWorkspace.test.js`（纯函数钳制）、`src/modules/AssetManager.test.js`（jsdom 导入 + 方法面）。`test:js` 11296 / 0 fail。**实际搬迁拆分仍待执行**（需逐文件、逐次提交）。
+> **进度（2026-10-12）**：三个原无测试文件的**安全网已补**（提交 `73311883`）——`api/storyGenerationApi.test.js`（分块/解析边界）、`src/modules/storyboard3d/editorWorkspace.test.js`（纯函数钳制）、`src/modules/AssetManager.test.js`（jsdom 导入 + 方法面）。`test:js` 11296 / 0 fail。
+>
+> **搬迁拆分（2026-10-12）**：`editorWorkspace.js` **6817 → 5217 行**，分两刀抽离：
+> 1. `editorLayoutMetrics.js`（布局常量 + 4 个纯尺寸函数）— `be2cf2d7`
+> 2. `storyboard3DRenderHelpers.js`（45 个模块级渲染函数）— `6aca37cf`
+>
+> 每刀都用**临时 `no-undef` 配置**校验搬迁闭包（0 undefined），导入导出面不变，`test:js` / `lint` / `check:reachability` 全绿。其余 4 个巨型文件仍待拆。
 >
 > **另注**：lint 报出的 3 处 `no-misleading-character-class` 均为**故意的零宽字符检测正则**（ZWJ/ZWNJ/BOM），属误报，已按存量降为 warn。
