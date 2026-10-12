@@ -1,6 +1,6 @@
 {
-  "scope": 2061,
-  "reachable": 1888,
+  "scope": 2073,
+  "reachable": 1902,
   "orphans": [
     "api/adapters/ApimartAdapter.js",
     "api/adapters/ComfyUiAdapter.js",
@@ -50,9 +50,7 @@
     "electron/chromeShellStartupFallback.js",
     "electron/chromeShellStartupHealth.js",
     "electron/chromeShellWebPreviewManager.js",
-    "electron/globalCaptureWindow.js",
     "electron/nativeContextMenuIcons.js",
-    "electron/screenshotOverlay.js",
     "electron/sortformerModelRoot.js",
     "electron/windowsTaskbarIdentity.js",
     "eslint.config.mjs",

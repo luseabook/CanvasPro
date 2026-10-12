@@ -82,6 +82,21 @@ function entryPoints() {
   };
   byGlob('electron', /preload.*\.cjs$/i);
   byGlob('db/migrations', /\.cjs$/i);
+  // Scripts loaded directly by an HTML document (not imported by any module).
+  for (const [directory, name] of [
+    ['.', 'index.html'],
+    ['electron', 'screenshotOverlay.html'],
+    ['electron', 'globalCaptureWindow.html'],
+  ]) {
+    const file = path.join(ROOT, directory, name);
+    if (!fs.existsSync(file)) continue;
+    const html = fs.readFileSync(file, 'utf8');
+    for (const tag of html.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["']/gi)) {
+      const clean = tag[1].split(/[?#]/)[0];
+      const rel = path.posix.normalize(path.posix.join(directory === '.' ? '' : directory, clean));
+      if (/\.(?:js|mjs|cjs)$/i.test(rel)) entries.add(rel.replace(/^\.?\//, ''));
+    }
+  }
   return entries;
 }
 
