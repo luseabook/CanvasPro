@@ -268,4 +268,6 @@ canvas@0.4.12
 >
 > **注**：`storyGenerationApi.js` 的其余辅助函数呈**级联耦合**（一个切口会引出一串本地依赖），继续深挖需要更大范围的成组搬迁或先补更多测试，暂缓；剩余可拆文件见上表。
 >
+> 6. 已补剧集拆分段**行为测试** `api/storyGenerationApi.episodeSplit.test.js`（9 项，`abf96a7d`）。**但实测该段仍不可安全切分**：把「剧集拆分清洗/蓝图」簇整段（约 950 行）抽出后，`no-undef` 仍报出 **31 项**依赖（含刚抽出的 `storyGenerationInputHelpers` 与 `normalizeStoryEpisodeSplitSourceBeats` 等跨段引用），实际闭包接近整文件一半。**结论：该文件不宜再按簇切分**，除非接受一次搬走约 3500 行的半文件级改动；建议保持现状。
+>
 > **另注**：lint 报出的 3 处 `no-misleading-character-class` 均为**故意的零宽字符检测正则**（ZWJ/ZWNJ/BOM），属误报，已按存量降为 warn。
