@@ -1,154 +1,164 @@
-> **给 AI 助手和开发者**：在本仓库做任何分析或修改之前，先读 [`AGENTS.md`](AGENTS.md)（强制规则）。入口文档是 [`docs/TRACKING.md`](docs/TRACKING.md)，所有文件改动都会自动记录到 [`docs/tracking/changes/`](docs/tracking/changes/)。
+> **给 AI 助手和开发者**：在本仓库做任何分析或修改之前，先读 [`AGENTS.md`](AGENTS.md)（强制规则），再读项目入口文档 [`docs/TRACKING.md`](docs/TRACKING.md)。
+> ⚠️ 文件改动跟踪机制自 2026-09-29 起**暂停**，详见 `AGENTS.md` §0。
 
 <div align="center">
 
-<img src="images\favicon.svg" width="64" height="64" alt="Canvas Logo"/>
+<img src="images/favicon.svg" width="64" height="64" alt="Canvas Logo"/>
 
 # Canvas
 
 **基于节点的 AI 多模态画布编辑器**
 
-一款纯原生 Web 应用（HTML / CSS / JS），让你在无限画布上，通过可视化节点连线的方式，自由组合 AI 能力，生成文本、图像、视频与音频。
-
-[![作者：阿硕](https://img.shields.io/badge/作者-阿硕-pink?style=flat-square)](https://space.bilibili.com/1876480181)
-[![Bilibili](https://img.shields.io/badge/Bilibili-主页-00A1D6?style=flat-square\&logo=bilibili)](https://space.bilibili.com/1876480181)
-[![License](https://img.shields.io/badge/License-Source%20Available%20%7C%20NC-orange?style=flat-square)](LICENSE)
+一款纯原生 Web 应用（HTML / CSS / ES Modules），在无限画布上通过可视化节点连线组合 AI 能力，生成文本、图像、视频与音频；可运行于浏览器，也可打包为 Electron 桌面应用。
 
 </div>
 
-***
+## 技术栈
 
-## 授权与非官方部署声明
+| 层 | 技术 |
+| --- | --- |
+| 前端 | 原生 ES Modules（无框架、无打包器）、原生 CSS |
+| 本地后端 | Python 3.10+，标准库 `http.server` + 自定义路由分发 |
+| 桌面 | Electron（可选），渲染进程全面沙箱化 |
+| 存储 | JSON 文件（`user/`）+ SQLite（knex 迁移）+ 本地媒体目录 |
+| 测试 | `node --test` 单测、Playwright E2E / 桌面测试、Python `unittest` |
 
-本项目采用双许可证模式，为 **Source Available / 公开源码项目**，并非 OSI 定义下的开源项目。未获得书面商业授权时，源码仅供个人学习、研究、评估和非商业使用。
+## 目录结构
 
-未经作者单独书面授权，禁止将本项目或其衍生版本用于商业用途、SaaS、云服务、公开托管服务、收费服务、商业交付、外包交付、广告引流、会员订阅或其他直接/间接商业收益场景。
+```
+.
+├── index.html          # 单入口 SPA（仅 2 个 module script）
+├── main.js             # 前端引导入口
+├── server.py           # 本地后端（HTTP 服务 + API 路由）
+├── src/                # 前端源码
+│   ├── core/           # 运行期内核（画布 / 任务 / 生成流转）
+│   ├── modules/        # 业务模块（storyWorkspace、personReplacement 等）
+│   ├── components/     # 画布节点与 UI 组件
+│   ├── services/       # 前端服务层
+│   ├── manifests/      # 模型 / 厂商清单
+│   ├── i18n/           # 多语言
+│   └── config/ domain/ hooks/ ui/ utils/
+├── api/                # 前端 API 客户端与请求适配
+├── backend/            # Python 后端服务与路由（backend/services/）
+├── electron/           # Electron 主进程 / 预加载 / 窗口
+├── db/                 # SQLite schema 与 knex 迁移
+├── styles/ + style.css # 样式（模块 css + 主样式）
+├── tools/              # 门禁与开发脚本
+├── e2e/                # Playwright 测试
+├── docs/               # 专题文档与跟踪记录
+└── vendor/ native/ images/ assets/
+```
 
-除作者明确公布的地址外，任何第三方公开部署、镜像站点、托管服务或改版服务均为非官方行为，与作者无关；请勿在非官方站点输入 API Key、授权码或其他敏感信息。
+## 快速开始（开发环境）
 
-详细条款请查看 [LICENSE](./LICENSE) 和 [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md)。
+前置：Node.js ≥ 24、Python ≥ 3.10、Git；视频处理需 FFmpeg（可用 `AIC_FFMPEG_EXE` / `AIC_FFPROBE_EXE` 指定路径）。
 
-***
+```bash
+git clone https://github.com/luseaer-ship-it/CanvasPro.git
+cd CanvasPro
+npm ci
+python -m venv venv
+venv\Scripts\activate.bat        # Windows
+pip install -r requirements.txt
+```
 
-## 📖 使用说明
+启动：
 
-[查看 Canvas 使用说明](./使用说明.md)
+```bash
+# 浏览器版 → http://localhost:8777
+python server.py
+# 等价于
+npm run web
 
-## ✨ 功能特性
+# 桌面版（Electron）
+npm run desktop
+```
 
-### 🎨 无限画布
+首次使用（或剧本工作室等依赖数据库的能力）先执行迁移：`npm run migrate`。
 
-- 自由缩放、平移的无限画布
-- 小地图导航 + 画布对齐网格
-- 多画布 切换
-- 适应画布（一键归位）
+## 主要能力
 
-### 🤖 AI 节点类型
+画布支持自由缩放平移、小地图、多画布与项目 JSON 导入导出；节点类型涵盖 AI 图像 / 文本 / 视频 / 音频生成、360 全景、3D 导演台与注释节点。完整功能与操作见 [`使用说明.md`](使用说明.md)。
 
-| 节点类型              | 说明                          | 支持模型                       |
-| ----------------- | --------------------------- | -------------------------- |
-| 🖼️ **AI 图像生成节点** | 输入提示词，一键生成图片，支持批量出图         | Banana Pro、GRSAI 等         |
-| ✍️ **AI 文本生成节点**  | 多轮对话、流式输出，支持 @ 引用其他节点结果     | Gemini、GPT 系列等 OpenAI 兼容接口 |
-| 🎬 **AI 视频生成节点**  | 文生视频 / 图生视频                 | 主流视频模型                     |
-| 🔊 **AI 音频生成节点**  | 文本转语音生成                     | TTS 模型                     |
-| 🌐 **360 全景图节点**  | 生成沉浸式 360 度全景图像             | 全景生成模型                     |
-| 📐 **3D导演台节点**    | 创建和编辑 3D 场景，支持模型导入与场景布局     | 3D 渲染引擎                    |
-| 💬 **注释节点**       | 添加文本注释、说明和标记，增强画布可读性、作为标记跳转 | 无（纯功能节点）                   |
+## 开发命令
 
-### 💾 项目管理
+| 命令 | 说明 |
+| --- | --- |
+| `npm run web` | 以 venv Python 启动本地服务 |
+| `npm run desktop` / `npm run desktop:solo` | 启动 Electron 桌面应用（带 / 不带预设端口） |
+| `npm run migrate` / `npm run migrate:rollback` | 数据库迁移 / 回滚 |
+| `npm run build:win` | 打包 Windows 桌面应用（electron-builder） |
+| `npm test` | 门禁合集：去混淆 + JS 单测 + CSP + 后端测试 |
 
-- 多项目切换（左侧边栏项目面板）
-- `Ctrl+S` 保存画布到本地 `user/Canvas Project/` 目录
-- 自动缓存画布状态，刷新页面即时恢复
-- 项目文件为标准 JSON 格式，方便迁移（类似comfyui操作，直接拖拽json文件到画布即可打开）
+## 测试与质量门禁
 
-## 🚀 快速开始
+项目自带完整门禁，CI（[`.github/workflows/ci.yml`](.github/workflows/ci.yml)）逐步执行：
 
-### 方法 1：源码运行（推荐开发者）
+| 命令 | 内容 |
+| --- | --- |
+| `npm run check:obfuscation` | 去混淆残留扫描（全仓） |
+| `npm run test:js` | `node --test` 全量 JS 单测 |
+| `npm run check:csp` | CSP 静态门禁（禁止内联脚本 / `eval`） |
+| `npm run test:backend` | Python 后端单测 |
+| `npm run test:migrations` | 迁移与 17 表 schema 检查 |
+| `npm run check:package` | 打包结构检查（不安装、不发布） |
+| `npm run test:e2e` / `test:desktop` / `test:stability` / `verify:startup` | E2E / 桌面 / 稳定性 / 启动检查 |
 
-1. 需要安装git /ffmpeg/python3.12以上
-   1. git:[Git - Install for Windows](https://git-scm.com/install/windows)
-   2. ffmpeg:[Download FFmpeg](https://ffmpeg.org/download.html)
-   3. python:[Welcome to Python.org](https://www.python.org/)
-2. **克隆仓库**
-   ```bash
-   任意一个不带中文路径的目录 上面的地址栏 输入 CMD
-   # 克隆项目
-   git clone https://github.com/luseaer-ship-it/CanvasPro.git
-   # 进入项目
-   cd CanvasPro
-   ```
-3. **安装依赖并启动**
-   ```bash
-   # 创建虚拟环境
-   python -m venv venv
-   # 激活虚拟环境
-   venv\Scripts\activate.bat
-   # 安装依赖
-   pip install -r requirements.txt
-   # 启动服务
-   python server.py
-   ```
-4. **打开浏览器**
-   访问 <http://localhost:8777> 即可使用。
+测试的隔离、端口与清理约定见 [`TESTING.md`](TESTING.md)。
 
-### 方法 2：Windows系统 一键整合包（推荐普通用户）
+## 架构概览
 
-1. **下载整合包**
-   [点击下载](https://github.com/luseaer-ship-it/CanvasPro/releases)
-2. **解压文件**
-   将下载的压缩包解压到不带中文的路径，例如 `D:\CanvasPro`
-3. **一键启动**
-   直接双击 **`Canvas.exe`** 文件即可
+- **前端**：`index.html` 单入口加载 `main.js`，再沿 ESM 依赖图装配 `src/`。`src/core` 承担运行期内核，`src/modules` 承载业务，`src/components` 提供画布节点，`api/` 封装对外请求。
+- **后端**：`server.py` 基于标准库 HTTP 服务器；除静态资源外，路由按职责拆分到 `backend/services/*_route_service.py`，由 `HttpRouteDispatcher` 分发。出站请求统一走 `outbound_http_transport`（含 SSRF 防护），文件访问经 `static_file_access` / `path_security` 收敛。
+- **桌面**：`electron/main.js` 主进程 + `preload.cjs` 预加载，所有窗口统一 `contextIsolation: true` / `nodeIntegration: false` / `sandbox: true`。
+- **安全基线**：严格 CSP（`script-src 'self'`，无 `unsafe-inline`）、本地 API 访问控制（Origin / loopback / 本地令牌）。
 
-***
+## 数据与存储
 
-# 🖱️ 使用说明
+| 路径 | 内容 |
+| --- | --- |
+| `user/Canvas Project/` | 画布项目（标准 JSON） |
+| `user/{settings,config,shortcuts}.json` | 应用设置 / API Key / 快捷键 |
+| `data/uploads/`、`data/assets/` | 上传文件与素材 |
+| `output/` | 生成结果 |
+| SQLite（`db/`） | 剧本工作室等领域数据 |
 
-更完整的用户手册请直接看：[使用说明.md](./使用说明.md)
+以上目录均在 `.gitignore` 中，属本机运行时数据。
 
-## ⚙️ 配置 API Key
+## 配置与环境变量（常用）
 
-1. 点击左下角头像 → **设置**
-2. 切换到 **API 输入** 标签页
-3. 填写对应提供商的 API Key，点击**保存**
+| 变量 | 作用 |
+| --- | --- |
+| `AICANVAS_PORT` | 后端端口（默认 `8777`） |
+| `AIC_BIND_HOST` | 绑定地址（默认 `127.0.0.1`） |
+| `AIC_LAN_MODE` / `AIC_ENABLE_LAN` | 开启局域网访问 |
+| `AIC_FFMPEG_EXE` / `AIC_FFPROBE_EXE` | 指定 FFmpeg / FFprobe |
+| `AIC_ALLOWED_ORIGINS` | 允许的跨源来源 |
+| `AIC_TEST_PYTHON` | 测试使用的 Python 解释器 |
 
-| 提供商                  | 说明                                                                                |
-| -------------------- | --------------------------------------------------------------------------------- |
-| **即梦官方（目前只能高级会员）**   | 设置-api输入-最下面登陆扫码 对应：图像生成-即梦，视频生成-即梦视频                                             |
-| **RunningHub**       | 图像生成，前往 [runninghub.com](https://www.runninghub.cn/?inviteCode=rh-v1312) 获取 Key   |
-| **APImart**          | 大语言模型,图像生成，前往 [APImart.ai](https://apimart.ai/zh/register?aff=ashuoai) 获取 Key     |
-| **派欧云 (PPIO)（准备下架）** | 大语言模型,图片生成，前往 [ppio.com](https://ppio.com/user/register?invited_by=SF4VL3) 获取 Key |
-| **GRSAI**            | 大语言模型,图像生成，前往 [grsai.com](https://grsai.com/zh/dashboard/user-info) 获取 Key        |
-| **通用 OpenAI 接口**     | 支持任何兼容 OpenAI 格式的第三方接口                                                            |
+运行后在应用内「**设置 → API 输入**」填写各厂商 API Key（厂商清单见 [`使用说明.md`](使用说明.md)）。
 
-***
+## 发布
 
-### 基础操作
+Windows 一键整合包从 [Releases](https://github.com/luseaer-ship-it/CanvasPro/releases) 下载；开发者本地打包使用 `npm run build:win`。
 
-| 操作                        | 说明                                       |
-| ------------------------- | ---------------------------------------- |
-| **双击画布**                  | 快速添加 AI 生成节点                             |
-| **左键拖拽**                  | 移动节点                                     |
-| **右键画布**                  | 打开右键菜单                                   |
-| **滚轮**                    | 缩放画布                                     |
-| **中键/空格拖拽**               | 平移画布                                     |
-| **Ctrl+S**                | 保存当前画布                                   |
-| **Ctrl+Z / Shift+Ctrl+Z** | 撤销 / 重做                                  |
-| **D**                     | 删除选中节点（可在“设置→键盘快捷键”里改成 Delete/Backspace） |
-| **节点左侧** **`+`** **按钮**   | 打开节点添加菜单                                 |
+## 文档索引
 
-### 连接节点
+| 文档 | 用途 |
+| --- | --- |
+| [`AGENTS.md`](AGENTS.md) | 本仓库强制规则（AI 与开发者必读） |
+| [`docs/TRACKING.md`](docs/TRACKING.md) | 项目入口文档：现状、进度与批次记账 |
+| [`使用说明.md`](使用说明.md) | 面向用户的功能与操作手册 |
+| [`TESTING.md`](TESTING.md) | 测试与隔离验收说明 |
+| `docs/*.md` | 各子系统专题文档 |
 
-1. 鼠标悬停到节点边缘，出现连接锚点
-2. 从输出锚点拖拽到目标节点的输入锚点
-3. 连线建立后，上游节点的结果会自动流向下游
+## 开发约定
 
-### 引用其他节点（@ 语法  / 预设 ）
+- 遵守 `AGENTS.md` 的强制规则；改动前先读 `docs/TRACKING.md`。
+- 文件改动跟踪机制当前**暂停**（2026-09-29 起），不要运行跟踪脚本或恢复自动监视。
+- 前端遵守严格 CSP：不得引入内联脚本 / 事件处理器、`eval` / `new Function`。
+- 新增或修改逻辑请配套 `*.test.js`，提交前跑对应门禁。
 
-在 生成节点的提示词编辑框中，输入 `@` 即可弹出引用菜单，选择画布上任意节点，其输出结果将被动态嵌入提示词中。
+## 许可
 
-输入 `/` 引用预设命令，快速调用内置预设（后续支持自定义预设）
-
-***
-
+见 [`LICENSE`](LICENSE)。
