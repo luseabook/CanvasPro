@@ -153,6 +153,13 @@ class FakeElement {
     else this.children.push(el3);
     return ((el3.parentNode = this), (el3.parentElement = this), el3);
   }
+  get ['textContent']() {
+    return this._textContent || '';
+  }
+  set ['textContent'](scope) {
+    this._textContent = String(scope || '');
+    this.children = [];
+  }
   ['remove']() {
     if (!this.parentNode) return;
     const list6 = this.parentNode.children,

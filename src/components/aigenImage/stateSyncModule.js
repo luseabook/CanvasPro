@@ -46,6 +46,7 @@ import {
 import { renderManifestFixedImageRefBar } from './fixedImageRefBar.js';
 import {
   bindImageRefThumbOrderDrag,
+  appendRefUploadLabel,
   escapeRefBarHtml,
   formatRefUploadLabel,
   syncImageRefBarButtonIcon,
@@ -512,7 +513,7 @@ export function createAIGenerateNodeStateSyncModule(value) {
               (el5.dataset.kind = 'image'),
               (el5.title = value24),
               el5.setAttribute('draggable', 'false'),
-              (el5.innerHTML = '<span class="ref-upload-label">' + value25 + '</span>'),
+              appendRefUploadLabel(el5, value25),
               el5
             );
           },

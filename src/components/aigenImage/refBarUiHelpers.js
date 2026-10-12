@@ -7,6 +7,13 @@ export function escapeRefBarHtml(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+export function appendRefUploadLabel(el, label) {
+  const span = document.createElement('span');
+  span.className = 'ref-upload-label';
+  span.textContent = String(label ?? '');
+  el.appendChild(span);
+  return el;
+}
 export function formatRefUploadLabel(item) {
   return escapeRefBarHtml(item).replace(/\s+/g, '<br>');
 }
