@@ -260,7 +260,8 @@ canvas@0.4.12
 > **搬迁拆分（2026-10-12）**：分两刀抽离，每刀都用**临时 `no-undef` 配置**校验搬迁闭包（0 undefined），导入导出面不变：
 > 1. `editorWorkspace.js` **6817 → 5217 行**：`editorLayoutMetrics.js`（常量 + 纯函数，`be2cf2d7`）、`storyboard3DRenderHelpers.js`（45 个渲染函数，`6aca37cf`）
 > 2. `personReplacementWorkspace.js` **7187 → 6992 行**：`personReplacementWorkspacePresentation.js`（20 个展示函数 + 2 常量，`d2b4a75b`）
+> 3. `storyWorkspace.js` **9495 → 9285 行**（3 步各一提交）：`storyWorkspaceSharedHelpers.js`（`2940e7eb`）、`storyWorkspaceAssetPresentation.js`（`d983c20f`）、`storyWorkspaceModelPickerPresentation.js`（`810bccf3`）
 >
-> `test:js` / `lint` / `check:reachability` 全绿。其余 3 个巨型文件（`storyWorkspace.js` 9495、`storyGenerationApi.js` 7677、`AssetManager.js` 4719）仍待拆。
+> `test:js` / `lint` / `check:reachability` 全绿。其余巨型文件（`storyGenerationApi.js` 7677、`AssetManager.js` 4719）仍待拆。
 >
 > **另注**：lint 报出的 3 处 `no-misleading-character-class` 均为**故意的零宽字符检测正则**（ZWJ/ZWNJ/BOM），属误报，已按存量降为 warn。
