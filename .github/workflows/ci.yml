@@ -58,6 +58,9 @@ jobs:
       - name: innerHTML gate
         run: npm run check:innerhtml
 
+      - name: CSS budget gate
+        run: npm run check:css-budget
+
       - name: JavaScript unit tests
         run: npm run test:js
 
