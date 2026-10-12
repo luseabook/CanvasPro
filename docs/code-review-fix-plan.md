@@ -273,3 +273,24 @@ canvas@0.4.12
 > 7. **半文件级搬迁实测失败（已回滚，未提交）**：按 [376..5089] 抽出约 4700 行后，`storyGenerationSplitSupport.js` 自身仅在**模块求值期**就触发 `Cannot access 'STORY_SOURCE_CHUNK_CHARACTERS' before initialization`——因为该区间里混有**模块顶层工厂实例 `const`**（如 `storySummaryGenerationApi = createStorySummaryGenerationApi({... sourceChunkCharacters: STORY_SOURCE_CHUNK_CHARACTERS ...})`），它们在 import/求值阶段就要用到源模块的顶层常量，形成**求值期循环依赖**（function 循环可 hoist 规避，顶层 const 不行）。要消除必须把源模块几乎全部顶层常量/工厂实例一并搬走——等价于搬走整个配置层。**最终判定：`storyGenerationApi.js` 的拆分需要领域级重写，机械搬迁在任何切口都会撞上求值期循环依赖。保持现状。**
 >
 > **另注**：lint 报出的 3 处 `no-misleading-character-class` 均为**故意的零宽字符检测正则**（ZWJ/ZWNJ/BOM），属误报，已按存量降为 warn。
+
+---
+
+## 10. 技术债登记（archive，2026-10-12）
+
+| 项 | 结论 | 证据 |
+| --- | --- | --- |
+| `api/storyGenerationApi.js` **拆分** | **存档：领域重写候选，不做机械搬迁** | 顶层是「常量 → 工厂实例 → 函数」的**求值期依赖图**；任何切口都会触发 `Cannot access '...' before initialization`（两次实测：按簇切分闭包≈半文件；半文件搬迁 [376..5089] 求值期 TDZ）。正确路径是按配置层/工厂层/纯函数层重写，非搬迁 |
+| 已完成的搬迁拆分 | 见 §9 第 1–5 条 | `editorWorkspace.js` / `personReplacementWorkspace.js` / `storyWorkspace.js` / `AssetManager.js` 均已完成 |
+
+## 11. P0 复核（2026-10-12）
+
+| 检查 | 结果 | 说明 |
+| --- | --- | --- |
+| `npm audit` | **9 项**（8 moderate / 1 high / 0 critical） | 较审查时的 16 项（8 high/8 moderate）已消除 7 项 |
+| `extract-zip@2.0.1` | 1 high，**无官方修复** | 按决策保留；已接 `electron/zipEntrySafety.js` 解包前校验（`asrRuntimeInstallTask.js:277`），且只解到新建空目录 |
+| electron-builder 链（8 moderate） | 均为 **dev 构建工具**依赖 | 已装 26.15.3 即 latest；26.17.0 仍依赖有漏洞的 `@electron/get@3`；仅 27-alpha 换代——构建链不上 alpha，**不改** |
+| `electron` | 42.11.12（同 major 升级） | `npx electron --version` 可验证 |
+| 缓解有效性 | `check:csp` / `test:backend` / `check:package` 全绿 | `zipEntrySafety` 有 8 项单测（`electron/zipEntrySafety.test.js`） |
+
+> **P0 结论**：可利用的生产依赖漏洞已从 16 项收敛到 **仅剩 1 项无修复版且已加隔离校验**（`extract-zip`）；其余 8 项是仅影响本地打包的 dev 工具链 moderate。**P0 视为收敛。**
