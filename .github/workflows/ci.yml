@@ -49,6 +49,9 @@ jobs:
       - name: Obfuscation gate
         run: npm run check:obfuscation
 
+      - name: ESLint
+        run: npm run lint
+
       - name: JavaScript unit tests
         run: npm run test:js
 
