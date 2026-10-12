@@ -25,3 +25,34 @@ export function createPromptAttachmentButtonHTML(options = {}) {
     '" />\n                    <path d="M12 12 Q 17 12 19 18" stroke-dasharray="3 3" />\n                </svg>\n            </span>\n        </div>'
   );
 }
+
+export function createPromptAttachmentButtonElement(options = {}) {
+  const tooltip = options.tooltip || PROMPT_ATTACHMENT_BUTTON_TOOLTIP,
+    stroke = options.stroke || 'var(--text-primary)',
+    fill = options.fill || 'var(--white-05)',
+    circleFill = options.circleFill || stroke,
+    el = document.createElement('div'),
+    icon = document.createElement('span'),
+    createSvgNode = (tagName) =>
+      typeof document.createElementNS === 'function'
+        ? document.createElementNS('http://www.w3.org/2000/svg', tagName)
+        : document.createElement(tagName),
+    svg = createSvgNode('svg'),
+    path = createSvgNode('path'),
+    dot = createSvgNode('circle'),
+    dash = createSvgNode('path');
+  (el.classList.add('prompt-attachment-btn'), (el.title = tooltip), el.setAttribute('aria-label', tooltip));
+  (icon.classList.add('btn-icon'),
+    svg.setAttribute('viewBox', '0 0 24 24'),
+    svg.setAttribute('width', '28'),
+    svg.setAttribute('height', '28'),
+    svg.setAttribute('fill', 'none'),
+    svg.setAttribute('stroke', stroke),
+    svg.setAttribute('stroke-width', '1.5'),
+    svg.setAttribute('stroke-linecap', 'round'),
+    svg.setAttribute('stroke-linejoin', 'round'));
+  (path.setAttribute('d', 'M4 4l7.07 16.97 2.51-7.39 7.39-2.51L4 4z'), path.setAttribute('fill', fill));
+  (dot.setAttribute('cx', '20'), dot.setAttribute('cy', '20'), dot.setAttribute('r', '2.5'), dot.setAttribute('fill', circleFill));
+  (dash.setAttribute('d', 'M12 12 Q 17 12 19 18'), dash.setAttribute('stroke-dasharray', '3 3'));
+  return (svg.appendChild(path), svg.appendChild(dot), svg.appendChild(dash), icon.appendChild(svg), el.appendChild(icon), el);
+}

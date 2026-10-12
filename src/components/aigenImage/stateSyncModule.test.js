@@ -153,6 +153,10 @@ class FakeElement {
     else this.children.push(el3);
     return ((el3.parentNode = this), (el3.parentElement = this), el3);
   }
+  ['replaceChildren'](...nodes) {
+    (this.children = []), (this._innerHTML = '');
+    for (const node of nodes) if (node) this.appendChild(node);
+  }
   get ['textContent']() {
     return this._textContent || '';
   }
@@ -319,7 +323,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: terminal Dreamina state clears loading UI', () => {
     const value17 = globalThis.document;
-    globalThis.document = { activeElement: null };
+    globalThis.document = { activeElement: null, createElement: (tagName) => new FakeElement({ tagName: tagName }), createElementNS: (namespace, tagName2) => new FakeElement({ tagName: tagName2 }) };
     try {
       const id = 'node-state-sync-dreamina-terminal',
         _data = {
@@ -388,7 +392,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: running RH task keeps loading when inactive Dreamina fields are done', () => {
     const value25 = globalThis.document;
-    globalThis.document = { activeElement: null };
+    globalThis.document = { activeElement: null, createElement: (tagName) => new FakeElement({ tagName: tagName }), createElementNS: (namespace, tagName2) => new FakeElement({ tagName: tagName2 }) };
     try {
       const id2 = 'node-state-sync-rh-running',
         _data2 = {
@@ -457,7 +461,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: live running state restarts loading after remount', () => {
     const value32 = globalThis.document;
-    globalThis.document = { activeElement: null };
+    globalThis.document = { activeElement: null, createElement: (tagName) => new FakeElement({ tagName: tagName }), createElementNS: (namespace, tagName2) => new FakeElement({ tagName: tagName2 }) };
     try {
       const id3 = 'node-state-sync-live-running',
         _data3 = {
@@ -676,7 +680,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: person replace V3 fixed image slots can swap', async () => {
     const value47 = globalThis.document;
-    globalThis.document = { createElement: (tagName2) => new FakeElement({ tagName: tagName2 }) };
+    globalThis.document = { createElement: (tagName2) => new FakeElement({ tagName: tagName2 }), createElementNS: (ns, tagName2) => new FakeElement({ tagName: tagName2 }) };
     const id12 = 'node-person-replace-v3';
     try {
       const _data8 = {
@@ -786,7 +790,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: modelApi fixed image slots render from manifest', async () => {
     const value52 = globalThis.document;
-    globalThis.document = { createElement: (tagName3) => new FakeElement({ tagName: tagName3 }) };
+    globalThis.document = { createElement: (tagName3) => new FakeElement({ tagName: tagName3 }), createElementNS: (ns, tagName3) => new FakeElement({ tagName: tagName3 }) };
     const id13 = 'node-youchuan-fixed-slots';
     try {
       const _data9 = {
@@ -857,7 +861,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: Midjourney V7 renders only main and style fixed slots', async () => {
     const value55 = globalThis.document;
-    globalThis.document = { createElement: (tagName4) => new FakeElement({ tagName: tagName4 }) };
+    globalThis.document = { createElement: (tagName4) => new FakeElement({ tagName: tagName4 }), createElementNS: (ns, tagName4) => new FakeElement({ tagName: tagName4 }) };
     const id14 = 'node-youchuan-v7-fixed-slots';
     try {
       const _data10 = {
@@ -928,7 +932,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: RunningHub image X renders one manifest fixed image slot', async () => {
     const value59 = globalThis.document;
-    globalThis.document = { createElement: (tagName5) => new FakeElement({ tagName: tagName5 }) };
+    globalThis.document = { createElement: (tagName5) => new FakeElement({ tagName: tagName5 }), createElementNS: (ns, tagName5) => new FakeElement({ tagName: tagName5 }) };
     const id15 = 'node-rh-image-x-fixed-slot';
     try {
       const _data11 = {
@@ -1008,7 +1012,7 @@ function createDragEvent(target2) {
         },
       };
     try {
-      globalThis.document = { activeElement: null };
+      globalThis.document = { activeElement: null, createElement: (tagName) => new FakeElement({ tagName: tagName }), createElementNS: (namespace, tagName2) => new FakeElement({ tagName: tagName2 }) };
       const store5 = {
           getState: () => _data12,
           getStateRaw: () => _data12,
@@ -1069,7 +1073,7 @@ function createDragEvent(target2) {
         },
       };
     try {
-      globalThis.document = { activeElement: null };
+      globalThis.document = { activeElement: null, createElement: (tagName) => new FakeElement({ tagName: tagName }), createElementNS: (namespace, tagName2) => new FakeElement({ tagName: tagName2 }) };
       const store6 = {
           getState: () => _data13,
           getStateRaw: () => _data13,
@@ -1109,7 +1113,7 @@ function createDragEvent(target2) {
   }),
   test('aigenImage state sync: person replace V2.1 model keeps empty upload slot', async () => {
     const value73 = globalThis.document;
-    globalThis.document = { createElement: (tagName6) => new FakeElement({ tagName: tagName6 }) };
+    globalThis.document = { createElement: (tagName6) => new FakeElement({ tagName: tagName6 }), createElementNS: (ns, tagName6) => new FakeElement({ tagName: tagName6 }) };
     const id18 = 'node-person-replace-v21';
     try {
       const _data14 = {

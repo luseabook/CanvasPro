@@ -34,7 +34,10 @@ import {
   resetGenerateButtonIdleUi,
 } from './generationUiState.js';
 import { bindRefThumbFixedSlotDrag } from '../../modules/refThumbDragController.js';
-import { createPromptAttachmentButtonHTML } from '../refAttachmentButton.js';
+import {
+  createPromptAttachmentButtonElement,
+  createPromptAttachmentButtonHTML,
+} from '../refAttachmentButton.js';
 import { syncAdaptiveImageInputRatio } from './adaptiveImageInputRatio.js';
 import { t } from '../../i18n/index.js';
 import {
@@ -47,6 +50,7 @@ import { renderManifestFixedImageRefBar } from './fixedImageRefBar.js';
 import {
   bindImageRefThumbOrderDrag,
   appendRefUploadLabel,
+  createRefThumbContainerElement,
   escapeRefBarHtml,
   formatRefUploadLabel,
   syncImageRefBarButtonIcon,
@@ -290,7 +294,10 @@ export function createAIGenerateNodeStateSyncModule(value) {
             thumbContainer = this.refBarEl.querySelector('.ref-thumb-container');
           return (
             (!attachBtn || !thumbContainer) &&
-              ((this.refBarEl.innerHTML = attachBtnHTML + ' <div class="ref-thumb-container"></div>'),
+              (this.refBarEl.replaceChildren(
+                createPromptAttachmentButtonElement({ stroke: 'var(--white-80)' }),
+                createRefThumbContainerElement(),
+              ),
               (attachBtn = this.refBarEl.querySelector('.prompt-attachment-btn')),
               (thumbContainer = this.refBarEl.querySelector('.ref-thumb-container')),
               (this._attachBtnIcon = attachBtn ? attachBtn.querySelector('.btn-icon') : null)),

@@ -7,6 +7,11 @@ export function escapeRefBarHtml(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+export function createRefThumbContainerElement() {
+  const el = document.createElement('div');
+  el.className = 'ref-thumb-container';
+  return el;
+}
 export function appendRefUploadLabel(el, label) {
   const span = document.createElement('span');
   span.className = 'ref-upload-label';
