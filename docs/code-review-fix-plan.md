@@ -204,3 +204,31 @@ canvas@0.4.12
 | `extract-zip` | **保留 + 隔离校验**（不替换依赖；解包隔离临时目录 + 白名单 + 落盘前逐条校验，`ponytail:` 注释记录风险上限） |
 | 127 孤立模块 | **直接逐簇清零**（接线或删除，按目录分批）；**前置**先恢复可复现的 reachability 脚本，否则无法判定"清零" |
 | electron-builder | **接受跨 major 升级**，作为独立批次回归打包 |
+
+---
+
+## 9. 执行进展（2026-10-12）
+
+| 批次 | 状态 | 证据 |
+| --- | --- | --- |
+| 批 1 · P0 依赖 | ✅ 完成 | 漏洞 16 → 9；electron 42.4.1 → 42.11.12；提交 `d0ab7c1f` |
+| 批 2 · extract-zip | ✅ 完成 | 新增 `electron/zipEntrySafety.js` + 解包前校验；提交 `d5def8ac` |
+| 批 3 · 未提交改动 | ✅ 完成 | 恢复 `release_notes.txt` / `COMMERCIAL-LICENSE.md`；README/计划提交 `8e5804bd` |
+| 批 4 · lint/覆盖率 | ✅ 完成 | ESLint + Prettier + `test:js:cov` + CI 步骤；提交 `a9f13796` |
+| 批 5 · 孤立模块 | 🟡 前置+门禁完成 | `tools/reachability.mjs` + 基线门禁（实测 scope 2061/可达 1888/孤立 173）；提交 `573a75fc` |
+| 批 6 · 巨型文件/innerHTML | ⬜ 未开始 | — |
+| 批 7 · electron-builder/清理 | ⬜ 未开始 | — |
+
+### 逐批门禁结果（本机实测）
+`test:js` 11283 / 0 fail / 1 skip；`check:csp` PASS；`check:obfuscation` PASS；`test:backend` 223 OK（skip 3）；`test:migrations` PASS（17 表）；`check:package` PASS（electron 42.11.12）；`lint` 0 error（52 warn 存量）；`check:reachability` PASS。
+
+### 批 5 清零分析（173 个孤立模块）
+用 `test-artifacts/orphan-importers.mjs`（一次性工具）把孤立模块按引用来源分三类：
+
+| 类别 | 数量 | 含义与处置 |
+| --- | --- | --- |
+| 全仓零引用 | 54 | 多数是**约定式入口**（`eslint.config.mjs`、`playwright*.js`、`electron-builder.win.dev.cjs`、`globalCaptureWindow.js`、`screenshotOverlay.js`），并非死代码；其余（如 `ProjectManager.js`、`*_lf.js`、若干 `index.js` 桶文件）才是删除候选 |
+| 仅被自身测试引用 | 45 | **接线缺口**：实现已落地并有单测，只差一个消费方 import（如 `chromeShell*`、各类 modelApi manifest）；删除即删测试 |
+| 仅被其它孤立模块引用 | 74 | 需按"孤立簇"整体接线或整体删除，不能单删 |
+
+> **结论**：批 5 的"逐簇清零"不能按列表盲删——先把"约定式入口"补进 `tools/reachability.mjs` 的入口集合并重算基线，再逐簇接线/删除。`electron-builder.win.dev.cjs`、`#` 桶文件等需与 0.7.16 镜像的消费方对照后才能定夺（镜像不在仓库内）。**该步拆为后续专用批次执行。**
