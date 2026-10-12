@@ -1,3 +1,4 @@
+import { clearElement } from '../utils/dom.js';
 import appStore from '../core/stores/appStore.js';
 import { onLocaleChange, t } from '../i18n/index.js';
 import { detectScenes } from '../../api/sceneDetectionApi.js';
@@ -116,7 +117,7 @@ export class SceneDetectionNode {
       (this._autoClipBtn.style.display = 'block'),
       (this._exportBtn.style.display = 'block'),
       (this._sceneCount.textContent = data.sceneCount),
-      (this._timelineMarkers.innerHTML = ''));
+      (clearElement(this._timelineMarkers)));
     const list2 = data.sceneChanges;
     (list2.forEach((item2, options) => {
       const el2 = document.createElement('div');
@@ -129,7 +130,7 @@ export class SceneDetectionNode {
         (el2.title = sceneDetectionText('timeline.changeAt', { time: this._formatTime(item2) })),
         this._timelineMarkers.appendChild(el2));
     }),
-      (this._sceneItems.innerHTML = ''));
+      (clearElement(this._sceneItems)));
     let target = 0;
     for (let index2 = 0; index2 < data.sceneCount; index2++) {
       const source = index2 < data.sceneChanges.length ? data.sceneChanges[index2] : 100,

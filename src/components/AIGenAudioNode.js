@@ -1,3 +1,4 @@
+import { clearElement } from '../utils/dom.js';
 import { openDebugRequestWindow } from '../modules/debugRequestWindow.js';
 import { normalizeRunningHubInstanceType } from '../modules/runningHubInstanceTypes.js';
 import appStore from '../core/stores/appStore.js';
@@ -1472,7 +1473,7 @@ export class AIGenAudioNode {
       value109 = value107?.rhStatusCode;
     if (!enabled20 && value108) {
       const el22 = this._ensureStatusOverlayEl();
-      ((el22.innerHTML = ''),
+      ((clearElement(el22)),
         el22.appendChild(this._createStatusCard(value108, value109)));
       if (this._placeholderEl) this._placeholderEl.style.display = 'none';
       return;
@@ -2958,7 +2959,7 @@ export class AIGenAudioNode {
     const workflowKey2 = this._getCurrentWorkflow().key;
     this._refBarWorkflowKey !== workflowKey2 &&
       ((this._refBarWorkflowKey = workflowKey2),
-      (this.refBarEl.innerHTML = ''),
+      (clearElement(this.refBarEl)),
       this.refBarEl.classList.remove('active', 'rh-v5-refbar'));
     const list17 = getAudioWorkflowSlots(workflowKey2, { includeImages: true }),
       enabled40 = list17.length > 0,

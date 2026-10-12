@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import { openDebugRequestWindow, closeDebugRequestWindow } from '../debugRequestWindow.js';
 import { bindPersonReplacementPricing } from './personReplacementPricing.js';
 import { bindWorkspaceSelects } from '../workspaceSelects.js';
@@ -3167,7 +3168,7 @@ export function createReplacementStudioWorkspace({
         el86?.setAttribute?.('aria-hidden', String(!enabled40)),
         !enabled40 &&
           el86?.dataset?.personReplacementPickerOptionsLazy === 'true' &&
-          ((el86.innerHTML = ''),
+          ((clearElement(el86)),
           el86.dataset && delete el86.dataset.personReplacementPickerOptionsReady),
         true
       );

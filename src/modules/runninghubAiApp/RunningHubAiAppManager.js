@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import { graphStore } from '../../core/stores/appStore.js';
 import {
   SOURCE_TYPES,
@@ -2873,7 +2874,7 @@ class RunningHubAiAppManager {
       ((this.comfyCandidatePickerOpen = false),
         (this.componentPickerEl.hidden = true),
         this.componentPickerEl.setAttribute('aria-hidden', 'true'),
-        (this.componentPickerEl.innerHTML = ''));
+        (clearElement(this.componentPickerEl)));
       return;
     }
     this.comfyCandidatePickerOpen = open === true;

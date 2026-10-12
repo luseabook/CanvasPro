@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import {
   buildSourceMediaNodePayload,
   getAIGenerationNodeSize,
@@ -1393,7 +1394,7 @@ export function createAIGenerateNodeUiModule(entry) {
     }
     ['_switchToPrompt']() {
       if (!this._promptPanel) return;
-      this._promptPanel.innerHTML = '';
+      clearElement(this._promptPanel);
       const value93 = this.modelWrap?.closest('.prompt-panel-footer'),
         value94 = this.promptEl?.closest('.prompt-input-wrapper');
       if (this.refBarEl) this._promptPanel.appendChild(this.refBarEl);
@@ -1513,7 +1514,7 @@ export function createAIGenerateNodeUiModule(entry) {
             pointerEvents: 'none',
           }),
           this.previewEl.appendChild(this._statusOverlayEl));
-        ((this._statusOverlayEl.innerHTML = ''),
+        ((clearElement(this._statusOverlayEl)),
           this._statusOverlayEl.appendChild(this._createStatusCard(value100, value101)));
         return;
       }
@@ -1756,7 +1757,7 @@ export function createAIGenerateNodeUiModule(entry) {
           value129 !== multiResultBackplateCount ||
           this._multiBackplateKeyStr !== multiResultBackplateKey;
       if (value130) {
-        ((this._multiImagesContainer.innerHTML = ''),
+        ((clearElement(this._multiImagesContainer)),
           (this._multiLayerEls = []),
           (this._multiErrorEls = []),
           (this._multiBackplateEls = []),

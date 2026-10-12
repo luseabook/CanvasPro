@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import { sanitizePromptHtml } from '../../utils/dom.js';
 import { isPreviewModeEnabled, syncPreviewNodeLoading } from '../../modules/previewMode.js';
 import { setupPromptBoxResize, syncPromptBoxSizeFromData } from './promptBoxResizeUi.js';
@@ -359,7 +360,7 @@ export function createAIGenTextNodeUiModule(value) {
         if (!el17) return;
         const list2 = getCustomTextModels(),
           value2 = this._data.model || '';
-        ((el17.innerHTML = ''),
+        ((clearElement(el17)),
           list2.forEach((model2, value3) => {
             const el18 = document.createElement('div');
             ((el18.className = 'floating-menu-item custom-model-item' + (value2 === model2 ? ' active' : '')),
@@ -426,7 +427,7 @@ export function createAIGenTextNodeUiModule(value) {
             t('aigenText.customModel.addModel') +
             '</span>\n            '),
           el25.addEventListener('click', (event13) => {
-            (event13.stopPropagation(), (el25.innerHTML = ''), el25.classList.add('editing'));
+            (event13.stopPropagation(), (clearElement(el25)), el25.classList.add('editing'));
             const el26 = document.createElement('input');
             ((el26.type = 'text'),
               (el26.placeholder = t('aigenText.customModel.namePlaceholder')),

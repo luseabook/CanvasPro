@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import { scrollClosestElementHorizontallyWithWheel } from '../workspaceHorizontalWheel.js';
 import { reconcileElementTree } from './personReplacementShotSelectionRendering.js';
 import { createPersonReplacementResultHistoryLayout } from './personReplacementResultHistoryLayout.js';
@@ -70,7 +71,7 @@ export function createPersonReplacementResultHistoryController({
       handler2();
       const run = () => {
           if (source !== item || next !== focus) return;
-          (focus && ((focus.hidden = true), (focus.innerHTML = '')), (value = ''));
+          (focus && ((focus.hidden = true), (clearElement(focus))), (value = ''));
         },
         list = personReplacementResultHistoryLayout.hide({ animate: animate });
       if (list.length) {

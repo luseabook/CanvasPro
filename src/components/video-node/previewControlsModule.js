@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import {
   captureVideoFrameSnapshot,
   getVideoFrameSource,
@@ -362,7 +363,7 @@ export function createVideoNodePreviewControlsModule(index) {
           ? (el14.innerHTML = '<polygon points="6 4 20 12 6 20 6 4"></polygon>')
           : (el14.innerHTML =
               '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>'),
-        (this._centerIndicatorInnerEl.innerHTML = ''),
+        (clearElement(this._centerIndicatorInnerEl)),
         this._centerIndicatorInnerEl.appendChild(el14));
     }
     ['_showPausedCenterIndicator']() {

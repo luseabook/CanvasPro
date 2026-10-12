@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import { t } from '../../i18n/index.js';
 import { getModelManifest } from '../../manifests/index.js';
 import {
@@ -64,7 +65,7 @@ export function renderProviderModelCatalogPanel({
   if (!el) return null;
   const { models: models } = readProviderModelCatalog({ modelCatalog: catalog });
   if (models.length === 0 && !message) {
-    (el.classList?.remove?.('is-active'), (el.hidden = true), (el.innerHTML = ''));
+    (el.classList?.remove?.('is-active'), (el.hidden = true), (clearElement(el)));
     return null;
   }
   const current = models

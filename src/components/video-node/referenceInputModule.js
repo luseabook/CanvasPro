@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import { createReferenceFallbackThumbHtml } from '../../modules/referenceThumbnailFallback.js';
 import {
   createReferenceMaskBadgeHtml,
@@ -1097,7 +1098,7 @@ export function createVideoNodeReferenceInputModule(value43) {
       this._refBarLayoutKey !== fixedRefBarLayoutKey &&
         ((this._refBarLayoutKey = fixedRefBarLayoutKey),
         this.refBarEl.classList.remove('active', 'rh-v5-refbar'),
-        (this.refBarEl.innerHTML = ''),
+        (clearElement(this.refBarEl)),
         !fixedInputConfig2 && this._clearObjectUrlMap(this._getFixedSlotRefThumbObjectUrlMap()),
         fixedRefBarLayoutKey !== 'generic' && this._clearObjectUrlMap(this._refThumbObjectUrls));
       if (fixedInputConfig2) {

@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 import {
   attachVideoPlaybackRecovery,
   getVideoCurrentSource,
@@ -522,7 +523,7 @@ export function createVideoNodeResultRenderModule(index) {
         this._multiVideosContainer &&
           (this._multiVideosContainer.remove(), (this._multiVideosContainer = null));
         const el11 = this._ensureStatusOverlayEl();
-        ((el11.innerHTML = ''), el11.appendChild(this._createErrorCard(value49)));
+        ((clearElement(el11)), el11.appendChild(this._createErrorCard(value49)));
         return;
       }
       if (value47 && videoUrl.length === 0) {
@@ -534,7 +535,7 @@ export function createVideoNodeResultRenderModule(index) {
         this._multiVideosContainer &&
           (this._multiVideosContainer.remove(), (this._multiVideosContainer = null));
         const el12 = this._ensureStatusOverlayEl();
-        ((el12.innerHTML = ''), el12.appendChild(this._createStatusCard(value47, value48)));
+        ((clearElement(el12)), el12.appendChild(this._createStatusCard(value47, value48)));
         return;
       }
       this._clearStatusOverlay();
@@ -763,7 +764,7 @@ export function createVideoNodeResultRenderModule(index) {
             (el14.style.border = value90.border));
         };
       if (value70 || !this._multiStackWrap) {
-        ((this._multiVideosContainer.innerHTML = ''),
+        ((clearElement(this._multiVideosContainer)),
           (this._multiLayerEls = []),
           (this._multiErrorEls = []),
           (this._multiToggleBtn = null),

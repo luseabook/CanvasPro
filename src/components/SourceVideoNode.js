@@ -1,3 +1,4 @@
+import { clearElement } from '../utils/dom.js';
 import appStore from '../core/stores/appStore.js';
 import { onLocaleChange, t } from '../i18n/index.js';
 import { resumeAsyncVideoTask, resumeRunningHubVideoTask } from '../../api/aiVideoApi.js';
@@ -721,7 +722,7 @@ export class SourceVideoNode {
       this._card?.appendChild?.(this._generationErrorOverlay),
       (value24 = true));
     (value24 || this._generationErrorMessage !== sourceVideoGenerationFailureMessage) &&
-      ((this._generationErrorOverlay.innerHTML = ''),
+      ((clearElement(this._generationErrorOverlay)),
       this._generationErrorOverlay.appendChild(createVideoGenerationErrorCard(sourceVideoGenerationFailureMessage)),
       (this._generationErrorMessage = sourceVideoGenerationFailureMessage));
     this._setPosterFrameVisible(false);
@@ -2391,7 +2392,7 @@ export class SourceVideoNode {
         ? (el17.innerHTML = '<polygon points="6 4 20 12 6 20 6 4"></polygon>')
         : (el17.innerHTML =
             '<rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect>'),
-      (this._indicatorInner.innerHTML = ''),
+      (clearElement(this._indicatorInner)),
       this._indicatorInner.appendChild(el17));
   }
   ['_showPausedCenterIndicator']() {

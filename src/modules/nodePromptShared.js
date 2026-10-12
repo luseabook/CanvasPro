@@ -1,3 +1,4 @@
+import { clearElement } from '../utils/dom.js';
 import { normalizePromptMentionType } from './promptAssetInputRefs.js';
 import {
   rememberVirtualizedPromptCommit,
@@ -1525,7 +1526,7 @@ export function _getMentionMenu() {
 export function _closeMentionMenu() {
   _cleanupMentionMenuLifecycle();
   const el28 = _getMentionMenu();
-  ((el28.style.display = 'none'), (el28.innerHTML = ''), (_mentionMenuState.activeMenu = null));
+  ((el28.style.display = 'none'), (clearElement(el28)), (_mentionMenuState.activeMenu = null));
 }
 export function _buildMentionCandidates(value184, value185 = '', value186 = {}) {
   const value187 = value184?.nodeId,
@@ -2249,7 +2250,7 @@ export function _populateMentionMenu(
   _cleanupMentionMenuLifecycle();
   const list27 = _buildMentionCandidates(value242, query, { excludePill: pillToEdit || null }),
     _buildMentionMenuTree2 = _buildMentionMenuTree(list27);
-  menu.innerHTML = '';
+  clearElement(menu);
   if (!list27.length) return (_closeMentionMenu(), false);
   return (
     _buildMentionMenuTree2.nodeItems.forEach((item37) => {

@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 export function disposeVideoNodePromptDetails(node) {
   for (const key of [
     '_generationNodeHelpTip',
@@ -61,7 +62,7 @@ export function hydrateVideoNodeDeferredDetails(node, helpers = {}) {
 export function renderInitialVideoNodeFooter(node, footerEl) {
   if (!node || !footerEl) return;
   if (node._rendererThinVideoHydration === true) {
-    ((footerEl.dataset.thinVideoHydration = '1'), (footerEl.innerHTML = ''), (node.btnEl = null));
+    ((footerEl.dataset.thinVideoHydration = '1'), (clearElement(footerEl)), (node.btnEl = null));
     return;
   }
   if (node._rendererDetailsDeferred === true && typeof node._renderFooterShell === 'function') {

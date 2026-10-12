@@ -53,7 +53,13 @@ export function setStaticInnerHTML(el, item) {
 }
 export function clearElement(enabled3) {
   if (!enabled3) return;
-  enabled3.replaceChildren();
+  if (typeof enabled3.replaceChildren === 'function') {
+    enabled3.replaceChildren();
+    return;
+  }
+  // DOM stubs used by offline tests predate replaceChildren(); clearing via innerHTML
+  // is equivalent for them.
+  enabled3.innerHTML = '';
 }
 export function setText(el3, index) {
   if (!el3) return;

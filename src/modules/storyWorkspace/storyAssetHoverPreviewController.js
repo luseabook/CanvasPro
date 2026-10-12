@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 function normalizeText(value) {
   return String(value ?? '').trim();
 }
@@ -94,7 +95,7 @@ export function createStoryAssetHoverPreviewController({
         });
       if (!enabled2)
         return (
-          (previewElement.innerHTML = ''),
+          (clearElement(previewElement)),
           (previewElement.dataset.assetId = ''),
           (previewElement.dataset.signature = ''),
           false

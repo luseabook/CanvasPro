@@ -1,3 +1,4 @@
+import { clearElement } from '../../utils/dom.js';
 export function createRhAiAppPreviewPresentation({
   readState: readState = () => ({}),
   writeState: writeState = () => {},
@@ -186,7 +187,7 @@ export function createRhAiAppPreviewPresentation({
         return (
           (el7.hidden = true),
           el7.setAttribute('aria-hidden', 'true'),
-          (el7.innerHTML = ''),
+          (clearElement(el7)),
           true
         );
       return (

@@ -1,3 +1,4 @@
+import { clearElement } from '../utils/dom.js';
 import { openDebugRequestWindow } from './debugRequestWindow.js';
 import appStore from '../core/stores/appStore.js';
 import {
@@ -298,7 +299,7 @@ const ImageFreeAngleController = {
   },
   _createUI() {
     const el4 = this.containerEl;
-    el4.innerHTML = '';
+    clearElement(el4);
     const el5 = document.createElement('div');
     el5.className = 'v2-free-angle-embedded';
     let config =
@@ -515,7 +516,7 @@ const ImageFreeAngleController = {
     if (this._cleanupHandlers) this._cleanupHandlers();
     if (this._cleanupModelMenu) this._cleanupModelMenu();
     if (this._cleanupSubmenuClick) this._cleanupSubmenuClick();
-    if (this.containerEl) this.containerEl.innerHTML = '';
+    if (this.containerEl) clearElement(this.containerEl);
     this.triggerBtn &&
       ((this.triggerBtn.innerHTML = this._oldTriggerContent),
       this._oldTriggerTooltip != null
