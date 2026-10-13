@@ -1,9 +1,9 @@
 {
-  "total": 348,
+  "total": 347,
   "perFile": {
     "src/components/AIGenAudioNode.js": 18,
     "src/components/AIGenerateNode.js": 1,
-    "src/components/aigenImage/fixedImageRefBar.js": 3,
+    "src/components/aigenImage/fixedImageRefBar.js": 2,
     "src/components/aigenImage/modelSelector.js": 3,
     "src/components/aigenImage/stateSyncModule.js": 4,
     "src/components/aigenImage/uiModule.impl.js": 10,

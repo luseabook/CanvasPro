@@ -1,6 +1,7 @@
 import { buildFixedInputAssetSlotMap } from '../../modules/fixedInputAssetRefs.js';
 import { bindRefThumbFixedSlotDrag } from '../../modules/refThumbDragController.js';
 import { t } from '../../i18n/index.js';
+import { appendRefUploadLabel } from './refBarUiHelpers.js';
 function escapeRefBarHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -14,6 +15,11 @@ function getFixedImageSlotLabelHtml(item, key) {
     result = item?.slotById?.[index] || {},
     data = String(result.label || index).trim() || index;
   return escapeRefBarHtml(data).replace(/\s+/g, '<br>');
+}
+function getFixedImageSlotLabelText(item, key) {
+  const index = String(key || '').trim(),
+    result = item?.slotById?.[index] || {};
+  return String(result.label || index).trim() || index;
 }
 function getFixedImageSlotTitle(options, target) {
   const source = String(target || '').trim(),
@@ -239,9 +245,10 @@ function syncFixedSlotElement({
     ].forEach((item8) => {
       if (el3.dataset[item8]) delete el3.dataset[item8];
     }));
-  const output =
-    '<span class="ref-upload-label">' + getFixedImageSlotLabelHtml(fixedInputConfig4, slot3) + '</span>';
-  if (el3.innerHTML !== output) el3.innerHTML = output;
+  // ponytail: empty-slot label is DOM text now; the thumbnail branch above still uses
+  // the shared thumbHTML builder — convert it when that builder is DOM-converted too.
+  el3.replaceChildren();
+  appendRefUploadLabel(el3, getFixedImageSlotLabelText(fixedInputConfig4, slot3));
 }
 export function renderManifestFixedImageRefBar({
   owner: owner2,
