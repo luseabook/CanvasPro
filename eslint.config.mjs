@@ -24,19 +24,6 @@ const strictInProduction = {
   'no-template-curly-in-string': 'warn',
 };
 
-// Test fixtures / e2e / tooling intentionally use patterns these rules flag (dup keys in
-// fixture objects, double spaces in expected strings, deliberate zero-width classes).
-const testRelaxed = {
-  'no-regex-spaces': 'warn',
-  'no-empty-pattern': 'warn',
-  'no-dupe-keys': 'warn',
-  'no-misleading-character-class': 'warn',
-  'no-cond-assign': 'warn',
-  'no-unreachable': 'warn',
-  'no-compare-neg-zero': 'warn',
-  'no-template-curly-in-string': 'warn',
-};
-
 const correctnessRules = {
   'no-dupe-args': 'error',
   'no-dupe-class-members': 'error',
@@ -90,9 +77,5 @@ export default [
     files: ['**/*.cjs'],
     languageOptions: { ecmaVersion: 'latest', sourceType: 'commonjs' },
     rules: correctnessRules,
-  },
-  {
-    files: ['**/*.test.js', '**/*.spec.js', 'e2e/**', 'tools/**'],
-    rules: testRelaxed,
   },
 ];

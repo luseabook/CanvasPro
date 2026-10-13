@@ -31,6 +31,7 @@ function make(over = {}) {
     getProjectId: () => 'proj_a',
     now: () => clock,
     ...over,
+    /* eslint-disable-next-line no-dupe-keys -- fixture documents last-key-wins */
     windowObject: win,
   });
   return { win, store, setClock: (value) => (clock = value) };

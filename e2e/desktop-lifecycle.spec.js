@@ -66,6 +66,7 @@ async function closeMain(app, baseURL) {
   }, baseURL);
 }
 
+/* eslint-disable-next-line no-empty-pattern -- empty object pattern in an e2e fixture helper */
 test('ordinary close waits for the Story POST, then exits despite a hidden window', async ({}, testInfo) => {
   await desktop(testInfo, async ({ app, page, fixture, baseURL, child }) => {
     await openStory(page);
@@ -101,6 +102,7 @@ test('ordinary close waits for the Story POST, then exits despite a hidden windo
   });
 });
 
+/* eslint-disable-next-line no-empty-pattern -- empty object pattern in an e2e fixture helper */
 test('failed save cancels close and leaves the backend running', async ({}, testInfo) => {
   await desktop(testInfo, async ({ app, page, baseURL, child }) => {
     await app.evaluate(({ dialog }) => {
@@ -120,6 +122,7 @@ test('failed save cancels close and leaves the backend running', async ({}, test
   });
 });
 
+/* eslint-disable-next-line no-empty-pattern -- empty object pattern in an e2e fixture helper */
 test('updater IPC background/manual/duplicate feedback stays quiet or singular', async ({}, testInfo) => {
   await desktop(testInfo, async ({ app, page, baseURL }) => {
     await page.evaluate(() => { window.__auditToasts = []; window.showToast = (message, type) => window.__auditToasts.push({ message, type }); });
@@ -147,6 +150,7 @@ test('updater IPC background/manual/duplicate feedback stays quiet or singular',
 });
 
 
+/* eslint-disable-next-line no-empty-pattern -- empty object pattern in an e2e fixture helper */
 test('explicit discard is honored even with a renderer beforeunload veto', async ({}, testInfo) => {
   await desktop(testInfo, async ({ app, page, baseURL, child }) => {
     await openStory(page); // Real user activation before installing the veto.

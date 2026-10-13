@@ -85,6 +85,7 @@ test('modelCatalogProviderCard: modelCount 需有限正数，数字字符串与 
       String(modelCount),
     );
   }
+  /* eslint-disable-next-line no-compare-neg-zero -- deliberate -0 edge case assertion */
   assert.ok(-0 === 0);
   assert.equal(Object.is(-0, 0), false);
 });

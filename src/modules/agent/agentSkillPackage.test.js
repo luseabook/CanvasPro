@@ -129,7 +129,9 @@ test('serializeManagedAgentSkillDefinition round-trips through the parser', () =
   assert.equal(serialized.definition.id, 'my-skill');
   assert.equal(serialized.definition.managedBy, MANAGED_AGENT_SKILL_OWNER);
   assert.match(serialized.markdown, /^---\nname: my-skill\n/);
+  /* eslint-disable-next-line no-regex-spaces -- expected double space in a golden string */
   assert.match(serialized.markdown, /\n  managed-by: shuo-canvas\n/);
+  /* eslint-disable-next-line no-regex-spaces -- expected double space in a golden string */
   assert.match(serialized.markdown, /\n  triggers:\n    - "one"\n    - "two"\n/);
 
   const parsed = parseAgentSkillMarkdown(serialized.markdown, { packageId: 'my-skill' });

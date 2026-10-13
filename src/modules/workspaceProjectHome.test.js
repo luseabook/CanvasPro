@@ -304,6 +304,7 @@ test('sorts by creation time falling back from createdAt to the id and then upda
   const projects = [
     { id: 'a', createdAt: 3000 },
     { id: 'b', createdAt: '1000' },
+    /* eslint-disable-next-line no-dupe-keys -- fixture documents last-key-wins */
     { id: 'c', id: 'proj-1700000000000', updatedAt: 20 },
     { id: 'd', updatedAt: 5 },
     { id: 'e', createdAt: -10, updatedAt: 7 },

@@ -273,6 +273,7 @@ test('renderOverview：分集页的标题、说明、全选与批量拆分按钮
   const [splitAll] = withAttr(html, 'button', 'data-story-action', 'split-all-episodes');
   assert.equal(attr(splitAll, 'aria-busy'), 'false');
   assert.match(html, />批量拆分<\/button>/);
+  /* eslint-disable-next-line no-regex-spaces -- expected double space in a golden string */
   assert.match(html, /<footer>尾<\/footer>\n  <\/div>$/);
   // description 为空串时不出段落；没有卡片时两个按钮都禁用
   const empty = renderOverview({ description: '', eyebrow: '<眉>', title: '标题' });
@@ -589,6 +590,7 @@ test('renderDetail：默认比例与标题，分隔条数值由左栏和中栏�
   );
   assert.match(html, /<span>&lt;镜头 1&gt;<\/span><span>5 秒<\/span>/);
   assert.match(html, /<textarea><\/textarea>/);
+  /* eslint-disable-next-line no-regex-spaces -- expected double space in a golden string */
   assert.match(html, /<div data-timeline><\/div>\n  <\/div>$/);
   const [preview] = openTags(html, 'section').filter((tag) => tag.includes('story-video-preview'));
   assert.equal(attr(preview, 'data-story-clip-navigation'), 'false');

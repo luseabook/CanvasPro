@@ -2384,10 +2384,12 @@ function extractMenuModelOrder(item) {
       assert.match(renderModelUiSchemaControls56, /aria-valuenow="0" tabindex="0">全长</),
       assert.match(
         renderModelUiSchemaControls56,
+        /* eslint-disable-next-line no-regex-spaces -- expected double space in a golden string */
         /img-rp-quality-item  rh-v5-res-btn ui-schema-option" data-value="1600" data-ui-schema-value="1600"/,
       ),
       assert.match(
         renderModelUiSchemaControls56,
+        /* eslint-disable-next-line no-regex-spaces -- expected double space in a golden string */
         /img-rp-quality-item  rh-v5-res-btn ui-schema-option" data-value="1920" data-ui-schema-value="1920"/,
       ),
       assert.doesNotMatch(renderModelUiSchemaControls56, /dev-mode-only[^>]+data-value="(?:1600|1920)"/));
