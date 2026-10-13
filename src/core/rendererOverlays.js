@@ -6,7 +6,6 @@ export function createContextMenuEl() {
     (el.dataset.uiStop = '1'),
     Object.assign(el.style, {
       position: 'absolute',
-      display: 'none',
       background: 'var(--preset-menu-bg)',
       border: '1px solid var(--preset-menu-border)',
       borderRadius: 'var(--radius-18)',

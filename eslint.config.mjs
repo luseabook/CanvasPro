@@ -13,7 +13,20 @@
 // ponytail: no @eslint/js preset and no `globals` package yet. Upgrade path: adopt
 // `@eslint/js` recommended + `globals` per directory (browser / node / electron) once
 // the repo can pass them.
-const preExistingWarnings = {
+const strictInProduction = {
+  'no-regex-spaces': 'error',
+  'no-empty-pattern': 'error',
+  'no-dupe-keys': 'error',
+  'no-misleading-character-class': 'error',
+  'no-cond-assign': 'error',
+  'no-unreachable': 'error',
+  'no-compare-neg-zero': 'error',
+  'no-template-curly-in-string': 'warn',
+};
+
+// Test fixtures / e2e / tooling intentionally use patterns these rules flag (dup keys in
+// fixture objects, double spaces in expected strings, deliberate zero-width classes).
+const testRelaxed = {
   'no-regex-spaces': 'warn',
   'no-empty-pattern': 'warn',
   'no-dupe-keys': 'warn',
@@ -42,7 +55,7 @@ const correctnessRules = {
   'no-fallthrough': 'error',
   'use-isnan': 'error',
   'no-useless-backreference': 'error',
-  ...preExistingWarnings,
+  ...strictInProduction,
 };
 
 export default [
@@ -77,5 +90,9 @@ export default [
     files: ['**/*.cjs'],
     languageOptions: { ecmaVersion: 'latest', sourceType: 'commonjs' },
     rules: correctnessRules,
+  },
+  {
+    files: ['**/*.test.js', '**/*.spec.js', 'e2e/**', 'tools/**'],
+    rules: testRelaxed,
   },
 ];

@@ -35,6 +35,8 @@ export function bindTextToolbarEvents(toolbarEl, nodeData, handler) {
       return key?.nodes?.[enabled] || nodeData || {};
     },
     handler3 = (index) => String(index ?? '').replace(/\r\n?/g, '\n'),
+    // deliberate zero-width/joiner class
+    // eslint-disable-next-line no-misleading-character-class
     handler4 = (result) => handler3(result).replace(/[\u00A0\u200B\u200C\u200D\uFEFF]/g, ''),
     handler5 = (data) => {
       const options = handler4(data);

@@ -87,7 +87,6 @@ export function createScreenshotOverlayController({
   }
   function setShortcutStatus(patch = {}) {
     shortcutStatus = {
-      accelerator: currentAccelerator,
       ...shortcutStatus,
       ...patch,
       accelerator: currentAccelerator,

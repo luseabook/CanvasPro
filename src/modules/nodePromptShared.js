@@ -2423,6 +2423,8 @@ export function _rehydratePromptPills(enabled62) {
     _bindPromptPill(enabled62, item39);
   });
 }
+// deliberate zero-width/joiner class
+// eslint-disable-next-line no-misleading-character-class
 const CARET_SPACER_TEXT_RE = /^[\u00A0\u200B\u200C\u200D\uFEFF]*$/;
 function _isCaretSpacerTextNode(el64) {
   return !!(

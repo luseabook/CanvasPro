@@ -224,15 +224,6 @@ export function createGenerationNodeHelpTipController({
           helpTipText('advancedVoiceClone.exampleSpeaker2'),
         ));
       return;
-      (handler2(el16, '进阶声音克隆用法', 'generation-node-help-title'),
-        handler2(el16, '支持 [[red:3~15 秒音频]]'),
-        handler2(el16, '[[red:无音频入参]]时 TTS语音 根据提示词生成随机音色'),
-        handler2(el16, '例：今晚月色真好', 'generation-node-help-muted-line'),
-        handler2(el16, '[[red:1个音频入参]]时 克隆语音'),
-        handler2(el16, '[[red:2个音频入参]]时 多人克隆音色对话'),
-        handler2(el16, '例：'),
-        handler3(el16, '@音频1', '你今晚回家吗'),
-        handler3(el16, '@音频2', '不回了加班要忙到很晚'));
     },
     handler9 = () => {
       if (!panel) return null;

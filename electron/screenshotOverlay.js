@@ -261,6 +261,7 @@ RGB: (${e[0]},${e[1]},${e[2]})`),
               (x('busy'),
               (n = l.rect),
               (a = l.capture?.display?.imageSize),
+              // eslint-disable-next-line no-cond-assign
               (a =
                 (n &&
                   a &&

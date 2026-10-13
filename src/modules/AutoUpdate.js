@@ -172,6 +172,8 @@ function _buildNotesText(config) {
 function _cleanNotesHeading(input) {
   return String(input || '')
     .replace(/^[\s#*>\-•]+/, '')
+    // deliberate emoji class (includes ZWJ sequences)
+    // eslint-disable-next-line no-misleading-character-class
     .replace(/^[🎉✨🐛🔧✅⚠️📌]+\s*/u, '')
     .replace(/[：:]\s*$/, '')
     .trim();
