@@ -24,6 +24,24 @@ export function createRefUploadSlot({ refSlot, title = '', label = '' } = {}) {
     appendRefUploadLabel(el, label);
   return el;
 }
+export function createUploadThumbSlot(thumbnailUrl, removeTitle = '') {
+  const slot = document.createElement('div');
+  (slot.className = 'ref-thumb-wrap ref-upload-slot'), (slot.dataset.refSrc = 'upload');
+  const img = document.createElement('img');
+  (img.className = 'ref-thumb-media ref-input-thumbnail ref-input-thumbnail--image is-pending'),
+    (img.src = String(thumbnailUrl)),
+    img.setAttribute('draggable', 'false'),
+    img.setAttribute('alt', '');
+  const del = document.createElement('button');
+  (del.type = 'button'), (del.className = 'ref-upload-delete'), (del.textContent = '×'),
+    del.setAttribute('title', removeTitle);
+  return (slot.appendChild(img), slot.appendChild(del), slot);
+}
+export function createUploadReferenceButton(label, title = label) {
+  const el = document.createElement('button');
+  (el.type = 'button'), (el.className = 'ref-thumb-wrap ref-upload-slot'), el.setAttribute('title', title);
+  return appendRefUploadLabel(el, label);
+}
 export function appendRefUploadLabel(el, label) {
   const span = document.createElement('span');
   span.className = 'ref-upload-label';

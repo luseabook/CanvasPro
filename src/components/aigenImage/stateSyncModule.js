@@ -52,6 +52,8 @@ import {
   appendRefUploadLabel,
   createRefThumbContainerElement,
   createRefUploadSlot,
+  createUploadReferenceButton,
+  createUploadThumbSlot,
   escapeRefBarHtml,
   formatRefUploadLabel,
   syncImageRefBarButtonIcon,
@@ -721,25 +723,17 @@ export function createAIGenerateNodeStateSyncModule(value) {
         if (value10 === 'image') {
           this.refBarEl.classList.remove('rh-v5-refbar');
           const t4 = t('aigenImage.refs.uploadReference'),
-            value36 =
-              attachBtnHTML +
-              ' <div class="ref-thumb-container">' +
-              (thumbnailUrl
-                ? '<div class="ref-thumb-wrap ref-upload-slot" data-ref-src="upload">' +
-                  createReferenceInputThumbnailHtml({ kind: 'image', thumbnailUrl: thumbnailUrl }) +
-                  '<button type="button" class="ref-upload-delete" title="' +
-                  t('aigenImage.refs.removeReference') +
-                  '">&times;</button></div>'
-                : '<button type="button" class="ref-thumb-wrap ref-upload-slot" title="' +
-                  escapeRefBarHtml(t4) +
-                  '"><span class="ref-upload-label">' +
-                  formatRefUploadLabel(t4) +
-                  '</span></button>') +
-              '</div>';
-          if (this._lastRefHTML !== value36) {
-            ((this._lastRefHTML = value36),
-              this.refBarEl.classList.add('active'),
-              (this.refBarEl.innerHTML = value36));
+            uploadSignature = 'upload|' + (thumbnailUrl || '');
+          if (this._lastRefHTML !== uploadSignature) {
+            ((this._lastRefHTML = uploadSignature), this.refBarEl.classList.add('active'));
+            this.refBarEl.replaceChildren(
+              createPromptAttachmentButtonElement({ stroke: 'var(--white-80)' }),
+              createRefThumbContainerElement([
+                thumbnailUrl
+                  ? createUploadThumbSlot(thumbnailUrl, t('aigenImage.refs.removeReference'))
+                  : createUploadReferenceButton(t4),
+              ]),
+            );
             const el14 = this.refBarEl.querySelector('.prompt-attachment-btn');
             this._attachBtnIcon = el14 ? el14.querySelector('.btn-icon') : null;
           }
