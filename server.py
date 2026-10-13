@@ -1533,6 +1533,31 @@ def _enforce_vip_subscription_gate(handler, payload=None, required_model_id=""):
     return False
 
 
+class _HeadBodySink:
+    """Wraps wfile for a HEAD response: headers pass through, the body is dropped.
+
+    The flag is flipped by ``Handler.end_headers`` (i.e. after the status line and
+    headers have been flushed), so only the message body is discarded.
+    """
+
+    def __init__(self, real):
+        self._real = real
+        self.sink = False
+
+    def write(self, data):
+        if self.sink:
+            return len(data)
+        return self._real.write(data)
+
+    def writelines(self, lines):
+        if self.sink:
+            return None
+        return self._real.writelines(lines)
+
+    def __getattr__(self, name):
+        return getattr(self._real, name)
+
+
 def _json_ok(handler, data):
     body = json.dumps(data, ensure_ascii=False, indent=2).encode()
     handler.send_response(200)
@@ -2742,6 +2767,23 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     # ════════════════════════════════════════════════════
     #  GET
     # ════════════════════════════════════════════════════
+    def end_headers(self):
+        super().end_headers()
+        # For HEAD, everything after the headers is the (suppressed) message body.
+        if getattr(self, '_head_only', False) and isinstance(self.wfile, _HeadBodySink):
+            self.wfile.sink = True
+
+    def do_HEAD(self):
+        # RFC 9110: a HEAD response must not carry a message body. Reuse the GET pipeline,
+        # letting the status line and headers through and dropping only the body.
+        real_wfile = self.wfile
+        self._head_only = True
+        self.wfile = _HeadBodySink(real_wfile)
+        try:
+            self.do_GET()
+        finally:
+            self.wfile = real_wfile
+
     def do_GET(self):
         path = self.path.split("?")[0]
         if not _enforce_local_api_access(self, path):
