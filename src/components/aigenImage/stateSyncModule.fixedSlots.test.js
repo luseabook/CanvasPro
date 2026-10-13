@@ -26,6 +26,7 @@ for (const key of [
 }
 
 const { createAIGenerateNodeStateSyncModule } = await import('./stateSyncModule.js');
+const { renderManifestFixedImageRefBar } = await import('./fixedImageRefBar.js');
 
 async function renderBar({ id, model, sources, edges }) {
   const nodes = { [id]: { id, type: 'ai-image', model, provider: 'runninghub' } };
@@ -89,6 +90,8 @@ test('manifest fixed slots: main + style render as two slots and no extra slot',
   assert.equal(refBarEl.querySelector('[data-ref-slot="cref"]'), null);
   const slots = refBarEl.querySelectorAll('.ref-thumb-wrap');
   assert.ok(slots.length >= 2, 'at least the two bound slots exist');
+  assert.ok(main.querySelector('.ref-thumb-delete'), 'bound main slot has a delete button');
+  assert.ok(style.querySelector('.ref-thumb-delete'), 'bound style slot has a delete button');
 });
 
 test('manifest fixed slots: a single-slot manifest renders only that slot', async () => {
@@ -111,4 +114,38 @@ test('manifest fixed slots: a single-slot manifest renders only that slot', asyn
   assert.equal(main.dataset.edgeId, 'edgeRef');
   assert.equal(main.dataset.kind, 'image');
   assert.equal(refBarEl.querySelector('[data-ref-slot="sref"]'), null);
+  assert.ok(main.querySelector('.ref-thumb-delete'), 'bound slot has a delete button');
+});
+
+test('manifest fixed slots: builder reports whether it handled the bar', () => {
+  const makeArgs = (fixedInputConfig) => ({
+    owner: { _lastRefHTML: '', _syncBtnIconState() {} },
+    refBarEl: document.createElement('div'),
+    promptEl: { innerText: '', querySelectorAll: () => [] },
+    attachBtnHTML: '',
+    fixedInputConfig,
+    items: new Map(),
+    targetNodeData: {},
+    sourceIdToLabel: {},
+    store: {},
+    nodeId: 'n1',
+    ensureThumbDecoded() {},
+    revealRefThumbMedia() {},
+    syncPillLabels() {},
+  });
+
+  // No image slot in the manifest -> not handled (must return false so the caller falls through).
+  const emptyArgs = makeArgs({ visibleSlots: [], slotKindById: {} });
+  assert.equal(renderManifestFixedImageRefBar(emptyArgs), false);
+  assert.equal(emptyArgs.refBarEl.classList.contains('rh-v5-refbar'), false);
+
+  // An image slot -> handled (true) and the bar is marked as the Rh fixed-image bar.
+  const handledArgs = makeArgs({
+    visibleSlots: ['imageUrl'],
+    slotKindById: { imageUrl: 'image' },
+    slotLabels: {},
+    slotTitleById: {},
+  });
+  assert.equal(renderManifestFixedImageRefBar(handledArgs), true);
+  assert.ok(handledArgs.refBarEl.classList.contains('rh-v5-refbar'));
 });
