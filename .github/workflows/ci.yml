@@ -64,6 +64,9 @@ jobs:
       - name: JavaScript unit tests
         run: npm run test:js
 
+      - name: JS coverage threshold (60% lines)
+        run: npm run test:js:cov
+
       - name: CSP static checks
         run: npm run check:csp
 

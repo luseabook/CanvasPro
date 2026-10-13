@@ -9,7 +9,7 @@
   "scripts": {
     "test": "npm run check:obfuscation && npm run test:js && npm run check:csp && npm run test:backend",
     "test:js": "node --test \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
-    "test:js:cov": "node --test --experimental-test-coverage \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
+    "test:js:cov": "node --test --experimental-test-coverage --test-coverage-lines=60 --test-coverage-exclude=src/i18n/messages/** --test-coverage-exclude=src/manifests/** \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
     "lint": "eslint .",
     "format:check": "prettier --check .",
     "check:reachability": "node tools/check-reachability.mjs",
