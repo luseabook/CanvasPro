@@ -8,10 +8,15 @@ import {
   openSubscriptionAccessSettings,
 } from '../modules/subscriptionAccessMissingToast.js';
 import { logDiagnosticEvent } from './diagnosticsService.js';
-const DEFAULT_DURATION = 2900,
+const MAX_TOAST_TEXT_LENGTH = 320,
+  DEFAULT_DURATION = 2900,
   ALERT_DURATION = 5000,
   SETTINGS_ACTION_LABEL = '去设置',
   ICONS = { ok: '', warn: '⚠️', error: '✕', success: '✓' };
+function boundToastText(value) {
+  const text = String(value ?? '');
+  return text.length > MAX_TOAST_TEXT_LENGTH ? text.slice(0, MAX_TOAST_TEXT_LENGTH - 1) + '…' : text;
+}
 function resolveToastActionOptions(message, value = {}) {
   if (value?.actionLabel || typeof value?.onAction === 'function') return value || {};
   if (isApiKeyConfigurationMessage(message)) {
@@ -71,7 +76,7 @@ export function showToast(item, key = 'ok', index, result = {}) {
       el2.appendChild(el3));
   }
   const el4 = document.createElement('span');
-  ((el4.textContent = item), el2.appendChild(el4));
+  ((el4.textContent = boundToastText(item)), el2.appendChild(el4));
   const toastActionOptions = resolveToastActionOptions(item, result);
   if (typeof toastActionOptions?.renderContent === 'function') toastActionOptions.renderContent(el4);
   if (typeof toastActionOptions?.onClick === 'function') {
