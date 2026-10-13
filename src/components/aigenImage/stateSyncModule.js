@@ -51,6 +51,7 @@ import {
   bindImageRefThumbOrderDrag,
   appendRefUploadLabel,
   createRefThumbContainerElement,
+  createRefUploadSlot,
   escapeRefBarHtml,
   formatRefUploadLabel,
   syncImageRefBarButtonIcon,
@@ -452,17 +453,21 @@ export function createAIGenerateNodeStateSyncModule(value) {
             if (!el4 || !container || !enabled3 || !enabled4) {
               const t2 = t('aigenImage.refs.replaceTarget'),
                 t3 = t('aigenImage.refs.replacedImage');
-              ((this.refBarEl.innerHTML =
-                attachBtnHTML +
-                ' <div class="ref-thumb-container"><div class="ref-thumb-wrap ref-upload-slot" data-ref-slot="replaceTarget" data-slot="replaceTarget" data-kind="image" draggable="false" title="' +
-                escapeRefBarHtml(t2) +
-                '"><span class="ref-upload-label">' +
-                formatRefUploadLabel(t2) +
-                '</span></div><div class="ref-thumb-wrap ref-upload-slot" data-ref-slot="replacedImage" data-slot="replacedImage" data-kind="image" draggable="false" title="' +
-                escapeRefBarHtml(t3) +
-                '"><span class="ref-upload-label">' +
-                formatRefUploadLabel(t3) +
-                '</span></div></div>'),
+              (this.refBarEl.replaceChildren(
+                createPromptAttachmentButtonElement({ stroke: 'var(--white-80)' }),
+                createRefThumbContainerElement([
+                  createRefUploadSlot({
+                    refSlot: 'replaceTarget',
+                    title: t2,
+                    label: t2,
+                  }),
+                  createRefUploadSlot({
+                    refSlot: 'replacedImage',
+                    title: t3,
+                    label: t3,
+                  }),
+                ]),
+              ),
                 (el4 = this.refBarEl.querySelector('.prompt-attachment-btn')),
                 (container = this.refBarEl.querySelector('.ref-thumb-container')),
                 (this._attachBtnIcon = el4 ? el4.querySelector('.btn-icon') : null));

@@ -7,9 +7,21 @@ export function escapeRefBarHtml(value) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
-export function createRefThumbContainerElement() {
+export function createRefThumbContainerElement(children = []) {
   const el = document.createElement('div');
   el.className = 'ref-thumb-container';
+  for (const child of children) if (child) el.appendChild(child);
+  return el;
+}
+export function createRefUploadSlot({ refSlot, title = '', label = '' } = {}) {
+  const el = document.createElement('div');
+  (el.className = 'ref-thumb-wrap ref-upload-slot'),
+    (el.dataset.refSlot = refSlot),
+    (el.dataset.slot = refSlot),
+    (el.dataset.kind = 'image'),
+    el.setAttribute('draggable', 'false'),
+    el.setAttribute('title', title),
+    appendRefUploadLabel(el, label);
   return el;
 }
 export function appendRefUploadLabel(el, label) {
