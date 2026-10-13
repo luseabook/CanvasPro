@@ -42,6 +42,17 @@ export function createUploadReferenceButton(label, title = label) {
   (el.type = 'button'), (el.className = 'ref-thumb-wrap ref-upload-slot'), el.setAttribute('title', title);
   return appendRefUploadLabel(el, label);
 }
+export function createFixedEmptySlot({ slot, label = '', title = label } = {}) {
+  const el = document.createElement('button');
+  (el.type = 'button'),
+(el.className = 'ref-thumb-wrap ref-upload-slot rh-v5-ref-box'),
+(el.dataset.refSlot = slot),
+(el.dataset.slot = slot),
+(el.dataset.kind = 'image'),
+el.setAttribute('draggable', 'false'),
+el.setAttribute('title', title);
+  return appendRefUploadLabel(el, label);
+}
 export function appendRefUploadLabel(el, label) {
   const span = document.createElement('span');
   span.className = 'ref-upload-label';

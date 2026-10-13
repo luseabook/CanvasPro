@@ -1,7 +1,12 @@
 import { buildFixedInputAssetSlotMap } from '../../modules/fixedInputAssetRefs.js';
 import { bindRefThumbFixedSlotDrag } from '../../modules/refThumbDragController.js';
 import { t } from '../../i18n/index.js';
-import { appendRefUploadLabel } from './refBarUiHelpers.js';
+import {
+  appendRefUploadLabel,
+  createFixedEmptySlot,
+  createRefThumbContainerElement,
+} from './refBarUiHelpers.js';
+import { createPromptAttachmentButtonElement } from '../refAttachmentButton.js';
 function escapeRefBarHtml(value) {
   return String(value ?? '')
     .replace(/&/g, '&amp;')
@@ -94,27 +99,20 @@ function ensureFixedImageSkeleton({
     el2 = refBarEl.querySelector('.rh-v5-ref-container') || refBarEl.querySelector('.ref-thumb-container');
   const enabled2 = slotOrder.every((item4) => el2?.querySelector?.('[data-slot="' + item4 + '"]'));
   if (!el || !el2 || !enabled2) {
-    const payload = slotOrder
-      .map((item5) => {
-        const escapeRefBarHtml2 = escapeRefBarHtml(getFixedImageSlotTitle(fixedInputConfig2, item5));
-        return (
-          '<button type="button" class="ref-thumb-wrap ref-upload-slot rh-v5-ref-box" data-ref-slot="' +
-          escapeRefBarHtml(item5) +
-          '" data-slot="' +
-          escapeRefBarHtml(item5) +
-          '" data-kind="image" draggable="false" title="' +
-          escapeRefBarHtml2 +
-          '"><span class="ref-upload-label">' +
-          getFixedImageSlotLabelHtml(fixedInputConfig2, item5) +
-          '</span></button>'
-        );
-      })
-      .join('');
-    ((refBarEl.innerHTML =
-      attachBtnHTML + ' <div class="ref-thumb-container rh-v5-ref-container">' + payload + '</div>'),
+    const container = createRefThumbContainerElement();
+    container.classList.add('rh-v5-ref-container');
+    slotOrder.forEach((item5) =>
+      container.appendChild(
+        createFixedEmptySlot({
+          slot: item5,
+          label: getFixedImageSlotLabelText(fixedInputConfig2, item5),
+          title: getFixedImageSlotTitle(fixedInputConfig2, item5),
+        }),
+      ),
+    );
+    (refBarEl.replaceChildren(createPromptAttachmentButtonElement(), container),
       (el = refBarEl.querySelector('.prompt-attachment-btn')),
-      (el2 =
-        refBarEl.querySelector('.rh-v5-ref-container') || refBarEl.querySelector('.ref-thumb-container')),
+      (el2 = refBarEl.querySelector('.rh-v5-ref-container') || refBarEl.querySelector('.ref-thumb-container')),
       (owner._attachBtnIcon = el ? el.querySelector('.btn-icon') : null));
   }
   return el2;
