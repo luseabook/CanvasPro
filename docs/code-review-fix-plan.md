@@ -314,4 +314,14 @@ canvas@0.4.12
 | console.log | ✅ 处置 | 实测仅 11 处、可用诊断，保留 |
 | `debug`/`once` 重复 | ✅ 处置 | 随 `npm dedupe` 收敛 |
 | 测试覆盖率门槛 | ✅ 完成 | `test:js:cov` 加 60% 行覆盖阈值并接入 CI（排除 i18n 文案与 manifests 数据目录；实测 70.63%） |
-| E2E / 桌面 / 真实模型 | ⚪ 未跑 | 与审查报告口径一致（未覆盖项） |
+| E2E（浏览器，本地环境、不碰真实模型） | 🟡 8 passed / 1 failed | 修好 HEAD 无 body（server）与 toast 文本上限；仅余 node-parameters 的 hover 预览播放链未移植 |
+
+---
+
+## 13. E2E 结论（2026-10-12）
+
+- 结果：**8 passed / 1 failed**（`npm run test:e2e`，本地自建服务 127.0.0.1:18779，不触发真实模型）。
+- 已修（各一提交）：
+  1. **HEAD 响应带 body**（违反 HTTP，导致 Playwright 解析失败）：server.py 新增 do_HEAD + `_HeadBodySink`，响应头先放行、`end_headers` 之后丢弃消息体。
+  2. **toast 文本无上限**：toastService.js 增加 320 字符上限（带省略号）。
+- 未修（**功能级移植缺口**）：node-parameters 失败在 AIGenVideoNode 调用了从未移植的 activatePreviewHoverPlayback / _deactivatePreviewHoverPlayback。核对镜像后确认其依赖在本仓缺 5 个 helper（_schedulePreviewHoverPlaybackWhenVideoReady / _isPreviewPosterClearedForPlayback / _schedulePreviewHoverTimer / _markPreviewPosterClearedForPlayback / 字段 _previewHoverRetryTimers），且镜像实现里仍含未解析闭包变量。属独立特性排期，非一行接线。
