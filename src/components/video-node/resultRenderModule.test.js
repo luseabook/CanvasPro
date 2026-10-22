@@ -793,3 +793,232 @@ test('resultRenderModule: 视口忙闲判定读交互状态', () => {
     globalThis.document = previous;
   }
 });
+
+// ---------------------------------------------------------------------------
+// 202 批：媒体生命周期契约。
+// 这批方法原本在结果模块里**完全不存在**，但有 5 处外部调用点用 `?.()` 调它们
+// （协调器挂起、薄呈现水合、recovery 摘除），静默 no-op 就是「功能看着在、实际没跑」。
+// ---------------------------------------------------------------------------
+test('resultRenderModule: 终态判定——失败任务或主视频带 error 必须继续渲染', () => {
+  const { ctx: normal } = createContext({
+    id: 'terminal-normal',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  assert.equal(normal._mustRenderTerminalVideoState(normal._data), false, '正常结果不算终态');
+
+  const { ctx: failed } = createContext({
+    id: 'terminal-failed',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+    asyncTaskStatus: 'error',
+    asyncTaskError: '模型超时',
+  });
+  assert.equal(
+    failed._mustRenderTerminalVideoState(failed._data),
+    true,
+    '任务失败要判终态，否则媒体推迟会把错误提示一起挡掉'
+  );
+
+  const { ctx: brokenVideo } = createContext({
+    id: 'terminal-broken',
+    type: 'ai-video',
+    mainVideoIndex: 1,
+    videos: [{ localPath: 'a.mp4' }, { localPath: 'b.mp4', error: '转码失败' }],
+  });
+  assert.equal(
+    brokenVideo._mustRenderTerminalVideoState(brokenVideo._data),
+    true,
+    '主视频自带 error 也算终态'
+  );
+
+  const { ctx: outOfRange } = createContext({
+    id: 'terminal-oor',
+    type: 'ai-video',
+    mainVideoIndex: 5,
+    videos: [{ localPath: 'a.mp4' }, { localPath: 'b.mp4', error: '坏的' }],
+  });
+  assert.equal(
+    outOfRange._mustRenderTerminalVideoState(outOfRange._data),
+    false,
+    '越界索引回落到 videos[0]，不能拿别的条目的 error 误判'
+  );
+
+  assert.equal(normal._mustRenderTerminalVideoState(null), false, '空数据不能抛，按非终态处理');
+});
+
+test('resultRenderModule: 失败态不回退海报，避免把失败伪装成成功', () => {
+  const { ctx: ok } = createContext({
+    id: 'poster-ok',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4', thumbUrl: '/a.jpg' }],
+  });
+  assert.equal(ok._resolveDeferredVideoPosterUrl(), 'http://local/a.jpg');
+
+  const { ctx: failed } = createContext({
+    id: 'poster-failed',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4', thumbUrl: '/a.jpg' }],
+    posterUrl: '/node.jpg',
+    asyncTaskStatus: 'error',
+    asyncTaskError: '失败',
+  });
+  assert.equal(failed._resolveDeferredVideoPosterUrl(), '', '失败时不能拿旧海报顶上去');
+
+  const { ctx: single } = createContext({
+    id: 'poster-single',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+    posterUrl: '/node.jpg',
+  });
+  assert.equal(
+    single._resolveDeferredVideoPosterUrl(),
+    'http://local/node.jpg',
+    '单条结果允许回退节点级字段'
+  );
+
+  const { ctx: multi } = createContext({
+    id: 'poster-multi',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }, { localPath: 'b.mp4' }],
+    posterUrl: '/node.jpg',
+  });
+  assert.equal(
+    multi._resolveDeferredVideoPosterUrl(),
+    '',
+    '多条结果不能回退节点级海报，否则会串图'
+  );
+});
+
+test('resultRenderModule: 海报候选只要图片，视频源不能当 poster', () => {
+  const { ctx } = createContext({
+    id: 'poster-candidates',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  assert.equal(
+    ctx._resolveVideoResultPosterUrl({ posterUrl: '/clip.mp4', thumbUrl: '/t.png' }),
+    'http://local/t.png',
+    '跳过非图片候选，取下一个'
+  );
+  assert.equal(
+    ctx._resolveVideoResultPosterUrl({ posterUrl: '/clip.mp4' }),
+    '',
+    '全是非图片时返回空串'
+  );
+  assert.equal(ctx._resolveVideoResultPosterUrl(null), '', '空条目返回空串而不是 undefined');
+});
+
+test('resultRenderModule: 结果身份键能区分不同视频、忽略空白字段', () => {
+  const { ctx } = createContext({
+    id: 'identity',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  assert.equal(ctx._getVideoResultIdentityKey(null), '', '空条目没有身份');
+  assert.equal(ctx._getVideoResultIdentityKey({ thumbId: '   ' }), '', '全空白视为无身份');
+  const left = ctx._getVideoResultIdentityKey({ videoUrl: '/a.mp4', thumbId: 't1' });
+  const same = ctx._getVideoResultIdentityKey({ videoUrl: '/a.mp4', thumbId: 't1' });
+  const other = ctx._getVideoResultIdentityKey({ videoUrl: '/b.mp4', thumbId: 't1' });
+  assert.equal(left, same, '同样内容要给出同样的键');
+  assert.notEqual(left, other, '换视频必须换键，否则全屏会停在旧片');
+});
+
+test('resultRenderModule: 结果变了要关掉陈旧全屏', () => {
+  const { ctx: idle } = createContext({
+    id: 'fullscreen-idle',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  assert.equal(idle._closeFullscreenForStaleResult(), false, '没开全屏时不动');
+
+  const { ctx: stale } = createContext({
+    id: 'fullscreen-stale',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  let closed = 0;
+  ((stale._activeFullscreenResultIdentity = JSON.stringify(['/old.mp4', '', '', '', '', ''])),
+    (stale._activeFullscreenCleanup = () => {
+      closed += 1;
+    }));
+  assert.equal(stale._closeFullscreenForStaleResult(), true, '当前结果里没有它 → 要关');
+  assert.equal(closed, 1, '清理函数必须被调用一次');
+});
+
+test('resultRenderModule: 挂起媒体会失效所有在途令牌并摘掉 src', () => {
+  const { ctx } = createContext({
+    id: 'suspend-media',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  const video = new FakeVideoElement();
+  video.setAttribute('src', 'blob:preview');
+  ctx.previewEl.appendChild(video);
+  let paused = 0;
+  video.pause = () => {
+    paused += 1;
+  };
+  const epoch = Number(ctx._videoRenderEpoch || 0),
+    token = Number(ctx._videoSourceAttachToken || 0);
+  ctx.suspendRendererMedia();
+  assert.equal(ctx._videoRenderEpoch, epoch + 1, '渲染 epoch 要前进，旧回调才会失效');
+  assert.equal(ctx._videoSourceAttachToken, token + 1, '接源令牌同样要前进');
+  assert.equal(ctx._rendererMediaDeferred, true, '挂起后必须是「媒体已推迟」状态');
+  assert.equal(paused, 1, '要真的暂停播放');
+  assert.equal(video.getAttribute('src'), '', 'src 必须摘掉，否则解码器继续跑');
+});
+
+test('resultRenderModule: 挂起前没海报就不算准备好', () => {
+  const { ctx } = createContext({
+    id: 'fallback-suspend',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  assert.equal(
+    ctx.prepareRendererMediaFallbackForSuspend(),
+    false,
+    '没有海报还返回 true 会让协调器挂起后留一片空白'
+  );
+});
+
+test('resultRenderModule: 没有已呈现画面时不谎报', () => {
+  const { ctx } = createContext({
+    id: 'presented-none',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4' }],
+  });
+  assert.equal(ctx.hasPresentedRendererMedia(), false, '空层级不能谎报，否则协调器会丢帧');
+  ctx._multiLayerEls = [new FakeVideoElement()];
+  assert.equal(ctx.hasPresentedRendererMedia(), false, '有元素但没有接源/没有呈现帧也不能报 true');
+});
+
+test('resultRenderModule: 薄呈现水合只跑一次', async () => {
+  const { ctx } = createContext({
+    id: 'thin-hydrate',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4', thumbUrl: '/a.jpg' }],
+  });
+  assert.equal(await ctx.hydrateRendererThinVideoPresentation(), false, '没标记时不该重复加载');
+  ctx._rendererThinVideoHydration = true;
+  // 返回的是 _loadAndDisplayVideo() 的 Promise（上游同语义），不保证返回 true；
+  // 真正的契约是「标记被清掉 + 确实加载了一次」。
+  await ctx.hydrateRendererThinVideoPresentation();
+  assert.equal(ctx._rendererThinVideoHydration, false, '加载后必须清标记，否则每次都重载');
+  assert.equal(ctx._multiLayerEls.length, 1, '水合后要真的把主预览建出来');
+  assert.equal(await ctx.hydrateRendererThinVideoPresentation(), false, '第二次不再重复加载');
+});

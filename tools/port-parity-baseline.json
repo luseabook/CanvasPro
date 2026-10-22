@@ -1,24 +1,8 @@
 {
   "mirror": "shuo-deobf-089",
-  "totalMissing": 83,
+  "totalMissing": 72,
   "moduleFunctionTotal": 54,
   "files": {
-    "src/components/video-node/resultRenderModule.js": [
-      "_buildRhAiAppVideoResultDisplayPatch",
-      "_closeFullscreenForStaleResult",
-      "_detachPreviewVideoRecovery",
-      "_getVideoResultIdentityKey",
-      "_handlePreviewVideoEnded",
-      "_mustRenderTerminalVideoState",
-      "_releaseIdlePreviewHoverPlaybackMedia",
-      "_resolveVideoResultPosterUrl",
-      "_restoreIdlePreviewPoster",
-      "hasPresentedRendererMedia",
-      "hydrateRendererThinVideoPresentation",
-      "prepareRendererMediaFallbackForSuspend",
-      "requestVideoMetaForNodeInfo",
-      "suspendRendererMedia"
-    ],
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
       "_applyTransformOptions",
@@ -64,6 +48,11 @@
       "_finishUnreceivedAsyncTask",
       "_getGenerationTaskRecoveryOwner",
       "_hasUnconfirmedAsyncTask"
+    ],
+    "src/components/video-node/resultRenderModule.js": [
+      "_handlePreviewVideoEnded",
+      "_releaseIdlePreviewHoverPlaybackMedia",
+      "requestVideoMetaForNodeInfo"
     ],
     "src/components/GroupNode.js": [
       "_resolveToolbarAnchorInsetY",

@@ -2,11 +2,17 @@ import { clearElement } from '../../utils/dom.js';
 import { readViewportInteractionState } from '../../core/viewportInteractionState.js';
 import {
   attachVideoPlaybackRecovery,
+  detachVideoPlaybackRecovery,
   getVideoCurrentSource,
   logVideoPlaybackEvent,
   playVideoWithRecovery,
 } from './mediaPlaybackRecovery.js';
 import { localPathToUrl, urlToLocalPath } from '../../utils/localMediaPath.js';
+import { getModelManifest } from '../../manifests/index.js';
+import {
+  buildRhAiAppResultDisplayPatch,
+  isRunningHubAiAppManifest,
+} from '../shared/rhAiAppNodeBehavior.js';
 import {
   attachMediaElementPlaybackSource,
   clearDesktopMediaPlaybackSourceMetadata,
@@ -171,6 +177,17 @@ export function createVideoNodeResultRenderModule(index) {
     VideoKeyingController: VideoKeyingController,
   } = index;
   class result {
+    ['_buildRhAiAppVideoResultDisplayPatch'](
+      nodeData = {},
+      mediaWidth = 0,
+      mediaHeight = 0,
+      mediaKey = ''
+    ) {
+      // 只有 RunningHub AI App 出图才需要按 manifest 声明的展示规格改写结果层的
+      // 尺寸/宽高比；普通视频走默认布局，这里直接返回空补丁。
+      if (!isRunningHubAiAppManifest(getModelManifest(nodeData?.model))) return {};
+      return buildRhAiAppResultDisplayPatch({ nodeData, mediaWidth, mediaHeight, mediaKey });
+    }
     ['_getPreviewVideoRecoveryLabel'](el, data = 'preview') {
       const options = String(el?.dataset?.idx ?? ''),
         target = options ? data + ':' + options : data;
@@ -500,6 +517,87 @@ export function createVideoNodeResultRenderModule(index) {
       if (playbackObjectUrl) revokeTrackedMediaObjectUrl(playbackObjectUrl);
       return scopeReleased || !!playbackObjectUrl;
     }
+    ['_restoreIdlePreviewPoster'](videoEl) {
+      // 退出悬停/手动播放后回到「静止海报」形态：有海报就设 poster 并藏占位符，
+      // 没有就清掉 poster 并让占位符露出来——否则会留一块透明区域什么都不显示。
+      if (!videoEl) return false;
+      const posterUrl = this._resolveDeferredVideoPosterUrl();
+      return (
+        posterUrl
+          ? ((videoEl.poster = posterUrl), setVideoResultElementVisible(this._placeholderEl, false))
+          : (videoEl.removeAttribute?.('poster'),
+            setVideoResultElementVisible(this._placeholderEl, true)),
+        this._removeDeferredVideoPosterPreview(),
+        this._setVideoOverlaysVisible?.(false),
+        !!posterUrl
+      );
+    }
+    ['prepareRendererMediaFallbackForSuspend']() {
+      // 视口忙（平移/缩放）时协调器会挂起媒体。挂起前必须先把海报解码好，
+      // 否则视频源被摘掉那一刻屏幕是空的——这是「平移时闪黑」的根因。
+      if (this._showDeferredVideoPosterPreview() !== true) return false;
+      const posterImg = this._deferredPosterImgEl;
+      if (!posterImg) return false;
+      posterImg.loading = 'eager';
+      try {
+        posterImg.fetchPriority = 'high';
+      } catch {}
+      return (
+        posterImg.isConnected !== false &&
+        posterImg.complete === true &&
+        Number(posterImg.naturalWidth || 0) > 0
+      );
+    }
+    ['hasPresentedRendererMedia']() {
+      // 协调器据此决定「挂起时是否保留已呈现画面」。返回 false 会让已解码的帧被丢弃，
+      // 表现为每次平移都重新解码 + 闪一下。
+      const nodeData = this._data || {},
+        videos = Array.isArray(nodeData.videos) ? nodeData.videos : [],
+        mainIndex = Math.max(
+          0,
+          Math.min(Math.max(0, videos.length - 1), Math.trunc(Number(nodeData.mainVideoIndex) || 0))
+        ),
+        layerEl = this._multiLayerEls?.[mainIndex] || null;
+      return !!(layerEl && getVideoCurrentSource(layerEl) && isVideoResultFrameReady(layerEl));
+    }
+    ['suspendRendererMedia']() {
+      // 挂起 = 主动放弃当前解码会话：换 epoch/令牌让所有在途回调失效，
+      // 再逐个 <video> 停播、清帧、摘 src。漏一步就会出现「已挂起但仍在播」的鬼影。
+      ((this._videoRenderEpoch = Number(this._videoRenderEpoch || 0) + 1),
+        (this._videoSourceAttachToken = Number(this._videoSourceAttachToken || 0) + 1),
+        (this._isHovered = false),
+        (this._previewHoverActivationPending = false),
+        (this._hoverManualPause = false),
+        (this._isManualControl = false),
+        (this._autoPlayToken = Number(this._autoPlayToken || 0) + 1),
+        this._setVideoOverlaysVisible?.(false),
+        this._releaseLocalVideoPlaybackObjectUrl(),
+        (this._previewPostersClearedForPlayback = new WeakMap()));
+      for (const previewVideo of this.previewEl?.querySelectorAll?.('video') || []) {
+        resetVideoFramePresentation(previewVideo);
+        try {
+          previewVideo.pause?.();
+        } catch {}
+        previewVideo.removeAttribute?.('src');
+        try {
+          previewVideo.load?.();
+        } catch {}
+      }
+      (this._releaseAllCachedVideoObjectUrls({ invalidatePending: true }),
+        (this._rendererMediaDeferred = true),
+        (this._rendererEagerVideoPreview = false),
+        (this._deferredVideoViewRefreshPending = true),
+        this._showDeferredVideoPosterPreview());
+    }
+    ['_detachPreviewVideoRecovery'](videoEl) {
+      return detachVideoPlaybackRecovery(videoEl);
+    }
+    ['hydrateRendererThinVideoPresentation']() {
+      // 「薄呈现」= 先给海报、视频源延后。标记还在说明还没真正加载，
+      // 这里补上最后一次加载并清标记；已加载过就直接返回 false，避免重复解码。
+      if (this._rendererThinVideoHydration !== true) return false;
+      return ((this._rendererThinVideoHydration = false), this._loadAndDisplayVideo());
+    }
     ['_restorePreviewHoverPlaybackTime'](el, sourceUrl) {
       const resumeState = this._hoverPlaybackResumeState,
         normalizedSource = String(sourceUrl || '').trim();
@@ -537,30 +635,50 @@ export function createVideoNodeResultRenderModule(index) {
       );
     }
     ['_resolveDeferredVideoPosterUrl']() {
-      const value5 = this._data || {},
-        value6 = Array.isArray(value5.videos) ? value5.videos : [],
-        value7 = Number(value5.mainVideoIndex),
-        value8 = Number.isFinite(value7) ? Math.max(0, Math.trunc(value7)) : 0,
-        value9 = value6[value8] || value6[0] || null,
-        value10 = [
-          value9?.posterUrl,
-          value9?.thumbUrl,
-          value9?.thumbnailUrl,
-          localPathToUrl(value9?.posterLocalPath),
-          localPathToUrl(value9?.thumbLocalPath),
-          localPathToUrl(value9?.thumbnailLocalPath),
-          value5.posterUrl,
-          value5.thumbUrl,
-          value5.thumbnailUrl,
-          localPathToUrl(value5.posterLocalPath),
-          localPathToUrl(value5.thumbLocalPath),
-          localPathToUrl(value5.thumbnailLocalPath),
+      const nodeData = this._data || {},
+        videos = Array.isArray(nodeData.videos) ? nodeData.videos : [],
+        rawIndex = Number(nodeData.mainVideoIndex),
+        mainIndex = Number.isFinite(rawIndex) ? Math.max(0, Math.trunc(rawIndex)) : 0,
+        currentVideo = videos[mainIndex] || videos[0] || null;
+      // 失败/取消/单条 error 时不回退海报：此时画面该显示错误卡，
+      // 拿旧海报顶上去等于把失败伪装成成功（用户以为生成好了）。
+      if (
+        isTaskFailed(nodeData) ||
+        isTaskCancelled(nodeData) ||
+        String(currentVideo?.error || '').trim()
+      )
+        return '';
+      return this._resolveVideoResultPosterUrl(currentVideo, {
+        nodeData,
+        // 单条结果时允许回退节点级字段；多条时节点级字段是「上一次选中的那条」，
+        // 回退会串图。
+        allowNodeFallback: videos.length <= 1,
+      });
+    }
+    ['_resolveVideoResultPosterUrl'](
+      videoItem,
+      { nodeData = this._data || {}, allowNodeFallback = false } = {}
+    ) {
+      const collectPosterCandidates = (source) => [
+          source?.posterUrl,
+          source?.thumbUrl,
+          source?.thumbnailUrl,
+          source?.previewUrl,
+          source?.videoThumbSrc,
+          localPathToUrl(source?.posterLocalPath),
+          localPathToUrl(source?.thumbLocalPath),
+          localPathToUrl(source?.thumbnailLocalPath),
+          localPathToUrl(source?.previewLocalPath),
+        ],
+        candidates = [
+          ...collectPosterCandidates(videoItem),
+          ...(allowNodeFallback ? collectPosterCandidates(nodeData) : []),
         ];
-      for (const value11 of value10) {
-        const value12 = String(value11 || '').trim();
-        if (!isLikelyPosterImageUrl(value12)) continue;
-        const value13 = this._resolveMediaUrl(value12);
-        if (value13) return value13;
+      for (const candidate of candidates) {
+        const normalized = String(candidate || '').trim();
+        if (!isLikelyPosterImageUrl(normalized)) continue;
+        const resolvedUrl = this._resolveMediaUrl(normalized);
+        if (resolvedUrl) return resolvedUrl;
       }
       return '';
     }
@@ -674,6 +792,51 @@ export function createVideoNodeResultRenderModule(index) {
         String(enabled10.videoUrl || '').trim() ||
         String(enabled10.src || '').trim() ||
         String(enabled10.thumbId || '').trim()
+      );
+    }
+    ['_getVideoResultIdentityKey'](videoItem) {
+      // 用来判断「全屏里放的还是不是当前这条结果」。只认能唯一定位的字段，
+      // 全空就返回空串（调用方据此视为「无法判定」，不当作身份）。
+      if (!videoItem || typeof videoItem !== 'object') return '';
+      const identityValues = [
+        videoItem.thumbId,
+        videoItem.assetId,
+        videoItem.displayLocalPath,
+        videoItem.localPath,
+        videoItem.videoUrl,
+        videoItem.src,
+      ].map((value) => String(value || '').trim());
+      return identityValues.some(Boolean) ? JSON.stringify(identityValues) : '';
+    }
+    ['_closeFullscreenForStaleResult'](nodeData = null) {
+      // 结果变了（重跑/换主视频/删条）但全屏还开着旧的，必须主动关掉，
+      // 否则用户会盯着一条已经不存在的视频，且它的 objectURL 还占着内存。
+      const activeIdentity = String(this._activeFullscreenResultIdentity || '').trim(),
+        pendingIdentity = String(this._pendingFullscreenResultIdentity || '').trim();
+      if (!activeIdentity && !pendingIdentity) return false;
+      const source = nodeData && typeof nodeData === 'object' ? nodeData : this._data || {},
+        videos = Array.isArray(source.videos) ? source.videos : [],
+        candidates = videos.length > 0 ? videos : [source],
+        liveIdentities = new Set(
+          candidates
+            .filter(
+              (item) => !String(item?.error || '').trim() && !this._isVideoMarkedUnavailable(item)
+            )
+            .map((item) => this._getVideoResultIdentityKey(item))
+            .filter(Boolean)
+        );
+      let closed = false;
+      return (
+        pendingIdentity &&
+          !liveIdentities.has(pendingIdentity) &&
+          ((this._fullscreenOpenEpoch = Number(this._fullscreenOpenEpoch || 0) + 1),
+          (this._pendingFullscreenResultIdentity = ''),
+          (closed = true)),
+        activeIdentity &&
+          this._activeFullscreenCleanup &&
+          !liveIdentities.has(activeIdentity) &&
+          (this._activeFullscreenCleanup(), (closed = true)),
+        closed
       );
     }
     ['_isVideoMarkedUnavailable'](value15) {
@@ -888,6 +1051,18 @@ export function createVideoNodeResultRenderModule(index) {
       const isTaskFailed2 = isTaskFailed(enabled19) || isTaskCancelled(enabled19);
       if (!isTaskFailed2) return '';
       return getTaskMessage(enabled19) || videoResultRenderText('generationFailed');
+    }
+    ['_mustRenderTerminalVideoState'](nodeData = this._data) {
+      // 「终态」= 任务失败/取消，或当前主视频带 error。这类状态下必须继续渲染，
+      // 否则媒体推迟（_rendererMediaDeferred）会连错误提示一起挡掉，
+      // 用户看到的是一个空的、永远转圈或永远灰掉的节点。
+      const source = nodeData && typeof nodeData === 'object' ? nodeData : {},
+        videos = Array.isArray(source.videos) ? source.videos : [],
+        mainIndex = Math.max(0, Math.trunc(Number(source.mainVideoIndex) || 0)),
+        currentVideo = videos[mainIndex] || videos[0] || null;
+      return (
+        !!this._getGenerationFailureMessage(source) || !!String(currentVideo?.error || '').trim()
+      );
     }
     ['_createErrorCard'](value44) {
       const el7 = document.createElement('div');
