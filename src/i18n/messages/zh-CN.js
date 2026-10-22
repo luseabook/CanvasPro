@@ -2636,7 +2636,12 @@ const zhCN = Object.freeze({
   }),
   sourceVideoNode: Object.freeze({
     upload: Object.freeze({ button: '上传', uploading: '上传中...', failedRetry: '上传失败，请重试' }),
-    controls: Object.freeze({ toggleMute: '切换静音', captureFrame: '截取当前帧' }),
+    controls: Object.freeze({
+      playLoopHint: '播放（Shift+点击循环）',
+      pause: '暂停',
+      toggleMute: '切换静音',
+      captureFrame: '截取当前帧',
+    }),
     recovery: Object.freeze({
       taskFailed: '任务恢复失败',
       failedWithMessage: '恢复失败: {message}',

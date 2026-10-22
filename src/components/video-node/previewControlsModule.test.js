@@ -177,7 +177,7 @@ async function flushAsyncSave() {
       assert.equal(payload._muteIconMutedEl.style.display, ''),
       assert.equal(payload._muteIconUnmutedEl.style.display, 'none'));
   }),
-  test('previewControlsModule: Alt 播放按钮开启循环，暂停时清理循环状态', async () => {
+  test('previewControlsModule: 传入 loop 时进入手动循环，暂停时清理循环状态', async () => {
     const videoNodePreviewControlsModule3 = createVideoNodePreviewControlsModule({
         store: { getState: () => ({ nodes: {} }) },
         saveOutputBlob: async () => ({}),
@@ -216,6 +216,9 @@ async function flushAsyncSave() {
       _syncVideoControlsFromVideo() {
         input += 1;
       },
+      // 进度循环在无 rAF 环境会退回 16ms 定时器；本用例只关心同步次数，屏蔽掉以免异步串扰。
+      _startVideoProgressLoop() {},
+      _cancelVideoProgressLoop() {},
     }),
       output._toggleVideoPlayPause(config, { loop: true }),
       await Promise.resolve(),
@@ -224,7 +227,8 @@ async function flushAsyncSave() {
       assert.equal(config.loop, true),
       assert.equal(config.paused, false),
       assert.deepEqual(list4, ['play']),
-      assert.equal(input, 1),
+      // 2 次：一次来自 _setVideoOverlaysVisible 的结构性同步，一次来自播放成功后的刷新。
+      assert.equal(input, 2),
       (list4.length = 0),
       output._toggleVideoPlayPause(config),
       assert.equal(output._isManualLoopPlayback, false),
@@ -232,5 +236,311 @@ async function flushAsyncSave() {
       assert.equal(config.paused, true),
       assert.equal(output._hoverManualPause, true),
       assert.deepEqual(list4, ['paused']),
-      assert.equal(input, 2));
+      // 再 +2：暂停分支同样先过 _setVideoOverlaysVisible，再同步控件。
+      assert.equal(input, 4));
   }));
+
+// ---------------------------------------------------------------------------
+// 悬停播放状态机 / 进度循环 / 静音偏好
+//
+// 这些方法此前整体缺失（上游有、仓库没有），调用点却已经在用
+// （节点 unmount 里就调 `_cancelPreviewHoverRetryTimers?.()` 与
+// `_disposeVideoProgressInteraction?.()`），所以行为一直静默失效。
+// 下面每个用例都从公开导出进入，只断言可观察结果。
+// ---------------------------------------------------------------------------
+
+function createDeps(overrides = {}) {
+  return {
+    store: { getState: () => ({ nodes: {} }), getStateRaw: () => ({ nodes: {} }) },
+    saveOutputBlob: async () => ({}),
+    VideoKeyingController: { isActiveFor: () => false },
+    getAutoMediaSizeByShortSide: () => ({ width: 160, height: 90 }),
+    buildSourceMediaNodePayload: (payload) => payload,
+    calcSafeSpawnPosNearNode: () => ({ x: 0, y: 0 }),
+    ...overrides,
+  };
+}
+
+test('previewControlsModule: 悬停重试定时器可登记并一次性清理', async () => {
+  const controls = createVideoNodePreviewControlsModule(createDeps()),
+    node = Object.create(controls),
+    fired = [];
+  const firstTimer = node._schedulePreviewHoverTimer(() => fired.push('first'), 0);
+  node._schedulePreviewHoverTimer(() => fired.push('second'), 600);
+  (assert.notEqual(firstTimer, null),
+    assert.equal(node._previewHoverRetryTimers.size, 2),
+    assert.equal(node._cancelPreviewHoverRetryTimers(), 2),
+    assert.equal(node._previewHoverRetryTimers.size, 0));
+  await new Promise((resolve) => setTimeout(resolve, 12));
+  (assert.deepEqual(fired, [], '清理后不应再触发回调'),
+    assert.equal(node._cancelPreviewHoverRetryTimers(), 0, '空集合上调用应幂等返回 0'),
+    assert.equal(node._schedulePreviewHoverTimer(null, 0), null, '非函数入参不入队'));
+}),
+  test('previewControlsModule: 悬停离开时按手动播放状态决定是否保留呈现', () => {
+    const controls = createVideoNodePreviewControlsModule(createDeps());
+    // 场景一：纯悬停播放 —— 离开要暂停、清 loop、收回控件。
+    const hoverVideoEl = {
+        paused: false,
+        loop: true,
+        pause() {
+          this.paused = true;
+        },
+      },
+      hoverVisibility = [],
+      hoverNode = Object.create(controls);
+    (Object.assign(hoverNode, {
+      nodeId: 'videoNode',
+      _isHovered: true,
+      _isManualControl: false,
+      _hoverManualPause: true,
+      _autoPlayToken: 3,
+      _getActivePreviewVideoEl: () => hoverVideoEl,
+      _logPreviewVideoPlaybackEvent: () => {},
+      _setVideoOverlaysVisible: (visible) => hoverVisibility.push(visible),
+      _hoverPlaybackLifecycle: { deactivate: () => hoverVisibility.push('deactivated') },
+    }),
+      assert.equal(hoverNode._deactivatePreviewHoverPlayback(), true),
+      assert.equal(hoverVideoEl.loop, false),
+      assert.equal(hoverVideoEl.paused, true),
+      assert.equal(hoverNode._isHovered, false),
+      assert.equal(hoverNode._hoverManualPause, false),
+      assert.equal(hoverNode._autoPlayToken, 4, '非手动播放时离开要作废在途播放'),
+      assert.deepEqual(hoverVisibility, [false, 'deactivated']));
+    // 场景二：手动播放中 —— 只清悬停标记，画面与循环都保留。
+    const manualVideoEl = {
+        paused: false,
+        loop: true,
+        pause() {
+          this.paused = true;
+        },
+      },
+      manualVisibility = [],
+      manualNode = Object.create(controls);
+    (Object.assign(manualNode, {
+      nodeId: 'videoNode',
+      _isManualControl: true,
+      _autoPlayToken: 5,
+      _getActivePreviewVideoEl: () => manualVideoEl,
+      _logPreviewVideoPlaybackEvent: () => {},
+      _setVideoOverlaysVisible: (visible) => manualVisibility.push(visible),
+    }),
+      assert.equal(manualNode._deactivatePreviewHoverPlayback(), true),
+      assert.equal(manualVideoEl.loop, true),
+      assert.equal(manualVideoEl.paused, false),
+      assert.equal(manualNode._autoPlayToken, 5, '手动播放时不应作废播放'),
+      assert.equal(manualNode._isManualControl, true),
+      assert.deepEqual(manualVisibility, [true]));
+  }),
+  test('previewControlsModule: 低倍缩放或已有播放接管时拒绝悬停播放', () => {
+    const denseStore = {
+        getState: () => ({ nodes: { videoNode: {} } }),
+        getStateRaw: () => ({
+          viewport: { zoom: 0.2 },
+          _nodeCount: 200,
+          nodes: { videoNode: {} },
+          selectedNodeIds: [],
+        }),
+      },
+      denseNode = Object.create(
+        createVideoNodePreviewControlsModule(createDeps({ store: denseStore })),
+      );
+    (Object.assign(denseNode, { nodeId: 'videoNode' }),
+      assert.equal(
+        denseNode.activatePreviewHoverPlayback(),
+        false,
+        '极低缩放下不应激活悬停播放',
+      ));
+    // 同一节点已被 videoClip 预览接管时也要让路。
+    const clipStore = {
+        getState: () => ({ nodes: { videoNode: {} } }),
+        getStateRaw: () => ({
+          nodes: { videoNode: {} },
+          videoClip: { active: true, nodeId: 'videoNode' },
+        }),
+      },
+      clipNode = Object.create(
+        createVideoNodePreviewControlsModule(createDeps({ store: clipStore })),
+      );
+    (Object.assign(clipNode, { nodeId: 'videoNode' }),
+      assert.equal(clipNode.activatePreviewHoverPlayback(), false));
+  }),
+  test('previewControlsModule: 任务失败时收起预览控件', () => {
+    const failedStore = {
+        getState: () => ({ nodes: { videoNode: { jobStatus: 'error' } } }),
+        getStateRaw: () => ({ nodes: { videoNode: { jobStatus: 'error' } } }),
+      },
+      visibility = [],
+      node = Object.create(
+        createVideoNodePreviewControlsModule(createDeps({ store: failedStore })),
+      );
+    (Object.assign(node, {
+      nodeId: 'videoNode',
+      _setVideoOverlaysVisible: (visible) => visibility.push(visible),
+    }),
+      assert.equal(node.activatePreviewHoverPlayback(), false),
+      assert.deepEqual(visibility, [false]));
+  }),
+  test('previewControlsModule: 切换语言后刷新控件提示文案', () => {
+    const controls = createVideoNodePreviewControlsModule(createDeps()),
+      node = Object.create(controls),
+      muteBtn = { dataset: {}, setAttribute() {} },
+      snapBtn = { dataset: {}, setAttribute() {} },
+      playBtn = {
+        dataset: {},
+        children: [],
+        setAttribute() {},
+        replaceChildren() {
+          this.children = [];
+        },
+        appendChild(icon) {
+          this.children.push(icon);
+        },
+      },
+      originalDocument = globalThis.document;
+    globalThis.document = {
+      createElementNS() {
+        const attrs = {};
+        return {
+          style: {},
+          attrs: attrs,
+          children: [],
+          setAttribute(name, value) {
+            attrs[name] = value;
+          },
+          appendChild(child) {
+            this.children.push(child);
+          },
+        };
+      },
+    };
+    try {
+      (Object.assign(node, {
+        _muteBtnEl: muteBtn,
+        _snapBtnEl: snapBtn,
+        _playBtnEl: playBtn,
+        _getActivePreviewVideoEl: () => ({ paused: true }),
+      }),
+        setLocale('en-US', { persist: false, notify: false }),
+        node._syncPreviewControlLocaleTexts(),
+        assert.equal(muteBtn.dataset.tooltip, 'Toggle mute'),
+        assert.equal(snapBtn.dataset.tooltip, 'Capture current frame'),
+        assert.equal(playBtn.dataset.tooltip, 'Play (Shift+click to loop)'),
+        setLocale('zh-CN', { persist: false, notify: false }),
+        node._syncPreviewControlLocaleTexts(),
+        assert.equal(muteBtn.dataset.tooltip, '切换静音'),
+        assert.equal(snapBtn.dataset.tooltip, '截取当前帧'),
+        assert.equal(playBtn.dataset.tooltip, '播放（Shift+点击循环）'));
+    } finally {
+      typeof originalDocument === 'undefined'
+        ? delete globalThis.document
+        : (globalThis.document = originalDocument);
+    }
+  }),
+  test('previewControlsModule: 进度循环只跟随当前播放的视频，暂停即停', () => {
+    const originalWindow = globalThis.window,
+      pendingFrames = new Map();
+    let frameSeq = 0;
+    globalThis.window = {
+      requestAnimationFrame(callback) {
+        frameSeq += 1;
+        return (pendingFrames.set(frameSeq, callback), frameSeq);
+      },
+      cancelAnimationFrame(handle) {
+        pendingFrames.delete(handle);
+      },
+    };
+    try {
+      const controls = createVideoNodePreviewControlsModule(createDeps()),
+        node = Object.create(controls),
+        synced = [],
+        videoEl = { paused: false, ended: false };
+      (Object.assign(node, {
+        _getActivePreviewVideoEl: () => videoEl,
+        _syncVideoControlsFromVideo: (target) => synced.push(target),
+      }),
+        node._startVideoProgressLoop(videoEl));
+      const firstFrame = node._progressRaf;
+      (assert.ok(firstFrame > 0),
+        node._startVideoProgressLoop(videoEl),
+        assert.equal(node._progressRaf, firstFrame, '同一视频重复启动不应新建帧'),
+        pendingFrames.get(firstFrame)(),
+        assert.deepEqual(synced, [videoEl], '推进一步应同步一次进度'),
+        assert.ok(node._progressRaf > firstFrame, '在播时继续排下一帧'),
+        (videoEl.paused = true),
+        node._startVideoProgressLoop(videoEl),
+        assert.equal(node._progressRaf, 0, '暂停后应停止循环'),
+        node._cancelVideoProgressLoop(),
+        assert.equal(node._progressRafVideoEl, null));
+    } finally {
+      typeof originalWindow === 'undefined'
+        ? delete globalThis.window
+        : (globalThis.window = originalWindow);
+    }
+  }),
+  test('previewControlsModule: 无 rAF 环境用定时器兜底调度进度帧', async () => {
+    const originalWindow = globalThis.window;
+    (delete globalThis.window, delete globalThis.requestAnimationFrame);
+    try {
+      const controls = createVideoNodePreviewControlsModule(createDeps()),
+        node = Object.create(controls);
+      let called = 0;
+      const handle = node._requestVideoProgressFrame(() => {
+        called += 1;
+      });
+      assert.equal(typeof handle, 'object', '定时器兜底返回 Timeout 句柄');
+      await new Promise((resolve) => setTimeout(resolve, 24));
+      (assert.equal(called, 1), node._cancelVideoProgressFrame(handle));
+    } finally {
+      if (typeof originalWindow !== 'undefined') globalThis.window = originalWindow;
+    }
+  }),
+  test('previewControlsModule: 卸载时释放进度拖拽会话并作废在途 seek', () => {
+    const controls = createVideoNodePreviewControlsModule(createDeps()),
+      node = Object.create(controls);
+    let disposeCount = 0;
+    (Object.assign(node, {
+      _progressDragSession: {
+        dispose() {
+          disposeCount += 1;
+          return true;
+        },
+      },
+      _isProgressDragging: true,
+      _isProgressSeeking: true,
+      _progressSeekToken: 7,
+    }),
+      node._disposeVideoProgressInteraction(),
+      assert.equal(disposeCount, 1),
+      assert.equal(node._progressDragSession, null),
+      assert.equal(node._isProgressDragging, false),
+      assert.equal(node._isProgressSeeking, false),
+      assert.equal(node._progressSeekToken, 8, '递增 token 让队列里的旧 seek 失效'));
+  }),
+  test('previewControlsModule: 节点未显式设置静音时跟随全局默认开声音开关', () => {
+    const loudStore = {
+        getState: () => ({ nodes: { videoNode: {} } }),
+        getStateRaw: () => ({ ui: { videoAudioDefaultEnabled: true }, nodes: {} }),
+      },
+      node = Object.create(
+        createVideoNodePreviewControlsModule(createDeps({ store: loudStore })),
+      ),
+      appliedMuted = [];
+    (Object.assign(node, {
+      nodeId: 'videoNode',
+      _data: {},
+      _multiLayerEls: [],
+      previewEl: { querySelectorAll: () => [] },
+      _muteIconMutedEl: { style: {} },
+      _muteIconUnmutedEl: { style: {} },
+      _applyMuteStateToPreviewVideos() {
+        appliedMuted.push(this._isMuted);
+      },
+      _syncMuteBtnIcon() {},
+    }),
+      node._syncMutedStateFromNodeData({}),
+      assert.equal(node._isMuted, false, '全局默认开声音时未设置过的节点应不静音'),
+      node._syncMutedStateFromNodeData({ videoMuted: true }),
+      assert.equal(node._isMuted, true, '节点显式设置优先于全局开关'),
+      assert.deepEqual(appliedMuted, [false, true]));
+  });
+

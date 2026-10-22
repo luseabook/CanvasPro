@@ -69,7 +69,6 @@ import { videoUiRenderMixin } from './aigenVideo/uiRenderMixin.js';
 import { videoStateSyncMixin } from './aigenVideo/stateSyncMixin.js';
 import { videoTaskOrchestrationMixin } from './aigenVideo/taskOrchestrationMixin.js';
 import { createVideoNodeReferenceInputModule } from './video-node/referenceInputModule.js';
-import { createVideoNodePreviewHoverPlaybackModule } from './video-node/previewHoverPlaybackModule.js';
 import { subscribeAssetMentionRegistry } from '../modules/assetMentionRegistry.js';
 import { removeCoveredAssetInputRefForConnection } from '../modules/promptAssetInputOverride.js';
 import { localPathToUrl, pickResultLocalPath, urlToLocalPath } from '../utils/localMediaPath.js';
@@ -1472,10 +1471,7 @@ const videoNodeReferenceInputModule = createVideoNodeReferenceInputModule(VIDEO_
   videoNodeParameterPanelModule = createVideoNodeParameterPanelModule(VIDEO_NODE_MODULE_DEPS),
   videoNodeTaskOrchestrationModule = createVideoNodeTaskOrchestrationModule(VIDEO_NODE_MODULE_DEPS),
   videoNodeResultRenderModule = createVideoNodeResultRenderModule(VIDEO_NODE_MODULE_DEPS),
-  videoNodePreviewControlsModule = createVideoNodePreviewControlsModule(VIDEO_NODE_MODULE_DEPS),
-  videoNodePreviewHoverPlaybackModule = createVideoNodePreviewHoverPlaybackModule(
-    VIDEO_NODE_MODULE_DEPS,
-  );
+  videoNodePreviewControlsModule = createVideoNodePreviewControlsModule(VIDEO_NODE_MODULE_DEPS);
 function applyClassPrototypeMethods(value102, enabled15) {
   if (!enabled15) return;
   const value103 = Object.getOwnPropertyDescriptors(enabled15);
@@ -1486,7 +1482,6 @@ function applyClassPrototypeMethods(value102, enabled15) {
   applyClassPrototypeMethods(AIGenVideoNode.prototype, videoNodeTaskOrchestrationModule),
   applyClassPrototypeMethods(AIGenVideoNode.prototype, videoNodeResultRenderModule),
   applyClassPrototypeMethods(AIGenVideoNode.prototype, videoNodePreviewControlsModule),
-  applyClassPrototypeMethods(AIGenVideoNode.prototype, videoNodePreviewHoverPlaybackModule),
   Object.assign(
     AIGenVideoNode.prototype,
     videoUiRenderMixin,

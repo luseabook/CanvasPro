@@ -1,6 +1,14 @@
 export const VIDEO_MUTED_FIELD = 'videoMuted';
-export function resolveVideoMutedPreference(options = {}) {
-  return options?.[VIDEO_MUTED_FIELD] === false ? false : true;
+/**
+ * 解析节点应有的静音状态。
+ *
+ * 优先级：节点显式设置 > 全局「视频默认开声音」开关 > 默认静音。
+ * 旧实现只看节点字段，导致全局开关对未单独设置过的节点完全无效。
+ */
+export function resolveVideoMutedPreference(nodeData = {}, { videoAudioDefaultEnabled = false } = {}) {
+  if (nodeData?.[VIDEO_MUTED_FIELD] === false) return false;
+  if (nodeData?.[VIDEO_MUTED_FIELD] === true) return true;
+  return videoAudioDefaultEnabled === true ? false : true;
 }
 export function buildVideoMutedPatch(options2 = {}, enabled) {
   const value = !!enabled;

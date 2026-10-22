@@ -3052,7 +3052,12 @@ const enUS = Object.freeze({
       uploading: 'Uploading...',
       failedRetry: 'Upload failed. Try again.',
     }),
-    controls: Object.freeze({ toggleMute: 'Toggle mute', captureFrame: 'Capture current frame' }),
+    controls: Object.freeze({
+      playLoopHint: 'Play (Shift+click to loop)',
+      pause: 'Pause',
+      toggleMute: 'Toggle mute',
+      captureFrame: 'Capture current frame',
+    }),
     recovery: Object.freeze({
       taskFailed: 'Task recovery failed',
       failedWithMessage: 'Recovery failed: {message}',
