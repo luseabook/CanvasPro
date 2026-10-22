@@ -5,6 +5,9 @@
 - 验证人：QA 严过关（软件公司团队）
 - 报告产物：`docs/qa/verify-2026-10-22/{matrix.md, evidence.md, report.md}`
 - 约束遵守：**未启动 GUI/Electron、未构建、未安装依赖、未做 git 写操作**。全部修改仅限 `docs/qa/verify-2026-10-22/`。
+- ⚠ **时效说明**：本报告记录的是 HEAD `df1811a5` 时点的验证状态。**187 批**（`459178af` 起）已把悬停播放的临时替代实现
+  按上游 0.8.9 结构重写进 `video-node/previewControlsModule.js`，并删除了 `previewHoverPlaybackModule.js`；
+  当前状态以 `docs/TRACKING.md` §11 与代码为准，本报告中的文件路径不复读。
 
 ---
 
@@ -120,6 +123,7 @@
 | 引入时间 | 只读 `git log -S` 定位到 `91d76472 port(b164): …`，**早于换牌提交 `df1811a5`**，属**既有缺陷**，与本次品牌替换无关 |
 | 为什么单测没抓到 | 原有 `AIGenVideoNode.test.js` 只断言 DOM 结构/数据签名，不派发 hover 事件，因此这两个分支从未被执行 |
 | 修复实现 | 工程师新增 `src/components/video-node/previewHoverPlaybackModule.js`，导出 `createVideoNodePreviewHoverPlaybackModule()`，用计算属性名提供 `['activatePreviewHoverPlayback']()` / `['_deactivatePreviewHoverPlayback']()`；在 `AIGenVideoNode.js:72` 导入、`:1476` 创建、`:1489` 经 `applyClassPrototypeMethods` 挂到原型。实现内含 try/catch 兜底、`_previewHoverActivationPending` 重入保护、外部播放owner/手动播放不抢控制权等分支 |
+| ⚠ 后续更正（187 批） | 上述「新增独立模块」是**结构上的替代方案，不是上游组织方式**。上游 0.8.9 把这两个方法放在 `video-node/previewControlsModule.js` 内（该文件共 30 个方法，仓库当时只有 18 个，缺 12 个）。187 批已按上游整文件重写补齐并**删除** `previewHoverPlaybackModule.js` 及其 13 例测试，改由 `tools/check-port-parity.mjs` 门禁防止同类缺口复发。功能语义未变，但文件位置与回归用例归属已变更——查当前实现请直接看 `previewControlsModule.js` |
 | 回归验证（QA 独立复跑） | ① `npx playwright test e2e/node-parameters.spec.js` → **1 passed**（14.6s）；② 4 个 web spec 全跑 → **9 passed (1.5m)**；③ 修复自带回归用例 `previewHoverPlaybackModule.test.js` **13/13 通过**（内部用 `assert.doesNotThrow` 派发 `mouseenter`/`mouseleave`，正是原缺口）；④ 全量 JS 复跑 **11339/11339、0 失败** |
 | 路由决策 | 首轮 **Send To: Engineer** → 已修复；本轮 QA **验证关闭** |
 
