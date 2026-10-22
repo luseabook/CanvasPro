@@ -1035,21 +1035,50 @@ export function createVideoNodeResultRenderModule(index) {
         return false;
       }
     }
-    async ['_maybeFetchVideoMeta'](value34) {
+    ['requestVideoMetaForNodeInfo'](nodeData = this._data) {
+      // 渲染器在「还没拿到 fps/帧数」时会调这个（renderer.js 用 typeof 守卫，
+      // 所以此前 AIGenVideoNode 上根本没有这个方法 → 静默跳过，节点信息面板永远空）。
+      // 5 秒内同源只发一次：节点信息面板每帧都可能问一遍。
+      const videos = Array.isArray(nodeData?.videos) ? nodeData.videos : [];
+      if (!videos.length) return null;
+      const rawIndex = Number(nodeData?.mainVideoIndex),
+        mainIndex = Number.isFinite(rawIndex) ? Math.max(0, Math.trunc(rawIndex)) : 0,
+        currentVideo = videos[Math.min(mainIndex, videos.length - 1)] || videos[0] || null;
+      if (!currentVideo || this._isVideoMarkedUnavailable(currentVideo)) return null;
+      if (String(currentVideo.error || '').trim()) return null;
+      const metaSrc = this._resolveVideoMetaSrcFromVideoData(currentVideo);
+      if (!metaSrc) return null;
+      const now = Date.now();
+      if (
+        this._videoMetaInfoRequestSrc === metaSrc &&
+        now - Number(this._videoMetaInfoRequestAt || 0) < 5000
+      )
+        return this._metaFetchPromise || null;
+      return (
+        (this._videoMetaInfoRequestSrc = metaSrc),
+        (this._videoMetaInfoRequestAt = now),
+        this._maybeFetchVideoMeta(metaSrc)
+      );
+    }
+    async ['_maybeFetchVideoMeta'](videoMetaSrc2) {
       if (!this._shouldFetchVideoMetaForNodeInfo()) return;
-      const videoMetaSrc = String(value34 || '').trim();
+      const videoMetaSrc = String(videoMetaSrc2 || '').trim();
       if (!videoMetaSrc) return;
-      const enabled17 = store.getState().nodes[this.nodeId];
-      if (!enabled17) return;
-      const value35 = String(enabled17.videoMetaSrc || ''),
-        value36 =
-          Number.isFinite(Number(enabled17.videoFps)) &&
-          Number(enabled17.videoFps) > 0 &&
-          Number.isFinite(Number(enabled17.videoFrameCount)) &&
-          Number(enabled17.videoFrameCount) > 0;
-      if (value36 && value35 === videoMetaSrc) return;
-      value35 &&
-        value35 !== videoMetaSrc &&
+      const nodeRecord = store.getState().nodes[this.nodeId];
+      if (!nodeRecord) return;
+      const currentSrc = String(nodeRecord.videoMetaSrc || ''),
+        hasMeta =
+          Number.isFinite(Number(nodeRecord.videoFps)) &&
+          Number(nodeRecord.videoFps) > 0 &&
+          Number.isFinite(Number(nodeRecord.videoFrameCount)) &&
+          Number(nodeRecord.videoFrameCount) > 0;
+      if (hasMeta && currentSrc === videoMetaSrc) return;
+      // 同源请求在途时复用同一个 Promise。requestVideoMetaForNodeInfo 会被渲染器
+      // 反复调用（每次节点信息刷新一次），不去重就是一串重复请求。
+      if (this._metaFetchPromise && this._metaFetchSrc === videoMetaSrc)
+        return this._metaFetchPromise;
+      currentSrc &&
+        currentSrc !== videoMetaSrc &&
         store.updateNodeData(this.nodeId, {
           videoMetaSrc: videoMetaSrc,
           videoFps: null,
@@ -1058,33 +1087,42 @@ export function createVideoNodeResultRenderModule(index) {
           videoWidth: null,
           videoHeight: null,
         });
-      const value37 = ++this._metaFetchToken;
-      try {
-        const box = await api.fetchVideoMetaFromServer(videoMetaSrc);
-        if (value37 !== this._metaFetchToken) return;
-        if (!box || box.success !== true) return;
-        const count4 = Number(box.fps),
-          count5 = Number(box.frameCount),
-          count6 = Number(box.duration),
-          count7 = Number(box.width),
-          count8 = Number(box.height),
-          value38 = { videoMetaSrc: videoMetaSrc };
-        if (Number.isFinite(count4) && count4 > 0) value38.videoFps = count4;
-        if (Number.isFinite(count5) && count5 > 0) value38.videoFrameCount = Math.round(count5);
-        if (Number.isFinite(count6) && count6 > 0) value38.videoDuration = count6;
-        if (Number.isFinite(count7) && count7 > 0) value38.videoWidth = Math.round(count7);
-        if (Number.isFinite(count8) && count8 > 0) value38.videoHeight = Math.round(count8);
-        const enabled18 = store.getState().nodes[this.nodeId];
-        if (!enabled18) return;
-        const value39 =
-          String(enabled18.videoMetaSrc || '') !== String(value38.videoMetaSrc || '') ||
-          Number(enabled18.videoFps || 0) !== Number(value38.videoFps || 0) ||
-          Number(enabled18.videoFrameCount || 0) !== Number(value38.videoFrameCount || 0) ||
-          Number(enabled18.videoDuration || 0) !== Number(value38.videoDuration || 0) ||
-          Number(enabled18.videoWidth || 0) !== Number(value38.videoWidth || 0) ||
-          Number(enabled18.videoHeight || 0) !== Number(value38.videoHeight || 0);
-        if (value39) store.updateNodeData(this.nodeId, value38);
-      } catch {}
+      const fetchToken = ++this._metaFetchToken,
+        task = (async () => {
+          try {
+            const box = await api.fetchVideoMetaFromServer(videoMetaSrc);
+            if (fetchToken !== this._metaFetchToken) return;
+            if (!box || box.success !== true) return;
+            const count4 = Number(box.fps),
+              count5 = Number(box.frameCount),
+              count6 = Number(box.duration),
+              count7 = Number(box.width),
+              count8 = Number(box.height),
+              patch = { videoMetaSrc: videoMetaSrc };
+            if (Number.isFinite(count4) && count4 > 0) patch.videoFps = count4;
+            if (Number.isFinite(count5) && count5 > 0) patch.videoFrameCount = Math.round(count5);
+            if (Number.isFinite(count6) && count6 > 0) patch.videoDuration = count6;
+            if (Number.isFinite(count7) && count7 > 0) patch.videoWidth = Math.round(count7);
+            if (Number.isFinite(count8) && count8 > 0) patch.videoHeight = Math.round(count8);
+            const latest = store.getState().nodes[this.nodeId];
+            if (!latest) return;
+            const changed =
+              String(latest.videoMetaSrc || '') !== String(patch.videoMetaSrc || '') ||
+              Number(latest.videoFps || 0) !== Number(patch.videoFps || 0) ||
+              Number(latest.videoFrameCount || 0) !== Number(patch.videoFrameCount || 0) ||
+              Number(latest.videoDuration || 0) !== Number(patch.videoDuration || 0) ||
+              Number(latest.videoWidth || 0) !== Number(patch.videoWidth || 0) ||
+              Number(latest.videoHeight || 0) !== Number(patch.videoHeight || 0);
+            if (changed) store.updateNodeData(this.nodeId, patch);
+          } catch {
+          } finally {
+            // 只有仍是「当前这次请求」才清：并发时后发起的那个才配清自己。
+            if (this._metaFetchPromise === task) {
+              ((this._metaFetchPromise = null), (this._metaFetchSrc = ''));
+            }
+          }
+        })();
+      return ((this._metaFetchSrc = videoMetaSrc), (this._metaFetchPromise = task), task);
     }
     ['_createStatusCard'](value40, value41) {
       const el6 = document.createElement('div');

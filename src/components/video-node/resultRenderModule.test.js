@@ -1139,3 +1139,103 @@ test('resultRenderModule: 播完时非主层不处理、悬停中自动重播', 
   assert.equal(idleVideo.paused, true);
   assert.equal(pausedIndicator, 1, '要露出暂停指示器');
 });
+
+// ---------------------------------------------------------------------------
+// 205 批：节点信息用的视频元信息（fps / 帧数）。
+// 渲染器用 `typeof x.requestVideoMetaForNodeInfo === 'function'` 守卫调用，
+// AIGenVideoNode 上一直没有这个方法 → 静默跳过，节点信息面板的帧率永远空着。
+// ---------------------------------------------------------------------------
+test('resultRenderModule: 元信息请求对失败/不可用结果直接放弃', () => {
+  const { ctx, getFetchVideoMetaCallCount } = createContext(
+    {
+      id: 'meta-skip',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [],
+    },
+    { showVideoMeta: true }
+  );
+  assert.equal(ctx.requestVideoMetaForNodeInfo(ctx._data), null, '没有视频就没有元信息');
+
+  const { ctx: brokenCtx, getFetchVideoMetaCallCount: brokenCalls } = createContext(
+    {
+      id: 'meta-broken',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [{ localPath: 'output/a.mp4', error: '转码失败' }],
+    },
+    { showVideoMeta: true }
+  );
+  assert.equal(brokenCtx.requestVideoMetaForNodeInfo(brokenCtx._data), null, '失败条目不去取帧率');
+  assert.equal(brokenCalls(), 0, '不该发出请求');
+
+  const { ctx: unavailableCtx, getFetchVideoMetaCallCount: unavailableCalls } = createContext(
+    {
+      id: 'meta-unavailable',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [
+        {
+          localPath: 'output/a.mp4',
+          mediaUnavailable: true,
+          mediaUnavailableSource: 'output/a.mp4',
+        },
+      ],
+    },
+    { showVideoMeta: true }
+  );
+  assert.equal(
+    unavailableCtx.requestVideoMetaForNodeInfo(unavailableCtx._data),
+    null,
+    '已标记不可用的媒体不去取帧率'
+  );
+  assert.equal(unavailableCalls(), 0);
+  assert.equal(getFetchVideoMetaCallCount(), 0);
+});
+
+test('resultRenderModule: 元信息请求 5 秒内同源只发一次', async () => {
+  const { ctx, getFetchVideoMetaCallCount } = createContext(
+    {
+      id: 'meta-throttle',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [{ localPath: 'output/a.mp4' }],
+    },
+    { showVideoMeta: true }
+  );
+  const first = ctx.requestVideoMetaForNodeInfo(ctx._data);
+  assert.ok(first, '首次应发出请求');
+  await first;
+  assert.equal(getFetchVideoMetaCallCount(), 1);
+
+  assert.equal(
+    ctx.requestVideoMetaForNodeInfo(ctx._data),
+    null,
+    '5 秒窗口内不再发请求（返回 null 表示「无需新请求」）'
+  );
+  assert.equal(getFetchVideoMetaCallCount(), 1, '请求数不能涨');
+
+  // 把上次请求时间推远，模拟窗口过期。
+  ctx._videoMetaInfoRequestAt = Date.now() - 6000;
+  const again = ctx.requestVideoMetaForNodeInfo(ctx._data);
+  assert.ok(again, '窗口过后应允许重试');
+  await again;
+  assert.equal(getFetchVideoMetaCallCount(), 2);
+});
+
+test('resultRenderModule: 已有同源 fps 与帧数时不再请求', async () => {
+  const { ctx, store, getFetchVideoMetaCallCount } = createContext(
+    {
+      id: 'meta-cached',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [{ localPath: 'output/a.mp4' }],
+    },
+    { showVideoMeta: true }
+  );
+  store.state.nodes['meta-cached'].videoMetaSrc = '/output/a.mp4';
+  store.state.nodes['meta-cached'].videoFps = 30;
+  store.state.nodes['meta-cached'].videoFrameCount = 300;
+  await ctx._maybeFetchVideoMeta('/output/a.mp4');
+  assert.equal(getFetchVideoMetaCallCount(), 0, '已有完整元信息就不该再打服务端');
+});

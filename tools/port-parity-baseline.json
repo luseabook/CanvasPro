@@ -1,6 +1,6 @@
 {
   "mirror": "shuo-deobf-089",
-  "totalMissing": 70,
+  "totalMissing": 69,
   "moduleFunctionTotal": 54,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
@@ -91,9 +91,6 @@
     ],
     "src/components/video-node/referenceInputModule.js": [
       "_scheduleFixedThumbObjectUrl"
-    ],
-    "src/components/video-node/resultRenderModule.js": [
-      "requestVideoMetaForNodeInfo"
     ],
     "src/core/generationTaskRuntime.js": [
       "resolveSettled"
