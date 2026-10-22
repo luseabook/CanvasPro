@@ -506,15 +506,22 @@ $ AIC_E2E_PORT=18792 npx playwright test e2e/smoke.spec.js e2e/http-security.spe
 
 ```bash
 $ node tools/run-full-tests.mjs --js-only
-# 结果取自 test-artifacts/full-review/run-tkpf1k/summary.json
-startedAt 2026-10-22T05:56:50.119Z
-counts    {"tests":11339,"pass":11339,"fail":0,"skipped":0,"cancelled":0}
-batches   20（全部 exitCode=0）  manifest 1186 个用例文件  用时 ≈ 169 s
+# 日志第 1 行即给出本次运行的权威目录：
+#   {"type":"start","resultRoot":"F:\\CanvasPro\\test-artifacts\\full-review\\run-Z9L83q","unitFiles":1186,"nodeFiles":1163,"pythonFiles":23}
+# 结果取自该 run 的 summary.json：
+startedAt   2026-10-22T05:59:45.642Z
+finishedAt  2026-10-22T06:05:55.877Z
+counts      {"tests":11339,"pass":11339,"fail":0,"skipped":0,"cancelled":0}
+success     true    batches 20（全部 exitCode=0）    manifest 1186 个用例文件    批用时合计 ≈ 273 s
 ```
 
-> ⚠️ 取证注意：本轮有其他 teammate 并发跑同一条命令，`test-artifacts/full-review/` 下同时存在多个 `run-*` 目录。
-> 我是**按 `summary.json` 里的 `startedAt` 认领自己的 run**（`run-tkpf1k` = 05:56:50，20 批已 `finishedAt` 收尾），
-> 未使用「最新目录」（`ls -td` 会拿到别人未跑完的目录，曾误读到 `batches=11` 的中间态）。复现时请同样按 `startedAt` 或 `finishedAt` 确认。
+> ⚠️ 取证注意（我实际踩过一次，记录以免后人重复）：本轮有其他 teammate **并发**跑同一条命令，
+> `test-artifacts/full-review/` 下同时存在多个 `run-*`（`run-tkpf1k` 05:56:50、`run-Tu9j4O` 05:59:13、`run-Z9L83q` 05:59:45）。
+> 认领自己那次**唯一可靠的办法是看自己进程日志的第 1 行 `{"type":"start","resultRoot":…}`**；
+> 用 `ls -td | head -1` 会拿到别人未跑完的中间态（曾误读到 `batches=11` / `tests=5901`），
+> 用 `startedAt` 排序也可能认错（我最初就把另一个并发 run `run-tkpf1k` 当成了自己的）。
+> 补充：那几个并发 run 的终态数字**完全一致**（`run-tkpf1k` / `run-Tu9j4O` / `run-Z9L83q` 三者均 `finished=true` 且均为 `11339/11339/0`），
+> 说明该结果**可复现**；但**引用的路径必须是自己那个**，否则无法复核（本节早先版本曾误引 `run-tkpf1k`，已更正为 `run-Z9L83q`）。
 
 ### E23.5 增量 +20 的逐文件分解（11319 → 11339）
 
