@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（189 批·**去压缩**）：133 个粘成单行的文件全部过 prettier（最小只有 400 B），仓库压缩文件归零。逐文件比对 AST 证明零语义变更（键位三种等价写法归一后 **133/133 完全一致**）。`deobf-gate.mjs` 新增 `compressed-source` 硬失败（≥800 B 且 ≤2 行），不依赖镜像，自有新文件也能拦住；`check-port-parity` 的 minified 由 INFO 升为硬失败。顺带修 `server.py` 的 HEAD 带 body（同类 `end_headers` 重复定义，后者覆盖前者，抑制开关成死代码；裸 socket 断言零 body）。全量 **11350/11350/0**；e2e **10/10**；后端 223 例。
 - 2026-10-22（188 批·**门禁校准**）：`check-port-parity.mjs` 加三项判据——别名/箭头属性 API 独立成层只报告（151 项，63 项有活调用点）、规模差改按**字节**比（行数被 41 个单行压缩文件打回，报 32 个）、形参个数漂移（27 项）。修自身两处：迁移判定加**同目录**约束（原先同名局部函数吞掉真实缺口）、抽取器补跨行形参。基线 **28/129 → 33/143**（+14 均为之前被误吸收的真实缺口）。自测 7→12，双向 exit 1/0。全量 **11347/11347/0**；e2e 9/9（上轮「夹具缺失」推翻，实为端口残留）。
-- 2026-10-22（187 批·**移植完整性校准与门禁**）：按上游 0.8.9 重写 `video-node/previewControlsModule.js`，方法 **18→30**（hover 定时器/激活/停用、手动循环、文案刷新、进度 rAF、拖拽释放）；删 186 批临时件 `previewHoverPlaybackModule.js`（13 例同删）。行为对齐：循环键 Alt→**Shift**（同 `SourceVideoNode`）、静音跟随 `videoAudioDefaultEnabled`、提示改 `data-tooltip`。新增 `tools/check-port-parity.mjs`：比对同名文件方法集，基线 28 文件/129 方法只拦**新增**缺口，已证可失败（删方法→exit 1）。JS **11342/11342/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）
