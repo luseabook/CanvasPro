@@ -15,6 +15,7 @@ import { fileURLToPath } from 'node:url';
 import {
   comparePortParity,
   diffAgainstBaseline,
+  diffModuleFunctionsAgainstBaseline,
   extractAliasSignatures,
   extractMethodNames,
   extractMethodSignatures,
@@ -336,6 +337,66 @@ test('check-port-parity: 模块级函数缺失只报告，不计入硬缺口、�
       [],
       '迁到共享 util 的同名函数不算缺失'
     ));
+});
+
+test('check-port-parity: 模块级函数缺口走自己的基线段落，只拦新增', () => {
+  const rows = [{ file: 'src/a.js', missing: ['helper', 'readPositiveNumber'] }];
+  const strict = diffModuleFunctionsAgainstBaseline(rows, {
+    moduleFunctions: { 'src/a.js': ['helper'] },
+  });
+  (assert.equal(strict.totalMissing, 2),
+    assert.deepEqual(
+      strict.regressions,
+      [{ file: 'src/a.js', missing: ['readPositiveNumber'] }],
+      '基线外的模块级缺口要算回归'
+    ));
+  // 与方法缺口互不干扰：同名条目放在 files 段落里不该被当成已接受。
+  const crossTier = diffModuleFunctionsAgainstBaseline(rows, { files: { 'src/a.js': ['helper'] } });
+  assert.equal(crossTier.regressions.length, 1, '两层基线不能互相兜底');
+  assert.deepEqual(
+    diffModuleFunctionsAgainstBaseline([], {
+      moduleFunctions: { 'src/a.js': ['helper'] },
+    }).resolved,
+    [{ file: 'src/a.js', count: 1 }],
+    '补齐后记为 resolved，提示收紧基线'
+  );
+});
+
+test('check-port-parity: 模块级函数新增缺口让门禁 exit 1（基线内则放行）', () => {
+  // 层与基线都要能真的失败：报告层若只打 INFO，下一次整块漏移植依然静默通过。
+  const filler = {};
+  for (let index = 0; index < 100; index += 1) {
+    filler[`src/f${String(index).padStart(3, '0')}.js`] = `class F${index} {\n  ['_only']() {}\n}\n`;
+  }
+  const mirror = makeTree({
+    ...filler,
+    'src/target.js': 'function helper(a) {\n  return a;\n}\nclass T {\n  _only() {}\n}\n',
+  });
+  const repo = makeTree({ ...filler, 'src/target.js': 'class T {\n  _only() {}\n}\n' });
+
+  const emptyBaseline = path.join(repo, 'baseline-empty.json');
+  fs.writeFileSync(emptyBaseline, JSON.stringify({ files: {}, moduleFunctions: {} }), 'utf8');
+  const fails = spawnSync(
+    process.execPath,
+    [GATE, '--mirror', mirror, '--repo', repo, '--baseline', emptyBaseline],
+    { encoding: 'utf8' }
+  );
+  (assert.equal(fails.status, 1, '基线外新增模块级缺口必须 exit 1'),
+    assert.match(`${fails.stdout}${fails.stderr}`, /helper/, '并点名缺的是哪个函数'));
+
+  const acceptedBaseline = path.join(repo, 'baseline-accepted.json');
+  fs.writeFileSync(
+    acceptedBaseline,
+    JSON.stringify({ files: {}, moduleFunctions: { 'src/target.js': ['helper'] } }),
+    'utf8'
+  );
+  const passes = spawnSync(
+    process.execPath,
+    [GATE, '--mirror', mirror, '--repo', repo, '--baseline', acceptedBaseline],
+    { encoding: 'utf8' }
+  );
+  (assert.equal(passes.status, 0, '已在基线内就该放行'),
+    assert.match(passes.stdout, /PASS/, '并明确 PASS'));
 });
 
 test('check-port-parity: 存在压缩文件时门禁直接失败（双向）', () => {

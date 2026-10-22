@@ -1,6 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 84,
+  "moduleFunctionTotal": 96,
   "files": {
     "src/components/video-node/resultRenderModule.js": [
       "_buildRhAiAppVideoResultDisplayPatch",
@@ -145,6 +146,168 @@
     ],
     "src/services/webPreviewViewSyncService.js": [
       "refresh"
+    ]
+  },
+  "moduleFunctions": {
+    "src/services/webPreviewViewSyncService.js": [
+      "clearPendingPanFreeze",
+      "collectCanvasNodeOccluders",
+      "collectWebPreviewContextMenuShortcuts",
+      "createWebPreviewNodeActivityTracker",
+      "elementOwnsHit",
+      "getCanvasOccluderHostElement",
+      "getCanvasOccluderZIndex",
+      "getDomOcclusionSamplePoints",
+      "getElementVisibleRect",
+      "getElementZIndex",
+      "getElementsFromPoint",
+      "getSlotHostNodeElement",
+      "getSlotSnapshotMetrics",
+      "getSlotSnapshotToken",
+      "getTopRenderableHitElement",
+      "isDocumentRootHitElement",
+      "isOccludedByHigherCanvasNode",
+      "isOccludedByRendererStack",
+      "isOwnedByWebPreviewSlot",
+      "isPendingPanFreezeActive",
+      "isPotentialNativeViewOccluderElement",
+      "isRenderableHitElement",
+      "parseStackingZIndex",
+      "readGraphStoreState",
+      "readPositiveNumber",
+      "readySnapshotMatchesBounds",
+      "startPendingPanFreeze"
+    ],
+    "src/modules/app/appCanvasPointerBindings.js": [
+      "findScrollableWheelAncestor",
+      "getElementComputedStyle",
+      "getWheelDeltaScale",
+      "isActiveWhiteboardInteractionTarget",
+      "isPointerModifierShortcutActive",
+      "isScrollableOverflowValue",
+      "normalizeModifierShortcutToken",
+      "resolveCanvasWheelGesture"
+    ],
+    "src/components/video-node/resultRenderModule.js": [
+      "applyVideoResultGeometryAnimationStyle",
+      "buildSelectedVideoResultPresentationPatch",
+      "getVideoResultMediaKey",
+      "isVideoResultElementVisible",
+      "isVideoResultViewportBusy",
+      "setVideoResultElementVisible",
+      "setVideoResultLayerActive"
+    ],
+    "src/modules/canvasCommands/generationCommands.js": [
+      "isGenerationFailureStatus",
+      "pickGenerationTaskId",
+      "summarizeBatchStatus",
+      "summarizeGenerationRunResult",
+      "validateBatchNodeIds"
+    ],
+    "src/components/aigenImage/taskOrchestrationModule.impl.js": [
+      "buildImageSchemaPayloadParams",
+      "hasOwnObjectField",
+      "normalizeImageBatchSize",
+      "resolveImageNodeBatchSize"
+    ],
+    "src/modules/personReplacement/personReplacementPromptControls.js": [
+      "bindPersonReplacementPromptModeSelect",
+      "modeOptions",
+      "syncModeSelect",
+      "syncModeTooltip"
+    ],
+    "src/components/media-clip/videoRangeTimelineView.js": [
+      "createVideoRangePlayheadReadoutView",
+      "createVideoRangeSelectionView",
+      "positionVideoRangePlayheadReadout"
+    ],
+    "src/services/completionSoundService.js": [
+      "getNotificationSoundPlayer",
+      "isDesktopHttpShimRuntime",
+      "resolveHttpCompatSystemSoundUrl"
+    ],
+    "src/components/video-node/modelSelectorShared.js": [
+      "buildDreaminaVideoMenuGroups",
+      "compareOfficialVideoMenuModels"
+    ],
+    "src/components/video-node/referenceInputModule.js": [
+      "getFixedSlotLabelText",
+      "getRefSourceDisplayStateKey"
+    ],
+    "src/core/generationTaskRuntime.js": [
+      "executeResumeTask",
+      "executeSubmitTask"
+    ],
+    "src/core/stores/modelMenuPreferenceStore.js": [
+      "sanitizeAutoHiddenProviders",
+      "sanitizeProviderVisibility"
+    ],
+    "src/modules/agent/agentConversationStore.js": [
+      "normalizeMessageInputRef",
+      "normalizePendingInputRef"
+    ],
+    "src/modules/interaction/PanoramaSceneInteraction.js": [
+      "resolveScaleConstraint",
+      "scalePositionAroundPivotAxes"
+    ],
+    "src/modules/MascotManager.js": [
+      "formatShortcutBinding",
+      "getMascotTipText"
+    ],
+    "src/modules/personReplacement/personReplacementProjectSession.js": [
+      "getPersonReplacementSourceProcessingMessage",
+      "getPersonReplacementSourceProcessingProgress"
+    ],
+    "src/modules/providerIconLod.js": [
+      "preloadProviderIconAssets",
+      "resetProviderIconPreloadForTests"
+    ],
+    "src/modules/registry.js": [
+      "canCreateConnectedNode",
+      "getRegisteredConnectionDecision"
+    ],
+    "src/modules/storyWorkspace/storyClipFrames.js": [
+      "createStoryClipFrameBatch",
+      "insertStoryClipFrameAfter"
+    ],
+    "src/components/aigenText/modelSelector.js": [
+      "refreshMountedAIGenTextModelSelectors"
+    ],
+    "src/components/SourceImageNode.js": [
+      "hasSharedCanvasImageAcquisition"
+    ],
+    "src/components/video-node/segmentRetakeController.js": [
+      "syncSegmentRetakeController"
+    ],
+    "src/modules/collaboration/collaborationChat.js": [
+      "mentionPattern"
+    ],
+    "src/modules/previewGenerateButtonUi.js": [
+      "setGenerateButtonIcon"
+    ],
+    "src/modules/settings/modelServiceSettingsNavigator.js": [
+      "clearModelServiceSettingsFieldReveal"
+    ],
+    "src/modules/storyWorkspace/storyClipGeneration.js": [
+      "createStoryClipVideoReferenceState"
+    ],
+    "src/modules/storyWorkspace/storyClipProduction.js": [
+      "hasStoryClipPreviewContent"
+    ],
+    "src/modules/storyWorkspace/storyReplicationIntakeController.js": [
+      "reuseStoryReplicationHomeSources"
+    ],
+    "src/modules/taskCenterListView.js": [
+      "createTaskHistoryNotice"
+    ],
+    "src/modules/workspacePersistencePresentation.js": [
+      "presentSaveError"
+    ],
+    "src/services/desktopBridge.js": [
+      "chromeShellPoll"
+    ],
+    "src/services/smartClipJobService.js": [
+      "waitForStatusPoll"
     ]
   }
 }

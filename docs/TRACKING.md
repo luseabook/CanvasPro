@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（195 批·**模块级函数缺口升为硬拦截**）：基线新增独立段落 `moduleFunctions`（32 文件 / 96 个），`diffModuleFunctionsAgainstBaseline` 复用 `diffGapRows` 的「只拦新增」规则，基线外新增即 **exit 1**；方法口径不变（30 文件 / 84 个），总口径 = 84 + 96。补测试 2 例（跨层不互相兜底、双向退出码），全量 **11417/11417/0**。
 - 2026-10-22（194 批·**门禁补盲：模块级 function 层**）：`port-parity-scan.mjs` 新增 `extractModuleFunctionSignatures`（只收 0 缩进的模块级声明，排除 `_0x` 与嵌套闭包）；`check-port-parity.mjs` 以独立层 `moduleFunctionRows` 报告，**不进退出码、不动基线**。实跑暴露 **96 个模块级函数全仓无定义，分布 32 个文件，其中 21 个文件方法缺口为 0**（此前完全看不见）。线索由 REA `semantic_graph` 交叉核对得出。补测试 2 例，全量 **11415/11415/0**。
-- 2026-10-22（193 批·**音频区间切割**）：`AudioClipController.js` 补 22 方法 + `initForSource` + 两个导出，整块切分从零落地：分段归一化（重叠/最短长度/越界夹取）、相邻段硬边界、整体平移与边缘拉伸、切点预告线、`has-split` 遮罩、双段拖拽命中。`_confirm` 加 `onConfirm({startSec,endSec,splitSec,ranges})` 出口——`audioVoicePanel:2724` 早按此契约调用，此前是空钩子。样式拆到 `styles/audio-clip-split.css`。测试 0→14，基线 105→84，全量 **11413/11413/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

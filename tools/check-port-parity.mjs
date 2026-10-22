@@ -377,13 +377,13 @@ export function readBaseline(baselineFile) {
 }
 
 /**
- * Splits current gaps into regressions (not in the baseline) and resolved
- * entries (in the baseline, now gone).
- * @param {ReturnType<typeof comparePortParity>['rows']} rows
- * @param {{files?: Record<string, string[]>}|null} baseline
+ * Shared rule for both tiers: a baseline only blocks *additions*, and an entry
+ * that disappeared counts as cleared. One implementation so the method tier and
+ * the module-function tier cannot drift apart in how they treat the baseline.
+ * @param {Array<{file:string, missing:string[]}>} rows
+ * @param {Record<string, string[]>} knownFiles
  */
-export function diffAgainstBaseline(rows, baseline) {
-  const knownFiles = baseline?.files || {};
+function diffGapRows(rows, knownFiles) {
   const regressions = [];
   let totalMissing = 0;
   for (const row of rows) {
@@ -407,6 +407,27 @@ export function diffAgainstBaseline(rows, baseline) {
 }
 
 /**
+ * Splits current method gaps into regressions (not in the baseline) and resolved
+ * entries (in the baseline, now gone).
+ * @param {ReturnType<typeof comparePortParity>['rows']} rows
+ * @param {{files?: Record<string, string[]>}|null} baseline
+ */
+export function diffAgainstBaseline(rows, baseline) {
+  return diffGapRows(rows, baseline?.files || {});
+}
+
+/**
+ * Same split for the module-function tier. It has its own baseline section on
+ * purpose: merging these into `files` would inflate the method-gap count and let
+ * a helper satisfy a method gap (or the reverse) — two different contracts.
+ * @param {ReturnType<typeof comparePortParity>['moduleFunctionRows']} rows
+ * @param {{moduleFunctions?: Record<string, string[]>}|null} baseline
+ */
+export function diffModuleFunctionsAgainstBaseline(rows, baseline) {
+  return diffGapRows(rows, baseline?.moduleFunctions || {});
+}
+
+/**
  * Writes the accepted backlog in a stable, diff-friendly shape.
  * The `equivalent` section is preserved verbatim: it records gaps that were
  * proven to be served by a different implementation, and dropping it on
@@ -415,16 +436,21 @@ export function diffAgainstBaseline(rows, baseline) {
  * @param {ReturnType<typeof comparePortParity>['rows']} rows
  * @param {string} mirrorRoot
  */
-export function writeBaseline(baselineFile, rows, mirrorRoot) {
+export function writeBaseline(baselineFile, rows, mirrorRoot, moduleFunctionRows = []) {
   const files = {};
   for (const row of rows) files[row.file] = [...row.missing].sort();
+  const moduleFunctions = {};
+  for (const row of moduleFunctionRows) moduleFunctions[row.file] = [...row.missing].sort();
   const previous = readBaseline(baselineFile);
   const payload = {
     // Kept intentionally explicit so a reviewer can tell which mirror the
     // backlog was measured against.
     mirror: path.basename(mirrorRoot),
     totalMissing: rows.reduce((sum, row) => sum + row.missing.length, 0),
+    moduleFunctionTotal: moduleFunctionRows.reduce((sum, row) => sum + row.missing.length, 0),
     files,
+    // Separate section, separate contract — see diffModuleFunctionsAgainstBaseline.
+    moduleFunctions,
   };
   if (previous?.equivalent && Object.keys(previous.equivalent).length > 0) {
     payload.equivalent = previous.equivalent;
@@ -463,7 +489,8 @@ function parseArguments(argv) {
           '  --verbose            逐文件列出缺口方法',
           '',
           '只比对两边都存在的同名文件；整件未移植的文件不在此门禁范围内。',
-          'sizeDrift / signatureDrift / 别名缺口 / 模块级 function 缺口为只报告项，不参与退出码。',
+          'sizeDrift / signatureDrift / 别名缺口为只报告项，不参与退出码。',
+          '模块级 function 缺口有自己的基线段落（moduleFunctions），只拦基线外新增。',
           'compressed（压缩成单行）参与退出码：它违反「不做压缩处理」的要求。',
         ].join('\n')
       );
@@ -503,10 +530,11 @@ function main() {
   }
 
   if (options.updateBaseline) {
-    const payload = writeBaseline(options.baselineFile, rows, mirrorPath);
+    const payload = writeBaseline(options.baselineFile, rows, mirrorPath, moduleFunctionRows);
     console.log(
       `WROTE 移植完整性基线：${Object.keys(payload.files).length} 个文件 / ` +
-        `${payload.totalMissing} 个缺失方法 → ${path.relative(process.cwd(), options.baselineFile)}`
+        `${payload.totalMissing} 个缺失方法 + ` +
+        `${payload.moduleFunctionTotal} 个模块级函数 → ${path.relative(process.cwd(), options.baselineFile)}`
     );
     return;
   }
@@ -514,6 +542,11 @@ function main() {
   const baseline = readBaseline(options.baselineFile);
   const { regressions, resolved, totalMissing } = diffAgainstBaseline(rows, baseline);
   const regressionTotal = regressions.reduce((sum, item) => sum + item.missing.length, 0);
+  const moduleDiff = diffModuleFunctionsAgainstBaseline(moduleFunctionRows, baseline);
+  const moduleRegressionTotal = moduleDiff.regressions.reduce(
+    (sum, item) => sum + item.missing.length,
+    0
+  );
 
   if (options.json) {
     console.log(
@@ -530,6 +563,8 @@ function main() {
           aliasRows,
           minified,
           moduleFunctionRows,
+          moduleFunctionRegressions: moduleDiff.regressions,
+          moduleFunctionResolved: moduleDiff.resolved,
         },
         null,
         2
@@ -540,16 +575,21 @@ function main() {
     if (!baseline) {
       console.log(`REPORT 移植完整性门禁：${headline}；尚无基线，只报告不拦截。`);
       console.log('       跑 --update-baseline 生成基线后，本门禁才会拦新增缺口。');
-    } else if (regressionTotal === 0 && minified.length === 0) {
+    } else if (regressionTotal === 0 && minified.length === 0 && moduleRegressionTotal === 0) {
       console.log(`PASS  移植完整性门禁：${headline}，无基线外新增缺口。`);
     } else {
       const reasons = [];
       if (regressionTotal > 0) reasons.push(`基线外新增缺口 ${regressionTotal} 个`);
+      if (moduleRegressionTotal > 0)
+        reasons.push(`基线外新增模块级函数缺口 ${moduleRegressionTotal} 个`);
       if (minified.length > 0) reasons.push(`${minified.length} 个文件被压缩成单行`);
       console.error(`FAIL  移植完整性门禁：${headline}，${reasons.join('；')}。`);
       for (const item of regressions)
         console.error(`  - ${item.file}: 新增缺失 ${item.missing.join(', ')}`);
-      if (regressionTotal > 0) console.error('  若确属有意删减，跑 --update-baseline 显式接受。');
+      for (const item of moduleDiff.regressions)
+        console.error(`  - ${item.file}: 新增缺失模块级函数 ${item.missing.join(', ')}`);
+      if (regressionTotal > 0 || moduleRegressionTotal > 0)
+        console.error('  若确属有意删减，跑 --update-baseline 显式接受。');
     }
     if (resolved.length > 0)
       console.log(
@@ -589,18 +629,31 @@ function main() {
       0
     );
     if (moduleFunctionTotal > 0) {
-      // Never part of the exit code: a module-level helper can be inlined or moved
-      // to a shared util between versions without losing a feature. It is surfaced
-      // because the strict set cannot see this layer at all — 53 real losses were
-      // invisible before this line existed.
+      // Gated on its own baseline section. The layer stays separate from the
+      // method tier so the two contracts never satisfy each other, but a new
+      // module-level loss is now a failure, not a footnote.
+      const listed =
+        moduleRegressionTotal > 0
+          ? moduleDiff.regressions
+          : options.verbose
+            ? moduleFunctionRows
+            : [];
       console.log(
-        `INFO  ${moduleFunctionTotal} 个模块级 function 声明在仓库中找不到（只报告，不进退出码），` +
-          `分布在 ${moduleFunctionRows.length} 个文件：`
+        `INFO  ${moduleFunctionTotal} 个模块级 function 缺口（${moduleFunctionRows.length} 个文件）` +
+          (moduleRegressionTotal === 0
+            ? '，均在基线内。'
+            : `，其中 ${moduleRegressionTotal} 个是基线外新增。`) +
+          (listed.length === 0 ? '用 --verbose 看明细。' : '')
       );
-      for (const item of moduleFunctionRows.slice(0, 10))
+      for (const item of listed.slice(0, 10))
         console.log(`  - ${item.file}: ${item.missing.join(', ')}`);
-      if (moduleFunctionRows.length > 10) console.log(`  ...另有 ${moduleFunctionRows.length - 10} 个文件`);
+      if (listed.length > 10) console.log(`  ...另有 ${listed.length - 10} 个文件`);
     }
+    if (moduleDiff.resolved.length > 0)
+      console.log(
+        `INFO  ${moduleDiff.resolved.length} 个文件已补齐基线内的模块级函数（共 ` +
+          `${moduleDiff.resolved.reduce((sum, item) => sum + item.count, 0)} 个），可跑 --update-baseline 收紧基线。`
+      );
     if (minified.length > 0) {
       const totalBytes = minified.reduce((sum, item) => sum + item.bytes, 0);
       console.error(
@@ -626,10 +679,17 @@ function main() {
     }
   }
 
-  // Two independent reasons to fail: a method gap the baseline does not cover,
-  // or a file that was pasted in pre-minified. The second is not a porting gap
-  // at all — it is a formatting defect that makes every diff unreadable.
-  if ((baseline && regressionTotal > 0) || minified.length > 0) process.exitCode = 1;
+  // Three independent reasons to fail: a method gap the baseline does not cover,
+  // a module-level function gap it does not cover, or a file that was pasted in
+  // pre-minified. The last is not a porting gap at all — it is a formatting defect
+  // that makes every diff unreadable.
+  if (
+    (baseline && regressionTotal > 0) ||
+    (baseline && moduleRegressionTotal > 0) ||
+    minified.length > 0
+  ) {
+    process.exitCode = 1;
+  }
 }
 
 const invokedDirectly =
