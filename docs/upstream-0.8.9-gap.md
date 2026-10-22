@@ -54,10 +54,17 @@ dreamina headless 登录等）、CSP 闸门、`check-csp.mjs`、E2E 与离线测
 
 ## 4. 建议批次计划（整代升代 + 依赖闭包，沿 b163 路线）
 
-1. **B-0（本批已完成）**：镜像标尺升到 0.8.9 + 本台账。
-2. **B-1 官方目录簇**：`manifests/official` + `video/modelApi` + `dreamina` + `api/adapters`
-   + 聚合器升代（modelRegistry / vendor*ModelApiManifests / Normalizer / RunningHubAdapter）。
-   聚合层是规格变更型，须一次性接通 0.8.9 规格，禁止逐件。
+> **B-1 执行状态（2026-10-22，184 批）**：196 件（B-1 新 + 改 + 2 闭包件
+> `api/localGatewayEnvironment.js`、`src/services/modelMediaInputPresentation.js`）
+> 已在 `deobf-tools/b184/port/` 完成四闸门（bool/auto-map/rename/verify + node --check）
+> **全 PASS、闭包 0 断链**。落库试测 288 失败（基线 14），且沙箱文件系统视图分叉使测量
+> 不可信——按 162 批先例整体回滚。**下批动作**：从 staging 重落 → 跑全量 → T/A 收编
+> （断层面：`modelRegistry`/`index.js` 导出面变化波及 storyboard3d、storyWorkspace、
+> video-node、参数面板、provider profile 等；另需迁移 dreamina 旧路径
+> `image/dreamina`、`video/dreamina` → `manifests/dreamina/` 并删孤儿件）。
+
+1. **B-0（已完成）**：镜像标尺升到 0.8.9 + 本台账。
+2. **B-1 官方目录簇**：staging 已就绪（见上），聚合器一次性接通 0.8.9 规格，禁止逐件。
 3. **B-2 electron 能力簇**：28 件新 electron 模块与渲染侧调用点配对落地
    （browserGuardian/ownership 三件套、jianyingDraft、desktopEventPoll 等）。
 4. **B-3 复刻工作室**：≈342 件全量（依赖 B-1/B-2），含 `shot_detection_worker.py`

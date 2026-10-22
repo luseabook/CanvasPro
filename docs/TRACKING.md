@@ -371,7 +371,7 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-09（183 批·**管理后台接入客户端 + 换牌残留修复**）：① `tutorialCatalog.js:1` 的 `CONTENT_ORIGIN` 仍是旧域名 `https://api.ashuoai.com`（教程拉不到）→ `https://api.1e1e.cn`，可由后台 `content_sources.tutorialOrigin` 覆盖。② `subscription_client.py` 新增 `normalize_structured_config()`，解析后台 10 个结构化命名空间。③ 新增 `admin_content_gateway.py` + `/api/v2/admin-content/*` + `api/adminContentApi.js`：公告/更新/目录/推广位/门禁/工单/优惠码/事件，TTL 缓存 + 离线降级 + 脏数据裁剪。④ 新增 `brandIdentity.js` + `clientConfigStore.js`；`http_route_dispatcher` 加 `contact_overrides_getter`，后台 brand/contact 优先于硬编码。⑤ `set_remote_subscription_gates()`：后台门禁为权威来源，本地 manifest 退化兜底（FR-2.3）。**验证**：JS **11275/11261/14**（既有失败同前）；后端 219；两门禁 PASS。
+- 2026-10-22（184 批·**上游 0.8.9 逆向 + B-1 试落回滚**）：已装 SHUO Canvas 升 0.8.9，镜像标尺升级 `shuo-deobf-089`（2468 件）+ `shuo-electron-deobf-089`（asar 提取 158 件）；台账 `docs/upstream-0.8.9-gap.md`（仅镜像有 api 192 / src 465 / electron 28 / styles 203）。B-1 官方目录簇 196 件 staging 四闸门全 PASS、闭包 0 断链；落库试测 **288 失败**（基线 14），沙箱 FS 视图分叉致测量不可信——按 162 批先例**整体回滚**，成品存 staging，聚合器切换留待下批（gap §4）。**验证**：树回 HEAD、deobf-gate PASS。
 
 ## 12. 变更记录机制（**已冻结**）
 
