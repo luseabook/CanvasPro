@@ -129,7 +129,7 @@ export function listJavaScriptFiles(root) {
  * @returns {{
  *   comparedFiles: number,
  *   rows: Array<{file:string, upstream:number, repo:number, missing:string[], relocated:string[]}>,
- *   sizeDrift: Array<{file:string, upstreamLines:number, repoLines:number, ratio:number}>,
+ *   sizeDrift: Array<{file:string, upstreamLines:number, repoLines:number, upstreamBytes:number, repoBytes:number, ratio:number}>,
  *   signatureDrift: Array<{file:string, name:string, upstreamArity:number, repoArity:number}>,
  *   aliasRows: Array<{file:string, missing:string[], live:string[]}>,
  *   minified: Array<{file:string, bytes:number, upstreamLines:number}>,
@@ -236,6 +236,8 @@ export function comparePortParity(mirrorRoot, repoRoot) {
           file: relativePath,
           upstreamLines,
           repoLines,
+          upstreamBytes,
+          repoBytes,
           ratio: Number(byteRatio.toFixed(2)),
         });
       }
@@ -406,7 +408,8 @@ function parseArguments(argv) {
           '  --verbose            逐文件列出缺口方法',
           '',
           '只比对两边都存在的同名文件；整件未移植的文件不在此门禁范围内。',
-          'sizeDrift / signatureDrift 为只报告项，不参与退出码。',
+          'sizeDrift / signatureDrift / 别名缺口为只报告项，不参与退出码。',
+          'compressed（压缩成单行）参与退出码：它违反「不做压缩处理」的要求。',
         ].join('\n')
       );
       process.exit(0);
@@ -483,15 +486,16 @@ function main() {
     if (!baseline) {
       console.log(`REPORT 移植完整性门禁：${headline}；尚无基线，只报告不拦截。`);
       console.log('       跑 --update-baseline 生成基线后，本门禁才会拦新增缺口。');
-    } else if (regressionTotal === 0) {
+    } else if (regressionTotal === 0 && minified.length === 0) {
       console.log(`PASS  移植完整性门禁：${headline}，无基线外新增缺口。`);
     } else {
-      console.error(
-        `FAIL  移植完整性门禁：${headline}，其中基线外新增缺口 ${regressionTotal} 个。`
-      );
+      const reasons = [];
+      if (regressionTotal > 0) reasons.push(`基线外新增缺口 ${regressionTotal} 个`);
+      if (minified.length > 0) reasons.push(`${minified.length} 个文件被压缩成单行`);
+      console.error(`FAIL  移植完整性门禁：${headline}，${reasons.join('；')}。`);
       for (const item of regressions)
         console.error(`  - ${item.file}: 新增缺失 ${item.missing.join(', ')}`);
-      console.error('  若确属有意删减，跑 --update-baseline 显式接受。');
+      if (regressionTotal > 0) console.error('  若确属有意删减，跑 --update-baseline 显式接受。');
     }
     if (resolved.length > 0)
       console.log(
@@ -499,10 +503,13 @@ function main() {
           '可跑 --update-baseline 收紧基线。'
       );
     if (sizeDrift.length > 0) {
-      console.log(`INFO  ${sizeDrift.length} 个文件上游明显更大（可能是整块功能未移植）：`);
+      console.log(
+        `INFO  ${sizeDrift.length} 个文件上游明显更大（可能是整块功能未移植，比例按字节算）：`
+      );
       for (const item of sizeDrift.slice(0, 10))
         console.log(
-          `  - ${item.file}: 仓库 ${item.repoLines} 行 / 上游 ${item.upstreamLines} 行（${item.ratio}x）`
+          `  - ${item.file}: 仓库 ${item.repoLines} 行/${Math.round(item.repoBytes / 1024)} KB · ` +
+            `上游 ${item.upstreamLines} 行/${Math.round(item.upstreamBytes / 1024)} KB（${item.ratio}x）`
         );
       if (sizeDrift.length > 10) console.log(`  ...另有 ${sizeDrift.length - 10} 个`);
     }
@@ -525,15 +532,15 @@ function main() {
     }
     if (minified.length > 0) {
       const totalBytes = minified.reduce((sum, item) => sum + item.bytes, 0);
-      console.log(
-        `INFO  ${minified.length} 个文件被压缩成单行（合计 ${(totalBytes / 1024).toFixed(0)} KB），` +
-          '与「不做压缩处理」的要求冲突，需要格式化：'
+      console.error(
+        `  以下 ${minified.length} 个文件被压缩成单行（合计 ${(totalBytes / 1024).toFixed(0)} KB），` +
+          '违反「不做压缩处理」的要求，必须格式化：'
       );
-      for (const item of minified.slice(0, 8))
-        console.log(
+      for (const item of minified)
+        console.error(
           `  - ${item.file}: ${(item.bytes / 1024).toFixed(0)} KB 压成 1 行（上游 ${item.upstreamLines} 行）`
         );
-      if (minified.length > 8) console.log(`  ...另有 ${minified.length - 8} 个`);
+      console.error('  修法：npx prettier --write <file>（格式化不改语义，可用 AST 比对复核）。');
     }
     if (options.verbose) {
       console.log('  缺口明细（缺失数降序）：');
@@ -548,7 +555,10 @@ function main() {
     }
   }
 
-  if (baseline && regressionTotal > 0) process.exitCode = 1;
+  // Two independent reasons to fail: a method gap the baseline does not cover,
+  // or a file that was pasted in pre-minified. The second is not a porting gap
+  // at all — it is a formatting defect that makes every diff unreadable.
+  if ((baseline && regressionTotal > 0) || minified.length > 0) process.exitCode = 1;
 }
 
 const invokedDirectly =

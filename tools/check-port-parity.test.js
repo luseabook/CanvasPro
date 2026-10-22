@@ -254,3 +254,65 @@ test('check-port-parity: 仓库用别名属性实现时不算缺口', () => {
   (assert.deepEqual(report.rows, [], '不报缺失'),
     assert.deepEqual(report.aliasRows, [], '也不报别名缺口'));
 });
+
+test('check-port-parity: 压缩成单行的文件单独报 minified，不算 sizeDrift', () => {
+  // 仓库里有 133 个文件被粘成一行（上游同名文件是几十到上千行）。按行数算规模差
+  // 会得出「仓库 1 行 / 上游 1725 行」这种比值，把「没格式化」误读成「功能缺失」。
+  const methods = [];
+  for (let index = 0; index < 60; index += 1) methods.push(`  ['_m${index}']() {}`);
+  const mirror = makeTree({ 'src/target.js': `class Target {\n${methods.join('\n')}\n}\n` });
+  const repo = makeTree({
+    'src/target.js': `class Target { ${methods.map((line) => line.trim()).join(' ')} }\n`,
+  });
+  const report = comparePortParity(mirror, repo);
+  const row = report.minified.find((item) => item.file === 'src/target.js');
+  (assert.ok(row, '压缩文件要报 minified'),
+    assert.equal(row.upstreamLines > 50, true, '附带上游行数供判断'),
+    assert.deepEqual(report.sizeDrift, [], '压缩文件不重复计入 sizeDrift'),
+    assert.deepEqual(report.rows, [], '方法都在，不该报缺口'));
+});
+
+test('check-port-parity: 存在压缩文件时门禁直接失败（双向）', () => {
+  // 门禁存在的意义是能失败。压缩文件是格式缺陷而非移植缺口，因此不挂在基线上，
+  // 必须自己就能拦住——否则下一次粘贴会静默通过。
+  const filler = {};
+  for (let index = 0; index < 100; index += 1) {
+    filler[`src/f${String(index).padStart(3, '0')}.js`] = `class F${index} {\n  ['_only']() {}\n}\n`;
+  }
+  const methods = [];
+  for (let index = 0; index < 60; index += 1) methods.push(`['_m${index}']() {}`);
+  const mirror = makeTree({
+    ...filler,
+    'src/target.js': `class Target {\n${methods.map((item) => `  ${item}`).join('\n')}\n}\n`,
+  });
+  const compressedRepo = makeTree({
+    ...filler,
+    'src/target.js': `class Target { ${methods.join(' ')} }\n`,
+  });
+  const formattedRepo = makeTree({
+    ...filler,
+    'src/target.js': `class Target {\n${methods.map((item) => `  ${item}`).join('\n')}\n}\n`,
+  });
+  const baseline = path.join(compressedRepo, 'baseline.json');
+  fs.writeFileSync(baseline, JSON.stringify({ files: {} }), 'utf8');
+
+  const failures = spawnSync(
+    process.execPath,
+    [GATE, '--mirror', mirror, '--repo', compressedRepo, '--baseline', baseline],
+    { encoding: 'utf8' }
+  );
+  (assert.equal(failures.status, 1, '有压缩文件必须 exit 1'),
+    assert.match(
+      `${failures.stdout}${failures.stderr}`,
+      /压缩成单行/,
+      '并说明原因，而不是只报一句 FAIL'
+    ));
+
+  const passes = spawnSync(
+    process.execPath,
+    [GATE, '--mirror', mirror, '--repo', formattedRepo, '--baseline', baseline],
+    { encoding: 'utf8' }
+  );
+  (assert.equal(passes.status, 0, '格式化后必须 exit 0'),
+    assert.match(passes.stdout, /PASS/, '并明确 PASS'));
+});

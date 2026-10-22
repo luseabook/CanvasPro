@@ -125,6 +125,15 @@ const WARN_RULES = [
   { id: 'js-eval', pattern: /\beval\s*\(/, why: 'dynamic code evaluation' },
 ];
 
+// A file pasted in pre-minified is unreadable in review. That is the same class
+// of defect as obfuscation — the code is present but nobody can audit it — so it
+// fails here instead of waiting for someone to notice. The thresholds are
+// calibrated against this tree: every real source file is formatted at
+// printWidth 100, and the smallest legitimate two-line module is 315 bytes, so
+// 800 bytes spread over at most two lines cannot be anything but compressed.
+const MINIFIED_MIN_BYTES = 800;
+const MINIFIED_MAX_LINES = 2;
+
 const failures = [];
 const warnings = [];
 const skipped = { dirs: [], scratch: [], tooling: [], unreadable: [], oversized: [], vendor: 0 };
@@ -135,6 +144,14 @@ const lineOf = (source, offset) => source.slice(0, offset).split('\n').length;
 const report = (file, line, text) => {
   if (line === undefined) return `  ${file}\n      ${text}`;
   return `  ${file}:${line}\n      ${String(text).trim().slice(0, 100)}`;
+};
+
+/** Returns `{bytes, lines}` when the source looks pasted in already-minified. */
+const detectMinified = (source) => {
+  const bytes = Buffer.byteLength(source, 'utf8');
+  if (bytes < MINIFIED_MIN_BYTES) return null;
+  const lines = source.split('\n').filter((line) => line.trim().length > 0).length;
+  return lines <= MINIFIED_MAX_LINES ? { bytes, lines } : null;
 };
 
 // `![]` / `!![]` as a fresh array literal only. `![][0]` and `![].x` index into
@@ -245,6 +262,16 @@ const walk = (dir, rel) => {
         continue;
       }
       scanned += 1;
+      const minifiedHit = detectMinified(source);
+      if (minifiedHit) {
+        failures.push({
+          id: 'compressed-source',
+          file: relPath,
+          text:
+            `${(minifiedHit.bytes / 1024).toFixed(1)} KB on ${minifiedHit.lines} line(s) — ` +
+            'format with prettier: compression makes the file unreviewable',
+        });
+      }
       try {
         if (NEEDS_LEX.test(source)) scanTokens(relPath, source, lex(source));
         scanText(relPath, source);
@@ -278,11 +305,11 @@ if (skipped.oversized.length) console.log('  oversized (>8MB): ' + skipped.overs
 if (skipped.unreadable.length) console.log('  unreadable      : ' + skipped.unreadable.length);
 
 if (failures.length) {
-  console.log('\nFAIL  ' + failures.length + ' obfuscation signal(s): ' + JSON.stringify(byId(failures)));
+  console.log('\nFAIL  ' + failures.length + ' blocking signal(s): ' + JSON.stringify(byId(failures)));
   for (const f of failures.slice(0, verbose ? failures.length : 25)) console.log(report(f.file, f.line, f.text));
   if (!verbose && failures.length > 25) console.log('  ... ' + (failures.length - 25) + ' more (use --verbose)');
 } else {
-  console.log('\nPASS  no obfuscation signals in code positions');
+  console.log('\nPASS  no obfuscation signals in code positions, no compressed source');
 }
 
 if (warnings.length) {

@@ -154,3 +154,28 @@ test('vendor is excluded but the exclusion is reported', () => {
   assert.equal(r.status, 0, r.stdout);
   assert.match(r.stdout, /vendor excluded : yes/);
 });
+
+test('a file pasted in pre-minified fails, the same file formatted passes', () => {
+  // 133 files in this tree arrived as a single line (up to 32 KB on one line).
+  // Compression is a build failure of the same kind as obfuscation: the code is
+  // present but unreadable, so review cannot happen at all. Asserting both
+  // directions keeps this from degrading into a rule nobody can satisfy.
+  const statements = [];
+  for (let index = 0; index < 60; index += 1) statements.push(`export const v${index} = ${index};`);
+  const compressed = statements.join(' ');
+  const formatted = statements.join('\n');
+  assert.ok(Buffer.byteLength(compressed) > 800, 'fixture must exceed the size floor');
+
+  const pressed = run({ 'src/pressed.js': compressed });
+  assert.equal(pressed.status, 1, pressed.stdout);
+  assert.deepEqual(
+    pressed.report.failures.map((item) => item.id),
+    ['compressed-source']
+  );
+
+  assert.equal(run({ 'src/pressed.js': formatted }).status, 0, '格式化后必须通过');
+
+  // 小文件不该误报：仓库里最小的合法两行模块是 315 字节。
+  const tiny = 'export const STORYBOARD_ICON = "<svg></svg>";\nexport const OTHER = 1;';
+  assert.equal(run({ 'src/tiny.js': tiny }).status, 0, '小文件不触发');
+});
