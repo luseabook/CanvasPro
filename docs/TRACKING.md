@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（192 批·**会话仓库升代闭合事件流**）：`agentConversationStore.js` 升到 schema v2（277→740 行）：事件溯源落盘、`persistence` 注入、写失败暂存内存 + `getPersistenceError`/`retryPersistence` 重试、带 replyVersions 的关键写入失败抛错；`updateConversation` 未传事件流时逐字段 diff 补事件；老数据就地补等价事件流。新增 `api/officialTextAdmission.js`（路由白名单 + 凭据剥离）与 `agentOfficialTextTask.js`。补测试 20 例，含两仓库事件流闭合联动用例。全量 **11399/11399/0**。
 - 2026-10-22（191 批·**Agent 事件溯源接线**）：`agentSessionStore.js` 升到 0.8.9 事件溯源版（172→640 行），补 19 个 API：消息/运行事件/操作/任务绑定各产出带单调 seq 的 sessionEvent，投影走 `projectAgentSessionEvents` 并用 `compareAgentSessionProjection` 对账；运行事件上限 240、账本 120；跨会话操作只更新既有条目；`recordTrace` 四个 type 转运行事件（技能注入按 run 去重）。支撑库导出面本就齐备，纯接线。补测试 18 例。基线 125→105，全量 **11379**。⚠ 会话仓库侧 appendRunEvent/flushPersistence 仍空，排 192 批。
-- 2026-10-22（190 批·**objectURL 生命周期接线**）：`desktopMediaBlobSource.js` 升代到 0.8.9（补 shouldAssign/onSourceAssigned/playbackUrl/pending 去重/chrome-shell audio 改写；17 文件 57 处调用点此前传新选项被静默丢弃）；`resultRenderModule.js` 补 18 方法（objectURL 缓存对账/释放/竞态双 token/poster 清除），thumbId 裸 `URL.createObjectURL` 全部改 tracked，`AIGenVideoNode:1453` 原空钩子自动生效。基线 143→125。全量 **11361/11361/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）
