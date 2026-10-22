@@ -379,7 +379,11 @@ export function installAppCanvasPointerBindings({
         if (!enabled12 || !enabled12.contains(event3.target)) return;
         return;
       }
-      const value7 = event3.altKey && !targetWindow?._spaceHeld;
+      // 走快捷键表而不是硬编码 Alt：用户把「拖拽创建连线副本」改到别的修饰键后
+      // 这里要跟着变，否则改了键位不生效。
+      const value7 =
+        isPointerModifierShortcutActive(event3, 'duplicate-with-edges', 'Alt') &&
+        !targetWindow?._spaceHeld;
       if (cache2.pickerVisible) {
         uiStore2?.hidePicker?.();
         return;

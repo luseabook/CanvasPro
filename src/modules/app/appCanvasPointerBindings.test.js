@@ -165,3 +165,18 @@ test('appCanvasPointerBindings: 白板编辑目标与 overflow 取值判定', ()
     assert.equal(internals.isScrollableOverflowValue('hidden'), false),
     assert.equal(internals.isScrollableOverflowValue('clip'), false));
 });
+
+test('appCanvasPointerBindings: Alt+拖拽复制走快捷键表，不硬编码 Alt', () => {
+  // 该动作在 shortcuts.js 里登记为 keys: ['Alt'] 且属于 MODIFIER_ONLY_SHORTCUT_ACTIONS。
+  // 接线读表而不是读 event.altKey，用户改键位后才能生效。
+  assert.equal(
+    internals.isPointerModifierShortcutActive({ altKey: true }, 'duplicate-with-edges', 'Alt'),
+    true,
+    '默认 Alt 生效'
+  );
+  assert.equal(
+    internals.isPointerModifierShortcutActive({ ctrlKey: true }, 'duplicate-with-edges', 'Alt'),
+    false,
+    '只按住 Ctrl 不该触发复制'
+  );
+});
