@@ -369,9 +369,9 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（187 批·**移植完整性校准与门禁**）：按上游 0.8.9 重写 `video-node/previewControlsModule.js`，方法 **18→30**（hover 定时器/激活/停用、手动循环、文案刷新、进度 rAF、拖拽释放）；删 186 批临时件 `previewHoverPlaybackModule.js`（13 例同删）。行为对齐：循环键 Alt→**Shift**（同 `SourceVideoNode`）、静音跟随 `videoAudioDefaultEnabled`、提示改 `data-tooltip`。新增 `tools/check-port-parity.mjs`：比对同名文件方法集，基线 28 文件/129 方法只拦**新增**缺口，已证可失败（删方法→exit 1）。JS **11342/11342/0**。
 
 - 2026-10-22（186 批·**全面功能验证与缺陷修复**）：QA 覆盖 17 个能力域，可执行断言 **11568 例 0 失败**（3 例软链用例补前提校验后 SKIP）；修 `AIGenVideoNode` hover 调用未定义方法（既有缺陷，`91d76472` 引入）→ 新增 `video-node/previewHoverPlaybackModule.js` + 13 例回归，原 e2e 复跑通过；`vendor` 纳入跑测入口、换牌 3 例边界用例并入 `electron/`。JS **11339/11339/0**；后端 223（3 SKIP）。详见 `docs/qa/verify-2026-10-22/report.md`。
-- 2026-10-22（185 批·**换牌 一帧 OneFrame**）：包/安装身份（`com.oneframe.app`、productName、`OneFrame-Setup-*`）、主进程显示名与 userData 改 `OneFrame` + 新增 `brandDataMigration.js` 从 `CanvasPro` 迁移（旧目录保留）、i18n/首页/关于页/预设名/后端/卸载清单换牌；保留更新源、服务域名、存储 key 前缀、握手头与 legacy 路径。JS **11319/11319/0**（基线 14 例失败清零）；后端 223（3 例既有 symlink 环境限制）。详见 `docs/rebrand-oneframe.md`。
 
 ## 12. 变更记录机制（**已冻结**）
 
