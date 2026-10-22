@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 54,
+  "moduleFunctionTotal": 49,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -130,13 +130,6 @@
     ]
   },
   "moduleFunctions": {
-    "src/modules/canvasCommands/generationCommands.js": [
-      "isGenerationFailureStatus",
-      "pickGenerationTaskId",
-      "summarizeBatchStatus",
-      "summarizeGenerationRunResult",
-      "validateBatchNodeIds"
-    ],
     "src/components/aigenImage/taskOrchestrationModule.impl.js": [
       "buildImageSchemaPayloadParams",
       "hasOwnObjectField",

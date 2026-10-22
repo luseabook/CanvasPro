@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（206 批·**批量生成命令**）：`generationCommands.js` 补全 `generation.runBatch`（多节点一次确认起跑，上限 12）+ 5 个辅助函数（任务号选取/状态归一/失败判定/批量校验/批量汇总）。`agentActionPostconditions` 早就在等这个命令，但它**从未注册**。同时把 `generation.run` 对齐 0.8.9：返回 `status`/`taskId`，失败**抛错**而不是静默成功。模块级缺口 54→49，全量 **11478/11478/0**。
 - 2026-10-23（205 批·**节点信息元数据**）：`resultRenderModule.js` 补 `requestVideoMetaForNodeInfo`（最后一个缺口，该文件清零）——渲染器用 `typeof … === 'function'` 守卫调用，AIGenVideoNode 一直没有它 → 静默跳过，节点信息面板的 fps/帧数永远空。补 5 秒同源节流 + 失败/不可用条目直接放弃；`_maybeFetchVideoMeta` 加在途 Promise 去重（渲染器每次刷新都会问）。测试 37→40，方法缺口 70→69（28 文件），全量 **11470/11470/0**。
-- 2026-10-23（204 批·**门禁补第三层：静默空调用**）：`check-port-parity` 新增 `findDanglingOptionalCalls`，扫 `this._m?.()` / `this['_m']?.()` 全仓无定义的调用——这是 202–203 批在视频结果模块抓到的 6 处缺陷。**零容忍硬门禁**（当前 0，无需欠账），基线留 `danglingCalls` 空登记位给运行时挂载；定义判据含 `['_m']()` 形态（首版漏了它 → 43 个假阳性）。测试 18→21，全量 **11467/11467/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）
