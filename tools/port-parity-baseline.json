@@ -1,6 +1,6 @@
 {
   "mirror": "shuo-deobf-089",
-  "totalMissing": 72,
+  "totalMissing": 70,
   "moduleFunctionTotal": 54,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
@@ -49,11 +49,6 @@
       "_getGenerationTaskRecoveryOwner",
       "_hasUnconfirmedAsyncTask"
     ],
-    "src/components/video-node/resultRenderModule.js": [
-      "_handlePreviewVideoEnded",
-      "_releaseIdlePreviewHoverPlaybackMedia",
-      "requestVideoMetaForNodeInfo"
-    ],
     "src/components/GroupNode.js": [
       "_resolveToolbarAnchorInsetY",
       "_syncGroupRunButton"
@@ -96,6 +91,9 @@
     ],
     "src/components/video-node/referenceInputModule.js": [
       "_scheduleFixedThumbObjectUrl"
+    ],
+    "src/components/video-node/resultRenderModule.js": [
+      "requestVideoMetaForNodeInfo"
     ],
     "src/core/generationTaskRuntime.js": [
       "resolveSettled"

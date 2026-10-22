@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（203 批·**悬停播放收尾**）：`resultRenderModule.js` 补 3 方法并改接线。`_getActivePreviewVideoEl` 在**上游只有调用、从未定义**（`previewControlsModule` 12 处调用，数处非可选）→ 仓库同样缺，走到即 TypeError；现按主结果层优先、唯一 `<video>` 兜底实现。`_releaseIdlePreviewHoverPlaybackMedia`：悬停结束且真停住才卸播放源并记住进度（手动控制/拖进度/仍在播一律不动）。`_handlePreviewVideoEnded` + `ended` 监听改接它（原先只亮暂停指示器，连播失效）。测试 34→37，方法缺口 72→70，全量 **11464/11464/0**。
 - 2026-10-23（202 批·**结果模块媒体生命周期**）：`resultRenderModule.js` 补 11 方法，核心是修 5 处**悬空调用**——挂起前海报回退、`hasPresentedRendererMedia`、`suspendRendererMedia`、薄呈现水合、recovery 摘除此前在结果模块全无定义，`?.()` 静默 no-op（薄呈现永不水合、视口忙不挂起、已呈现帧被丢）。另补终态判定（失败/取消/单条 error 不得被媒体推迟挡住错误卡）、海报解析拆分（失败返回空、多条不回退节点级防串图）、结果身份键 + 陈旧全屏关闭、RH AI App 展示补丁。测试 34 全过，缺口 83→72，全量 **11461/11461/0**。
-- 2026-10-23（201 批·**视频结果层可见性/分层**）：`resultRenderModule.js` 补 7 个模块级函数：结果元素可见性（`hidden` 与 `is-hidden` 同步翻转）、主结果层切换（z-index 非有限值不写入）、几何动画样式一次合并、媒体键按优先级取首个非空、`buildSelectedVideoResultPresentationPatch`（索引夹取 + 19 字段白名单，避免把生成参数一起铺平）、视口忙闲判定。补测试 6 例，模块级缺口 61→54，全量 **11452/11452/0**。14 个方法缺口留 202。
 
 
 ## 12. 变更记录机制（**已冻结**）

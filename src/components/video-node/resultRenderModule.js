@@ -598,6 +598,104 @@ export function createVideoNodeResultRenderModule(index) {
       if (this._rendererThinVideoHydration !== true) return false;
       return ((this._rendererThinVideoHydration = false), this._loadAndDisplayVideo());
     }
+    ['_getActivePreviewVideoEl']() {
+      // 「当前正在展示的那一条」的视频元素。上游只调用不定义（previewControlsModule
+      // 里 12 处调用，其中数处是非可选调用），一旦走到就是 TypeError。
+      // 优先取主结果层；层级数组不可用时退到预览容器里唯一的 <video>，
+      // 多于一个就返回 null——宁可让调用方走「等视频就绪」分支，也不要猜错元素。
+      const nodeData = this._data || {},
+        videos = Array.isArray(nodeData.videos) ? nodeData.videos : [],
+        rawIndex = Number(nodeData.mainVideoIndex),
+        mainIndex = Number.isFinite(rawIndex) ? Math.max(0, Math.trunc(rawIndex)) : 0,
+        slotIndex = Math.max(0, Math.min(Math.max(0, videos.length - 1), mainIndex)),
+        layeredEl = this._multiLayerEls?.[slotIndex];
+      if (layeredEl && layeredEl.isConnected !== false) return layeredEl;
+      const previewVideos = this.previewEl?.querySelectorAll?.('video') || [];
+      return previewVideos.length === 1 ? previewVideos[0] : null;
+    }
+    ['_releaseIdlePreviewHoverPlaybackMedia']() {
+      // 悬停结束且确实停住时，把预览的播放源整个卸掉：悬停播放用的解码会话
+      // 留着会持续占内存，而且下次悬停要重接源。手动控制/拖动进度时不能动。
+      const activeVideo = this._getActivePreviewVideoEl?.();
+      if (
+        !activeVideo ||
+        this._isHovered === true ||
+        this._isManualControl === true ||
+        this._isManualLoopPlayback === true ||
+        this._isProgressSeeking === true ||
+        this._isProgressDragging === true ||
+        activeVideo.paused === false
+      )
+        return false;
+      const nodeData = this._data || {},
+        videos = Array.isArray(nodeData.videos) ? nodeData.videos : [],
+        mainIndex = Math.max(
+          0,
+          Math.min(Math.max(0, videos.length - 1), Math.trunc(Number(nodeData.mainVideoIndex) || 0))
+        ),
+        playbackUrl = this._resolveVideoPlaybackUrl(videos[mainIndex] || videos[0]),
+        currentTime = Number(activeVideo.currentTime || 0);
+      ((this._hoverPlaybackResumeState =
+        playbackUrl && Number.isFinite(currentTime) && currentTime > 0
+          ? { source: playbackUrl, time: currentTime }
+          : null),
+        (this._videoSourceAttachToken = Number(this._videoSourceAttachToken || 0) + 1),
+        this._videoSourceAttachTokens?.set?.(
+          activeVideo,
+          Number(this._videoSourceAttachTokens?.get?.(activeVideo) || 0) + 1
+        ),
+        this._releaseLocalVideoPlaybackObjectUrl(),
+        (this._previewPostersClearedForPlayback = new WeakMap()),
+        resetVideoFramePresentation(activeVideo),
+        clearDesktopMediaPlaybackSourceMetadata(activeVideo),
+        this._restoreIdlePreviewPoster(activeVideo),
+        (activeVideo.preload = 'none'),
+        activeVideo.removeAttribute?.('src'));
+      try {
+        activeVideo.load?.();
+      } catch {}
+      return true;
+    }
+    ['_handlePreviewVideoEnded'](videoEl) {
+      // 播完了：悬停中或手动循环就立刻从头重播，否则停在最后一帧并露出暂停指示器。
+      // 只处理主结果层那一条——多条结果里别的层播完不该抢主层的表现。
+      if (!videoEl) return false;
+      const nodeData = store.getState()?.nodes?.[this.nodeId] || this._data || {},
+        mainIndex = Math.max(0, Math.trunc(Number(nodeData.mainVideoIndex) || 0)),
+        slotIndex = Math.max(0, Math.trunc(Number(videoEl.dataset?.idx) || 0));
+      if (slotIndex !== mainIndex) return false;
+      const hoverShouldContinue =
+          this._isHovered === true &&
+          this._isManualControl !== true &&
+          this._hoverManualPause !== true,
+        manualLoop = this._isManualLoopPlayback === true,
+        shouldReplay = hoverShouldContinue || manualLoop;
+      if (shouldReplay) {
+        try {
+          videoEl.currentTime = 0;
+        } catch {}
+        ((videoEl.loop = true),
+          this._hideCenterIndicator?.(),
+          (this._autoPlayToken = Number(this._autoPlayToken || 0) + 1));
+        const autoPlayToken = this._autoPlayToken,
+          shouldContinue = () =>
+            this._autoPlayToken === autoPlayToken &&
+            (this._isManualLoopPlayback === true ||
+              (this._isHovered === true &&
+                this._isManualControl !== true &&
+                this._hoverManualPause !== true));
+        if (typeof this._playPreviewVideoWithRecovery === 'function')
+          void this._playPreviewVideoWithRecovery(videoEl, {
+            reason: manualLoop ? 'manual' : 'hover',
+            shouldContinue,
+          })?.catch?.(() => {});
+        else {
+          const playResult = videoEl.play?.();
+          playResult?.catch?.(() => {});
+        }
+      } else ((videoEl.loop = false), videoEl.pause?.(), this._showPausedCenterIndicator?.());
+      return (this._syncVideoControlsFromVideo?.(videoEl), true);
+    }
     ['_restorePreviewHoverPlaybackTime'](el, sourceUrl) {
       const resumeState = this._hoverPlaybackResumeState,
         normalizedSource = String(sourceUrl || '').trim();
@@ -1523,7 +1621,9 @@ export function createVideoNodeResultRenderModule(index) {
               run3() && (this._hideCenterIndicator(), this._syncVideoControlsFromVideo(el15));
             }),
             el15.addEventListener('ended', () => {
-              run3() && (this._showPausedCenterIndicator(), this._syncVideoControlsFromVideo(el15));
+              // 继续走统一入口：它负责悬停/手动循环的自动重播，也是「播完停在最后一帧」
+              // 的唯一判定点。此前这里只显示暂停指示器，悬停连播因此失效。
+              if (run3()) this._handlePreviewVideoEnded(el15);
             }),
             el15.addEventListener('click', (event2) => {
               const value105 = store.getState().nodes[this.nodeId];

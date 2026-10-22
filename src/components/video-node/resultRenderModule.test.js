@@ -1022,3 +1022,120 @@ test('resultRenderModule: 薄呈现水合只跑一次', async () => {
   assert.equal(ctx._multiLayerEls.length, 1, '水合后要真的把主预览建出来');
   assert.equal(await ctx.hydrateRendererThinVideoPresentation(), false, '第二次不再重复加载');
 });
+
+// ---------------------------------------------------------------------------
+// 203 批：悬停播放收尾与「当前预览元素」定位。
+// _getActivePreviewVideoEl 在上游只被调用、从未定义（previewControlsModule 有 12 处
+// 调用点，其中数处非可选），仓库同样缺失——走到即 TypeError。
+// ---------------------------------------------------------------------------
+test('resultRenderModule: 当前预览元素取主结果层，取不到才退回唯一视频', () => {
+  const { ctx } = createContext({
+    id: 'active-preview-el',
+    type: 'ai-video',
+    mainVideoIndex: 1,
+    videos: [{ localPath: 'a.mp4' }, { localPath: 'b.mp4' }],
+  });
+  const first = new FakeVideoElement(),
+    second = new FakeVideoElement();
+  ctx._multiLayerEls = [first, second];
+  assert.equal(ctx._getActivePreviewVideoEl(), second, '要看主视频那一条，不是第 0 条');
+
+  ctx._multiLayerEls = [];
+  assert.equal(ctx._getActivePreviewVideoEl(), null, '容器里没有视频时返回 null，不抛');
+
+  ctx.previewEl.appendChild(first);
+  assert.equal(ctx._getActivePreviewVideoEl(), first, '只有一个视频时可以退回到它');
+
+  ctx.previewEl.appendChild(second);
+  assert.equal(
+    ctx._getActivePreviewVideoEl(),
+    null,
+    '多个视频又无层级信息时不猜，交给调用方等就绪'
+  );
+});
+
+test('resultRenderModule: 悬停播放空闲释放只在真正停住时发生', () => {
+  // 注意：localPathToUrl('a.mp4') 返回空串（要求带目录），夹具必须用 output/ 前缀，
+  // 否则这里断言的 resumeState 永远为 null，看起来像代码没实现。
+  const { ctx } = createContext({
+    id: 'idle-release',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'output/a.mp4', thumbUrl: '/a.jpg' }],
+  });
+  const video = new FakeVideoElement();
+  video.setAttribute('src', 'blob:hover');
+  video.currentTime = 4.5;
+  ctx._multiLayerEls = [video];
+
+  ctx._isHovered = true;
+  assert.equal(ctx._releaseIdlePreviewHoverPlaybackMedia(), false, '悬停中不能卸源');
+  ctx._isHovered = false;
+  video.paused = false;
+  assert.equal(ctx._releaseIdlePreviewHoverPlaybackMedia(), false, '还在播就不能卸源');
+
+  ctx._isProgressDragging = true;
+  video.paused = true;
+  assert.equal(ctx._releaseIdlePreviewHoverPlaybackMedia(), false, '拖动进度时不能卸源');
+
+  ctx._isProgressDragging = false;
+  assert.equal(ctx._releaseIdlePreviewHoverPlaybackMedia(), true, '停住且空闲才卸源');
+  assert.equal(video.getAttribute('src'), '', 'src 要摘掉');
+  assert.equal(video.preload, 'none', '改成 preload=none，避免立刻重新拉流');
+  assert.deepEqual(
+    ctx._hoverPlaybackResumeState && {
+      source: ctx._hoverPlaybackResumeState.source,
+      time: ctx._hoverPlaybackResumeState.time,
+    },
+    { source: 'http://local/output/a.mp4', time: 4.5 },
+    '要记住进度，下次悬停接着播'
+  );
+});
+
+test('resultRenderModule: 播完时非主层不处理、悬停中自动重播', () => {
+  const { ctx } = createContext({
+    id: 'ended-handling',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4', thumbUrl: '/a.jpg' }],
+  });
+  const video = new FakeVideoElement();
+  video.dataset.idx = '1';
+  assert.equal(ctx._handlePreviewVideoEnded(video), false, '别的层播完不抢主层表现');
+
+  video.dataset.idx = '0';
+  video.currentTime = 9;
+  ctx._isHovered = true;
+  const replays = [];
+  // _playPreviewVideoWithRecovery 是异步的（内部还要重接源），这里只验证被请求了重播。
+  ctx._playPreviewVideoWithRecovery = (el, options) => {
+    replays.push({ el, options });
+    return Promise.resolve(true);
+  };
+  assert.equal(ctx._handlePreviewVideoEnded(video), true);
+  assert.equal(video.loop, true, '悬停中要连播');
+  assert.equal(video.currentTime, 0, '重播要回到开头');
+  assert.equal(replays.length, 1, '要真的请求重播');
+  assert.equal(replays[0].options.reason, 'hover', '悬停触发的重播要标成 hover');
+  assert.equal(replays[0].options.shouldContinue(), true, '仍在悬停 → 允许继续');
+
+  // 不在悬停、也不在手动循环：停在最后一帧并露出暂停指示器。
+  const { ctx: idleCtx } = createContext({
+    id: 'ended-idle',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'a.mp4', thumbUrl: '/a.jpg' }],
+  });
+  const idleVideo = new FakeVideoElement();
+  idleVideo.dataset.idx = '0';
+  idleVideo.loop = true;
+  idleVideo.paused = false;
+  let pausedIndicator = 0;
+  idleCtx._showPausedCenterIndicator = () => {
+    pausedIndicator += 1;
+  };
+  assert.equal(idleCtx._handlePreviewVideoEnded(idleVideo), true);
+  assert.equal(idleVideo.loop, false, '停下时要关循环，否则手动循环的残留会一直生效');
+  assert.equal(idleVideo.paused, true);
+  assert.equal(pausedIndicator, 1, '要露出暂停指示器');
+});
