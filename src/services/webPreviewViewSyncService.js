@@ -598,23 +598,51 @@ function buildViewPayload({
   fullscreenBlockerRects: fullscreenBlockerRects,
   softBlockerRects: softBlockerRects,
   hardBlockerRects: hardBlockerRects,
+  canvasNodeOccluders: canvasNodeOccluders = [],
+  root: root = document,
   canvasSpaceHeld: canvasSpaceHeld = false,
   pendingPopup: pendingPopup = false,
 }) {
   let visible = false,
-    bounds = null;
+    bounds = null,
+    slotRect = null,
+    hardOccluded = false,
+    softOccluded = false,
+    canvasOccluded = false,
+    rendererOccluded = false,
+    snapshotMatchesReady = false;
   const zoomFactor = getSlotFullscreen(slot);
   if (slot?.isConnected !== false) {
-    const box7 = slot?.getBoundingClientRect?.(),
-      enabled7 = box7 ? isOccludedByRects(box7, fullscreenBlockerRects) : false,
-      enabled8 = box7 && !zoomFactor ? isOccludedByRects(box7, hardBlockerRects) : false,
-      enabled9 =
-        box7 && !zoomFactor ? isSignificantlyOccludedByRects(box7, softBlockerRects) : false;
+    const box7 = slot?.getBoundingClientRect?.();
+    slotRect = box7 || null;
+    const roundedSize = box7
+        ? { width: Math.round(box7.width), height: Math.round(box7.height) }
+        : null,
+      fullscreenOrSelected = Boolean(zoomFactor || selected);
+    // 同尺寸同缩放的 ready 快照可以直接顶替重绘，并据此进入 passive 冻结。
+    snapshotMatchesReady = Boolean(
+      box7 &&
+      !zoomFactor &&
+      !fullscreenOrSelected &&
+      readySnapshotMatchesBounds(slot, roundedSize, canvasZoom)
+    );
+    const fullscreenOccluded = box7 ? isOccludedByRects(box7, fullscreenBlockerRects) : false;
+    hardOccluded = box7 && !zoomFactor ? isOccludedByRects(box7, hardBlockerRects) : false;
+    softOccluded =
+      box7 && !zoomFactor ? isSignificantlyOccludedByRects(box7, softBlockerRects) : false;
+    // 画布上更高的节点与渲染层命中栈：原生视图永远盖在 DOM 之上，只能靠推断。
+    canvasOccluded = Boolean(
+      box7 && !zoomFactor && isOccludedByHigherCanvasNode(slot, box7, canvasNodeOccluders)
+    );
+    rendererOccluded = Boolean(box7 && !zoomFactor && isOccludedByRendererStack(slot, box7, root));
     box7 &&
       hasVisibleViewportIntersection(box7) &&
-      !enabled7 &&
-      !enabled8 &&
-      !enabled9 &&
+      !fullscreenOccluded &&
+      !hardOccluded &&
+      !softOccluded &&
+      !canvasOccluded &&
+      !rendererOccluded &&
+      !snapshotMatchesReady &&
       ((visible = true),
       (bounds = {
         x: Math.round(box7.left),
@@ -624,10 +652,60 @@ function buildViewPayload({
       }));
   }
   const snapshotHold = getSlotSnapshotHold(slot),
-    frozen2 = Boolean((interactionState2.frozen || snapshotHold) && !zoomFactor && visible),
-    freezeToken3 = frozen2 ? String(freezeToken2 || '0') : '',
-    snapshotReady = Boolean(frozen2 && (interactionState2.showSnapshot || snapshotHold)),
-    allowAnyToken2 = snapshotReady || snapshotHold;
+    occluded = Boolean(
+      (hardOccluded || softOccluded || canvasOccluded || rendererOccluded) && !zoomFactor
+    ),
+    frozenByOcclusion = Boolean(occluded || snapshotMatchesReady),
+    frozen2 = Boolean(
+      ((interactionState2.frozen || snapshotHold) && !zoomFactor && visible) || frozenByOcclusion
+    ),
+    // 被遮挡/可复用快照时冻结在「那一个区域 + 缩放」上，令牌由它和冻结原因共同决定。
+    snapshotBounds =
+      frozenByOcclusion && slotRect && hasVisibleViewportIntersection(slotRect)
+        ? {
+            x: Math.round(slotRect.left),
+            y: Math.round(slotRect.top),
+            width: Math.round(slotRect.width),
+            height: Math.round(slotRect.height),
+          }
+        : null,
+    frozenWithInteraction = Boolean(occluded && interactionState2.frozen),
+    occlusionFreezeToken =
+      occluded && snapshotBounds
+        ? frozenWithInteraction
+          ? String(freezeToken2 || '0')
+          : [
+              'occlusion',
+              snapshotBounds.width,
+              snapshotBounds.height,
+              Number(canvasZoom || 1).toFixed(3),
+            ].join(':')
+        : '',
+    passiveFreezeToken =
+      snapshotMatchesReady && !occluded && snapshotBounds
+        ? [
+            'passive',
+            snapshotBounds.width,
+            snapshotBounds.height,
+            Number(canvasZoom || 1).toFixed(3),
+          ].join(':')
+        : '',
+    freezeToken3 = frozen2
+      ? occlusionFreezeToken || passiveFreezeToken || String(freezeToken2 || '0')
+      : '',
+    showSnapshot = Boolean(
+      frozenByOcclusion || (frozen2 && (interactionState2.showSnapshot || snapshotHold))
+    ),
+    snapshotToken = getSlotSnapshotToken(slot),
+    snapshotReady = Boolean(
+      showSnapshot &&
+      frozenByOcclusion &&
+      (snapshotMatchesReady ||
+        (!frozenWithInteraction && readySnapshotMatchesBounds(slot, snapshotBounds, canvasZoom)))
+    ),
+    allowAnyToken2 = Boolean(
+      showSnapshot && (!frozenByOcclusion || frozenWithInteraction || snapshotReady)
+    );
   return {
     nodeId: node.id,
     tabId: tabId,
@@ -637,15 +715,18 @@ function buildViewPayload({
     active: active,
     visible: visible,
     bounds: bounds,
+    snapshotBounds: snapshotBounds,
     zoomFactor: zoomFactor ? 1 : canvasZoom,
     deferZoomFactor: zoomFactor ? false : interactionState2.deferZoomFactor,
     frozen: frozen2,
     freezeToken: freezeToken3,
-    snapshotReady: snapshotReady
+    snapshotReady: showSnapshot
       ? getSlotSnapshotReady(slot, freezeToken3, { allowAnyToken: allowAnyToken2 })
       : false,
+    snapshotToken: snapshotToken,
+    allowReusableSnapshot: allowAnyToken2,
     snapshotHold: snapshotHold,
-    showSnapshot: snapshotReady,
+    showSnapshot: showSnapshot,
     fullscreen: zoomFactor,
     selected: selected,
     canvasSpaceHeld: canvasSpaceHeld === true,
@@ -886,6 +967,8 @@ function collectWebPreviewViews({
     softBlockerRects2 = collectOcclusionRects(root, SOFT_OCCLUSION_SELECTOR),
     hardBlockerRects2 = collectOcclusionRects(root, HARD_OCCLUSION_SELECTOR),
     fullscreenBlockerRects2 = collectOcclusionRects(root, FULLSCREEN_OCCLUSION_SELECTOR),
+    // 整轮同步只收一次遮挡物：每个视图重复扫 DOM 会把每次同步变成 O(节点数²)。
+    canvasNodeOccluders2 = collectCanvasNodeOccluders(root),
     list8 = [];
   for (const { node: node3, tabs: tabs } of list7) {
     const value35 = map7.get(node3.id);
@@ -911,6 +994,8 @@ function collectWebPreviewViews({
           fullscreenBlockerRects: fullscreenBlockerRects2,
           softBlockerRects: softBlockerRects2,
           hardBlockerRects: hardBlockerRects2,
+          canvasNodeOccluders: canvasNodeOccluders2,
+          root: root,
         })
       );
     }
@@ -1102,6 +1187,7 @@ export { collectWebPreviewViews };
  * 运行时不要引用：这些不是稳定 API，随实现改。
  */
 export const _webPreviewViewSyncInternalsForTest = {
+  buildViewPayload,
   parseStackingZIndex,
   getElementZIndex,
   getElementVisibleRect,

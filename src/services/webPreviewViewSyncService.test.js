@@ -332,3 +332,156 @@ test('webPreviewViewSyncService: 上下文菜单快捷键只收 context-web- 前
     '不能把别的域的快捷键混进来'
   );
 });
+
+// ---------------------------------------------------------------------------
+// buildViewPayload：遮挡判定的最终出口。这一段是 197 批的核心，任何一个分支写反
+// 都会表现为「预览该显示时不显示」或「该冻结时乱跳」，所以逐条钉住。
+// ---------------------------------------------------------------------------
+
+const VISIBLE_STYLE = { display: 'block', visibility: 'visible', opacity: '1', position: 'static' };
+const RECT = { left: 100, top: 100, right: 500, bottom: 400, width: 400, height: 300 };
+
+/** 造一个能进 buildViewPayload 的槽位：盒子 + 可选快照元数据。 */
+function buildSlot({ rect = RECT, snapshot = null } = {}) {
+  const component = snapshot
+    ? {
+        classList: { contains: (name) => name === 'has-freeze-snapshot' },
+        dataset: {
+          webPreviewSnapshotToken: snapshot.token || 'ready',
+          webPreviewSnapshotWidth: String(snapshot.width || 0),
+          webPreviewSnapshotHeight: String(snapshot.height || 0),
+          webPreviewSnapshotZoomFactor: String(snapshot.zoomFactor || 0),
+        },
+      }
+    : null;
+  return {
+    dataset: { nodeId: 'node-1' },
+    hidden: false,
+    isConnected: true,
+    getBoundingClientRect: () => rect,
+    closest: (selector) => {
+      if (selector === '.web-preview-component') return component;
+      if (selector === '.v2-node') return null;
+      return null;
+    },
+  };
+}
+
+function buildPayloadArgs(overrides = {}) {
+  return {
+    node: { id: 'node-1', browserProfileId: '' },
+    tabId: 'tab-1',
+    webUrl: 'https://example.com/',
+    slot: buildSlot(),
+    active: true,
+    selected: false,
+    canvasZoom: 1,
+    interactionState: { frozen: false, showSnapshot: false, deferZoomFactor: false },
+    freezeToken: 0,
+    fullscreenBlockerRects: [],
+    softBlockerRects: [],
+    hardBlockerRects: [],
+    canvasNodeOccluders: [],
+    root: { elementsFromPoint: () => [] },
+    canvasSpaceHeld: false,
+    pendingPopup: false,
+    ...overrides,
+  };
+}
+
+test('webPreviewViewSyncService: 无遮挡且可交互时可见，且不冻结', async () => {
+  const { buildViewPayload } = internalsOf(await load());
+  withWindow({ innerWidth: 1000, innerHeight: 800, getComputedStyle: () => VISIBLE_STYLE }, () => {
+    const payload = buildViewPayload(buildPayloadArgs());
+    (assert.equal(payload.visible, true, '干净区域必须可见'),
+      assert.deepEqual(payload.bounds, { x: 100, y: 100, width: 400, height: 300 }),
+      assert.equal(payload.frozen, false, '没交互也没遮挡，不该冻结'),
+      assert.equal(payload.freezeToken, ''),
+      assert.equal(payload.showSnapshot, false, '不该用快照'),
+      assert.equal(payload.snapshotBounds, null));
+  });
+});
+
+test('webPreviewViewSyncService: 被硬遮挡时不可见但进入冻结并给出 occlusion 令牌', async () => {
+  const { buildViewPayload } = internalsOf(await load());
+  const blocker = { left: 0, top: 0, right: 1000, bottom: 800, width: 1000, height: 800 };
+  withWindow({ innerWidth: 1000, innerHeight: 800, getComputedStyle: () => VISIBLE_STYLE }, () => {
+    const payload = buildViewPayload(buildPayloadArgs({ hardBlockerRects: [blocker] }));
+    (assert.equal(payload.visible, false, '被盖住就不该认为可见'),
+      assert.equal(payload.frozen, true, '遮挡要进冻结，否则会看到穿透'),
+      assert.equal(payload.showSnapshot, true, '冻结时用快照顶住'),
+      assert.match(payload.freezeToken, /^occlusion:/, '令牌要标明是遮挡冻结'),
+      assert.deepEqual(payload.snapshotBounds, { x: 100, y: 100, width: 400, height: 300 }));
+  });
+});
+
+test('webPreviewViewSyncService: 更高层画布节点与渲染层命中共用同一套冻结', async () => {
+  const { buildViewPayload } = internalsOf(await load());
+  const occluder = { element: { id: 'other' }, nodeId: 'other', rect: RECT, zIndex: 40 };
+  const style = { ...VISIBLE_STYLE, zIndex: '10' };
+  withWindow({ innerWidth: 1000, innerHeight: 800, getComputedStyle: () => style }, () => {
+    const byCanvas = buildViewPayload(buildPayloadArgs({ canvasNodeOccluders: [occluder] }));
+    (assert.equal(byCanvas.visible, false, '被更高节点压住就不该可见'),
+      assert.equal(byCanvas.frozen, true),
+      assert.match(byCanvas.freezeToken, /^occlusion:/));
+    // 渲染层命中：命中栈顶端是别人的面板。
+    const foreign = { nodeType: 1, tagName: 'PANEL', hidden: false };
+    const byRenderer = buildViewPayload(
+      buildPayloadArgs({ root: { elementsFromPoint: () => [foreign] } })
+    );
+    (assert.equal(byRenderer.visible, false, '渲染层遮挡同样要判为不可见'),
+      assert.equal(byRenderer.frozen, true));
+  });
+});
+
+test('webPreviewViewSyncService: 同尺寸同缩放的 ready 快照直接复用（passive 冻结）', async () => {
+  const { buildViewPayload } = internalsOf(await load());
+  const slot = buildSlot({ snapshot: { token: 'ready', width: 400, height: 300, zoomFactor: 1 } });
+  withWindow({ innerWidth: 1000, innerHeight: 800, getComputedStyle: () => VISIBLE_STYLE }, () => {
+    const payload = buildViewPayload(buildPayloadArgs({ slot }));
+    (assert.equal(payload.visible, false, '有可复用快照就不必重绘'),
+      assert.equal(payload.frozen, true),
+      assert.match(payload.freezeToken, /^passive:/, '可复用快照记为 passive'),
+      assert.equal(payload.snapshotReady, true, '快照要标记为可用'),
+      assert.equal(payload.allowReusableSnapshot, true));
+  });
+  // 缩放对不上就不能复用，必须回到正常渲染。
+  const staleSlot = buildSlot({
+    snapshot: { token: 'ready', width: 400, height: 300, zoomFactor: 2 },
+  });
+  withWindow({ innerWidth: 1000, innerHeight: 800, getComputedStyle: () => VISIBLE_STYLE }, () => {
+    const payload = buildViewPayload(buildPayloadArgs({ slot: staleSlot }));
+    (assert.equal(payload.visible, true, '快照失配就正常显示'),
+      assert.equal(payload.frozen, false),
+      assert.equal(payload.snapshotReady, false));
+  });
+});
+
+test('webPreviewViewSyncService: 全屏时跳过遮挡判定，缩放固定为 1', async () => {
+  const { buildViewPayload } = internalsOf(await load());
+  const blocker = { left: 0, top: 0, right: 1000, bottom: 800, width: 1000, height: 800 };
+  const slot = buildSlot();
+  slot.dataset.webPreviewFullscreen = 'true';
+  withWindow({ innerWidth: 1000, innerHeight: 800, getComputedStyle: () => VISIBLE_STYLE }, () => {
+    const payload = buildViewPayload(
+      buildPayloadArgs({ slot, hardBlockerRects: [blocker], canvasZoom: 2.5 })
+    );
+    (assert.equal(payload.fullscreen, true),
+      assert.equal(payload.zoomFactor, 1, '全屏不看画布缩放'),
+      assert.equal(payload.deferZoomFactor, false),
+      assert.equal(payload.frozen, false, '全屏优先，遮挡不参与冻结判定'));
+  });
+});
+
+test('webPreviewViewSyncService: 零尺寸元素既不显示也不冻结', async () => {
+  // 真实 DOM 里 display:none 的元素包围盒全为 0，buildViewPayload 靠这个判不可见
+  // （它不自己查计算样式，避免每帧对每个槽位多做一次 getComputedStyle）。
+  const { buildViewPayload } = internalsOf(await load());
+  const zeroRect = { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
+  withWindow({ innerWidth: 1000, innerHeight: 800, getComputedStyle: () => VISIBLE_STYLE }, () => {
+    const payload = buildViewPayload(buildPayloadArgs({ slot: buildSlot({ rect: zeroRect }) }));
+    (assert.equal(payload.visible, false, '零尺寸的元素不可见'),
+      assert.equal(payload.frozen, false, '本来看不见就没必要冻结'),
+      assert.equal(payload.bounds, null));
+  });
+});
