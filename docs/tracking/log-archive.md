@@ -3,6 +3,7 @@
 > 由 `docs/TRACKING.md` §9 第 4 条维护：TRACKING.md §11 只保留最新 10 条，挤出来的旧日志移到这里，最新的在上。
 > 只追加，不改写已有内容。
 
+- 2026-10-22（186 批·**全面功能验证与缺陷修复**）：QA 覆盖 17 个能力域，可执行断言 **11568 例 0 失败**（3 例软链用例补前提校验后 SKIP）；修 `AIGenVideoNode` hover 调用未定义方法（既有缺陷，`91d76472` 引入）→ 新增 `video-node/previewHoverPlaybackModule.js` + 13 例回归，原 e2e 复跑通过；`vendor` 纳入跑测入口、换牌 3 例边界用例并入 `electron/`。JS **11339/11339/0**；后端 223（3 SKIP）。详见 `docs/qa/verify-2026-10-22/report.md`。
 - 2026-10-22（185 批·**换牌 一帧 OneFrame**）：包/安装身份（`com.oneframe.app`、productName、`OneFrame-Setup-*`）、主进程显示名与 userData 改 `OneFrame` + 新增 `brandDataMigration.js` 从 `CanvasPro` 迁移（旧目录保留）、i18n/首页/关于页/预设名/后端/卸载清单换牌；保留更新源、服务域名、存储 key 前缀、握手头与 legacy 路径。JS **11319/11319/0**（基线 14 例失败清零）；后端 223（3 例既有 symlink 环境限制）。详见 `docs/rebrand-oneframe.md`。
 
 - 2026-10-22（184 批·**上游 0.8.9 逆向 + B-1 官方目录簇落库（分支）**）：已装 SHUO Canvas 升 0.8.9，镜像 `shuo-deobf-089`（2468 件）+ `shuo-electron-deobf-089`（158 件），总账 `docs/upstream-0.8.9-gap.md`。B-1 共 198 件落分支 `b184-b1-catalog`，四闸门全 PASS。三配置实验证明该批**全有或全无**（代码新+清单旧 346 失败；只加不改加载即抛错）。保留 `resolveProviderProfileConfig` 兼容块、补 2 件同层超集依赖、删 2 件孤儿。全量 **11313/11161/152**（基线 14），台账 `docs/b184-b1-triage.md`。**master 绿**。
