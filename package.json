@@ -8,7 +8,7 @@
   "type": "module",
   "main": "electron/main.js",
   "scripts": {
-    "test": "npm run check:obfuscation && npm run test:js && npm run check:csp && npm run test:backend",
+    "test": "npm run check:obfuscation && npm run check:port-parity && npm run test:js && npm run check:csp && npm run test:backend",
     "test:js": "node --test \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\" \"vendor/**/*.test.js\"",
     "test:js:cov": "node --test --experimental-test-coverage --test-coverage-lines=60 --test-coverage-exclude=src/i18n/messages/** --test-coverage-exclude=src/manifests/** \"src/**/*.test.js\" \"electron/**/*.test.js\" \"api/**/*.test.js\" \"tools/**/*.test.js\"",
     "lint": "eslint .",
@@ -26,6 +26,7 @@
     "test:backend": "node tools/run-backend-tests.mjs",
     "verify:startup": "node tools/verify-startup.mjs",
     "check:obfuscation": "node tools/deobf-gate.mjs",
+    "check:port-parity": "node tools/check-port-parity.mjs",
     "check:csp": "node tools/check-csp.mjs",
     "build:win": "electron-builder --win --config electron-builder.win.cjs --publish never",
     "test:desktop": "playwright test --config playwright.desktop.config.js",

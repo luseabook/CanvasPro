@@ -49,6 +49,12 @@ jobs:
       - name: Obfuscation gate
         run: npm run check:obfuscation
 
+      # Catches modules that kept only part of their upstream methods, which no
+      # unit test can see (the missing ones are usually optional-chained calls).
+      # Auto-skips when no upstream mirror is configured, so a clean runner passes.
+      - name: Port parity gate
+        run: npm run check:port-parity
+
       - name: ESLint
         run: npm run lint
 

@@ -1,0 +1,191 @@
+{
+  "mirror": "shuo-deobf-089",
+  "totalMissing": 129,
+  "files": {
+    "src/components/video-node/resultRenderModule.js": [
+      "_buildRhAiAppVideoResultDisplayPatch",
+      "_clearPreviewPosterForVisibleFrame",
+      "_closeFullscreenForStaleResult",
+      "_detachCachedVideoObjectUrlConsumers",
+      "_detachPreviewVideoRecovery",
+      "_disposeCachedVideoObjectUrls",
+      "_getActiveCachedVideoThumbIds",
+      "_getCachedVideoObjectUrlConsumers",
+      "_getVideoResultIdentityKey",
+      "_handlePreviewVideoEnded",
+      "_isCachedVideoObjectUrlReferenced",
+      "_isCachedVideoThumbIdCurrent",
+      "_isCachedVideoThumbIdCurrentForSlot",
+      "_isPreviewPosterClearedForPlayback",
+      "_markPreviewPosterClearedForPlayback",
+      "_mustRenderTerminalVideoState",
+      "_releaseAllCachedVideoObjectUrls",
+      "_releaseCachedVideoObjectUrl",
+      "_releaseIdlePreviewHoverPlaybackMedia",
+      "_releaseLocalVideoPlaybackObjectUrl",
+      "_resolveCachedVideoObjectUrl",
+      "_resolveLocalVideoPlaybackObjectUrl",
+      "_resolveVideoResultPosterUrl",
+      "_restoreIdlePreviewPoster",
+      "_restorePreviewHoverPlaybackTime",
+      "_shouldRecoverPreviewPlayback",
+      "_syncCachedVideoObjectUrls",
+      "hydrateRendererThinVideoPresentation"
+    ],
+    "src/modules/AudioClipController.js": [
+      "_clearSplit",
+      "_clearSplitRangeHover",
+      "_getActiveSplitRange",
+      "_getMinSelectionSec",
+      "_getPlaybackRange",
+      "_getSplitRangeBounds",
+      "_getSplitRangeById",
+      "_getSplitRangeElement",
+      "_getSplitRangeElementFromTarget",
+      "_getSplitRanges",
+      "_getValidSplitSec",
+      "_hasSplitRanges",
+      "_moveSplitRangeByDelta",
+      "_normalizeSplitRange",
+      "_replaceSplitRange",
+      "_resizeSplitRangeEdge",
+      "_resolveActiveAudioSrc",
+      "_setActiveSplitRange",
+      "_setSplitRangeCurrentTime",
+      "_stageSplitAtCurrentTime",
+      "_syncSelectionEnvelopeFromSplitRanges"
+    ],
+    "src/modules/agent/agentSessionStore.js": [
+      "clearPendingLoopRun",
+      "emitAssistantStream",
+      "getAssistantTextTask",
+      "getContextDigest",
+      "getOperationLedger",
+      "getPendingLoopRun",
+      "getRunEvents",
+      "getSessionEvents",
+      "getSessionProjection",
+      "getSessionProjectionParity",
+      "getTaskBindings",
+      "isConversationLoaded",
+      "replaceConversationMessages",
+      "replayRun",
+      "setContextDigest",
+      "setPendingLoopRun",
+      "subscribeAssistantStream",
+      "upsertOperation"
+    ],
+    "src/modules/interaction/PanoramaSceneInteraction.js": [
+      "_applyFlyNavigationStep",
+      "_applyTransformOptions",
+      "_finishFlyNavigation",
+      "_flushWheelDraft",
+      "_hasFlightMovement",
+      "_isFlyMode",
+      "_readFlightInput",
+      "_resolveFlightKey",
+      "_scheduleFlyNavigation",
+      "_scheduleWheelCommit",
+      "cancelFlightNavigation",
+      "handleFlightKeyDown",
+      "handleFlightKeyUp"
+    ],
+    "src/components/aigenImage/uiModule.impl.js": [
+      "_applySchemaAspectRatioResizeAnimation",
+      "_disposeImageObjectUrls",
+      "_flushPendingImageObjectUrlReleases",
+      "_getImageDisplayElements",
+      "_handleReferenceUploadFile",
+      "_hydrateStoredThumbsInBackground",
+      "_isImageObjectUrlReferenced",
+      "_queueImageObjectUrlRelease",
+      "_syncReferenceUploadUi"
+    ],
+    "src/components/SourceImageNode.js": [
+      "_assignImageDisplaySource",
+      "_flushRetiredCapturePreviewUrls",
+      "_getCapturePreviewReleaseCallback",
+      "_isShowingFullImage",
+      "_maybeResumePersistedTasks",
+      "_readDisplayedImageSource",
+      "_retireCapturePreviewUrl",
+      "_shouldCommitPreloadedImage",
+      "_waitForDisplayedImageLoad"
+    ],
+    "src/components/aigenImage/taskOrchestrationModule.impl.js": [
+      "_ensureDreaminaCliLoggedIn",
+      "_executeGeneration",
+      "_finishUnreceivedAsyncTask",
+      "_hasUnconfirmedAsyncTask"
+    ],
+    "src/components/GroupNode.js": [
+      "_resolveToolbarAnchorInsetY",
+      "_syncGroupRunButton"
+    ],
+    "src/components/video-node/taskOrchestrationModule.js": [
+      "_buildVideoTaskSuccessResult",
+      "_captureVideoTaskResultOwner"
+    ],
+    "src/core/stores/modelMenuPreferenceStore.js": [
+      "preserveConfiguredProviders",
+      "setProviderVisible"
+    ],
+    "src/modules/AssetManager.js": [
+      "_notifyCreatePanelSaved",
+      "showLibrarySavePanelForMedia"
+    ],
+    "src/modules/storyWorkspace/storyEpisodeCanvas.js": [
+      "connectReference",
+      "pruneReferences"
+    ],
+    "src/modules/TaskCenterManager.js": [
+      "confirmHistoryClear",
+      "showTask"
+    ],
+    "api/canvasCollaborationApi.js": [
+      "clearIdentity"
+    ],
+    "src/components/AIGenTextNode.js": [
+      "_maybeResumeTextTask"
+    ],
+    "src/components/video-node/referenceInputModule.js": [
+      "_scheduleFixedThumbObjectUrl"
+    ],
+    "src/core/generationTaskRuntime.js": [
+      "resolveSettled"
+    ],
+    "src/modules/agent/agentConversationStore.js": [
+      "retryPersistence"
+    ],
+    "src/modules/agent/agentModelControls.js": [
+      "refreshMenu"
+    ],
+    "src/modules/collaboration/collaborationChatPosition.js": [
+      "placeAt"
+    ],
+    "src/modules/collaboration/collaborationMediaQueue.js": [
+      "onProgress"
+    ],
+    "src/modules/collaboration/collaborationSession.js": [
+      "onProgressChange"
+    ],
+    "src/modules/interaction/SelectionController.js": [
+      "resolveRect"
+    ],
+    "src/modules/personReplacement/personReplacementWorkspace.js": [
+      "refreshLibraryAssets"
+    ],
+    "src/modules/ProjectManager.js": [
+      "setProjectOperations"
+    ],
+    "src/modules/settings/modelServiceSettingsNavigator.js": [
+      "clearFieldReveal"
+    ],
+    "src/modules/storyWorkspace/storyClipFrames.js": [
+      "upsert"
+    ],
+    "src/modules/workflows/WorkflowManager.js": [
+      "handleSidebarContextMenu"
+    ]
+  }
+}
