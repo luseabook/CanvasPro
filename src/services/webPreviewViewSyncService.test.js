@@ -485,3 +485,203 @@ test('webPreviewViewSyncService: 零尺寸元素既不显示也不冻结', async
       assert.equal(payload.bounds, null));
   });
 });
+
+// ---------------------------------------------------------------------------
+// 198 批：init 接线（追踪器 / 平移冻结 / 右键快捷键）。
+// 这些是「接线」而不是算法，所以测试盯的是三件事：状态到底有没有传进去、
+// 签名有没有覆盖到新字段、dispose 有没有把监听和定时器收干净。
+// ---------------------------------------------------------------------------
+
+/** 最小可用的 window/document/MutationObserver 夹具，用完整体还原。 */
+async function withSyncEnvironment(bridge, listeners, run) {
+  const saved = {
+    window: globalThis.window,
+    document: globalThis.document,
+    MutationObserver: globalThis.MutationObserver,
+    CustomEvent: globalThis.CustomEvent,
+  };
+  const hadWindow = Object.prototype.hasOwnProperty.call(globalThis, 'window');
+  const hadDocument = Object.prototype.hasOwnProperty.call(globalThis, 'document');
+  class FakeMutationObserver {
+    observe() {}
+    disconnect() {
+      listeners.observerDisconnects += 1;
+    }
+  }
+  const fakeDocument = {
+    body: { classList: { contains: () => false } },
+    documentElement: {},
+  };
+  globalThis.document = fakeDocument;
+  globalThis.MutationObserver = FakeMutationObserver;
+  globalThis.window = {
+    electronAPI: { webPreview: bridge },
+    innerWidth: 1000,
+    innerHeight: 800,
+    getComputedStyle: () => VISIBLE_STYLE,
+    requestAnimationFrame: (callback) => {
+      callback();
+      return (listeners.frames += 1);
+    },
+    cancelAnimationFrame: () => {
+      listeners.cancelled += 1;
+    },
+    addEventListener: (type, handler) => listeners.added.push([type, handler]),
+    removeEventListener: (type) => listeners.removed.push(type),
+    dispatchEvent: () => {},
+  };
+  globalThis.CustomEvent = class {
+    constructor(type, init) {
+      this.type = type;
+      this.detail = init?.detail;
+    }
+  };
+  try {
+    // 必须 await：夹具要在回调整体跑完后才还原，否则 dispose 里访问 window 会落空。
+    return await run(fakeDocument);
+  } finally {
+    if (hadWindow) globalThis.window = saved.window;
+    else delete globalThis.window;
+    if (hadDocument) globalThis.document = saved.document;
+    else delete globalThis.document;
+    globalThis.MutationObserver = saved.MutationObserver;
+    globalThis.CustomEvent = saved.CustomEvent;
+  }
+}
+
+function makeStore(nodeState) {
+  const subscribers = [];
+  return {
+    state: nodeState,
+    subscribers,
+    getStateRaw() {
+      return this.state;
+    },
+    subscribeRaw(handler) {
+      subscribers.push(handler);
+      return () => {
+        subscribers.length = 0;
+      };
+    },
+  };
+}
+
+function makePreviewRoot() {
+  return {
+    querySelectorAll: () => [],
+    body: { classList: { contains: () => false } },
+    documentElement: {},
+    elementsFromPoint: () => [],
+  };
+}
+
+test('webPreviewViewSyncService: 没有 electronAPI.webPreview 时安全降级', async () => {
+  const { initWebPreviewViewSyncService } = await load();
+  const listeners = { added: [], removed: [], frames: 0, cancelled: 0, observerDisconnects: 0 };
+  await withSyncEnvironment(undefined, listeners, () => {
+    const handle = initWebPreviewViewSyncService({ graphStore: makeStore({ nodes: {} }) });
+    assert.equal(typeof handle.dispose, 'function');
+    handle.dispose();
+  });
+  assert.equal(listeners.frames, 0, '没有 bridge 就不该排帧');
+});
+
+test('webPreviewViewSyncService: init 下发 views 与快捷键表，同签名不重复下发', async () => {
+  const { initWebPreviewViewSyncService } = await load();
+  const sent = [];
+  const bridge = {
+    isAvailable: () => true,
+    syncViews: async (payload) => {
+      sent.push(payload);
+    },
+    onEvent: () => () => {},
+    disposeViews: () => {},
+  };
+  const listeners = { added: [], removed: [], frames: 0, cancelled: 0, observerDisconnects: 0 };
+  const store = makeStore({
+    _persistRev: 1,
+    nodes: {
+      'node-1': {
+        id: 'node-1',
+        type: 'web-preview',
+        webTabs: [{ id: 'tab-1', title: '示例', url: 'https://example.com' }],
+      },
+    },
+    selectedNodeIds: [],
+    viewport: { zoom: 1 },
+  });
+  await withSyncEnvironment(bridge, listeners, async () => {
+    const handle = initWebPreviewViewSyncService({ graphStore: store, root: makePreviewRoot() });
+    await Promise.resolve();
+    assert.equal(sent.length, 1, '初始化应立即同步一次');
+    assert.equal(sent[0].views.length, 1, '应当下发一个预览视图');
+    assert.ok(sent[0].contextMenuShortcuts, '快捷键表必须一起下发，否则右键菜单是旧文案');
+    assert.ok(Object.keys(sent[0].contextMenuShortcuts).length > 0, '预览右键快捷键不应为空');
+    // 触发一次强制同步：状态没变，签名相同 → 不该重复下发。
+    const forceSync = listeners.added.find(([type]) => type === 'web-preview:force-sync');
+    forceSync[1]();
+    await Promise.resolve();
+    assert.equal(sent.length, 1, '签名未变时不该重复下发');
+    handle.dispose();
+    assert.equal(listeners.observerDisconnects, 1, 'dispose 要断开 MutationObserver');
+    assert.ok(listeners.removed.includes('pointerup'), 'dispose 要摘掉 pointerup 监听');
+    assert.ok(listeners.removed.includes('shortcuts-updated'), 'dispose 要摘掉快捷键监听');
+  });
+});
+
+test('webPreviewViewSyncService: 平移冻结经 controller 进入交互状态', async () => {
+  const { getCanvasInteractionState } = internalsOf(await load());
+  await withSyncEnvironment(
+    undefined,
+    { added: [], removed: [], frames: 0, cancelled: 0, observerDisconnects: 0 },
+    () => {
+      const active = { pendingPanFreezeUntil: Date.now() + 10_000 };
+      const state = getCanvasInteractionState(active);
+      (assert.equal(state.frozen, true, '惯性滚动期间必须判为忙'),
+        assert.equal(state.showSnapshot, true));
+      const expired = { pendingPanFreezeUntil: 0 };
+      const idle = getCanvasInteractionState(expired);
+      assert.equal(idle.frozen, false, '冻结到期后要能自动放开');
+      // body 上的视口动画 class 仍然生效。
+      globalThis.document.body.classList.contains = (name) => name === 'is-viewport-animating';
+      const animating = getCanvasInteractionState(null);
+      (assert.equal(animating.frozen, true),
+        assert.equal(animating.deferZoomFactor, true, '动画期间要延后缩放'),
+        assert.equal(animating.settleSnapshot, true));
+    }
+  );
+});
+
+test('webPreviewViewSyncService: 视图签名覆盖快照字段与快捷键表', async () => {
+  const { buildViewsSignature } = internalsOf(await load());
+  const baseView = {
+    nodeId: 'n1',
+    tabId: 't1',
+    webUrl: 'https://example.com/',
+    visible: true,
+    bounds: { x: 0, y: 0, width: 100, height: 100 },
+    zoomFactor: 1,
+    snapshotToken: 'ready',
+    allowReusableSnapshot: true,
+  };
+  const signature = buildViewsSignature([baseView], { 'context-web-refresh': ['F5'] });
+  (assert.notEqual(
+    signature,
+    buildViewsSignature([{ ...baseView, snapshotToken: 'stale' }], {
+      'context-web-refresh': ['F5'],
+    }),
+    '快照令牌变化必须改变签名，否则界面停在旧帧'
+  ),
+    assert.notEqual(
+      signature,
+      buildViewsSignature([{ ...baseView, allowReusableSnapshot: false }], {
+        'context-web-refresh': ['F5'],
+      }),
+      '可复用标记同样要进签名'
+    ),
+    assert.notEqual(
+      signature,
+      buildViewsSignature([baseView], { 'context-web-refresh': ['F6'] }),
+      '改键位要触发重新下发'
+    ));
+});

@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（198 批·**预览同步 init 接线**）：`initWebPreviewViewSyncService` 换 0.8.9 时序（175→193 行）：活跃节点改走 `createWebPreviewNodeActivityTracker`（只在 `_persistRev` 变时重算，替掉每帧全量扫）；手势起止接 `startPendingPanFreeze`/`clearPendingPanFreeze`，`getCanvasInteractionState(controller)` 才看得见惯性期；`buildViewsSignature` 补快照令牌/可复用标记与快捷键段 + `shortcuts-updated` 监听。补测试 4 例，全量 **11438/11438/0**。**需真机验收**。
 - 2026-10-22（197 批·**预览遮挡判定接入**）：`buildViewPayload` 换成 0.8.9 语义（66→145 行）：补画布节点遮挡与渲染层命中两条判定，产出 `snapshotBounds`/`snapshotToken`/`allowReusableSnapshot`，冻结令牌区分 `occlusion:` 与 `passive:` 两个来源；`collectWebPreviewViews` 每轮只收一次 occluders（否则每次同步退化成 O(节点数²)）。补测试 6 例，全量 **11434/11434/0**。init 的追踪器/平移冻结接线留 198，需真机验证。
-- 2026-10-22（196 批·**预览同步遮挡层落地**）：`webPreviewViewSyncService.js` 补 27 个模块级函数（z-index 解析、可见矩形、画布节点遮挡收集、DOM 采样命中测试、快照令牌/尺寸校验、平移冻结、节点活跃度追踪、右键快捷键表）。**顺带修正一处签名错配**：`hasActiveWebPreviewNodes` 仓库收 store、上游收 state，追踪器一接就静默返回 false（测试抓到）。新增同名测试 11 例；模块级缺口 96→69、方法缺口 84→83（`refresh` 本就是该缺失追踪器的症状）。全量 **11428/11428/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

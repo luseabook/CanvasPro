@@ -511,13 +511,21 @@ function startPendingPanFreeze(controller) {
   }, PENDING_PAN_FREEZE_MS);
 }
 
-function getCanvasInteractionState() {
-  const value10 = globalThis.document?.body?.classList,
-    frozen = Boolean(value10?.contains?.('is-viewport-animating'));
+/**
+ * 画布交互状态。平移/缩放/视口动画都会让原生视图的位置不稳定，此时应当冻结。
+ * `controller` 带 pendingPanFreeze 时不看 body class —— 手势刚结束、class 已摘掉但
+ * 惯性滚动还没停，这段时间仍要算作忙。
+ */
+function getCanvasInteractionState(controller) {
+  const canvasState = readViewportInteractionState({
+    panPreviewActive: isViewportPanPreviewActive(),
+    pendingPanFreezeActive: isPendingPanFreezeActive(controller),
+  });
+  const frozen = canvasState.isViewportBusy;
   return {
     frozen: frozen,
-    deferZoomFactor: frozen,
-    settleSnapshot: frozen,
+    deferZoomFactor: canvasState.isViewportAnimating || canvasState.isZooming,
+    settleSnapshot: canvasState.isViewportAnimating,
     showSnapshot: frozen,
   };
 }
@@ -810,35 +818,46 @@ function syncCachedViewsForBudget(list5, args) {
     };
   });
 }
-function buildViewsSignature(list6 = []) {
-  return list6
-    .map((item8) => {
-      const box8 = item8?.bounds || {};
-      return [
-        item8?.nodeId || '',
-        item8?.tabId || '',
-        item8?.webUrl || '',
-        item8?.pendingPopup === true ? 1 : 0,
-        item8?.browserProfileId || '',
-        item8?.active === true ? 1 : 0,
-        item8?.visible === true ? 1 : 0,
-        Number(box8.x || 0),
-        Number(box8.y || 0),
-        Number(box8.width || 0),
-        Number(box8.height || 0),
-        Number(item8?.zoomFactor || 1).toFixed(3),
-        item8?.deferZoomFactor === true ? 1 : 0,
-        item8?.frozen === true ? 1 : 0,
-        item8?.freezeToken || '',
-        item8?.snapshotReady === true ? 1 : 0,
-        item8?.snapshotHold === true ? 1 : 0,
-        item8?.showSnapshot === true ? 1 : 0,
-        item8?.fullscreen === true ? 1 : 0,
-        item8?.selected === true ? 1 : 0,
-        item8?.canvasSpaceHeld === true ? 1 : 0,
-      ].join(':');
-    })
-    .join('|');
+/**
+ * 视图签名：主进程靠它判断「这一帧值得下发吗」。
+ * 漏掉任何一个会影响渲染的字段，表现就是「界面卡住不更新」，所以快照令牌与
+ * 可复用标记必须在内；快捷键表单独成段，改键位要能触发重新下发。
+ */
+function buildViewsSignature(list6 = [], shortcuts = {}) {
+  const viewsSignature = list6
+      .map((item8) => {
+        const box8 = item8?.bounds || {};
+        return [
+          item8?.nodeId || '',
+          item8?.tabId || '',
+          item8?.webUrl || '',
+          item8?.pendingPopup === true ? 1 : 0,
+          item8?.browserProfileId || '',
+          item8?.active === true ? 1 : 0,
+          item8?.visible === true ? 1 : 0,
+          Number(box8.x || 0),
+          Number(box8.y || 0),
+          Number(box8.width || 0),
+          Number(box8.height || 0),
+          Number(item8?.zoomFactor || 1).toFixed(3),
+          item8?.deferZoomFactor === true ? 1 : 0,
+          item8?.frozen === true ? 1 : 0,
+          item8?.freezeToken || '',
+          item8?.snapshotReady === true ? 1 : 0,
+          item8?.snapshotToken || '',
+          item8?.allowReusableSnapshot === true ? 1 : 0,
+          item8?.snapshotHold === true ? 1 : 0,
+          item8?.showSnapshot === true ? 1 : 0,
+          item8?.fullscreen === true ? 1 : 0,
+          item8?.selected === true ? 1 : 0,
+          item8?.canvasSpaceHeld === true ? 1 : 0,
+        ].join(':');
+      })
+      .join('|'),
+    shortcutsSignature = Object.entries(shortcuts)
+      .map(([shortcutId, keys]) => shortcutId + ':' + (keys || []).join('+'))
+      .join('|');
+  return viewsSignature + '#' + shortcutsSignature;
 }
 function clearFinalSyncTimer(enabled11) {
   if (!enabled11?.finalSyncTimer) return;
@@ -1009,20 +1028,26 @@ export function initWebPreviewViewSyncService({
   graphStore: graphStore2,
   root: root = document,
 } = {}) {
-  const enabled19 = globalThis.window?.electronAPI?.webPreview;
-  if (!enabled19 || typeof enabled19.syncViews !== 'function') return { dispose() {} };
-  const run = getRequestAnimationFrame(),
-    handler2 = getCancelAnimationFrame(),
-    handler3 =
-      typeof enabled19.syncViewsFast === 'function' ? enabled19.syncViewsFast : enabled19.syncViews;
-  let value37 = null,
-    value38 = false,
-    hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(readGraphStoreState(graphStore2)),
+  const webPreviewBridge = globalThis.window?.electronAPI?.webPreview;
+  if (!webPreviewBridge || typeof webPreviewBridge.syncViews !== 'function')
+    return { dispose() {} };
+  const requestFrame = getRequestAnimationFrame(),
+    cancelFrame = getCancelAnimationFrame(),
+    syncViews =
+      typeof webPreviewBridge.syncViewsFast === 'function'
+        ? webPreviewBridge.syncViewsFast
+        : webPreviewBridge.syncViews;
+  let frameHandle = null,
+    disposed = false,
     freezeToken4 = null;
+  // 活跃节点只在 _persistRev 变化时重算：每帧全量扫一遍 nodes 会把同步循环变成热点，
+  // 而 99% 的帧状态根本没变。
+  const activityTracker = createWebPreviewNodeActivityTracker(graphStore2);
+  let hasActiveWebPreviewNodes2 = activityTracker.hasActiveNodes;
   const run2 = () => {
-      value37 = null;
-      if (value38) return;
-      const canvasInteractionState = getCanvasInteractionState();
+      frameHandle = null;
+      if (disposed) return;
+      const canvasInteractionState = getCanvasInteractionState(freezeToken4);
       markInteractionTransition(freezeToken4, canvasInteractionState);
       const interactionState3 = getEffectiveInteractionState(canvasInteractionState, freezeToken4),
         views = syncCachedViewsForBudget(
@@ -1036,24 +1061,26 @@ export function initWebPreviewViewSyncService({
           freezeToken4
         );
       setFreezeActiveClass(views.some((item14) => item14?.showSnapshot === true));
-      const viewsSignature = buildViewsSignature(views);
+      // 快捷键表也要进签名：改键位后主进程必须重新下发，否则右键菜单会是旧文案。
+      const contextMenuShortcuts = collectWebPreviewContextMenuShortcuts(),
+        viewsSignature = buildViewsSignature(views, contextMenuShortcuts);
       if (viewsSignature === freezeToken4?.lastViewsSignature) return;
       if (freezeToken4) freezeToken4.lastViewsSignature = viewsSignature;
       try {
-        const promise = handler3({ views: views });
+        const promise = syncViews({ views: views, contextMenuShortcuts: contextMenuShortcuts });
         promise && typeof promise.catch === 'function' && void promise.catch(() => {});
       } catch {}
     },
     handler4 = () => {
-      if (value38 || value37 !== null) return;
-      value37 = run(run2);
+      if (disposed || frameHandle !== null) return;
+      frameHandle = requestFrame(run2);
     },
     handler5 = () => {
-      if (value38) return;
-      (value37 !== null && (handler2(value37), (value37 = null)), run2());
+      if (disposed) return;
+      (frameHandle !== null && (cancelFrame(frameHandle), (frameHandle = null)), run2());
     },
     handler6 = () => {
-      const canvasInteractionState2 = getCanvasInteractionState();
+      const canvasInteractionState2 = getCanvasInteractionState(freezeToken4);
       return (
         canvasInteractionState2.frozen ||
         canvasInteractionState2.deferZoomFactor ||
@@ -1082,9 +1109,10 @@ export function initWebPreviewViewSyncService({
       if (!hasActiveWebPreviewNodes2) return;
       handler5();
     },
+    // 平移手势开始时先挂一个短冻结：惯性滚动还没停就同步，会看到预览来回跳。
     handler9 = () => {
       if (!hasActiveWebPreviewNodes2) return;
-      handler5();
+      (startPendingPanFreeze(freezeToken4), handler5());
     },
     value40 = (value41) => {
       if (!hasActiveWebPreviewNodes2) return;
@@ -1094,8 +1122,9 @@ export function initWebPreviewViewSyncService({
       }
       handler4();
     },
+    // 手势结束才解除冻结，随后再走一次立即同步。
     value42 = () => {
-      run3();
+      (clearPendingPanFreeze(freezeToken4), run3());
     },
     value43 = () => {
       if (!hasActiveWebPreviewNodes2 || !freezeToken4) return;
@@ -1103,17 +1132,23 @@ export function initWebPreviewViewSyncService({
       if (freezeToken4.canvasSpaceHeld === canvasSpaceHeld2) return;
       ((freezeToken4.canvasSpaceHeld = canvasSpaceHeld2), handler5());
     },
-    value44 = () => {
-      ((hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(readGraphStoreState(graphStore2))),
-        handler7());
+    value44 = (value49) => {
+      const wasActive = hasActiveWebPreviewNodes2;
+      hasActiveWebPreviewNodes2 = activityTracker.refresh(value49);
+      if (!hasActiveWebPreviewNodes2) {
+        // 从「有预览」变成「没了」必须补一次同步，否则主进程会留着已删视图。
+        if (wasActive) handler5();
+        return;
+      }
+      handler7();
     },
     value45 =
       typeof graphStore2?.subscribeRaw === 'function'
         ? graphStore2.subscribeRaw(value44)
         : () => {},
     value46 =
-      typeof enabled19.onEvent === 'function'
-        ? enabled19.onEvent((detail) => {
+      typeof webPreviewBridge.onEvent === 'function'
+        ? webPreviewBridge.onEvent((detail) => {
             if (isNativePanStartPreviewEvent(detail)) handler9();
             globalThis.window?.dispatchEvent?.(
               new CustomEvent('web-preview:native-event', { detail: detail })
@@ -1127,9 +1162,9 @@ export function initWebPreviewViewSyncService({
             if (shouldSyncForOcclusionMutation(value48)) handler8();
           })
         : null,
-    value49 = root?.body || root?.documentElement || root;
+    value50 = root?.body || root?.documentElement || root;
   try {
-    value47?.observe?.(value49, {
+    value47?.observe?.(value50, {
       attributes: true,
       attributeFilter: ['class', 'style', 'hidden'],
       attributeOldValue: true,
@@ -1150,16 +1185,18 @@ export function initWebPreviewViewSyncService({
     globalThis.window?.addEventListener?.('blur', value43),
     globalThis.window?.addEventListener?.('wheel', run3, { passive: true }),
     globalThis.window?.addEventListener?.('web-preview:force-sync', handler5),
+    globalThis.window?.addEventListener?.('shortcuts-updated', handler5),
     handler4(),
     {
       dispose() {
-        ((value38 = true),
+        ((disposed = true),
           clearFinalSyncTimer(freezeToken4),
-          clearFreezeSettlingTimer(freezeToken4));
+          clearFreezeSettlingTimer(freezeToken4),
+          clearPendingPanFreeze(freezeToken4));
         if (freezeToken4) freezeToken4.freezeSettlingUntil = 0;
         (setFreezeActiveClass(false), setFreezeSettlingClass(false));
-        if (value37 !== null) handler2(value37);
-        ((value37 = null),
+        if (frameHandle !== null) cancelFrame(frameHandle);
+        ((frameHandle = null),
           value45?.(),
           value46?.(),
           globalThis.window?.removeEventListener?.('resize', handler4),
@@ -1174,8 +1211,9 @@ export function initWebPreviewViewSyncService({
           globalThis.window?.removeEventListener?.('blur', value43),
           globalThis.window?.removeEventListener?.('wheel', run3, { passive: true }),
           globalThis.window?.removeEventListener?.('web-preview:force-sync', handler5),
+          globalThis.window?.removeEventListener?.('shortcuts-updated', handler5),
           value47?.disconnect?.(),
-          void enabled19.disposeViews?.());
+          void webPreviewBridge.disposeViews?.());
       },
     }
   );
@@ -1188,6 +1226,8 @@ export { collectWebPreviewViews };
  */
 export const _webPreviewViewSyncInternalsForTest = {
   buildViewPayload,
+  buildViewsSignature,
+  getCanvasInteractionState,
   parseStackingZIndex,
   getElementZIndex,
   getElementVisibleRect,
