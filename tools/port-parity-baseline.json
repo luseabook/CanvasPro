@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 83,
-  "moduleFunctionTotal": 69,
+  "moduleFunctionTotal": 61,
   "files": {
     "src/components/video-node/resultRenderModule.js": [
       "_buildRhAiAppVideoResultDisplayPatch",
@@ -146,16 +146,6 @@
     ]
   },
   "moduleFunctions": {
-    "src/modules/app/appCanvasPointerBindings.js": [
-      "findScrollableWheelAncestor",
-      "getElementComputedStyle",
-      "getWheelDeltaScale",
-      "isActiveWhiteboardInteractionTarget",
-      "isPointerModifierShortcutActive",
-      "isScrollableOverflowValue",
-      "normalizeModifierShortcutToken",
-      "resolveCanvasWheelGesture"
-    ],
     "src/components/video-node/resultRenderModule.js": [
       "applyVideoResultGeometryAnimationStyle",
       "buildSelectedVideoResultPresentationPatch",

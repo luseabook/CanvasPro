@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（199 批·**滚轮手势路由**）：`appCanvasPointerBindings.js` 补 8 函数并重写两条 wheel 监听：滚轮按偏好分缩放/平移（Shift 转横移，Ctrl/Meta 恒缩放）、deltaMode 归一（行×16、页×视口高，修 Firefox 滚一格跳半屏）、可滚祖先容器让位（只认真溢出 + overflow 可滚）、白板编辑中整体让位。新增同名测试 7 例，模块级缺口 69→61，全量 **11445/11445/0**。修饰键判定已落，Alt+拖拽复制接线留 200。
 - 2026-10-22（198 批·**预览同步 init 接线**）：`initWebPreviewViewSyncService` 换 0.8.9 时序（175→193 行）：活跃节点改走 `createWebPreviewNodeActivityTracker`（只在 `_persistRev` 变时重算，替掉每帧全量扫）；手势起止接 `startPendingPanFreeze`/`clearPendingPanFreeze`，`getCanvasInteractionState(controller)` 才看得见惯性期；`buildViewsSignature` 补快照令牌/可复用标记与快捷键段 + `shortcuts-updated` 监听。补测试 4 例，全量 **11438/11438/0**。**需真机验收**。
-- 2026-10-22（197 批·**预览遮挡判定接入**）：`buildViewPayload` 换成 0.8.9 语义（66→145 行）：补画布节点遮挡与渲染层命中两条判定，产出 `snapshotBounds`/`snapshotToken`/`allowReusableSnapshot`，冻结令牌区分 `occlusion:` 与 `passive:` 两个来源；`collectWebPreviewViews` 每轮只收一次 occluders（否则每次同步退化成 O(节点数²)）。补测试 6 例，全量 **11434/11434/0**。init 的追踪器/平移冻结接线留 198，需真机验证。
 
 
 ## 12. 变更记录机制（**已冻结**）
