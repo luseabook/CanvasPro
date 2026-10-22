@@ -93,6 +93,8 @@ class FileSaveMigrationTests(unittest.TestCase):
             os.symlink(self.old / "projects", link, target_is_directory=True)
         except (OSError, NotImplementedError):
             self.skipTest("symlink creation is not available")
+        if not (link.is_symlink() and link.exists()):
+            self.skipTest("Host cannot create real symlinks; symlink-based assertions cannot run here")
         with self.assertRaises(ValueError):
             validate_copy_steps([{"src": str(link), "dst": str(self.new / "projects")}])
 

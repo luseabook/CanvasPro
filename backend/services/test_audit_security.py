@@ -104,10 +104,13 @@ class FileBoundaryTests(TemporaryFiles):
     def test_symlink_cannot_escape_root(self):
         inside = self.root / "inside"; inside.mkdir()
         outside = self.root / "outside.json"; outside.write_text('{}')
+        link = inside / "link.json"
         try:
-            (inside / "link.json").symlink_to(outside)
+            link.symlink_to(outside)
         except OSError:
             self.skipTest("Host does not permit symlink creation")
+        if not (link.is_symlink() and link.exists()):
+            self.skipTest("Host cannot create real symlinks; symlink-based assertions cannot run here")
         with self.assertRaises(ValueError):
             confined_json_path(inside, "link.json")
         self.assertEqual(outside.read_text(), '{}')
@@ -154,8 +157,11 @@ class StaticAccessTests(TemporaryFiles):
         assets = self.root / 'assets'; assets.mkdir()
         outside = self.root.parent / (self.root.name + '-outside.png')
         outside.write_bytes(b'fixture'); self.addCleanup(lambda: outside.unlink(missing_ok=True))
-        try: (assets / 'link.png').symlink_to(outside)
+        link = assets / 'link.png'
+        try: link.symlink_to(outside)
         except OSError: self.skipTest('Host does not permit symlink creation')
+        if not (link.is_symlink() and link.exists()):
+            self.skipTest('Host cannot create real symlinks; symlink-based assertions cannot run here')
         self.assertIsNone(self.resolve('/assets/link.png'))
 
     def test_server_auth_policy_is_default_protected(self):

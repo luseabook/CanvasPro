@@ -42,7 +42,7 @@ try {
   }
   // Physical copies: tests cannot mutate the real repository/dependency files through links.
   copy(path.join(ROOT,'node_modules'),path.join(workspace,'node_modules'),true);
-  for (const directory of ['src','api','electron','backend','tools','e2e','tests','test']) if(fs.existsSync(path.join(workspace,directory))) inventory(path.join(workspace,directory));
+  for (const directory of ['src','api','electron','backend','tools','e2e','tests','test','vendor']) if(fs.existsSync(path.join(workspace,directory))) inventory(path.join(workspace,directory));
   const unitFiles = manifest.filter(p=>!p.startsWith('e2e'+path.sep)).filter(p=>!filter||filter.test(p.replace(/\\/g,'/'))).sort();
   fs.writeFileSync(path.join(resultRoot,'test-manifest.json'),JSON.stringify(unitFiles,null,2));
   fixture=createTestEnvironment(18783);
