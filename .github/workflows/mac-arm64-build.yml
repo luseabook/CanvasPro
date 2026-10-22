@@ -1,4 +1,4 @@
-name: Canvas macOS ARM64 package
+name: OneFrame macOS ARM64 package
 
 on:
   workflow_dispatch:
@@ -124,9 +124,9 @@ jobs:
         run: |
           cat > electron-builder.mac-arm64.cjs <<'EOF'
           module.exports = {
-            appId: "com.aicanvaspro.editor",
-            productName: "Canvas",
-            copyright: "Copyright (c) 2026 Canvas",
+            appId: "com.oneframe.app",
+            productName: "一帧 OneFrame",
+            copyright: "Copyright (c) 2026 一帧 OneFrame",
             asar: false,
             directories: {
               output: "dist-mac",
@@ -175,16 +175,16 @@ jobs:
                 { target: "dmg", arch: ["arm64"] },
                 { target: "zip", arch: ["arm64"] }
               ],
-              artifactName: "Canvas-Mac-${arch}-${version}.${ext}"
+              artifactName: "OneFrame-Mac-${arch}-${version}.${ext}"
             },
             dmg: {
-              artifactName: "Canvas-Mac-${arch}-${version}.${ext}"
+              artifactName: "OneFrame-Mac-${arch}-${version}.${ext}"
             },
             fileAssociations: [
               {
                 ext: ["aicanvas", "aicproj"],
-                name: "Canvas Project",
-                description: "Canvas Project"
+                name: "一帧 OneFrame Project",
+                description: "一帧 OneFrame Project"
               }
             ]
           };
@@ -198,7 +198,7 @@ jobs:
       - name: Upload workflow artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Canvas-mac-arm64-${{ steps.version.outputs.version }}
+          name: OneFrame-mac-arm64-${{ steps.version.outputs.version }}
           if-no-files-found: error
           path: |
             dist-mac/*.dmg

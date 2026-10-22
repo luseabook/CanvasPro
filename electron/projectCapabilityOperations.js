@@ -65,7 +65,7 @@ export function createProjectCapabilityOperations({
   function buildProjectFileFilters() {
     return [
       {
-        name: 'SHUO Canvas Project',
+        name: '一帧 OneFrame Project',
         extensions: supportedProjectFileExtensions.map((extension) =>
           String(extension || '').replace(/^\./, ''),
         ),

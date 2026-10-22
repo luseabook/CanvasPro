@@ -237,7 +237,7 @@ test('a failure event rejects with the reported stage', async () => {
   assert.equal(controller.observeDiagnosticEvent(failedEvent({ failure: 'project-hydration' })), true);
   const result = await promise;
   assert.equal(result.error.code, 'CHROME_SHELL_RENDERER_STARTUP_FAILED');
-  assert.equal(result.error.message, 'Canvas renderer initialization failed');
+  assert.equal(result.error.message, 'OneFrame renderer initialization failed');
   assert.deepEqual(result.error.details, { stage: 'project-hydration' });
   assert.equal(timers.cleared.length, 1);
 });

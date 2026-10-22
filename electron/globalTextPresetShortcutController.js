@@ -213,7 +213,7 @@ export function createGlobalTextPresetShortcutController({
         type: 'global_capture.focus_failed',
         level: 'warn',
         source: 'main',
-        message: 'Canvas focus failed after global capture action',
+        message: 'OneFrame focus failed after global capture action',
         error: error,
         context: { actionId: actionId },
       });

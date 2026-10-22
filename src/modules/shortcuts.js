@@ -12,7 +12,10 @@ import { openSettingsPanel, closeSettingsPanel, activateSettingsPane } from './s
 import { SAVED_WORKFLOW_LIBRARY_ENTRY_ENABLED } from '../config/productFeatures.js';
 import { CONTEXT_MENU_SHORTCUTS, isContextMenuShortcut } from '../utils/contextMenuShortcutCatalog.js';
 const DEFAULT_PRESET_NAME = '默认预设',
-  ASHUO_PRESET_NAME = '阿硕预设',
+  // 换牌：预设名从「阿硕预设」改为「一帧预设」。名字是**存到服务端的值**，所以旧值要走
+  // LEGACY_ASHUO_PRESET_NAMES 归一化，否则老用户读回来会被当成「用户自定义」而丢掉整套预设。
+  ASHUO_PRESET_NAME = '一帧预设',
+  LEGACY_ASHUO_PRESET_NAMES = new Set(['阿硕预设']),
   CUSTOM_PRESET_NAME = '用户自定义',
   SHORTCUT_GROUP_I18N_KEYS = Object.freeze({
     通用: 'general',
@@ -104,7 +107,7 @@ export const DEFAULT_SHORTCUTS = {
   'toggle-node-avoid-overlap': { label: '新节点自动避让', keys: [], group: '设置开关' },
   'reset-media-size': { label: '恢复节点默认大小', keys: ['Shift', 'R'], group: '编辑与选择' },
   'add-reference': { label: '添加参考', keys: ['X'], group: '编辑与选择' },
-  'toggle-agent': { label: '打开/关闭 SHUO Agent', keys: ['T'], group: '侧边栏' },
+  'toggle-agent': { label: '打开/关闭 一帧 Agent', keys: ['T'], group: '侧边栏' },
   'create-text': { label: '创建源文本节点', keys: [], group: '创建节点' },
   'create-comment-note': { label: '创建注释节点', keys: ['N'], group: '创建节点' },
   'create-ai-text': { label: '创建生成文本节点', keys: ['Q'], group: '创建节点' },
@@ -459,7 +462,8 @@ function _resolveSavedShortcutKeys(value34, value35, value36, value37 = {}) {
   const value40 =
       value37.savedPresetName === DEFAULT_PRESET_NAME
         ? DEFAULT_PRESET_SHORTCUT_MIGRATIONS[value34]
-        : value37.savedPresetName === ASHUO_PRESET_NAME
+        : value37.savedPresetName === ASHUO_PRESET_NAME ||
+            LEGACY_ASHUO_PRESET_NAMES.has(value37.savedPresetName)
           ? ASHUO_PRESET_SHORTCUT_MIGRATIONS[value34]
           : null,
     value41 = BUILTIN_PRESET_NAMES.has(value37.savedPresetName)
@@ -501,6 +505,7 @@ function _normalizePresetName(value47) {
   const value48 = String(value47 || '').trim();
   if (value48 === '自定义') return CUSTOM_PRESET_NAME;
   if (BUILTIN_PRESET_NAMES.has(value48)) return value48;
+  if (LEGACY_ASHUO_PRESET_NAMES.has(value48)) return ASHUO_PRESET_NAME;
   if (value48 === CUSTOM_PRESET_NAME) return CUSTOM_PRESET_NAME;
   return ASHUO_PRESET_NAME;
 }

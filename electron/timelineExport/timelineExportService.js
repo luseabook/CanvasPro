@@ -52,7 +52,7 @@ export function createTimelineExporter({ getRoots, resolveLocalVirtualPath, prob
       assertActive();
       if (!await confirmExport({ directory: parent, plan, totalBytes })) return { status: 'cancelled', directory: '', results: [] };
       assertActive();
-      directory = await fs.mkdtemp(path.join(parent, 'CanvasPro-timeline-'));
+      directory = await fs.mkdtemp(path.join(parent, 'oneframe-timeline-'));
       const mediaDirectory = path.join(directory, 'media'); await fs.mkdir(mediaDirectory);
       for (const [index, clip] of plan.clips.entries()) {
         assertActive();

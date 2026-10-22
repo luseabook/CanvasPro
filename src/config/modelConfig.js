@@ -67,7 +67,7 @@ export const IMAGE_MODELS = {
     models: getManifestImageModels({ provider: 'runninghub', adapterType: 'modelApi' }),
   },
   aicanvas: {
-    name: 'AICanvas',
+    name: 'OneFrame',
     icon: 'images/favicon.svg',
     get description() {
       return t('imageModelConfig.providers.aicanvas.description');
@@ -78,13 +78,13 @@ export const IMAGE_MODELS = {
       return [
         {
           id: 'aicanvas/image-lite',
-          name: 'AICanvas Image Lite',
+          name: 'OneFrame Image Lite',
           description: description2,
           icon: 'images/favicon.svg',
         },
         {
           id: 'aicanvas/image-pro',
-          name: 'AICanvas Image Pro',
+          name: 'OneFrame Image Pro',
           description: description2,
           icon: 'images/favicon.svg',
         },

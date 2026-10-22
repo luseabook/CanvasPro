@@ -137,7 +137,7 @@ class ComfyUiRouteService:
     def connection(self, payload):
         endpoint = normalize_endpoint(payload.get("endpoint"))
         if endpoint not in self.endpoints():
-            raise ComfyError("Endpoint is not allowed. Configure AIC_COMFYUI_ALLOWED_URLS on the Canvas backend first", 403)
+            raise ComfyError("Endpoint is not allowed. Configure AIC_COMFYUI_ALLOWED_URLS on the OneFrame backend first", 403)
         token = payload.get("token") or ""
         if not isinstance(token, str) or len(token) > 4096 or "\n" in token or "\r" in token:
             raise ComfyError("Invalid token")

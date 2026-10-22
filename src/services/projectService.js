@@ -716,7 +716,7 @@ export function exportProject(filename, value68) {
     filename: filename + '.aicanvas',
     content: JSON.stringify(value68, null, 2),
     mimeType: 'application/json',
-    filterName: 'SHUO Canvas Project',
+    filterName: '一帧 OneFrame Project',
   });
 }
 export async function importProject(value69) {

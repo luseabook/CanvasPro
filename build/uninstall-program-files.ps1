@@ -19,7 +19,9 @@ try {
         $destination = [IO.Path]::GetFullPath((Join-Path $root $relative))
         if (-not $destination.StartsWith($root + [char]92, [StringComparison]::OrdinalIgnoreCase)) { throw 'Program manifest escaped install directory' }
         # Preserve data folders in place, including legacy webapp/app layouts.
-        if ($relative -match '^(?:(?:resources[/\\](?:app|webapp)[/\\]))?(?:user|user-data|data|output|projects|Canvas Project|Canvas Files|AI CanvasPro Files)(?:[/\\]|$)') { continue }
+        # 换牌后新增 OneFrame Project / OneFrame Files；旧品牌目录继续保留在清单里，
+        # 这样卸载新版时不会连带删掉老版本留下的用户文件。
+        if ($relative -match '^(?:(?:resources[/\\](?:app|webapp)[/\\]))?(?:user|user-data|data|output|projects|OneFrame Project|OneFrame Files|Canvas Project|Canvas Files|AI CanvasPro Files)(?:[/\\]|$)') { continue }
         $current = $destination
         $linked = $false
         while ($current -and $current -ne $root) {

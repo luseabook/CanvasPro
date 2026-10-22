@@ -1,11 +1,11 @@
 const zhCN = Object.freeze({
   app: Object.freeze({
-    documentTitle: 'Canvas',
+    documentTitle: '一帧 OneFrame · 无限画布',
     serverDisconnected:
       '⚠️ 警告：与本地服务断开连接，正在尝试自动恢复…若长时间无法恢复，请重启应用。',
     serverDisconnectedDev:
       '⚠️ 警告：与本地服务器断开连接，功能将受限。请检查后台终端（黑框）是否被意外关闭，若关闭请重新「双击运行。bat」。',
-    quickGenerate: 'AiCanvas Agent',
+    quickGenerate: '一帧 Agent',
     debugSandbox: 'V2 架构验证沙盒 · 拖拽节点进行测试',
     sourceDefaults: Object.freeze({
       image: '图片',
@@ -97,7 +97,7 @@ const zhCN = Object.freeze({
     addCanvasPage: '新建画布页面',
     currentVersion: '当前版本',
     canvasProject: '画布项目',
-    canvasTitle: 'Canvas',
+    canvasTitle: 'OneFrame',
     loading: '加载中...',
     newCanvas: '新建画布',
   }),
@@ -475,7 +475,7 @@ const zhCN = Object.freeze({
       rootDir: Object.freeze({
         label: '保存根目录',
         desc: '项目、数据和输出会统一保存在该目录下',
-        placeholder: '例如 D:\\Canvas Files',
+        placeholder: '例如 D:\\OneFrame Files',
         pickAria: '选择保存根目录',
         choose: '选择',
       }),
@@ -865,7 +865,7 @@ const zhCN = Object.freeze({
       title: '键盘快捷键',
       presetLabel: '预设方案',
       desc: '自定义你的创作效率。点击下方动作对应的按键可录制新快捷键。',
-      presets: Object.freeze({ default: '默认预设', ashuo: '阿硕预设', custom: '用户自定义' }),
+      presets: Object.freeze({ default: '默认预设', ashuo: '一帧预设', custom: '用户自定义' }),
       escExitRecording: '退出录制',
       closePanel: '关闭面板',
       resetDefault: '恢复默认设置',
@@ -876,22 +876,22 @@ const zhCN = Object.freeze({
       updated: '快捷键已更新',
       restored: '已恢复默认快捷键',
       actions: Object.freeze({
-        'toggle-agent': '打开/关闭 AiCanvas Agent',
+        'toggle-agent': '打开/关闭 一帧 Agent',
         'ms-sync-video-play': '同步播放视频',
       }),
     }),
   }),
   saveDialog: Object.freeze({
     title: '保存画布',
-    subtitle: '文件将保存到 user/Canvas Project/ 文件夹',
+    subtitle: '文件将保存到 user/OneFrame Project/ 文件夹',
     placeholder: '输入画布名称...',
     cancel: '取消',
     save: '保存',
   }),
   about: Object.freeze({
-    author: '作者：',
+    author: '团队：',
     bilibili: '访问 Bilibili 主页',
-    footer: '© 2026 Canvas. All rights reserved...',
+    footer: '© 2026 一帧 OneFrame. All rights reserved.',
   }),
   appPanels: Object.freeze({
     tutorial: Object.freeze({
@@ -2382,7 +2382,7 @@ const zhCN = Object.freeze({
       apimart: Object.freeze({ description: '一个 API 搞定一切——节省 30-70%' }),
       runninghub: Object.freeze({ description: 'AI 工作流与模型 API 聚合平台' }),
       aicanvas: Object.freeze({
-        description: 'AICanvas 开发者模式占位厂商',
+        description: 'OneFrame 开发者模式占位厂商',
         placeholderImageModel: '开发者模式占位图像模型',
       }),
     }),

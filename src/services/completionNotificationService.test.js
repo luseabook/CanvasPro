@@ -40,7 +40,7 @@ const originalWindow = globalThis.window;
       }));
     const showGenerationCompleteNotification3 = await showGenerationCompleteNotification();
     (assert.deepEqual(showGenerationCompleteNotification3, { success: true, shown: true }),
-      assert.deepEqual(list, [{ title: 'Canvas', body: '生成任务已完成。' }]));
+      assert.deepEqual(list, [{ title: 'OneFrame', body: '生成任务已完成。' }]));
   }),
   test('completionNotificationService: skips when disabled in settings', async () => {
     const list2 = [];
@@ -70,7 +70,7 @@ test('completionNotificationService: builds a node-aware request with the local 
     navigation: { source: 'canvas', nodeId: 'n1' },
   });
   assert.deepEqual(request, {
-    title: 'Canvas',
+    title: 'OneFrame',
     body: '“图片 1”生成完成。',
     thumbnailLocalPath: 'data/assets/a.png',
     navigation: { source: 'canvas', nodeId: 'n1' },
@@ -94,7 +94,7 @@ test('completionNotificationService: video requests use the injected first-frame
   assert.equal(seen.length, 1);
   assert.equal(seen[0].localPath, 'data/assets/a.mp4');
   assert.deepEqual(request, {
-    title: 'Canvas',
+    title: 'OneFrame',
     body: '“视频 1”生成完成。',
     thumbnailLocalPath: 'data/assets/a.thumb.jpg',
   });
@@ -109,7 +109,7 @@ test('completionNotificationService: a failing first-frame enhancer still yields
       },
     },
   );
-  assert.deepEqual(request, { title: 'Canvas', body: '“视频 2”生成完成。' });
+  assert.deepEqual(request, { title: 'OneFrame', body: '“视频 2”生成完成。' });
 });
 
 test('completionNotificationService: navigation payload drives the toast and the native delivery', async () => {
@@ -197,7 +197,7 @@ test('completionNotificationService: task status notifications reuse the toast a
     assert.equal(toasts[0][3].ariaLabel, '生成失败，点击查看任务'),
     assert.deepEqual(played, [{ system: true }]),
     assert.equal(delivered.length, 1),
-    assert.equal(delivered[0].title, 'Canvas'),
+    assert.equal(delivered[0].title, 'OneFrame'),
     assert.equal(delivered[0].body, '生成失败'),
     assert.deepEqual(delivered[0].navigation, { source: 'canvas', nodeId: 'n1' }));
 });

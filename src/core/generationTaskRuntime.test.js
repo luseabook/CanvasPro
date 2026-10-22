@@ -118,7 +118,7 @@ function baseSpec(args4 = {}) {
         ['volume', 0.4],
         ['play', 'assets/sounds/notify.mp3'],
       ]),
-      assert.deepEqual(list3, [{ title: 'Canvas', body: '生成任务已完成。' }]));
+      assert.deepEqual(list3, [{ title: 'OneFrame', body: '生成任务已完成。' }]));
   }),
   test('generationTaskRuntime: resume skips duplicate recovery while foreground task is active', async () => {
     const store3 = createMockStore({ 'target-1': { id: 'target-1', type: 'source-image' } }),

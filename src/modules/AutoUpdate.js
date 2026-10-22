@@ -190,7 +190,7 @@ function _isReleaseFooterLine(value2) {
   if (!enabled4) return false;
   return (
     /^感谢各位/u.test(enabled4) ||
-    /^(?:SHUO Canvas|AI-CanvasPro)[！!]/u.test(enabled4) ||
+    /^(?:一帧 OneFrame|OneFrame|SHUO Canvas|AI-CanvasPro)[！!]/u.test(enabled4) ||
     /^windows版本.*下载链接[：:]/iu.test(enabled4) ||
     /^注[：:]/u.test(enabled4) ||
     /^BUG问题/u.test(enabled4) ||

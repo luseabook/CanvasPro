@@ -15,7 +15,7 @@ FFMPEG = os.environ.get("AIC_FFMPEG_EXE", "ffmpeg")
 
 
 def _out_dir():
-    d = os.path.join(os.environ.get("APPDATA") or os.getcwd(), "CanvasPro", "output")
+    d = os.path.join(db.app_data_dir(), "output")
     os.makedirs(d, exist_ok=True)
     return d
 

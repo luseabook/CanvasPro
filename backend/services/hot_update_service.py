@@ -237,7 +237,7 @@ class HotUpdateService:
                 # 读取更新配置失败时忽略该覆盖
                 _LOGGER.debug("读取更新配置失败: %s", exc)
         headers = {
-            "User-Agent": "Canvas-AutoUpdate/2.0",
+            "User-Agent": "OneFrame-AutoUpdate/2.0",
             "Accept": "application/json, application/octet-stream;q=0.9, */*;q=0.8",
         }
         req = urllib.request.Request(manifest_url, headers=headers)

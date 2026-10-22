@@ -151,7 +151,7 @@ export function createGlobalCaptureWindowController({
     ((captureWindow = new BrowserWindowClass({
       width: windowSize.width,
       height: windowSize.height,
-      title: '发送到 Canvas 无限画布',
+      title: '发送到 OneFrame 无限画布',
       show: false,
       frame: false,
       thickFrame: false,

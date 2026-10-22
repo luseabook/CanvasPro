@@ -60,10 +60,10 @@ export const getDisplayModelName = (enabled) => {
     'apimart/gpt-5.4': 'GPT-5.4',
     'seedance-2.0-fast': 'Seedance 2.0 Fast',
     'seedance-2.0': 'Seedance 2.0',
-    'aicanvas/text-lite': 'AICanvas Text Lite',
-    'aicanvas/text-pro': 'AICanvas Text Pro',
-    'aicanvas/image-lite': 'AICanvas Image Lite',
-    'aicanvas/image-pro': 'AICanvas Image Pro',
+    'aicanvas/text-lite': 'OneFrame Text Lite',
+    'aicanvas/text-pro': 'OneFrame Text Pro',
+    'aicanvas/image-lite': 'OneFrame Image Lite',
+    'aicanvas/image-pro': 'OneFrame Image Pro',
   };
   return translateManifestText(options[enabled] || enabled);
 };
@@ -129,7 +129,7 @@ export const PROVIDERS_META = {
     logoPath: 'images/RH.png',
   },
   dreamina: { id: 'dreamina', label: '即梦', defaultUrl: '', logoPath: null },
-  aicanvas: { id: 'aicanvas', label: 'AICanvas', defaultUrl: '', logoPath: 'images/favicon.svg' },
+  aicanvas: { id: 'aicanvas', label: 'OneFrame', defaultUrl: '', logoPath: 'images/favicon.svg' },
 };
 export function getAllProviderIds() {
   return Object.keys(PROVIDERS_META);

@@ -137,7 +137,7 @@ export async function buildGenerationCompleteNotificationRequest(
       ? t('coreServices.completion.notificationNodeBody', { name: name2 })
       : t('coreServices.completion.notificationBody');
   return {
-    title: normalizeText(notificationId2?.title) || normalizeText(globalThis.document?.title) || 'Canvas',
+    title: normalizeText(notificationId2?.title) || normalizeText(globalThis.document?.title) || 'OneFrame',
     body: normalizeText(notificationId2?.body) || input,
     ...(thumbnailLocalPath ? { thumbnailLocalPath: thumbnailLocalPath } : {}),
     ...(notificationId2?.navigation && typeof notificationId2.navigation === 'object'
@@ -222,7 +222,7 @@ export async function showTaskStatusNotification({
   ) {
     const value3 = Promise.resolve().then(() =>
       notificationApi2?.showGenerationComplete?.({
-        title: normalizeText(globalThis.document?.title) || 'Canvas',
+        title: normalizeText(globalThis.document?.title) || 'OneFrame',
         body: body,
         ...(navigation2
           ? { navigation: navigation2, notificationId: notificationId4.notificationId }

@@ -10,7 +10,7 @@ export function stripCanvasProjectFileExtension(key) {
   return String(key || '').replace(CANVAS_PROJECT_FILE_EXTENSION_RE, '');
 }
 export function buildUniqueCanvasName(index, result = [], data = {}) {
-  const options = String(data?.fallbackName || 'Canvas').trim() || 'Canvas',
+  const options = String(data?.fallbackName || 'OneFrame').trim() || 'OneFrame',
     target = String(index || '').trim() || options,
     map = new Set(
       (Array.isArray(result) ? result : [])

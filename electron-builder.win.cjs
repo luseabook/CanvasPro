@@ -1,10 +1,11 @@
 const path = require('node:path');
 
 module.exports = {
-  // Preserve the existing bundle identity so installs upgrade in place.
-  appId: 'com.aicanvaspro.editor',
-  productName: 'Canvas',
-  copyright: 'Copyright (c) 2026 Canvas',
+  // 换牌后的独立产品标识：appId 变化意味着这是与旧 AI CanvasPro 安装**并列**的新产品，
+  // 不会覆盖旧安装；用户数据由 electron/brandDataMigration.js 从旧目录自动迁移。
+  appId: 'com.oneframe.app',
+  productName: '一帧 OneFrame',
+  copyright: 'Copyright (c) 2026 一帧 OneFrame',
   asar: false,
   afterSign: path.join(__dirname, 'build', 'write-install-manifest.cjs'),
   directories: {
@@ -59,7 +60,7 @@ module.exports = {
     ],
     icon: path.join(__dirname, 'build', 'app-icon.ico'),
     requestedExecutionLevel: 'asInvoker',
-    artifactName: 'Canvas-${version}-win-${arch}.${ext}',
+    artifactName: 'OneFrame-${version}-win-${arch}.${ext}',
   },
   nsis: {
     oneClick: false,
@@ -67,8 +68,8 @@ module.exports = {
     allowToChangeInstallationDirectory: true,
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
-    shortcutName: 'Canvas',
+    shortcutName: '一帧 OneFrame',
     include: path.join(__dirname, 'build', 'installer.nsh'),
-    artifactName: 'Canvas-Setup-${version}-${arch}.${ext}',
+    artifactName: 'OneFrame-Setup-${version}-${arch}.${ext}',
   },
 };

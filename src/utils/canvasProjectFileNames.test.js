@@ -26,7 +26,7 @@ test('canvasProjectFileNames: strips only the final recognized extension', () =>
 });
 
 test('canvasProjectFileNames: builds unique names and honors limits', () => {
-  assert.equal(buildUniqueCanvasName('', []), 'Canvas');
+  assert.equal(buildUniqueCanvasName('', []), 'OneFrame');
   assert.equal(buildUniqueCanvasName('', [], { fallbackName: 'Project' }), 'Project');
   assert.equal(buildUniqueCanvasName('  New  ', []), 'New');
   assert.equal(buildUniqueCanvasName('New', [{ name: 'New' }, { name: 'New(1)' }]), 'New(2)');

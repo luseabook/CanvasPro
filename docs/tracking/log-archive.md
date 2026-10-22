@@ -3,6 +3,8 @@
 > 由 `docs/TRACKING.md` §9 第 4 条维护：TRACKING.md §11 只保留最新 10 条，挤出来的旧日志移到这里，最新的在上。
 > 只追加，不改写已有内容。
 
+- 2026-10-22（184 批·**上游 0.8.9 逆向 + B-1 官方目录簇落库（分支）**）：已装 SHUO Canvas 升 0.8.9，镜像 `shuo-deobf-089`（2468 件）+ `shuo-electron-deobf-089`（158 件），总账 `docs/upstream-0.8.9-gap.md`。B-1 共 198 件落分支 `b184-b1-catalog`，四闸门全 PASS。三配置实验证明该批**全有或全无**（代码新+清单旧 346 失败；只加不改加载即抛错）。保留 `resolveProviderProfileConfig` 兼容块、补 2 件同层超集依赖、删 2 件孤儿。全量 **11313/11161/152**（基线 14），台账 `docs/b184-b1-triage.md`。**master 绿**。
+
 - 2026-10-09（183 批·**管理后台接入客户端 + 换牌残留修复**）：① `tutorialCatalog.js:1` 的 `CONTENT_ORIGIN` 仍是旧域名 `https://api.ashuoai.com`（教程拉不到）→ `https://api.1e1e.cn`，可由后台 `content_sources.tutorialOrigin` 覆盖。② `subscription_client.py` 新增 `normalize_structured_config()`，解析后台 10 个结构化命名空间。③ 新增 `admin_content_gateway.py` + `/api/v2/admin-content/*` + `api/adminContentApi.js`：公告/更新/目录/推广位/门禁/工单/优惠码/事件，TTL 缓存 + 离线降级 + 脏数据裁剪。④ 新增 `brandIdentity.js` + `clientConfigStore.js`；`http_route_dispatcher` 加 `contact_overrides_getter`，后台 brand/contact 优先于硬编码。⑤ `set_remote_subscription_gates()`：后台门禁为权威来源，本地 manifest 退化兜底（FR-2.3）。**验证**：JS **11275/11261/14**（既有失败同前）；后端 219；两门禁 PASS。
 
 - 2026-10-08（182 批·**Agnes 视频轮询线路修复 + ③ 结论更正**）：**更正**——第 180 批把 ③ 判为「余额 ￥0 BLOCKED」是误判：￥0 下文本/图像/flash 视频均实测可用，仅非 flash `agnes-video-2.5` 需付费额度。**真缺陷**——清单 `provider` 恒为 `'agnes'`，创建按档取 Key 而轮询用裸 `getProviderConfig('agnes')`，只配国内档时 Bearer 为空，后端回 400（真机创建 200 后 3.1s 失败）。

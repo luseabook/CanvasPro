@@ -21,7 +21,7 @@ export function openTimelineExportDialog(nodes, selectedIds) {
   dialog.append(element('h2', '导出 Premiere/FCP7 时间线工程'));
   dialog.append(element('p', '先调整顺序及入出点（秒，出点留空使用全长）。按最近帧量化；只支持相同分辨率、相同受支持帧率的本地视频。不是MP4、不是剪映草稿，也不读取现有剪辑节点的复杂轨道。'));
   dialog.append(element('p', '将用本地 ffprobe 预检；不会联网/安装运行时。预检失败整批停止；通过后选择目录并原生确认。复制完整原视频，未使用部分及音频仍在副本中。'));
-  const title = element('input'); title.value = 'CanvasPro 时间线'; title.maxLength = 60;
+  const title = element('input'); title.value = 'OneFrame 时间线'; title.maxLength = 60;
   const titleLabel = element('label', '工程标题：'); titleLabel.append(title); dialog.append(titleLabel);
   const includeAudio = element('input'); includeAudio.type = 'checkbox'; includeAudio.checked = true;
   const audioLabel = element('label', ' 保留原音轨（单路单/双声道，44.1/48kHz，起点同步；不支持时拒绝）');

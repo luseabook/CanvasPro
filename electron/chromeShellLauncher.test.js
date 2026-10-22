@@ -624,8 +624,8 @@ test('activateChromeShellWindowSoon spawns the windows activator with the decode
   const script = spawn.calls[0].args[5];
   assert.ok(script.startsWith('$targetPid = 4660\n$deadline = [DateTime]::UtcNow.AddMilliseconds(6000)'));
   assert.ok(script.includes('AicChromeShellWindowActivator'));
-  assert.ok(script.includes("-like '*updream canvas*'"));
-  assert.ok(script.includes("-like '*AI CanvasPro*'"));
+  assert.ok(script.includes("-like '*一帧*'"));
+  assert.ok(script.includes("-like '*OneFrame*'"));
   assert.ok(!script.includes('SHUO'));
   assert.ok(script.endsWith('exit 0'));
   assert.equal(helper.state.unrefed, 1);
@@ -757,7 +757,7 @@ test('controlChromeShellLaunchWindow spawns an encoded focus helper carrying the
   assert.ok(script.includes('AicChromeShellFocus'));
   assert.ok(
     script.includes(
-      '$title -notlike "*updream canvas*" -and $title -notlike "*AI CanvasPro*" -and $title -notlike "*AI Canvas*"',
+      '$title -notlike "*一帧*" -and $title -notlike "*OneFrame*" -and $title -notlike "*AI Canvas*"',
     ),
   );
   assert.ok(!script.includes('SHUO'));

@@ -119,7 +119,7 @@ export function createNodeMediaExporter({ getRoots, resolveLocalVirtualPath, cho
       if (!await confirmExport({ directory: parent, items: prepared.map(({ item }) => item),
         totalBytes, failedCount: results.length })) return { status: 'cancelled', results: [], directory: '', manifestSaved: false };
       assertActive();
-      const directory = await fs.mkdtemp(path.join(parent, 'CanvasPro-media-'));
+      const directory = await fs.mkdtemp(path.join(parent, 'oneframe-media-'));
       for (const { item, source } of prepared) {
         try {
           // If the renderer closes/navigates, stop starting new copies; existing files remain.

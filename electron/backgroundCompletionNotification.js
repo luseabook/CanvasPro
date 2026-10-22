@@ -89,7 +89,7 @@ export function createBackgroundCompletionNotifier({
   globalShortcutApi: globalShortcutApi,
   logEvent: logEvent,
   resolveNotificationIconPath: resolveNotificationIconPath,
-  appName: appName = 'Canvas',
+  appName: appName = 'OneFrame',
   platform: platform = process.platform,
   setTimeoutFn: setTimeoutFn = setTimeout,
   clearTimeoutFn: clearTimeoutFn = clearTimeout,
@@ -122,7 +122,7 @@ export function createBackgroundCompletionNotifier({
       if (typeof Notification?.isSupported === 'function' && !Notification.isSupported())
         return { success: true, shown: false, reason: 'unsupported' };
       const configuredAppName = typeof appName === 'function' ? appName() : appName,
-        title = normalizeText(payload?.title, configuredAppName || 'Canvas', 80),
+        title = normalizeText(payload?.title, configuredAppName || 'OneFrame', 80),
         body = normalizeText(payload?.body, '生成任务已完成。', 180),
         icon = resolveNotificationIcon(payload, resolveNotificationIconPath);
       let release = () => {};

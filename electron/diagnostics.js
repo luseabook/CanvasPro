@@ -393,7 +393,7 @@ function timestampForFilename(value34 = new Date()) {
 }
 function buildReadme() {
   return [
-    'SHUO Canvas 诊断包',
+    '一帧 OneFrame 诊断包',
     '',
     '请将整个 ZIP 文件发送给开发者用于排查问题。',
     '本诊断包包含运行日志、错误摘要、环境摘要和生成瞬间的脱敏状态快照。',
@@ -445,7 +445,7 @@ export function createDiagnosticsManager(options2 = {}) {
     }
   }
   function getSuggestedPackagePath(value39 = new Date()) {
-    const value40 = 'Canvas-Diagnostics-' + timestampForFilename(value39) + '.zip';
+    const value40 = 'OneFrame-Diagnostics-' + timestampForFilename(value39) + '.zip';
     return path.join(resolveDownloadsDir(app, diagnosticsDir), value40);
   }
   async function createPackage(options4 = {}) {

@@ -114,17 +114,21 @@ import {
   writeProjectJson,
   writeRecoverySnapshot,
 } from '../src/services/desktopProjectFileStore.js';
+import {
+  BRAND_USER_DATA_DIRNAME,
+  formatMigrationResult,
+  migrateLegacyUserData,
+} from './brandDataMigration.js';
 import { registerIpcHandlers } from './ipc/registerIpcHandlers.js';
-let APP_DISPLAY_NAME = 'Canvas';
-const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
-    ? // Keep a profile folder of our own. The historical 'AI CanvasPro' name is now also
-      // claimed by the separately installed SHUO Canvas build, and two Electron apps sharing
-      // one profile folder cannot both hold the single-instance lock: whichever starts second
-      // exits silently, which is what stopped the packaged app from opening.
-      'CanvasPro'
-    : // A side-by-side test build carries its own productName in package.json (see
+let APP_DISPLAY_NAME = 'OneFrame';
+const APP_DATA_DIRECTORY_NAME = /dev/iu.test(app.getName() || '')
+    ? // A side-by-side test build carries its own productName in package.json (see
       // electron-builder.win.dev.cjs), so it gets its own folder instead of sharing data.
-      app.getName() || 'AI CanvasPro',
+      // 目录名固定成 ASCII：中文/空格路径会给 Python 运行时与 PowerShell 脚本添麻烦。
+      'OneFrame Dev'
+    : // 换牌后的正式数据目录。旧的 'CanvasPro' / 'AI CanvasPro' 只作为**迁移来源**：
+      // 启动早期由 brandDataMigration 复制到新目录，旧目录保留不删（可回滚）。
+      BRAND_USER_DATA_DIRNAME,
   APP_USER_DATA_ROOT = process.env.AIC_USER_DATA_ROOT
     ? path.resolve(process.env.AIC_USER_DATA_ROOT)
     : path.join(app.getPath('appData'), APP_DATA_DIRECTORY_NAME),
@@ -157,7 +161,9 @@ const APP_DATA_DIRECTORY_NAME = /^canvas$/iu.test(app.getName() || '')
   SERVER_READY_INTERVAL_MS = 400,
   LOCAL_ACCESS_TOKEN = randomBytes(32).toString('hex'),
   SERVER_ID_HEADER = 'x-aicanvas-server',
-  SERVER_ID_VALUE = APP_DISPLAY_NAME,
+  // 与后端握手用的**协议值**，不是品牌名：server.py 发 `X-AICanvas-Server: Canvas`，
+  // 这里必须逐字相同，否则健康检查永远不通过（启动会卡在「正在启动」）。
+  SERVER_ID_VALUE = 'Canvas',
   LOCAL_PREVIEW_SCHEME = 'aic-local-preview',
   LOCAL_PREVIEW_TTL_MS = 12 * 60 * 60 * 1000,
   CLIPBOARD_FILE_REFERENCES_FORMAT = 'application/x-ai-canvas-file-references',
@@ -241,6 +247,18 @@ const pendingExternalProjectOpenRequests = [],
     },
   ]),
   app.setName(APP_DISPLAY_NAME));
+// 换牌：把旧目录 %APPDATA%/CanvasPro 的用户数据复制到 %APPDATA%/OneFrame。
+// 只在正式目录、且未被测试隔离目录覆盖时执行；旧目录保留不删，可回滚。
+if (!process.env.AIC_USER_DATA_ROOT && APP_DATA_DIRECTORY_NAME === BRAND_USER_DATA_DIRNAME) {
+  try {
+    const migrationLine = formatMigrationResult(
+      migrateLegacyUserData({ appDataDir: app.getPath('appData') }),
+    );
+    if (migrationLine) console.log(migrationLine);
+  } catch (error) {
+    console.warn('[userdata] 迁移旧品牌数据失败（继续使用新目录）:', error?.message || error);
+  }
+}
 const USER_DATA_DIR = APP_USER_DATA_ROOT;
 (mkdirSync(USER_DATA_DIR, { recursive: true }), app.setPath('userData', USER_DATA_DIR));
 const GOT_SINGLE_INSTANCE_LOCK = app.requestSingleInstanceLock();
@@ -1629,7 +1647,7 @@ function getLocalAssetCleanupManager() {
 function getProjectDialogFilters() {
   return [
     {
-      name: 'Canvas Project',
+      name: '一帧 OneFrame Project',
       extensions: SUPPORTED_PROJECT_FILE_EXTENSIONS.map((item7) => item7.replace(/^\./, '')),
     },
   ];

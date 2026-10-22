@@ -1,11 +1,11 @@
 const enUS = Object.freeze({
   app: Object.freeze({
-    documentTitle: 'Canvas',
+    documentTitle: 'OneFrame · Infinite Canvas',
     serverDisconnected:
       '⚠️ Warning: the local service is disconnected. Trying to recover automatically — restart the app if it does not come back.',
     serverDisconnectedDev:
       '⚠️ Warning: the local server is disconnected. Some features are limited. Check whether the background terminal was closed, then restart the app if needed.',
-    quickGenerate: 'AiCanvas Agent',
+    quickGenerate: 'OneFrame Agent',
     debugSandbox: 'V2 architecture sandbox · Drag nodes to test',
     sourceDefaults: Object.freeze({
       image: 'Image',
@@ -114,7 +114,7 @@ const enUS = Object.freeze({
     addCanvasPage: 'New canvas page',
     currentVersion: 'Current version',
     canvasProject: 'Canvas projects',
-    canvasTitle: 'Canvas',
+    canvasTitle: 'OneFrame',
     loading: 'Loading...',
     newCanvas: 'New canvas',
   }),
@@ -528,7 +528,7 @@ const enUS = Object.freeze({
       rootDir: Object.freeze({
         label: 'Save root folder',
         desc: 'Projects, data, and outputs are saved together under this folder',
-        placeholder: 'For example D:\\Canvas Files',
+        placeholder: 'For example D:\\OneFrame Files',
         pickAria: 'Choose save root folder',
         choose: 'Choose',
       }),
@@ -932,7 +932,7 @@ const enUS = Object.freeze({
       title: 'Keyboard Shortcuts',
       presetLabel: 'Preset',
       desc: 'Customize your creation workflow. Click the key for any action below to record a new shortcut.',
-      presets: Object.freeze({ default: 'Default preset', ashuo: 'Ashuo preset', custom: 'Custom' }),
+      presets: Object.freeze({ default: 'Default preset', ashuo: 'OneFrame preset', custom: 'Custom' }),
       escExitRecording: 'Exit recording',
       closePanel: 'Close panel',
       resetDefault: 'Restore defaults',
@@ -987,7 +987,7 @@ const enUS = Object.freeze({
         'toggle-node-avoid-overlap': 'Avoid existing nodes',
         'reset-media-size': 'Reset node size',
         'add-reference': 'Add reference',
-        'toggle-agent': 'Toggle AiCanvas Agent',
+        'toggle-agent': 'Toggle OneFrame Agent',
         'create-text': 'Create source text node',
         'create-comment-note': 'Create comment node',
         'create-ai-text': 'Create generated text node',
@@ -1066,15 +1066,15 @@ const enUS = Object.freeze({
   }),
   saveDialog: Object.freeze({
     title: 'Save Canvas',
-    subtitle: 'The file will be saved to the user/Canvas Project/ folder',
+    subtitle: 'The file will be saved to the user/OneFrame Project/ folder',
     placeholder: 'Enter a canvas name...',
     cancel: 'Cancel',
     save: 'Save',
   }),
   about: Object.freeze({
-    author: 'Author:',
+    author: 'Team:',
     bilibili: 'Visit Bilibili profile',
-    footer: '© 2026 Canvas. All rights reserved...',
+    footer: '© 2026 OneFrame. All rights reserved.',
   }),
   appPanels: Object.freeze({
     tutorial: Object.freeze({
@@ -2769,7 +2769,7 @@ const enUS = Object.freeze({
         description: 'AI workflow and model API aggregation platform',
       }),
       aicanvas: Object.freeze({
-        description: 'AICanvas developer-mode placeholder provider',
+        description: 'OneFrame developer-mode placeholder provider',
         placeholderImageModel: 'Developer-mode placeholder image model',
       }),
     }),

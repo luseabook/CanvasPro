@@ -296,7 +296,7 @@ const projectGallery = document.getElementById('projectGallery'),
                     justifyContent: 'center',
                     height: '100%',
                   }),
-                  (el31.textContent = 'AICanvas'),
+                  (el31.textContent = 'OneFrame'),
                   el29.appendChild(el31));
               }
             }

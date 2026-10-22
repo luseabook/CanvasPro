@@ -770,7 +770,7 @@ const CanvasTabManager = {
               filename: filename,
               content: JSON.stringify(value56, null, 2),
               mimeType: 'application/json',
-              filterName: 'SHUO Canvas Project',
+              filterName: '一帧 OneFrame Project',
             });
           if (saveTextDownload2?.canceled) return;
           window.showToast?.(canvasTabsText('downloadedWorkflow', { filename: filename }));

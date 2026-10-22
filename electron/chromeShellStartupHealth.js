@@ -91,7 +91,7 @@ export function createChromeShellStartupHealthController({
     if (metadata.readyTimeoutMs !== pending.readyTimeoutMs) return false;
     if (isFailure) {
       const failureError = createStartupHealthError(
-          'Canvas renderer initialization failed',
+          'OneFrame renderer initialization failed',
           'CHROME_SHELL_RENDERER_STARTUP_FAILED',
         ),
         knownStages = ['entry', 'initialization', 'storage-migration', 'project-hydration'];

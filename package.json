@@ -1,9 +1,10 @@
 {
-  "name": "canvas",
+  "name": "oneframe",
+  "productName": "一帧 OneFrame",
   "private": true,
   "version": "0.4.12",
-  "description": "Canvas desktop editor",
-  "author": "Canvas",
+  "description": "一帧 OneFrame · AI 无限画布与剧本工作台",
+  "author": "一帧 OneFrame",
   "type": "module",
   "main": "electron/main.js",
   "scripts": {

@@ -1,6 +1,6 @@
 """短剧数据层 — 纯 stdlib sqlite3,可读可测,server.py 单行 import 接入。
 首次连接按共享 schema 幂等初始化;与 Knex 迁移兼容，不删除已有数据。
-连同一个 userData/CanvasPro/shortdrama.db。"""
+连同一个 userData/OneFrame/shortdrama.db（旧版 CanvasPro 目录仍会回退复用）。"""
 import os
 import sqlite3
 import time
@@ -11,9 +11,24 @@ from pathlib import Path
 _DB = None
 _DB_LOCK = threading.RLock()
 
+# 换牌：新目录 OneFrame；旧的 CanvasPro / AI CanvasPro 只作为**回退**（只读复用，不迁移
+# 数据库文件：SQLite 在运行中被复制容易拿到半写状态）。新目录一旦存在就优先用它。
+BRAND_DATA_DIRNAME = "OneFrame"
+LEGACY_DATA_DIRNAMES = ("CanvasPro", "AI CanvasPro")
+
+def app_data_dir():
+    base = os.environ.get("APPDATA") or os.getcwd()
+    brand_dir = os.path.join(base, BRAND_DATA_DIRNAME)
+    if os.path.isdir(brand_dir):
+        return brand_dir
+    for legacy in LEGACY_DATA_DIRNAMES:
+        legacy_dir = os.path.join(base, legacy)
+        if os.path.isdir(legacy_dir):
+            return legacy_dir
+    return brand_dir
+
 def db_path():
-    return os.environ.get("SHORTDRAMA_DB") or os.path.join(
-        os.environ.get("APPDATA") or os.getcwd(), "CanvasPro", "shortdrama.db")
+    return os.environ.get("SHORTDRAMA_DB") or os.path.join(app_data_dir(), "shortdrama.db")
 
 def conn():
     global _DB

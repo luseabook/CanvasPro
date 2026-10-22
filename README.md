@@ -3,9 +3,9 @@
 
 <div align="center">
 
-<img src="images/favicon.svg" width="64" height="64" alt="Canvas Logo"/>
+<img src="images/favicon.svg" width="64" height="64" alt="一帧 OneFrame Logo"/>
 
-# Canvas
+# 一帧 OneFrame
 
 **基于节点的 AI 多模态画布编辑器**
 

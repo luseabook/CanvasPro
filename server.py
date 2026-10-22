@@ -1,5 +1,5 @@
 r"""
-./server.py - Canvas V2 本地服务
+./server.py - OneFrame 本地服务
 
 用法:
   cd v2
@@ -8,7 +8,7 @@ r"""
 访问地址: http://localhost:8777
 
 主要目录位于 v2/ 下:
-  user/Canvas Project/  - 画布项目
+  user/OneFrame Project/  - 画布项目（旧版 user/Canvas Project/ 会自动沿用）
   user/shortcuts.json   - 快捷键配置
   user/settings.json    - 应用设置
   user/config.json      - API Key 配置
@@ -298,7 +298,24 @@ def _normalize_smart_clip_output_mode(value):
 
 # --- 可配置的数据目录，默认位于 v2/ 下 ---
 DEFAULT_USER_DIR = _get_path_env("AIC_USER_DIR", os.path.join(DIRECTORY, "user"))
-DEFAULT_CANVAS_DIR = _get_path_env("AIC_CANVAS_DIR", os.path.join(DEFAULT_USER_DIR, "Canvas Project"))
+DEFAULT_CANVAS_DIRNAME = "OneFrame Project"
+LEGACY_CANVAS_DIRNAME = "Canvas Project"
+
+
+def _resolve_default_canvas_dir():
+    """换牌后默认工程目录改名。旧目录还在、新目录还没建时**继续用旧目录**，
+    这样老用户打开应用仍能看到原有工程列表（不移动、不复制用户文件）。"""
+    configured = str(os.environ.get("AIC_CANVAS_DIR", "") or "").strip()
+    if configured:
+        return _get_path_env("AIC_CANVAS_DIR", configured)
+    brand_dir = os.path.join(DEFAULT_USER_DIR, DEFAULT_CANVAS_DIRNAME)
+    legacy_dir = os.path.join(DEFAULT_USER_DIR, LEGACY_CANVAS_DIRNAME)
+    if not os.path.isdir(brand_dir) and os.path.isdir(legacy_dir):
+        return os.path.abspath(legacy_dir)
+    return os.path.abspath(brand_dir)
+
+
+DEFAULT_CANVAS_DIR = _resolve_default_canvas_dir()
 DEFAULT_OUTPUT_DIR = _get_path_env("AIC_OUTPUT_DIR", os.path.join(DIRECTORY, "output"))
 DEFAULT_DATA_DIR = _get_path_env("AIC_DATA_DIR", os.path.join(DIRECTORY, "data"))
 DEFAULT_UPLOADS_DIR = _get_path_env("AIC_UPLOADS_DIR", os.path.join(DEFAULT_DATA_DIR, "uploads"))

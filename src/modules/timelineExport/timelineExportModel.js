@@ -21,7 +21,7 @@ export function normalizeTimelineRequest(payload) {
     }
     return { ...item, startSec, endSec };
   });
-  return { title: safeExportName(payload.title || 'CanvasPro 时间线'), includeAudio: payload.includeAudio, clips };
+  return { title: safeExportName(payload.title || 'OneFrame 时间线'), includeAudio: payload.includeAudio, clips };
 }
 
 const RATES = [

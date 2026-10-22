@@ -815,7 +815,7 @@ class MediaFileRouteService:
         try:
             request = urllib.request.Request(request_url, method="GET")
             opener = urllib.request.build_opener(_ValidatedDownloadRedirectHandler(self._validate_download_host))
-            request.add_header("User-Agent", "AI-Canvas/1.0")
+            request.add_header("User-Agent", "OneFrame/1.0")
             try:
                 with opener.open(request, timeout=120) as resp:
                     declared_size = int(resp.headers.get("Content-Length") or 0)

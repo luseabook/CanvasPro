@@ -21,7 +21,7 @@ _LOGGER = logging.getLogger(__name__)
 
 DEFAULT_LICENSE_DOMAIN = "https://api.1e1e.cn"
 DEFAULT_GRACE_SECONDS = 259200
-DEFAULT_PRODUCT_DISPLAY_NAME = "Canvas"
+DEFAULT_PRODUCT_DISPLAY_NAME = "OneFrame"
 DEFAULT_UPDATE_MANIFEST_URL = "https://github.com/luseaer-ship-it/CanvasPro/releases/latest/download/latest.json"
 
 # 客户端↔后台契约版本（跨仓对齐）：与 canvas-admin

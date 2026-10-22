@@ -462,7 +462,7 @@ function renderHome(value40) {
   return (
     '<main class="story-home-page" data-person-replacement-home-project="' +
     escapeHtml(value40.id) +
-    '">\n    <section class="story-home-hero">\n      <span class="story-eyebrow">SHUO Canvas · ' +
+    '">\n    <section class="story-home-hero">\n      <span class="story-eyebrow">一帧 OneFrame · ' +
     REPLACEMENT_STUDIO_NAME +
     '</span>\n      <h1>完整替换视频中的人物与声音</h1>\n      <div class="story-home-composer">\n        <div class="story-home-composer-body">\n          <div class="story-home-composer-panel story-upload-drop workspace-video-import-panel person-replacement-video-drop ' +
     (value43 ? 'has-sources' : '') +

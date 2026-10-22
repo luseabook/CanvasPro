@@ -12,7 +12,7 @@ function trimText(value) {
 }
 function getProjectPackageDialogFilters() {
   return [
-    { name: 'Canvas Project Package', extensions: [PROJECT_PACKAGE_FILE_EXTENSION.replace(/^\./, '')] },
+    { name: '一帧 OneFrame 工程包', extensions: [PROJECT_PACKAGE_FILE_EXTENSION.replace(/^\./, '')] },
   ];
 }
 function resolveProjectPackageImportPath(options = {}) {

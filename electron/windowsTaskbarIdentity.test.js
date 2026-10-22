@@ -288,7 +288,7 @@ test('the script builds the relaunch command, the profile switch and the size gu
 test('the taskbar brand matcher accepts Canvas and legacy titles', () => {
   const script = buildWindowsChromeShellTaskbarIdentityScript(SCRIPT_INPUT);
   assert.ok(script.includes('title.IndexOf("updream canvas", StringComparison.OrdinalIgnoreCase) >= 0'));
-  assert.ok(script.includes('title.IndexOf("AI CanvasPro", StringComparison.OrdinalIgnoreCase) >= 0'));
+  assert.ok(script.includes('title.IndexOf("OneFrame", StringComparison.OrdinalIgnoreCase) >= 0'));
   assert.ok(script.includes('title.IndexOf("AI Canvas", StringComparison.OrdinalIgnoreCase) >= 0'));
   assert.ok(script.includes('title.IndexOf("Canvas", StringComparison.OrdinalIgnoreCase) >= 0'));
   assert.ok(!script.includes('SHUO Canvas'));

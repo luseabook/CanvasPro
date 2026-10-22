@@ -21,7 +21,7 @@ function isAutoDefaultRecentProject(error) {
     /\.(?:aicanvas|aicproj|json)$/i.test(value) &&
     value.replace(/\.(?:aicanvas|aicproj|json)$/i, '') === '默认画布' &&
     item === '默认画布' &&
-    /(^|[\\/])user[\\/]Canvas Project[\\/]/i.test(key)
+    /(^|[\\/])user[\\/](?:Canvas Project|OneFrame Project)[\\/]/i.test(key)
   );
 }
 export function canUseDesktopProjectApi() {

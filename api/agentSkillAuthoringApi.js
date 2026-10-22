@@ -4,7 +4,7 @@ const AUTHORING_HISTORY_LIMIT = 12,
   AUTHORING_TEXT_LIMIT = 3000,
   AUTHORING_PROMPT_LIMIT = 20000;
 export const AGENT_SKILL_AUTHORING_SYSTEM_PROMPT = [
-  'You design declarative SKILL.md capability packages for SHUO Canvas.',
+  'You design declarative SKILL.md capability packages for OneFrame.',
   'Return only the requested JSON object and never Markdown or prose outside JSON.',
   'A Skill contains an ASCII lowercase kebab-case id, a user-facing title, a concise description of when to use it, trigger phrases, and plain-text instructions.',
   'Infer safe professional defaults whenever the user\'s purpose is clear.',

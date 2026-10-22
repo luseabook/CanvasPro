@@ -2,7 +2,10 @@ import { onLocaleChange, t } from '../i18n/index.js';
 import { applyBrandIdentity } from './brandIdentity.js';
 import { loadClientConfig, onClientConfigChange } from './clientConfigStore.js';
 
-const DEFAULT_PRODUCT_NAME = 'Canvas';
+// 换牌：产品名（正文/关于页用 OneFrame），而 logo 处的中文简称固定为「一帧」。
+// 两者刻意分开：正文里写「一帧 OneFrame」会过于冗长，而 logo 只放英文又丢了中文识别度。
+const DEFAULT_PRODUCT_NAME = 'OneFrame';
+const PRODUCT_WORDMARK = '一帧';
 let productName = DEFAULT_PRODUCT_NAME;
 let brandConfig = null;
 
@@ -16,6 +19,10 @@ function normalizeProductName(value) {
 function replaceProductName(value) {
   return String(value || '')
     .replace(/updream canvas/gi, productName)
+    .replace(/SHUO Canvas/gi, productName)
+    .replace(/AI[-\s]?CanvasPro/gi, productName)
+    .replace(/\bAiCanvas\b/gi, productName)
+    .replace(/\bAICanvas\b/g, productName)
     .replace(/\bCanvas\b/g, productName);
 }
 
@@ -28,7 +35,7 @@ function applyProductBranding() {
   if (typeof document === 'undefined') return;
   document.title = replaceProductName(t('app.documentTitle')) || productName;
   const wordmark = document.querySelector('[data-product-name="wordmark"]');
-  if (wordmark) wordmark.textContent = productName;
+  if (wordmark) wordmark.textContent = PRODUCT_WORDMARK;
   const aboutTitle = document.querySelector('[data-product-name="about"]');
   if (aboutTitle) aboutTitle.textContent = productName;
   const aboutLogo = document.querySelector('[data-product-name-alt]');

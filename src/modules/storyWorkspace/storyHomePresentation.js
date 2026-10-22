@@ -665,7 +665,7 @@ export function renderStoryHome(args) {
   return (
     '<div class="story-home-page' +
     (value26.homeTab === 'replication' ? ' story-home-page--replication' : '') +
-    '">\n    <section class="story-home-hero">\n      <span class="story-eyebrow">SHUO Canvas · ' +
+    '">\n    <section class="story-home-hero">\n      <span class="story-eyebrow">一帧 OneFrame · ' +
     (args.workspaceSurface === 'replication' ? 'Replication Studio' : 'Story Studio') +
     '</span>\n      <h1>' +
     (args.workspaceSurface === 'replication' ? '复刻工作室' : '从一个想法到完整的AI视频') +

@@ -266,7 +266,7 @@ function renderHome({
       .filter(Boolean)
       .join(' · ');
   return (
-    '<div class="storyboard-3d-workspace-home-page">\n    <section class="storyboard-3d-home-hero">\n      <span class="storyboard-3d-home-eyebrow">SHUO Canvas · Previz Studio</span>\n      <h1>先在空间里走一遍，再把镜头交给生成模型</h1>\n      <p>用场景、人物、道具和机位搭建可持续编辑的 3D 预演项目，让镜头关系在生成前就清晰可控。</p>\n      <div class="storyboard-3d-home-composer ' +
+    '<div class="storyboard-3d-workspace-home-page">\n    <section class="storyboard-3d-home-hero">\n      <span class="storyboard-3d-home-eyebrow">一帧 OneFrame · Previz Studio</span>\n      <h1>先在空间里走一遍，再把镜头交给生成模型</h1>\n      <p>用场景、人物、道具和机位搭建可持续编辑的 3D 预演项目，让镜头关系在生成前就清晰可控。</p>\n      <div class="storyboard-3d-home-composer ' +
     (isGenerating ? 'is-generating' : '') +
     '" aria-busy="' +
     (isGenerating ? 'true' : 'false') +
