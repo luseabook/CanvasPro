@@ -272,8 +272,7 @@ node tools/tracking/track.mjs --status
   - R23 渲染器性能件。
   - R08 替换工作室核心。
 - 接线会改变在用代码的行为，所以必须单独成批、写清行为差异，并在用户授权后真机验收。
-- 接线候选（第 119/125j/127/128 批）：① `api/imageUploadApi.js` 自带 RunningHub 上传响应解析私有副本（失败码判定与端口不同）；② `src/modules/nodePromptShared.js` 自带 `getAssetMentionRefFromPillNode`、`getAssetInputRefsFromPromptHtml`、`getPromptAssetInputRefsFromNode` 等私有副本（125j 的抽取源）；③ `modelProviderProfileSelection.js` 的 `getModelProviderProfileIds` 与 128 的 `modelProviderProfiles` 不是同一函数；④ 127 批归因的 40 个「旧世代」文件本身就是升代目标。
-- 第 125j 批发现的接线候选：`src/modules/nodePromptShared.js` 自带 `getAssetMentionRefFromPillNode`、`getAssetInputRefsFromPromptHtml`、`getPromptAssetInputRefsFromNode`、`getAssetInputRefsFromNodeData`、`getAssetInputRefsFromPromptAndNode` 的私有副本，本批 `promptAssetInputRefs` 正是从它抽出来的；组件侧还有 6 处同名局部调用。要先逐条比对行为差异，不能整块替换。
+- 接线候选（第 119/125j/127/128 批）：① `api/imageUploadApi.js` 自带 RunningHub 上传响应解析私有副本（失败码判定与端口不同）；② `nodePromptShared.js` 自带 `getAssetMentionRefFromPillNode`、`getAssetInputRefsFromPromptHtml`、`getPromptAssetInputRefsFromNode` 等私有副本（125j 抽取源，组件侧另 6 处同名调用），须逐条比对、不可整块替换；③ `modelProviderProfileSelection.js` 的 `getModelProviderProfileIds` 与 128 的 `modelProviderProfiles` 非同一函数；④ 127 批归因的 40 个「旧世代」文件即升代目标。
 - 第 126 批接线分批建议（风险从低到高）：① `src/hooks/` 4 件 + `src/core/stores/index.js`；② `src/modules/canvasCommands/` 4 件；③ `storyboard3d` 触达 >0 的 9 件；④ `agent` 触达 >0 的 19 件；⑤ 其余 353 个孤岛须连同外部装配一起设计。明细见 `docs/b126-reachability.md` §5。
 - 建议用户授权运行应用后，先接「消费方已存在、依赖已闭合」的。例如把第 74 批的 3 个键盘原语接进 `shortcuts.js` 和 `keyboardService.js`，每接一处就真机验证一处。
 
@@ -371,6 +370,7 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
+- 2026-10-22（186 批·**全面功能验证与缺陷修复**）：QA 覆盖 17 个能力域，可执行断言 **11568 例 0 失败**（3 例软链用例补前提校验后 SKIP）；修 `AIGenVideoNode` hover 调用未定义方法（既有缺陷，`91d76472` 引入）→ 新增 `video-node/previewHoverPlaybackModule.js` + 13 例回归，原 e2e 复跑通过；`vendor` 纳入跑测入口、换牌 3 例边界用例并入 `electron/`。JS **11339/11339/0**；后端 223（3 SKIP）。详见 `docs/qa/verify-2026-10-22/report.md`。
 - 2026-10-22（185 批·**换牌 一帧 OneFrame**）：包/安装身份（`com.oneframe.app`、productName、`OneFrame-Setup-*`）、主进程显示名与 userData 改 `OneFrame` + 新增 `brandDataMigration.js` 从 `CanvasPro` 迁移（旧目录保留）、i18n/首页/关于页/预设名/后端/卸载清单换牌；保留更新源、服务域名、存储 key 前缀、握手头与 legacy 路径。JS **11319/11319/0**（基线 14 例失败清零）；后端 223（3 例既有 symlink 环境限制）。详见 `docs/rebrand-oneframe.md`。
 
 ## 12. 变更记录机制（**已冻结**）
