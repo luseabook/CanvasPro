@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（191 批·**Agent 事件溯源接线**）：`agentSessionStore.js` 升到 0.8.9 事件溯源版（172→640 行），补 19 个 API：消息/运行事件/操作/任务绑定各产出带单调 seq 的 sessionEvent，投影走 `projectAgentSessionEvents` 并用 `compareAgentSessionProjection` 对账；运行事件上限 240、账本 120；跨会话操作只更新既有条目；`recordTrace` 四个 type 转运行事件（技能注入按 run 去重）。支撑库导出面本就齐备，纯接线。补测试 18 例。基线 125→105，全量 **11379**。⚠ 会话仓库侧 appendRunEvent/flushPersistence 仍空，排 192 批。
 - 2026-10-22（190 批·**objectURL 生命周期接线**）：`desktopMediaBlobSource.js` 升代到 0.8.9（补 shouldAssign/onSourceAssigned/playbackUrl/pending 去重/chrome-shell audio 改写；17 文件 57 处调用点此前传新选项被静默丢弃）；`resultRenderModule.js` 补 18 方法（objectURL 缓存对账/释放/竞态双 token/poster 清除），thumbId 裸 `URL.createObjectURL` 全部改 tracked，`AIGenVideoNode:1453` 原空钩子自动生效。基线 143→125。全量 **11361/11361/0**。
-- 2026-10-22（189 批·**去压缩**）：133 个粘成单行的文件全部过 prettier（最小只有 400 B），仓库压缩文件归零。逐文件比对 AST 证明零语义变更（键位三种等价写法归一后 **133/133 完全一致**）。`deobf-gate.mjs` 新增 `compressed-source` 硬失败（≥800 B 且 ≤2 行），不依赖镜像，自有新文件也能拦住；`check-port-parity` 的 minified 由 INFO 升为硬失败。顺带修 `server.py` 的 HEAD 带 body（同类 `end_headers` 重复定义，后者覆盖前者，抑制开关成死代码；裸 socket 断言零 body）。全量 **11350/11350/0**；e2e **10/10**；后端 223 例。
 
 
 ## 12. 变更记录机制（**已冻结**）

@@ -1,6 +1,6 @@
 {
   "mirror": "shuo-deobf-089",
-  "totalMissing": 125,
+  "totalMissing": 105,
   "files": {
     "src/modules/AudioClipController.js": [
       "_clearSplit",
@@ -24,27 +24,6 @@
       "_setSplitRangeCurrentTime",
       "_stageSplitAtCurrentTime",
       "_syncSelectionEnvelopeFromSplitRanges"
-    ],
-    "src/modules/agent/agentSessionStore.js": [
-      "clearPendingLoopRun",
-      "emitAssistantStream",
-      "getAssistantTextTask",
-      "getContextDigest",
-      "getOperationLedger",
-      "getPendingLoopRun",
-      "getRunEvents",
-      "getSessionEvents",
-      "getSessionProjection",
-      "getSessionProjectionParity",
-      "getTaskBindings",
-      "isConversationLoaded",
-      "replaceConversationMessages",
-      "replayRun",
-      "setContextDigest",
-      "setPendingLoopRun",
-      "subscribe",
-      "subscribeAssistantStream",
-      "upsertOperation"
     ],
     "src/components/video-node/resultRenderModule.js": [
       "_buildRhAiAppVideoResultDisplayPatch",
@@ -153,9 +132,6 @@
     ],
     "src/core/generationTaskRuntime.js": [
       "resolveSettled"
-    ],
-    "src/modules/agent/agentConversationStore.js": [
-      "retryPersistence"
     ],
     "src/modules/agent/agentModelControls.js": [
       "refreshMenu"
