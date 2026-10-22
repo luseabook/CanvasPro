@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
-  "totalMissing": 84,
-  "moduleFunctionTotal": 96,
+  "totalMissing": 83,
+  "moduleFunctionTotal": 69,
   "files": {
     "src/components/video-node/resultRenderModule.js": [
       "_buildRhAiAppVideoResultDisplayPatch",
@@ -143,41 +143,9 @@
     ],
     "src/modules/workflows/WorkflowManager.js": [
       "handleSidebarContextMenu"
-    ],
-    "src/services/webPreviewViewSyncService.js": [
-      "refresh"
     ]
   },
   "moduleFunctions": {
-    "src/services/webPreviewViewSyncService.js": [
-      "clearPendingPanFreeze",
-      "collectCanvasNodeOccluders",
-      "collectWebPreviewContextMenuShortcuts",
-      "createWebPreviewNodeActivityTracker",
-      "elementOwnsHit",
-      "getCanvasOccluderHostElement",
-      "getCanvasOccluderZIndex",
-      "getDomOcclusionSamplePoints",
-      "getElementVisibleRect",
-      "getElementZIndex",
-      "getElementsFromPoint",
-      "getSlotHostNodeElement",
-      "getSlotSnapshotMetrics",
-      "getSlotSnapshotToken",
-      "getTopRenderableHitElement",
-      "isDocumentRootHitElement",
-      "isOccludedByHigherCanvasNode",
-      "isOccludedByRendererStack",
-      "isOwnedByWebPreviewSlot",
-      "isPendingPanFreezeActive",
-      "isPotentialNativeViewOccluderElement",
-      "isRenderableHitElement",
-      "parseStackingZIndex",
-      "readGraphStoreState",
-      "readPositiveNumber",
-      "readySnapshotMatchesBounds",
-      "startPendingPanFreeze"
-    ],
     "src/modules/app/appCanvasPointerBindings.js": [
       "findScrollableWheelAncestor",
       "getElementComputedStyle",

@@ -1,10 +1,19 @@
 import { normalizeWebPreviewUrl } from '../modules/webPreviewUrl.js';
 import { normalizeWebPreviewTabs } from '../modules/webPreviewTabs.js';
-import { isViewportPanPreviewActive, VIEWPORT_PAN_PREVIEW_FRAME_EVENT } from '../core/viewportPanPreview.js';
+import {
+  isViewportPanPreviewActive,
+  VIEWPORT_PAN_PREVIEW_FRAME_EVENT,
+} from '../core/viewportPanPreview.js';
+import { readViewportInteractionState } from '../core/viewportInteractionState.js';
+import { CONTEXT_MENU_SHORTCUT_IDS } from '../utils/contextMenuShortcutCatalog.js';
+import { getShortcutKeys } from '../modules/shortcuts.js';
 const SOFT_OCCLUSION_SELECTOR = '.header',
   HARD_OCCLUSION_SELECTOR =
     '#settingsOverlay, #aboutOverlay, #feedbackGroupOverlay, #v2PickerOverlay, #nodePickerOverlay, .settings-overlay, .save-dialog-overlay.open, .preset-modal-overlay, .custom-confirm-overlay, .v2-asset-sidebar-panel.show, .v2-workflow-sidebar-panel.show, .sidebar-floating #avatarMenu.open, .sidebar-floating .avatar-menu.open, .node-add-menu, .v2-node-picker, .canvas-proj-dropdown, .web-preview-image-picker-overlay',
   FULLSCREEN_OCCLUSION_SELECTOR = '.web-preview-image-picker-overlay',
+  // 画布节点的可见实体：整块节点、展开的多层背板、多级弹出面板的直接子项。
+  CANVAS_NODE_OCCLUDER_SELECTOR =
+    '.v2-node, .multi-stack-backplate.is-expanded-card, .multi-flyout-panel > *',
   OCCLUSION_OBSERVER_SELECTOR = [
     SOFT_OCCLUSION_SELECTOR,
     HARD_OCCLUSION_SELECTOR,
@@ -14,12 +23,27 @@ const SOFT_OCCLUSION_SELECTOR = '.header',
   BACKGROUND_SYNC_INTERVAL_MS = 50,
   FINAL_INTERACTION_SYNC_DELAY_MS = 40,
   FREEZE_SETTLE_HOLD_MS = 360,
+  // 平移手势结束后仍按住冻结的时长：等惯性滚动停下再放开，否则会看到跳帧。
+  PENDING_PAN_FREEZE_MS = 240,
   MIN_VISIBLE_INTERSECTION_SIZE = 16,
   SOFT_OCCLUSION_HIDE_RATIO = 0.35,
   FREEZE_ACTIVE_BODY_CLASS = 'is-web-preview-freeze-active',
   FREEZE_SETTLING_BODY_CLASS = 'is-web-preview-freeze-settling',
   WEB_PREVIEW_FREEZE_BODY_CLASSES = new Set([FREEZE_ACTIVE_BODY_CLASS, FREEZE_SETTLING_BODY_CLASS]),
-  registeredSlotsByNodeId = new Map();
+  // 命中栈采样比例：两端取 2%/98% 而不是 0/100，避免落在圆角与边缘阴影上。
+  DOM_OCCLUSION_SAMPLE_RATIOS = [0.02, 0.1, 0.5, 0.9, 0.98],
+  registeredSlotsByNodeId = new Map(),
+  WEB_PREVIEW_CONTEXT_MENU_SHORTCUT_IDS = CONTEXT_MENU_SHORTCUT_IDS.filter((shortcutId) =>
+    shortcutId.startsWith('context-web-')
+  );
+export function collectWebPreviewContextMenuShortcuts() {
+  return Object.fromEntries(
+    WEB_PREVIEW_CONTEXT_MENU_SHORTCUT_IDS.map((shortcutId) => [
+      shortcutId,
+      getShortcutKeys(shortcutId),
+    ])
+  );
+}
 function normalizeNodeId(value) {
   return String(value || '').trim();
 }
@@ -34,13 +58,18 @@ function readCanvasSpaceHeld() {
   return globalThis.window?._spaceHeld === true;
 }
 function getRequestAnimationFrame() {
-  return globalThis.window?.requestAnimationFrame?.bind(globalThis.window) || ((key) => setTimeout(key, 16));
+  return (
+    globalThis.window?.requestAnimationFrame?.bind(globalThis.window) ||
+    ((key) => setTimeout(key, 16))
+  );
 }
 function getCancelAnimationFrame() {
   return globalThis.window?.cancelAnimationFrame?.bind(globalThis.window) || clearTimeout;
 }
 function rectIntersects(box, box2) {
-  return box.left < box2.right && box.right > box2.left && box.top < box2.bottom && box.bottom > box2.top;
+  return (
+    box.left < box2.right && box.right > box2.left && box.top < box2.bottom && box.bottom > box2.top
+  );
 }
 function getRectArea(box3) {
   return Math.max(0, Number(box3?.width) || 0) * Math.max(0, Number(box3?.height) || 0);
@@ -91,6 +120,218 @@ function isSignificantlyOccludedByRects(handle, state = []) {
   }
   return false;
 }
+// ---------------------------------------------------------------------------
+// 画布节点遮挡与命中测试
+//
+// 预览视图是原生 webview，永远盖在 DOM 之上，所以「有没有被遮住」只能推断：
+// 先按可见性与 z-index 收集体积遮挡物，再用 document.elementsFromPoint 采样，
+// 看命中栈顶端是否仍属于自己。全部函数只读不写，单测可以用假元素驱动。
+// ---------------------------------------------------------------------------
+
+/** 解析 CSS z-index 文本；auto / 空值 / 非法值一律按 0 处理。 */
+function parseStackingZIndex(rawValue) {
+  const text = String(rawValue ?? '').trim();
+  if (!text || text === 'auto') return 0;
+  const parsed = Number.parseInt(text, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/** 元素的有效 z-index；完全不可见（display/visibility/opacity）时返回 null，表示不参与比较。 */
+function getElementZIndex(element) {
+  const style = globalThis.window?.getComputedStyle?.(element);
+  if (style?.display === 'none' || style?.visibility === 'hidden') return null;
+  const opacity = Number(style?.opacity);
+  if (Number.isFinite(opacity) && opacity <= 0) return null;
+  return parseStackingZIndex(style?.zIndex || element?.style?.zIndex);
+}
+
+/** 元素可见时返回它的包围盒，否则 null。宽高为 0 视为不可见。 */
+function getElementVisibleRect(element) {
+  if (!element || element.hidden || element.isConnected === false) return null;
+  const style = globalThis.window?.getComputedStyle?.(element);
+  if (style?.display === 'none' || style?.visibility === 'hidden') return null;
+  const opacity = Number(style?.opacity);
+  if (Number.isFinite(opacity) && opacity <= 0) return null;
+  const rect = element.getBoundingClientRect?.();
+  if (!rect || (Number(rect.width) || 0) <= 0 || (Number(rect.height) || 0) <= 0) return null;
+  return rect;
+}
+
+/**
+ * 候选遮挡物：定位脱离文档流（fixed/sticky/absolute）或 z-index > 0，且与视口有可见交集。
+ * 只是「可能」遮挡，真正判定交给命中测试。
+ */
+function isPotentialNativeViewOccluderElement(element) {
+  if (!element || element.nodeType === 3 || element.hidden) return false;
+  const style = globalThis.window?.getComputedStyle?.(element);
+  if (style?.display === 'none' || style?.visibility === 'hidden') return false;
+  const opacity = Number(style?.opacity);
+  if (Number.isFinite(opacity) && opacity <= 0) return false;
+  const position = String(style?.position || element?.style?.position || '').trim();
+  const zIndex = parseStackingZIndex(style?.zIndex || element?.style?.zIndex);
+  if (!['fixed', 'sticky', 'absolute'].includes(position) && zIndex <= 0) return false;
+  const rect = element.getBoundingClientRect?.();
+  if (!rect || (Number(rect.width) || 0) <= 0 || (Number(rect.height) || 0) <= 0) return false;
+  return hasVisibleViewportIntersection(rect);
+}
+
+/** 找到遮挡物所属的画布节点宿主（`.v2-node`）；节点内部元素返回最近的宿主。 */
+function getCanvasOccluderHostElement(element) {
+  try {
+    if (element?.matches?.('.v2-node')) return element;
+  } catch {
+    // 非 Element（文本节点、已脱离文档）调 matches 会抛，直接走 closest。
+  }
+  return element?.closest?.('.v2-node') || null;
+}
+
+/** 遮挡物的层叠高度：取自身与宿主的较大值；任一不可见则整体不可比较（null）。 */
+function getCanvasOccluderZIndex(element, hostElement) {
+  const elementZIndex = getElementZIndex(element);
+  if (elementZIndex === null) return null;
+  if (!hostElement || hostElement === element) return elementZIndex;
+  const hostZIndex = getElementZIndex(hostElement);
+  if (hostZIndex === null) return null;
+  return Math.max(elementZIndex, hostZIndex);
+}
+
+/** 收集当前画布上所有可能遮挡预览的节点，按 z-index 排序留给后续比较。 */
+function collectCanvasNodeOccluders(root = document) {
+  const candidates = root.querySelectorAll?.(CANVAS_NODE_OCCLUDER_SELECTOR) || [];
+  const occluders = [];
+  for (const element of candidates) {
+    const rect = getElementVisibleRect(element);
+    if (!rect) continue;
+    const hostElement = getCanvasOccluderHostElement(element);
+    const zIndex = getCanvasOccluderZIndex(element, hostElement);
+    if (zIndex === null) continue;
+    occluders.push({
+      element,
+      nodeId: normalizeNodeId(
+        hostElement?.dataset?.nodeId || element?.dataset?.nodeId || element?.id
+      ),
+      rect,
+      zIndex,
+    });
+  }
+  return occluders;
+}
+
+/** 预览槽位所属的画布节点宿主。 */
+function getSlotHostNodeElement(slot) {
+  return slot?.closest?.('.v2-node') || null;
+}
+
+/**
+ * 是否被画布上更高的节点压住：跳过自己与自己所在的宿主，只比较 z-index 更高的，
+ * 并且必须真的与预览区域相交——只看 z-index 会把远处的节点也算成遮挡。
+ */
+function isOccludedByHigherCanvasNode(slot, rect, occluders = []) {
+  if (!slot || !rect || !occluders.length) return false;
+  const hostElement = getSlotHostNodeElement(slot);
+  const nodeId = normalizeNodeId(slot?.dataset?.nodeId);
+  const hostZIndex = getElementZIndex(hostElement) ?? 0;
+  for (const occluder of occluders) {
+    if (!occluder?.element || occluder.element === hostElement) continue;
+    if (nodeId && occluder.nodeId === nodeId) continue;
+    if (occluder.zIndex <= hostZIndex) continue;
+    if (rectIntersects(rect, occluder.rect)) return true;
+  }
+  return false;
+}
+
+/** 在预览矩形内生成采样点（含视口裁剪），去重后返回；可用区域太小则不采样。 */
+function getDomOcclusionSamplePoints(rect) {
+  const viewport = globalThis.window || {};
+  const viewportWidth = Number(viewport.innerWidth) || 0;
+  const viewportHeight = Number(viewport.innerHeight) || 0;
+  if (viewportWidth <= 0 || viewportHeight <= 0) return [];
+  const left = Math.max(0, Number(rect?.left) || 0);
+  const top = Math.max(0, Number(rect?.top) || 0);
+  const right = Math.min(viewportWidth, Number(rect?.right) || 0);
+  const bottom = Math.min(viewportHeight, Number(rect?.bottom) || 0);
+  const width = right - left;
+  const height = bottom - top;
+  if (width < MIN_VISIBLE_INTERSECTION_SIZE || height < MIN_VISIBLE_INTERSECTION_SIZE) return [];
+  const points = [];
+  const seen = new Set();
+  for (const ratioY of DOM_OCCLUSION_SAMPLE_RATIOS) {
+    for (const ratioX of DOM_OCCLUSION_SAMPLE_RATIOS) {
+      const x = Math.round(left + width * ratioX);
+      const y = Math.round(top + height * ratioY);
+      const key = x + ',' + y;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      points.push({ x, y });
+    }
+  }
+  return points;
+}
+
+/** 命中测试；优先用传入的 root，拿不到 elementsFromPoint 时返回空数组（视为无数据，不是无遮挡）。 */
+function getElementsFromPoint(root, x, y) {
+  const target = root?.elementsFromPoint ? root : globalThis.document;
+  const elementsFromPoint = target?.elementsFromPoint;
+  if (typeof elementsFromPoint !== 'function') return [];
+  try {
+    return Array.from(elementsFromPoint.call(target, x, y) || []);
+  } catch {
+    return [];
+  }
+}
+
+/** html / body 是命中栈的兜底元素，它们出现说明采样点下面没有实际内容。 */
+function isDocumentRootHitElement(element) {
+  const tagName = String(element?.tagName || '').toLowerCase();
+  return tagName === 'html' || tagName === 'body';
+}
+
+/** 命中栈里可以代表「有内容」的元素：可见的元素节点，且不是文档根。 */
+function isRenderableHitElement(element) {
+  if (!element || (element.nodeType && element.nodeType !== 1)) return false;
+  if (isDocumentRootHitElement(element) || element.hidden) return false;
+  const style = globalThis.window?.getComputedStyle?.(element);
+  if (style?.display === 'none' || style?.visibility === 'hidden') return false;
+  const opacity = Number(style?.opacity);
+  return !(Number.isFinite(opacity) && opacity <= 0);
+}
+
+/** 命中的元素是否属于 container（自身或其后代）。 */
+function elementOwnsHit(container, hitElement) {
+  return Boolean(container && (container === hitElement || container.contains?.(hitElement)));
+}
+
+/** 命中的元素是否属于这个预览槽位（槽位自身或它所在画布节点的子树）。 */
+function isOwnedByWebPreviewSlot(hitElement, slot) {
+  if (!hitElement || !slot) return false;
+  const hostElement = getSlotHostNodeElement(slot);
+  return elementOwnsHit(slot, hitElement) || elementOwnsHit(hostElement, hitElement);
+}
+
+/** 命中栈顶端第一个「有内容」的元素；整条栈都是 html/body 时返回 null。 */
+function getTopRenderableHitElement(elements = []) {
+  for (const element of elements) {
+    if (isRenderableHitElement(element)) return element;
+  }
+  return null;
+}
+
+/**
+ * 采样点里只要有一个被别的元素抢走，就判定为被渲染层遮挡。
+ * 用「任一」而不是「多数」：预览被盖住一半时用户就已经看不见内容了。
+ */
+function isOccludedByRendererStack(slot, rect, root = document) {
+  if (!slot || !rect) return false;
+  const points = getDomOcclusionSamplePoints(rect);
+  if (!points.length) return false;
+  for (const point of points) {
+    const topElement = getTopRenderableHitElement(getElementsFromPoint(root, point.x, point.y));
+    if (!topElement) continue;
+    if (!isOwnedByWebPreviewSlot(topElement, slot)) return true;
+  }
+  return false;
+}
+
 function nodeMatchesOcclusionSelector(el3) {
   if (!el3 || el3.nodeType === 3) return false;
   try {
@@ -126,7 +367,10 @@ function normalizeObservedClassName(value2 = '') {
 function isOwnFreezeClassMutation(event2) {
   if (event2?.type !== 'attributes' || event2?.attributeName !== 'class') return false;
   if (event2.target !== globalThis.document?.body) return false;
-  return normalizeObservedClassName(event2.oldValue) === normalizeObservedClassName(event2.target?.className);
+  return (
+    normalizeObservedClassName(event2.oldValue) ===
+    normalizeObservedClassName(event2.target?.className)
+  );
 }
 function shouldSyncForOcclusionMutation(list3 = []) {
   for (const event3 of list3) {
@@ -186,14 +430,24 @@ export function registerWebPreviewSlot(value7, enabled4) {
 export function _clearWebPreviewSlotRegistryForTest() {
   registeredSlotsByNodeId.clear();
 }
-function hasActiveWebPreviewNodes(store) {
-  const value8 = typeof store?.getStateRaw === 'function' ? store.getStateRaw() : store?.getState?.() || {};
-  return Object.values(value8.nodes || {}).some(
-    (item6) =>
-      item6?.type === 'web-preview' &&
-      normalizeWebPreviewTabs(item6).tabs.some(
-        (response) => normalizeWebPreviewUrl(response.url) || response.pendingPopup === true,
-      ),
+/**
+ * 读图存储的原始状态：优先 getStateRaw（不触发订阅/拷贝），退回 getState。
+ * 追踪器每帧都要读，走订阅接口会把自己卷进渲染循环。
+ */
+function readGraphStoreState(graphStore) {
+  return typeof graphStore?.getStateRaw === 'function'
+    ? graphStore.getStateRaw()
+    : graphStore?.getState?.() || {};
+}
+
+/** 状态里是否存在「有可用 URL 或待打开弹窗」的预览节点。入参是图状态，不是 store。 */
+function hasActiveWebPreviewNodes(state = {}) {
+  return Object.values(state.nodes || {}).some(
+    (node) =>
+      node?.type === 'web-preview' &&
+      normalizeWebPreviewTabs(node).tabs.some(
+        (tab) => normalizeWebPreviewUrl(tab.url) || tab.pendingPopup === true
+      )
   );
 }
 function normalizeCanvasZoom(value9) {
@@ -201,6 +455,62 @@ function normalizeCanvasZoom(value9) {
   if (!Number.isFinite(count7) || count7 <= 0) return 1;
   return Math.min(5, Math.max(0.25, count7));
 }
+/**
+ * 节点活跃度追踪器：只有「有 web-preview 节点且带可用 URL」时同步循环才值得跑。
+ * 用 `_persistRev` 判断状态是否真的变了——每帧做全量扫描会把主线程吃掉。
+ */
+export function createWebPreviewNodeActivityTracker(graphStore) {
+  const initialState = readGraphStoreState(graphStore);
+  let lastRevision = Number(initialState?._persistRev);
+  let hasRevision = Number.isFinite(lastRevision);
+  let hasActiveNodes = hasActiveWebPreviewNodes(initialState);
+  return {
+    get hasActiveNodes() {
+      return hasActiveNodes;
+    },
+    /** 传入新状态则用它，否则自己读；返回最新的「是否存在活跃节点」。 */
+    refresh(nextState) {
+      const state = nextState || readGraphStoreState(graphStore);
+      const revision = Number(state?._persistRev);
+      const revisionValid = Number.isFinite(revision);
+      // 任一侧拿不到版本号时也必须重算，否则版本号缺失会让缓存永远不失效。
+      if (!revisionValid || !hasRevision || revision !== lastRevision) {
+        hasActiveNodes = hasActiveWebPreviewNodes(state);
+        lastRevision = revision;
+        hasRevision = revisionValid;
+      }
+      return hasActiveNodes;
+    },
+  };
+}
+
+// --- 平移手势后的临时冻结 ---
+// 手势结束时惯性滚动还会持续几十毫秒，这段时间继续用旧快照，避免预览来回跳。
+
+function isPendingPanFreezeActive(controller) {
+  return Number(controller?.pendingPanFreezeUntil || 0) > getNowMs();
+}
+
+function clearPendingPanFreeze(controller) {
+  if (!controller) return;
+  if (controller.pendingPanFreezeTimer) {
+    clearTimeout(controller.pendingPanFreezeTimer);
+    controller.pendingPanFreezeTimer = null;
+  }
+  controller.pendingPanFreezeUntil = 0;
+}
+
+function startPendingPanFreeze(controller) {
+  if (!controller) return;
+  clearPendingPanFreeze(controller);
+  controller.pendingPanFreezeUntil = getNowMs() + PENDING_PAN_FREEZE_MS;
+  controller.pendingPanFreezeTimer = setTimeout(() => {
+    controller.pendingPanFreezeTimer = null;
+    controller.pendingPanFreezeUntil = 0;
+    controller.scheduleFinalSync?.();
+  }, PENDING_PAN_FREEZE_MS);
+}
+
 function getCanvasInteractionState() {
   const value10 = globalThis.document?.body?.classList,
     frozen = Boolean(value10?.contains?.('is-viewport-animating'));
@@ -217,7 +527,51 @@ function getSlotFullscreen(el8) {
 function getSlotSnapshotComponent(el9) {
   return el9?.closest?.('.web-preview-component') || null;
 }
-function getSlotSnapshotReady(value11, value12 = '', { allowAnyToken: allowAnyToken = false } = {}) {
+/** 快照令牌：标记当前快照是给哪一次冻结算出来的，令牌不一致就不能复用。 */
+function getSlotSnapshotToken(slot) {
+  const component = getSlotSnapshotComponent(slot);
+  if (!component?.classList?.contains?.('has-freeze-snapshot')) return '';
+  return String(component?.dataset?.webPreviewSnapshotToken || '').trim();
+}
+
+function readPositiveNumber(rawValue) {
+  const value = Number(rawValue);
+  return Number.isFinite(value) && value > 0 ? value : 0;
+}
+
+/** 快照的尺寸/缩放元数据；三项缺一就当作没有可用快照。 */
+function getSlotSnapshotMetrics(slot) {
+  const component = getSlotSnapshotComponent(slot);
+  if (!component?.classList?.contains?.('has-freeze-snapshot')) return null;
+  const dataset = component?.dataset || {};
+  const width = readPositiveNumber(dataset.webPreviewSnapshotWidth);
+  const height = readPositiveNumber(dataset.webPreviewSnapshotHeight);
+  const zoomFactor = readPositiveNumber(dataset.webPreviewSnapshotZoomFactor);
+  if (!width || !height || !zoomFactor) return null;
+  return { width, height, zoomFactor };
+}
+
+/**
+ * 已就绪快照能否直接顶替当前区域：令牌必须是 ready，且尺寸与缩放都对得上。
+ * 尺寸用 round 比较，浮点误差不该让快照作废。
+ */
+function readySnapshotMatchesBounds(slot, bounds, zoomFactor) {
+  if (!bounds) return false;
+  if (getSlotSnapshotToken(slot) !== 'ready') return false;
+  const metrics = getSlotSnapshotMetrics(slot);
+  if (!metrics) return false;
+  const widthMatches = Math.round(metrics.width) === Math.round(bounds.width);
+  const heightMatches = Math.round(metrics.height) === Math.round(bounds.height);
+  const expectedZoom = readPositiveNumber(zoomFactor) || 1;
+  const zoomMatches = Math.abs(metrics.zoomFactor - expectedZoom) < 0.001;
+  return widthMatches && heightMatches && zoomMatches;
+}
+
+function getSlotSnapshotReady(
+  value11,
+  value12 = '',
+  { allowAnyToken: allowAnyToken = false } = {}
+) {
   const el10 = getSlotSnapshotComponent(value11);
   if (!el10?.classList?.contains?.('has-freeze-snapshot')) return false;
   if (allowAnyToken) return true;
@@ -227,7 +581,9 @@ function getSlotSnapshotReady(value11, value12 = '', { allowAnyToken: allowAnyTo
   return value13 === enabled6;
 }
 function getSlotSnapshotHold(value14) {
-  return Boolean(getSlotSnapshotComponent(value14)?.classList?.contains?.('is-web-preview-loading'));
+  return Boolean(
+    getSlotSnapshotComponent(value14)?.classList?.contains?.('is-web-preview-loading')
+  );
 }
 function buildViewPayload({
   node: node,
@@ -252,7 +608,8 @@ function buildViewPayload({
     const box7 = slot?.getBoundingClientRect?.(),
       enabled7 = box7 ? isOccludedByRects(box7, fullscreenBlockerRects) : false,
       enabled8 = box7 && !zoomFactor ? isOccludedByRects(box7, hardBlockerRects) : false,
-      enabled9 = box7 && !zoomFactor ? isSignificantlyOccludedByRects(box7, softBlockerRects) : false;
+      enabled9 =
+        box7 && !zoomFactor ? isSignificantlyOccludedByRects(box7, softBlockerRects) : false;
     box7 &&
       hasVisibleViewportIntersection(box7) &&
       !enabled7 &&
@@ -336,7 +693,10 @@ function syncCachedViewsForBudget(list5, args) {
       return (args.cachedViewsByNodeId.set(viewKey, value19), value19);
     }
     const value20 = value17 && selected2.frozen !== true,
-      value21 = selected2.deferZoomFactor === true && selected2.frozen !== true && selected2.visible === true,
+      value21 =
+        selected2.deferZoomFactor === true &&
+        selected2.frozen !== true &&
+        selected2.visible === true,
       value22 =
         selected2.fullscreen ||
         (selected2.selected && !selected2.frozen) ||
@@ -521,7 +881,7 @@ function collectWebPreviewViews({
     canvasZoom2 = normalizeCanvasZoom(value34.viewport?.zoom),
     map7 = buildSlotIndex(
       root,
-      list7.map((item12) => item12.node.id),
+      list7.map((item12) => item12.node.id)
     ),
     softBlockerRects2 = collectOcclusionRects(root, SOFT_OCCLUSION_SELECTOR),
     hardBlockerRects2 = collectOcclusionRects(root, HARD_OCCLUSION_SELECTOR),
@@ -529,7 +889,12 @@ function collectWebPreviewViews({
     list8 = [];
   for (const { node: node3, tabs: tabs } of list7) {
     const value35 = map7.get(node3.id);
-    for (const { tab: tab2, webUrl: webUrl2, pendingPopup: pendingPopup2, active: active2 } of tabs) {
+    for (const {
+      tab: tab2,
+      webUrl: webUrl2,
+      pendingPopup: pendingPopup2,
+      active: active2,
+    } of tabs) {
       list8.push(
         buildViewPayload({
           node: node3,
@@ -546,21 +911,28 @@ function collectWebPreviewViews({
           fullscreenBlockerRects: fullscreenBlockerRects2,
           softBlockerRects: softBlockerRects2,
           hardBlockerRects: hardBlockerRects2,
-        }),
+        })
       );
     }
   }
-  return (list8.sort((item13, value36) => Number(item13.selected) - Number(value36.selected)), list8);
+  return (
+    list8.sort((item13, value36) => Number(item13.selected) - Number(value36.selected)),
+    list8
+  );
 }
-export function initWebPreviewViewSyncService({ graphStore: graphStore2, root: root = document } = {}) {
+export function initWebPreviewViewSyncService({
+  graphStore: graphStore2,
+  root: root = document,
+} = {}) {
   const enabled19 = globalThis.window?.electronAPI?.webPreview;
   if (!enabled19 || typeof enabled19.syncViews !== 'function') return { dispose() {} };
   const run = getRequestAnimationFrame(),
     handler2 = getCancelAnimationFrame(),
-    handler3 = typeof enabled19.syncViewsFast === 'function' ? enabled19.syncViewsFast : enabled19.syncViews;
+    handler3 =
+      typeof enabled19.syncViewsFast === 'function' ? enabled19.syncViewsFast : enabled19.syncViews;
   let value37 = null,
     value38 = false,
-    hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(graphStore2),
+    hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(readGraphStoreState(graphStore2)),
     freezeToken4 = null;
   const run2 = () => {
       value37 = null;
@@ -576,7 +948,7 @@ export function initWebPreviewViewSyncService({ graphStore: graphStore2, root: r
             interactionState: interactionState3,
             canvasSpaceHeld: freezeToken4?.canvasSpaceHeld === true,
           }),
-          freezeToken4,
+          freezeToken4
         );
       setFreezeActiveClass(views.some((item14) => item14?.showSnapshot === true));
       const viewsSignature = buildViewsSignature(views);
@@ -647,15 +1019,19 @@ export function initWebPreviewViewSyncService({ graphStore: graphStore2, root: r
       ((freezeToken4.canvasSpaceHeld = canvasSpaceHeld2), handler5());
     },
     value44 = () => {
-      ((hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(graphStore2)), handler7());
+      ((hasActiveWebPreviewNodes2 = hasActiveWebPreviewNodes(readGraphStoreState(graphStore2))),
+        handler7());
     },
-    value45 = typeof graphStore2?.subscribeRaw === 'function' ? graphStore2.subscribeRaw(value44) : () => {},
+    value45 =
+      typeof graphStore2?.subscribeRaw === 'function'
+        ? graphStore2.subscribeRaw(value44)
+        : () => {},
     value46 =
       typeof enabled19.onEvent === 'function'
         ? enabled19.onEvent((detail) => {
             if (isNativePanStartPreviewEvent(detail)) handler9();
             globalThis.window?.dispatchEvent?.(
-              new CustomEvent('web-preview:native-event', { detail: detail }),
+              new CustomEvent('web-preview:native-event', { detail: detail })
             );
           })
         : () => {},
@@ -692,7 +1068,9 @@ export function initWebPreviewViewSyncService({ graphStore: graphStore2, root: r
     handler4(),
     {
       dispose() {
-        ((value38 = true), clearFinalSyncTimer(freezeToken4), clearFreezeSettlingTimer(freezeToken4));
+        ((value38 = true),
+          clearFinalSyncTimer(freezeToken4),
+          clearFreezeSettlingTimer(freezeToken4));
         if (freezeToken4) freezeToken4.freezeSettlingUntil = 0;
         (setFreezeActiveClass(false), setFreezeSettlingClass(false));
         if (value37 !== null) handler2(value37);
@@ -718,3 +1096,25 @@ export function initWebPreviewViewSyncService({ graphStore: graphStore2, root: r
   );
 }
 export { collectWebPreviewViews };
+
+/**
+ * 仅供单测驱动内部纯函数（遮挡采样、快照令牌、平移冻结）。
+ * 运行时不要引用：这些不是稳定 API，随实现改。
+ */
+export const _webPreviewViewSyncInternalsForTest = {
+  parseStackingZIndex,
+  getElementZIndex,
+  getElementVisibleRect,
+  collectCanvasNodeOccluders,
+  isOccludedByHigherCanvasNode,
+  getDomOcclusionSamplePoints,
+  isOccludedByRendererStack,
+  getSlotSnapshotToken,
+  getSlotSnapshotMetrics,
+  readySnapshotMatchesBounds,
+  isPendingPanFreezeActive,
+  startPendingPanFreeze,
+  clearPendingPanFreeze,
+  readPositiveNumber,
+  readGraphStoreState,
+};
