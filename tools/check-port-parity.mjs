@@ -47,6 +47,7 @@ import {
   extractAliasSignatures,
   extractMethodSignatures,
   extractModuleFunctionSignatures,
+  findDanglingOptionalCalls,
 } from './port-parity-scan.mjs';
 
 // Re-exported so callers (and the test suite) keep a single import surface.
@@ -55,6 +56,7 @@ export {
   extractMethodNames,
   extractMethodSignatures,
   extractModuleFunctionSignatures,
+  findDanglingOptionalCalls,
 } from './port-parity-scan.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -350,6 +352,10 @@ export function comparePortParity(mirrorRoot, repoRoot) {
     (left, right) =>
       right.missing.length - left.missing.length || left.file.localeCompare(right.file)
   );
+  // Silent no-op calls: an optional call to a private method that no file in the
+  // repo defines. Reported as its own layer because the per-file gap comparison
+  // cannot see it at all — the *call site* is what is wrong, not the file.
+  const danglingCalls = findDanglingOptionalCalls(repoSourcesByFile);
   return {
     comparedFiles,
     rows,
@@ -358,6 +364,7 @@ export function comparePortParity(mirrorRoot, repoRoot) {
     aliasRows,
     minified,
     moduleFunctionRows,
+    danglingCalls,
   };
 }
 
@@ -436,7 +443,13 @@ export function diffModuleFunctionsAgainstBaseline(rows, baseline) {
  * @param {ReturnType<typeof comparePortParity>['rows']} rows
  * @param {string} mirrorRoot
  */
-export function writeBaseline(baselineFile, rows, mirrorRoot, moduleFunctionRows = []) {
+export function writeBaseline(
+  baselineFile,
+  rows,
+  mirrorRoot,
+  moduleFunctionRows = [],
+  danglingCalls = []
+) {
   const files = {};
   for (const row of rows) files[row.file] = [...row.missing].sort();
   const moduleFunctions = {};
@@ -451,7 +464,14 @@ export function writeBaseline(baselineFile, rows, mirrorRoot, moduleFunctionRows
     files,
     // Separate section, separate contract — see diffModuleFunctionsAgainstBaseline.
     moduleFunctions,
+    // Allowlist, normally empty: a method attached at runtime (proxy, dynamic
+    // mixin) is legitimate but invisible to the static scan.
+    danglingCalls: [...(previous?.danglingCalls || [])],
   };
+  if (danglingCalls.length > 0)
+    payload.danglingCalls = [
+      ...new Set([...(previous?.danglingCalls || []), ...danglingCalls.map((row) => row.method)]),
+    ].sort();
   if (previous?.equivalent && Object.keys(previous.equivalent).length > 0) {
     payload.equivalent = previous.equivalent;
   }
@@ -491,6 +511,8 @@ function parseArguments(argv) {
           '只比对两边都存在的同名文件；整件未移植的文件不在此门禁范围内。',
           'sizeDrift / signatureDrift / 别名缺口为只报告项，不参与退出码。',
           '模块级 function 缺口有自己的基线段落（moduleFunctions），只拦基线外新增。',
+          '静默空调用（可选调用私有方法但全仓无定义）也参与退出码；',
+          '  运行时挂载的合法情形登记在基线 danglingCalls 里。',
           'compressed（压缩成单行）参与退出码：它违反「不做压缩处理」的要求。',
         ].join('\n')
       );
@@ -519,8 +541,16 @@ function main() {
     return;
   }
 
-  const { comparedFiles, rows, sizeDrift, signatureDrift, aliasRows, minified, moduleFunctionRows } =
-    comparePortParity(mirrorPath, options.repo);
+  const {
+    comparedFiles,
+    rows,
+    sizeDrift,
+    signatureDrift,
+    aliasRows,
+    minified,
+    moduleFunctionRows,
+    danglingCalls,
+  } = comparePortParity(mirrorPath, options.repo);
   if (comparedFiles < 100) {
     console.log(
       `SKIP  移植完整性门禁：镜像 ${mirrorPath} 只匹配到 ${comparedFiles} 个同名文件，` +
@@ -530,7 +560,13 @@ function main() {
   }
 
   if (options.updateBaseline) {
-    const payload = writeBaseline(options.baselineFile, rows, mirrorPath, moduleFunctionRows);
+    const payload = writeBaseline(
+      options.baselineFile,
+      rows,
+      mirrorPath,
+      moduleFunctionRows,
+      danglingCalls
+    );
     console.log(
       `WROTE 移植完整性基线：${Object.keys(payload.files).length} 个文件 / ` +
         `${payload.totalMissing} 个缺失方法 + ` +
@@ -543,6 +579,8 @@ function main() {
   const { regressions, resolved, totalMissing } = diffAgainstBaseline(rows, baseline);
   const regressionTotal = regressions.reduce((sum, item) => sum + item.missing.length, 0);
   const moduleDiff = diffModuleFunctionsAgainstBaseline(moduleFunctionRows, baseline);
+  const danglingAllowlist = new Set(baseline?.danglingCalls || []);
+  const danglingRegressions = danglingCalls.filter((row) => !danglingAllowlist.has(row.method));
   const moduleRegressionTotal = moduleDiff.regressions.reduce(
     (sum, item) => sum + item.missing.length,
     0
@@ -563,6 +601,8 @@ function main() {
           aliasRows,
           minified,
           moduleFunctionRows,
+          danglingCalls,
+          danglingRegressions: danglingRegressions.map((row) => row.method),
           moduleFunctionRegressions: moduleDiff.regressions,
           moduleFunctionResolved: moduleDiff.resolved,
         },
@@ -575,7 +615,12 @@ function main() {
     if (!baseline) {
       console.log(`REPORT 移植完整性门禁：${headline}；尚无基线，只报告不拦截。`);
       console.log('       跑 --update-baseline 生成基线后，本门禁才会拦新增缺口。');
-    } else if (regressionTotal === 0 && minified.length === 0 && moduleRegressionTotal === 0) {
+    } else if (
+      regressionTotal === 0 &&
+      minified.length === 0 &&
+      moduleRegressionTotal === 0 &&
+      danglingRegressions.length === 0
+    ) {
       console.log(`PASS  移植完整性门禁：${headline}，无基线外新增缺口。`);
     } else {
       const reasons = [];
@@ -583,13 +628,23 @@ function main() {
       if (moduleRegressionTotal > 0)
         reasons.push(`基线外新增模块级函数缺口 ${moduleRegressionTotal} 个`);
       if (minified.length > 0) reasons.push(`${minified.length} 个文件被压缩成单行`);
+      if (danglingRegressions.length > 0)
+        reasons.push(`${danglingRegressions.length} 处静默空调用（方法全仓无定义）`);
       console.error(`FAIL  移植完整性门禁：${headline}，${reasons.join('；')}。`);
       for (const item of regressions)
         console.error(`  - ${item.file}: 新增缺失 ${item.missing.join(', ')}`);
       for (const item of moduleDiff.regressions)
         console.error(`  - ${item.file}: 新增缺失模块级函数 ${item.missing.join(', ')}`);
+      for (const item of danglingRegressions)
+        console.error(
+          `  - ${item.files.join(', ')}: 可选调用了不存在的 ${item.method}（${item.calls} 处）`
+        );
       if (regressionTotal > 0 || moduleRegressionTotal > 0)
         console.error('  若确属有意删减，跑 --update-baseline 显式接受。');
+      if (danglingRegressions.length > 0)
+        console.error(
+          '  这类调用是静默 no-op：补上方法定义，或在基线 danglingCalls 里显式登记（仅限运行时挂载）。'
+        );
     }
     if (resolved.length > 0)
       console.log(
@@ -649,6 +704,15 @@ function main() {
         console.log(`  - ${item.file}: ${item.missing.join(', ')}`);
       if (listed.length > 10) console.log(`  ...另有 ${listed.length - 10} 个文件`);
     }
+    const danglingTotal = danglingCalls.reduce((sum, row) => sum + row.calls, 0);
+    if (danglingTotal > 0) {
+      console.log(
+        `INFO  ${danglingCalls.length} 个私有方法被可选调用但全仓无定义（共 ${danglingTotal} 处），` +
+          (danglingRegressions.length === 0 ? '均在基线登记内。' : '其中含基线外新增，见上。')
+      );
+      for (const item of options.verbose ? danglingCalls : [])
+        console.log(`  - ${item.method}: ${item.calls} 处（${item.files.join(', ')}）`);
+    }
     if (moduleDiff.resolved.length > 0)
       console.log(
         `INFO  ${moduleDiff.resolved.length} 个文件已补齐基线内的模块级函数（共 ` +
@@ -686,6 +750,7 @@ function main() {
   if (
     (baseline && regressionTotal > 0) ||
     (baseline && moduleRegressionTotal > 0) ||
+    (baseline && danglingRegressions.length > 0) ||
     minified.length > 0
   ) {
     process.exitCode = 1;

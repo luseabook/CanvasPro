@@ -20,6 +20,7 @@ import {
   extractMethodNames,
   extractMethodSignatures,
   extractModuleFunctionSignatures,
+  findDanglingOptionalCalls,
   listJavaScriptFiles,
 } from './check-port-parity.mjs';
 
@@ -366,7 +367,8 @@ test('check-port-parity: 模块级函数新增缺口让门禁 exit 1（基线内
   // 层与基线都要能真的失败：报告层若只打 INFO，下一次整块漏移植依然静默通过。
   const filler = {};
   for (let index = 0; index < 100; index += 1) {
-    filler[`src/f${String(index).padStart(3, '0')}.js`] = `class F${index} {\n  ['_only']() {}\n}\n`;
+    filler[`src/f${String(index).padStart(3, '0')}.js`] =
+      `class F${index} {\n  ['_only']() {}\n}\n`;
   }
   const mirror = makeTree({
     ...filler,
@@ -404,7 +406,8 @@ test('check-port-parity: 存在压缩文件时门禁直接失败（双向）', (
   // 必须自己就能拦住——否则下一次粘贴会静默通过。
   const filler = {};
   for (let index = 0; index < 100; index += 1) {
-    filler[`src/f${String(index).padStart(3, '0')}.js`] = `class F${index} {\n  ['_only']() {}\n}\n`;
+    filler[`src/f${String(index).padStart(3, '0')}.js`] =
+      `class F${index} {\n  ['_only']() {}\n}\n`;
   }
   const methods = [];
   for (let index = 0; index < 60; index += 1) methods.push(`['_m${index}']() {}`);
@@ -442,4 +445,111 @@ test('check-port-parity: 存在压缩文件时门禁直接失败（双向）', (
   );
   (assert.equal(passes.status, 0, '格式化后必须 exit 0'),
     assert.match(passes.stdout, /PASS/, '并明确 PASS'));
+});
+
+test('check-port-parity: 静默空调用——调用点存在但全仓无定义，两种调用形态都要抓', () => {
+  // 这类缺陷比缺口更危险：`this._m?.()` 找不到定义就是静默 no-op，
+  // 功能看着接好了、单测全绿、按文件比对的门禁也看不见。
+  const rows = findDanglingOptionalCalls(
+    new Map([
+      [
+        'src/a.js',
+        [
+          'class A {',
+          '  run(node) {',
+          '    this._ghost?.(1);',
+          "    node['_bracket_ghost']?.();",
+          '    this._defined?.(2);',
+          '  }',
+          "  ['_defined']() {}",
+          '}',
+        ].join('\n'),
+      ],
+    ])
+  );
+  assert.deepEqual(
+    rows.map((row) => row.method),
+    ['_bracket_ghost', '_ghost'],
+    '两个无定义的都要报，已定义的不报'
+  );
+  assert.equal(rows.find((row) => row.method === '_ghost').calls, 1);
+  assert.deepEqual(rows.find((row) => row.method === '_ghost').files, ['src/a.js']);
+});
+
+test('check-port-parity: 定义形态齐全时不误报（括号方法/赋值/对象字面量/函数声明）', () => {
+  // 首版判据漏了 `['_m']()` 这一形态，全仓报出 43 个假阳性——这条测试锁住它。
+  const rows = findDanglingOptionalCalls(
+    new Map([
+      [
+        'src/defs.js',
+        [
+          'class Defs {',
+          "  ['_byBracket']() {}",
+          '}',
+          'function wire(target) {',
+          '  target._byAssign = function () {};',
+          '  const literal = { _byLiteral: 1 };',
+          '  return literal;',
+          '}',
+          'function _byDeclaration() {}',
+        ].join('\n'),
+      ],
+      [
+        'src/calls.js',
+        [
+          'function use(node, target) {',
+          '  this._byBracket?.(1);',
+          '  node._byAssign?.(2);',
+          '  target._byLiteral?.(3);',
+          '  node._byDeclaration?.(4);',
+          '}',
+        ].join('\n'),
+      ],
+    ])
+  );
+  assert.deepEqual(rows, [], '四种定义形态都要算作已实现');
+});
+
+test('check-port-parity: 静默空调用让门禁 exit 1（基线登记后放行）', () => {
+  const filler = {};
+  for (let index = 0; index < 100; index += 1) {
+    filler[`src/f${String(index).padStart(3, '0')}.js`] =
+      `class F${index} {\n  ['_only']() {}\n}\n`;
+  }
+  const mirror = makeTree({ ...filler, 'src/target.js': "class T {\n  ['_only']() {}\n}\n" });
+  const repo = makeTree({
+    ...filler,
+    'src/target.js': [
+      'class T {',
+      "  ['_only']() {}",
+      '  run() {',
+      '    this._missingEveryone?.(1);',
+      '  }',
+      '}',
+    ].join('\n'),
+  });
+
+  const emptyBaseline = path.join(repo, 'baseline-empty.json');
+  fs.writeFileSync(emptyBaseline, JSON.stringify({ files: {}, moduleFunctions: {} }), 'utf8');
+  const fails = spawnSync(
+    process.execPath,
+    [GATE, '--mirror', mirror, '--repo', repo, '--baseline', emptyBaseline],
+    { encoding: 'utf8' }
+  );
+  (assert.equal(fails.status, 1, '基线外出现静默空调用必须 exit 1'),
+    assert.match(`${fails.stdout}${fails.stderr}`, /_missingEveryone/, '并点名是哪个方法'));
+
+  // 运行时挂载的方法静态扫不到，允许在基线里显式登记。
+  const acceptedBaseline = path.join(repo, 'baseline-accepted.json');
+  fs.writeFileSync(
+    acceptedBaseline,
+    JSON.stringify({ files: {}, moduleFunctions: {}, danglingCalls: ['_missingEveryone'] }),
+    'utf8'
+  );
+  const passes = spawnSync(
+    process.execPath,
+    [GATE, '--mirror', mirror, '--repo', repo, '--baseline', acceptedBaseline],
+    { encoding: 'utf8' }
+  );
+  (assert.equal(passes.status, 0, '已登记就该放行'), assert.match(passes.stdout, /PASS/));
 });

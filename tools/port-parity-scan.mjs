@@ -348,3 +348,87 @@ export function extractModuleFunctionSignatures(source) {
 export function extractMethodNames(source) {
   return new Set(extractMethodSignatures(source).keys());
 }
+
+// Receivers that own the method being called. Deliberately narrow: a bare
+// `foo?.(…)` says nothing about where `foo` is supposed to live.
+const OPTIONAL_CALL_RECEIVERS = 'this|node|target|current|entry|controller|owner';
+
+/**
+ * Definition forms that count as "this method exists somewhere in the repo".
+ *
+ * The bracket form is the one that matters most and the one that is easiest to
+ * forget: `['_m']() {…}` is how every de-obfuscated method is written here. A
+ * first cut of this scan omitted it and reported 43 false positives.
+ */
+const METHOD_DEFINITION_PATTERNS = [
+  // ['_m']() {  /  ['_m']: value  /  ['_m']: function
+  /\[\s*['"](_[A-Za-z][\w$]*)['"]\s*\]\s*[:(]/g,
+  // shorthand method at line start: `_m(args) {` (optionally async/get/set/static)
+  /^\s*(?:(?:async|get|set|static)\s+)?(_[A-Za-z][\w$]*)\s*\(/gm,
+  // property assignment: `this._m = …` / `proto._m = …`
+  /\.\s*(_[A-Za-z][\w$]*)\s*=(?!=)/g,
+  // object literal / class field: `_m: …`
+  /\b(_[A-Za-z][\w$]*)\s*:/g,
+  // function declaration
+  /function\s+(_[A-Za-z][\w$]*)\b/g,
+];
+
+/**
+ * Finds optional calls to private methods that no file in the repo defines.
+ *
+ * This is a different failure class from a porting gap, and a nastier one:
+ * `this['_mustRenderTerminalVideoState']?.(…)` with no definition is a silent
+ * no-op, so the feature looks wired up, every unit test passes, and the parity
+ * gate (which compares names per file) sees nothing wrong. 202/203 found six of
+ * these in the video result module alone — three of them called by the renderer
+ * coordinator, which then quietly skipped suspending media.
+ *
+ * Scope is the whole repo on purpose: these methods are mixed onto node
+ * prototypes from sibling modules, so "defined in a different file" is normal.
+ *
+ * @param {Map<string, string>|Iterable<[string, string]>} sourcesByFile
+ * @returns {Array<{method: string, files: string[], calls: number}>}
+ */
+export function findDanglingOptionalCalls(sourcesByFile) {
+  const entries = sourcesByFile instanceof Map ? [...sourcesByFile] : Array.from(sourcesByFile);
+  const dotCall = new RegExp(
+    `\\b(?:${OPTIONAL_CALL_RECEIVERS})\\s*\\.\\s*(_[A-Za-z][\\w$]*)\\s*\\?\\.\\s*\\(`,
+    'g'
+  );
+  const bracketCall = new RegExp(
+    `\\b(?:${OPTIONAL_CALL_RECEIVERS})\\s*\\[\\s*['"](_[A-Za-z][\\w$]*)['"]\\s*\\]\\s*\\?\\.\\s*\\(`,
+    'g'
+  );
+
+  /** @type {Map<string, {files: Set<string>, calls: number}>} */
+  const callSites = new Map();
+  /** @type {Set<string>} */
+  const declared = new Set();
+  for (const [file, source] of entries) {
+    for (const pattern of [dotCall, bracketCall]) {
+      pattern.lastIndex = 0;
+      let call;
+      while ((call = pattern.exec(source)) !== null) {
+        const record = callSites.get(call[1]);
+        if (record) {
+          record.files.add(file);
+          record.calls += 1;
+        } else callSites.set(call[1], { files: new Set([file]), calls: 1 });
+      }
+    }
+    for (const pattern of METHOD_DEFINITION_PATTERNS) {
+      pattern.lastIndex = 0;
+      let declaration;
+      while ((declaration = pattern.exec(source)) !== null) declared.add(declaration[1]);
+    }
+  }
+
+  const rows = [];
+  for (const [method, record] of callSites) {
+    if (declared.has(method)) continue;
+    rows.push({ method, files: [...record.files].sort(), calls: record.calls });
+  }
+  return rows.sort(
+    (left, right) => right.calls - left.calls || left.method.localeCompare(right.method)
+  );
+}
