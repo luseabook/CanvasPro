@@ -3315,7 +3315,7 @@ const zhCN = Object.freeze({
     }),
   }),
   audioClip: Object.freeze({
-    controls: Object.freeze({ cancel: '取消', done: '完成' }),
+    controls: Object.freeze({ cancel: '取消', split: '裁剪', undoSplit: '撤回裁剪', done: '完成' }),
     helpers: Object.freeze({
       cancel: '取消',
       playPauseRange: '区间播放/暂停',

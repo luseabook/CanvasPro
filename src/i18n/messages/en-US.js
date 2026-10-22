@@ -3791,7 +3791,7 @@ const enUS = Object.freeze({
     }),
   }),
   audioClip: Object.freeze({
-    controls: Object.freeze({ cancel: 'Cancel', done: 'Done' }),
+    controls: Object.freeze({ cancel: 'Cancel', split: 'Split', undoSplit: 'Undo split', done: 'Done' }),
     helpers: Object.freeze({
       cancel: 'Cancel',
       playPauseRange: 'Play/pause range',

@@ -1,0 +1,79 @@
+/* 音频剪辑条的分段（切分）样式。
+   与 style.css 里的 .v2-video-clip* 一起使用；拆分到独立文件是为了守住
+   style.css 的行数预算（该预算只允许缩小）。 */
+.v2-video-clipsplit-selection {
+  pointer-events: auto;
+  cursor: var(--grab-cursor);
+  box-shadow: none;
+  z-index: 4;
+}
+.v2-video-clipsplit-selection.is-active {
+  border-color: var(--media-clip-selection-hover-stroke);
+}
+.v2-video-clipsplit-selection:active {
+  cursor: var(--grabbing-cursor);
+}
+.v2-video-clipsplit-selection.left {
+  border-radius: 4px 0 0 4px;
+}
+.v2-video-clipsplit-selection.right {
+  border-radius: 0 4px 4px 0;
+}
+.v2-video-clipselection.v2-video-clipsplit-selection::after,
+.v2-video-clipselection.v2-video-clipsplit-selection::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  bottom: auto;
+  width: 6px;
+  height: 24px;
+  border-radius: 3px;
+  background: var(--media-clip-handle-bg);
+  box-shadow: var(--media-clip-handle-shadow);
+  transform: translateY(-50%);
+  pointer-events: none;
+  cursor: default;
+  z-index: 5;
+}
+.v2-video-clipselection.v2-video-clipsplit-selection::before {
+  left: 4px;
+}
+.v2-video-clipselection.v2-video-clipsplit-selection::after {
+  right: 4px;
+}
+/* 未落定的候选切点用一条竖线预告。 */
+.v2-video-clipsplit-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--media-clip-selection-hover-stroke);
+  box-shadow: var(--media-clip-handle-active-shadow);
+  pointer-events: none;
+  z-index: 13;
+}
+.v2-video-clipbtn.split,
+.v2-video-clipbtn.undo {
+  background: var(--media-clip-secondary-bg);
+  color: var(--media-clip-secondary-text);
+}
+.v2-video-clipbtn.split:hover,
+.v2-video-clipbtn.undo:hover {
+  background: var(--media-clip-secondary-hover);
+}
+.v2-video-clipbtn.split:disabled,
+.v2-video-clipbtn.split[data-disabled="true"],
+.v2-video-clipbtn.undo:disabled,
+.v2-video-clipbtn.undo[data-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+/* 切分状态下选区本身退成遮罩，只留两段可交互。 */
+.v2-video-clipselection.has-split {
+  border-color: transparent;
+  background: 0 0;
+  box-shadow: 0 0 0 9999px var(--media-clip-selection-mask);
+  pointer-events: none;
+}
+

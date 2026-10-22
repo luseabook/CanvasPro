@@ -11,6 +11,33 @@ import { localPathToUrl, pickResultLocalPath } from '../utils/localMediaPath.js'
 export function normalizeAudioCutResultLocalPath(value) {
   return pickResultLocalPath(value);
 }
+// 拖动选区后 pointerup 是否要把播放头挪到选区：只有在「移动选区」且本次没真正拖动时才跳。
+export function shouldAudioClipSelectionPointerUpSeek(mode = '', moved = false) {
+  return String(mode || '') === 'move' && moved !== true;
+}
+/**
+ * 把候选切分点收敛到合法区间内。
+ * 左段与右段都必须不短于 minLenSec，否则视为不可切，返回 null。
+ */
+export function normalizeAudioClipSplitSec({
+  splitSec: splitSec,
+  startSec: startSec,
+  endSec: endSec,
+  durationSec: durationSec,
+  minLenSec: minLenSec = 0.1,
+} = {}) {
+  const totalSec = Number(durationSec),
+    selectionStart = Math.max(0, Number(startSec) || 0),
+    selectionEnd = Math.max(selectionStart, Number(endSec) || selectionStart),
+    candidateSec = Number(splitSec),
+    minLen = Math.max(0.001, Number(minLenSec) || 0.1);
+  if (!Number.isFinite(totalSec) || totalSec <= 0) return null;
+  if (!Number.isFinite(candidateSec)) return null;
+  const clampedSec = Math.max(0, Math.min(totalSec, candidateSec));
+  if (clampedSec - selectionStart < minLen) return null;
+  if (selectionEnd - clampedSec < minLen) return null;
+  return clampedSec;
+}
 function audioClipText(item, key = {}) {
   return t('audioClip.' + item, key);
 }
@@ -22,16 +49,28 @@ const AudioClipController = {
   barEl: null,
   trackEl: null,
   selectionEl: null,
+  splitLeftSelectionEl: null,
+  splitRightSelectionEl: null,
   leftHandleEl: null,
   rightHandleEl: null,
   playheadEl: null,
+  splitMarkerEl: null,
   labelEl: null,
   cancelBtnEl: null,
   confirmBtnEl: null,
+  splitBtnEl: null,
+  undoSplitBtnEl: null,
   audioEl: null,
   durationSec: 0,
   startSec: 0,
   endSec: 0,
+  // 切分状态：_splitSec 是切点，_splitRanges 是切点两侧的 [left, right] 段。
+  _splitSec: null,
+  _splitRanges: null,
+  _activeSplitRangeId: '',
+  _dragRangeId: '',
+  // 外部来源模式（initForSource）的参数集合；null 表示走画布节点模式。
+  _sourceOptions: null,
   _dragMode: null,
   _dragOffsetPx: 0,
   _onKeyDown: null,
@@ -66,6 +105,45 @@ const AudioClipController = {
       (this.anchorNodeId = enabled),
       (this._retryCount = 0),
       this._mountWhenReady());
+  },
+  /**
+   * 对「已有但不在画布上」的音频来源开一段剪辑条（例如在别的节点里就地裁剪/切分）。
+   * 与 init 的区别：不依赖画布节点 id，允许传入现成 audioEl，并支持 allowSplit / onConfirm。
+   */
+  initForSource(options = {}) {
+    const wrapperEl = options.wrapperEl,
+      sourceUrl =
+        localPathToUrl(options.sourceLocalPath) || String(options.sourceUrl || '').trim();
+    if (!wrapperEl || !sourceUrl) {
+      window.showToast?.(audioClipText('toasts.uploadFirst'), 'warn');
+      return;
+    }
+    if (this.active) this.exit({ silent: true });
+    ((this.active = true),
+      (this.audioEl = options.audioEl || null),
+      (this.nodeId = String(options.anchorId || options.nodeId || 'audio-source-clip')),
+      (this.anchorNodeId = this.nodeId),
+      (this.wrapperEl = wrapperEl),
+      (this.durationSec = 0),
+      (this.startSec = Math.max(0, Number(options.initialStartSec) || 0)),
+      (this.endSec = Math.max(this.startSec, Number(options.initialEndSec) || this.startSec)),
+      (this._splitSec = null),
+      (this._splitRanges = null),
+      (this._activeSplitRangeId = ''),
+      (this._dragRangeId = ''),
+      (this._retryCount = 0),
+      (this._sourceOptions = {
+        ...options,
+        sourceUrl: sourceUrl,
+        allowSplit: options.allowSplit === true,
+        dimMode: options.dimMode === true,
+      }),
+      this._applyFrozenUI(true),
+      this._applyDimMode(this._sourceOptions.dimMode),
+      this._createUI(),
+      this._bindEvents(),
+      this._syncDurationAndDefaults(),
+      this._render());
   },
   _applyDimMode(index) {
     const el = document.getElementById('v2-wrap');
@@ -204,8 +282,19 @@ const AudioClipController = {
     el19.className = 'v2-video-cliprange';
     const payload = document.createElement('div');
     payload.className = 'v2-video-clipselection';
+    // 切分后的两段各自一个覆盖层，data-split-range-id 供拖拽命中识别。
+    const splitLeftEl = document.createElement('div');
+    ((splitLeftEl.className = 'v2-video-clipselection v2-video-clipsplit-selection left'),
+      (splitLeftEl.dataset.splitRangeId = 'left'),
+      (splitLeftEl.hidden = true));
+    const splitRightEl = document.createElement('div');
+    ((splitRightEl.className = 'v2-video-clipselection v2-video-clipsplit-selection right'),
+      (splitRightEl.dataset.splitRangeId = 'right'),
+      (splitRightEl.hidden = true));
     const handle = document.createElement('div');
     handle.className = 'v2-video-clipplayhead';
+    const splitMarkerEl = document.createElement('div');
+    ((splitMarkerEl.className = 'v2-video-clipsplit-marker'), (splitMarkerEl.hidden = true));
     const el20 = document.createElement('div');
     ((el20.className = 'v2-video-cliphandle left'), (el20.dataset.handle = 'left'));
     const el21 = document.createElement('div');
@@ -218,13 +307,76 @@ const AudioClipController = {
       el19.appendChild(el21),
       el14.appendChild(el15),
       el14.appendChild(el19),
+      el14.appendChild(splitLeftEl),
+      el14.appendChild(splitRightEl),
+      el14.appendChild(splitMarkerEl),
       el14.appendChild(handle),
       el14.appendChild(record),
       el14.appendChild(el22),
       el13.appendChild(el6),
       el13.appendChild(el14),
-      el13.appendChild(el10),
-      el5.appendChild(el13));
+      el13.appendChild(el10));
+    // 只有允许切分的来源才挂「裁剪 / 撤回裁剪」两个按钮。
+    let splitBtnEl = null,
+      undoSplitBtnEl = null;
+    if (this._sourceOptions?.allowSplit === true) {
+      splitBtnEl = document.createElement('button');
+      ((splitBtnEl.type = 'button'),
+        (splitBtnEl.className = 'v2-video-clipbtn split'),
+        (splitBtnEl.title = audioClipText('controls.split')));
+      {
+        const ns = 'http://www.w3.org/2000/svg',
+          svg = document.createElementNS(ns, 'svg');
+        (svg.setAttribute('width', '20'),
+          svg.setAttribute('height', '20'),
+          svg.setAttribute('viewBox', '0 0 24 24'),
+          svg.setAttribute('fill', 'none'),
+          svg.setAttribute('stroke', 'currentColor'),
+          svg.setAttribute('stroke-width', '2'),
+          svg.setAttribute('stroke-linecap', 'round'),
+          svg.setAttribute('stroke-linejoin', 'round'));
+        const topCircle = document.createElementNS(ns, 'circle');
+        (topCircle.setAttribute('cx', '6'),
+          topCircle.setAttribute('cy', '6'),
+          topCircle.setAttribute('r', '2'));
+        const bottomCircle = document.createElementNS(ns, 'circle');
+        (bottomCircle.setAttribute('cx', '6'),
+          bottomCircle.setAttribute('cy', '18'),
+          bottomCircle.setAttribute('r', '2'));
+        const upperPath = document.createElementNS(ns, 'path');
+        upperPath.setAttribute('d', 'M20 4 8.12 15.88');
+        const lowerPath = document.createElementNS(ns, 'path');
+        lowerPath.setAttribute('d', 'M14.47 14.48 20 20');
+        const shortPath = document.createElementNS(ns, 'path');
+        (shortPath.setAttribute('d', 'M8.12 8.12 12 12'),
+          svg.append(topCircle, bottomCircle, upperPath, lowerPath, shortPath),
+          splitBtnEl.appendChild(svg));
+      }
+      undoSplitBtnEl = document.createElement('button');
+      ((undoSplitBtnEl.type = 'button'),
+        (undoSplitBtnEl.className = 'v2-video-clipbtn undo'),
+        (undoSplitBtnEl.title = audioClipText('controls.undoSplit')));
+      {
+        const ns = 'http://www.w3.org/2000/svg',
+          svg = document.createElementNS(ns, 'svg');
+        (svg.setAttribute('width', '20'),
+          svg.setAttribute('height', '20'),
+          svg.setAttribute('viewBox', '0 0 24 24'),
+          svg.setAttribute('fill', 'none'),
+          svg.setAttribute('stroke', 'currentColor'),
+          svg.setAttribute('stroke-width', '2'),
+          svg.setAttribute('stroke-linecap', 'round'),
+          svg.setAttribute('stroke-linejoin', 'round'));
+        const undoPath = document.createElementNS(ns, 'path');
+        (undoPath.setAttribute('d', 'M3 7v6h6'), svg.appendChild(undoPath));
+        const undoArc = document.createElementNS(ns, 'path');
+        (undoArc.setAttribute('d', 'M3 13a9 9 0 1 0 3-7.7L3 8'),
+          svg.appendChild(undoArc),
+          undoSplitBtnEl.appendChild(svg));
+      }
+      (el13.appendChild(splitBtnEl), el13.appendChild(undoSplitBtnEl));
+    }
+    el5.appendChild(el13);
     const el23 = document.createElement('div');
     el23.className = 'v2-video-cliphelper-row';
     const el24 = document.createElement('div');
@@ -262,11 +414,16 @@ const AudioClipController = {
       (this.barEl = el5),
       (this.cancelBtnEl = el6),
       (this.confirmBtnEl = el10),
+      (this.splitBtnEl = splitBtnEl),
+      (this.undoSplitBtnEl = undoSplitBtnEl),
       (this.trackEl = el14),
       (this.selectionEl = payload),
+      (this.splitLeftSelectionEl = splitLeftEl),
+      (this.splitRightSelectionEl = splitRightEl),
       (this.leftHandleEl = el20),
       (this.rightHandleEl = el21),
       (this.playheadEl = handle),
+      (this.splitMarkerEl = splitMarkerEl),
       (this.labelEl = el22),
       this._subscribeLocaleChanges(),
       this._syncLocaleTexts());
@@ -340,6 +497,8 @@ const AudioClipController = {
   _syncLocaleTexts() {
     if (this.cancelBtnEl) this.cancelBtnEl.title = audioClipText('controls.cancel');
     if (this.confirmBtnEl) this.confirmBtnEl.title = audioClipText('controls.done');
+    if (this.splitBtnEl) this.splitBtnEl.title = audioClipText('controls.split');
+    if (this.undoSplitBtnEl) this.undoSplitBtnEl.title = audioClipText('controls.undoSplit');
     if (Array.isArray(this._msgEls)) {
       const scope = this._buildHelperMessages();
       this._msgEls.forEach((el28, input) => {
@@ -352,8 +511,31 @@ const AudioClipController = {
     const url = localPathToUrl(enabled5.localPath);
     return url || enabled5.src || enabled5.audioUrl || enabled5.resultUrl || '';
   },
-  _getAudioEl() {
+  // 优先用外部传入的 sourceOptions（对已有节点的某段音频做操作），否则回落到画布节点。
+  _resolveActiveAudioSrc() {
+    if (this._sourceOptions)
+      return (
+        localPathToUrl(this._sourceOptions.sourceLocalPath) ||
+        String(this._sourceOptions.sourceUrl || '').trim()
+      );
+    return this._resolveAudioSrcFromNode(appStore.getState().nodes[this.nodeId]);
+  },
+  _getAudioEl({ create: create = true } = {}) {
     if (!this.wrapperEl) return null;
+    // 外部来源模式没有现成 audio 元素，需要现场建一个隐藏播放器。
+    if (this._sourceOptions) {
+      if (this.audioEl && this.audioEl.isConnected) return this.audioEl;
+      if (!create) return this.audioEl || null;
+      const hiddenAudio = document.createElement('audio');
+      return (
+        (hiddenAudio.className = 'audio-player v2-audio-clip-hidden-player'),
+        (hiddenAudio.preload = 'auto'),
+        (hiddenAudio.hidden = true),
+        (this.barEl || this.wrapperEl).appendChild(hiddenAudio),
+        (this.audioEl = hiddenAudio),
+        hiddenAudio
+      );
+    }
     if (this.audioEl && this.audioEl.isConnected && this.wrapperEl.contains?.(this.audioEl))
       return this.audioEl;
     const output = this.wrapperEl.querySelector('audio.audio-player');
@@ -393,9 +575,7 @@ const AudioClipController = {
     return true;
   },
   async _syncDurationAndDefaults() {
-    const enabled6 = appStore.getState().nodes[this.nodeId];
-    if (!enabled6) return;
-    const enabled7 = this._resolveAudioSrcFromNode(enabled6);
+    const enabled7 = this._resolveActiveAudioSrc();
     if (!enabled7) {
       this.exit({ silent: true });
       return;
@@ -477,11 +657,228 @@ const AudioClipController = {
       return;
     }
     let value20 = Number(enabled10.currentTime) || 0;
-    (value20 < this.startSec || value20 > this.endSec) &&
+    // 切分后各段各有自己的播放区间，播放头越界要拉回当前段的起点。
+    const playbackRange = this._getPlaybackRange();
+    (value20 < playbackRange.startSec || value20 > playbackRange.endSec) &&
       !enabled10.paused &&
-      ((enabled10.currentTime = this.startSec), (value20 = this.startSec));
+      ((enabled10.currentTime = playbackRange.startSec), (value20 = playbackRange.startSec));
     const value21 = Math.max(0, Math.min(1, value20 / count4));
     ((this.playheadEl.style.display = 'block'), (this.playheadEl.style.left = value21 * 100 + '%'));
+  },
+  _getMinSelectionSec() {
+    const totalSec = this.durationSec;
+    if (!Number.isFinite(totalSec) || totalSec <= 0) return 0.1;
+    return Math.min(0.1, totalSec);
+  },
+  _normalizeSplitRange(range = {}, fallbackId = '') {
+    const totalSec = this.durationSec;
+    if (!Number.isFinite(totalSec) || totalSec <= 0) return null;
+    const minLenSec = this._getMinSelectionSec(),
+      id = String(range?.id || fallbackId || '').trim(),
+      rawStartSec = Number(range?.startSec),
+      rawEndSec = Number(range?.endSec),
+      startCandidate = Number.isFinite(rawStartSec) ? rawStartSec : 0,
+      endCandidate = Number.isFinite(rawEndSec) ? rawEndSec : startCandidate,
+      startSec = Math.max(0, Math.min(totalSec, startCandidate)),
+      endSec = Math.max(startSec, Math.min(totalSec, endCandidate));
+    if (endSec - startSec < minLenSec) return null;
+    return { id: id || fallbackId, startSec: startSec, endSec: endSec };
+  },
+  _getSplitRanges() {
+    if (!Array.isArray(this._splitRanges) || this._splitRanges.length < 2) return null;
+    const leftCandidate =
+        this._splitRanges.find((range) => range?.id === 'left') || this._splitRanges[0],
+      rightCandidate =
+        this._splitRanges.find((range) => range?.id === 'right') || this._splitRanges[1],
+      leftRange = this._normalizeSplitRange(leftCandidate, 'left'),
+      rightRange = this._normalizeSplitRange(rightCandidate, 'right');
+    if (!leftRange || !rightRange) return null;
+    // 两段不允许重叠：左段终点必须在右段起点之前（可以相邻）。
+    if (leftRange.endSec > rightRange.startSec) return null;
+    return [
+      { ...leftRange, id: 'left' },
+      { ...rightRange, id: 'right' },
+    ];
+  },
+  _hasSplitRanges() {
+    return this._getSplitRanges() !== null;
+  },
+  // 切分后选区包络要覆盖两段的总跨度，否则拖动/渲染都会算错区间。
+  _syncSelectionEnvelopeFromSplitRanges() {
+    const splitRanges = this._getSplitRanges();
+    if (!splitRanges) return null;
+    return (
+      (this.startSec = Math.min(...splitRanges.map((range) => range.startSec))),
+      (this.endSec = Math.max(...splitRanges.map((range) => range.endSec))),
+      splitRanges
+    );
+  },
+  _getSplitRangeById(rangeId) {
+    const normalizedId = String(rangeId || '').trim(),
+      splitRanges = this._getSplitRanges();
+    if (!splitRanges) return null;
+    return splitRanges.find((range) => range.id === normalizedId) || null;
+  },
+  _getActiveSplitRange() {
+    const splitRanges = this._getSplitRanges();
+    if (!splitRanges) return null;
+    const activeRange =
+      splitRanges.find((range) => range.id === this._activeSplitRangeId) || splitRanges[0];
+    return ((this._activeSplitRangeId = activeRange.id), activeRange);
+  },
+  _setActiveSplitRange(rangeId) {
+    const splitRange = this._getSplitRangeById(rangeId);
+    if (!splitRange) return null;
+    return ((this._activeSplitRangeId = splitRange.id), splitRange);
+  },
+  _getPlaybackRange() {
+    const activeSplitRange = this._getActiveSplitRange();
+    if (activeSplitRange) return activeSplitRange;
+    return { id: 'selection', startSec: this.startSec, endSec: this.endSec };
+  },
+  // 相邻段就是硬边界：左段的 start 不能越过前一段终点，右段的 end 不能越过下一段起点。
+  _getSplitRangeBounds(rangeId) {
+    const splitRanges = this._getSplitRanges();
+    if (!splitRanges) return null;
+    const rangeIndex = splitRanges.findIndex((range) => range.id === rangeId);
+    if (rangeIndex < 0) return null;
+    const totalSec = this.durationSec;
+    return {
+      minStart: rangeIndex > 0 ? splitRanges[rangeIndex - 1].endSec : 0,
+      maxEnd: rangeIndex < splitRanges.length - 1 ? splitRanges[rangeIndex + 1].startSec : totalSec,
+    };
+  },
+  _replaceSplitRange(rangeId, patch = {}) {
+    const splitRanges = this._getSplitRanges();
+    if (!splitRanges) return null;
+    const nextRanges = splitRanges.map((range) =>
+      range.id === rangeId ? { ...range, ...patch, id: range.id } : range,
+    );
+    return (
+      (this._splitRanges = nextRanges),
+      this._syncSelectionEnvelopeFromSplitRanges(),
+      this._getSplitRangeById(rangeId)
+    );
+  },
+  _getSplitRangeElement(rangeId) {
+    if (rangeId === 'left') return this.splitLeftSelectionEl || null;
+    if (rangeId === 'right') return this.splitRightSelectionEl || null;
+    return null;
+  },
+  _getSplitRangeElementFromTarget(target) {
+    const rangeEl = target?.closest?.('[data-split-range-id]'),
+      rangeId = String(rangeEl?.dataset?.splitRangeId || '').trim();
+    if (!rangeId) return null;
+    return this._getSplitRangeById(rangeId) ? rangeEl : null;
+  },
+  _clearSplitRangeHover() {
+    [this.splitLeftSelectionEl, this.splitRightSelectionEl].forEach((rangeEl) => {
+      if (!rangeEl) return;
+      (rangeEl.classList?.remove?.('hover-active', 'hover-left', 'hover-right'),
+        (rangeEl.style.cursor = ''));
+    });
+  },
+  _setSplitRangeCurrentTime(splitRange) {
+    const audioEl = this._getAudioEl();
+    if (!audioEl || !splitRange) return;
+    try {
+      audioEl.currentTime = splitRange.startSec;
+    } catch {}
+  },
+  // 整体平移一段：先按「段长不变」求出可移动区间，再夹住。
+  _moveSplitRangeByDelta(rangeId, deltaSec) {
+    const splitRange = this._getSplitRangeById(rangeId),
+      bounds = this._getSplitRangeBounds(rangeId);
+    if (!splitRange || !bounds) return null;
+    const rangeLengthSec = Math.max(
+        this._getMinSelectionSec(),
+        splitRange.endSec - splitRange.startSec,
+      ),
+      minStart = bounds.minStart,
+      maxStart = Math.max(minStart, bounds.maxEnd - rangeLengthSec),
+      nextStartSec = Math.max(minStart, Math.min(maxStart, splitRange.startSec + deltaSec)),
+      nextRange = this._replaceSplitRange(rangeId, {
+        startSec: nextStartSec,
+        endSec: nextStartSec + rangeLengthSec,
+      });
+    return (this._setSplitRangeCurrentTime(nextRange), nextRange);
+  },
+  // 拖某一侧边缘：对侧固定，本侧不越过「对侧 ∓ 最短长度」和相邻段边界。
+  _resizeSplitRangeEdge(rangeId, edge, targetSec) {
+    const splitRange = this._getSplitRangeById(rangeId),
+      bounds = this._getSplitRangeBounds(rangeId);
+    if (!splitRange || !bounds) return null;
+    const minLenSec = this._getMinSelectionSec(),
+      clampedSec = Math.max(0, Math.min(this.durationSec, Number(targetSec) || 0));
+    let nextRange = null;
+    if (edge === 'left') {
+      const maxStartSec = Math.max(bounds.minStart, splitRange.endSec - minLenSec);
+      return (
+        (nextRange = this._replaceSplitRange(rangeId, {
+          startSec: Math.max(bounds.minStart, Math.min(maxStartSec, clampedSec)),
+        })),
+        this._setSplitRangeCurrentTime(nextRange),
+        nextRange
+      );
+    }
+    if (edge === 'right') {
+      const minEndSec = Math.min(bounds.maxEnd, splitRange.startSec + minLenSec);
+      return (
+        (nextRange = this._replaceSplitRange(rangeId, {
+          endSec: Math.max(minEndSec, Math.min(bounds.maxEnd, clampedSec)),
+        })),
+        this._setSplitRangeCurrentTime(nextRange),
+        nextRange
+      );
+    }
+    return null;
+  },
+  _getValidSplitSec(selectionStartSec = this.startSec, selectionEndSec = this.endSec) {
+    if (this._sourceOptions?.allowSplit !== true) return null;
+    return normalizeAudioClipSplitSec({
+      splitSec: this._splitSec,
+      startSec: selectionStartSec,
+      endSec: selectionEndSec,
+      durationSec: this.durationSec,
+      minLenSec: this._getMinSelectionSec(),
+    });
+  },
+  // 「裁剪」按钮：在当前播放头位置把选区一分为二，默认落到右段。
+  _stageSplitAtCurrentTime() {
+    if (this._sourceOptions?.allowSplit !== true) return false;
+    if (this._hasSplitRanges() || this._getValidSplitSec() !== null) return false;
+    const audioEl = this._getAudioEl(),
+      middleSec = (this.startSec + this.endSec) / 2,
+      currentTimeSec = Number.isFinite(Number(audioEl?.currentTime))
+        ? Number(audioEl.currentTime)
+        : middleSec,
+      splitSec = normalizeAudioClipSplitSec({
+        splitSec: currentTimeSec,
+        startSec: this.startSec,
+        endSec: this.endSec,
+        durationSec: this.durationSec,
+        minLenSec: this._getMinSelectionSec(),
+      });
+    if (splitSec === null)
+      return (window.showToast?.(audioClipText('toasts.splitAtMiddle'), 'warn'), false);
+    return (
+      (this._splitSec = splitSec),
+      (this._splitRanges = [
+        { id: 'left', startSec: this.startSec, endSec: splitSec },
+        { id: 'right', startSec: splitSec, endSec: this.endSec },
+      ]),
+      (this._activeSplitRangeId = 'right'),
+      this._render(),
+      true
+    );
+  },
+  _clearSplit() {
+    if (this._splitSec === null && !this._hasSplitRanges()) return;
+    ((this._splitSec = null),
+      (this._splitRanges = null),
+      (this._activeSplitRangeId = ''),
+      (this._dragRangeId = ''),
+      this._render());
   },
   _bindEvents() {
     if (!this.barEl) return;
@@ -490,14 +887,37 @@ const AudioClipController = {
     }),
       this.confirmBtnEl?.addEventListener('click', (event5) => {
         (event5.stopPropagation(), this._confirm());
+      }),
+      this.splitBtnEl?.addEventListener('click', (event6a) => {
+        (event6a.stopPropagation(), this._stageSplitAtCurrentTime());
+      }),
+      this.undoSplitBtnEl?.addEventListener('click', (event6b) => {
+        (event6b.stopPropagation(), this._clearSplit());
       }));
     const value22 = (event6) => {
       if (!this.trackEl || !this.active || this._dragMode) return;
-      const value23 = event6.clientX,
-        box = this.selectionEl.getBoundingClientRect(),
+      const hasSplit = this._hasSplitRanges(),
+        splitRangeEl = hasSplit ? this._getSplitRangeElementFromTarget(event6.target) : null,
+        value23 = event6.clientX,
+        box = (splitRangeEl || this.selectionEl).getBoundingClientRect(),
         value24 = 20,
         value25 = Math.abs(value23 - box.left) < value24,
         value26 = Math.abs(value23 - box.right) < value24;
+      if (splitRangeEl) {
+        // 悬停在某个分段上：清掉别的段的 hover，再按左右边给出拉伸光标。
+        (this._clearSplitRangeHover(),
+          this.leftHandleEl.classList.remove('hover-active'),
+          this.rightHandleEl.classList.remove('hover-active'),
+          splitRangeEl.classList.add('hover-active'));
+        if (value25)
+          (splitRangeEl.classList.add('hover-left'), (splitRangeEl.style.cursor = 'var(--resize-ew-cursor)'));
+        else if (value26)
+          (splitRangeEl.classList.add('hover-right'),
+            (splitRangeEl.style.cursor = 'var(--resize-ew-cursor)'));
+        else splitRangeEl.style.cursor = 'var(--grab-cursor)';
+        return;
+      }
+      this._clearSplitRangeHover();
       if (value25)
         (this.leftHandleEl.classList.add('hover-active'),
           this.rightHandleEl.classList.remove('hover-active'),
@@ -613,6 +1033,17 @@ const AudioClipController = {
         let value58 = Number(enabled16.currentTime) || 0;
         value58 = handler3(value58, 0, count14);
         const value59 = handler2();
+        // 已切分时 I / O 改的是当前段的边界，而不是整段选区。
+        const activeSplitRange = this._getActiveSplitRange();
+        if (activeSplitRange) {
+          (this._resizeSplitRangeEdge(
+            activeSplitRange.id,
+            value57 === 'in' ? 'left' : 'right',
+            value58,
+          ),
+            this._render());
+          return;
+        }
         if (value57 === 'in') {
           const value60 = Math.max(0, this.endSec - value59);
           this.startSec = handler3(value58, 0, value60);
@@ -625,36 +1056,48 @@ const AudioClipController = {
       value62 = (event7) => {
         if (!this.trackEl || !this.active) return;
         const el31 = event7.target.closest('.v2-video-cliphandle'),
-          value63 = !!event7.target.closest('.v2-video-clipselection'),
+          hasSplit = this._hasSplitRanges(),
+          splitRangeEl = hasSplit ? this._getSplitRangeElementFromTarget(event7.target) : null,
+          onSelection = !hasSplit && !!event7.target.closest('.v2-video-clipselection'),
           box3 = this.trackEl.getBoundingClientRect();
         if (!box3.width) return;
         const value64 = event7.clientX,
-          box4 = this.selectionEl.getBoundingClientRect(),
+          box4 = splitRangeEl ? splitRangeEl.getBoundingClientRect() : this.selectionEl.getBoundingClientRect(),
           value65 = 20,
           value66 = Math.abs(value64 - box4.left) < value65,
           value67 = Math.abs(value64 - box4.right) < value65;
-        if (value66 || (el31 && el31.dataset.handle === 'left'))
+        if (splitRangeEl) {
+          // 命中某一段：先记下段 id，再按落点离哪条边更近决定拉伸还是平移。
+          const rangeId = String(splitRangeEl.dataset.splitRangeId || '').trim();
+          ((this._dragRangeId = rangeId),
+            this._setActiveSplitRange(rangeId),
+            this._clearSplitRangeHover(),
+            splitRangeEl.classList.add('hover-active'));
+          if (value66) ((this._dragMode = 'left'), splitRangeEl.classList.add('hover-left'));
+          else if (value67)
+            ((this._dragMode = 'right'), splitRangeEl.classList.add('hover-right'));
+          else this._dragMode = 'move';
+        } else if (!hasSplit && (value66 || (el31 && el31.dataset.handle === 'left')))
           ((this._dragMode = 'left'), this.leftHandleEl.classList.add('hover-active'));
+        else if (!hasSplit && (value67 || (el31 && el31.dataset.handle === 'right')))
+          ((this._dragMode = 'right'), this.rightHandleEl.classList.add('hover-active'));
+        else if (!hasSplit && onSelection) this._dragMode = 'move';
         else {
-          if (value67 || (el31 && el31.dataset.handle === 'right'))
-            ((this._dragMode = 'right'), this.rightHandleEl.classList.add('hover-active'));
-          else {
-            if (value63) this._dragMode = 'move';
-            else {
-              this._dragMode = 'scrub';
-              const enabled17 = this._getAudioEl();
-              if (enabled17)
-                try {
-                  if (!enabled17.paused) enabled17.pause();
-                } catch (value68) {}
-            }
-          }
+          this._dragMode = 'scrub';
+          const enabled17 = this._getAudioEl();
+          if (enabled17)
+            try {
+              if (!enabled17.paused) enabled17.pause();
+            } catch (value68) {}
         }
         if (this._dragMode === 'move') {
-          const box5 = this.selectionEl.getBoundingClientRect();
+          const dragEl = splitRangeEl || this.selectionEl,
+            box5 = dragEl.getBoundingClientRect();
           this._dragOffsetPx = event7.clientX - box5.left;
         } else this._dragOffsetPx = 0;
         (event7.preventDefault(), event7.stopPropagation());
+        const pointerStartX = Number(event7.clientX || 0);
+        let hasMoved = false;
         if (this._dragMode === 'scrub') handler4(event7.clientX);
         else this._handleDragAtClientX(event7.clientX);
         if (this._onPointerMove) window.removeEventListener('pointermove', this._onPointerMove, true);
@@ -662,20 +1105,35 @@ const AudioClipController = {
         ((this._onPointerMove = (event8) => {
           if (!this.active || !this.trackEl) return;
           (event8.preventDefault(), event8.stopPropagation());
-          if (this._dragMode === 'scrub') handler4(event8.clientX);
-          else this._handleDragAtClientX(event8.clientX);
+          if (this._dragMode === 'scrub') {
+            handler4(event8.clientX);
+            return;
+          }
+          // 抖动容忍：位移不超过 2px 不算真正拖动。
+          if (this._dragMode === 'move') {
+            if (!hasMoved && Math.abs(event8.clientX - pointerStartX) <= 2) return;
+            hasMoved = true;
+          }
+          this._handleDragAtClientX(event8.clientX);
         }),
           (this._onPointerUp = (event9) => {
             if (!this.active) return;
-            (event9.preventDefault(),
-              event9.stopPropagation(),
-              (this._dragMode = null),
+            (event9.preventDefault(), event9.stopPropagation());
+            const dragMode = this._dragMode,
+              shouldSeek = shouldAudioClipSelectionPointerUpSeek(dragMode, hasMoved),
+              releaseClientX = Number.isFinite(Number(event9.clientX))
+                ? Number(event9.clientX)
+                : pointerStartX;
+            ((this._dragMode = null),
+              (this._dragRangeId = ''),
               (this._dragOffsetPx = 0),
               this.leftHandleEl?.classList.remove('hover-active'),
-              this.rightHandleEl?.classList.remove('hover-active'));
+              this.rightHandleEl?.classList.remove('hover-active'),
+              this._clearSplitRangeHover());
             if (this._onPointerMove) window.removeEventListener('pointermove', this._onPointerMove, true);
             if (this._onPointerUp) window.removeEventListener('pointerup', this._onPointerUp, true);
             ((this._onPointerMove = null), (this._onPointerUp = null));
+            if (shouldSeek) handler4(releaseClientX);
           }),
           window.addEventListener('pointermove', this._onPointerMove, true),
           window.addEventListener('pointerup', this._onPointerUp, true));
@@ -803,7 +1261,23 @@ const AudioClipController = {
       value88 = Math.max(0, Math.min(1, value87 / box7.width)),
       value89 = value88 * enabled21,
       value90 = Math.min(0.1, enabled21),
-      value91 = Math.max(value90, this.endSec - this.startSec);
+      dragRangeId = String(this._dragRangeId || '').trim();
+    // 拖的是某一分段：边缘拉伸或整体平移，都按该段的相邻边界夹住。
+    if (dragRangeId && this._hasSplitRanges()) {
+      this._setActiveSplitRange(dragRangeId);
+      if (this._dragMode === 'left' || this._dragMode === 'right')
+        this._resizeSplitRangeEdge(dragRangeId, this._dragMode, value89);
+      else if (this._dragMode === 'move') {
+        const dragRange = this._getSplitRangeById(dragRangeId);
+        if (dragRange) {
+          const pointerSec = ((value86 - box7.left - this._dragOffsetPx) / box7.width) * enabled21;
+          this._moveSplitRangeByDelta(dragRangeId, pointerSec - dragRange.startSec);
+        }
+      }
+      this._render();
+      return;
+    }
+    const value91 = Math.max(value90, this.endSec - this.startSec);
     if (this._dragMode === 'left') {
       const value92 = Math.max(0, Math.min(value89, this.endSec - value90));
       this.startSec = value92;
@@ -838,8 +1312,18 @@ const AudioClipController = {
     if (!this.active || !this.trackEl || !this.selectionEl || !this.leftHandleEl || !this.rightHandleEl)
       return;
     const count16 = this.durationSec,
-      value103 = Number.isFinite(count16) && count16 > 0,
-      value104 = value103 ? Math.max(0, Math.min(this.startSec, count16)) : 0,
+      value103 = Number.isFinite(count16) && count16 > 0;
+    let splitRanges = value103 ? this._getSplitRanges() : null;
+    // 分段数据失效（越界/重叠/短于最短长度）就地作废，避免渲染出坏区间。
+    Array.isArray(this._splitRanges) &&
+      this._splitRanges.length &&
+      !splitRanges &&
+      ((this._splitRanges = null),
+      (this._activeSplitRangeId = ''),
+      (this._dragRangeId = ''));
+    splitRanges &&
+      (this._syncSelectionEnvelopeFromSplitRanges(), (splitRanges = this._getSplitRanges()));
+    const value104 = value103 ? Math.max(0, Math.min(this.startSec, count16)) : 0,
       value105 = value103 ? Math.max(0, Math.min(this.endSec, count16)) : 0,
       count17 = Math.max(0, value105 - value104);
     if (value103) {
@@ -848,10 +1332,17 @@ const AudioClipController = {
       ((this.selectionEl.style.left = value106 + '%'),
         (this.selectionEl.style.width = value107 + '%'),
         (this.leftHandleEl.style.left = value106 + '%'),
-        (this.rightHandleEl.style.left = value106 + value107 + '%'),
-        this.labelEl &&
-          ((this.labelEl.textContent = count17.toFixed(2) + 's'),
-          (this.labelEl.style.left = value106 + value107 / 2 + '%')));
+        (this.rightHandleEl.style.left = value106 + value107 + '%'));
+      if (this.labelEl) {
+        // 已切分时标签只显示当前段时长，否则显示整段选区时长。
+        const activeRange = splitRanges ? this._getActiveSplitRange() || splitRanges[0] : null,
+          labelStartSec = activeRange ? activeRange.startSec : value104,
+          labelEndSec = activeRange ? activeRange.endSec : value105,
+          labelLeftPct = (labelStartSec / count16) * 100,
+          labelWidthPct = ((labelEndSec - labelStartSec) / count16) * 100;
+        ((this.labelEl.textContent = Math.max(0, labelEndSec - labelStartSec).toFixed(2) + 's'),
+          (this.labelEl.style.left = labelLeftPct + labelWidthPct / 2 + '%'));
+      }
     } else
       ((this.selectionEl.style.left = '0%'),
         (this.selectionEl.style.width = '0%'),
@@ -859,9 +1350,79 @@ const AudioClipController = {
         (this.rightHandleEl.style.left = '0%'),
         this.labelEl &&
           ((this.labelEl.textContent = audioClipText('status.loading')), (this.labelEl.style.left = '50%')));
+    // 还没落到 _splitRanges 时，若播放头落在合法切点上就先画个预告标记。
+    const previewSplitSec = value103 && !splitRanges ? this._getValidSplitSec(value104, value105) : null;
+    if (this._splitSec !== null && !splitRanges && previewSplitSec === null) this._splitSec = null;
+    const renderedRanges =
+      splitRanges ||
+      (previewSplitSec !== null
+        ? [
+            { id: 'left', startSec: value104, endSec: previewSplitSec },
+            { id: 'right', startSec: previewSplitSec, endSec: value105 },
+          ]
+        : null);
+    if (this.selectionEl) {
+      if (renderedRanges) this.selectionEl.classList.add('has-split');
+      else this.selectionEl.classList.remove('has-split');
+    }
+    if (this.splitLeftSelectionEl && this.splitRightSelectionEl) {
+      if (renderedRanges && value103) {
+        const leftRange = renderedRanges[0],
+          rightRange = renderedRanges[1],
+          activeRangeId = splitRanges ? this._getActiveSplitRange()?.id : '';
+        ((this.splitLeftSelectionEl.hidden = false), (this.splitRightSelectionEl.hidden = false));
+        this.splitLeftSelectionEl.dataset &&
+          (this.splitLeftSelectionEl.dataset.splitRangeId = 'left');
+        this.splitRightSelectionEl.dataset &&
+          (this.splitRightSelectionEl.dataset.splitRangeId = 'right');
+        ((this.splitLeftSelectionEl.style.left = (leftRange.startSec / count16) * 100 + '%'),
+          (this.splitLeftSelectionEl.style.width =
+            Math.max(0, ((leftRange.endSec - leftRange.startSec) / count16) * 100) + '%'),
+          (this.splitRightSelectionEl.style.left = (rightRange.startSec / count16) * 100 + '%'),
+          (this.splitRightSelectionEl.style.width =
+            Math.max(0, ((rightRange.endSec - rightRange.startSec) / count16) * 100) + '%'));
+        if (activeRangeId === 'left')
+          (this.splitLeftSelectionEl.classList.add('is-active'),
+            this.splitRightSelectionEl.classList.remove('is-active'));
+        else if (activeRangeId === 'right')
+          (this.splitRightSelectionEl.classList.add('is-active'),
+            this.splitLeftSelectionEl.classList.remove('is-active'));
+        else
+          (this.splitLeftSelectionEl.classList.remove('is-active'),
+            this.splitRightSelectionEl.classList.remove('is-active'));
+      } else
+        ((this.splitLeftSelectionEl.hidden = true),
+          (this.splitRightSelectionEl.hidden = true),
+          (this.splitLeftSelectionEl.style.left = '0%'),
+          (this.splitLeftSelectionEl.style.width = '0%'),
+          (this.splitRightSelectionEl.style.left = '0%'),
+          (this.splitRightSelectionEl.style.width = '0%'),
+          this.splitLeftSelectionEl.classList.remove('is-active'),
+          this.splitRightSelectionEl.classList.remove('is-active'));
+    }
+    // 预告切点的虚线标记：只在「有候选切点、还没真正切」时显示。
+    this.splitMarkerEl &&
+      (!splitRanges && previewSplitSec !== null && value103
+        ? ((this.splitMarkerEl.hidden = false),
+          (this.splitMarkerEl.style.left = (previewSplitSec / count16) * 100 + '%'))
+        : ((this.splitMarkerEl.hidden = true), (this.splitMarkerEl.style.left = '0%')));
+    if (this.splitBtnEl) {
+      const splitDisabled = !value103 || renderedRanges !== null;
+      ((this.splitBtnEl.disabled = splitDisabled),
+        (this.splitBtnEl.dataset.disabled = splitDisabled ? 'true' : 'false'));
+    }
+    if (this.undoSplitBtnEl) {
+      const undoDisabled = renderedRanges === null;
+      ((this.undoSplitBtnEl.disabled = undoDisabled),
+        (this.undoSplitBtnEl.dataset.disabled = undoDisabled ? 'true' : 'false'));
+    }
     this._renderPlayhead();
     if (this.confirmBtnEl) {
-      const enabled22 = value103 && count17 >= 0.1;
+      const enabled22 = splitRanges
+        ? splitRanges.every(
+            (range) => range.endSec - range.startSec >= this._getMinSelectionSec(),
+          )
+        : value103 && count17 >= 0.1;
       ((this.confirmBtnEl.disabled = !enabled22),
         (this.confirmBtnEl.dataset.disabled = enabled22 ? 'false' : 'true'),
         this.confirmBtnEl.dataset.loading !== 'true' &&
@@ -873,18 +1434,26 @@ const AudioClipController = {
     if (!this.confirmBtnEl) return;
     const el32 = this.confirmBtnEl;
     if (el32.dataset.disabled === 'true') return;
-    const value108 = appStore.getState().nodes,
-      name = value108[this.anchorNodeId];
-    if (!name) {
-      this.exit({ silent: true });
-      return;
+    // 两种来源：外部传入的 sourceOptions（对已有节点做区间操作）或画布上的音频节点。
+    const sourceOptions = this._sourceOptions;
+    let name = null;
+    if (!sourceOptions) {
+      name = appStore.getState().nodes[this.anchorNodeId];
+      if (!name) {
+        this.exit({ silent: true });
+        return;
+      }
     }
     const enabled23 = this.durationSec;
     if (!enabled23 || !Number.isFinite(enabled23) || enabled23 <= 0) return;
-    const start = Math.max(0, Math.min(this.startSec, enabled23)),
+    // 切分后选区包络按两段总跨度取，裁剪范围才不会算小。
+    const splitRanges = this._syncSelectionEnvelopeFromSplitRanges(),
+      start = Math.max(0, Math.min(this.startSec, enabled23)),
       end = Math.max(0, Math.min(this.endSec, enabled23));
     if (!(end > start)) return;
-    const src = localPathToUrl(name.localPath) || name.src || name.audioUrl || name.resultUrl || '';
+    const src = sourceOptions
+      ? this._resolveActiveAudioSrc()
+      : localPathToUrl(name.localPath) || name.src || name.audioUrl || name.resultUrl || '';
     if (!src) return;
     ((el32.dataset.disabled = 'true'),
       (el32.dataset.loading = 'true'),
@@ -892,6 +1461,28 @@ const AudioClipController = {
         '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><g style="animation:spin 1s linear infinite;transform-origin:50% 50%;transform-box:fill-box;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></g></svg>'),
       window.showToast?.(audioClipText('toasts.cutting'), 'info'));
     try {
+      // 外部接管：把选中范围与切分结果交回调用方，由它决定落成几个节点。
+      if (sourceOptions) {
+        if (typeof sourceOptions.onConfirm === 'function') {
+          const exportedRanges = splitRanges
+            ? splitRanges.map((range) => ({
+                id: range.id,
+                startSec: range.startSec,
+                endSec: range.endSec,
+              }))
+            : null;
+          await sourceOptions.onConfirm({
+            startSec: start,
+            endSec: end,
+            splitSec: this._getValidSplitSec(start, end),
+            ranges: exportedRanges,
+            sourceUrl: src,
+            sourceLocalPath: String(sourceOptions.sourceLocalPath || ''),
+          });
+        }
+        this.exit({ silent: true });
+        return;
+      }
       let error = null;
       if (canUseElectronMediaTask())
         error = await enqueueElectronMediaTask(
@@ -997,6 +1588,16 @@ const AudioClipController = {
       (this.labelEl = null),
       (this.cancelBtnEl = null),
       (this.confirmBtnEl = null),
+      (this.splitBtnEl = null),
+      (this.undoSplitBtnEl = null),
+      (this.splitLeftSelectionEl = null),
+      (this.splitRightSelectionEl = null),
+      (this.splitMarkerEl = null),
+      (this._splitSec = null),
+      (this._splitRanges = null),
+      (this._activeSplitRangeId = ''),
+      (this._dragRangeId = ''),
+      (this._sourceOptions = null),
       this._applyFrozenUI(false),
       this._applyDimMode(false),
       (this.wrapperEl = null),
