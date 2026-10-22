@@ -15,7 +15,9 @@ import { fileURLToPath } from 'node:url';
 import {
   comparePortParity,
   diffAgainstBaseline,
+  extractAliasSignatures,
   extractMethodNames,
+  extractMethodSignatures,
   listJavaScriptFiles,
 } from './check-port-parity.mjs';
 
@@ -155,4 +157,100 @@ test('check-port-parity: 找不到镜像时跳过而不是失败', () => {
   });
   (assert.equal(result.status, 0, '无镜像应正常退出'),
     assert.match(result.stdout, /SKIP/, '并明确说明跳过原因'));
+});
+
+test('check-port-parity: 别名属性与箭头属性进别名集，不进严格集', () => {
+  // 这正是 `agentSessionStore` 只报 18 而不是 27 的原因：`recordRunEvent` 在上游是
+  // `recordRunEvent: _0x1243ae`（指向同文件函数），名字根本没出现在方法定义里。
+  const source = [
+    'function build() {',
+    '  function _0x1243ae(payload = {}) {',
+    '    return payload;',
+    '  }',
+    '  return {',
+    '    recordRunEvent: _0x1243ae,',
+    '    getPersistenceError: () => store.getError?.() || "",',
+    '    subscribe(handler) {',
+    '      return handler;',
+    '    },',
+    '  };',
+    '}',
+  ].join('\n');
+
+  const strict = extractMethodSignatures(source);
+  (assert.equal(strict.has('subscribe'), true, '方法简写属严格集'),
+    assert.equal(strict.has('recordRunEvent'), false, '别名不进严格集'),
+    assert.equal(strict.has('getPersistenceError'), false, '箭头属性不进严格集'));
+
+  const aliases = extractAliasSignatures(source);
+  (assert.equal(aliases.has('recordRunEvent'), true, '别名要能识别'),
+    assert.equal(aliases.get('recordRunEvent').length, 1, '形参从目标函数继承'),
+    assert.equal(aliases.has('getPersistenceError'), true, '箭头属性要能识别'),
+    assert.equal(aliases.has('subscribe'), false, '严格集里已有的不重复计入别名'));
+});
+
+test('check-port-parity: 配置回调计入缺口（已试过排除，代价太大）', () => {
+  // `SelectionController.resolveRect` 是传给 createNodeSpatialIndex 的配置回调，
+  // 严格说不是 API。曾加过"调用实参里的对象字面量不计数"的过滤器，结果连
+  // `clearFieldReveal`/`placeAt`/`upsert`/`refreshMenu` 四个真实缺口一起藏掉了
+  // —— 它们本身就是以注入回调的形式存在的。漏报比多报危险，因此保留。
+  const source = [
+    'function resolve(nodes) {',
+    '  return createNodeSpatialIndex(nodes, {',
+    '    resolveRect(node) {',
+    '      return node;',
+    '    },',
+    '  });',
+    '}',
+  ].join('\n');
+  assert.equal(
+    extractMethodNames(source).has('resolveRect'),
+    true,
+    '已知假阳性，靠基线的 equivalent 段记录'
+  );
+});
+
+test('check-port-parity: 上游明显更大时标记 sizeDrift', () => {
+  // 方法名集合能对上、但上游多出几百行，说明整块功能没移植。
+  const padding = new Array(200).fill('  const unused = 1;').join('\n');
+  const mirror = makeTree({
+    'src/big.js': `class Big {\n  _one() {}\n  _two() {}\n${padding}\n}\n`,
+  });
+  const repo = makeTree({ 'src/big.js': 'class Big {\n  _one() {}\n}\n' });
+  const report = comparePortParity(mirror, repo);
+  const drift = report.sizeDrift.find((row) => row.file === 'src/big.js');
+  (assert.ok(drift, '应检出规模差'),
+    assert.equal(drift.upstreamLines > drift.repoLines, true),
+    assert.equal(drift.ratio > 1.3, true, '比值要超过阈值'));
+});
+
+test('check-port-parity: 同名方法形参变少时标记 signatureDrift', () => {
+  // SourceImageNode._maybeResumeRunningHubTask 丢了 resumePaused 参数：方法名齐全，
+  // 断点续跑语义却没了，方法名集合比对完全看不出来。
+  const mirror = makeTree({ 'src/a.js': 'class A {\n  _resume(options = {}) {}\n}\n' });
+  const repo = makeTree({ 'src/a.js': 'class A {\n  _resume() {}\n}\n' });
+  const report = comparePortParity(mirror, repo);
+  assert.deepEqual(report.rows, [], '方法名在，不该报缺失');
+  const drift = report.signatureDrift.find((row) => row.name === '_resume');
+  (assert.ok(drift, '应检出形参变少'),
+    assert.equal(drift.upstreamArity, 1),
+    assert.equal(drift.repoArity, 0));
+});
+
+test('check-port-parity: 仓库用别名属性实现时不算缺口', () => {
+  // 匹配用严格集∪别名集：把 API 写成箭头属性也是实现了它。
+  const mirror = makeTree({
+    'src/a.js': [
+      'function build() {',
+      '  function _0ximpl() {}',
+      '  return { recordRunEvent: _0ximpl };',
+      '}',
+    ].join('\n'),
+  });
+  const repo = makeTree({
+    'src/a.js': ['function build() {', '  return { recordRunEvent() {} };', '}'].join('\n'),
+  });
+  const report = comparePortParity(mirror, repo);
+  (assert.deepEqual(report.rows, [], '不报缺失'),
+    assert.deepEqual(report.aliasRows, [], '也不报别名缺口'));
 });

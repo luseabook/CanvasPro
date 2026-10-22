@@ -1,6 +1,6 @@
 {
   "mirror": "shuo-deobf-089",
-  "totalMissing": 129,
+  "totalMissing": 143,
   "files": {
     "src/components/video-node/resultRenderModule.js": [
       "_buildRhAiAppVideoResultDisplayPatch",
@@ -30,7 +30,11 @@
       "_restorePreviewHoverPlaybackTime",
       "_shouldRecoverPreviewPlayback",
       "_syncCachedVideoObjectUrls",
-      "hydrateRendererThinVideoPresentation"
+      "hasPresentedRendererMedia",
+      "hydrateRendererThinVideoPresentation",
+      "prepareRendererMediaFallbackForSuspend",
+      "requestVideoMetaForNodeInfo",
+      "suspendRendererMedia"
     ],
     "src/modules/AudioClipController.js": [
       "_clearSplit",
@@ -72,6 +76,7 @@
       "replayRun",
       "setContextDigest",
       "setPendingLoopRun",
+      "subscribe",
       "subscribeAssistantStream",
       "upsertOperation"
     ],
@@ -99,7 +104,9 @@
       "_hydrateStoredThumbsInBackground",
       "_isImageObjectUrlReferenced",
       "_queueImageObjectUrlRelease",
-      "_syncReferenceUploadUi"
+      "_syncPromptInputVisibility",
+      "_syncReferenceUploadUi",
+      "refreshModelRegistryUi"
     ],
     "src/components/SourceImageNode.js": [
       "_assignImageDisplaySource",
@@ -116,6 +123,7 @@
       "_ensureDreaminaCliLoggedIn",
       "_executeGeneration",
       "_finishUnreceivedAsyncTask",
+      "_getGenerationTaskRecoveryOwner",
       "_hasUnconfirmedAsyncTask"
     ],
     "src/components/GroupNode.js": [
@@ -134,6 +142,10 @@
       "_notifyCreatePanelSaved",
       "showLibrarySavePanelForMedia"
     ],
+    "src/modules/storyWorkspace/storyClipFrames.js": [
+      "find",
+      "upsert"
+    ],
     "src/modules/storyWorkspace/storyEpisodeCanvas.js": [
       "connectReference",
       "pruneReferences"
@@ -145,8 +157,14 @@
     "api/canvasCollaborationApi.js": [
       "clearIdentity"
     ],
+    "src/components/aigenText/uiModule.js": [
+      "refreshModelRegistryUi"
+    ],
     "src/components/AIGenTextNode.js": [
       "_maybeResumeTextTask"
+    ],
+    "src/components/media-clip/videoRangeTimelineView.js": [
+      "destroy"
     ],
     "src/components/video-node/referenceInputModule.js": [
       "_scheduleFixedThumbObjectUrl"
@@ -178,14 +196,20 @@
     "src/modules/ProjectManager.js": [
       "setProjectOperations"
     ],
+    "src/modules/settings/apiConfigSavePresentation.js": [
+      "getState"
+    ],
     "src/modules/settings/modelServiceSettingsNavigator.js": [
       "clearFieldReveal"
     ],
-    "src/modules/storyWorkspace/storyClipFrames.js": [
-      "upsert"
+    "src/modules/tutorials/tutorialReleaseNotes.js": [
+      "open"
     ],
     "src/modules/workflows/WorkflowManager.js": [
       "handleSidebarContextMenu"
+    ],
+    "src/services/webPreviewViewSyncService.js": [
+      "refresh"
     ]
   }
 }
