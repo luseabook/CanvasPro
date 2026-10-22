@@ -371,7 +371,7 @@ node tools/tracking/track.mjs --status
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
 
-- 2026-10-22（184 批·**上游 0.8.9 逆向 + B-1 试落回滚**）：已装 SHUO Canvas 升 0.8.9，镜像标尺升级 `shuo-deobf-089`（2468 件）+ `shuo-electron-deobf-089`（asar 提取 158 件）；台账 `docs/upstream-0.8.9-gap.md`（仅镜像有 api 192 / src 465 / electron 28 / styles 203）。B-1 官方目录簇 196 件 staging 四闸门全 PASS、闭包 0 断链；落库试测 **288 失败**（基线 14），沙箱 FS 视图分叉致测量不可信——按 162 批先例**整体回滚**，成品存 staging，聚合器切换留待下批（gap §4）。**验证**：树回 HEAD、deobf-gate PASS。
+- 2026-10-22（184 批·**上游 0.8.9 逆向 + B-1 官方目录簇落库（分支）**）：已装 SHUO Canvas 升 0.8.9，镜像 `shuo-deobf-089`（2468 件）+ `shuo-electron-deobf-089`（158 件），总账 `docs/upstream-0.8.9-gap.md`。B-1 共 198 件落分支 `b184-b1-catalog`，四闸门全 PASS。三配置实验证明该批**全有或全无**（代码新+清单旧 346 失败；只加不改加载即抛错）。保留 `resolveProviderProfileConfig` 兼容块、补 2 件同层超集依赖、删 2 件孤儿。全量 **11313/11161/152**（基线 14），台账 `docs/b184-b1-triage.md`。**master 绿**。
 
 ## 12. 变更记录机制（**已冻结**）
 

@@ -54,14 +54,16 @@ dreamina headless 登录等）、CSP 闸门、`check-csp.mjs`、E2E 与离线测
 
 ## 4. 建议批次计划（整代升代 + 依赖闭包，沿 b163 路线）
 
-> **B-1 执行状态（2026-10-22，184 批）**：196 件（B-1 新 + 改 + 2 闭包件
-> `api/localGatewayEnvironment.js`、`src/services/modelMediaInputPresentation.js`）
-> 已在 `deobf-tools/b184/port/` 完成四闸门（bool/auto-map/rename/verify + node --check）
-> **全 PASS、闭包 0 断链**。落库试测 288 失败（基线 14），且沙箱文件系统视图分叉使测量
-> 不可信——按 162 批先例整体回滚。**下批动作**：从 staging 重落 → 跑全量 → T/A 收编
-> （断层面：`modelRegistry`/`index.js` 导出面变化波及 storyboard3d、storyWorkspace、
-> video-node、参数面板、provider profile 等；另需迁移 dreamina 旧路径
-> `image/dreamina`、`video/dreamina` → `manifests/dreamina/` 并删孤儿件）。
+> **B-1 执行状态（2026-10-22，184 批）**：198 件（196 件 B-1 主体 + 2 件同层超集依赖
+> `src/modules/modelMediaInputLimits.js`、`api/officialAccountRuntime.js`）已落分支
+> **`b184-b1-catalog`**，四闸门全 PASS、闭包 0 断链、导入与具名导出双向校验通过。
+> 三种配置实验证明该批**全有或全无**：代码新+清单旧 → 346 失败；只加不改 → 注册表加载即抛错。
+> 全量回归 **11313/11161/152**（基线 14），已收编 27 例，剩余 152 例的根因分类、
+> 逐文件清单与下批 6 步动作见 **`docs/b184-b1-triage.md`**。**master 保持绿**（未合入）。
+>
+> 两个关键判定：① `ModelApiManifestNormalizer` 的 `resolveProviderProfileConfig` 是**仓库自有能力**，
+> 上游已删，须保留兼容块；② dreamina 整族改「目录编译 + 运行时发现」，注册在
+> `src/modules/dreaminaModelCatalogService.js`（仓库尚无此文件），不接线则整族模型缺失。
 
 1. **B-0（已完成）**：镜像标尺升到 0.8.9 + 本台账。
 2. **B-1 官方目录簇**：staging 已就绪（见上），聚合器一次性接通 0.8.9 规格，禁止逐件。
