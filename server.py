@@ -2784,12 +2784,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     # ════════════════════════════════════════════════════
     #  GET
     # ════════════════════════════════════════════════════
-    def end_headers(self):
-        super().end_headers()
-        # For HEAD, everything after the headers is the (suppressed) message body.
-        if getattr(self, '_head_only', False) and isinstance(self.wfile, _HeadBodySink):
-            self.wfile.sink = True
-
     def do_HEAD(self):
         # RFC 9110: a HEAD response must not carry a message body. Reuse the GET pipeline,
         # letting the status line and headers through and dropping only the body.
@@ -2853,6 +2847,16 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not has_cors:
             _send_cors_origin_header(self)
         super().end_headers()
+        # RFC 9110: a HEAD response carries headers only. do_HEAD() installs the sink
+        # and flags `_head_only`; flip it here rather than in do_HEAD(), i.e. only
+        # once the status line and headers have actually been flushed.
+        #
+        # This must live in *this* end_headers: an earlier duplicate definition in
+        # the same class body used to hold this line and was silently overridden,
+        # so every HEAD response carried a body -- a 403 JSON error body reached
+        # strict clients as "Data after `Connection: close`".
+        if getattr(self, "_head_only", False) and isinstance(self.wfile, _HeadBodySink):
+            self.wfile.sink = True
 
     # ════════════════════════════════════════════════════
     #  POST
