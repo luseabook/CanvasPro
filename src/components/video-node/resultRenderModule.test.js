@@ -150,7 +150,7 @@ function createStore(args3) {
     },
   };
 }
-function createContext(nodeId, showVideoMeta = {}) {
+function createContext(nodeId, showVideoMeta = {}, overrides = {}) {
   const store = createStore(nodeId);
   store.state.ui = { showVideoMeta: showVideoMeta.showVideoMeta === true };
   let input = 0,
@@ -171,7 +171,7 @@ function createContext(nodeId, showVideoMeta = {}) {
           return Promise.resolve({ url: '' });
         },
       },
-      getImage: async () => null,
+      getImage: overrides.getImage ?? (async () => null),
       ensureThumbDecoded: () => {},
       buildApiUrl: (output) => 'http://local' + String(output || ''),
       VideoKeyingController: {
@@ -512,3 +512,140 @@ function createContext(nodeId, showVideoMeta = {}) {
       assert.match(list4[0].getAttribute('src'), /^http:\/\/local\/output\/[bc]\.mp4$/),
       assert.equal(list4[0].loadCount, 0));
   }));
+test('video result render: thumbId 回退接源走追踪 objectURL 缓存', async () => {
+  const prevCreateObjectURL = globalThis.URL.createObjectURL,
+    prevRevokeObjectURL = globalThis.URL.revokeObjectURL;
+  let revoked = [];
+  globalThis.URL.createObjectURL = () => 'blob:tracked-thumb-1';
+  globalThis.URL.revokeObjectURL = (url) => {
+    revoked.push(url);
+  };
+  try {
+    const { ctx: ctx16 } = createContext(
+      {
+        id: 'ai-video-thumb-cache',
+        type: 'ai-video',
+        mainVideoIndex: 0,
+        videos: [{ thumbId: 'thumb-1' }],
+      },
+      {},
+      { getImage: async () => new Blob(['video'], { type: 'video/mp4' }) },
+    );
+    (ctx16._cachedVideoUrls = new Map(),
+      (ctx16._cachedVideoUrlLoads = new Map()),
+      (ctx16._videoObjectUrlLifecycleEpoch = 0),
+      (ctx16._videoObjectUrlsDisposed = false));
+    const url = await ctx16._resolveCachedVideoObjectUrl('thumb-1');
+    assert.equal(url, 'blob:tracked-thumb-1');
+    assert.equal(ctx16._cachedVideoUrls.get('thumb-1'), 'blob:tracked-thumb-1');
+    // 并发去重：同一 thumbId 二次请求复用 in-flight promise，不再打 getImage。
+    assert.equal(await ctx16._resolveCachedVideoObjectUrl('thumb-1'), 'blob:tracked-thumb-1');
+    assert.deepEqual(revoked, []);
+    // 激活集不含该 thumbId 时直接短路，不触碰缓存。
+    assert.equal(await ctx16._resolveCachedVideoObjectUrl('thumb-gone'), '');
+    assert.equal(ctx16._cachedVideoUrls.has('thumb-gone'), false);
+  } finally {
+    globalThis.URL.createObjectURL = prevCreateObjectURL;
+    globalThis.URL.revokeObjectURL = prevRevokeObjectURL;
+  }
+});
+test('video result render: 缓存释放时同步分离消费者并撤销 URL', () => {
+  const prevRevokeObjectURL = globalThis.URL.revokeObjectURL;
+  globalThis.URL.revokeObjectURL = () => {};
+  try {
+    const { ctx: ctx17, store: store4 } = createContext({
+      id: 'ai-video-release-consumers',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [{ thumbId: 'thumb-live' }],
+    });
+    const el = new FakeVideoElement();
+    (el.dataset.idx = '0'),
+      el.setAttribute('src', 'blob:tracked-thumb-stale'),
+      (el.loadCount = 0);
+    ctx17._multiLayerEls = [el];
+    ctx17._cachedVideoUrls = new Map([
+      ['thumb-stale', 'blob:tracked-thumb-stale'],
+      ['thumb-live', 'blob:tracked-thumb-live'],
+    ]);
+    const released = ctx17._syncCachedVideoObjectUrls(store4.state.nodes[ctx17.nodeId]);
+    (assert.equal(released, 1),
+      assert.equal(ctx17._cachedVideoUrls.has('thumb-stale'), false),
+      assert.equal(ctx17._cachedVideoUrls.has('thumb-live'), true),
+      // 引用旧 URL 的视频元素被摘掉 src 并触发一次 load 收尾。
+      assert.equal(el.getAttribute('src'), ''),
+      assert.equal(el.loadCount, 1));
+  } finally {
+    globalThis.URL.revokeObjectURL = prevRevokeObjectURL;
+  }
+});
+test('video result render: dispose 置位后缓存解析全部短路', async () => {
+  const { ctx: ctx18 } = createContext(
+    {
+      id: 'ai-video-dispose',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [{ thumbId: 'thumb-1' }],
+    },
+    {},
+    { getImage: async () => new Blob(['video'], { type: 'video/mp4' }) },
+  );
+  (ctx18._cachedVideoUrls = new Map([['thumb-1', 'blob:tracked-before-dispose']]));
+  const released = ctx18._disposeCachedVideoObjectUrls();
+  (assert.equal(released, 1),
+    assert.equal(ctx18._cachedVideoUrls.size, 0),
+    assert.equal(ctx18._videoObjectUrlsDisposed, true),
+    assert.equal(await ctx18._resolveCachedVideoObjectUrl('thumb-1'), ''));
+});
+test('video result render: 接源竞态翻页后不写旧源', async () => {
+  const { ctx: ctx19 } = createContext(
+    {
+      id: 'ai-video-attach-race',
+      type: 'ai-video',
+      mainVideoIndex: 0,
+      videos: [{ thumbId: 'thumb-1' }],
+    },
+    {},
+    {
+      getImage: async () => {
+        await Promise.resolve();
+        return new Blob(['video'], { type: 'video/mp4' });
+      },
+    },
+  );
+  const prevCreateObjectURL = globalThis.URL.createObjectURL;
+  globalThis.URL.createObjectURL = () => 'blob:tracked-race';
+  try {
+    (ctx19._cachedVideoUrls = new Map()),
+      (ctx19._videoSourceAttachToken = 0),
+      (ctx19._videoSourceAttachTokens = new WeakMap());
+    const el = new FakeVideoElement();
+    el.dataset.idx = '0';
+    const pending = ctx19._ensureVideoSrcFor(el, { forPlayback: true });
+    // 加载在途时节点翻页，token 失效。
+    ctx19._videoSourceAttachToken = 1;
+    assert.equal(await pending, false);
+    assert.equal(el.getAttribute('src'), '');
+    assert.equal(el.loadCount, 0);
+  } finally {
+    globalThis.URL.createObjectURL = prevCreateObjectURL;
+  }
+});
+test('video result render: poster 标记在可见帧就绪后清掉 poster 属性', () => {
+  const { ctx: ctx20 } = createContext({
+    id: 'ai-video-poster-clear',
+    type: 'ai-video',
+    mainVideoIndex: 0,
+    videos: [{ localPath: 'output/main.mp4', thumbUrl: '/output/main.jpg' }],
+  });
+  const el = new FakeVideoElement();
+  (el.setAttribute('poster', 'http://local/output/main.jpg'),
+    el.setAttribute('src', 'blob:tracked-poster-src'));
+  // fake video 未上报已渲染帧：走 watchVideoFramePresentation 路径，不抛错即可。
+  assert.equal(ctx20._clearPreviewPosterForVisibleFrame(el), false);
+  assert.equal(el.poster, 'http://local/output/main.jpg');
+  // 直接标记：poster 属性存在时摘除并返回 true。
+  assert.equal(ctx20._markPreviewPosterClearedForPlayback(el), true);
+  assert.equal(el.poster, '');
+  assert.equal(ctx20._isPreviewPosterClearedForPlayback(el), true);
+});

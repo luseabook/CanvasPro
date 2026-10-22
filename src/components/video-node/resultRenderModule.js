@@ -8,12 +8,44 @@ import {
 import { localPathToUrl, urlToLocalPath } from '../../utils/localMediaPath.js';
 import {
   attachMediaElementPlaybackSource,
+  clearDesktopMediaPlaybackSourceMetadata,
   isMediaElementPlaybackSource,
 } from '../../services/desktopMediaBlobSource.js';
+import { desktopBridge } from '../../services/desktopBridge.js';
 import { getTaskMessage, isTaskCancelled, isTaskFailed } from '../../core/generationTaskUiState.js';
 import { t } from '../../i18n/index.js';
+import {
+  acquireLocalVideoPlaybackObjectUrl,
+  releaseLocalVideoPlaybackObjectUrlOwner,
+  releaseLocalVideoPlaybackObjectUrlOwnerScope,
+} from '../../services/localVideoPlaybackObjectUrlService.js';
+import { resolveCanvasVideoDisplayUrl } from '../../services/canvasMediaLocalService.js';
+import {
+  createTrackedMediaObjectUrl,
+  revokeTrackedMediaObjectUrl,
+} from '../../services/mediaObjectUrlRegistry.js';
+import {
+  getVideoPresentationSource,
+  hasPresentedVideoFrame,
+  resetVideoFramePresentation,
+  watchVideoFramePresentation,
+} from '../../services/videoFramePresentation.js';
 function videoResultRenderText(value, item = {}) {
   return t('videoResultRender.' + value, item);
+}
+function isChromeShellRuntime() {
+  const search = String(globalThis.location?.search || globalThis.window?.location?.search || '');
+  return new URLSearchParams(search).get('aicRuntime') === 'chrome-shell';
+}
+// chrome-shell 没有桌面预览桥，非桌面的 web 渲染也一样——这两种环境都要走
+// 共享本地视频 blob（由 localVideoPlaybackObjectUrlService 统一复用与释放）。
+function shouldUseSharedLocalVideoBlob() {
+  if (isChromeShellRuntime()) return true;
+  return !desktopBridge.mediaPreview.isAvailable();
+}
+function isVideoResultFrameReady(el, sourceKey = '') {
+  if (!el) return false;
+  return hasPresentedVideoFrame(el, sourceKey);
 }
 function isDesktopRenderer() {
   return !!globalThis.window?.electronAPI;
@@ -49,8 +81,7 @@ export function createVideoNodeResultRenderModule(index) {
         readyTimeoutMs: minBufferAhead ? 350 : undefined,
         recoveryDebounceMs: minBufferAhead ? 150 : undefined,
         recoveryCooldownMs: minBufferAhead ? 500 : undefined,
-        shouldRecover: () =>
-          el2.isConnected !== false && (this._isHovered || this._isManualControl || !el2.paused),
+        shouldRecover: () => this._shouldRecoverPreviewPlayback(el2),
       });
     }
     ['_logPreviewVideoPlaybackEvent'](enabled2, next, current = 'preview') {
@@ -80,9 +111,14 @@ export function createVideoNodeResultRenderModule(index) {
     }
     async ['_ensureVideoSrcFor'](el4, load = {}) {
       if (!el4) return false;
-      const record = !!String(el4.getAttribute('src') || '').trim();
-      if (record)
-        return (load.forPlayback === true && el4.preload !== 'auto' && (el4.preload = 'auto'), true);
+      const preload2 = load.preload === 'metadata' ? 'metadata' : 'auto',
+        hasSrc = !!String(el4.getAttribute('src') || '').trim();
+      if (hasSrc)
+        return (
+          load.forPlayback === true && el4.preload !== preload2 && (el4.preload = preload2),
+          this._clearPreviewPosterForVisibleFrame(el4),
+          true
+        );
       const payload = store.getState(),
         handle = payload.nodes?.[this.nodeId] || this._data || {},
         state = Array.isArray(handle.videos) ? handle.videos : [],
@@ -90,34 +126,49 @@ export function createVideoNodeResultRenderModule(index) {
         scope = Number.isFinite(config) ? Math.max(0, Math.trunc(config)) : 0,
         enabled3 = state[scope] || null;
       if (!enabled3) return false;
+      // 双 token（节点级 + 元素级）防止异步竞态期间元素被复用后误写旧源。
+      const attachToken = Number(this._videoSourceAttachToken || 0);
+      !this._videoSourceAttachTokens && (this._videoSourceAttachTokens = new WeakMap());
+      const elToken = Number(this._videoSourceAttachTokens.get(el4) || 0) + 1;
+      this._videoSourceAttachTokens.set(el4, elToken);
+      const isAttachCurrent = () =>
+        Number(this._videoSourceAttachToken || 0) === attachToken &&
+        this._videoSourceAttachTokens?.get(el4) === elToken;
       let enabled4 = this._resolveVideoPlaybackUrl(enabled3);
       if (!enabled4 && enabled3.thumbId) {
-        const input = String(enabled3.thumbId || '');
-        if (input) {
-          const output = this._cachedVideoUrls.get(input);
-          if (output) enabled4 = output;
-          else {
-            let value2 = null;
-            try {
-              value2 = await getImage(input);
-            } catch {
-              value2 = null;
-            }
-            if (value2) {
-              const value3 = URL.createObjectURL(value2);
-              (this._cachedVideoUrls.set(input, value3), (enabled4 = value3));
-            }
-          }
+        const thumbId = String(enabled3.thumbId || '');
+        if (thumbId) {
+          enabled4 = await this._resolveCachedVideoObjectUrl(thumbId);
+          if (!isAttachCurrent() || !this._isCachedVideoThumbIdCurrentForSlot(thumbId, scope))
+            return false;
         }
       }
       if (!enabled4) return false;
+      const playbackUrl = await this._resolveLocalVideoPlaybackObjectUrl(
+        enabled4,
+        'ai-video:' + this.nodeId + ':slot:' + scope,
+      );
+      if (!isAttachCurrent()) return false;
       return (
+        globalThis.window?.__runtimeCompareMark?.('ai-video-playback:attach', {
+          nodeId: this.nodeId,
+          slotIndex: scope,
+          sourceUrl: enabled4,
+          playbackUrl: playbackUrl,
+        }),
         await attachMediaElementPlaybackSource(el4, enabled4, {
-          preload: 'auto',
+          playbackUrl: playbackUrl,
+          preload: preload2,
           warmRanges: false,
           load: load.forPlayback === true,
+          shouldAssign: isAttachCurrent,
+          onSourceAssigned: () => {
+            this._clearPreviewPosterForVisibleFrame(el4);
+          },
         }),
-        true
+        this._restorePreviewHoverPlaybackTime(el4, enabled4),
+        this._clearPreviewPosterForVisibleFrame(el4),
+        isAttachCurrent()
       );
     }
     ['_resolveVideoPlaybackUrl'](enabled5) {
@@ -126,6 +177,7 @@ export function createVideoNodeResultRenderModule(index) {
         this._resolveMediaUrl(localPathToUrl(enabled5.displayLocalPath)) ||
         this._resolveMediaUrl(localPathToUrl(enabled5.localPath)) ||
         this._resolveMediaUrl(enabled5.videoUrl) ||
+        this._resolveMediaUrl(resolveCanvasVideoDisplayUrl(enabled5)) ||
         ''
       );
     }
@@ -143,6 +195,236 @@ export function createVideoNodeResultRenderModule(index) {
       if (url) return buildApiUrl(url);
       if (enabled6.startsWith('/')) return buildApiUrl(enabled6);
       return buildApiUrl('/' + enabled6.replace(/^\/+/, ''));
+    }
+    async ['_resolveLocalVideoPlaybackObjectUrl'](sourceUrl, ownerKey = '') {
+      if (!shouldUseSharedLocalVideoBlob()) return '';
+      const owner = String(ownerKey || '').trim() || 'ai-video:' + this.nodeId + ':slot:main';
+      return acquireLocalVideoPlaybackObjectUrl(sourceUrl, owner);
+    }
+    ['_getActiveCachedVideoThumbIds'](nodeData = null) {
+      const nodes = store.getState()?.nodes,
+        nodesIsObject = nodes && typeof nodes === 'object',
+        effectiveData =
+          nodeData && typeof nodeData === 'object'
+            ? nodeData
+            : nodesIsObject
+              ? nodes[this.nodeId] || {}
+              : this._data || {},
+        videos = Array.isArray(effectiveData.videos) ? effectiveData.videos : [],
+        candidates = videos.length > 0 ? videos : [effectiveData],
+        activeThumbIds = new Set();
+      for (const item of candidates) {
+        const thumbId = String(item?.thumbId || '').trim();
+        if (
+          !thumbId ||
+          String(item?.error || '').trim() ||
+          this._isVideoMarkedUnavailable(item) ||
+          this._resolveVideoPlaybackUrl(item)
+        )
+          continue;
+        activeThumbIds.add(thumbId);
+      }
+      return activeThumbIds;
+    }
+    ['_isCachedVideoThumbIdCurrent'](thumbId) {
+      const normalized = String(thumbId || '').trim();
+      if (!normalized || this._videoObjectUrlsDisposed === true) return false;
+      const nodes = store.getState()?.nodes,
+        nodeData = nodes && typeof nodes === 'object' ? nodes[this.nodeId] : this._data;
+      if (!nodeData) return false;
+      return this._getActiveCachedVideoThumbIds(nodeData).has(normalized);
+    }
+    ['_isCachedVideoThumbIdCurrentForSlot'](thumbId, slotIndex) {
+      const normalized = String(thumbId || '').trim();
+      if (!normalized || this._videoObjectUrlsDisposed === true) return false;
+      const nodes = store.getState()?.nodes,
+        nodeData = nodes && typeof nodes === 'object' ? nodes[this.nodeId] : this._data;
+      if (!nodeData) return false;
+      const videos = Array.isArray(nodeData.videos) ? nodeData.videos : [],
+        index = Math.max(0, Math.trunc(Number(slotIndex) || 0)),
+        item = videos.length > 0 ? videos[index] || null : index === 0 ? nodeData : null;
+      return Boolean(
+        item &&
+          String(item.thumbId || '').trim() === normalized &&
+          !String(item.error || '').trim() &&
+          !this._isVideoMarkedUnavailable(item) &&
+          !this._resolveVideoPlaybackUrl(item),
+      );
+    }
+    ['_getCachedVideoObjectUrlConsumers']() {
+      const consumers = new Set(),
+        addConsumer = (el) => {
+          if (el) consumers.add(el);
+        };
+      (addConsumer(this.videoEl), addConsumer(this._activeFullscreenVideoEl));
+      for (const layerEl of this._multiLayerEls || []) addConsumer(layerEl);
+      for (const previewVideo of this.previewEl?.querySelectorAll?.('video') || []) {
+        addConsumer(previewVideo);
+      }
+      for (const expandVideo of this._expandPanel?.querySelectorAll?.('video') || []) {
+        addConsumer(expandVideo);
+      }
+      return consumers;
+    }
+    ['_isCachedVideoObjectUrlReferenced'](el, objectUrl) {
+      const normalized = String(objectUrl || '').trim();
+      if (!el || !normalized) return false;
+      return [
+        el.getAttribute?.('src'),
+        el.currentSrc,
+        el.src,
+        el.dataset?.desktopMediaSourceUrl,
+      ].some((candidate) => String(candidate || '').trim() === normalized);
+    }
+    ['_detachCachedVideoObjectUrlConsumers'](objectUrl) {
+      const staleConsumers = [...this._getCachedVideoObjectUrlConsumers()].filter((el) =>
+        this._isCachedVideoObjectUrlReferenced(el, objectUrl),
+      );
+      this._activeFullscreenVideoEl &&
+        staleConsumers.includes(this._activeFullscreenVideoEl) &&
+        this._activeFullscreenCleanup?.();
+      for (const el of staleConsumers) {
+        const slotIndex = Math.max(0, Math.trunc(Number(el?.dataset?.idx) || 0));
+        resetVideoFramePresentation(el);
+        try {
+          el.pause?.();
+        } catch {}
+        (clearDesktopMediaPlaybackSourceMetadata(el), el.removeAttribute?.('src'));
+        try {
+          el.load?.();
+        } catch {}
+        releaseLocalVideoPlaybackObjectUrlOwner('ai-video:' + this.nodeId + ':slot:' + slotIndex);
+      }
+      return staleConsumers.length;
+    }
+    ['_releaseCachedVideoObjectUrl'](thumbId, objectUrl) {
+      const normalizedThumbId = String(thumbId || '').trim(),
+        normalizedObjectUrl = String(objectUrl || '').trim();
+      if (normalizedThumbId) this._cachedVideoUrls?.delete?.(normalizedThumbId);
+      if (!normalizedObjectUrl) return false;
+      return (
+        this._detachCachedVideoObjectUrlConsumers(normalizedObjectUrl),
+        revokeTrackedMediaObjectUrl(normalizedObjectUrl)
+      );
+    }
+    ['_syncCachedVideoObjectUrls'](nodeData = null) {
+      !(this._cachedVideoUrls instanceof Map) && (this._cachedVideoUrls = new Map());
+      const activeThumbIds = this._getActiveCachedVideoThumbIds(nodeData);
+      let releasedCount = 0;
+      for (const [thumbId, objectUrl] of [...this._cachedVideoUrls.entries()]) {
+        if (activeThumbIds.has(thumbId)) continue;
+        releasedCount += this._releaseCachedVideoObjectUrl(thumbId, objectUrl) ? 1 : 0;
+      }
+      return releasedCount;
+    }
+    ['_releaseAllCachedVideoObjectUrls']({ invalidatePending: invalidatePending = false } = {}) {
+      invalidatePending &&
+        ((this._videoObjectUrlLifecycleEpoch = Number(this._videoObjectUrlLifecycleEpoch || 0) + 1),
+        this._cachedVideoUrlLoads?.clear?.());
+      let releasedCount = 0;
+      for (const [thumbId, objectUrl] of [...(this._cachedVideoUrls?.entries?.() || [])]) {
+        releasedCount += this._releaseCachedVideoObjectUrl(thumbId, objectUrl) ? 1 : 0;
+      }
+      return (this._cachedVideoUrls?.clear?.(), releasedCount);
+    }
+    async ['_resolveCachedVideoObjectUrl'](thumbId) {
+      const normalizedThumbId = String(thumbId || '').trim();
+      if (!normalizedThumbId || !this._isCachedVideoThumbIdCurrent(normalizedThumbId)) return '';
+      !(this._cachedVideoUrls instanceof Map) && (this._cachedVideoUrls = new Map());
+      const cachedUrl = String(this._cachedVideoUrls.get(normalizedThumbId) || '').trim();
+      if (cachedUrl) return cachedUrl;
+      !(this._cachedVideoUrlLoads instanceof Map) && (this._cachedVideoUrlLoads = new Map());
+      const pendingLoad = this._cachedVideoUrlLoads.get(normalizedThumbId);
+      if (pendingLoad) return pendingLoad;
+      const lifecycleEpoch = Number(this._videoObjectUrlLifecycleEpoch || 0),
+        loadPromise = Promise.resolve()
+          .then(() => getImage(normalizedThumbId))
+          .then((blob) => {
+            if (
+              !blob ||
+              this._videoObjectUrlsDisposed === true ||
+              Number(this._videoObjectUrlLifecycleEpoch || 0) !== lifecycleEpoch ||
+              !this._isCachedVideoThumbIdCurrent(normalizedThumbId)
+            )
+              return '';
+            const alreadyCached = String(this._cachedVideoUrls.get(normalizedThumbId) || '').trim();
+            if (alreadyCached) return alreadyCached;
+            const objectUrl = createTrackedMediaObjectUrl(blob, {
+              kind: 'video',
+              ownerId: 'ai-video:' + this.nodeId + ':result-cache',
+              sourceUrl: normalizedThumbId,
+            });
+            if (!objectUrl) return '';
+            // 加载期间状态已翻页：丢弃新 URL，返回当时已落缓存的那份（若有）。
+            if (
+              this._videoObjectUrlsDisposed === true ||
+              Number(this._videoObjectUrlLifecycleEpoch || 0) !== lifecycleEpoch ||
+              !this._isCachedVideoThumbIdCurrent(normalizedThumbId) ||
+              this._cachedVideoUrls.has(normalizedThumbId)
+            )
+              return (
+                revokeTrackedMediaObjectUrl(objectUrl),
+                String(this._cachedVideoUrls.get(normalizedThumbId) || '').trim()
+              );
+            return (this._cachedVideoUrls.set(normalizedThumbId, objectUrl), objectUrl);
+          })
+          .catch(() => '')
+          .finally(() => {
+            this._cachedVideoUrlLoads.get(normalizedThumbId) === loadPromise &&
+              this._cachedVideoUrlLoads.delete(normalizedThumbId);
+          });
+      return (this._cachedVideoUrlLoads.set(normalizedThumbId, loadPromise), loadPromise);
+    }
+    ['_disposeCachedVideoObjectUrls']() {
+      return (
+        (this._videoObjectUrlsDisposed = true),
+        this._releaseAllCachedVideoObjectUrls({ invalidatePending: true })
+      );
+    }
+    ['_releaseLocalVideoPlaybackObjectUrl']() {
+      ((this._localPlaybackBlobToken = Number(this._localPlaybackBlobToken || 0) + 1),
+        this._localPlaybackBlobFetchController?.abort?.(),
+        (this._localPlaybackBlobFetchController = null),
+        (this._localPlaybackBlobPromise = null),
+        (this._localPlaybackBlobPromiseSource = ''));
+      const playbackObjectUrl = String(this._localPlaybackObjectUrl || '').trim();
+      ((this._localPlaybackObjectUrl = ''), (this._localPlaybackObjectSource = ''));
+      const scopeReleased = releaseLocalVideoPlaybackObjectUrlOwnerScope('ai-video:' + this.nodeId) > 0;
+      if (playbackObjectUrl) revokeTrackedMediaObjectUrl(playbackObjectUrl);
+      return scopeReleased || !!playbackObjectUrl;
+    }
+    ['_restorePreviewHoverPlaybackTime'](el, sourceUrl) {
+      const resumeState = this._hoverPlaybackResumeState,
+        normalizedSource = String(sourceUrl || '').trim();
+      if (!resumeState || !el || !normalizedSource || resumeState.source !== normalizedSource)
+        return false;
+      const tryRestore = () => {
+        if (this._hoverPlaybackResumeState !== resumeState || !isMediaElementPlaybackSource(el, normalizedSource))
+          return false;
+        const duration = Number(el.duration || 0);
+        if (!Number.isFinite(duration) || duration <= 0) return false;
+        const resumeTime = Math.min(
+          Math.max(0, Number(resumeState.time || 0)),
+          Math.max(0, duration - 0.05),
+        );
+        try {
+          el.currentTime = resumeTime;
+        } catch {
+          return false;
+        }
+        return ((this._hoverPlaybackResumeState = null), true);
+      };
+      if (tryRestore()) return true;
+      const onReady = () => {
+        if (!tryRestore()) return;
+        (el.removeEventListener?.('loadedmetadata', onReady),
+          el.removeEventListener?.('canplay', onReady));
+      };
+      return (
+        el.addEventListener?.('loadedmetadata', onReady),
+        el.addEventListener?.('canplay', onReady),
+        true
+      );
     }
     ['_resolveDeferredVideoPosterUrl']() {
       const value5 = this._data || {},
@@ -171,6 +453,58 @@ export function createVideoNodeResultRenderModule(index) {
         if (value13) return value13;
       }
       return '';
+    }
+    ['_shouldRecoverPreviewPlayback'](el) {
+      return (
+        el?.isConnected !== false &&
+        this._hoverManualPause !== true &&
+        (this._isHovered || this._isManualControl || !el?.paused)
+      );
+    }
+    ['_clearPreviewPosterForVisibleFrame'](el) {
+      if (isVideoResultFrameReady(el))
+        return (this._markPreviewPosterClearedForPlayback(el), true);
+      return (
+        watchVideoFramePresentation(el, () => {
+          const nodeData =
+              (typeof store.getStateRaw === 'function'
+                ? store.getStateRaw()
+                : store.getState()
+              )?.nodes?.[this.nodeId] ||
+              this._data ||
+              {},
+            mainIndex = Math.max(0, Math.trunc(Number(nodeData.mainVideoIndex) || 0)),
+            slotIndex = Math.max(0, Math.trunc(Number(el?.dataset?.idx) || 0));
+          if (slotIndex !== mainIndex || !isVideoResultFrameReady(el)) return;
+          this._markPreviewPosterClearedForPlayback(el);
+        }),
+        false
+      );
+    }
+    ['_markPreviewPosterClearedForPlayback'](el) {
+      if (!el) return false;
+      !this._previewPostersClearedForPlayback &&
+        (this._previewPostersClearedForPlayback = new WeakMap());
+      const presentationSource = getVideoPresentationSource(el),
+        alreadyCleared = !!(
+          presentationSource &&
+          this._previewPostersClearedForPlayback.get(el) === presentationSource
+        ),
+        hasDeferredPoster = !!this._deferredPosterImgEl,
+        hasPosterAttr = !!String(el?.poster || '').trim(),
+        isFastPreviewOwner = this.el?.dataset?.rendererPresentationOwner === 'fast-preview';
+      if (alreadyCleared && !hasDeferredPoster && !hasPosterAttr && !isFastPreviewOwner) return false;
+      (this._previewPostersClearedForPlayback.set(el, presentationSource),
+        this._removeDeferredVideoPosterPreview(),
+        globalThis.window?.v2Renderer?.releaseFastPreviewForPlayback?.(this.nodeId));
+      if (hasPosterAttr) return (el.removeAttribute?.('poster'), true);
+      return hasDeferredPoster || isFastPreviewOwner;
+    }
+    ['_isPreviewPosterClearedForPlayback'](el) {
+      const presentationSource = getVideoPresentationSource(el);
+      return !!(
+        presentationSource && this._previewPostersClearedForPlayback?.get?.(el) === presentationSource
+      );
     }
     ['_removeDeferredVideoPosterPreview']() {
       (this._deferredPosterImgEl?.remove?.(), (this._deferredPosterImgEl = null));
@@ -498,10 +832,14 @@ export function createVideoNodeResultRenderModule(index) {
       return videoResultRenderText('elapsedSeconds', { seconds: seconds });
     }
     async ['_loadAndDisplayVideo']() {
+      const nodeData = store.getState().nodes?.[this.nodeId] || this._data || {};
       if (this._rendererMediaDeferred === true) {
         ((this._deferredVideoViewRefreshPending = true), this._showDeferredVideoPosterPreview());
         return;
       }
+      // 每轮渲染先对账缓存：失活 thumbId 的 objectURL 在此统一撤销。
+      (this._videoRenderEpoch = Number(this._videoRenderEpoch || 0) + 1),
+        this._syncCachedVideoObjectUrls(nodeData);
       this._removeDeferredVideoPosterPreview();
       const videoUrl = this._data.videos || [];
       videoUrl.length === 0 &&
@@ -515,6 +853,8 @@ export function createVideoNodeResultRenderModule(index) {
         value48 = this._data.rhStatusCode,
         value49 = this._getGenerationFailureMessage(this._data);
       if (value49 && videoUrl.length === 0) {
+        ((this._videoSourceAttachToken = Number(this._videoSourceAttachToken || 0) + 1),
+          this._releaseLocalVideoPlaybackObjectUrl());
         this.videoEl &&
           ((this.videoEl.style.display = 'none'),
           this.videoEl.removeAttribute?.('src'),
@@ -527,6 +867,8 @@ export function createVideoNodeResultRenderModule(index) {
         return;
       }
       if (value47 && videoUrl.length === 0) {
+        ((this._videoSourceAttachToken = Number(this._videoSourceAttachToken || 0) + 1),
+          this._releaseLocalVideoPlaybackObjectUrl());
         this.videoEl &&
           ((this.videoEl.style.display = 'none'),
           this.videoEl.removeAttribute?.('src'),
@@ -541,6 +883,8 @@ export function createVideoNodeResultRenderModule(index) {
       this._clearStatusOverlay();
       const count9 = videoUrl.length;
       if (count9 === 0) {
+        ((this._videoSourceAttachToken = Number(this._videoSourceAttachToken || 0) + 1),
+          this._releaseLocalVideoPlaybackObjectUrl());
         this.videoEl &&
           ((this.videoEl.style.display = 'none'),
           this.videoEl.removeAttribute?.('src'),

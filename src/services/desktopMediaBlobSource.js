@@ -1,7 +1,10 @@
+import { desktopBridge } from './desktopBridge.js';
 const DESKTOP_PREVIEW_URL_CACHE_TTL_MS = 30 * 60 * 1000,
   desktopPreviewUrlCache = new Map(),
+  desktopPreviewUrlPendingCache = new Map(),
   LOCAL_MEDIA_PATH_PREFIX_RE = /^(?:\/)?(?:output\/|data\/assets\/|data\/uploads\/)/i,
   LOCAL_PREVIEW_SCHEME_RE = /^aic-local-preview:/i,
+  DIRECT_LOCAL_MEDIA_FLAG_RE = /^(1|true|yes|on)$/i,
   MEDIA_MIME_BY_EXT = {
     mp4: 'video/mp4',
     m4v: 'video/mp4',
@@ -23,151 +26,244 @@ function normalizeUrl(value) {
     return enabled;
   }
 }
+function nowMs() {
+  return typeof performance !== 'undefined' && typeof performance.now === 'function'
+    ? performance.now()
+    : Date.now();
+}
+function markMediaSourceAttach(payload = {}) {
+  globalThis.window?.__runtimeCompareMark?.('media-source-attach:complete', payload);
+}
 function isDesktopRenderer() {
-  return !!globalThis.window?.electronAPI;
+  return desktopBridge.mediaPreview.isAvailable();
+}
+// 诊断开关：强制走直连 http 本地地址，绕过 desktop 本地预览 URL 协商。
+function shouldUseDirectLocalMediaSource() {
+  const windowObject = globalThis.window || {},
+    diagnosticFlag =
+      windowObject.__AIC_ALLOW_DIRECT_LOCAL_MEDIA_DIAGNOSTIC__ ??
+      globalThis.__AIC_ALLOW_DIRECT_LOCAL_MEDIA_DIAGNOSTIC__;
+  if (!DIRECT_LOCAL_MEDIA_FLAG_RE.test(String(diagnosticFlag || '').trim())) return false;
+  const directFlag =
+    windowObject.__AIC_DIRECT_LOCAL_MEDIA__ ??
+    windowObject.__AIC_DESKTOP_MEDIA_DIRECT_HTTP__ ??
+    globalThis.__AIC_DIRECT_LOCAL_MEDIA__;
+  return DIRECT_LOCAL_MEDIA_FLAG_RE.test(String(directFlag || '').trim());
 }
 function isDesktopBlobCandidate(item) {
   return (void item, false);
 }
-function isLoopbackHost(key) {
-  const index = String(key || '').toLowerCase();
-  return index === 'localhost' || index === '127.0.0.1' || index === '::1' || index === '[::1]';
+function isLoopbackHost(host) {
+  const normalized = String(host || '').toLowerCase();
+  return (
+    normalized === 'localhost' ||
+    normalized === '127.0.0.1' ||
+    normalized === '::1' ||
+    normalized === '[::1]'
+  );
 }
-function normalizeDesktopLocalMediaPath(result) {
-  const enabled2 = String(result || '').trim();
-  if (!enabled2 || /^(?:blob:|data:|file:)/i.test(enabled2) || LOCAL_PREVIEW_SCHEME_RE.test(enabled2))
+function normalizeDesktopLocalMediaPath(target) {
+  const trimmed = String(target || '').trim();
+  if (!trimmed || /^(?:blob:|data:|file:)/i.test(trimmed) || LOCAL_PREVIEW_SCHEME_RE.test(trimmed))
     return '';
-  let data = enabled2;
+  let path = trimmed;
   try {
-    const uRL = new URL(enabled2, globalThis.location?.href || 'http://127.0.0.1:8777/'),
-      options = String(globalThis.location?.origin || ''),
-      enabled3 =
-        /^https?:$/i.test(uRL.protocol) &&
-        ((options && uRL.origin === options) || isLoopbackHost(uRL.hostname));
-    if (!enabled3) return '';
-    data = uRL.pathname;
+    const parsed = new URL(trimmed, globalThis.location?.href || 'http://127.0.0.1:8777/'),
+      origin = String(globalThis.location?.origin || ''),
+      isLocalOrigin =
+        /^https?:$/i.test(parsed.protocol) &&
+        ((origin && parsed.origin === origin) || isLoopbackHost(parsed.hostname));
+    if (!isLocalOrigin) return '';
+    path = parsed.pathname;
   } catch {
-    data = enabled2.split(/[?#]/, 1)[0];
+    path = trimmed.split(/[?#]/, 1)[0];
   }
-  data = String(data || '')
+  path = String(path || '')
     .replace(/\\/g, '/')
     .split(/[?#]/, 1)[0];
   try {
-    data = decodeURIComponent(data);
+    path = decodeURIComponent(path);
   } catch {}
-  data = data.replace(/^\/+/, '');
-  if (!LOCAL_MEDIA_PATH_PREFIX_RE.test(data)) return '';
-  return '/' + data;
+  path = path.replace(/^\/+/, '');
+  if (!LOCAL_MEDIA_PATH_PREFIX_RE.test(path)) return '';
+  return '/' + path;
 }
 function inferMediaMimeType(target) {
-  const enabled4 = String(target || '')
+  const matched = String(target || '')
     .split(/[?#]/, 1)[0]
     .match(/\.([a-z0-9]+)$/i);
-  if (!enabled4) return '';
-  return MEDIA_MIME_BY_EXT[String(enabled4[1] || '').toLowerCase()] || '';
+  if (!matched) return '';
+  return MEDIA_MIME_BY_EXT[String(matched[1] || '').toLowerCase()] || '';
 }
-function readPreviewCache(source) {
-  const response = desktopPreviewUrlCache.get(source);
-  if (!response) return '';
-  if (Number(response.expiresAt || 0) <= Date.now()) return (desktopPreviewUrlCache.delete(source), '');
-  return String(response.url || '');
+// chrome-shell 下 audio 元素与本地预览地址同源不一致会触发混合内容拦截，
+// 这里在 127.0.0.1 / localhost 之间做一次等价改写。
+function resolveChromeShellAudioPlaybackUrl(el, url) {
+  if (!desktopBridge.isChromeShell || String(el?.tagName || '').toLowerCase() !== 'audio') return url;
+  const normalized = normalizeUrl(url),
+    localPath = normalizeDesktopLocalMediaPath(normalized);
+  if (!localPath) return normalized;
+  try {
+    const origin = String(globalThis.location?.origin || ''),
+      parsed = new URL(normalized);
+    if (origin && parsed.origin !== origin) return normalized;
+    if (parsed.hostname === '127.0.0.1') parsed.hostname = 'localhost';
+    else if (parsed.hostname === 'localhost') parsed.hostname = '127.0.0.1';
+    else return normalized;
+    return parsed.href;
+  } catch {
+    return normalized;
+  }
 }
-function writePreviewCache(enabled5, url) {
-  if (!enabled5 || !url) return;
-  desktopPreviewUrlCache.set(enabled5, {
+function readPreviewCache(localPath) {
+  const cached = desktopPreviewUrlCache.get(localPath);
+  if (!cached) return '';
+  if (Number(cached.expiresAt || 0) <= Date.now())
+    return (desktopPreviewUrlCache.delete(localPath), '');
+  return String(cached.url || '');
+}
+function writePreviewCache(localPath, url) {
+  if (!localPath || !url) return;
+  desktopPreviewUrlCache.set(localPath, {
     url: url,
     expiresAt: Date.now() + DESKTOP_PREVIEW_URL_CACHE_TTL_MS,
   });
 }
-function getMediaElementSource(next) {
-  return String(next?.getAttribute?.('src') || next?.currentSrc || next?.src || '').trim();
+function getMediaElementSource(el) {
+  const readAttribute = el?.getAttribute;
+  if (typeof readAttribute === 'function')
+    return String(readAttribute.call(el, 'src') || el?.src || '').trim();
+  return String(el?.src || el?.currentSrc || '').trim();
 }
-export function getMediaElementCurrentSource(current) {
-  return getMediaElementSource(current);
+export function getMediaElementCurrentSource(el) {
+  return getMediaElementSource(el);
 }
 export function getMediaElementPlaybackSourceKey(el) {
   const mediaElementSource = getMediaElementSource(el);
   if (!mediaElementSource) return '';
-  const entry = String(el?.dataset?.desktopMediaSourceUrl || '').trim();
-  if (entry) return entry;
+  const originalSourceUrl = String(el?.dataset?.desktopMediaSourceUrl || '').trim();
+  if (originalSourceUrl) return originalSourceUrl;
   return mediaElementSource;
 }
-export function normalizeMediaPlaybackSourceUrl(record) {
-  return normalizeUrl(record);
+export function normalizeMediaPlaybackSourceUrl(value) {
+  return normalizeUrl(value);
 }
-export function isMediaElementPlaybackSource(payload, handle) {
-  const mediaElementPlaybackSourceKey = getMediaElementPlaybackSourceKey(payload),
-    url2 = normalizeUrl(handle);
-  return !!mediaElementPlaybackSourceKey && !!url2 && normalizeUrl(mediaElementPlaybackSourceKey) === url2;
+export function isMediaElementPlaybackSource(el, handle) {
+  const playbackSourceKey = getMediaElementPlaybackSourceKey(el),
+    normalizedHandle = normalizeUrl(handle);
+  return !!playbackSourceKey && !!normalizedHandle && normalizeUrl(playbackSourceKey) === normalizedHandle;
 }
-export function clearDesktopMediaPlaybackSourceMetadata(el2) {
-  if (!el2?.dataset) return;
-  delete el2.dataset.desktopMediaSourceUrl;
+export function clearDesktopMediaPlaybackSourceMetadata(el) {
+  if (!el?.dataset) return;
+  delete el.dataset.desktopMediaSourceUrl;
 }
-function assignMediaElementSource(el3, enabled6, state = 'auto', config = {}) {
-  if (!el3 || !enabled6) return '';
-  const url3 = normalizeUrl(config.originalSourceUrl || enabled6),
-    url4 = normalizeUrl(enabled6),
-    mediaElementSource2 = getMediaElementSource(el3),
-    scope = String(el3?.dataset?.desktopMediaSourceUrl || '').trim();
+function assignMediaElementSource(el, url, preload = 'auto', options = {}) {
+  if (!el || !url) return '';
+  if (typeof options.shouldAssign === 'function' && options.shouldAssign() !== true) return '';
+  const startedAt = nowMs(),
+    originalSourceUrl = normalizeUrl(options.originalSourceUrl || url),
+    playbackUrl = normalizeUrl(url);
+  // 本地预览协议需要 CORS 放行才能取帧；已经设过就不必重复赋值。
+  let crossOriginChanged = false;
+  if (LOCAL_PREVIEW_SCHEME_RE.test(playbackUrl) && 'crossOrigin' in el && el.crossOrigin !== 'anonymous') {
+    el.crossOrigin = 'anonymous';
+    crossOriginChanged = true;
+  }
+  const currentSource = getMediaElementSource(el),
+    currentOriginalSourceUrl = String(el?.dataset?.desktopMediaSourceUrl || '').trim();
   if (
-    mediaElementSource2 &&
-    (normalizeUrl(mediaElementSource2) === url4 || (scope && normalizeUrl(scope) === url3))
+    !crossOriginChanged &&
+    currentSource &&
+    (normalizeUrl(currentSource) === playbackUrl ||
+      (currentOriginalSourceUrl && normalizeUrl(currentOriginalSourceUrl) === originalSourceUrl))
   )
-    return mediaElementSource2;
-  el3.preload = state || el3.preload || 'auto';
-  el3.dataset &&
-    (url3 && url4 !== url3
-      ? (el3.dataset.desktopMediaSourceUrl = url3)
-      : delete el3.dataset.desktopMediaSourceUrl);
-  typeof el3.setAttribute === 'function' ? el3.setAttribute('src', enabled6) : (el3.src = enabled6);
-  if (config.load !== false)
+    return currentSource;
+  el.preload = preload || el.preload || 'auto';
+  if (el.dataset) {
+    if (originalSourceUrl && playbackUrl !== originalSourceUrl)
+      el.dataset.desktopMediaSourceUrl = originalSourceUrl;
+    else delete el.dataset.desktopMediaSourceUrl;
+  }
+  typeof el.setAttribute === 'function' ? el.setAttribute('src', url) : (el.src = url);
+  try {
+    options.onSourceAssigned?.({ originalSourceUrl: originalSourceUrl, playbackUrl: playbackUrl });
+  } catch {}
+  if (options.load !== false) {
     try {
-      el3.load?.();
+      el.load?.();
     } catch {}
-  return enabled6;
+  }
+  return (
+    markMediaSourceAttach({
+      originalSourceUrl: originalSourceUrl,
+      playbackUrl: playbackUrl,
+      tag: String(el?.tagName || '').toLowerCase(),
+      loadRequested: options.load !== false,
+      durationMs: Math.max(0, nowMs() - startedAt),
+    }),
+    url
+  );
 }
 export async function resolveDesktopMediaPlaybackUrl(input) {
-  const url5 = normalizeUrl(input);
-  if (!isDesktopRenderer()) return url5;
-  const localPath = normalizeDesktopLocalMediaPath(url5 || input);
-  if (!localPath) return url5;
-  const previewCache = readPreviewCache(localPath);
-  if (previewCache) return previewCache;
-  const output = globalThis.window?.electronAPI;
-  if (typeof output?.getLocalPreviewUrl !== 'function') return url5;
-  try {
-    const response2 = await output.getLocalPreviewUrl({
-        localPath: localPath,
-        type: inferMediaMimeType(localPath),
-      }),
-      value2 = String(response2?.url || response2 || '').trim();
-    if (value2) return (writePreviewCache(localPath, value2), value2);
-  } catch {}
-  return url5;
+  const normalized = normalizeUrl(input);
+  if (desktopBridge.isChromeShell) return normalized;
+  if (!isDesktopRenderer()) return normalized;
+  const localPath = normalizeDesktopLocalMediaPath(normalized || input);
+  if (!localPath) return normalized;
+  if (shouldUseDirectLocalMediaSource()) return normalized;
+  const cachedUrl = readPreviewCache(localPath);
+  if (cachedUrl) return cachedUrl;
+  // 同一路径并发请求只打一次桥，其余等同一个 promise。
+  const pending = desktopPreviewUrlPendingCache.get(localPath);
+  if (pending) return await pending;
+  const request = (async () => {
+    try {
+      const response = await desktopBridge.mediaPreview.getLocalPreviewUrl({
+          localPath: localPath,
+          type: inferMediaMimeType(localPath),
+        }),
+        resolvedUrl = String(response?.url || response || '').trim();
+      if (resolvedUrl) return (writePreviewCache(localPath, resolvedUrl), resolvedUrl);
+    } catch {}
+    return normalized;
+  })().finally(() => {
+    desktopPreviewUrlPendingCache.delete(localPath);
+  });
+  return (desktopPreviewUrlPendingCache.set(localPath, request), await request);
 }
-export async function attachDesktopMediaPlaybackSource(enabled7, value3, load = {}) {
-  if (!enabled7) return '';
-  const originalSourceUrl = normalizeUrl(value3),
-    isDesktopRenderer2 = isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(value3) : value3;
-  return assignMediaElementSource(enabled7, isDesktopRenderer2, load.preload || enabled7.preload, {
+export async function attachDesktopMediaPlaybackSource(el, source, load = {}) {
+  if (!el) return '';
+  const originalSourceUrl = normalizeUrl(source),
+    resolvedUrl = isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(source) : source,
+    playbackUrl = resolveChromeShellAudioPlaybackUrl(el, resolvedUrl);
+  return assignMediaElementSource(el, playbackUrl, load.preload || el.preload, {
     originalSourceUrl: originalSourceUrl,
     load: load.load,
+    onSourceAssigned: load.onSourceAssigned,
+    shouldAssign: load.shouldAssign,
   });
 }
-export async function attachMediaElementPlaybackSource(enabled8, value4, load2 = {}) {
-  if (!enabled8) return '';
-  const originalSourceUrl2 = normalizeUrl(value4);
-  if (!originalSourceUrl2) return '';
-  const isDesktopRenderer3 = isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(value4) : value4;
-  return assignMediaElementSource(enabled8, isDesktopRenderer3, load2.preload || enabled8.preload, {
-    originalSourceUrl: originalSourceUrl2,
-    load: load2.load,
+export async function attachMediaElementPlaybackSource(el, source, load = {}) {
+  if (!el) return '';
+  const originalSourceUrl = normalizeUrl(source);
+  if (!originalSourceUrl) return '';
+  // 调用方已算好播放地址时直接用它，不再重复协商，也不再做 chrome-shell 改写。
+  const explicitPlaybackUrl = String(load.playbackUrl || '').trim(),
+    resolvedUrl =
+      explicitPlaybackUrl ||
+      (isDesktopRenderer() ? await resolveDesktopMediaPlaybackUrl(source) : source),
+    playbackUrl = explicitPlaybackUrl
+      ? resolvedUrl
+      : resolveChromeShellAudioPlaybackUrl(el, resolvedUrl);
+  return assignMediaElementSource(el, playbackUrl, load.preload || el.preload, {
+    originalSourceUrl: originalSourceUrl,
+    load: load.load,
+    onSourceAssigned: load.onSourceAssigned,
+    shouldAssign: load.shouldAssign,
   });
 }
 export const __desktopMediaBlobSourceForTest = {
   clearBlobCacheForTest() {
-    desktopPreviewUrlCache.clear();
+    (desktopPreviewUrlCache.clear(), desktopPreviewUrlPendingCache.clear());
   },
   isDesktopBlobCandidate: isDesktopBlobCandidate,
   normalizeDesktopLocalMediaPath: normalizeDesktopLocalMediaPath,
