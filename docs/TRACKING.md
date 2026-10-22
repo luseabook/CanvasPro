@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-22（194 批·**门禁补盲：模块级 function 层**）：`port-parity-scan.mjs` 新增 `extractModuleFunctionSignatures`（只收 0 缩进的模块级声明，排除 `_0x` 与嵌套闭包）；`check-port-parity.mjs` 以独立层 `moduleFunctionRows` 报告，**不进退出码、不动基线**。实跑暴露 **96 个模块级函数全仓无定义，分布 32 个文件，其中 21 个文件方法缺口为 0**（此前完全看不见）。线索由 REA `semantic_graph` 交叉核对得出。补测试 2 例，全量 **11415/11415/0**。
 - 2026-10-22（193 批·**音频区间切割**）：`AudioClipController.js` 补 22 方法 + `initForSource` + 两个导出，整块切分从零落地：分段归一化（重叠/最短长度/越界夹取）、相邻段硬边界、整体平移与边缘拉伸、切点预告线、`has-split` 遮罩、双段拖拽命中。`_confirm` 加 `onConfirm({startSec,endSec,splitSec,ranges})` 出口——`audioVoicePanel:2724` 早按此契约调用，此前是空钩子。样式拆到 `styles/audio-clip-split.css`。测试 0→14，基线 105→84，全量 **11413/11413/0**。
-- 2026-10-22（192 批·**会话仓库升代闭合事件流**）：`agentConversationStore.js` 升到 schema v2（277→740 行）：事件溯源落盘、`persistence` 注入、写失败暂存内存 + `getPersistenceError`/`retryPersistence` 重试、带 replyVersions 的关键写入失败抛错；`updateConversation` 未传事件流时逐字段 diff 补事件；老数据就地补等价事件流。新增 `api/officialTextAdmission.js`（路由白名单 + 凭据剥离）与 `agentOfficialTextTask.js`。补测试 20 例，含两仓库事件流闭合联动用例。全量 **11399/11399/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

@@ -43,13 +43,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { extractAliasSignatures, extractMethodSignatures } from './port-parity-scan.mjs';
+import {
+  extractAliasSignatures,
+  extractMethodSignatures,
+  extractModuleFunctionSignatures,
+} from './port-parity-scan.mjs';
 
 // Re-exported so callers (and the test suite) keep a single import surface.
 export {
   extractAliasSignatures,
   extractMethodNames,
   extractMethodSignatures,
+  extractModuleFunctionSignatures,
 } from './port-parity-scan.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -133,6 +138,7 @@ export function listJavaScriptFiles(root) {
  *   signatureDrift: Array<{file:string, name:string, upstreamArity:number, repoArity:number}>,
  *   aliasRows: Array<{file:string, missing:string[], live:string[]}>,
  *   minified: Array<{file:string, bytes:number, upstreamLines:number}>,
+ *   moduleFunctionRows: Array<{file:string, missing:string[]}>,
  * }}
  */
 export function comparePortParity(mirrorRoot, repoRoot) {
@@ -145,6 +151,13 @@ export function comparePortParity(mirrorRoot, repoRoot) {
   const repoSourcesByFile = new Map();
   /** @type {Map<string, string[]>} method name -> files defining it */
   const definitionsByName = new Map();
+  /**
+   * Module-scope `function` declarations seen anywhere in the repo, name ->
+   * files. Separate from `definitionsByName` so this layer can never satisfy a
+   * method gap (or vice versa): a helper and a method are different contracts.
+   * @type {Map<string, string[]>}
+   */
+  const moduleFunctionOwners = new Map();
   for (const relativePath of repoFiles) {
     if (relativePath.endsWith('.test.js')) continue;
     let source;
@@ -167,6 +180,22 @@ export function comparePortParity(mirrorRoot, repoRoot) {
       if (owners) owners.push(relativePath);
       else definitionsByName.set(name, [relativePath]);
     }
+    for (const name of extractModuleFunctionSignatures(source).keys()) {
+      const owners = moduleFunctionOwners.get(name);
+      if (owners) owners.push(relativePath);
+      else moduleFunctionOwners.set(name, [relativePath]);
+    }
+    // A helper implemented as `const helper = (...) => ...` is just as ported as
+    // one written with `function helper(...)`. Without this the report layer flags
+    // every arrow-style utility as missing, which is pure noise.
+    const valueBinding =
+      /^(?:export\s+)?(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:function\b|\([^)]*\)\s*=>|[A-Za-z_$][\w$]*\s*=>)/gm;
+    let binding;
+    while ((binding = valueBinding.exec(source)) !== null) {
+      const owners = moduleFunctionOwners.get(binding[1]);
+      if (owners) owners.push(relativePath);
+      else moduleFunctionOwners.set(binding[1], [relativePath]);
+    }
   }
 
   const rows = [];
@@ -176,6 +205,8 @@ export function comparePortParity(mirrorRoot, repoRoot) {
   const minified = [];
   /** @type {Array<{file:string, missing:string[], live:string[]}>} */
   const aliasRows = [];
+  /** @type {Array<{file:string, missing:string[]}>} */
+  const moduleFunctionRows = [];
   let comparedFiles = 0;
 
   // Dot-access call sites across the repo. Used only to rank alias gaps: an API
@@ -216,6 +247,18 @@ export function comparePortParity(mirrorRoot, repoRoot) {
         missing: aliasMissing,
         live: aliasMissing.filter((name) => calledNames.has(name)),
       });
+    }
+
+    // Module-scope `function` declarations, reported apart from the hard gap
+    // count: a helper may legitimately move into a shared util module, so a def
+    // anywhere in the repo satisfies it. Only "nowhere in the repo" is worth a
+    // look, and even then it is never a failure — see the layer's docs in
+    // `port-parity-scan.mjs` for why the strict set excludes declarations.
+    const moduleFunctionMissing = [...extractModuleFunctionSignatures(upstreamSource).keys()]
+      .filter((name) => !repoSignatures.has(name) && !moduleFunctionOwners.has(name))
+      .sort();
+    if (moduleFunctionMissing.length > 0) {
+      moduleFunctionRows.push({ file: relativePath, missing: moduleFunctionMissing });
     }
 
     // Whole-block collapse, measured in bytes rather than lines: this repo
@@ -303,7 +346,19 @@ export function comparePortParity(mirrorRoot, repoRoot) {
       left.file.localeCompare(right.file)
   );
   minified.sort((left, right) => right.bytes - left.bytes);
-  return { comparedFiles, rows, sizeDrift, signatureDrift, aliasRows, minified };
+  moduleFunctionRows.sort(
+    (left, right) =>
+      right.missing.length - left.missing.length || left.file.localeCompare(right.file)
+  );
+  return {
+    comparedFiles,
+    rows,
+    sizeDrift,
+    signatureDrift,
+    aliasRows,
+    minified,
+    moduleFunctionRows,
+  };
 }
 
 /**
@@ -408,7 +463,7 @@ function parseArguments(argv) {
           '  --verbose            逐文件列出缺口方法',
           '',
           '只比对两边都存在的同名文件；整件未移植的文件不在此门禁范围内。',
-          'sizeDrift / signatureDrift / 别名缺口为只报告项，不参与退出码。',
+          'sizeDrift / signatureDrift / 别名缺口 / 模块级 function 缺口为只报告项，不参与退出码。',
           'compressed（压缩成单行）参与退出码：它违反「不做压缩处理」的要求。',
         ].join('\n')
       );
@@ -437,10 +492,8 @@ function main() {
     return;
   }
 
-  const { comparedFiles, rows, sizeDrift, signatureDrift, aliasRows, minified } = comparePortParity(
-    mirrorPath,
-    options.repo
-  );
+  const { comparedFiles, rows, sizeDrift, signatureDrift, aliasRows, minified, moduleFunctionRows } =
+    comparePortParity(mirrorPath, options.repo);
   if (comparedFiles < 100) {
     console.log(
       `SKIP  移植完整性门禁：镜像 ${mirrorPath} 只匹配到 ${comparedFiles} 个同名文件，` +
@@ -476,6 +529,7 @@ function main() {
           signatureDrift,
           aliasRows,
           minified,
+          moduleFunctionRows,
         },
         null,
         2
@@ -529,6 +583,23 @@ function main() {
           `其中 ${aliasLiveTotal} 个在代码里有调用点（等于死钩子）。` +
           '用 --verbose 看明细。'
       );
+    }
+    const moduleFunctionTotal = moduleFunctionRows.reduce(
+      (sum, row) => sum + row.missing.length,
+      0
+    );
+    if (moduleFunctionTotal > 0) {
+      // Never part of the exit code: a module-level helper can be inlined or moved
+      // to a shared util between versions without losing a feature. It is surfaced
+      // because the strict set cannot see this layer at all — 53 real losses were
+      // invisible before this line existed.
+      console.log(
+        `INFO  ${moduleFunctionTotal} 个模块级 function 声明在仓库中找不到（只报告，不进退出码），` +
+          `分布在 ${moduleFunctionRows.length} 个文件：`
+      );
+      for (const item of moduleFunctionRows.slice(0, 10))
+        console.log(`  - ${item.file}: ${item.missing.join(', ')}`);
+      if (moduleFunctionRows.length > 10) console.log(`  ...另有 ${moduleFunctionRows.length - 10} 个文件`);
     }
     if (minified.length > 0) {
       const totalBytes = minified.reduce((sum, item) => sum + item.bytes, 0);

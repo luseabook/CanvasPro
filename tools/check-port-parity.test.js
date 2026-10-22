@@ -18,6 +18,7 @@ import {
   extractAliasSignatures,
   extractMethodNames,
   extractMethodSignatures,
+  extractModuleFunctionSignatures,
   listJavaScriptFiles,
 } from './check-port-parity.mjs';
 
@@ -270,6 +271,71 @@ test('check-port-parity: 压缩成单行的文件单独报 minified，不算 siz
     assert.equal(row.upstreamLines > 50, true, '附带上游行数供判断'),
     assert.deepEqual(report.sizeDrift, [], '压缩文件不重复计入 sizeDrift'),
     assert.deepEqual(report.rows, [], '方法都在，不该报缺口'));
+});
+
+test('check-port-parity: 模块级 function 声明独立成层，排除 _0x 与嵌套闭包', () => {
+  // 严格集只认三种类方法形态，所以模块级 `function f()` 一直是盲区：实测 30 个
+  // 缺口文件里有 53 个模块级函数「全仓无」却从未被报告。这一层只报告、不拦截，
+  // 但必须先把两类噪声挡在外面：上游 `_0x` 名（仓库已改名）与嵌套闭包（名字跨版本
+  // 无意义）。
+  const source = [
+    'function moduleLevel(a, b) {',
+    '  return a + b;',
+    '}',
+    'export async function exported(only) {',
+    '  return only;',
+    '}',
+    'function _0x9f8a1c(payload) {',
+    '  return payload;',
+    '}',
+    'class Holder {',
+    '  method() {',
+    '    function nestedClosure(x) {',
+    '      return x;',
+    '    }',
+    '    return nestedClosure(1);',
+    '  }',
+    '}',
+  ].join('\n');
+  const moduleFunctions = extractModuleFunctionSignatures(source);
+  (assert.equal(moduleFunctions.has('moduleLevel'), true, '模块级声明要收'),
+    assert.equal(moduleFunctions.get('moduleLevel').length, 2, '形参个数要保留'),
+    assert.equal(moduleFunctions.has('exported'), true, 'export 前缀不影响识别'),
+    assert.equal(moduleFunctions.has('_0x9f8a1c'), false, '_0x 名必须排除'),
+    assert.equal(moduleFunctions.has('nestedClosure'), false, '嵌套闭包不算模块级'),
+    assert.equal(extractMethodNames(source).has('moduleLevel'), false, '也不许混进严格集'));
+});
+
+test('check-port-parity: 模块级函数缺失只报告，不计入硬缺口、不影响退出码', () => {
+  const mirror = makeTree({
+    'src/a.js': [
+      'function helper(a, b) {',
+      '  return a + b;',
+      '}',
+      'class A {',
+      '  _one() {}',
+      '}',
+      '',
+    ].join('\n'),
+  });
+  const repo = makeTree({ 'src/a.js': 'class A {\n  _one() {}\n}\n' });
+  const report = comparePortParity(mirror, repo);
+  const row = report.moduleFunctionRows.find((item) => item.file === 'src/a.js');
+  (assert.deepEqual(report.rows, [], '模块级函数不进硬缺口，基线不受影响'),
+    assert.deepEqual(row?.missing, ['helper'], '要单独报出来'),
+    // 同一个名字若在仓库别处（例如共享 util）以模块级形式存在，就不算缺失：
+    // helper 挪进共享模块是重构，不是功能丢失。
+    assert.deepEqual(
+      comparePortParity(
+        mirror,
+        makeTree({
+          'src/a.js': 'class A {\n  _one() {}\n}\n',
+          'src/shared/util.js': 'export function helper(a, b) {\n  return a + b;\n}\n',
+        })
+      ).moduleFunctionRows,
+      [],
+      '迁到共享 util 的同名函数不算缺失'
+    ));
 });
 
 test('check-port-parity: 存在压缩文件时门禁直接失败（双向）', () => {

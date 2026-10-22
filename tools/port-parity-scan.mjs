@@ -302,6 +302,44 @@ export function extractAliasSignatures(source) {
 }
 
 /**
+ * Module-scope `function name(...) { ... }` declarations.
+ *
+ * Kept out of the strict set on purpose: the hard gate compares the three method
+ * shapes only, because a module-level helper may be inlined, merged or renamed
+ * between versions without a feature being lost. That exclusion is also why 53
+ * helpers that were really never ported stayed invisible, so this layer exists —
+ * reported separately and never as a hard gap.
+ *
+ * Two constraints keep it from manufacturing noise:
+ *  - column 0 only. An indented `function` is a closure inside some other body,
+ *    and its name means nothing across versions.
+ *  - `_0x` names dropped. Upstream mangles them and the repo renames them, so
+ *    comparing them would report every renamed local as a gap.
+ * @param {string} source
+ * @returns {Map<string, string[]>} Name -> parameter descriptors.
+ */
+export function extractModuleFunctionSignatures(source) {
+  /** @type {Map<string, string[]>} */
+  const signatures = new Map();
+  const declaration = /^(?:export\s+)?(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/gm;
+  let match;
+  while ((match = declaration.exec(source)) !== null) {
+    const name = match[1];
+    if (name.startsWith('_0x')) continue;
+    const openParen = match.index + match[0].length - 1;
+    const closeParen = skipBalancedAt(source, openParen, '(', ')');
+    if (closeParen < 0 || !opensBlockAt(source, closeParen)) continue;
+    const parameters = parseParameterList(source.slice(openParen + 1, closeParen - 1));
+    // Widest arity wins, same rule as the strict set: that is the contract a
+    // caller can rely on when a factory rebuilds the same declaration.
+    const existing = signatures.get(name);
+    if (existing && parameters.length <= existing.length) continue;
+    signatures.set(name, parameters);
+  }
+  return signatures;
+}
+
+/**
  * Names only, strict tier. Kept as the simple entry point for callers that do
  * not care about arity.
  * @param {string} source
