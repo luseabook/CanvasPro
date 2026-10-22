@@ -1,1 +1,24 @@
-import{getModelManifest}from'../../manifests/modelRegistry.js';export const STORY_REPLICATION_MAX_VIDEO_BYTES=100*1024*1024;const VOLCENGINE_MAX_VIDEO_BYTES=500*1024*1024;export function getStoryReplicationVideoMaxBytes(value=''){return getModelManifest(value)?.provider==="volcengine"?VOLCENGINE_MAX_VIDEO_BYTES:STORY_REPLICATION_MAX_VIDEO_BYTES;}export function validateStoryReplicationVideoSize(options={},item=''){const storyReplicationVideoMaxBytes=getStoryReplicationVideoMaxBytes(item),key=item?"请压缩视频或选择支持更大文件的模型。":"请压缩视频后重试。";return Number(options.size)>storyReplicationVideoMaxBytes?{'ok':false,'error':'“'+(options.name||"原视频")+'”超过 '+storyReplicationVideoMaxBytes/1024/1024+'MB 上限，'+key}:{'ok':true,'error':''};}
+import { getModelManifest } from '../../manifests/modelRegistry.js';
+export const STORY_REPLICATION_MAX_VIDEO_BYTES = 100 * 1024 * 1024;
+const VOLCENGINE_MAX_VIDEO_BYTES = 500 * 1024 * 1024;
+export function getStoryReplicationVideoMaxBytes(value = '') {
+  return getModelManifest(value)?.provider === 'volcengine'
+    ? VOLCENGINE_MAX_VIDEO_BYTES
+    : STORY_REPLICATION_MAX_VIDEO_BYTES;
+}
+export function validateStoryReplicationVideoSize(options = {}, item = '') {
+  const storyReplicationVideoMaxBytes = getStoryReplicationVideoMaxBytes(item),
+    key = item ? '请压缩视频或选择支持更大文件的模型。' : '请压缩视频后重试。';
+  return Number(options.size) > storyReplicationVideoMaxBytes
+    ? {
+        ok: false,
+        error:
+          '“' +
+          (options.name || '原视频') +
+          '”超过 ' +
+          storyReplicationVideoMaxBytes / 1024 / 1024 +
+          'MB 上限，' +
+          key,
+      }
+    : { ok: true, error: '' };
+}

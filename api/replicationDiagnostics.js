@@ -1,1 +1,25 @@
-import{logDiagnosticEvent}from'../src/services/diagnosticsService.js';export function summarizeReplicationResource(value){try{const args=new URL(value),item=/(?:sign|signature|token|credential|expires)/iu;return{'present':true,'scheme':args.protocol.slice(0,-1),'host':args.hostname,'extension':args.pathname.match(/\.[a-z0-9]{1,8}$/iu)?.[0]||'','signed':[...args.searchParams.keys()].some(key=>item.test(key))};}catch{return{'present':Boolean(value),'scheme':"local"};}}export function reportReplicationDiagnostic(index,result,data={},options){void logDiagnosticEvent({'type':"replication."+index+'.'+result,'level':result==="failed"?'error':'info','message':'Replication '+index+' '+result,'context':data,'error':options});}
+import { logDiagnosticEvent } from '../src/services/diagnosticsService.js';
+export function summarizeReplicationResource(value) {
+  try {
+    const args = new URL(value),
+      item = /(?:sign|signature|token|credential|expires)/iu;
+    return {
+      present: true,
+      scheme: args.protocol.slice(0, -1),
+      host: args.hostname,
+      extension: args.pathname.match(/\.[a-z0-9]{1,8}$/iu)?.[0] || '',
+      signed: [...args.searchParams.keys()].some((key) => item.test(key)),
+    };
+  } catch {
+    return { present: Boolean(value), scheme: 'local' };
+  }
+}
+export function reportReplicationDiagnostic(index, result, data = {}, options) {
+  void logDiagnosticEvent({
+    type: 'replication.' + index + '.' + result,
+    level: result === 'failed' ? 'error' : 'info',
+    message: 'Replication ' + index + ' ' + result,
+    context: data,
+    error: options,
+  });
+}

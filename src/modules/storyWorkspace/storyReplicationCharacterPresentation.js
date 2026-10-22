@@ -1,1 +1,145 @@
-import{REPLICATION_CHARACTER_ROLES,REPLICATION_SUBJECT_TYPES,getVideoReplicationCharacterRoster,getVideoReplicationCharacterSummary}from'../../domain/storyGeneration/videoReplicationCharacters.js';const escape=value=>String(value??'').replace(/[&<>"']/gu,item=>({'&':"&amp;",'<':"&lt;",'>':"&gt;",'"':"&quot;",'\'':'&#39;'}[item])),options=(key,index)=>Object.entries(key).map(([result,data])=>"<option value=\""+result+'"'+(index===result?' selected':'')+'>'+data+"</option>").join('');export function renderStoryReplicationCharacterSummary(target){const videoReplicationCharacterSummary=getVideoReplicationCharacterSummary(target);return'已识别 '+videoReplicationCharacterSummary.total+" 个角色："+videoReplicationCharacterSummary.people+" 人、"+videoReplicationCharacterSummary.animals+" 个动物 · "+videoReplicationCharacterSummary.main+" 位主角 · "+videoReplicationCharacterSummary.uncertain+" 位待核对";}export function renderStoryReplicationCharacters(source,{field:field,seek:seek}){const next=source.replication.sourceAnalysis;return "<div class=\"story-source-roster-summary\">\n    <div class=\"story-source-actions\"><button type=\"button\" data-replication-add-character>补录当前画面人物</button></div></div>\n    "+getVideoReplicationCharacterRoster(next).map(error=>"<article class=\"story-source-character\" data-replication-character=\""+escape(error.id)+'">\n      <div class="story-source-character-overview"><div data-replication-character-frame>\n      '+(error.portrait?.url||error.frame?.url?'<img src="'+escape(error.portrait?.url||error.frame.url)+'" alt="'+escape(error.name)+"在原片中的代表画面\" loading=\"lazy\">":"<p class=\"story-source-empty-frame\">暂无代表画面</p>")+"\n      </div><div class=\"story-source-character-info\"><strong data-replication-character-heading>"+escape(error.name)+"</strong>\n      <p data-replication-character-counts>"+error.eventCount+" 个出场片段 · "+error.dialogueCount+" 句对白</p>\n      <label>角色类型<select data-replication-edit=\"character\" data-id=\""+escape(error.id)+"\" data-field=\"role\">"+options(REPLICATION_CHARACTER_ROLES,error.role)+"</select></label>\n      "+field('称呼',"character",error.id,"name",error.name)+'\n      '+field("外观与位置",'character',error.id,"description",error.description)+"\n      </div></div>\n      "+(error.frameError?"<p role=\"status\">"+escape(error.frameError)+"</p>":'')+"\n      <div class=\"story-source-actions\">"+seek(error.representativeTimeSec,"回看代表画面")+'\n        <button type="button" data-replication-capture="'+escape(error.id)+"\">使用当前帧</button></div>\n      <details><summary>核对出场片段</summary><div class=\"story-source-presence\">"+next.events.map(current=>"<label><input type=\"checkbox\" data-replication-presence=\""+escape(error.id)+"\" data-event-id=\""+escape(current.id)+'"'+(current.characterIds.includes(error.id)?" checked":'')+'>'+escape(current.startSec)+'–'+escape(current.endSec)+" 秒</label>"+seek(current.startSec,'回看')).join('')+"</div></details>\n      <details class=\"story-source-character-corrections\"><summary>修正识别与角色关系</summary><div class=\"story-source-character-info\">\n      <label>主体类别<select data-replication-edit=\"character\" data-id=\""+escape(error.id)+'" data-field="subjectType">'+options(REPLICATION_SUBJECT_TYPES,error.subjectType)+"</select></label>\n      "+field("主配角判断依据",'character',error.id,"roleEvidence",error.roleEvidence)+'\n      '+field("身份疑点","character",error.id,'identityNotes',error.identityNotes)+"\n      <div class=\"story-source-actions\"><label>合并重复角色<select data-replication-merge=\""+escape(error.id)+"\"><option value=\"\">选择同一人物的记录</option>"+next.characters.filter(entry=>entry.id!==error.id).map(error2=>'<option value="'+escape(error2.id)+'">'+escape(error2.name)+'</option>').join('')+'</select></label>\n        <button type="button" data-replication-remove-character="'+escape(error.id)+"\">删除误识别人物</button></div>\n      </div></details>\n    </article>").join('');}export function syncStoryReplicationCharacterPresence(enabled,record,payload){const videoReplicationCharacterRoster=getVideoReplicationCharacterRoster(record.replication.sourceAnalysis).find(handle=>handle.id===payload);if(!enabled||!videoReplicationCharacterRoster)return;enabled.querySelector('[data-replication-character-counts]').textContent=videoReplicationCharacterRoster.eventCount+" 个出场片段 · "+videoReplicationCharacterRoster.dialogueCount+" 句对白",enabled.querySelector('[data-replication-seek]').dataset.replicationSeek=String(videoReplicationCharacterRoster.representativeTimeSec);const state=enabled.querySelector("[data-replication-character-frame]");if(!videoReplicationCharacterRoster.portrait?.url&&!videoReplicationCharacterRoster.frame?.url&&state.querySelector("img")){const config=enabled.ownerDocument.createElement('p');config.className='story-source-empty-frame',config.textContent="暂无代表画面",state.replaceChildren(config);}}
+import {
+  REPLICATION_CHARACTER_ROLES,
+  REPLICATION_SUBJECT_TYPES,
+  getVideoReplicationCharacterRoster,
+  getVideoReplicationCharacterSummary,
+} from '../../domain/storyGeneration/videoReplicationCharacters.js';
+const escape = (value) =>
+    String(value ?? '').replace(
+      /[&<>"']/gu,
+      (item) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[item]
+    ),
+  options = (key, index) =>
+    Object.entries(key)
+      .map(
+        ([result, data]) =>
+          '<option value="' +
+          result +
+          '"' +
+          (index === result ? ' selected' : '') +
+          '>' +
+          data +
+          '</option>'
+      )
+      .join('');
+export function renderStoryReplicationCharacterSummary(target) {
+  const videoReplicationCharacterSummary = getVideoReplicationCharacterSummary(target);
+  return (
+    '已识别 ' +
+    videoReplicationCharacterSummary.total +
+    ' 个角色：' +
+    videoReplicationCharacterSummary.people +
+    ' 人、' +
+    videoReplicationCharacterSummary.animals +
+    ' 个动物 · ' +
+    videoReplicationCharacterSummary.main +
+    ' 位主角 · ' +
+    videoReplicationCharacterSummary.uncertain +
+    ' 位待核对'
+  );
+}
+export function renderStoryReplicationCharacters(source, { field: field, seek: seek }) {
+  const next = source.replication.sourceAnalysis;
+  return (
+    '<div class="story-source-roster-summary">\n    <div class="story-source-actions"><button type="button" data-replication-add-character>补录当前画面人物</button></div></div>\n    ' +
+    getVideoReplicationCharacterRoster(next)
+      .map(
+        (error) =>
+          '<article class="story-source-character" data-replication-character="' +
+          escape(error.id) +
+          '">\n      <div class="story-source-character-overview"><div data-replication-character-frame>\n      ' +
+          (error.portrait?.url || error.frame?.url
+            ? '<img src="' +
+              escape(error.portrait?.url || error.frame.url) +
+              '" alt="' +
+              escape(error.name) +
+              '在原片中的代表画面" loading="lazy">'
+            : '<p class="story-source-empty-frame">暂无代表画面</p>') +
+          '\n      </div><div class="story-source-character-info"><strong data-replication-character-heading>' +
+          escape(error.name) +
+          '</strong>\n      <p data-replication-character-counts>' +
+          error.eventCount +
+          ' 个出场片段 · ' +
+          error.dialogueCount +
+          ' 句对白</p>\n      <label>角色类型<select data-replication-edit="character" data-id="' +
+          escape(error.id) +
+          '" data-field="role">' +
+          options(REPLICATION_CHARACTER_ROLES, error.role) +
+          '</select></label>\n      ' +
+          field('称呼', 'character', error.id, 'name', error.name) +
+          '\n      ' +
+          field('外观与位置', 'character', error.id, 'description', error.description) +
+          '\n      </div></div>\n      ' +
+          (error.frameError ? '<p role="status">' + escape(error.frameError) + '</p>' : '') +
+          '\n      <div class="story-source-actions">' +
+          seek(error.representativeTimeSec, '回看代表画面') +
+          '\n        <button type="button" data-replication-capture="' +
+          escape(error.id) +
+          '">使用当前帧</button></div>\n      <details><summary>核对出场片段</summary><div class="story-source-presence">' +
+          next.events
+            .map(
+              (current) =>
+                '<label><input type="checkbox" data-replication-presence="' +
+                escape(error.id) +
+                '" data-event-id="' +
+                escape(current.id) +
+                '"' +
+                (current.characterIds.includes(error.id) ? ' checked' : '') +
+                '>' +
+                escape(current.startSec) +
+                '–' +
+                escape(current.endSec) +
+                ' 秒</label>' +
+                seek(current.startSec, '回看')
+            )
+            .join('') +
+          '</div></details>\n      <details class="story-source-character-corrections"><summary>修正识别与角色关系</summary><div class="story-source-character-info">\n      <label>主体类别<select data-replication-edit="character" data-id="' +
+          escape(error.id) +
+          '" data-field="subjectType">' +
+          options(REPLICATION_SUBJECT_TYPES, error.subjectType) +
+          '</select></label>\n      ' +
+          field('主配角判断依据', 'character', error.id, 'roleEvidence', error.roleEvidence) +
+          '\n      ' +
+          field('身份疑点', 'character', error.id, 'identityNotes', error.identityNotes) +
+          '\n      <div class="story-source-actions"><label>合并重复角色<select data-replication-merge="' +
+          escape(error.id) +
+          '"><option value="">选择同一人物的记录</option>' +
+          next.characters
+            .filter((entry) => entry.id !== error.id)
+            .map(
+              (error2) =>
+                '<option value="' + escape(error2.id) + '">' + escape(error2.name) + '</option>'
+            )
+            .join('') +
+          '</select></label>\n        <button type="button" data-replication-remove-character="' +
+          escape(error.id) +
+          '">删除误识别人物</button></div>\n      </div></details>\n    </article>'
+      )
+      .join('')
+  );
+}
+export function syncStoryReplicationCharacterPresence(enabled, record, payload) {
+  const videoReplicationCharacterRoster = getVideoReplicationCharacterRoster(
+    record.replication.sourceAnalysis
+  ).find((handle) => handle.id === payload);
+  if (!enabled || !videoReplicationCharacterRoster) return;
+  ((enabled.querySelector('[data-replication-character-counts]').textContent =
+    videoReplicationCharacterRoster.eventCount +
+    ' 个出场片段 · ' +
+    videoReplicationCharacterRoster.dialogueCount +
+    ' 句对白'),
+    (enabled.querySelector('[data-replication-seek]').dataset.replicationSeek = String(
+      videoReplicationCharacterRoster.representativeTimeSec
+    )));
+  const state = enabled.querySelector('[data-replication-character-frame]');
+  if (
+    !videoReplicationCharacterRoster.portrait?.url &&
+    !videoReplicationCharacterRoster.frame?.url &&
+    state.querySelector('img')
+  ) {
+    const config = enabled.ownerDocument.createElement('p');
+    ((config.className = 'story-source-empty-frame'),
+      (config.textContent = '暂无代表画面'),
+      state.replaceChildren(config));
+  }
+}

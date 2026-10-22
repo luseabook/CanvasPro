@@ -1,1 +1,36 @@
-export function findReplicationSpeechBlock(list,value,handler,item=0,key){const run=key>value&&handler(value-item)===handler(key-item)?index=>index:handler,result=run(value-item),count=list.findIndex(data=>result>=run(data.startSec-item)&&result<run(data.endSec-item));return count>=0?count:list.length-1;}export function groupContinuousReplicationVoiceover(options,list2,handler2,handler3){const list3=[];let target;for(const source of options){const args=list3.at(-1),next=source.parts.length===1?source.parts[0]:null,args2=args?.parts.length===1?args.parts[0]:null;if(next?.kind==="voiceover"&&args2?.kind==='voiceover'&&handler3(next)&&next.speakerId===args2.speakerId&&handler3(next)===handler3(args2)&&list2.indexOf(source)===list2.indexOf(target)+1&&source.startSec>=args.endSec&&handler2(source.startSec)===handler2(args.endSec))list3[list3.length-1]={...args,'endSec':source.endSec,'parts':[{...args2,'text':args2.text+next.text}]};else list3.push(source);target=source;}return list3;}
+export function findReplicationSpeechBlock(list, value, handler, item = 0, key) {
+  const run =
+      key > value && handler(value - item) === handler(key - item) ? (index) => index : handler,
+    result = run(value - item),
+    count = list.findIndex(
+      (data) => result >= run(data.startSec - item) && result < run(data.endSec - item)
+    );
+  return count >= 0 ? count : list.length - 1;
+}
+export function groupContinuousReplicationVoiceover(options, list2, handler2, handler3) {
+  const list3 = [];
+  let target;
+  for (const source of options) {
+    const args = list3.at(-1),
+      next = source.parts.length === 1 ? source.parts[0] : null,
+      args2 = args?.parts.length === 1 ? args.parts[0] : null;
+    if (
+      next?.kind === 'voiceover' &&
+      args2?.kind === 'voiceover' &&
+      handler3(next) &&
+      next.speakerId === args2.speakerId &&
+      handler3(next) === handler3(args2) &&
+      list2.indexOf(source) === list2.indexOf(target) + 1 &&
+      source.startSec >= args.endSec &&
+      handler2(source.startSec) === handler2(args.endSec)
+    )
+      list3[list3.length - 1] = {
+        ...args,
+        endSec: source.endSec,
+        parts: [{ ...args2, text: args2.text + next.text }],
+      };
+    else list3.push(source);
+    target = source;
+  }
+  return list3;
+}
