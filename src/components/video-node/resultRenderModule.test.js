@@ -347,16 +347,18 @@ function createContext(nodeId, showVideoMeta = {}, overrides = {}) {
   test('video result render: 视频节点信息关闭时不请求后端元信息', async () => {
     const { ctx: ctx8, getFetchVideoMetaCallCount: getFetchVideoMetaCallCount } = createContext(
       { id: 'ai-video-meta-off', type: 'ai-video', videos: [{ localPath: 'output/main.mp4' }] },
-      { showVideoMeta: false },
+      { showVideoMeta: false }
     );
-    (await ctx8._maybeFetchVideoMeta('/output/main.mp4'), assert.equal(getFetchVideoMetaCallCount(), 0));
+    (await ctx8._maybeFetchVideoMeta('/output/main.mp4'),
+      assert.equal(getFetchVideoMetaCallCount(), 0));
   }),
   test('video result render: 视频节点信息开启时才请求后端元信息', async () => {
     const { ctx: ctx9, getFetchVideoMetaCallCount: getFetchVideoMetaCallCount2 } = createContext(
       { id: 'ai-video-meta-on', type: 'ai-video', videos: [{ localPath: 'output/main.mp4' }] },
-      { showVideoMeta: true },
+      { showVideoMeta: true }
     );
-    (await ctx9._maybeFetchVideoMeta('/output/main.mp4'), assert.equal(getFetchVideoMetaCallCount2(), 1));
+    (await ctx9._maybeFetchVideoMeta('/output/main.mp4'),
+      assert.equal(getFetchVideoMetaCallCount2(), 1));
   }),
   test('video result render: failed thumbnail backfill keeps result video usable', async () => {
     const {
@@ -382,7 +384,7 @@ function createContext(nodeId, showVideoMeta = {}, overrides = {}) {
         fetchVideoFirstFrameThumbFromServer() {
           return Promise.reject(new Error('Invalid media source path'));
         },
-      },
+      }
     );
     (await ctx10._loadAndDisplayVideo(), await Promise.resolve(), await Promise.resolve());
     const value10 = store2.state.nodes[ctx10.nodeId];
@@ -437,7 +439,7 @@ function createContext(nodeId, showVideoMeta = {}, overrides = {}) {
         asyncTaskStatus: 'failed',
         asyncTaskError: 'Async provider failed',
       }),
-      'Async provider failed',
+      'Async provider failed'
     ),
       assert.equal(
         ctx13._getGenerationFailureMessage({
@@ -445,7 +447,7 @@ function createContext(nodeId, showVideoMeta = {}, overrides = {}) {
           rhTaskStatus: 'failed',
           rhStatusMessage: 'RunningHub failed',
         }),
-        'RunningHub failed',
+        'RunningHub failed'
       ),
       assert.equal(
         ctx13._getGenerationFailureMessage({
@@ -453,7 +455,7 @@ function createContext(nodeId, showVideoMeta = {}, overrides = {}) {
           isGenerating: true,
           jobStatus: 'running',
         }),
-        '',
+        ''
       ));
   }),
   test('video result render: 切换主视频后新的 poster 主预览仍保持懒加载', async () => {
@@ -529,9 +531,9 @@ test('video result render: thumbId 回退接源走追踪 objectURL 缓存', asyn
         videos: [{ thumbId: 'thumb-1' }],
       },
       {},
-      { getImage: async () => new Blob(['video'], { type: 'video/mp4' }) },
+      { getImage: async () => new Blob(['video'], { type: 'video/mp4' }) }
     );
-    (ctx16._cachedVideoUrls = new Map(),
+    ((ctx16._cachedVideoUrls = new Map()),
       (ctx16._cachedVideoUrlLoads = new Map()),
       (ctx16._videoObjectUrlLifecycleEpoch = 0),
       (ctx16._videoObjectUrlsDisposed = false));
@@ -560,9 +562,9 @@ test('video result render: 缓存释放时同步分离消费者并撤销 URL', (
       videos: [{ thumbId: 'thumb-live' }],
     });
     const el = new FakeVideoElement();
-    (el.dataset.idx = '0'),
+    ((el.dataset.idx = '0'),
       el.setAttribute('src', 'blob:tracked-thumb-stale'),
-      (el.loadCount = 0);
+      (el.loadCount = 0));
     ctx17._multiLayerEls = [el];
     ctx17._cachedVideoUrls = new Map([
       ['thumb-stale', 'blob:tracked-thumb-stale'],
@@ -588,9 +590,9 @@ test('video result render: dispose 置位后缓存解析全部短路', async () 
       videos: [{ thumbId: 'thumb-1' }],
     },
     {},
-    { getImage: async () => new Blob(['video'], { type: 'video/mp4' }) },
+    { getImage: async () => new Blob(['video'], { type: 'video/mp4' }) }
   );
-  (ctx18._cachedVideoUrls = new Map([['thumb-1', 'blob:tracked-before-dispose']]));
+  ctx18._cachedVideoUrls = new Map([['thumb-1', 'blob:tracked-before-dispose']]);
   const released = ctx18._disposeCachedVideoObjectUrls();
   (assert.equal(released, 1),
     assert.equal(ctx18._cachedVideoUrls.size, 0),
@@ -611,14 +613,14 @@ test('video result render: 接源竞态翻页后不写旧源', async () => {
         await Promise.resolve();
         return new Blob(['video'], { type: 'video/mp4' });
       },
-    },
+    }
   );
   const prevCreateObjectURL = globalThis.URL.createObjectURL;
   globalThis.URL.createObjectURL = () => 'blob:tracked-race';
   try {
-    (ctx19._cachedVideoUrls = new Map()),
+    ((ctx19._cachedVideoUrls = new Map()),
       (ctx19._videoSourceAttachToken = 0),
-      (ctx19._videoSourceAttachTokens = new WeakMap());
+      (ctx19._videoSourceAttachTokens = new WeakMap()));
     const el = new FakeVideoElement();
     el.dataset.idx = '0';
     const pending = ctx19._ensureVideoSrcFor(el, { forPlayback: true });
@@ -648,4 +650,146 @@ test('video result render: poster 标记在可见帧就绪后清掉 poster 属�
   assert.equal(ctx20._markPreviewPosterClearedForPlayback(el), true);
   assert.equal(el.poster, '');
   assert.equal(ctx20._isPreviewPosterClearedForPlayback(el), true);
+});
+
+// ---------------------------------------------------------------------------
+// 201 批：结果层可见性 / 分层 / 媒体键。
+// 这些函数每帧都会跑，任何「半隐藏」或「换片没换 key」都会直接表现为鬼影与错帧。
+// ---------------------------------------------------------------------------
+const resultRenderModuleNs = await import('./resultRenderModule.js');
+const internals201 = resultRenderModuleNs._resultRenderModuleInternalsForTest;
+
+function makeResultElement() {
+  const classes = new Set();
+  return {
+    hidden: false,
+    style: {},
+    classList: {
+      add: (name) => classes.add(name),
+      remove: (name) => classes.delete(name),
+      contains: (name) => classes.has(name),
+      toggle: (name, force) => {
+        if (force) classes.add(name);
+        else classes.delete(name);
+      },
+    },
+    classes,
+  };
+}
+
+test('resultRenderModule: 隐藏/显示同时翻转 hidden 与 is-hidden', () => {
+  const element = makeResultElement();
+  internals201.setVideoResultElementVisible(element, false);
+  (assert.equal(element.hidden, true, 'hidden 属性要跟上'),
+    assert.equal(element.classes.has('is-hidden'), true, '样式类名也要跟上，否则仍占位'));
+  internals201.setVideoResultElementVisible(element, true);
+  (assert.equal(element.hidden, false),
+    assert.equal(element.classes.has('is-hidden'), false),
+    assert.equal(internals201.isVideoResultElementVisible(element), true));
+  internals201.setVideoResultElementVisible(null, true);
+  assert.equal(internals201.isVideoResultElementVisible(null), false, '空元素视为不可见且不抛');
+});
+
+test('resultRenderModule: 主结果层切换带 z-index，非法层级不写入', () => {
+  const element = makeResultElement();
+  internals201.setVideoResultLayerActive(element, true, 12);
+  (assert.equal(element.classes.has('is-main-result'), true),
+    assert.equal(element.style.zIndex, '12', '层级要转成字符串写进 style'),
+    assert.equal(element.hidden, false));
+  internals201.setVideoResultLayerActive(element, false, 'not-a-number');
+  (assert.equal(element.classes.has('is-main-result'), false, '退场要摘标记'),
+    assert.equal(element.style.zIndex, '12', '非法层级保持原值，不能写成 NaN'));
+});
+
+test('resultRenderModule: 几何动画样式一次性合并', () => {
+  const element = makeResultElement();
+  element.style.transform = 'translate(0px, 0px)';
+  internals201.applyVideoResultGeometryAnimationStyle(element, {
+    transform: 'translate(4px, 8px)',
+    opacity: '0.5',
+  });
+  (assert.equal(element.style.transform, 'translate(4px, 8px)'),
+    assert.equal(element.style.opacity, '0.5'));
+  internals201.applyVideoResultGeometryAnimationStyle(null, { opacity: '1' });
+  internals201.applyVideoResultGeometryAnimationStyle(element, null);
+  assert.equal(element.style.opacity, '0.5', '空补丁不该清样式');
+});
+
+test('resultRenderModule: 媒体键按优先级取第一个非空来源', () => {
+  (assert.equal(
+    internals201.getVideoResultMediaKey({ localPath: ' /a.mp4 ', videoUrl: '/b.mp4' }),
+    '/a.mp4',
+    'localPath 优先于 videoUrl，并 trim'
+  ),
+    assert.equal(
+      internals201.getVideoResultMediaKey({}, { src: '/fallback.mp4' }),
+      '/fallback.mp4',
+      '主对象取不到时回落到当前选中项'
+    ),
+    assert.equal(
+      internals201.getVideoResultMediaKey({ videoUrl: '  ' }),
+      '',
+      '全空给空串而不是 undefined'
+    ),
+    assert.equal(
+      internals201.getVideoResultMediaKey({ thumbId: 'thumb-1' }),
+      'thumb-1',
+      '只有 thumbId 也要能用'
+    ));
+});
+
+test('resultRenderModule: 切换主视频的呈现补丁只搬运白名单字段', () => {
+  const patch = resultRenderModuleNs.buildSelectedVideoResultPresentationPatch(
+    [
+      { videoUrl: '/0.mp4', localPath: '/0.local', prompt: '不该出现' },
+      { videoUrl: '/1.mp4', posterUrl: '/1.png', mediaUnavailable: true },
+    ],
+    1
+  );
+  (assert.equal(patch.mainVideoIndex, 1),
+    assert.equal(patch.videoUrl, '/1.mp4'),
+    assert.equal(patch.posterUrl, '/1.png'),
+    assert.equal(patch.mediaUnavailable, true),
+    assert.equal(patch.isVideosExpanded, false, '切主视频要收起列表'),
+    assert.equal('prompt' in patch, false, '非白名单字段不能被带进去'),
+    assert.equal(patch.localPath, '', '缺失字段补空串'));
+  // 索引越界与 NaN 都夹到合法范围，避免拿到 undefined 再炸。
+  (assert.equal(
+    resultRenderModuleNs.buildSelectedVideoResultPresentationPatch([{ videoUrl: '/a' }], 9)
+      .mainVideoIndex,
+    0
+  ),
+    assert.equal(
+      resultRenderModuleNs.buildSelectedVideoResultPresentationPatch([{ videoUrl: '/a' }], -3)
+        .mainVideoIndex,
+      0
+    ),
+    assert.equal(
+      resultRenderModuleNs.buildSelectedVideoResultPresentationPatch(
+        [{ videoUrl: '/a' }, { videoUrl: '/b' }],
+        Number.NaN
+      ).mainVideoIndex,
+      0
+    ),
+    assert.equal(
+      resultRenderModuleNs.buildSelectedVideoResultPresentationPatch([], 0).mainVideoIndex,
+      0
+    ));
+});
+
+test('resultRenderModule: 视口忙闲判定读交互状态', () => {
+  const previous = globalThis.document;
+  const makeDocument = (classes) => ({
+    body: { classList: { contains: (name) => classes.includes(name) } },
+  });
+  try {
+    globalThis.document = makeDocument([]);
+    assert.equal(internals201.isVideoResultViewportBusy(), false, '空闲时不该判忙');
+    globalThis.document = makeDocument(['is-panning']);
+    assert.equal(internals201.isVideoResultViewportBusy(), true, '平移中要判忙');
+    globalThis.document = makeDocument(['is-zooming']);
+    assert.equal(internals201.isVideoResultViewportBusy(), true, '缩放中要判忙');
+  } finally {
+    globalThis.document = previous;
+  }
 });

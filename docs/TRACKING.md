@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（201 批·**视频结果层可见性/分层**）：`resultRenderModule.js` 补 7 个模块级函数：结果元素可见性（`hidden` 与 `is-hidden` 同步翻转）、主结果层切换（z-index 非有限值不写入）、几何动画样式一次合并、媒体键按优先级取首个非空、`buildSelectedVideoResultPresentationPatch`（索引夹取 + 19 字段白名单，避免把生成参数一起铺平）、视口忙闲判定。补测试 6 例，模块级缺口 61→54，全量 **11452/11452/0**。14 个方法缺口留 202。
 - 2026-10-22（200 批·**拖拽复制走快捷键表**）：`appCanvasPointerBindings.js` 的 pointerdown 不再硬编码 `event.altKey`，改走 `isPointerModifierShortcutActive(event, 'duplicate-with-edges', 'Alt')`——用户在 `shortcuts.js` 改「拖拽创建连线副本」键位后能生效（该动作属 `MODIFIER_ONLY_SHORTCUT_ACTIONS`）。补测试 1 例，全量 **11446/11446/0**。
-- 2026-10-22（199 批·**滚轮手势路由**）：`appCanvasPointerBindings.js` 补 8 函数并重写两条 wheel 监听：滚轮按偏好分缩放/平移（Shift 转横移，Ctrl/Meta 恒缩放）、deltaMode 归一（行×16、页×视口高，修 Firefox 滚一格跳半屏）、可滚祖先容器让位（只认真溢出 + overflow 可滚）、白板编辑中整体让位。新增同名测试 7 例，模块级缺口 69→61，全量 **11445/11445/0**。修饰键判定已落，Alt+拖拽复制接线留 200。
 
 
 ## 12. 变更记录机制（**已冻结**）

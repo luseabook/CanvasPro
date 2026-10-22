@@ -1,4 +1,5 @@
 import { clearElement } from '../../utils/dom.js';
+import { readViewportInteractionState } from '../../core/viewportInteractionState.js';
 import {
   attachVideoPlaybackRecovery,
   getVideoCurrentSource,
@@ -56,6 +57,110 @@ function isLikelyPosterImageUrl(key) {
   if (/^(data:image\/|blob:|aic-local-preview:)/i.test(enabled)) return true;
   return /\.(?:png|jpe?g|webp|gif|avif|bmp)(?:[?#].*)?$/i.test(enabled);
 }
+
+// ---------------------------------------------------------------------------
+// 结果元素的可见性 / 分层 / 媒体键
+//
+// 视频结果节点里同时存在多个 <video> 与海报层，靠 hidden + 两个 class 决定谁在前。
+// 这些操作必须可重入：同一元素连续调用不能留下半隐藏状态，否则会出现「主结果亮了
+// 但旧帧还在上面」这种鬼影。
+// ---------------------------------------------------------------------------
+
+/** 视口正在平移/缩放/动画时为 true，此时不该重排结果层。 */
+function isVideoResultViewportBusy() {
+  return readViewportInteractionState().isViewportBusy;
+}
+
+/** 显示/隐藏结果元素：hidden 属性与 is-hidden class 必须同时翻转。 */
+function setVideoResultElementVisible(element, visible) {
+  if (!element) return;
+  const hidden = visible !== true;
+  element.hidden = hidden;
+  if (hidden) element.classList?.add?.('is-hidden');
+  else if (element.classList?.contains?.('is-hidden')) element.classList?.remove?.('is-hidden');
+}
+
+function isVideoResultElementVisible(element) {
+  return !!element && element.hidden !== true;
+}
+
+/** 切换主结果层：可见性、is-main-result 标记、z-index 一起改。 */
+function setVideoResultLayerActive(element, active, zIndex) {
+  if (!element) return;
+  (setVideoResultElementVisible(element, active),
+    element.classList?.toggle?.('is-main-result', active === true),
+    Number.isFinite(Number(zIndex)) && (element.style.zIndex = String(zIndex)));
+}
+
+/** 批量写几何动画样式（transform/opacity 之类），一次性 assign 避免多次重排。 */
+function applyVideoResultGeometryAnimationStyle(element, stylePatch) {
+  if (!element || !stylePatch || typeof stylePatch !== 'object') return;
+  Object.assign(element.style, stylePatch);
+}
+
+/** 结果媒体指纹：按优先级取第一个非空来源，用来判断「换片了没有」。 */
+function getVideoResultMediaKey(videoItem = {}, selectedItem = {}) {
+  return (
+    [
+      videoItem.displayLocalPath,
+      videoItem.localPath,
+      videoItem.videoUrl,
+      videoItem.url,
+      videoItem.src,
+      videoItem.thumbUrl,
+      videoItem.thumbId,
+      selectedItem?.localPath,
+      selectedItem?.videoUrl,
+      selectedItem?.src,
+      selectedItem?.thumbUrl,
+    ]
+      .map((candidate) => String(candidate || '').trim())
+      .find(Boolean) || ''
+  );
+}
+
+/** 跟随主结果切换时需要一起搬运的呈现字段（换主视频不能只换 url）。 */
+const SELECTED_VIDEO_PRESENTATION_FIELDS = [
+  'videoUrl',
+  'localPath',
+  'displayLocalPath',
+  'videoLocalPath',
+  'thumbId',
+  'thumbUrl',
+  'posterUrl',
+  'thumbnailUrl',
+  'previewUrl',
+  'coverUrl',
+  'posterLocalPath',
+  'thumbLocalPath',
+  'thumbnailLocalPath',
+  'previewLocalPath',
+  'capturePreviewUrl',
+  'capturePreviewLocalPath',
+  'videoThumbSrc',
+  'videoThumbUnavailableSource',
+  'mediaUnavailableSource',
+];
+
+/**
+ * 切换主视频时的呈现补丁：索引夹取到合法范围，并只搬运白名单字段。
+ * 白名单是必需的——把整个结果对象铺平会把无关状态（生成参数、进度）也一起写进去。
+ */
+export function buildSelectedVideoResultPresentationPatch(videoItems = [], mainVideoIndex = 0) {
+  const items = Array.isArray(videoItems) ? videoItems : [],
+    index = Math.max(0, Math.min(items.length - 1, Math.trunc(Number(mainVideoIndex) || 0))),
+    selectedItem = items[index] && typeof items[index] === 'object' ? items[index] : {},
+    patch = {
+      mainVideoIndex: index,
+      isVideosExpanded: false,
+      mediaUnavailable: selectedItem.mediaUnavailable === true,
+    };
+  for (const field of SELECTED_VIDEO_PRESENTATION_FIELDS) {
+    patch[field] = selectedItem[field] ?? '';
+  }
+  return patch;
+}
+
 export function createVideoNodeResultRenderModule(index) {
   const {
     store: store,
@@ -105,7 +210,8 @@ export function createVideoNodeResultRenderModule(index) {
           recoveryCooldownMs: minBufferAhead2 === 'hover' ? 500 : undefined,
           shouldRecover: () =>
             el3.isConnected !== false && (this._isHovered || this._isManualControl || !el3.paused),
-          shouldContinue: typeof entry.shouldContinue === 'function' ? entry.shouldContinue : undefined,
+          shouldContinue:
+            typeof entry.shouldContinue === 'function' ? entry.shouldContinue : undefined,
         })
       );
     }
@@ -146,7 +252,7 @@ export function createVideoNodeResultRenderModule(index) {
       if (!enabled4) return false;
       const playbackUrl = await this._resolveLocalVideoPlaybackObjectUrl(
         enabled4,
-        'ai-video:' + this.nodeId + ':slot:' + scope,
+        'ai-video:' + this.nodeId + ':slot:' + scope
       );
       if (!isAttachCurrent()) return false;
       return (
@@ -245,10 +351,10 @@ export function createVideoNodeResultRenderModule(index) {
         item = videos.length > 0 ? videos[index] || null : index === 0 ? nodeData : null;
       return Boolean(
         item &&
-          String(item.thumbId || '').trim() === normalized &&
-          !String(item.error || '').trim() &&
-          !this._isVideoMarkedUnavailable(item) &&
-          !this._resolveVideoPlaybackUrl(item),
+        String(item.thumbId || '').trim() === normalized &&
+        !String(item.error || '').trim() &&
+        !this._isVideoMarkedUnavailable(item) &&
+        !this._resolveVideoPlaybackUrl(item)
       );
     }
     ['_getCachedVideoObjectUrlConsumers']() {
@@ -278,7 +384,7 @@ export function createVideoNodeResultRenderModule(index) {
     }
     ['_detachCachedVideoObjectUrlConsumers'](objectUrl) {
       const staleConsumers = [...this._getCachedVideoObjectUrlConsumers()].filter((el) =>
-        this._isCachedVideoObjectUrlReferenced(el, objectUrl),
+        this._isCachedVideoObjectUrlReferenced(el, objectUrl)
       );
       this._activeFullscreenVideoEl &&
         staleConsumers.includes(this._activeFullscreenVideoEl) &&
@@ -389,7 +495,8 @@ export function createVideoNodeResultRenderModule(index) {
         (this._localPlaybackBlobPromiseSource = ''));
       const playbackObjectUrl = String(this._localPlaybackObjectUrl || '').trim();
       ((this._localPlaybackObjectUrl = ''), (this._localPlaybackObjectSource = ''));
-      const scopeReleased = releaseLocalVideoPlaybackObjectUrlOwnerScope('ai-video:' + this.nodeId) > 0;
+      const scopeReleased =
+        releaseLocalVideoPlaybackObjectUrlOwnerScope('ai-video:' + this.nodeId) > 0;
       if (playbackObjectUrl) revokeTrackedMediaObjectUrl(playbackObjectUrl);
       return scopeReleased || !!playbackObjectUrl;
     }
@@ -399,13 +506,16 @@ export function createVideoNodeResultRenderModule(index) {
       if (!resumeState || !el || !normalizedSource || resumeState.source !== normalizedSource)
         return false;
       const tryRestore = () => {
-        if (this._hoverPlaybackResumeState !== resumeState || !isMediaElementPlaybackSource(el, normalizedSource))
+        if (
+          this._hoverPlaybackResumeState !== resumeState ||
+          !isMediaElementPlaybackSource(el, normalizedSource)
+        )
           return false;
         const duration = Number(el.duration || 0);
         if (!Number.isFinite(duration) || duration <= 0) return false;
         const resumeTime = Math.min(
           Math.max(0, Number(resumeState.time || 0)),
-          Math.max(0, duration - 0.05),
+          Math.max(0, duration - 0.05)
         );
         try {
           el.currentTime = resumeTime;
@@ -462,15 +572,12 @@ export function createVideoNodeResultRenderModule(index) {
       );
     }
     ['_clearPreviewPosterForVisibleFrame'](el) {
-      if (isVideoResultFrameReady(el))
-        return (this._markPreviewPosterClearedForPlayback(el), true);
+      if (isVideoResultFrameReady(el)) return (this._markPreviewPosterClearedForPlayback(el), true);
       return (
         watchVideoFramePresentation(el, () => {
           const nodeData =
-              (typeof store.getStateRaw === 'function'
-                ? store.getStateRaw()
-                : store.getState()
-              )?.nodes?.[this.nodeId] ||
+              (typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState())
+                ?.nodes?.[this.nodeId] ||
               this._data ||
               {},
             mainIndex = Math.max(0, Math.trunc(Number(nodeData.mainVideoIndex) || 0)),
@@ -493,7 +600,8 @@ export function createVideoNodeResultRenderModule(index) {
         hasDeferredPoster = !!this._deferredPosterImgEl,
         hasPosterAttr = !!String(el?.poster || '').trim(),
         isFastPreviewOwner = this.el?.dataset?.rendererPresentationOwner === 'fast-preview';
-      if (alreadyCleared && !hasDeferredPoster && !hasPosterAttr && !isFastPreviewOwner) return false;
+      if (alreadyCleared && !hasDeferredPoster && !hasPosterAttr && !isFastPreviewOwner)
+        return false;
       (this._previewPostersClearedForPlayback.set(el, presentationSource),
         this._removeDeferredVideoPosterPreview(),
         globalThis.window?.v2Renderer?.releaseFastPreviewForPlayback?.(this.nodeId));
@@ -503,7 +611,8 @@ export function createVideoNodeResultRenderModule(index) {
     ['_isPreviewPosterClearedForPlayback'](el) {
       const presentationSource = getVideoPresentationSource(el);
       return !!(
-        presentationSource && this._previewPostersClearedForPlayback?.get?.(el) === presentationSource
+        presentationSource &&
+        this._previewPostersClearedForPlayback?.get?.(el) === presentationSource
       );
     }
     ['_removeDeferredVideoPosterPreview']() {
@@ -542,7 +651,8 @@ export function createVideoNodeResultRenderModule(index) {
       }
       const value14 = el5.getAttribute?.('src') || el5.src || '';
       value14 !== enabled7 &&
-        (typeof el5.setAttribute === 'function' && el5.setAttribute('src', enabled7), (el5.src = enabled7));
+        (typeof el5.setAttribute === 'function' && el5.setAttribute('src', enabled7),
+        (el5.src = enabled7));
       if (this._placeholderEl) this._placeholderEl.style.display = 'none';
       return (this._setVideoOverlaysVisible?.(false), ensureThumbDecoded?.(enabled7), true);
     }
@@ -579,7 +689,7 @@ export function createVideoNodeResultRenderModule(index) {
     }
     ['_markVideoThumbUnavailable'](count, value19, value20 = '') {
       const videoThumbUnavailableSource = String(
-        value20 || this._resolveVideoMetaSrcFromVideoData(value19),
+        value20 || this._resolveVideoMetaSrcFromVideoData(value19)
       ).trim();
       if (!videoThumbUnavailableSource) return;
       const enabled13 = store.getState().nodes[this.nodeId];
@@ -589,7 +699,8 @@ export function createVideoNodeResultRenderModule(index) {
         value22 = Number.isFinite(value21) ? Math.max(0, Math.trunc(value21)) : 0,
         value23 = {};
       (count < 0 || count === value22) &&
-        ((value23.videoThumbUnavailableSource = videoThumbUnavailableSource), (value23.thumbUrl = ''));
+        ((value23.videoThumbUnavailableSource = videoThumbUnavailableSource),
+        (value23.thumbUrl = ''));
       if (count >= 0 && count < list.length) {
         const args = list[count];
         if (args && typeof args === 'object') {
@@ -656,7 +767,8 @@ export function createVideoNodeResultRenderModule(index) {
     }
     ['_shouldFetchVideoMetaForNodeInfo']() {
       try {
-        const value33 = typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState();
+        const value33 =
+          typeof store.getStateRaw === 'function' ? store.getStateRaw() : store.getState();
         return value33?.ui?.showVideoMeta === true;
       } catch {
         return false;
@@ -838,8 +950,8 @@ export function createVideoNodeResultRenderModule(index) {
         return;
       }
       // 每轮渲染先对账缓存：失活 thumbId 的 objectURL 在此统一撤销。
-      (this._videoRenderEpoch = Number(this._videoRenderEpoch || 0) + 1),
-        this._syncCachedVideoObjectUrls(nodeData);
+      ((this._videoRenderEpoch = Number(this._videoRenderEpoch || 0) + 1),
+        this._syncCachedVideoObjectUrls(nodeData));
       this._removeDeferredVideoPosterPreview();
       const videoUrl = this._data.videos || [];
       videoUrl.length === 0 &&
@@ -863,7 +975,7 @@ export function createVideoNodeResultRenderModule(index) {
         this._multiVideosContainer &&
           (this._multiVideosContainer.remove(), (this._multiVideosContainer = null));
         const el11 = this._ensureStatusOverlayEl();
-        ((clearElement(el11)), el11.appendChild(this._createErrorCard(value49)));
+        (clearElement(el11), el11.appendChild(this._createErrorCard(value49)));
         return;
       }
       if (value47 && videoUrl.length === 0) {
@@ -877,7 +989,7 @@ export function createVideoNodeResultRenderModule(index) {
         this._multiVideosContainer &&
           (this._multiVideosContainer.remove(), (this._multiVideosContainer = null));
         const el12 = this._ensureStatusOverlayEl();
-        ((clearElement(el12)), el12.appendChild(this._createStatusCard(value47, value48)));
+        (clearElement(el12), el12.appendChild(this._createStatusCard(value47, value48)));
         return;
       }
       this._clearStatusOverlay();
@@ -951,7 +1063,11 @@ export function createVideoNodeResultRenderModule(index) {
               if (!(count10 >= 0 && count10 < list5.length)) return;
               const args5 = list5[count10];
               if (!args5 || typeof args5 !== 'object') return;
-              const value61 = { ...args5, videoThumbSrc: videoThumbSrc, videoThumbUnavailableSource: '' };
+              const value61 = {
+                ...args5,
+                videoThumbSrc: videoThumbSrc,
+                videoThumbUnavailableSource: '',
+              };
               if (!String(value61.thumbUrl || '').trim() && enabled23) value61.thumbUrl = enabled23;
               const videos2 = list5.slice();
               videos2[count10] = value61;
@@ -960,7 +1076,8 @@ export function createVideoNodeResultRenderModule(index) {
                 value64 = Number.isFinite(value63) ? Math.max(0, Math.trunc(value63)) : 0;
               if (count10 === value64) value62.videoThumbUnavailableSource = '';
               if (count10 === value64) {
-                if (!String(enabled24.thumbUrl || '').trim() && enabled23) value62.thumbUrl = enabled23;
+                if (!String(enabled24.thumbUrl || '').trim() && enabled23)
+                  value62.thumbUrl = enabled23;
               }
               store.updateNodeData(this.nodeId, value62);
             })
@@ -969,7 +1086,8 @@ export function createVideoNodeResultRenderModule(index) {
                 value66 = Array.isArray(value65.videos) ? value65.videos : [],
                 value67 = value66[count10] || value55 || {},
                 value68 = this._resolveVideoMetaSrcFromVideoData(value67);
-              value68 === videoThumbSrc && this._markVideoThumbUnavailable(count10, value67, videoThumbSrc);
+              value68 === videoThumbSrc &&
+                this._markVideoThumbUnavailable(count10, value67, videoThumbSrc);
             })
             .finally(() => {
               this._videoThumbPending.delete(value58);
@@ -986,14 +1104,16 @@ export function createVideoNodeResultRenderModule(index) {
               '|' +
               (item2.thumbId || '') +
               '|' +
-              (item2.error || ''),
+              (item2.error || '')
           )
           .join('||'),
         value70 = value69 !== this._lastVideosKeyStr,
         value71 = value50 !== this._lastMainIdx,
         value72 = enabled20 !== this._lastIsExpanded,
         enabled25 = !this._expandPanel || value70 || value71 || value72;
-      ((this._lastVideosKeyStr = value69), (this._lastMainIdx = value50), (this._lastIsExpanded = enabled20));
+      ((this._lastVideosKeyStr = value69),
+        (this._lastMainIdx = value50),
+        (this._lastIsExpanded = enabled20));
       !this._multiVideosContainer &&
         ((this._multiVideosContainer = document.createElement('div')),
         Object.assign(this._multiVideosContainer.style, {
@@ -1010,7 +1130,9 @@ export function createVideoNodeResultRenderModule(index) {
       for (let i = 0; i < count9; i++) {
         const value74 = videoUrl[i] || {},
           enabled27 = this._isVideoMarkedUnavailable(value74),
-          value75 = enabled27 ? '' : String(value74.thumbUrl || '').trim() || (i === value52 ? value73 : '');
+          value75 = enabled27
+            ? ''
+            : String(value74.thumbUrl || '').trim() || (i === value52 ? value73 : '');
         if (value75) enabled26[i] = this._resolveMediaUrl(value75);
         const value76 = i === value52,
           value77 = enabled20 || (!isDesktopRenderer() && value76 && !enabled26[i]);
@@ -1080,9 +1202,11 @@ export function createVideoNodeResultRenderModule(index) {
                 (el13.style.left = value85 + 'px'));
             }),
               setTimeout(() => {
-                (store.updateNodeData(this.nodeId, handler2()), (this._isExpandedPickClosing = false));
+                (store.updateNodeData(this.nodeId, handler2()),
+                  (this._isExpandedPickClosing = false));
               }, 350));
-          } else (store.updateNodeData(this.nodeId, handler2()), (this._isExpandedPickClosing = false));
+          } else
+            (store.updateNodeData(this.nodeId, handler2()), (this._isExpandedPickClosing = false));
         },
         handler3 = (el14, value87) => {
           const value88 = {
@@ -1108,12 +1232,16 @@ export function createVideoNodeResultRenderModule(index) {
             (el14.style.border = value90.border));
         };
       if (value70 || !this._multiStackWrap) {
-        ((clearElement(this._multiVideosContainer)),
+        (clearElement(this._multiVideosContainer),
           (this._multiLayerEls = []),
           (this._multiErrorEls = []),
           (this._multiToggleBtn = null),
           (this._multiStackWrap = document.createElement('div')),
-          Object.assign(this._multiStackWrap.style, { position: 'relative', width: '100%', height: '100%' }));
+          Object.assign(this._multiStackWrap.style, {
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+          }));
         for (let count11 = count9 - 1; count11 >= 0; count11--) {
           const el15 = document.createElement('video');
           el15.dataset.idx = String(count11);
@@ -1243,7 +1371,8 @@ export function createVideoNodeResultRenderModule(index) {
             el15.addEventListener('dblclick', (event3) => {
               event3.stopPropagation();
               if (VideoKeyingController.isActiveFor(this.nodeId)) return;
-              this._videoClickTimer && (clearTimeout(this._videoClickTimer), (this._videoClickTimer = null));
+              this._videoClickTimer &&
+                (clearTimeout(this._videoClickTimer), (this._videoClickTimer = null));
               const value107 = this._lastMainIdx || 0,
                 value108 = store.getState().nodes[this.nodeId],
                 value109 = value108.videos || [],
@@ -1281,7 +1410,8 @@ export function createVideoNodeResultRenderModule(index) {
                 value113 === value52 &&
                   this._placeholderEl &&
                   this._placeholderEl.style.display !== 'none' &&
-                  ((this._placeholderEl.style.display = 'none'), this._setVideoOverlaysVisible(true));
+                  ((this._placeholderEl.style.display = 'none'),
+                  this._setVideoOverlaysVisible(true));
               })
               .catch(() => {});
           }
@@ -1331,7 +1461,9 @@ export function createVideoNodeResultRenderModule(index) {
               } else store.updateNodeData(this.nodeId, { isVideosExpanded: false });
             } else store.updateNodeData(this.nodeId, { isVideosExpanded: true });
           }),
-          this._multiToggleBtn.addEventListener('mouseenter', () => handler3(this._multiToggleBtn, true)),
+          this._multiToggleBtn.addEventListener('mouseenter', () =>
+            handler3(this._multiToggleBtn, true)
+          ),
           this._multiToggleBtn.addEventListener('mouseleave', () => {
             const enabled35 = store.getState().nodes[this.nodeId];
             handler3(this._multiToggleBtn, !!enabled35.isVideosExpanded);
@@ -1378,7 +1510,11 @@ export function createVideoNodeResultRenderModule(index) {
               !this._isHovered &&
               !this._isManualControl &&
               (el19.removeAttribute('src'), el19.load?.());
-            if (enabled37 && enabled39 !== enabled37 && !isMediaElementPlaybackSource(el19, enabled37))
+            if (
+              enabled37 &&
+              enabled39 !== enabled37 &&
+              !isMediaElementPlaybackSource(el19, enabled37)
+            )
               await attachMediaElementPlaybackSource(el19, enabled37, {
                 preload: preload,
                 warmRanges: false,
@@ -1389,7 +1525,8 @@ export function createVideoNodeResultRenderModule(index) {
                 const value121 = videoUrl[value119] || {},
                   value122 = String(value121.thumbId || '');
                 if (value122 && (enabled20 || value119 === value52)) {
-                  if (this._cachedVideoUrls.has(value122)) el19.src = this._cachedVideoUrls.get(value122);
+                  if (this._cachedVideoUrls.has(value122))
+                    el19.src = this._cachedVideoUrls.get(value122);
                   else {
                     const value123 = ++this._blobResolveToken;
                     getImage(value122)
@@ -1435,13 +1572,19 @@ export function createVideoNodeResultRenderModule(index) {
           value126 = store.getState().nodes[this.nodeId];
         if (value126) {
           const value127 = {};
-          if (count15 > 0 && Number(value126.videoWidth || 0) !== count15) value127.videoWidth = count15;
-          if (count16 > 0 && Number(value126.videoHeight || 0) !== count16) value127.videoHeight = count16;
+          if (count15 > 0 && Number(value126.videoWidth || 0) !== count15)
+            value127.videoWidth = count15;
+          if (count16 > 0 && Number(value126.videoHeight || 0) !== count16)
+            value127.videoHeight = count16;
           if (count15 > 0 && Number(value126.selectedVideoWidth || 0) !== count15)
             value127.selectedVideoWidth = count15;
           if (count16 > 0 && Number(value126.selectedVideoHeight || 0) !== count16)
             value127.selectedVideoHeight = count16;
-          if (Number.isFinite(count17) && count17 > 0 && Number(value126.videoDuration || 0) !== count17)
+          if (
+            Number.isFinite(count17) &&
+            count17 > 0 &&
+            Number(value126.videoDuration || 0) !== count17
+          )
             value127.videoDuration = count17;
           if (Object.keys(value127).length) store.updateNodeData(this.nodeId, value127);
         }
@@ -1786,3 +1929,17 @@ export function createVideoNodeResultRenderModule(index) {
   }
   return result.prototype;
 }
+
+/**
+ * 仅供单测驱动内部纯函数（结果层可见性、媒体键、呈现补丁）。
+ * 运行时不要引用：随实现改。
+ */
+export const _resultRenderModuleInternalsForTest = {
+  isVideoResultViewportBusy,
+  setVideoResultElementVisible,
+  isVideoResultElementVisible,
+  setVideoResultLayerActive,
+  applyVideoResultGeometryAnimationStyle,
+  getVideoResultMediaKey,
+  SELECTED_VIDEO_PRESENTATION_FIELDS,
+};
