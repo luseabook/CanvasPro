@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（210 批·**图片批量张数解析**）：`taskOrchestrationModule.impl.js` 补 `hasOwnObjectField`/`normalizeImageBatchSize`/`resolveImageNodeBatchSize`，并按「生成参数 > 原始参数 > 节点数据」回退（原先只认 schema，没声明 batchSize 就硬取 1）。回退**限定 modelApi 清单**——workflow 是一次输入一次产出，已有测试钉住恒为 1（先改全域导致该例红）。顺带把 schema 参数放行到 workflow 清单。测试 3 例，模块级缺口 40→37，全量 **11494/11494/0**。
 - 2026-10-23（209 批·**人物替换模式控件改下拉**）：`personReplacementPromptControls.js` 按 0.8.9 重写：按钮循环切换 → `<select>`（4 档带说明），补 `modeOptions`/`syncModeTooltip`/`bindPersonReplacementPromptModeSelect`/`syncModeSelect`；`applyPersonReplacementPromptControlAction` 改读 `element.value`。**三处接线一并改**：workspace 注册绑定、`change` 事件转给点击处理器（不转则下拉点了没反应）、重渲染时保留该节点（否则绑定被销毁）。测试 5 例，模块级缺口 44→40，全量 **11491/11491/0**。⚠ 需真机。
-- 2026-10-23（208 批·**视频模型菜单官方目录**）：`modelSelectorShared.js` 补 `compareOfficialVideoMenuModels`（先推荐位次、再「官方热推>正价>官推>官转>白名单」档位）与 `buildDreaminaVideoMenuGroups`，兜底分支补 **即梦 / 小云雀 / SHUO Canvas 官方** 三个分组并加 `officialCatalog` 标记（`nodeModelMenu` 同步支持）。测试新增 4 例；模块级缺口 46→44，全量 **11486/11486/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

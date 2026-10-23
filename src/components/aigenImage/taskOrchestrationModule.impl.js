@@ -283,6 +283,37 @@ function normalizeTaskBooleanParam(output) {
   if (['false', '0', 'no', 'off', ''].includes(value2)) return false;
   return Boolean(output);
 }
+function hasOwnObjectField(source, key) {
+  // 必须是「自有属性」：原型链上的 batchSize 不该算用户设置过。
+  // 返回值统一成布尔——上游这里短路后可能返回 null，下游一旦写成 `=== false` 判断就会错。
+  return Boolean(
+    source &&
+      typeof source === 'object' &&
+      !Array.isArray(source) &&
+      Object.prototype.hasOwnProperty.call(source, key),
+  );
+}
+function normalizeImageBatchSize(value, fallback = 1) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 1) return fallback;
+  return parsed;
+}
+function resolveImageNodeBatchSize({
+  data: data = {},
+  generationParams: generationParams = {},
+  rawGenerationParams: rawGenerationParams = {},
+} = {}) {
+  // 优先级：清洗后的生成参数 > 原始生成参数 > 节点数据 > 1。
+  // 「有没有这个字段」比「值是不是真值」重要：显式写 0 / 空串要按非法值回退，
+  // 而不是当成「没设置」掉到下一层。
+  const hasDataBatchSize = hasOwnObjectField(data, 'batchSize'),
+    dataBatchSize = normalizeImageBatchSize(data?.batchSize, 1);
+  if (hasOwnObjectField(generationParams, 'batchSize'))
+    return normalizeImageBatchSize(generationParams.batchSize, dataBatchSize);
+  if (hasOwnObjectField(rawGenerationParams, 'batchSize'))
+    return normalizeImageBatchSize(rawGenerationParams.batchSize, dataBatchSize);
+  return hasDataBatchSize ? dataBatchSize : 1;
+}
 const MODEL_API_PAYLOAD_SCHEMA_PARAM_EXCLUDES = Object.freeze(
   new Set([
     'mode',
@@ -1615,7 +1646,19 @@ export function createAIGenerateNodeTaskOrchestrationModule(value10) {
         }),
         imageSize5 = getManifestField3('imageSize') ? requireSchemaParam3('imageSize') : undefined,
         value102 = getManifestField3('aspectRatio') ? requireSchemaParam3('aspectRatio') : '自适应',
-        value103 = getManifestField3('batchSize') ? requireSchemaParam3('batchSize') : 1,
+        // manifest 声明了 batchSize 时以 schema 为准（带默认值并做校验）；
+        // 没声明时：modelApi 清单才回退到节点/生成参数里的张数，workflow 固定 1。
+        // workflow 是「一次输入一次产出」的工作流，回退会把用户残留的 batchSize
+        // 塞进请求里（有测试钉住 workflow 恒为 1）。
+        value103 = getManifestField3('batchSize')
+          ? requireSchemaParam3('batchSize')
+          : isModelApiManifest2
+            ? resolveImageNodeBatchSize({
+                data: this._data,
+                generationParams: generationParams3,
+                rawGenerationParams: value101,
+              })
+            : 1,
         google_image_search =
           isModelApiManifest2 && getManifestField3('google_image_search')
             ? normalizeTaskBooleanParam(readSchemaParam4('google_image_search'))
@@ -1625,7 +1668,9 @@ export function createAIGenerateNodeTaskOrchestrationModule(value10) {
             ? normalizeTaskBooleanParam(readSchemaParam4('google_search')) || google_image_search === true
             : undefined,
         args4 = buildModelApiSchemaPayloadParams({
-          isModelApiManifest: isModelApiManifest2,
+          // workflow 节点也会带自定义 schema 字段，上游按「modelApi 或 workflow」放行；
+          // 只认 modelApi 会让 workflow 的自定义参数整块丢失。
+          isModelApiManifest: isModelApiManifest2 || modelManifest3.adapterType === 'workflow',
           manifestFields: manifestFields4,
           readSchemaParam: readSchemaParam4,
         });
@@ -2603,3 +2648,14 @@ export function createAIGenerateNodeTaskOrchestrationModule(value10) {
   }
   return value11.prototype;
 }
+
+/**
+ * 仅供单测驱动内部纯函数（批量张数归一、schema 参数挑选）。
+ * 运行时不要引用：随实现改。
+ */
+export const _imageTaskPayloadInternalsForTest = {
+  hasOwnObjectField,
+  normalizeImageBatchSize,
+  resolveImageNodeBatchSize,
+  buildModelApiSchemaPayloadParams,
+};
