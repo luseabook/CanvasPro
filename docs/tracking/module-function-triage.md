@@ -14,7 +14,7 @@
 
 | 函数 | 文件 | 上游内部调用 | 可能影响 |
 |---|---|---|---|
-| `chromeShellPoll` | `services/desktopBridge.js` | 19 | chrome-shell 运行时只有单次 POST，缺**轮询**：更新状态、外部打开请求、打包进度、素材更新都拿不到 |
+| ~~`chromeShellPoll`~~ **已补 212 批** | `services/desktopBridge.js` | 19 | 已实现：合并请求的事件轮询客户端 + 订阅层改长轮询（待真机） |
 | `hasSharedCanvasImageAcquisition` | `components/SourceImageNode.js` | 5 | 共享画布图片获取能力判定 |
 | `mentionPattern` | `modules/collaboration/collaborationChat.js` | 5 | 聊天里 `@所有人` / `@名字` 的识别与高亮 |
 | `getMascotTipText` | `modules/MascotManager.js` | 3 | 吉祥物提示文案 |

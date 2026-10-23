@@ -1,6 +1,7 @@
 import { post } from '../../api/apiBase.js';
 import { deferredMediaPreview, withDeferredMediaFiles } from '../../api/deferredMediaApi.js';
 import { CHROME_SHELL_STARTUP_READY_EVENT } from './chromeShellStartupReadiness.js';
+import { createDesktopEventPollClient } from '../../api/desktopEventPollApi.js';
 const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '::1', '[::1]']),
   LONG_DESKTOP_REQUEST_TIMEOUT_MS = 30 * 60 * 1000,
   CHROME_SHELL_STARTUP_READY_REQUEST_TIMEOUT_MS = 1500,
@@ -91,6 +92,23 @@ function chromeShellPost(next, current = {}) {
   if (!desktopBridge.isChromeShell) return undefined;
   return normalizeDesktopHttpPayload(current).then((entry) => postDesktopBridge(next, entry));
 }
+// 同源事件轮询客户端：所有订阅共享一个实例，避免每个订阅各起一条定时器、
+// 各拉一次同一份数据。窗口切换时重建（不同窗口的 fetch 语义不通用）。
+let eventPollWindow = null,
+  eventPollClient = null;
+function chromeShellPoll(path, signal) {
+  if (!desktopBridge.isChromeShell) return undefined;
+  const windowObject = getWindowObject();
+  (!eventPollClient || eventPollWindow !== windowObject) &&
+    ((eventPollWindow = windowObject),
+    (eventPollClient = createDesktopEventPollClient({
+      requestBatch: (payload) => postDesktopBridge('/api/v2/desktop/events/poll', payload),
+      requestSnapshot: (snapshotPath) =>
+        postDesktopBridge(snapshotPath, snapshotPath.endsWith('/media-task/list') ? { limit: 120 } : {}),
+      minimumIntervalMs: 150,
+    })));
+  return eventPollClient.read(path, { signal: signal });
+}
 function chromeShellPostOperationResult(record, payload = {}) {
   if (!desktopBridge.isChromeShell) return undefined;
   return normalizeDesktopHttpPayload(payload).then(async (handle) => {
@@ -145,61 +163,64 @@ function subscribeByPolling(
   handler,
   handler2,
   {
-    intervalMs: intervalMs = 1000,
     extractItems: extractItems = (input) => input,
     getKey: getKey = (output) => JSON.stringify(output),
   } = {},
 ) {
   if (!desktopBridge.isChromeShell || typeof handler2 !== 'function') return () => {};
-  let enabled3 = false;
-  const map2 = new Map(),
-    async2 = async () => {
-      if (enabled3) return;
+  // 长轮询：handler(signal) 会一直挂到后端有变化才返回，所以循环用 queueMicrotask
+  // 衔接即可，不再需要 intervalMs 定时器（每个订阅一条定时器正是要消掉的东西）。
+  let stopped = false;
+  const controller = new AbortController(),
+    seen = new Map(),
+    run = async () => {
+      if (stopped) return;
       try {
-        const value3 = await handler();
-        if (enabled3) return;
-        const extractItems2 = extractItems(value3);
-        if (Array.isArray(extractItems2))
-          for (const value4 of extractItems2) {
-            if (enabled3) break;
-            const key2 = getKey(value4),
-              value5 = JSON.stringify(value4 || {});
-            if (map2.get(key2) === value5) continue;
-            (map2.set(key2, value5), handler2(value4));
+        const snapshot = await handler(controller.signal);
+        if (stopped) return;
+        const items = extractItems(snapshot);
+        if (Array.isArray(items))
+          for (const item of items) {
+            if (stopped) break;
+            const key = getKey(item),
+              fingerprint = JSON.stringify(item || {});
+            if (seen.get(key) === fingerprint) continue;
+            (seen.set(key, fingerprint), handler2(item));
           }
         else {
-          if (extractItems2 && typeof extractItems2 === 'object') {
-            const key3 = getKey(extractItems2),
-              value6 = JSON.stringify(extractItems2 || {});
-            map2.get(key3) !== value6 && (map2.set(key3, value6), handler2(extractItems2));
+          if (items && typeof items === 'object') {
+            const key = getKey(items),
+              fingerprint = JSON.stringify(items || {});
+            seen.get(key) !== fingerprint && (seen.set(key, fingerprint), handler2(items));
           }
         }
       } catch {}
-      if (!enabled3) setTimeout(async2, intervalMs);
+      if (!stopped) queueMicrotask(run);
     };
   return (
-    setTimeout(async2, 0),
+    queueMicrotask(run),
     () => {
-      enabled3 = true;
+      ((stopped = true), controller.abort());
     }
   );
 }
-function subscribeToConsumedBatch(handler3, handler4, { intervalMs: intervalMs = 500 } = {}) {
+function subscribeToConsumedBatch(handler3, handler4) {
   if (!desktopBridge.isChromeShell || typeof handler4 !== 'function') return () => {};
-  let enabled4 = false;
-  const async3 = async () => {
-    if (enabled4) return;
-    try {
-      const list2 = await handler3();
-      if (enabled4) return;
-      if (Array.isArray(list2) && list2.length > 0) handler4(list2);
-    } catch {}
-    if (!enabled4) setTimeout(async3, intervalMs);
-  };
+  let stopped = false;
+  const controller = new AbortController(),
+    run = async () => {
+      if (stopped) return;
+      try {
+        const items = await handler3(controller.signal);
+        if (stopped) return;
+        if (Array.isArray(items) && items.length > 0) handler4(items);
+      } catch {}
+      if (!stopped) queueMicrotask(run);
+    };
   return (
-    setTimeout(async3, 0),
+    queueMicrotask(run),
     () => {
-      enabled4 = true;
+      ((stopped = true), controller.abort());
     }
   );
 }
@@ -235,7 +256,7 @@ function subscribeToUpdaterState(value8, handler5, handler6 = subscribeByPolling
       const updaterEventFromStateSnapshot2 = updaterEventFromStateSnapshot(value9);
       if (updaterEventFromStateSnapshot2) handler5(updaterEventFromStateSnapshot2);
     },
-    { intervalMs: 3000, getKey: () => 'updater-state' },
+    { getKey: () => 'updater-state' },
   );
 }
 function subscribeByLongPolling(handler7, handler8) {
@@ -329,7 +350,9 @@ export const desktopBridge = {
     },
     onUpdaterEvent: (value18) =>
       getDesktopApi()?.onUpdaterEvent?.(value18) ||
-      subscribeToUpdaterState(() => desktopBridge.app.getUpdateState(), value18),
+      subscribeToUpdaterState(
+        (signal) => chromeShellPoll('/api/v2/desktop/app/update-state', signal),
+        value18),
   },
   project: {
     get api() {
@@ -394,17 +417,16 @@ export const desktopBridge = {
     onExternalOpen: (value19) =>
       desktopBridge.project.api?.onExternalOpen?.(value19) ||
       subscribeToConsumedBatch(
-        () => chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', {}),
+        (signal) => chromeShellPoll('/api/v2/desktop/project/consume-external-open-requests', signal),
         value19,
-        { intervalMs: 500 },
+        {},
       ),
     onPackageProgress: (value20) =>
       desktopBridge.project.api?.onPackageProgress?.(value20) ||
       subscribeByPolling(
-        () => chromeShellPost('/api/v2/desktop/project/consume-package-progress-events', {}),
+        (signal) => chromeShellPoll('/api/v2/desktop/project/consume-package-progress-events', signal),
         value20,
         {
-          intervalMs: 250,
           extractItems: (value21) => (Array.isArray(value21) ? value21 : []),
           getKey: (value22) =>
             String(value22?.createdAt || value22?.operationId || JSON.stringify(value22 || {})),
@@ -503,8 +525,7 @@ export const desktopBridge = {
     getPathForFile: (...args23) => getElectronApi()?.getPathForFile?.(...args23) || '',
     onAssetUpdated: (value25) =>
       getElectronApi()?.onAssetUpdated?.(value25) ||
-      subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), value25, {
-        intervalMs: 500,
+      subscribeByPolling((signal) => chromeShellPoll('/api/v2/desktop/asset/consume-updates', signal), value25, {
         extractItems: (value26) => (Array.isArray(value26) ? value26 : []),
         getKey: (value27) => String(value27?.assetId || JSON.stringify(value27 || {})),
       }),
@@ -546,7 +567,7 @@ export const desktopBridge = {
     onEvent: (value28) =>
       desktopBridge.webPreview.api?.onEvent?.(value28) ||
       subscribeByLongPolling(
-        () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 1000 }),
+        (signal) => chromeShellPoll('/api/v2/desktop/web-preview/wait-events', signal),
         value28,
       ),
   },
@@ -641,8 +662,7 @@ export const desktopBridge = {
       chromeShellPost('/api/v2/desktop/media-task/list', args42[0]),
     onUpdate: (value30) =>
       desktopBridge.mediaTask.api?.onUpdate?.(value30) ||
-      subscribeByPolling(() => desktopBridge.mediaTask.list({ limit: 120 }), value30, {
-        intervalMs: 1000,
+      subscribeByPolling((signal) => chromeShellPoll('/api/v2/desktop/media-task/list', signal), value30, {
         extractItems: (value31) =>
           Array.isArray(value31?.tasks) ? value31.tasks : Array.isArray(value31) ? value31 : [],
         getKey: (value32) => String(value32?.taskId || JSON.stringify(value32 || {})),
@@ -754,10 +774,9 @@ export const desktopBridge = {
     onGenerationCompleteClick: (value35) =>
       desktopBridge.notification.api?.onGenerationCompleteClick?.(value35) ||
       subscribeByPolling(
-        () => chromeShellPost('/api/v2/desktop/notification/consume-generation-complete-clicks', {}),
+        (signal) => chromeShellPoll('/api/v2/desktop/notification/consume-generation-complete-clicks', signal),
         value35,
         {
-          intervalMs: 400,
           extractItems: (value36) => (Array.isArray(value36) ? value36 : []),
           getKey: (value37) =>
             String(value37?.eventId || value37?.createdAt || JSON.stringify(value37 || {})),
@@ -780,10 +799,9 @@ export const desktopBridge = {
     onGlobalCapture: (value38) =>
       desktopBridge.screenshot.api?.onGlobalCapture?.(value38) ||
       subscribeByPolling(
-        () => chromeShellPost('/api/v2/desktop/screenshot/consume-global-capture-events', {}),
+        (signal) => chromeShellPoll('/api/v2/desktop/screenshot/consume-global-capture-events', signal),
         value38,
         {
-          intervalMs: 150,
           extractItems: (value39) => (Array.isArray(value39) ? value39 : []),
           getKey: (value40) =>
             String(value40?.createdAt || value40?.source || JSON.stringify(value40 || {})),
@@ -792,9 +810,9 @@ export const desktopBridge = {
     onGlobalShortcutStatus: (value41) =>
       desktopBridge.screenshot.api?.onGlobalShortcutStatus?.(value41) ||
       subscribeByPolling(
-        () => chromeShellPost('/api/v2/desktop/screenshot/get-global-shortcut-status', {}),
+        (signal) => chromeShellPoll('/api/v2/desktop/screenshot/get-global-shortcut-status', signal),
         value41,
-        { intervalMs: 1000, getKey: () => 'global-shortcut-status' },
+        { getKey: () => 'global-shortcut-status' },
       ),
   },
   textPreset: {
@@ -816,16 +834,16 @@ export const desktopBridge = {
     onSelectedText: (handler10) =>
       desktopBridge.textPreset.api?.onSelectedText?.(handler10) ||
       subscribeToConsumedBatch(
-        () => chromeShellPost('/api/v2/desktop/text-preset/consume-events', {}),
+        (signal) => chromeShellPoll('/api/v2/desktop/text-preset/consume-events', signal),
         (list4) => list4.forEach((value44) => handler10(value44)),
-        { intervalMs: 150 },
+        {},
       ),
     onGlobalShortcutStatus: (value45) =>
       desktopBridge.textPreset.api?.onGlobalShortcutStatus?.(value45) ||
       subscribeByPolling(
-        () => chromeShellPost('/api/v2/desktop/text-preset/get-global-shortcut-status', {}),
+        (signal) => chromeShellPoll('/api/v2/desktop/text-preset/get-global-shortcut-status', signal),
         value45,
-        { intervalMs: 1000, getKey: () => 'global-text-preset-shortcut-status' },
+        { getKey: () => 'global-text-preset-shortcut-status' },
       ),
   },
   notificationSound: {
@@ -934,7 +952,7 @@ export function installDesktopBridgeCompat() {
         );
       },
       onUpdaterEvent: (value53) =>
-        subscribeToUpdaterState(() => chromeShellPost('/api/v2/desktop/app/update-state', {}), value53),
+        subscribeToUpdaterState((signal) => chromeShellPoll('/api/v2/desktop/app/update-state', signal), value53),
     }),
     (windowObject5.electronAPI = {
       __aicDesktopHttpShim: true,
@@ -958,16 +976,15 @@ export function installDesktopBridgeCompat() {
           chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', value65),
         onExternalOpen: (value66) =>
           subscribeToConsumedBatch(
-            () => chromeShellPost('/api/v2/desktop/project/consume-external-open-requests', {}),
+            (signal) => chromeShellPoll('/api/v2/desktop/project/consume-external-open-requests', signal),
             value66,
-            { intervalMs: 500 },
+            {},
           ),
         onPackageProgress: (value67) =>
           subscribeByPolling(
-            () => chromeShellPost('/api/v2/desktop/project/consume-package-progress-events', {}),
+            (signal) => chromeShellPoll('/api/v2/desktop/project/consume-package-progress-events', signal),
             value67,
             {
-              intervalMs: 250,
               extractItems: (value68) => (Array.isArray(value68) ? value68 : []),
               getKey: (value69) =>
                 String(
@@ -996,7 +1013,7 @@ export function installDesktopBridgeCompat() {
         controlView: (value81) => chromeShellPost('/api/v2/desktop/web-preview/control-view', value81),
         onEvent: (value82) =>
           subscribeByLongPolling(
-            () => chromeShellPost('/api/v2/desktop/web-preview/wait-events', { waitMs: 1000 }),
+            (signal) => chromeShellPoll('/api/v2/desktop/web-preview/wait-events', signal),
             value82,
           ),
       },
@@ -1018,10 +1035,9 @@ export function installDesktopBridgeCompat() {
         list: (value91) => chromeShellPost('/api/v2/desktop/media-task/list', value91),
         onUpdate: (value92) =>
           subscribeByPolling(
-            () => chromeShellPost('/api/v2/desktop/media-task/list', { limit: 120 }),
+            (signal) => chromeShellPoll('/api/v2/desktop/media-task/list', signal),
             value92,
             {
-              intervalMs: 1000,
               extractItems: (value93) =>
                 Array.isArray(value93?.tasks)
                   ? value93.tasks
@@ -1071,10 +1087,9 @@ export function installDesktopBridgeCompat() {
           chromeShellPost('/api/v2/desktop/screenshot/update-global-shortcut', value112),
         onGlobalCapture: (value113) =>
           subscribeByPolling(
-            () => chromeShellPost('/api/v2/desktop/screenshot/consume-global-capture-events', {}),
+            (signal) => chromeShellPoll('/api/v2/desktop/screenshot/consume-global-capture-events', signal),
             value113,
             {
-              intervalMs: 150,
               extractItems: (value114) => (Array.isArray(value114) ? value114 : []),
               getKey: (value115) =>
                 String(value115?.createdAt || value115?.source || JSON.stringify(value115 || {})),
@@ -1082,9 +1097,9 @@ export function installDesktopBridgeCompat() {
           ),
         onGlobalShortcutStatus: (value116) =>
           subscribeByPolling(
-            () => chromeShellPost('/api/v2/desktop/screenshot/get-global-shortcut-status', {}),
+            (signal) => chromeShellPoll('/api/v2/desktop/screenshot/get-global-shortcut-status', signal),
             value116,
-            { intervalMs: 1000, getKey: () => 'global-shortcut-status' },
+            { getKey: () => 'global-shortcut-status' },
           ),
       },
       textPreset: {
@@ -1095,15 +1110,15 @@ export function installDesktopBridgeCompat() {
           chromeShellPost('/api/v2/desktop/text-preset/update-global-shortcut', value119),
         onSelectedText: (handler11) =>
           subscribeToConsumedBatch(
-            () => chromeShellPost('/api/v2/desktop/text-preset/consume-events', {}),
+            (signal) => chromeShellPoll('/api/v2/desktop/text-preset/consume-events', signal),
             (list5) => list5.forEach((value120) => handler11(value120)),
-            { intervalMs: 150 },
+            {},
           ),
         onGlobalShortcutStatus: (value121) =>
           subscribeByPolling(
-            () => chromeShellPost('/api/v2/desktop/text-preset/get-global-shortcut-status', {}),
+            (signal) => chromeShellPoll('/api/v2/desktop/text-preset/get-global-shortcut-status', signal),
             value121,
-            { intervalMs: 1000, getKey: () => 'global-text-preset-shortcut-status' },
+            { getKey: () => 'global-text-preset-shortcut-status' },
           ),
       },
       clipboard: {
@@ -1115,8 +1130,7 @@ export function installDesktopBridgeCompat() {
           chromeShellPost('/api/v2/desktop/clipboard/read-file-references', value125),
       },
       onAssetUpdated: (value126) =>
-        subscribeByPolling(() => chromeShellPost('/api/v2/desktop/asset/consume-updates', {}), value126, {
-          intervalMs: 500,
+        subscribeByPolling((signal) => chromeShellPoll('/api/v2/desktop/asset/consume-updates', signal), value126, {
           extractItems: (value127) => (Array.isArray(value127) ? value127 : []),
           getKey: (value128) => String(value128?.assetId || JSON.stringify(value128 || {})),
         }),

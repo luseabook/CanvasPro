@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 37,
+  "moduleFunctionTotal": 36,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -210,9 +210,6 @@
     ],
     "src/modules/workspacePersistencePresentation.js": [
       "presentSaveError"
-    ],
-    "src/services/desktopBridge.js": [
-      "chromeShellPoll"
     ],
     "src/services/smartClipJobService.js": [
       "waitForStatusPoll"
