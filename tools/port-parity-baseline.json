@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 32,
+  "moduleFunctionTotal": 28,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -155,10 +155,6 @@
       "resolveScaleConstraint",
       "scalePositionAroundPivotAxes"
     ],
-    "src/modules/MascotManager.js": [
-      "formatShortcutBinding",
-      "getMascotTipText"
-    ],
     "src/modules/personReplacement/personReplacementProjectSession.js": [
       "getPersonReplacementSourceProcessingMessage",
       "getPersonReplacementSourceProcessingProgress"
@@ -166,10 +162,6 @@
     "src/modules/providerIconLod.js": [
       "preloadProviderIconAssets",
       "resetProviderIconPreloadForTests"
-    ],
-    "src/modules/registry.js": [
-      "canCreateConnectedNode",
-      "getRegisteredConnectionDecision"
     ],
     "src/modules/storyWorkspace/storyClipFrames.js": [
       "createStoryClipFrameBatch",

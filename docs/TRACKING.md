@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（219 批·**吉祥物提示跟随键位 + 连线策略**）：`MascotManager` 40 条提示把键位写死在文案里（换预设/改快捷键就在教错按键）——补 `getMascotTipText`/`formatShortcutBinding` 与两张动作表，键位改为运行时从 `shortcuts.js` 取，并订阅 `shortcuts-updated` 重算，两语种文案同步换成占位符版。`registry` 补 `canCreateConnectedNode`/`getRegisteredConnectionDecision`（`registerNode` 第三参数此前被整体忽略），`EdgeController` 三处接线：连线裁决先问注册策略、两处「连线建节点」菜单加闸。模块级缺口 32→28，全量 **11539/11539/0**。
 - 2026-10-23（218 批·**真机验收 + 修 215 去抖**）：真机跑通 7 项（启动/无 pageerror/209 下拉 select 与双向同步/213 提及边界/215 去抖/217 应用自己的 bridge 上批量轮询）。**验收抓到 215 的真 bug**：`setGenerateButtonIcon` 拿 `innerHTML` 跟源字符串比，浏览器序列化后永远不等 → 去抖等于没做；改按 `<template>` 规范化后比较，并补模拟序列化的单测。桌面 e2e 原先 1 条长期红（手动更新失败早已改走 banner、`showToast` 不带 type）→ 断言对齐当前契约后 4/4 绿。台账 `docs/tracking/runtime-acceptance.md`。全量 **11524/11524/0**。
-- 2026-10-23（217 批·**事件轮询补服务端**）：212 批只搬客户端——`/api/v2/desktop/events/poll` 服务端从未存在，`web-preview/wait-events`（自带 waitMs 的直连）又被误塞进批量端点。本批补 `electron/desktopEventPoll.js`（4 快照+6 事件白名单、150ms/1000ms 节流、sha256 revision、挂起 1s、失败隔离）并注册端点，bridge 透传 AbortSignal；两处 wait-events 改回直连；客户端把「拿回 null」（404 被 apiBase 归一）也算降级，超 10 路径拆批；新增两端不变式守卫。测试 +12，全量 **11523/11523/0**。盲区：按文件比对看不见「上游有、仓库整文件缺失」。
 
 
 ## 12. 变更记录机制（**已冻结**）

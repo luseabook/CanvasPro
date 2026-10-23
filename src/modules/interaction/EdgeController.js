@@ -3,7 +3,7 @@ import appStore, {
   uiStore as uiStore_2,
   workspaceStore as workspaceStore_2,
 } from '../../core/stores/appStore.js';
-import { isNodeType } from '../registry.js';
+import { canCreateConnectedNode, getRegisteredConnectionDecision, isNodeType } from '../registry.js';
 import { commit } from '../history.js';
 import {
   screenToWorld,
@@ -427,6 +427,9 @@ export function setDragContextGetter(value19) {
 export function isValidConnection(enabled10, enabled11) {
   if (!enabled10 || !enabled11) return false;
   if (enabled10.id === enabled11.id) return false;
+  // 节点类型自己注册了连线策略就听它的（两端都注册时取交集）。
+  const registeredDecision = getRegisteredConnectionDecision(enabled10, enabled11);
+  if (registeredDecision !== undefined) return registeredDecision;
   const value20 = enabled10.type || '',
     value21 = enabled11.type || '';
   if (value20 === 'debug' || _isBlockedOutputNodeType(value20)) return false;
@@ -2619,6 +2622,11 @@ function _createSidePlusCreationMenu(value304) {
   );
 }
 function _showQuoteMenu(value306, value307, value308, value309, value310, value311 = {}) {
+  // 这个节点类型声明了「不允许连线建节点」，直接收摊。
+  if (!canCreateConnectedNode(getStateRaw().nodes[value308])) {
+    value310?.();
+    return;
+  }
   document.querySelector('.v2-quote-menu')?.remove();
   const { nodes: nodes19 } = getStateRaw(),
     handler4 = (value312, value313 = null) => {
@@ -2995,6 +3003,10 @@ function _showQuoteMenu(value306, value307, value308, value309, value310, value3
   requestAnimationFrame(() => document.addEventListener('mousedown', value352, true));
 }
 function _showLeftQuoteMenu(value353, value354, targetId10, value355, value356) {
+  if (!canCreateConnectedNode(getState().nodes[targetId10])) {
+    value356?.();
+    return;
+  }
   document.querySelector('.v2-quote-menu')?.remove();
   const { nodes: nodes20 } = getState(),
     args3 = nodes20[targetId10];
