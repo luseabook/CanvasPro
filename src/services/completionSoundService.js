@@ -1,5 +1,6 @@
 import { fetchUserSettingsFromServer } from '../../api/userSettingsApi.js';
 import { t } from '../i18n/index.js';
+import { desktopBridge } from './desktopBridge.js';
 export const BUILT_IN_COMPLETION_SOUND_PATH = 'assets/sounds/notify.mp3';
 export const COMPLETION_SOUND_DEFAULTS = Object.freeze({
   enabled: true,
@@ -14,6 +15,9 @@ let cachedSettings = null,
   audioFactory = (value) => new Audio(value);
 function normalizeText(item) {
   return String(item || '').trim();
+}
+function normalizePathKey(key) {
+  return normalizeText(key).replace(/\\/g, '/').toLowerCase();
 }
 function clampVolume(key) {
   const index = Number(key);
@@ -54,23 +58,51 @@ export async function loadCompletionSoundSettings({ force: force = false } = {})
     );
   }
 }
+async function resolveHttpCompatSystemSoundUrl(filePath) {
+  // http-compat 运行时（浏览器连桌面后端）拿不到本地文件，只能请宿主把系统提示音
+  // 以可播放 URL 的形式给出来；`<audio src="D:////...">` 在浏览器里一定会失败。
+  if (!isDesktopHttpShimRuntime() || !desktopBridge.notificationSound.isAvailable()) return '';
+  const listed = await desktopBridge.notificationSound.listSystemSounds(),
+    targetKey = normalizePathKey(filePath),
+    matched = (Array.isArray(listed?.files) ? listed.files : []).find(
+      (entry) => normalizePathKey(entry?.path) === targetKey
+    );
+  return normalizeText(matched?.playbackUrl);
+}
+function getNotificationSoundPlayer() {
+  return desktopBridge.notificationSound.isAvailable()
+    ? (options) => desktopBridge.notificationSound.play(options)
+    : null;
+}
+function isDesktopHttpShimRuntime() {
+  return desktopBridge.usesHttpCompat;
+}
 async function resolvePlaybackUrl(target) {
   const completionSoundSettings = normalizeCompletionSoundSettings(target),
-    path = normalizeText(completionSoundSettings.selectedFilePath) || completionSoundSettings.builtInPath;
+    path =
+      normalizeText(completionSoundSettings.selectedFilePath) ||
+      completionSoundSettings.builtInPath;
   if (!path) return '';
   if (!/^(?:[a-zA-Z]:[\\/]|\\\\|\/)/.test(path)) return path;
-  const run = globalThis.window?.electronAPI?.getLocalPreviewUrl;
-  if (typeof run !== 'function') return path;
-  const response = await run({ path: path, type: 'audio/mpeg' });
-  return normalizeText(response?.url || response);
+  if (isDesktopHttpShimRuntime()) {
+    const systemSoundUrl = await resolveHttpCompatSystemSoundUrl(path);
+    if (systemSoundUrl) return systemSoundUrl;
+    throw new Error('System completion sound is unavailable to the browser runtime');
+  }
+  if (!desktopBridge.mediaPreview.isAvailable()) return path;
+  const preview = await desktopBridge.mediaPreview.getLocalPreviewUrl({
+    path: path,
+    type: 'audio/mpeg',
+  });
+  return normalizeText(preview?.url || preview);
 }
 async function playNativeCompletionSound(source) {
-  const run2 = globalThis.window?.electronAPI?.notificationSound?.play;
-  if (typeof run2 !== 'function') return { ok: false, skipped: 'unavailable' };
+  const play = getNotificationSoundPlayer();
+  if (typeof play !== 'function') return { ok: false, skipped: 'unavailable' };
   const volume = normalizeCompletionSoundSettings(source),
     filePath = normalizeText(volume.selectedFilePath) || volume.builtInPath;
   if (!filePath) return { ok: false, skipped: 'missing-file' };
-  const skipped = await run2({
+  const skipped = await play({
     filePath: filePath,
     volume: volume.volume,
     reason: 'generation-success',
@@ -82,6 +114,22 @@ async function playNativeCompletionSound(source) {
 async function playResolvedSound(next) {
   const completionSoundSettings2 = normalizeCompletionSoundSettings(next);
   if (completionSoundSettings2.enabled === false) return { ok: false, skipped: 'disabled' };
+  // shim 运行时先请宿主放：浏览器那侧连文件都读不到，先试 <audio> 必然白报一次错。
+  const httpShim = isDesktopHttpShimRuntime();
+  if (httpShim) {
+    let nativeFailure = null;
+    try {
+      const nativeResult = await playNativeCompletionSound(completionSoundSettings2);
+      if (nativeResult.ok) return nativeResult;
+      nativeFailure = nativeResult.result || nativeResult;
+    } catch (error) {
+      nativeFailure = error;
+    }
+    console.warn(
+      '[completionSound] native playback failed; falling back to browser audio:',
+      nativeFailure
+    );
+  }
   if (typeof audioFactory !== 'function') return { ok: false, skipped: 'no-audio-factory' };
   const url = await resolvePlaybackUrl(completionSoundSettings2);
   if (!url) return { ok: false, skipped: 'missing-url' };
@@ -92,10 +140,11 @@ async function playResolvedSound(next) {
     const promise = audioFactory2.play?.();
     if (promise && typeof promise.then === 'function') await promise;
   } catch (current) {
-    try {
-      const response2 = await playNativeCompletionSound(completionSoundSettings2);
-      if (response2.ok) return response2;
-    } catch {}
+    if (!httpShim)
+      try {
+        const response2 = await playNativeCompletionSound(completionSoundSettings2);
+        if (response2.ok) return response2;
+      } catch {}
     throw current;
   }
   return { ok: true, url: url };

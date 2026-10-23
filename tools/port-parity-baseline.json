@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 49,
+  "moduleFunctionTotal": 46,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -146,11 +146,6 @@
       "createVideoRangePlayheadReadoutView",
       "createVideoRangeSelectionView",
       "positionVideoRangePlayheadReadout"
-    ],
-    "src/services/completionSoundService.js": [
-      "getNotificationSoundPlayer",
-      "isDesktopHttpShimRuntime",
-      "resolveHttpCompatSystemSoundUrl"
     ],
     "src/components/video-node/modelSelectorShared.js": [
       "buildDreaminaVideoMenuGroups",

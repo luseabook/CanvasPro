@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（207 批·**完成提示音 shim 运行时**）：`completionSoundService.js` 从直连 `window.electronAPI` 改为走 `desktopBridge`，补 `isDesktopHttpShimRuntime`/`getNotificationSoundPlayer`/`resolveHttpCompatSystemSoundUrl`/`normalizePathKey`。浏览器连桌面后端时读不到本地文件，必须宿主给可播放 URL 或直接播，否则提示音**静默失败**。测试 6→10，模块级缺口 49→46，全量 **11482/11482/0**。
 - 2026-10-23（206 批·**批量生成命令**）：`generationCommands.js` 补全 `generation.runBatch`（多节点一次确认起跑，上限 12）+ 5 个辅助函数（任务号选取/状态归一/失败判定/批量校验/批量汇总）。`agentActionPostconditions` 早就在等这个命令，但它**从未注册**。同时把 `generation.run` 对齐 0.8.9：返回 `status`/`taskId`，失败**抛错**而不是静默成功。模块级缺口 54→49，全量 **11478/11478/0**。
-- 2026-10-23（205 批·**节点信息元数据**）：`resultRenderModule.js` 补 `requestVideoMetaForNodeInfo`（最后一个缺口，该文件清零）——渲染器用 `typeof … === 'function'` 守卫调用，AIGenVideoNode 一直没有它 → 静默跳过，节点信息面板的 fps/帧数永远空。补 5 秒同源节流 + 失败/不可用条目直接放弃；`_maybeFetchVideoMeta` 加在途 Promise 去重（渲染器每次刷新都会问）。测试 37→40，方法缺口 70→69（28 文件），全量 **11470/11470/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）
