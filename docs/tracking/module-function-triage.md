@@ -16,7 +16,7 @@
 |---|---|---|---|
 | ~~`chromeShellPoll`~~ **已补 212 批** | `services/desktopBridge.js` | 19 | 已实现：合并请求的事件轮询客户端 + 订阅层改长轮询（待真机） |
 | `hasSharedCanvasImageAcquisition` | `components/SourceImageNode.js` | 5 | 共享画布图片获取能力判定 |
-| `mentionPattern` | `modules/collaboration/collaborationChat.js` | 5 | 聊天里 `@所有人` / `@名字` 的识别与高亮 |
+| ~~`mentionPattern`~~ **已补 213 批** | `modules/collaboration/collaborationChat.js` | 5 | 已实现：手打 `@名字` 也算提及（原先只认下拉点选）；边界与元字符有测试 |
 | `getMascotTipText` | `modules/MascotManager.js` | 3 | 吉祥物提示文案 |
 | `setGenerateButtonIcon` | `modules/previewGenerateButtonUi.js` | 3 | 生成按钮图标切换 |
 | `formatShortcutBinding` | `modules/MascotManager.js` | 2 | 快捷键展示文案 |

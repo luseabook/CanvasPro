@@ -11,6 +11,34 @@ import { bindCollaborationChatPosition } from './collaborationChatPosition.js';
 import { showToast } from '../../services/toastService.js';
 import { updateNodeReference } from './collaborationNodeReference.js';
 import { bindTextareaMentions } from '../../components/shared/textareaMentions.js';
+/**
+ * 匹配「完整的一个 @名字」：把名字里可能出现正则元字符全部转义，
+ * 并要求后面不再跟字母/数字/下划线——否则 `@小明` 会命中 `@小明同学` 的前缀，
+ * 把不该提醒的人一起提醒了。
+ */
+function mentionPattern(token) {
+  return new RegExp(
+    String(token || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?![\\p{L}\\p{N}_])',
+    'gu',
+  );
+}
+/**
+ * 从消息正文反解提及 id 列表。
+ *
+ * 手打 `@名字` 与从下拉里点选等价——只靠点选的话，用户打完字直接回车就丢了提醒。
+ * 规则：
+ * - 只认当前仍在房间里的人（`members`），名字被 @ 到才算；
+ * - `@所有人` 命中则全员（仍然排除自己）；
+ * - 不认自己：自己 @ 自己不该产生提醒。
+ */
+export function resolveMentionIds({ body, members = [], actorId = '' } = {}) {
+  const text = String(body || ''),
+    mentionsEveryone = mentionPattern('@所有人').test(text);
+  return (Array.isArray(members) ? members : [])
+    .filter((member) => member?.id && member.id !== actorId)
+    .filter((member) => mentionsEveryone || mentionPattern('@' + member.name).test(text))
+    .map((member) => member.id);
+}
 export function createCollaborationChat({ store: store, getSession: getSession, openNode: openNode }) {
   const root = reviewElement('section', 'collaboration-chat');
   ((root.hidden = true),
@@ -135,10 +163,17 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
         const body = target.typed
           ? dom.body.slice(0, target.start) + dom.body.slice(target.end)
           : dom.body;
-        (mentions.edit({ [options.kind]: list, body: body }),
+        (mentions.edit({ [options.kind]: list, body: body, mentions: resolveMentionsFromBody(body) }),
           input.setSelectionRange(target.start, target.start));
       },
     });
+  function resolveMentionsFromBody(body) {
+    return resolveMentionIds({
+      body: body,
+      members: enabled2?.state.members || [],
+      actorId: enabled2?.state.actorId || '',
+    });
+  }
   function run4(next) {
     if (!store.getStateRaw().nodes[next]) return showToast('该节点已删除', 'ok');
     openNode(next);
@@ -376,7 +411,9 @@ export function createCollaborationChat({ store: store, getSession: getSession, 
     if (nodeIds.length > 20) return (showToast('每条消息最多引用 20 个节点，请分批发送', 'warn'), false);
     return (mentions.edit({ nodeIds: nodeIds }), run(), true);
   }
-  (input.addEventListener('input', () => mentions.edit({ body: input.value })),
+  (input.addEventListener('input', () =>
+      mentions.edit({ body: input.value, mentions: resolveMentionsFromBody(input.value) }),
+    ),
     input.addEventListener('keydown', (event) => {
       if (event.isComposing) return;
       event.key === 'Enter' && !event.shiftKey && (event.preventDefault(), void mentions.send());

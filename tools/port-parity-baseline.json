@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 36,
+  "moduleFunctionTotal": 35,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -186,9 +186,6 @@
     ],
     "src/components/video-node/segmentRetakeController.js": [
       "syncSegmentRetakeController"
-    ],
-    "src/modules/collaboration/collaborationChat.js": [
-      "mentionPattern"
     ],
     "src/modules/previewGenerateButtonUi.js": [
       "setGenerateButtonIcon"
