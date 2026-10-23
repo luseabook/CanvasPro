@@ -126,15 +126,20 @@ test('failed save cancels close and leaves the backend running', async ({}, test
 test('updater IPC background/manual/duplicate feedback stays quiet or singular', async ({}, testInfo) => {
   await desktop(testInfo, async ({ app, page, baseURL }) => {
     await page.evaluate(() => { window.__auditToasts = []; window.showToast = (message, type) => window.__auditToasts.push({ message, type }); });
+    const bannerCount = () => page.evaluate(() => document.querySelectorAll('#update-banner').length);
+    const bannerSubtitle = () => page.evaluate(() => document.getElementById('update-banner-sub')?.textContent || '');
     const send = event => app.evaluate(({ BrowserWindow }, { origin, event }) => {
       BrowserWindow.getAllWindows().find(window => window.webContents.getURL().startsWith(origin + '/')).webContents.send('appUpdater:event', event);
     }, { origin: baseURL, event });
+    // 后台（非手动）检查失败：走自动 toast，不弹 banner。
     await send({ type: 'error', manual: false, eventId: 70001, message: '后台检查失败' });
-    // A renderer evaluation is an IPC barrier, not an arbitrary multi-second sleep.
-    expect(await page.evaluate(() => window.__auditToasts.filter(item => item.type === 'warning').length)).toBe(0);
+    await expect.poll(() => page.evaluate(() => window.__auditToasts.length)).toBe(1);
+    expect(await bannerCount()).toBe(0);
+    // 手动检查失败：当前契约是 banner（不是 toast），重复事件只留一个 banner。
     await send({ type: 'error', manual: true, eventId: 70002, message: '暂时无法检查更新，请稍后重试。' });
     await send({ type: 'error', manual: true, eventId: 70002, message: '暂时无法检查更新，请稍后重试。' });
-    await expect.poll(() => page.evaluate(() => window.__auditToasts.filter(item => item.type === 'warning').length)).toBe(1);
+    await expect.poll(bannerCount).toBe(1);
+    expect(await page.evaluate(() => window.__auditToasts.length)).toBe(1);
     await app.evaluate(({ ipcMain }, origin) => {
       ipcMain.removeHandler('appUpdater:checkForUpdates');
       ipcMain.handle('appUpdater:checkForUpdates', async event => {
@@ -143,9 +148,14 @@ test('updater IPC background/manual/duplicate feedback stays quiet or singular',
       });
     }, baseURL);
     await page.evaluate(async () => { const { showManualUpdateCheck } = await import('/src/modules/AutoUpdate.js'); await showManualUpdateCheck(); });
-    const warnings = await page.evaluate(() => window.__auditToasts.filter(item => item.type === 'warning'));
-    expect(warnings).toHaveLength(2);
-    expect(warnings.every(item => item.message.length < 100 && !item.message.includes('SYNTHETIC_HTTP_RESPONSE'))).toBe(true);
+    // banner 是「替换」而不是叠加；而且 5 KB 原始错误不能出现在任何用户可见文案里。
+    await expect.poll(bannerCount).toBe(1);
+    expect((await bannerSubtitle()).length).toBeGreaterThan(0);
+    const texts = await page.evaluate(() => [
+      ...window.__auditToasts.map(item => item.message),
+      document.getElementById('update-banner')?.textContent || '',
+    ]);
+    expect(texts.every(text => text.length < 200 && !text.includes('SYNTHETIC_HTTP_RESPONSE'))).toBe(true);
   });
 });
 

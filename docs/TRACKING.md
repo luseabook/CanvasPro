@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（218 批·**真机验收 + 修 215 去抖**）：真机跑通 7 项（启动/无 pageerror/209 下拉 select 与双向同步/213 提及边界/215 去抖/217 应用自己的 bridge 上批量轮询）。**验收抓到 215 的真 bug**：`setGenerateButtonIcon` 拿 `innerHTML` 跟源字符串比，浏览器序列化后永远不等 → 去抖等于没做；改按 `<template>` 规范化后比较，并补模拟序列化的单测。桌面 e2e 原先 1 条长期红（手动更新失败早已改走 banner、`showToast` 不带 type）→ 断言对齐当前契约后 4/4 绿。台账 `docs/tracking/runtime-acceptance.md`。全量 **11524/11524/0**。
 - 2026-10-23（217 批·**事件轮询补服务端**）：212 批只搬客户端——`/api/v2/desktop/events/poll` 服务端从未存在，`web-preview/wait-events`（自带 waitMs 的直连）又被误塞进批量端点。本批补 `electron/desktopEventPoll.js`（4 快照+6 事件白名单、150ms/1000ms 节流、sha256 revision、挂起 1s、失败隔离）并注册端点，bridge 透传 AbortSignal；两处 wait-events 改回直连；客户端把「拿回 null」（404 被 apiBase 归一）也算降级，超 10 路径拆批；新增两端不变式守卫。测试 +12，全量 **11523/11523/0**。盲区：按文件比对看不见「上游有、仓库整文件缺失」。
-- 2026-10-23（216 批·**保存失败文案**）：`workspacePersistencePresentation.js` 补 `presentSaveError`——磁盘满/权限/中文透传/兜底四路映射，状态条不再直接显示 `ENOSPC: no space left on device` 这类技术原文。测试 17→18（3 例改断言到新契约 + 1 例兜底）。模块级缺口 33→32，全量 **11511/11511/0**。另：`createTaskHistoryNotice` 查明消费方 `TaskCenterManager.js` 在仓库不存在 → 归整块升代。
 
 
 ## 12. 变更记录机制（**已冻结**）

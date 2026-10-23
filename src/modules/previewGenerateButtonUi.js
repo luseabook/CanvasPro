@@ -5,14 +5,31 @@ export const GENERATE_LOADING_ICON_HTML =
   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
 export const GENERATE_CANCEL_ICON_HTML =
   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><g class="v2-task-cancel-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></g><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>';
+// 图标源字符串只有三个常量，规范化结果按字符串缓存即可。
+const normalizedIconCache = new Map();
 /**
  * 只在图标真的变了时才写 innerHTML。
  *
  * 直接赋值同一个 HTML 也会重建整棵子树：带 CSS 动画的图标（加载中的旋转圈）会因此
- * 从 0 度重新开始，按钮每次状态刷新看起来都「顿」一下。字符串相等就跳过。
+ * 从 0 度重新开始，按钮每次状态刷新看起来都「顿」一下。
+ *
+ * ⚠ 不能拿 `el.innerHTML` 直接跟源字符串比：浏览器会把刚写进去的 HTML 重新序列化
+ * （自闭合标签 `<line/>` 变 `<line>`、`style` 补分号与空格、属性顺序变化），于是
+ * 「永远不相等」→ 每次都重写，去抖等于没做（217 批真机验收实测）。比较前先用
+ * `<template>` 把源字符串过一遍同一个序列化器，拿到浏览器眼里的规范形态。
  */
+function normalizedIconHtml(iconHtml) {
+  if (typeof document === 'undefined' || !document.createElement) return iconHtml;
+  const cached = normalizedIconCache.get(iconHtml);
+  if (cached !== undefined) return cached;
+  const template = document.createElement('template');
+  template.innerHTML = iconHtml;
+  normalizedIconCache.set(iconHtml, template.innerHTML);
+  return template.innerHTML;
+}
 function setGenerateButtonIcon(el, iconHtml) {
-  if (el.innerHTML !== iconHtml) el.innerHTML = iconHtml;
+  if (!el) return;
+  if (el.innerHTML !== normalizedIconHtml(iconHtml)) el.innerHTML = iconHtml;
 }
 function generateButtonText(value, item = {}) {
   return t('previewGenerateButton.' + value, item);
