@@ -15,10 +15,10 @@
 | 函数 | 文件 | 上游内部调用 | 可能影响 |
 |---|---|---|---|
 | ~~`chromeShellPoll`~~ **已补 212 批** | `services/desktopBridge.js` | 19 | 已实现：合并请求的事件轮询客户端 + 订阅层改长轮询（待真机） |
-| `hasSharedCanvasImageAcquisition` | `components/SourceImageNode.js` | 5 | 共享画布图片获取能力判定 |
+| `hasSharedCanvasImageAcquisition` ⚠ **需真机** | `components/SourceImageNode.js` | 5 | 判定「共享画布正在获取该图」并跳过自身加载。**风险高**：仓库缺这个概念，判错就是图片不显示 |
 | ~~`mentionPattern`~~ **已补 213 批** | `modules/collaboration/collaborationChat.js` | 5 | 已实现：手打 `@名字` 也算提及（原先只认下拉点选）；边界与元字符有测试 |
 | `getMascotTipText` | `modules/MascotManager.js` | 3 | 吉祥物提示文案 |
-| `setGenerateButtonIcon` | `modules/previewGenerateButtonUi.js` | 3 | 生成按钮图标切换 |
+| ~~`setGenerateButtonIcon`~~ **已补 215 批** | `modules/previewGenerateButtonUi.js` | 3 | 已实现：图标相同时不重写 innerHTML（否则旋转动画每次刷新都从 0 度重来） |
 | `formatShortcutBinding` | `modules/MascotManager.js` | 2 | 快捷键展示文案 |
 | ~~`waitForStatusPoll`~~ **已补 214 批** | `services/smartClipJobService.js` | 2 | 已实现：中止统一翻译为 cancelled + 状态查询超时/断网**重试 3 次**（原仓库无重试，抖动直接判死） |
 | `getPersonReplacementSourceProcessingMessage` | `modules/personReplacement/personReplacementProjectSession.js` | 1（+1 外部） | 素材处理中的进度提示 |
@@ -57,3 +57,11 @@
 
 复核方式：`node tools/check-port-parity.mjs --json` 取 `moduleFunctionRows`，
 按上表名字比对；若某条已在仓库出现，说明已补，跑 `--update-baseline` 收紧。
+
+## 复查记录（215 批，逐个核过但决定暂不补）
+
+| 条目 | 复查结论 |
+|---|---|
+| `hasSharedCanvasImageAcquisition`（5 处） | 语义清楚（共享画布正在取图时本节点不重复加载），但仓库**完全没有共享获取这套机制**，`_assignImageDisplaySource` 是唯一出图路径。守卫判错 = 图片不显示，**必须真机验证**才能做，暂缓 |
+| `sanitizeProviderVisibility` / `sanitizeAutoHiddenProviders` | 不是两个函数的事：`modelMenuPreferenceStore` 仓库 55 行 vs 上游 138 行，**provider 可见性/自动隐藏整块功能缺失**。单补会是死代码，应作整块升代 |
+| `preloadProviderIconAssets` / `resetProviderIconPreloadForTests` | **上游自己也没有任何消费方**（全镜像 grep 为空）。属「上游遗留的未接线导出」，不建议补 |

@@ -5,6 +5,15 @@ export const GENERATE_LOADING_ICON_HTML =
   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>';
 export const GENERATE_CANCEL_ICON_HTML =
   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><g class="v2-task-cancel-spin"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></g><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>';
+/**
+ * 只在图标真的变了时才写 innerHTML。
+ *
+ * 直接赋值同一个 HTML 也会重建整棵子树：带 CSS 动画的图标（加载中的旋转圈）会因此
+ * 从 0 度重新开始，按钮每次状态刷新看起来都「顿」一下。字符串相等就跳过。
+ */
+function setGenerateButtonIcon(el, iconHtml) {
+  if (el.innerHTML !== iconHtml) el.innerHTML = iconHtml;
+}
 function generateButtonText(value, item = {}) {
   return t('previewGenerateButton.' + value, item);
 }
@@ -34,7 +43,7 @@ export function setGenerateButtonLoadingUi(
   const title2 = normalizeTitle(ariaLabel || title);
   (el2.setAttribute?.('aria-label', title2),
     (el2.title = normalizeTitle(title)),
-    (el2.innerHTML = GENERATE_LOADING_ICON_HTML));
+    setGenerateButtonIcon(el2, GENERATE_LOADING_ICON_HTML));
 }
 export function setGenerateButtonCancellableUi(
   el3,
@@ -54,7 +63,7 @@ export function setGenerateButtonCancellableUi(
     applyTooltip(el3, tooltip),
     el3.setAttribute?.('aria-label', String(ariaLabel || generateButtonText('cancelGenerate'))),
     (el3.title = String(title || generateButtonText('clickCancelTask'))),
-    (el3.innerHTML = GENERATE_CANCEL_ICON_HTML));
+    setGenerateButtonIcon(el3, GENERATE_CANCEL_ICON_HTML));
 }
 export function resetGenerateButtonIdleUi(el4, generateButtonText3 = generateButtonText('generate')) {
   if (!el4) return;
@@ -64,7 +73,7 @@ export function resetGenerateButtonIdleUi(el4, generateButtonText3 = generateBut
     applyTooltip(el4, ''),
     el4.setAttribute?.('aria-label', normalizeTitle(generateButtonText3)),
     (el4.title = normalizeTitle(generateButtonText3)),
-    (el4.innerHTML = GENERATE_ICON_HTML));
+    setGenerateButtonIcon(el4, GENERATE_ICON_HTML));
 }
 export function setPreviewGenerateButtonLoading(data) {
   setGenerateButtonLoadingUi(data);
