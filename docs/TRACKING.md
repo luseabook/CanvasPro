@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（211 批·**模块级缺口分诊**）：37 条 / 25 文件逐条归类成 `docs/tracking/module-function-triage.md`。三项实测支撑：①全仓 2113 文件里 37 条**仓库调用点全为 0**（没有一条是死调用）；②按上游同文件内部调用数排优先级（`chromeShellPoll` 19 处最高）；③按「消费方文件是否存在」分出整块升代类。结论：A 真缺 18 / B 等价 3（上游自己有两处重复命名）/ C 整块升代 13。无代码改动。
 - 2026-10-23（210 批·**图片批量张数解析**）：`taskOrchestrationModule.impl.js` 补 `hasOwnObjectField`/`normalizeImageBatchSize`/`resolveImageNodeBatchSize`，并按「生成参数 > 原始参数 > 节点数据」回退（原先只认 schema，没声明 batchSize 就硬取 1）。回退**限定 modelApi 清单**——workflow 是一次输入一次产出，已有测试钉住恒为 1（先改全域导致该例红）。顺带把 schema 参数放行到 workflow 清单。测试 3 例，模块级缺口 40→37，全量 **11494/11494/0**。
-- 2026-10-23（209 批·**人物替换模式控件改下拉**）：`personReplacementPromptControls.js` 按 0.8.9 重写：按钮循环切换 → `<select>`（4 档带说明），补 `modeOptions`/`syncModeTooltip`/`bindPersonReplacementPromptModeSelect`/`syncModeSelect`；`applyPersonReplacementPromptControlAction` 改读 `element.value`。**三处接线一并改**：workspace 注册绑定、`change` 事件转给点击处理器（不转则下拉点了没反应）、重渲染时保留该节点（否则绑定被销毁）。测试 5 例，模块级缺口 44→40，全量 **11491/11491/0**。⚠ 需真机。
 
 
 ## 12. 变更记录机制（**已冻结**）
