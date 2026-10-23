@@ -7,11 +7,7 @@ import {
 const VIDEO_REFERENCE_LIST_SELECTOR = '[data-person-replacement-video-reference-list]',
   RESULT_HISTORY_TOGGLE_SELECTOR = ':scope > [data-person-replacement-result-history-toggle]',
   imageSourceReconcileTokens = new WeakMap();
-function syncElementAttributes(
-  el,
-  enabled,
-  { preserveAttributeNames: preserveAttributeNames = [] } = {}
-) {
+function syncElementAttributes(el, enabled, { preserveAttributeNames: preserveAttributeNames = [] } = {}) {
   if (!el || !enabled) return false;
   const map = new Set(preserveAttributeNames),
     map2 = new Set(Array.from(enabled.attributes || [], (error) => error.name));
@@ -45,14 +41,12 @@ function reconcileImageNode(el3, el4) {
     imageSourceReconcileTokens.delete(el3);
     const preserveAttributeNames2 =
       el3.classList?.contains?.('is-ready') && el4.classList?.contains?.('ref-thumb-media');
-    syncElementAttributes(el3, el4, {
-      preserveAttributeNames: preserveAttributeNames2 ? ['class'] : [],
-    });
+    syncElementAttributes(el3, el4, { preserveAttributeNames: preserveAttributeNames2 ? ['class'] : [] });
     if (preserveAttributeNames2) {
       const map3 = new Set(
         String(el4.getAttribute('class') || '')
           .split(/\s+/)
-          .filter(Boolean)
+          .filter(Boolean),
       );
       (map3.delete('is-pending'), map3.add('is-ready'));
       const result = [...map3].join(' ');
@@ -80,7 +74,7 @@ function reconcileImageNode(el3, el4) {
 function syncEquivalentNodeTree(
   options,
   target,
-  { preserveImageNodes: preserveImageNodes = false, preserveSelector: preserveSelector = '' } = {}
+  { preserveImageNodes: preserveImageNodes = false, preserveSelector: preserveSelector = '' } = {},
 ) {
   if (preserveSelector && options.matches?.(preserveSelector) && target.matches?.(preserveSelector))
     return;
@@ -117,7 +111,7 @@ export function reconcileElementTree(
     preserveImageNodes: preserveImageNodes = false,
     preserveSelector: preserveSelector = '',
     preserveChildNodes: preserveChildNodes = false,
-  } = {}
+  } = {},
 ) {
   if (!enabled5 || !enabled6) return false;
   if (preserveChildNodes)
@@ -156,8 +150,7 @@ function reconcileShotTimelineCardPair(enabled7, enabled8) {
     list4.forEach((config, scope) => {
       const enabled9 = state[scope];
       if (!enabled9) return;
-      (reconcileElementTree(config, enabled9, { preserveImageNodes: true }),
-        enabled9.replaceWith(config));
+      (reconcileElementTree(config, enabled9, { preserveImageNodes: true }), enabled9.replaceWith(config));
     }),
     reconcileElementTree(enabled7, enabled8, { preserveImageNodes: true }),
     enabled8.replaceWith(enabled7),
@@ -173,9 +166,7 @@ export function reconcilePersonReplacementShotTimelineCard({
   const enabled10 = String(shotId ?? '').trim();
   if (!enabled10) return false;
   const run2 = (el5) =>
-      Array.from(el5?.querySelectorAll?.('[data-person-replacement-shot-card="true"]') || []).find(
-        (el6) => String(el6.dataset?.shotId ?? '').trim() === enabled10
-      ),
+      Array.from(el5?.querySelectorAll?.('[data-person-replacement-shot-card="true"]') || []).find((el6) => String(el6.dataset?.shotId ?? '').trim() === enabled10),
     enabled11 = run2(currentScroller),
     enabled12 = run2(nextScroller);
   if (!enabled11 || !enabled12) return false;
@@ -188,7 +179,7 @@ export function reconcilePersonReplacementShotTimelineCard({
   return (
     reconcileShotTimelineCardPair2.currentRoot?.parentElement === el7
       ? reconcileShotTimelineCardPair2.currentRoot.replaceWith(
-          reconcileShotTimelineCardPair2.nextRoot
+          reconcileShotTimelineCardPair2.nextRoot,
         )
       : el7.insertBefore(reconcileShotTimelineCardPair2.nextRoot, input),
     true
@@ -207,25 +198,23 @@ function getDirectShotPreview(el8) {
       (enabled13) =>
         !enabled13.matches?.('[data-person-replacement-shot-timeline-stage]') &&
         !enabled13.matches?.('[data-person-replacement-layout-splitter="center"]') &&
-        !enabled13.matches?.('.person-replacement-middle-preview-slide--outgoing')
+        !enabled13.matches?.('.person-replacement-middle-preview-slide--outgoing'),
     ) || null
   );
 }
 function getVideoReferenceCards(el9) {
-  return Array.from(
-    el9?.querySelectorAll?.('[data-person-replacement-video-reference-index]') || []
-  );
+  return Array.from(el9?.querySelectorAll?.('[data-person-replacement-video-reference-index]') || []);
 }
 function getVideoReferenceCardKey(el10) {
   return String(
     el10?.dataset?.personReplacementVideoReferenceKey ||
       el10?.dataset?.personReplacementVideoReferenceIndex ||
-      ''
+      '',
   );
 }
 function prepareVideoReferenceCardPairs(output, value2) {
   const nextCard = new Map(
-    getVideoReferenceCards(value2).map((value3) => [getVideoReferenceCardKey(value3), value3])
+    getVideoReferenceCards(value2).map((value3) => [getVideoReferenceCardKey(value3), value3]),
   );
   return getVideoReferenceCards(output)
     .map((currentCard) => ({
@@ -240,12 +229,12 @@ function reconcileVideoElementTree(value4, value5) {
 function reconcileVideoReferenceRail(el11, enabled14) {
   if (!el11 || !enabled14) return false;
   const captureWorkspaceScrollPosition2 = captureWorkspaceScrollPosition(
-      el11.querySelector?.(VIDEO_REFERENCE_LIST_SELECTOR)
+      el11.querySelector?.(VIDEO_REFERENCE_LIST_SELECTOR),
     ),
     handler = () =>
       restoreWorkspaceScrollPosition(
         el11.querySelector?.(VIDEO_REFERENCE_LIST_SELECTOR),
-        captureWorkspaceScrollPosition2
+        captureWorkspaceScrollPosition2,
       );
   if (hasEquivalentNodeShape(el11, enabled14)) {
     const reconcileVideoElementTree2 = reconcileVideoElementTree(el11, enabled14);
@@ -254,7 +243,7 @@ function reconcileVideoReferenceRail(el11, enabled14) {
   prepareVideoReferenceCardPairs(el11, enabled14).forEach(
     ({ currentCard: currentCard2, nextCard: nextCard3 }) => {
       (reconcileVideoElementTree(currentCard2, nextCard3), nextCard3.replaceWith(currentCard2));
-    }
+    },
   );
   const reconcileVideoElementTree3 = reconcileVideoElementTree(el11, enabled14);
   return (handler(), reconcileVideoElementTree3);
@@ -268,7 +257,7 @@ export function reconcilePersonReplacementReferenceInputs({
     Array.from(nextInputs.querySelectorAll?.('[data-slot]') || []).map((el12) => [
       String(el12.dataset?.slot || ''),
       el12,
-    ])
+    ]),
   );
   return (
     Array.from(currentInputs.querySelectorAll?.('[data-slot]') || []).forEach((el13) => {
@@ -316,50 +305,44 @@ export function reconcilePersonReplacementVideoControlContinuity({
 function collectVideoShotSelectionElements(currentReferenceRail2, nextReferenceRail2) {
   const currentMiddle = currentReferenceRail2?.querySelector?.('.person-replacement-middle-layout'),
     nextMiddle = nextReferenceRail2?.querySelector?.('.person-replacement-middle-layout'),
-    currentScroller2 = currentMiddle?.querySelector?.(
-      '[data-person-replacement-shot-timeline-stage]'
-    ),
+    currentScroller2 = currentMiddle?.querySelector?.('[data-person-replacement-shot-timeline-stage]'),
     nextScroller2 = nextMiddle?.querySelector?.('[data-person-replacement-shot-timeline-stage]'),
     currentGenerationPanel = currentReferenceRail2?.querySelector?.(
-      '.person-replacement-video-generation-panel'
+      '.person-replacement-video-generation-panel',
     ),
     nextGenerationPanel = nextReferenceRail2?.querySelector?.(
-      '.person-replacement-video-generation-panel'
+      '.person-replacement-video-generation-panel',
     );
   return {
     currentReferenceRail: currentReferenceRail2?.querySelector?.(
-      '.person-replacement-video-reference-assets'
+      '.person-replacement-video-reference-assets',
     ),
-    nextReferenceRail: nextReferenceRail2?.querySelector?.(
-      '.person-replacement-video-reference-assets'
-    ),
+    nextReferenceRail: nextReferenceRail2?.querySelector?.('.person-replacement-video-reference-assets'),
     currentLeftSplitter: currentReferenceRail2?.querySelector?.(
-      '[data-person-replacement-layout-splitter="left"]'
+      '[data-person-replacement-layout-splitter="left"]',
     ),
     nextLeftSplitter: nextReferenceRail2?.querySelector?.(
-      '[data-person-replacement-layout-splitter="left"]'
+      '[data-person-replacement-layout-splitter="left"]',
     ),
     currentMiddle: currentMiddle,
     nextMiddle: nextMiddle,
     currentPreview: getDirectShotPreview(currentMiddle),
     nextPreview: getDirectShotPreview(nextMiddle),
-    currentScroller: currentScroller2?.querySelector?.(
-      '[data-person-replacement-shot-timeline-scroll]'
-    ),
+    currentScroller: currentScroller2?.querySelector?.('[data-person-replacement-shot-timeline-scroll]'),
     nextScroller: nextScroller2?.querySelector?.('[data-person-replacement-shot-timeline-scroll]'),
     currentRightSplitter: currentReferenceRail2?.querySelector?.(
-      '[data-person-replacement-layout-splitter="right"]'
+      '[data-person-replacement-layout-splitter="right"]',
     ),
     nextRightSplitter: nextReferenceRail2?.querySelector?.(
-      '[data-person-replacement-layout-splitter="right"]'
+      '[data-person-replacement-layout-splitter="right"]',
     ),
     currentGenerationPanel: currentGenerationPanel,
     nextGenerationPanel: nextGenerationPanel,
     currentReferenceInputs: currentGenerationPanel?.querySelector?.(
-      '[data-person-replacement-video-reference-inputs]'
+      '[data-person-replacement-video-reference-inputs]',
     ),
     nextReferenceInputs: nextGenerationPanel?.querySelector?.(
-      '[data-person-replacement-video-reference-inputs]'
+      '[data-person-replacement-video-reference-inputs]',
     ),
     currentFooter: currentReferenceRail2?.querySelector?.('.person-replacement-step-footer'),
     nextFooter: nextReferenceRail2?.querySelector?.('.person-replacement-step-footer'),
@@ -372,10 +355,7 @@ export function reconcilePersonReplacementVideoShotSelection({
   const currentInputs2 = collectVideoShotSelectionElements(currentPage, nextPage);
   if (Object.values(currentInputs2).some((enabled16) => !enabled16)) return false;
   if (
-    !reconcileVideoReferenceRail(
-      currentInputs2.currentReferenceRail,
-      currentInputs2.nextReferenceRail
-    )
+    !reconcileVideoReferenceRail(currentInputs2.currentReferenceRail, currentInputs2.nextReferenceRail)
   )
     return false;
   if (
@@ -395,29 +375,24 @@ export function reconcilePersonReplacementVideoShotSelection({
     currentInputs2.nextScroller.replaceWith(currentInputs2.currentScroller),
     reconcileVideoElementTree(currentInputs2.currentLeftSplitter, currentInputs2.nextLeftSplitter),
     reconcileVideoElementTree(currentInputs2.currentMiddle, currentInputs2.nextMiddle),
-    reconcileVideoElementTree(
-      currentInputs2.currentRightSplitter,
-      currentInputs2.nextRightSplitter
-    ),
+    reconcileVideoElementTree(currentInputs2.currentRightSplitter, currentInputs2.nextRightSplitter),
     reconcileVideoElementTree(
       currentInputs2.currentGenerationPanel,
-      currentInputs2.nextGenerationPanel
+      currentInputs2.nextGenerationPanel,
     ),
     reconcileVideoElementTree(currentInputs2.currentFooter, currentInputs2.nextFooter),
     true
   );
 }
 function getTargetCharacterCards(el14) {
-  return Array.from(
-    el14?.querySelectorAll?.('[data-person-replacement-target-character-id]') || []
-  );
+  return Array.from(el14?.querySelectorAll?.('[data-person-replacement-target-character-id]') || []);
 }
 function prepareTargetCardPairs(value6, value7) {
   const map5 = new Map(
     getTargetCharacterCards(value7).map((el15) => [
       el15.dataset?.personReplacementTargetCharacterId || '',
       el15,
-    ])
+    ]),
   );
   return getTargetCharacterCards(value6).map((currentCard3) => {
     const nextCard4 = map5.get(currentCard3.dataset?.personReplacementTargetCharacterId || '');
@@ -472,7 +447,7 @@ function reconcileGenerationCopy(value8) {
           value9 !== currentFooter &&
           // 模式下拉是自定义 select（trigger + 原生 select 已绑定），整块重渲染会把它
           // 换成未绑定的新节点 → 下拉点了没反应。保留旧节点，只同步其余部分。
-          !value9.matches?.(PROMPT_MODE_OPTIONS_SELECTOR)
+          !value9.matches?.(PROMPT_MODE_OPTIONS_SELECTOR),
       )
       .forEach((el16) => el16.remove?.()));
   let value10 = false;
@@ -510,42 +485,38 @@ function collectImageShotSelectionElements(el17, el18) {
     currentGenerationPanel: currentGenerationPanel2,
     nextGenerationPanel: nextGenerationPanel2,
     currentResultPreview: currentGenerationPanel2?.querySelector?.(
-      '.person-replacement-generation-preview'
+      '.person-replacement-generation-preview',
     ),
-    nextResultPreview: nextGenerationPanel2?.querySelector?.(
-      '.person-replacement-generation-preview'
-    ),
+    nextResultPreview: nextGenerationPanel2?.querySelector?.('.person-replacement-generation-preview'),
     currentCopy: currentCopy2,
     nextCopy: nextCopy2,
     currentPromptField: currentPromptField2,
     nextPromptField: nextPromptField2,
     currentPromptHeading: currentPromptField2?.querySelector?.(
-      '.person-replacement-prompt-field-heading'
+      '.person-replacement-prompt-field-heading',
     ),
-    nextPromptHeading: nextPromptField2?.querySelector?.(
-      '.person-replacement-prompt-field-heading'
-    ),
+    nextPromptHeading: nextPromptField2?.querySelector?.('.person-replacement-prompt-field-heading'),
     currentPromptReferenceInputs: currentPromptField2?.querySelector?.(
-      '.person-replacement-prompt-reference-inputs'
+      '.person-replacement-prompt-reference-inputs',
     ),
     nextPromptReferenceInputs: nextPromptField2?.querySelector?.(
-      '.person-replacement-prompt-reference-inputs'
+      '.person-replacement-prompt-reference-inputs',
     ),
     currentPromptEditor: currentPromptField2?.querySelector?.(
-      '[data-person-replacement-field="image-prompt"]'
+      '[data-person-replacement-field="image-prompt"]',
     ),
     nextPromptEditor: nextPromptField2?.querySelector?.(
-      '[data-person-replacement-field="image-prompt"]'
+      '[data-person-replacement-field="image-prompt"]',
     ),
     currentFooter: currentFooter2,
     nextFooter: nextFooter2,
     currentModelSelector: currentFooter2?.querySelector?.('[data-aigen-image-model-selector]'),
     nextModelSelector: nextFooter2?.querySelector?.('[data-aigen-image-model-selector]'),
     currentGenerateButton: currentFooter2?.querySelector?.(
-      '[data-person-replacement-action="generate-replacement-image"]'
+      '[data-person-replacement-action="generate-replacement-image"]',
     ),
     nextGenerateButton: nextFooter2?.querySelector?.(
-      '[data-person-replacement-action="generate-replacement-image"]'
+      '[data-person-replacement-action="generate-replacement-image"]',
     ),
   };
 }
@@ -556,7 +527,7 @@ export function reconcilePersonReplacementImageShotSelection({
   const imageShotSelectionElements = collectImageShotSelectionElements(currentPage2, nextPage2),
     list5 = prepareTargetCardPairs(
       imageShotSelectionElements.currentTargetRail,
-      imageShotSelectionElements.nextTargetRail
+      imageShotSelectionElements.nextTargetRail,
     ),
     list6 = Object.values(imageShotSelectionElements);
   if (
@@ -568,7 +539,7 @@ export function reconcilePersonReplacementImageShotSelection({
     reconcileElementTree(
       imageShotSelectionElements.currentPreview,
       imageShotSelectionElements.nextPreview,
-      { preserveImageNodes: true }
+      { preserveImageNodes: true },
     ),
     list5.forEach(reconcileTargetCardPair),
     imageShotSelectionElements.currentResultPreview
@@ -579,7 +550,7 @@ export function reconcilePersonReplacementImageShotSelection({
       imageShotSelectionElements.nextResultPreview,
       {
         preserveImageNodes: true,
-      }
+      },
     ),
     reconcileGenerationCopy(imageShotSelectionElements),
     true
