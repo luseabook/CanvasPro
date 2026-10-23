@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 44,
+  "moduleFunctionTotal": 40,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -135,12 +135,6 @@
       "hasOwnObjectField",
       "normalizeImageBatchSize",
       "resolveImageNodeBatchSize"
-    ],
-    "src/modules/personReplacement/personReplacementPromptControls.js": [
-      "bindPersonReplacementPromptModeSelect",
-      "modeOptions",
-      "syncModeSelect",
-      "syncModeTooltip"
     ],
     "src/components/media-clip/videoRangeTimelineView.js": [
       "createVideoRangePlayheadReadoutView",

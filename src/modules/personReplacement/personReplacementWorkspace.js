@@ -29,6 +29,7 @@ import {
 } from './personReplacementPromptMentions.js';
 import {
   applyPersonReplacementPromptControlAction,
+  bindPersonReplacementPromptModeSelect,
   syncPersonReplacementPromptModeControl,
 } from './personReplacementPromptControls.js';
 import { localPathToUrl } from '../../utils/localMediaPath.js';
@@ -92,7 +93,10 @@ import {
   normalizeWorkspaceProjectSortOrder,
   refreshWorkspaceProjectResultsInPlace,
 } from '../workspaceProjectHome.js';
-import { resolveWorkspaceCardMultiSelection, focusWorkspaceAssetCard } from '../workspaceAssetSelection.js';
+import {
+  resolveWorkspaceCardMultiSelection,
+  focusWorkspaceAssetCard,
+} from '../workspaceAssetSelection.js';
 import {
   createWorkspaceAssetLibraryDisclosure,
   handleWorkspaceAssetLibraryImageError,
@@ -210,7 +214,10 @@ import {
   normalizePersonReplacementVoiceLayout,
   normalizePersonReplacementWorkspaceProject,
 } from './personReplacementProjectSession.js';
-import { PERSON_REPLACEMENT_STEPS, getPersonReplacementStepGate } from './personReplacementWorkflow.js';
+import {
+  PERSON_REPLACEMENT_STEPS,
+  getPersonReplacementStepGate,
+} from './personReplacementWorkflow.js';
 import {
   PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE,
   getPersonReplacementBoxedPeople,
@@ -240,7 +247,7 @@ const PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE = 'application/x-person-replaceme
     'audio',
     'canvas',
     "[contenteditable='true']",
-    '[role=\'button\']',
+    "[role='button']",
     "[role='option']",
     "[role='menuitem']",
     "[role='slider']",
@@ -349,16 +356,20 @@ export function createReplacementStudioWorkspace({
     handler = (value52) => personReplacementVideoPlaybackController.bind(value52),
     handler2 = () => personReplacementVideoPlaybackController.bindCenterIndicators(),
     handler3 = (value53) => personReplacementVideoPlaybackController.stop(value53),
-    personReplacementCompositePreviewController = createPersonReplacementCompositePreviewController({
-      getRoot: () => floatingMenuHost,
-      getProject: () => initialProject2,
-      documentObject: documentObject,
-      windowObject: windowObject,
-      createVideoPlayback: createVideoPlayback,
-    }),
+    personReplacementCompositePreviewController = createPersonReplacementCompositePreviewController(
+      {
+        getRoot: () => floatingMenuHost,
+        getProject: () => initialProject2,
+        documentObject: documentObject,
+        windowObject: windowObject,
+        createVideoPlayback: createVideoPlayback,
+      }
+    ),
     handler4 = () => personReplacementCompositePreviewController.stop(),
-    handler5 = (value54) => personReplacementCompositePreviewController.releaseOriginalWarmup(value54),
-    handler6 = (value55) => personReplacementCompositePreviewController.startOriginalWarmup(value55),
+    handler5 = (value54) =>
+      personReplacementCompositePreviewController.releaseOriginalWarmup(value54),
+    handler6 = (value55) =>
+      personReplacementCompositePreviewController.startOriginalWarmup(value55),
     handler7 = () => personReplacementCompositePreviewController.prepareOriginalHandoff(),
     handler8 = () => personReplacementCompositePreviewController.retainFullVideosForPageRefresh(),
     handler9 = () => personReplacementCompositePreviewController.bind();
@@ -370,9 +381,13 @@ export function createReplacementStudioWorkspace({
         documentObject?.body?.classList?.remove?.('person-replacement-cut-resizing');
       },
       onDetectionRequested: async (value56) => {
-        const value57 = await promptEnhancementModel(downloadImageIntent.DETECT_SHOT_CUT_RANGES, value56, {
-            project: cloneJson(initialProject2),
-          }),
+        const value57 = await promptEnhancementModel(
+            downloadImageIntent.DETECT_SHOT_CUT_RANGES,
+            value56,
+            {
+              project: cloneJson(initialProject2),
+            }
+          ),
           list4 = Array.isArray(value57?.ranges) ? value57.ranges : [];
         if (!list4.length) throw new Error('智能检测未返回可用切口');
         return list4;
@@ -456,22 +471,27 @@ export function createReplacementStudioWorkspace({
       splitAtPlayhead: splitAtPlayhead,
       watchOpeningVideo: watchOpeningVideo,
     } = editorController,
-    personReplacementShotCutInteractionController = createPersonReplacementShotCutInteractionController({
-      session: session,
-      previewController: previewController,
-      viewportController: viewportController,
-      editorController: editorController,
-      getRoot: () => floatingMenuHost,
-      getProject: () => initialProject2,
-      documentObject: documentObject,
-      windowObject: windowObject,
-      isDestroyed: () => value43,
-      requestRender: () => run(),
-      onShotCutDetectionRequested: onShotKeyframeSelected(downloadImageIntent.DETECT_SHOT_CUT_RANGES),
-      onShotCutRangesRequested: onShotKeyframeSelected(downloadImageIntent.UPDATE_SHOT_CUT_RANGES),
-      runRequest: (value62, value63) => handler11(value62, value63),
-      updateSmartClipSettings: (...args5) => handler12(...args5),
-    }),
+    personReplacementShotCutInteractionController =
+      createPersonReplacementShotCutInteractionController({
+        session: session,
+        previewController: previewController,
+        viewportController: viewportController,
+        editorController: editorController,
+        getRoot: () => floatingMenuHost,
+        getProject: () => initialProject2,
+        documentObject: documentObject,
+        windowObject: windowObject,
+        isDestroyed: () => value43,
+        requestRender: () => run(),
+        onShotCutDetectionRequested: onShotKeyframeSelected(
+          downloadImageIntent.DETECT_SHOT_CUT_RANGES
+        ),
+        onShotCutRangesRequested: onShotKeyframeSelected(
+          downloadImageIntent.UPDATE_SHOT_CUT_RANGES
+        ),
+        runRequest: (value62, value63) => handler11(value62, value63),
+        updateSmartClipSettings: (...args5) => handler12(...args5),
+      }),
     {
       applyBoundaryTime: applyBoundaryTime,
       beginBoundaryDrag: beginBoundaryDrag,
@@ -480,14 +500,15 @@ export function createReplacementStudioWorkspace({
       syncHoverPlayhead: syncHoverPlayhead,
       undoDraft: undoDraft,
     } = personReplacementShotCutInteractionController,
-    personReplacementAssetHoverPreviewController = createPersonReplacementAssetHoverPreviewController({
-      getRoot: () => floatingMenuHost,
-      getProject: () => initialProject2,
-      getSelectedAppearance: (value64) => handler13(value64),
-      isTargetAssetDragActive: () => enabled2,
-      documentObject: documentObject,
-      windowObject: windowObject,
-    }),
+    personReplacementAssetHoverPreviewController =
+      createPersonReplacementAssetHoverPreviewController({
+        getRoot: () => floatingMenuHost,
+        getProject: () => initialProject2,
+        getSelectedAppearance: (value64) => handler13(value64),
+        isTargetAssetDragActive: () => enabled2,
+        documentObject: documentObject,
+        windowObject: windowObject,
+      }),
     {
       blockDropTarget: blockDropTarget,
       handlePointerMove: handlePointerMove,
@@ -520,7 +541,10 @@ export function createReplacementStudioWorkspace({
       root: () => floatingMenuHost,
     }),
     handler15 = (value75 = null) => {
-      return (personReplacementExportSubmenuController.close(), workspaceMenuController.close(value75));
+      return (
+        personReplacementExportSubmenuController.close(),
+        workspaceMenuController.close(value75)
+      );
     },
     handler16 = (value76) => workspaceMenuController.toggle(value76),
     handler17 = (list5) => {
@@ -529,8 +553,8 @@ export function createReplacementStudioWorkspace({
       if (hasWorkspaceIntent(downloadImageIntent.SELECT_SOURCE_VIDEO))
         return Promise.all(
           list5.map((value77) =>
-            promptEnhancementModel(downloadImageIntent.SELECT_SOURCE_VIDEO, value77),
-          ),
+            promptEnhancementModel(downloadImageIntent.SELECT_SOURCE_VIDEO, value77)
+          )
         );
       return null;
     },
@@ -542,8 +566,8 @@ export function createReplacementStudioWorkspace({
           list6.map((value78) =>
             promptEnhancementModel(downloadImageIntent.SELECT_NEW_CHARACTER_IMAGE, value78, {
               project: cloneJson(initialProject2),
-            }),
-          ),
+            })
+          )
         );
       return null;
     },
@@ -551,12 +575,14 @@ export function createReplacementStudioWorkspace({
       refreshPersonReplacementWorkspaceAssets(value79, () =>
         hasWorkspaceIntent(downloadImageIntent.LIST_LIBRARY_ASSETS)
           ? promptEnhancementModel(downloadImageIntent.LIST_LIBRARY_ASSETS)
-          : null,
+          : null
       ),
     handler20 = (value80, reason2) => {
       const libraryProjects = normalizePersonReplacementWorkspaceProject(value80);
       if (typeof projectSession?.commitWorkspaceProject !== 'function') return libraryProjects;
-      const args6 = projectSession.commitWorkspaceProject(cloneJson(libraryProjects), { reason: reason2 });
+      const args6 = projectSession.commitWorkspaceProject(cloneJson(libraryProjects), {
+        reason: reason2,
+      });
       return normalizePersonReplacementWorkspaceProject({
         ...args6,
         libraryProjects: libraryProjects.libraryProjects,
@@ -610,7 +636,7 @@ export function createReplacementStudioWorkspace({
       const workspaceTabTransitionDirection = resolveWorkspaceTabTransitionDirection(
         value88.characterAssetTab,
         value89.characterAssetTab,
-        ['character', 'scene', 'audio', 'library'],
+        ['character', 'scene', 'audio', 'library']
       );
       if (workspaceTabTransitionDirection === 'none') return;
       ((value67 = workspaceTabTransitionDirection),
@@ -619,7 +645,9 @@ export function createReplacementStudioWorkspace({
     handler28 = (value91, args7 = null, { inPlace: inPlace = false } = {}) => {
       const args8 = value91?.project || value91;
       if (args8 && typeof args8 === 'object') {
-        const value92 = args7 ? { ...args8, workspace: { ...(args8.workspace || {}), ...args7 } } : args8;
+        const value92 = args7
+          ? { ...args8, workspace: { ...(args8.workspace || {}), ...args7 } }
+          : args8;
         inPlace
           ? value93.syncProjectState(value92, { returnSnapshot: false })
           : value93.setProject(value92);
@@ -632,7 +660,7 @@ export function createReplacementStudioWorkspace({
       {
         applyCallbackResult: applyCallbackResult = true,
         applyCallbackResultInPlace: applyCallbackResultInPlace = false,
-      } = {},
+      } = {}
     ) => {
       const value95 =
         initialProject2.workspace.view === 'home'
@@ -649,11 +677,14 @@ export function createReplacementStudioWorkspace({
         if (promise?.then)
           void promise.then(
             (value96) => {
-              applyCallbackResult && handler28(value96, value95, { inPlace: applyCallbackResultInPlace });
+              applyCallbackResult &&
+                handler28(value96, value95, { inPlace: applyCallbackResultInPlace });
             },
-            () => {},
+            () => {}
           );
-        else applyCallbackResult && handler28(promise, value95, { inPlace: applyCallbackResultInPlace });
+        else
+          applyCallbackResult &&
+            handler28(promise, value95, { inPlace: applyCallbackResultInPlace });
         return promise;
       } catch (value97) {
         return (
@@ -673,7 +704,7 @@ export function createReplacementStudioWorkspace({
       initialProject2 = normalizePersonReplacementWorkspaceProject({
         ...initialProject2,
         shots: initialProject2.shots.map((args10) =>
-          args10.id === text2 ? { ...args10, videoPrompt: videoPrompt } : args10,
+          args10.id === text2 ? { ...args10, videoPrompt: videoPrompt } : args10
         ),
       });
       if (value102) handler21(value102);
@@ -693,7 +724,7 @@ export function createReplacementStudioWorkspace({
         downloadImageIntent.GENERATE_REPLACEMENT_VIDEO,
         { projectId: initialProject2.id, shotId: normalizeText(promptEl.dataset?.shotId) },
         {},
-        { applyCallbackResult: false },
+        { applyCallbackResult: false }
       );
     },
     handler32 = (value104, value105 = initialProject2.id) =>
@@ -728,7 +759,9 @@ export function createReplacementStudioWorkspace({
       );
     },
     handler35 = (el7, enabled4) => {
-      const el8 = el7?.querySelector?.('[data-person-replacement-action="toggle-library-add-targets"]'),
+      const el8 = el7?.querySelector?.(
+          '[data-person-replacement-action="toggle-library-add-targets"]'
+        ),
         el9 = el7?.querySelector?.('.story-asset-batch-menu');
       if (!el7 || !el8 || !el9) return false;
       if (enabled4) syncWorkspaceInlineMenuExpandedWidth(el9);
@@ -740,9 +773,11 @@ export function createReplacementStudioWorkspace({
       );
     },
     handler36 = (value108 = null) => {
-      floatingMenuHost?.querySelectorAll?.('.person-replacement-library-add-menu-wrap.is-open')?.forEach?.((value109) => {
-        if (value109 !== value108) handler35(value109, false);
-      });
+      floatingMenuHost
+        ?.querySelectorAll?.('.person-replacement-library-add-menu-wrap.is-open')
+        ?.forEach?.((value109) => {
+          if (value109 !== value108) handler35(value109, false);
+        });
     },
     handler37 = (el10, enabled5) => {
       const el11 = el10?.querySelector?.('[data-story-action="toggle-character-voice-menu"]'),
@@ -756,9 +791,11 @@ export function createReplacementStudioWorkspace({
       );
     },
     handler38 = (value110 = null) => {
-      floatingMenuHost?.querySelectorAll?.('.person-replacement-add-voice-menu-wrap.is-open')?.forEach?.((value111) => {
-        if (value111 !== value110) handler37(value111, false);
-      });
+      floatingMenuHost
+        ?.querySelectorAll?.('.person-replacement-add-voice-menu-wrap.is-open')
+        ?.forEach?.((value111) => {
+          if (value111 !== value110) handler37(value111, false);
+        });
     },
     updateProject = (value112, value113, value114 = {}) => {
       const value115 = initialProject2;
@@ -786,24 +823,23 @@ export function createReplacementStudioWorkspace({
         value116 = initialProject2.shots.find((value117) => value117.id === shotId),
         sourceCharacterId2 = value116?.people?.find((value118) => value118.id === personId);
       if (!sourceCharacterId2) return false;
-      const label2 = label === undefined ? normalizeText(sourceCharacterId2.label) : normalizeText(label);
+      const label2 =
+        label === undefined ? normalizeText(sourceCharacterId2.label) : normalizeText(label);
       if (!label2) return false;
       const targetSourceCharacterId = normalizeText(
           sourceCharacterId,
-          normalizeText(sourceCharacterId2.sourceCharacterId),
+          normalizeText(sourceCharacterId2.sourceCharacterId)
         ),
         orientation2 =
           orientation === undefined
             ? normalizeText(sourceCharacterId2.orientation)
             : normalizeText(orientation),
-        personReplacementIdentityCorrectionDraftKey = getPersonReplacementIdentityCorrectionDraftKey(
-          shotId,
-          personId,
-        ),
+        personReplacementIdentityCorrectionDraftKey =
+          getPersonReplacementIdentityCorrectionDraftKey(shotId, personId),
         identityCorrectionDrafts = { ...initialProject2.workspace.identityCorrectionDrafts };
       delete identityCorrectionDrafts[personReplacementIdentityCorrectionDraftKey];
       const removedCustomPersonLabels = initialProject2.workspace.removedCustomPersonLabels.filter(
-        (value119) => value119 !== label2,
+        (value119) => value119 !== label2
       );
       return (
         (initialProject2 = normalizePersonReplacementWorkspaceProject({
@@ -835,7 +871,7 @@ export function createReplacementStudioWorkspace({
           return (
             windowObject?.showToast?.(
               '请返回「声音克隆」，先生成语音并点击「合成」，完成后再选择替换音轨。',
-              'warn',
+              'warn'
             ),
             cloneJson(initialProject2)
           );
@@ -853,16 +889,22 @@ export function createReplacementStudioWorkspace({
           transitionPersonReplacementOutput(
             {
               ...initialProject2,
-              audio: { ...initialProject2.audio, previewTrack: previewTrack, exportTrack: previewTrack },
+              audio: {
+                ...initialProject2.audio,
+                previewTrack: previewTrack,
+                exportTrack: previewTrack,
+              },
             },
-            { type: PERSON_REPLACEMENT_OUTPUT_TRANSITIONS.FINAL_MUX_INVALIDATE },
-          ),
+            { type: PERSON_REPLACEMENT_OUTPUT_TRANSITIONS.FINAL_MUX_INVALIDATE }
+          )
         )),
-        floatingMenuHost?.querySelectorAll?.('[data-person-replacement-action="set-preview-track"]')?.forEach?.((el13) => {
-          const value121 = el13.dataset?.previewTrack === previewTrack;
-          (el13.classList?.toggle?.('is-selected', value121),
-            el13.setAttribute?.('aria-pressed', String(value121)));
-        }),
+        floatingMenuHost
+          ?.querySelectorAll?.('[data-person-replacement-action="set-preview-track"]')
+          ?.forEach?.((el13) => {
+            const value121 = el13.dataset?.previewTrack === previewTrack;
+            (el13.classList?.toggle?.('is-selected', value121),
+              el13.setAttribute?.('aria-pressed', String(value121)));
+          }),
         personReplacementCompositePreviewController.setTrack(previewTrack),
         handler21('preview-track'),
         cloneJson(initialProject2)
@@ -871,19 +913,22 @@ export function createReplacementStudioWorkspace({
     handler41 = (value122 = '') => {
       const selectedShot = initialProject2.shots.find(
           (value123) =>
-            value123.id === normalizeText(value122 || initialProject2.workspace.selectedShotId),
+            value123.id === normalizeText(value122 || initialProject2.workspace.selectedShotId)
         ),
         stage = floatingMenuHost?.querySelector?.('[data-person-replacement-video-stage]'),
         videoEl = stage?.querySelector?.('[data-person-replacement-video-player]'),
         personReplacementVideoSlotState = resolvePersonReplacementVideoSlotState(
           initialProject2,
-          selectedShot,
+          selectedShot
         ).slotEntries.sourceVideo?.url,
         mediaUrl = normalizeMediaUrl(personReplacementVideoSlotState);
       if (!selectedShot || !stage || !videoEl || !mediaUrl)
         return (windowObject?.showToast?.('当前视频片段尚未准备完成。', 'warn'), false);
       if (isPersonReplacementVideoCropReverseRunning(selectedShot))
-        return (windowObject?.showToast?.('当前视频片段正在处理倒放，请稍后再裁剪。', 'info'), false);
+        return (
+          windowObject?.showToast?.('当前视频片段正在处理倒放，请稍后再裁剪。', 'info'),
+          false
+        );
       videoEl.pause?.();
       const durationSec =
           Number(videoEl.duration) > 0
@@ -898,7 +943,8 @@ export function createReplacementStudioWorkspace({
             durationSec: durationSec,
             getProject: () => initialProject2,
             acceptProject: (value125) => {
-              const personReplacementWorkspaceProject2 = normalizePersonReplacementWorkspaceProject(value125);
+              const personReplacementWorkspaceProject2 =
+                normalizePersonReplacementWorkspaceProject(value125);
               return (
                 normalizeText(personReplacementWorkspaceProject2.id) ===
                   normalizeText(initialProject2.id) &&
@@ -910,8 +956,11 @@ export function createReplacementStudioWorkspace({
             onConfirm: (args11) => {
               (personReplacementVideoPlaybackController.setClipActive(false),
                 updateProject(
-                  applyPersonReplacementVideoCrop(initialProject2, { ...args11, shotId: selectedShot.id }),
-                  'video-crop',
+                  applyPersonReplacementVideoCrop(initialProject2, {
+                    ...args11,
+                    shotId: selectedShot.id,
+                  }),
+                  'video-crop'
                 ));
             },
             onExit: ({ reason: reason4 } = {}) => {
@@ -919,7 +968,7 @@ export function createReplacementStudioWorkspace({
               if (['confirm', 'silent'].includes(reason4) || value43) return;
               if (!handler42()) run();
             },
-          }),
+          })
         );
       return personReplacementVideoPlaybackController.setClipActive(value124 === true);
     },
@@ -929,7 +978,9 @@ export function createReplacementStudioWorkspace({
       getProject: () => initialProject2,
       commitLayoutChange: (value126) => {
         ((initialProject2 = normalizePersonReplacementWorkspaceProject(initialProject2)),
-          handler21(value126 === 'asset-detail' ? 'asset-detail-split-ratio' : 'replacement-layout'));
+          handler21(
+            value126 === 'asset-detail' ? 'asset-detail-split-ratio' : 'replacement-layout'
+          ));
       },
     }),
     { begin: begin, stop: stop } = personReplacementLayoutResizeController,
@@ -942,29 +993,32 @@ export function createReplacementStudioWorkspace({
         value127,
         value128,
         { renderWorkspace: false },
-        { applyCallbackResultInPlace: true },
+        { applyCallbackResultInPlace: true }
       );
       if (promise3?.then) void promise3.then(requestRender, () => {});
       else requestRender();
     },
-    personReplacementPersonBoxInteractionController = createPersonReplacementPersonBoxInteractionController({
-      getRoot: () => floatingMenuHost,
-      getProject: () => initialProject2,
-      requestRender: requestRender,
-      runRequest: (...args12) => handler11(...args12),
-      updateStageA11y: (...args13) => handler45(...args13),
-      onDeletePeopleRequested: (value129) => handler44(downloadImageIntent.DELETE_PEOPLE, value129),
-      onManualPersonSelected: (value130) => handler44(downloadImageIntent.SELECT_MANUAL_PERSON, value130),
-      onUpdatePeopleRequested: (value131) =>
-        runIntent(
-          downloadImageIntent.UPDATE_PEOPLE,
-          value131,
-          { renderWorkspace: false },
-          { applyCallbackResultInPlace: true },
-        ),
-      documentObject: documentObject,
-      windowObject: windowObject,
-    }),
+    personReplacementPersonBoxInteractionController =
+      createPersonReplacementPersonBoxInteractionController({
+        getRoot: () => floatingMenuHost,
+        getProject: () => initialProject2,
+        requestRender: requestRender,
+        runRequest: (...args12) => handler11(...args12),
+        updateStageA11y: (...args13) => handler45(...args13),
+        onDeletePeopleRequested: (value129) =>
+          handler44(downloadImageIntent.DELETE_PEOPLE, value129),
+        onManualPersonSelected: (value130) =>
+          handler44(downloadImageIntent.SELECT_MANUAL_PERSON, value130),
+        onUpdatePeopleRequested: (value131) =>
+          runIntent(
+            downloadImageIntent.UPDATE_PEOPLE,
+            value131,
+            { renderWorkspace: false },
+            { applyCallbackResultInPlace: true }
+          ),
+        documentObject: documentObject,
+        windowObject: windowObject,
+      }),
     {
       beginBoxEdit: beginBoxEdit,
       beginManualSelection: beginManualSelection,
@@ -987,7 +1041,7 @@ export function createReplacementStudioWorkspace({
       initialProject2.characters.find((value133) => value133.id === value132) || null,
     handler13 = (value134 = characterId()) => {
       const value135 = Math.trunc(
-        Number(initialProject2.workspace.assetAppearanceIndexes?.[value134?.id]) || 0,
+        Number(initialProject2.workspace.assetAppearanceIndexes?.[value134?.id]) || 0
       );
       return (
         getWorkspaceAssetAppearances(value134)[value135] ||
@@ -1000,11 +1054,11 @@ export function createReplacementStudioWorkspace({
         error3 =
           value136 === 'scene'
             ? initialProject2.scenes.find(
-                (value137) => value137.id === initialProject2.workspace.selectedSceneId,
+                (value137) => value137.id === initialProject2.workspace.selectedSceneId
               )
             : value136 === 'library'
               ? initialProject2.libraryAssets.find(
-                  (value138) => value138.id === initialProject2.workspace.selectedLibraryAssetId,
+                  (value138) => value138.id === initialProject2.workspace.selectedLibraryAssetId
                 )
               : characterId(),
         error4 = value136 === 'library' ? error3 : handler13(error3),
@@ -1066,7 +1120,7 @@ export function createReplacementStudioWorkspace({
       ((initialProject2 = normalizePersonReplacementWorkspaceProject({
         ...initialProject2,
         characters: initialProject2.characters.map((args14) =>
-          args14.id === text6 ? { ...args14, name: name } : args14,
+          args14.id === text6 ? { ...args14, name: name } : args14
         ),
       })),
         floatingMenuHost?.querySelectorAll?.('[data-story-asset-name-id]')?.forEach?.((el16) => {
@@ -1095,12 +1149,15 @@ export function createReplacementStudioWorkspace({
     handler10 = () => ctx?.hide(),
     captureResultHistoryMenu = () => ctx?.capture(),
     restoreResultHistoryMenu = (value147) => ctx?.restore(value147),
-    personReplacementVoiceCloneInteractionController = createPersonReplacementVoiceCloneInteractionController(
-      {
+    personReplacementVoiceCloneInteractionController =
+      createPersonReplacementVoiceCloneInteractionController({
         getRoot: () => floatingMenuHost,
         getProject: () => initialProject2,
         isDestroyed: () => value43,
-        commitProject: (value148, { reason: reason = 'voice-clone', render: render = false } = {}) => {
+        commitProject: (
+          value148,
+          { reason: reason = 'voice-clone', render: render = false } = {}
+        ) => {
           if (render) return updateProject(value148, reason);
           return (
             (initialProject2 = normalizePersonReplacementWorkspaceProject(value148)),
@@ -1115,13 +1172,12 @@ export function createReplacementStudioWorkspace({
             downloadImageIntent.RESUME_VOICE_EXTRACTION,
             value149,
             {},
-            { applyCallbackResult: false },
+            { applyCallbackResult: false }
           ),
         resolveCharacterVoiceUrl: getCharacterVoiceUrl,
         documentObject: documentObject,
         windowObject: windowObject,
-      },
-    ),
+      }),
     {
       bindSourcePlayback: bindSourcePlayback,
       canDropOnAudioParam: canDropOnAudioParam,
@@ -1142,16 +1198,19 @@ export function createReplacementStudioWorkspace({
     handler52 = () => {
       (list3.forEach((value150) => value150?.destroy?.()), (list3 = []));
       const value151 = floatingMenuHost?.querySelector?.('.story-audio-detail');
+      // 模式下拉是自定义 select（trigger 与原生 <select> 分离），必须单独绑定：
+      // 只改 select.value 不会刷新可见文字与 tooltip。
+      list3.push(bindPersonReplacementPromptModeSelect(floatingMenuHost));
       if (value151?.ownerDocument) list3.push(bindWorkspaceSelects(value151));
       list3.push(bindPersonReplacementPricing(floatingMenuHost, () => initialProject2));
       const audioPlaybackSurfaceController = createAudioPlaybackSurfaceController(
         floatingMenuHost?.querySelector?.(
-          '.person-replacement-audio-playback[data-audio-playback-surface], .person-replacement-voice-library-playback[data-audio-playback-surface]',
+          '.person-replacement-audio-playback[data-audio-playback-surface], .person-replacement-voice-library-playback[data-audio-playback-surface]'
         ),
         {
           onBeforePlay: stopPreview,
           onError: () => windowObject?.showToast?.('声音素材播放失败。', 'warn'),
-        },
+        }
       );
       if (audioPlaybackSurfaceController) list3.push(audioPlaybackSurfaceController);
       bindSourcePlayback();
@@ -1202,10 +1261,8 @@ export function createReplacementStudioWorkspace({
               generationParamsByModel
                 ? ((settings2.characterImageModelId = modelId2),
                   (settings2.characterImageProvider = resolveModelProvider(modelId2, provider)),
-                  (settings2.characterImageGenerationParams = normalizeCharacterAssetImageGenerationParams(
-                    modelId2,
-                    generationParams2,
-                  )),
+                  (settings2.characterImageGenerationParams =
+                    normalizeCharacterAssetImageGenerationParams(modelId2, generationParams2)),
                   (settings2.characterImageGenerationParamsByModel = generationParamsByModel2),
                   (settings2.characterImageProviderProfileId = providerProfileId2),
                   (settings2.characterImageProviderProfileIdByModel = providerProfileIdByModel2))
@@ -1223,7 +1280,7 @@ export function createReplacementStudioWorkspace({
               if (!generationParamsByModel) handler53();
               el17?.sync();
             },
-          }),
+          })
         );
       }
       const value154 = floatingMenuHost?.querySelector?.('[data-aigen-video-model-selector]');
@@ -1240,7 +1297,8 @@ export function createReplacementStudioWorkspace({
           generationParams: generationParams3.generationParams,
           uiSchemaFieldState: generationParams3.uiSchemaFieldState,
           providerProfileId: initialProject2.settings.replacementVideoProviderProfileId,
-          providerProfileIdByModel: initialProject2.settings.replacementVideoProviderProfileIdByModel,
+          providerProfileIdByModel:
+            initialProject2.settings.replacementVideoProviderProfileIdByModel,
           referenceCounts: referenceCounts.slotState.referenceCounts,
           showSchemaControls: true,
           allowedModelIds: PERSON_REPLACEMENT_VIDEO_MODEL_IDS,
@@ -1272,15 +1330,17 @@ export function createReplacementStudioWorkspace({
               },
             });
             const currentInputs = floatingMenuHost?.querySelector?.(
-              '[data-person-replacement-video-reference-inputs]',
+              '[data-person-replacement-video-reference-inputs]'
             );
             if (currentInputs) {
               const value155 = personReplacementIdentityPresentation.buildVideo(
                   initialProject2,
-                  personReplacementVideoPresentation.build(initialProject2),
+                  personReplacementVideoPresentation.build(initialProject2)
                 ).referenceInputsHtml,
                 nextInputs =
-                  typeof currentInputs.cloneNode === 'function' ? currentInputs.cloneNode(false) : null;
+                  typeof currentInputs.cloneNode === 'function'
+                    ? currentInputs.cloneNode(false)
+                    : null;
               (nextInputs && (nextInputs.innerHTML = value155),
                 (!nextInputs ||
                   !reconcilePersonReplacementReferenceInputs({
@@ -1298,7 +1358,7 @@ export function createReplacementStudioWorkspace({
         initialProject2.workspace.step === 1
           ? {
               panel: floatingMenuHost?.querySelector?.(
-                '.story-asset-detail-panel .story-asset-prompt-field',
+                '.story-asset-detail-panel .story-asset-prompt-field'
               ),
               modelSetting: 'characterImageModelId',
               providerSetting: 'characterImageProvider',
@@ -1308,7 +1368,7 @@ export function createReplacementStudioWorkspace({
           : initialProject2.workspace.step === 2
             ? {
                 panel: floatingMenuHost?.querySelector?.(
-                  '.person-replacement-image-generation-panel .person-replacement-prompt-input-wrapper',
+                  '.person-replacement-image-generation-panel .person-replacement-prompt-input-wrapper'
                 ),
                 modelSetting: 'replacementImageModelId',
                 providerSetting: 'replacementImageProvider',
@@ -1318,7 +1378,7 @@ export function createReplacementStudioWorkspace({
             : initialProject2.workspace.step === 3
               ? {
                   panel: floatingMenuHost?.querySelector?.(
-                    '.person-replacement-video-generation-panel .person-replacement-prompt-input-wrapper',
+                    '.person-replacement-video-generation-panel .person-replacement-prompt-input-wrapper'
                   ),
                   modelSetting: 'replacementModelId',
                   providerSetting: '',
@@ -1375,17 +1435,23 @@ export function createReplacementStudioWorkspace({
           model: initialProject2.settings.replacementImageModelId,
           provider: resolveModelProvider(
             initialProject2.settings.replacementImageModelId,
-            initialProject2.settings.replacementImageProvider,
+            initialProject2.settings.replacementImageProvider
           ),
         },
         getMentionMenuPages: () => [{ id: 'assets', label: '素材', icon: 'assets' }],
         getMentionMenuDefaultPage: () => 'assets',
         getMentionCandidates: ({ query: query = '' } = {}) =>
-          buildPersonReplacementPromptMentionCandidates(initialProject2, { query: query, shot: shot() }),
+          buildPersonReplacementPromptMentionCandidates(initialProject2, {
+            query: query,
+            shot: shot(),
+          }),
         getMentionVisual: ({ mention: mention, pill: pill } = {}) => {
           const response = mention?.thumbUrl
             ? mention
-            : resolvePersonReplacementPromptMentionRef(pill, { project: initialProject2, shot: shot() });
+            : resolvePersonReplacementPromptMentionRef(pill, {
+                project: initialProject2,
+                shot: shot(),
+              });
           return {
             thumbUrl: normalizeMediaUrl(response?.thumbUrl || response?.url),
             iconType: 'image',
@@ -1398,7 +1464,7 @@ export function createReplacementStudioWorkspace({
             shots: initialProject2.shots.map((args17) =>
               normalizeText(args17.id) === text8
                 ? { ...args17, imagePrompt: sanitizePromptHtmlForCommit(value158) }
-                : args17,
+                : args17
             ),
           })),
             handler21('image-prompt'));
@@ -1411,7 +1477,7 @@ export function createReplacementStudioWorkspace({
       if (initialProject2.workspace.view !== 'project' || initialProject2.workspace.step !== 2)
         return;
       const value159 = floatingMenuHost?.querySelector?.(
-          '[data-person-replacement-field="image-prompt"][contenteditable="true"]',
+          '[data-person-replacement-field="image-prompt"][contenteditable="true"]'
         ),
         enabled7 = handler54(value159);
       if (!enabled7) return;
@@ -1426,7 +1492,7 @@ export function createReplacementStudioWorkspace({
         floatingMenuHost?.querySelector?.(
           '.person-replacement-middle-preview-slide:not(' +
             '.person-replacement-middle-preview-slide--outgoing) ' +
-            '[data-person-replacement-keyframe-stage] > img',
+            '[data-person-replacement-keyframe-stage] > img'
         ) || floatingMenuHost?.querySelector?.('[data-person-replacement-keyframe-stage] > img');
       if (!el18) return;
       const run3 = () => syncPersonReplacementImageStageFrame(el18);
@@ -1451,24 +1517,26 @@ export function createReplacementStudioWorkspace({
       requestRender: () => run(),
       refreshShotSelectionControls: () => handler53(),
       resolveCharacterImageBatchConcurrency: onShotKeyframeSelected(
-        downloadImageIntent.RESOLVE_CHARACTER_IMAGE_BATCH_CONCURRENCY,
+        downloadImageIntent.RESOLVE_CHARACTER_IMAGE_BATCH_CONCURRENCY
       ),
       onGenerateReplacementImageRequested: onShotKeyframeSelected(
-        downloadImageIntent.GENERATE_REPLACEMENT_IMAGE,
+        downloadImageIntent.GENERATE_REPLACEMENT_IMAGE
       ),
       onCancelReplacementImageRequested: onShotKeyframeSelected(
-        downloadImageIntent.CANCEL_REPLACEMENT_IMAGE,
+        downloadImageIntent.CANCEL_REPLACEMENT_IMAGE
       ),
       onGenerateReplacementVideoRequested: onShotKeyframeSelected(
-        downloadImageIntent.GENERATE_REPLACEMENT_VIDEO,
+        downloadImageIntent.GENERATE_REPLACEMENT_VIDEO
       ),
       onCancelReplacementVideoRequested: onShotKeyframeSelected(
-        downloadImageIntent.CANCEL_REPLACEMENT_VIDEO,
+        downloadImageIntent.CANCEL_REPLACEMENT_VIDEO
       ),
       onGenerateCharacterImageRequested: onShotKeyframeSelected(
-        downloadImageIntent.GENERATE_CHARACTER_IMAGE,
+        downloadImageIntent.GENERATE_CHARACTER_IMAGE
       ),
-      onGenerationBatchCompleted: onShotKeyframeSelected(downloadImageIntent.COMPLETE_GENERATION_BATCH),
+      onGenerationBatchCompleted: onShotKeyframeSelected(
+        downloadImageIntent.COMPLETE_GENERATION_BATCH
+      ),
       windowObject: windowObject,
     }),
     {
@@ -1500,7 +1568,7 @@ export function createReplacementStudioWorkspace({
         canvasSyncOverlayInline: false,
         assetLibraryDisclosure: assetLibraryDisclosure,
         assetUploadPendingKinds: ['character', 'scene', 'audio'].filter((value163) =>
-          map.has(handler32(value163)),
+          map.has(handler32(value163))
         ),
         voiceLibraryTargetCharacterId: voiceLibraryTargetCharacterId,
         promptEnhancementModel:
@@ -1508,7 +1576,9 @@ export function createReplacementStudioWorkspace({
       });
     },
     handler58 = () => {
-      const el19 = floatingMenuHost?.querySelector?.('#person-replacement-shot-cut-smart-detect-panel');
+      const el19 = floatingMenuHost?.querySelector?.(
+        '#person-replacement-shot-cut-smart-detect-panel'
+      );
       if (!el19?.style) return false;
       const count3 =
         Number(windowObject?.innerWidth || documentObject?.documentElement?.clientWidth) || 0;
@@ -1520,19 +1590,18 @@ export function createReplacementStudioWorkspace({
           true
         );
       const el20 = floatingMenuHost?.querySelector?.(
-          '[data-person-replacement-action="toggle-shot-cut-smart-detect"]',
+          '[data-person-replacement-action="toggle-shot-cut-smart-detect"]'
         ),
         box = el20?.getBoundingClientRect?.(),
         box2 = el19.getBoundingClientRect?.();
       if (!box || !box2) return false;
       const value165 =
-          Number(windowObject?.innerHeight || documentObject?.documentElement?.clientHeight) ||
-          0,
+          Number(windowObject?.innerHeight || documentObject?.documentElement?.clientHeight) || 0,
         value166 = 16,
         value167 = 8,
         value168 = Math.max(
           value166,
-          Math.min(count3 - box2.width - value166, box.right - box2.width),
+          Math.min(count3 - box2.width - value166, box.right - box2.width)
         ),
         value169 = box.bottom + value167,
         value170 =
@@ -1557,7 +1626,7 @@ export function createReplacementStudioWorkspace({
     },
     handler60 = () => {
       const el22 = floatingMenuHost?.querySelector?.(
-        '[data-person-replacement-compare-card="replacement"] .person-replacement-compare-media-frame',
+        '[data-person-replacement-compare-card="replacement"] .person-replacement-compare-media-frame'
       );
       if (!el22) return false;
       (el22.classList?.toggle?.('img-preview-loading', composeOutputPending2),
@@ -1570,7 +1639,7 @@ export function createReplacementStudioWorkspace({
           renderWorkspaceAssetLoadingOverlay({
             title: '视频合成中',
             description: '正在合成替换片段，完成后会自动显示完整视频。',
-          }),
+          })
         );
         if (value173) el22.appendChild?.(value173);
       } else !composeOutputPending2 && el23?.remove?.();
@@ -1624,7 +1693,9 @@ export function createReplacementStudioWorkspace({
       }
       if (!el4) {
         el4 = handler59(
-          personReplacementShellPresentation.renderCanvasSyncLoadingOverlay({ canvasSyncPending: true }),
+          personReplacementShellPresentation.renderCanvasSyncLoadingOverlay({
+            canvasSyncPending: true,
+          })
         );
         if (el4) el25.appendChild?.(el4);
       }
@@ -1646,7 +1717,9 @@ export function createReplacementStudioWorkspace({
     handler64 = () => '[data-person-replacement-shot-timeline-scroll]',
     handler65 = (el26) => {
       const text9 = normalizeText(initialProject2.workspace.selectedShotId);
-      Array.from(el26?.querySelectorAll?.('[data-person-replacement-shot-card="true"]') || []).forEach((el27) => {
+      Array.from(
+        el26?.querySelectorAll?.('[data-person-replacement-shot-card="true"]') || []
+      ).forEach((el27) => {
         const text10 = normalizeText(el27.dataset?.shotId) === text9;
         (el27.classList?.toggle?.('is-selected', text10),
           el27.setAttribute?.('aria-current', String(text10)));
@@ -1700,7 +1773,7 @@ export function createReplacementStudioWorkspace({
             batchGenerationLabel: isBatchGenerating.label,
             batchGeneratingShotIds: isBatchGenerating.generatingShotIds,
             batchCancelRequested: isBatchGenerating.cancelRequested,
-          }),
+          })
         ),
         nextScroller = el29?.querySelector?.('[data-person-replacement-shot-timeline-scroll]');
       if (!currentScroller || !nextScroller) return false;
@@ -1725,7 +1798,7 @@ export function createReplacementStudioWorkspace({
       syncPersonReplacementPromptModeControl(
         floatingMenuHost,
         initialProject2,
-        isBatchGenerating2.generatingShotIds,
+        isBatchGenerating2.generatingShotIds
       );
       const el30 = floatingMenuHost?.querySelector?.('.person-replacement-shot-timeline'),
         el31 = handler59(
@@ -1736,21 +1809,21 @@ export function createReplacementStudioWorkspace({
             batchGenerationLabel: isBatchGenerating2.label,
             batchGeneratingShotIds: isBatchGenerating2.generatingShotIds,
             batchCancelRequested: isBatchGenerating2.cancelRequested,
-          }),
+          })
         ),
         currentList = el30?.querySelector?.('[data-person-replacement-shot-timeline-scroll]'),
         nextList = el31?.querySelector?.('[data-person-replacement-shot-timeline-scroll]'),
         enabled8 = floatingMenuHost?.querySelector?.(
           mode
             ? '[data-person-replacement-action="generate-replacement-video"]'
-            : '[data-person-replacement-action="generate-replacement-image"]',
+            : '[data-person-replacement-action="generate-replacement-image"]'
         ),
         args19 = handler22(),
         presentation = mode
           ? personReplacementVideoPresentation.build(initialProject2)
           : personReplacementImagePresentation.build(
               initialProject2,
-              args19.shotBatchGeneratingShotIds,
+              args19.shotBatchGeneratingShotIds
             ),
         enabled9 = handler59(
           mode
@@ -1761,7 +1834,7 @@ export function createReplacementStudioWorkspace({
             : personReplacementImagePresentation.renderGenerateButton(initialProject2, {
                 presentation: presentation,
                 ...args19,
-              }),
+              })
         );
       if (
         !el30 ||
@@ -1795,12 +1868,14 @@ export function createReplacementStudioWorkspace({
       const el32 = floatingMenuHost?.querySelector?.('.person-replacement-preview-shot-rail'),
         el33 = handler59(
           personReplacementCompositePreviewPresentation.renderRail(
-            buildPersonReplacementCompositePreviewSnapshot(initialProject2),
-          ),
+            buildPersonReplacementCompositePreviewSnapshot(initialProject2)
+          )
         ),
-        enabled10 = floatingMenuHost?.querySelector?.('.person-replacement-preview-actions--toolbar'),
+        enabled10 = floatingMenuHost?.querySelector?.(
+          '.person-replacement-preview-actions--toolbar'
+        ),
         enabled11 = handler59(
-          personReplacementShellPresentation.renderToolbarActions(initialProject2, handler22()),
+          personReplacementShellPresentation.renderToolbarActions(initialProject2, handler22())
         ),
         currentList2 = el32?.querySelector?.('.person-replacement-preview-shot-list'),
         nextList2 = el33?.querySelector?.('.person-replacement-preview-shot-list');
@@ -1815,7 +1890,12 @@ export function createReplacementStudioWorkspace({
         return false;
       const value183 = currentList2 && nextList2 ? handler68(currentList2) : null;
       if (currentList2 && nextList2) {
-        if (!reconcilePersonReplacementShotCardList({ currentList: currentList2, nextList: nextList2 }))
+        if (
+          !reconcilePersonReplacementShotCardList({
+            currentList: currentList2,
+            nextList: nextList2,
+          })
+        )
           return (value183?.(), false);
         nextList2.replaceWith(currentList2);
       }
@@ -1842,7 +1922,9 @@ export function createReplacementStudioWorkspace({
       )
         return false;
       const run8 = handler68(currentList3);
-      if (!reconcilePersonReplacementShotCardList({ currentList: currentList3, nextList: nextList3 }))
+      if (
+        !reconcilePersonReplacementShotCardList({ currentList: currentList3, nextList: nextList3 })
+      )
         return (run8(), false);
       return (
         nextList3.replaceWith(currentList3),
@@ -1874,7 +1956,7 @@ export function createReplacementStudioWorkspace({
             : personReplacementImagePresentation.render(initialProject2, {
                 ...args20,
                 omitShotTimeline: true,
-              }),
+              })
         ),
         value185 = handler64(),
         enabled12 = currentPage?.querySelector?.(value185),
@@ -1885,7 +1967,12 @@ export function createReplacementStudioWorkspace({
       if (value184) {
         if (!currentPage || !nextPage || !enabled12 || !enabled13) return false;
         const run9 = handler68(enabled12);
-        if (!reconcilePersonReplacementVideoShotSelection({ currentPage: currentPage, nextPage: nextPage }))
+        if (
+          !reconcilePersonReplacementVideoShotSelection({
+            currentPage: currentPage,
+            nextPage: nextPage,
+          })
+        )
           return false;
         return (handler66(), run9(), handler67(), handler55(), handler52(), handler(), true);
       }
@@ -1893,7 +1980,12 @@ export function createReplacementStudioWorkspace({
       if (refreshTimelineCard && !handler69(enabled12, timelineShotId)) return false;
       if (!refreshTimelineCard) handler65(enabled12);
       (hide(), value47?.(), (value47 = null));
-      if (!reconcilePersonReplacementImageShotSelection({ currentPage: currentPage, nextPage: nextPage }))
+      if (
+        !reconcilePersonReplacementImageShotSelection({
+          currentPage: currentPage,
+          nextPage: nextPage,
+        })
+      )
         return false;
       return (handler67(), handler55(), handler56(), true);
     },
@@ -1909,10 +2001,8 @@ export function createReplacementStudioWorkspace({
         el38 = handler59(personReplacementVideoPresentation.render(initialProject2, handler22())),
         value186 = el37?.querySelector?.('[data-person-replacement-video-playback-stage="source"]'),
         value187 = el38?.querySelector?.('[data-person-replacement-video-playback-stage="source"]'),
-        shouldReusePersonReplacementVideoPlaybackStage2 = shouldReusePersonReplacementVideoPlaybackStage(
-          value186,
-          value187,
-        ),
+        shouldReusePersonReplacementVideoPlaybackStage2 =
+          shouldReusePersonReplacementVideoPlaybackStage(value186, value187),
         enabled16 = el37?.querySelector?.('.person-replacement-video-reference-assets'),
         enabled17 = el38?.querySelector?.('.person-replacement-video-reference-assets'),
         el39 = el37?.querySelector?.('[data-person-replacement-shot-timeline-stage]'),
@@ -1924,10 +2014,10 @@ export function createReplacementStudioWorkspace({
         enabled18 = el41?.querySelector?.('[data-person-replacement-video-reference-inputs]'),
         enabled19 = el42?.querySelector?.('[data-person-replacement-video-reference-inputs]'),
         enabled20 = el41?.querySelector?.(
-          '[data-person-replacement-field="video-prompt"][contenteditable="true"]',
+          '[data-person-replacement-field="video-prompt"][contenteditable="true"]'
         ),
         enabled21 = el42?.querySelector?.(
-          '[data-person-replacement-field="video-prompt"][contenteditable="true"]',
+          '[data-person-replacement-field="video-prompt"][contenteditable="true"]'
         ),
         value188 = el41?.querySelector?.('[data-person-replacement-video-playback-stage="result"]'),
         value189 = el42?.querySelector?.('[data-person-replacement-video-playback-stage="result"]'),
@@ -1962,12 +2052,14 @@ export function createReplacementStudioWorkspace({
         !enabled21 ||
         list7.some(
           ([enabled22, enabled23]) =>
-            !enabled22 || !enabled23 || typeof enabled22.replaceWith !== 'function',
+            !enabled22 || !enabled23 || typeof enabled22.replaceWith !== 'function'
         )
       )
         return false;
       const run10 = handler68(currentList4);
-      if (!reconcilePersonReplacementShotCardList({ currentList: currentList4, nextList: nextList4 }))
+      if (
+        !reconcilePersonReplacementShotCardList({ currentList: currentList4, nextList: nextList4 })
+      )
         return (run10(), false);
       (hide(), reconcileElementTree(enabled16, enabled17, { preserveChildNodes: true }));
       if (!shouldReusePersonReplacementVideoPlaybackStage3)
@@ -1996,12 +2088,13 @@ export function createReplacementStudioWorkspace({
         }));
       if (shouldReusePersonReplacementVideoPlaybackStage3) handler2();
       else handler({ roles: ['result'], reset: false });
-      if (!shouldReusePersonReplacementVideoPlaybackStage2) handler({ roles: ['source'], reset: false });
+      if (!shouldReusePersonReplacementVideoPlaybackStage2)
+        handler({ roles: ['source'], reset: false });
       return true;
     };
   handler14 = (
     value194,
-    { timelineShotId: timelineShotId = initialProject2.workspace.selectedShotId } = {},
+    { timelineShotId: timelineShotId = initialProject2.workspace.selectedShotId } = {}
   ) => {
     const text11 = normalizeText(value194);
     if (
@@ -2016,7 +2109,7 @@ export function createReplacementStudioWorkspace({
     )
       return syncPersonReplacementAssetSelection(
         floatingMenuHost,
-        renderAssetSettings(initialProject2, handler22()),
+        renderAssetSettings(initialProject2, handler22())
       );
     if (
       initialProject2.workspace.step === 2 &&
@@ -2032,7 +2125,7 @@ export function createReplacementStudioWorkspace({
           ...handler22(),
           omitShotTimeline: true,
         }),
-        { targetRail: true },
+        { targetRail: true }
       );
     if (
       initialProject2.workspace.step === 2 &&
@@ -2116,7 +2209,7 @@ export function createReplacementStudioWorkspace({
         close2({ animate: false, renderWorkspace: false }),
         updateProject(
           { ...initialProject2, workspace: { ...initialProject2.workspace, step: step } },
-          'step-change',
+          'step-change'
         )
       );
     },
@@ -2126,7 +2219,7 @@ export function createReplacementStudioWorkspace({
           floatingMenuHost &&
           !floatingMenuHost.hidden &&
           !canvasSyncPending &&
-          initialProject2.workspace.view === 'project',
+          initialProject2.workspace.view === 'project'
         ),
         stepCount: PERSON_REPLACEMENT_STEPS.length,
         navigate: navigate,
@@ -2134,17 +2227,17 @@ export function createReplacementStudioWorkspace({
     handler73 = (count4, value198 = '') => {
       const value199 = value198
           ? [...initialProject2.characters, ...initialProject2.scenes].find(
-              (value200) => value200.id === value198,
+              (value200) => value200.id === value198
             )
           : initialProject2.workspace.characterAssetTab === 'scene'
             ? initialProject2.scenes.find(
-                (value201) => value201.id === initialProject2.workspace.selectedSceneId,
+                (value201) => value201.id === initialProject2.workspace.selectedSceneId
               )
             : characterId(),
         list8 = getWorkspaceAssetAppearances(value199);
       if (list8.length < 2) return;
       const value202 = Math.trunc(
-          Number(initialProject2.workspace.assetAppearanceIndexes?.[value199.id]) || 0,
+          Number(initialProject2.workspace.assetAppearanceIndexes?.[value199.id]) || 0
         ),
         value203 = (value202 + count4 + list8.length) % list8.length,
         value204 = count4 > 0 ? 'next' : 'previous',
@@ -2153,7 +2246,9 @@ export function createReplacementStudioWorkspace({
           (initialProject2.workspace.characterAssetTab === 'scene'
             ? initialProject2.workspace.selectedSceneId
             : initialProject2.workspace.selectedCharacterId),
-        el43 = floatingMenuHost?.querySelector?.('.story-asset-detail .story-asset-preview-slide')?.cloneNode?.(true);
+        el43 = floatingMenuHost
+          ?.querySelector?.('.story-asset-detail .story-asset-preview-slide')
+          ?.cloneNode?.(true);
       updateProject(
         {
           ...initialProject2,
@@ -2165,7 +2260,7 @@ export function createReplacementStudioWorkspace({
             },
           },
         },
-        'appearance-change',
+        'appearance-change'
       );
       if (!enabled24) return;
       const el44 = floatingMenuHost?.querySelector?.('.story-asset-detail'),
@@ -2186,17 +2281,19 @@ export function createReplacementStudioWorkspace({
       (void el44.offsetWidth, el44.classList.add('is-sliding-' + value204));
     },
     handler74 = (value206) => {
-      const personReplacementProjectAudioAssets = getPersonReplacementProjectAudioAssets(initialProject2).find((value207) => value207.id === initialProject2.workspace.selectedAudioAssetId),
+      const personReplacementProjectAudioAssets = getPersonReplacementProjectAudioAssets(
+          initialProject2
+        ).find((value207) => value207.id === initialProject2.workspace.selectedAudioAssetId),
         selectedCharacterId = getPersonReplacementVoiceLibraryBoundCharacters(
           initialProject2,
-          personReplacementProjectAudioAssets,
+          personReplacementProjectAudioAssets
         );
       if (selectedCharacterId.length < 2) return;
       const value208 = Math.max(
           0,
           selectedCharacterId.findIndex(
-            (value209) => value209.id === initialProject2.workspace.selectedCharacterId,
-          ),
+            (value209) => value209.id === initialProject2.workspace.selectedCharacterId
+          )
         ),
         value210 = (value208 + value206 + selectedCharacterId.length) % selectedCharacterId.length;
       updateProject(
@@ -2207,13 +2304,13 @@ export function createReplacementStudioWorkspace({
             selectedCharacterId: selectedCharacterId[value210].id,
           },
         },
-        'audio-bound-character-change',
+        'audio-bound-character-change'
       );
     },
     scrollShotCardIntoView = (value211) => {
       const run11 = () => {
         Array.from(
-          floatingMenuHost?.querySelectorAll?.('[data-person-replacement-shot-card="true"]') || [],
+          floatingMenuHost?.querySelectorAll?.('[data-person-replacement-shot-card="true"]') || []
         )
           .find((el45) => el45.dataset?.shotId === normalizeText(value211))
           ?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
@@ -2224,36 +2321,42 @@ export function createReplacementStudioWorkspace({
     },
     getShotSwitchDirection = (value212) => {
       const count5 = initialProject2.shots.findIndex(
-          (value213) => value213.id === normalizeText(initialProject2.workspace.selectedShotId),
+          (value213) => value213.id === normalizeText(initialProject2.workspace.selectedShotId)
         ),
         count6 = initialProject2.shots.findIndex(
-          (value214) => value214.id === normalizeText(value212),
+          (value214) => value214.id === normalizeText(value212)
         );
       if (count5 < 0 || count6 < 0 || count5 === count6) return '';
       return count6 > count5 ? 'next' : 'previous';
     },
     captureImagePreviewSlide = () =>
-      floatingMenuHost?.querySelector?.(
-        '.person-replacement-image-generation-panel ' +
-          '.person-replacement-image-preview-slide:not(' +
-          '.person-replacement-image-preview-slide--outgoing)',
-      )?.cloneNode?.(true) || null,
+      floatingMenuHost
+        ?.querySelector?.(
+          '.person-replacement-image-generation-panel ' +
+            '.person-replacement-image-preview-slide:not(' +
+            '.person-replacement-image-preview-slide--outgoing)'
+        )
+        ?.cloneNode?.(true) || null,
     captureMiddlePreviewSlide = () =>
-      floatingMenuHost?.querySelector?.(
-        '.person-replacement-middle-layout ' +
-          '> .person-replacement-middle-preview-slide:not(' +
-          '.person-replacement-middle-preview-slide--outgoing)',
-      )?.cloneNode?.(true) || null,
+      floatingMenuHost
+        ?.querySelector?.(
+          '.person-replacement-middle-layout ' +
+            '> .person-replacement-middle-preview-slide:not(' +
+            '.person-replacement-middle-preview-slide--outgoing)'
+        )
+        ?.cloneNode?.(true) || null,
     handler75 = (el46) => {
       return (
-        el46?.querySelectorAll?.(
-          '.person-replacement-detection-empty, ' +
-            '.person-replacement-keyframe-tools, ' +
-            '.person-replacement-shot-navigation-arrow',
-        )?.forEach?.((el47) => el47.remove?.()),
-        el46?.querySelectorAll?.('.person-replacement-detection-box')?.forEach?.((value215) =>
-          value215.replaceChildren?.(),
-        ),
+        el46
+          ?.querySelectorAll?.(
+            '.person-replacement-detection-empty, ' +
+              '.person-replacement-keyframe-tools, ' +
+              '.person-replacement-shot-navigation-arrow'
+          )
+          ?.forEach?.((el47) => el47.remove?.()),
+        el46
+          ?.querySelectorAll?.('.person-replacement-detection-box')
+          ?.forEach?.((value215) => value215.replaceChildren?.()),
         el46
       );
     },
@@ -2261,26 +2364,26 @@ export function createReplacementStudioWorkspace({
       floatingMenuHost?.querySelector?.(
         '.person-replacement-video-generation-panel ' +
           '.person-replacement-video-result-slide:not(' +
-          '.person-replacement-video-result-slide--outgoing)',
+          '.person-replacement-video-result-slide--outgoing)'
       ) || null,
     playMiddlePreviewTransition = (value216, outgoingSlide) => {
       const direction2 = value216 === 'previous' ? 'previous' : 'next',
         el48 = floatingMenuHost?.querySelector?.('.person-replacement-middle-layout'),
         incomingSlide = el48?.querySelector?.(
           '.person-replacement-middle-preview-slide:not(' +
-            '.person-replacement-middle-preview-slide--outgoing)',
+            '.person-replacement-middle-preview-slide--outgoing)'
         );
       if (!el48 || !incomingSlide || incomingSlide === outgoingSlide) return false;
-      (el48.querySelectorAll?.('.person-replacement-middle-preview-slide--outgoing')?.forEach?.(
-        (el49) => el49.remove?.(),
-      ),
+      (el48
+        .querySelectorAll?.('.person-replacement-middle-preview-slide--outgoing')
+        ?.forEach?.((el49) => el49.remove?.()),
         el48.classList?.remove?.('is-sliding-next', 'is-sliding-previous'));
       if (outgoingSlide) {
         (handler75(outgoingSlide),
           outgoingSlide.classList?.remove?.(
             'img-preview-loading',
             'is-sliding-next',
-            'is-sliding-previous',
+            'is-sliding-previous'
           ),
           outgoingSlide.classList?.add?.('person-replacement-middle-preview-slide--outgoing'),
           outgoingSlide.removeAttribute?.('aria-busy'),
@@ -2288,7 +2391,9 @@ export function createReplacementStudioWorkspace({
         try {
           outgoingSlide.inert = true;
         } catch {}
-        (outgoingSlide.querySelector?.('.story-asset-loading-overlay, .img-loading-overlay')?.remove?.(),
+        (outgoingSlide
+          .querySelector?.('.story-asset-loading-overlay, .img-loading-overlay')
+          ?.remove?.(),
           el48.append?.(outgoingSlide));
       }
       const startPersonReplacementSlideTransition2 = startPersonReplacementSlideTransition({
@@ -2313,23 +2418,25 @@ export function createReplacementStudioWorkspace({
     playImagePreviewTransition = (value219, outgoingSlide2) => {
       const direction3 = value219 === 'previous' ? 'previous' : 'next',
         el50 = floatingMenuHost?.querySelector?.(
-          '.person-replacement-image-generation-panel ' + '.person-replacement-generation-preview',
+          '.person-replacement-image-generation-panel ' + '.person-replacement-generation-preview'
         ),
         incomingSlide2 = el50?.querySelector?.(
           '.person-replacement-image-preview-slide:not(' +
-            '.person-replacement-image-preview-slide--outgoing)',
+            '.person-replacement-image-preview-slide--outgoing)'
         );
       if (!el50 || !incomingSlide2) return false;
-      (el50.querySelectorAll?.('.person-replacement-image-preview-slide--outgoing')?.forEach?.(
-        (el51) => el51.remove?.(),
-      ),
+      (el50
+        .querySelectorAll?.('.person-replacement-image-preview-slide--outgoing')
+        ?.forEach?.((el51) => el51.remove?.()),
         el50.classList?.remove?.('is-sliding-next', 'is-sliding-previous'));
       outgoingSlide2 &&
         (outgoingSlide2.classList?.remove?.('img-preview-loading'),
         outgoingSlide2.classList?.add?.('person-replacement-image-preview-slide--outgoing'),
         outgoingSlide2.removeAttribute?.('aria-busy'),
         outgoingSlide2.setAttribute?.('aria-hidden', 'true'),
-        outgoingSlide2.querySelector?.('.story-asset-loading-overlay, .img-loading-overlay')?.remove?.(),
+        outgoingSlide2
+          .querySelector?.('.story-asset-loading-overlay, .img-loading-overlay')
+          ?.remove?.(),
         el50.append?.(outgoingSlide2));
       const startPersonReplacementSlideTransition3 = startPersonReplacementSlideTransition({
         windowObject: windowObject,
@@ -2353,21 +2460,22 @@ export function createReplacementStudioWorkspace({
     playVideoResultTransition = (value222, outgoingSlide3) => {
       const direction4 = value222 === 'previous' ? 'previous' : 'next',
         el52 = floatingMenuHost?.querySelector?.(
-          '.person-replacement-video-generation-panel ' + '.person-replacement-video-result',
+          '.person-replacement-video-generation-panel ' + '.person-replacement-video-result'
         ),
         incomingSlide3 = el52?.querySelector?.(
-          '.person-replacement-video-result-slide:not(' + '.person-replacement-video-result-slide--outgoing)',
+          '.person-replacement-video-result-slide:not(' +
+            '.person-replacement-video-result-slide--outgoing)'
         );
       if (!el52 || !incomingSlide3 || incomingSlide3 === outgoingSlide3) return false;
-      (el52.querySelectorAll?.('.person-replacement-video-result-slide--outgoing')?.forEach?.((el53) =>
-        el53.remove?.(),
-      ),
+      (el52
+        .querySelectorAll?.('.person-replacement-video-result-slide--outgoing')
+        ?.forEach?.((el53) => el53.remove?.()),
         el52.classList?.remove?.('is-sliding-next', 'is-sliding-previous'));
       if (outgoingSlide3) {
         (outgoingSlide3.classList?.remove?.(
           'img-preview-loading',
           'is-sliding-next',
-          'is-sliding-previous',
+          'is-sliding-previous'
         ),
           outgoingSlide3.classList?.add?.('person-replacement-video-result-slide--outgoing'),
           outgoingSlide3.removeAttribute?.('aria-busy'),
@@ -2375,7 +2483,9 @@ export function createReplacementStudioWorkspace({
         try {
           outgoingSlide3.inert = true;
         } catch {}
-        (outgoingSlide3.querySelector?.('.story-asset-loading-overlay, .img-loading-overlay')?.remove?.(),
+        (outgoingSlide3
+          .querySelector?.('.story-asset-loading-overlay, .img-loading-overlay')
+          ?.remove?.(),
           el52.append?.(outgoingSlide3));
       }
       const startPersonReplacementSlideTransition4 = startPersonReplacementSlideTransition({
@@ -2411,7 +2521,10 @@ export function createReplacementStudioWorkspace({
         true
       );
     },
-    handler51 = (value227, { direction: direction = '', ensureVisible: ensureVisible = false } = {}) => {
+    handler51 = (
+      value227,
+      { direction: direction = '', ensureVisible: ensureVisible = false } = {}
+    ) => {
       const selectedShotId = normalizeText(value227),
         enabled26 = initialProject2.shots.find((value228) => value228.id === selectedShotId),
         enabled27 =
@@ -2432,7 +2545,7 @@ export function createReplacementStudioWorkspace({
             ...(initialProject2.workspace.step === 5 ? { compositePreviewMode: 'shot' } : {}),
           },
         },
-        'shot-select',
+        'shot-select'
       ),
         playImagePreviewTransition(value229 || 'next', value230),
         playMiddlePreviewTransition(value229 || 'next', value231),
@@ -2446,7 +2559,7 @@ export function createReplacementStudioWorkspace({
         'aria-label',
         el55?.dataset?.personReplacementShotWheel === 'true'
           ? '拖拽新增可替换主体；按住 Ctrl 拖拽可多选人物框；按 D 或 Delete 删除选中框；滚轮或左右方向键切换片段'
-          : '拖拽新增可替换主体；按住 Ctrl 拖拽可多选人物框，按 D 或 Delete 批量删除',
+          : '拖拽新增可替换主体；按住 Ctrl 拖拽可多选人物框，按 D 或 Delete 批量删除'
       );
     },
     handler77 = (value233) => {
@@ -2454,7 +2567,7 @@ export function createReplacementStudioWorkspace({
       if (list9.length < 2) return false;
       const value234 = Math.max(
           0,
-          list9.findIndex((value235) => value235.id === initialProject2.workspace.selectedShotId),
+          list9.findIndex((value235) => value235.id === initialProject2.workspace.selectedShotId)
         ),
         value236 = (value234 + Math.sign(Number(value233) || 0) + list9.length) % list9.length,
         enabled28 = list9[value236];
@@ -2493,7 +2606,7 @@ export function createReplacementStudioWorkspace({
     } = personReplacementResultSelectionController,
     handler78 = (event) => {
       const currentResultIndex = event.target?.closest?.(
-        '[data-person-replacement-video-reference-wheel="true"]',
+        '[data-person-replacement-video-reference-wheel="true"]'
       );
       if (
         !currentResultIndex ||
@@ -2503,7 +2616,7 @@ export function createReplacementStudioWorkspace({
         return false;
       event.preventDefault();
       const sourceShotId = normalizeText(
-          currentResultIndex.dataset.personReplacementVideoReferenceSourceShotId,
+          currentResultIndex.dataset.personReplacementVideoReferenceSourceShotId
         ),
         value237 = map4.get(sourceShotId) || { accumulator: 0, lockedUntil: 0 };
       map4.set(sourceShotId, value237);
@@ -2515,7 +2628,8 @@ export function createReplacementStudioWorkspace({
         delta &&
           switchVideoReferenceResult({
             sourceShotId: sourceShotId,
-            currentResultIndex: currentResultIndex.dataset.personReplacementVideoReferenceResultIndex,
+            currentResultIndex:
+              currentResultIndex.dataset.personReplacementVideoReferenceResultIndex,
             delta: delta,
           }),
         true
@@ -2523,7 +2637,7 @@ export function createReplacementStudioWorkspace({
     },
     handler79 = (value238, value239) => {
       const enabled29 = initialProject2.characters.find(
-          (value240) => value240.id === normalizeText(value238),
+          (value240) => value240.id === normalizeText(value238)
         ),
         list10 = getWorkspaceAssetAppearances(enabled29),
         list11 = list10.filter((value241) => value241.imageUrl);
@@ -2533,14 +2647,14 @@ export function createReplacementStudioWorkspace({
           Math.min(
             list10.length - 1,
             Math.trunc(
-              Number(initialProject2.workspace.assetAppearanceIndexes?.[enabled29.id]) || 0,
-            ),
-          ),
+              Number(initialProject2.workspace.assetAppearanceIndexes?.[enabled29.id]) || 0
+            )
+          )
         ),
         value243 = list10[value242]?.id,
         value244 = Math.max(
           0,
-          list11.findIndex((value245) => value245.id === value243),
+          list11.findIndex((value245) => value245.id === value243)
         ),
         value246 = (value244 + Math.sign(Number(value239) || 0) + list11.length) % list11.length;
       if (value246 === value244) return false;
@@ -2560,7 +2674,7 @@ export function createReplacementStudioWorkspace({
     },
     handler80 = (event2) => {
       const el56 = event2.target?.closest?.(
-        '[data-person-replacement-target-appearance-wheel="true"]',
+        '[data-person-replacement-target-appearance-wheel="true"]'
       );
       if (
         !el56 ||
@@ -2581,7 +2695,7 @@ export function createReplacementStudioWorkspace({
     },
     handler81 = (event3) => {
       const boundaryRoot = event3.target?.closest?.(
-        '[data-story-appearance-wheel="true"], [data-story-card-appearance-wheel]',
+        '[data-story-appearance-wheel="true"], [data-story-card-appearance-wheel]'
       );
       if (
         !boundaryRoot ||
@@ -2590,7 +2704,8 @@ export function createReplacementStudioWorkspace({
         initialProject2.workspace.characterAssetTab === 'library'
       )
         return false;
-      if (shouldPreserveWorkspaceNestedWheel(event3.target, { boundaryRoot: boundaryRoot })) return false;
+      if (shouldPreserveWorkspaceNestedWheel(event3.target, { boundaryRoot: boundaryRoot }))
+        return false;
       event3.preventDefault();
       const consumeWorkspaceWheelDirection3 = consumeWorkspaceWheelDirection(event3, value70);
       if (consumeWorkspaceWheelDirection3)
@@ -2598,7 +2713,9 @@ export function createReplacementStudioWorkspace({
       return true;
     },
     handler82 = (event4) => {
-      const enabled30 = event4.target?.closest?.('[data-person-replacement-audio-bound-wheel="true"]');
+      const enabled30 = event4.target?.closest?.(
+        '[data-person-replacement-audio-bound-wheel="true"]'
+      );
       if (
         !enabled30 ||
         initialProject2.workspace.view !== 'project' ||
@@ -2627,7 +2744,7 @@ export function createReplacementStudioWorkspace({
     },
     handler84 = (event6) => {
       const value252 = event6.target?.closest?.(
-        '[data-person-replacement-video-result-wheel="true"]',
+        '[data-person-replacement-video-result-wheel="true"]'
       );
       if (
         value252 &&
@@ -2640,7 +2757,7 @@ export function createReplacementStudioWorkspace({
         return true;
       }
       const enabled32 = event6.target?.closest?.(
-        '[data-person-replacement-image-result-wheel="true"]',
+        '[data-person-replacement-image-result-wheel="true"]'
       );
       if (
         !enabled32 ||
@@ -2675,7 +2792,7 @@ export function createReplacementStudioWorkspace({
         Number(el57.scrollLeft) + enabled34,
         0,
         count7,
-        Number(el57.scrollLeft) || 0,
+        Number(el57.scrollLeft) || 0
       );
       if (clamp2 === Number(el57.scrollLeft)) return false;
       return (
@@ -2689,19 +2806,25 @@ export function createReplacementStudioWorkspace({
       return scrollClosestElementHorizontallyWithWheel(
         value255,
         '[data-person-replacement-shot-timeline-scroll]',
-        { boundaryRoot: floatingMenuHost, preserveNestedScrollable: true },
+        { boundaryRoot: floatingMenuHost, preserveNestedScrollable: true }
       );
     },
     handler87 = (value256) => {
-      return scrollClosestElementHorizontallyWithWheel(value256, '.person-replacement-video-model-selector', {
-        boundaryRoot: floatingMenuHost,
-        preserveNestedScrollable: true,
-        stopPropagation: true,
-      });
+      return scrollClosestElementHorizontallyWithWheel(
+        value256,
+        '.person-replacement-video-model-selector',
+        {
+          boundaryRoot: floatingMenuHost,
+          preserveNestedScrollable: true,
+          stopPropagation: true,
+        }
+      );
     },
     value257 = (cancelled2) => {
       if (ctx?.handleKeyDown(cancelled2)) return;
-      const el58 = cancelled2.target?.closest?.('[data-person-replacement-composite-project-title]');
+      const el58 = cancelled2.target?.closest?.(
+        '[data-person-replacement-composite-project-title]'
+      );
       if (el58 && ['Enter', 'Escape'].includes(cancelled2.key)) {
         (cancelled2.preventDefault(), cancelled2.stopPropagation());
         cancelled2.key === 'Escape' && (el58.value = initialProject2.title);
@@ -2716,7 +2839,7 @@ export function createReplacementStudioWorkspace({
       if (personReplacementExportSubmenuController.handleKeyDown(cancelled2)) return;
       if (workspaceMenuController.handleKeyDown(cancelled2)) return;
       const el59 = cancelled2.target?.closest?.(
-        '[data-person-replacement-composite-sidebar-splitter]',
+        '[data-person-replacement-composite-sidebar-splitter]'
       );
       if (el59 && ['ArrowLeft', 'ArrowRight'].includes(cancelled2.key)) {
         (cancelled2.preventDefault(), cancelled2.stopPropagation());
@@ -2726,7 +2849,7 @@ export function createReplacementStudioWorkspace({
           applyPersonReplacementCompositeSidebarWidthToLayout(
             value258,
             el59,
-            initialProject2.workspace.compositeSidebarWidth + value259,
+            initialProject2.workspace.compositeSidebarWidth + value259
           )),
           handler21('composite-sidebar-width'));
         return;
@@ -2737,7 +2860,9 @@ export function createReplacementStudioWorkspace({
         const text13 = normalizeText(el60.dataset?.personReplacementVoiceLayoutSplitter);
         if (['assets', 'sources'].includes(text13)) {
           const value260 = el60.closest?.('[data-person-replacement-voice-layout]'),
-            assetsEnd = normalizePersonReplacementVoiceLayout(initialProject2.workspace.voiceLayout),
+            assetsEnd = normalizePersonReplacementVoiceLayout(
+              initialProject2.workspace.voiceLayout
+            ),
             value261 = cancelled2.key === 'ArrowLeft' ? -2 : 2;
           ((initialProject2.workspace.voiceLayout = applyPersonReplacementVoiceLayoutToElement(
             value260,
@@ -2746,14 +2871,16 @@ export function createReplacementStudioWorkspace({
               ...(text13 === 'assets'
                 ? { assetsEnd: assetsEnd.assetsEnd + value261 }
                 : { sourcesEnd: assetsEnd.sourcesEnd + value261 }),
-            },
+            }
           )),
             handler21('voice-layout'));
         }
         return;
       }
       if (cancelled2.key === 'Escape') {
-        const el61 = floatingMenuHost?.querySelector?.('.person-replacement-add-voice-menu-wrap.is-open');
+        const el61 = floatingMenuHost?.querySelector?.(
+          '.person-replacement-add-voice-menu-wrap.is-open'
+        );
         if (el61) {
           (cancelled2.preventDefault(), cancelled2.stopPropagation());
           const el62 = el61.querySelector?.('[data-story-action="toggle-character-voice-menu"]');
@@ -2761,19 +2888,21 @@ export function createReplacementStudioWorkspace({
           return;
         }
         const el63 = floatingMenuHost?.querySelector?.(
-          '.person-replacement-library-add-menu-wrap.is-open',
+          '.person-replacement-library-add-menu-wrap.is-open'
         );
         if (el63) {
           (cancelled2.preventDefault(), cancelled2.stopPropagation());
           const el64 = el63.querySelector?.(
-            '[data-person-replacement-action="toggle-library-add-targets"]',
+            '[data-person-replacement-action="toggle-library-add-targets"]'
           );
           (handler35(el63, false), el64?.focus?.());
           return;
         }
       }
       if (cancelled2.key === 'Escape' && value66) {
-        (cancelled2.preventDefault(), cancelled2.stopPropagation(), handler88({ restoreFocus: true }));
+        (cancelled2.preventDefault(),
+          cancelled2.stopPropagation(),
+          handler88({ restoreFocus: true }));
         return;
       }
       const el65 = cancelled2.target?.closest?.('[data-person-replacement-person-custom-label]');
@@ -2798,15 +2927,15 @@ export function createReplacementStudioWorkspace({
         applyBoundaryTime(
           active,
           Number(value263?.startSec) + value264 * personReplacementShotCutFrameSec,
-          { active: active },
+          { active: active }
         );
         return;
       }
       const el68 = cancelled2.target?.closest?.('[data-person-replacement-cut-shot-index]'),
         isEditableTarget = Boolean(
           cancelled2.target?.closest?.(
-            'input, textarea, select, [contenteditable="true"], [role="textbox"]',
-          ),
+            'input, textarea, select, [contenteditable="true"], [role="textbox"]'
+          )
         );
       if (handler72(cancelled2)) return;
       if (
@@ -2819,7 +2948,9 @@ export function createReplacementStudioWorkspace({
         })
       )
         return;
-      const enabled36 = Boolean(cancelled2.target?.closest?.('.person-replacement-shot-cut-action'));
+      const enabled36 = Boolean(
+        cancelled2.target?.closest?.('.person-replacement-shot-cut-action')
+      );
       if (
         selectedIds.isOpen &&
         !isBusy() &&
@@ -2895,7 +3026,7 @@ export function createReplacementStudioWorkspace({
             seekTimeline(
               cancelled2.key === 'Home'
                 ? 0
-                : getPersonReplacementShotCutTotalDuration(selectedIds.draft),
+                : getPersonReplacementShotCutTotalDuration(selectedIds.draft)
             ));
           return;
         }
@@ -2908,7 +3039,7 @@ export function createReplacementStudioWorkspace({
         return;
       }
       const value266 = cancelled2.target?.closest?.(
-        '[data-story-asset-name-id][contenteditable="true"]',
+        '[data-story-asset-name-id][contenteditable="true"]'
       );
       if (value266 && ['Enter', 'Escape'].includes(cancelled2.key)) {
         (cancelled2.preventDefault(),
@@ -2946,22 +3077,30 @@ export function createReplacementStudioWorkspace({
             updateProject(
               {
                 ...initialProject2,
-                workspace: { ...initialProject2.workspace, shotSelectionMode: false, selectedShotIds: [] },
+                workspace: {
+                  ...initialProject2.workspace,
+                  shotSelectionMode: false,
+                  selectedShotIds: [],
+                },
               },
-              'shot-selection-cancel',
+              'shot-selection-cancel'
             ),
           initialProject2.workspace.step === 1 &&
             initialProject2.workspace.selectedAssetIds.length &&
             updateProject(
               {
                 ...initialProject2,
-                workspace: { ...initialProject2.workspace, assetSelectionMode: false, selectedAssetIds: [] },
+                workspace: {
+                  ...initialProject2.workspace,
+                  assetSelectionMode: false,
+                  selectedAssetIds: [],
+                },
               },
-              'asset-selection-cancel',
+              'asset-selection-cancel'
             ));
       }
       const el70 = cancelled2.target?.closest?.(
-        '[data-person-replacement-target-appearance-wheel="true"]',
+        '[data-person-replacement-target-appearance-wheel="true"]'
       );
       if (
         el70 &&
@@ -2972,7 +3111,7 @@ export function createReplacementStudioWorkspace({
           cancelled2.stopPropagation(),
           handler79(
             el70.dataset.personReplacementTargetCharacterId,
-            cancelled2.key === 'ArrowRight' ? 1 : -1,
+            cancelled2.key === 'ArrowRight' ? 1 : -1
           ));
         return;
       }
@@ -2988,7 +3127,7 @@ export function createReplacementStudioWorkspace({
         return;
       }
       const value268 = cancelled2.target?.closest?.(
-        '[data-person-replacement-audio-bound-wheel="true"]',
+        '[data-person-replacement-audio-bound-wheel="true"]'
       );
       if (
         value268 &&
@@ -3011,7 +3150,7 @@ export function createReplacementStudioWorkspace({
       event7.stopPropagation();
       const alt = event7.target?.closest?.(
         '.person-replacement-image-preview-slide:not(' +
-          '.person-replacement-image-preview-slide--outgoing) > img',
+          '.person-replacement-image-preview-slide--outgoing) > img'
       );
       if (alt && floatingMenuHost?.contains?.(alt)) {
         const mediaUrl2 = normalizeMediaUrl(alt.currentSrc || alt.getAttribute?.('src'));
@@ -3023,9 +3162,7 @@ export function createReplacementStudioWorkspace({
       const el71 = event7.target?.closest?.('video[data-person-replacement-video-player="result"]');
       if (el71 && floatingMenuHost?.contains?.(el71)) {
         const mediaUrl3 = normalizeMediaUrl(
-          el71.dataset?.personReplacementVideoUrl ||
-            el71.getAttribute?.('src') ||
-            el71.currentSrc,
+          el71.dataset?.personReplacementVideoUrl || el71.getAttribute?.('src') || el71.currentSrc
         );
         if (!mediaUrl3) return;
         const playbackUrl = normalizeMediaUrl(el71.currentSrc || el71.getAttribute?.('src'));
@@ -3036,7 +3173,8 @@ export function createReplacementStudioWorkspace({
       if (!alt2 || !floatingMenuHost?.contains?.(alt2)) return;
       const mediaUrl4 = normalizeMediaUrl(alt2.currentSrc || alt2.getAttribute?.('src'));
       if (!mediaUrl4) return;
-      (event7.preventDefault(), openImagePreview(mediaUrl4, { alt: alt2.alt || '人物形象图片预览' }));
+      (event7.preventDefault(),
+        openImagePreview(mediaUrl4, { alt: alt2.alt || '人物形象图片预览' }));
     },
     handler92 = (args21 = {}) => {
       return (
@@ -3050,8 +3188,12 @@ export function createReplacementStudioWorkspace({
     },
     handler93 = () => {
       if (initialProject2.workspace.view !== 'home') return false;
-      const el72 = floatingMenuHost?.querySelector?.('[data-person-replacement-smart-clip-settings]'),
-        el73 = el72?.querySelector?.('[data-person-replacement-action="toggle-smart-clip-settings"]');
+      const el72 = floatingMenuHost?.querySelector?.(
+          '[data-person-replacement-smart-clip-settings]'
+        ),
+        el73 = el72?.querySelector?.(
+          '[data-person-replacement-action="toggle-smart-clip-settings"]'
+        );
       if (!el72 || !el73) return false;
       const enabled38 = initialProject2.workspace.smartClipSettingsOpen === true,
         el74 = el72.querySelector?.('.person-replacement-smart-clip-settings-panel');
@@ -3061,13 +3203,12 @@ export function createReplacementStudioWorkspace({
       if (enabled38 && !el74)
         el72.insertAdjacentHTML(
           'beforeend',
-          personReplacementShellPresentation.renderSmartClipSettingsPanel(initialProject2),
+          personReplacementShellPresentation.renderSmartClipSettingsPanel(initialProject2)
         );
       else !enabled38 && el74?.remove?.();
       return (
         el72.querySelectorAll?.('[data-smart-clip-mode]')?.forEach?.((el75) => {
-          const value270 =
-            el75.dataset?.smartClipMode === initialProject2.settings.smartClipMode;
+          const value270 = el75.dataset?.smartClipMode === initialProject2.settings.smartClipMode;
           (el75.classList?.toggle?.('is-active', value270),
             el75.setAttribute?.('aria-pressed', String(value270)));
         }),
@@ -3082,7 +3223,7 @@ export function createReplacementStudioWorkspace({
     },
     handler12 = (
       { workspace: workspace = {}, settings: settings = {} } = {},
-      { notify: notify = false } = {},
+      { notify: notify = false } = {}
     ) => {
       initialProject2 = normalizePersonReplacementWorkspaceProject({
         ...initialProject2,
@@ -3102,14 +3243,15 @@ export function createReplacementStudioWorkspace({
         el79?.setAttribute?.('aria-hidden', String(!enabled39)));
     },
     handler91 = (value272 = null) => {
-      floatingMenuHost?.querySelectorAll?.('.story-home-param-picker.is-open')?.forEach?.((el80) => {
-        if (el80 === value272) return;
-        (el80.classList?.remove?.('is-open'),
-          el80.querySelector?.('[data-story-home-param-trigger]')?.setAttribute?.(
-            'aria-expanded',
-            'false',
-          ));
-      });
+      floatingMenuHost
+        ?.querySelectorAll?.('.story-home-param-picker.is-open')
+        ?.forEach?.((el80) => {
+          if (el80 === value272) return;
+          (el80.classList?.remove?.('is-open'),
+            el80
+              .querySelector?.('[data-story-home-param-trigger]')
+              ?.setAttribute?.('aria-expanded', 'false'));
+        });
     },
     handler95 = (el81) => {
       const el82 = el81?.querySelector?.('[data-person-replacement-detection-picker-menu]'),
@@ -3125,13 +3267,14 @@ export function createReplacementStudioWorkspace({
           if (text14 === 'label') {
             const el83 = el81.closest?.('.person-replacement-detection-box'),
               text15 = normalizeText(
-                el83?.dataset?.shotId || initialProject2.workspace.selectedShotId,
+                el83?.dataset?.shotId || initialProject2.workspace.selectedShotId
               ),
               value273 = initialProject2.shots.find((value274) => value274.id === text15),
               list12 = getPersonReplacementBoxedPeople(value273),
               selectedLabel = normalizeText(
-                selectedValue.querySelector?.('[data-person-replacement-detection-picker-value]')?.textContent,
-                selectedValue.value,
+                selectedValue.querySelector?.('[data-person-replacement-detection-picker-value]')
+                  ?.textContent,
+                selectedValue.value
               );
             options4 = getPersonReplacementLabelOptions({
               labels: [
@@ -3160,15 +3303,14 @@ export function createReplacementStudioWorkspace({
       if (enabled40 && !handler95(el84)) return false;
       return (
         el84?.classList?.toggle?.('is-open', enabled40),
-        el84?.closest?.('.person-replacement-detection-box')?.classList?.toggle?.(
-          'is-picker-open',
-          enabled40,
-        ),
+        el84
+          ?.closest?.('.person-replacement-detection-box')
+          ?.classList?.toggle?.('is-picker-open', enabled40),
         el85?.setAttribute?.('aria-expanded', String(enabled40)),
         el86?.setAttribute?.('aria-hidden', String(!enabled40)),
         !enabled40 &&
           el86?.dataset?.personReplacementPickerOptionsLazy === 'true' &&
-          ((clearElement(el86)),
+          (clearElement(el86),
           el86.dataset && delete el86.dataset.personReplacementPickerOptionsReady),
         true
       );
@@ -3176,10 +3318,12 @@ export function createReplacementStudioWorkspace({
     handler90 = (value277 = null) => {
       let value278 = false;
       return (
-        floatingMenuHost?.querySelectorAll?.('[data-person-replacement-detection-picker].is-open')?.forEach?.((value279) => {
-          if (value279 === value277) return;
-          (handler96(value279, false), (value278 = true));
-        }),
+        floatingMenuHost
+          ?.querySelectorAll?.('[data-person-replacement-detection-picker].is-open')
+          ?.forEach?.((value279) => {
+            if (value279 === value277) return;
+            (handler96(value279, false), (value278 = true));
+          }),
         value278
       );
     },
@@ -3187,8 +3331,12 @@ export function createReplacementStudioWorkspace({
       if (!el87 || el87.hidden) return false;
       const el88 = el87.closest?.('[data-person-replacement-detection-picker]'),
         detectionBox2 = el87.closest?.('.person-replacement-detection-box'),
-        sourceCharacterId3 = el88?.querySelector?.('[data-person-replacement-detection-picker-trigger]'),
-        el89 = sourceCharacterId3?.querySelector?.('[data-person-replacement-detection-picker-value]');
+        sourceCharacterId3 = el88?.querySelector?.(
+          '[data-person-replacement-detection-picker-trigger]'
+        ),
+        el89 = sourceCharacterId3?.querySelector?.(
+          '[data-person-replacement-detection-picker-value]'
+        );
       if (!el88 || !sourceCharacterId3 || !el89) return false;
       const text16 = normalizeText(el88.dataset.personReplacementPreviousValue),
         text17 = normalizeText(el88.dataset.personReplacementPreviousLabel, text16),
@@ -3203,26 +3351,24 @@ export function createReplacementStudioWorkspace({
           ? text18
           : normalizeText(
               initialProject2.shots
-                .find(
-                  (value281) => value281.id === normalizeText(detectionBox2?.dataset?.shotId),
-                )
+                .find((value281) => value281.id === normalizeText(detectionBox2?.dataset?.shotId))
                 ?.people?.find(
-                  (value282) => value282.id === normalizeText(detectionBox2?.dataset?.personId),
-                )?.sourceCharacterId,
+                  (value282) => value282.id === normalizeText(detectionBox2?.dataset?.personId)
+                )?.sourceCharacterId
             )),
         (sourceCharacterId3.hidden = false),
         sourceCharacterId3.setAttribute('aria-label', '人物名称：' + label3),
         (el89.textContent = label3),
         (el87.value = label3),
         (el87.hidden = true),
-        el88.querySelectorAll?.('[data-person-replacement-detection-picker-option]')?.forEach?.(
-          (el90) => {
+        el88
+          .querySelectorAll?.('[data-person-replacement-detection-picker-option]')
+          ?.forEach?.((el90) => {
             const text20 =
               normalizeText(el90.dataset.personReplacementDetectionPickerOption) === value280;
             (el90.classList?.toggle?.('is-selected', text20),
               el90.setAttribute?.('aria-selected', String(text20)));
-          },
-        ),
+          }),
         delete el88.dataset.personReplacementPreviousValue,
         delete el88.dataset.personReplacementPreviousLabel,
         delete el88.dataset.personReplacementPreviousSourceCharacterId,
@@ -3230,7 +3376,8 @@ export function createReplacementStudioWorkspace({
           handler39({
             detectionBox: detectionBox2,
             label: label3,
-            sourceCharacterId: sourceCharacterId3.dataset.personReplacementSelectedSourceCharacterId,
+            sourceCharacterId:
+              sourceCharacterId3.dataset.personReplacementSelectedSourceCharacterId,
           }),
         !enabled41
       );
@@ -3267,7 +3414,7 @@ export function createReplacementStudioWorkspace({
                 : { assetSelectionMode: false, selectedAssetIds: [] }),
             },
           },
-          enabled43 ? 'shot-selection-cancel' : 'asset-selection-cancel',
+          enabled43 ? 'shot-selection-cancel' : 'asset-selection-cancel'
         ),
         true
       );
@@ -3275,7 +3422,7 @@ export function createReplacementStudioWorkspace({
     handler98 = (value285) => {
       const value286 = () => {
         const el92 = Array.from(
-          floatingMenuHost?.querySelectorAll?.('[data-story-project-title]') || [],
+          floatingMenuHost?.querySelectorAll?.('[data-story-project-title]') || []
         ).find((el93) => normalizeText(el93.dataset.storyProjectTitle) === normalizeText(value285));
         (el92?.focus?.(), el92?.select?.());
       };
@@ -3291,7 +3438,7 @@ export function createReplacementStudioWorkspace({
         if (initialProject2.workspace.view === 'home' && archived === 'select-project-sort')
           handler92({
             projectSortOrder: normalizeWorkspaceProjectSortOrder(
-              projectId.dataset.storyProjectSortOption,
+              projectId.dataset.storyProjectSortOption
             ),
           });
         else {
@@ -3305,13 +3452,15 @@ export function createReplacementStudioWorkspace({
             if (initialProject2.workspace.view === 'home' && archived === 'toggle-project-menu') {
               const text21 = normalizeText(projectId.dataset.storyProjectId);
               handler92({
-                openProjectMenuId: initialProject2.workspace.openProjectMenuId === text21 ? '' : text21,
+                openProjectMenuId:
+                  initialProject2.workspace.openProjectMenuId === text21 ? '' : text21,
                 pendingDeleteProjectId: '',
               });
             } else {
               if (initialProject2.workspace.view === 'home' && archived === 'rename-project') {
                 const text22 = normalizeText(projectId.dataset.storyProjectId);
-                (handler92({ openProjectMenuId: '', pendingDeleteProjectId: '' }), handler98(text22));
+                (handler92({ openProjectMenuId: '', pendingDeleteProjectId: '' }),
+                  handler98(text22));
               } else {
                 if (initialProject2.workspace.view === 'home' && archived === 'duplicate-project')
                   runIntent(downloadImageIntent.DUPLICATE_PROJECT, {
@@ -3363,11 +3512,11 @@ export function createReplacementStudioWorkspace({
                                 archived === 'target-next-appearance'
                               ) {
                                 const el95 = projectId.closest?.(
-                                  '[data-person-replacement-target-controls]',
+                                  '[data-person-replacement-target-controls]'
                                 );
                                 handler79(
                                   el95?.dataset?.personReplacementTargetControls,
-                                  archived === 'target-next-appearance' ? 1 : -1,
+                                  archived === 'target-next-appearance' ? 1 : -1
                                 );
                               } else {
                                 if (
@@ -3375,13 +3524,15 @@ export function createReplacementStudioWorkspace({
                                   archived === 'video-reference-next-result'
                                 ) {
                                   const sourceShotId2 = projectId.closest?.(
-                                    '[data-person-replacement-video-reference-controls]',
+                                    '[data-person-replacement-video-reference-controls]'
                                   );
                                   switchVideoReferenceResult({
                                     sourceShotId:
-                                      sourceShotId2?.dataset?.personReplacementVideoReferenceControls,
+                                      sourceShotId2?.dataset
+                                        ?.personReplacementVideoReferenceControls,
                                     currentResultIndex:
-                                      sourceShotId2?.dataset?.personReplacementVideoReferenceResultIndex,
+                                      sourceShotId2?.dataset
+                                        ?.personReplacementVideoReferenceResultIndex,
                                     delta: archived === 'video-reference-next-result' ? 1 : -1,
                                   });
                                 } else {
@@ -3395,24 +3546,26 @@ export function createReplacementStudioWorkspace({
                                           selectedAssetIds: [],
                                         },
                                       },
-                                      'asset-selection-cancel',
+                                      'asset-selection-cancel'
                                     );
                                   else {
-                                    if (archived === 'cancel-shot-batch-generation') cancelShotBatch();
+                                    if (archived === 'cancel-shot-batch-generation')
+                                      cancelShotBatch();
                                     else {
-                                      if (archived === 'cancel-asset-batch-generation') cancelAssetBatch();
+                                      if (archived === 'cancel-asset-batch-generation')
+                                        cancelAssetBatch();
                                       else {
                                         if (archived === 'toggle-all-assets') {
                                           const list13 = getPersonReplacementSelectableAssets(
                                               initialProject2,
-                                              initialProject2.workspace.characterAssetTab,
+                                              initialProject2.workspace.characterAssetTab
                                             ),
                                             selectedAssetIds =
                                               list13.length > 0 &&
                                               list13.every((value287) =>
                                                 initialProject2.workspace.selectedAssetIds.includes(
-                                                  value287.id,
-                                                ),
+                                                  value287.id
+                                                )
                                               );
                                           updateProject(
                                             {
@@ -3426,15 +3579,15 @@ export function createReplacementStudioWorkspace({
                                                   !selectedAssetIds && list13.length > 0,
                                               },
                                             },
-                                            'asset-selection-all',
+                                            'asset-selection-all'
                                           );
                                         } else {
                                           if (archived === 'toggle-all-shots') {
                                             const selectedShotIds = initialProject2.shots.every(
                                               (value289) =>
                                                 initialProject2.workspace.selectedShotIds.includes(
-                                                  value289.id,
-                                                ),
+                                                  value289.id
+                                                )
                                             );
                                             updateProject(
                                               {
@@ -3445,18 +3598,24 @@ export function createReplacementStudioWorkspace({
                                                   selectedShotIds: selectedShotIds
                                                     ? []
                                                     : initialProject2.shots.map(
-                                                        (value290) => value290.id,
+                                                        (value290) => value290.id
                                                       ),
                                                 },
                                               },
-                                              'shot-selection-all',
+                                              'shot-selection-all'
                                             );
                                           } else {
                                             if (archived === 'previous-appearance')
-                                              handler73(-1, projectId.dataset.storyCardAppearanceId);
+                                              handler73(
+                                                -1,
+                                                projectId.dataset.storyCardAppearanceId
+                                              );
                                             else {
                                               if (archived === 'next-appearance')
-                                                handler73(1, projectId.dataset.storyCardAppearanceId);
+                                                handler73(
+                                                  1,
+                                                  projectId.dataset.storyCardAppearanceId
+                                                );
                                               else {
                                                 if (archived === 'previous-audio-bound-character')
                                                   handler74(-1);
@@ -3468,39 +3627,54 @@ export function createReplacementStudioWorkspace({
                                                     else {
                                                       if (archived === 'next-shot') handler77(1);
                                                       else {
-                                                        if (archived === 'previous-replacement-image-result')
+                                                        if (
+                                                          archived ===
+                                                          'previous-replacement-image-result'
+                                                        )
                                                           switchImageResult(-1);
                                                         else {
-                                                          if (archived === 'next-replacement-image-result')
+                                                          if (
+                                                            archived ===
+                                                            'next-replacement-image-result'
+                                                          )
                                                             switchImageResult(1);
                                                           else {
                                                             if (
-                                                              archived === 'previous-replacement-video-result'
+                                                              archived ===
+                                                              'previous-replacement-video-result'
                                                             )
                                                               switchVideoResult(-1);
                                                             else {
                                                               if (
-                                                                archived === 'next-replacement-video-result'
+                                                                archived ===
+                                                                'next-replacement-video-result'
                                                               )
                                                                 switchVideoResult(1);
                                                               else {
                                                                 if (
-                                                                  archived === 'select-video-shot-reference'
+                                                                  archived ===
+                                                                  'select-video-shot-reference'
                                                                 )
                                                                   selectVideoReference(
                                                                     projectId.dataset.shotId ||
-                                                                      initialProject2.workspace.selectedShotId,
-                                                                    projectId.dataset.personReplacementVideoReferenceIndex,
+                                                                      initialProject2.workspace
+                                                                        .selectedShotId,
+                                                                    projectId.dataset
+                                                                      .personReplacementVideoReferenceIndex,
                                                                     {
                                                                       sourceShotId:
-                                                                        projectId.dataset.personReplacementVideoReferenceSourceShotId,
+                                                                        projectId.dataset
+                                                                          .personReplacementVideoReferenceSourceShotId,
                                                                       resultIndex:
-                                                                        projectId.dataset.personReplacementVideoReferenceResultIndex,
+                                                                        projectId.dataset
+                                                                          .personReplacementVideoReferenceResultIndex,
                                                                       referencePersonId:
-                                                                        projectId.dataset.personReplacementVideoCharacterReference,
+                                                                        projectId.dataset
+                                                                          .personReplacementVideoCharacterReference,
                                                                       referenceKind:
-                                                                        projectId.dataset.personReplacementVideoReferenceKind,
-                                                                    },
+                                                                        projectId.dataset
+                                                                          .personReplacementVideoReferenceKind,
+                                                                    }
                                                                   );
                                                                 else {
                                                                   if (
@@ -3509,7 +3683,8 @@ export function createReplacementStudioWorkspace({
                                                                   )
                                                                     (selectImageResult(
                                                                       projectId.dataset.shotId,
-                                                                      projectId.dataset.replacementImageResultIndex,
+                                                                      projectId.dataset
+                                                                        .replacementImageResultIndex
                                                                     ),
                                                                       ctx?.refresh());
                                                                   else {
@@ -3519,7 +3694,8 @@ export function createReplacementStudioWorkspace({
                                                                     )
                                                                       setImageReference(
                                                                         projectId.dataset.shotId,
-                                                                        projectId.dataset.replacementImageResultIndex,
+                                                                        projectId.dataset
+                                                                          .replacementImageResultIndex
                                                                       );
                                                                     else {
                                                                       if (
@@ -3528,7 +3704,8 @@ export function createReplacementStudioWorkspace({
                                                                       )
                                                                         deleteImageResult(
                                                                           projectId.dataset.shotId,
-                                                                          projectId.dataset.replacementImageResultIndex,
+                                                                          projectId.dataset
+                                                                            .replacementImageResultIndex
                                                                         );
                                                                       else {
                                                                         if (
@@ -3536,8 +3713,10 @@ export function createReplacementStudioWorkspace({
                                                                           'select-replacement-video-result'
                                                                         )
                                                                           (selectVideoResult(
-                                                                            projectId.dataset.shotId,
-                                                                            projectId.dataset.replacementVideoResultIndex,
+                                                                            projectId.dataset
+                                                                              .shotId,
+                                                                            projectId.dataset
+                                                                              .replacementVideoResultIndex
                                                                           ),
                                                                             ctx?.refresh());
                                                                         else {
@@ -3546,8 +3725,10 @@ export function createReplacementStudioWorkspace({
                                                                             'set-replacement-video-reference'
                                                                           )
                                                                             setVideoReference(
-                                                                              projectId.dataset.shotId,
-                                                                              projectId.dataset.replacementVideoResultIndex,
+                                                                              projectId.dataset
+                                                                                .shotId,
+                                                                              projectId.dataset
+                                                                                .replacementVideoResultIndex
                                                                             );
                                                                           else {
                                                                             if (
@@ -3555,8 +3736,10 @@ export function createReplacementStudioWorkspace({
                                                                               'delete-replacement-video-result'
                                                                             )
                                                                               deleteVideoResult(
-                                                                                projectId.dataset.shotId,
-                                                                                projectId.dataset.replacementVideoResultIndex,
+                                                                                projectId.dataset
+                                                                                  .shotId,
+                                                                                projectId.dataset
+                                                                                  .replacementVideoResultIndex
                                                                               );
                                                                             else {
                                                                               if (
@@ -3565,7 +3748,7 @@ export function createReplacementStudioWorkspace({
                                                                               )
                                                                                 requestImageDownload(
                                                                                   projectId,
-                                                                                  handler46(),
+                                                                                  handler46()
                                                                                 );
                                                                               else {
                                                                                 if (
@@ -3577,11 +3760,11 @@ export function createReplacementStudioWorkspace({
                                                                                     characterId(),
                                                                                     handler13(),
                                                                                     onShotKeyframeSelected(
-                                                                                      downloadImageIntent.ADD_ASSET_APPEARANCE_TO_LIBRARY,
+                                                                                      downloadImageIntent.ADD_ASSET_APPEARANCE_TO_LIBRARY
                                                                                     ),
                                                                                     handler11,
                                                                                     documentObject,
-                                                                                    windowObject,
+                                                                                    windowObject
                                                                                   );
                                                                                 else {
                                                                                   if (
@@ -3590,7 +3773,7 @@ export function createReplacementStudioWorkspace({
                                                                                   )
                                                                                     requestImageDownload(
                                                                                       projectId,
-                                                                                      getSelectedReplacementImageDownloadRequest(),
+                                                                                      getSelectedReplacementImageDownloadRequest()
                                                                                     );
                                                                                   else {
                                                                                     if (
@@ -3600,11 +3783,15 @@ export function createReplacementStudioWorkspace({
                                                                                       ((value45 = {
                                                                                         kind: 'replacement-image',
                                                                                         shotId:
-                                                                                          initialProject2.workspace.selectedShotId,
+                                                                                          initialProject2
+                                                                                            .workspace
+                                                                                            .selectedShotId,
                                                                                       }),
-                                                                                        floatingMenuHost.querySelector(
-                                                                                          "[data-person-replacement-input='replacement-image']",
-                                                                                        )?.click?.());
+                                                                                        floatingMenuHost
+                                                                                          .querySelector(
+                                                                                            "[data-person-replacement-input='replacement-image']"
+                                                                                          )
+                                                                                          ?.click?.());
                                                                                     else {
                                                                                       if (
                                                                                         archived ===
@@ -3612,7 +3799,7 @@ export function createReplacementStudioWorkspace({
                                                                                       )
                                                                                         requestVideoDownload(
                                                                                           projectId,
-                                                                                          getSelectedReplacementVideoDownloadRequest(),
+                                                                                          getSelectedReplacementVideoDownloadRequest()
                                                                                         );
                                                                                       else {
                                                                                         if (
@@ -3621,14 +3808,19 @@ export function createReplacementStudioWorkspace({
                                                                                         )
                                                                                           ((value46 =
                                                                                             projectId),
-                                                                                            (value45 = {
-                                                                                              kind: 'replacement-video',
-                                                                                              shotId:
-                                                                                                initialProject2.workspace.selectedShotId,
-                                                                                            }),
-                                                                                            floatingMenuHost.querySelector(
-                                                                                              "[data-person-replacement-input='replacement-video-result']",
-                                                                                            )?.click?.());
+                                                                                            (value45 =
+                                                                                              {
+                                                                                                kind: 'replacement-video',
+                                                                                                shotId:
+                                                                                                  initialProject2
+                                                                                                    .workspace
+                                                                                                    .selectedShotId,
+                                                                                              }),
+                                                                                            floatingMenuHost
+                                                                                              .querySelector(
+                                                                                                "[data-person-replacement-input='replacement-video-result']"
+                                                                                              )
+                                                                                              ?.click?.());
                                                                                         else {
                                                                                           if (
                                                                                             archived ===
@@ -3636,23 +3828,30 @@ export function createReplacementStudioWorkspace({
                                                                                           ) {
                                                                                             const characterId2 =
                                                                                                 characterId(
-                                                                                                  projectId.dataset.storyCardAppearanceId ||
-                                                                                                    initialProject2.workspace.selectedCharacterId,
+                                                                                                  projectId
+                                                                                                    .dataset
+                                                                                                    .storyCardAppearanceId ||
+                                                                                                    initialProject2
+                                                                                                      .workspace
+                                                                                                      .selectedCharacterId
                                                                                                 ),
                                                                                               appearanceId =
                                                                                                 handler13(
-                                                                                                  characterId2,
+                                                                                                  characterId2
                                                                                                 );
-                                                                                            ((value45 = {
-                                                                                              kind: 'appearance',
-                                                                                              characterId:
-                                                                                                characterId2?.id,
-                                                                                              appearanceId:
-                                                                                                appearanceId?.id,
-                                                                                            }),
-                                                                                              floatingMenuHost.querySelector(
-                                                                                                "[data-person-replacement-input='appearance-image']",
-                                                                                              )?.click?.());
+                                                                                            ((value45 =
+                                                                                              {
+                                                                                                kind: 'appearance',
+                                                                                                characterId:
+                                                                                                  characterId2?.id,
+                                                                                                appearanceId:
+                                                                                                  appearanceId?.id,
+                                                                                              }),
+                                                                                              floatingMenuHost
+                                                                                                .querySelector(
+                                                                                                  "[data-person-replacement-input='appearance-image']"
+                                                                                                )
+                                                                                                ?.click?.());
                                                                                           } else {
                                                                                             if (
                                                                                               archived ===
@@ -3660,18 +3859,18 @@ export function createReplacementStudioWorkspace({
                                                                                             ) {
                                                                                               const el96 =
                                                                                                   projectId.closest?.(
-                                                                                                    '.person-replacement-add-voice-menu-wrap',
+                                                                                                    '.person-replacement-add-voice-menu-wrap'
                                                                                                   ),
                                                                                                 value291 =
                                                                                                   !el96?.classList?.contains?.(
-                                                                                                    'is-open',
+                                                                                                    'is-open'
                                                                                                   );
                                                                                               (handler38(
-                                                                                                el96,
+                                                                                                el96
                                                                                               ),
                                                                                                 handler37(
                                                                                                   el96,
-                                                                                                  value291,
+                                                                                                  value291
                                                                                                 ));
                                                                                             } else {
                                                                                               if (
@@ -3692,7 +3891,7 @@ export function createReplacementStudioWorkspace({
                                                                                                       characters:
                                                                                                         initialProject2.characters.map(
                                                                                                           (
-                                                                                                            args22,
+                                                                                                            args22
                                                                                                           ) =>
                                                                                                             args22.id ===
                                                                                                             enabled45.id
@@ -3703,10 +3902,10 @@ export function createReplacementStudioWorkspace({
                                                                                                                   voiceRef:
                                                                                                                     '',
                                                                                                                 }
-                                                                                                              : args22,
+                                                                                                              : args22
                                                                                                         ),
                                                                                                     },
-                                                                                                    'remove-character-voice',
+                                                                                                    'remove-character-voice'
                                                                                                   ));
                                                                                               } else {
                                                                                                 if (
@@ -3718,11 +3917,14 @@ export function createReplacementStudioWorkspace({
                                                                                                       {
                                                                                                         kind: 'voice',
                                                                                                         characterId:
-                                                                                                          characterId()?.id,
+                                                                                                          characterId()
+                                                                                                            ?.id,
                                                                                                       }),
-                                                                                                    floatingMenuHost.querySelector(
-                                                                                                      '[data-person-replacement-input=\'character-voice\']',
-                                                                                                    )?.click?.());
+                                                                                                    floatingMenuHost
+                                                                                                      .querySelector(
+                                                                                                        "[data-person-replacement-input='character-voice']"
+                                                                                                      )
+                                                                                                      ?.click?.());
                                                                                                 else {
                                                                                                   if (
                                                                                                     archived ===
@@ -3736,7 +3938,7 @@ export function createReplacementStudioWorkspace({
                                                                                                     ) {
                                                                                                       windowObject?.showToast?.(
                                                                                                         '请先选择要添加声音的人设。',
-                                                                                                        'warn',
+                                                                                                        'warn'
                                                                                                       );
                                                                                                       return;
                                                                                                     }
@@ -3744,23 +3946,23 @@ export function createReplacementStudioWorkspace({
                                                                                                         initialProject2,
                                                                                                       list14 =
                                                                                                         getPersonReplacementProjectAudioAssets(
-                                                                                                          args23,
+                                                                                                          args23
                                                                                                         ),
                                                                                                       selectedAudioAssetId =
                                                                                                         list14.find(
                                                                                                           (
-                                                                                                            value292,
+                                                                                                            value292
                                                                                                           ) =>
                                                                                                             getPersonReplacementVoiceLibraryBoundCharacters(
                                                                                                               args23,
-                                                                                                              value292,
+                                                                                                              value292
                                                                                                             ).some(
                                                                                                               (
-                                                                                                                value293,
+                                                                                                                value293
                                                                                                               ) =>
                                                                                                                 value293.id ===
-                                                                                                                enabled46.id,
-                                                                                                            ),
+                                                                                                                enabled46.id
+                                                                                                            )
                                                                                                         );
                                                                                                     ((voiceLibraryTargetCharacterId =
                                                                                                       enabled46.id),
@@ -3774,15 +3976,15 @@ export function createReplacementStudioWorkspace({
                                                                                                                 'audio',
                                                                                                               selectedAudioAssetId:
                                                                                                                 selectedAudioAssetId?.id ||
-                                                                                                                list14[0]?.id ||
+                                                                                                                list14[0]
+                                                                                                                  ?.id ||
                                                                                                                 '',
-                                                                                                              assetSelectionMode:
-                                                                                                                false,
+                                                                                                              assetSelectionMode: false,
                                                                                                               selectedAssetIds:
                                                                                                                 [],
                                                                                                             },
                                                                                                         },
-                                                                                                        'character-voice-library-open',
+                                                                                                        'character-voice-library-open'
                                                                                                       ));
                                                                                                   } else {
                                                                                                     if (
@@ -3793,12 +3995,12 @@ export function createReplacementStudioWorkspace({
                                                                                                           characterId(),
                                                                                                         baseAppearanceId =
                                                                                                           handler13(
-                                                                                                            value294,
+                                                                                                            value294
                                                                                                           ),
                                                                                                         characters =
                                                                                                           initialProject2.characters.map(
                                                                                                             (
-                                                                                                              args24,
+                                                                                                              args24
                                                                                                             ) =>
                                                                                                               args24.id ===
                                                                                                               value294?.id
@@ -3807,7 +4009,7 @@ export function createReplacementStudioWorkspace({
                                                                                                                     baseAppearanceId:
                                                                                                                       baseAppearanceId?.id,
                                                                                                                   }
-                                                                                                                : args24,
+                                                                                                                : args24
                                                                                                           );
                                                                                                       updateProject(
                                                                                                         {
@@ -3815,7 +4017,7 @@ export function createReplacementStudioWorkspace({
                                                                                                           characters:
                                                                                                             characters,
                                                                                                         },
-                                                                                                        'set-base-appearance',
+                                                                                                        'set-base-appearance'
                                                                                                       );
                                                                                                     } else {
                                                                                                       if (
@@ -3826,7 +4028,7 @@ export function createReplacementStudioWorkspace({
                                                                                                             characterId(),
                                                                                                           enabled48 =
                                                                                                             handler13(
-                                                                                                              enabled47,
+                                                                                                              enabled47
                                                                                                             );
                                                                                                         if (
                                                                                                           !enabled47 ||
@@ -3838,7 +4040,7 @@ export function createReplacementStudioWorkspace({
                                                                                                         const characters2 =
                                                                                                           initialProject2.characters.map(
                                                                                                             (
-                                                                                                              appearances,
+                                                                                                              appearances
                                                                                                             ) =>
                                                                                                               appearances.id ===
                                                                                                               enabled47.id
@@ -3847,13 +4049,13 @@ export function createReplacementStudioWorkspace({
                                                                                                                     appearances:
                                                                                                                       appearances.appearances.filter(
                                                                                                                         (
-                                                                                                                          value295,
+                                                                                                                          value295
                                                                                                                         ) =>
                                                                                                                           value295.id !==
-                                                                                                                          enabled48.id,
+                                                                                                                          enabled48.id
                                                                                                                       ),
                                                                                                                   }
-                                                                                                                : appearances,
+                                                                                                                : appearances
                                                                                                           );
                                                                                                         updateProject(
                                                                                                           {
@@ -3865,13 +4067,14 @@ export function createReplacementStudioWorkspace({
                                                                                                                 ...initialProject2.workspace,
                                                                                                                 assetAppearanceIndexes:
                                                                                                                   {
-                                                                                                                    ...initialProject2.workspace.assetAppearanceIndexes,
-                                                                                                                    [enabled47.id]:
-                                                                                                                      0,
+                                                                                                                    ...initialProject2
+                                                                                                                      .workspace
+                                                                                                                      .assetAppearanceIndexes,
+                                                                                                                    [enabled47.id]: 0,
                                                                                                                   },
                                                                                                               },
                                                                                                           },
-                                                                                                          'delete-appearance',
+                                                                                                          'delete-appearance'
                                                                                                         );
                                                                                                       } else {
                                                                                                         if (
@@ -3881,17 +4084,21 @@ export function createReplacementStudioWorkspace({
                                                                                                           hide();
                                                                                                           const sceneId =
                                                                                                             normalizeText(
-                                                                                                              projectId.dataset.storyAssetDeleteId,
+                                                                                                              projectId
+                                                                                                                .dataset
+                                                                                                                .storyAssetDeleteId
                                                                                                             );
                                                                                                           if (
-                                                                                                            initialProject2.workspace.characterAssetTab ===
+                                                                                                            initialProject2
+                                                                                                              .workspace
+                                                                                                              .characterAssetTab ===
                                                                                                               'scene' &&
                                                                                                             initialProject2.scenes.some(
                                                                                                               (
-                                                                                                                value296,
+                                                                                                                value296
                                                                                                               ) =>
                                                                                                                 value296.id ===
-                                                                                                                sceneId,
+                                                                                                                sceneId
                                                                                                             )
                                                                                                           )
                                                                                                             runIntent(
@@ -3899,36 +4106,38 @@ export function createReplacementStudioWorkspace({
                                                                                                               {
                                                                                                                 sceneId:
                                                                                                                   sceneId,
-                                                                                                              },
+                                                                                                              }
                                                                                                             );
                                                                                                           else
-                                                                                                            initialProject2.workspace.characterAssetTab ===
+                                                                                                            initialProject2
+                                                                                                              .workspace
+                                                                                                              .characterAssetTab ===
                                                                                                               'audio' &&
                                                                                                             initialProject2.audioAssets.some(
                                                                                                               (
-                                                                                                                value297,
+                                                                                                                value297
                                                                                                               ) =>
                                                                                                                 value297.id ===
-                                                                                                                sceneId,
+                                                                                                                sceneId
                                                                                                             )
                                                                                                               ? runIntent(
                                                                                                                   downloadImageIntent.DELETE_AUDIO_ASSET,
                                                                                                                   {
                                                                                                                     audioAssetId:
                                                                                                                       sceneId,
-                                                                                                                  },
+                                                                                                                  }
                                                                                                                 )
                                                                                                               : runIntent(
                                                                                                                   downloadImageIntent.DELETE_CHARACTER,
                                                                                                                   {
                                                                                                                     characterId:
                                                                                                                       sceneId,
-                                                                                                                  },
+                                                                                                                  }
                                                                                                                 );
                                                                                                         } else {
                                                                                                           if (
                                                                                                             archived.startsWith(
-                                                                                                              'debug-generation-',
+                                                                                                              'debug-generation-'
                                                                                                             )
                                                                                                           ) {
                                                                                                             if (
@@ -3938,13 +4147,14 @@ export function createReplacementStudioWorkspace({
                                                                                                               return;
                                                                                                             const kind =
                                                                                                                 archived.slice(
-                                                                                                                  'debug-generation-'.length,
+                                                                                                                  'debug-generation-'
+                                                                                                                    .length
                                                                                                                 ),
                                                                                                               characterId3 =
                                                                                                                 characterId(),
                                                                                                               appearanceId2 =
                                                                                                                 handler13(
-                                                                                                                  characterId3,
+                                                                                                                  characterId3
                                                                                                                 );
                                                                                                             openDebugRequestWindow(
                                                                                                               {
@@ -3965,19 +4175,23 @@ export function createReplacementStudioWorkspace({
                                                                                                                             projectId:
                                                                                                                               initialProject2.id,
                                                                                                                             shotId:
-                                                                                                                              initialProject2.workspace.selectedShotId,
+                                                                                                                              initialProject2
+                                                                                                                                .workspace
+                                                                                                                                .selectedShotId,
                                                                                                                             sourceImageSize:
                                                                                                                               resolvePersonReplacementSourceImageSize(
                                                                                                                                 floatingMenuHost?.querySelector(
-                                                                                                                                  '[data-person-replacement-keyframe-stage] > img',
+                                                                                                                                  '[data-person-replacement-keyframe-stage] > img'
                                                                                                                                 ),
                                                                                                                                 initialProject2.shots.find(
                                                                                                                                   (
-                                                                                                                                    value298,
+                                                                                                                                    value298
                                                                                                                                   ) =>
                                                                                                                                     value298.id ===
-                                                                                                                                    initialProject2.workspace.selectedShotId,
-                                                                                                                                ),
+                                                                                                                                    initialProject2
+                                                                                                                                      .workspace
+                                                                                                                                      .selectedShotId
+                                                                                                                                )
                                                                                                                               ),
                                                                                                                             characterId:
                                                                                                                               characterId3?.id,
@@ -3987,21 +4201,24 @@ export function createReplacementStudioWorkspace({
                                                                                                                               appearanceId2?.prompt ||
                                                                                                                               characterId3?.description,
                                                                                                                             promptPresetId:
-                                                                                                                              initialProject2.workspace.assetPromptPresetId,
+                                                                                                                              initialProject2
+                                                                                                                                .workspace
+                                                                                                                                .assetPromptPresetId,
                                                                                                                           },
                                                                                                                           {},
                                                                                                                           {
-                                                                                                                            applyCallbackResult:
-                                                                                                                              false,
-                                                                                                                          },
+                                                                                                                            applyCallbackResult: false,
+                                                                                                                          }
                                                                                                                         )),
                                                                                                                         notes:
-                                                                                                                          initialProject2.settings?.replacementPromptEnhancementEnabled
+                                                                                                                          initialProject2
+                                                                                                                            .settings
+                                                                                                                            ?.replacementPromptEnhancementEnabled
                                                                                                                             ? '已开启 AI 提示词增强；此处显示增强前输入。增强结果需要调用模型后才能确定，调试不会发起该调用。'
                                                                                                                             : '',
-                                                                                                                      },
+                                                                                                                      }
                                                                                                                     ),
-                                                                                                              },
+                                                                                                              }
                                                                                                             );
                                                                                                             return;
                                                                                                           } else {
@@ -4011,12 +4228,16 @@ export function createReplacementStudioWorkspace({
                                                                                                             ) {
                                                                                                               const characterId4 =
                                                                                                                   characterId(
-                                                                                                                    projectId.dataset.storyCardAppearanceId ||
-                                                                                                                      initialProject2.workspace.selectedCharacterId,
+                                                                                                                    projectId
+                                                                                                                      .dataset
+                                                                                                                      .storyCardAppearanceId ||
+                                                                                                                      initialProject2
+                                                                                                                        .workspace
+                                                                                                                        .selectedCharacterId
                                                                                                                   ),
                                                                                                                 appearanceId3 =
                                                                                                                   handler13(
-                                                                                                                    characterId4,
+                                                                                                                    characterId4
                                                                                                                   );
                                                                                                               runIntent(
                                                                                                                 downloadImageIntent.GENERATE_CHARACTER_IMAGE,
@@ -4029,16 +4250,26 @@ export function createReplacementStudioWorkspace({
                                                                                                                     appearanceId3?.prompt ||
                                                                                                                     characterId4?.description,
                                                                                                                   promptPresetId:
-                                                                                                                    initialProject2.workspace.assetPromptPresetId,
+                                                                                                                    initialProject2
+                                                                                                                      .workspace
+                                                                                                                      .assetPromptPresetId,
                                                                                                                   modelId:
-                                                                                                                    initialProject2.settings.characterImageModelId,
+                                                                                                                    initialProject2
+                                                                                                                      .settings
+                                                                                                                      .characterImageModelId,
                                                                                                                   provider:
-                                                                                                                    initialProject2.settings.characterImageProvider,
+                                                                                                                    initialProject2
+                                                                                                                      .settings
+                                                                                                                      .characterImageProvider,
                                                                                                                   providerProfileId:
-                                                                                                                    initialProject2.settings.characterImageProviderProfileId,
+                                                                                                                    initialProject2
+                                                                                                                      .settings
+                                                                                                                      .characterImageProviderProfileId,
                                                                                                                   generationParams:
-                                                                                                                    initialProject2.settings.characterImageGenerationParams,
-                                                                                                                },
+                                                                                                                    initialProject2
+                                                                                                                      .settings
+                                                                                                                      .characterImageGenerationParams,
+                                                                                                                }
                                                                                                               );
                                                                                                             } else {
                                                                                                               if (
@@ -4048,14 +4279,18 @@ export function createReplacementStudioWorkspace({
                                                                                                                   2,
                                                                                                                   3,
                                                                                                                 ].includes(
-                                                                                                                  initialProject2.workspace.step,
+                                                                                                                  initialProject2
+                                                                                                                    .workspace
+                                                                                                                    .step
                                                                                                                 )
                                                                                                               )
                                                                                                                 runShotBatch(
-                                                                                                                  initialProject2.workspace.step ===
+                                                                                                                  initialProject2
+                                                                                                                    .workspace
+                                                                                                                    .step ===
                                                                                                                     3
                                                                                                                     ? 'video'
-                                                                                                                    : 'image',
+                                                                                                                    : 'image'
                                                                                                                 );
                                                                                                               else {
                                                                                                                 if (
@@ -4067,7 +4302,9 @@ export function createReplacementStudioWorkspace({
                                                                                                                   archived ===
                                                                                                                     'play-character-voice' &&
                                                                                                                     void playPreview(
-                                                                                                                      projectId.dataset.storyVoiceAssetId,
+                                                                                                                      projectId
+                                                                                                                        .dataset
+                                                                                                                        .storyVoiceAssetId
                                                                                                                     );
                                                                                                               }
                                                                                                             }
@@ -4128,15 +4365,21 @@ export function createReplacementStudioWorkspace({
       return (hide(), updateProject(enabled49.project, enabled49.reason), true);
     },
     handler101 = (value299, reason5 = 'scene-reference-change') =>
-      handler100(applyPersonReplacementShotSceneReference(initialProject2, value299, { reason: reason5 })),
+      handler100(
+        applyPersonReplacementShotSceneReference(initialProject2, value299, { reason: reason5 })
+      ),
     handler102 = (value300, reason6 = 'person-mapping-clear') =>
-      handler100(clearPersonReplacementShotPersonMappings(initialProject2, value300, { reason: reason6 })),
+      handler100(
+        clearPersonReplacementShotPersonMappings(initialProject2, value300, { reason: reason6 })
+      ),
     handler103 = (value301) =>
       handler100(assignPersonReplacementShotPersonMapping(initialProject2, value301)),
     handler88 = ({ restoreFocus: restoreFocus = false } = {}) => {
       const el97 = value66?.focusTarget;
       ((value66 = null),
-        floatingMenuHost?.querySelector?.('[data-person-replacement-mapping-scope-menu]')?.remove?.());
+        floatingMenuHost
+          ?.querySelector?.('[data-person-replacement-mapping-scope-menu]')
+          ?.remove?.());
       if (restoreFocus) el97?.focus?.();
     },
     handler104 = ({
@@ -4157,7 +4400,7 @@ export function createReplacementStudioWorkspace({
             personLabel: personLabel,
             targetName: targetName,
             appearanceName: appearanceName,
-          }),
+          })
         ));
       const el98 = floatingMenuHost.querySelector?.('[data-person-replacement-mapping-scope-menu]');
       if (!el98) return ((value66 = null), false);
@@ -4179,7 +4422,7 @@ export function createReplacementStudioWorkspace({
           el98.style?.setProperty?.('--person-replacement-mapping-scope-top', value307 + 'px'));
       }
       return (
-        el98.querySelector?.('[data-person-replacement-mapping-scope=\'current\']')?.focus?.(),
+        el98.querySelector?.("[data-person-replacement-mapping-scope='current']")?.focus?.(),
         true
       );
     },
@@ -4243,11 +4486,11 @@ export function createReplacementStudioWorkspace({
             workspace: {
               ...initialProject2.workspace,
               assetPromptPresetId: normalizePersonReplacementAssetPromptPresetId(
-                el101.dataset.storyAssetPresetOption,
+                el101.dataset.storyAssetPresetOption
               ),
             },
           },
-          'asset-prompt-preset',
+          'asset-prompt-preset'
         );
         return;
       }
@@ -4255,7 +4498,9 @@ export function createReplacementStudioWorkspace({
       if (el102 && floatingMenuHost.contains(el102)) {
         const text23 = normalizeText(el102.dataset.refRemoveAction);
         if (
-          ['clear-person-replacement-target', 'clear-person-replacement-scene-reference'].includes(text23)
+          ['clear-person-replacement-target', 'clear-person-replacement-scene-reference'].includes(
+            text23
+          )
         ) {
           shiftKey.preventDefault?.();
           let shotId3 = null;
@@ -4274,7 +4519,7 @@ export function createReplacementStudioWorkspace({
         }
       }
       const el103 = shiftKey.target?.closest?.(
-        '[data-person-replacement-video-reference-inputs] .ref-thumb-delete',
+        '[data-person-replacement-video-reference-inputs] .ref-thumb-delete'
       );
       if (el103 && floatingMenuHost.contains(el103)) {
         const slotId = el103.closest?.('[data-slot]');
@@ -4289,12 +4534,12 @@ export function createReplacementStudioWorkspace({
               modelId: initialProject2.settings.replacementModelId,
             },
             {},
-            { applyCallbackResult: false },
+            { applyCallbackResult: false }
           ));
         return;
       }
       const slotId2 = shiftKey.target?.closest?.(
-        '[data-person-replacement-video-reference-inputs] .ref-upload-slot[data-slot]',
+        '[data-person-replacement-video-reference-inputs] .ref-upload-slot[data-slot]'
       );
       if (slotId2 && floatingMenuHost.contains(slotId2)) {
         const kind2 = normalizeText(slotId2.dataset.kind);
@@ -4305,7 +4550,7 @@ export function createReplacementStudioWorkspace({
           modelId: initialProject2.settings.replacementModelId,
         };
         const el104 = floatingMenuHost.querySelector?.(
-          '[data-person-replacement-input=\'replacement-video-slot\']',
+          "[data-person-replacement-input='replacement-video-slot']"
         );
         el104 && ((el104.accept = kind2 === 'image' ? 'image/*' : 'video/*'), el104.click?.());
         return;
@@ -4335,7 +4580,7 @@ export function createReplacementStudioWorkspace({
                   selectedShotIds: shotSelectionMode.selectedIds,
                 },
               },
-              'shot-selection',
+              'shot-selection'
             ),
             !shiftKey.shiftKey && !shiftKey.ctrlKey && !shiftKey.metaKey && handler51(itemId));
         } else {
@@ -4345,8 +4590,11 @@ export function createReplacementStudioWorkspace({
           ) {
             if (initialProject2.workspace.selectedSceneId === itemId) return;
             updateProject(
-              { ...initialProject2, workspace: { ...initialProject2.workspace, selectedSceneId: itemId } },
-              'replacement-scene-asset-select',
+              {
+                ...initialProject2,
+                workspace: { ...initialProject2.workspace, selectedSceneId: itemId },
+              },
+              'replacement-scene-asset-select'
             );
           } else {
             if (
@@ -4359,7 +4607,7 @@ export function createReplacementStudioWorkspace({
                   ...initialProject2,
                   workspace: { ...initialProject2.workspace, selectedCharacterId: itemId },
                 },
-                'replacement-target-asset-select',
+                'replacement-target-asset-select'
               );
             } else {
               if (initialProject2.workspace.characterAssetTab === 'audio') {
@@ -4368,7 +4616,7 @@ export function createReplacementStudioWorkspace({
                   itemId: itemId,
                   activeItemId: initialProject2.workspace.selectedAudioAssetId,
                   orderedIds: getPersonReplacementSelectableAssets(initialProject2, 'audio').map(
-                    (value314) => value314.id,
+                    (value314) => value314.id
                   ),
                   shiftKey: shiftKey.shiftKey,
                   toggleKey: shiftKey.ctrlKey || shiftKey.metaKey,
@@ -4383,7 +4631,7 @@ export function createReplacementStudioWorkspace({
                       selectedAssetIds: assetSelectionMode.selectedIds,
                     },
                   },
-                  'audio-library-asset-select',
+                  'audio-library-asset-select'
                 );
               } else {
                 if (initialProject2.workspace.characterAssetTab === 'scene') {
@@ -4392,7 +4640,7 @@ export function createReplacementStudioWorkspace({
                     itemId: itemId,
                     activeItemId: initialProject2.workspace.selectedSceneId,
                     orderedIds: getPersonReplacementSelectableAssets(initialProject2, 'scene').map(
-                      (value315) => value315.id,
+                      (value315) => value315.id
                     ),
                     toggleKey: shiftKey.ctrlKey || shiftKey.metaKey,
                     selectionMode: initialProject2.workspace.assetSelectionMode,
@@ -4412,12 +4660,12 @@ export function createReplacementStudioWorkspace({
                           : { selectedSceneId: itemId }),
                       },
                     },
-                    'scene-asset-select',
+                    'scene-asset-select'
                   );
                 } else {
                   if (initialProject2.workspace.characterAssetTab === 'library') {
                     const value316 = initialProject2.libraryAssets.find(
-                        (value317) => value317.id === itemId,
+                        (value317) => value317.id === itemId
                       ),
                       assetSelectionMode3 = resolveWorkspaceCardMultiSelection({
                         selectedIds: initialProject2.workspace.selectedAssetIds,
@@ -4425,7 +4673,7 @@ export function createReplacementStudioWorkspace({
                         activeItemId: initialProject2.workspace.selectedLibraryAssetId,
                         orderedIds: getWorkspaceAssetLibrarySelectionOrder(
                           getPersonReplacementSelectableAssets(initialProject2, 'library'),
-                          assetLibraryDisclosure,
+                          assetLibraryDisclosure
                         ),
                         toggleKey: shiftKey.ctrlKey || shiftKey.metaKey,
                         selectionMode: initialProject2.workspace.assetSelectionMode,
@@ -4434,7 +4682,7 @@ export function createReplacementStudioWorkspace({
                           (normalizeText(value316?.mediaKind).toLowerCase() === 'image' &&
                             normalizeText(value316?.sourceUrl || value316?.imageUrl)) ||
                           (normalizeText(value316?.mediaKind).toLowerCase() === 'audio' &&
-                            getPersonReplacementLibraryAudioRef(value316)),
+                            getPersonReplacementLibraryAudioRef(value316))
                         ),
                       });
                     updateProject(
@@ -4451,16 +4699,17 @@ export function createReplacementStudioWorkspace({
                             : {}),
                         },
                       },
-                      'library-asset-select',
+                      'library-asset-select'
                     );
                   } else {
                     const assetSelectionMode4 = resolveWorkspaceCardMultiSelection({
                       selectedIds: initialProject2.workspace.selectedAssetIds,
                       itemId: itemId,
                       activeItemId: initialProject2.workspace.selectedCharacterId,
-                      orderedIds: getPersonReplacementSelectableAssets(initialProject2, 'character').map(
-                        (value318) => value318.id,
-                      ),
+                      orderedIds: getPersonReplacementSelectableAssets(
+                        initialProject2,
+                        'character'
+                      ).map((value318) => value318.id),
                       toggleKey: shiftKey.ctrlKey || shiftKey.metaKey,
                       selectionMode: initialProject2.workspace.assetSelectionMode,
                       shiftKey: shiftKey.shiftKey === true,
@@ -4479,7 +4728,7 @@ export function createReplacementStudioWorkspace({
                             : { selectedCharacterId: itemId }),
                         },
                       },
-                      'asset-select',
+                      'asset-select'
                     );
                   }
                 }
@@ -4514,16 +4763,16 @@ export function createReplacementStudioWorkspace({
           ...initialProject2,
           workspace: { ...initialProject2.workspace, openProjectMenuId: '' },
         })),
-        floatingMenuHost?.querySelectorAll?.('.story-project-card.is-menu-open')?.forEach?.(
-          (el108) => {
+        floatingMenuHost
+          ?.querySelectorAll?.('.story-project-card.is-menu-open')
+          ?.forEach?.((el108) => {
             el108.classList?.remove?.('is-menu-open');
             const el109 = el108.querySelector?.("[data-story-action='toggle-project-menu']"),
               el110 = el108.querySelector?.('[data-story-project-menu]');
             (el109?.setAttribute?.('aria-expanded', 'false'),
               el110?.setAttribute?.('aria-hidden', 'true'));
             if (el110) el110.hidden = true;
-          },
-        ));
+          }));
       if (shiftKey.target?.closest?.('[data-person-replacement-cut-boundary-index]')) return;
       const sourceId = shiftKey.target?.closest?.('[data-person-replacement-action]');
       if (!sourceId || !floatingMenuHost.contains(sourceId)) return;
@@ -4531,14 +4780,16 @@ export function createReplacementStudioWorkspace({
       if (mode2 === 'confirm-person-mapping-scope') {
         const args25 = value66?.mapping,
           scope2 =
-            normalizeText(sourceId.dataset.personReplacementMappingScope).toLowerCase() === 'current'
+            normalizeText(sourceId.dataset.personReplacementMappingScope).toLowerCase() ===
+            'current'
               ? 'current'
               : 'all';
         (handler88(), args25 && handler103({ ...args25, scope: scope2 }));
       } else {
         if (mode2 === 'close') value93.close();
         else {
-          if (mode2 === 'back-home') runIntent(downloadImageIntent.BACK_HOME, cloneJson(initialProject2));
+          if (mode2 === 'back-home')
+            runIntent(downloadImageIntent.BACK_HOME, cloneJson(initialProject2));
           else {
             if (mode2 === 'open-project')
               runIntent(downloadImageIntent.OPEN_PROJECT, sourceId.dataset.projectId);
@@ -4557,12 +4808,14 @@ export function createReplacementStudioWorkspace({
                           : PERSON_REPLACEMENT_VIDEO_INPUT_MODE_FIRST_FRAME;
                       if (inputMode === initialProject2.settings.replacementVideoInputMode) return;
                       const value319 = documentObject?.activeElement === sourceId,
-                        replacementVideoGenerationParams2 = resolvePersonReplacementVideoParameterPolicy({
-                          modelId: initialProject2.settings.replacementModelId,
-                          inputMode: inputMode,
-                          generationParams: initialProject2.settings.replacementVideoGenerationParams,
-                          resetModeDefaults: true,
-                        });
+                        replacementVideoGenerationParams2 =
+                          resolvePersonReplacementVideoParameterPolicy({
+                            modelId: initialProject2.settings.replacementModelId,
+                            inputMode: inputMode,
+                            generationParams:
+                              initialProject2.settings.replacementVideoGenerationParams,
+                            resetModeDefaults: true,
+                          });
                       updateProject(
                         {
                           ...initialProject2,
@@ -4573,12 +4826,12 @@ export function createReplacementStudioWorkspace({
                               replacementVideoGenerationParams2.generationParams,
                           },
                         },
-                        'video-input-mode',
+                        'video-input-mode'
                       );
                       if (value319)
-                        floatingMenuHost.querySelector(
-                          '[data-person-replacement-action="set-video-input-mode"]',
-                        )?.focus?.({ preventScroll: true });
+                        floatingMenuHost
+                          .querySelector('[data-person-replacement-action="set-video-input-mode"]')
+                          ?.focus?.({ preventScroll: true });
                     } else {
                       if (mode2 === 'select-voice-source') selectSource(sourceId.dataset.sourceId);
                       else {
@@ -4587,7 +4840,7 @@ export function createReplacementStudioWorkspace({
                             downloadImageIntent.EXTRACT_VOICE,
                             sourceId.dataset.sourceId,
                             {},
-                            { applyCallbackResult: false },
+                            { applyCallbackResult: false }
                           );
                         else {
                           if (mode2 === 'cancel-voice-separation')
@@ -4595,16 +4848,16 @@ export function createReplacementStudioWorkspace({
                               downloadImageIntent.CANCEL_VOICE_EXTRACTION,
                               sourceId.dataset.sourceId,
                               {},
-                              { applyCallbackResult: false },
+                              { applyCallbackResult: false }
                             );
                           else {
                             if (mode2 === 'select-voice-asset')
                               selectVoiceAsset(sourceId.dataset.characterId);
                             else {
                               if (mode2 === 'choose-source-videos')
-                                floatingMenuHost.querySelector(
-                                  "[data-person-replacement-input='source-videos']",
-                                )?.click?.();
+                                floatingMenuHost
+                                  .querySelector("[data-person-replacement-input='source-videos']")
+                                  ?.click?.();
                               else {
                                 if (mode2 === 'remove-source')
                                   runIntent(downloadImageIntent.REMOVE_SOURCE, {
@@ -4612,22 +4865,29 @@ export function createReplacementStudioWorkspace({
                                   });
                                 else {
                                   if (mode2 === 'choose-new-character-images')
-                                    floatingMenuHost.querySelector(
-                                      "[data-person-replacement-input='new-character-images']",
-                                    )?.click?.();
+                                    floatingMenuHost
+                                      .querySelector(
+                                        "[data-person-replacement-input='new-character-images']"
+                                      )
+                                      ?.click?.();
                                   else {
                                     if (mode2 === 'choose-new-scene-images')
-                                      floatingMenuHost.querySelector(
-                                        "[data-person-replacement-input='new-scene-images']",
-                                      )?.click?.();
+                                      floatingMenuHost
+                                        .querySelector(
+                                          "[data-person-replacement-input='new-scene-images']"
+                                        )
+                                        ?.click?.();
                                     else {
                                       if (mode2 === 'choose-new-audio-files')
-                                        floatingMenuHost.querySelector(
-                                          "[data-person-replacement-input='new-audio-files']",
-                                        )?.click?.();
+                                        floatingMenuHost
+                                          .querySelector(
+                                            "[data-person-replacement-input='new-audio-files']"
+                                          )
+                                          ?.click?.();
                                       else {
                                         if (mode2 === 'cancel-character-voice-library') {
-                                          const selectedCharacterId2 = voiceLibraryTargetCharacterId;
+                                          const selectedCharacterId2 =
+                                            voiceLibraryTargetCharacterId;
                                           ((voiceLibraryTargetCharacterId = ''),
                                             updateProject(
                                               {
@@ -4642,7 +4902,7 @@ export function createReplacementStudioWorkspace({
                                                   selectedAssetIds: [],
                                                 },
                                               },
-                                              'character-voice-library-cancel',
+                                              'character-voice-library-cancel'
                                             ));
                                         } else {
                                           if (
@@ -4653,7 +4913,7 @@ export function createReplacementStudioWorkspace({
                                             ].includes(mode2)
                                           ) {
                                             const el111 = sourceId.closest(
-                                                '[data-workspace-audio-asset-id]',
+                                                '[data-workspace-audio-asset-id]'
                                               ),
                                               audioAssetId = el111?.dataset.workspaceAudioAssetId,
                                               enabled50 = [
@@ -4670,11 +4930,11 @@ export function createReplacementStudioWorkspace({
                                                 });
                                               else {
                                                 const characterId5 = el111.querySelector(
-                                                  '[data-person-replacement-audio-character]',
+                                                  '[data-person-replacement-audio-character]'
                                                 )?.value;
                                                 if (
                                                   initialProject2.characters.some(
-                                                    (value321) => value321.id === characterId5,
+                                                    (value321) => value321.id === characterId5
                                                   )
                                                 )
                                                   runIntent(
@@ -4682,22 +4942,26 @@ export function createReplacementStudioWorkspace({
                                                     {
                                                       characterId: characterId5,
                                                       asset: cloneJson(enabled50),
-                                                    },
+                                                    }
                                                   );
                                               }
                                             }
                                           } else {
                                             if (mode2 === 'confirm-character-voice-library') {
-                                              const selectedCharacterId3 = voiceLibraryTargetCharacterId,
+                                              const selectedCharacterId3 =
+                                                  voiceLibraryTargetCharacterId,
                                                 text24 = normalizeText(
-                                                  sourceId.dataset.personReplacementAudioAssetId,
+                                                  sourceId.dataset.personReplacementAudioAssetId
                                                 ),
                                                 value322 = initialProject2.audioAssets.find(
                                                   (value323) =>
                                                     value323.id ===
                                                       (text24 ||
-                                                        initialProject2.workspace.selectedAudioAssetId) &&
-                                                    normalizeText(value323?.mediaKind).toLowerCase() === 'audio',
+                                                        initialProject2.workspace
+                                                          .selectedAudioAssetId) &&
+                                                    normalizeText(
+                                                      value323?.mediaKind
+                                                    ).toLowerCase() === 'audio'
                                                 );
                                               if (
                                                 !selectedCharacterId3 ||
@@ -4705,7 +4969,7 @@ export function createReplacementStudioWorkspace({
                                               ) {
                                                 windowObject?.showToast?.(
                                                   '请选择要添加的人设声音。',
-                                                  'warn',
+                                                  'warn'
                                                 );
                                                 return;
                                               }
@@ -4723,7 +4987,7 @@ export function createReplacementStudioWorkspace({
                                                           selectedAssetIds: [],
                                                         },
                                                       },
-                                                      'character-voice-library-confirm',
+                                                      'character-voice-library-confirm'
                                                     ));
                                                 },
                                                 promise4 = runIntent(
@@ -4731,16 +4995,17 @@ export function createReplacementStudioWorkspace({
                                                   {
                                                     characterId: selectedCharacterId3,
                                                     asset: cloneJson(value322),
-                                                  },
+                                                  }
                                                 );
                                               if (promise4?.then) void promise4.then(run12);
                                               else run12(promise4);
                                             } else {
                                               if (mode2 === 'toggle-library-add-targets') {
                                                 const el112 = sourceId.closest?.(
-                                                    '.person-replacement-library-add-menu-wrap',
+                                                    '.person-replacement-library-add-menu-wrap'
                                                   ),
-                                                  value324 = !el112?.classList?.contains?.('is-open');
+                                                  value324 =
+                                                    !el112?.classList?.contains?.('is-open');
                                                 (handler36(el112), handler35(el112, value324));
                                               } else {
                                                 if (
@@ -4748,30 +5013,35 @@ export function createReplacementStudioWorkspace({
                                                   mode2 === 'add-library-assets-to-characters'
                                                 ) {
                                                   const text25 = normalizeText(
-                                                      sourceId.dataset.personReplacementLibraryTargetKind,
+                                                      sourceId.dataset
+                                                        .personReplacementLibraryTargetKind
                                                     ),
                                                     value325 =
                                                       mode2 === 'add-library-assets-to-characters'
                                                         ? 'character'
-                                                        : ['character', 'scene', 'audio'].includes(text25)
+                                                        : ['character', 'scene', 'audio'].includes(
+                                                              text25
+                                                            )
                                                           ? text25
                                                           : 'character';
                                                   handler35(
                                                     sourceId.closest?.(
-                                                      '.person-replacement-library-add-menu-wrap',
+                                                      '.person-replacement-library-add-menu-wrap'
                                                     ),
-                                                    false,
+                                                    false
                                                   );
-                                                  const value326 = initialProject2.workspace.assetSelectionMode
+                                                  const value326 = initialProject2.workspace
+                                                    .assetSelectionMode
                                                     ? initialProject2.workspace.selectedAssetIds
                                                     : [
-                                                        initialProject2.workspace.selectedLibraryAssetId,
+                                                        initialProject2.workspace
+                                                          .selectedLibraryAssetId,
                                                       ];
                                                   handler105(value326, value325);
                                                 } else {
                                                   if (mode2 === 'select-character-asset-tab') {
                                                     const text26 = normalizeText(
-                                                        sourceId.dataset.assetTab,
+                                                        sourceId.dataset.assetTab
                                                       ),
                                                       characterAssetTab = [
                                                         'character',
@@ -4787,14 +5057,17 @@ export function createReplacementStudioWorkspace({
                                                           : initialProject2,
                                                       list15 =
                                                         characterAssetTab === 'audio'
-                                                          ? getPersonReplacementProjectAudioAssets(args26)
+                                                          ? getPersonReplacementProjectAudioAssets(
+                                                              args26
+                                                            )
                                                           : [],
                                                       selectedAudioAssetId2 =
                                                         characterAssetTab === 'audio'
                                                           ? list15.some(
                                                               (value327) =>
                                                                 value327.id ===
-                                                                args26.workspace.selectedAudioAssetId,
+                                                                args26.workspace
+                                                                  .selectedAudioAssetId
                                                             )
                                                             ? args26.workspace.selectedAudioAssetId
                                                             : list15[0]?.id || ''
@@ -4807,19 +5080,21 @@ export function createReplacementStudioWorkspace({
                                                         workspace: {
                                                           ...args26.workspace,
                                                           characterAssetTab: characterAssetTab,
-                                                          selectedAudioAssetId: selectedAudioAssetId2,
+                                                          selectedAudioAssetId:
+                                                            selectedAudioAssetId2,
                                                           assetSelectionMode: false,
                                                           selectedAssetIds: [],
                                                         },
                                                       },
-                                                      'character-asset-tab',
+                                                      'character-asset-tab'
                                                     );
                                                   } else {
                                                     if (mode2 === 'toggle-smart-clip-settings')
                                                       handler12({
                                                         workspace: {
                                                           smartClipSettingsOpen:
-                                                            !initialProject2.workspace.smartClipSettingsOpen,
+                                                            !initialProject2.workspace
+                                                              .smartClipSettingsOpen,
                                                         },
                                                       });
                                                     else {
@@ -4831,7 +5106,7 @@ export function createReplacementStudioWorkspace({
                                                                 sourceId.dataset.smartClipMode,
                                                             },
                                                           },
-                                                          { notify: true },
+                                                          { notify: true }
                                                         );
                                                       else {
                                                         if (mode2 === 'set-smart-clip-fps')
@@ -4839,19 +5114,20 @@ export function createReplacementStudioWorkspace({
                                                             {
                                                               settings: {
                                                                 smartClipFps: Number(
-                                                                  sourceId.dataset.smartClipFps,
+                                                                  sourceId.dataset.smartClipFps
                                                                 ),
                                                               },
                                                             },
-                                                            { notify: true },
+                                                            { notify: true }
                                                           );
                                                         else {
                                                           if (mode2 === 'process-sources')
                                                             runIntent(
                                                               downloadImageIntent.PROCESS_SOURCES,
                                                               {
-                                                                mode: sourceId.dataset.processingMode,
-                                                              },
+                                                                mode: sourceId.dataset
+                                                                  .processingMode,
+                                                              }
                                                             );
                                                           else {
                                                             if (
@@ -4866,21 +5142,27 @@ export function createReplacementStudioWorkspace({
                                                                   animate: false,
                                                                   renderWorkspace: false,
                                                                 }),
-                                                                  handler51(sourceId.dataset.shotId));
+                                                                  handler51(
+                                                                    sourceId.dataset.shotId
+                                                                  ));
                                                               else {
-                                                                if (mode2 === 'select-composite-full-video')
+                                                                if (
+                                                                  mode2 ===
+                                                                  'select-composite-full-video'
+                                                                )
                                                                   buildPersonReplacementCompositePreviewSnapshot(
-                                                                    initialProject2,
+                                                                    initialProject2
                                                                   ).fullAvailable &&
                                                                     updateProject(
                                                                       {
                                                                         ...initialProject2,
                                                                         workspace: {
                                                                           ...initialProject2.workspace,
-                                                                          compositePreviewMode: 'full',
+                                                                          compositePreviewMode:
+                                                                            'full',
                                                                         },
                                                                       },
-                                                                      'composite-full-video-select',
+                                                                      'composite-full-video-select'
                                                                     );
                                                                 else {
                                                                   if (
@@ -4888,10 +5170,12 @@ export function createReplacementStudioWorkspace({
                                                                     'toggle-source-identity-selection'
                                                                   ) {
                                                                     const text27 = normalizeText(
-                                                                        sourceId.dataset.sourceCharacterId,
+                                                                        sourceId.dataset
+                                                                          .sourceCharacterId
                                                                       ),
                                                                       map5 = new Set(
-                                                                        initialProject2.workspace.selectedIdentityIds,
+                                                                        initialProject2.workspace
+                                                                          .selectedIdentityIds
                                                                       );
                                                                     if (map5.has(text27))
                                                                       map5.delete(text27);
@@ -4901,81 +5185,108 @@ export function createReplacementStudioWorkspace({
                                                                         ...initialProject2,
                                                                         workspace: {
                                                                           ...initialProject2.workspace,
-                                                                          selectedIdentityIds: [...map5],
+                                                                          selectedIdentityIds: [
+                                                                            ...map5,
+                                                                          ],
                                                                         },
                                                                       },
-                                                                      'identity-selection',
+                                                                      'identity-selection'
                                                                     );
                                                                   } else {
-                                                                    if (mode2 === 'merge-source-identities')
+                                                                    if (
+                                                                      mode2 ===
+                                                                      'merge-source-identities'
+                                                                    )
                                                                       runIntent(
                                                                         downloadImageIntent.MERGE_SOURCE_IDENTITIES,
                                                                         {
                                                                           sourceCharacterIds:
-                                                                            initialProject2.workspace.selectedIdentityIds,
-                                                                        },
+                                                                            initialProject2
+                                                                              .workspace
+                                                                              .selectedIdentityIds,
+                                                                        }
                                                                       );
                                                                     else {
                                                                       if (
-                                                                        mode2 === 'toggle-detection-picker'
+                                                                        mode2 ===
+                                                                        'toggle-detection-picker'
                                                                       ) {
-                                                                        const el113 = sourceId.closest?.(
-                                                                            '[data-person-replacement-detection-picker]',
-                                                                          ),
+                                                                        const el113 =
+                                                                            sourceId.closest?.(
+                                                                              '[data-person-replacement-detection-picker]'
+                                                                            ),
                                                                           value328 =
-                                                                            !el113?.classList?.contains?.('is-open');
+                                                                            !el113?.classList?.contains?.(
+                                                                              'is-open'
+                                                                            );
                                                                         (handler90(el113),
-                                                                          handler96(el113, value328));
+                                                                          handler96(
+                                                                            el113,
+                                                                            value328
+                                                                          ));
                                                                       } else {
                                                                         if (
                                                                           mode2 ===
                                                                           'select-detection-picker-option'
                                                                         ) {
-                                                                          const el114 = sourceId.closest?.(
-                                                                              '[data-person-replacement-detection-picker]',
-                                                                            ),
+                                                                          const el114 =
+                                                                              sourceId.closest?.(
+                                                                                '[data-person-replacement-detection-picker]'
+                                                                              ),
                                                                             text28 = normalizeText(
-                                                                              el114?.dataset?.personReplacementDetectionPicker,
+                                                                              el114?.dataset
+                                                                                ?.personReplacementDetectionPicker
                                                                             ),
-                                                                            orientation3 = normalizeText(
-                                                                              sourceId.dataset.personReplacementDetectionPickerOption,
-                                                                            ),
+                                                                            orientation3 =
+                                                                              normalizeText(
+                                                                                sourceId.dataset
+                                                                                  .personReplacementDetectionPickerOption
+                                                                              ),
                                                                             label4 = normalizeText(
                                                                               sourceId.querySelector?.(
-                                                                                'span',
+                                                                                'span'
                                                                               )?.textContent,
-                                                                              orientation3,
+                                                                              orientation3
                                                                             ),
                                                                             sourceCharacterId4 =
                                                                               normalizeText(
-                                                                                sourceId.dataset.personReplacementSourceCharacterId,
+                                                                                sourceId.dataset
+                                                                                  .personReplacementSourceCharacterId
                                                                               ),
-                                                                            el115 = el114?.querySelector?.(
-                                                                              '[data-person-replacement-detection-picker-trigger]',
-                                                                            ),
-                                                                            el116 = el115?.querySelector?.(
-                                                                              '[data-person-replacement-detection-picker-value]',
-                                                                            ),
+                                                                            el115 =
+                                                                              el114?.querySelector?.(
+                                                                                '[data-person-replacement-detection-picker-trigger]'
+                                                                              ),
+                                                                            el116 =
+                                                                              el115?.querySelector?.(
+                                                                                '[data-person-replacement-detection-picker-value]'
+                                                                              ),
                                                                             enabled52 =
                                                                               text28 === 'label' &&
                                                                               orientation3 ===
                                                                                 PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE;
                                                                           enabled52 &&
                                                                             el115 &&
-                                                                            ((el114.dataset.personReplacementPreviousValue = normalizeText(
-                                                                              el115.value,
-                                                                            )),
-                                                                            (el114.dataset.personReplacementPreviousLabel = normalizeText(
-                                                                              el116?.textContent,
-                                                                            )),
-                                                                            (el114.dataset.personReplacementPreviousSourceCharacterId = normalizeText(
-                                                                              el115.dataset?.personReplacementSelectedSourceCharacterId,
-                                                                            )));
+                                                                            ((el114.dataset.personReplacementPreviousValue =
+                                                                              normalizeText(
+                                                                                el115.value
+                                                                              )),
+                                                                            (el114.dataset.personReplacementPreviousLabel =
+                                                                              normalizeText(
+                                                                                el116?.textContent
+                                                                              )),
+                                                                            (el114.dataset.personReplacementPreviousSourceCharacterId =
+                                                                              normalizeText(
+                                                                                el115.dataset
+                                                                                  ?.personReplacementSelectedSourceCharacterId
+                                                                              )));
                                                                           el115 &&
-                                                                            ((el115.value = orientation3),
+                                                                            ((el115.value =
+                                                                              orientation3),
                                                                             text28 === 'label' &&
                                                                               !enabled52 &&
-                                                                              (el115.dataset.personReplacementSelectedSourceCharacterId = sourceCharacterId4),
+                                                                              (el115.dataset.personReplacementSelectedSourceCharacterId =
+                                                                                sourceCharacterId4),
                                                                             el115.setAttribute(
                                                                               'aria-label',
                                                                               (text28 === 'label'
@@ -4984,81 +5295,104 @@ export function createReplacementStudioWorkspace({
                                                                                   ? '替换范围'
                                                                                   : '人物朝向') +
                                                                                 '：' +
-                                                                                label4,
+                                                                                label4
                                                                             ));
                                                                           if (el116)
-                                                                            el116.textContent = label4;
-                                                                          el114?.querySelectorAll?.(
-                                                                            '[data-person-replacement-detection-picker-option]',
-                                                                          )?.forEach?.((el117) => {
-                                                                            const value329 =
-                                                                              el117 === sourceId;
-                                                                            (el117.classList?.toggle?.(
-                                                                              'is-selected',
-                                                                              value329,
-                                                                            ),
-                                                                              el117.setAttribute?.(
-                                                                                'aria-selected',
-                                                                                String(value329),
-                                                                              ));
-                                                                          });
-                                                                          if (text28 === 'label') {
-                                                                            const el118 = el114?.querySelector?.(
-                                                                                '[data-person-replacement-person-custom-label]',
+                                                                            el116.textContent =
+                                                                              label4;
+                                                                          el114
+                                                                            ?.querySelectorAll?.(
+                                                                              '[data-person-replacement-detection-picker-option]'
+                                                                            )
+                                                                            ?.forEach?.((el117) => {
+                                                                              const value329 =
+                                                                                el117 === sourceId;
+                                                                              (el117.classList?.toggle?.(
+                                                                                'is-selected',
+                                                                                value329
                                                                               ),
+                                                                                el117.setAttribute?.(
+                                                                                  'aria-selected',
+                                                                                  String(value329)
+                                                                                ));
+                                                                            });
+                                                                          if (text28 === 'label') {
+                                                                            const el118 =
+                                                                                el114?.querySelector?.(
+                                                                                  '[data-person-replacement-person-custom-label]'
+                                                                                ),
                                                                               enabled53 =
                                                                                 orientation3 ===
                                                                                 PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE;
                                                                             if (el115)
-                                                                              el115.hidden = enabled53;
+                                                                              el115.hidden =
+                                                                                enabled53;
                                                                             el118 &&
-                                                                              ((el118.hidden = !enabled53),
+                                                                              ((el118.hidden =
+                                                                                !enabled53),
                                                                               enabled53 &&
                                                                                 ((el118.value = ''),
                                                                                 el118.focus?.()));
                                                                           }
                                                                           handler96(el114, false);
-                                                                          const detectionBox3 = el114?.closest?.(
-                                                                            '.person-replacement-detection-box',
-                                                                          );
-                                                                          if (text28 === 'orientation') {
-                                                                            const label5 = detectionBox3?.querySelector?.(
-                                                                              '[data-person-replacement-person-label]',
+                                                                          const detectionBox3 =
+                                                                            el114?.closest?.(
+                                                                              '.person-replacement-detection-box'
                                                                             );
+                                                                          if (
+                                                                            text28 === 'orientation'
+                                                                          ) {
+                                                                            const label5 =
+                                                                              detectionBox3?.querySelector?.(
+                                                                                '[data-person-replacement-person-label]'
+                                                                              );
                                                                             handler39({
-                                                                              detectionBox: detectionBox3,
-                                                                              label: label5?.querySelector?.(
-                                                                                '[data-person-replacement-detection-picker-value]',
-                                                                              )?.textContent,
+                                                                              detectionBox:
+                                                                                detectionBox3,
+                                                                              label:
+                                                                                label5?.querySelector?.(
+                                                                                  '[data-person-replacement-detection-picker-value]'
+                                                                                )?.textContent,
                                                                               sourceCharacterId:
-                                                                                label5?.dataset?.personReplacementSelectedSourceCharacterId,
-                                                                              orientation: orientation3,
+                                                                                label5?.dataset
+                                                                                  ?.personReplacementSelectedSourceCharacterId,
+                                                                              orientation:
+                                                                                orientation3,
                                                                             });
                                                                           } else {
                                                                             if (text28 === 'scope')
                                                                               runIntent(
                                                                                 downloadImageIntent.UPDATE_PEOPLE,
                                                                                 {
-                                                                                  shotId: normalizeText(
-                                                                                    detectionBox3?.dataset?.shotId ||
-                                                                                      initialProject2.workspace.selectedShotId,
-                                                                                  ),
+                                                                                  shotId:
+                                                                                    normalizeText(
+                                                                                      detectionBox3
+                                                                                        ?.dataset
+                                                                                        ?.shotId ||
+                                                                                        initialProject2
+                                                                                          .workspace
+                                                                                          .selectedShotId
+                                                                                    ),
                                                                                   updates: [
                                                                                     {
-                                                                                      personId: normalizeText(
-                                                                                        detectionBox3?.dataset?.personId,
-                                                                                      ),
+                                                                                      personId:
+                                                                                        normalizeText(
+                                                                                          detectionBox3
+                                                                                            ?.dataset
+                                                                                            ?.personId
+                                                                                        ),
                                                                                       replacementScope:
                                                                                         orientation3,
                                                                                     },
                                                                                   ],
-                                                                                },
+                                                                                }
                                                                               );
                                                                             else
                                                                               orientation3 !==
                                                                                 PERSON_REPLACEMENT_CUSTOM_LABEL_VALUE &&
                                                                                 handler39({
-                                                                                  detectionBox: detectionBox3,
+                                                                                  detectionBox:
+                                                                                    detectionBox3,
                                                                                   label: label4,
                                                                                   sourceCharacterId:
                                                                                     sourceCharacterId4,
@@ -5069,18 +5403,22 @@ export function createReplacementStudioWorkspace({
                                                                             mode2 ===
                                                                             'delete-detection-custom-label'
                                                                           ) {
-                                                                            const text29 = normalizeText(
-                                                                              sourceId.dataset.personReplacementCustomLabel,
-                                                                            );
+                                                                            const text29 =
+                                                                              normalizeText(
+                                                                                sourceId.dataset
+                                                                                  .personReplacementCustomLabel
+                                                                              );
                                                                             if (
                                                                               !text29 ||
                                                                               isGeneratedPersonReplacementLabel(
-                                                                                text29,
+                                                                                text29
                                                                               )
                                                                             )
                                                                               return;
                                                                             const args27 = new Set(
-                                                                              initialProject2.workspace.removedCustomPersonLabels,
+                                                                              initialProject2
+                                                                                .workspace
+                                                                                .removedCustomPersonLabels
                                                                             );
                                                                             (args27.add(text29),
                                                                               updateProject(
@@ -5092,30 +5430,40 @@ export function createReplacementStudioWorkspace({
                                                                                       [...args27],
                                                                                   },
                                                                                 },
-                                                                                'person-custom-label-delete',
+                                                                                'person-custom-label-delete'
                                                                               ));
                                                                           } else {
                                                                             if (
-                                                                              mode2 === 'clear-person-mapping'
+                                                                              mode2 ===
+                                                                              'clear-person-mapping'
                                                                             )
                                                                               handler102({
                                                                                 shotId:
-                                                                                  sourceId.dataset.shotId,
+                                                                                  sourceId.dataset
+                                                                                    .shotId,
                                                                                 personId:
-                                                                                  sourceId.dataset.personId,
+                                                                                  sourceId.dataset
+                                                                                    .personId,
                                                                               });
                                                                             else {
-                                                                              if (mode2 === 'delete-person')
+                                                                              if (
+                                                                                mode2 ===
+                                                                                'delete-person'
+                                                                              )
                                                                                 (clearKeyboardSelection(),
                                                                                   handler44(
                                                                                     downloadImageIntent.DELETE_PEOPLE,
                                                                                     {
                                                                                       shotId:
-                                                                                        sourceId.dataset.shotId,
+                                                                                        sourceId
+                                                                                          .dataset
+                                                                                          .shotId,
                                                                                       personIds: [
-                                                                                        sourceId.dataset.personId,
+                                                                                        sourceId
+                                                                                          .dataset
+                                                                                          .personId,
                                                                                       ],
-                                                                                    },
+                                                                                    }
                                                                                   ));
                                                                               else {
                                                                                 if (
@@ -5124,35 +5472,50 @@ export function createReplacementStudioWorkspace({
                                                                                 ) {
                                                                                   const shotId4 =
                                                                                       normalizeText(
-                                                                                        sourceId.dataset.shotId ||
-                                                                                          initialProject2.workspace.selectedShotId,
+                                                                                        sourceId
+                                                                                          .dataset
+                                                                                          .shotId ||
+                                                                                          initialProject2
+                                                                                            .workspace
+                                                                                            .selectedShotId
                                                                                       ),
                                                                                     value330 =
                                                                                       initialProject2.shots.find(
-                                                                                        (value331) =>
+                                                                                        (
+                                                                                          value331
+                                                                                        ) =>
                                                                                           value331.id ===
-                                                                                          shotId4,
+                                                                                          shotId4
                                                                                       ),
                                                                                     personIds =
                                                                                       getPersonReplacementBoxedPeople(
-                                                                                        value330,
+                                                                                        value330
                                                                                       )
-                                                                                        .map((value332) =>
-                                                                                          normalizeText(
-                                                                                            value332.id,
-                                                                                          ),
+                                                                                        .map(
+                                                                                          (
+                                                                                            value332
+                                                                                          ) =>
+                                                                                            normalizeText(
+                                                                                              value332.id
+                                                                                            )
                                                                                         )
-                                                                                        .filter(Boolean);
-                                                                                  if (!personIds.length)
+                                                                                        .filter(
+                                                                                          Boolean
+                                                                                        );
+                                                                                  if (
+                                                                                    !personIds.length
+                                                                                  )
                                                                                     return;
                                                                                   (clearKeyboardSelection(),
                                                                                     clearBatchSelection(),
                                                                                     handler44(
                                                                                       downloadImageIntent.DELETE_PEOPLE,
                                                                                       {
-                                                                                        shotId: shotId4,
-                                                                                        personIds: personIds,
-                                                                                      },
+                                                                                        shotId:
+                                                                                          shotId4,
+                                                                                        personIds:
+                                                                                          personIds,
+                                                                                      }
                                                                                     ));
                                                                                 } else {
                                                                                   if (
@@ -5166,23 +5529,26 @@ export function createReplacementStudioWorkspace({
                                                                                         initialProject2,
                                                                                         mode2,
                                                                                         sourceId,
-                                                                                        getShotRenderState().generatingShotIds,
+                                                                                        getShotRenderState()
+                                                                                          .generatingShotIds
                                                                                       );
-                                                                                    if (!args28) return;
+                                                                                    if (!args28)
+                                                                                      return;
                                                                                     ((initialProject2 =
                                                                                       normalizePersonReplacementWorkspaceProject(
                                                                                         {
                                                                                           ...initialProject2,
                                                                                           ...args28.patch,
-                                                                                        },
+                                                                                        }
                                                                                       )),
                                                                                       syncPersonReplacementPromptModeControl(
                                                                                         floatingMenuHost,
                                                                                         initialProject2,
-                                                                                        getShotRenderState().generatingShotIds,
+                                                                                        getShotRenderState()
+                                                                                          .generatingShotIds
                                                                                       ),
                                                                                       handler21(
-                                                                                        args28.reason,
+                                                                                        args28.reason
                                                                                       ));
                                                                                     if (
                                                                                       mode2 ===
@@ -5191,7 +5557,7 @@ export function createReplacementStudioWorkspace({
                                                                                       syncPersonReplacementImagePromptGate(
                                                                                         floatingMenuHost,
                                                                                         initialProject2,
-                                                                                        handler22(),
+                                                                                        handler22()
                                                                                       );
                                                                                   } else {
                                                                                     if (
@@ -5199,7 +5565,9 @@ export function createReplacementStudioWorkspace({
                                                                                       'generate-replacement-image'
                                                                                     ) {
                                                                                       if (
-                                                                                        initialProject2.workspace.shotSelectionMode
+                                                                                        initialProject2
+                                                                                          .workspace
+                                                                                          .shotSelectionMode
                                                                                       ) {
                                                                                         if (
                                                                                           isShotBatchForCurrentProject()
@@ -5207,44 +5575,60 @@ export function createReplacementStudioWorkspace({
                                                                                           cancelShotBatch();
                                                                                           return;
                                                                                         }
-                                                                                        runShotBatch('image');
+                                                                                        runShotBatch(
+                                                                                          'image'
+                                                                                        );
                                                                                         return;
                                                                                       }
                                                                                       const enabled54 =
-                                                                                          personReplacementImagePresentation.build(initialProject2),
+                                                                                          personReplacementImagePresentation.build(
+                                                                                            initialProject2
+                                                                                          ),
                                                                                         value333 =
                                                                                           enabled54.selectedShot,
                                                                                         list16 =
-                                                                                          enabled54.gate.duplicateRoleLabels;
+                                                                                          enabled54
+                                                                                            .gate
+                                                                                            .duplicateRoleLabels;
                                                                                       if (
-                                                                                        !enabled54.gate.sceneOnly &&
+                                                                                        !enabled54
+                                                                                          .gate
+                                                                                          .sceneOnly &&
                                                                                         list16.length
                                                                                       ) {
                                                                                         windowObject?.showToast?.(
                                                                                           '同一镜头内角色不能重复：' +
                                                                                             list16.join(
-                                                                                              '、',
+                                                                                              '、'
                                                                                             ) +
                                                                                             '。请修改红色框中的角色名。',
-                                                                                          'warn',
+                                                                                          'warn'
                                                                                         );
                                                                                         return;
                                                                                       }
                                                                                       if (
-                                                                                        !enabled54.gate.sceneOnly &&
-                                                                                        enabled54.gate.unresolvedOrientationPersonIds.length
+                                                                                        !enabled54
+                                                                                          .gate
+                                                                                          .sceneOnly &&
+                                                                                        enabled54
+                                                                                          .gate
+                                                                                          .unresolvedOrientationPersonIds
+                                                                                          .length
                                                                                       ) {
                                                                                         windowObject?.showToast?.(
                                                                                           '还有 ' +
-                                                                                            enabled54.gate.unresolvedOrientationPersonIds.length +
+                                                                                            enabled54
+                                                                                              .gate
+                                                                                              .unresolvedOrientationPersonIds
+                                                                                              .length +
                                                                                             ' 个人物未确认朝向，请先选择朝向。',
-                                                                                          'warn',
+                                                                                          'warn'
                                                                                         );
                                                                                         return;
                                                                                       }
                                                                                       const value334 =
                                                                                         floatingMenuHost?.querySelector?.(
-                                                                                          '[data-person-replacement-keyframe-stage] > img',
+                                                                                          '[data-person-replacement-keyframe-stage] > img'
                                                                                         );
                                                                                       runIntent(
                                                                                         downloadImageIntent.GENERATE_REPLACEMENT_IMAGE,
@@ -5252,18 +5636,19 @@ export function createReplacementStudioWorkspace({
                                                                                           projectId:
                                                                                             initialProject2.id,
                                                                                           shotId:
-                                                                                            initialProject2.workspace.selectedShotId,
+                                                                                            initialProject2
+                                                                                              .workspace
+                                                                                              .selectedShotId,
                                                                                           sourceImageSize:
                                                                                             resolvePersonReplacementSourceImageSize(
                                                                                               value334,
-                                                                                              value333,
+                                                                                              value333
                                                                                             ),
                                                                                         },
                                                                                         {},
                                                                                         {
-                                                                                          applyCallbackResult:
-                                                                                            false,
-                                                                                        },
+                                                                                          applyCallbackResult: false,
+                                                                                        }
                                                                                       );
                                                                                     } else {
                                                                                       if (
@@ -5271,7 +5656,9 @@ export function createReplacementStudioWorkspace({
                                                                                         'generate-replacement-video'
                                                                                       ) {
                                                                                         if (
-                                                                                          initialProject2.workspace.shotSelectionMode
+                                                                                          initialProject2
+                                                                                            .workspace
+                                                                                            .shotSelectionMode
                                                                                         ) {
                                                                                           if (
                                                                                             isShotBatchForCurrentProject()
@@ -5280,20 +5667,22 @@ export function createReplacementStudioWorkspace({
                                                                                             return;
                                                                                           }
                                                                                           runShotBatch(
-                                                                                            'video',
+                                                                                            'video'
                                                                                           );
                                                                                           return;
                                                                                         }
                                                                                         const shotId5 =
-                                                                                            initialProject2.workspace.selectedShotId,
+                                                                                            initialProject2
+                                                                                              .workspace
+                                                                                              .selectedShotId,
                                                                                           personReplacementVideoGenerationState =
                                                                                             resolvePersonReplacementVideoGenerationState(
                                                                                               initialProject2.workspace,
-                                                                                              shotId5,
+                                                                                              shotId5
                                                                                             );
                                                                                         if (
                                                                                           isPersonReplacementVideoGenerationActive(
-                                                                                            personReplacementVideoGenerationState,
+                                                                                            personReplacementVideoGenerationState
                                                                                           )
                                                                                         ) {
                                                                                           runIntent(
@@ -5301,13 +5690,13 @@ export function createReplacementStudioWorkspace({
                                                                                             {
                                                                                               projectId:
                                                                                                 initialProject2.id,
-                                                                                              shotId: shotId5,
+                                                                                              shotId:
+                                                                                                shotId5,
                                                                                             },
                                                                                             {},
                                                                                             {
-                                                                                              applyCallbackResult:
-                                                                                                false,
-                                                                                            },
+                                                                                              applyCallbackResult: false,
+                                                                                            }
                                                                                           );
                                                                                           return;
                                                                                         }
@@ -5316,13 +5705,13 @@ export function createReplacementStudioWorkspace({
                                                                                           {
                                                                                             projectId:
                                                                                               initialProject2.id,
-                                                                                            shotId: shotId5,
+                                                                                            shotId:
+                                                                                              shotId5,
                                                                                           },
                                                                                           {},
                                                                                           {
-                                                                                            applyCallbackResult:
-                                                                                              false,
-                                                                                          },
+                                                                                            applyCallbackResult: false,
+                                                                                          }
                                                                                         );
                                                                                       } else {
                                                                                         if (
@@ -5330,7 +5719,9 @@ export function createReplacementStudioWorkspace({
                                                                                           'trim-current-video'
                                                                                         )
                                                                                           handler41(
-                                                                                            sourceId.dataset.shotId,
+                                                                                            sourceId
+                                                                                              .dataset
+                                                                                              .shotId
                                                                                           );
                                                                                         else {
                                                                                           if (
@@ -5350,7 +5741,9 @@ export function createReplacementStudioWorkspace({
                                                                                                 'set-preview-track'
                                                                                               )
                                                                                                 handler40(
-                                                                                                  sourceId.dataset.previewTrack,
+                                                                                                  sourceId
+                                                                                                    .dataset
+                                                                                                    .previewTrack
                                                                                                 );
                                                                                               else {
                                                                                                 if (
@@ -5360,13 +5753,12 @@ export function createReplacementStudioWorkspace({
                                                                                                   runIntent(
                                                                                                     downloadImageIntent.COMPOSE_OUTPUT,
                                                                                                     cloneJson(
-                                                                                                      initialProject2,
+                                                                                                      initialProject2
                                                                                                     ),
                                                                                                     {},
                                                                                                     {
-                                                                                                      applyCallbackResult:
-                                                                                                        false,
-                                                                                                    },
+                                                                                                      applyCallbackResult: false,
+                                                                                                    }
                                                                                                   );
                                                                                                 else {
                                                                                                   if (
@@ -5374,7 +5766,7 @@ export function createReplacementStudioWorkspace({
                                                                                                     'toggle-output-menu'
                                                                                                   )
                                                                                                     handler16(
-                                                                                                      sourceId,
+                                                                                                      sourceId
                                                                                                     );
                                                                                                   else {
                                                                                                     if (
@@ -5389,14 +5781,13 @@ export function createReplacementStudioWorkspace({
                                                                                                               PERSON_REPLACEMENT_CANVAS_SCOPES.CLIPS,
                                                                                                             project:
                                                                                                               cloneJson(
-                                                                                                                initialProject2,
+                                                                                                                initialProject2
                                                                                                               ),
                                                                                                           },
                                                                                                           {},
                                                                                                           {
-                                                                                                            applyCallbackResult:
-                                                                                                              false,
-                                                                                                          },
+                                                                                                            applyCallbackResult: false,
+                                                                                                          }
                                                                                                         ));
                                                                                                     else {
                                                                                                       if (
@@ -5411,14 +5802,13 @@ export function createReplacementStudioWorkspace({
                                                                                                                 PERSON_REPLACEMENT_CANVAS_SCOPES.PROJECT,
                                                                                                               project:
                                                                                                                 cloneJson(
-                                                                                                                  initialProject2,
+                                                                                                                  initialProject2
                                                                                                                 ),
                                                                                                             },
                                                                                                             {},
                                                                                                             {
-                                                                                                              applyCallbackResult:
-                                                                                                                false,
-                                                                                                            },
+                                                                                                              applyCallbackResult: false,
+                                                                                                            }
                                                                                                           ));
                                                                                                       else
                                                                                                         Object.hasOwn(
@@ -5428,25 +5818,25 @@ export function createReplacementStudioWorkspace({
                                                                                                             'export-premiere-xml': 1,
                                                                                                             'export-jianying-draft': 1,
                                                                                                           },
-                                                                                                          mode2,
+                                                                                                          mode2
                                                                                                         ) &&
                                                                                                           (handler15(),
                                                                                                           runIntent(
                                                                                                             downloadImageIntent.EXPORT_OUTPUT,
                                                                                                             {
                                                                                                               mode: mode2.slice(
-                                                                                                                'export-'.length,
+                                                                                                                'export-'
+                                                                                                                  .length
                                                                                                               ),
                                                                                                               project:
                                                                                                                 cloneJson(
-                                                                                                                  initialProject2,
+                                                                                                                  initialProject2
                                                                                                                 ),
                                                                                                             },
                                                                                                             {},
                                                                                                             {
-                                                                                                              applyCallbackResult:
-                                                                                                                false,
-                                                                                                            },
+                                                                                                              applyCallbackResult: false,
+                                                                                                            }
                                                                                                           ));
                                                                                                     }
                                                                                                   }
@@ -5531,7 +5921,7 @@ export function createReplacementStudioWorkspace({
           libraryProjects: initialProject2.libraryProjects.map((args29) =>
             normalizeText(args29?.id) === text30
               ? { ...args29, title: projectSearchQuery.target.value }
-              : args29,
+              : args29
           ),
         });
         return;
@@ -5552,10 +5942,10 @@ export function createReplacementStudioWorkspace({
                           ...args30,
                           prompt: readPersonReplacementAssetPromptText(projectSearchQuery.target),
                         }
-                      : args30,
+                      : args30
                   ),
                 }
-              : appearances2,
+              : appearances2
           ),
         })),
           handler21('appearance-prompt'));
@@ -5570,7 +5960,7 @@ export function createReplacementStudioWorkspace({
         ((initialProject2 = normalizePersonReplacementWorkspaceProject({
           ...initialProject2,
           shots: initialProject2.shots.map((args31) =>
-            args31.id === value336 ? { ...args31, imagePrompt: imagePrompt } : args31,
+            args31.id === value336 ? { ...args31, imagePrompt: imagePrompt } : args31
           ),
         })),
           handler21('image-prompt'));
@@ -5583,18 +5973,29 @@ export function createReplacementStudioWorkspace({
             nodeType: 'ai-video',
             nodeId: '',
             onPromptCommit: () => handler30(projectSearchQuery.target, 'video-prompt'),
-            onGenerate: (value337, value338) => handler31(projectSearchQuery.target, value337, value338),
+            onGenerate: (value337, value338) =>
+              handler31(projectSearchQuery.target, value337, value338),
           }),
         handler30(projectSearchQuery.target));
     },
     value339 = (selectedVoiceSourceId) => {
+      // 模式下拉是自定义 select：workspaceSelects 在 change 里分发事件，
+      // 不在这里转给点击处理器，下拉选完就什么都不会发生。
+      if (
+        selectedVoiceSourceId.target.matches?.(
+          '[data-person-replacement-action="toggle-prompt-mode"]'
+        )
+      ) {
+        value308(selectedVoiceSourceId);
+        return;
+      }
       if (selectedVoiceSourceId.target.matches?.('[data-person-replacement-audio-character]')) {
         const el120 = selectedVoiceSourceId.target
           .closest('[data-workspace-audio-asset-id]')
           ?.querySelector('[data-person-replacement-action="bind-project-audio"]');
         if (el120)
           el120.disabled = !initialProject2.characters.some(
-            (value340) => value340.id === selectedVoiceSourceId.target.value,
+            (value340) => value340.id === selectedVoiceSourceId.target.value
           );
         return;
       }
@@ -5610,20 +6011,33 @@ export function createReplacementStudioWorkspace({
             if (value341 === 'new-scene-images') {
               const list19 = list17.filter(isPersonReplacementImageFile);
               list19.length &&
-                handler33('scene', () => runIntent(downloadImageIntent.SELECT_NEW_SCENE_IMAGES, list19));
+                handler33('scene', () =>
+                  runIntent(downloadImageIntent.SELECT_NEW_SCENE_IMAGES, list19)
+                );
             } else {
               if (value341 === 'new-audio-files') {
                 const list20 = list17.filter(isPersonReplacementAudioFile);
                 list20.length &&
-                  handler33('audio', () => runIntent(downloadImageIntent.SELECT_NEW_AUDIO_FILES, list20));
+                  handler33('audio', () =>
+                    runIntent(downloadImageIntent.SELECT_NEW_AUDIO_FILES, list20)
+                  );
               } else {
                 if (value341 === 'appearance-image' && list17[0])
-                  runIntent(downloadImageIntent.SELECT_CHARACTER_REFERENCE, list17[0], value45 || {});
+                  runIntent(
+                    downloadImageIntent.SELECT_CHARACTER_REFERENCE,
+                    list17[0],
+                    value45 || {}
+                  );
                 else {
                   if (value341 === 'replacement-image' && list17[0])
-                    runIntent(downloadImageIntent.SELECT_REPLACEMENT_IMAGE, list17[0], value45 || {}, {
-                      applyCallbackResult: false,
-                    });
+                    runIntent(
+                      downloadImageIntent.SELECT_REPLACEMENT_IMAGE,
+                      list17[0],
+                      value45 || {},
+                      {
+                        applyCallbackResult: false,
+                      }
+                    );
                   else {
                     if (value341 === 'replacement-video-result' && list17[0]) {
                       const value342 = value46,
@@ -5636,9 +6050,9 @@ export function createReplacementStudioWorkspace({
                             value343,
                             {
                               applyCallbackResult: false,
-                            },
-                          ),
-                        ),
+                            }
+                          )
+                        )
                       ).catch(() => {});
                     } else {
                       if (value341 === 'replacement-video-slot' && list17[0])
@@ -5646,14 +6060,14 @@ export function createReplacementStudioWorkspace({
                           downloadImageIntent.SELECT_REPLACEMENT_VIDEO_INPUT,
                           list17[0],
                           value45 || {},
-                          { applyCallbackResult: false },
+                          { applyCallbackResult: false }
                         );
                       else {
                         if (value341 === 'character-voice' && list17[0])
                           runIntent(
                             downloadImageIntent.SELECT_CHARACTER_VOICE,
                             list17[0],
-                            value45 || {},
+                            value45 || {}
                           );
                       }
                     }
@@ -5673,7 +6087,9 @@ export function createReplacementStudioWorkspace({
           runIntent(downloadImageIntent.RENAME_PROJECT, { projectId: projectId2, title: title }));
       } else {
         if (
-          selectedVoiceSourceId.target?.matches?.('[data-person-replacement-composite-project-title]')
+          selectedVoiceSourceId.target?.matches?.(
+            '[data-person-replacement-composite-project-title]'
+          )
         ) {
           const title2 = normalizeText(selectedVoiceSourceId.target.value) || '未命名人物替换项目';
           ((selectedVoiceSourceId.target.value = title2),
@@ -5703,7 +6119,7 @@ export function createReplacementStudioWorkspace({
                       selectedVoiceSourceId: selectedVoiceSourceId.target.value,
                     },
                   },
-                  'voice-source',
+                  'voice-source'
                 );
           }
         }
@@ -5715,7 +6131,9 @@ export function createReplacementStudioWorkspace({
       if (value345) handler89(value345);
       const enabled57 = event9.target?.closest?.('[data-person-replacement-detection-picker]');
       enabled57 && !enabled57.contains?.(event9.relatedTarget) && handler96(enabled57, false);
-      const value346 = event9.target?.closest?.('[data-story-asset-name-id][contenteditable="true"]');
+      const value346 = event9.target?.closest?.(
+        '[data-story-asset-name-id][contenteditable="true"]'
+      );
       if (value346) handler49(value346);
     },
     value347 = (event10) => {
@@ -5730,18 +6148,18 @@ export function createReplacementStudioWorkspace({
         ((event10.dataTransfer.effectAllowed = 'copy'),
           event10.dataTransfer.setData(
             PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE,
-            JSON.stringify({ characterId: characterId6 }),
+            JSON.stringify({ characterId: characterId6 })
           ),
           applyWorkspaceAssetNativeDragPreview(
             event10.dataTransfer,
-            el121.querySelector?.('.person-replacement-voice-asset-image img') || el121,
+            el121.querySelector?.('.person-replacement-voice-asset-image img') || el121
           ),
           el121.classList?.add?.('is-voice-asset-dragging'),
           floatingMenuHost?.classList?.add?.('is-voice-asset-dragging'));
         return;
       }
       const el122 = event10.target?.closest?.(
-        '[data-person-replacement-target-character-id], [data-person-replacement-target-scene-id]',
+        '[data-person-replacement-target-character-id], [data-person-replacement-target-scene-id]'
       );
       if (!el122 || !event10.dataTransfer) {
         event10.preventDefault?.();
@@ -5756,7 +6174,7 @@ export function createReplacementStudioWorkspace({
         appearanceId4 = normalizeText(
           sceneId2
             ? el122.dataset.personReplacementTargetSceneAppearanceId
-            : el122.dataset.personReplacementTargetAppearanceId,
+            : el122.dataset.personReplacementTargetAppearanceId
         );
       if ((!sceneId2 && !characterId7) || !appearanceId4) {
         event10.preventDefault?.();
@@ -5767,15 +6185,15 @@ export function createReplacementStudioWorkspace({
         sceneId2
           ? event10.dataTransfer.setData(
               PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE,
-              JSON.stringify({ sceneId: sceneId2, appearanceId: appearanceId4 }),
+              JSON.stringify({ sceneId: sceneId2, appearanceId: appearanceId4 })
             )
           : event10.dataTransfer.setData(
               'application/x-person-replacement-target',
-              JSON.stringify({ characterId: characterId7, appearanceId: appearanceId4 }),
+              JSON.stringify({ characterId: characterId7, appearanceId: appearanceId4 })
             ),
         applyWorkspaceAssetNativeDragPreview(
           event10.dataTransfer,
-          el122.querySelector?.('.story-asset-card-image') || el122,
+          el122.querySelector?.('.story-asset-card-image') || el122
         ),
         el122.classList?.add?.('is-story-asset-dragging'));
     },
@@ -5808,14 +6226,8 @@ export function createReplacementStudioWorkspace({
       const value353 = Number(event11?.clientX) || 0,
         value354 = Number(event11?.clientY) || 0,
         box7 = el126.getBoundingClientRect?.() || {},
-        value355 = Math.max(
-          1,
-          Number(box7.width) || Number.parseFloat(el126.style.width) || 1,
-        ),
-        value356 = Math.max(
-          1,
-          Number(box7.height) || Number.parseFloat(el126.style.height) || 1,
-        ),
+        value355 = Math.max(1, Number(box7.width) || Number.parseFloat(el126.style.width) || 1),
+        value356 = Math.max(1, Number(box7.height) || Number.parseFloat(el126.style.height) || 1),
         value357 = Number(windowObject?.innerWidth) || Number.POSITIVE_INFINITY,
         value358 = Number(windowObject?.innerHeight) || Number.POSITIVE_INFINITY,
         value359 = 8;
@@ -5835,7 +6247,7 @@ export function createReplacementStudioWorkspace({
     handler109 = (event12) => {
       const el127 = documentObject?.elementFromPoint?.(
           Number(event12?.clientX) || 0,
-          Number(event12?.clientY) || 0,
+          Number(event12?.clientY) || 0
         ),
         value362 = el127?.closest?.('[data-person-replacement-person-drop]');
       return value362 && floatingMenuHost?.contains?.(value362) ? value362 : null;
@@ -5843,7 +6255,7 @@ export function createReplacementStudioWorkspace({
     handler110 = (event13) => {
       const el128 = documentObject?.elementFromPoint?.(
           Number(event13?.clientX) || 0,
-          Number(event13?.clientY) || 0,
+          Number(event13?.clientY) || 0
         ),
         value363 = el128?.closest?.('[data-person-replacement-keyframe-stage]');
       return value363 && floatingMenuHost?.contains?.(value363) ? value363 : null;
@@ -5873,20 +6285,20 @@ export function createReplacementStudioWorkspace({
           targetAppearanceId: target2.appearanceId,
         },
         value365 = initialProject2.shots.find(
-          (value366) => value366.id === normalizeText(mapping2.shotId),
+          (value366) => value366.id === normalizeText(mapping2.shotId)
         ),
         enabled58 = value365?.people?.find(
-          (value367) => value367.id === normalizeText(mapping2.personId),
+          (value367) => value367.id === normalizeText(mapping2.personId)
         );
       if (!enabled58) return false;
       const text32 = normalizeText(enabled58.sourceCharacterId),
         value368 = initialProject2.mappings.find(
-          (value369) => normalizeText(value369.sourceCharacterId) === text32,
+          (value369) => normalizeText(value369.sourceCharacterId) === text32
         )?.targetCharacterId,
         value370 = Boolean(normalizeText(enabled58.targetCharacterId) || normalizeText(value368));
       if (value370) {
         const error7 = initialProject2.characters.find(
-            (value371) => value371.id === normalizeText(target2.characterId),
+            (value371) => value371.id === normalizeText(target2.characterId)
           ),
           error8 = getCharacterAppearance(error7, normalizeText(target2.appearanceId));
         handler104({
@@ -5923,7 +6335,7 @@ export function createReplacementStudioWorkspace({
     },
     handler114 = (pointerId) => {
       const element = pointerId.target?.closest?.(
-        '[data-person-replacement-target-character-id], [data-person-replacement-target-scene-id]',
+        '[data-person-replacement-target-character-id], [data-person-replacement-target-scene-id]'
       );
       if (
         !element ||
@@ -5937,7 +6349,7 @@ export function createReplacementStudioWorkspace({
         appearanceId5 = normalizeText(
           kind3
             ? element.dataset?.personReplacementTargetSceneAppearanceId
-            : element.dataset?.personReplacementTargetAppearanceId,
+            : element.dataset?.personReplacementTargetAppearanceId
         );
       if ((!kind3 && !characterId8) || !appearanceId5) return false;
       return (
@@ -5992,7 +6404,10 @@ export function createReplacementStudioWorkspace({
             ? handler109(clientX4)
             : null,
         enabled59 = characterId9.active,
-        target3 = { characterId: characterId9.characterId, appearanceId: characterId9.appearanceId };
+        target3 = {
+          characterId: characterId9.characterId,
+          appearanceId: characterId9.appearanceId,
+        };
       (handler113(),
         handler111(null),
         (enabled2 = false),
@@ -6022,8 +6437,10 @@ export function createReplacementStudioWorkspace({
     },
     value374 = (event17) => {
       if (
-        promptEnhancementModel(downloadImageIntent.HAS_PROJECT_PACKAGE_DRAG, event17.dataTransfer) ===
-        true
+        promptEnhancementModel(
+          downloadImageIntent.HAS_PROJECT_PACKAGE_DRAG,
+          event17.dataTransfer
+        ) === true
       ) {
         (event17.preventDefault?.(), event17.stopPropagation?.());
         if (event17.dataTransfer) event17.dataTransfer.dropEffect = 'copy';
@@ -6076,15 +6493,15 @@ export function createReplacementStudioWorkspace({
       ((enabled2 = false),
         handler113(),
         handler111(null),
-        floatingMenuHost?.querySelectorAll?.(
-          '.person-replacement-target-asset.is-story-asset-dragging',
-        )?.forEach?.((el129) => el129.classList?.remove?.('is-story-asset-dragging')));
+        floatingMenuHost
+          ?.querySelectorAll?.('.person-replacement-target-asset.is-story-asset-dragging')
+          ?.forEach?.((el129) => el129.classList?.remove?.('is-story-asset-dragging')));
     },
     handler119 = () => {
       (floatingMenuHost?.classList?.remove?.('is-voice-asset-dragging'),
-        floatingMenuHost?.querySelectorAll?.(
-          '.person-replacement-voice-asset-card.is-voice-asset-dragging',
-        )?.forEach?.((el130) => el130.classList?.remove?.('is-voice-asset-dragging')),
+        floatingMenuHost
+          ?.querySelectorAll?.('.person-replacement-voice-asset-card.is-voice-asset-dragging')
+          ?.forEach?.((el130) => el130.classList?.remove?.('is-voice-asset-dragging')),
         clearDropTarget(),
         resetDropEligibility());
     },
@@ -6099,7 +6516,8 @@ export function createReplacementStudioWorkspace({
       (clearDropTarget(), resetDropEligibility(), handler117(), handler111(null));
     },
     value382 = (clientX5) => {
-      if (promptEnhancementModel(downloadImageIntent.DROP_PROJECT_PACKAGE, clientX5) === true) return;
+      if (promptEnhancementModel(downloadImageIntent.DROP_PROJECT_PACKAGE, clientX5) === true)
+        return;
       const el131 = clientX5.target?.closest?.('[data-audio-voice-action="audio-param"]'),
         value383 = clientX5.dataTransfer?.getData?.(PERSON_REPLACEMENT_VOICE_ASSET_DRAG_TYPE),
         value384 = clientX5.dataTransfer?.getData?.(PERSON_REPLACEMENT_SCENE_ASSET_DRAG_TYPE),
@@ -6138,7 +6556,9 @@ export function createReplacementStudioWorkspace({
       }
       const personBox4 = clientX5.target?.closest?.('[data-person-replacement-person-drop]');
       if (personBox4) {
-        const enabled63 = clientX5.dataTransfer?.getData?.('application/x-person-replacement-target');
+        const enabled63 = clientX5.dataTransfer?.getData?.(
+          'application/x-person-replacement-target'
+        );
         if (!enabled63) return;
         (clientX5.stopPropagation?.(), clientX5.preventDefault());
         let target4;
@@ -6175,14 +6595,14 @@ export function createReplacementStudioWorkspace({
       el132 && floatingMenuHost.contains(el132) && bringBoxToFront(el132);
       if (
         event19.target?.closest?.(
-          '[data-person-replacement-result-history-toggle], [data-person-replacement-result-history-close]',
+          '[data-person-replacement-result-history-toggle], [data-person-replacement-result-history-close]'
         )
       )
         return;
       if (handler114(event19)) return;
       const value388 = event19.target?.closest?.('[data-story-marquee-surface="people"]'),
         enabled64 = event19.target?.closest?.(
-          '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action], [data-person-replacement-manual-resize]',
+          '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action], [data-person-replacement-manual-resize]'
         );
       if (
         run13(event19) &&
@@ -6201,7 +6621,7 @@ export function createReplacementStudioWorkspace({
       value389 && floatingMenuHost.contains(value389)
         ? selectBox(value389, {
             focus: !event19.target?.closest?.(
-              '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action]',
+              '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action]'
             ),
           })
         : clearKeyboardSelection();
@@ -6209,7 +6629,7 @@ export function createReplacementStudioWorkspace({
         value389 &&
         floatingMenuHost.contains(value389) &&
         !event19.target?.closest?.(
-          '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action]',
+          '.person-replacement-detection-label, .person-replacement-mapping-badge, [data-person-replacement-action]'
         ) &&
         beginBoxEdit(event19, value389)
       )
@@ -6229,7 +6649,7 @@ export function createReplacementStudioWorkspace({
       const value391 = event19.target?.closest?.('[data-person-replacement-layout-splitter]');
       if (value391 && begin(event19, value391)) return;
       const splitter = event19.target?.closest?.(
-        '[data-person-replacement-composite-sidebar-splitter]',
+        '[data-person-replacement-composite-sidebar-splitter]'
       );
       if (splitter) {
         const layout = splitter.closest?.('.person-replacement-preview-workbench');
@@ -6256,7 +6676,9 @@ export function createReplacementStudioWorkspace({
         if (!beginWorkspaceHorizontalResizeSession2) splitter.classList?.remove?.('is-active');
         if (beginWorkspaceHorizontalResizeSession2) return;
       }
-      const splitter2 = event19.target?.closest?.('[data-person-replacement-voice-layout-splitter]');
+      const splitter2 = event19.target?.closest?.(
+        '[data-person-replacement-voice-layout-splitter]'
+      );
       if (splitter2) {
         const layout2 = splitter2.closest?.('[data-person-replacement-voice-layout]'),
           text34 = normalizeText(splitter2.dataset?.personReplacementVoiceLayoutSplitter),
@@ -6273,7 +6695,7 @@ export function createReplacementStudioWorkspace({
             resizingClass: 'person-replacement-voice-layout-resizing',
             onRatio: (value396) => {
               const args32 = normalizePersonReplacementVoiceLayout(
-                  initialProject2.workspace.voiceLayout,
+                  initialProject2.workspace.voiceLayout
                 ),
                 personReplacementVoiceLayout = normalizePersonReplacementVoiceLayout({
                   ...args32,
@@ -6287,7 +6709,7 @@ export function createReplacementStudioWorkspace({
                 });
               initialProject2.workspace.voiceLayout = applyPersonReplacementVoiceLayoutToElement(
                 layout2,
-                personReplacementVoiceLayout,
+                personReplacementVoiceLayout
               );
             },
             onFinish: () => {
@@ -6313,7 +6735,7 @@ export function createReplacementStudioWorkspace({
             initialProject2.workspace.assetSplitRatio = applyWorkspaceAssetSplitRatioToLayout(
               layout3,
               splitter3,
-              value398,
+              value398
             );
           },
           onFinish: () => handler21('asset-split-ratio'),
@@ -6327,7 +6749,8 @@ export function createReplacementStudioWorkspace({
       (syncHoverPlayhead(value400), handlePointerMove(value400));
     },
     value401 = (value402) => {
-      (personReplacementExportSubmenuController.handlePointerOver(value402), handlePointerOver(value402));
+      (personReplacementExportSubmenuController.handlePointerOver(value402),
+        handlePointerOver(value402));
     },
     value403 = (value404) => {
       handler116(value404);
@@ -6438,7 +6861,7 @@ export function createReplacementStudioWorkspace({
         floatingMenuHost.addEventListener('change', value339),
         floatingMenuHost.addEventListener(
           'focusin',
-          personReplacementExportSubmenuController.handleFocusIn,
+          personReplacementExportSubmenuController.handleFocusIn
         ),
         floatingMenuHost.addEventListener('focusout', value344),
         floatingMenuHost.addEventListener('dragstart', value347),
@@ -6465,8 +6888,7 @@ export function createReplacementStudioWorkspace({
       const run14 = (event21) => {
         const el135 = event21.target?.closest?.('.person-replacement-production-page');
         if (!el135 || !floatingMenuHost.contains(el135)) return false;
-        const value423 =
-          el135.ownerDocument?.defaultView?.getComputedStyle?.(el135)?.overflowY;
+        const value423 = el135.ownerDocument?.defaultView?.getComputedStyle?.(el135)?.overflowY;
         if (!['auto', 'scroll', 'overlay'].includes(value423)) return false;
         const count8 = Number(event21.deltaY) || 0,
           value424 = Math.max(0, el135.scrollHeight - el135.clientHeight);
@@ -6516,7 +6938,7 @@ export function createReplacementStudioWorkspace({
           if (handler83(event22) || handler80(event22)) return;
           handler82(event22);
         },
-        { passive: false },
+        { passive: false }
       ),
         floatingMenuHost.addEventListener('keydown', value257, true),
         windowObject?.addEventListener?.('keydown', handler72, true),
@@ -6607,7 +7029,7 @@ export function createReplacementStudioWorkspace({
                         selectedShotIds: selectedShotIds2,
                       },
                     },
-                    'shot-marquee',
+                    'shot-marquee'
                   );
                 },
               };
@@ -6617,15 +7039,15 @@ export function createReplacementStudioWorkspace({
                 initialProject2.workspace.view === 'project' &&
                 initialProject2.workspace.step === 1 &&
                 ['character', 'scene', 'audio', 'library'].includes(
-                  initialProject2.workspace.characterAssetTab,
+                  initialProject2.workspace.characterAssetTab
                 ),
               selectedIds: initialProject2.workspace.selectedAssetIds,
               commit: (list23) => {
                 const map6 = new Set(
                     getPersonReplacementSelectableAssets(
                       initialProject2,
-                      initialProject2.workspace.characterAssetTab,
-                    ).map((value429) => value429.id),
+                      initialProject2.workspace.characterAssetTab
+                    ).map((value429) => value429.id)
                   ),
                   assetSelectionMode5 = list23.filter((value430) => map6.has(value430));
                 (updateProject(
@@ -6648,7 +7070,7 @@ export function createReplacementStudioWorkspace({
                         : {}),
                     },
                   },
-                  'asset-marquee',
+                  'asset-marquee'
                 ),
                   focusWorkspaceAssetCard(floatingMenuHost, assetSelectionMode5.at(-1)));
               },
@@ -6690,7 +7112,7 @@ export function createReplacementStudioWorkspace({
         value431 === 'none' && value69 === value433
           ? captureWorkspaceNestedScrollPositions(
               floatingMenuHost,
-              PERSON_REPLACEMENT_PERSISTENT_NESTED_SCROLL_SELECTORS,
+              PERSON_REPLACEMENT_PERSISTENT_NESTED_SCROLL_SELECTORS
             )
           : null;
     ((value67 = 'none'), (value68 = 'page'));
@@ -6698,7 +7120,9 @@ export function createReplacementStudioWorkspace({
     const focusKey = captureFocus2();
     (preserveBufferedVideo(), stop2({ renderPending: false }));
     const value435 = floatingMenuHost.querySelector?.('.person-replacement-project-body'),
-      el139 = ['forward', 'backward'].includes(value431) ? value435?.firstElementChild || null : null,
+      el139 = ['forward', 'backward'].includes(value431)
+        ? value435?.firstElementChild || null
+        : null,
       currentToolbar = el139 ? floatingMenuHost.querySelector?.('.story-workspace-toolbar') : null;
     (el139?.remove?.(), currentToolbar?.remove?.());
     const value436 =
@@ -6713,7 +7137,9 @@ export function createReplacementStudioWorkspace({
       handler58());
     const value437 = floatingMenuHost.querySelector?.('.person-replacement-project-body'),
       incomingPage = value437?.firstElementChild || null,
-      nextToolbar = currentToolbar ? floatingMenuHost.querySelector?.('.story-workspace-toolbar') : null;
+      nextToolbar = currentToolbar
+        ? floatingMenuHost.querySelector?.('.story-workspace-toolbar')
+        : null;
     if (currentToolbar && nextToolbar) nextToolbar.replaceWith?.(currentToolbar);
     const enabled69 = start(el139, incomingPage, value431, value432, {
       currentToolbar: currentToolbar,
@@ -6757,7 +7183,8 @@ export function createReplacementStudioWorkspace({
       let enabled70 = true;
       try {
         enabled70 =
-          promptEnhancementModel(downloadImageIntent.CAN_CLOSE, cloneJson(initialProject2)) !== false;
+          promptEnhancementModel(downloadImageIntent.CAN_CLOSE, cloneJson(initialProject2)) !==
+          false;
       } catch {
         enabled70 = true;
       }
@@ -6791,7 +7218,7 @@ export function createReplacementStudioWorkspace({
       initialProject2 = value440;
       voiceLibraryTargetCharacterId &&
         !initialProject2.characters.some(
-          (value441) => value441.id === voiceLibraryTargetCharacterId,
+          (value441) => value441.id === voiceLibraryTargetCharacterId
         ) &&
         (voiceLibraryTargetCharacterId = '');
       const value442 = session.syncProject(initialProject2);
@@ -6819,36 +7246,38 @@ export function createReplacementStudioWorkspace({
         personReplacementWorkspaceProject3.libraryProjects = value446.libraryProjects;
       const value447 = Boolean(
           floatingMenuHost &&
-          normalizeText(personReplacementWorkspaceProject3.id) === normalizeText(initialProject2.id) &&
+          normalizeText(personReplacementWorkspaceProject3.id) ===
+            normalizeText(initialProject2.id) &&
           personReplacementWorkspaceProject3.workspace?.view === 'project' &&
           personReplacementWorkspaceProject3.workspace?.step === 3 &&
           initialProject2.workspace?.view === 'project' &&
-          initialProject2.workspace?.step === 3,
+          initialProject2.workspace?.step === 3
         ),
         value448 = value447
           ? resolvePersonReplacementVideoGenerationUiRefreshScope(
               value446,
-              personReplacementWorkspaceProject3,
+              personReplacementWorkspaceProject3
             )
           : '',
         value449 = Boolean(
           floatingMenuHost &&
-          normalizeText(personReplacementWorkspaceProject3.id) === normalizeText(initialProject2.id) &&
+          normalizeText(personReplacementWorkspaceProject3.id) ===
+            normalizeText(initialProject2.id) &&
           personReplacementWorkspaceProject3.workspace?.view === 'project' &&
           personReplacementWorkspaceProject3.workspace?.step === 2 &&
           initialProject2.workspace?.view === 'project' &&
-          initialProject2.workspace?.step === 2,
+          initialProject2.workspace?.step === 2
         ),
         value450 = value449
           ? resolvePersonReplacementImageGenerationUiRefreshScope(
               value446,
-              personReplacementWorkspaceProject3,
+              personReplacementWorkspaceProject3
             )
           : '';
       normalizeText(personReplacementWorkspaceProject3.id) !== normalizeText(initialProject2.id) &&
         (handler4(),
         personReplacementCompositePreviewController.switchProject(
-          personReplacementWorkspaceProject3.id,
+          personReplacementWorkspaceProject3.id
         ));
       initialProject2 = personReplacementWorkspaceProject3;
       if (session.syncProject(initialProject2)) reset();
@@ -6867,7 +7296,7 @@ export function createReplacementStudioWorkspace({
         syncPersonReplacementPromptModeControl(
           floatingMenuHost,
           initialProject2,
-          getShotRenderState().generatingShotIds,
+          getShotRenderState().generatingShotIds
         ),
         personReplacementShellPresentation.syncStatus(floatingMenuHost, initialProject2),
         preparePreviewVideo(),
@@ -6895,7 +7324,7 @@ export function createReplacementStudioWorkspace({
         handler15());
       const value452 = floatingMenuHost?.querySelector?.('.person-replacement-toolbar-actions'),
         value453 = handler59(
-          personReplacementShellPresentation.renderToolbarActions(initialProject2, handler22()),
+          personReplacementShellPresentation.renderToolbarActions(initialProject2, handler22())
         );
       return (
         value452 &&
@@ -6911,7 +7340,7 @@ export function createReplacementStudioWorkspace({
       const value454 = composeOutputPending2;
       composeOutputPending2 = options7?.pending === true;
       const value455 = floatingMenuHost?.querySelector?.(
-          '[data-person-replacement-action="compose-output"]',
+          '[data-person-replacement-action="compose-output"]'
         ),
         value456 = handler59(renderCompositeComposeAction(initialProject2, handler22()));
       return (
@@ -6929,7 +7358,7 @@ export function createReplacementStudioWorkspace({
       ((exportOutputPending = options8?.pending === true), handler15());
       const value457 = floatingMenuHost?.querySelector?.('.person-replacement-toolbar-actions'),
         value458 = handler59(
-          personReplacementShellPresentation.renderToolbarActions(initialProject2, handler22()),
+          personReplacementShellPresentation.renderToolbarActions(initialProject2, handler22())
         );
       return (
         value457 &&
@@ -6976,7 +7405,11 @@ export function createReplacementStudioWorkspace({
         value50?.(),
         (value50 = null),
         typeof floatingMenuHost?.removeEventListener === 'function' &&
-          floatingMenuHost.removeEventListener('error', handleWorkspaceAssetLibraryImageError, true),
+          floatingMenuHost.removeEventListener(
+            'error',
+            handleWorkspaceAssetLibraryImageError,
+            true
+          ),
         bindWorkspaceEntityContextMenu2?.(),
         (bindWorkspaceEntityContextMenu2 = null),
         value65?.(),

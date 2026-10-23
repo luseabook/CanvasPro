@@ -10,6 +10,17 @@ import { isPersonReplacementGenerationTaskActive } from './personReplacementGene
 import { resolvePersonReplacementImageGenerationState } from './personReplacementImageGeneration.js';
 import { buildPersonReplacementPromptPackage } from './personReplacementPromptCompiler.js';
 import { syncPersonReplacementPromptReferenceInputs } from './personReplacementIdentityPresentation.js';
+import { bindWorkspaceSelects } from '../workspaceSelects.js';
+
+// 绑定过的 <select> 需要能被 sync 反查（值变了要重算 tooltip，而不是只改 value）。
+const modeBindings = new WeakMap();
+
+export const PERSON_REPLACEMENT_MANUAL_PROMPT_EXAMPLE =
+  '格式：把图片1中的【人物特征】的【男人】替换为图2的【人物特征】女人。\n例：把图片1中穿黑色外套的男人替换为图2中穿白色连衣裙的女人。';
+const MANUAL_MODE_EXAMPLE = '例子：把图片1中穿黑色外套的男人替换为图2中穿白色连衣裙的女人。',
+  MANUAL_MODE_FORMAT =
+    '通用格式：把图片1中【人物特征】的【原人物】替换为图片2中【人物特征】的【新人物】。';
+
 function selectedShot(value) {
   return (
     value.shots?.find((item) => item.id === value.workspace?.selectedShotId) ||
@@ -17,39 +28,48 @@ function selectedShot(value) {
     null
   );
 }
-function isPromptModeLocked(key, list = []) {
-  const edShot = selectedShot(key);
+function isPromptModeLocked(project, pendingShotIds = []) {
+  const shot = selectedShot(project);
   return (
-    !edShot ||
-    list.includes(edShot.id) ||
+    !shot ||
+    pendingShotIds.includes(shot.id) ||
     isPersonReplacementGenerationTaskActive(
-      resolvePersonReplacementImageGenerationState(key.workspace, edShot.id),
+      resolvePersonReplacementImageGenerationState(project.workspace, shot.id)
     )
   );
 }
-function modePresentation(index) {
-  const positioning = normalizePersonReplacementPromptMode(selectedShot(index)?.replacementPromptMode),
-    result = positioning === PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING,
-    label = positioning === PERSON_REPLACEMENT_PROMPT_MODE_TEST;
-  return {
-    positioning: positioning !== PERSON_REPLACEMENT_PROMPT_MODE_REGULAR,
-    label: label
-      ? '测试模式'
-      : positioning === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL
-        ? '手动模式'
-        : result
-          ? '指定替换'
-          : '全部替换',
-    tooltip: label
-      ? '测试模式仅限开发者：图1叠加人物框和参考图号，不发送独立定位图。点击切换为全部替换。'
-      : positioning === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL
-        ? '手动模式：直接提交原图和参考图，不添加默认提示词、定位图或 AI 增强。请自行填写完整提示词，可输入 @ 引用素材。点击切换为' +
-          (isPersonReplacementTestModeAvailable() ? '测试模式' : '全部替换') +
-          '。'
-        : result
-          ? '指定替换：只框选并绑定需要替换的人物，其余人物保持原样。用户提示词作为补充。点击切换为手动模式。'
-          : '全部替换：用于一次替换画面中的所有人物。请检查人物框齐全并全部绑定；用户提示词作为补充。点击切换为指定替换。',
-  };
+/**
+ * 下拉里的四个模式。顺序即展示顺序；测试模式只在开发者开关打开时出现。
+ * 每个模式都带一句「什么时候该用它」，比只写模式名有用得多。
+ */
+function modeOptions() {
+  return [
+    {
+      mode: PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING,
+      label: '指定替换',
+      tooltip: '适合只替换部分人物：框选并绑定需要替换的人物，其余人物保持原样。',
+    },
+    {
+      mode: PERSON_REPLACEMENT_PROMPT_MODE_REGULAR,
+      label: '全部替换',
+      tooltip: '适合一次替换画面中的所有人物：请检查人物框齐全并全部绑定。',
+    },
+    {
+      mode: PERSON_REPLACEMENT_PROMPT_MODE_MANUAL,
+      label: '手动模式',
+      tooltip:
+        '适合自行描述替换效果：请填写完整提示词，可输入 @ 引用素材；不会自动补充提示词或使用 AI 增强。',
+    },
+    ...(isPersonReplacementTestModeAvailable()
+      ? [
+          {
+            mode: PERSON_REPLACEMENT_PROMPT_MODE_TEST,
+            label: '测试模式',
+            tooltip: '仅限开发者测试：适合对比带人物框的原图对替换效果的影响。',
+          },
+        ]
+      : []),
+  ];
 }
 export function isPersonReplacementManualPromptMode(data) {
   return selectedShot(data)?.replacementPromptMode === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL;
@@ -57,76 +77,142 @@ export function isPersonReplacementManualPromptMode(data) {
 export const PERSON_REPLACEMENT_MANUAL_ENHANCEMENT_TOOLTIP =
   '手动模式仅使用你填写的提示词，不执行 AI 提示词增强。切回替换模式后恢复增强设置。';
 export function renderPersonReplacementPromptModeControl(
-  options,
-  { pendingShotIds: pendingShotIds = [] } = {},
+  project,
+  { pendingShotIds: pendingShotIds = [] } = {}
 ) {
-  const { positioning: positioning2, label: label2, tooltip: tooltip } = modePresentation(options);
+  // 下拉而不是「点一下换一个」的按钮：四个模式循环切换需要点三下才能回到原处，
+  // 而且当前处于哪一档只能靠按钮文字猜。
+  const currentMode = normalizePersonReplacementPromptMode(
+    selectedShot(project)?.replacementPromptMode
+  );
   return (
-    '<button type="button" class="story-secondary-button person-replacement-toggle-button person-replacement-prompt-mode-toggle" data-person-replacement-action="toggle-prompt-mode" aria-pressed="' +
-    positioning2 +
-    '" aria-label="' +
-    label2 +
-    '" data-tooltip="仅对当前选中的片段生效。' +
-    tooltip +
-    '" ' +
-    (isPromptModeLocked(options, pendingShotIds) ? 'disabled' : '') +
+    '<div class="person-replacement-prompt-mode-options" role="group" aria-label="当前片段的替换模式"><select data-person-replacement-action="toggle-prompt-mode" aria-label="当前片段的替换模式" ' +
+    (isPromptModeLocked(project, pendingShotIds) ? 'disabled' : '') +
     '>' +
-    label2 +
-    '</button>'
+    modeOptions()
+      .map(
+        ({ mode, label, tooltip }) =>
+          '<option value="' +
+          mode +
+          '" data-tooltip="仅对当前选中的片段生效。' +
+          tooltip +
+          '" ' +
+          (currentMode === mode ? 'selected' : '') +
+          '>' +
+          label +
+          '</option>'
+      )
+      .join('') +
+    '</select></div>'
   );
 }
-function syncModeButton(el, target) {
-  const { positioning: positioning3, label: label3, tooltip: tooltip2 } = modePresentation(target);
-  if (el.textContent !== label3) el.textContent = label3;
-  for (const [source, next] of Object.entries({
-    'aria-pressed': String(positioning3),
-    'aria-label': label3,
-    'data-tooltip': '仅对当前选中的片段生效。' + tooltip2,
-  })) {
-    if (el.getAttribute?.(source) !== next) el.setAttribute?.(source, next);
+function syncModeTooltip(trigger, option) {
+  trigger?.setAttribute?.(
+    'data-tooltip-right',
+    option?.dataset?.tooltip || '请选择当前片段的替换模式。'
+  );
+  // 手动模式额外给两个示例属性，提示浮层据此展示格式与例子；切走要摘掉。
+  for (const [attribute, value] of [
+    ['data-tooltip-example', MANUAL_MODE_EXAMPLE],
+    ['data-tooltip-format', MANUAL_MODE_FORMAT],
+  ]) {
+    if (option?.value === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL)
+      trigger?.setAttribute?.(attribute, value);
+    else trigger?.removeAttribute?.(attribute);
   }
 }
-export function syncPersonReplacementPromptModeControl(el2, project, current = []) {
-  const el3 = el2?.querySelector?.('[data-person-replacement-action="toggle-prompt-mode"]');
-  if (!el3) return;
-  (syncModeButton(el3, project),
-    (el3.disabled = isPromptModeLocked(project, current)),
+export function bindPersonReplacementPromptModeSelect(root) {
+  const container = root?.querySelector?.('.person-replacement-prompt-mode-options');
+  if (!container?.ownerDocument?.defaultView) return null;
+  const select = container.querySelector('select'),
+    workspaceBinding = bindWorkspaceSelects(container),
+    sync = () => {
+      workspaceBinding.sync();
+      // 自定义下拉的可视 trigger 是另一个元素，tooltip 得挂在它上面。
+      syncModeTooltip(
+        container.querySelector('.story-replication-select-trigger'),
+        select.selectedOptions[0]
+      );
+    };
+  for (const optionEl of container.querySelectorAll('[role="option"]')) {
+    syncModeTooltip(
+      optionEl,
+      [...select.options].find((option) => option.value === optionEl.dataset.value)
+    );
+  }
+  modeBindings.set(select, { sync });
+  sync();
+  return {
+    sync: sync,
+    destroy() {
+      (modeBindings.delete(select), workspaceBinding.destroy());
+    },
+  };
+}
+function syncModeSelect(select, project) {
+  const mode = normalizePersonReplacementPromptMode(selectedShot(project)?.replacementPromptMode);
+  select.value = mode;
+  // 只改 value 不会刷新自定义 trigger 的文字和 tooltip。
+  modeBindings.get(select)?.sync();
+}
+export function syncPersonReplacementPromptModeControl(root, project, pendingShotIds = []) {
+  const selects =
+    root?.querySelectorAll?.('[data-person-replacement-action="toggle-prompt-mode"]') || [];
+  if (!selects.length) return;
+  const locked = isPromptModeLocked(project, pendingShotIds);
+  (selects.forEach((select) => {
+    ((select.disabled = locked), syncModeSelect(select, project));
+  }),
     syncPersonReplacementPromptReferenceInputs(
-      el2,
+      root,
       project,
-      buildPersonReplacementPromptPackage({ project: project, shot: selectedShot(project) || {} }),
-    ));
-  const el4 = el2?.querySelector?.('[data-person-replacement-action="toggle-prompt-enhancement"]');
-  if (el4) {
-    const isPersonReplacementManualPromptMode2 = isPersonReplacementManualPromptMode(project);
-    ((el4.disabled = isPersonReplacementManualPromptMode2 || el3.disabled),
-      el4.setAttribute(
+      buildPersonReplacementPromptPackage({ project: project, shot: selectedShot(project) || {} })
+    ),
+    // 手动模式下提示词框要给出格式示例，否则用户不知道该怎么写。
+    root
+      ?.querySelector?.('[data-person-replacement-field="image-prompt"]')
+      ?.setAttribute?.(
+        'data-placeholder',
+        isPersonReplacementManualPromptMode(project)
+          ? PERSON_REPLACEMENT_MANUAL_PROMPT_EXAMPLE
+          : '描述替换效果，输入 @ 引用左侧素材图'
+      ));
+  const enhancementButton = root?.querySelector?.(
+    '[data-person-replacement-action="toggle-prompt-enhancement"]'
+  );
+  if (enhancementButton) {
+    const manual = isPersonReplacementManualPromptMode(project);
+    ((enhancementButton.disabled = manual || locked),
+      enhancementButton.setAttribute(
         'aria-pressed',
-        String(
-          !isPersonReplacementManualPromptMode2 &&
-            project.settings?.replacementPromptEnhancementEnabled === true,
-        ),
+        String(!manual && project.settings?.replacementPromptEnhancementEnabled === true)
       ),
-      el4.setAttribute(
+      enhancementButton.setAttribute(
         'data-tooltip',
-        isPersonReplacementManualPromptMode2
+        manual
           ? PERSON_REPLACEMENT_MANUAL_ENHANCEMENT_TOOLTIP
-          : el4.getAttribute('data-auto-tooltip') || '使用画布 Agent 当前模型补充替换提示词。',
+          : enhancementButton.getAttribute('data-auto-tooltip') ||
+              '使用画布 Agent 当前模型补充替换提示词。'
       ));
   }
 }
-export function applyPersonReplacementPromptControlAction(args, entry, el5, record = []) {
-  if (el5.disabled) return null;
-  if (entry === 'toggle-prompt-enhancement') {
-    if (isPersonReplacementManualPromptMode(args)) return null;
+export function applyPersonReplacementPromptControlAction(
+  project,
+  action,
+  element,
+  pendingShotIds = []
+) {
+  if (element.disabled) return null;
+  if (action === 'toggle-prompt-enhancement') {
+    if (isPersonReplacementManualPromptMode(project)) return null;
     const replacementPromptEnhancementEnabled =
-      args.settings.replacementPromptEnhancementEnabled !== true;
+      project.settings.replacementPromptEnhancementEnabled !== true;
     return (
-      el5.setAttribute?.('aria-pressed', String(replacementPromptEnhancementEnabled)),
+      element.setAttribute?.('aria-pressed', String(replacementPromptEnhancementEnabled)),
       {
         patch: {
           settings: {
-            ...args.settings,
+            ...project.settings,
             replacementPromptEnhancementEnabled: replacementPromptEnhancementEnabled,
           },
         },
@@ -134,24 +220,19 @@ export function applyPersonReplacementPromptControlAction(args, entry, el5, reco
       }
     );
   }
-  if (entry !== 'toggle-prompt-mode' || isPromptModeLocked(args, record)) return null;
-  const args2 = selectedShot(args),
-    replacementPromptMode = normalizePersonReplacementPromptMode(args2.replacementPromptMode),
-    payload = {
-      ...args2,
-      replacementPromptMode:
-        replacementPromptMode === PERSON_REPLACEMENT_PROMPT_MODE_REGULAR
-          ? PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING
-          : replacementPromptMode === PERSON_REPLACEMENT_PROMPT_MODE_POSITIONING
-            ? PERSON_REPLACEMENT_PROMPT_MODE_MANUAL
-            : replacementPromptMode === PERSON_REPLACEMENT_PROMPT_MODE_MANUAL &&
-                isPersonReplacementTestModeAvailable()
-              ? PERSON_REPLACEMENT_PROMPT_MODE_TEST
-              : PERSON_REPLACEMENT_PROMPT_MODE_REGULAR,
-    },
-    shots = args.shots.map((handle) => (handle.id === args2.id ? payload : handle));
+  if (action !== 'toggle-prompt-mode' || isPromptModeLocked(project, pendingShotIds)) return null;
+  // 下拉直接给出目标模式，不再按「下一档」推算。
+  const shot = selectedShot(project),
+    nextMode = element.value;
+  if (
+    !modeOptions().some((option) => option.mode === nextMode) ||
+    nextMode === normalizePersonReplacementPromptMode(shot.replacementPromptMode)
+  )
+    return null;
+  const nextShot = { ...shot, replacementPromptMode: nextMode },
+    shots = project.shots.map((entry) => (entry.id === shot.id ? nextShot : entry));
   return (
-    syncModeButton(el5, { ...args, shots: shots }),
+    syncModeSelect(element, { ...project, shots: shots }),
     { patch: { shots: shots }, reason: 'image-prompt-mode' }
   );
 }
