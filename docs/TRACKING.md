@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（221 批·**分诊收口**）：把「可独立补的 14 条」剩余 8 条逐个核完，结论是这个估计偏高——真正单文件能落地的只有 6 条（219/220 已补）。余 8 条：`getFixedSlotLabelText` 属等价重构；`getRefSourceDisplayStateKey` 是多视频源按边取缩略图的真 bug，需视频参考缩略图整块；personReplacement 两个进度文案的消费方一个只差 5 行、另一个已分叉 284 行，且上游硬编码中文需先定 i18n 口径；Panorama 缩放差 448 行属整块。**流程教训**：分诊加第三条判据「消费方行数差 ≤20 行」才算可独立补。缺口维持 26。
 - 2026-10-23（220 批·**provider 图标预热**）：`providerIconLod` 补 `preloadProviderIconAssets`/`resetProviderIconPreloadForTests`，在 `installProviderIconLodController` 里调用——四个小 PNG 高优先级预热，低缩放反复摘挂 src 不再重新解码。**纠正 215 批分诊错误**：「上游也没有消费方」是跨文件 grep 假阴性，上游系同文件内调用、仓库 `appViewport.js` 已消费该控制器。`modelMenuPreferenceStore` 两个清洗函数确认属整块升代（缺 `modelProviderVisibilityControl.js`）。缺口 28→26，全量 **11545/11545/0**。
-- 2026-10-23（219 批·**吉祥物提示跟随键位 + 连线策略**）：`MascotManager` 40 条提示把键位写死在文案里（换预设/改快捷键就在教错按键）——补 `getMascotTipText`/`formatShortcutBinding` 与两张动作表，键位改为运行时从 `shortcuts.js` 取，并订阅 `shortcuts-updated` 重算，两语种文案同步换成占位符版。`registry` 补 `canCreateConnectedNode`/`getRegisteredConnectionDecision`（`registerNode` 第三参数此前被整体忽略），`EdgeController` 三处接线：连线裁决先问注册策略、两处「连线建节点」菜单加闸。模块级缺口 32→28，全量 **11539/11539/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

@@ -75,3 +75,17 @@
 | `preloadProviderIconAssets` / `resetProviderIconPreloadForTests` | **220 批已补，且修正上表错误**：先前判「上游也没有消费方」是 grep 姿势错的——上游是在**同文件内**调用（`installProviderIconLodController` 里 `preloadProviderIconAssets()`），跨文件 grep 看不见。仓库 `appViewport.js` 已消费该控制器，所以这是活线。**教训：判「上游有没有消费方」必须连定义文件自己一起搜** |
 | `sanitizeProviderVisibility` / `sanitizeAutoHiddenProviders` | 维持 C 类（整块升代）。整块 = `modelMenuPreferenceStore` 升级 + `modelMenuVisibility.js`/`modelCredentialUi.js`/`apiSettings.js` 三处消费 + **新建** `settings/modelProviderVisibilityControl.js`（仓库缺件）。单补两个清洗函数仍是死代码 |
 | 上游 `dehydrateProviderIcon` 语义漂移 | 0.8.9 的 `dehydrateProviderIcon` 实际是**恢复**（把 dataset 里的 src 写回去、删 dataset、摘占位类），与函数名和 `shouldDehydrateProviderIcon` 的调用语义相反。推测是「四个图标太小 + 已预热 → 不再需要卸载」的取舍。220 批**没有跟进这个漂移**：只补预热，`dehydrate/hydrate` 保持仓库原语义，避免把低缩放下的行为一起翻掉 |
+
+## 复查记录（221 批，继续核「可独立补的 14 条」剩余 8 条）
+
+结论：**「14 条可独立补」这个估计偏高**。真正单文件就能落地的只有 6 条（219/220 已补完），余下 8 条逐个核完，全部需要跨文件接线或整块升代。
+
+| 条目 | 复查结论 |
+|---|---|
+| `getFixedSlotLabelText` | 上游把它从 `getFixedSlotLabelHtml` 里抽了出来，仓库是内联版（1358 行 vs 上游 1292 行，仓库反而更大）。**属等价重构**，不补。但注意一处真实差异：上游用 `formatInputSlotLabelHtml`（4/5 字中文强制断成两行、空白替换成 `<br>`），仓库用 `escapeHtmlText`（不断行）。要不要对齐是**视觉决策**，不是缺口 |
+| `getRefSourceDisplayStateKey` | 仓库的 `_getRefSourceStateKey(response)` 只收一个参数、按 `mainVideoIndex` 取视频；上游 `getRefSourceDisplayStateKey(node, edge)` 按**边**取（`resolveReferenceVideoItemByEdge`）。多视频源节点的多条出边会全部显示同一个缩略图——**这是真 bug**，但需要 `referenceInputThumbnail.js` 的整套边感知解析，属视频参考缩略图整块 |
+| `getPersonReplacementSourceProcessingProgress` / `…Message` | 消费方 `personReplacementShellPresentation.js` 仓库 654 行 vs 上游 659 行（**只差 5 行**），接线成本低；但另一个消费方 `personReplacementApplication.js` 仓库 2835 vs 上游 2551（仓库更大、已分叉），进度条那段不是简单照搬。且上游这两个函数把中文**硬编码**在 JS 里，仓库同模块也是硬编码——照搬=追平但英文界面会出中文，走 i18n 则偏离上游。需先定口径 |
+| `resolveScaleConstraint` / `scalePositionAroundPivotAxes` | `PanoramaSceneInteraction.js` 仓库 1622 vs 上游 2070，**差 448 行**，缩放约束只是其中一小块。属整块升代 |
+| `sanitizeProviderVisibility` / `sanitizeAutoHiddenProviders` | 维持 C 类，见 219–220 批记录 |
+
+**流程教训**：分诊表当初只按「上游同文件内调用次数 + 消费方文件是否存在」两判据，**没量消费方文件的规模差**。消费方存在但自身落后 200+ 行时，被调函数照样接不上。下次分诊加第三条判据：消费方行数差 ≤20 行才算「可独立补」。
