@@ -371,4 +371,5 @@ chrome-shell 下渲染器没有 IPC，只能靠 HTTP 轮询拿主进程事件。
 - **取消**：`startDesktopHttpBridge` 给每个请求建 `AbortController`，响应 `close` 即 abort；`safeCall(handler, payload, { signal })` 把信号透传给处理器（目前只有挂起型处理器会用到）。
 - **客户端** `api/desktopEventPollApi.js`：同路径多订阅共用一次在途请求；`known` 带上次 revision；批量端点不存在时降级为逐路径快照，**只降一次** —— 注意 `apiBase.post` 把 HTTP 404 归一成 `{success:true,data:null}` 而不抛错，所以「拿回 null」与「抛 404」都要认；路径数超过 10 自动拆批；失败指数退避 1/2/4/8/10s。
 - **两端不变式**（`electron/desktopHttpBridge.test.js` 守）：`src/services/desktopBridge.js` 里每个 `chromeShellPoll('<path>')` 字面量的路径，必须同时「在服务端白名单」且「在 bridge 路由表里」。
+- **端到端用例**：`electron/desktopEventPoll.integration.test.js` 用真 bridge + 真 fetch 跑通「订阅 → 服务端挂起 → 主进程推事件 → 前端拿到」，不启动 Electron，因此可进普通单测。
 - **`web-preview/wait-events` 不在白名单**：它自带 `waitMs`、服务端挂起再回，属直连长轮询，走 `chromeShellPost(..., { waitMs: 1000 })`，不能塞进批量端点（塞进去会让整批被拒）。
