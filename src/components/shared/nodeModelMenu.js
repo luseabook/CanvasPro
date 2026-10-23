@@ -41,7 +41,7 @@ function attrsFromObject(options = {}) {
     .map(([result, data]) =>
       data === true
         ? ' ' + escapeNodeMenuHtml(result)
-        : ' ' + escapeNodeMenuHtml(result) + '="' + escapeNodeMenuHtml(data) + '"',
+        : ' ' + escapeNodeMenuHtml(result) + '="' + escapeNodeMenuHtml(data) + '"'
     )
     .join('');
 }
@@ -113,7 +113,9 @@ export function renderNodeMenuGroup(args = {}, payload = {}) {
     escapeNodeMenuHtml(translateManifestText(args.label || handle)) +
     '</div>\n        ' +
     (args.subtitle
-      ? '<div class="fmi-sub">' + escapeNodeMenuHtml(translateManifestText(args.subtitle)) + '</div>'
+      ? '<div class="fmi-sub">' +
+        escapeNodeMenuHtml(translateManifestText(args.subtitle)) +
+        '</div>'
       : '') +
     '\n      </div>\n      ' +
     renderBadge(args) +
@@ -142,7 +144,10 @@ export function renderNodeModelMenu(options2 = {}) {
     value4 +
     '" data-node-menu-kind="' +
     escapeNodeMenuHtml(options2.kind || '') +
-    '">' +
+    '"' +
+    // 官方目录菜单（含即梦/小云雀/官方模型分组）要单独标记，样式与埋点靠它区分。
+    (options2.officialCatalog ? ' data-official-model-catalog' : '') +
+    '>' +
     value3 +
     '</div>'
   );

@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 46,
+  "moduleFunctionTotal": 44,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -146,10 +146,6 @@
       "createVideoRangePlayheadReadoutView",
       "createVideoRangeSelectionView",
       "positionVideoRangePlayheadReadout"
-    ],
-    "src/components/video-node/modelSelectorShared.js": [
-      "buildDreaminaVideoMenuGroups",
-      "compareOfficialVideoMenuModels"
     ],
     "src/components/video-node/referenceInputModule.js": [
       "getFixedSlotLabelText",

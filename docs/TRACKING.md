@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（208 批·**视频模型菜单官方目录**）：`modelSelectorShared.js` 补 `compareOfficialVideoMenuModels`（先推荐位次、再「官方热推>正价>官推>官转>白名单」档位）与 `buildDreaminaVideoMenuGroups`，兜底分支补 **即梦 / 小云雀 / SHUO Canvas 官方** 三个分组并加 `officialCatalog` 标记（`nodeModelMenu` 同步支持）。测试新增 4 例；模块级缺口 46→44，全量 **11486/11486/0**。
 - 2026-10-23（207 批·**完成提示音 shim 运行时**）：`completionSoundService.js` 从直连 `window.electronAPI` 改为走 `desktopBridge`，补 `isDesktopHttpShimRuntime`/`getNotificationSoundPlayer`/`resolveHttpCompatSystemSoundUrl`/`normalizePathKey`。浏览器连桌面后端时读不到本地文件，必须宿主给可播放 URL 或直接播，否则提示音**静默失败**。测试 6→10，模块级缺口 49→46，全量 **11482/11482/0**。
-- 2026-10-23（206 批·**批量生成命令**）：`generationCommands.js` 补全 `generation.runBatch`（多节点一次确认起跑，上限 12）+ 5 个辅助函数（任务号选取/状态归一/失败判定/批量校验/批量汇总）。`agentActionPostconditions` 早就在等这个命令，但它**从未注册**。同时把 `generation.run` 对齐 0.8.9：返回 `status`/`taskId`，失败**抛错**而不是静默成功。模块级缺口 54→49，全量 **11478/11478/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

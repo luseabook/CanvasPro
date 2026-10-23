@@ -31,6 +31,43 @@ import {
 import { isModelAllowed } from '../../modules/subscriptionAccess.js';
 import { bindNodeModelMenuPrewarm, bindNodeSubmenus } from '../shared/nodeFooterControls.js';
 export const BINGHUO_VIDEO_GATE_MODEL_ID = 'feature/binghuo_video';
+const OFFICIAL_VIDEO_MENU_PREFIXES = ['官方热推', '正价', '官推', '官转', '白名单'];
+function compareOfficialVideoMenuModels(left, right) {
+  // 先按后台下发的推荐位次，再按「官方热推 > 正价 > 官推 > 官转 > 白名单」的档位。
+  // 只按名字排会把「官方热推」的模型压到列表末尾，用户找不到主推的那几个。
+  const rankDelta =
+    Number(left.extensions?.videoMenu?.recommendationRank || 0) -
+    Number(right.extensions?.videoMenu?.recommendationRank || 0);
+  if (rankDelta) return rankDelta;
+  const tierOf = (model) => {
+    const tier = OFFICIAL_VIDEO_MENU_PREFIXES.findIndex((prefix) =>
+      String(model.displayName || '').startsWith(prefix)
+    );
+    return tier < 0 ? OFFICIAL_VIDEO_MENU_PREFIXES.length : tier;
+  };
+  return tierOf(left) - tierOf(right);
+}
+function buildDreaminaVideoMenuGroups(models) {
+  const dreaminaModels = (Array.isArray(models) ? models : []).filter(
+    (model) => model.provider === 'dreamina'
+  );
+  return dreaminaModels.length
+    ? [
+        {
+          id: 'dreamina-canvas-video',
+          label: '即梦官方',
+          subtitle: '使用即梦账号生成',
+          iconHtml: buildDreaminaVideoLogoHTML(20),
+          items: dreaminaModels.map((model) => ({
+            modelId: model.modelId,
+            provider: model.provider,
+            label: model.displayName,
+            iconHtml: buildDreaminaVideoLogoHTML(20),
+          })),
+        },
+      ]
+    : [];
+}
 export function isBinghuoVideoChannelVisible(options = {}) {
   return isModelAllowed(BINGHUO_VIDEO_GATE_MODEL_ID, options, 'binghuo');
 }
@@ -45,7 +82,7 @@ export function buildVideoModelMenuHTML({
       ...new Set(
         (Array.isArray(allowedModelIds) ? allowedModelIds : [])
           .map((value) => String(value || '').trim())
-          .filter(Boolean),
+          .filter(Boolean)
       ),
     ],
     activeModel2 = allowedModelIds2.includes(String(activeModel || '').trim())
@@ -55,11 +92,11 @@ export function buildVideoModelMenuHTML({
         getDefaultRunningHubVideoWorkflowModelId(),
     itemsHtml = buildBinghuoVideoMenuItemsHtml(activeModel2);
   if (allowedModelIds2.length) {
-    const list = allowedModelIds2.map((item) => getModelManifest(item)).filter(
-        (key) => key?.kind === 'video',
-      ),
+    const list = allowedModelIds2
+        .map((item) => getModelManifest(item))
+        .filter((key) => key?.kind === 'video'),
       label = list.every(
-        (index) => index.provider === 'runninghubwf' && index.adapterType === 'workflow',
+        (index) => index.provider === 'runninghubwf' && index.adapterType === 'workflow'
       ),
       result = list.every(
         (enabled) =>
@@ -67,7 +104,7 @@ export function buildVideoModelMenuHTML({
             !!enabled?.extensions?.dreaminaStyleVideo) ||
           (enabled?.provider === 'runninghub' &&
             enabled?.adapterType === 'modelApi' &&
-            enabled?.extensions?.videoMenu?.role === 'runninghubModel'),
+            enabled?.extensions?.videoMenu?.role === 'runninghubModel')
       );
     if (result) {
       const map = new Set(list.map((data) => data.provider)),
@@ -85,11 +122,12 @@ export function buildVideoModelMenuHTML({
           ...(map.has('dreamina')
             ? buildDreaminaOfficialVideoMenuItems().map((args) => ({
                 ...args,
-                active:
-                  active?.provider === 'dreamina' && !!active?.extensions?.dreaminaStyleVideo,
+                active: active?.provider === 'dreamina' && !!active?.extensions?.dreaminaStyleVideo,
               }))
             : []),
-          ...(map.has('volcengine') ? buildVolcengineOfficialVideoMenuItems(activeModel2, provider) : []),
+          ...(map.has('volcengine')
+            ? buildVolcengineOfficialVideoMenuItems(activeModel2, provider)
+            : []),
         ],
         groups: [
           ...(itemsHtml2
@@ -153,12 +191,60 @@ export function buildVideoModelMenuHTML({
     });
   return renderNodeModelMenu({
     kind: 'video',
+    // 这里列的是官方目录（含即梦/小云雀/官方模型），标记出来供样式与埋点区分。
+    officialCatalog: true,
     activeModel: activeModel2,
     items: [
       ...buildDreaminaOfficialVideoMenuItems(),
       ...buildVolcengineOfficialVideoMenuItems(activeModel2, provider),
     ],
     groups: [
+      ...buildDreaminaVideoMenuGroups(getModelsByKind('video')),
+      ...(() => {
+        const pippitModels = getModelsByKind('video').filter(
+          (target) => target.provider === 'pippit'
+        );
+        return pippitModels.length
+          ? [
+              {
+                id: 'pippit-video',
+                label: '小云雀',
+                subtitle: '使用小云雀账号生成',
+                items: pippitModels.map((model) => ({
+                  modelId: model.modelId,
+                  provider: model.provider,
+                  label: model.displayName,
+                })),
+              },
+            ]
+          : [];
+      })(),
+      ...(() => {
+        const officialModels = getModelsByKind('video')
+          .filter(
+            (target) =>
+              target.provider === 'aicanvas' &&
+              target.extensions?.videoMenu?.role === 'officialModel'
+          )
+          .sort(compareOfficialVideoMenuModels);
+        return officialModels.length
+          ? [
+              {
+                id: 'aicanvas-video',
+                label: 'SHUO Canvas',
+                subtitle: '官方模型·消耗积分',
+                icon: 'images/favicon.svg',
+                items: officialModels.map((model) => ({
+                  modelId: model.modelId,
+                  provider: model.provider,
+                  label: model.displayName,
+                  description: model.description,
+                  icon: 'images/favicon.svg',
+                })),
+              },
+            ]
+          : [];
+      })(),
       {
         id: 'grsai-video',
         label: 'GRSAI',
@@ -322,7 +408,9 @@ export function renderVideoModelTriggerIconHTML({
   provider: provider = '',
   providersMeta: providersMeta = {},
   resolveExecution: resolveExecution = (entry, providerHint) =>
-    resolveModelExecution(entry, { providerHint: providerHint }) || resolveModelExecution(entry) || null,
+    resolveModelExecution(entry, { providerHint: providerHint }) ||
+    resolveModelExecution(entry) ||
+    null,
   resolveProviderId: resolveProviderId = (record, payload, handle) =>
     normalizeProviderId(handle?.modelManifest?.provider) ||
     resolveModelProvider(record, payload, { allowPrefixInference: false }) ||
@@ -339,7 +427,7 @@ export function renderVideoModelTriggerIconHTML({
   if (providerId === 'comfyui')
     return getComfyUiVideoWorkflowIconHtml(
       execution?.modelManifest?.extensions?.videoMenu || {},
-      12,
+      12
     );
   if (providerId && /^custom_[a-z0-9_-]+$/i.test(providerId))
     return buildCustomProviderVideoLogoHTML(execution?.modelManifest || {}, 12);
@@ -354,3 +442,13 @@ export function renderVideoModelTriggerIconHTML({
     );
   return '<div class="node-menu-icon-small node-menu-icon-badge video-model-fallback-icon">VM</div>';
 }
+
+/**
+ * 仅供单测驱动内部纯函数（官方模型排序、即梦分组）。
+ * 运行时不要引用：随实现改。
+ */
+export const _modelSelectorSharedInternalsForTest = {
+  OFFICIAL_VIDEO_MENU_PREFIXES,
+  compareOfficialVideoMenuModels,
+  buildDreaminaVideoMenuGroups,
+};
