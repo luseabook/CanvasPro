@@ -2,6 +2,7 @@ import http from 'node:http';
 import { mkdirSync } from 'node:fs';
 import electron from 'electron';
 import { createCustomAiAppStorage } from './customAiAppStorage.js';
+import { createDesktopEventPollHandler } from './desktopEventPoll.js';
 import { openShellFolder, revealShellItemInFolder } from './shellItemRevealer.js';
 
 const MAX_BODY_BYTES = 64 * 1024 * 1024;
@@ -80,8 +81,8 @@ function requireToken(request, token) {
   return received === expected;
 }
 
-function safeCall(handler, payload) {
-  return Promise.resolve().then(() => handler(payload || {}));
+function safeCall(handler, payload, options) {
+  return Promise.resolve().then(() => handler(payload || {}, options));
 }
 
 export function createDesktopHttpBridgeHandlers(context = {}) {
@@ -157,7 +158,7 @@ export function createDesktopHttpBridgeHandlers(context = {}) {
     const { localPath: _staged, ...rest } = input;
     return context.importAssetToLibrary?.({ ...rest, path: resolved });
   }
-  return new Map([
+  const routeTable = new Map([
     ['/api/v2/desktop/app/get-version', () => context.getAppVersion?.() || ''],
     ['/api/v2/desktop/app/get-device-id', (payload) => context.getStableDeviceId?.(payload) || ''],
     ['/api/v2/desktop/app/update-state', () => getUpdaterController()?.getState?.() || null],
@@ -384,6 +385,21 @@ export function createDesktopHttpBridgeHandlers(context = {}) {
     ],
     ['/api/v2/desktop/clipboard/read-file-references', () => requireClipboard().readFileReferences()],
   ]);
+  // 批量事件轮询端点必须最后注册：它要把上面整张表当数据源来读。
+  routeTable.set(
+    '/api/v2/desktop/events/poll',
+    createDesktopEventPollHandler(routeTable, {
+      onError: (path, error) =>
+        context.logDiagnosticEvent?.({
+          type: 'desktop_http_bridge.event_read_failed',
+          level: 'warn',
+          source: 'main',
+          error,
+          context: { path },
+        }),
+    }),
+  );
+  return routeTable;
 }
 
 export function startDesktopHttpBridge({
@@ -409,11 +425,17 @@ export function startDesktopHttpBridge({
       jsonResponse(response, 404, { success: false, error: 'Desktop bridge route not found' });
       return;
     }
+    // 挂起型处理器（事件轮询最长挂 1s）在客户端断开时要立刻放手，
+    // 否则关窗/切页后这些请求会继续占着 handle 读到下一个 tick。
+    const controller = new AbortController(),
+      abort = () => controller.abort();
+    response.once('close', abort);
     try {
       const payload = await readJsonBody(request);
-      const data = await safeCall(handler, payload);
-      jsonResponse(response, 200, { success: true, data });
+      const data = await safeCall(handler, payload, { signal: controller.signal });
+      if (!response.destroyed) jsonResponse(response, 200, { success: true, data });
     } catch (error) {
+      if (controller.signal.aborted) return;
       const message =
         error?.message === 'REQUEST_BODY_TOO_LARGE'
           ? 'Request body too large'
@@ -430,6 +452,8 @@ export function startDesktopHttpBridge({
         success: false,
         error: message,
       });
+    } finally {
+      response.off('close', abort);
     }
   });
   server.on('connection', (socket) => {

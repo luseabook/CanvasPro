@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createDesktopHttpBridgeHandlers, startDesktopHttpBridge } from './desktopHttpBridge.js';
+import { isDesktopEventPollPath } from './desktopEventPoll.js';
 import { MediaTaskQueue } from './mediaTaskQueue.js';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -31,16 +32,63 @@ function post(bridge, route, body, { token = TOKEN, method = 'POST' } = {}) {
 
 test('the route table covers the desktop v2 surface', () => {
   const routes = createDesktopHttpBridgeHandlers({});
-  assert.equal(routes.size, 82);
+  assert.equal(routes.size, 83);
   for (const route of [
     '/api/v2/desktop/app/get-version',
     '/api/v2/desktop/project/save',
     '/api/v2/desktop/clipboard/read-text',
     '/api/v2/desktop/node-export/save-timeline',
     '/api/v2/desktop/text-preset/claim-event',
+    '/api/v2/desktop/events/poll',
   ])
     assert.equal(typeof routes.get(route), 'function', route);
   for (const key of routes.keys()) assert.match(key, /^\/api\/v2\/desktop\//);
+});
+
+test('前端轮询的每条路径都在服务端白名单与路由表里（两端形状一致）', () => {
+  // 这条守卫针对的是一次真实事故：批量轮询客户端从上游搬来了，服务端 endpoint 没搬，
+  // 且有一条 wait-events 被误当成批量路径 —— 按文件比对的闸门两头都看不见。
+  const source = readFileSync(new URL('../src/services/desktopBridge.js', import.meta.url), 'utf8');
+  const polled = [...source.matchAll(/chromeShellPoll\(\s*'([^']+)'/g)].map((match) => match[1]);
+  const routes = createDesktopHttpBridgeHandlers({});
+  // 10 条路径 × 两个入口（主桥 + legacy shim），少数只在一处订阅。
+  assert.ok(polled.length >= 19, '走批量轮询的路径少了，说明某处订阅被漏改或误删');
+  assert.equal(new Set(polled).size, 10, '批量轮询的路径集合应当稳定在 10 条');
+  for (const path of new Set(polled)) {
+    assert.ok(isDesktopEventPollPath(path), path + ' 不在批量轮询白名单里');
+    assert.equal(typeof routes.get(path), 'function', path + ' 在 bridge 路由表里不存在');
+  }
+  // wait-events 自带 waitMs（服务端挂起再回），必须走直连，不能塞进批量端点。
+  assert.match(
+    source,
+    /web-preview\/wait-events',\s*\{\s*waitMs:\s*1000/,
+    'wait-events 要走带 waitMs 的直连长轮询',
+  );
+});
+
+test('events/poll 把多条订阅合并成一次请求，并拒绝白名单外的路径', async () => {
+  await withBridge(
+    { getUpdaterController: () => ({ getState: () => ({ status: 'idle' }) }) },
+    async (bridge) => {
+      const ok = await post(bridge, '/api/v2/desktop/events/poll', {
+        paths: ['/api/v2/desktop/app/update-state'],
+        known: {},
+      });
+      assert.equal(ok.status, 200);
+      const body = await ok.json();
+      assert.equal(body.success, true);
+      assert.deepEqual(body.data.updates['/api/v2/desktop/app/update-state'].value, { status: 'idle' });
+      assert.match(body.data.updates['/api/v2/desktop/app/update-state'].revision, /^[0-9a-f]{64}$/);
+      assert.deepEqual(body.data.failed, []);
+
+      // 任意 bridge 路由都不能被变成轮询目标。
+      const rejected = await post(bridge, '/api/v2/desktop/events/poll', {
+        paths: ['/api/v2/desktop/project/save'],
+      });
+      assert.equal(rejected.status, 500);
+      assert.equal((await rejected.json()).error, 'Invalid desktop event paths');
+    },
+  );
 });
 
 test('only POST is accepted and a valid token is required', async () => {

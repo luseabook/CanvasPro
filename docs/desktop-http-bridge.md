@@ -18,7 +18,7 @@
 
 | 文件 | 作用 |
 | --- | --- |
-| `electron/desktopHttpBridge.js` | 82 路由 Map；POST-only；`x-aic-desktop-bridge-token` 校验；回环监听随机端口；关闭含宽限与强制回收 |
+| `electron/desktopHttpBridge.js` | 83 路由 Map（含 `events/poll` 批量事件端点，见 §7）；POST-only；`x-aic-desktop-bridge-token` 校验；回环监听随机端口；关闭含宽限与强制回收 |
 | `electron/clipboardCapabilityOperations.js` | 剪贴板文本/图片/文件引用（含自定义格式与纯文本回退） |
 | `electron/secureSettingsCapabilityOperations.js` | 安全存储 get/set/delete 与可用性降级 |
 | `electron/diagnosticsCapabilityOperations.js` | 诊断包另存为 + 打开日志目录 |
@@ -326,7 +326,7 @@ node --test $(find electron -name '*.test.js')
 
 ## 5. 验收欠项（须授权后执行）
 - [ ] 真实应用内调用 `desktop-bridge:start`，核对回环地址、token、`stop`/退出后端口确实释放、生命周期内不重复开启。
-- [ ] 逐条核对上表 82 路由中**已具备能力对象**的那些（app/notification/secure-settings/clipboard/custom-ai-apps/media-task/local-asset-cleanup/diagnostics/shell/dialog/web-preview/notification-sound/project/agent-skills/agent-information/screenshot/node-export/storage-migration）返回结构与主窗口 IPC 一致；其中 `diagnostics/*` 与 `notification-sound/play` 到第34批才真正有实现（此前 `diagnosticsCapabilityOperations` 无生产引用），`screenshot/*` 三条路由到第35批才由控制器真实服务（此前控制器在旧树里已存在但从未被桥接线），`notification/*` 四条路由到第36批才由 `backgroundCompletionNotifier` 真实服务（此前本仓 notifier 只有 `showGenerationComplete`，三条路由恒空转），`node-export/*` 五条路由到第37批才由 `nodeExportController` 真实服务（此前 `exportSelectedNodesPackage` 等五个扁平键从未被 `mainIpcSetup` 产出），`storage-migration/*` 两条路由到第38批才由 `legacyRendererStorageMigration` 真实服务（此前两个 context 键从未产出，路由恒返回无理由的 `{available:false}`），`node-export/save-timeline` 到第39批才由 `saveTimeline` 键真实服务（此前桥路由恒 `undefined`、同一 `nodeExport:saveTimeline` IPC 恒抛"当前环境不支持导出剪辑工程"），`asset/consume-updates` 与 `custom-ai-apps/read|write` 到第40批才由 `consumeAssetUpdateEvents`/`getDataDir` 两个键真实服务（此前前者恒返回 `[]`、后者必然抛 `data directory is unavailable`）；**`customAiApps:read|write` 两个 IPC 通道与 `agentInformation`/`agentSkills` 三组能力到第42批才首次对本树渲染器（`window.electronAPI`）可达**（此前两条通道**根本未注册**、另两组已在第31/32批注册却无 preload 暴露，渲染器 `window.electronAPI.agentSkills` 为 `undefined`）。
+- [ ] 逐条核对上表 83 路由中**已具备能力对象**的那些（app/notification/secure-settings/clipboard/custom-ai-apps/media-task/local-asset-cleanup/diagnostics/shell/dialog/web-preview/notification-sound/project/agent-skills/agent-information/screenshot/node-export/storage-migration）返回结构与主窗口 IPC 一致；其中 `diagnostics/*` 与 `notification-sound/play` 到第34批才真正有实现（此前 `diagnosticsCapabilityOperations` 无生产引用），`screenshot/*` 三条路由到第35批才由控制器真实服务（此前控制器在旧树里已存在但从未被桥接线），`notification/*` 四条路由到第36批才由 `backgroundCompletionNotifier` 真实服务（此前本仓 notifier 只有 `showGenerationComplete`，三条路由恒空转），`node-export/*` 五条路由到第37批才由 `nodeExportController` 真实服务（此前 `exportSelectedNodesPackage` 等五个扁平键从未被 `mainIpcSetup` 产出），`storage-migration/*` 两条路由到第38批才由 `legacyRendererStorageMigration` 真实服务（此前两个 context 键从未产出，路由恒返回无理由的 `{available:false}`），`node-export/save-timeline` 到第39批才由 `saveTimeline` 键真实服务（此前桥路由恒 `undefined`、同一 `nodeExport:saveTimeline` IPC 恒抛"当前环境不支持导出剪辑工程"），`asset/consume-updates` 与 `custom-ai-apps/read|write` 到第40批才由 `consumeAssetUpdateEvents`/`getDataDir` 两个键真实服务（此前前者恒返回 `[]`、后者必然抛 `data directory is unavailable`）；**`customAiApps:read|write` 两个 IPC 通道与 `agentInformation`/`agentSkills` 三组能力到第42批才首次对本树渲染器（`window.electronAPI`）可达**（此前两条通道**根本未注册**、另两组已在第31/32批注册却无 preload 暴露，渲染器 `window.electronAPI.agentSkills` 为 `undefined`）。
 - [ ] 核对仍缺失能力路由（`asset/consume-updates` 已由第40批接线；`text-preset/*` 五条已由第41批接线但需先注册快捷键）返回的"不可用"文案与前端降级是否可接受；`globalCaptureWindow:*` 四条 IPC 通道仍恒 `not-supported`（面板未移植）。
 - [ ] 第31批 `agent-information/read-url`：授权后用真实公网 HTTPS 核对证书校验与正文抽取、IPv6 公开地址的固定直连、跨主机 30x 逐跳私网拦截、`gzip`/`br` 的实际拒绝文案、以及经渲染进程调用时的超时/取消传播。
 - [ ] 第32批 `agent-skills/*`：授权后在真实应用内核对 `list`/`openRoot`/`installFromFolder`/`saveManaged`/`deleteInstalled` 经渲染进程与 HTTP 桥的端到端行为，含原生选目录取消/重复安装文案、`openRoot` 在 Windows 打开 explorer 的回退、`<userData>/skills/` 目录创建的副作用、安装/删除后再挂载的 `list` 结果。
@@ -358,3 +358,17 @@ node --test $(find electron -name '*.test.js')
 - **第42批的新缺陷轴（与第34–41批不同，须继续扫描）**：前八次命中都是"桥读的键宿主从未产出"；第42批发现的是**通道已注册但 preload 从未暴露**——`customAiApps:read|write` 在旧树里**根本未注册任何 IPC 通道**，而 `agentInformation:readUrl`（第31批）、`agentSkills:*` 五通道（第32批）虽已注册，`electron/preload.cjs` 的 `electronAPI` 里却没有对应键，故本树渲染器 `window.electronAPI.agentSkills === undefined`。**后续批次应把这一轴也纳入扫描**：对每个已注册的 `ipcMain.handle('x:y')` 通道，核对 `preload.cjs` 是否有可达的暴露路径（注意 `appIpc.js` 等注册器用局部别名 `_0x91da6a.handle(...)`，naive 的 `ipcMain.handle(` grep 会漏）；反向亦然，preload 里每个 `invoke('x:y')` 都应有对应注册。**结论：本批已使三组能力可达，但 `src/` 仍零消费者**，真正的端到端要等渲染器侧 `desktopBridge.js`（R15/R12）。
 - 第42批**未移植** `electron/ipc/customAiAppIpc.js` 之外的任何一轴向：新版 `customAiAppStorage.js` 的语义本仓早已有等价手写实现（第30批），本批只是补 IPC 通道与 preload 暴露，**存储格式/目录结构未变**。
 - 未做真实桌面联调、未跑构建/打包/安装包；`readUrl` 的真实外网行为完全未验证；`project/*` 的原生对话框与真实工程/恢复快照读写未验证。
+
+## 7. 事件批量轮询 `/api/v2/desktop/events/poll`
+
+chrome-shell 下渲染器没有 IPC，只能靠 HTTP 轮询拿主进程事件。早先每个订阅各起一条定时器、各发一次请求（10 个订阅 = 10 份流量）；本节这套端点把同一窗口内所有订阅合并成一次请求。
+
+- **服务端**：`electron/desktopEventPoll.js` 的 `createDesktopEventPollHandler(routeTable, { onError })`，在 `createDesktopHttpBridgeHandlers` 的**最后**注册（它把整张路由表当数据源）。
+- **白名单**：快照 4 条（`app/update-state`、`screenshot|text-preset/get-global-shortcut-status`、`media-task/list`）+ 事件 6 条（`project/consume-external-open-requests`、`project/consume-package-progress-events`、`asset/consume-updates`、`notification/consume-generation-complete-clicks`、`screenshot/consume-global-capture-events`、`text-preset/consume-events`）。每请求最多 10 条，越界或含白名单外路径 → 500 `Invalid desktop event paths`。白名单存在是为了不把任意 bridge 路由变成轮询目标。
+- **节流与挂起**：事件路径 150ms 问一次、非空才回；快照路径 1000ms 问一次；整请求最长挂 1000ms，没变化也要回 `{updates:{},failed:[]}` 当心跳，避免前端一直等。
+- **revision**：快照用 `sha256(JSON)` 当 revision，与请求里的 `known[path]` 相同就不回值。事件路径不回 revision（消费语义本身就是一次性的）。
+- **失败隔离**：单路径异常只进 `failed` 并回调 `onError`（主进程记 `desktop_http_bridge.event_read_failed`），不连累同批其它路径 —— 否则一个坏接口会让所有订阅一起退避。
+- **取消**：`startDesktopHttpBridge` 给每个请求建 `AbortController`，响应 `close` 即 abort；`safeCall(handler, payload, { signal })` 把信号透传给处理器（目前只有挂起型处理器会用到）。
+- **客户端** `api/desktopEventPollApi.js`：同路径多订阅共用一次在途请求；`known` 带上次 revision；批量端点不存在时降级为逐路径快照，**只降一次** —— 注意 `apiBase.post` 把 HTTP 404 归一成 `{success:true,data:null}` 而不抛错，所以「拿回 null」与「抛 404」都要认；路径数超过 10 自动拆批；失败指数退避 1/2/4/8/10s。
+- **两端不变式**（`electron/desktopHttpBridge.test.js` 守）：`src/services/desktopBridge.js` 里每个 `chromeShellPoll('<path>')` 字面量的路径，必须同时「在服务端白名单」且「在 bridge 路由表里」。
+- **`web-preview/wait-events` 不在白名单**：它自带 `waitMs`、服务端挂起再回，属直连长轮询，走 `chromeShellPost(..., { waitMs: 1000 })`，不能塞进批量端点（塞进去会让整批被拒）。

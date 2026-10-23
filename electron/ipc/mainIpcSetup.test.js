@@ -59,7 +59,8 @@ test('buildMainIpcHandlerDeps exposes the capability operations the bridge requi
 
 test('the bridge route table is fully populated by buildMainIpcHandlerDeps', () => {
   const routes = createDesktopHttpBridgeHandlers(buildMainIpcHandlerDeps(stubContext()));
-  assert.equal(routes.size, 82);
+  assert.equal(routes.size, 83);
+  assert.equal(typeof routes.get('/api/v2/desktop/events/poll'), 'function');
   assert.equal(typeof routes.get('/api/v2/desktop/agent-information/read-url'), 'function');
   assert.equal(typeof routes.get('/api/v2/desktop/agent-skills/list'), 'function');
   assert.equal(typeof routes.get('/api/v2/desktop/agent-skills/delete-installed'), 'function');

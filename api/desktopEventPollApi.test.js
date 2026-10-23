@@ -133,3 +133,57 @@ test('desktopEventPoll: 中止后立即以 AbortError 拒绝，也不再发请�
   await timerHost.runAll();
   assert.equal(batches.length, 0, '中止发生在第一次请求之前，不该产生请求');
 });
+
+test('desktopEventPoll: 批量接口拿回 null（HTTP 404 被归一成空体）时同样降级为逐路径快照', async () => {
+  // 仓库的 apiBase.post 对 404 返回 {success:true,data:null}，不会抛错；
+  // 若只认「抛出的 404」，后端没有批量端点时所有订阅会一起退避到死。
+  const timerHost = createTimerHost();
+  let batchAttempts = 0;
+  const snapshots = [];
+  const client = createDesktopEventPollClient({
+    timerHost: timerHost,
+    requestBatch: async () => {
+      batchAttempts += 1;
+      return null;
+    },
+    requestSnapshot: async (path) => {
+      snapshots.push(path);
+      return ['fallback'];
+    },
+  });
+  const first = client.read('/a');
+  await timerHost.runAll();
+  assert.deepEqual(await first, ['fallback'], '拿回 null 要走降级路径');
+  assert.equal(batchAttempts, 1);
+
+  const second = client.read('/b');
+  await timerHost.runAll();
+  assert.deepEqual(await second, ['fallback']);
+  assert.equal(batchAttempts, 1, '降级只发生一次');
+  assert.deepEqual(snapshots, ['/a', '/b']);
+});
+
+test('desktopEventPoll: 路径数超过单批上限时拆成多批，不让一条越界路径拖垮全部订阅', async () => {
+  const timerHost = createTimerHost();
+  const batches = [];
+  const client = createDesktopEventPollClient({
+    timerHost: timerHost,
+    requestBatch: async (payload) => {
+      batches.push(payload.paths);
+      return {
+        updates: Object.fromEntries(payload.paths.map((path) => [path, { value: [path] }])),
+        failed: [],
+      };
+    },
+  });
+  const paths = Array.from({ length: 12 }, (_, index) => '/path-' + String(index));
+  const pendings = paths.map((path) => client.read(path));
+  await timerHost.runAll();
+  const values = await Promise.all(pendings);
+  assert.deepEqual(values, paths.map((path) => [path]));
+  assert.deepEqual(
+    batches.map((batch) => batch.length),
+    [10, 2],
+    '服务端上限 10 条/批',
+  );
+});

@@ -566,8 +566,12 @@ export const desktopBridge = {
       chromeShellPost('/api/v2/desktop/web-preview/control-view', args28[0]),
     onEvent: (value28) =>
       desktopBridge.webPreview.api?.onEvent?.(value28) ||
+      // wait-events 自带 waitMs（服务端挂起 1s 再回），是直连长轮询，不走批量事件端点。
       subscribeByLongPolling(
-        (signal) => chromeShellPoll('/api/v2/desktop/web-preview/wait-events', signal),
+        () =>
+          chromeShellPost('/api/v2/desktop/web-preview/wait-events', {
+            waitMs: 1000,
+          }),
         value28,
       ),
   },
@@ -1013,7 +1017,10 @@ export function installDesktopBridgeCompat() {
         controlView: (value81) => chromeShellPost('/api/v2/desktop/web-preview/control-view', value81),
         onEvent: (value82) =>
           subscribeByLongPolling(
-            (signal) => chromeShellPoll('/api/v2/desktop/web-preview/wait-events', signal),
+            () =>
+              chromeShellPost('/api/v2/desktop/web-preview/wait-events', {
+                waitMs: 1000,
+              }),
             value82,
           ),
       },

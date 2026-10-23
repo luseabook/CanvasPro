@@ -15,6 +15,9 @@
  * 因此单测不需要真实定时器或网络。
  */
 const MAX_BACKOFF_MS = 10000;
+// 服务端一次最多接 10 条路径（白名单 + 批量上限），超了整批会被拒。
+// 拆批而不是报错：多一个订阅就把所有订阅一起打死是最坏的失效方式。
+const MAX_BATCH_PATHS = 10;
 
 function createAbortError() {
   return Object.assign(new Error('Desktop event subscription stopped'), { name: 'AbortError' });
@@ -46,11 +49,16 @@ export function createDesktopEventPollClient({
     batchRetryAt = 0,
     batchUnsupported = false;
 
-  async function requestPaths(paths) {
-    // 先试批量接口；404 说明这个后端版本没有批量端点，降级为逐路径快照并记住。
+  async function requestPaths(request) {
+    // 先试批量接口；后端没有这个端点时降级为逐路径快照，并且只降一次。
     if (!batchUnsupported) {
       try {
-        return await requestBatch(paths);
+        const response = await requestBatch(request);
+        if (response) return response;
+        // 仓库里的 post 把 HTTP 404 归一成 {success:true, data:null}，不抛错 ——
+        // 所以「拿回 null」同样意味着后端没有批量端点。
+        if (typeof requestSnapshot !== 'function') return { updates: {}, failed: request.paths.slice() };
+        batchUnsupported = true;
       } catch (error) {
         if (error?.status !== 404 || typeof requestSnapshot !== 'function') throw error;
         batchUnsupported = true;
@@ -60,7 +68,7 @@ export function createDesktopEventPollClient({
     const updates = {},
       failed = [];
     await Promise.all(
-      paths.paths.map(async (path) => {
+      request.paths.map(async (path) => {
         try {
           updates[path] = { value: await requestSnapshot(path) };
         } catch {
@@ -69,6 +77,14 @@ export function createDesktopEventPollClient({
       })
     );
     return { updates, failed };
+  }
+
+  function chunkPaths(paths) {
+    if (paths.length <= MAX_BATCH_PATHS) return [paths];
+    const chunks = [];
+    for (let index = 0; index < paths.length; index += MAX_BATCH_PATHS)
+      chunks.push(paths.slice(index, index + MAX_BATCH_PATHS));
+    return chunks;
   }
 
   function schedule() {
@@ -97,21 +113,23 @@ export function createDesktopEventPollClient({
     ((inflight = true), (batchRetryAt = now() + minimumIntervalMs), (inflightBatch = due));
     for (const path of due.keys()) waiting.delete(path);
     try {
-      const response = await requestPaths({
-        paths: [...due.keys()],
-        known: Object.fromEntries(
-          [...due.keys()]
-            .filter((path) => cache.has(path))
-            .map((path) => [path, cache.get(path).revision])
-        ),
-      });
-      if (
-        !response?.updates ||
-        typeof response.updates !== 'object' ||
-        Array.isArray(response.updates) ||
-        !Array.isArray(response.failed)
-      )
-        throw new Error('Invalid desktop event response');
+      const requested = [...due.keys()],
+        knownFor = (chunk) =>
+          Object.fromEntries(
+            chunk.filter((path) => cache.has(path)).map((path) => [path, cache.get(path).revision])
+          ),
+        response = { updates: {}, failed: [] };
+      for (const chunk of chunkPaths(requested)) {
+        const part = await requestPaths({ paths: chunk, known: knownFor(chunk) });
+        if (
+          !part?.updates ||
+          typeof part.updates !== 'object' ||
+          Array.isArray(part.updates) ||
+          !Array.isArray(part.failed)
+        )
+          throw new Error('Invalid desktop event response');
+        (Object.assign(response.updates, part.updates), response.failed.push(...part.failed));
+      }
       for (const [path, pending] of due) {
         if (response.failed.includes(path)) {
           const count = (pathFailures.get(path)?.count || 0) + 1;
