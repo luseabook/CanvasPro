@@ -178,11 +178,12 @@ test('shows the error immediately with its message', () => {
   const created = [];
   const root = makeRoot(created);
   const lifecycle = createWorkspacePersistencePresentation({ getRoot: () => root });
-  lifecycle.update({ status: 'error', error: 'boom' });
+  // 真实会过来的就是这种技术原文；用户不该看到 ENOSPC。
+  lifecycle.update({ status: 'error', error: 'ENOSPC: no space left on device, write' });
   const [container, spinner, text] = created;
   assert.equal(container.hidden, false);
   assert.equal(container.attributes['data-state'], 'error');
-  assert.equal(text.textContent, '尚未保存：boom');
+  assert.equal(text.textContent, '尚未保存：保存位置的磁盘空间不足，请腾出空间后重试。');
   assert.equal(spinner.hidden, true);
 });
 
@@ -202,13 +203,13 @@ test('announces a retry with the previous error attached', () => {
   const created = [];
   const root = makeRoot(created);
   const lifecycle = createWorkspacePersistencePresentation({ getRoot: () => root });
-  lifecycle.update({ status: 'error', error: 'boom' });
+  lifecycle.update({ status: 'error', error: 'EACCES: permission denied, open app.json' });
   lifecycle.update({ status: 'saving', retryAttempt: 2 });
   const [container, spinner, text] = created;
   assert.equal(container.hidden, false);
   assert.equal(container.attributes['data-state'], 'error');
   assert.equal(spinner.hidden, false);
-  assert.equal(text.textContent, '保存失败，正在重试：boom');
+  assert.equal(text.textContent, '保存失败，正在重试：保存目录无法写入，请检查目录权限。');
 });
 
 test('announces a retry even without a stored error', () => {
@@ -223,11 +224,11 @@ test('keeps warning about an unsaved change while pending', () => {
   const created = [];
   const root = makeRoot(created);
   const lifecycle = createWorkspacePersistencePresentation({ getRoot: () => root });
-  lifecycle.update({ status: 'error', error: 'boom' });
+  lifecycle.update({ status: 'error', error: '项目目录不可用' });
   lifecycle.update({ status: 'pending', retryAttempt: 1 });
   const [container, , text] = created;
   assert.equal(container.hidden, false);
-  assert.equal(text.textContent, '尚未保存，将自动重试：boom');
+  assert.equal(text.textContent, '尚未保存，将自动重试：项目目录不可用', '已是中文的提示不能被二次包装');
 });
 
 test('falls back to the idle text for pending and idle', () => {
@@ -310,4 +311,17 @@ test('a reveal scheduled before destroy never fires', () => {
   lifecycle.destroy();
   assert.doesNotThrow(() => entry.fn());
   assert.equal(container.hidden, true);
+});
+
+test('maps unrecognised technical errors to the generic save message', () => {
+  const created = [];
+  const root = makeRoot(created);
+  const lifecycle = createWorkspacePersistencePresentation({ getRoot: () => root });
+  lifecycle.update({ status: 'error', error: 'unexpected token < in JSON at position 0' });
+  const [, , text] = created;
+  assert.equal(
+    text.textContent,
+    '尚未保存：项目保存未完成，当前修改仍在窗口中，请稍后重试。',
+    '内部报错细节不该原样抛给用户'
+  );
 });

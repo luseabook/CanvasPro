@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（216 批·**保存失败文案**）：`workspacePersistencePresentation.js` 补 `presentSaveError`——磁盘满/权限/中文透传/兜底四路映射，状态条不再直接显示 `ENOSPC: no space left on device` 这类技术原文。测试 17→18（3 例改断言到新契约 + 1 例兜底）。模块级缺口 33→32，全量 **11511/11511/0**。另：`createTaskHistoryNotice` 查明消费方 `TaskCenterManager.js` 在仓库不存在 → 归整块升代。
 - 2026-10-23（215 批·**生成按钮图标去抖**）：`previewGenerateButtonUi.js` 补 `setGenerateButtonIcon`——图标字符串相同时**不重写 `innerHTML`**。原因是重写会重建子树，带 CSS 动画的加载圈每次状态刷新都从 0 度重来（按钮「一顿一顿」）。3 处落点改用它。测试 3 例，模块级缺口 34→33，全量 **11510/11510/0**。另：分诊表补三条复查结论（3 个候选经核定为高风险/整块缺失/上游死代码）。
-- 2026-10-23（214 批·**智能剪辑状态重试**）：`smartClipJobService.js` 补 `waitForStatusPoll`，并补上仓库**整段缺失**的状态查询重试——`TIMEOUT`/`NETWORK_ERROR` 重试 3 次（原逻辑一次抖动就把整条剪辑判死）。`SmartClipJobError` 支持 `cause`（原先丢根因）；补 i18n 键 `videoClip.errors.progressUnavailable`（中/英）。测试 6→9，模块级缺口 35→34，全量 **11507/11507/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

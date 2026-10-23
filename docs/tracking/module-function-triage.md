@@ -28,7 +28,7 @@
 | `sanitizeAutoHiddenProviders` / `sanitizeProviderVisibility` | `core/stores/modelMenuPreferenceStore.js` | 1 / 1 | 模型菜单隐藏项清洗 |
 | `resolveScaleConstraint` / `scalePositionAroundPivotAxes` | `modules/interaction/PanoramaSceneInteraction.js` | 1 / 1 | 全景场景缩放约束 |
 | `preloadProviderIconAssets` | `modules/providerIconLod.js` | 1 | Provider 图标预加载 |
-| `presentSaveError` | `modules/workspacePersistencePresentation.js` | 1 | 保存失败提示 |
+| ~~`presentSaveError`~~ **已补 216 批** | `modules/workspacePersistencePresentation.js` | 1 | 已实现：磁盘满/权限/中文透传/兜底四路映射，技术原文不再直接抛给用户 |
 
 ## B. 等价，不补（上游改了名/拆了函数，仓库已有同逻辑）
 

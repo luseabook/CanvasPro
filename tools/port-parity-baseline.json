@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 33,
+  "moduleFunctionTotal": 32,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -201,9 +201,6 @@
     ],
     "src/modules/taskCenterListView.js": [
       "createTaskHistoryNotice"
-    ],
-    "src/modules/workspacePersistencePresentation.js": [
-      "presentSaveError"
     ]
   },
   "danglingCalls": []
