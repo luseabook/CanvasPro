@@ -1533,6 +1533,7 @@ const enUS = Object.freeze({
       cutEndpointMissing: 'Backend endpoint missing: /api/v2/video/cut (restart server.py)',
       startFailed: 'Failed to start',
       startMissingJobId: 'Failed to start: missing jobId',
+      progressUnavailable: 'Unable to read clip progress. Try again.',
       exitedClipMode: 'Exited trim mode',
       smartClipFailed: 'Smart clip failed',
       sourceNodeMissing: 'Source node not found',

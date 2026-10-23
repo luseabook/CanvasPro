@@ -1337,6 +1337,7 @@ const zhCN = Object.freeze({
       smartClipFailed: '智能剪辑失败',
       sourceNodeMissing: '找不到原节点',
       cutFailed: '视频裁剪失败',
+      progressUnavailable: '无法获取剪辑进度，请稍后重试',
     }),
     smartClip: Object.freeze({
       stages: Object.freeze({

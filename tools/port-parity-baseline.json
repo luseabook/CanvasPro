@@ -1,7 +1,7 @@
 {
   "mirror": "shuo-deobf-089",
   "totalMissing": 69,
-  "moduleFunctionTotal": 35,
+  "moduleFunctionTotal": 34,
   "files": {
     "src/modules/interaction/PanoramaSceneInteraction.js": [
       "_applyFlyNavigationStep",
@@ -207,9 +207,6 @@
     ],
     "src/modules/workspacePersistencePresentation.js": [
       "presentSaveError"
-    ],
-    "src/services/smartClipJobService.js": [
-      "waitForStatusPoll"
     ]
   },
   "danglingCalls": []

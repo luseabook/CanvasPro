@@ -1,4 +1,5 @@
 import { requester } from '../../api/requester.js';
+import { t } from '../i18n/index.js';
 export const SMART_CLIP_MIN_SEGMENTS = 2;
 export const SMART_CLIP_MAX_SEGMENTS = 25;
 export const SMART_CLIP_DEFAULT_SEGMENTS = 20;
@@ -11,13 +12,18 @@ export const SMART_CLIP_OUTPUT_MODE_ANALYSIS = 'analysis';
 export const SMART_CLIP_DEFAULT_OUTPUT_MODE = SMART_CLIP_OUTPUT_MODE_SEGMENTS;
 export const SMART_CLIP_KEYFRAME_SELECTION_POLICY_PERSON = 'person';
 const SMART_CLIP_MODE_OPTIONS = Object.freeze(['stable', 'balanced', 'sensitive']),
-  SMART_CLIP_STATUS_POLL_INTERVAL_MS = 800;
+  SMART_CLIP_STATUS_POLL_INTERVAL_MS = 800,
+  SMART_CLIP_STATUS_RETRY_LIMIT = 3;
 function toErrorMessage(error, value) {
   return String(error?.message || error || value || 'Smart clip failed');
 }
 export class SmartClipJobError extends Error {
-  constructor(item, { code: code = 'smart_clip_failed', stage: stage = 'unknown', jobId: jobId = '' } = {}) {
-    (super(String(item || 'Smart clip failed')),
+  constructor(
+    item,
+    { code: code = 'smart_clip_failed', stage: stage = 'unknown', jobId: jobId = '', cause: cause } = {},
+  ) {
+    // 带上 cause：取消/失败时能看出根因是 abort 还是上游请求错误，否则只剩一句笼统文案。
+    (super(String(item || 'Smart clip failed'), { cause: cause }),
       (this.name = 'SmartClipJobError'),
       (this.code = code),
       (this.stage = stage),
@@ -117,6 +123,26 @@ function readResponseData(value3) {
     return value3.data;
   return value3;
 }
+/**
+ * 等待一次轮询间隔，并把「中止」统一翻译成取消错误。
+ *
+ * 两处轮询都要这段逻辑（正常等待、超时重试）；直接内联会导致取消时的错误形状
+ * 不一致，上层判断 `code === 'cancelled'` 就会漏。
+ */
+async function waitForStatusPoll(waitFn, intervalMs, signal, jobId) {
+  try {
+    await waitFn(intervalMs, signal);
+  } catch (error) {
+    if (signal?.aborted || error?.code === 'cancelled')
+      throw new SmartClipJobError('Smart clip cancelled', {
+        code: 'cancelled',
+        stage: 'cancelled',
+        jobId: jobId,
+        cause: error,
+      });
+    throw error;
+  }
+}
 export async function runSmartClipJob({
   src: src,
   options: options3,
@@ -170,6 +196,7 @@ export async function runSmartClipJob({
       code: 'missing_job_id',
       stage: 'start',
     });
+  let statusRetries = 0;
   for (;;) {
     throwIfCancelled(signal, shouldContinue, jobId3);
     let request2;
@@ -188,11 +215,28 @@ export async function runSmartClipJob({
           code: 'cancelled',
           stage: 'cancelled',
           jobId: jobId3,
+          cause: value5,
+        });
+      // 状态查询偶发超时/断网不该直接判死：剪辑任务在后端还在跑，等一会儿再问。
+      const transient = ['TIMEOUT', 'NETWORK_ERROR'].includes(value5?.type || value5?.code);
+      if (transient && ++statusRetries <= SMART_CLIP_STATUS_RETRY_LIMIT) {
+        (throwIfCancelled(signal, shouldContinue, jobId3),
+          await waitForStatusPoll(wait, pollIntervalMs, signal, jobId3));
+        continue;
+      }
+      // 重试用尽才报「进度不可用」，并带上根因，避免把网络抖动说成任务失败。
+      if (transient)
+        throw new SmartClipJobError(t('videoClip.errors.progressUnavailable'), {
+          code: 'status_unavailable',
+          stage: 'status',
+          jobId: jobId3,
+          cause: value5,
         });
       throw new SmartClipJobError(toErrorMessage(value5, 'Smart clip status failed'), {
         code: 'status_failed',
         stage: 'status',
         jobId: jobId3,
+        cause: value5,
       });
     }
     const job = readResponseData(request2) || {};
@@ -220,16 +264,6 @@ export async function runSmartClipJob({
         segments: Array.isArray(job.segments) ? job.segments : [],
         job: job,
       };
-    try {
-      await wait(pollIntervalMs, signal);
-    } catch (value6) {
-      if (signal?.aborted || value6?.code === 'cancelled')
-        throw new SmartClipJobError('Smart clip cancelled', {
-          code: 'cancelled',
-          stage: 'cancelled',
-          jobId: jobId3,
-        });
-      throw value6;
-    }
+    await waitForStatusPoll(wait, pollIntervalMs, signal, jobId3);
   }
 }

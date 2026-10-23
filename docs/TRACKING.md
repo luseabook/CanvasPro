@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（214 批·**智能剪辑状态重试**）：`smartClipJobService.js` 补 `waitForStatusPoll`，并补上仓库**整段缺失**的状态查询重试——`TIMEOUT`/`NETWORK_ERROR` 重试 3 次（原逻辑一次抖动就把整条剪辑判死）。`SmartClipJobError` 支持 `cause`（原先丢根因）；补 i18n 键 `videoClip.errors.progressUnavailable`（中/英）。测试 6→9，模块级缺口 35→34，全量 **11507/11507/0**。
 - 2026-10-23（213 批·**协作聊天手打 @提及**）：`collaborationChat.js` 补 `mentionPattern`（转义元字符 + `(?![\p{L}\p{N}_])` 边界）与 `resolveMentionIds`，接到输入框 `input` 与下拉点选两处。原先只有从下拉点选才算提及，**手打 `@名字` 直接回车会丢提醒**。测试 5 例，模块级缺口 36→35，全量 **11504/11504/0**。
-- 2026-10-23（212 批·**chrome-shell 事件轮询**）：新增 `api/desktopEventPollApi.js`（合并请求、404 降级快照、指数退避、AbortController），`desktopBridge` 加 `chromeShellPoll`，三个订阅辅助改**长轮询**（去掉每订阅一条定时器），20 处订阅首参换成 `chromeShellPoll(path, signal)`。两类直调（`storage-migration/read`、`node-export/open-jianying`）**回退为 POST**——改成轮询会永久挂起。测试 5 例，缺口 37→36，全量 **11499/11499/0**。⚠ 需真机。
 
 
 ## 12. 变更记录机制（**已冻结**）

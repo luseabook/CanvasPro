@@ -125,3 +125,65 @@ test('smartClipJobService: cancelled and failed jobs surface typed failures', as
     (error) => error.code === 'job_failed' && error.stage === 'render' && /boom/.test(error.message),
   );
 });
+
+test('smartClipJobService: 状态查询偶发超时会重试，不直接判死任务', async () => {
+  let statusCalls = 0;
+  const request = async (options) => {
+    if (options.url.includes('/status')) {
+      statusCalls += 1;
+      // 前两次按「超时」抛，第三次才拿到真实状态。
+      if (statusCalls <= 2) throw Object.assign(new Error('timeout'), { type: 'TIMEOUT' });
+      return { status: 200, data: { success: true, status: 'done', segments: [{ start: 0 }] } };
+    }
+    return { status: 200, data: { success: true, jobId: 'job/1' } };
+  };
+  const result = await runSmartClipJob({
+    src: 'video.mp4',
+    request,
+    wait: async () => {},
+  });
+  assert.equal(result.jobId, 'job/1', '重试后应正常完成，而不是报失败');
+  assert.equal(statusCalls, 3);
+});
+
+test('smartClipJobService: 重试用尽后报 status_unavailable，并保留根因', async () => {
+  let statusCalls = 0;
+  const timeout = () => Object.assign(new Error('network down'), { type: 'NETWORK_ERROR' });
+  const request = async (options) => {
+    if (options.url.includes('/status')) {
+      statusCalls += 1;
+      throw timeout();
+    }
+    return { status: 200, data: { success: true, jobId: 'job/1' } };
+  };
+  await assert.rejects(
+    runSmartClipJob({ src: 'video.mp4', request, wait: async () => {} }),
+    (error) => {
+      assert.equal(error.code, 'status_unavailable', '网络抖动不能伪装成任务失败');
+      assert.equal(error.stage, 'status');
+      assert.equal(error.cause?.message, 'network down', '根因要保留，否则排查时只剩一句文案');
+      return true;
+    },
+  );
+  assert.equal(statusCalls, 4, '首次 + 3 次重试');
+});
+
+test('smartClipJobService: 取消时把中止翻译成 cancelled 并带上根因', async () => {
+  const controller = new AbortController();
+  const request = async (options) => {
+    if (options.url.includes('/status')) {
+      controller.abort();
+      throw Object.assign(new Error('aborted'), { name: 'AbortError' });
+    }
+    return { status: 200, data: { success: true, jobId: 'job/1' } };
+  };
+  await assert.rejects(
+    runSmartClipJob({ src: 'video.mp4', request, wait: async () => {}, signal: controller.signal }),
+    (error) => {
+      assert.equal(error.code, 'cancelled');
+      assert.equal(error.stage, 'cancelled');
+      assert.equal(error.cause?.name, 'AbortError');
+      return true;
+    },
+  );
+});

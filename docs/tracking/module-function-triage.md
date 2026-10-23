@@ -20,7 +20,7 @@
 | `getMascotTipText` | `modules/MascotManager.js` | 3 | 吉祥物提示文案 |
 | `setGenerateButtonIcon` | `modules/previewGenerateButtonUi.js` | 3 | 生成按钮图标切换 |
 | `formatShortcutBinding` | `modules/MascotManager.js` | 2 | 快捷键展示文案 |
-| `waitForStatusPoll` | `services/smartClipJobService.js` | 2 | 智能剪辑任务状态轮询 |
+| ~~`waitForStatusPoll`~~ **已补 214 批** | `services/smartClipJobService.js` | 2 | 已实现：中止统一翻译为 cancelled + 状态查询超时/断网**重试 3 次**（原仓库无重试，抖动直接判死） |
 | `getPersonReplacementSourceProcessingMessage` | `modules/personReplacement/personReplacementProjectSession.js` | 1（+1 外部） | 素材处理中的进度提示 |
 | `getPersonReplacementSourceProcessingProgress` | 同上 | 0（+1 外部） | 进程百分比 |
 | `getFixedSlotLabelText` / `getRefSourceDisplayStateKey` | `components/video-node/referenceInputModule.js` | 1 / 1 | 固定参考槽标签、来源展示态 key |
