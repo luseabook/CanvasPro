@@ -369,8 +369,8 @@ node tools/tracking/track.mjs --status
 - **更细的说明**见 `docs/tracking/project-map.md`：进程关系、节点系统、持久化、Electron、Python 路由与安全模型，以及「按需求找代码」表。
 
 ## 11. 会话日志（最新在上；挤出的最旧条目移入 `docs/tracking/log-archive.md`）
+- 2026-10-23（220 批·**provider 图标预热**）：`providerIconLod` 补 `preloadProviderIconAssets`/`resetProviderIconPreloadForTests`，在 `installProviderIconLodController` 里调用——四个小 PNG 高优先级预热，低缩放反复摘挂 src 不再重新解码。**纠正 215 批分诊错误**：「上游也没有消费方」是跨文件 grep 假阴性，上游系同文件内调用、仓库 `appViewport.js` 已消费该控制器。`modelMenuPreferenceStore` 两个清洗函数确认属整块升代（缺 `modelProviderVisibilityControl.js`）。缺口 28→26，全量 **11545/11545/0**。
 - 2026-10-23（219 批·**吉祥物提示跟随键位 + 连线策略**）：`MascotManager` 40 条提示把键位写死在文案里（换预设/改快捷键就在教错按键）——补 `getMascotTipText`/`formatShortcutBinding` 与两张动作表，键位改为运行时从 `shortcuts.js` 取，并订阅 `shortcuts-updated` 重算，两语种文案同步换成占位符版。`registry` 补 `canCreateConnectedNode`/`getRegisteredConnectionDecision`（`registerNode` 第三参数此前被整体忽略），`EdgeController` 三处接线：连线裁决先问注册策略、两处「连线建节点」菜单加闸。模块级缺口 32→28，全量 **11539/11539/0**。
-- 2026-10-23（218 批·**真机验收 + 修 215 去抖**）：真机跑通 7 项（启动/无 pageerror/209 下拉 select 与双向同步/213 提及边界/215 去抖/217 应用自己的 bridge 上批量轮询）。**验收抓到 215 的真 bug**：`setGenerateButtonIcon` 拿 `innerHTML` 跟源字符串比，浏览器序列化后永远不等 → 去抖等于没做；改按 `<template>` 规范化后比较，并补模拟序列化的单测。桌面 e2e 原先 1 条长期红（手动更新失败早已改走 banner、`showToast` 不带 type）→ 断言对齐当前契约后 4/4 绿。台账 `docs/tracking/runtime-acceptance.md`。全量 **11524/11524/0**。
 
 
 ## 12. 变更记录机制（**已冻结**）

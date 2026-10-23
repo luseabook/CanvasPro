@@ -65,3 +65,13 @@
 | `hasSharedCanvasImageAcquisition`（5 处） | 语义清楚（共享画布正在取图时本节点不重复加载），但仓库**完全没有共享获取这套机制**，`_assignImageDisplaySource` 是唯一出图路径。守卫判错 = 图片不显示，**必须真机验证**才能做，暂缓 |
 | `sanitizeProviderVisibility` / `sanitizeAutoHiddenProviders` | 不是两个函数的事：`modelMenuPreferenceStore` 仓库 55 行 vs 上游 138 行，**provider 可见性/自动隐藏整块功能缺失**。单补会是死代码，应作整块升代 |
 | `preloadProviderIconAssets` / `resetProviderIconPreloadForTests` | **上游自己也没有任何消费方**（全镜像 grep 为空）。属「上游遗留的未接线导出」，不建议补 |
+
+## 复查记录（219–220 批）
+
+| 条目 | 结论 |
+|---|---|
+| `canCreateConnectedNode` / `getRegisteredConnectionDecision` | **219 批已补**。原表判「消费方从不调用」是错的：`EdgeController.js` 仓库 3184 行 vs 上游 3196 行，只差 12 行——`isValidConnection` 与两处「连线建节点」菜单的接线缺了，而且 `registerNode` 的第三参数被整个忽略，节点类型根本无法声明策略。补函数 + 三处接线 +13/-1。目前 `registerNode` 无调用方（唯一调用方 `learning-route/routeCanvasEntry.js` 整块未移植），策略表恒空 → 守卫走默认放行 |
+| `getMascotTipText` / `formatShortcutBinding` | **219 批已补**。原表只当「文案工具」，实际是**键位写死在文案里**的坑：换预设/改快捷键后提示一直教错按键。两语种 40 条文案同步换成占位符版 |
+| `preloadProviderIconAssets` / `resetProviderIconPreloadForTests` | **220 批已补，且修正上表错误**：先前判「上游也没有消费方」是 grep 姿势错的——上游是在**同文件内**调用（`installProviderIconLodController` 里 `preloadProviderIconAssets()`），跨文件 grep 看不见。仓库 `appViewport.js` 已消费该控制器，所以这是活线。**教训：判「上游有没有消费方」必须连定义文件自己一起搜** |
+| `sanitizeProviderVisibility` / `sanitizeAutoHiddenProviders` | 维持 C 类（整块升代）。整块 = `modelMenuPreferenceStore` 升级 + `modelMenuVisibility.js`/`modelCredentialUi.js`/`apiSettings.js` 三处消费 + **新建** `settings/modelProviderVisibilityControl.js`（仓库缺件）。单补两个清洗函数仍是死代码 |
+| 上游 `dehydrateProviderIcon` 语义漂移 | 0.8.9 的 `dehydrateProviderIcon` 实际是**恢复**（把 dataset 里的 src 写回去、删 dataset、摘占位类），与函数名和 `shouldDehydrateProviderIcon` 的调用语义相反。推测是「四个图标太小 + 已预热 → 不再需要卸载」的取舍。220 批**没有跟进这个漂移**：只补预热，`dehydrate/hydrate` 保持仓库原语义，避免把低缩放下的行为一起翻掉 |

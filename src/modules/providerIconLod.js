@@ -4,6 +4,16 @@ import {
   isNodePromotedForFullImage,
 } from './canvasImageLod.js';
 const PROVIDER_ICON_RE = /^images\/(?:RH|jimeng|grsai|ppio)\.png(?:[?#].*)?$/i,
+  // 四个 provider 图标都是小 PNG，低缩放下反复摘挂 `<img src>` 会让它们每次都重新解码。
+  // 安装 LOD 控制器时先把这几张图塞进浏览器缓存，之后无论摘挂都能立即出图。
+  PROVIDER_ICON_PRELOAD_URLS = Object.freeze([
+    'images/RH.png',
+    'images/jimeng.png',
+    'images/grsai.png',
+    'images/ppio.png',
+  ]),
+  // 已预热的 url → Image 实例。持有引用是为了不让 GC 把它们回收掉（否则缓存也一起没了）。
+  providerIconPreloadImages = new Map(),
   PROVIDER_ICON_SELECTOR = [
     '#v2-canvas .v2-node .img-model-pills img',
     '#v2-canvas .v2-node .img-model-menu img',
@@ -154,6 +164,48 @@ function shouldDehydrateProviderIcon(el6, { store: store2, documentRef: document
 export function isProviderLogoSrc(state) {
   return PROVIDER_ICON_RE.test(normalizeIconSrc(state));
 }
+/**
+ * 预热 provider 图标，返回本次真正新建的请求数（已热过的跳过）。
+ *
+ * 用 `new Image()` 而不是 `<link rel=preload>`：这些图标是页面里 `<img>` 的 src，
+ * 同一份 URL 才能命中同一份缓存。`imageFactory` 只为测试注入。
+ */
+export function preloadProviderIconAssets({ imageFactory: imageFactory = null } = {}) {
+  const createImage =
+    typeof imageFactory === 'function'
+      ? imageFactory
+      : () => {
+          const ImageCtor = globalThis.Image;
+          return typeof ImageCtor === 'function' ? new ImageCtor() : null;
+        };
+  let started = 0;
+  for (const url of PROVIDER_ICON_PRELOAD_URLS) {
+    const key = normalizeIconSrc(url);
+    if (!key || providerIconPreloadImages.has(key)) continue;
+    let image;
+    try {
+      image = createImage(url);
+      if (!image) continue;
+      image.decoding = 'async';
+      image.loading = 'eager';
+      image.fetchPriority = 'high';
+      image.src = url;
+      // decode() 可能不存在（老 WebView）或 reject（图挂了），都不该冒泡。
+      image.decode?.()?.catch?.(() => {});
+    } catch {
+      continue;
+    }
+    providerIconPreloadImages.set(key, image);
+    started += 1;
+  }
+  return started;
+}
+/**
+ * 清空预热记录。测试用：模块级 Map 会跨用例残留，不清就测不到「重复调用不再新建」。
+ */
+export function resetProviderIconPreloadForTests() {
+  providerIconPreloadImages.clear();
+}
 export function dehydrateProviderIcon(el7) {
   if (!el7 || !isProviderIconImage(el7)) return false;
   const config = String(el7.getAttribute?.('src') || '').trim();
@@ -191,6 +243,8 @@ export function installProviderIconLodController({ rootEl: rootEl = null, store:
   const documentRef3 = getDocumentRef(rootEl),
     rootEl2 = rootEl || documentRef3?.getElementById?.('v2-canvas') || documentRef3;
   let scheduleFrame2 = null;
+  // 画布挂载时顺手把四个 provider 图标预热一次（幂等，重复安装只会命中已热过的 key）。
+  preloadProviderIconAssets();
   const scheduleSync = () => {
       if (scheduleFrame2 !== null) return;
       scheduleFrame2 = scheduleFrame(() => {
